@@ -31,6 +31,7 @@ class NavigationDrawerListItem extends PureComponent {
                     numberOfLines={1}
                     leftElement={<Icon name={this.props.name} />}
                     centerElement={this.props.label}
+                    hideChevron={false}
                 />
             </View>
         );
@@ -44,8 +45,6 @@ class NavigationDrawerListItem extends PureComponent {
 const style = StyleSheet.create({
     container: {
         width: '100%',
-        justifyContent: 'center',
-        alignItems: 'center'
     },
     textInput: {
         borderColor: 'red',

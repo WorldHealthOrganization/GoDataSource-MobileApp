@@ -56,7 +56,18 @@ export default class App {
                     },
                     appStyle: {
                         orientation: 'portrait'
-                    }
+                    },
+                    drawer: {
+                        left: {
+                            screen: 'NavigationDrawer',
+                            fixedWidth: 250
+                        },
+                        style: {
+                            drawerShadow: false,
+                            contentOverlayColor: 'rgba(0,0,0,0.25)',
+                        }
+                    },
+                    animationType: 'slide-down'
                 });
                 break;
             default:

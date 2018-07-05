@@ -44,7 +44,10 @@ class FollowUpsScreen extends Component {
 // Create style outside the class, or for components that will be used by other components (buttons),
 // make a global style in the config directory
 const style = StyleSheet.create({
-
+    container: {
+        flex: 1,
+        backgroundColor: styles.screenBackgroundGrey
+    }
 });
 
 export default FollowUpsScreen;
