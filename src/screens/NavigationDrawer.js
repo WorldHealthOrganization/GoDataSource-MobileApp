@@ -48,7 +48,8 @@ class NavigationDrawer extends Component {
 const style = StyleSheet.create({
     container: {
         flex: 1,
-        marginLeft: 15
+        width: '100%',
+        backgroundColor: 'white'
     },
     textInput: {
         borderColor: 'red',

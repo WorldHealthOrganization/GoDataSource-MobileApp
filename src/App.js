@@ -11,6 +11,7 @@ import appActions from './actions';
 import {appInitialized} from './actions/app';
 import { registerScreens } from './screens';
 import config from './utils/config';
+import Modal from 'react-native-root-modal';
 
 console.disableYellowBox = true;
 
@@ -60,7 +61,6 @@ export default class App {
                     drawer: {
                         left: {
                             screen: 'NavigationDrawer',
-                            fixedWidth: 250
                         },
                         style: {
                             drawerShadow: false,

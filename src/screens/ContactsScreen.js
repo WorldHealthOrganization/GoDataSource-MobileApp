@@ -1,8 +1,5 @@
 /**
- * Created by florinpopa on 04/07/2018.
- */
-/**
- * Created by florinpopa on 14/06/2018.
+ * Created by florinpopa on 18/07/2018.
  */
 import React, {Component} from 'react';
 import {TextInput, View, Text, StyleSheet, Platform, Dimensions} from 'react-native';
@@ -21,7 +18,7 @@ import ButtonWithIcons from './../components/ButtonWithIcons';
 let height = Dimensions.get('window').height;
 let width = Dimensions.get('window').width;
 
-class FollowUpsScreen extends Component {
+class ContactsScreen extends Component {
 
     static navigatorStyle = {
         navBarHidden: true
@@ -90,4 +87,4 @@ const style = StyleSheet.create({
     }
 });
 
-export default FollowUpsScreen;
+export default ContactsScreen;

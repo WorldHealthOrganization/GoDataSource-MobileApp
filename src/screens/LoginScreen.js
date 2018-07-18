@@ -75,7 +75,7 @@ class LoginScreen extends Component {
     handleLogin = () => {
         console.log("handleLogin");
         this.props.loginUser({
-            email: this.state.email,
+            email: this.state.email.toLowerCase(),
             password: this.state.password
         });
     };
