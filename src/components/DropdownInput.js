@@ -1,15 +1,14 @@
 /**
- * Created by florinpopa on 04/07/2018.
+ * Created by mobileclarisoft on 16/07/2018.
  */
 import React, {PureComponent} from 'react';
 import {View, Text, StyleSheet} from 'react-native';
-import {Icon} from 'react-native-material-ui';
 import PropTypes from 'prop-types';
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
-import { TextField } from 'react-native-material-textfield';
+import { Dropdown } from 'react-native-material-dropdown';
 
-class TextInput extends PureComponent {
+class DropdownInput extends PureComponent {
 
     // This will be a dumb component, so it's best not to put any business logic in it
     constructor(props) {
@@ -31,29 +30,25 @@ class TextInput extends PureComponent {
     }
 
     // Please write here all the methods that are not react native lifecycle methods
-    editInput = () => {
+    editInput() {
         return (
             <View style={[{
-
-            },this.props.style]}>
-                <TextField
-                    label={this.props.isRequired ? this.props.label + ' * ' : this.props.label}
-                    value={this.props.value != undefined ? this.props.value : ''}
-                    onChangeText={ (value) => this.props.onChange(value,this.props.id)}
-                    textColor='rgb(0,0,0)'
-                    fontSize={15}
-                    labelFontSize={12.5}
-                    labelHeight={30}
-                    labelTextStyle={{
-                        fontFamily: 'Roboto-Light',
-                        textAlign: 'left'
-                    }}
-                    tintColor='rgb(77,176,160)'
-                    multiline={this.props.multiline != undefined ? this.props.multiline : false}
+                // width: '100%'
+            }, this.props.style]}>
+                <Dropdown
+                   label={this.props.label}
+                   data={this.props.data}
+                   value={this.props.value}
+                   fontSize={15}
+                   labelFontSize={12.5}
+                   // baseColor={}
+                   // textColor={}
+                   selectedItemColor={'rgb(255,60,56)'}
+                   onChangeText={ (state) => this.props.onChange(state, this.props.id)}
                 />
             </View>
         );
-    };
+    }
 
     viewInput = () => {
         return (
@@ -86,25 +81,19 @@ class TextInput extends PureComponent {
 
 // Create style outside the class, or for components that will be used by other components (buttons),
 // make a global style in the config directory
-const styles = StyleSheet.create({
-    editLabel: {
+const style = StyleSheet.create({
 
-    },
-    viewLabel: {
-
-    }
 });
 
-
-TextInput.propTypes = {
+DropdownInput.propTypes = {
     id: PropTypes.string.isRequired,
     label: PropTypes.string.isRequired,
     value: PropTypes.string.isRequired,
+    data: PropTypes.array.isRequired,
     isEditMode: PropTypes.bool.isRequired,
     isRequired: PropTypes.bool.isRequired,
     onChange: PropTypes.func.isRequired,
     style: PropTypes.object,
-    multiline: PropTypes.bool
 };
 
-export default TextInput;
+export default DropdownInput;

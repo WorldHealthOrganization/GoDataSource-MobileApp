@@ -6,10 +6,18 @@
     "start": "node node_modules/react-native/local-cli/cli.js start",
     "test": "jest"
   },
+  "rnpm": {
+    "assets": [
+      "./assets/fonts/"
+    ]
+  },
   "dependencies": {
     "hoist-non-react-statics": "^2.5.5",
     "react": "16.3.1",
     "react-native": "0.55.4",
+    "react-native-material-buttons": "^0.5.0",
+    "react-native-material-dropdown": "^0.11.1",
+    "react-native-material-switch": "0.0.4",
     "react-native-material-textfield": "^0.12.0",
     "react-native-material-ui": "1.30.0",
     "react-native-navigation": "1.1.471",
@@ -23,14 +31,14 @@
   "devDependencies": {
     "babel-jest": "23.0.1",
     "babel-preset-react-native": "4.0.0",
-    "jest": "23.1.0",
-    "react-test-renderer": "16.3.1",
-    "redux-devtools-extension": "^2.13.2",
-    "remote-redux-devtools": "^0.5.12",
     "eslint": "^4.19.1",
     "eslint-config-standard-jsx": "^5.0.0",
     "eslint-plugin-react": "^7.7.0",
-    "eslint-plugin-react-native": "^3.2.1"
+    "eslint-plugin-react-native": "^3.2.1",
+    "jest": "23.1.0",
+    "react-test-renderer": "16.3.1",
+    "redux-devtools-extension": "^2.13.2",
+    "remote-redux-devtools": "^0.5.12"
   },
   "jest": {
     "preset": "react-native"
