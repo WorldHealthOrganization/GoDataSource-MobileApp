@@ -111,7 +111,7 @@ class CasesScreen extends Component {
                         shadowOffset: { width: 0, height: 2.5 },
                         shadowOpacity: 1,
                         shadowRadius: 2,
-                        elevation: 2,
+                        elevation: 3,
                     }}>
                         <SwitchInput
                             id='flagged'
@@ -166,7 +166,7 @@ class CasesScreen extends Component {
                         shadowOffset: { width: 0, height: 2.5 },
                         shadowOpacity: 1,
                         shadowRadius: 2,
-                        elevation: 2,
+                        elevation: 3,
                     }}>
                         <TextInput
                             id='firstName'
