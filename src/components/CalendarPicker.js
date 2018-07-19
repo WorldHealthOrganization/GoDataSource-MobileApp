@@ -12,9 +12,9 @@ import CalendarPickerView from './CalendarPickerView';
 import Ripple from 'react-native-material-ripple';
 import ButtonWithIcons from './ButtonWithIcons';
 import { Calendar, CalendarList, Agenda } from 'react-native-calendars';
-
-let height = Dimensions.get('window').height;
-let width = Dimensions.get('window').width;
+import {connect} from "react-redux";
+import {bindActionCreators} from "redux";
+import ElevatedView from 'react-native-elevated-view';
 
 class CalendarPicker extends PureComponent {
 
@@ -34,7 +34,7 @@ class CalendarPicker extends PureComponent {
     // and can slow down the app
     render() {
         return (
-            <View style={[style.container, {width: this.props.width, height: this.props.height}]}>
+            <ElevatedView elevation={2} style={[style.container, {width: this.props.width, height: this.props.height}]}>
                 <ButtonWithIcons
                     height={this.props.height}
                     width={this.props.width}
@@ -49,7 +49,7 @@ class CalendarPicker extends PureComponent {
                     showPicker={this.state.pickerOpen}
                     width={2.75 * this.props.width}
                 />
-            </View>
+            </ElevatedView>
         );
     }
 
@@ -80,4 +80,15 @@ const style = StyleSheet.create({
     }
 });
 
-export default CalendarPicker;
+function mapStateToProps(state) {
+    return {
+        screenSize: state.app.screenSize
+    };
+}
+
+function matchDispatchProps(dispatch) {
+    return bindActionCreators({
+    }, dispatch);
+}
+
+export default connect(mapStateToProps, matchDispatchProps)(CalendarPicker);

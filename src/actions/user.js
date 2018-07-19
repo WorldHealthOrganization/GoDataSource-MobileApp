@@ -4,6 +4,7 @@
 import {ACTION_TYPE_STORE_USER} from './../utils/enums';
 import { changeAppRoot } from './app';
 import {loginUserRequest, getUserByIdRequest} from './../requests/user';
+import { getFollowUpsForOutbreakId } from './followUps';
 
 // Add here only the actions, not also the requests that are executed.
 // For that purpose is the requests directory
@@ -47,6 +48,7 @@ export function getUserById(userId, token) {
                 // store also the token
                 let user = Object.assign({}, response, {token: token});
                 dispatch(storeUser(user));
+                dispatch(getFollowUpsForOutbreakId(user.activeOutbreakId, user.token));
                 dispatch(changeAppRoot('after-login'));
             }
         })

@@ -10,9 +10,8 @@ import {calculateDimension} from './../utils/functions';
 import config from './../utils/config';
 import CalendarPicker from './CalendarPicker';
 import Calendar from "react-native-calendars/src/calendar/index";
-
-let height = Dimensions.get('window').height;
-let width = Dimensions.get('window').width;
+import {connect} from "react-redux";
+import {bindActionCreators} from "redux";
 
 class NavBarCustom extends PureComponent {
 
@@ -35,8 +34,8 @@ class NavBarCustom extends PureComponent {
         return (
             <View style={[this.props.style, style.container,
                 {
-                    height: calculateDimension(81, true, {height, width}),
-                    marginTop: Platform.OS === 'ios' ? height === 812 ? 44 : 20 : 0
+                    height: calculateDimension(81, true, this.props.screenSize),
+                    marginTop: Platform.OS === 'ios' ? this.props.screenSize.height === 812 ? 44 : 20 : 0
                 },
                 Platform.OS === 'ios' && {zIndex: 99}
             ]}
@@ -45,7 +44,7 @@ class NavBarCustom extends PureComponent {
                     <Icon name="menu"/>
                     <Text style={style.title}>{this.props.title}</Text>
                 </View>
-                <View style={style.containerLowerNavBar}>
+                <View style={[style.containerLowerNavBar, {paddingHorizontal: calculateDimension(16, false, this.props.screenSize)}]}>
                     {
                         this.props.children
                     }
@@ -79,9 +78,19 @@ const style = StyleSheet.create({
         backgroundColor: 'white',
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'space-between',
-        paddingHorizontal: calculateDimension(16, false, {width, height})
+        justifyContent: 'space-between'
     }
 });
 
-export default NavBarCustom;
+function mapStateToProps(state) {
+    return {
+        screenSize: state.app.screenSize
+    };
+}
+
+function matchDispatchProps(dispatch) {
+    return bindActionCreators({
+    }, dispatch);
+}
+
+export default connect(mapStateToProps, matchDispatchProps)(NavBarCustom);

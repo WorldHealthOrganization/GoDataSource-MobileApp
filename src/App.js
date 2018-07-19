@@ -60,7 +60,7 @@ export default class App {
                     },
                     drawer: {
                         left: {
-                            screen: 'NavigationDrawer',
+                            screen: 'NavigationDrawer'
                         },
                         style: {
                             drawerShadow: false,

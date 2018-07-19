@@ -11,6 +11,10 @@ import config from './../utils/config';
 import Ripple from 'react-native-material-ripple';
 import IconMaterial from 'react-native-vector-icons/MaterialCommunityIcons';
 import styles from './../styles';
+import {connect} from "react-redux";
+import {bindActionCreators} from "redux";
+import ElevatedView from 'react-native-elevated-view';
+
 
 let height = Dimensions.get('window').height;
 let width = Dimensions.get('window').width;
@@ -33,29 +37,29 @@ class ButtonWithIcons extends PureComponent {
     // and can slow down the app
     render() {
         return (
-            <Ripple style={[style.containerButton, Platform.OS === 'android' && {elevation: 2}, {
+            <Ripple style={[style.containerButton, {
                 width: this.props.width,
                 height: this.props.height
             }]} onPress={this.props.onPress}>
                 <View style={style.containerInnerView}>
                     {
                         this.props.isFirstIconPureMaterial ? (
-                            <Icon size={calculateDimension(15, false, {width, height})} color={styles.buttonGreen} name={this.props.firstIcon}
+                            <Icon size={calculateDimension(15, false, this.props.screenSize)} color={styles.buttonGreen} name={this.props.firstIcon}
                                   style={{display: this.props.isFirstIconPureMaterial ? 'flex' : 'none'}}/>
                         ) : (
                             <IconMaterial style={{display: this.props.isFirstIconPureMaterial ? 'none' : 'flex'}}
-                                          name={this.props.firstIcon} size={calculateDimension(15, false, {width, height})}
+                                          name={this.props.firstIcon} size={calculateDimension(15, false, this.props.screenSize)}
                                           color={styles.buttonGreen}/>
                         )
                     }
                     <Text>{this.props.label}</Text>
                     {
                         this.props.isSecondIconPureMaterial ? (
-                            <Icon size={calculateDimension(18, false, {width, height})} color={'black'} name={this.props.secondIcon}
+                            <Icon size={calculateDimension(18, false, this.props.screenSize)} color={'black'} name={this.props.secondIcon}
                                   style={{display: this.props.isSecondIconPureMaterial ? 'flex' : 'none'}}/>
                         ) : (
                             <IconMaterial style={{display: this.props.isSecondIconPureMaterial ? 'none' : 'flex'}}
-                                          name={this.props.firstIcon} size={calculateDimension(11, false, {width, height})}
+                                          name={this.props.firstIcon} size={calculateDimension(11, false, this.props.screenSize)}
                                           color={styles.buttonGreen}/>
                         )
                     }
@@ -83,13 +87,6 @@ const style = StyleSheet.create({
         alignItems: 'center',
         backgroundColor: 'white',
         borderRadius: 4,
-        shadowColor: 'gray',
-        shadowOffset: {
-            width: 0,
-            height: 1
-        },
-        shadowRadius: 4,
-        shadowOpacity: 0.8,
     },
     containerInnerView: {
         flexDirection: 'row',
@@ -100,4 +97,15 @@ const style = StyleSheet.create({
     }
 });
 
-export default ButtonWithIcons;
+function mapStateToProps(state) {
+    return {
+        screenSize: state.app.screenSize
+    };
+}
+
+function matchDispatchProps(dispatch) {
+    return bindActionCreators({
+    }, dispatch);
+}
+
+export default connect(mapStateToProps, matchDispatchProps)(ButtonWithIcons);

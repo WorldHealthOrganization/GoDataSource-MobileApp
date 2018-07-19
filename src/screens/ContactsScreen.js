@@ -14,6 +14,8 @@ import CalendarPicker from './../components/CalendarPicker';
 import {calculateDimension} from './../utils/functions';
 import config from './../utils/config';
 import ButtonWithIcons from './../components/ButtonWithIcons';
+import {connect} from "react-redux";
+import {bindActionCreators} from "redux";
 
 let height = Dimensions.get('window').height;
 let width = Dimensions.get('window').width;
@@ -30,7 +32,7 @@ class ContactsScreen extends Component {
 
         };
         // Bind here methods, or at least don't declare methods in the render method
-
+        this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this));
     }
 
     // Please add here the react lifecycle methods that you need
@@ -44,13 +46,13 @@ class ContactsScreen extends Component {
             <View style={style.container}>
                 <NavBarCustom title="Follow-ups">
                     <CalendarPicker
-                        width={calculateDimension(124, false, {width, height})}
-                        height={calculateDimension(25, true, {width, height})}
+                        width={calculateDimension(124, false, this.props.screenSize)}
+                        height={calculateDimension(25, true, this.props.screenSize)}
                     />
                     <ButtonWithIcons
                         label="Altceva"
-                        width={calculateDimension(124, false, {width, height})}
-                        height={calculateDimension(25, true, {width, height})}
+                        width={calculateDimension(124, false, this.props.screenSize)}
+                        height={calculateDimension(25, true, this.props.screenSize)}
                         firstIcon="visibility"
                         secondIcon="arrow-drop-down"
                         isFirstIconPureMaterial={true}
@@ -58,20 +60,50 @@ class ContactsScreen extends Component {
                     />
                     <Button raised text="" onPress={() => console.log("Empty button")} icon="add"
                             style={{
-                                container: {width: calculateDimension(33, true, {width, height}),height: calculateDimension(25, true, {width, height}), margin: 0, padding: 0},
+                                container: {width: calculateDimension(33, true, this.props.screenSize),height: calculateDimension(25, true, this.props.screenSize), margin: 0, padding: 0},
                                 text: {width: 0, margin: 0, padding: 0, height: 0},
                                 icon: {margin: 0, padding: 0, alignSelf: 'center'}
                             }}/>
                 </NavBarCustom>
                 <View style={style.containerContent}>
-                    <Text>TODO! FollowUps screen</Text>
+                    <Text>TODO! Contacts screen</Text>
                 </View>
             </View>
         );
     }
 
     // Please write here all the methods that are not react native lifecycle methods
-
+    onNavigatorEvent = (event) => {
+        if (event.type === 'DeepLink') {
+            console.log("###");
+            if (event.link.includes('Navigate')) {
+                let linkComponents = event.link.split('/');
+                console.log("### linkComponents: ", linkComponents);
+                if (linkComponents.length > 0) {
+                    let screenToSwitchTo = null;
+                    switch(linkComponents[1]) {
+                        case '0':
+                            screenToSwitchTo = 'FollowUpsScreen';
+                            break;
+                        case '1':
+                            screenToSwitchTo = "ContactsScreen";
+                            break;
+                        case '2':
+                            screenToSwitchTo = "CasesScreen";
+                            break;
+                        default:
+                            screenToSwitchTo = "FollowUpsScreen";
+                            break;
+                    }
+                    console.log("Screen index: ", screenToSwitchTo);
+                    this.props.navigator.resetTo({
+                        screen: screenToSwitchTo,
+                        animated: true
+                    })
+                }
+            }
+        }
+    };
 }
 
 // Create style outside the class, or for components that will be used by other components (buttons),
@@ -83,8 +115,20 @@ const style = StyleSheet.create({
     },
     containerContent: {
         flex: 1,
-        backgroundColor: 'gray'
+        backgroundColor: 'rgba(217, 217, 217, 0.5)'
     }
 });
 
-export default ContactsScreen;
+function mapStateToProps(state) {
+    return {
+        user: state.user,
+        screenSize: state.app.screenSize
+    };
+}
+
+function matchDispatchProps(dispatch) {
+    return bindActionCreators({
+    }, dispatch);
+}
+
+export default connect(mapStateToProps, matchDispatchProps)(ContactsScreen);

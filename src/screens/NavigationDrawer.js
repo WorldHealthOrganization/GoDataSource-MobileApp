@@ -2,20 +2,30 @@
  * Created by florinpopa on 03/07/2018.
  */
 import React, {Component} from 'react';
-import {TextInput, View, StyleSheet} from 'react-native';
+import {TextInput, View, StyleSheet, Platform, Dimensions} from 'react-native';
 import NavigationDrawerListItem from './../components/NavigationDrawerListItem';
+import config from './../utils/config';
+import {connect} from "react-redux";
+import {bindActionCreators} from "redux";
+import {logoutUser} from './../actions/user';
+import styles from './../styles';
+import {ListItem, Icon} from 'react-native-material-ui';
+
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 
+let height = Dimensions.get('window').height;
 
 class NavigationDrawer extends Component {
 
     constructor(props) {
         super(props);
         this.state = {
-
+            selectedScreen: 0
         };
         // Bind here methods, or at least don't declare methods in the render method
+        this.handlePressOnListItem = this.handlePressOnListItem.bind(this);
+        this.handleLogout = this.handleLogout.bind(this);
     }
 
     // Please add here the react lifecycle methods that you need
@@ -27,20 +37,63 @@ class NavigationDrawer extends Component {
     render() {
         return (
             <View style={style.container}>
-                <View style={{flex: 0.33}} />
-                <View style={{flex: 0.33}}>
-                    <NavigationDrawerListItem label='Follow-ups' name="update" />
-                    <NavigationDrawerListItem label='Contacts' name="people" />
-                    <NavigationDrawerListItem label='Cases' name="create-new-folder" />
+                <View style={{flex: 0.15, marginTop: Platform.OS === 'ios' ? this.props.screenSize.height === 812 ? 44 : 20 : 0, justifyContent: 'center'}}>
+                    <ListItem
+                        numberOfLines={2}
+                        leftElement={<Icon name="account-circle" size={40} color={styles.buttonGreen} />}
+                        centerElement={{primaryText: "Florin Popa", secondaryText: 'florin.popa@clarisoft.com'}}
+                        style={{
+                            container: {height: '100%'},
+                            primaryText: {fontFamily: 'Roboto-Medium', fontSize: 18},
+                            secondaryText: {fontFamily: 'Roboto-Regular', fontSize: 12},
+                            centerElementContainer: {height: '100%', justifyContent: 'center'}
+                        }}
+                    />
+                    <View style={styles.lineStyle} />
                 </View>
-                <View style={{flex: 0.33}}>
-                    <NavigationDrawerListItem label='Logout' name="power-settings-new" />
+                <View style={{flex: 0.25}}>
+                    {
+                        config.sideMenuItems.map((item, index) => {
+                            return (
+                                <NavigationDrawerListItem label={item.label} name={item.name}
+                                                          onPress={() => this.handlePressOnListItem(index)}
+                                                          isSelected={index === this.state.selectedScreen}/>
+                            )
+                        })
+                    }
+                    <View style={styles.lineStyle} />
+                </View>
+                <View style={{flex: 0.25}}>
+                    <NavigationDrawerListItem label={'Sync HUB manually'} name={'cached'}/>
+                    <NavigationDrawerListItem label={'Change HUB configuration'} name={'settings'}/>
+                    <View style={styles.lineStyle} />
+                </View>
+                <View style={{flex: 0.35}}>
+                    <NavigationDrawerListItem label='Logout' name="power-settings-new" onPress={this.handleLogout} />
                 </View>
             </View>
         );
     }
 
     // Please write here all the methods that are not react native lifecycle methods
+    handlePressOnListItem = (index) => {
+        this.setState({
+           selectedScreen: index
+        }, () => {
+            this.props.navigator.toggleDrawer({
+                side: 'left',
+                animated: true,
+                to: 'missing'
+            });
+            this.props.navigator.handleDeepLink({
+                link: 'Navigate/' + index
+            })
+        });
+    };
+
+    handleLogout = () => {
+        this.props.logoutUser();
+    }
 }
 
 // Create style outside the class, or for components that will be used by other components (buttons),
@@ -59,4 +112,17 @@ const style = StyleSheet.create({
     }
 });
 
-export default NavigationDrawer;
+function mapStateToProps(state) {
+    return {
+        user: state.user,
+        screenSize: state.app.screenSize
+    };
+}
+
+function matchDispatchProps(dispatch) {
+    return bindActionCreators({
+        logoutUser
+    }, dispatch);
+}
+
+export default connect(mapStateToProps, matchDispatchProps)(NavigationDrawer);

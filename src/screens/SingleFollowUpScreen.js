@@ -8,6 +8,8 @@ import {TextInput, View, Text, StyleSheet} from 'react-native';
 import {Button} from 'react-native-material-ui';
 import { TextField } from 'react-native-material-textfield';
 import styles from './../styles';
+import {connect} from "react-redux";
+import {bindActionCreators} from "redux";
 
 class SingleFollowUpScreen extends Component {
 
@@ -44,4 +46,16 @@ const style = StyleSheet.create({
 
 });
 
-export default SingleFollowUpScreen;
+function mapStateToProps(state) {
+    return {
+        user: state.user,
+        screenSize: state.app.screenSize
+    };
+}
+
+function matchDispatchProps(dispatch) {
+    return bindActionCreators({
+    }, dispatch);
+}
+
+export default connect(mapStateToProps, matchDispatchProps)(SingleFollowUpScreen);

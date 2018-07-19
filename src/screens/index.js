@@ -9,12 +9,14 @@ import LoginScreen from './LoginScreen';
 import NavigationDrawer from './NavigationDrawer';
 import FollowUpsScreen from './FollowUpsScreen';
 import CasesScreen from './CasesScreen';
+import ContactsScreen from './ContactsScreen';
 
 const screens = [
     {screen: 'LoginScreen', component: LoginScreen},
     {screen: 'NavigationDrawer', component: NavigationDrawer},
     {screen: 'FollowUpsScreen', component: FollowUpsScreen},
-    {screen: 'CasesScreen', component: CasesScreen}
+    {screen: 'CasesScreen', component: CasesScreen},
+    {screen: 'ContactsScreen', component: ContactsScreen}
 ];
 
 export function registerScreens(store, Provider) {

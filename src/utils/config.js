@@ -7,24 +7,23 @@ const designScreenSize = {
     height: 667
 };
 
-const sideMenuItems = {
-    followUps: {
-        name: 'alarm',
+const sideMenuItems = [
+    {
+        id: 'followups',
+        name: 'update',
         label: 'Follow-ups'
     },
-    contacts: {
-        name: 'account-multiple',
+    {
+        id: 'contacts',
+        name: 'people',
         label: 'Contacts'
     },
-    cases: {
-        name: 'folder-plus',
+    {
+        id: 'cases',
+        name: 'create-new-folder',
         label: 'Cases'
-    },
-    logout: {
-        name: 'power',
-        label: 'Log out'
     }
-};
+];
 
 
 export default {

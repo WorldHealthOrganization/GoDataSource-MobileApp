@@ -7,6 +7,8 @@ import PropTypes from 'prop-types';
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import { RaisedTextButton } from 'react-native-material-buttons';
+import {connect} from "react-redux";
+import {bindActionCreators} from "redux";
 
 class Button extends PureComponent {
 
@@ -62,4 +64,15 @@ Button.propTypes = {
     style: PropTypes.object,
 };
 
-export default Button;
+function mapStateToProps(state) {
+    return {
+        screenSize: state.app.screenSize
+    };
+}
+
+function matchDispatchProps(dispatch) {
+    return bindActionCreators({
+    }, dispatch);
+}
+
+export default connect(mapStateToProps, matchDispatchProps)(Button);

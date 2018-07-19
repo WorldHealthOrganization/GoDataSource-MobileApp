@@ -10,6 +10,8 @@ import TextInput from './../components/TextInput';
 import SwitchInput from './../components/SwitchInput';
 import DropdownInput from './../components/DropdownInput';
 import styles from './../styles';
+import {connect} from "react-redux";
+import {bindActionCreators} from "redux";
 
 class CasesScreen extends Component {
 
@@ -26,7 +28,7 @@ class CasesScreen extends Component {
             }]
         };
         // Bind here methods, or at least don't declare methods in the render method
-
+        this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this));
     }
 
     // Please add here the react lifecycle methods that you need
@@ -277,6 +279,38 @@ class CasesScreen extends Component {
         console.log(value);
         console.log(id);
     };
+
+    onNavigatorEvent = (event) => {
+        if (event.type === 'DeepLink') {
+            console.log("###");
+            if (event.link.includes('Navigate')) {
+                let linkComponents = event.link.split('/');
+                console.log("### linkComponents: ", linkComponents);
+                if (linkComponents.length > 0) {
+                    let screenToSwitchTo = null;
+                    switch(linkComponents[1]) {
+                        case '0':
+                            screenToSwitchTo = 'FollowUpsScreen';
+                            break;
+                        case '1':
+                            screenToSwitchTo = "ContactsScreen";
+                            break;
+                        case '2':
+                            screenToSwitchTo = "CasesScreen";
+                            break;
+                        default:
+                            screenToSwitchTo = "FollowUpsScreen";
+                            break;
+                    }
+                    console.log("Screen index: ", screenToSwitchTo);
+                    this.props.navigator.resetTo({
+                        screen: screenToSwitchTo,
+                        animated: true
+                    })
+                }
+            }
+        }
+    };
 }
 
 // Create style outside the class, or for components that will be used by other components (buttons),
@@ -288,4 +322,16 @@ const style = StyleSheet.create({
     }
 });
 
-export default CasesScreen;
+function mapStateToProps(state) {
+    return {
+        user: state.user,
+        screenSize: state.app.screenSize
+    };
+}
+
+function matchDispatchProps(dispatch) {
+    return bindActionCreators({
+    }, dispatch);
+}
+
+export default connect(mapStateToProps, matchDispatchProps)(CasesScreen);

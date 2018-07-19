@@ -3,5 +3,8 @@
  */
 const app = require('./app');
 const user = require('./user');
+const outbreak = require('./outbreak');
+const cases = require('./cases');
+const followUps = require('./followUps');
 
-module.exports = Object.assign({}, app, user);
+module.exports = Object.assign({}, app, user, outbreak, cases, followUps);

@@ -61,6 +61,7 @@ class LoginScreen extends Component {
                     containerStyle={style.textInput}
                     onChangeText={this.handleTextChange}
                     label='Password'
+                    secureTextEntry={true}
                 />
                 <Button raised onPress={this.handleLogin} text="Login" style={styles.buttonLogin} />
             </View>
@@ -108,7 +109,7 @@ const style = StyleSheet.create({
 
 function mapStateToProps(state) {
     return {
-
+        screenSize: state.app.screenSize
     };
 }
 

@@ -11,9 +11,9 @@ import config from './../utils/config';
 import Calendar from "react-native-calendars/src/calendar/index";
 import {Overlay} from 'react-native-elements';
 import Modal from 'react-native-root-modal';
-
-let height = Dimensions.get('window').height;
-let width = Dimensions.get('window').width;
+import {connect} from "react-redux";
+import {bindActionCreators} from "redux";
+import ElevatedView from 'react-native-elevated-view';
 
 class CalendarPickerView extends PureComponent {
 
@@ -23,6 +23,8 @@ class CalendarPickerView extends PureComponent {
         this.state = {
             pickerOpen: false
         };
+
+        this.calculateTop = this.calculateTop.bind(this);
     }
 
     // Please add here the react lifecycle methods that you need
@@ -38,18 +40,20 @@ class CalendarPickerView extends PureComponent {
                 style={[style.container, {
                     position: 'absolute',
                     top: this.calculateTop(),
-                    left: calculateDimension(16, false, {width, height}),
+                    left: calculateDimension(16, false, this.props.screenSize),
                     width: this.props.width
                 }, Platform.OS === 'android' && {elevation: 2}]}
             >
-                <Calendar/>
+                <ElevatedView elevation={4} style={{flex: 1}}>
+                    <Calendar/>
+                </ElevatedView>
             </Modal>
         );
     }
 
     // Please write here all the methods that are not react native lifecycle methods
     calculateTop = () => {
-        return calculateDimension(74, true, {width, height}) + (Platform.OS === 'ios' ? height === 812 ? 44 : 20 : 0);
+        return calculateDimension(74, true, this.props.screenSize) + (Platform.OS === 'ios' ? this.props.screenSize.height === 812 ? 44 : 20 : 0);
     }
 }
 
@@ -62,18 +66,20 @@ CalendarPickerView.defaultProps = {
 // make a global style in the config directory
 const style = StyleSheet.create({
     container: {
-        height: 339,
         borderRadius: 5,
-        padding: 10,
-        backgroundColor: 'white',
-        shadowColor: '#000000',
-        shadowOffset: {
-            width: 0,
-            height: 3
-        },
-        shadowRadius: 3,
-        shadowOpacity: 1.0,
+        backgroundColor: 'white'
     }
 });
 
-export default CalendarPickerView;
+function mapStateToProps(state) {
+    return {
+        screenSize: state.app.screenSize
+    };
+}
+
+function matchDispatchProps(dispatch) {
+    return bindActionCreators({
+    }, dispatch);
+}
+
+export default connect(mapStateToProps, matchDispatchProps)(CalendarPickerView);
