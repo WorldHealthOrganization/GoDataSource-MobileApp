@@ -14,6 +14,7 @@ import styles from './../styles';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import ElevatedView from 'react-native-elevated-view';
+import {Dropdown} from 'react-native-material-dropdown';
 
 
 let height = Dimensions.get('window').height;
@@ -64,6 +65,7 @@ class ButtonWithIcons extends PureComponent {
                         )
                     }
                 </View>
+                {this.props.children}
             </Ripple>
         );
     }

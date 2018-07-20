@@ -9,24 +9,37 @@ const designScreenSize = {
 
 const sideMenuItems = [
     {
-        id: 'followups',
+    key: 'followups',
         name: 'update',
         label: 'Follow-ups'
     },
     {
-        id: 'contacts',
+        key: 'contacts',
         name: 'people',
         label: 'Contacts'
     },
     {
-        id: 'cases',
+        key: 'cases',
         name: 'create-new-folder',
         label: 'Cases'
+    }
+];
+
+const dropDownValues = [
+    {
+        value: 'All'
+    },
+    {
+        value: 'To do'
+    },
+    {
+        value: 'Missed'
     }
 ];
 
 
 export default {
     designScreenSize,
-    sideMenuItems
+    sideMenuItems,
+    dropDownValues
 }

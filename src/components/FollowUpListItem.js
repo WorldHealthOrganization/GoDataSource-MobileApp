@@ -32,14 +32,36 @@ class FollowUpListItem extends Component {
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
+        // Get contact info from the follow-ups
+
+        let contact = this.props && this.props.contacts && Array.isArray(this.props.contacts) && this.props.contacts.length > 0 ? this.props.contacts[this.props.contacts.map((e) => {return e.id}).indexOf(this.props.item.personId)] : null;
+        let primaryText = contact && ((contact.firstName ? contact.firstName : ' ') + (contact.lastName ? (" " + contact.lastName) : ' '));
+        let secondaryText = contact && ((contact.gender ? contact.gender : ' ') + (contact.age ? (" " + contact.age + ' y.o.') : ' '));
+
+        let addressText = ' ';
+        let addressArray = []
+
+        if (this.props && this.props.item && this.props.item.address) {
+            addressArray = [this.props.item.address.addressLine1, this.props.item.address.addressLine2, this.props.item.address.city, this.props.item.address.country, this.props.item.address.postalCode];
+            addressArray = addressArray.filter((e) => {return e});
+        }
+
+        addressText = addressArray.join(', ');
+
         return (
-            <ElevatedView elevation={3} style={[style.container, {marginHorizontal: calculateDimension(16, false, this.props.screenSize), height: calculateDimension(203, true, this.props.screenSize)}]}>
-                <View style={[style.firstSectionContainer, {height: calculateDimension(104, true, this.props.screenSize), paddingBottom: calculateDimension(18, true, this.props.screenSize)}]}>
+            <ElevatedView elevation={3} style={[style.container, {
+                marginHorizontal: calculateDimension(16, false, this.props.screenSize),
+                height: calculateDimension(203, true, this.props.screenSize)
+            }]}>
+                <View style={[style.firstSectionContainer, {
+                    height: calculateDimension(75, true, this.props.screenSize),
+                    paddingBottom: calculateDimension(18, true, this.props.screenSize)
+                }]}>
                     <ListItem
                         numberOfLines={2}
                         centerElement={{
-                            primaryText: "Florin Popa",
-                            secondaryText: 'Male, 25 y.o.'
+                            primaryText,
+                            secondaryText
                         }}
                         rightElement={<Icon name="location-on" size={32} color={styles.buttonGreen}/>}
                         style={{
@@ -49,14 +71,19 @@ class FollowUpListItem extends Component {
                             centerElementContainer: {height: '100%', justifyContent: 'center'}
                         }}
                     />
-                    <Text style={[style.addressStyle, {marginHorizontal: calculateDimension(14, false, this.props.screenSize)}]}>1798 Queen City Ave, Cincinati, OH 45214</Text>
                 </View>
-                <View style={styles.lineStyle} />
-                <View style={[style.secondSectionContainer, {height: calculateDimension(52, true, this.props.screenSize)}]}>
-                    <Text style={[style.addressStyle, {marginHorizontal: calculateDimension(14, false, this.props.screenSize)}]}>Exposed to: Diana Jones</Text>
+                <View style={styles.lineStyle}/>
+                <View
+                    style={[style.secondSectionContainer, {height: calculateDimension(70, true, this.props.screenSize)}]}>
+                    <Text
+                        style={[style.addressStyle, {marginHorizontal: calculateDimension(14, false, this.props.screenSize)}]}>{addressText}</Text>
+                    <Text
+                        style={[style.addressStyle, {marginHorizontal: calculateDimension(14, false, this.props.screenSize)}]}>Exposed
+                        to: Diana Jones</Text>
                 </View>
-                <View style={styles.lineStyle} />
-                <View style={[style.thirdSectionContainer, {marginHorizontal: calculateDimension(14, false, this.props.screenSize)}]}>
+                <View style={styles.lineStyle}/>
+                <View
+                    style={[style.thirdSectionContainer, {marginHorizontal: calculateDimension(14, false, this.props.screenSize)}]}>
                     <Ripple style={[style.rippleStyle]}>
                         <Text style={[style.rippleTextStyle]}>FOLLOW-UP</Text>
                     </Ripple>
@@ -112,7 +139,8 @@ const style = StyleSheet.create({
 
 function mapStateToProps(state) {
     return {
-        screenSize: state.app.screenSize
+        screenSize: state.app.screenSize,
+        contacts: state.contacts
     };
 }
 

@@ -36,7 +36,7 @@ export function calculateDimension (designResourceDimension, isHeight, screenSiz
     let designScreenDimension = config.designScreenSize;
     let scaledHeight = designScreenDimension.height;
     if (designScreenDimension.height / designScreenDimension.width !== screenSize.height / screenSize.width) {
-        scaledHeight = designScreenDimension.width * screenSize.height / screenSize.width;
+        scaledHeight = designScreenDimension.width * designScreenDimension.height / screenSize.width;
     }
 
     if (isHeight) {
@@ -44,4 +44,11 @@ export function calculateDimension (designResourceDimension, isHeight, screenSiz
     }
 
     return (designResourceDimension * screenSize.width) / designScreenDimension.width;
+}
+
+export function checkIfSameDay(date1, date2) {
+    if (Object.prototype.toString.call(date1) !== '[object Date]' || Object.prototype.toString.call(date2) !== '[object Date]') {
+        return false;
+    }
+    return date1.getDate() === date2.getDate() && date1.getMonth() === date2.getMonth() && date1.getFullYear() === date2.getFullYear();
 }

@@ -55,9 +55,12 @@ class NavigationDrawer extends Component {
                     {
                         config.sideMenuItems.map((item, index) => {
                             return (
-                                <NavigationDrawerListItem label={item.label} name={item.name}
-                                                          onPress={() => this.handlePressOnListItem(index)}
-                                                          isSelected={index === this.state.selectedScreen}/>
+                                <NavigationDrawerListItem
+                                    key={index}
+                                    label={item.label} name={item.name}
+                                    onPress={() => this.handlePressOnListItem(index)}
+                                    isSelected={index === this.state.selectedScreen}
+                                />
                             )
                         })
                     }

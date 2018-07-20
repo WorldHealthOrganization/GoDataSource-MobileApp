@@ -45,7 +45,10 @@ class CalendarPickerView extends PureComponent {
                 }, Platform.OS === 'android' && {elevation: 2}]}
             >
                 <ElevatedView elevation={4} style={{flex: 1}}>
-                    <Calendar/>
+                    <Calendar
+                        onDayPress={this.props.dateChanged}
+                        monthFormat={'MMMM yyyy'}
+                    />
                 </ElevatedView>
             </Modal>
         );

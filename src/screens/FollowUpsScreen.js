@@ -7,7 +7,7 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
-import {TextInput, View, Text, StyleSheet, Platform, Dimensions} from 'react-native';
+import {TextInput, View, Text, StyleSheet, Platform, FlatList} from 'react-native';
 import {Button} from 'react-native-material-ui';
 import { TextField } from 'react-native-material-textfield';
 import styles from './../styles';
@@ -22,6 +22,7 @@ import {bindActionCreators} from "redux";
 import SearchFilterView from './../components/SearchFilterView';
 import FollowUpListItem from './../components/FollowUpListItem';
 import ElevatedView from 'react-native-elevated-view';
+import {Dropdown} from 'react-native-material-dropdown';
 
 class FollowUpsScreen extends Component {
 
@@ -54,14 +55,28 @@ class FollowUpsScreen extends Component {
                     />
                     <ElevatedView elevation={2}>
                         <ButtonWithIcons
-                            label="Altceva"
+                            label="To do"
                             width={calculateDimension(124, false, this.props.screenSize)}
                             height={calculateDimension(25, true, this.props.screenSize)}
                             firstIcon="visibility"
                             secondIcon="arrow-drop-down"
                             isFirstIconPureMaterial={true}
                             isSecondIconPureMaterial={true}
-                        />
+                            onPress={this.handlePressDropdown}
+                        >
+                            <Dropdown
+                                ref='dropdown'
+                                data={config.dropDownValues}
+                                renderAccessory={() => {
+                                    return null;
+                                }}
+                                dropdownOffset={{
+                                    top: this.calculateTopForDropdown(),
+                                    left: -calculateDimension(110, false, this.props.screenSize)
+                                }}
+                                dropdownPosition={0}
+                            />
+                        </ButtonWithIcons>
                     </ElevatedView>
                     <Button raised text="" onPress={() => console.log("Empty button")} icon="add"
                             style={{
@@ -72,13 +87,41 @@ class FollowUpsScreen extends Component {
                 </NavBarCustom>
                 <View style={style.containerContent}>
                     <SearchFilterView/>
-                    <FollowUpListItem/>
+                    <FlatList
+                        data={this.props.followUps}
+                        renderItem={this.renderFollowUp}
+                        keyExtractor={this.keyExtractor}
+                        ItemSeparatorComponent={this.renderSeparatorComponent}
+                    />
                 </View>
             </View>
         );
     }
 
     // Please write here all the methods that are not react native lifecycle methods
+    renderFollowUp = ({item}) => {
+        return (
+            <FollowUpListItem item={item} />
+        )
+    };
+
+    keyExtractor = (item, index) => item.id;
+
+    renderSeparatorComponent = () => {
+        return (
+            <View style={style.separatorComponentStyle} />
+        )
+    };
+
+    handlePressDropdown = () => {
+        this.refs.dropdown.focus();
+    };
+
+    calculateTopForDropdown = () => {
+        let dim = calculateDimension(98, true, this.props.screenSize);
+        return dim;
+    };
+
     onNavigatorEvent = (event) => {
         if (event.type === 'DeepLink') {
             console.log("###");
@@ -122,13 +165,17 @@ const style = StyleSheet.create({
     containerContent: {
         flex: 1,
         backgroundColor: 'rgba(217, 217, 217, 0.5)'
+    },
+    separatorComponentStyle: {
+        height: 8
     }
 });
 
 function mapStateToProps(state) {
     return {
         user: state.user,
-        screenSize: state.app.screenSize
+        screenSize: state.app.screenSize,
+        followUps: state.followUps
     };
 }
 

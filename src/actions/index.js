@@ -6,5 +6,6 @@ const user = require('./user');
 const outbreak = require('./outbreak');
 const cases = require('./cases');
 const followUps = require('./followUps');
+const contacts = require('./contacts');
 
-module.exports = Object.assign({}, app, user, outbreak, cases, followUps);
+module.exports = Object.assign({}, app, user, outbreak, cases, followUps, contacts);

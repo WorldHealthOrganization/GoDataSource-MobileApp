@@ -6,7 +6,7 @@ import {TextInput, View, Text, StyleSheet, Platform, Dimensions, TouchableOpacit
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import {ListItem, Icon, Button} from 'react-native-material-ui';
-import {calculateDimension} from './../utils/functions';
+import {calculateDimension, checkIfSameDay} from './../utils/functions';
 import config from './../utils/config';
 import CalendarPickerView from './CalendarPickerView';
 import Ripple from 'react-native-material-ripple';
@@ -22,7 +22,8 @@ class CalendarPicker extends PureComponent {
     constructor(props) {
         super(props);
         this.state = {
-            pickerOpen: false
+            pickerOpen: false,
+            label: 'Today'
         };
     }
 
@@ -39,7 +40,7 @@ class CalendarPicker extends PureComponent {
                     height={this.props.height}
                     width={this.props.width}
                     onPress={this.openCalendarModal}
-                    label="ceva"
+                    label={this.state.label}
                     firstIcon="calendar-blank"
                     secondIcon="arrow-drop-down"
                     isFirstIconPureMaterial={false}
@@ -48,6 +49,7 @@ class CalendarPicker extends PureComponent {
                 <CalendarPickerView
                     showPicker={this.state.pickerOpen}
                     width={2.75 * this.props.width}
+                    dateChanged={this.handleDateChanged}
                 />
             </ElevatedView>
         );
@@ -57,6 +59,14 @@ class CalendarPicker extends PureComponent {
     openCalendarModal = () => {
         console.log("You got another thing coming");
         this.setState({pickerOpen: !this.state.pickerOpen})
+    }
+
+    handleDateChanged = (date) => {
+        let dateAux = checkIfSameDay(new Date(date.dateString), new Date()) ? 'Today' : new Date(date.dateString).toLocaleDateString();
+        console.log("### date changed: ", new Date(date.dateString));
+        this.setState({
+            label: dateAux
+        })
     }
 }
 
