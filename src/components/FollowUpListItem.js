@@ -3,8 +3,8 @@
  */
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
-import React, {Component} from 'react';
-import {TextInput, View, Text, StyleSheet, Platform, Dimensions} from 'react-native';
+import React, {PureComponent} from 'react';
+import {TextInput, View, Text, StyleSheet, Platform, Dimensions, Image} from 'react-native';
 import {ListItem, Icon} from 'react-native-material-ui';
 import {calculateDimension} from './../utils/functions';
 import config from './../utils/config';
@@ -16,7 +16,7 @@ import styles from './../styles';
 import Ripple from 'react-native-material-ripple';
 import ElevatedView from 'react-native-elevated-view';
 
-class FollowUpListItem extends Component {
+class FollowUpListItem extends PureComponent {
 
     // This will be a dumb component, so it's best not to put any business logic in it
     constructor(props) {
@@ -36,7 +36,7 @@ class FollowUpListItem extends Component {
 
         let contact = this.props && this.props.contacts && Array.isArray(this.props.contacts) && this.props.contacts.length > 0 ? this.props.contacts[this.props.contacts.map((e) => {return e.id}).indexOf(this.props.item.personId)] : null;
         let primaryText = contact && ((contact.firstName ? contact.firstName : ' ') + (contact.lastName ? (" " + contact.lastName) : ' '));
-        let secondaryText = contact && ((contact.gender ? contact.gender : ' ') + (contact.age ? (" " + contact.age + ' y.o.') : ' '));
+        let secondaryText = contact && ((contact.gender ? contact.gender.charAt(0) : ' ') + (contact.age ? (", " + contact.age) : ' '));
 
         let addressText = ' ';
         let addressArray = []
@@ -51,30 +51,30 @@ class FollowUpListItem extends Component {
         return (
             <ElevatedView elevation={3} style={[style.container, {
                 marginHorizontal: calculateDimension(16, false, this.props.screenSize),
-                height: calculateDimension(203, true, this.props.screenSize)
+                height: calculateDimension(178, true, this.props.screenSize)
             }]}>
                 <View style={[style.firstSectionContainer, {
-                    height: calculateDimension(75, true, this.props.screenSize),
+                    height: calculateDimension(53, true, this.props.screenSize),
                     paddingBottom: calculateDimension(18, true, this.props.screenSize)
                 }]}>
                     <ListItem
-                        numberOfLines={2}
-                        centerElement={{
-                            primaryText,
-                            secondaryText
-                        }}
-                        rightElement={<Icon name="location-on" size={32} color={styles.buttonGreen}/>}
+                        numberOfLines={0}
+                        centerElement={
+                            <View style={style.centerItemContainer}>
+                                <Text style={style.primaryText}>{primaryText}</Text>
+                                <Text style={[style.primaryText, {marginHorizontal: 7}]}>{'\u2022'}</Text>
+                                <Text style={style.secondaryText}>{secondaryText}</Text>
+                            </View>
+                        }
+                        rightElement={<Image source={{uri: 'map_icon'}} style={{width: 31, height: 31}} />}
                         style={{
-                            container: {},
-                            primaryText: {fontFamily: 'Roboto-Medium', fontSize: 18, color: 'black'},
-                            secondaryText: {fontFamily: 'Roboto-Regular', fontSize: 13, color: 'black'},
-                            centerElementContainer: {height: '100%', justifyContent: 'center'}
+                            container: {}
                         }}
                     />
                 </View>
                 <View style={styles.lineStyle}/>
                 <View
-                    style={[style.secondSectionContainer, {height: calculateDimension(70, true, this.props.screenSize)}]}>
+                    style={[style.secondSectionContainer, {height: calculateDimension(78.5, true, this.props.screenSize)}]}>
                     <Text
                         style={[style.addressStyle, {marginHorizontal: calculateDimension(14, false, this.props.screenSize)}]}>{addressText}</Text>
                     <Text
@@ -110,7 +110,7 @@ const style = StyleSheet.create({
         borderRadius: 2
     },
     firstSectionContainer: {
-        justifyContent: 'space-between'
+        justifyContent: 'space-between',
     },
     addressStyle: {
         fontFamily: 'Roboto-Light',
@@ -134,6 +134,21 @@ const style = StyleSheet.create({
         fontFamily: 'Roboto-Medium',
         fontSize: 12,
         color: styles.buttonGreen
+    },
+    centerItemContainer: {
+        flexDirection: 'row',
+        height: '100%',
+        alignItems: 'center'
+    },
+    primaryText: {
+        fontFamily: 'Roboto-Medium',
+        fontSize: 18,
+        color: 'black'
+    },
+    secondaryText: {
+        fontFamily: 'Roboto-Regular',
+        fontSize: 13,
+        color: 'black'
     }
 });
 

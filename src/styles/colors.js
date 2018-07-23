@@ -8,6 +8,7 @@ const navigationDrawerItemText = 'rgb(60, 60, 60)';
 const navigationDrawerBackgroundColor = 'rgba(1, 1, 1, 0.24)';
 const navigationDrawerSeparatorGrey = 'rgb(211, 211, 211)';
 const buttonTextGray = 'rgb(71, 70, 70)';
+const textEmptyList = 'rgb(55, 55, 55)';
 
 export default {
     screenBackgroundGrey,
@@ -16,5 +17,6 @@ export default {
     navigationDrawerItemText,
     navigationDrawerBackgroundColor,
     navigationDrawerSeparatorGrey,
-    buttonTextGray
+    buttonTextGray,
+    textEmptyList
 }

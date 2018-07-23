@@ -7,12 +7,11 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
-import {TextInput, View, Text, StyleSheet, Platform, FlatList} from 'react-native';
+import {TextInput, View, Text, StyleSheet, Platform} from 'react-native';
 import {Button} from 'react-native-material-ui';
 import { TextField } from 'react-native-material-textfield';
 import styles from './../styles';
 import NavBarCustom from './../components/NavBarCustom';
-import {Calendar} from 'react-native-calendars';
 import CalendarPicker from './../components/CalendarPicker';
 import {calculateDimension} from './../utils/functions';
 import config from './../utils/config';
@@ -23,6 +22,8 @@ import SearchFilterView from './../components/SearchFilterView';
 import FollowUpListItem from './../components/FollowUpListItem';
 import ElevatedView from 'react-native-elevated-view';
 import {Dropdown} from 'react-native-material-dropdown';
+import AnimatedListView from './../components/AnimatedListView';
+
 
 class FollowUpsScreen extends Component {
 
@@ -38,6 +39,8 @@ class FollowUpsScreen extends Component {
         // Bind here methods, or at least don't declare methods in the render method
         this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this));
     }
+
+
 
     // Please add here the react lifecycle methods that you need
 
@@ -87,11 +90,14 @@ class FollowUpsScreen extends Component {
                 </NavBarCustom>
                 <View style={style.containerContent}>
                     <SearchFilterView/>
-                    <FlatList
+                    <AnimatedListView
                         data={this.props.followUps}
                         renderItem={this.renderFollowUp}
                         keyExtractor={this.keyExtractor}
                         ItemSeparatorComponent={this.renderSeparatorComponent}
+                        ListEmptyComponent={this.listEmptyComponent}
+                        style={style.listViewStyle}
+                        componentContainerStyle={style.componentContainerStyle}
                     />
                 </View>
             </View>
@@ -120,6 +126,28 @@ class FollowUpsScreen extends Component {
     calculateTopForDropdown = () => {
         let dim = calculateDimension(98, true, this.props.screenSize);
         return dim;
+    };
+
+    listEmptyComponent = () => {
+        return (
+            <View style={[style.emptyComponent]}>
+                <Text style={style.emptyComponentTextView}>There are no follow-ups to display</Text>
+                <Button
+                    raised
+                    upperCase={false}
+                    text="Generate for 1 day"
+                    color="blue"
+                    titleColor="red"
+                    onPress={() => {
+                        console.log("Ceve")
+                    }}
+                    style={{
+                        text: style.buttonEmptyListText,
+                        container: {width: calculateDimension(230, false, this.props.screenSize), height: calculateDimension(35, true, this.props.screenSize)}
+                    }}
+                />
+            </View>
+        )
     };
 
     onNavigatorEvent = (event) => {
@@ -168,6 +196,26 @@ const style = StyleSheet.create({
     },
     separatorComponentStyle: {
         height: 8
+    },
+    listViewStyle: {
+
+    },
+    componentContainerStyle: {
+    },
+    emptyComponent: {
+        height: '100%',
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+    emptyComponentTextView: {
+        fontFamily: 'Roboto-Light',
+        fontSize: 15,
+        color: styles.textEmptyList
+    },
+    buttonEmptyListText: {
+        fontFamily: 'Roboto-Regular',
+        fontSize: 16.8,
+        color: styles.buttonTextGray
     }
 });
 

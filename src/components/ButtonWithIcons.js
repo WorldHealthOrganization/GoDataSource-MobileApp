@@ -13,12 +13,6 @@ import IconMaterial from 'react-native-vector-icons/MaterialCommunityIcons';
 import styles from './../styles';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
-import ElevatedView from 'react-native-elevated-view';
-import {Dropdown} from 'react-native-material-dropdown';
-
-
-let height = Dimensions.get('window').height;
-let width = Dimensions.get('window').width;
 
 class ButtonWithIcons extends PureComponent {
 
