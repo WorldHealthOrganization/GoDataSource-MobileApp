@@ -6,6 +6,7 @@ import { changeAppRoot } from './app';
 import {loginUserRequest, getUserByIdRequest} from './../requests/user';
 import { getFollowUpsForOutbreakId } from './followUps';
 import { getContactsForOutbreakId } from './contacts';
+import { getCasesForOutbreakId } from './cases';
 
 // Add here only the actions, not also the requests that are executed.
 // For that purpose is the requests directory
@@ -51,6 +52,7 @@ export function getUserById(userId, token) {
                 dispatch(storeUser(user));
                 dispatch(getFollowUpsForOutbreakId(user.activeOutbreakId, null, user.token));
                 dispatch(getContactsForOutbreakId(user.activeOutbreakId, user.token));
+                dispatch(getCasesForOutbreakId(user.activeOutbreakId, user.token));
                 dispatch(changeAppRoot('after-login'));
             }
         })
