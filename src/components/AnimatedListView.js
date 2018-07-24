@@ -28,7 +28,6 @@ class AnimatedListView extends PureComponent {
     constructor(props) {
         super(props);
         this.state = {
-
         };
     }
 
@@ -56,10 +55,12 @@ class AnimatedListView extends PureComponent {
                 legacyImplementation={false}
                 viewabilityCongig={VIEWABILITY_CONFIG}
                 disableVirtualization={false}
-                onScroll={this.handleScroll}
+                onScroll={this.props.onScroll}
+                ListHeaderComponent={this.props.ListHeaderComponent}
                 ListEmptyComponent={this.props.ListEmptyComponent}
                 style={this.props.style}
                 componentContainerStyle={this.props.componentContainerStyle}
+                stickyHeaderIndices={this.props.stickyHeaderIndices}
             />
         );
     }
@@ -77,20 +78,6 @@ AnimatedListView.defaultProps = {
 // Create style outside the class, or for components that will be used by other components (buttons),
 // make a global style in the config directory
 const style = StyleSheet.create({
-    containerButton: {
-        height: '100%',
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: 'white',
-        borderRadius: 4,
-    },
-    containerInnerView: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingHorizontal: 9,
-        justifyContent: 'space-between',
-        flex: 1
-    }
 });
 
 function mapStateToProps(state) {

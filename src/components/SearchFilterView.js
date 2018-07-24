@@ -4,7 +4,7 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
-import {TextInput, View, Text, StyleSheet, Platform, Dimensions} from 'react-native';
+import {TextInput, View, Text, StyleSheet, Platform, Dimensions, Animated} from 'react-native';
 import {ListItem, Icon} from 'react-native-material-ui';
 import {calculateDimension} from './../utils/functions';
 import config from './../utils/config';
@@ -36,11 +36,24 @@ class SearchFilterView extends Component {
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
+
+        console.log("### style: ", this.props.style);
+
         return (
-            <View style={[style.container, {marginHorizontal: calculateDimension(16, false, this.props.screenSize), marginVertical: calculateDimension(13, false, this.props.screenSize)}]}>
-                <TextInputWithIcon/>
-                <Button title="Filter" color="white" titleColor={styles.buttonTextGray} onPress={() => console.log("TEst")} height={25} width={35} />
-            </View>
+            <Animated.View style={[this.props.style, {
+                height: calculateDimension(50, true, this.props.screenSize),
+                backgroundColor: '#eeeeee'
+            }]}>
+                <View style={[style.container, {
+                    width: calculateDimension(375 - 32, false, this.props.screenSize),
+                    marginHorizontal: calculateDimension(16, false, this.props.screenSize),
+                    marginVertical: calculateDimension(12.5, true, this.props.screenSize)
+                }]}>
+                    <TextInputWithIcon/>
+                    <Button title="Filter" color="white" titleColor={styles.buttonTextGray}
+                            onPress={() => console.log("TEst")} height={25} width={35}/>
+                </View>
+            </Animated.View>
         );
     }
 

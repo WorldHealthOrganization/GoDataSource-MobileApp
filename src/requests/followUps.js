@@ -4,8 +4,12 @@
 import url from './../utils/url';
 import {handleResponse} from './../utils/functions';
 
-export function getFollowUpsForOutbreakIdRequest(outbreakId, token, callback) {
+export function getFollowUpsForOutbreakIdRequest(outbreakId, filter, token, callback) {
     let requestUrl = url.outbreaks + outbreakId + '/follow-ups';
+
+    if (filter) {
+        requestUrl += '?filter=' + JSON.stringify(filter);
+    }
 
     fetch(requestUrl, {
         method: 'GET',

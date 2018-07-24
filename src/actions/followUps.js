@@ -13,9 +13,12 @@ export function storeFollowUps(followUps) {
     }
 }
 
-export function getFollowUpsForOutbreakId(outbreakId, token) {
+export function getFollowUpsForOutbreakId(outbreakId, filter, token) {
     return async function (dispatch, getState) {
-        getFollowUpsForOutbreakIdRequest(outbreakId, token, (error, response) => {
+        if (!filter || !filter.where || filter.where.and.length === 0 || !Array.isArray(filter.where.and)) {
+            filter = null;
+        }
+        getFollowUpsForOutbreakIdRequest(outbreakId, filter, token, (error, response) => {
             if (error) {
                 console.log("*** getFollowUpsForOutbreakId error: ", error);
             }

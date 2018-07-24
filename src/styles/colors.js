@@ -9,6 +9,8 @@ const navigationDrawerBackgroundColor = 'rgba(1, 1, 1, 0.24)';
 const navigationDrawerSeparatorGrey = 'rgb(211, 211, 211)';
 const buttonTextGray = 'rgb(71, 70, 70)';
 const textEmptyList = 'rgb(55, 55, 55)';
+const missedRedColor = 'rgb(255, 60, 56)';
+const appBackground = 'rgba(217, 217, 217, 0.5)';
 
 export default {
     screenBackgroundGrey,
@@ -18,5 +20,7 @@ export default {
     navigationDrawerBackgroundColor,
     navigationDrawerSeparatorGrey,
     buttonTextGray,
-    textEmptyList
+    textEmptyList,
+    missedRedColor,
+    appBackground
 }

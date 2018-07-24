@@ -7,7 +7,7 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
-import {TextInput, View, Text, StyleSheet, Platform} from 'react-native';
+import {TextInput, View, Text, StyleSheet, Platform, Animated} from 'react-native';
 import {Button} from 'react-native-material-ui';
 import { TextField } from 'react-native-material-textfield';
 import styles from './../styles';
@@ -20,10 +20,15 @@ import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import SearchFilterView from './../components/SearchFilterView';
 import FollowUpListItem from './../components/FollowUpListItem';
+import MissedFollowUpListItem from './../components/MissedFollowUpListItem';
 import ElevatedView from 'react-native-elevated-view';
 import {Dropdown} from 'react-native-material-dropdown';
 import AnimatedListView from './../components/AnimatedListView';
+import ValuePicker from './../components/ValuePicker';
+import {getFollowUpsForOutbreakId} from './../actions/followUps';
 
+const scrollAnim = new Animated.Value(0);
+const offsetAnim = new Animated.Value(0);
 
 class FollowUpsScreen extends Component {
 
@@ -34,53 +39,65 @@ class FollowUpsScreen extends Component {
     constructor(props) {
         super(props);
         this.state = {
-
+            filter: null
         };
         // Bind here methods, or at least don't declare methods in the render method
         this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this));
+        this.renderFollowUp = this.renderFollowUp.bind(this);
+        this.keyExtractor = this.keyExtractor.bind(this);
+        this.renderSeparatorComponent = this.renderSeparatorComponent.bind(this);
+        this.calculateTopForDropdown = this.calculateTopForDropdown.bind(this);
+        this.listEmptyComponent = this.listEmptyComponent.bind(this);
+        this.onSelectValue = this.onSelectValue.bind(this);
+        this.handleDayPress = this.handleDayPress.bind(this);
     }
 
-
-
     // Please add here the react lifecycle methods that you need
+    clampedScroll= Animated.diffClamp(
+        Animated.add(
+            scrollAnim.interpolate({
+                inputRange: [0, 1],
+                outputRange: [0, 1],
+                extrapolateLeft: 'clamp',
+            }),
+            offsetAnim,
+        ),
+        0,
+        30,
+    );
 
+    handleScroll = Animated.event(
+            [{nativeEvent: {contentOffset: {y: scrollAnim}}}],
+            {useNativeDriver: true}
+        );
 
     // The render method should have at least business logic as possible,
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
+        const navbarTranslate = this.clampedScroll.interpolate({
+            inputRange: [0, 30],
+            outputRange: [0, -30],
+            extrapolate: 'clamp',
+        });
+        const navbarOpacity = this.clampedScroll.interpolate({
+            inputRange: [0, 30],
+            outputRange: [1, 0],
+            extrapolate: 'clamp',
+        });
+
         return (
             <View style={style.container}>
-                <NavBarCustom title="Follow-ups">
+                <NavBarCustom title="Follow-ups" navigator={this.props.navigator} >
                     <CalendarPicker
                         width={calculateDimension(124, false, this.props.screenSize)}
                         height={calculateDimension(25, true, this.props.screenSize)}
+                        onDayPress={this.handleDayPress}
                     />
-                    <ElevatedView elevation={2}>
-                        <ButtonWithIcons
-                            label="To do"
-                            width={calculateDimension(124, false, this.props.screenSize)}
-                            height={calculateDimension(25, true, this.props.screenSize)}
-                            firstIcon="visibility"
-                            secondIcon="arrow-drop-down"
-                            isFirstIconPureMaterial={true}
-                            isSecondIconPureMaterial={true}
-                            onPress={this.handlePressDropdown}
-                        >
-                            <Dropdown
-                                ref='dropdown'
-                                data={config.dropDownValues}
-                                renderAccessory={() => {
-                                    return null;
-                                }}
-                                dropdownOffset={{
-                                    top: this.calculateTopForDropdown(),
-                                    left: -calculateDimension(110, false, this.props.screenSize)
-                                }}
-                                dropdownPosition={0}
-                            />
-                        </ButtonWithIcons>
-                    </ElevatedView>
+                    <ValuePicker
+                        top={this.calculateTopForDropdown()}
+                        onSelectValue={this.onSelectValue}
+                    />
                     <Button raised text="" onPress={() => console.log("Empty button")} icon="add"
                             style={{
                                 container: {width: calculateDimension(33, true, this.props.screenSize),height: calculateDimension(25, true, this.props.screenSize), margin: 0, padding: 0},
@@ -89,15 +106,22 @@ class FollowUpsScreen extends Component {
                             }}/>
                 </NavBarCustom>
                 <View style={style.containerContent}>
-                    <SearchFilterView/>
                     <AnimatedListView
+                        stickyHeaderIndices={[0]}
                         data={this.props.followUps}
                         renderItem={this.renderFollowUp}
                         keyExtractor={this.keyExtractor}
+                        ListHeaderComponent={<SearchFilterView style={{
+                            transform: [{
+                                translateY: navbarTranslate
+                            }],
+                            opacity: navbarOpacity
+                        }}  />}
                         ItemSeparatorComponent={this.renderSeparatorComponent}
                         ListEmptyComponent={this.listEmptyComponent}
-                        style={style.listViewStyle}
+                        style={[style.listViewStyle]}
                         componentContainerStyle={style.componentContainerStyle}
+                        onScroll={this.handleScroll}
                     />
                 </View>
             </View>
@@ -106,9 +130,15 @@ class FollowUpsScreen extends Component {
 
     // Please write here all the methods that are not react native lifecycle methods
     renderFollowUp = ({item}) => {
-        return (
-            <FollowUpListItem item={item} />
-        )
+        if (item.performed) {
+            return (
+                <FollowUpListItem item={item} />
+            )
+        } else {
+            return (
+                <MissedFollowUpListItem item={item} />
+            )
+        }
     };
 
     keyExtractor = (item, index) => item.id;
@@ -117,10 +147,6 @@ class FollowUpsScreen extends Component {
         return (
             <View style={style.separatorComponentStyle} />
         )
-    };
-
-    handlePressDropdown = () => {
-        this.refs.dropdown.focus();
     };
 
     calculateTopForDropdown = () => {
@@ -148,6 +174,70 @@ class FollowUpsScreen extends Component {
                 />
             </View>
         )
+    };
+
+    onSelectValue = (value) => {
+        if (value === 'All') {
+            this.removeFromFilter({type: 'performed'});
+        } else {
+            this.appendToFilter({type: 'performed', value});
+        }
+    };
+
+    handleDayPress = (day) => {
+        this.appendToFilter({type: 'date', value: day});
+    };
+
+
+    // Append to the existing filter newProp={name: value}
+    appendToFilter = (newProp) => {
+        let auxFilter = Object.assign({}, this.state.filter);
+
+        // If the filter exists, check if it has already the wanted props and change them. Otherwise add them
+        if (auxFilter) {
+           auxFilter[newProp.type] = newProp.value;
+        }
+
+        this.setFilter(auxFilter);
+    };
+
+    removeFromFilter = (newProp) => {
+        let auxFilter = Object.assign({}, this.state.filter);
+
+        if (auxFilter && auxFilter[newProp.type]) {
+            delete auxFilter[newProp.type];
+        }
+
+        this.setFilter(auxFilter);
+    };
+
+    setFilter = (filter) => {
+        this.setState({filter}, () => {
+            // After setting the filter, we want to apply it
+            this.applyFilters();
+        });
+    };
+
+    applyFilters = () => {
+        let filter = {};
+
+        filter.where = {};
+        filter.where.and = [];
+
+
+        if (this.state.filter.date) {
+            let oneDay = 24 * 60 * 60 * 1000;
+            filter.where.and.push({date: {gt: new Date(this.state.filter.date.getTime() - oneDay)}});
+            filter.where.and.push({date: {lt: new Date(this.state.filter.date.getTime() + oneDay)}});
+        }
+
+        if (this.state.filter.performed) {
+            filter.where.and.push({performed: this.state.filter.performed === 'To do'})
+        }
+
+        console.log("### filter: ", filter);
+
+        this.props.getFollowUpsForOutbreakId(this.props.user.activeOutbreakId, filter, this.props.user.token)
     };
 
     onNavigatorEvent = (event) => {
@@ -181,6 +271,7 @@ class FollowUpsScreen extends Component {
             }
         }
     };
+
 }
 
 // Create style outside the class, or for components that will be used by other components (buttons),
@@ -192,7 +283,7 @@ const style = StyleSheet.create({
     },
     containerContent: {
         flex: 1,
-        backgroundColor: 'rgba(217, 217, 217, 0.5)'
+        backgroundColor: styles.appBackground
     },
     separatorComponentStyle: {
         height: 8
@@ -229,6 +320,7 @@ function mapStateToProps(state) {
 
 function matchDispatchProps(dispatch) {
     return bindActionCreators({
+        getFollowUpsForOutbreakId
     }, dispatch);
 }
 

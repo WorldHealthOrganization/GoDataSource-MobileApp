@@ -44,7 +44,7 @@ class ContactsScreen extends Component {
     render() {
         return (
             <View style={style.container}>
-                <NavBarCustom title="Follow-ups">
+                <NavBarCustom title="Follow-ups" navigator={this.props.navigator} >
                     <CalendarPicker
                         width={calculateDimension(124, false, this.props.screenSize)}
                         height={calculateDimension(25, true, this.props.screenSize)}

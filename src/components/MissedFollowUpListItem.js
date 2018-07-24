@@ -15,8 +15,9 @@ import Button from './Button';
 import styles from './../styles';
 import Ripple from 'react-native-material-ripple';
 import ElevatedView from 'react-native-elevated-view';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
-class FollowUpListItem extends PureComponent {
+class MissedFollowUpListItem extends PureComponent {
 
     // This will be a dumb component, so it's best not to put any business logic in it
     constructor(props) {
@@ -34,28 +35,15 @@ class FollowUpListItem extends PureComponent {
     render() {
         // Get contact info from the follow-ups
 
-        // console.log("### item: ", this.props.item);
-
         let contact = this.props && this.props.contacts && Array.isArray(this.props.contacts) && this.props.contacts.length > 0 ? this.props.contacts[this.props.contacts.map((e) => {return e.id}).indexOf(this.props.item.personId)] : null;
         let primaryText = contact && ((contact.firstName ? contact.firstName : ' ') + (contact.lastName ? (" " + contact.lastName) : ' '));
-        let secondaryText = contact && ((contact.gender ? contact.gender.charAt(0) : ' ') + (contact.age ? (", " + contact.age) : ' '));
-
-        let addressText = ' ';
-        let addressArray = [];
-
-        if (this.props && this.props.item && this.props.item.address) {
-            addressArray = [this.props.item.address.addressLine1, this.props.item.address.addressLine2, this.props.item.address.city, this.props.item.address.country, this.props.item.address.postalCode];
-            addressArray = addressArray.filter((e) => {return e});
-        }
-
-        addressText = addressArray.join(', ');
 
         return (
             <ElevatedView elevation={3} style={[style.container, {
                 marginHorizontal: calculateDimension(16, false, this.props.screenSize),
-                height: calculateDimension(178, true, this.props.screenSize)
+                height: calculateDimension(157, true, this.props.screenSize)
             }]}>
-                <Ripple>
+                <Ripple style={{flex: 1}}>
                     <View style={[style.firstSectionContainer, {
                         height: calculateDimension(53, true, this.props.screenSize),
                         paddingBottom: calculateDimension(18, true, this.props.screenSize)
@@ -65,11 +53,14 @@ class FollowUpListItem extends PureComponent {
                             centerElement={
                                 <View style={style.centerItemContainer}>
                                     <Text style={style.primaryText}>{primaryText}</Text>
-                                    <Text style={[style.primaryText, {marginHorizontal: 7}]}>{'\u2022'}</Text>
-                                    <Text style={style.secondaryText}>{secondaryText}</Text>
                                 </View>
                             }
-                            rightElement={<Image source={{uri: 'map_icon'}} style={{width: 31, height: 31}}/>}
+                            rightElement={
+                                <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                                    <Ionicons name="ios-close-circle-outline" color={styles.missedRedColor} size={13}/>
+                                    <Text style={style.missedTextStyle}>Missed</Text>
+                                </View>
+                            }
                             style={{
                                 container: {marginRight: calculateDimension(13, false, this.props.screenSize)},
                                 rightElementContainer: {justifyContent: 'center', alignItems: 'center'}
@@ -78,33 +69,20 @@ class FollowUpListItem extends PureComponent {
                     </View>
                     <View style={styles.lineStyle}/>
                     <View
-                        style={[style.secondSectionContainer, {height: calculateDimension(78.5, true, this.props.screenSize)}]}>
-                        <Text
-                            style={[style.addressStyle, {
-                                marginHorizontal: calculateDimension(14, false, this.props.screenSize),
-                                marginVertical: 7.5
-                            }]}>{addressText}</Text>
-                        <Text
-                            style={[style.addressStyle, {
-                                marginHorizontal: calculateDimension(14, false, this.props.screenSize),
-                                marginVertical: 7.5
-                            }]}>Exposed
-                            to: Diana Jones</Text>
+                        style={[style.secondSectionContainer, {
+                            height: calculateDimension(52, true, this.props.screenSize),
+                            marginHorizontal: calculateDimension(14, false, this.props.screenSize)
+                        }]}>
+                        <Text style={style.followUpPrefix}>Last follow-up: </Text>
+                        <Text style={style.followUpSuffix}>28.06.2018 - hardcoded</Text>
                     </View>
                     <View style={styles.lineStyle}/>
+                    <View
+                        style={[style.thirdSectionContainer, {marginHorizontal: calculateDimension(14, false, this.props.screenSize)}]}>
+                        <Text style={style.followUpPrefix}>Next follow-up: </Text>
+                        <Text style={style.followUpSuffix}>28.06.2018 - hardcoded</Text>
+                    </View>
                 </Ripple>
-                <View
-                    style={[style.thirdSectionContainer, {marginHorizontal: calculateDimension(14, false, this.props.screenSize)}]}>
-                    <Ripple style={[style.rippleStyle]}>
-                        <Text style={[style.rippleTextStyle]}>FOLLOW-UP</Text>
-                    </Ripple>
-                    <Ripple style={[style.rippleStyle]}>
-                        <Text style={[style.rippleTextStyle]}>MISSING</Text>
-                    </Ripple>
-                    <Ripple style={[style.rippleStyle]}>
-                        <Text style={[style.rippleTextStyle]}>ADD EXPOSURE</Text>
-                    </Ripple>
-                </View>
             </ElevatedView>
         );
     }
@@ -129,12 +107,12 @@ const style = StyleSheet.create({
         color: styles.navigationDrawerItemText
     },
     secondSectionContainer: {
-        justifyContent: 'center'
+        flexDirection: 'row',
+        alignItems: 'center'
     },
     thirdSectionContainer: {
         flex: 1,
         flexDirection: 'row',
-        justifyContent: 'space-between',
         alignItems: 'center'
     },
     rippleStyle: {
@@ -160,6 +138,22 @@ const style = StyleSheet.create({
         fontFamily: 'Roboto-Regular',
         fontSize: 13,
         color: 'black'
+    },
+    missedTextStyle: {
+        fontFamily: 'Roboto-Medium',
+        fontSize: 12,
+        color: styles.missedRedColor,
+        marginLeft: 4.5
+    },
+    followUpPrefix: {
+        fontFamily: 'Roboto-Light',
+        fontSize: 12.5,
+        color: styles.navigationDrawerItemText
+    },
+    followUpSuffix: {
+        fontFamily: 'Roboto-Medium',
+        fontSize: 12.5,
+        color: styles.navigationDrawerItemText
     }
 });
 
@@ -175,4 +169,7 @@ function matchDispatchProps(dispatch) {
     }, dispatch);
 }
 
-export default connect(mapStateToProps, matchDispatchProps)(FollowUpListItem);
+export default connect(mapStateToProps, matchDispatchProps)(MissedFollowUpListItem);
+/**
+ * Created by florinpopa on 23/07/2018.
+ */

@@ -18,13 +18,15 @@ import ElevatedView from 'react-native-elevated-view';
 
 class CalendarPicker extends PureComponent {
 
-    // This will be a dumb component, so it's best not to put any business logic in it
     constructor(props) {
         super(props);
         this.state = {
             pickerOpen: false,
             label: 'Today'
         };
+
+        this.openCalendarModal = this.openCalendarModal.bind(this);
+        this.handleDateChanged = this.handleDateChanged.bind(this);
     }
 
     // Please add here the react lifecycle methods that you need
@@ -59,15 +61,17 @@ class CalendarPicker extends PureComponent {
     openCalendarModal = () => {
         console.log("You got another thing coming");
         this.setState({pickerOpen: !this.state.pickerOpen})
-    }
+    };
 
     handleDateChanged = (date) => {
         let dateAux = checkIfSameDay(new Date(date.dateString), new Date()) ? 'Today' : new Date(date.dateString).toLocaleDateString();
-        console.log("### date changed: ", new Date(date.dateString));
         this.setState({
             label: dateAux
+        }, () => {
+            this.openCalendarModal();
+            this.props.onDayPress(new Date(date.dateString));
         })
-    }
+    };
 }
 
 CalendarPicker.defaultProps = {

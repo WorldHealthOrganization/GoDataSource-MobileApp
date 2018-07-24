@@ -49,7 +49,7 @@ export function getUserById(userId, token) {
                 // store also the token
                 let user = Object.assign({}, response, {token: token});
                 dispatch(storeUser(user));
-                dispatch(getFollowUpsForOutbreakId(user.activeOutbreakId, user.token));
+                dispatch(getFollowUpsForOutbreakId(user.activeOutbreakId, null, user.token));
                 dispatch(getContactsForOutbreakId(user.activeOutbreakId, user.token));
                 dispatch(changeAppRoot('after-login'));
             }

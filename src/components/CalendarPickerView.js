@@ -9,7 +9,6 @@ import {ListItem, Icon, Button} from 'react-native-material-ui';
 import {calculateDimension} from './../utils/functions';
 import config from './../utils/config';
 import Calendar from "react-native-calendars/src/calendar/index";
-import {Overlay} from 'react-native-elements';
 import Modal from 'react-native-root-modal';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -21,7 +20,7 @@ class CalendarPickerView extends PureComponent {
     constructor(props) {
         super(props);
         this.state = {
-            pickerOpen: false
+            selectedDate: new Date()
         };
 
         this.calculateTop = this.calculateTop.bind(this);
@@ -46,7 +45,8 @@ class CalendarPickerView extends PureComponent {
             >
                 <ElevatedView elevation={4} style={{flex: 1}}>
                     <Calendar
-                        onDayPress={this.props.dateChanged}
+                        markedDates={{[this.state.selectedDate]: {marked: true}}}
+                        onDayPress={this.handleDateChanged}
                         monthFormat={'MMMM yyyy'}
                     />
                 </ElevatedView>
@@ -57,7 +57,15 @@ class CalendarPickerView extends PureComponent {
     // Please write here all the methods that are not react native lifecycle methods
     calculateTop = () => {
         return calculateDimension(74, true, this.props.screenSize) + (Platform.OS === 'ios' ? this.props.screenSize.height === 812 ? 44 : 20 : 0);
-    }
+    };
+
+    handleDateChanged = (date) => {
+        this.setState({
+            selectedDate: date.dateString
+        }, () => {
+            this.props.dateChanged(date);
+        })
+    };
 }
 
 CalendarPickerView.defaultProps = {

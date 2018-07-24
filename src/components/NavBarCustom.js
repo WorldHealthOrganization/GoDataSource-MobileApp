@@ -12,6 +12,7 @@ import CalendarPicker from './CalendarPicker';
 import Calendar from "react-native-calendars/src/calendar/index";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
+import Ripple from 'react-native-material-ripple';
 
 class NavBarCustom extends PureComponent {
 
@@ -35,16 +36,19 @@ class NavBarCustom extends PureComponent {
             <View style={[this.props.style, style.container,
                 {
                     height: calculateDimension(81, true, this.props.screenSize),
-                    marginTop: Platform.OS === 'ios' ? this.props.screenSize.height === 812 ? 44 : 20 : 0
+                    marginTop: Platform.OS === 'ios' ? this.props.screenSize.height === 812 ? 44 : 20 : 0,
+                    marginHorizontal: calculateDimension(16, false, this.props.screenSize)
                 },
                 Platform.OS === 'ios' && {zIndex: 99}
             ]}
             >
-                <View style={style.containerUpperNavBar}>
-                    <Icon name="menu"/>
+                <View style={[style.containerUpperNavBar]}>
+                    <Ripple onPress={this.handlePressNavbarButton}>
+                        <Icon name="menu"/>
+                    </Ripple>
                     <Text style={style.title}>{this.props.title}</Text>
                 </View>
-                <View style={[style.containerLowerNavBar, {paddingHorizontal: calculateDimension(16, false, this.props.screenSize)}]}>
+                <View style={[style.containerLowerNavBar]}>
                     {
                         this.props.children
                     }
@@ -54,6 +58,13 @@ class NavBarCustom extends PureComponent {
     }
 
     // Please write here all the methods that are not react native lifecycle methods
+    handlePressNavbarButton = () => {
+        this.props.navigator.toggleDrawer({
+            side: 'left',
+            animated: true,
+            to: 'missing'
+        })
+    }
 }
 
 // Create style outside the class, or for components that will be used by other components (buttons),
