@@ -37,9 +37,21 @@ const dropDownValues = [
     }
 ];
 
+const tabsValuesRoutes = {
+    followUpsFilter: [
+        {key: 'filters', title: 'FILTERS'},
+        {key: 'sort', title: 'SORT'}
+    ],
+    followUpsSingle: [
+        {key: 'genInfo', title: 'GENERAL INFO'},
+        {key: 'quest', title: 'QUESTIONNAIRE'}
+    ]
+};
+
 
 export default {
     designScreenSize,
     sideMenuItems,
-    dropDownValues
+    dropDownValues,
+    tabsValuesRoutes
 }

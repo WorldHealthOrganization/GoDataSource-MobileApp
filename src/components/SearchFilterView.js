@@ -51,7 +51,7 @@ class SearchFilterView extends Component {
                 }]}>
                     <TextInputWithIcon/>
                     <Button title="Filter" color="white" titleColor={styles.buttonTextGray}
-                            onPress={() => console.log("TEst")} height={25} width={35}/>
+                            onPress={this.props.onPress} height={25} width={35}/>
                 </View>
             </Animated.View>
         );

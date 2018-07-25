@@ -44,7 +44,12 @@ class ContactsScreen extends Component {
     render() {
         return (
             <View style={style.container}>
-                <NavBarCustom title="Follow-ups" navigator={this.props.navigator} >
+                <NavBarCustom
+                    title="Contacts"
+                    navigator={this.props.navigator}
+                    iconName="menu"
+                    handlePressNavbarButton={this.handlePressNavbarButton}
+                >
                     <CalendarPicker
                         width={calculateDimension(124, false, this.props.screenSize)}
                         height={calculateDimension(25, true, this.props.screenSize)}
@@ -73,6 +78,14 @@ class ContactsScreen extends Component {
     }
 
     // Please write here all the methods that are not react native lifecycle methods
+    handlePressNavbarButton = () => {
+        this.props.navigator.toggleDrawer({
+            side: 'left',
+            animated: true,
+            to: 'open'
+        })
+    };
+
     onNavigatorEvent = (event) => {
         if (event.type === 'DeepLink') {
             console.log("###");

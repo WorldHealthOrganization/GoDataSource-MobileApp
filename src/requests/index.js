@@ -6,5 +6,6 @@ import outbreak from './outbreak';
 import cases from './cases';
 import followUps from './followUps';
 import contacts from './contacts';
+import events from './events';
 
-module.exports = Object.assign({}, user, outbreak, cases, followUps, contacts);
+module.exports = Object.assign({}, user, outbreak, cases, followUps, contacts, events);

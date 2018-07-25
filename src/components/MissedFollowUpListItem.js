@@ -43,7 +43,7 @@ class MissedFollowUpListItem extends PureComponent {
                 marginHorizontal: calculateDimension(16, false, this.props.screenSize),
                 height: calculateDimension(157, true, this.props.screenSize)
             }]}>
-                <Ripple style={{flex: 1}}>
+                <Ripple style={{flex: 1}} onPress={this.props.onPressFollowUp}>
                     <View style={[style.firstSectionContainer, {
                         height: calculateDimension(53, true, this.props.screenSize),
                         paddingBottom: calculateDimension(18, true, this.props.screenSize)

@@ -11,6 +11,8 @@ const buttonTextGray = 'rgb(71, 70, 70)';
 const textEmptyList = 'rgb(55, 55, 55)';
 const missedRedColor = 'rgb(255, 60, 56)';
 const appBackground = 'rgba(217, 217, 217, 0.5)';
+const colorLabelActiveTab = 'rgb(46, 46, 46)';
+const colorLabelInactiveTab = 'rgba(46, 46, 46, 0.35)'
 
 export default {
     screenBackgroundGrey,
@@ -22,5 +24,7 @@ export default {
     buttonTextGray,
     textEmptyList,
     missedRedColor,
-    appBackground
+    appBackground,
+    colorLabelActiveTab,
+    colorLabelInactiveTab
 }

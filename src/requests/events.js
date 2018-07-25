@@ -1,10 +1,10 @@
 /**
- * Created by florinpopa on 20/07/2018.
+ * Created by florinpopa on 25/07/2018.
  */
 import url from './../utils/url';
 import {handleResponse} from './../utils/functions';
 
-export function getContactsForOutbreakIdRequest(outbreakId, token, callback) {
+export function getEventsForOutbreakIdRequest(outbreakId, token, callback) {
 
     let filter = {
         include: {
@@ -12,7 +12,7 @@ export function getContactsForOutbreakIdRequest(outbreakId, token, callback) {
         }
     };
 
-    let requestUrl = url.outbreaks + outbreakId + '/contacts?filter=' + JSON.stringify(filter);
+    let requestUrl = url.outbreaks + outbreakId + '/events?filter=' + JSON.stringify(filter);
 
     fetch(requestUrl, {
         method: 'GET',
@@ -26,11 +26,11 @@ export function getContactsForOutbreakIdRequest(outbreakId, token, callback) {
             return handleResponse(response);
         })
         .then((response) => {
-            console.log('### getContactsForOutbreakId response: ', response);
+            console.log('### getEventsForOutbreakIdRequest response: ', response);
             callback(null, response);
         })
         .catch((error) => {
-            console.log("*** getContactsForOutbreakId error: ", error);
+            console.log("*** getEventsForOutbreakIdRequest error: ", error);
             callback(error);
         })
 }

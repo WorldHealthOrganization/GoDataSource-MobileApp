@@ -20,8 +20,6 @@ class NavBarCustom extends PureComponent {
     constructor(props) {
         super(props);
         this.state = {
-            username: '',
-            password: ''
         };
     }
 
@@ -35,36 +33,33 @@ class NavBarCustom extends PureComponent {
         return (
             <View style={[this.props.style, style.container,
                 {
-                    height: calculateDimension(81, true, this.props.screenSize),
+                    height: calculateDimension(this.props.children ? 81 : 40.5, true, this.props.screenSize),
                     marginTop: Platform.OS === 'ios' ? this.props.screenSize.height === 812 ? 44 : 20 : 0,
                     marginHorizontal: calculateDimension(16, false, this.props.screenSize)
                 },
                 Platform.OS === 'ios' && {zIndex: 99}
             ]}
             >
-                <View style={[style.containerUpperNavBar]}>
-                    <Ripple onPress={this.handlePressNavbarButton}>
-                        <Icon name="menu"/>
+                <View style={[style.containerUpperNavBar, {flex: this.props.children ? 0.5 : 1}]}>
+                    <Ripple onPress={this.props.handlePressNavbarButton}>
+                        <Icon name={this.props.iconName}/>
                     </Ripple>
                     <Text style={style.title}>{this.props.title}</Text>
                 </View>
-                <View style={[style.containerLowerNavBar]}>
-                    {
-                        this.props.children
-                    }
-                </View>
+                {
+                    this.props.children && (
+                        <View style={[style.containerLowerNavBar]}>
+                            {
+                                this.props.children
+                            }
+                        </View>
+                    )
+                }
             </View>
         );
     }
 
     // Please write here all the methods that are not react native lifecycle methods
-    handlePressNavbarButton = () => {
-        this.props.navigator.toggleDrawer({
-            side: 'left',
-            animated: true,
-            to: 'missing'
-        })
-    }
 }
 
 // Create style outside the class, or for components that will be used by other components (buttons),
@@ -74,7 +69,6 @@ const style = StyleSheet.create({
         backgroundColor: 'rgb(237, 237, 237)'
     },
     containerUpperNavBar: {
-        flex: 0.5,
         flexDirection: 'row',
         alignItems: 'center',
         backgroundColor: 'white'

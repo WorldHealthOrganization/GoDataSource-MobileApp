@@ -8,6 +8,7 @@ import outbreak from './outbreak';
 import cases from './cases';
 import followUps from './followUps';
 import contacts from './contacts';
+import events from './events';
 
 const allReducers = combineReducers({
     app,
@@ -15,7 +16,8 @@ const allReducers = combineReducers({
     outbreak,
     cases,
     followUps,
-    contacts
+    contacts,
+    events
 });
 
 export default allReducers;

@@ -25,7 +25,7 @@ import ElevatedView from 'react-native-elevated-view';
 import {Dropdown} from 'react-native-material-dropdown';
 import AnimatedListView from './../components/AnimatedListView';
 import ValuePicker from './../components/ValuePicker';
-import {getFollowUpsForOutbreakId} from './../actions/followUps';
+import {getFollowUpsForOutbreakId, getMissedFollowUpsForOutbreakId} from './../actions/followUps';
 
 const scrollAnim = new Animated.Value(0);
 const offsetAnim = new Animated.Value(0);
@@ -88,7 +88,12 @@ class FollowUpsScreen extends Component {
 
         return (
             <View style={style.container}>
-                <NavBarCustom title="Follow-ups" navigator={this.props.navigator} >
+                <NavBarCustom
+                    title="Follow-ups"
+                    navigator={this.props.navigator}
+                    iconName="menu"
+                    handlePressNavbarButton={this.handlePressNavbarButton}
+                >
                     <CalendarPicker
                         width={calculateDimension(124, false, this.props.screenSize)}
                         height={calculateDimension(25, true, this.props.screenSize)}
@@ -116,7 +121,9 @@ class FollowUpsScreen extends Component {
                                 translateY: navbarTranslate
                             }],
                             opacity: navbarOpacity
-                        }}  />}
+                        }}
+                           onPress={this.handlePressFilter}
+                        />}
                         ItemSeparatorComponent={this.renderSeparatorComponent}
                         ListEmptyComponent={this.listEmptyComponent}
                         style={[style.listViewStyle]}
@@ -129,14 +136,22 @@ class FollowUpsScreen extends Component {
     }
 
     // Please write here all the methods that are not react native lifecycle methods
+    handlePressNavbarButton = () => {
+        this.props.navigator.toggleDrawer({
+            side: 'left',
+            animated: true,
+            to: 'open'
+        })
+    };
+
     renderFollowUp = ({item}) => {
-        if (item.performed) {
+        if (!item.performed && new Date(item.date) > new Date()) {
             return (
-                <FollowUpListItem item={item} />
+                <FollowUpListItem item={item} onPressFollowUp={this.handlePressFollowUp} />
             )
         } else {
             return (
-                <MissedFollowUpListItem item={item} />
+                <MissedFollowUpListItem item={item} onPressFollowUp={this.handlePressFollowUp} />
             )
         }
     };
@@ -156,7 +171,7 @@ class FollowUpsScreen extends Component {
 
     listEmptyComponent = () => {
         return (
-            <View style={[style.emptyComponent]}>
+            <View style={[style.emptyComponent, {height: calculateDimension((667 - 152), true, this.props.screenSize)}]}>
                 <Text style={style.emptyComponentTextView}>There are no follow-ups to display</Text>
                 <Button
                     raised
@@ -188,6 +203,21 @@ class FollowUpsScreen extends Component {
         this.appendToFilter({type: 'date', value: day});
     };
 
+    handlePressFollowUp = () => {
+        this.props.navigator.push({
+            screen: 'FollowUpsSingleScreen',
+            animated: true,
+            animationType: 'fade'
+        })
+    };
+
+    handlePressFilter = () => {
+        this.props.navigator.push({
+            screen: 'FollowUpsFilterScreen',
+            animated: true,
+            animationType: 'fade'
+        })
+    };
 
     // Append to the existing filter newProp={name: value}
     appendToFilter = (newProp) => {
@@ -224,20 +254,30 @@ class FollowUpsScreen extends Component {
         filter.where = {};
         filter.where.and = [];
 
+        let oneDay = 24 * 60 * 60 * 1000;
 
         if (this.state.filter.date) {
-            let oneDay = 24 * 60 * 60 * 1000;
             filter.where.and.push({date: {gt: new Date(this.state.filter.date.getTime() - oneDay)}});
             filter.where.and.push({date: {lt: new Date(this.state.filter.date.getTime() + oneDay)}});
         }
+        // else {
+        //     let now = new Date();
+        //
+        //     filter.where.and.push({date: {gt: new Date(now.getTime() - oneDay)}});
+        //     filter.where.and.push({date: {lt: new Date(now.getTime() + oneDay)}});
+        // }
 
         if (this.state.filter.performed) {
-            filter.where.and.push({performed: this.state.filter.performed === 'To do'})
+            filter.where.and.push({performed: this.state.filter.performed !== 'To do'})
         }
 
         console.log("### filter: ", filter);
 
-        this.props.getFollowUpsForOutbreakId(this.props.user.activeOutbreakId, filter, this.props.user.token)
+        if (this.state.filter.performed === 'Missed') {
+            this.props.getMissedFollowUpsForOutbreakId(this.props.user.activeOutbreakId, filter, this.props.user.token);
+        } else {
+            this.props.getFollowUpsForOutbreakId(this.props.user.activeOutbreakId, filter, this.props.user.token);
+        }
     };
 
     onNavigatorEvent = (event) => {
@@ -271,7 +311,6 @@ class FollowUpsScreen extends Component {
             }
         }
     };
-
 }
 
 // Create style outside the class, or for components that will be used by other components (buttons),
@@ -294,7 +333,6 @@ const style = StyleSheet.create({
     componentContainerStyle: {
     },
     emptyComponent: {
-        height: '100%',
         justifyContent: 'center',
         alignItems: 'center'
     },
@@ -320,7 +358,8 @@ function mapStateToProps(state) {
 
 function matchDispatchProps(dispatch) {
     return bindActionCreators({
-        getFollowUpsForOutbreakId
+        getFollowUpsForOutbreakId,
+        getMissedFollowUpsForOutbreakId
     }, dispatch);
 }
 

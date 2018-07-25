@@ -34,8 +34,6 @@ class FollowUpListItem extends PureComponent {
     render() {
         // Get contact info from the follow-ups
 
-        // console.log("### item: ", this.props.item);
-
         let contact = this.props && this.props.contacts && Array.isArray(this.props.contacts) && this.props.contacts.length > 0 ? this.props.contacts[this.props.contacts.map((e) => {return e.id}).indexOf(this.props.item.personId)] : null;
         let primaryText = contact && ((contact.firstName ? contact.firstName : ' ') + (contact.lastName ? (" " + contact.lastName) : ' '));
         let secondaryText = contact && ((contact.gender ? contact.gender.charAt(0) : ' ') + (contact.age ? (", " + contact.age) : ' '));
@@ -50,12 +48,14 @@ class FollowUpListItem extends PureComponent {
 
         addressText = addressArray.join(', ');
 
+        let relationshipText = this.handleExposedTo(contact);
+
         return (
             <ElevatedView elevation={3} style={[style.container, {
                 marginHorizontal: calculateDimension(16, false, this.props.screenSize),
                 height: calculateDimension(178, true, this.props.screenSize)
             }]}>
-                <Ripple>
+                <Ripple onPress={this.props.onPressFollowUp}>
                     <View style={[style.firstSectionContainer, {
                         height: calculateDimension(53, true, this.props.screenSize),
                         paddingBottom: calculateDimension(18, true, this.props.screenSize)
@@ -88,8 +88,7 @@ class FollowUpListItem extends PureComponent {
                             style={[style.addressStyle, {
                                 marginHorizontal: calculateDimension(14, false, this.props.screenSize),
                                 marginVertical: 7.5
-                            }]}>Exposed
-                            to: Diana Jones</Text>
+                            }]}>{'Exposed to: ' + relationshipText}</Text>
                     </View>
                     <View style={styles.lineStyle}/>
                 </Ripple>
@@ -110,6 +109,32 @@ class FollowUpListItem extends PureComponent {
     }
 
     // Please write here all the methods that are not react native lifecycle methods
+    handleExposedTo = (contact) => {
+        if (!contact || !contact.relationships || !Array.isArray(contact.relationships) || contact.relationships.length === 0) {
+            return ' ';
+        }
+
+        let relationshipText = '';
+        let relationshipArray = [];
+
+        let relationships = contact.relationships;
+
+        for (let i=0; i<relationships.length; i++) {
+            // Get only the persons that the contact has been exposed to
+            let persons = relationships[i].persons.filter((e) => {return e.id !== contact.id});
+            for (let j=0; j<persons.length; j++) {
+                if (persons[j].type === 'case') {
+                    let auxCase = this.props.cases[this.props.cases.map((e) => {return e.id}).indexOf(persons[j].id)];
+                    relationshipArray.push((auxCase.firstName || '') + " " + (auxCase.lastName || ''));
+                } else {
+                    let auxEvent = this.props.events[this.props.events.map((e) => {return e.id}).indexOf(persons[j].id)];
+                    relationshipArray.push(auxEvent.name);
+                }
+            }
+        }
+
+        return relationshipArray.join(", ");
+    };
 }
 
 
@@ -166,7 +191,9 @@ const style = StyleSheet.create({
 function mapStateToProps(state) {
     return {
         screenSize: state.app.screenSize,
-        contacts: state.contacts
+        contacts: state.contacts,
+        cases: state.cases,
+        events: state.events
     };
 }
 
