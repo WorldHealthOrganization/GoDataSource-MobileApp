@@ -43,7 +43,7 @@ class MissedFollowUpListItem extends PureComponent {
                 marginHorizontal: calculateDimension(16, false, this.props.screenSize),
                 height: calculateDimension(157, true, this.props.screenSize)
             }]}>
-                <Ripple style={{flex: 1}} onPress={this.props.onPressFollowUp}>
+                <Ripple style={{flex: 1}} onPress={this.onPressFollowUp}>
                     <View style={[style.firstSectionContainer, {
                         height: calculateDimension(53, true, this.props.screenSize),
                         paddingBottom: calculateDimension(18, true, this.props.screenSize)
@@ -88,6 +88,11 @@ class MissedFollowUpListItem extends PureComponent {
     }
 
     // Please write here all the methods that are not react native lifecycle methods
+    onPressFollowUp = () => {
+        let contact = this.props && this.props.contacts && Array.isArray(this.props.contacts) && this.props.contacts.length > 0 ? this.props.contacts[this.props.contacts.map((e) => {return e.id}).indexOf(this.props.item.personId)] : null;
+
+        this.props.onPressFollowUp({followUp: this.props.item, contact: contact});
+    }
 }
 
 

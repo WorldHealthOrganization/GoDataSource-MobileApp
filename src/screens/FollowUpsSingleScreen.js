@@ -5,25 +5,16 @@
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
 import {TextInput, View, Text, StyleSheet, Platform, Animated} from 'react-native';
-import {Button} from 'react-native-material-ui';
-import { TextField } from 'react-native-material-textfield';
 import styles from './../styles';
 import NavBarCustom from './../components/NavBarCustom';
-import CalendarPicker from './../components/CalendarPicker';
 import {calculateDimension} from './../utils/functions';
 import config from './../utils/config';
-import ButtonWithIcons from './../components/ButtonWithIcons';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
-import SearchFilterView from './../components/SearchFilterView';
-import FollowUpListItem from './../components/FollowUpListItem';
-import MissedFollowUpListItem from './../components/MissedFollowUpListItem';
-import ElevatedView from 'react-native-elevated-view';
-import {Dropdown} from 'react-native-material-dropdown';
-import AnimatedListView from './../components/AnimatedListView';
-import ValuePicker from './../components/ValuePicker';
 import {getFollowUpsForOutbreakId, getMissedFollowUpsForOutbreakId} from './../actions/followUps';
 import {TabBar, TabView} from 'react-native-tab-view';
+import FollowUpsSingleGetInfoContainer from './../containers/FollowUpsSingleGetInfoContainer';
+import FollowUpsSingleQuestionnaireContainer from './../containers/FollowUpsSingleQuestionnaireContainer';
 
 
 const scrollAnim = new Animated.Value(0);
@@ -50,6 +41,8 @@ class FollowUpsSingleScreen extends Component {
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
+
+        // console.log("### props from click: ", this.props.item);
 
         return (
             <View style={style.container}>
@@ -82,11 +75,15 @@ class FollowUpsSingleScreen extends Component {
     };
 
     handleRenderScene = () => {
-        return (
-            <View>
-                <Text>To do single followUp</Text>
-            </View>
-        )
+        if (this.state.index === 0) {
+            return (
+                <FollowUpsSingleGetInfoContainer item={this.props.item} />
+            )
+        } else {
+            return (
+                <FollowUpsSingleQuestionnaireContainer item={this.props.item} />
+            )
+        }
     };
 
     handleRenderTabBar = (props) => {

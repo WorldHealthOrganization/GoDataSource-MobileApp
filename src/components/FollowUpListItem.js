@@ -55,7 +55,7 @@ class FollowUpListItem extends PureComponent {
                 marginHorizontal: calculateDimension(16, false, this.props.screenSize),
                 height: calculateDimension(178, true, this.props.screenSize)
             }]}>
-                <Ripple onPress={this.props.onPressFollowUp}>
+                <Ripple onPress={this.onPressFollowUp}>
                     <View style={[style.firstSectionContainer, {
                         height: calculateDimension(53, true, this.props.screenSize),
                         paddingBottom: calculateDimension(18, true, this.props.screenSize)
@@ -123,18 +123,30 @@ class FollowUpListItem extends PureComponent {
             // Get only the persons that the contact has been exposed to
             let persons = relationships[i].persons.filter((e) => {return e.id !== contact.id});
             for (let j=0; j<persons.length; j++) {
-                if (persons[j].type === 'case') {
+                if (persons[j].type === 'case' && this.props && this.props.cases && Array.isArray(this.props.cases)) {
                     let auxCase = this.props.cases[this.props.cases.map((e) => {return e.id}).indexOf(persons[j].id)];
                     relationshipArray.push((auxCase.firstName || '') + " " + (auxCase.lastName || ''));
                 } else {
-                    let auxEvent = this.props.events[this.props.events.map((e) => {return e.id}).indexOf(persons[j].id)];
-                    relationshipArray.push(auxEvent.name);
+                    if (this.props && this.props.events && Array.isArray(this.props.events)) {
+                        let auxEvent = this.props.events[this.props.events.map((e) => {
+                            return e.id
+                        }).indexOf(persons[j].id)];
+                        if (auxEvent && auxEvent.name) {
+                            relationshipArray.push(auxEvent.name);
+                        }
+                    }
                 }
             }
         }
 
         return relationshipArray.join(", ");
     };
+
+    onPressFollowUp = () => {
+        let contact = this.props && this.props.contacts && Array.isArray(this.props.contacts) && this.props.contacts.length > 0 ? this.props.contacts[this.props.contacts.map((e) => {return e.id}).indexOf(this.props.item.personId)] : null;
+
+        this.props.onPressFollowUp({followUp: this.props.item, contact: contact});
+    }
 }
 
 

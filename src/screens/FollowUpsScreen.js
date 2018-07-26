@@ -203,11 +203,15 @@ class FollowUpsScreen extends Component {
         this.appendToFilter({type: 'date', value: day});
     };
 
-    handlePressFollowUp = () => {
+    handlePressFollowUp = (item) => {
+        console.log("### handlePressFollowUp: ", item);
         this.props.navigator.push({
             screen: 'FollowUpsSingleScreen',
             animated: true,
-            animationType: 'fade'
+            animationType: 'fade',
+            passProps: {
+                item: item
+            }
         })
     };
 
