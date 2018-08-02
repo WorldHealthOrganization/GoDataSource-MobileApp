@@ -15,6 +15,7 @@ import Button from './../components/Button';
 import styles from './../styles';
 import Ripple from 'react-native-material-ripple';
 import ElevatedView from 'react-native-elevated-view';
+import CardComponent from './../components/CardComponent';
 
 class FollowUpsFiltersContainer extends PureComponent {
 
@@ -33,13 +34,26 @@ class FollowUpsFiltersContainer extends PureComponent {
     // and can slow down the app
     render() {
         return (
-            <ElevatedView elevation={3} style={[style.container]}>
-                <Text>To do FollowUps filters container: first create necessary components and then integrate them here</Text>
-            </ElevatedView>
+            <View style={style.container}>
+                {
+                    config.followUpsFilterScreen.filter.map((item) => {
+                        return this.handleRenderItem(item);
+                    })
+                }
+            </View>
         );
     }
 
     // Please write here all the methods that are not react native lifecycle methods
+    handleRenderItem = (item) => {
+        console.log("### item from FollowUpsFiltersContainer: ", item);
+        return (
+            <CardComponent
+                item={item.fields}
+                style={{height: 108}}
+            />
+        )
+    }
 }
 
 

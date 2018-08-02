@@ -7,9 +7,8 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
-import {TextInput, View, Text, StyleSheet, Platform, Animated} from 'react-native';
+import {View, Text, StyleSheet, Alert, Animated} from 'react-native';
 import {Button} from 'react-native-material-ui';
-import { TextField } from 'react-native-material-textfield';
 import styles from './../styles';
 import NavBarCustom from './../components/NavBarCustom';
 import CalendarPicker from './../components/CalendarPicker';
@@ -21,11 +20,11 @@ import {bindActionCreators} from "redux";
 import SearchFilterView from './../components/SearchFilterView';
 import FollowUpListItem from './../components/FollowUpListItem';
 import MissedFollowUpListItem from './../components/MissedFollowUpListItem';
-import ElevatedView from 'react-native-elevated-view';
-import {Dropdown} from 'react-native-material-dropdown';
 import AnimatedListView from './../components/AnimatedListView';
 import ValuePicker from './../components/ValuePicker';
 import {getFollowUpsForOutbreakId, getMissedFollowUpsForOutbreakId} from './../actions/followUps';
+import {removeErrors} from './../actions/errors';
+import {addFilterForScreen} from './../actions/app';
 
 const scrollAnim = new Animated.Value(0);
 const offsetAnim = new Animated.Value(0);
@@ -39,7 +38,10 @@ class FollowUpsScreen extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            filter: null
+            // filter: this.props.filter && this.props.filter['FollowUpsScreen'] ? this.props.filter['FollowUpsScreen'] : null,
+            filter: this.props.filter && this.props.filter['FollowUpsScreen'] ? this.props.filter['FollowUpsScreen'] : {
+                date: new Date()
+            }
         };
         // Bind here methods, or at least don't declare methods in the render method
         this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this));
@@ -53,6 +55,17 @@ class FollowUpsScreen extends Component {
     }
 
     // Please add here the react lifecycle methods that you need
+    static getDerivedStateFromProps(props, state) {
+        if (props.errors && props.errors.type && props.errors.message) {
+            Alert.alert(props.errors.type, props.errors.message, [
+                {
+                    text: 'Ok', onPress: () => {props.removeErrors()}
+                }
+            ])
+        }
+        return null;
+    }
+
     clampedScroll= Animated.diffClamp(
         Animated.add(
             scrollAnim.interpolate({
@@ -86,6 +99,8 @@ class FollowUpsScreen extends Component {
             extrapolate: 'clamp',
         });
 
+        console.log('this.state.filter: ', this.state.filter);
+
         return (
             <View style={style.container}>
                 <NavBarCustom
@@ -98,10 +113,12 @@ class FollowUpsScreen extends Component {
                         width={calculateDimension(124, false, this.props.screenSize)}
                         height={calculateDimension(25, true, this.props.screenSize)}
                         onDayPress={this.handleDayPress}
+                        value={this.state.filter.date || new Date().toLocaleString()}
                     />
                     <ValuePicker
                         top={this.calculateTopForDropdown()}
                         onSelectValue={this.onSelectValue}
+                        value={this.state.filter.performed || config.dropDownValues[0].value}
                     />
                     <Button raised text="" onPress={() => console.log("Empty button")} icon="add"
                             style={{
@@ -145,7 +162,9 @@ class FollowUpsScreen extends Component {
     };
 
     renderFollowUp = ({item}) => {
-        if (!item.performed && new Date(item.date) > new Date()) {
+        let oneDay = 24 * 60 * 60 * 1000;
+        let itemDate = new Date(item.date).getTime() - oneDay;
+        if (!item.performed && new Date(itemDate) > new Date()) {
             return (
                 <FollowUpListItem item={item} onPressFollowUp={this.handlePressFollowUp} />
             )
@@ -192,25 +211,37 @@ class FollowUpsScreen extends Component {
     };
 
     onSelectValue = (value) => {
-        if (value === 'All') {
-            this.removeFromFilter({type: 'performed'});
-        } else {
-            this.appendToFilter({type: 'performed', value});
-        }
+        this.setState(prevState => ({
+            filter: Object.assign({}, prevState.filter, {performed: value})
+        }), () => {
+            console.log("### filter from onSelectValue: ", this.state.filter);
+            if (value === 'All') {
+                this.removeFromFilter({type: 'performed'});
+            } else {
+                this.appendToFilter({type: 'performed', value});
+            }
+        });
     };
 
     handleDayPress = (day) => {
-        this.appendToFilter({type: 'date', value: day});
+        this.setState(prevState => ({
+            filter: Object.assign({}, prevState.filter, {date: day})
+        }), () => {
+            console.log("### filter from handleDayPress: ", this.state.filter);
+            this.appendToFilter({type: 'date', value: day});
+        });
     };
 
-    handlePressFollowUp = (item) => {
+    handlePressFollowUp = (item, contact) => {
         console.log("### handlePressFollowUp: ", item);
         this.props.navigator.push({
             screen: 'FollowUpsSingleScreen',
             animated: true,
             animationType: 'fade',
             passProps: {
-                item: item
+                item: item,
+                contact: contact,
+                filter: this.state.filter
             }
         })
     };
@@ -275,7 +306,7 @@ class FollowUpsScreen extends Component {
             filter.where.and.push({performed: this.state.filter.performed !== 'To do'})
         }
 
-        console.log("### filter: ", filter);
+        this.props.addFilterForScreen('FollowUpsScreen', this.state.filter);
 
         if (this.state.filter.performed === 'Missed') {
             this.props.getMissedFollowUpsForOutbreakId(this.props.user.activeOutbreakId, filter, this.props.user.token);
@@ -306,7 +337,6 @@ class FollowUpsScreen extends Component {
                             screenToSwitchTo = "FollowUpsScreen";
                             break;
                     }
-                    console.log("Screen index: ", screenToSwitchTo);
                     this.props.navigator.resetTo({
                         screen: screenToSwitchTo,
                         animated: true
@@ -356,14 +386,18 @@ function mapStateToProps(state) {
     return {
         user: state.user,
         screenSize: state.app.screenSize,
-        followUps: state.followUps
+        filter: state.app.filters,
+        followUps: state.followUps,
+        errors: state.errors
     };
 }
 
 function matchDispatchProps(dispatch) {
     return bindActionCreators({
         getFollowUpsForOutbreakId,
-        getMissedFollowUpsForOutbreakId
+        getMissedFollowUpsForOutbreakId,
+        removeErrors,
+        addFilterForScreen
     }, dispatch);
 }
 

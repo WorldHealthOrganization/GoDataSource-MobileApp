@@ -93,7 +93,7 @@ class DatePicker extends PureComponent {
                 </Text>
             </View>
         );
-    }
+    };
 
     handleShowDatePicker = () => {
         if (!this.state.isDateTimePickerVisible && this.refs.textField.isFocused()) {
@@ -108,7 +108,7 @@ class DatePicker extends PureComponent {
     };
 
     handleDatePicked = (date) => {
-        console.log('A date has been picked: ', date);
+        this.props.onChange(date, this.props.id);
         this.handleDateCancelled();
     };
 

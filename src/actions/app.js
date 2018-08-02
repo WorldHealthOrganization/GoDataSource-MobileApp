@@ -1,7 +1,7 @@
 /**
  * Created by florinpopa on 14/06/2018.
  */
-import {ACTION_TYPE_ROOT_CHANGE, ACTION_TYPE_SAVE_SCREEN_SIZE} from './../utils/enums';
+import {ACTION_TYPE_ROOT_CHANGE, ACTION_TYPE_SAVE_SCREEN_SIZE, ACTION_TYPE_ADD_FILTER_FOR_SCREEN, ACTION_TYPE_REMOVE_FILTER_FOR_SCREEN} from './../utils/enums';
 import url from '../utils/url';
 import config from './../utils/config';
 import { loginUser } from './user';
@@ -14,13 +14,27 @@ export function changeAppRoot(root) {
         type: ACTION_TYPE_ROOT_CHANGE,
         root: root
     };
-};
+}
 
 export function saveScreenSize(screenSize) {
     return {
         type: ACTION_TYPE_SAVE_SCREEN_SIZE,
         screenSize: screenSize
     };
+}
+
+export function addFilterForScreen(screenName, filter) {
+    return {
+        type: ACTION_TYPE_ADD_FILTER_FOR_SCREEN,
+        payload: {screenName: screenName, filters: filter}
+    }
+}
+
+export function removeFilterForScreen(screenName) {
+    return {
+        type: ACTION_TYPE_REMOVE_FILTER_FOR_SCREEN,
+        payload: {screenName: screenName}
+    }
 }
 
 export function appInitialized() {

@@ -6,6 +6,8 @@
 // Add here only the actions, not also the requests that are executed. For that purpose is the requests directory
 import {ACTION_TYPE_GET_CASES, ACTION_TYPE_STORE_CASES} from './../utils/enums';
 import {getCasesForOutbreakIdRequest} from './../requests/cases';
+import { addError } from './errors';
+import errorTypes from './../utils/errorTypes';
 
 
 // Add here only the actions, not also the requests that are executed. For that purpose is the requests directory
@@ -21,6 +23,7 @@ export function getCasesForOutbreakId(outbreakId, token) {
         getCasesForOutbreakIdRequest(outbreakId, token, (error, response) => {
             if (error) {
                 console.log("*** getCasesForOutbreakId error: ", error);
+                dispatch(addError(errorTypes.ERROR_CASES));
             }
             if (response) {
                 dispatch(storeCases(response));

@@ -1,11 +1,11 @@
 /**
- * Created by florinpopa on 19/07/2018.
+ * Created by florinpopa on 02/08/2018.
  */
 import url from './../utils/url';
 import {handleResponse} from './../utils/functions';
 
-export function getOutbreakByIdRequest(outbreakId, token, callback) {
-    let requestUrl = url.outbreaks + outbreakId;
+export function getReferenceDataRequest(token, callback) {
+    let requestUrl = url.referenceData;
 
     fetch(requestUrl, {
         method: 'GET',
@@ -19,11 +19,11 @@ export function getOutbreakByIdRequest(outbreakId, token, callback) {
             return handleResponse(response);
         })
         .then((response) => {
-            console.log('### getOutbreakByIdRequest resposne: ', response);
+            console.log('### getReferenceDataRequest response: ', response);
             callback(null, response);
         })
         .catch((error) => {
-            console.log("*** getOutbreakByIdRequest error: ", error);
+            console.log("*** getReferenceDataRequest error: ", JSON.stringify(error));
             callback(error);
         })
 }

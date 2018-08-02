@@ -37,8 +37,6 @@ class SearchFilterView extends Component {
     // and can slow down the app
     render() {
 
-        console.log("### style: ", this.props.style);
-
         return (
             <Animated.View style={[this.props.style, {
                 height: calculateDimension(50, true, this.props.screenSize),

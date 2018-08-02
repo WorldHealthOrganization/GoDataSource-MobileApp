@@ -2,7 +2,7 @@
  * Created by florinpopa on 16/07/2018.
  */
 import React, {PureComponent} from 'react';
-import {TextInput, View, Text, StyleSheet, Platform, Dimensions} from 'react-native';
+import {TextInput, View, Text, StyleSheet, Platform, InteractionManager} from 'react-native';
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import {ListItem, Icon} from 'react-native-material-ui';
@@ -41,10 +41,16 @@ class NavBarCustom extends PureComponent {
             ]}
             >
                 <View style={[style.containerUpperNavBar, {flex: this.props.children ? 0.5 : 1}]}>
-                    <Ripple onPress={this.props.handlePressNavbarButton}>
+                    <Ripple onPress={this.handlePressNavbarButton}>
                         <Icon name={this.props.iconName}/>
                     </Ripple>
-                    <Text style={style.title}>{this.props.title}</Text>
+                    {
+                        this.props.customTitle && !this.props.title ? (
+                            this.props.customTitle
+                        ) : (
+                            <Text style={style.title}>{this.props.title}</Text>
+                        )
+                    }
                 </View>
                 {
                     this.props.children && (
@@ -60,7 +66,17 @@ class NavBarCustom extends PureComponent {
     }
 
     // Please write here all the methods that are not react native lifecycle methods
+    handlePressNavbarButton = () => {
+        InteractionManager.runAfterInteractions(() => {
+            this.props.handlePressNavbarButton();
+        })
+    }
 }
+
+NavBarCustom.defaultProps = {
+    customTitle: null,
+    title: 'Test'
+};
 
 // Create style outside the class, or for components that will be used by other components (buttons),
 // make a global style in the config directory

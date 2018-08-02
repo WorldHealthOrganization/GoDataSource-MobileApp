@@ -20,7 +20,7 @@ class CalendarPickerView extends PureComponent {
     constructor(props) {
         super(props);
         this.state = {
-            selectedDate: new Date()
+            selectedDate: this.parseDate(this.props.value)
         };
 
         this.calculateTop = this.calculateTop.bind(this);
@@ -33,6 +33,7 @@ class CalendarPickerView extends PureComponent {
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
+        console.log("selected date: ", this.state.selectedDate);
         return (
             <Modal
                 visible={this.props.showPicker}
@@ -57,6 +58,12 @@ class CalendarPickerView extends PureComponent {
     // Please write here all the methods that are not react native lifecycle methods
     calculateTop = () => {
         return calculateDimension(74, true, this.props.screenSize) + (Platform.OS === 'ios' ? this.props.screenSize.height === 812 ? 44 : 20 : 0);
+    };
+
+    parseDate = (date) => {
+        let month = (date.getMonth() + 1) < 9 ? ("0" + (date.getMonth() + 1)) : (date.getMonth() + 1);
+        let day = date.getDate() < 9 ? ("0" + date.getDate()) : date.getDate();
+        return date.getFullYear() + '-' + month + '-' + day;
     };
 
     handleDateChanged = (date) => {

@@ -9,6 +9,8 @@ import cases from './cases';
 import followUps from './followUps';
 import contacts from './contacts';
 import events from './events';
+import errors from './errors';
+import referenceData from './referenceData';
 
 const allReducers = combineReducers({
     app,
@@ -17,7 +19,9 @@ const allReducers = combineReducers({
     cases,
     followUps,
     contacts,
-    events
+    events,
+    errors,
+    referenceData
 });
 
 export default allReducers;

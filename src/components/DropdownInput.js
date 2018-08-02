@@ -44,7 +44,13 @@ class DropdownInput extends PureComponent {
                    // baseColor={}
                    // textColor={}
                    selectedItemColor={'rgb(255,60,56)'}
-                   onChangeText={ (state) => this.props.onChange(state, this.props.id)}
+                   onChangeText={ (state) => {
+                       if (this.props.labelValue) {
+                           this.props.onChange({label: state, value: this.props.data[this.props.data.map((e) => {return e.value}).indexOf(state)].id}, this.props.labelValue)
+                       } else {
+                           this.props.onChange(state, this.props.id)}
+                       }
+                   }
                 />
             </View>
         );

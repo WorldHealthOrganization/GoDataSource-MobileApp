@@ -1,6 +1,8 @@
 /**
  * Created by florinpopa on 04/07/2018.
  */
+import colors from './colors';
+
 const buttonGreen = {
     container: {
         backgroundColor: 'green',
@@ -21,13 +23,16 @@ const buttonRed = {
 
 const buttonLogin = {
     container: {
-        backgroundColor: 'white',
-        width: '75%'
+        backgroundColor: 'rgba(255, 255, 255, 0.7)',
+        width: '100%',
+        borderRadius: 5
     },
     text: {
-        color: 'black'
+        fontFamily: 'Roboto-Medium',
+        fontSize: 18,
+        color: colors.colorLoginButtonText
     }
-}
+};
 
 export default {
     buttonGreen,

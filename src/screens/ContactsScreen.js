@@ -29,7 +29,9 @@ class ContactsScreen extends Component {
     constructor(props) {
         super(props);
         this.state = {
-
+            filter: {
+                date: new Date()
+            }
         };
         // Bind here methods, or at least don't declare methods in the render method
         this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this));
@@ -53,6 +55,7 @@ class ContactsScreen extends Component {
                     <CalendarPicker
                         width={calculateDimension(124, false, this.props.screenSize)}
                         height={calculateDimension(25, true, this.props.screenSize)}
+                        value={this.state.filter.date || new Date()}
                     />
                     <ButtonWithIcons
                         label="Altceva"

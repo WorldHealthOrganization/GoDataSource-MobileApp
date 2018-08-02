@@ -35,7 +35,7 @@ class ValuePicker extends PureComponent {
         return (
             <ElevatedView elevation={2}>
                 <ButtonWithIcons
-                    label={this.state.selectedText}
+                    label={this.props.value}
                     width={calculateDimension(124, false, this.props.screenSize)}
                     height={calculateDimension(25, true, this.props.screenSize)}
                     firstIcon="visibility"
@@ -47,7 +47,7 @@ class ValuePicker extends PureComponent {
                     <Dropdown
                         ref='dropdown'
                         data={config.dropDownValues}
-                        value={config.dropDownValues[0].value}
+                        value={this.props.value}
                         renderAccessory={() => {
                             return null;
                         }}
@@ -69,11 +69,11 @@ class ValuePicker extends PureComponent {
     };
 
     handleChangeText = (value, index, data) => {
-        this.setState({
-            selectedText: value
-        }, () => {
+        // this.setState({
+        //     selectedText: value
+        // }, () => {
             this.props.onSelectValue(value);
-        })
+        // })
     }
 }
 

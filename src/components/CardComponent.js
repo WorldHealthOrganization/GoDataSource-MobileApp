@@ -6,10 +6,10 @@
  */
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
-import React, {PureComponent} from 'react';
+import React, {Component} from 'react';
 import {View, Text, StyleSheet, Platform, Dimensions, Image, FlatList, ScrollView} from 'react-native';
 import {ListItem, Icon} from 'react-native-material-ui';
-import {calculateDimension} from './../utils/functions';
+import {calculateDimension, handleExposedTo, getAddress} from './../utils/functions';
 import config from './../utils/config';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -21,8 +21,9 @@ import DropdownInput from './DropdownInput';
 import TextInput from './TextInput';
 import SwitchInput from './SwitchInput';
 import DatePicker from './DatePicker';
+import _ from 'lodash';
 
-class FollowUpListItem extends PureComponent {
+class CardComponent extends Component {
 
     // This will be a dumb component, so it's best not to put any business logic in it
     constructor(props) {
@@ -39,9 +40,9 @@ class FollowUpListItem extends PureComponent {
     // and can slow down the app
     render() {
         return (
-            <ElevatedView elevation={3} style={[style.container, {
+            <ElevatedView elevation={3} style={[this.props.style, style.container, {
                 marginHorizontal: calculateDimension(16, false, this.props.screenSize),
-                width: calculateDimension(this.props.screenSize.width - 32, false, this.props.screenSize),
+                width: calculateDimension(config.designScreenSize.width - 32, false, this.props.screenSize),
                 marginVertical: 4
             }]}>
                 <ScrollView scrollEnabled={false}>
@@ -73,7 +74,14 @@ class FollowUpListItem extends PureComponent {
 
         let width = calculateDimension(315, false, this.props.screenSize);
         let marginHorizontal = calculateDimension(14, false, this.props.screenSize);
-        let source = this.props.source;
+        let followUp = this.props.followUp;
+        let contact = this.props.contact;
+
+        if (item.type === 'DropdownInput') {
+            item.data = this.computeDataForDropdown(item, contact);
+        }
+
+        let value = this.computeValueForId(item.type, item.id, followUp, contact);
 
         switch(item.type) {
             case 'TextInput':
@@ -81,10 +89,10 @@ class FollowUpListItem extends PureComponent {
                     <TextInput
                         id={item.id}
                         label={item.label}
-                        value={item.value}
+                        value={value}
                         isEditMode={item.isEditMode}
                         isRequired={item.isRequired}
-                        onChange={() => {console.log("On change")}}
+                        onChange={this.props.onChangeText}
                         multiline={item.multiline}
                         style={{width: width, marginHorizontal: marginHorizontal}}
                     />
@@ -94,11 +102,11 @@ class FollowUpListItem extends PureComponent {
                     <DropdownInput
                         id={item.id}
                         label={item.label}
-                        value={item.value}
+                        value={value}
                         data={item.data}
                         isEditMode={item.isEditMode}
                         isRequired={item.isRequired}
-                        onChange={() => {console.log("On change")}}
+                        onChange={this.props.onChangeDropDown}
                         style={{width: width, marginHorizontal: marginHorizontal}}
                     />
                 );
@@ -107,14 +115,14 @@ class FollowUpListItem extends PureComponent {
                     <SwitchInput
                         id={item.id}
                         label={item.label}
-                        value={item.value}
+                        value={value}
                         showValue={true}
                         isEditMode={item.isEditMode}
                         isRequired={item.isRequired}
-                        onChange={() => {console.log("On change")}}
+                        onChange={this.props.onChangeSwitch}
                         activeButtonColor={item.activeButtonColor}
                         activeBackgroundColor={item.activeBackgroundColor}
-                        style={{width: width, marginHorizontal: marginHorizontal}}
+                        style={{justifyContent: 'space-between', width: width, marginHorizontal: marginHorizontal}}
                     />
                 );
             case 'DatePicker':
@@ -122,10 +130,10 @@ class FollowUpListItem extends PureComponent {
                     <DatePicker
                         id={item.id}
                         label={item.label}
-                        value={item.value}
+                        value={value}
                         isEditMode={item.isEditMode}
                         isRequired={item.isRequired}
-                        onChange={() => {console.log("On change")}}
+                        onChange={this.props.onChangeDate}
                         style={{width: width, marginHorizontal: marginHorizontal}}
                     />
                 );
@@ -136,6 +144,41 @@ class FollowUpListItem extends PureComponent {
                     </View>
                 )
         }
+    };
+
+    computeValueForId = (type, id, followUp, contact) => {
+        if (type === 'DropdownInput' && id === 'exposedTo') {
+            return handleExposedTo(contact, true, this.props.cases);
+        }
+
+        if (type === 'DropdownInput' && id === 'address' && followUp.address) {
+            return getAddress(followUp.address, true)
+        }
+
+        if (type === 'SwitchInput' && id === "fillGeolocation") {
+            return followUp.fillGeolocation ? true : false
+        }
+
+
+        return followUp[id] ? followUp[id] : contact[id] ? contact[id] : '';
+    }
+
+    computeDataForDropdown = (item, contact) => {
+        if (item.id === 'exposedTo') {
+            return this.props.cases.map((e) => {return {value: ((e.firstName ? e.firstName : '') + (e.lastName ? (" " + e.lastName) : ''))}});
+        }
+
+        if (item.id === 'address') {
+            return contact.addresses.map((e) => {return Object.assign({}, e, {value: getAddress(e, true)})});
+        }
+
+        if (item.id === 'riskLevel') {
+            return _.filter(this.props.referenceData, (o) => {
+                return o.categoryId.includes("RISK_LEVEL")
+            }).map((o) => {return {value: o.value}})
+        }
+
+        return [];
     }
 }
 
@@ -159,7 +202,8 @@ function mapStateToProps(state) {
         screenSize: state.app.screenSize,
         contacts: state.contacts,
         cases: state.cases,
-        events: state.events
+        events: state.events,
+        referenceData: state.referenceData
     };
 }
 
@@ -168,4 +212,4 @@ function matchDispatchProps(dispatch) {
     }, dispatch);
 }
 
-export default connect(mapStateToProps, matchDispatchProps)(FollowUpListItem);
+export default connect(mapStateToProps, matchDispatchProps)(CardComponent);

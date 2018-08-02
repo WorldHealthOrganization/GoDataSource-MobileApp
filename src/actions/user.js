@@ -8,6 +8,10 @@ import { getFollowUpsForOutbreakId } from './followUps';
 import { getContactsForOutbreakId } from './contacts';
 import { getCasesForOutbreakId } from './cases';
 import { getEventsForOutbreakId } from './events';
+import { getOutbreakById } from './outbreak';
+import { addError } from './errors';
+import {getReferenceData} from './referenceData'
+import errorTypes from './../utils/errorTypes';
 
 // Add here only the actions, not also the requests that are executed.
 // For that purpose is the requests directory
@@ -24,6 +28,7 @@ export function loginUser(credentials) {
         loginUserRequest(credentials, (error, response) => {
             if (error) {
                 console.log("*** An error occurred while logging the user");
+                dispatch(addError(errorTypes.ERROR_LOGIN));
             }
             if (response) {
                 if (response.userId && response.id) {
@@ -46,6 +51,8 @@ export function getUserById(userId, token) {
         getUserByIdRequest(userId, token, (error, response) => {
             if (error) {
                 console.log("*** getUserById error: ", error);
+                dispatch(addError(errorTypes.ERROR_GET_USER));
+                dispatch(changeAppRoot('after-login'));
             }
             if (response) {
                 // store also the token
@@ -55,6 +62,8 @@ export function getUserById(userId, token) {
                 dispatch(getContactsForOutbreakId(user.activeOutbreakId, user.token));
                 dispatch(getCasesForOutbreakId(user.activeOutbreakId, user.token));
                 dispatch(getEventsForOutbreakId(user.activeOutbreakId, user.token));
+                dispatch(getOutbreakById(user.activeOutbreakId, user.token));
+                dispatch(getReferenceData(user.token));
                 dispatch(changeAppRoot('after-login'));
             }
         })

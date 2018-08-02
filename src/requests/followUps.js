@@ -83,3 +83,52 @@ export function getMissedFollowUpsForOutbreakIdRequest(outbreakId, filter, token
             callback(error);
         })
 }
+
+export function updateFollowUpRequest(outbreakId, contactId, followUpId, followUp, token, callback) {
+    let requestUrl = url.outbreaks + outbreakId + '/contacts/' + contactId + '/follow-ups/' + followUpId;
+
+    fetch(requestUrl, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Authorization': token,
+        },
+        body: JSON.stringify(followUp)
+    })
+        .then((response) => {
+            return handleResponse(response);
+        })
+        .then((response) => {
+            console.log('### updateFollowUp resposne: ', response);
+            callback(null, response);
+        })
+        .catch((error) => {
+            console.log("*** updateFollowUp error: ", error);
+            callback(error);
+        })
+}
+
+export function deleteFollowUpRequest(outbreakId, contactId, followUpId, token, callback) {
+    let requestUrl = url.outbreaks + outbreakId + '/contacts/' + contactId + '/follow-ups/' + followUpId;
+
+    fetch(requestUrl, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Authorization': token,
+        }
+    })
+        .then((response) => {
+            return handleResponse(response);
+        })
+        .then((response) => {
+            console.log('### deleteFollowUpRequest response: ', response);
+            callback(null, response);
+        })
+        .catch((error) => {
+            console.log("*** deleteFollowUpRequest error: ", error);
+            callback(error);
+        })
+}

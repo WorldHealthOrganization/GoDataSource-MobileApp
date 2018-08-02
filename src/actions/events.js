@@ -3,6 +3,8 @@
  */
 import {ACTION_TYPE_STORE_EVENTS} from './../utils/enums';
 import {getEventsForOutbreakIdRequest} from './../requests/events';
+import { addError } from './errors';
+import errorTypes from './../utils/errorTypes';
 
 
 // Add here only the actions, not also the requests that are executed. For that purpose is the requests directory
@@ -18,6 +20,7 @@ export function getEventsForOutbreakId(outbreakId, token) {
         getEventsForOutbreakIdRequest(outbreakId, token, (error, response) => {
             if (error) {
                 console.log("*** getContactsForOutbreakId error: ", error);
+                dispatch(addError(errorTypes.ERROR_EVENTS));
             }
             if (response) {
                 dispatch(storeEvents(response));

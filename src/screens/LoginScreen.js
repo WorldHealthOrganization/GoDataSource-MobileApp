@@ -2,7 +2,7 @@
  * Created by florinpopa on 14/06/2018.
  */
 import React, {Component} from 'react';
-import {TextInput, View, Text, StyleSheet} from 'react-native';
+import {View, Text, StyleSheet, Platform, Image, Alert} from 'react-native';
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import {Button} from 'react-native-material-ui';
@@ -11,6 +11,8 @@ import styles from './../styles';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { loginUser } from './../actions/user';
+import { removeErrors } from './../actions/errors';
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 
 class LoginScreen extends Component {
 
@@ -34,37 +36,58 @@ class LoginScreen extends Component {
 
     // Please add here the react lifecycle methods that you need
 
+    static getDerivedStateFromProps(props, state) {
+        if (props.errors && props.errors.type && props.errors.message) {
+            Alert.alert(props.errors.type, props.errors.message, [
+                {
+                    text: 'Ok', onPress: () => {props.removeErrors()}
+                }
+            ])
+        }
+        return null;
+    }
 
     // The render method should have at least business logic as possible,
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
         return (
-            <View style={style.container}>
-                <Text>Welcome!</Text>
-                <TextField
-                    ref={this.emailRef}
-                    value={this.state.email}
-                    autoCorrect={false}
-                    lineWidth={1}
-                    enablesReturnKeyAutomatically={true}
-                    containerStyle={style.textInput}
-                    onChangeText={this.handleTextChange}
-                    label='Email address'
-                />
-                <TextField
-                    ref={this.passwordRef}
-                    value={this.state.password}
-                    autoCorrect={false}
-                    lineWidth={1}
-                    enablesReturnKeyAutomatically={true}
-                    containerStyle={style.textInput}
-                    onChangeText={this.handleTextChange}
-                    label='Password'
-                    secureTextEntry={true}
-                />
-                <Button raised onPress={this.handleLogin} text="Login" style={styles.buttonLogin} />
-            </View>
+            <KeyboardAwareScrollView
+                style={[style.container, {paddingTop: Platform.OS ? this.props.screenSize.height === 812 ? 44 : 20 : 0}]}
+                contentContainerStyle={style.contentContainerStyle}
+                keyboardShouldPersistTaps={'always'}
+            >
+                <View style={[style.welcomeTextContainer]}>
+                    <Text style={style.welcomeText}>Welcome!</Text>
+                </View>
+                <View style={style.inputsContainer}>
+                    <TextField
+                        ref={this.emailRef}
+                        value={this.state.email}
+                        autoCorrect={false}
+                        lineWidth={1}
+                        enablesReturnKeyAutomatically={true}
+                        containerStyle={style.textInput}
+                        onChangeText={this.handleTextChange}
+                        label='Email address'
+                    />
+                    <TextField
+                        ref={this.passwordRef}
+                        value={this.state.password}
+                        autoCorrect={false}
+                        lineWidth={1}
+                        enablesReturnKeyAutomatically={true}
+                        containerStyle={style.textInput}
+                        onChangeText={this.handleTextChange}
+                        label='Password'
+                        secureTextEntry={true}
+                    />
+                    <Button raised onPress={this.handleLogin} text="Login" style={styles.buttonLogin} />
+                </View>
+                <View style={style.logoContainer}>
+                    <Image source={{uri: 'logo_app'}} style={style.logoStyle} />
+                </View>
+            </KeyboardAwareScrollView>
         );
     }
 
@@ -74,11 +97,27 @@ class LoginScreen extends Component {
     }
 
     handleLogin = () => {
-        console.log("handleLogin");
-        this.props.loginUser({
-            email: this.state.email.toLowerCase(),
-            password: this.state.password
-        });
+        let re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+        if (!this.state.email || !this.state.password) {
+            Alert.alert('Invalid credentials', "Please make sure you have completed the fields", [
+                {
+                    text: 'Ok', onPress: () => {console.log('Ok pressed')}
+                }
+            ])
+        } else {
+            if (!re.test(this.state.email)) {
+                Alert.alert('Invalid email', "Please make sure you have entered a valid email address", [
+                    {
+                        text: 'Ok', onPress: () => {console.log('Ok pressed')}
+                    }
+                ])
+            } else {
+                this.props.loginUser({
+                    email: this.state.email.toLowerCase(),
+                    password: this.state.password
+                });
+            }
+        }
     };
 
     handleTextChange = (text) => {
@@ -97,25 +136,56 @@ class LoginScreen extends Component {
 const style = StyleSheet.create({
     container: {
         flex: 1,
-        justifyContent: 'space-evenly',
-        alignItems: 'center',
         backgroundColor: '#55b5a6'
     },
+    contentContainerStyle: {
+        justifyContent: 'space-around',
+        alignItems: 'center',
+        flexGrow: 1
+    },
     textInput: {
-        width: '75%',
+        width: '100%',
         alignSelf: 'center'
+    },
+    welcomeTextContainer: {
+        flex: 0.35,
+        width: '75%',
+        justifyContent: 'center'
+    },
+    welcomeText: {
+        fontFamily: 'Roboto-Bold',
+        fontSize: 35,
+        color: 'white',
+        textAlign: 'left'
+    },
+    inputsContainer: {
+        flex: 0.15,
+        width: '75%',
+        justifyContent: 'space-around',
+    },
+    logoContainer: {
+        flex: 0.5,
+        width: '100%',
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+    logoStyle: {
+        width: 180,
+        height: 34
     }
 });
 
 function mapStateToProps(state) {
     return {
-        screenSize: state.app.screenSize
+        screenSize: state.app.screenSize,
+        errors: state.errors
     };
 }
 
 function matchDispatchToProps(dispatch) {
     return bindActionCreators({
         loginUser,
+        removeErrors
     }, dispatch);
 }
 

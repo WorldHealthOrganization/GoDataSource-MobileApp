@@ -43,46 +43,44 @@ class MissedFollowUpListItem extends PureComponent {
                 marginHorizontal: calculateDimension(16, false, this.props.screenSize),
                 height: calculateDimension(157, true, this.props.screenSize)
             }]}>
-                <Ripple style={{flex: 1}} onPress={this.onPressFollowUp}>
-                    <View style={[style.firstSectionContainer, {
-                        height: calculateDimension(53, true, this.props.screenSize),
-                        paddingBottom: calculateDimension(18, true, this.props.screenSize)
+                <View style={[style.firstSectionContainer, {
+                    height: calculateDimension(53, true, this.props.screenSize),
+                    paddingBottom: calculateDimension(18, true, this.props.screenSize)
+                }]}>
+                    <ListItem
+                        numberOfLines={1}
+                        centerElement={
+                            <View style={style.centerItemContainer}>
+                                <Text style={style.primaryText}>{primaryText}</Text>
+                            </View>
+                        }
+                        rightElement={
+                            <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                                <Ionicons name="ios-close-circle-outline" color={styles.missedRedColor} size={13}/>
+                                <Text style={style.missedTextStyle}>Missed</Text>
+                            </View>
+                        }
+                        style={{
+                            container: {marginRight: calculateDimension(13, false, this.props.screenSize)},
+                            rightElementContainer: {justifyContent: 'center', alignItems: 'center'}
+                        }}
+                    />
+                </View>
+                <View style={styles.lineStyle}/>
+                <View
+                    style={[style.secondSectionContainer, {
+                        height: calculateDimension(52, true, this.props.screenSize),
+                        marginHorizontal: calculateDimension(14, false, this.props.screenSize)
                     }]}>
-                        <ListItem
-                            numberOfLines={1}
-                            centerElement={
-                                <View style={style.centerItemContainer}>
-                                    <Text style={style.primaryText}>{primaryText}</Text>
-                                </View>
-                            }
-                            rightElement={
-                                <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                                    <Ionicons name="ios-close-circle-outline" color={styles.missedRedColor} size={13}/>
-                                    <Text style={style.missedTextStyle}>Missed</Text>
-                                </View>
-                            }
-                            style={{
-                                container: {marginRight: calculateDimension(13, false, this.props.screenSize)},
-                                rightElementContainer: {justifyContent: 'center', alignItems: 'center'}
-                            }}
-                        />
-                    </View>
-                    <View style={styles.lineStyle}/>
-                    <View
-                        style={[style.secondSectionContainer, {
-                            height: calculateDimension(52, true, this.props.screenSize),
-                            marginHorizontal: calculateDimension(14, false, this.props.screenSize)
-                        }]}>
-                        <Text style={style.followUpPrefix}>Last follow-up: </Text>
-                        <Text style={style.followUpSuffix}>28.06.2018 - hardcoded</Text>
-                    </View>
-                    <View style={styles.lineStyle}/>
-                    <View
-                        style={[style.thirdSectionContainer, {marginHorizontal: calculateDimension(14, false, this.props.screenSize)}]}>
-                        <Text style={style.followUpPrefix}>Next follow-up: </Text>
-                        <Text style={style.followUpSuffix}>28.06.2018 - hardcoded</Text>
-                    </View>
-                </Ripple>
+                    <Text style={style.followUpPrefix}>Last follow-up: </Text>
+                    <Text style={style.followUpSuffix}>28.06.2018 - hardcoded</Text>
+                </View>
+                <View style={styles.lineStyle}/>
+                <View
+                    style={[style.thirdSectionContainer, {marginHorizontal: calculateDimension(14, false, this.props.screenSize)}]}>
+                    <Text style={style.followUpPrefix}>Next follow-up: </Text>
+                    <Text style={style.followUpSuffix}>28.06.2018 - hardcoded</Text>
+                </View>
             </ElevatedView>
         );
     }
@@ -91,7 +89,7 @@ class MissedFollowUpListItem extends PureComponent {
     onPressFollowUp = () => {
         let contact = this.props && this.props.contacts && Array.isArray(this.props.contacts) && this.props.contacts.length > 0 ? this.props.contacts[this.props.contacts.map((e) => {return e.id}).indexOf(this.props.item.personId)] : null;
 
-        this.props.onPressFollowUp({followUp: this.props.item, contact: contact});
+        this.props.onPressFollowUp(Object.assign({}, this.props.item, contact));
     }
 }
 

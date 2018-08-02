@@ -11,6 +11,8 @@ import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import styles from './../styles';
 import CardComponent from './../components/CardComponent';
+import Button from './../components/Button';
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 
 class FollowUpsFiltersContainer extends PureComponent {
 
@@ -31,21 +33,42 @@ class FollowUpsFiltersContainer extends PureComponent {
 
         return (
             <View style={style.container}>
-                {
-                    config.followUpsSingleScreen.generalInfo.map((item) => {
-                        return this.handleRenderItem(item)
-                    })
-                }
+                <Button
+                    title={'Next'}
+                    onPress={this.props.onNext}
+                    color={styles.buttonGreen}
+                    titleColor={'white'}
+                    height={calculateDimension(25, true, this.props.screenSize)}
+                    width={calculateDimension(166, false, this.props.screenSize)}
+                    style={{
+                        marginVertical: calculateDimension(12.5, true, this.props.screenSize)
+                    }}
+                />
+                <KeyboardAwareScrollView style={style.containerScrollView} contentContainerStyle={style.contentContainerStyle}
+                                         keyboardShouldPersistTaps={'always'}>
+                    {
+                        config.followUpsSingleScreen.generalInfo.map((item) => {
+                            return this.handleRenderItem(item)
+                        })
+                    }
+                </KeyboardAwareScrollView>
             </View>
         );
     }
 
     // Please write here all the methods that are not react native lifecycle methods
     handleRenderItem = (item) => {
+        // console.log("Item: ", item);
         return (
             <CardComponent
                 item={item.fields}
-                source={this.props.item}
+                followUp={this.props.item}
+                contact={this.props.contact}
+                style={style.cardStyle}
+                onChangeText={this.props.onChangeText}
+                onChangeDate={this.props.onChangeDate}
+                onChangeSwitch={this.props.onChangeSwitch}
+                onChangeDropDown={this.props.onChangeDropDown}
             />
         )
     }
@@ -59,8 +82,17 @@ const style = StyleSheet.create({
         flex: 1,
         backgroundColor: styles.screenBackgroundGrey,
         alignItems: 'center',
-        justifyContent: 'space-around'
-    }
+    },
+    cardStyle: {
+        marginVertical: 4
+    },
+    containerScrollView: {
+        flex: 1,
+        backgroundColor: styles.screenBackgroundGrey
+    },
+    contentContainerStyle: {
+        alignItems: 'center'
+    },
 });
 
 function mapStateToProps(state) {
