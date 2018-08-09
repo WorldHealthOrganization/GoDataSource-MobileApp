@@ -57,8 +57,11 @@ class FollowUpsFiltersContainer extends PureComponent {
                         width={buttonWidth}
                     />
                 </View>
-                <KeyboardAwareScrollView style={style.container} contentContainerStyle={style.contentContainerStyle}
-                                         keyboardShouldPersistTaps={'always'}>
+                <KeyboardAwareScrollView
+                    style={style.container}
+                    contentContainerStyle={[style.contentContainerStyle, {paddingBottom: this.props.screenSize.height < 600 ? 70 : 20}]}
+                    keyboardShouldPersistTaps={'always'}
+                >
                     {
                         this.props.questions.map((item, index) => {
                             return this.handleRenderItem(item, index)

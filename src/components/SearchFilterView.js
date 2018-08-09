@@ -47,8 +47,8 @@ class SearchFilterView extends Component {
                     marginHorizontal: calculateDimension(16, false, this.props.screenSize),
                     marginVertical: calculateDimension(12.5, true, this.props.screenSize)
                 }]}>
-                    <TextInputWithIcon/>
-                    <Button title="Filter" color="white" titleColor={styles.buttonTextGray}
+                    <TextInputWithIcon onSubmitEditing={this.props.onSubmitEditing} onChangeText={this.props.onChangeText} value={this.props.value} />
+                    <Button title={this.props.filterText} color="white" titleColor={styles.buttonTextGray}
                             onPress={this.props.onPress} height={25} width={35}/>
                 </View>
             </Animated.View>

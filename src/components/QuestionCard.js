@@ -17,6 +17,7 @@ import ElevatedView from 'react-native-elevated-view';
 import DropdownInput from './DropdownInput';
 import TextInput from './TextInput';
 import DropDown from './DropDown';
+import _ from 'lodash';
 
 
 class FollowUpListItem extends PureComponent {
@@ -87,30 +88,35 @@ class FollowUpListItem extends PureComponent {
 
         let width = calculateDimension(315, false, this.props.screenSize);
         let marginHorizontal = calculateDimension(14, false, this.props.screenSize);
-        let source = Object.assign({}, this.props.source);
+        let source = _.cloneDeep(this.props.source);
         if (!source.questionnaireAnswers) {
             source.questionnaireAnswers = {};
         }
-        if (!source.questionnaireAnswers[item.text]) {
+        if (!source.questionnaireAnswers[item.variable]) {
             switch(item.answerType) {
                 case 'Free text':
-                    source.questionnaireAnswers[item.text] = '';
+                    source.questionnaireAnswers[item.variable] = '';
                     break;
                 case 'Single Selection':
-                    source.questionnaireAnswers[item.text] = '';
+                    source.questionnaireAnswers[item.variable] = '';
                     break;
                 case 'Multiple Options':
-                    source.questionnaireAnswers[item.text] = [];
+                    source.questionnaireAnswers[item.variable] = [];
                     break;
                 default:
-                    source.questionnaireAnswers[item.text] = '';
+                    source.questionnaireAnswers[item.variable] = '';
                     break;
             }
         }
-        let questionAnswers = source.questionnaireAnswers[item.text];
+        let questionAnswers = source.questionnaireAnswers[item.variable] || null;
 
         if (item.answerType === 'Single Selection') {
-            questionAnswers = questionAnswers ? item.answers[item.answers.map((e) => {return e.value}).indexOf(questionAnswers)].label : '';
+            questionAnswers = questionAnswers !== null &&
+                questionAnswers !== undefined &&
+                item.answers[item.answers.map((e) => {return e.value})] &&
+                item.answers.map((e) => {return e.value}).indexOf(questionAnswers) > -1 &&
+                item.answers[item.answers.map((e) => {return e.value}).indexOf(questionAnswers)] ?
+                    item.answers[item.answers.map((e) => {return e.value}).indexOf(questionAnswers)].label : ' ';
         }
         else {
             if (item.answerType === 'Multiple Options') {

@@ -4,14 +4,7 @@
 import url from './../utils/url';
 import {handleResponse} from './../utils/functions';
 
-export function getContactsForOutbreakIdRequest(outbreakId, token, callback) {
-
-    let filter = {
-        include: {
-            relation: 'relationships'
-        }
-    };
-
+export function getContactsForOutbreakIdRequest(outbreakId, filter, token, callback) {
     let requestUrl = url.outbreaks + outbreakId + '/contacts?filter=' + JSON.stringify(filter);
 
     fetch(requestUrl, {

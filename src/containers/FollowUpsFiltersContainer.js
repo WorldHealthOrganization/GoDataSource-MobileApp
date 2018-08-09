@@ -13,8 +13,6 @@ import {bindActionCreators} from "redux";
 import {TextField} from 'react-native-material-textfield';
 import Button from './../components/Button';
 import styles from './../styles';
-import Ripple from 'react-native-material-ripple';
-import ElevatedView from 'react-native-elevated-view';
 import CardComponent from './../components/CardComponent';
 
 class FollowUpsFiltersContainer extends PureComponent {
@@ -40,17 +38,39 @@ class FollowUpsFiltersContainer extends PureComponent {
                         return this.handleRenderItem(item);
                     })
                 }
+                <View style={style.containerButtonApplyFilters}>
+                    <Button
+                        title="Apply filters"
+                        color={styles.buttonGreen}
+                        onPress={this.props.onPressApplyFilters}
+                        width={calculateDimension(343, false, this.props.screenSize)}
+                        height={calculateDimension(32, true, this.props.screenSize)}
+                        style={{alignSelf: 'center'}}
+                        titleStyle={{fontFamily: 'Roboto-Medium', fontSize: 14}}
+                        titleColor={'white'}
+                    />
+                </View>
             </View>
         );
     }
 
     // Please write here all the methods that are not react native lifecycle methods
     handleRenderItem = (item) => {
-        console.log("### item from FollowUpsFiltersContainer: ", item);
+        // console.log("### item from FollowUpsFiltersContainer: ", item);
         return (
             <CardComponent
                 item={item.fields}
-                style={{height: 108}}
+                style={{minHeight: calculateDimension(108, true, this.props.screenSize)}}
+                onChangeText={() => {console.log("onChangeText")}}
+                onChangeSwitch={() => {console.log("onChangeSwitch")}}
+                onChangeDropDown={() => {console.log('onChangeDropdown')}}
+                onChangeDate={() => {console.log('onChangeDate')}}
+                onChangeSectionedDropDown={this.props.onChangeSectionedDropDown}
+                onChangeInterval={this.props.onChangeInterval}
+                onChangeMultipleSelection={this.props.onChangeMultipleSelection}
+                onSelectItem={this.props.onSelectItem}
+                screen="FollowUpsFilter"
+                filter={this.props.filter}
             />
         )
     }
@@ -61,8 +81,14 @@ class FollowUpsFiltersContainer extends PureComponent {
 // make a global style in the config directory
 const style = StyleSheet.create({
     container: {
-        backgroundColor: 'white',
+        flex: 1,
+        backgroundColor: styles.screenBackgroundGrey,
         borderRadius: 2
+    },
+    containerButtonApplyFilters: {
+        flex: 1,
+        justifyContent: 'flex-end',
+        marginBottom: 22
     }
 });
 

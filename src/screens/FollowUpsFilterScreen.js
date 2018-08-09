@@ -12,7 +12,8 @@ import {calculateDimension} from './../utils/functions';
 import config from './../utils/config';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
-import {getFollowUpsForOutbreakId, getMissedFollowUpsForOutbreakId} from './../actions/followUps';
+import {getContactsForOutbreakId} from './../actions/contacts';
+import {addFilterForScreen} from './../actions/app';
 import {TabBar, TabView} from 'react-native-tab-view';
 import FollowUpsFiltersContainer from './../containers/FollowUpsFiltersContainer';
 import FollowUpsSortContainer from './../containers/FollowUpsSortContainer';
@@ -26,7 +27,18 @@ class FollowUpsFilterScreen extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            filter: null,
+            filter: {
+                filter: {
+                    gender: {
+                        Male: false,
+                        Female: false
+                    },
+                    age: [0, 100],
+                    selectedLocations: [],
+                    exposure: []
+                },
+                sort: []
+            },
             routes: config.tabsValuesRoutes.followUpsFilter,
             index: 0
         };
@@ -34,6 +46,23 @@ class FollowUpsFilterScreen extends Component {
     }
 
     // Please add here the react lifecycle methods that you need
+    static getDerivedStateFromProps(props, state) {
+        let filterClone = Object.assign({}, state.filter.filter);
+        if (props && props.activeFilters && props.activeFilters.where && props.activeFilters.where.and && Array.isArray(props.activeFilters.where.and)) {
+            for(let i=0; i<props.activeFilters.where.and.length; i++) {
+                if (props.activeFilters.where.and[i].gender) {
+                    filterClone.gender[props.activeFilters.where.and[i].gender] = true;
+                }
+                if (props.activeFilters.where.and[i].age && props.activeFilters.where.and[i].age.gte) {
+                    filterClone.age[0] = props.activeFilters.where.and[i].age.gte;
+                }
+                if (props.activeFilters.where.and[i].age && props.activeFilters.where.and[i].age.lte) {
+                    filterClone.age[1] = props.activeFilters.where.and[i].age.lte;
+                }
+            }
+            console.log("### Active filters: ", filterClone);
+        }
+    }
 
     // The render method should have at least business logic as possible,
     // because this will be called whenever there is a new setState call
@@ -60,10 +89,7 @@ class FollowUpsFilterScreen extends Component {
 
     // Please write here all the methods that are not react native lifecycle methods
     handlePressNavbarButton = () => {
-        this.props.navigator.pop({
-            animated: true,
-            animationType: 'fade'
-        })
+        this.props.navigator.dismissModal(this.props.onApplyFilters(config.defaultFilterForContacts));
     };
 
     handleOnIndexChange = (index) => {
@@ -73,11 +99,20 @@ class FollowUpsFilterScreen extends Component {
     handleRenderScene = () => {
         if (this.state.index === 0) {
             return (
-                <FollowUpsFiltersContainer/>
+                <FollowUpsFiltersContainer
+                    filter={this.state.filter}
+                    onSelectItem={this.handleOnSelectItem}
+                    onChangeSectionedDropDown={this.handleOnChangeSectionedDropDown}
+                    onChangeInterval={this.handleOnChangeInterval}
+                    onChangeMultipleSelection={this.handleOnChangeMultipleSelection}
+                    onPressApplyFilters={this.handleOnPressApplyFilters}
+                />
             )
         } else {
             return (
-                <FollowUpsSortContainer/>
+                <FollowUpsSortContainer
+                    filter={this.state.filter}
+                />
             )
         }
     };
@@ -122,6 +157,64 @@ class FollowUpsFilterScreen extends Component {
             </Animated.Text>
         );
     }
+
+    handleOnSelectItem = (item, index, id) => {
+        console.log("### handleOnSelectItem: ", item, index, id);
+        let filter = Object.assign({}, this.state.filter.filter);
+        filter[id][item.value] = !filter[id][item.value];
+        this.setState(prevState => ({
+            filter: Object.assign({}, prevState.filter, Object.assign({}, prevState.filter.filter, {[id]: filter[id]}))
+        }))
+    }
+
+    handleOnChangeSectionedDropDown = (selectedItems) => {
+        this.setState(prevState => ({
+            filter: Object.assign({}, prevState.filter, {filter: Object.assign({}, prevState.filter.filter, {selectedLocations: selectedItems})})
+        }), () => {
+            console.log("Filters: ", this.state.filter.filter);
+        })
+    };
+
+    handleOnChangeInterval = (values, id) => {
+        this.setState(prevState => ({
+            filter: Object.assign({}, prevState.filter, {filter: Object.assign({}, prevState.filter.filter, {[id]: values})})
+        }));
+    }
+
+    handleOnChangeMultipleSelection = (selections, id) => {
+        this.setState(prevState => ({
+            filter: Object.assign({}, prevState.filter, {filter: Object.assign({}, prevState.filter.filter, {[id]: selections})})
+        }), () => {
+            console.log("### selections: ", this.state.filter.filter);
+        })
+    };
+
+    handleOnPressApplyFilters = () => {
+        let filterStateClone = Object.assign({}, this.state.filter.filter);
+        let filter = Object.assign({}, config.defaultFilterForContacts);
+
+        filter.where = {};
+
+        filter.where.and = [];
+
+        if (filterStateClone.gender.Male) {
+            filter.where.and.push({gender: 'Male'})
+        }
+        if (filterStateClone.gender.Female) {
+            filter.where.and.push({gender: 'Female'})
+        }
+
+        if (filterStateClone.age) {
+            filter.where.and.push({age: {gte: filterStateClone.age[0]}});
+            filter.where.and.push({age: {lte: filterStateClone.age[1]}});
+        }
+
+        // this.props.getContactsForOutbreakId(this.props.user.activeOutbreakId, filter, this.props.user.token);
+
+        this.props.addFilterForScreen('FollowUpsFilterScreen', filter);
+
+        this.props.navigator.dismissModal(this.props.onApplyFilters(filter));
+    }
 }
 
 // Create style outside the class, or for components that will be used by other components (buttons),
@@ -143,8 +236,8 @@ function mapStateToProps(state) {
 
 function matchDispatchProps(dispatch) {
     return bindActionCreators({
-        getFollowUpsForOutbreakId,
-        getMissedFollowUpsForOutbreakId
+        getContactsForOutbreakId,
+        addFilterForScreen
     }, dispatch);
 }
 

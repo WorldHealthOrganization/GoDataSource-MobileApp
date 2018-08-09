@@ -23,6 +23,7 @@ import {updateFollowUpAndContact, deleteFollowUp} from './../actions/followUps';
 import {updateContact} from './../actions/contacts';
 import {removeErrors} from './../actions/errors';
 import DateTimePicker from 'react-native-modal-datetime-picker';
+import _ from 'lodash';
 
 class FollowUpsSingleScreen extends Component {
 
@@ -94,9 +95,6 @@ class FollowUpsSingleScreen extends Component {
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
-
-        // console.log("### props from click: ", this.state.item);
-
         return (
             <View style={style.container}>
                 <NavBarCustom
@@ -349,7 +347,7 @@ class FollowUpsSingleScreen extends Component {
     };
 
     onChangeTextAnswer = (value, id) => {
-        let questionnaireAnswers = Object.assign({}, this.state.item.questionnaireAnswers);
+        let questionnaireAnswers = _.cloneDeep(this.state.item.questionnaireAnswers);
         questionnaireAnswers[id] = value;
         this.setState(prevState => ({
             item: Object.assign({}, prevState.item, {questionnaireAnswers: questionnaireAnswers})
@@ -357,7 +355,7 @@ class FollowUpsSingleScreen extends Component {
     };
 
     onChangeSingleSelection = (value, id) => {
-        let questionnaireAnswers = Object.assign({}, this.state.item.questionnaireAnswers);
+        let questionnaireAnswers = _.cloneDeep(this.state.item.questionnaireAnswers);
         questionnaireAnswers[id] = value.value;
         this.setState(prevState => ({
             item: Object.assign({}, prevState.item, {questionnaireAnswers: questionnaireAnswers})

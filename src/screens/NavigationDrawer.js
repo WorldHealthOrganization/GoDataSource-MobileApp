@@ -51,7 +51,7 @@ class NavigationDrawer extends Component {
                     />
                     <View style={styles.lineStyle} />
                 </View>
-                <View style={{flex: 0.25}}>
+                <View style={{flex: 0.35}}>
                     {
                         config.sideMenuItems.map((item, index) => {
                             return (
@@ -71,7 +71,7 @@ class NavigationDrawer extends Component {
                     <NavigationDrawerListItem label={'Change HUB configuration'} name={'settings'}/>
                     <View style={styles.lineStyle} />
                 </View>
-                <View style={{flex: 0.35}}>
+                <View style={{flex: 0.15}}>
                     <NavigationDrawerListItem label='Logout' name="power-settings-new" onPress={this.handleLogout} />
                 </View>
             </View>

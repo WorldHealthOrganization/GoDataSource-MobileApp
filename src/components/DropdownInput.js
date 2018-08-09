@@ -22,9 +22,9 @@ class DropdownInput extends PureComponent {
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
-        if(this.props.isEditMode){
+        if (this.props.isEditMode) {
             return this.editInput();
-        }else{
+        } else {
             return this.viewInput();
         }
     }
@@ -36,21 +36,17 @@ class DropdownInput extends PureComponent {
                 // width: '100%'
             }, this.props.style]}>
                 <Dropdown
-                   label={this.props.label}
-                   data={this.props.data}
-                   value={this.props.value}
-                   fontSize={15}
-                   labelFontSize={12.5}
-                   // baseColor={}
-                   // textColor={}
-                   selectedItemColor={'rgb(255,60,56)'}
-                   onChangeText={ (state) => {
-                       if (this.props.labelValue) {
-                           this.props.onChange({label: state, value: this.props.data[this.props.data.map((e) => {return e.value}).indexOf(state)].id}, this.props.labelValue)
-                       } else {
-                           this.props.onChange(state, this.props.id)}
-                       }
-                   }
+                    label={this.props.label}
+                    data={this.props.data}
+                    value={this.props.value}
+                    fontSize={15}
+                    labelFontSize={12.5}
+                    // baseColor={}
+                    // textColor={}
+                    selectedItemColor={'rgb(255,60,56)'}
+                    onChangeText={this.handleOnChangeText}
+                    dropdownPosition={1}
+                    dropdownMargins={{min: 4, max: 8}}
                 />
             </View>
         );
@@ -58,9 +54,7 @@ class DropdownInput extends PureComponent {
 
     viewInput = () => {
         return (
-            <View style={[{
-
-            },this.props.style]}>
+            <View style={[{}, this.props.style]}>
                 <Text style={{
                     fontFamily: 'Roboto-Regular',
                     fontSize: 15,
@@ -83,6 +77,21 @@ class DropdownInput extends PureComponent {
         );
     }
 
+    handleOnChangeText = (state) => {
+        if (this.props.labelValue) {
+            console.log("Label value branch");
+            if (this.props && this.props.data && Array.isArray(this.props.data)) {
+                this.props.onChange({
+                    label: state, value: this.props.data[this.props.data.map((e) => {
+                        return e.value
+                    }).indexOf(state)].id
+                }, this.props.id)
+            }
+        } else {
+            console.log("Other branch");
+            this.props.onChange(state, this.props.id)
+        }
+    }
 }
 
 // Create style outside the class, or for components that will be used by other components (buttons),

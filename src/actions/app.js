@@ -47,11 +47,11 @@ export function appInitialized() {
 
         dispatch(saveScreenSize(screenSize));
 
-        // dispatch(changeAppRoot('login'));
+        dispatch(changeAppRoot('login'));
         // Login to skip the first step. Only for develop mode
-        dispatch(loginUser({
-            email: 'florin.popa@clarisoft.com',
-            password: 'Cl@r1soft'
-        }))
+        // dispatch(loginUser({
+        //     email: 'florin.popa@clarisoft.com',
+        //     password: 'Cl@r1soft'
+        // }))
     }
 };

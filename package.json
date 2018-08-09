@@ -12,6 +12,7 @@
     ]
   },
   "dependencies": {
+    "@ptomasroos/react-native-multi-slider": "^1.0.0",
     "hoist-non-react-statics": "^2.5.5",
     "lodash": "^4.17.10",
     "react": "16.3.1",
@@ -24,7 +25,6 @@
     "react-native-material-dropdown": "^0.11.1",
     "react-native-material-menu": "^0.4.0",
     "react-native-material-ripple": "^0.8.0",
-    "react-native-material-selectize": "^1.9.0",
     "react-native-material-switch": "0.0.4",
     "react-native-material-textfield": "^0.12.0",
     "react-native-material-ui": "1.30.0",
@@ -33,6 +33,7 @@
     "react-native-multiple-select": "^0.4.4",
     "react-native-navigation": "1.1.471",
     "react-native-root-modal": "^3.1.1",
+    "react-native-sectioned-multi-select": "^0.5.2",
     "react-native-select-multiple": "^1.2.0",
     "react-native-tab-view": "^1.0.2",
     "react-native-vector-icons": "^4.6.0",

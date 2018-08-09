@@ -15,6 +15,7 @@ import {bindActionCreators} from "redux";
 import Modal from 'react-native-modal';
 import ElevatedView from "react-native-elevated-view";
 import SelectMultiple from 'react-native-select-multiple';
+import SectionedMultiSelect from 'react-native-sectioned-multi-select';
 
 class DropDown extends PureComponent {
 
@@ -55,11 +56,26 @@ class DropDown extends PureComponent {
                     onBackdropPress={() => this.setState({ showDropdown: false })}
                 >
                     <ElevatedView elevation={3} style={[{backgroundColor: 'white'}]}>
-                        <SelectMultiple
-                            items={this.props.data}
-                            selectedItems={this.state.selectedItems}
-                            onSelectionsChange={this.handleOnselectionChange}
-                        />
+                        {/*{*/}
+                            {/*this.props.isSectionedList ? (*/}
+                                {/*<SectionedMultiSelect*/}
+                                    {/*items={this.props.data}*/}
+                                    {/*uniqueKey='id'*/}
+                                    {/*subKey='children'*/}
+                                    {/*selectText='Choose one or more locations'*/}
+                                    {/*showDropDowns={true}*/}
+                                    {/*readOnlyHeadings={true}*/}
+                                    {/*onSelectedItemsChange={this.onSelectedItemsChange}*/}
+                                    {/*selectedItems={this.state.selectedItems}*/}
+                                {/*/>*/}
+                            {/*) : (*/}
+                                <SelectMultiple
+                                    items={this.props.data}
+                                    selectedItems={this.state.selectedItems}
+                                    onSelectionsChange={this.handleOnselectionChange}
+                                />
+                        //     )
+                        // }
                     </ElevatedView>
                 </Modal>
             </Ripple>
@@ -73,11 +89,15 @@ class DropDown extends PureComponent {
         })
     };
 
+    onSelectedItemsChange = (selectedItems) => {
+        console.log("Selected items SectionedMultiSelect: ", selectedItems);
+    };
+
     handleOnselectionChange = (selections, item) => {
         this.setState({
             selectedItems: selections
         }, () => {
-            this.props.onChange(selections, this.props.labelValue);
+            this.props.onChange(selections, this.props.id);
         })
     }
 }

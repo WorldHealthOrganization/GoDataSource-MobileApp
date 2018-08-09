@@ -5,6 +5,7 @@ import {ACTION_TYPE_STORE_OUTBREAK} from './../utils/enums';
 import {getOutbreakByIdRequest} from './../requests/outbreak';
 import { addError } from './errors';
 import errorTypes from './../utils/errorTypes';
+import {getLocations} from './locations'
 
 // Add here only the actions, not also the requests that are executed. For that purpose is the requests directory
 export function storeOutbreak(outbreak) {
@@ -22,6 +23,7 @@ export function getOutbreakById(outbreakId, token) {
                 dispatch(addError(errorTypes.ERROR_OUTBREAK));
             }
             if (response) {
+                dispatch(getLocations(response.countries ,token));
                 dispatch(storeOutbreak(response));
             }
         })

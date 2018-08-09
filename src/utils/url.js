@@ -8,11 +8,13 @@ const users = baseUrl + '/users/';
 const login = users + 'login';
 const outbreaks = baseUrl + '/outbreaks/';
 const referenceData = baseUrl + '/reference-data';
+const locations = baseUrl + '/locations';
 
 export default {
     baseUrl,
     users,
     login,
     outbreaks,
-    referenceData
+    referenceData,
+    locations
 }

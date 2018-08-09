@@ -11,7 +11,9 @@ import { getEventsForOutbreakId } from './events';
 import { getOutbreakById } from './outbreak';
 import { addError } from './errors';
 import {getReferenceData} from './referenceData'
+import {getLocations} from './locations'
 import errorTypes from './../utils/errorTypes';
+import config from './../utils/config';
 
 // Add here only the actions, not also the requests that are executed.
 // For that purpose is the requests directory
@@ -59,7 +61,7 @@ export function getUserById(userId, token) {
                 let user = Object.assign({}, response, {token: token});
                 dispatch(storeUser(user));
                 dispatch(getFollowUpsForOutbreakId(user.activeOutbreakId, null, user.token));
-                dispatch(getContactsForOutbreakId(user.activeOutbreakId, user.token));
+                dispatch(getContactsForOutbreakId(user.activeOutbreakId, config.defaultFilterForContacts, user.token));
                 dispatch(getCasesForOutbreakId(user.activeOutbreakId, user.token));
                 dispatch(getEventsForOutbreakId(user.activeOutbreakId, user.token));
                 dispatch(getOutbreakById(user.activeOutbreakId, user.token));

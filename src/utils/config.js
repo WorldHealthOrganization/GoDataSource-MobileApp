@@ -196,52 +196,69 @@ const followUpsFilterScreen = {
                 {
                     cardNumber: 2,
                     id: 'age',
-                    type: 'IntervalSelector',
+                    type: 'IntervalPicker',
                     value: '',
                     min: 0,
                     max: 100
                 }
             ]
         },
+        // {
+        //     fields: [
+        //         {
+        //             cardNumber: 3,
+        //             label: 'Location',
+        //             type: 'Section',
+        //             hasBorderBottom: true,
+        //             borderBottomColor: styles.navigationDrawerSeparatorGrey
+        //         },
+        //         {
+        //             cardNumber: 3,
+        //             id: 'selectedLocations',
+        //             type: 'DropDownSectioned',
+        //             label: 'Choose one or more locations',
+        //             value: '',
+        //             data: [],
+        //             isRequired: false,
+        //             isEditMode: true,
+        //         }
+        //     ]
+        // },
+        // {
+        //     fields: [
+        //         {
+        //             cardNumber: 4,
+        //             label: 'Exposure',
+        //             type: 'Section',
+        //             hasBorderBottom: true,
+        //             borderBottomColor: styles.navigationDrawerSeparatorGrey
+        //         },
+        //         {
+        //             cardNumber: 4,
+        //             id: 'exposure',
+        //             label: 'Choose one or more cases',
+        //             type: 'DropDown',
+        //             value: '',
+        //             data: [{value: 'Diana Jones'}, {value: 'Florin Popa'}],
+        //             isRequired: false,
+        //             isEditMode: true
+        //         }
+        //     ]
+        // }
+    ]
+};
+
+const defaultFilterForContacts = {
+    include: [
+        'relationships',
         {
-            fields: [
-                {
-                    cardNumber: 3,
-                    label: 'Location',
-                    type: 'Section',
-                    hasBorderBottom: true,
-                    borderBottomColor: styles.navigationDrawerSeparatorGrey
-                },
-                {
-                    cardNumber: 3,
-                    id: 'address',
-                    type: 'DropdownInput',
-                    label: 'Choose one or more locations',
-                    value: '',
-                    data: [{value: '1 Infinite Loop, Cupertino, California'}, {value: 'Trump Tower, New York, New York'}]
-                }
-            ]
-        },
-        {
-            fields: [
-                {
-                    cardNumber: 4,
-                    label: 'Exposure',
-                    type: 'Section',
-                    hasBorderBottom: true,
-                    borderBottomColor: styles.navigationDrawerSeparatorGrey
-                },
-                {
-                    cardNumber: 4,
-                    id: 'exposure',
-                    type: 'DropdownInput',
-                    value: '',
-                    data: [{value: 'Diana Jones'}, {value: 'Florin Popa'}]
-                }
-            ]
+            relation: 'followUps',
+            scope: {
+                order: 'date ASC'
+            }
         }
     ]
-}
+};
 
 
 export default {
@@ -250,5 +267,6 @@ export default {
     dropDownValues,
     tabsValuesRoutes,
     followUpsSingleScreen,
-    followUpsFilterScreen
+    followUpsFilterScreen,
+    defaultFilterForContacts
 }

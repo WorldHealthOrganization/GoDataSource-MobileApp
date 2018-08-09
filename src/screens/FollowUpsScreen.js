@@ -8,13 +8,13 @@
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
 import {View, Text, StyleSheet, Alert, Animated} from 'react-native';
-import {Button} from 'react-native-material-ui';
+import {Button, Icon} from 'react-native-material-ui';
 import styles from './../styles';
 import NavBarCustom from './../components/NavBarCustom';
 import CalendarPicker from './../components/CalendarPicker';
 import {calculateDimension} from './../utils/functions';
 import config from './../utils/config';
-import ButtonWithIcons from './../components/ButtonWithIcons';
+import Ripple from 'react-native-material-ripple';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import SearchFilterView from './../components/SearchFilterView';
@@ -23,8 +23,11 @@ import MissedFollowUpListItem from './../components/MissedFollowUpListItem';
 import AnimatedListView from './../components/AnimatedListView';
 import ValuePicker from './../components/ValuePicker';
 import {getFollowUpsForOutbreakId, getMissedFollowUpsForOutbreakId} from './../actions/followUps';
+import {getContactsForOutbreakId} from './../actions/contacts';
 import {removeErrors} from './../actions/errors';
 import {addFilterForScreen} from './../actions/app';
+import ElevatedView from 'react-native-elevated-view';
+import _ from 'lodash';
 
 const scrollAnim = new Animated.Value(0);
 const offsetAnim = new Animated.Value(0);
@@ -40,8 +43,11 @@ class FollowUpsScreen extends Component {
         this.state = {
             // filter: this.props.filter && this.props.filter['FollowUpsScreen'] ? this.props.filter['FollowUpsScreen'] : null,
             filter: this.props.filter && this.props.filter['FollowUpsScreen'] ? this.props.filter['FollowUpsScreen'] : {
-                date: new Date()
-            }
+                date: new Date(),
+                searchText: ''
+            },
+            filterFromFilterScreen: this.props.filter && this.props.filter['FollowUpsFilterScreen'] ? this.props.filter['FollowUpsFilterScreen'] : null,
+            followUps: []
         };
         // Bind here methods, or at least don't declare methods in the render method
         this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this));
@@ -63,7 +69,47 @@ class FollowUpsScreen extends Component {
                 }
             ])
         }
-        return null;
+
+        // console.log("Contacts: ", props.contacts);
+
+        if (props.contacts) {
+            let contactWithOneFollowUp = [];
+            state.followUps = [];
+            contactWithOneFollowUp = _.filter(props.contacts, (contact) => {
+                // console.log("### contact from filter: ", contact);
+                let followUp = _.filter(contact.followUps, (followUp) => {
+                    let oneDay = 24 * 60 * 60 * 1000;
+                    let truthValue = false;
+                    if (!state.filter.date) {
+                        state.filter.date = new Date();
+                    }
+
+                    // let dateString = state.filter.date.getFullYear() + '-' + (state.filter.date.getMonth() + 1) + '-' + (state.filter.date.getDate() + 1);
+                    // let date = new Date('2018/8/10');
+                    //
+                    //
+                    // console.log(date);
+                    // console.log(new Date(followUp.date));
+                    // console.log(new Date(new Date(state.filter.date.getFullYear() + '-' + (state.filter.date.getMonth() + 1) + '-' + (state.filter.date.getDate() + 1))));
+                    // console.log("~~~~~~~~~~~~~~");
+
+                    truthValue = (new Date(state.filter.date.getFullYear() + '/' + (state.filter.date.getMonth() + 1) + '/' + (state.filter.date.getDate() + 1)).getTime() - oneDay) <= new Date(followUp.date).getTime() &&
+                        (new Date(new Date(state.filter.date.getFullYear() + '/' + (state.filter.date.getMonth() + 1) + '/' + (state.filter.date.getDate() + 1)).getTime()) > new Date(followUp.date).getTime());
+
+                    // console.log("### truthValue: ", truthValue);
+
+                    if (state.filter.performed && state.filter.performed === 'To do') {
+                        truthValue = truthValue && followUp.performed;
+                    }
+                    if (truthValue) {
+                        state.followUps.push(followUp);
+                    }
+                    return truthValue;
+                });
+                return followUp.length > 0;
+            });
+            return null;
+        }
     }
 
     clampedScroll= Animated.diffClamp(
@@ -99,7 +145,7 @@ class FollowUpsScreen extends Component {
             extrapolate: 'clamp',
         });
 
-        console.log('this.state.filter: ', this.state.filter);
+        // console.log('this.state.filter: ', this.state.followUps);
 
         return (
             <View style={style.container}>
@@ -120,27 +166,44 @@ class FollowUpsScreen extends Component {
                         onSelectValue={this.onSelectValue}
                         value={this.state.filter.performed || config.dropDownValues[0].value}
                     />
-                    <Button raised text="" onPress={() => console.log("Empty button")} icon="add"
-                            style={{
-                                container: {width: calculateDimension(33, true, this.props.screenSize),height: calculateDimension(25, true, this.props.screenSize), margin: 0, padding: 0},
-                                text: {width: 0, margin: 0, padding: 0, height: 0},
-                                icon: {margin: 0, padding: 0, alignSelf: 'center'}
-                            }}/>
+                    <ElevatedView
+                        elevation={3}
+                        style={{
+                            backgroundColor: styles.buttonGreen,
+                            width: calculateDimension(33, false, this.props.screenSize),
+                            height: calculateDimension(25, true, this.props.screenSize),
+                            borderRadius: 4
+                        }}
+                    >
+                    <Ripple style={{
+                        flex: 1,
+                        justifyContent: 'center',
+                        alignItems: 'center'
+                    }}>
+                        <Icon name="add" color={'white'} size={15}/>
+                    </Ripple>
+                    </ElevatedView>
                 </NavBarCustom>
                 <View style={style.containerContent}>
                     <AnimatedListView
                         stickyHeaderIndices={[0]}
-                        data={this.props.followUps}
+                        data={this.state.followUps || []}
                         renderItem={this.renderFollowUp}
                         keyExtractor={this.keyExtractor}
-                        ListHeaderComponent={<SearchFilterView style={{
-                            transform: [{
-                                translateY: navbarTranslate
-                            }],
-                            opacity: navbarOpacity
-                        }}
-                           onPress={this.handlePressFilter}
-                        />}
+                        ListHeaderComponent={
+                            <SearchFilterView
+                                style={{
+                                    transform: [{
+                                        translateY: navbarTranslate
+                                    }],
+                                    opacity: navbarOpacity
+                                }}
+                                value={this.state.filter.searchText}
+                                onPress={this.handlePressFilter}
+                                onChangeText={this.handleOnChangeText}
+                                onSubmitEditing={this.handleOnSubmitEditing}
+                                filterText={this.state.filterFromFilterScreen && this.state.filterFromFilterScreen.where && this.state.filterFromFilterScreen.where.and && Array.isArray(this.state.filterFromFilterScreen.where.and) ? ("Filter (" + this.state.filterFromFilterScreen.where.and.length + ')') : 'Filter'}
+                            />}
                         ItemSeparatorComponent={this.renderSeparatorComponent}
                         ListEmptyComponent={this.listEmptyComponent}
                         style={[style.listViewStyle]}
@@ -163,14 +226,15 @@ class FollowUpsScreen extends Component {
 
     renderFollowUp = ({item}) => {
         let oneDay = 24 * 60 * 60 * 1000;
-        let itemDate = new Date(item.date).getTime() - oneDay;
-        if (!item.performed && new Date(itemDate) > new Date()) {
+        let itemDate = new Date(item.date).getTime();
+        let now = new Date().getTime() - oneDay;
+        if (!item.performed && itemDate < now) {
             return (
-                <FollowUpListItem item={item} onPressFollowUp={this.handlePressFollowUp} />
+                <MissedFollowUpListItem item={item} onPressFollowUp={this.handlePressFollowUp}/>
             )
         } else {
             return (
-                <MissedFollowUpListItem item={item} onPressFollowUp={this.handlePressFollowUp} />
+                <FollowUpListItem item={item} onPressFollowUp={this.handlePressFollowUp} />
             )
         }
     };
@@ -247,11 +311,21 @@ class FollowUpsScreen extends Component {
     };
 
     handlePressFilter = () => {
-        this.props.navigator.push({
+        this.props.navigator.showModal({
             screen: 'FollowUpsFilterScreen',
             animated: true,
-            animationType: 'fade'
+            passProps: {
+                activeFilters: this.state.filterFromFilterScreen || null,
+                onApplyFilters: this.handleOnApplyFilters
+            }
         })
+    };
+
+    handleOnChangeText = (text) => {
+        console.log("### handleOnChangeText: ", text);
+        this.setState(prevState => ({
+            filter: Object.assign({}, prevState.filter, {searchText: text})
+        }), console.log('### filter after changed text: ', this.state.filter))
     };
 
     // Append to the existing filter newProp={name: value}
@@ -284,35 +358,98 @@ class FollowUpsScreen extends Component {
     };
 
     applyFilters = () => {
-        let filter = {};
-
-        filter.where = {};
-        filter.where.and = [];
-
-        let oneDay = 24 * 60 * 60 * 1000;
-
-        if (this.state.filter.date) {
-            filter.where.and.push({date: {gt: new Date(this.state.filter.date.getTime() - oneDay)}});
-            filter.where.and.push({date: {lt: new Date(this.state.filter.date.getTime() + oneDay)}});
-        }
-        // else {
-        //     let now = new Date();
+        // let filter = {};
         //
-        //     filter.where.and.push({date: {gt: new Date(now.getTime() - oneDay)}});
-        //     filter.where.and.push({date: {lt: new Date(now.getTime() + oneDay)}});
+        // filter.where = {};
+        // filter.where.and = [];
+        //
+        // let oneDay = 24 * 60 * 60 * 1000;
+        //
+        // if (this.state.filter.date) {
+        //     filter.where.and.push({date: {gt: new Date(this.state.filter.date.getTime() - oneDay)}});
+        //     filter.where.and.push({date: {lt: new Date(this.state.filter.date.getTime() + oneDay)}});
+        // }
+        // // else {
+        // //     let now = new Date();
+        // //
+        // //     filter.where.and.push({date: {gt: new Date(now.getTime() - oneDay)}});
+        // //     filter.where.and.push({date: {lt: new Date(now.getTime() + oneDay)}});
+        // // }
+        //
+        // if (this.state.filter.performed) {
+        //     filter.where.and.push({performed: this.state.filter.performed !== 'To do'})
+        // }
+        //
+        this.props.addFilterForScreen('FollowUpsScreen', this.state.filter);
+        //
+        // if (this.state.filter.performed === 'Missed') {
+        //     this.props.getMissedFollowUpsForOutbreakId(this.props.user.activeOutbreakId, filter, this.props.user.token);
+        // } else {
+        //     this.props.getFollowUpsForOutbreakId(this.props.user.activeOutbreakId, filter, this.props.user.token);
         // }
 
-        if (this.state.filter.performed) {
-            filter.where.and.push({performed: this.state.filter.performed !== 'To do'})
+        let defaultFilter = Object.assign({}, config.defaultFilterForContacts);
+
+        // Check if there is an active search
+        if (this.state.filter.searchText) {
+            if (!defaultFilter.where || Object.keys(defaultFilter.where).length === 0) {
+                defaultFilter.where = {}
+            }
+            if (!defaultFilter.where.or || defaultFilter.where.or.length === 0) {
+                defaultFilter.where.or = [];
+            }
+            defaultFilter.where.or.push({firstName: {like: this.state.filter.searchText, options: 'i'}});
+            defaultFilter.where.or.push({lastName: {like: this.state.filter.searchText, options: 'i'}});
         }
 
-        this.props.addFilterForScreen('FollowUpsScreen', this.state.filter);
-
-        if (this.state.filter.performed === 'Missed') {
-            this.props.getMissedFollowUpsForOutbreakId(this.props.user.activeOutbreakId, filter, this.props.user.token);
-        } else {
-            this.props.getFollowUpsForOutbreakId(this.props.user.activeOutbreakId, filter, this.props.user.token);
+        //Check if there are active filters
+        if (this.state.filterFromFilterScreen) {
+            defaultFilter.where = this.state.filterFromFilterScreen.where;
+            if (this.state.filter.searchText) {
+                if (!defaultFilter.where || Object.keys(defaultFilter.where).length === 0) {
+                    defaultFilter.where = {}
+                }
+                if (!defaultFilter.where.or || defaultFilter.where.or.length === 0) {
+                    defaultFilter.where.or = [];
+                }
+                defaultFilter.where.or.push({firstName: {like: this.state.filter.searchText, options: 'i'}});
+                defaultFilter.where.or.push({lastName: {like: this.state.filter.searchText, options: 'i'}});
+            }
         }
+
+        this.props.getContactsForOutbreakId(this.props.user.activeOutbreakId, defaultFilter, this.props.user.token)
+    };
+
+    handleOnSubmitEditing = (text) => {
+        this.props.addFilterForScreen("FollowUpsScreen", this.state.filter);
+        let existingFilter = this.state.filterFromFilterScreen ? Object.assign({}, this.state.filterFromFilterScreen) : Object.assign({}, config.defaultFilterForContacts);
+
+        if (!existingFilter.where || Object.keys(existingFilter.where).length === 0) {
+            existingFilter.where = {};
+        }
+        if (!existingFilter.where.or || existingFilter.where.or.length === 0) {
+            existingFilter.where.or = [];
+        }
+        existingFilter.where.or.push({firstName: {like: text, options: 'i'}});
+        existingFilter.where.or.push({lastName: {like: text, options: 'i'}});
+
+        this.props.getContactsForOutbreakId(this.props.user.activeOutbreakId, existingFilter, this.props.user.token);
+    };
+
+    handleOnApplyFilters = (filter) => {
+        this.setState({
+            filterFromFilterScreen: filter
+        }, () => {
+            if (this.state.filter.searchText) {
+
+                if (!filter.where.or || filter.where.or.length === 0) {
+                    filter.where.or = [];
+                }
+                filter.where.or.push({firstName: {like: this.state.filter.searchText, options: 'i'}});
+                filter.where.or.push({lastName: {like: this.state.filter.searchText, options: 'i'}});
+            }
+            this.props.getContactsForOutbreakId(this.props.user.activeOutbreakId, filter, this.props.user.token);
+        })
     };
 
     onNavigatorEvent = (event) => {
@@ -365,6 +502,7 @@ const style = StyleSheet.create({
 
     },
     componentContainerStyle: {
+
     },
     emptyComponent: {
         justifyContent: 'center',
@@ -388,6 +526,7 @@ function mapStateToProps(state) {
         screenSize: state.app.screenSize,
         filter: state.app.filters,
         followUps: state.followUps,
+        contacts: state.contacts,
         errors: state.errors
     };
 }
@@ -397,7 +536,8 @@ function matchDispatchProps(dispatch) {
         getFollowUpsForOutbreakId,
         getMissedFollowUpsForOutbreakId,
         removeErrors,
-        addFilterForScreen
+        addFilterForScreen,
+        getContactsForOutbreakId
     }, dispatch);
 }
 

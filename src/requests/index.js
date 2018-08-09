@@ -8,5 +8,6 @@ import followUps from './followUps';
 import contacts from './contacts';
 import events from './events';
 import referenceData from './referenceData';
+import locations from './locations';
 
-module.exports = Object.assign({}, user, outbreak, cases, followUps, contacts, events, referenceData);
+module.exports = Object.assign({}, user, outbreak, cases, followUps, contacts, events, referenceData, locations);

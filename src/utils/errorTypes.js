@@ -14,4 +14,5 @@ export default {
     ERROR_CASES: {type: "Cases error", message: 'An error occurred while trying to get cases data'},
     ERROR_EVENTS: {type: "Events error", message: 'An error occurred while trying to get events data'},
     ERROR_REFERENCE_DATA: {type: "Reference data error", message: 'An error occurred while trying to get reference data'},
+    ERROR_LOCATIONS: {type: "Location areas error", message: 'An error occurred while trying to get location areas'},
 }

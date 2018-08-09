@@ -10,5 +10,6 @@ const contacts = require('./contacts');
 const events = require('./events');
 const errors = require('./errors');
 const referenceData = require('./referenceData');
+const locations = require('./locations');
 
-module.exports = Object.assign({}, app, user, outbreak, cases, followUps, contacts, events, errors, referenceData);
+module.exports = Object.assign({}, app, user, outbreak, cases, followUps, contacts, events, errors, referenceData, locations);

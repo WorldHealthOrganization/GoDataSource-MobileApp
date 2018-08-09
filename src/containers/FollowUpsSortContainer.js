@@ -47,7 +47,8 @@ class FollowUpsSortContainer extends PureComponent {
 // make a global style in the config directory
 const style = StyleSheet.create({
     container: {
-        backgroundColor: 'white',
+        flex: 1,
+        backgroundColor: styles.screenBackgroundGrey,
         borderRadius: 2
     }
 });

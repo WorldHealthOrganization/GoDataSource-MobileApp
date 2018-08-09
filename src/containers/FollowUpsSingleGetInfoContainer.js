@@ -44,8 +44,11 @@ class FollowUpsFiltersContainer extends PureComponent {
                         marginVertical: calculateDimension(12.5, true, this.props.screenSize)
                     }}
                 />
-                <KeyboardAwareScrollView style={style.containerScrollView} contentContainerStyle={style.contentContainerStyle}
-                                         keyboardShouldPersistTaps={'always'}>
+                <KeyboardAwareScrollView
+                    style={style.containerScrollView}
+                    contentContainerStyle={[style.contentContainerStyle, {paddingBottom: this.props.screenSize.height < 600 ? 70 : 20}]}
+                    keyboardShouldPersistTaps={'always'}
+                >
                     {
                         config.followUpsSingleScreen.generalInfo.map((item) => {
                             return this.handleRenderItem(item)

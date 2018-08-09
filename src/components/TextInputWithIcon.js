@@ -38,7 +38,16 @@ class TextInputWithIcon extends Component {
         return (
             <View style={[style.container]}>
                 <Icon name="search" size={20} style={{alignSelf: 'center'}} />
-                <TextInput label="Search" value={this.state.search} style={style.textInput} placeholder={"Search"} underlineColorAndroid={'transparent'} />
+                <TextInput
+                    label="Search"
+                    ref={this.searchRef}
+                    value={this.props.value}
+                    style={style.textInput}
+                    placeholder={"Search"}
+                    underlineColorAndroid={'transparent'}
+                    onChangeText={this.handleTextChange}
+                    onSubmitEditing={this.handleOnSubmitEditing}
+                />
             </View>
         );
     }
@@ -53,10 +62,14 @@ class TextInputWithIcon extends Component {
             .map((name) => ({ name, ref: this[name] }))
             .forEach(({ name, ref }) => {
                 if (ref.isFocused()) {
-                    this.setState({ [name]: text });
+                    this.props.onChangeText(text);
                 }
             });
     };
+
+    handleOnSubmitEditing = () => {
+        this.props.onSubmitEditing(this.state.search);
+    }
 }
 
 

@@ -22,9 +22,9 @@ export function updateContactAction(contact) {
     }
 }
 
-export function getContactsForOutbreakId(outbreakId, token) {
+export function getContactsForOutbreakId(outbreakId, filter, token) {
     return async function (dispatch, getState) {
-        getContactsForOutbreakIdRequest(outbreakId, token, (error, response) => {
+        getContactsForOutbreakIdRequest(outbreakId, filter, token, (error, response) => {
             if (error) {
                 console.log("*** getContactsForOutbreakId error: ", error);
                 dispatch(addError(errorTypes.ERROR_CONTACT));

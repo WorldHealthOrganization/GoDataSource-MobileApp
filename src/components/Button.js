@@ -29,12 +29,12 @@ class Button extends PureComponent {
                 title={this.props.title}
                 color={this.props.color}
                 titleColor={this.props.titleColor}
-                titleStyle={{
+                titleStyle={[{
                     fontFamily: 'Roboto-Regular',
                     fontSize: 11.8,
                     alignSelf: 'center',
                     lineHeight: 25
-                }}
+                }, this.props.titleStyle]}
                 onPress={this.props.onPress}
                 style={[{
                     borderRadius: 4,

@@ -17,6 +17,8 @@ const colorLabelInactiveTab = 'rgba(46, 46, 46, 0.35)';
 const colorBackgroundQuestions = 'rgb(214, 214, 214)';
 const textFieldUnderline = 'rgb(176, 176, 176)';
 const colorLoginButtonText = 'rgb(39, 39, 39)';
+const colorUnselectedItem = 'rgb(237, 237, 237)';
+const colorUnselectedItemText = 'rgb(49, 49, 49)';
 
 export default {
     screenBackgroundGrey,
@@ -34,5 +36,7 @@ export default {
     colorLabelInactiveTab,
     colorBackgroundQuestions,
     textFieldUnderline,
-    colorLoginButtonText
+    colorLoginButtonText,
+    colorUnselectedItem,
+    colorUnselectedItemText
 }
