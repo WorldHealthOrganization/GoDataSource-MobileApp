@@ -208,9 +208,9 @@ class FollowUpsSingleScreen extends Component {
         this.handleOnIndexChange(this.state.index + 1 );
     };
 
-    onChangeText = (value, id) => {
-        // console.log("onChangeText: ", this.state.item);
-        if (this.state.item[id]) {
+    onChangeText = (value, id, objectType) => {
+        console.log("onChangeText: ", objectType);
+        if (objectType === 'FollowUp') {
             this.setState(
                 (prevState) => ({
                     item: Object.assign({}, prevState.item, {[id]: value})
@@ -219,7 +219,7 @@ class FollowUpsSingleScreen extends Component {
                 }
             )
         } else {
-            if (this.state.contact[id]) {
+            if (objectType === 'Contact') {
                 this.setState(
                     (prevState) => ({
                         contact: Object.assign({}, prevState.contact, {[id]: value})
@@ -231,23 +231,25 @@ class FollowUpsSingleScreen extends Component {
         }
     };
 
-    onChangeDate = (value, id) => {
-        // console.log("onChangeDate: ", value, id, this.state.item);
+    onChangeDate = (value, id, objectType) => {
+        console.log("onChangeDate: ", value, id);
 
-        if (this.state.item[id]) {
+        if (objectType === 'FollowUp') {
             this.setState(
                 (prevState) => ({
-                    item: Object.assign({}, prevState.item, {[id]: value.toLocaleString()})
-                }), () => {
+                    item: Object.assign({}, prevState.item, {[id]: value})
+                })
+                , () => {
                     console.log("onChangeDate", id, " ", value, " ", this.state.item);
                 }
             )
         } else {
-            if (this.state.contact[id]) {
+            if (objectType === 'Contact') {
                 this.setState(
                     (prevState) => ({
-                        contact: Object.assign({}, prevState.contact, {[id]: value.toLocaleString()})
-                    }), () => {
+                        contact: Object.assign({}, prevState.contact, {[id]: value})
+                    })
+                    , () => {
                         console.log("onChangeDate", id, " ", value, " ", this.state.contact);
                     }
                 )
@@ -255,7 +257,7 @@ class FollowUpsSingleScreen extends Component {
         }
     };
 
-    onChangeSwitch = (value, id) => {
+    onChangeSwitch = (value, id, objectType) => {
         // console.log("onChangeSwitch: ", value, id, this.state.item);
         if (id === 'fillGeolocation') {
             navigator.geolocation.getCurrentPosition((position) => {
@@ -279,7 +281,7 @@ class FollowUpsSingleScreen extends Component {
                 }
             )
         } else {
-            if (this.state.item[id]) {
+            if (objectType === 'FollowUp') {
                 this.setState(
                     (prevState) => ({
                         item: Object.assign({}, prevState.item, {[id]: value})
@@ -288,7 +290,7 @@ class FollowUpsSingleScreen extends Component {
                     }
                 )
             } else {
-                if (this.state.contact[id]) {
+                if (objectType === 'Contact') {
                     this.setState(
                         (prevState) => ({
                             contact: Object.assign({}, prevState.contact, {[id]: value})
@@ -302,9 +304,9 @@ class FollowUpsSingleScreen extends Component {
 
     };
 
-    onChangeDropDown = (value, id) => {
+    onChangeDropDown = (value, id, objectType) => {
         // console.log("onChangeDropDown: ", value, id, this.state.item);
-        if (this.state.item[id] || id === 'address') {
+        if (objectType === 'FollowUp' || id === 'address') {
             if (id === 'address') {
                 if (!this.state.item[id]) {
                     this.state.item[id] = {};
@@ -334,7 +336,7 @@ class FollowUpsSingleScreen extends Component {
             }
 
         } else {
-            if (this.state.contact[id]) {
+            if (objectType === 'Contact') {
                 this.setState(
                     (prevState) => ({
                         contact: Object.assign({}, prevState.contact, {[id]: value})
@@ -347,7 +349,12 @@ class FollowUpsSingleScreen extends Component {
     };
 
     onChangeTextAnswer = (value, id) => {
-        let questionnaireAnswers = _.cloneDeep(this.state.item.questionnaireAnswers);
+        let itemClone = _.cloneDeep(this.state.item);
+        let questionnaireAnswers = itemClone.questionnaireAnswers;
+        if (!itemClone.questionnaireAnswers) {
+            itemClone.questionnaireAnswers = {};
+            questionnaireAnswers = itemClone.questionnaireAnswers;
+        }
         questionnaireAnswers[id] = value;
         this.setState(prevState => ({
             item: Object.assign({}, prevState.item, {questionnaireAnswers: questionnaireAnswers})
@@ -355,7 +362,12 @@ class FollowUpsSingleScreen extends Component {
     };
 
     onChangeSingleSelection = (value, id) => {
-        let questionnaireAnswers = _.cloneDeep(this.state.item.questionnaireAnswers);
+        let itemClone = _.cloneDeep(this.state.item);
+        let questionnaireAnswers = itemClone.questionnaireAnswers;
+        if (!itemClone.questionnaireAnswers) {
+            itemClone.questionnaireAnswers = {};
+            questionnaireAnswers = itemClone.questionnaireAnswers;
+        }
         questionnaireAnswers[id] = value.value;
         this.setState(prevState => ({
             item: Object.assign({}, prevState.item, {questionnaireAnswers: questionnaireAnswers})
@@ -363,7 +375,12 @@ class FollowUpsSingleScreen extends Component {
     };
 
     onChangeMultipleSelection = (selections, id) => {
-        let questionnaireAnswers = Object.assign({}, this.state.item.questionnaireAnswers);
+        let itemClone = Object.assign({}, this.state.item);
+        let questionnaireAnswers = itemClone.questionnaireAnswers;
+        if (!itemClone.questionnaireAnswers) {
+            itemClone.questionnaireAnswers = {};
+            questionnaireAnswers = itemClone.questionnaireAnswers;
+        }
         questionnaireAnswers[id] = selections.map((e) => {return e.value});
         this.setState(prevState => ({
             item: Object.assign({}, prevState.item, {questionnaireAnswers: questionnaireAnswers})
@@ -371,9 +388,11 @@ class FollowUpsSingleScreen extends Component {
     };
 
     handleOnPressSave = () => {
-        this.setState({
+        // Mark followUp as performed, and then update to the server
+        this.setState(prevState => ({
+            item: Object.assign({}, prevState.item, {performed: true}),
             savePressed: true
-        }, () => {
+        }), () => {
             this.props.updateFollowUpAndContact(this.props.outbreak.id, this.state.contact.id, this.state.item.id, this.state.item, this.state.contact, this.props.user.token);
         });
     };

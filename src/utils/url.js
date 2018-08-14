@@ -1,20 +1,50 @@
 /**
  * Created by florinpopa on 14/06/2018.
  */
-const baseUrl = 'http://whoapicd.clarisoft.com/api';
+const DEFAULT_BASE_URL = 'http://whoapicd.clarisoft.com/api';
 
+var baseUrl = DEFAULT_BASE_URL;
 
-const users = baseUrl + '/users/';
-const login = users + 'login';
-const outbreaks = baseUrl + '/outbreaks/';
-const referenceData = baseUrl + '/reference-data';
-const locations = baseUrl + '/locations';
+var users = getBaseUrl() + '/users/';
+var login = users + 'login';
+var outbreaks = getBaseUrl() + '/outbreaks/';
+var referenceData = getBaseUrl() + '/reference-data';
+var locations = getBaseUrl() + '/locations';
+
+function getBaseUrl () {
+    return baseUrl;
+}
+
+function setBaseUrl (newBaseUrl) {
+    baseUrl = newBaseUrl || DEFAULT_BASE_URL;
+}
+
+function getUsersUrl () {
+    return getBaseUrl() + '/users/';
+}
+
+function getLoginUrl () {
+    return getUsersUrl() + 'login';
+}
+
+function getOutbreaksUrl () {
+    return getBaseUrl() + '/outbreaks/';
+}
+
+function getReferenceDataUrl () {
+    return getBaseUrl() + '/reference-data';
+}
+
+function getLocationsUrl () {
+    return getBaseUrl() + '/locations';
+}
 
 export default {
-    baseUrl,
-    users,
-    login,
-    outbreaks,
-    referenceData,
-    locations
+    getUsersUrl,
+    getLoginUrl,
+    getOutbreaksUrl,
+    getReferenceDataUrl,
+    getLocationsUrl,
+    getBaseUrl,
+    setBaseUrl
 }

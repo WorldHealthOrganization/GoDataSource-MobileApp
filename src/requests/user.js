@@ -5,7 +5,7 @@ import url from './../utils/url';
 import {handleResponse} from './../utils/functions';
 
 export function loginUserRequest(credentials, callback) {
-    fetch(url.login, {
+    fetch(url.getLoginUrl(), {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -33,7 +33,7 @@ export function getUserByIdRequest(userId, token, callback) {
         include: {relation: 'roles'}
     };
 
-    let requestUrl = url.users + userId + '?filter=' + JSON.stringify(filter);
+    let requestUrl = url.getUsersUrl() + userId + '?filter=' + JSON.stringify(filter);
 
     fetch(requestUrl, {
         method: 'GET',

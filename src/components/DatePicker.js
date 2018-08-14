@@ -9,6 +9,9 @@ import PropTypes from 'prop-types';
 // the material ui library, since it provides design and animations out of the box
 import { TextField } from 'react-native-material-textfield';
 import DateTimePicker from 'react-native-modal-datetime-picker';
+import Ripple from 'react-native-material-ripple';
+import style from './../styles';
+import moment from 'moment';
 
 class DatePicker extends PureComponent {
 
@@ -36,29 +39,32 @@ class DatePicker extends PureComponent {
 
     // Please write here all the methods that are not react native lifecycle methods
     editInput = () => {
+        console.log("### date from value: ", this.props.value);
         return (
             <View style={[{
 
             },this.props.style]}
             >
-                <TextField
-                    ref="textField"
-                    label={this.props.isRequired ? this.props.label + ' * ' : this.props.label}
-                    value={this.props.value != undefined ? this.props.value : ''}
-                    onChangeText={ (value) => this.props.onChange(value,this.props.id)}
-                    textColor='rgb(0,0,0)'
-                    fontSize={15}
-                    labelFontSize={12.5}
-                    labelHeight={30}
-                    labelTextStyle={{
-                        fontFamily: 'Roboto-Light',
-                        textAlign: 'left'
-                    }}
-                    tintColor='rgb(77,176,160)'
-                    multiline={this.props.multiline != undefined ? this.props.multiline : false}
-                    editable={!this.state.isDateTimePickerVisible}
-                    onFocus={this.handleShowDatePicker}
-                />
+                <Text style={{
+                    fontFamily: 'Roboto-Light',
+                    fontSize: 12.5,
+                    textAlign: 'left',
+                    color: style.navigationDrawerSeparatorGrey,
+                }}>
+                    {this.props.isRequired ? this.props.label + ' * ' : this.props.label}
+                </Text>
+                <Ripple onPress={this.handleShowDatePicker}>
+                    <Text style={{
+                        fontFamily: 'Roboto-Regular',
+                        fontSize: 15,
+                        textAlign: 'left',
+                        lineHeight: 30,
+                        color: 'rgb(60,60,60)',
+                        marginBottom: 7.5
+                    }}>
+                        {this.props.value !== undefined ? moment(this.props.value).format('MM/DD/YYYY') : ''}
+                    </Text>
+                </Ripple>
                 <DateTimePicker
                     isVisible={this.state.isDateTimePickerVisible}
                     onConfirm={this.handleDatePicked}
@@ -96,9 +102,9 @@ class DatePicker extends PureComponent {
     };
 
     handleShowDatePicker = () => {
-        if (!this.state.isDateTimePickerVisible && this.refs.textField.isFocused()) {
+        // if (!this.state.isDateTimePickerVisible && this.refs.textField.isFocused()) {
             this.setState({isDateTimePickerVisible: true})
-        }
+        // }
     };
 
     handleDateCancelled = () => {
@@ -108,7 +114,8 @@ class DatePicker extends PureComponent {
     };
 
     handleDatePicked = (date) => {
-        this.props.onChange(date, this.props.id);
+        console.log("### date picked: ", date, moment(date).format());
+        this.props.onChange(moment(date).format(), this.props.id, this.props.objectType || null);
         this.handleDateCancelled();
     };
 

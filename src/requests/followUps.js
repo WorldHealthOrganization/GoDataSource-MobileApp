@@ -5,7 +5,7 @@ import url from './../utils/url';
 import {handleResponse} from './../utils/functions';
 
 export function getFollowUpsForOutbreakIdRequest(outbreakId, filter, token, callback) {
-    let requestUrl = url.outbreaks + outbreakId + '/follow-ups';
+    let requestUrl = url.getOutbreaksUrl() + outbreakId + '/follow-ups';
 
     if (filter) {
         requestUrl += '?filter=' + JSON.stringify(filter);
@@ -45,7 +45,7 @@ export function getFollowUpsForOutbreakIdRequest(outbreakId, filter, token, call
 }
 
 export function getMissedFollowUpsForOutbreakIdRequest(outbreakId, filter, token, callback) {
-    let requestUrl = url.outbreaks + outbreakId + '/follow-ups/latest-by-contacts-if-not-performed';
+    let requestUrl = url.getOutbreaksUrl() + outbreakId + '/follow-ups/latest-by-contacts-if-not-performed';
 
     if (filter) {
         requestUrl += '?filter=' + JSON.stringify(filter);
@@ -85,7 +85,7 @@ export function getMissedFollowUpsForOutbreakIdRequest(outbreakId, filter, token
 }
 
 export function updateFollowUpRequest(outbreakId, contactId, followUpId, followUp, token, callback) {
-    let requestUrl = url.outbreaks + outbreakId + '/contacts/' + contactId + '/follow-ups/' + followUpId;
+    let requestUrl = url.getOutbreaksUrl() + outbreakId + '/contacts/' + contactId + '/follow-ups/' + followUpId;
 
     fetch(requestUrl, {
         method: 'PUT',
@@ -109,8 +109,66 @@ export function updateFollowUpRequest(outbreakId, contactId, followUpId, followU
         })
 }
 
+export function addFollowUpRequest(outbreakId, contactId, followUp, token, callback) {
+    let requestUrl = url.getOutbreaksUrl() + outbreakId + '/contacts/' + contactId + '/follow-ups';
+
+    fetch(requestUrl, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Authorization': token,
+        },
+        body: JSON.stringify(followUp)
+    })
+        .then((response) => {
+            return handleResponse(response);
+        })
+        .then((response) => {
+            console.log('### addFollowUpRequest response: ', response);
+            callback(null, response);
+        })
+        .catch((error) => {
+            console.log("*** addFollowUpRequest error: ", error);
+            callback(error);
+        })
+}
+
+export function generateFollowUpRequest(outbreakId, followUpPeriod, token, callback) {
+    let requestUrl = url.getOutbreaksUrl() + outbreakId + '/generate-followups';
+
+    if (!followUpPeriod || typeof followUpPeriod !== 'number' || followUpPeriod <= 0) {
+        followUpPeriod = 1;
+    }
+
+    let followUpPeriodObject = {
+        followUpPeriod: followUpPeriod || 1
+    };
+
+    fetch(requestUrl, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Authorization': token,
+        },
+        body: JSON.stringify(followUpPeriodObject)
+    })
+        .then((response) => {
+            return handleResponse(response);
+        })
+        .then((response) => {
+            console.log('### generateFollowUpRequest response: ', response);
+            callback(null, response);
+        })
+        .catch((error) => {
+            console.log("*** generateFollowUpRequest error: ", error);
+            callback(error);
+        })
+}
+
 export function deleteFollowUpRequest(outbreakId, contactId, followUpId, token, callback) {
-    let requestUrl = url.outbreaks + outbreakId + '/contacts/' + contactId + '/follow-ups/' + followUpId;
+    let requestUrl = url.getOutbreaksUrl() + outbreakId + '/contacts/' + contactId + '/follow-ups/' + followUpId;
 
     fetch(requestUrl, {
         method: 'DELETE',

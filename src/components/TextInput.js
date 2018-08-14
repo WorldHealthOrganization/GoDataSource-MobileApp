@@ -39,7 +39,7 @@ class TextInput extends PureComponent {
                 <TextField
                     label={this.props.isRequired ? this.props.label + ' * ' : this.props.label}
                     value={this.props.value != undefined ? this.props.value : ''}
-                    onChangeText={ (value) => this.props.onChange(value, this.props.labelValue || this.props.id)}
+                    onChangeText={ (value) => this.props.onChange(value, this.props.labelValue || this.props.id, this.props.objectType || null)}
                     textColor='rgb(0,0,0)'
                     fontSize={15}
                     labelFontSize={12.5}

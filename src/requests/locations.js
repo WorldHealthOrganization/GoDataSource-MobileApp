@@ -18,7 +18,7 @@ export function getLocationsRequest(countries, token, callback) {
         };
     }
 
-    let requestUrl = url.locations + '/hierarchical?filter=' + JSON.stringify(filter);
+    let requestUrl = url.getLocationsUrl() + '/hierarchical?filter=' + JSON.stringify(filter);
 
     fetch(requestUrl, {
         method: 'GET',

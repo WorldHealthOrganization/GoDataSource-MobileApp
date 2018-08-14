@@ -64,7 +64,7 @@ class CardComponent extends Component {
             return true
         }
 
-        return false;
+        return true;
     }
 
     // The render method should have at least business logic as possible,
@@ -108,7 +108,8 @@ class CardComponent extends Component {
         let width = calculateDimension(315, false, this.props.screenSize);
         let marginHorizontal = calculateDimension(14, false, this.props.screenSize);
         let value = '';
-        let data = []
+        let data = [];
+
         if (this.props.followUp && this.props.contact) {
             let followUp = this.props.followUp;
             let contact = this.props.contact;
@@ -117,6 +118,9 @@ class CardComponent extends Component {
             }
 
             value = this.computeValueForId(item.type, item.id, followUp, contact);
+            if (item.type === 'DatePicker') {
+                console.log("### computed value for id: ", value);
+            }
         }
 
         if (this.props.screen === 'FollowUpsFilter') {
@@ -158,6 +162,7 @@ class CardComponent extends Component {
                         onChange={this.props.onChangeText}
                         multiline={item.multiline}
                         style={{width: width, marginHorizontal: marginHorizontal}}
+                        objectType={item.objectType}
                     />
                 );
             case 'DropdownInput':
@@ -171,6 +176,7 @@ class CardComponent extends Component {
                         isRequired={item.isRequired}
                         onChange={this.props.onChangeDropDown}
                         style={{width: width, marginHorizontal: marginHorizontal}}
+                        objectType={item.objectType}
                     />
                 );
             case 'DropDown':
@@ -188,6 +194,7 @@ class CardComponent extends Component {
                         style={{width: width, marginHorizontal: marginHorizontal}}
                         dropDownStyle={{width: width, alignSelf: 'center'}}
                         showDropdown={this.state.showDropdown}
+                        objectType={item.objectType}
                     />
                 );
             case 'DropDownSectioned':
@@ -203,6 +210,7 @@ class CardComponent extends Component {
                         onChange={this.props.onChangeSectionedDropDown}
                         style={{width: width, marginHorizontal: marginHorizontal, flex: 1}}
                         dropDownStyle={{width: width, alignSelf: 'center'}}
+                        objectType={item.objectType}
                     />
                 );
             case 'SwitchInput':
@@ -218,6 +226,7 @@ class CardComponent extends Component {
                         activeButtonColor={item.activeButtonColor}
                         activeBackgroundColor={item.activeBackgroundColor}
                         style={{justifyContent: 'space-between', width: width, marginHorizontal: marginHorizontal}}
+                        objectType={item.objectType}
                     />
                 );
             case 'DatePicker':
@@ -230,6 +239,7 @@ class CardComponent extends Component {
                         isRequired={item.isRequired}
                         onChange={this.props.onChangeDate}
                         style={{width: width, marginHorizontal: marginHorizontal}}
+                        objectType={item.objectType}
                     />
                 );
             case 'Selector':
@@ -240,6 +250,7 @@ class CardComponent extends Component {
                         data={item.data}
                         selectItem={this.props.onSelectItem}
                         style={{width: width, height: '100%', marginHorizontal: marginHorizontal}}
+                        objectType={item.objectType}
                     />
                 );
             case 'IntervalPicker':
@@ -252,6 +263,7 @@ class CardComponent extends Component {
                         max={item.max}
                         style={{width, marginHorizontal}}
                         onChange={this.props.onChangeInterval}
+                        objectType={item.objectType}
                     />
                 );
             default:
@@ -275,6 +287,7 @@ class CardComponent extends Component {
         if (type === 'SwitchInput' && id === "fillGeolocation") {
             return followUp.fillGeolocation ? true : false
         }
+
 
 
         return followUp[id] ? followUp[id] : contact[id] ? contact[id] : '';

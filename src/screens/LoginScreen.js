@@ -13,6 +13,9 @@ import { bindActionCreators } from 'redux';
 import { loginUser } from './../actions/user';
 import { removeErrors } from './../actions/errors';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import DropdownInput from './../components/DropdownInput';
+import config from './../utils/config';
+import url from './../utils/url';
 
 class LoginScreen extends Component {
 
@@ -24,7 +27,8 @@ class LoginScreen extends Component {
         super(props);
         this.state = {
             email: '',
-            password: ''
+            password: '',
+            url: ''
         };
         // Bind here methods, or at least don't declare methods in the render method
         this.handleLogin = this.handleLogin.bind(this);
@@ -61,6 +65,15 @@ class LoginScreen extends Component {
                     <Text style={style.welcomeText}>Welcome!</Text>
                 </View>
                 <View style={style.inputsContainer}>
+                    <DropdownInput
+                        id="baseUrl"
+                        label="Select URL"
+                        value={this.state.url}
+                        data={config.baseUrls}
+                        isEditMode={true}
+                        isRequired={false}
+                        onChange={this.handleChangeUrl}
+                    />
                     <TextField
                         ref={this.emailRef}
                         value={this.state.email}
@@ -129,6 +142,10 @@ class LoginScreen extends Component {
                 }
             });
     };
+
+    handleChangeUrl = (value) => {
+        url.setBaseUrl(value);
+    }
 }
 
 // Create style outside the class, or for components that will be used by other components (buttons),

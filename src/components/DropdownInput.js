@@ -85,11 +85,11 @@ class DropdownInput extends PureComponent {
                     label: state, value: this.props.data[this.props.data.map((e) => {
                         return e.value
                     }).indexOf(state)].id
-                }, this.props.id)
+                }, this.props.id, this.props.objectType || null)
             }
         } else {
             console.log("Other branch");
-            this.props.onChange(state, this.props.id)
+            this.props.onChange(state, this.props.id, this.props.objectType || null)
         }
     }
 }

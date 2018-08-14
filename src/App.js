@@ -1,4 +1,4 @@
-import { Navigation } from 'react-native-navigation';
+import { Navigation, NativeEventsReceiver } from 'react-native-navigation';
 import {connect, Provider} from 'react-redux';
 import { createStore, applyMiddleware } from 'redux';
 import thunk from 'redux-thunk';
@@ -16,7 +16,7 @@ import Modal from 'react-native-root-modal';
 console.disableYellowBox = true;
 
 const logger = createLogger();
-export const store = createStore(appReducers, applyMiddleware(thunk, promise));
+export const store = createStore(appReducers, applyMiddleware(thunk, promise, logger));
 
 registerScreens(store, Provider);
 
@@ -32,7 +32,17 @@ export default class App {
 
         if (this.currentRoot !== root) {
             this.currentRoot = root;
-            this.startApp(root);
+            if (Platform.OS === 'ios') {
+                this.startApp(root);
+            } else {
+                Navigation.isAppLaunched()
+                    .then((appLaunched) => {
+                        if (appLaunched) {
+                            this.startApp(root);
+                        }
+                        new NativeEventsReceiver().appLaunched(this.startApp(root));
+                    })
+            }
         }
     };
 

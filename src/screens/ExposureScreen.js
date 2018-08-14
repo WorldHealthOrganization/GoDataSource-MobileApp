@@ -11,7 +11,7 @@ import styles from './../styles';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 
-class SingleFollowUpScreen extends Component {
+class ExposureScreen extends Component {
 
     constructor(props) {
         super(props);
@@ -31,7 +31,7 @@ class SingleFollowUpScreen extends Component {
     render() {
         return (
             <View style={style.container}>
-                <Text>TODO! FollowUps screen</Text>
+                <Text>TODO! ExposureScreen</Text>
             </View>
         );
     }
@@ -58,4 +58,4 @@ function matchDispatchProps(dispatch) {
     }, dispatch);
 }
 
-export default connect(mapStateToProps, matchDispatchProps)(SingleFollowUpScreen);
+export default connect(mapStateToProps, matchDispatchProps)(ExposureScreen);

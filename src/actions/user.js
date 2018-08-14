@@ -14,6 +14,11 @@ import {getReferenceData} from './referenceData'
 import {getLocations} from './locations'
 import errorTypes from './../utils/errorTypes';
 import config from './../utils/config';
+import {storeContacts} from './contacts';
+import {storeCases} from './cases';
+import {storeEvents} from './events';
+import {storeFollowUps} from './followUps';
+import {storeOutbreak} from './outbreak';
 
 // Add here only the actions, not also the requests that are executed.
 // For that purpose is the requests directory
@@ -44,6 +49,11 @@ export function loginUser(credentials) {
 export function logoutUser() {
     return async function (dispatch) {
         dispatch(storeUser(null));
+        dispatch(storeContacts(null));
+        dispatch(storeFollowUps(null));
+        dispatch(storeCases(null));
+        dispatch(storeEvents(null));
+        dispatch(storeOutbreak(null));
         dispatch(changeAppRoot('login'));
     }
 }

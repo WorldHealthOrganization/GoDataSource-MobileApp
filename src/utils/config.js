@@ -3,6 +3,10 @@
  */
 import styles from './../styles';
 
+const baseUrls = [
+    {value: 'http://whoapicd.clarisoft.com/api'},
+    {value: 'http://gva11sucombee.who.int:3000'}
+];
 
 const designScreenSize = {
     width: 375,
@@ -63,7 +67,8 @@ const followUpsSingleScreen = {
                     isRequired: false,
                     isEditMode: true,
                     activeButtonColor: 'red',
-                    activeBackgroundColor: 'red'
+                    activeBackgroundColor: 'red',
+                    objectType: 'Contact'
                 },
                 {
                     cardNumber: 1,
@@ -73,7 +78,8 @@ const followUpsSingleScreen = {
                     value: '',
                     isRequired: true,
                     isEditMode: true,
-                    multiline: true
+                    multiline: true,
+                    objectType: 'Contact'
                 },
             ]
         },
@@ -135,7 +141,8 @@ const followUpsSingleScreen = {
                     type: "DatePicker",
                     isRequired: true,
                     isEditMode: true,
-                    format: 'MM/dd/YYYY'
+                    format: 'MM/dd/YYYY',
+                    objectType: 'FollowUp'
                 },
                 {
                     cardNumber: 3,
@@ -146,7 +153,8 @@ const followUpsSingleScreen = {
                     isRequired: false,
                     isEditMode: true,
                     activeButtonColor: 'green',
-                    activeBackgroundColor: 'green'
+                    activeBackgroundColor: 'green',
+                    objectType: 'FollowUp'
                 },
                 {
                     cardNumber: 3,
@@ -157,7 +165,8 @@ const followUpsSingleScreen = {
                     data: [],
                     isRequired: false,
                     isEditMode: true,
-                    isAdditive: true
+                    isAdditive: true,
+                    objectType: 'FollowUp'
                 }
             ]
         }
@@ -260,6 +269,156 @@ const defaultFilterForContacts = {
     ]
 };
 
+const addFollowUpScreen = [
+    {
+        cardNumber: 1,
+        label: 'Add Follow-Ups',
+        type: 'Section',
+        hasBorderBottom: false,
+        borderBottomColor: styles.navigationDrawerSeparatorGrey
+    },
+    {
+        cardNumber: 1,
+        id: 'contact',
+        label: 'Contact',
+        type: 'DropdownInput',
+        value: '',
+        data: [],
+        isRequired: false,
+        isEditMode: true,
+        isAdditive: true,
+        objectType: 'Contact'
+    },
+    {
+        cardNumber: 1,
+        id: 'date',
+        label: 'Date',
+        value: new Date,
+        type: "DatePicker",
+        isRequired: true,
+        isEditMode: true,
+        format: 'MM/dd/YYYY',
+        objectType: 'FollowUp'
+    },
+];
+
+const addExposureScreen = [
+    {
+        cardNumber: 1,
+        id: 'exposure',
+        label: 'Choose one or more cases',
+        type: 'DropDown',
+        value: '',
+        data: [{value: 'Diana Jones'}, {value: 'Florin Popa'}],
+        isRequired: true,
+        isEditMode: true
+    },
+    {
+        cardNumber: 1,
+        id: 'contactDate',
+        label: 'Date',
+        value: '',
+        type: "DatePicker",
+        isRequired: true,
+        isEditMode: true,
+        format: 'MM/dd/YYYY',
+        objectType: 'FollowUp'
+    },
+    {
+        cardNumber: 1,
+        id: 'contactDateEstimated',
+        label: 'Is Contact Date Estimated?',
+        type: 'SwitchInput',
+        value: false,
+        isRequired: false,
+        isEditMode: true,
+        activeButtonColor: styles.missedRedColor,
+        activeBackgroundColor: styles.missedRedColorWithOpacity
+    },
+    {
+        cardNumber: 1,
+        id: 'certaintyLevelId',
+        label: 'Certainty Level',
+        type: 'DropdownInput',
+        value: '',
+        isRequired: true,
+        isEditMode: true,
+        activeButtonColor: 'red',
+        activeBackgroundColor: 'red',
+        objectType: 'Contact'
+    },
+    {
+        cardNumber: 1,
+        id: 'exposureTypeId',
+        label: 'Exposure Type',
+        type: 'DropdownInput',
+        value: '',
+        isRequired: true,
+        isEditMode: true,
+        activeButtonColor: 'red',
+        activeBackgroundColor: 'red',
+        objectType: 'Contact'
+    },
+    {
+        cardNumber: 1,
+        id: 'exposureFrequencyId',
+        label: 'Exposure Frequency',
+        type: 'DropdownInput',
+        value: '',
+        isRequired: true,
+        isEditMode: true,
+        activeButtonColor: 'red',
+        activeBackgroundColor: 'red',
+        objectType: 'Contact'
+    },
+    {
+        cardNumber: 1,
+        id: 'exposureDurationId',
+        label: 'Exposure Duration',
+        type: 'DropdownInput',
+        value: '',
+        isRequired: true,
+        isEditMode: true,
+        activeButtonColor: 'red',
+        activeBackgroundColor: 'red',
+        objectType: 'Contact'
+    },
+    {
+        cardNumber: 1,
+        id: 'socialRelationshipTypeId',
+        label: 'Relation',
+        type: 'DropdownInput',
+        value: '',
+        isRequired: true,
+        isEditMode: true,
+        activeButtonColor: 'red',
+        activeBackgroundColor: 'red',
+        objectType: 'Contact'
+    },
+    {
+        cardNumber: 1,
+        id: 'clusterId',
+        label: 'Cluster',
+        type: 'DropdownInput',
+        value: '',
+        isRequired: true,
+        isEditMode: true,
+        activeButtonColor: 'red',
+        activeBackgroundColor: 'red',
+        objectType: 'Contact'
+    },
+    {
+        cardNumber: 1,
+        id: 'comment',
+        label: 'Comment',
+        type: 'TextInput',
+        value: '',
+        isRequired: true,
+        isEditMode: true,
+        multiline: true,
+        objectType: 'Contact'
+    }
+];
 
 export default {
     designScreenSize,
@@ -268,5 +427,7 @@ export default {
     tabsValuesRoutes,
     followUpsSingleScreen,
     followUpsFilterScreen,
-    defaultFilterForContacts
+    defaultFilterForContacts,
+    baseUrls,
+    addFollowUpScreen
 }

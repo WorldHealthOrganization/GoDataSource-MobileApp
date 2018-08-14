@@ -108,12 +108,11 @@ class FollowUpListItem extends PureComponent {
                     break;
             }
         }
-        let questionAnswers = source.questionnaireAnswers[item.variable] || null;
+        let questionAnswers = item.answerType === 'Free text' ? source.questionnaireAnswers[item.text] : source.questionnaireAnswers[item.variable] || null;
 
         if (item.answerType === 'Single Selection') {
             questionAnswers = questionAnswers !== null &&
                 questionAnswers !== undefined &&
-                item.answers[item.answers.map((e) => {return e.value})] &&
                 item.answers.map((e) => {return e.value}).indexOf(questionAnswers) > -1 &&
                 item.answers[item.answers.map((e) => {return e.value}).indexOf(questionAnswers)] ?
                     item.answers[item.answers.map((e) => {return e.value}).indexOf(questionAnswers)].label : ' ';

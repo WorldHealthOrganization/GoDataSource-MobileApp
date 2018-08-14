@@ -61,6 +61,8 @@ class AnimatedListView extends PureComponent {
                 style={this.props.style}
                 componentContainerStyle={this.props.componentContainerStyle}
                 stickyHeaderIndices={this.props.stickyHeaderIndices}
+                onRefresh={this.props.onRefresh}
+                refreshing={this.props.refreshing}
             />
         );
     }

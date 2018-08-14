@@ -18,7 +18,7 @@ import ElevatedView from 'react-native-elevated-view';
 
 class FollowUpListItem extends PureComponent {
 
-    // This will be a dumb component, so it's best not to put any business logic in it
+    // This will be a dumb component, so it's best to put as least business logic as possible
     constructor(props) {
         super(props);
         this.state = {
@@ -95,10 +95,10 @@ class FollowUpListItem extends PureComponent {
                     <Ripple style={[style.rippleStyle]} onPress={this.onPressFollowUp}>
                         <Text style={[style.rippleTextStyle]}>FOLLOW-UP</Text>
                     </Ripple>
-                    <Ripple style={[style.rippleStyle]}>
+                    <Ripple style={[style.rippleStyle]} onPress={this.onPressMissing}>
                         <Text style={[style.rippleTextStyle]}>MISSING</Text>
                     </Ripple>
-                    <Ripple style={[style.rippleStyle]}>
+                    <Ripple style={[style.rippleStyle]} onPress={this.onPressExposure}>
                         <Text style={[style.rippleTextStyle]}>ADD EXPOSURE</Text>
                     </Ripple>
                 </View>
@@ -107,16 +107,36 @@ class FollowUpListItem extends PureComponent {
     }
 
     // Please write here all the methods that are not react native lifecycle methods
-
     onPressFollowUp = () => {
         InteractionManager.runAfterInteractions(() => {
             let contact = this.props && this.props.contacts && Array.isArray(this.props.contacts) && this.props.contacts.length > 0 ? this.props.contacts[this.props.contacts.map((e) => {return e.id}).indexOf(this.props.item.personId)] : null;
 
-            console.log("### onPressFollowUp: ", this.props.item, contact, Object.assign({}, this.props.item, contact));
+            // console.log("### onPressFollowUp: ", this.props.item, contact, Object.assign({}, this.props.item, contact));
 
             this.props.onPressFollowUp(this.props.item, contact);
         });
-    }
+    };
+
+    onPressMissing = () => {
+        InteractionManager.runAfterInteractions(() => {
+            let contact = this.props && this.props.contacts && Array.isArray(this.props.contacts) && this.props.contacts.length > 0 ? this.props.contacts[this.props.contacts.map((e) => {return e.id}).indexOf(this.props.item.personId)] : null;
+
+            // console.log("### onPressFollowUp: ", this.props.item, contact, Object.assign({}, this.props.item, contact));
+
+            this.props.onPressMissing(this.props.item, contact);
+        })
+    };
+
+
+    onPressExposure = () => {
+        InteractionManager.runAfterInteractions(() => {
+            let contact = this.props && this.props.contacts && Array.isArray(this.props.contacts) && this.props.contacts.length > 0 ? this.props.contacts[this.props.contacts.map((e) => {return e.id}).indexOf(this.props.item.personId)] : null;
+
+            // console.log("### onPressFollowUp: ", this.props.item, contact, Object.assign({}, this.props.item, contact));
+
+            this.props.onPressExposure(this.props.item, contact);
+        })
+    };
 }
 
 

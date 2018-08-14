@@ -2,10 +2,11 @@
  * Created by florinpopa on 19/07/2018.
  */
 import {ACTION_TYPE_GET_FOLLOWUPS, ACTION_TYPE_STORE_FOLLOWUPS, ACTION_TYPE_UPDATE_FOLLOWUP, ACTION_TYPE_DELETE_FOLLOWUP} from './../utils/enums';
-import {getFollowUpsForOutbreakIdRequest, getMissedFollowUpsForOutbreakIdRequest, updateFollowUpRequest, deleteFollowUpRequest} from './../requests/followUps';
-import {updateContact} from './contacts';
+import {getFollowUpsForOutbreakIdRequest, getMissedFollowUpsForOutbreakIdRequest, updateFollowUpRequest, addFollowUpRequest, deleteFollowUpRequest, generateFollowUpRequest} from './../requests/followUps';
+import {updateContact, getContactsForOutbreakId} from './contacts';
 import { addError } from './errors';
 import errorTypes from './../utils/errorTypes';
+import config from './../utils/config';
 
 // Add here only the actions, not also the requests that are executed. For that purpose is the requests directory
 export function storeFollowUps(followUps) {
@@ -71,6 +72,34 @@ export function updateFollowUpAndContact(outbreakId, contactId, followUpId, foll
     }
 }
 
+export function addFollowUp(outbreakId, contactId, followUp, token) {
+    return async function(dispatch, getState) {
+        addFollowUpRequest(outbreakId, contactId, followUp, token, (error, response) => {
+            if (error) {
+                console.log("*** addFollowUp error: ", error);
+                dispatch(addError(errorTypes.ERROR_ADD_FOLLOWUP));
+            }
+            if (response) {
+                dispatch(getContactsForOutbreakId(outbreakId, config.defaultFilterForContacts, token))
+            }
+        })
+    }
+}
+
+export function generateFollowUp(outbreakId, followUpPeriod, token) {
+    return async function(dispatch, getState) {
+        generateFollowUpRequest(outbreakId, followUpPeriod, token, (error, response) => {
+            if (error) {
+                console.log("*** generateFollowUp error: ", error);
+                dispatch(addError(errorTypes.ERROR_GENERATE_FOLLOWUP));
+            }
+            if (response) {
+                dispatch(getContactsForOutbreakId(outbreakId, config.defaultFilterForContacts, token))
+            }
+        })
+    }
+}
+
 export function deleteFollowUp(outbreakId, contactId, followUpId, filter, token) {
     return async function(dispatch, getState) {
         deleteFollowUpRequest(outbreakId, contactId, followUpId, token, (error, response) => {
@@ -79,27 +108,29 @@ export function deleteFollowUp(outbreakId, contactId, followUpId, filter, token)
                 dispatch(addError(errorTypes.ERROR_DELETE_FOLLOWUP));
             }
             if (response) {
-                let filterNew = {};
+                // let filterNew = {};
+                //
+                // filterNew.where = {};
+                // filterNew.where.and = [];
+                //
+                // let oneDay = 24 * 60 * 60 * 1000;
+                //
+                // if (filter.date) {
+                //     filterNew.where.and.push({date: {gt: new Date(filter.date.getTime() - oneDay)}});
+                //     filterNew.where.and.push({date: {lt: new Date(filter.date.getTime() + oneDay)}});
+                // }
+                //
+                // if (filter.performed) {
+                //     filterNew.where.and.push({performed: this.state.filter.performed !== 'To do'})
+                // }
+                //
+                // if (filter.performed === 'Missed') {
+                //     dispatch(getMissedFollowUpsForOutbreakId(outbreakId, filterNew, token));
+                // } else {
+                //     dispatch(getFollowUpsForOutbreakId(outbreakId, filterNew, token));
+                // }
 
-                filterNew.where = {};
-                filterNew.where.and = [];
-
-                let oneDay = 24 * 60 * 60 * 1000;
-
-                if (filter.date) {
-                    filterNew.where.and.push({date: {gt: new Date(filter.date.getTime() - oneDay)}});
-                    filterNew.where.and.push({date: {lt: new Date(filter.date.getTime() + oneDay)}});
-                }
-
-                if (filter.performed) {
-                    filterNew.where.and.push({performed: this.state.filter.performed !== 'To do'})
-                }
-
-                if (filter.performed === 'Missed') {
-                    dispatch(getMissedFollowUpsForOutbreakId(outbreakId, filterNew, token));
-                } else {
-                    dispatch(getFollowUpsForOutbreakId(outbreakId, filterNew, token));
-                }
+                dispatch(getContactsForOutbreakId(outbreakId, config.defaultFilterForContacts, token));
             }
         })
     }

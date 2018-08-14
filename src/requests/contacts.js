@@ -5,7 +5,7 @@ import url from './../utils/url';
 import {handleResponse} from './../utils/functions';
 
 export function getContactsForOutbreakIdRequest(outbreakId, filter, token, callback) {
-    let requestUrl = url.outbreaks + outbreakId + '/contacts?filter=' + JSON.stringify(filter);
+    let requestUrl = url.getOutbreaksUrl() + outbreakId + '/contacts?filter=' + JSON.stringify(filter);
 
     fetch(requestUrl, {
         method: 'GET',
@@ -29,7 +29,7 @@ export function getContactsForOutbreakIdRequest(outbreakId, filter, token, callb
 }
 
 export function updateContactRequest(outbreakId, contactId, contact, token, callback) {
-    let requestUrl = url.outbreaks + outbreakId + '/contacts/' + contactId;
+    let requestUrl = url.getOutbreaksUrl() + outbreakId + '/contacts/' + contactId;
 
     fetch(requestUrl, {
         method: 'PUT',

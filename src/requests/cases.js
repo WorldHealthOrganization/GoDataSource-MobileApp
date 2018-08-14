@@ -5,7 +5,7 @@ import url from './../utils/url';
 import {handleResponse} from './../utils/functions';
 
 export function getCasesForOutbreakIdRequest(outbreakId, token, callback) {
-    let requestUrl = url.outbreaks + outbreakId + '/cases';
+    let requestUrl = url.getOutbreaksUrl() + outbreakId + '/cases';
 
     fetch(requestUrl, {
         method: 'GET',

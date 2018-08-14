@@ -13,7 +13,7 @@ import config from './../utils/config';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import {getContactsForOutbreakId} from './../actions/contacts';
-import {addFilterForScreen} from './../actions/app';
+import {addFilterForScreen, removeFilterForScreen} from './../actions/app';
 import {TabBar, TabView} from 'react-native-tab-view';
 import FollowUpsFiltersContainer from './../containers/FollowUpsFiltersContainer';
 import FollowUpsSortContainer from './../containers/FollowUpsSortContainer';
@@ -89,6 +89,7 @@ class FollowUpsFilterScreen extends Component {
 
     // Please write here all the methods that are not react native lifecycle methods
     handlePressNavbarButton = () => {
+        this.props.removeFilterForScreen('FollowUpsFilterScreen');
         this.props.navigator.dismissModal(this.props.onApplyFilters(config.defaultFilterForContacts));
     };
 
@@ -237,7 +238,8 @@ function mapStateToProps(state) {
 function matchDispatchProps(dispatch) {
     return bindActionCreators({
         getContactsForOutbreakId,
-        addFilterForScreen
+        addFilterForScreen,
+        removeFilterForScreen
     }, dispatch);
 }
 

@@ -12,7 +12,7 @@ export function getEventsForOutbreakIdRequest(outbreakId, token, callback) {
         }
     };
 
-    let requestUrl = url.outbreaks + outbreakId + '/events?filter=' + JSON.stringify(filter);
+    let requestUrl = url.getOutbreaksUrl() + outbreakId + '/events?filter=' + JSON.stringify(filter);
 
     fetch(requestUrl, {
         method: 'GET',

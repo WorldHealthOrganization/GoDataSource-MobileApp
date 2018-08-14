@@ -5,7 +5,7 @@ import url from './../utils/url';
 import {handleResponse} from './../utils/functions';
 
 export function getReferenceDataRequest(token, callback) {
-    let requestUrl = url.referenceData;
+    let requestUrl = url.getReferenceDataUrl();
 
     fetch(requestUrl, {
         method: 'GET',

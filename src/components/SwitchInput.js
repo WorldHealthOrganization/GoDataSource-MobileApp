@@ -7,6 +7,7 @@ import PropTypes from 'prop-types';
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 var Switch = require('react-native-material-switch');
+// import Switch from 'react-native-material-switch';
 
 class SwitchInput extends PureComponent {
 
@@ -36,9 +37,9 @@ class SwitchInput extends PureComponent {
                     this.props.isEditMode ?
                     <Switch
                         active={this.props.value}
-                        switchWidth={30}
-                        switchHeight={12.5}
-                        buttonRadius={9.5}
+                        switchWidth={32}
+                        switchHeight={12}
+                        buttonRadius={10}
                         inactiveButtonColor={'rgb(250,250,250)'}
                         inactiveBackgroundColor={'rgba(0,0,0,.3)'}
                         activeButtonColor={this.props.activeButtonColor}
@@ -46,7 +47,7 @@ class SwitchInput extends PureComponent {
                         style={{
                             flex: 0.1,
                         }}
-                        onChangeState={ (state) => this.props.onChange(state, this.props.id)}
+                        onChangeState={ (state) => this.props.onChange(state, this.props.id, this.props.objectType || null)}
                     /> : ( this.props.showValue &&
                         <Text style={{
                             fontFamily: 'Roboto-Light',
