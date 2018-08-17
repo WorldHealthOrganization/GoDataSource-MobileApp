@@ -5,7 +5,7 @@ import styles from './../styles';
 
 const baseUrls = [
     {value: 'http://whoapicd.clarisoft.com/api'},
-    {value: 'http://gva11sucombee.who.int:3000'}
+    {value: 'http://gva11sucombee.who.int:3000/api'}
 ];
 
 const designScreenSize = {
