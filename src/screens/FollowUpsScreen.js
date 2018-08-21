@@ -7,7 +7,7 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
-import {View, Text, StyleSheet, Alert, Animated} from 'react-native';
+import {View, Text, StyleSheet, Alert, Animated, NativeModules} from 'react-native';
 import {Button, Icon} from 'react-native-material-ui';
 import styles from './../styles';
 import NavBarCustom from './../components/NavBarCustom';
@@ -29,6 +29,7 @@ import {addFilterForScreen} from './../actions/app';
 import ElevatedView from 'react-native-elevated-view';
 import _ from 'lodash';
 import AddFollowUpScreen from './AddFollowUpScreen';
+import {LoaderScreen, Colors} from 'react-native-ui-lib'
 
 const scrollAnim = new Animated.Value(0);
 const offsetAnim = new Animated.Value(0);
@@ -50,7 +51,8 @@ class FollowUpsScreen extends Component {
             filterFromFilterScreen: this.props.filter && this.props.filter['FollowUpsFilterScreen'] ? this.props.filter['FollowUpsFilterScreen'] : null,
             followUps: [],
             showAddFollowUpScreen: false,
-            refreshing: false
+            refreshing: false,
+            loading: true
         };
         // Bind here methods, or at least don't declare methods in the render method
         this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this));
@@ -68,12 +70,13 @@ class FollowUpsScreen extends Component {
         if (props.errors && props.errors.type && props.errors.message) {
             Alert.alert(props.errors.type, props.errors.message, [
                 {
-                    text: 'Ok', onPress: () => {props.removeErrors()}
+                    text: 'Ok', onPress: () => {
+                    props.removeErrors();
+                    state.loading = false;
+                }
                 }
             ])
         }
-
-        // console.log("Contacts: ", props.contacts);
 
         if (props.contacts) {
             let contactWithOneFollowUp = [];
@@ -121,8 +124,9 @@ class FollowUpsScreen extends Component {
                 return followUp.length > 0;
             });
             state.refreshing = false;
-            return null;
+            state.loading = false;
         }
+        return null;
     }
 
     clampedScroll= Animated.diffClamp(
@@ -231,6 +235,14 @@ class FollowUpsScreen extends Component {
                     onCancelPressed={this.handleOnCancelPressed}
                     onSavePressed={this.handleOnSavePressed}
                 />
+                {
+                    this.state.loading &&
+                        <LoaderScreen
+                            color={Colors.blue60}
+                            message={"Loading..."}
+                            overlay
+                        />
+                }
             </View>
         );
     }

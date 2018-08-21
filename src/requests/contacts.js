@@ -28,6 +28,30 @@ export function getContactsForOutbreakIdRequest(outbreakId, filter, token, callb
         })
 }
 
+export function getContactByIdRequest(outbreakId, contactId, token, callback) {
+    let requestUrl = url.getOutbreaksUrl() + outbreakId + '/contacts/' + contactId;
+
+    fetch(requestUrl, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Authorization': token,
+        }
+    })
+        .then((response) => {
+            return handleResponse(response);
+        })
+        .then((response) => {
+            console.log('### getContactByIdRequest response: ', response);
+            callback(null, response);
+        })
+        .catch((error) => {
+            console.log("*** getContactByIdRequest error: ", error);
+            callback(error);
+        })
+}
+
 export function updateContactRequest(outbreakId, contactId, contact, token, callback) {
     let requestUrl = url.getOutbreaksUrl() + outbreakId + '/contacts/' + contactId;
 
@@ -49,6 +73,31 @@ export function updateContactRequest(outbreakId, contactId, contact, token, call
         })
         .catch((error) => {
             console.log("*** updateContact error: ", error);
+            callback(error);
+        })
+}
+
+export function addExposureForContactRequest(outbreakId, contactId, exposure, token, callback) {
+    let requestUrl = url.getOutbreaksUrl() + outbreakId + '/contacts/' + contactId + '/relationships';
+
+    fetch(requestUrl, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Authorization': token,
+        },
+        body: JSON.stringify(exposure)
+    })
+        .then((response) => {
+            return handleResponse(response);
+        })
+        .then((response) => {
+            console.log('### addExposureForContactRequest response: ', response);
+            callback(null, response);
+        })
+        .catch((error) => {
+            console.log("*** addExposureForContactRequest error: ", error);
             callback(error);
         })
 }

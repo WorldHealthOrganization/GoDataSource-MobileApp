@@ -51,6 +51,12 @@ const tabsValuesRoutes = {
     followUpsSingle: [
         {key: 'genInfo', title: 'GENERAL INFO'},
         {key: 'quest', title: 'QUESTIONNAIRE'}
+    ],
+    contactsSingle: [
+        {key: 'personal', title: 'PERSONAL'},
+        {key: 'address', title: 'ADDRESS'},
+        {key: 'exposures', title: 'EXPOSURES'},
+        {key: 'calendar', title: 'CALENDAR'}
     ]
 };
 
@@ -146,7 +152,7 @@ const followUpsSingleScreen = {
                 },
                 {
                     cardNumber: 3,
-                    id: 'fillGeolocation',
+                    id: 'fillGeoLocation',
                     label: 'Is the contact next to you?',
                     type: 'SwitchInput',
                     value: true,
@@ -306,8 +312,9 @@ const addExposureScreen = [
     {
         cardNumber: 1,
         id: 'exposure',
-        label: 'Choose one or more cases',
-        type: 'DropDown',
+        label: 'Choose a case/event',
+        labelValue: 'test',
+        type: 'DropdownInput',
         value: '',
         data: [{value: 'Diana Jones'}, {value: 'Florin Popa'}],
         isRequired: true,
@@ -316,8 +323,8 @@ const addExposureScreen = [
     {
         cardNumber: 1,
         id: 'contactDate',
-        label: 'Date',
-        value: '',
+        label: 'Date of last contact',
+        value: new Date(),
         type: "DatePicker",
         isRequired: true,
         isEditMode: true,
@@ -338,7 +345,9 @@ const addExposureScreen = [
     {
         cardNumber: 1,
         id: 'certaintyLevelId',
+        categoryId: 'LNG_REFERENCE_DATA_CATEGORY_CERTAINTY_LEVEL',
         label: 'Certainty Level',
+        labelValue: 'test',
         type: 'DropdownInput',
         value: '',
         isRequired: true,
@@ -350,7 +359,9 @@ const addExposureScreen = [
     {
         cardNumber: 1,
         id: 'exposureTypeId',
+        categoryId: 'LNG_REFERENCE_DATA_CATEGORY_EXPOSURE_TYPE',
         label: 'Exposure Type',
+        labelValue: 'test',
         type: 'DropdownInput',
         value: '',
         isRequired: true,
@@ -362,7 +373,9 @@ const addExposureScreen = [
     {
         cardNumber: 1,
         id: 'exposureFrequencyId',
+        categoryId: "LNG_REFERENCE_DATA_CATEGORY_EXPOSURE_FREQUENCY",
         label: 'Exposure Frequency',
+        labelValue: 'test',
         type: 'DropdownInput',
         value: '',
         isRequired: true,
@@ -374,7 +387,9 @@ const addExposureScreen = [
     {
         cardNumber: 1,
         id: 'exposureDurationId',
+        categoryId: 'LNG_REFERENCE_DATA_CATEGORY_EXPOSURE_DURATION',
         label: 'Exposure Duration',
+        labelValue: 'test',
         type: 'DropdownInput',
         value: '',
         isRequired: true,
@@ -386,10 +401,12 @@ const addExposureScreen = [
     {
         cardNumber: 1,
         id: 'socialRelationshipTypeId',
+        categoryId: 'LNG_REFERENCE_DATA_CATEGORY_CONTEXT_OF_TRANSMISSION',
         label: 'Relation',
+        labelValue: 'test',
         type: 'DropdownInput',
         value: '',
-        isRequired: true,
+        isRequired: false,
         isEditMode: true,
         activeButtonColor: 'red',
         activeBackgroundColor: 'red',
@@ -399,9 +416,10 @@ const addExposureScreen = [
         cardNumber: 1,
         id: 'clusterId',
         label: 'Cluster',
+        labelValue: 'test',
         type: 'DropdownInput',
         value: '',
-        isRequired: true,
+        isRequired: false,
         isEditMode: true,
         activeButtonColor: 'red',
         activeBackgroundColor: 'red',
@@ -411,14 +429,143 @@ const addExposureScreen = [
         cardNumber: 1,
         id: 'comment',
         label: 'Comment',
+        labelValue: 'test',
         type: 'TextInput',
         value: '',
-        isRequired: true,
+        isRequired: false,
         isEditMode: true,
         multiline: true,
         objectType: 'Contact'
     }
 ];
+
+const contactsSingleScreen = {
+    personal: [
+        {
+            fields: [
+                {
+                    cardNumber: 1,
+                    id: 'firstName',
+                    label: 'First Name',
+                    type: 'TextInput',
+                    value: '',
+                    isRequired: true,
+                    isEditMode: true,
+                    multiline: false
+                },
+                {
+                    cardNumber: 1,
+                    id: 'middleName',
+                    label: 'Middle Name',
+                    type: 'TextInput',
+                    value: '',
+                    isRequired: true,
+                    isEditMode: true,
+                    multiline: false
+                },
+                {
+                    cardNumber: 1,
+                    id: 'lastName',
+                    label: 'Last Name',
+                    type: 'TextInput',
+                    value: '',
+                    isRequired: true,
+                    isEditMode: true,
+                    multiline: false
+                },
+                {
+                    cardNumber: 1,
+                    id: 'gender',
+                    label: 'Gender',
+                    type: 'DropdownInput',
+                    value: '',
+                    isRequired: true,
+                    isEditMode: true,
+                    objectType: 'Contact'
+                },
+                {
+                    cardNumber: 1,
+                    id: 'phoneNumber',
+                    label: 'Phone Number',
+                    type: 'TextInput',
+                    value: '',
+                    isRequired: true,
+                    isEditMode: true,
+                    multiline: false
+                },
+                {
+                    cardNumber: 1,
+                    id: 'occupation',
+                    label: 'Occupation',
+                    type: 'TextInput',
+                    value: '',
+                    isRequired: true,
+                    isEditMode: true,
+                    multiline: false
+                },
+                {
+                    cardNumber: 3,
+                    id: 'dob',
+                    label: 'Date of birth',
+                    value: '',
+                    type: "DatePicker",
+                    isRequired: true,
+                    isEditMode: true,
+                    format: 'MM/dd/YYYY'
+                },
+                {
+                    cardNumber: 3,
+                    id: 'dateOfReporting',
+                    label: 'Date of Reporting',
+                    value: '',
+                    type: "DatePicker",
+                    isRequired: true,
+                    isEditMode: true,
+                    format: 'MM/dd/YYYY'
+                },
+                {
+                    cardNumber: 3,
+                    id: 'isDateOfReportingApproximate',
+                    label: 'Is date of reporting approximate?',
+                    type: 'SwitchInput',
+                    value: false,
+                    isRequired: false,
+                    isEditMode: true,
+                    activeButtonColor: 'green',
+                    activeBackgroundColor: 'green',
+                    objectType: 'FollowUp'
+                },
+            ]
+        },
+        {
+            fields: [
+                {
+                    cardNumber: 1,
+                    id: 'riskLevel',
+                    label: 'Risk level',
+                    type: 'DropdownInput',
+                    value: '',
+                    isRequired: false,
+                    isEditMode: true,
+                    activeButtonColor: 'red',
+                    activeBackgroundColor: 'red',
+                    objectType: 'Contact'
+                },
+                {
+                    cardNumber: 1,
+                    id: 'riskReason',
+                    label: 'Reason',
+                    type: 'TextInput',
+                    value: '',
+                    isRequired: true,
+                    isEditMode: true,
+                    multiline: true,
+                    objectType: 'Contact'
+                }
+            ]
+        }
+    ]
+};
 
 export default {
     designScreenSize,
@@ -429,5 +576,7 @@ export default {
     followUpsFilterScreen,
     defaultFilterForContacts,
     baseUrls,
-    addFollowUpScreen
+    addFollowUpScreen,
+    addExposureScreen,
+    contactsSingleScreen
 }

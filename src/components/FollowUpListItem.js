@@ -34,7 +34,15 @@ class FollowUpListItem extends PureComponent {
     render() {
         // Get contact info from the follow-ups
 
-        let contact = this.props && this.props.contacts && Array.isArray(this.props.contacts) && this.props.contacts.length > 0 ? this.props.contacts[this.props.contacts.map((e) => {return e.id}).indexOf(this.props.item.personId)] : null;
+        let contact = {};
+
+        if (this.props.isContact) {
+            contact = this.props.item;
+        } else {
+            contact = this.props && this.props.contacts && Array.isArray(this.props.contacts) && this.props.contacts.length > 0 ? this.props.contacts[this.props.contacts.map((e) => {
+                return e.id
+            }).indexOf(this.props.item.personId)] : null;
+        }
         let primaryText = contact && ((contact.firstName ? contact.firstName : ' ') + (contact.lastName ? (" " + contact.lastName) : ' '));
         let secondaryText = contact && ((contact.gender ? contact.gender.charAt(0) : ' ') + (contact.age ? (", " + contact.age) : ' '));
 
@@ -43,6 +51,10 @@ class FollowUpListItem extends PureComponent {
 
         if (this.props && this.props.item && this.props.item.address) {
             addressText = getAddress(this.props.item.address, true);
+        } else {
+            if (this.props.isContact) {
+                addressText = getAddress(contact.addresses[0], true);
+            }
         }
 
         let relationshipText = '';
@@ -82,24 +94,28 @@ class FollowUpListItem extends PureComponent {
                         style={[style.addressStyle, {
                             marginHorizontal: calculateDimension(14, false, this.props.screenSize),
                             marginVertical: 7.5
-                        }]}>{addressText}</Text>
+                        }]}
+                        numberOfLines={2}
+                    >{addressText}</Text>
                     <Text
                         style={[style.addressStyle, {
                             marginHorizontal: calculateDimension(14, false, this.props.screenSize),
                             marginVertical: 7.5
-                        }]}>{'Exposed to: ' + relationshipText}</Text>
+                        }]}
+                        numberOfLines={2}
+                    >{'Exposed to: ' + relationshipText}</Text>
                 </View>
                 <View style={styles.lineStyle}/>
                 <View
                     style={[style.thirdSectionContainer, {marginHorizontal: calculateDimension(14, false, this.props.screenSize)}]}>
                     <Ripple style={[style.rippleStyle]} onPress={this.onPressFollowUp}>
-                        <Text style={[style.rippleTextStyle]}>FOLLOW-UP</Text>
+                        <Text style={[style.rippleTextStyle]}>{this.props.firstActionText || 'FOLLOW-UP'}</Text>
                     </Ripple>
                     <Ripple style={[style.rippleStyle]} onPress={this.onPressMissing}>
-                        <Text style={[style.rippleTextStyle]}>MISSING</Text>
+                        <Text style={[style.rippleTextStyle]}>{this.props.secondActionText || 'MISSING'}</Text>
                     </Ripple>
                     <Ripple style={[style.rippleStyle]} onPress={this.onPressExposure}>
-                        <Text style={[style.rippleTextStyle]}>ADD EXPOSURE</Text>
+                        <Text style={[style.rippleTextStyle]}>{this.props.thirdActionText || 'ADD EXPOSURE'}</Text>
                     </Ripple>
                 </View>
             </ElevatedView>

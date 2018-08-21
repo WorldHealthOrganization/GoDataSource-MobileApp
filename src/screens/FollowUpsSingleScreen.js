@@ -19,7 +19,7 @@ import FollowUpsSingleQuestionnaireContainer from './../containers/FollowUpsSing
 import Breadcrumb from './../components/Breadcrumb';
 import Menu, {MenuItem} from 'react-native-material-menu';
 import Ripple from 'react-native-material-ripple';
-import {updateFollowUpAndContact, deleteFollowUp} from './../actions/followUps';
+import {addFollowUp, updateFollowUpAndContact, deleteFollowUp} from './../actions/followUps';
 import {updateContact} from './../actions/contacts';
 import {removeErrors} from './../actions/errors';
 import DateTimePicker from 'react-native-modal-datetime-picker';
@@ -103,7 +103,7 @@ class FollowUpsSingleScreen extends Component {
                         <View
                             style={[style.breadcrumbContainer]}>
                             <Breadcrumb
-                                entities={['Follow-ups', (this.props.contact.firstName + " " + this.props.contact.lastName)]}
+                                entities={['Follow-ups', ((this.props.contact && this.props.contact.firstName ? (this.props.contact.firstName + " ") : '') + (this.props.contact && this.props.contact.lastName ? this.props.contact.lastName : ''))]}
                                 navigator={this.props.navigator}
                             />
                             <View>
@@ -259,7 +259,7 @@ class FollowUpsSingleScreen extends Component {
 
     onChangeSwitch = (value, id, objectType) => {
         // console.log("onChangeSwitch: ", value, id, this.state.item);
-        if (id === 'fillGeolocation') {
+        if (id === 'fillGeoLocation') {
             navigator.geolocation.getCurrentPosition((position) => {
                     this.setState(
                         (prevState) => ({
@@ -350,7 +350,7 @@ class FollowUpsSingleScreen extends Component {
 
     onChangeTextAnswer = (value, id) => {
         let itemClone = _.cloneDeep(this.state.item);
-        let questionnaireAnswers = itemClone.questionnaireAnswers;
+        let questionnaireAnswers = itemClone && itemClone.questionnaireAnswers ? itemClone.questionnaireAnswers : null;
         if (!itemClone.questionnaireAnswers) {
             itemClone.questionnaireAnswers = {};
             questionnaireAnswers = itemClone.questionnaireAnswers;
@@ -363,7 +363,7 @@ class FollowUpsSingleScreen extends Component {
 
     onChangeSingleSelection = (value, id) => {
         let itemClone = _.cloneDeep(this.state.item);
-        let questionnaireAnswers = itemClone.questionnaireAnswers;
+        let questionnaireAnswers = itemClone && itemClone.questionnaireAnswers ? itemClone.questionnaireAnswers : null;
         if (!itemClone.questionnaireAnswers) {
             itemClone.questionnaireAnswers = {};
             questionnaireAnswers = itemClone.questionnaireAnswers;
@@ -376,7 +376,7 @@ class FollowUpsSingleScreen extends Component {
 
     onChangeMultipleSelection = (selections, id) => {
         let itemClone = Object.assign({}, this.state.item);
-        let questionnaireAnswers = itemClone.questionnaireAnswers;
+        let questionnaireAnswers = itemClone && itemClone.questionnaireAnswers ? itemClone.questionnaireAnswers : null;
         if (!itemClone.questionnaireAnswers) {
             itemClone.questionnaireAnswers = {};
             questionnaireAnswers = itemClone.questionnaireAnswers;
@@ -393,7 +393,11 @@ class FollowUpsSingleScreen extends Component {
             item: Object.assign({}, prevState.item, {performed: true}),
             savePressed: true
         }), () => {
-            this.props.updateFollowUpAndContact(this.props.outbreak.id, this.state.contact.id, this.state.item.id, this.state.item, this.state.contact, this.props.user.token);
+            if (this.props.isNew) {
+                this.props.addFollowUp(this.props.outbreak.id, this.state.contact.id, this.state.item, this.props.user.token);
+            } else {
+                this.props.updateFollowUpAndContact(this.props.outbreak.id, this.state.contact.id, this.state.item.id, this.state.item, this.state.contact, this.props.user.token);
+            }
         });
     };
 
@@ -481,7 +485,8 @@ function mapStateToProps(state) {
         screenSize: state.app.screenSize,
         followUps: state.followUps,
         outbreak: state.outbreak,
-        errors: state.errors
+        errors: state.errors,
+        contacts: state.contacts
     };
 }
 
@@ -489,6 +494,7 @@ function matchDispatchProps(dispatch) {
     return bindActionCreators({
         getFollowUpsForOutbreakId,
         getMissedFollowUpsForOutbreakId,
+        addFollowUp,
         updateFollowUpAndContact,
         deleteFollowUp,
         updateContact,

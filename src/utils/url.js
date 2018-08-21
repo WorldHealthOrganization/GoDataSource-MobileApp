@@ -39,12 +39,17 @@ function getLocationsUrl () {
     return getBaseUrl() + '/locations';
 }
 
+function getLanguagesUrl () {
+    return getBaseUrl() + '/languages';
+}
+
 export default {
     getUsersUrl,
     getLoginUrl,
     getOutbreaksUrl,
     getReferenceDataUrl,
     getLocationsUrl,
+    getLanguagesUrl,
     getBaseUrl,
     setBaseUrl
 }

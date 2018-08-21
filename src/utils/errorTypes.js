@@ -13,6 +13,7 @@ export default {
     ERROR_DELETE_FOLLOWUP: {type: "Follow-up delete error", message: 'An error occurred while trying to delete the follow-up'},
     ERROR_CONTACT: {type: "Contacts error", message: 'An error occurred while trying to get contacts data'},
     ERROR_UPDATE_CONTACT: {type: "Contact update error", message: 'An error occurred while trying to update the contact'},
+    ERROR_ADD_EXPOSURE: {type: "Exposure add error", message: 'An error occurred while trying to add exposure'},
     ERROR_CASES: {type: "Cases error", message: 'An error occurred while trying to get cases data'},
     ERROR_EVENTS: {type: "Events error", message: 'An error occurred while trying to get events data'},
     ERROR_REFERENCE_DATA: {type: "Reference data error", message: 'An error occurred while trying to get reference data'},

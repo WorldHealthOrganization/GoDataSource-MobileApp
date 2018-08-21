@@ -118,9 +118,6 @@ class CardComponent extends Component {
             }
 
             value = this.computeValueForId(item.type, item.id, followUp, contact);
-            if (item.type === 'DatePicker') {
-                console.log("### computed value for id: ", value);
-            }
         }
 
         if (this.props.screen === 'FollowUpsFilter') {
@@ -139,6 +136,13 @@ class CardComponent extends Component {
                 data = this.props.cases.map((e) => {return {label: ((e.firstName ? e.firstName : '') + (e.lastName ? (" " + e.lastName) : '')), value: e.id}})
                 value = this.props.filter.filter[item.id];
             }
+        }
+
+        if (this.props.screen === 'ExposureScreen') {
+            if (item.type === 'DropdownInput') {
+                item.data = this.computeDataForExposure(item);
+            }
+            value = this.computeExposureValue(item);
         }
 
         switch(item.type) {
@@ -170,6 +174,7 @@ class CardComponent extends Component {
                     <DropdownInput
                         id={item.id}
                         label={item.label}
+                        labelValue={item.labelValue}
                         value={value}
                         data={item.data}
                         isEditMode={item.isEditMode}
@@ -284,8 +289,8 @@ class CardComponent extends Component {
             return getAddress(followUp.address, true)
         }
 
-        if (type === 'SwitchInput' && id === "fillGeolocation") {
-            return followUp.fillGeolocation ? true : false
+        if (type === 'SwitchInput' && id === "fillGeoLocation") {
+            return followUp.fillGeoLocation ? true : false
         }
 
 
@@ -309,6 +314,42 @@ class CardComponent extends Component {
         }
 
         return [];
+    }
+
+    computeDataForExposure = (item) => {
+        let data = [];
+        if (item.categoryId) {
+            data = this.props.referenceData.filter((e) => {
+                return e.categoryId === item.categoryId
+            }).map((e) => {
+                return {value: e.value, id: e.id}
+            });
+        } else {
+            if (item.id === 'exposure') {
+                if (this.props.type !== 'Contact') {
+                    data = this.props.contacts.map((e) => {return {value: ((e.firstName ? e.firstName + ' ' : '') + (e.lastName ? e.lastName : '')), id: e.id, type: 'contact'}});
+                }
+                data = this.props.cases.map((e) => {return {value: ((e.firstName ? e.firstName + ' ' : '') + (e.lastName ? e.lastName : '')), id: e.id, type: 'case'}});
+                data = data.concat(this.props.events.map((e) => {return {value: e.name, id: e.id, type: 'event'}}));
+            } else {
+                if (item.id === 'clusterId') {
+
+                }
+            }
+        }
+        return data;
+    };
+
+    computeExposureValue = (item) => {
+        let value = '';
+
+        value = this.props.exposure[item.id];
+
+        // if (item.type === 'DropdownInput') {
+        //     value = this.props.exposure && this.props.exposure[item.id] && this.props.exposure[item.id].id;
+        // }
+
+        return value;
     }
 }
 
