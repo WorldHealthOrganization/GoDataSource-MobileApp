@@ -314,6 +314,22 @@ class CasesScreen extends Component {
         this.refs.dropdown.focus();
     };
 
+    handleOnApplyFilters = (filter) => {
+        this.setState({
+            filterFromFilterScreen: filter
+        }, () => {
+            if (this.state.filter.searchText) {
+
+                if (!filter.where.or || filter.where.or.length === 0) {
+                    filter.where.or = [];
+                }
+                filter.where.or.push({firstName: {like: this.state.filter.searchText, options: 'i'}});
+                filter.where.or.push({lastName: {like: this.state.filter.searchText, options: 'i'}});
+            }
+            this.props.getCasesForOutbreakId(this.props.user.activeOutbreakId, filter, this.props.user.token);
+        })
+    };
+
     //Open single case SingleCaseScreen
     handleOnPressCase = (item, contact) => {
         console.log("### handlePressCases: ", item);

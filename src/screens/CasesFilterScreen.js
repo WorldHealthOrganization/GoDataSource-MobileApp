@@ -14,7 +14,7 @@ import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import {getContactsForOutbreakId} from './../actions/contacts';
 import {addFilterForScreen} from './../actions/app';
-import {TabBar, TabView} from 'react-native-tab-view';
+import {TabBar, TabView, PagerScroll} from 'react-native-tab-view';
 import FollowUpsFiltersContainer from './../containers/FollowUpsFiltersContainer';
 import FollowUpsSortContainer from './../containers/FollowUpsSortContainer';
 
@@ -77,12 +77,13 @@ class CasesFilterScreen extends Component {
                     iconName="close"
                     handlePressNavbarButton={this.handlePressNavbarButton}
                 />
-                {/*<TabView*/}
-                    {/*navigationState={this.state}*/}
-                    {/*onIndexChange={this.handleOnIndexChange}*/}
-                    {/*renderScene={this.handleRenderScene}*/}
-                    {/*renderTabBar={this.handleRenderTabBar}*/}
-                {/*/>*/}
+                <TabView
+                    navigationState={this.state}
+                    onIndexChange={this.handleOnIndexChange}
+                    renderPager={this.handleRenderPager}
+                    renderScene={this.handleRenderScene}
+                    renderTabBar={this.handleRenderTabBar}
+                />
             </View>
         );
     }
@@ -90,7 +91,7 @@ class CasesFilterScreen extends Component {
     // Please write here all the methods that are not react native lifecycle methods
     handlePressNavbarButton = () => {
         this.props.navigator.dismissModal(
-            // this.props.onApplyFilters(config.defaultFilterForContacts)
+            this.props.onApplyFilters(config.defaultFilterForCases)
         );
     };
 
@@ -119,10 +120,16 @@ class CasesFilterScreen extends Component {
         }
     };
 
+    handleRenderPager = (props) => {
+        return (Platform.OS === 'ios') ? <PagerScroll {...props} swipeEnabled={false} animationEnabled={false} /> :
+            <PagerScroll {...props} swipeEnabled={false} animationEnabled={false} />
+    };
+
     handleRenderTabBar = (props) => {
         return (
             <TabBar
                 {...props}
+                scrollEnabled={false}
                 indicatorStyle={{
                     backgroundColor: styles.buttonGreen,
                     height: 2
@@ -193,7 +200,7 @@ class CasesFilterScreen extends Component {
 
     handleOnPressApplyFilters = () => {
         let filterStateClone = Object.assign({}, this.state.filter.filter);
-        let filter = Object.assign({}, config.defaultFilterForContacts);
+        let filter = Object.assign({}, config.defaultFilterForCases);
 
         filter.where = {};
 
@@ -211,7 +218,6 @@ class CasesFilterScreen extends Component {
             filter.where.and.push({age: {lte: filterStateClone.age[1]}});
         }
 
-        // this.props.getContactsForOutbreakId(this.props.user.activeOutbreakId, filter, this.props.user.token);
 
         this.props.addFilterForScreen('CasesFilterScreen', filter);
 
