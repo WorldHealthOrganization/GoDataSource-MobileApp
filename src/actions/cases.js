@@ -18,9 +18,9 @@ export function storeCases(cases) {
     }
 }
 
-export function getCasesForOutbreakId(outbreakId, token) {
+export function getCasesForOutbreakId(outbreakId, filter, token) {
     return async function (dispatch, getState) {
-        getCasesForOutbreakIdRequest(outbreakId, token, (error, response) => {
+        getCasesForOutbreakIdRequest(outbreakId, filter, token, (error, response) => {
             if (error) {
                 console.log("*** getCasesForOutbreakId error: ", error);
                 dispatch(addError(errorTypes.ERROR_CASES));
