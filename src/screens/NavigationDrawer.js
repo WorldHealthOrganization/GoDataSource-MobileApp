@@ -41,7 +41,7 @@ class NavigationDrawer extends Component {
                     <ListItem
                         numberOfLines={2}
                         leftElement={<Icon name="account-circle" size={40} color={styles.buttonGreen} />}
-                        centerElement={{primaryText: "Florin Popa", secondaryText: 'florin.popa@clarisoft.com'}}
+                        centerElement={{primaryText: "Username", secondaryText: 'username@clarisoft.com'}}
                         style={{
                             container: {height: '100%'},
                             primaryText: {fontFamily: 'Roboto-Medium', fontSize: 18},

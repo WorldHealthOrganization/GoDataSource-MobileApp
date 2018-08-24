@@ -276,6 +276,10 @@ const defaultFilterForContacts = {
     ]
 };
 
+const defaultFilterForCases = {
+
+};
+
 const addFollowUpScreen = [
     {
         cardNumber: 1,

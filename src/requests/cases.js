@@ -4,9 +4,12 @@
 import url from './../utils/url';
 import {handleResponse} from './../utils/functions';
 
-export function getCasesForOutbreakIdRequest(outbreakId, token, callback) {
+export function getCasesForOutbreakIdRequest(outbreakId, filter, token, callback) {
     let requestUrl = url.getOutbreaksUrl() + outbreakId + '/cases';
-
+    if (filter) {
+        requestUrl += '?filter=' + JSON.stringify(filter);
+    }
+    
     fetch(requestUrl, {
         method: 'GET',
         headers: {
@@ -19,7 +22,7 @@ export function getCasesForOutbreakIdRequest(outbreakId, token, callback) {
             return handleResponse(response);
         })
         .then((response) => {
-            console.log('### getCasesForOutbreakId resposne: ', response);
+            console.log('### getCasesForOutbreakId response: ', response);
             callback(null, response);
         })
         .catch((error) => {

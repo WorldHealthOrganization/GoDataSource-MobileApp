@@ -72,7 +72,7 @@ export function getUserById(userId, token) {
                 dispatch(storeUser(user));
                 dispatch(getFollowUpsForOutbreakId(user.activeOutbreakId, null, user.token));
                 dispatch(getContactsForOutbreakId(user.activeOutbreakId, config.defaultFilterForContacts, user.token));
-                dispatch(getCasesForOutbreakId(user.activeOutbreakId, user.token));
+                dispatch(getCasesForOutbreakId(user.activeOutbreakId, null, user.token));
                 dispatch(getEventsForOutbreakId(user.activeOutbreakId, user.token));
                 dispatch(getOutbreakById(user.activeOutbreakId, user.token));
                 dispatch(getReferenceData(user.token));
