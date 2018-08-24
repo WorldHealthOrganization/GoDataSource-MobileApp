@@ -113,12 +113,12 @@ export function appInitialized() {
 
         // Get the translations from the api and save them to the redux store
         dispatch(getTranslations());
-        // dispatch(changeAppRoot('login'));
+        dispatch(changeAppRoot('login'));
 
-        dispatch(loginUser({
-            email: 'florin.popa@clarisoft.com',
-            password: 'Cl@r1soft'
-        }));
+        // dispatch(loginUser({
+        //     email: 'florin.popa@clarisoft.com',
+        //     password: 'Cl@r1soft'
+        // }));
 
 
         // I don't think we need this in production since before the user logs in, the translations should be already saved
