@@ -17,6 +17,21 @@ export function storeLocations(locations) {
 
 export function getLocations(countries, token) {
     return async function (dispatch, getState) {
+        // The countries are saved as the reference data values, so we have to map them to the translations
+
+        // console.log('Countries: ', countries);
+        //
+        // let currentState = getState();
+        // let translations = currentState && currentState.app && currentState.app.translation && Array.isArray(currentState.app.translation) && currentState.app.translation.length > 0 ? currentState.app.translation : [];
+        // let referenceData = currentState && currentState.referenceData && Array.isArray(currentState.referenceData) && currentState.referenceData.length > 0 ? currentState.referenceData : [];
+        //
+        // for(let i=0; i<countries.length; i++) {
+        //     if (countries[i].includes("LNG")) {
+        //         console.log("### translation: ", translations[translations.map((e) => {return e.token;}).indexOf(countries[i])], referenceData[referenceData.map((e) => {return e.value}).indexOf(countries[i])]);
+        //         countries[i] = translations[translations.map((e) => {return e.token;}).indexOf(countries[i])].translation;
+        //     }
+        // }
+
         getLocationsRequest(countries, token, (error, response) => {
             if (error) {
                 // console.log("*** getLocations error: ", error);

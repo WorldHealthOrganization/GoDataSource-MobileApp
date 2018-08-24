@@ -79,18 +79,18 @@ class DropdownInput extends PureComponent {
 
     handleOnChangeText = (state) => {
         if (this.props.labelValue) {
-            console.log("Label value branch");
+            console.log("Label value branch: ", this.props.data);
             if (this.props && this.props.data && Array.isArray(this.props.data)) {
                 this.props.onChange({
                     label: state, value: this.props.data[this.props.data.map((e) => {
                         return e.value
                     }).indexOf(state)].id
-                }, this.props.id, this.props.objectType || this.props.data[this.props.data.map((e) => {
+                }, this.props.id, this.props.objectType ? this.props.objectType === 'Address' ? this.props.index : this.props.objectType : this.props.data[this.props.data.map((e) => {
                         return e.value
                     }).indexOf(state)].type || null)
             }
         } else {
-            this.props.onChange(state, this.props.id, this.props.objectType || null)
+            this.props.onChange(state, this.props.id, this.props.objectType ? this.props.objectType === 'Address' ? this.props.index : this.props.objectType : null)
         }
     }
 }

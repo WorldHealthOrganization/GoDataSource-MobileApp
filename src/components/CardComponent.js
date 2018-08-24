@@ -27,6 +27,7 @@ import _ from 'lodash';
 import Section from './Section';
 import Selector from './Selector';
 import IntervalPicker from './IntervalPicker';
+import ActionsBar from './ActionsBar';
 
 class CardComponent extends Component {
 
@@ -64,7 +65,7 @@ class CardComponent extends Component {
             return true
         }
 
-        return true;
+        return false;
     }
 
     // The render method should have at least business logic as possible,
@@ -145,6 +146,20 @@ class CardComponent extends Component {
             value = this.computeExposureValue(item);
         }
 
+        if (this.props.screen === 'ContactsSingleScreen') {
+            if (item.type === 'DropdownInput') {
+                item.data = this.computeDataForContactsSingleScreenDropdownInput(item, this.props.index);
+            }
+            if (item.type === 'ActionsBar') {
+                item.onPressArray = [this.props.onDeletePress]
+            }
+            value = this.computeValueForContactsSingleScreen(item, this.props.index);
+        }
+
+        if (this.props.screen === 'ContactsSingleScreenAddress') {
+            console.log("ContactsSingleScreenAddress: ", item);
+        }
+
         switch(item.type) {
             case 'Section':
                 return (
@@ -160,6 +175,7 @@ class CardComponent extends Component {
                     <TextInput
                         id={item.id}
                         label={item.label}
+                        index={this.props.index}
                         value={value}
                         isEditMode={item.isEditMode}
                         isRequired={item.isRequired}
@@ -173,6 +189,7 @@ class CardComponent extends Component {
                 return (
                     <DropdownInput
                         id={item.id}
+                        index={this.props.index}
                         label={item.label}
                         labelValue={item.labelValue}
                         value={value}
@@ -207,6 +224,7 @@ class CardComponent extends Component {
                     <DropDownSectioned
                         key={item.variable}
                         id={item.variable}
+                        index={this.props.index}
                         labelValue={item.text}
                         value={item.value}
                         data={this.props.locations}
@@ -216,6 +234,7 @@ class CardComponent extends Component {
                         style={{width: width, marginHorizontal: marginHorizontal, flex: 1}}
                         dropDownStyle={{width: width, alignSelf: 'center'}}
                         objectType={item.objectType}
+                        single={item.single}
                     />
                 );
             case 'SwitchInput':
@@ -271,6 +290,18 @@ class CardComponent extends Component {
                         objectType={item.objectType}
                     />
                 );
+            case 'ActionsBar':
+                return (
+                    <ActionsBar
+                        id={item.id}
+                        key={item.id}
+                        addressIndex={this.props.index}
+                        textsArray={item.textsArray}
+                        textsStyleArray={item.textsStyleArray}
+                        onPressArray={item.onPressArray}
+                        containerTextStyle={{width, marginHorizontal, height: calculateDimension(46, true, this.props.screenSize)}}
+                    />
+                );
             default:
                 return (
                     <View style={{backgroundColor: 'red'}}>
@@ -293,10 +324,26 @@ class CardComponent extends Component {
             return followUp.fillGeoLocation ? true : false
         }
 
+        // return followUp[id] ? followUp[id] : contact[id] ? contact[id] : '';
 
-
-        return followUp[id] ? followUp[id] : contact[id] ? contact[id] : '';
-    }
+        if (followUp[id]) {
+            if (typeof followUp[id] === 'string' && followUp[id].includes('LNG_')) {
+                return this.getTranslation(followUp[id]);
+            } else {
+                return followUp[id];
+            }
+        } else {
+            if (contact[id]) {
+                if (typeof contact[id] === 'string' && contact[id].includes('LNG_')) {
+                    return this.getTranslation(contact[id]);
+                } else {
+                    return contact[id];
+                }
+            } else {
+                return '';
+            }
+        }
+    };
 
     computeDataForDropdown = (item, contact) => {
         if (item.id === 'exposedTo') {
@@ -310,11 +357,11 @@ class CardComponent extends Component {
         if (item.id === 'riskLevel') {
             return _.filter(this.props.referenceData, (o) => {
                 return o.categoryId.includes("RISK_LEVEL")
-            }).map((o) => {return {value: o.value}})
+            }).map((o) => {return {value: this.getTranslation(o.value), id: o.value}})
         }
 
         return [];
-    }
+    };
 
     computeDataForExposure = (item) => {
         let data = [];
@@ -322,7 +369,7 @@ class CardComponent extends Component {
             data = this.props.referenceData.filter((e) => {
                 return e.categoryId === item.categoryId
             }).map((e) => {
-                return {value: e.value, id: e.id}
+                return {value: this.getTranslation(e.value), id: e.id}
             });
         } else {
             if (item.id === 'exposure') {
@@ -349,6 +396,43 @@ class CardComponent extends Component {
         //     value = this.props.exposure && this.props.exposure[item.id] && this.props.exposure[item.id].id;
         // }
 
+        return this.getTranslation(value);
+    };
+
+    computeDataForContactsSingleScreenDropdownInput = (item, index) => {
+        console.log("computeDataForContactsSingleScreenDropdownInput: ", item, this.props.contact);
+        if (item.id === 'riskLevel') {
+            return _.filter(this.props.referenceData, (o) => {
+                return o.categoryId.includes("RISK_LEVEL")
+            }).map((o) => {return {value: this.getTranslation(o.value), id: o.value}})
+        }
+        if (item.id === 'gender') {
+            return _.filter(this.props.referenceData, (o) => {
+                return o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_GENDER'
+            }).map((o) => {return {value: this.getTranslation(o.value), id: o.value}})
+        }
+        if (item.id === 'name') {
+            return _.filter(this.props.referenceData, (o) => {
+                return o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_ADDRESS_TYPE'
+            }).map((o) => {return {value: this.getTranslation(o.value), id: o.value}})
+        }
+    };
+
+    computeValueForContactsSingleScreen = (item, index) => {
+        if (index || index >= 0) {
+            return this.props.contact && this.props.contact.addresses && Array.isArray(this.props.contact.addresses) ?
+                this.getTranslation(this.props.contact.addresses[index][item.id]) : '';
+        }
+        return this.props.contact && this.props.contact[item.id] ? this.props.contact[item.id] : '';
+    };
+
+    getTranslation = (value) => {
+        console.log("Value from getTranslation: ", value);
+        if (value && typeof value === 'string' && value.includes('LNG')) {
+            return value && this.props.translation ? this.props.translation[this.props.translation.map((e) => {
+                return e.token
+            }).indexOf(value)].translation : '';
+        }
         return value;
     }
 }
@@ -374,7 +458,8 @@ function mapStateToProps(state) {
         cases: state.cases,
         events: state.events,
         referenceData: state.referenceData,
-        locations: state.locations
+        locations: state.locations,
+        translation: state.app.translation
     };
 }
 

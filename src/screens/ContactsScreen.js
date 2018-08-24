@@ -18,6 +18,8 @@ import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import AnimatedListView from './../components/AnimatedListView';
 import {LoaderScreen, Colors} from 'react-native-ui-lib';
+import {getContactsForOutbreakId} from './../actions/contacts';
+import {addFilterForScreen} from './../actions/app';
 
 const scrollAnim = new Animated.Value(0);
 const offsetAnim = new Animated.Value(0);
@@ -33,9 +35,11 @@ class ContactsScreen extends Component {
         super(props);
         this.state = {
             contacts: [],
-            filter: {
-                date: new Date()
-            }
+            filter: this.props.filter && this.props.filter['FollowUpsScreen'] ? this.props.filter['FollowUpsScreen'] : {
+                date: new Date(),
+                searchText: ''
+            },
+            filterFromFilterScreen: this.props.filter && this.props.filter['FollowUpsFilterScreen'] ? this.props.filter['FollowUpsFilterScreen'] : null,
         };
         // Bind here methods, or at least don't declare methods in the render method
         this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this));
@@ -163,6 +167,56 @@ class ContactsScreen extends Component {
         )
     };
 
+    handleOnChangeText = (text) => {
+        console.log("### handleOnChangeText: ", text);
+        this.setState(prevState => ({
+            filter: Object.assign({}, prevState.filter, {searchText: text})
+        }), console.log('### filter after changed text: ', this.state.filter))
+    };
+
+    handleOnSubmitEditing = (text) => {
+        this.props.addFilterForScreen("ContactsScreen", this.state.filter);
+        let existingFilter = this.state.filterFromFilterScreen ? Object.assign({}, this.state.filterFromFilterScreen) : Object.assign({}, config.defaultFilterForContacts);
+
+        if (!existingFilter.where || Object.keys(existingFilter.where).length === 0) {
+            existingFilter.where = {};
+        }
+        if (!existingFilter.where.or || existingFilter.where.or.length === 0) {
+            existingFilter.where.or = [];
+        }
+        existingFilter.where.or.push({firstName: {like: this.state.filter.searchText, options: 'i'}});
+        existingFilter.where.or.push({lastName: {like: this.state.filter.searchText, options: 'i'}});
+
+        this.props.getContactsForOutbreakId(this.props.user.activeOutbreakId, existingFilter, this.props.user.token);
+    };
+
+    handlePressFilter = () => {
+        this.props.navigator.showModal({
+            screen: 'FollowUpsFilterScreen',
+            animated: true,
+            passProps: {
+                activeFilters: this.state.filterFromFilterScreen || null,
+                onApplyFilters: this.handleOnApplyFilters
+            }
+        })
+    };
+
+    handleOnApplyFilters = (filter) => {
+        this.setState({
+            filterFromFilterScreen: filter
+        }, () => {
+            if (this.state.filter.searchText) {
+
+                if (!filter.where.or || filter.where.or.length === 0) {
+                    filter.where.or = [];
+                }
+                filter.where.or.push({firstName: {like: this.state.filter.searchText, options: 'i'}});
+                filter.where.or.push({lastName: {like: this.state.filter.searchText, options: 'i'}});
+            }
+            this.props.getContactsForOutbreakId(this.props.user.activeOutbreakId, filter, this.props.user.token);
+        })
+    };
+
     handlePressFollowUp = (item, contact) => {
         console.log("### handlePressFollowUp: ", item, contact);
         this.props.navigator.push({
@@ -183,10 +237,15 @@ class ContactsScreen extends Component {
     };
 
     handleOnPressMissing = (followUp, contact) => {
-        followUp.lostToFollowUp = true;
-        followUp.performed = true;
-        // console.log("### ceva: ", followUp, contact);
-        this.props.updateFollowUpAndContact(this.props.user.activeOutbreakId, contact.id, followUp.id, followUp, contact, this.props.user.token);
+        console.log("Handle on press edit: ", followUp, contact);
+        this.props.navigator.push({
+            screen: 'ContactsSingleScreen',
+            animated: true,
+            animationType: 'fade',
+            passProps: {
+                contact: contact || followUp
+            }
+        })
     };
 
     handleOnPressExposure = (followUp, contact) => {
@@ -194,7 +253,7 @@ class ContactsScreen extends Component {
             screen: "ExposureScreen",
             animated: true,
             passProps: {
-                contact: contact,
+                contact: contact || followUp,
                 type: 'Contact'
             }
         })
@@ -268,6 +327,8 @@ function mapStateToProps(state) {
 
 function matchDispatchProps(dispatch) {
     return bindActionCreators({
+        getContactsForOutbreakId,
+        addFilterForScreen
     }, dispatch);
 }
 

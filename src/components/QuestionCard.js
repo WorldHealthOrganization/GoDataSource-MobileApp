@@ -58,7 +58,7 @@ class FollowUpListItem extends PureComponent {
                         {
                             marginLeft: calculateDimension(8, false, this.props.screenSize),
                             marginRight: calculateDimension(34, false, this.props.screenSize)
-                        }]} numberOfLines={2}>{this.props.item.text}</Text>
+                        }]} numberOfLines={2}>{this.getTranslation(this.props.item.text)}</Text>
                 </View>
                 <ScrollView scrollEnabled={false} keyboardShouldPersistTaps={'always'}>
                     {
@@ -115,7 +115,7 @@ class FollowUpListItem extends PureComponent {
                 questionAnswers !== undefined &&
                 item.answers.map((e) => {return e.value}).indexOf(questionAnswers) > -1 &&
                 item.answers[item.answers.map((e) => {return e.value}).indexOf(questionAnswers)] ?
-                    item.answers[item.answers.map((e) => {return e.value}).indexOf(questionAnswers)].label : ' ';
+                    this.getTranslation(item.answers[item.answers.map((e) => {return e.value}).indexOf(questionAnswers)].label) : ' ';
         }
         else {
             if (item.answerType === 'Multiple Options') {
@@ -129,7 +129,7 @@ class FollowUpListItem extends PureComponent {
         //     item.data = this.props.cases.map((e) => {return {value: ((e.firstName ? e.firstName : '') + (e.lastName ? (" " + e.lastName) : ''))}})
         // }
 
-        // console.log('Itemm: ', item);
+        console.log('Itemm: ', item);
 
         switch(item.answerType) {
             case 'Free text':
@@ -153,7 +153,7 @@ class FollowUpListItem extends PureComponent {
                         label={'Select answer'}
                         labelValue={item.text}
                         value={questionAnswers}
-                        data={item.answers.map((e) => {return {value: e.label, id: e.value}})}
+                        data={item.answers.map((e) => {return {value: this.getTranslation(e.label), id: e.value}})}
                         isEditMode={true}
                         isRequired={item.required}
                         onChange={this.props.onChangeSingleSelection}
@@ -168,7 +168,7 @@ class FollowUpListItem extends PureComponent {
                         label={'Select answer(s)'}
                         labelValue={item.text}
                         value={questionAnswers}
-                        data={item.answers.map((e) => {return {label: e.label, value: e.value}})}
+                        data={item.answers.map((e) => {return {label: this.getTranslation(e.label), value: e.value}})}
                         isEditMode={true}
                         isRequired={item.required}
                         onChange={this.props.onChangeMultipleSelection}
@@ -184,6 +184,15 @@ class FollowUpListItem extends PureComponent {
                     </View>
                 )
         }
+    };
+
+    getTranslation = (value) => {
+        if (value.includes('LNG')) {
+            return value && this.props.translation ? this.props.translation[this.props.translation.map((e) => {
+                return e.token
+            }).indexOf(value)].translation : '';
+        }
+        return value;
     }
 }
 
@@ -225,7 +234,8 @@ function mapStateToProps(state) {
         screenSize: state.app.screenSize,
         contacts: state.contacts,
         cases: state.cases,
-        events: state.events
+        events: state.events,
+        translation: state.app.translation
     };
 }
 

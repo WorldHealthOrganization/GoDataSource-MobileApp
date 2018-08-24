@@ -30,7 +30,7 @@ const Crumb = ({isCrumbActive, index, text, numberOfEntities, crumbPress}) => {
     )
 }
 
-class DropDown extends PureComponent {
+class Breadcrumb extends PureComponent {
 
     // This will be a dumb component, so it's best not to put any business logic in it
     constructor(props) {
@@ -123,4 +123,4 @@ function matchDispatchProps(dispatch) {
     }, dispatch);
 }
 
-export default connect(mapStateToProps, matchDispatchProps)(DropDown);
+export default connect(mapStateToProps, matchDispatchProps)(Breadcrumb);

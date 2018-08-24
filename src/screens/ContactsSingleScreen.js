@@ -1,10 +1,10 @@
 /**
- * Created by florinpopa on 25/07/2018.
+ * Created by florinpopa on 21/08/2018.
  */
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
-import {View, StyleSheet, Platform, Animated, Alert} from 'react-native';
+import {View, StyleSheet, Dimensions, Animated, Alert, Platform} from 'react-native';
 import {Icon} from 'react-native-material-ui';
 import styles from './../styles';
 import NavBarCustom from './../components/NavBarCustom';
@@ -13,9 +13,11 @@ import config from './../utils/config';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import {getFollowUpsForOutbreakId, getMissedFollowUpsForOutbreakId} from './../actions/followUps';
-import {TabBar, TabView, SceneMap} from 'react-native-tab-view';
-import FollowUpsSingleGetInfoContainer from './../containers/FollowUpsSingleGetInfoContainer';
-import FollowUpsSingleQuestionnaireContainer from './../containers/FollowUpsSingleQuestionnaireContainer';
+import {TabBar, TabView, PagerScroll, PagerAndroid, SceneMap} from 'react-native-tab-view';
+import ContactsSingleAddress from './../containers/ContactsSingleAddress';
+import ContactsSingleCalendar from './../containers/ContactsSingleCalendar';
+import ContactsSingleExposures from './../containers/ContactsSingleExposures';
+import ContactsSinglePersonal from './../containers/ContactsSinglePersonal';
 import Breadcrumb from './../components/Breadcrumb';
 import Menu, {MenuItem} from 'react-native-material-menu';
 import Ripple from 'react-native-material-ripple';
@@ -25,7 +27,12 @@ import {removeErrors} from './../actions/errors';
 import DateTimePicker from 'react-native-modal-datetime-picker';
 import _ from 'lodash';
 
-class FollowUpsSingleScreen extends Component {
+const initialLayout = {
+    height: 0,
+    width: Dimensions.get('window').width,
+};
+
+class ContactsSingleScreen extends Component {
 
     static navigatorStyle = {
         navBarHidden: true
@@ -34,10 +41,11 @@ class FollowUpsSingleScreen extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            routes: config.tabsValuesRoutes.followUpsSingle,
+            interactionComplete: false,
+            routes: config.tabsValuesRoutes.contactsSingle,
             index: 0,
             item: this.props.item,
-            contact: this.props.contact,
+            contact: Object.assign({}, this.props.contact),
             savePressed: false,
             deletePressed: false,
             isDateTimePickerVisible: false
@@ -45,28 +53,41 @@ class FollowUpsSingleScreen extends Component {
         // Bind here methods, or at least don't declare methods in the render method
     }
 
-    GenInfoRoute = () => (
-        <FollowUpsSingleGetInfoContainer
-            item={this.state.item}
-            contact={this.state.contact}
-            onNext={this.handleNextPress}
-            onChangeText={this.onChangeText}
-            onChangeDate={this.onChangeDate}
-            onChangeSwitch={this.onChangeSwitch}
-            onChangeDropDown={this.onChangeDropDown}
-        />
-    );
-    QuestRoute = () => (
-        <FollowUpsSingleQuestionnaireContainer
-            item={this.state.item}
-            contact={this.state.contact}
-            onChangeTextAnswer={this.onChangeTextAnswer}
-            onChangeSingleSelection={this.onChangeSingleSelection}
-            onChangeMultipleSelection={this.onChangeMultipleSelection}
-            onPressSave={this.handleOnPressSave}
-            onPressMissing={this.handleOnPressMissing}
-        />
-    );
+    // PersonalRoute = () => (
+    //     <ContactsSinglePersonal
+    //         contact={this.state.contact}
+    //         activeIndex={this.state.index}
+    //         onChangeText={this.handleOnChangeText}
+    //         onChangeDropDown={this.handleOnChangeDropDown}
+    //         onChangeDate={this.handleOnChangeDate}
+    //         onChangeSwitch={this.handleOnChangeSwitch}
+    //     />
+    // );
+    // AddressRoute = () => (
+    //     <ContactsSingleAddress
+    //         contact={this.state.contact}
+    //         activeIndex={this.state.index}
+    //         onChangeText={this.handleOnChangeText}
+    //         onChangeDropDown={this.handleOnChangeDropDown}
+    //         onChangeDate={this.handleOnChangeDate}
+    //         onChangeSwitch={this.handleOnChangeSwitch}
+    //         onChangeSectionedDropDown={this.handleOnChangeSectionedDropDown}
+    //         onDeletePress={this.handleOnDeletePress}
+    //         onPressAddAdrress={this.handleOnPressAddAdrress}
+    //     />
+    // );
+    // ExposureRoute = () => (
+    //     <ContactsSingleExposures
+    //         contact={this.state.contact}
+    //         activeIndex={this.state.index}
+    //     />
+    // );
+    // CalendarRoute = () => (
+    //     <ContactsSingleCalendar
+    //         contact={this.state.contact}
+    //         activeIndex={this.state.index}
+    //     />
+    // );
 
     // Please add here the react lifecycle methods that you need
     static getDerivedStateFromProps(props, state) {
@@ -75,9 +96,9 @@ class FollowUpsSingleScreen extends Component {
             Alert.alert(props.errors.type, props.errors.message, [
                 {
                     text: 'Ok', onPress: () => {
-                        state.savePressed = false;
-                        props.removeErrors()
-                    }
+                    state.savePressed = false;
+                    props.removeErrors()
+                }
                 }
             ])
         } else {
@@ -95,6 +116,7 @@ class FollowUpsSingleScreen extends Component {
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
+        console.log("### contact from render ContactSingleScreen: ", this.state.contact);
         return (
             <View style={style.container}>
                 <NavBarCustom
@@ -103,7 +125,7 @@ class FollowUpsSingleScreen extends Component {
                         <View
                             style={[style.breadcrumbContainer]}>
                             <Breadcrumb
-                                entities={['Follow-ups', ((this.props.contact && this.props.contact.firstName ? (this.props.contact.firstName + " ") : '') + (this.props.contact && this.props.contact.lastName ? this.props.contact.lastName : ''))]}
+                                entities={['Contacts', ((this.props.contact && this.props.contact.firstName ? (this.props.contact.firstName + " ") : '') + (this.props.contact && this.props.contact.lastName ? this.props.contact.lastName : ''))]}
                                 navigator={this.props.navigator}
                             />
                             <View>
@@ -115,8 +137,7 @@ class FollowUpsSingleScreen extends Component {
                                         </Ripple>
                                     }
                                 >
-                                    <MenuItem onPress={this.handleOnPressDeceased}>Deceased</MenuItem>
-                                    <MenuItem onPress={this.handleOnPressDelete}>Delete follow-up</MenuItem>
+                                    <MenuItem onPress={this.handleOnPressSave}>Save</MenuItem>
                                     <DateTimePicker
                                         isVisible={this.state.isDateTimePickerVisible}
                                         onConfirm={this._handleDatePicked}
@@ -133,12 +154,11 @@ class FollowUpsSingleScreen extends Component {
                 <TabView
                     navigationState={this.state}
                     onIndexChange={this.handleOnIndexChange}
-                    renderScene={SceneMap({
-                        genInfo: this.GenInfoRoute,
-                        quest: this.QuestRoute
-                    })}
+                    renderScene={this.renderScene}
                     renderTabBar={this.handleRenderTabBar}
+                    // renderPager={this.handleRenderPager}
                     useNativeDriver
+                    initialLayout={initialLayout}
                 />
             </View>
         );
@@ -155,12 +175,6 @@ class FollowUpsSingleScreen extends Component {
 
     handleOnIndexChange = (index) => {
         this.setState({index});
-    };
-
-    handleRenderScene = () => {
-
-        return 'test';
-
     };
 
     handleRenderTabBar = (props) => {
@@ -204,11 +218,73 @@ class FollowUpsSingleScreen extends Component {
         );
     };
 
+    handleRenderPager = (props) => {
+        return Platform.OS === 'ios' ? (
+            <PagerScroll {...props} swipeEnabled={false}/>
+        ) : (
+            <PagerAndroid {...props} swipeEnabled={false}/>
+        )
+    };
+
+    renderScene = ({route}) => {
+        switch(route.key) {
+            case 'personal':
+                return (
+                    <ContactsSinglePersonal
+                        contact={this.state.contact}
+                        activeIndex={this.state.index}
+                        onChangeText={this.handleOnChangeText}
+                        onChangeDropDown={this.handleOnChangeDropDown}
+                        onChangeDate={this.handleOnChangeDate}
+                        onChangeSwitch={this.handleOnChangeSwitch}
+                    />
+                );
+            case 'address':
+                return (
+                    <ContactsSingleAddress
+                        contact={this.state.contact}
+                        activeIndex={this.state.index}
+                        onChangeText={this.handleOnChangeText}
+                        onChangeDropDown={this.handleOnChangeDropDown}
+                        onChangeDate={this.handleOnChangeDate}
+                        onChangeSwitch={this.handleOnChangeSwitch}
+                        onChangeSectionedDropDown={this.handleOnChangeSectionedDropDown}
+                        onDeletePress={this.handleOnDeletePress}
+                        onPressAddAdrress={this.handleOnPressAddAdrress}
+                    />
+                );
+            case 'exposures':
+                return (
+                    <ContactsSingleExposures
+                        contact={this.state.contact}
+                        activeIndex={this.state.index}
+                    />
+                );
+            case 'calendar':
+                return (
+                    <ContactsSingleCalendar
+                        contact={this.state.contact}
+                        activeIndex={this.state.index}
+                    />
+                );
+            default:
+                return (
+                    <ContactsSinglePersonal
+                        contact={this.state.contact}
+                        onChangeText={this.handleOnChangeText}
+                        onChangeDropDown={this.handleOnChangeDropDown}
+                        onChangeDate={this.handleOnChangeDate}
+                        onChangeSwitch={this.handleOnChangeSwitch}
+                    />
+                );
+        }
+    };
+
     handleNextPress = () => {
         this.handleOnIndexChange(this.state.index + 1 );
     };
 
-    onChangeText = (value, id, objectType) => {
+    handleOnChangeText = (value, id, objectType) => {
         console.log("onChangeText: ", objectType);
         if (objectType === 'FollowUp') {
             this.setState(
@@ -227,11 +303,22 @@ class FollowUpsSingleScreen extends Component {
                         console.log("onChangeText", id, " ", value, " ", this.state.contact);
                     }
                 )
+            } else {
+                if (typeof objectType === 'number' && objectType >= 0) {
+                    // Change address drop down
+                    let addressesClone = _.cloneDeep(this.state.contact.addresses);
+                    addressesClone[objectType][id] = value && value.value ? value.value : value;
+                    this.setState(prevState => ({
+                        contact: Object.assign({}, prevState.contact, {addresses: addressesClone})
+                    }), () => {
+                        console.log("onChangeDropDown", id, " ", value, " ", this.state.contact);
+                    })
+                }
             }
         }
     };
 
-    onChangeDate = (value, id, objectType) => {
+    handleOnChangeDate = (value, id, objectType) => {
         console.log("onChangeDate: ", value, id);
 
         if (objectType === 'FollowUp') {
@@ -257,7 +344,7 @@ class FollowUpsSingleScreen extends Component {
         }
     };
 
-    onChangeSwitch = (value, id, objectType) => {
+    handleOnChangeSwitch = (value, id, objectType) => {
         // console.log("onChangeSwitch: ", value, id, this.state.item);
         if (id === 'fillGeoLocation') {
             navigator.geolocation.getCurrentPosition((position) => {
@@ -304,8 +391,8 @@ class FollowUpsSingleScreen extends Component {
 
     };
 
-    onChangeDropDown = (value, id, objectType) => {
-        // console.log("onChangeDropDown: ", value, id, this.state.item);
+    handleOnChangeDropDown = (value, id, objectType) => {
+        console.log("onChangeDropDown: ", value, id, objectType, this.state.contact);
         if (objectType === 'FollowUp' || id === 'address') {
             if (id === 'address') {
                 if (!this.state.item[id]) {
@@ -313,7 +400,7 @@ class FollowUpsSingleScreen extends Component {
                 }
 
                 let address = this.state.contact && this.state.contact.addresses &&
-                                Array.isArray(this.state.contact.addresses) && this.state.contact.addresses.length > 0 ? this.state.contact.addresses.filter((e) => {
+                Array.isArray(this.state.contact.addresses) && this.state.contact.addresses.length > 0 ? this.state.contact.addresses.filter((e) => {
                     return value.includes(e.addressLine1 || '') && value.includes(e.addressLine2 || '') && value.includes(e.city || '') && value.includes(e.country || '') && value.includes(e.postalCode || '');
                 })
                     : [];
@@ -328,7 +415,7 @@ class FollowUpsSingleScreen extends Component {
             } else {
                 this.setState(
                     (prevState) => ({
-                        item: Object.assign({}, prevState.item, {[id]: value && value.value ? value.value : value})
+                        item: Object.assign({}, prevState.item, {[id]: value})
                     }), () => {
                         console.log("onChangeDropDown", id, " ", value, " ", this.state.item);
                     }
@@ -344,8 +431,28 @@ class FollowUpsSingleScreen extends Component {
                         console.log("onChangeDropDown", id, " ", value, " ", this.state.contact);
                     }
                 )
+            } else {
+                if (typeof objectType === 'number' && objectType >= 0) {
+                    // Change address drop down
+                    let addressesClone = _.cloneDeep(this.state.contact.addresses);
+                    addressesClone[objectType][id] = value && value.value ? value.value : value;
+                    this.setState(prevState => ({
+                        contact: Object.assign({}, prevState.contact, {addresses: addressesClone})
+                    }), () => {
+                        console.log("onChangeDropDown", id, " ", value, " ", this.state.contact);
+                    })
+                }
             }
         }
+    };
+
+    handleOnChangeSectionedDropDown = (selectedItems, index) => {
+        // Here selectedItems is always an array with just one value and should pe mapped to the locationId field from the address from index
+        let addresses = _.cloneDeep(this.state.contact.addresses);
+        addresses[index].locationId = selectedItems;
+        this.setState(prevState => ({
+            contact: Object.assign({}, prevState.contact, {addresses})
+        }))
     };
 
     onChangeTextAnswer = (value, id) => {
@@ -372,7 +479,7 @@ class FollowUpsSingleScreen extends Component {
         this.setState(prevState => ({
             item: Object.assign({}, prevState.item, {questionnaireAnswers: questionnaireAnswers})
         }))
-    };
+    };K
 
     onChangeMultipleSelection = (selections, id) => {
         let itemClone = Object.assign({}, this.state.item);
@@ -388,25 +495,44 @@ class FollowUpsSingleScreen extends Component {
     };
 
     handleOnPressSave = () => {
-        // Mark followUp as performed, and then update to the server
-        this.setState(prevState => ({
-            item: Object.assign({}, prevState.item, {performed: true}),
-            savePressed: true
-        }), () => {
-            if (this.props.isNew) {
-                this.props.addFollowUp(this.props.outbreak.id, this.state.contact.id, this.state.item, this.props.user.token);
-            } else {
-                this.props.updateFollowUpAndContact(this.props.outbreak.id, this.state.contact.id, this.state.item.id, this.state.item, this.state.contact, this.props.user.token);
-            }
-        });
+        // Check the required fields and then update the contact
+        if (this.checkRequiredFields()) {
+            this.setState({
+                savePressed: true
+            }, () => {
+                this.props.updateContact(this.props.user.activeOutbreakId, this.state.contact.id, this.state.contact, this.props.user.token);
+            });
+        } else {
+            Alert.alert("Validation error", 'Some of the required fields are missing. Please make sure you have completed them', [
+                {
+                    text: 'Ok', onPress: () => {console.log("Ok pressed")}
+                }
+            ])
+        }
     };
 
-    handleOnPressMissing = () => {
-        this.setState(prevState => ({
-            item: Object.assign({}, prevState.item, {lostToFollowUp: true})
-        }), () => {
-            this.handleOnPressSave();
-        })
+    checkRequiredFields = () => {
+        // First check the personal info
+        for(let i=0; i<config.contactsSingleScreen.personal.length; i++) {
+            for (let j=0; j<config.contactsSingleScreen.personal[i].fields.length; j++) {
+                if (config.contactsSingleScreen.personal[i].fields[j].isRequired && !this.state.contact[config.contactsSingleScreen.personal[i].fields[j].id]) {
+                    return false;
+                }
+            }
+        }
+
+        // Check for every address that it has all the required fields completed
+        if (this.state.contact && this.state.contact.addresses && Array.isArray(this.state.contact.addresses) && this.state.contact.addresses.length > 0) {
+            for (let i=0; i < this.state.contact.addresses.length; i++) {
+                for (let j=0; j<config.contactsSingleScreen.address.fields.length; j++) {
+                    if (config.contactsSingleScreen.address.fields[j].isRequired && !this.state.contact.addresses[i][config.contactsSingleScreen.address.fields[j].id]) {
+                        return false;
+                    }
+                }
+            }
+        }
+
+        return true;
     };
 
     showMenu = () => {
@@ -415,33 +541,6 @@ class FollowUpsSingleScreen extends Component {
 
     hideMenu = () => {
         this.refs.menuRef.hide();
-    };
-
-    handleOnPressDeceased = () => {
-        console.log("### show date time picker: ");
-        this._showDateTimePicker();
-    };
-
-    handleOnPressDelete = () => {
-        // console.log("### handleOnPressDelete");
-        Alert.alert("Alert", 'Are you sure you want to delete this follow-up?', [
-            {
-                text: 'Yes', onPress: () => {
-                    this.hideMenu();
-                    this.setState({
-                        deletePressed: true
-                    }, () => {
-                        // console.log("### existing filters: ", this.props.filter);
-                        this.props.deleteFollowUp(this.props.outbreak.id, this.state.contact.id, this.state.item.id, this.props.filter, this.props.user.token);
-                    })
-            }
-            },
-            {
-                text: 'No', onPress: () => {
-                    this.hideMenu();
-            }
-            }
-        ])
     };
 
     _showDateTimePicker = () => {
@@ -462,6 +561,42 @@ class FollowUpsSingleScreen extends Component {
             this.hideMenu();
             this.handleOnPressSave();
         });
+    };
+
+    handleOnDeletePress = (index) => {
+        console.log("DeletePressed: ", index);
+        let contactAddressesClone = _.cloneDeep(this.state.contact.addresses);
+        contactAddressesClone.splice(index, 1);
+        this.setState(prevState => ({
+            contact: Object.assign({}, prevState.contact, {addresses: contactAddressesClone})
+        }), () => {
+            console.log("After deleting the address: ", this.state.contact);
+        })
+    };
+
+    handleOnPressAddAdrress = () => {
+        let addresses = _.cloneDeep(this.state.contact.addresses);
+
+        addresses.push({
+            typeId: '',
+            country: '',
+            city: '',
+            addressLine1: '',
+            addressLine2: '',
+            postalCode: '',
+            locationId: '',
+            geoLocation: {
+                lat: 0,
+                lng: 0
+            },
+            date: new Date()
+        });
+
+        this.setState(prevState => ({
+            contact: Object.assign({}, prevState.contact, {addresses})
+        }), () => {
+            console.log("### after updating the data: ", this.state.contact);
+        })
     };
 }
 
@@ -502,4 +637,4 @@ function matchDispatchProps(dispatch) {
     }, dispatch);
 }
 
-export default connect(mapStateToProps, matchDispatchProps)(FollowUpsSingleScreen);
+export default connect(mapStateToProps, matchDispatchProps)(ContactsSingleScreen);

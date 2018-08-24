@@ -13,6 +13,7 @@ import FollowUpsFilterScreen from './FollowUpsFilterScreen';
 import FollowUpsSingleScreen from './FollowUpsSingleScreen';
 import CasesScreen from './CasesScreen';
 import ContactsScreen from './ContactsScreen';
+import ContactsSingleScreen from './ContactsSingleScreen';
 import ExposureScreen from './ExposureScreen';
 
 const screens = [
@@ -24,6 +25,7 @@ const screens = [
     {screen: 'FollowUpsSingleScreen', component: FollowUpsSingleScreen},
     {screen: 'CasesScreen', component: CasesScreen},
     {screen: 'ContactsScreen', component: ContactsScreen},
+    {screen: 'ContactsSingleScreen', component: ContactsSingleScreen},
     {screen: 'ExposureScreen', component: ExposureScreen}
 ];
 

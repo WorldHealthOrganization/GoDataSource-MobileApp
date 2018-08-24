@@ -35,7 +35,7 @@ export function saveTranslation(translation) {
     return {
         type: ACTION_TYPE_SAVE_TRANSLATION,
         translation: translation
-    };
+    }
 }
 
 export function addFilterForScreen(screenName, filter) {
@@ -52,8 +52,33 @@ export function removeFilterForScreen(screenName) {
     }
 }
 
+// export function getTranslations(dispatch) {
+//     return new Promise((resolve, reject) => {
+//         let language = '';
+//         if (Platform.OS === 'ios') {
+//             language = NativeModules.SettingsManager.settings.AppleLocale;
+//         } else {
+//             language = NativeModules.I18nManager.localeIdentifier;
+//         }
+//
+//         if (language === 'en_US') {
+//             language = 'english_us';
+//         }
+//
+//         getTranslationRequest(language, (error, response) => {
+//             if (error) {
+//                 console.log("*** addExposureForContact error: ", error);
+//             }
+//             if (response) {
+//                 dispatch(saveTranslation(response));
+//                 resolve();
+//             }
+//         })
+//     })
+// }
+
 export function getTranslations() {
-    return async function (dispatch, getState) {
+    return async function (dispatch) {
         let language = '';
         if (Platform.OS === 'ios') {
             language = NativeModules.SettingsManager.settings.AppleLocale;
@@ -70,7 +95,6 @@ export function getTranslations() {
                 console.log("*** addExposureForContact error: ", error);
             }
             if (response) {
-                console.log("Response from add exposure");
                 dispatch(saveTranslation(response));
             }
         })
@@ -89,12 +113,28 @@ export function appInitialized() {
 
         // Get the translations from the api and save them to the redux store
         dispatch(getTranslations());
-
         // dispatch(changeAppRoot('login'));
-        // Login to skip the first step. Only for develop mode
+
         dispatch(loginUser({
             email: 'florin.popa@clarisoft.com',
             password: 'Cl@r1soft'
-        }))
+        }));
+
+
+        // I don't think we need this in production since before the user logs in, the translations should be already saved
+        // TODO comment what's below and uncomment the code above
+        // getTranslations(dispatch)
+        //     .then(() => {
+        //         console.log('Saved?');
+        //         // dispatch(changeAppRoot('login'));
+        //         // Login to skip the first step. Only for develop mode
+        //         dispatch(loginUser({
+        //             email: 'florin.popa@clarisoft.com',
+        //             password: 'Cl@r1soft'
+        //         }))
+        //     })
+        //     .catch(() => {
+        //         console.log("Error?");
+        //     })
     }
 }

@@ -1,77 +1,83 @@
 /**
- * Created by florinpopa on 25/07/2018.
+ * Created by florinpopa on 21/08/2018.
  */
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
-import React, {PureComponent} from 'react';
-import {TextInput, View, Text, StyleSheet, FlatList} from 'react-native';
+import React, {Component} from 'react';
+import {View, StyleSheet, InteractionManager} from 'react-native';
 import {calculateDimension} from './../utils/functions';
 import config from './../utils/config';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import styles from './../styles';
-import CardComponent from './../components/CardComponent';
-import Button from './../components/Button';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import CardComponent from './../components/CardComponent';
+import {LoaderScreen} from 'react-native-ui-lib';
 
-class FollowUpsFiltersContainer extends PureComponent {
+class ContactsSinglePersonal extends Component {
 
     // This will be a container, so put as less business logic here as possible
     constructor(props) {
         super(props);
         this.state = {
+            interactionComplete: false
         };
     }
 
     // Please add here the react lifecycle methods that you need
+    // shouldComponentUpdate(nextProps, nextState) {
+    //     // console.log("NextPropsIndex ContactsSinglePersonal: ", nextProps.activeIndex, this.props.activeIndex);
+    //     return nextProps.activeIndex === 0;
+    // }
 
+    componentWillMount() {
+        InteractionManager.runAfterInteractions(() => {
+            this.setState({
+                interactionComplete: true
+            })
+        })
+    }
 
     // The render method should have at least business logic as possible,
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
+        if (!this.state.interactionComplete) {
+            return (
+                <LoaderScreen overlay/>
+            )
+        }
 
         return (
-            <View style={style.container}>
-                <Button
-                    title={'Next'}
-                    onPress={this.props.onNext}
-                    color={styles.buttonGreen}
-                    titleColor={'white'}
-                    height={calculateDimension(25, true, this.props.screenSize)}
-                    width={calculateDimension(166, false, this.props.screenSize)}
-                    style={{
-                        marginVertical: calculateDimension(12.5, true, this.props.screenSize)
-                    }}
-                />
-                <KeyboardAwareScrollView
-                    style={style.containerScrollView}
-                    contentContainerStyle={[style.contentContainerStyle, {paddingBottom: this.props.screenSize.height < 600 ? 70 : 20}]}
-                    keyboardShouldPersistTaps={'always'}
-                >
+            <KeyboardAwareScrollView
+                style={style.containerScrollView}
+                contentContainerStyle={[style.contentContainerStyle, {paddingBottom: this.props.screenSize.height < 600 ? 70 : 20}]}
+                keyboardShouldPersistTaps={'always'}
+            >
+                <View style={style.container}>
                     {
-                        config.followUpsSingleScreen.generalInfo.map((item) => {
+                        config.contactsSingleScreen.personal.map((item) => {
                             return this.handleRenderItem(item)
                         })
                     }
-                </KeyboardAwareScrollView>
-            </View>
+                </View>
+            </KeyboardAwareScrollView>
         );
     }
 
     // Please write here all the methods that are not react native lifecycle methods
     handleRenderItem = (item) => {
-        // console.log("Item: ", item);
+        // console.log("Item: ", item, this.props.contact);
         return (
             <CardComponent
                 item={item.fields}
-                followUp={this.props.item}
                 contact={this.props.contact}
                 style={style.cardStyle}
+                screen={'ContactsSingleScreen'}
                 onChangeText={this.props.onChangeText}
+                onChangeDropDown={this.props.onChangeDropDown}
                 onChangeDate={this.props.onChangeDate}
                 onChangeSwitch={this.props.onChangeSwitch}
-                onChangeDropDown={this.props.onChangeDropDown}
             />
         )
     }
@@ -81,11 +87,6 @@ class FollowUpsFiltersContainer extends PureComponent {
 // Create style outside the class, or for components that will be used by other components (buttons),
 // make a global style in the config directory
 const style = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: styles.screenBackgroundGrey,
-        alignItems: 'center',
-    },
     cardStyle: {
         marginVertical: 4,
         flex: 1
@@ -97,11 +98,18 @@ const style = StyleSheet.create({
     contentContainerStyle: {
         alignItems: 'center'
     },
+    container: {
+        flex: 1,
+        marginBottom: 30
+    }
 });
 
 function mapStateToProps(state) {
     return {
-        screenSize: state.app.screenSize
+        screenSize: state.app.screenSize,
+        contacts: state.contacts,
+        cases: state.cases,
+        events: state.events
     };
 }
 
@@ -110,4 +118,4 @@ function matchDispatchProps(dispatch) {
     }, dispatch);
 }
 
-export default connect(mapStateToProps, matchDispatchProps)(FollowUpsFiltersContainer);
+export default connect(mapStateToProps, matchDispatchProps)(ContactsSinglePersonal);

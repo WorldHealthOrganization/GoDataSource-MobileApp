@@ -66,6 +66,7 @@ class DropDownSectioned extends Component {
                         cancelButton: {backgroundColor: stylesGlobal.missedRedColor},
                         selectToggle: {borderBottomColor: stylesGlobal.textFieldUnderline, borderBottomWidth: 1}
                     }}
+                    single={this.props.single}
                 />
             </View>
         );
@@ -74,7 +75,7 @@ class DropDownSectioned extends Component {
     // Please write here all the methods that are not react native lifecycle methods;
 
     onSelectedItemsChange = (selectedItems) => {
-        this.props.onChange(selectedItems);
+        this.props.onChange(selectedItems, this.props.index);
     };
 }
 

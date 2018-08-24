@@ -6,19 +6,21 @@ import {handleResponse} from './../utils/functions';
 
 export function getLocationsRequest(countries, token, callback) {
 
-    let filter = {};
+    // let filter = {};
+    //
+    // if (countries && Array.isArray(countries) && countries.length > 0) {
+    //     filter = {
+    //         where: {
+    //             name: {
+    //                 inq: countries
+    //             }
+    //         }
+    //     };
+    // }
 
-    if (countries && Array.isArray(countries) && countries.length > 0) {
-        filter = {
-            where: {
-                name: {
-                    inq: countries
-                }
-            }
-        };
-    }
+    // let requestUrl = url.getLocationsUrl() + '/hierarchical?filter=' + JSON.stringify(filter);
 
-    let requestUrl = url.getLocationsUrl() + '/hierarchical?filter=' + JSON.stringify(filter);
+    let requestUrl = url.getLocationsUrl() + '/hierarchical';
 
     fetch(requestUrl, {
         method: 'GET',

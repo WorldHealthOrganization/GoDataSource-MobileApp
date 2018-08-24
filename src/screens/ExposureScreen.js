@@ -131,18 +131,18 @@ class ExposureScreen extends Component {
                         onChangeText={this.handleOnChangeText}
                         onChangeSwitch={this.handleOnChangeSwitch}
                     />
-                    <View style={[style.buttonContainer, {
-                        marginHorizontal: calculateDimension(16, false, this.props.screenSize),
-                        width: calculateDimension(config.designScreenSize.width - 32, false, this.props.screenSize),
-                    }]}>
-                        <Button
-                            title="Add Another Exposure"
-                            color="white"
-                            onPress={this.handleAddAnotherExposure}
-                            height={25}
-                            width={'100%'}
-                        />
-                    </View>
+                    {/*<View style={[style.buttonContainer, {*/}
+                        {/*marginHorizontal: calculateDimension(16, false, this.props.screenSize),*/}
+                        {/*width: calculateDimension(config.designScreenSize.width - 32, false, this.props.screenSize),*/}
+                    {/*}]}>*/}
+                        {/*<Button*/}
+                            {/*title="Add Another Exposure"*/}
+                            {/*color="white"*/}
+                            {/*onPress={this.handleAddAnotherExposure}*/}
+                            {/*height={25}*/}
+                            {/*width={'100%'}*/}
+                        {/*/>*/}
+                    {/*</View>*/}
                 </ScrollView>
             </View>
         );

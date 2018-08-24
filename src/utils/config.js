@@ -68,6 +68,7 @@ const followUpsSingleScreen = {
                     cardNumber: 1,
                     id: 'riskLevel',
                     label: 'Risk level',
+                    labelValue: 'test',
                     type: 'DropdownInput',
                     value: '',
                     isRequired: false,
@@ -447,36 +448,43 @@ const contactsSingleScreen = {
                     cardNumber: 1,
                     id: 'firstName',
                     label: 'First Name',
+                    labelValue: 'test',
                     type: 'TextInput',
                     value: '',
                     isRequired: true,
                     isEditMode: true,
-                    multiline: false
+                    multiline: false,
+                    objectType: 'Contact'
                 },
                 {
                     cardNumber: 1,
                     id: 'middleName',
                     label: 'Middle Name',
+                    labelValue: 'test',
                     type: 'TextInput',
                     value: '',
                     isRequired: true,
                     isEditMode: true,
-                    multiline: false
+                    multiline: false,
+                    objectType: 'Contact'
                 },
                 {
                     cardNumber: 1,
                     id: 'lastName',
                     label: 'Last Name',
+                    labelValue: 'test',
                     type: 'TextInput',
                     value: '',
                     isRequired: true,
                     isEditMode: true,
-                    multiline: false
+                    multiline: false,
+                    objectType: 'Contact'
                 },
                 {
                     cardNumber: 1,
                     id: 'gender',
                     label: 'Gender',
+                    labelValue: 'test',
                     type: 'DropdownInput',
                     value: '',
                     isRequired: true,
@@ -487,53 +495,62 @@ const contactsSingleScreen = {
                     cardNumber: 1,
                     id: 'phoneNumber',
                     label: 'Phone Number',
+                    labelValue: 'test',
                     type: 'TextInput',
                     value: '',
                     isRequired: true,
                     isEditMode: true,
-                    multiline: false
+                    multiline: false,
+                    objectType: 'Contact'
                 },
                 {
                     cardNumber: 1,
                     id: 'occupation',
+                    labelValue: 'test',
                     label: 'Occupation',
                     type: 'TextInput',
                     value: '',
                     isRequired: true,
                     isEditMode: true,
-                    multiline: false
+                    multiline: false,
+                    objectType: 'Contact'
                 },
                 {
                     cardNumber: 3,
                     id: 'dob',
                     label: 'Date of birth',
+                    labelValue: 'test',
                     value: '',
                     type: "DatePicker",
                     isRequired: true,
                     isEditMode: true,
-                    format: 'MM/dd/YYYY'
+                    format: 'MM/dd/YYYY',
+                    objectType: 'Contact'
                 },
                 {
                     cardNumber: 3,
                     id: 'dateOfReporting',
                     label: 'Date of Reporting',
+                    labelValue: 'test',
                     value: '',
                     type: "DatePicker",
                     isRequired: true,
                     isEditMode: true,
-                    format: 'MM/dd/YYYY'
+                    format: 'MM/dd/YYYY',
+                    objectType: 'Contact'
                 },
                 {
                     cardNumber: 3,
                     id: 'isDateOfReportingApproximate',
                     label: 'Is date of reporting approximate?',
+                    labelValue: 'test',
                     type: 'SwitchInput',
                     value: false,
                     isRequired: false,
                     isEditMode: true,
                     activeButtonColor: 'green',
                     activeBackgroundColor: 'green',
-                    objectType: 'FollowUp'
+                    objectType: 'Contact'
                 },
             ]
         },
@@ -543,6 +560,7 @@ const contactsSingleScreen = {
                     cardNumber: 1,
                     id: 'riskLevel',
                     label: 'Risk level',
+                    labelValue: 'test',
                     type: 'DropdownInput',
                     value: '',
                     isRequired: false,
@@ -555,16 +573,90 @@ const contactsSingleScreen = {
                     cardNumber: 1,
                     id: 'riskReason',
                     label: 'Reason',
+                    labelValue: 'test',
                     type: 'TextInput',
                     value: '',
-                    isRequired: true,
+                    isRequired: false,
                     isEditMode: true,
                     multiline: true,
                     objectType: 'Contact'
                 }
             ]
         }
-    ]
+    ],
+    address: {
+        fields: [
+            {
+                cardNumber: 1,
+                id: 'name',
+                label: 'Name',
+                labelValue: 'test',
+                type: 'DropdownInput',
+                value: '',
+                isRequired: true,
+                isEditMode: true,
+                objectType: 'Address'
+            },
+            {
+                cardNumber: 1,
+                id: 'locationId',
+                label: 'Area',
+                labelValue: 'test',
+                type: 'DropDownSectioned',
+                value: '',
+                isRequired: true,
+                isEditMode: true,
+                objectType: 'Address',
+                single: true
+            },
+            {
+                cardNumber: 1,
+                id: 'city',
+                label: 'City',
+                labelValue: 'test',
+                type: 'TextInput',
+                value: '',
+                isRequired: true,
+                isEditMode: true,
+                multiline: true,
+                objectType: 'Address'
+            },
+            {
+                cardNumber: 1,
+                id: 'postalCode',
+                label: 'ZIP',
+                labelValue: 'test',
+                type: 'TextInput',
+                value: '',
+                isRequired: true,
+                isEditMode: true,
+                multiline: true,
+                objectType: 'Address'
+            },
+            {
+                cardNumber: 1,
+                id: 'addressLine1',
+                label: 'Address',
+                labelValue: 'test',
+                type: 'TextInput',
+                value: '',
+                isRequired: true,
+                isEditMode: true,
+                multiline: true,
+                objectType: 'Address'
+            },
+            {
+                cardNumber: 1,
+                id: 'deleteButton',
+                type: 'ActionsBar',
+                labelValue: 'test',
+                textsArray: ['Delete'],
+                textsStyleArray: [{color: styles.missedRedColor}],
+                onPressArray: [],
+                objectType: 'Address'
+            }
+        ]
+    }
 };
 
 export default {
