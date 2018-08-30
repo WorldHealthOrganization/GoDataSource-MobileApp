@@ -59,7 +59,9 @@ class NavigationDrawer extends Component {
                                     key={index}
                                     label={item.label} name={item.name}
                                     onPress={() => this.handlePressOnListItem(index)}
+                                    handleOnPressAdd={() => this.handleOnPressAdd(item.key, index)}
                                     isSelected={index === this.state.selectedScreen}
+                                    addButton={item.addButton}
                                 />
                             )
                         })
@@ -92,6 +94,35 @@ class NavigationDrawer extends Component {
                 link: 'Navigate/' + index
             })
         });
+    };
+
+    handleOnPressAdd = (key, index) => {
+        console.log(key, index);
+        this.setState({
+            selectedScreen: index
+        }, () => {
+            this.props.navigator.toggleDrawer({
+                side: 'left',
+                animated: true,
+                to: 'missing'
+            });
+            switch(key) {
+                case 'contacts':
+                    this.props.navigator.handleDeepLink({
+                        link: 'Navigate/' + index
+                    });
+                    break;
+                case 'cases':
+                    this.props.navigator.handleDeepLink({
+                        link: 'Navigate/' + index + '-add'
+                    });
+                    break;
+                default:
+                    console.log('Add something from drawer');
+                    break;
+            }
+        });
+
     };
 
     handleLogout = () => {

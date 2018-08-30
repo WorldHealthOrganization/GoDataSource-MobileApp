@@ -56,6 +56,7 @@ class Breadcrumb extends PureComponent {
                     this.props.entities.map((item, index) => {
                         return (
                             <Crumb
+                                key={index}
                                 text={item}
                                 index={index}
                                 isCrumbActive={this.state.index === index}
