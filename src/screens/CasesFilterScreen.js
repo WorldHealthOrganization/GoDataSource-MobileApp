@@ -34,7 +34,7 @@ class CasesFilterScreen extends Component {
                     },
                     age: [0, 100],
                     selectedLocations: [],
-                    exposure: []
+                    classification: []
                 },
                 sort: []
             },
@@ -216,6 +216,14 @@ class CasesFilterScreen extends Component {
         if (filterStateClone.age) {
             filter.where.and.push({age: {gte: filterStateClone.age[0]}});
             filter.where.and.push({age: {lte: filterStateClone.age[1]}});
+        }
+
+        if(filterStateClone.classification){
+            if(filterStateClone.classification.length > 0){
+                filterStateClone.classification.map((item,index) =>{
+                    filter.where.and.push({classification: item.value});
+                })
+            }
         }
 
         this.props.addFilterForScreen('CasesFilterScreen', filter);

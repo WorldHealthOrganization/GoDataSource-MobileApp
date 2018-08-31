@@ -309,6 +309,27 @@ const casesFilterScreen = {
                 }
             ]
         },
+        {
+            fields: [
+                {
+                    cardNumber: 4,
+                    label: 'Classification',
+                    type: 'Section',
+                    hasBorderBottom: true,
+                    borderBottomColor: styles.navigationDrawerSeparatorGrey
+                },
+                {
+                    cardNumber: 4,
+                    id: 'classification',
+                    label: 'Choose one or more classification',
+                    type: 'DropDown',
+                    value: '',
+                    // data: [{value: 'Diana Jones'}, {value: 'Florin Popa'}],
+                    isRequired: false,
+                    isEditMode: true
+                }
+            ]
+        }
     ]
 };
 

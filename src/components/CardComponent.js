@@ -137,6 +137,10 @@ class CardComponent extends Component {
                 data = this.props.cases.map((e) => {return {label: ((e.firstName ? e.firstName : '') + (e.lastName ? (" " + e.lastName) : '')), value: e.id}})
                 value = this.props.filter.filter[item.id];
             }
+            if (item.type === 'DropDown' && item.id == 'classification') {
+                data = this.computeDataForDropdown(item);
+                value = this.props.filter.filter[item.id];
+            }
         }
 
         if (this.props.screen === 'ExposureScreen') {
@@ -358,6 +362,12 @@ class CardComponent extends Component {
             return _.filter(this.props.referenceData, (o) => {
                 return o.categoryId.includes("RISK_LEVEL")
             }).map((o) => {return {value: this.getTranslation(o.value), id: o.value}})
+        }
+
+        if (item.id === 'classification') {
+            return _.filter(this.props.referenceData, (o) => {
+                return o.categoryId.includes("CASE_CLASSIFICATION")
+            }).map((o) => {return {label: this.getTranslation(o.value), value: o.value}})
         }
 
         return [];
