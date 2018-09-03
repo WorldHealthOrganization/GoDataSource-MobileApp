@@ -295,6 +295,7 @@ class ContactsScreen extends Component {
                 console.log("### linkComponents: ", linkComponents);
                 if (linkComponents.length > 0) {
                     let screenToSwitchTo = null;
+                    let addScreen = null;
                     switch(linkComponents[1]) {
                         case '0':
                             screenToSwitchTo = 'FollowUpsScreen';
@@ -305,15 +306,29 @@ class ContactsScreen extends Component {
                         case '2':
                             screenToSwitchTo = "CasesScreen";
                             break;
+                        case '2-add':
+                            screenToSwitchTo = "CasesScreen";
+                            addScreen = "AddSingleCaseScreen";
+                            break;
                         default:
                             screenToSwitchTo = "FollowUpsScreen";
                             break;
                     }
-                    console.log("Screen index: ", screenToSwitchTo);
                     this.props.navigator.resetTo({
                         screen: screenToSwitchTo,
                         animated: true
-                    })
+                    });
+                    if(addScreen) {
+                        this.props.navigator.push({
+                            screen: addScreen,
+                            animated: true,
+                            animationType: 'fade',
+                            passProps: {
+                                item: {},
+                                filter: null
+                            }
+                        })
+                    }
                 }
             }
         }

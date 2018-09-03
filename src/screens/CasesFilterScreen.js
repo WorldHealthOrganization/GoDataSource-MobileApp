@@ -12,11 +12,10 @@ import {calculateDimension} from './../utils/functions';
 import config from './../utils/config';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
-import {getContactsForOutbreakId} from './../actions/contacts';
-import {addFilterForScreen} from './../actions/app';
+import {addFilterForScreen, removeFilterForScreen} from './../actions/app';
 import {TabBar, TabView, PagerScroll} from 'react-native-tab-view';
-import FollowUpsFiltersContainer from './../containers/FollowUpsFiltersContainer';
-import FollowUpsSortContainer from './../containers/FollowUpsSortContainer';
+import CasesFiltersContainer from './../containers/CasesFiltersContainer';
+import CasesSortContainer from './../containers/CasesSortContainer';
 
 class CasesFilterScreen extends Component {
 
@@ -35,11 +34,11 @@ class CasesFilterScreen extends Component {
                     },
                     age: [0, 100],
                     selectedLocations: [],
-                    exposure: []
+                    classification: []
                 },
                 sort: []
             },
-            routes: config.tabsValuesRoutes.followUpsFilter,
+            routes: config.tabsValuesRoutes.casesFilter,
             index: 0
         };
         // Bind here methods, or at least don't declare methods in the render method
@@ -62,6 +61,7 @@ class CasesFilterScreen extends Component {
             }
             console.log("### Active filters: ", filterClone);
         }
+        return null;
     }
 
     // The render method should have at least business logic as possible,
@@ -90,9 +90,8 @@ class CasesFilterScreen extends Component {
 
     // Please write here all the methods that are not react native lifecycle methods
     handlePressNavbarButton = () => {
-        this.props.navigator.dismissModal(
-            this.props.onApplyFilters(config.defaultFilterForCases)
-        );
+        this.props.removeFilterForScreen('CasesFilterScreen');
+        this.props.navigator.dismissModal(this.props.onApplyFilters(config.defaultFilterForCases));
     };
 
     handleOnIndexChange = (index) => {
@@ -102,7 +101,7 @@ class CasesFilterScreen extends Component {
     handleRenderScene = () => {
         if (this.state.index === 0) {
             return (
-                <FollowUpsFiltersContainer
+                <CasesFiltersContainer
                     filter={this.state.filter}
                     onSelectItem={this.handleOnSelectItem}
                     onChangeSectionedDropDown={this.handleOnChangeSectionedDropDown}
@@ -113,8 +112,9 @@ class CasesFilterScreen extends Component {
             )
         } else {
             return (
-                <FollowUpsSortContainer
+                <CasesSortContainer
                     filter={this.state.filter}
+                    key={this.state.index}
                 />
             )
         }
@@ -218,6 +218,13 @@ class CasesFilterScreen extends Component {
             filter.where.and.push({age: {lte: filterStateClone.age[1]}});
         }
 
+        if(filterStateClone.classification){
+            if(filterStateClone.classification.length > 0){
+                filterStateClone.classification.map((item,index) =>{
+                    filter.where.and.push({classification: item.value});
+                })
+            }
+        }
 
         this.props.addFilterForScreen('CasesFilterScreen', filter);
 
@@ -238,14 +245,14 @@ function mapStateToProps(state) {
     return {
         user: state.user,
         screenSize: state.app.screenSize,
-        followUps: state.followUps
+        cases: state.cases
     };
 }
 
 function matchDispatchProps(dispatch) {
     return bindActionCreators({
-        getContactsForOutbreakId,
-        addFilterForScreen
+        addFilterForScreen,
+        removeFilterForScreen
     }, dispatch);
 }
 

@@ -41,7 +41,7 @@ class CardComponent extends Component {
 
     // Please add here the react lifecycle methods that you need
     shouldComponentUpdate(nextProps, nextState) {
-        if (nextProps.screen === 'FollowUpsFilter') {
+        if (nextProps.screen === 'FollowUpsFilter' || nextProps.screen === 'CasesFilter') {
             if (nextProps && nextProps.item && nextProps.item[1] && this.props && this.props.item && this.props.item[1] && nextProps.item[1].type === 'Selector' && nextProps.item[1].id === 'gender') {
                 // console.log("Return true for selector: ", nextProps.filter.filter[nextProps.item[1].id], this.props.filter.filter[this.props.item[1].id]);
                 return true;
@@ -81,8 +81,8 @@ class CardComponent extends Component {
             }, this.props.style]}>
                 <ScrollView scrollEnabled={false} style={{flex: 1}} contentContainerStyle={{flexGrow: 1}}>
                     {
-                        this.props && this.props.item && this.props.item.map((item) => {
-                            return this.handleRenderItem(item);
+                        this.props && this.props.item && this.props.item.map((item, index) => {
+                            return this.handleRenderItem(item,index);
                         })
                     }
                 </ScrollView>
@@ -91,12 +91,12 @@ class CardComponent extends Component {
     }
 
     // Please write here all the methods that are not react native lifecycle methods
-    handleRenderItem = (item) => {
+    handleRenderItem = (item, index) => {
         // item = item.item;
         return (
             <View style={[style.containerCardComponent, {
                 flex: 1
-            }]}>
+            }]} key={index}>
                 {
                    this.handleRenderItemByType(item)
                 }
@@ -121,7 +121,7 @@ class CardComponent extends Component {
             value = this.computeValueForId(item.type, item.id, followUp, contact);
         }
 
-        if (this.props.screen === 'FollowUpsFilter') {
+        if (this.props.screen === 'FollowUpsFilter' || this.props.screen === 'CasesFilter') {
             if (item.type === 'Selector' && item.id === 'gender') {
                 item.data = item.data.map((e) => {return {value: e.value, selected: this.props.filter && this.props.filter.filter && this.props.filter.filter.gender && this.props.filter.filter.gender[e.value] ? true : false}})
             }
@@ -135,6 +135,10 @@ class CardComponent extends Component {
 
             if (item.type === 'DropDown' && item.id === 'exposure') {
                 data = this.props.cases.map((e) => {return {label: ((e.firstName ? e.firstName : '') + (e.lastName ? (" " + e.lastName) : '')), value: e.id}})
+                value = this.props.filter.filter[item.id];
+            }
+            if (item.type === 'DropDown' && item.id == 'classification') {
+                data = this.computeDataForDropdown(item);
                 value = this.props.filter.filter[item.id];
             }
         }
@@ -358,6 +362,12 @@ class CardComponent extends Component {
             return _.filter(this.props.referenceData, (o) => {
                 return o.categoryId.includes("RISK_LEVEL")
             }).map((o) => {return {value: this.getTranslation(o.value), id: o.value}})
+        }
+
+        if (item.id === 'classification') {
+            return _.filter(this.props.referenceData, (o) => {
+                return o.categoryId.includes("CASE_CLASSIFICATION")
+            }).map((o) => {return {label: this.getTranslation(o.value), value: o.value}})
         }
 
         return [];

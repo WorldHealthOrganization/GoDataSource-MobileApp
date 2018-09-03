@@ -15,19 +15,21 @@ const designScreenSize = {
 
 const sideMenuItems = [
     {
-    key: 'followups',
+        key: 'followups',
         name: 'update',
         label: 'Follow-ups'
     },
     {
         key: 'contacts',
         name: 'people',
-        label: 'Contacts'
+        label: 'Contacts',
+        addButton: true
     },
     {
         key: 'cases',
         name: 'create-new-folder',
-        label: 'Cases'
+        label: 'Cases',
+        addButton: true
     }
 ];
 
@@ -45,6 +47,10 @@ const dropDownValues = [
 
 const tabsValuesRoutes = {
     followUpsFilter: [
+        {key: 'filters', title: 'FILTERS'},
+        {key: 'sort', title: 'SORT'}
+    ],
+    casesFilter: [
         {key: 'filters', title: 'FILTERS'},
         {key: 'sort', title: 'SORT'}
     ],
@@ -266,6 +272,69 @@ const followUpsFilterScreen = {
         //         }
         //     ]
         // }
+    ]
+};
+
+const casesFilterScreen = {
+    filter: [
+        {
+            fields: [
+                {
+                    cardNumber: 1,
+                    label: 'Gender',
+                    type: 'Section',
+                    hasBorderBottom: true,
+                    borderBottomColor: styles.navigationDrawerSeparatorGrey
+                },
+                {
+                    cardNumber: 1,
+                    id: 'gender',
+                    type: 'Selector',
+                    value: '',
+                    data: [{value: 'Male'}, {value: 'Female'}]
+                }
+            ]
+        },
+        {
+            fields: [
+                {
+                    cardNumber: 2,
+                    label: 'Age range',
+                    type: 'Section',
+                    hasBorderBottom: true,
+                    borderBottomColor: styles.navigationDrawerSeparatorGrey
+                },
+                {
+                    cardNumber: 2,
+                    id: 'age',
+                    type: 'IntervalPicker',
+                    value: '',
+                    min: 0,
+                    max: 100
+                }
+            ]
+        },
+        {
+            fields: [
+                {
+                    cardNumber: 4,
+                    label: 'Classification',
+                    type: 'Section',
+                    hasBorderBottom: true,
+                    borderBottomColor: styles.navigationDrawerSeparatorGrey
+                },
+                {
+                    cardNumber: 4,
+                    id: 'classification',
+                    label: 'Choose one or more classification',
+                    type: 'DropDown',
+                    value: '',
+                    // data: [{value: 'Diana Jones'}, {value: 'Florin Popa'}],
+                    isRequired: false,
+                    isEditMode: true
+                }
+            ]
+        }
     ]
 };
 
@@ -675,7 +744,9 @@ export default {
     tabsValuesRoutes,
     followUpsSingleScreen,
     followUpsFilterScreen,
+    casesFilterScreen,
     defaultFilterForContacts,
+    defaultFilterForCases,
     baseUrls,
     addFollowUpScreen,
     addExposureScreen,
