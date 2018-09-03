@@ -84,7 +84,7 @@ class FollowUpListItem extends PureComponent {
     };
 
     handleRenderItemByType = (item) => {
-        // console.log("Answers: ", item);
+        console.log("Answers: ", item);
 
         let width = calculateDimension(315, false, this.props.screenSize);
         let marginHorizontal = calculateDimension(14, false, this.props.screenSize);
@@ -94,13 +94,13 @@ class FollowUpListItem extends PureComponent {
         }
         if (!source.questionnaireAnswers[item.variable]) {
             switch(item.answerType) {
-                case 'Free text':
+                case 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_FREE_TEXT':
                     source.questionnaireAnswers[item.variable] = '';
                     break;
-                case 'Single Selection':
+                case 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_SINGLE_ANSWER':
                     source.questionnaireAnswers[item.variable] = '';
                     break;
-                case 'Multiple Options':
+                case 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_MULTIPLE_ANSWERS':
                     source.questionnaireAnswers[item.variable] = [];
                     break;
                 default:
@@ -110,7 +110,7 @@ class FollowUpListItem extends PureComponent {
         }
         let questionAnswers = item.answerType === 'Free text' ? source.questionnaireAnswers[item.text] : source.questionnaireAnswers[item.variable] || null;
 
-        if (item.answerType === 'Single Selection') {
+        if (item.answerType === 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_SINGLE_ANSWER') {
             questionAnswers = questionAnswers !== null &&
                 questionAnswers !== undefined &&
                 item.answers.map((e) => {return e.value}).indexOf(questionAnswers) > -1 &&
@@ -118,8 +118,8 @@ class FollowUpListItem extends PureComponent {
                     this.getTranslation(item.answers[item.answers.map((e) => {return e.value}).indexOf(questionAnswers)].label) : ' ';
         }
         else {
-            if (item.answerType === 'Multiple Options') {
-                questionAnswers = item.answers.filter((e) => {return questionAnswers.indexOf(e.value) > -1}).map((e) => {return {label: e.label, value: e.value}}) || [];
+            if (item.answerType === 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_MULTIPLE_ANSWERS') {
+                questionAnswers = item.answers.filter((e) => {return questionAnswers.indexOf(e.value) > -1}).map((e) => {return {label: this.getTranslation(e.label), value: e.value}}) || [];
             }
         }
 
@@ -129,24 +129,24 @@ class FollowUpListItem extends PureComponent {
         //     item.data = this.props.cases.map((e) => {return {value: ((e.firstName ? e.firstName : '') + (e.lastName ? (" " + e.lastName) : ''))}})
         // }
 
-        console.log('Itemm: ', item);
+        // console.log('Itemm: ', item);
 
         switch(item.answerType) {
-            case 'Free text':
+            case 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_FREE_TEXT':
                 return (
                     <TextInput
                         id={item.variable}
                         label={'Write answer'}
                         labelValue={item.text}
                         value={questionAnswers}
-                        isEditMode={true}
+                        isEditMode={this.props.isEditMode}
                         isRequired={item.required}
                         onChange={this.props.onChangeTextAnswer}
                         multiline={true}
                         style={{width: width, marginHorizontal: marginHorizontal}}
                     />
                 );
-            case 'Single Selection':
+            case 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_SINGLE_ANSWER':
                 return (
                     <DropdownInput
                         id={item.variable}
@@ -154,13 +154,13 @@ class FollowUpListItem extends PureComponent {
                         labelValue={item.text}
                         value={questionAnswers}
                         data={item.answers.map((e) => {return {value: this.getTranslation(e.label), id: e.value}})}
-                        isEditMode={true}
+                        isEditMode={this.props.isEditMode}
                         isRequired={item.required}
                         onChange={this.props.onChangeSingleSelection}
                         style={{width: width, marginHorizontal: marginHorizontal}}
                     />
                 );
-            case 'Multiple Options':
+            case 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_MULTIPLE_ANSWERS':
                 return (
                     <DropDown
                         key={item.variable}
@@ -169,7 +169,7 @@ class FollowUpListItem extends PureComponent {
                         labelValue={item.text}
                         value={questionAnswers}
                         data={item.answers.map((e) => {return {label: this.getTranslation(e.label), value: e.value}})}
-                        isEditMode={true}
+                        isEditMode={this.props.isEditMode}
                         isRequired={item.required}
                         onChange={this.props.onChangeMultipleSelection}
                         style={{width: width, marginHorizontal: marginHorizontal}}
@@ -180,19 +180,20 @@ class FollowUpListItem extends PureComponent {
             default:
                 return(
                     <View>
-                        <Text>{"TODO: item type: " + item.type + " is not implemented yet"}</Text>
+                        <Text>{"TODO: item type: " + item.answerType + " is not implemented yet"}</Text>
                     </View>
                 )
         }
     };
 
     getTranslation = (value) => {
-        if (value.includes('LNG')) {
-            return value && this.props.translation ? this.props.translation[this.props.translation.map((e) => {
+        let valueToBeReturned = value;
+        if (value && typeof value === 'string' && value.includes('LNG')) {
+            valueToBeReturned = value && this.props.translation && Array.isArray(this.props.translation) && this.props.translation[this.props.translation.map((e) => {return e && e.token ? e.token : null}).indexOf(value)] ? this.props.translation[this.props.translation.map((e) => {
                 return e.token
             }).indexOf(value)].translation : '';
         }
-        return value;
+        return valueToBeReturned;
     }
 }
 

@@ -4,7 +4,7 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {PureComponent} from 'react';
-import {TextInput, View, Text, StyleSheet, FlatList} from 'react-native';
+import {View, StyleSheet, InteractionManager} from 'react-native';
 import {calculateDimension} from './../utils/functions';
 import config from './../utils/config';
 import {connect} from "react-redux";
@@ -13,6 +13,8 @@ import styles from './../styles';
 import QuestionCard from './../components/QuestionCard';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import Button from './../components/Button';
+import {LoaderScreen} from 'react-native-ui-lib'
+import {isEqual} from 'lodash';
 
 class FollowUpsFiltersContainer extends PureComponent {
 
@@ -20,43 +22,66 @@ class FollowUpsFiltersContainer extends PureComponent {
     constructor(props) {
         super(props);
         this.state = {
+            interactionComplete: false
         };
     }
 
     // Please add here the react lifecycle methods that you need
+    // shouldComponentUpdate(nextProps, nextState) {
+    //     if (isEqual(nextProps.item, this.props.item)) {
+    //         return false;
+    //     }
+    //     return true;
+    // }
 
+    componentDidMount() {
+        InteractionManager.runAfterInteractions(() => {
+            this.setState({
+                interactionComplete: true
+            })
+        })
+    }
 
     // The render method should have at least business logic as possible,
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
+        if(!this.state.interactionComplete) {
+            return (
+                <LoaderScreen overlay/>
+            )
+        }
 
         // console.log("### FollowUpsSingleQuestionnaire: ", this.props.questions);
         let buttonHeight = calculateDimension(25, true, this.props.screenSize);
         let buttonWidth = calculateDimension(165.5, false, this.props.screenSize);
         let marginVertical = calculateDimension(12.5, true, this.props.screenSize);
-        let viewWidth = calculateDimension(config.designScreenSize.width - 32, false, this.props.screenSize)
+        let viewWidth = calculateDimension(config.designScreenSize.width - 32, false, this.props.screenSize);
 
         return (
             <View style={style.mainContainer}>
-                <View style={[style.containerButtons, {marginVertical: marginVertical, width: viewWidth}]}>
-                    <Button
-                        title={'Save'}
-                        onPress={this.props.onPressSave}
-                        color={styles.buttonGreen}
-                        titleColor={'white'}
-                        height={buttonHeight}
-                        width={buttonWidth}
-                    />
-                    <Button
-                        title={'Missing'}
-                        onPress={this.props.onPressMissing}
-                        color={'white'}
-                        titleColor={styles.buttonTextGray}
-                        height={buttonHeight}
-                        width={buttonWidth}
-                    />
-                </View>
+                {
+                    this.props.isEditMode && (
+                        <View style={[style.containerButtons, {marginVertical: marginVertical, width: viewWidth}]}>
+                            <Button
+                                title={'Save'}
+                                onPress={this.props.onPressSave}
+                                color={styles.buttonGreen}
+                                titleColor={'white'}
+                                height={buttonHeight}
+                                width={buttonWidth}
+                            />
+                            <Button
+                                title={'Missing'}
+                                onPress={this.props.onPressMissing}
+                                color={'white'}
+                                titleColor={styles.buttonTextGray}
+                                height={buttonHeight}
+                                width={buttonWidth}
+                            />
+                        </View>
+                    )
+                }
                 <KeyboardAwareScrollView
                     style={style.container}
                     contentContainerStyle={[style.contentContainerStyle, {paddingBottom: this.props.screenSize.height < 600 ? 70 : 20}]}
@@ -79,6 +104,7 @@ class FollowUpsFiltersContainer extends PureComponent {
                 item={item}
                 index={index + 1}
                 source={this.props.item}
+                isEditMode={this.props.isEditMode}
                 onChangeTextAnswer={this.props.onChangeTextAnswer}
                 onChangeSingleSelection={this.props.onChangeSingleSelection}
                 onChangeMultipleSelection={this.props.onChangeMultipleSelection}

@@ -10,12 +10,13 @@ import { TextField } from 'react-native-material-textfield';
 import styles from './../styles';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
-import {addExposureForContact} from './../actions/contacts';
+import {addExposureForContact, updateExposureForContact} from './../actions/contacts';
 import NavBarCustom from './../components/NavBarCustom';
 import config from './../utils/config';
 import {calculateDimension} from './../utils/functions';
 import CardComponent from './../components/CardComponent';
 import Ripple from 'react-native-material-ripple';
+import {removeErrors} from './../actions/errors';
 
 class ExposureScreen extends Component {
 
@@ -26,7 +27,7 @@ class ExposureScreen extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            exposure: {
+            exposure: this.props.exposure || {
                 outbreakId: this.props.user.activeOutbreakId,
                 contactDate: new Date(),
                 contactDateEstimated: false,
@@ -62,19 +63,23 @@ class ExposureScreen extends Component {
                 props.navigator.dismissModal();
             } else {
                 // If the save button was not pressed, then we should empty the exposure object in order to add another one
-                state.exposure = {
-                    outbreakId: props.user.activeOutbreakId,
-                    contactDate: new Date(),
-                    contactDateEstimated: false,
-                    certaintyLevelId: '',
-                    exposureTypeId: '',
-                    exposureFrequencyId: '',
-                    exposureDurationId: '',
-                    socialRelationshipTypeId: '',
-                    clusterId: '',
-                    comment: '',
-                    persons: []
-                };
+                if (props.exposure) {
+                    state.exposure = props.exposure;
+                } else {
+                    state.exposure = {
+                        outbreakId: props.user.activeOutbreakId,
+                        contactDate: new Date(),
+                        contactDateEstimated: false,
+                        certaintyLevelId: '',
+                        exposureTypeId: '',
+                        exposureFrequencyId: '',
+                        exposureDurationId: '',
+                        socialRelationshipTypeId: '',
+                        clusterId: '',
+                        comment: '',
+                        persons: []
+                    };
+                }
             }
         }
         return null;
@@ -84,6 +89,8 @@ class ExposureScreen extends Component {
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
+        console.log('Render from ExposureScreen: ', this.state.exposure, this.props.exposure);
+
         return (
             <View style={[style.container]}>
                 <NavBarCustom
@@ -215,7 +222,15 @@ class ExposureScreen extends Component {
                 savePressed: true
             }, () => {
                 if (this.props.type === 'Contact') {
-                    this.props.addExposureForContact(this.props.user.activeOutbreakId, this.props.contact.id, this.state.exposure, this.props.user.token);
+                    if (this.props.exposure) {
+                        this.props.updateExposureForContact(this.props.user.activeOutbreakId, this.props.contact.id, this.state.exposure, this.props.user.token);
+                    } else {
+                        if (!this.props.contact) {
+                            this.props.navigator.dismissModal(this.props.saveExposure(this.state.exposure));
+                        } else {
+                            this.props.addExposureForContact(this.props.user.activeOutbreakId, this.props.contact.id, this.state.exposure, this.props.user.token);
+                        }
+                    }
                 }
             });
         } else {
@@ -279,7 +294,9 @@ function mapStateToProps(state) {
 
 function matchDispatchProps(dispatch) {
     return bindActionCreators({
-        addExposureForContact
+        addExposureForContact,
+        updateExposureForContact,
+        removeErrors
     }, dispatch);
 }
 

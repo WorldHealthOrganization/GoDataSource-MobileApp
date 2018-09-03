@@ -26,7 +26,8 @@ class SwitchInput extends PureComponent {
         return (
             <View style={[{
                 flexDirection: 'row',
-                width: '100%'
+                width: '100%',
+                marginVertical: 10
             }, this.props.style]}>
                 <Text style={[{
 

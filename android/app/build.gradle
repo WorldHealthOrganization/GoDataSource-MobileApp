@@ -100,7 +100,7 @@ android {
     defaultConfig {
         applicationId "com.who_mobile"
         minSdkVersion 16
-        targetSdkVersion 22
+        targetSdkVersion 25
         versionCode 1
         versionName "1.0"
         ndk {
@@ -137,6 +137,10 @@ android {
 }
 
 dependencies {
+    compile project(':react-native-sqlcipher-2')
+    compile project(':react-native-keychain')
+    compile project(':react-native-zip-archive')
+    compile project(':rn-fetch-blob')
     compile project(':react-native-vector-icons')
     compile project(':react-native-navigation')
     compile fileTree(dir: "libs", include: ["*.jar"])

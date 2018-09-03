@@ -6,6 +6,8 @@ import { COLOR, ThemeContext, getTheme } from 'react-native-material-ui';
 import hoistNonReactStatics from 'hoist-non-react-statics';
 
 import LoginScreen from './LoginScreen';
+import FirstConfigScreen from './FirstConfigScreen';
+import ManualConfigScreen from './ManualConfigScreen';
 import NavigationDrawer from './NavigationDrawer';
 import FollowUpsScreen from './FollowUpsScreen';
 import AddFollowUpScreen from './AddFollowUpScreen';
@@ -21,6 +23,8 @@ import ExposureScreen from './ExposureScreen';
 
 const screens = [
     {screen: 'LoginScreen', component: LoginScreen},
+    {screen: 'FirstConfigScreen', component: FirstConfigScreen},
+    {screen: 'ManualConfigScreen', component: ManualConfigScreen},
     {screen: 'NavigationDrawer', component: NavigationDrawer},
     {screen: 'FollowUpsScreen', component: FollowUpsScreen},
     {screen: 'AddFollowUpScreen', component: AddFollowUpScreen},

@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@ptomasroos/react-native-multi-slider": "^1.0.0",
+    "base-64": "^0.1.0",
     "hoist-non-react-statics": "^2.5.5",
     "lodash": "^4.17.10",
     "moment": "^2.22.2",
@@ -22,6 +23,7 @@
     "react-native-elements": "1.0.0-beta5",
     "react-native-elevated-view": "0.0.6",
     "react-native-keyboard-aware-scroll-view": "^0.6.0",
+    "react-native-keychain": "^3.0.0",
     "react-native-material-buttons": "^0.5.0",
     "react-native-material-dropdown": "^0.11.1",
     "react-native-material-menu": "^0.4.0",
@@ -36,14 +38,17 @@
     "react-native-root-modal": "^3.1.1",
     "react-native-sectioned-multi-select": "^0.5.2",
     "react-native-select-multiple": "^1.2.0",
+    "react-native-sqlcipher-2": "^1.0.2",
     "react-native-tab-view": "^1.0.2",
     "react-native-ui-lib": "^3.3.205",
     "react-native-vector-icons": "^4.6.0",
+    "react-native-zip-archive": "^2.2.6",
     "react-redux": "^5.0.7",
     "redux": "^4.0.0",
     "redux-logger": "^3.0.6",
     "redux-promise": "^0.6.0",
-    "redux-thunk": "^2.3.0"
+    "redux-thunk": "^2.3.0",
+    "rn-fetch-blob": "^0.10.13"
   },
   "devDependencies": {
     "babel-jest": "23.0.1",

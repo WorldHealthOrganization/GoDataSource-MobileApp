@@ -25,7 +25,8 @@ const buttonLogin = {
     container: {
         backgroundColor: 'rgba(255, 255, 255, 0.7)',
         width: '100%',
-        borderRadius: 5
+        borderRadius: 5,
+        justifyContent: 'space-evenly'
     },
     text: {
         fontFamily: 'Roboto-Medium',

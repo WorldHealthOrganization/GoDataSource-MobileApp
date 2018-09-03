@@ -4,8 +4,8 @@
 import styles from './../styles';
 
 const baseUrls = [
-    {value: 'http://whoapicd.clarisoft.com/api'},
-    {value: 'http://gva11sucombee.who.int:3000/api'}
+    {value: 'gva11sucombee.who.int:3000'},
+    {value: 'whoapicd.clarisoft.com'}
 ];
 
 const designScreenSize = {
@@ -57,6 +57,11 @@ const tabsValuesRoutes = {
         {key: 'address', title: 'ADDRESS'},
         {key: 'exposures', title: 'EXPOSURES'},
         {key: 'calendar', title: 'CALENDAR'}
+    ],
+    contactsAdd: [
+        {key: 'personal', title: 'PERSONAL'},
+        {key: 'address', title: 'ADDRESS'},
+        {key: 'exposures', title: 'EXPOSURES'},
     ]
 };
 

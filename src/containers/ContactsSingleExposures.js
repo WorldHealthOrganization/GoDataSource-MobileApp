@@ -7,7 +7,7 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
-import {Animated, StyleSheet, InteractionManager, ScrollView, View} from 'react-native';
+import {Animated, StyleSheet, InteractionManager, ScrollView, View, Text} from 'react-native';
 import {calculateDimension} from './../utils/functions';
 import config from './../utils/config';
 import {connect} from "react-redux";
@@ -17,6 +17,7 @@ import ElevatedView from 'react-native-elevated-view';
 import {LoaderScreen} from 'react-native-ui-lib';
 import AnimatedListView from './../components/AnimatedListView';
 import GeneralListItem from '../components/GeneralListItem';
+import Ripple from 'react-native-material-ripple';
 
 const scrollAnim = new Animated.Value(0);
 const offsetAnim = new Animated.Value(0);
@@ -93,7 +94,7 @@ class ContactsSingleExposures extends Component {
                         renderItem={this.renderRelationship}
                         keyExtractor={this.keyExtractor}
                         ItemSeparatorComponent={this.renderSeparatorComponent}
-                        // ListEmptyComponent={this.listEmptyComponent}
+                        ListEmptyComponent={this.listEmptyComponent}
                         style={[style.listViewStyle]}
                         componentContainerStyle={style.componentContainerStyle}
                         onScroll={this.handleScroll}
@@ -117,7 +118,7 @@ class ContactsSingleExposures extends Component {
                 title={title}
                 primaryText={primaryText}
                 secondaryText={secondaryText}
-                hasActionsBar={false}
+                hasActionsBar={true}
                 textsArray={['Edit', 'Delete']}
                 textsStyleArray={[
                     {
@@ -133,6 +134,7 @@ class ContactsSingleExposures extends Component {
                         fontSize: 12
                     }
                 ]}
+                onPressArray={[() => {this.props.onPressEditExposure(relation.item, relation.index)}, () => {this.props.onPressDeleteExposure(relation.item, relation.index)}]}
                 containerStyle={{flex: 1, height: '100%', marginHorizontal: calculateDimension(16, false, this.props.screenSize)}}
             />
         )
@@ -141,6 +143,20 @@ class ContactsSingleExposures extends Component {
     renderSeparatorComponent = () => {
         return (
             <View style={style.separatorComponentStyle} />
+        )
+    };
+
+    listEmptyComponent = () => {
+        return (
+            <Ripple
+                style={{
+                    height: 25,
+                    justifyContent: 'center'
+                }}
+                onPress={this.onPressAddExposure}
+            >
+                <Text style={{fontFamily: 'Roboto-Medium', fontSize: 12, color: styles.buttonGreen}}>Add another address</Text>
+            </Ripple>
         )
     };
 
@@ -160,16 +176,29 @@ class ContactsSingleExposures extends Component {
             caseName = aux && aux.name ? aux.name : '';
         }
 
-        return {title: caseName, primaryText: relation.contactDate, secondaryText: this.getTranslation(relation.certaintyLevelId)};
+        return {title: caseName, primaryText: relation.contactDate.toString(), secondaryText: this.getTranslation(relation.certaintyLevelId)};
     };
 
     getTranslation = (value) => {
-        if (value && value.includes('LNG')) {
-            return value && this.props.translation ? this.props.translation[this.props.translation.map((e) => {
+        let valueToBeReturned = value;
+        if (value && typeof value === 'string' && value.includes('LNG')) {
+            valueToBeReturned = value && this.props.translation && Array.isArray(this.props.translation) && this.props.translation[this.props.translation.map((e) => {return e && e.token ? e.token : null}).indexOf(value)] ? this.props.translation[this.props.translation.map((e) => {
                 return e.token
             }).indexOf(value)].translation : '';
         }
-        return value;
+        return valueToBeReturned;
+    };
+
+    onPressAddExposure = () => {
+        this.props.navigator.showModal({
+            screen: "ExposureScreen",
+            animated: true,
+            passProps: {
+                contact: null,
+                type: 'Contact',
+                saveExposure: this.props.saveExposure
+            }
+        })
     };
 }
 

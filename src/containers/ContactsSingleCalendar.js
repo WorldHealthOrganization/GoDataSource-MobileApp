@@ -8,7 +8,6 @@
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
 import {Text, StyleSheet, InteractionManager} from 'react-native';
-import {ListItem, Icon} from 'react-native-material-ui';
 import {calculateDimension} from './../utils/functions';
 import config from './../utils/config';
 import {connect} from "react-redux";
@@ -17,6 +16,7 @@ import styles from './../styles';
 import ElevatedView from 'react-native-elevated-view';
 import {LoaderScreen} from 'react-native-ui-lib';
 import FollowUpAgenda from './../components/FollowUpAgenda';
+import moment from 'moment';
 
 class ContactsSingleCalendar extends Component {
 
@@ -52,14 +52,35 @@ class ContactsSingleCalendar extends Component {
             )
         }
 
+        let followUps = this.computeFollowUps();
+        console.log("### ContactsSingleCalendar: ", followUps);
+
         return (
             <ElevatedView elevation={3} style={[style.container]}>
-                <FollowUpAgenda/>
+                <FollowUpAgenda
+                    contact={this.props.contact}
+                    followUps={followUps}
+                />
             </ElevatedView>
         );
     }
 
     // Please write here all the methods that are not react native lifecycle methods
+    computeFollowUps = () => {
+        let followUps = {};
+        if (this.props.contact && this.props.contact.followUps && Array.isArray(this.props.contact.followUps) && this.props.contact.followUps.length > 0) {
+            for (let i = 0; i < this.props.contact.followUps.length; i++) {
+                if (followUps[moment(this.props.contact.followUps[i].date).format('YYYY-MM-DD')]) {
+                    followUps[moment(this.props.contact.followUps[i].date).format('YYYY-MM-DD')].push({text: this.props.contact.followUps[i]});
+                }
+                followUps[moment(this.props.contact.followUps[i].date).format('YYYY-MM-DD')] = [];
+
+                followUps[moment(this.props.contact.followUps[i].date).format('YYYY-MM-DD')].push({text: this.props.contact.followUps[i]});
+            }
+        }
+
+        return followUps;
+    }
 }
 
 

@@ -44,7 +44,11 @@ class FollowUpListItem extends PureComponent {
             }).indexOf(this.props.item.personId)] : null;
         }
         let primaryText = contact && ((contact.firstName ? contact.firstName : ' ') + (contact.lastName ? (" " + contact.lastName) : ' '));
-        let secondaryText = contact && ((contact.gender ? contact.gender.charAt(0) : ' ') + (contact.age ? (", " + contact.age) : ' '));
+        let genderString = '';
+        if (contact && contact.gender) {
+            genderString = this.getTranslation(contact.gender);
+        }
+        let secondaryText = contact && ((genderString ? genderString.charAt(0) : ' ') + (contact.age ? (", " + contact.age) : ' '));
 
 
         let addressText = '';
@@ -143,7 +147,6 @@ class FollowUpListItem extends PureComponent {
         })
     };
 
-
     onPressExposure = () => {
         InteractionManager.runAfterInteractions(() => {
             let contact = this.props && this.props.contacts && Array.isArray(this.props.contacts) && this.props.contacts.length > 0 ? this.props.contacts[this.props.contacts.map((e) => {return e.id}).indexOf(this.props.item.personId)] : null;
@@ -153,6 +156,16 @@ class FollowUpListItem extends PureComponent {
             this.props.onPressExposure(this.props.item, contact);
         })
     };
+
+    getTranslation = (value) => {
+        let valueToBeReturned = value;
+        if (value && typeof value === 'string' && value.includes('LNG')) {
+            valueToBeReturned = value && this.props.translation && Array.isArray(this.props.translation) && this.props.translation[this.props.translation.map((e) => {return e && e.token ? e.token : null}).indexOf(value)] ? this.props.translation[this.props.translation.map((e) => {
+                return e.token
+            }).indexOf(value)].translation : '';
+        }
+        return valueToBeReturned;
+    }
 }
 
 
@@ -209,6 +222,7 @@ const style = StyleSheet.create({
 function mapStateToProps(state) {
     return {
         screenSize: state.app.screenSize,
+        translation: state.app.translation,
         contacts: state.contacts,
         cases: state.cases,
         events: state.events

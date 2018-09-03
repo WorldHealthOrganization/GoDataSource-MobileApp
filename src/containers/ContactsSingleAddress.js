@@ -57,7 +57,7 @@ class ContactsSingleAddress extends Component {
             >
                 <View style={style.container}>
                     {
-                        this.props.contact.addresses.map((item, index) => {
+                        this.props.contact && this.props.contact.addresses && this.props.contact.addresses.map((item, index) => {
                             return this.handleRenderItem(item, index)
                         })
                     }

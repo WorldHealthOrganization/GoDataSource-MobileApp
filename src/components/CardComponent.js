@@ -194,7 +194,7 @@ class CardComponent extends Component {
                         labelValue={item.labelValue}
                         value={value}
                         data={item.data}
-                        isEditMode={item.isEditMode}
+                        isEditMode={this.props.screen === 'ExposureScreen' ? this.props.exposure.persons.length > 1 && item.id === 'exposure' ? false : item.isEditMode : item.isEditMode}
                         isRequired={item.isRequired}
                         onChange={this.props.onChangeDropDown}
                         style={{width: width, marginHorizontal: marginHorizontal}}
@@ -396,7 +396,34 @@ class CardComponent extends Component {
         //     value = this.props.exposure && this.props.exposure[item.id] && this.props.exposure[item.id].id;
         // }
 
+        if (item.id === 'exposure') {
+            if (this.props.exposure.persons && Array.isArray(this.props.exposure.persons) && this.props.exposure.persons.length > 0) {
+                let persons = this.props.exposure.persons.filter((e) => {return e.type !== (this.props.type === 'Contact' ? 'contact' : 'contact')});
+                value = this.extractNameForExposure(persons[0]);
+            }
+        }
+
         return this.getTranslation(value);
+    };
+
+    extractNameForExposure = (person) => {
+        switch (person.type) {
+            case 'case':
+                return (this.props.cases && Array.isArray(this.props.cases) && this.props.cases.map((e) => {return e.id;}).indexOf(person.id) > -1 &&
+                    this.props.cases[this.props.cases.map((e) => {return e.id}).indexOf(person.id)].firstName ? (this.props.cases[this.props.cases.map((e) => {return e.id}).indexOf(person.id)].firstName + ' ') : '') +
+                    (this.props.cases && Array.isArray(this.props.cases) && this.props.cases.map((e) => {return e.id;}).indexOf(person.id) > -1 &&
+                    this.props.cases[this.props.cases.map((e) => {return e.id}).indexOf(person.id)].lastName ? (this.props.cases[this.props.cases.map((e) => {return e.id}).indexOf(person.id)].lastName) : '');
+            case 'event':
+                return (this.props.events && Array.isArray(this.props.events) && this.events.map((e) => {return e.id;}).indexOf(person.id) > -1 &&
+                this.props.events[this.props.events.map((e) => {return e.id}).indexOf(person.id)].name ? (this.props.events[this.props.events.map((e) => {return e.id}).indexOf(person.id)].name) : '');
+            case 'contact':
+                return (this.props.contacts && Array.isArray(this.props.contacts) && this.props.contacts.map((e) => {return e.id;}).indexOf(person.id) > -1 &&
+                    this.props.contacts[this.props.contacts.map((e) => {return e.id}).indexOf(person.id)].firstName ? (this.props.contacts[this.props.contacts.map((e) => {return e.id}).indexOf(person.id)].firstName + ' ') : '') +
+                    (this.props.contacts && Array.isArray(this.props.contacts) && this.props.contacts.map((e) => {return e.id;}).indexOf(person.id) > -1 &&
+                    this.props.contacts[this.props.contacts.map((e) => {return e.id}).indexOf(person.id)].lastName ? (this.props.contacts[this.props.contacts.map((e) => {return e.id}).indexOf(person.id)].lastName) : '');
+            default:
+                return ''
+        }
     };
 
     computeDataForContactsSingleScreenDropdownInput = (item, index) => {
@@ -423,17 +450,17 @@ class CardComponent extends Component {
             return this.props.contact && this.props.contact.addresses && Array.isArray(this.props.contact.addresses) ?
                 this.getTranslation(this.props.contact.addresses[index][item.id]) : '';
         }
-        return this.props.contact && this.props.contact[item.id] ? this.props.contact[item.id] : '';
+        return this.props.contact && this.props.contact[item.id] ? this.getTranslation(this.props.contact[item.id]) : '';
     };
 
     getTranslation = (value) => {
-        console.log("Value from getTranslation: ", value);
+        let valueToBeReturned = value;
         if (value && typeof value === 'string' && value.includes('LNG')) {
-            return value && this.props.translation ? this.props.translation[this.props.translation.map((e) => {
+            valueToBeReturned = value && this.props.translation && Array.isArray(this.props.translation) && this.props.translation[this.props.translation.map((e) => {return e && e.token ? e.token : null}).indexOf(value)] ? this.props.translation[this.props.translation.map((e) => {
                 return e.token
             }).indexOf(value)].translation : '';
         }
-        return value;
+        return valueToBeReturned;
     }
 }
 

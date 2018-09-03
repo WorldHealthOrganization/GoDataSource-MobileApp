@@ -18,11 +18,12 @@ import ContactsSingleAddress from './../containers/ContactsSingleAddress';
 import ContactsSingleCalendar from './../containers/ContactsSingleCalendar';
 import ContactsSingleExposures from './../containers/ContactsSingleExposures';
 import ContactsSinglePersonal from './../containers/ContactsSinglePersonal';
+import ExposureScreen from './../screens/ExposureScreen';
 import Breadcrumb from './../components/Breadcrumb';
 import Menu, {MenuItem} from 'react-native-material-menu';
 import Ripple from 'react-native-material-ripple';
 import {addFollowUp, updateFollowUpAndContact, deleteFollowUp} from './../actions/followUps';
-import {updateContact} from './../actions/contacts';
+import {updateContact, deleteExposureForContact, addContact} from './../actions/contacts';
 import {removeErrors} from './../actions/errors';
 import DateTimePicker from 'react-native-modal-datetime-picker';
 import _ from 'lodash';
@@ -42,10 +43,24 @@ class ContactsSingleScreen extends Component {
         super(props);
         this.state = {
             interactionComplete: false,
-            routes: config.tabsValuesRoutes.contactsSingle,
+            routes: this.props.isNew ? config.tabsValuesRoutes.contactsAdd : config.tabsValuesRoutes.contactsSingle,
             index: 0,
             item: this.props.item,
-            contact: Object.assign({}, this.props.contact),
+            contact: this.props.isNew ? {
+                riskLevel: '',
+                riskReason: '',
+                outbreakId: this.props.user.activeOutbreakId,
+                firstName: '',
+                middleName: '',
+                lastName: '',
+                gender: '',
+                occupation: '',
+                dob: new Date(),
+                dateOfReporting: new Date(),
+                isDateOfReportingApproximate: false,
+                relationships: [],
+                addresses: [],
+            } : Object.assign({}, this.props.contact),
             savePressed: false,
             deletePressed: false,
             isDateTimePickerVisible: false
@@ -108,6 +123,9 @@ class ContactsSingleScreen extends Component {
                     animationType: 'fade'
                 })
             }
+            // if (props.contacts && props.contact !== props.contacts[props.contacts.map((e) => {return e.id}).indexOf(props.contact.id)]) {
+            //     props.contact = props.contacts[props.contacts.map((e) => {return e.id}).indexOf(props.contact.id)];
+            // }
         }
         return null;
     }
@@ -116,7 +134,7 @@ class ContactsSingleScreen extends Component {
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
-        console.log("### contact from render ContactSingleScreen: ", this.state.contact);
+        // console.log("### contact from render ContactSingleScreen: ", this.state.contact);
         return (
             <View style={style.container}>
                 <NavBarCustom
@@ -125,7 +143,7 @@ class ContactsSingleScreen extends Component {
                         <View
                             style={[style.breadcrumbContainer]}>
                             <Breadcrumb
-                                entities={['Contacts', ((this.props.contact && this.props.contact.firstName ? (this.props.contact.firstName + " ") : '') + (this.props.contact && this.props.contact.lastName ? this.props.contact.lastName : ''))]}
+                                entities={['Contacts', this.props.isNew ? "Add Contact" : ((this.props.contact && this.props.contact.firstName ? (this.props.contact.firstName + " ") : '') + (this.props.contact && this.props.contact.lastName ? this.props.contact.lastName : ''))]}
                                 navigator={this.props.navigator}
                             />
                             <View>
@@ -218,14 +236,6 @@ class ContactsSingleScreen extends Component {
         );
     };
 
-    handleRenderPager = (props) => {
-        return Platform.OS === 'ios' ? (
-            <PagerScroll {...props} swipeEnabled={false}/>
-        ) : (
-            <PagerAndroid {...props} swipeEnabled={false}/>
-        )
-    };
-
     renderScene = ({route}) => {
         switch(route.key) {
             case 'personal':
@@ -258,6 +268,10 @@ class ContactsSingleScreen extends Component {
                     <ContactsSingleExposures
                         contact={this.state.contact}
                         activeIndex={this.state.index}
+                        onPressEditExposure={this.handleOnPressEditExposure}
+                        onPressDeleteExposure={this.handleOnPressDeleteExposure}
+                        navigator={this.props.navigator}
+                        saveExposure={this.handleSaveExposure}
                     />
                 );
             case 'calendar':
@@ -280,8 +294,14 @@ class ContactsSingleScreen extends Component {
         }
     };
 
-    handleNextPress = () => {
-        this.handleOnIndexChange(this.state.index + 1 );
+    handleSaveExposure = (exposure) => {
+        let relationships = _.cloneDeep(this.state.contact.relationships);
+        relationships.push(exposure);
+        this.setState(prevState => ({
+            contact: Object.assign({}, prevState.contact, {relationships})
+        }), () => {
+            console.log("After adding the exposure: ", this.state.contact);
+        })
     };
 
     handleOnChangeText = (value, id, objectType) => {
@@ -479,7 +499,7 @@ class ContactsSingleScreen extends Component {
         this.setState(prevState => ({
             item: Object.assign({}, prevState.item, {questionnaireAnswers: questionnaireAnswers})
         }))
-    };K
+    };
 
     onChangeMultipleSelection = (selections, id) => {
         let itemClone = Object.assign({}, this.state.item);
@@ -494,13 +514,61 @@ class ContactsSingleScreen extends Component {
         }))
     };
 
+    handleOnPressEditExposure = (relation, index) => {
+        console.log('handleOnPressEditExposure: ', relation, index);
+        this.props.navigator.showModal({
+            screen: 'ExposureScreen',
+            animated: true,
+            passProps: {
+                exposure: relation,
+                contact: this.props.contact,
+                type: 'Contact'
+            }
+        })
+    };
+
+    handleOnPressDeleteExposure = (relation, index) => {
+        if (this.state.contact.relationships.length === 1) {
+            Alert.alert('Alert', "Cannot delete a contact's last exposure to a case or event", [
+                {
+                    text: 'Ok', onPress: () => {console.log("Ok pressed")}
+                }
+            ])
+        } else {
+            Alert.alert('Warning', 'Are you sure you want to delete the exposure?', [
+                {
+                    text: 'No', onPress: () => {console.log("Cancel delete")}
+                },
+                {
+                    text: 'Yes', onPress: () => {
+                    let relations = _.cloneDeep(this.state.contact.relationships);
+                    if (relations && Array.isArray(relations) && relations.map((e) => {return e.id}).indexOf(relation.id) > -1) {
+                        relations.splice(relations.map((e) => {return e.id}).indexOf(relation.id), 1);
+
+                        this.setState(prevState => ({
+                            contact: Object.assign({}, prevState.contact, {relationships: relations})
+                        }), () => {
+                            this.props.deleteExposureForContact(this.props.user.activeOutbreakId, this.props.contact.id, relation, this.props.user.token);
+                        })
+                    }
+                }
+                }
+            ])
+        }
+    };
+
     handleOnPressSave = () => {
         // Check the required fields and then update the contact
         if (this.checkRequiredFields()) {
             this.setState({
                 savePressed: true
             }, () => {
-                this.props.updateContact(this.props.user.activeOutbreakId, this.state.contact.id, this.state.contact, this.props.user.token);
+                // If it is a new contact, save it
+                if (this.props.isNew) {
+                    this.props.addContact(this.props.user.activeOutbreakId, this.state.contact, this.props.user.token);
+                } else {
+                    this.props.updateContact(this.props.user.activeOutbreakId, this.state.contact.id, this.state.contact, this.props.user.token);
+                }
             });
         } else {
             Alert.alert("Validation error", 'Some of the required fields are missing. Please make sure you have completed them', [
@@ -530,6 +598,12 @@ class ContactsSingleScreen extends Component {
                     }
                 }
             }
+        } else {
+            return false;
+        }
+
+        if (!this.state.contact || !this.state.contact.relationships || !Array.isArray(this.state.contact.relationships) || this.state.contact.relationships.length < 1) {
+            return false;
         }
 
         return true;
@@ -633,6 +707,8 @@ function matchDispatchProps(dispatch) {
         updateFollowUpAndContact,
         deleteFollowUp,
         updateContact,
+        addContact,
+        deleteExposureForContact,
         removeErrors
     }, dispatch);
 }

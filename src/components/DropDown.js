@@ -36,8 +36,15 @@ class DropDown extends PureComponent {
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
-        // console.log("### multiple select dropdown values: ", this.props.data, this.props.value, this.props.label);
-        // console.log('Selected items: ', this.state.selectedItems);
+
+        if (!this.props.isEditMode) {
+            return (
+                <View style={[this.props.style]}>
+                    <Text style={style.labelStyle}>{this.state.selectedItems.map((e, index) => {return e.label + (index === (this.state.selectedItems.length - 1) ? '' : ', ')})}</Text>
+                </View>
+            )
+        }
+
         return (
             <Ripple style={[this.props.style, {flex: 1, marginTop: 25, marginBottom: 14, alignSelf: 'center'}]} onPress={this.handleOnPress}>
                 <View style={style.innerTextContainer}>

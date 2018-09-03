@@ -6,7 +6,8 @@ import {
     ACTION_TYPE_SAVE_SCREEN_SIZE,
     ACTION_TYPE_ADD_FILTER_FOR_SCREEN,
     ACTION_TYPE_REMOVE_FILTER_FOR_SCREEN,
-    ACTION_TYPE_SAVE_TRANSLATION
+    ACTION_TYPE_SAVE_TRANSLATION,
+    ACTION_TYPE_SAVE_HUB_CONFIGURATION
 } from './../utils/enums';
 import url from '../utils/url';
 import config from './../utils/config';
@@ -14,6 +15,8 @@ import { loginUser } from './user';
 import {Dimensions} from 'react-native';
 import {Platform, NativeModules} from 'react-native';
 import {getTranslationRequest} from './../requests/translation';
+import {getDatabaseSnapshotRequest} from './../requests/sync';
+import {setInternetCredentials} from 'react-native-keychain';
 
 
 // Add here only the actions, not also the requests that are executed. For that purpose is the requests directory
@@ -35,6 +38,13 @@ export function saveTranslation(translation) {
     return {
         type: ACTION_TYPE_SAVE_TRANSLATION,
         translation: translation
+    }
+}
+
+export function saveHubConfiguration(hubConfig) {
+    return {
+        type: ACTION_TYPE_SAVE_HUB_CONFIGURATION,
+        hubConfiguration: hubConfig
     }
 }
 
@@ -86,17 +96,32 @@ export function getTranslations() {
             language = NativeModules.I18nManager.localeIdentifier;
         }
 
+        console.log("### get translations for language: ", language);
         if (language === 'en_US') {
             language = 'english_us';
         }
 
         getTranslationRequest(language, (error, response) => {
             if (error) {
-                console.log("*** addExposureForContact error: ", error);
+                console.log("*** getTranslations error: ", error);
             }
             if (response) {
+                console.log("### here should have the translations: ");
                 dispatch(saveTranslation(response));
             }
+        })
+    }
+}
+
+export function storeHubConfiguration(hubConfiguration) {
+    return async function (dispatch) {
+        // dispatch(saveHubConfiguration(hubConfiguration));
+        // Store the HUB configuration(hubUrl, clientId, clientSecret) in the secure storage of each platform in order to be used later for syncing
+        await setInternetCredentials(hubConfiguration.url, hubConfiguration.clientId, hubConfiguration.clientSecret);
+
+        // After this, get the database from the hub, using the credentials
+        getDatabaseSnapshotRequest(hubConfiguration, (error, response) => {
+            console.log(error, response);
         })
     }
 }

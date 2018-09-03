@@ -1,8 +1,13 @@
 package com.who_mobile;
 
+import android.app.Activity;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import dog.craftz.sqlite_2.RNSqlite2Package;
+import com.oblador.keychain.KeychainPackage;
+import com.rnziparchive.RNZipArchivePackage;
+import com.RNFetchBlob.RNFetchBlobPackage;
 import com.oblador.vectoricons.VectorIconsPackage;
 import com.reactnativenavigation.NavigationApplication;
 import com.facebook.react.ReactNativeHost;
@@ -28,6 +33,10 @@ import java.util.List;
          // No need to add RnnPackage and MainReactPackage
          return Arrays.<ReactPackage>asList(
              // eg. new VectorIconsPackage()
+                 new RNFetchBlobPackage(),
+                 new RNZipArchivePackage(),
+                 new KeychainPackage(),
+                 new RNSqlite2Package()
          );
      }
 
@@ -39,5 +48,10 @@ import java.util.List;
      @Override
      public String getJSMainModuleName() {
          return "index";
+     }
+
+     @Override
+     public boolean clearHostOnActivityDestroy(Activity activity) {
+         return false;
      }
  }

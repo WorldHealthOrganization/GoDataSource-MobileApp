@@ -14,6 +14,7 @@ import styles from './../styles';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import {Agenda} from 'react-native-calendars';
+import FollowUpsSingleQuestionnarireContainer from './../containers/FollowUpsSingleQuestionnaireContainer';
 
 class FollowUpAgenda extends PureComponent {
 
@@ -31,25 +32,33 @@ class FollowUpAgenda extends PureComponent {
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
+        console.log('### FollowUpAgenda followUps: ', this.props.followUps);
         return (
             <Agenda
-                items={
-                    {
-                        '2018-08-22': [{text: 'item 1 - any js object'}],
-                        '2018-08-23': [{text: 'item 2 - any js object'}],
-                        '2018-08-24': [],
-                        '2018-08-25': [{text: 'item 3 - any js object'}, {text: 'any js object'}],
-                    }
-                }
-                renderItem={(item, firstItemInDay) => {return (<View><Text>Ceva</Text></View>);}}
+                items={this.props.followUps}
+                renderItem={this.renderItem}
                 renderEmptyDate={() => {return (<View />);}}
                 rowHasChanged={(r1, r2) => {return r1.text !== r2.text}}
                 renderDay={(day, item) => {return (<View />);}}
+                theme={{
+                    agendaKnobColor: 'rgba(0, 0, 0, 0.1)',
+                }}
+                renderEmptyData = {() => {return (<View />);}}
             />
         );
     }
 
     // Please write here all the methods that are not react native lifecycle methods
+    renderItem = (item, firstItemInDay) => {
+        console.log("RenderItem from FollowUpAgenda: ", item);
+        return(
+            <FollowUpsSingleQuestionnarireContainer
+                item={item.text}
+                contact={this.props.contact}
+                isEditMode={false}
+            />
+        )
+}
 }
 
 // FollowUpAgenda.defaultProps = {

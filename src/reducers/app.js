@@ -6,11 +6,12 @@ import {
     ACTION_TYPE_SAVE_SCREEN_SIZE,
     ACTION_TYPE_ADD_FILTER_FOR_SCREEN,
     ACTION_TYPE_REMOVE_FILTER_FOR_SCREEN,
-    ACTION_TYPE_SAVE_TRANSLATION
+    ACTION_TYPE_SAVE_TRANSLATION,
+    ACTION_TYPE_SAVE_HUB_CONFIGURATION
 } from './../utils/enums';
 
 // Do not add unnecessary business logic in the reducer. Here should only be updated the store
-export default function app(state = { root: undefined, screenSize: {width: 375, height: 667}, filters: {}, translation: {} }, action = {}) {
+export default function app(state = { root: undefined, screenSize: {width: 375, height: 667}, filters: {}, translation: {}, hubConfiguration:{} }, action = {}) {
     let stateClone = null;
     switch (action.type) {
         case ACTION_TYPE_ROOT_CHANGE:
@@ -24,6 +25,10 @@ export default function app(state = { root: undefined, screenSize: {width: 375, 
         case ACTION_TYPE_SAVE_TRANSLATION:
             return Object.assign({}, state, {
                 translation: action.translation
+            });
+        case ACTION_TYPE_SAVE_HUB_CONFIGURATION:
+            return Object.assign({}, state, {
+                hubConfiguration: action.hubConfiguration
             });
         case ACTION_TYPE_ADD_FILTER_FOR_SCREEN:
             if (!action.payload) {

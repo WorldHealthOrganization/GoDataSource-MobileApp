@@ -18,7 +18,7 @@ export function getTranslationRequest(languageId, callback) {
             return handleResponse(response);
         })
         .then((response) => {
-            console.log('### getTranslationRequest response: ', response);
+            console.log('### getTranslationRequest response: ');
             callback(null, response);
         })
         .catch((error) => {

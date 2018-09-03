@@ -43,6 +43,18 @@ function getLanguagesUrl () {
     return getBaseUrl() + '/languages';
 }
 
+function getSyncUrl () {
+    return getBaseUrl() + '/sync';
+}
+
+function getDatabaseSnapshotUrl () {
+    return getSyncUrl() + '/database-snapshot';
+}
+
+function postDatabaseSnapshot () {
+    return getSyncUrl() + '/import-database-snapshot';
+}
+
 export default {
     getUsersUrl,
     getLoginUrl,
@@ -51,5 +63,7 @@ export default {
     getLocationsUrl,
     getLanguagesUrl,
     getBaseUrl,
-    setBaseUrl
+    setBaseUrl,
+    getDatabaseSnapshotUrl,
+    postDatabaseSnapshot
 }

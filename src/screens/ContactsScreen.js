@@ -2,13 +2,14 @@
  * Created by florinpopa on 18/07/2018.
  */
 import React, {Component} from 'react';
-import {View, StyleSheet, Animated} from 'react-native';
+import {View, StyleSheet, Animated, Text} from 'react-native';
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
-import {Button} from 'react-native-material-ui';
+import {Icon} from 'react-native-material-ui';
 import styles from './../styles';
 import NavBarCustom from './../components/NavBarCustom';
-import CalendarPicker from './../components/CalendarPicker';
+import ElevatedView from 'react-native-elevated-view';
+import Ripple from 'react-native-material-ripple';
 import {calculateDimension} from './../utils/functions';
 import config from './../utils/config';
 import ButtonWithIcons from './../components/ButtonWithIcons';
@@ -84,31 +85,39 @@ class ContactsScreen extends Component {
         return (
             <View style={style.container}>
                 <NavBarCustom
-                    title="Contacts"
+                    customTitle={
+                        <View style={{
+                            flex: 1,
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            height: '100%'
+                        }}>
+                            <Text style={[style.title, {marginLeft: 30}]}>Contacts</Text>
+                            <ElevatedView
+                                elevation={3}
+                                style={{
+                                    backgroundColor: styles.buttonGreen,
+                                    width: calculateDimension(33, false, this.props.screenSize),
+                                    height: calculateDimension(25, true, this.props.screenSize),
+                                    borderRadius: 4
+                                }}
+                            >
+                                <Ripple style={{
+                                    flex: 1,
+                                    justifyContent: 'center',
+                                    alignItems: 'center'
+                                }} onPress={this.handleOnPressAddContact}>
+                                    <Icon name="add" color={'white'} size={15}/>
+                                </Ripple>
+                            </ElevatedView>
+                        </View>
+                    }
+                    title={null}
                     navigator={this.props.navigator}
                     iconName="menu"
                     handlePressNavbarButton={this.handlePressNavbarButton}
                 >
-                    {/*<CalendarPicker*/}
-                        {/*width={calculateDimension(124, false, this.props.screenSize)}*/}
-                        {/*height={calculateDimension(25, true, this.props.screenSize)}*/}
-                        {/*value={this.state.filter.date || new Date()}*/}
-                    {/*/>*/}
-                    {/*<ButtonWithIcons*/}
-                        {/*label="Altceva"*/}
-                        {/*width={calculateDimension(124, false, this.props.screenSize)}*/}
-                        {/*height={calculateDimension(25, true, this.props.screenSize)}*/}
-                        {/*firstIcon="visibility"*/}
-                        {/*secondIcon="arrow-drop-down"*/}
-                        {/*isFirstIconPureMaterial={true}*/}
-                        {/*isSecondIconPureMaterial={true}*/}
-                    {/*/>*/}
-                    {/*<Button raised text="" onPress={() => console.log("Empty button")} icon="add"*/}
-                            {/*style={{*/}
-                                {/*container: {width: calculateDimension(33, true, this.props.screenSize),height: calculateDimension(25, true, this.props.screenSize), margin: 0, padding: 0},*/}
-                                {/*text: {width: 0, margin: 0, padding: 0, height: 0},*/}
-                                {/*icon: {margin: 0, padding: 0, alignSelf: 'center'}*/}
-                            {/*}}/>*/}
                 </NavBarCustom>
                 <View style={style.containerContent}>
                     <AnimatedListView
@@ -144,6 +153,17 @@ class ContactsScreen extends Component {
     }
 
     // Please write here all the methods that are not react native lifecycle methods
+    handleOnPressAddContact = () => {
+        this.props.navigator.push({
+            screen: 'ContactsSingleScreen',
+            animated: true,
+            animationType: 'fade',
+            passProps: {
+                isNew: true
+            }
+        })
+    };
+
     keyExtractor = (item, index) => item.id;
 
     renderContact = (item) => {
@@ -314,6 +334,10 @@ const style = StyleSheet.create({
     separatorComponentStyle: {
         height: 8
     },
+    title: {
+        fontSize: 17,
+        fontFamily: 'Roboto-Medium',
+    }
 });
 
 function mapStateToProps(state) {

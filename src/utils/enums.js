@@ -5,6 +5,7 @@
 export const ACTION_TYPE_ROOT_CHANGE = 'ROOT_CHANGE';
 export const ACTION_TYPE_SAVE_SCREEN_SIZE = 'SAVE_SCREEN_SIZE';
 export const ACTION_TYPE_SAVE_TRANSLATION = 'SAVE_TRANSLATION';
+export const ACTION_TYPE_SAVE_HUB_CONFIGURATION = 'SAVE_HUB_CONFIGURATION';
 export const ACTION_TYPE_REMOVE_FILTER_FOR_SCREEN = 'REMOVE_FILTER_FOR_SCREEN';
 export const ACTION_TYPE_ADD_FILTER_FOR_SCREEN = 'ADD_FILTER_FOR_SCREEN';
 export const ACTION_TYPE_LOGIN = 'LOGIN';
@@ -18,9 +19,33 @@ export const ACTION_TYPE_GET_CASES = 'GET_CASES';
 export const ACTION_TYPE_STORE_CASES = 'STORE_CASES';
 export const ACTION_TYPE_STORE_CONTACTS = 'STORE_CONTACTS';
 export const ACTION_TYPE_UPDATE_CONTACT = 'UPDATE_CONTACT';
+export const ACTION_TYPE_ADD_CONTACT = 'ADD_CONTACT';
 export const ACTION_TYPE_STORE_EVENTS = 'STORE_EVENTS';
 export const ACTION_TYPE_STORE_OUTBREAK = 'STORE_OUTBREAK';
 export const ACTION_TYPE_STORE_REFERENCE_DATA = 'STORE_REFERENCE_DATA';
 export const ACTION_TYPE_STORE_LOCATIONS = 'STORE_LOCATIONS';
 export const ACTION_TYPE_ADD_ERROR = 'ADD_ERROR';
 export const ACTION_TYPE_REMOVE_ERRORS = 'REMOVE_ERRORS';
+
+
+// SQL query strings
+export const DROP_TABLE_USER = 'DROP TABLE IF EXISTS User';
+export const CREATE_TABLE_USER = 'CREATE TABLE IF NOT EXISTS User(' +
+    'id TEXT PRIMARY KEY NOT NULL, ' +
+    'firstName TEXT NOT NULL, ' +
+    'lastName TEXT NOT NULL, ' +
+    'roleIds TEXT NOT NULL, ' +
+    'languageId TEXT NOT NULL, ' +
+    'email TEXT NOT NULL,' +
+    'deleted BOOLEAN NOT NULL DEFAULT 0, ' +
+    'outbreakIds TEXT, ' +
+    'activeOutbreakId TEXT, ' +
+    'passwordChange BOOLEAN DEFAULT 1, ' +
+    'securityQuestions TEXT, ' +
+    'realm TEXT, ' +
+    'username TEXT, ' +
+    'emailVerified BOOLEAN DEFAULT 0, ' +
+    'createdAt DATETIME, ' +
+    'updatedAt DATETIME, ' +
+    'updatedBy TEXT, ' +
+    'deletedAt DATETIME)';

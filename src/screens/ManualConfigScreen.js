@@ -1,4 +1,7 @@
 /**
+ * Created by florinpopa on 28/08/2018.
+ */
+/**
  * Created by florinpopa on 14/06/2018.
  */
 import React, {Component} from 'react';
@@ -13,11 +16,11 @@ import { bindActionCreators } from 'redux';
 import { loginUser } from './../actions/user';
 import { removeErrors } from './../actions/errors';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
-import DropdownInput from './../components/DropdownInput';
 import config from './../utils/config';
 import url from './../utils/url';
+import {storeHubConfiguration} from './../actions/app';
 
-class LoginScreen extends Component {
+class ManualConfigScreen extends Component {
 
     static navigatorStyle = {
         navBarHidden: true
@@ -26,17 +29,14 @@ class LoginScreen extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            email: '',
-            password: '',
-            url: config.baseUrls[0].value
+            url: '',
+            clientId: '',
+            clientSecret: ''
         };
         // Bind here methods, or at least don't declare methods in the render method
-        this.handleLogin = this.handleLogin.bind(this);
-        this.handleTextChange = this.handleTextChange.bind(this);
-
-        this.emailRef = this.updateRef.bind(this, 'email');
-        this.passwordRef = this.updateRef.bind(this, 'password');
         this.urlRef = this.updateRef.bind(this, 'url');
+        this.clientIDRef = this.updateRef.bind(this, 'clientId');
+        this.clientSecretRef = this.updateRef.bind(this, 'clientSecret');
     }
 
     // Please add here the react lifecycle methods that you need
@@ -63,54 +63,41 @@ class LoginScreen extends Component {
                 keyboardShouldPersistTaps={'always'}
             >
                 <View style={[style.welcomeTextContainer]}>
-                    <Text style={style.welcomeText}>Welcome!</Text>
+                    <Text style={style.welcomeText}>HUB configuration</Text>
                 </View>
                 <View style={style.inputsContainer}>
-                    {/*<DropdownInput*/}
-                        {/*id="baseUrl"*/}
-                        {/*label="Select URL"*/}
-                        {/*value={this.state.url}*/}
-                        {/*data={config.baseUrls}*/}
-                        {/*isEditMode={true}*/}
-                        {/*isRequired={false}*/}
-                        {/*onChange={this.handleChangeUrl}*/}
-                    {/*/>*/}
-                    <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'}}>
-                        <Text style={{alignSelf: 'flex-end', marginBottom: 20, fontFamily: 'Roboto-Medium', fontSize: 15}}>http://</Text>
-                        <TextField
-                            ref={this.urlRef}
-                            value={this.state.url}
-                            autoCorrect={false}
-                            lineWidth={1}
-                            enablesReturnKeyAutomatically={true}
-                            containerStyle={[style.textInput, {width: '65%'}]}
-                            onChangeText={this.handleTextChange}
-                            label='URL'
-                        />
-                        <Text style={{alignSelf: 'flex-end', marginBottom: 20, fontFamily: 'Roboto-Medium', fontSize: 15}}>/api</Text>
-                    </View>
                     <TextField
-                        ref={this.emailRef}
-                        value={this.state.email}
+                        ref={this.urlRef}
+                        value={this.state.url}
                         autoCorrect={false}
                         lineWidth={1}
                         enablesReturnKeyAutomatically={true}
                         containerStyle={style.textInput}
                         onChangeText={this.handleTextChange}
-                        label='Email address'
+                        label='HUB URL'
                     />
                     <TextField
-                        ref={this.passwordRef}
-                        value={this.state.password}
+                        ref={this.clientIDRef}
+                        value={this.state.clientId}
                         autoCorrect={false}
                         lineWidth={1}
                         enablesReturnKeyAutomatically={true}
                         containerStyle={style.textInput}
                         onChangeText={this.handleTextChange}
-                        label='Password'
+                        label='Client ID'
+                    />
+                    <TextField
+                        ref={this.clientSecretRef}
+                        value={this.state.clientSecret}
+                        autoCorrect={false}
+                        lineWidth={1}
+                        enablesReturnKeyAutomatically={true}
+                        containerStyle={style.textInput}
+                        onChangeText={this.handleTextChange}
+                        label='Client secret'
                         secureTextEntry={true}
                     />
-                    <Button raised onPress={this.handleLogin} text="Login" style={styles.buttonLogin} />
+                    <Button upperCase={false} raised onPress={this.saveHubConfiguration} text="Save HUB configuration" style={styles.buttonLogin} />
                 </View>
                 <View style={style.logoContainer}>
                     <Image source={{uri: 'logo_app'}} style={style.logoStyle} />
@@ -124,41 +111,20 @@ class LoginScreen extends Component {
         this[name] = ref;
     }
 
-    handleLogin = () => {
-        let re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-        if (!this.state.email || !this.state.password) {
-            Alert.alert('Invalid credentials', "Please make sure you have completed the fields", [
+    saveHubConfiguration = () => {
+        if (!this.state.url || !this.state.clientId || !this.state.clientSecret) {
+            Alert.alert("Alert", "Please make sure you have completed all the fields before moving forward", [
                 {
                     text: 'Ok', onPress: () => {console.log('Ok pressed')}
                 }
             ])
         } else {
-            if (!re.test(this.state.email)) {
-                Alert.alert('Invalid email', "Please make sure you have entered a valid email address", [
-                    {
-                        text: 'Ok', onPress: () => {console.log('Ok pressed')}
-                    }
-                ])
-            } else {
-                let urlNew = this.state.url;
-                if (!urlNew.includes('http://')) {
-                    urlNew = 'http://' + urlNew;
-                }
-                if (!urlNew.includes('/api')) {
-                    urlNew += '/api';
-                }
-                url.setBaseUrl(urlNew);
-
-                this.props.loginUser({
-                    email: this.state.email.toLowerCase(),
-                    password: this.state.password
-                });
-            }
+            this.props.storeHubConfiguration({url: this.state.url, clientId: this.state.clientId, clientSecret: this.state.clientSecret});
         }
     };
 
     handleTextChange = (text) => {
-        ['email', 'password', 'url']
+        ['url', 'clientId', 'clientSecret']
             .map((name) => ({ name, ref: this[name] }))
             .forEach(({ name, ref }) => {
                 if (ref.isFocused()) {
@@ -166,10 +132,6 @@ class LoginScreen extends Component {
                 }
             });
     };
-
-    handleChangeUrl = (value) => {
-        url.setBaseUrl(value);
-    }
 }
 
 // Create style outside the class, or for components that will be used by other components (buttons),
@@ -195,7 +157,7 @@ const style = StyleSheet.create({
     },
     welcomeText: {
         fontFamily: 'Roboto-Bold',
-        fontSize: 35,
+        fontSize: 25,
         color: 'white',
         textAlign: 'left'
     },
@@ -226,8 +188,9 @@ function mapStateToProps(state) {
 function matchDispatchToProps(dispatch) {
     return bindActionCreators({
         loginUser,
-        removeErrors
+        removeErrors,
+        storeHubConfiguration
     }, dispatch);
 }
 
-export default connect(mapStateToProps, matchDispatchToProps)(LoginScreen);
+export default connect(mapStateToProps, matchDispatchToProps)(ManualConfigScreen);

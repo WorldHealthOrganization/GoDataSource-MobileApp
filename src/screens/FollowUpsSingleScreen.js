@@ -60,6 +60,7 @@ class FollowUpsSingleScreen extends Component {
         <FollowUpsSingleQuestionnaireContainer
             item={this.state.item}
             contact={this.state.contact}
+            isEditMode={true}
             onChangeTextAnswer={this.onChangeTextAnswer}
             onChangeSingleSelection={this.onChangeSingleSelection}
             onChangeMultipleSelection={this.onChangeMultipleSelection}
