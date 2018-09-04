@@ -53,7 +53,7 @@ export default class App {
                 // this.unregister();
                 Navigation.startSingleScreenApp({
                     screen: {
-                        screen: 'LoginScreen'
+                        screen: 'FirstConfigScreen'
                     },
                     appStyle: {
                         orientation: 'portrait'
@@ -84,7 +84,7 @@ export default class App {
                 // this.unregister();
                 Navigation.startSingleScreenApp({
                     screen: {
-                        screen: 'LoginScreen',
+                        screen: 'FirstConfigScreen',
                     },
                     appStyle: {
                         orientation: 'portrait'

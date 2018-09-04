@@ -1,0 +1,4 @@
+source 'https://github.com/CocoaPods/Specs.git'
+target ‘who_mobile’ do
+  pod 'SQLCipher'
+end

@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@ptomasroos/react-native-multi-slider": "^1.0.0",
+    "async-retry": "^1.2.1",
     "base-64": "^0.1.0",
     "hoist-non-react-statics": "^2.5.5",
     "lodash": "^4.17.10",
