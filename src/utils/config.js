@@ -58,6 +58,12 @@ const tabsValuesRoutes = {
         {key: 'genInfo', title: 'GENERAL INFO'},
         {key: 'quest', title: 'QUESTIONNAIRE'}
     ],
+    casesSingle: [
+        {key: 'personal', title: 'PERSONAL'},
+        {key: 'address', title: 'ADDRESS'},
+        {key: 'infection', title: 'INFECTION'},
+        {key: 'labData', title: 'LAB DATA'}
+    ],
     contactsSingle: [
         {key: 'personal', title: 'PERSONAL'},
         {key: 'address', title: 'ADDRESS'},
@@ -186,6 +192,129 @@ const followUpsSingleScreen = {
                     isAdditive: true,
                     objectType: 'FollowUp'
                 }
+            ]
+        }
+    ]
+};
+
+const caseSingleScreen = {
+    personal: [
+        {
+            fields: [
+                {
+                    cardNumber: 1,
+                    id: 'riskLevel',
+                    label: 'Risk level',
+                    labelValue: 'test',
+                    type: 'DropdownInput',
+                    value: '',
+                    isRequired: false,
+                    isEditMode: true,
+                    activeButtonColor: 'red',
+                    activeBackgroundColor: 'red',
+                    objectType: 'Contact'
+                },
+                {
+                    cardNumber: 1,
+                    id: 'riskReason',
+                    label: 'Reason',
+                    type: 'TextInput',
+                    value: '',
+                    isRequired: true,
+                    isEditMode: true,
+                    multiline: true,
+                    objectType: 'Contact'
+                },
+            ]
+        }
+    ],
+    address: [
+        {
+            fields: [
+                {
+                    cardNumber: 1,
+                    id: 'riskLevel',
+                    label: 'Risk level',
+                    labelValue: 'test',
+                    type: 'DropdownInput',
+                    value: '',
+                    isRequired: false,
+                    isEditMode: true,
+                    activeButtonColor: 'red',
+                    activeBackgroundColor: 'red',
+                    objectType: 'Contact'
+                },
+                {
+                    cardNumber: 1,
+                    id: 'riskReason',
+                    label: 'Reason',
+                    type: 'TextInput',
+                    value: '',
+                    isRequired: true,
+                    isEditMode: true,
+                    multiline: true,
+                    objectType: 'Contact'
+                },
+            ]
+        }
+    ],
+    infection: [
+        {
+            fields: [
+                {
+                    cardNumber: 1,
+                    id: 'riskLevel',
+                    label: 'Risk level',
+                    labelValue: 'test',
+                    type: 'DropdownInput',
+                    value: '',
+                    isRequired: false,
+                    isEditMode: true,
+                    activeButtonColor: 'red',
+                    activeBackgroundColor: 'red',
+                    objectType: 'Contact'
+                },
+                {
+                    cardNumber: 1,
+                    id: 'riskReason',
+                    label: 'Reason',
+                    type: 'TextInput',
+                    value: '',
+                    isRequired: true,
+                    isEditMode: true,
+                    multiline: true,
+                    objectType: 'Contact'
+                },
+            ]
+        }
+    ],
+    labData: [
+        {
+            fields: [
+                {
+                    cardNumber: 1,
+                    id: 'riskLevel',
+                    label: 'Risk level',
+                    labelValue: 'test',
+                    type: 'DropdownInput',
+                    value: '',
+                    isRequired: false,
+                    isEditMode: true,
+                    activeButtonColor: 'red',
+                    activeBackgroundColor: 'red',
+                    objectType: 'Contact'
+                },
+                {
+                    cardNumber: 1,
+                    id: 'riskReason',
+                    label: 'Reason',
+                    type: 'TextInput',
+                    value: '',
+                    isRequired: true,
+                    isEditMode: true,
+                    multiline: true,
+                    objectType: 'Contact'
+                },
             ]
         }
     ]
@@ -745,6 +874,7 @@ export default {
     followUpsSingleScreen,
     followUpsFilterScreen,
     casesFilterScreen,
+    caseSingleScreen,
     defaultFilterForContacts,
     defaultFilterForCases,
     baseUrls,

@@ -11,6 +11,7 @@ export default {
     ERROR_ADD_FOLLOWUP: {type: "Follow-up add error", message: 'An error occurred while trying to add the follow-up'},
     ERROR_GENERATE_FOLLOWUP: {type: "Follow-up generate error", message: 'An error occurred while trying to generate follow-ups'},
     ERROR_DELETE_FOLLOWUP: {type: "Follow-up delete error", message: 'An error occurred while trying to delete the follow-up'},
+    ERROR_DELETE_CASE: {type: "Case delete error", message: 'An error occurred while trying to delete the case'},
     ERROR_CONTACT: {type: "Contacts error", message: 'An error occurred while trying to get contacts data'},
     ERROR_UPDATE_CONTACT: {type: "Contact update error", message: 'An error occurred while trying to update the contact'},
     ERROR_ADD_CONTACT: {type: "Contact add error", message: 'An error occurred while trying to add the contact'},

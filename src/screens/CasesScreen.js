@@ -4,7 +4,7 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
-import {TextInput, View, Text, StyleSheet, Dimensions, Platform, FlatList, Animated} from 'react-native';
+import {TextInput, View, Text, Alert, StyleSheet, Dimensions, Platform, FlatList, Animated} from 'react-native';
 import {Button, Icon} from 'react-native-material-ui';
 import { TextField } from 'react-native-material-textfield';
 import styles from './../styles';
@@ -26,6 +26,7 @@ import Breadcrumb from './../components/Breadcrumb';
 import {getCasesForOutbreakId} from './../actions/cases';
 import {removeErrors} from './../actions/errors';
 import {addFilterForScreen} from './../actions/app';
+import AnimatedListView from './../components/AnimatedListView';
 
 let height = Dimensions.get('window').height;
 let width = Dimensions.get('window').width;
@@ -45,14 +46,16 @@ class CasesScreen extends Component {
                 searchText: ''
             },
             filterFromFilterScreen: this.props.filter && this.props.filter['CasesFilterScreen'] ? this.props.filter['CasesFilterScreen'] : null,
-            followUps: []
+            cases: [],
+            refreshing: false,
+            loading: true
         };
 
         // Bind here methods, or at least don't declare methods in the render method
         this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this));
     }
 
-    clampedScroll= Animated.diffClamp(
+    clampedScroll = Animated.diffClamp(
         Animated.add(
             scrollAnim.interpolate({
                 inputRange: [0, 1],
@@ -64,7 +67,31 @@ class CasesScreen extends Component {
         0,
         30,
     );
+
+    handleScroll = Animated.event(
+        [{nativeEvent: {contentOffset: {y: scrollAnim}}}],
+        {useNativeDriver: true}
+    );
+
     // Please add here the react lifecycle methods that you need
+    static getDerivedStateFromProps(props, state) {
+        if (props.errors && props.errors.type && props.errors.message) {
+            Alert.alert(props.errors.type, props.errors.message, [
+                {
+                    text: 'Ok', onPress: () => {
+                    props.removeErrors();
+                    state.loading = false;
+                }
+                }
+            ])
+        }
+
+        if(props.cases){
+            state.refreshing = false;
+            state.loading = false;
+        }
+        return null;
+    }
 
     // The render method should have at least business logic as possible,
     // because this will be called whenever there is a new setState call
@@ -123,26 +150,34 @@ class CasesScreen extends Component {
 
                 </NavBarCustom>
                 <View style={style.containerContent}>
-                    <SearchFilterView
-                        style={{
-                            transform: [{
-                                translateY: navbarTranslate
-                            }],
-                            opacity: navbarOpacity
-                        }}
-                        value={this.state.filter.searchText}
-                        onPress={this.handlePressFilter}
-                        onChangeText={this.handleOnChangeText}
-                        onSubmitEditing={this.handleOnSubmitEditing}
-                        filterText={this.state.filterFromFilterScreen && this.state.filterFromFilterScreen.where
-                        && this.state.filterFromFilterScreen.where.and && Array.isArray(this.state.filterFromFilterScreen.where.and) ?
-                            ("Filter (" + this.state.filterFromFilterScreen.where.and.length + ')') : 'Filter'}
-                    />
-                    <FlatList
-                        data={this.props.cases}
+                    <AnimatedListView
+                        stickyHeaderIndices={[0]}
+                        data={this.props.cases || []}
                         renderItem={this.renderCase}
                         keyExtractor={this.keyExtractor}
+                        ListHeaderComponent={
+                            <SearchFilterView
+                                style={{
+                                    transform: [{
+                                        translateY: navbarTranslate
+                                    }],
+                                    opacity: navbarOpacity
+                                }}
+                                value={this.state.filter.searchText}
+                                onPress={this.handlePressFilter}
+                                onChangeText={this.handleOnChangeText}
+                                onSubmitEditing={this.handleOnSubmitEditing}
+                                filterText={this.state.filterFromFilterScreen && this.state.filterFromFilterScreen.where
+                                && this.state.filterFromFilterScreen.where.and && Array.isArray(this.state.filterFromFilterScreen.where.and) ?
+                                    ("Filter (" + this.state.filterFromFilterScreen.where.and.length + ')') : 'Filter'}
+                            />
+                        }
                         ItemSeparatorComponent={this.renderSeparatorComponent}
+                        style={[style.listViewStyle]}
+                        componentContainerStyle={style.componentContainerStyle}
+                        onScroll={this.handleScroll}
+                        refreshing={this.state.refreshing}
+                        onRefresh={this.handleOnRefresh}
                     />
                 </View>
             </View>
@@ -158,28 +193,8 @@ class CasesScreen extends Component {
         })
     };
 
-    handleDayPress = (day) => {
-        this.setState(prevState => ({
-            filter: Object.assign({}, prevState.filter, {date: day})
-        }), () => {
-            console.log("### filter from handleDayPress: ", this.state.filter);
-            this.appendToFilter({type: 'date', value: day});
-        });
-    };
-
-    // Append to the existing filter newProp={name: value}
-    appendToFilter = (newProp) => {
-        let auxFilter = Object.assign({}, this.state.filter);
-
-        // If the filter exists, check if it has already the wanted props and change them. Otherwise add them
-        if (auxFilter) {
-            auxFilter[newProp.type] = newProp.value;
-        }
-
-        this.setFilter(auxFilter);
-    };
-
-    handleOnSubmitEditing = (text) => {
+    //Search cases using keyword
+    handleOnSubmitEditing = () => {
         this.props.addFilterForScreen("CasesScreen", this.state.filter);
         let existingFilter = this.state.filterFromFilterScreen ? Object.assign({}, this.state.filterFromFilterScreen) : Object.assign({}, config.defaultFilterForCases);
 
@@ -195,89 +210,15 @@ class CasesScreen extends Component {
         this.props.getCasesForOutbreakId(this.props.user.activeOutbreakId, existingFilter, this.props.user.token);
     };
 
-    setFilter = (filter) => {
-        this.setState({filter}, () => {
-            // After setting the filter, we want to apply it
-            this.applyFilters();
-        });
-    };
-
-    applyFilters = () => {
-        // // let filter = {};
-        // //
-        // // filter.where = {};
-        // // filter.where.and = [];
-        // //
-        // // let oneDay = 24 * 60 * 60 * 1000;
-        // //
-        // // if (this.state.filter.date) {
-        // //     filter.where.and.push({date: {gt: new Date(this.state.filter.date.getTime() - oneDay)}});
-        // //     filter.where.and.push({date: {lt: new Date(this.state.filter.date.getTime() + oneDay)}});
-        // // }
-        // // // else {
-        // // //     let now = new Date();
-        // // //
-        // // //     filter.where.and.push({date: {gt: new Date(now.getTime() - oneDay)}});
-        // // //     filter.where.and.push({date: {lt: new Date(now.getTime() + oneDay)}});
-        // // // }
-        // //
-        // // if (this.state.filter.performed) {
-        // //     filter.where.and.push({performed: this.state.filter.performed !== 'To do'})
-        // // }
-        // //
-        // this.props.addFilterForScreen('FollowUpsScreen', this.state.filter);
-        // //
-        // // if (this.state.filter.performed === 'Missed') {
-        // //     this.props.getMissedFollowUpsForOutbreakId(this.props.user.activeOutbreakId, filter, this.props.user.token);
-        // // } else {
-        // //     this.props.getFollowUpsForOutbreakId(this.props.user.activeOutbreakId, filter, this.props.user.token);
-        // // }
-        //
-        // let defaultFilter = Object.assign({}, config.defaultFilterForContacts);
-        //
-        // // Check if there is an active search
-        // if (this.state.filter.searchText) {
-        //     if (!defaultFilter.where || Object.keys(defaultFilter.where).length === 0) {
-        //         defaultFilter.where = {}
-        //     }
-        //     if (!defaultFilter.where.or || defaultFilter.where.or.length === 0) {
-        //         defaultFilter.where.or = [];
-        //     }
-        //     defaultFilter.where.or.push({firstName: {like: this.state.filter.searchText, options: 'i'}});
-        //     defaultFilter.where.or.push({lastName: {like: this.state.filter.searchText, options: 'i'}});
-        // }
-        //
-        // //Check if there are active filters
-        // if (this.state.filterFromFilterScreen) {
-        //     defaultFilter.where = this.state.filterFromFilterScreen.where;
-        //     if (this.state.filter.searchText) {
-        //         if (!defaultFilter.where || Object.keys(defaultFilter.where).length === 0) {
-        //             defaultFilter.where = {}
-        //         }
-        //         if (!defaultFilter.where.or || defaultFilter.where.or.length === 0) {
-        //             defaultFilter.where.or = [];
-        //         }
-        //         defaultFilter.where.or.push({firstName: {like: this.state.filter.searchText, options: 'i'}});
-        //         defaultFilter.where.or.push({lastName: {like: this.state.filter.searchText, options: 'i'}});
-        //     }
-        // }
-        //
-        // this.props.getContactsForOutbreakId(this.props.user.activeOutbreakId, defaultFilter, this.props.user.token)
-    };
-
-    onSelectValue = (value) => {
+    //Save keyword for search in cases
+    handleOnChangeText = (text) => {
+        console.log("### handleOnChangeText: ", text);
         this.setState(prevState => ({
-            filter: Object.assign({}, prevState.filter, {performed: value})
-        }), () => {
-            console.log("### filter from onSelectValue: ", this.state.filter);
-            if (value === 'All') {
-                this.removeFromFilter({type: 'performed'});
-            } else {
-                this.appendToFilter({type: 'performed', value});
-            }
-        });
+            filter: Object.assign({}, prevState.filter, {searchText: text})
+        }), console.log('### filter after changed text: ', this.state.filter))
     };
 
+    //Open filter screen for cases
     handlePressFilter = () => {
         this.props.navigator.showModal({
             screen: 'CasesFilterScreen',
@@ -289,36 +230,16 @@ class CasesScreen extends Component {
         })
     };
 
-    handleOnChangeText = (text) => {
-        console.log("### handleOnChangeText: ", text);
-        this.setState(prevState => ({
-            filter: Object.assign({}, prevState.filter, {searchText: text})
-        }), console.log('### filter after changed text: ', this.state.filter))
-    };
-
-    renderCase = ({item}) => {
-        return (
-            <CaseListItem item={item} onPressCase={this.handleOnPressCase}/>
-        )
-    };
-
-    keyExtractor = (item, index) => item.id;
-
-    renderSeparatorComponent = () => {
-        return (
-            <View style={style.separatorComponentStyle} />
-        )
-    };
-
-    handlePressDropdown = () => {
-        this.refs.dropdown.focus();
-    };
-
+    //Filter cases by selected criteria
     handleOnApplyFilters = (filter) => {
         this.setState({
             filterFromFilterScreen: filter
         }, () => {
             if (this.state.filter.searchText) {
+
+                if(!filter.hasOwnProperty('where')){
+                    filter.where = {};
+                }
 
                 if (!filter.where.or || filter.where.or.length === 0) {
                     filter.where.or = [];
@@ -330,11 +251,49 @@ class CasesScreen extends Component {
         })
     };
 
-    //Open single case SingleCaseScreen
+    //Render a case tile
+    renderCase = ({item}) => {
+        return (
+            <CaseListItem item={item} onPressCase={this.handleOnPressCase} onPressAddContact={this.handleOnPressAddContact} />
+        )
+    };
+
+    //Key extractor for case list
+    keyExtractor = (item, index) => item.id;
+
+    //Item separator for case list
+    renderSeparatorComponent = () => {
+        return (
+            <View style={style.separatorComponentStyle} />
+        )
+    };
+
+    //Refresh list of cases
+    handleOnRefresh = () => {
+        this.setState({
+            refreshing: true
+        }, () => {
+            this.props.addFilterForScreen("CasesScreen", this.state.filter);
+            let existingFilter = this.state.filterFromFilterScreen ? Object.assign({}, this.state.filterFromFilterScreen) : Object.assign({}, config.defaultFilterForCases);
+
+            if (!existingFilter.where || Object.keys(existingFilter.where).length === 0) {
+                existingFilter.where = {};
+            }
+            if (!existingFilter.where.or || existingFilter.where.or.length === 0) {
+                existingFilter.where.or = [];
+            }
+            existingFilter.where.or.push({firstName: {like: this.state.filter.searchText, options: 'i'}});
+            existingFilter.where.or.push({lastName: {like: this.state.filter.searchText, options: 'i'}});
+
+            this.props.getCasesForOutbreakId(this.props.user.activeOutbreakId, existingFilter, this.props.user.token);
+        });
+    };
+
+    //Open single case CaseSingleScreen
     handleOnPressCase = (item, contact) => {
         console.log("### handlePressCases: ", item);
         this.props.navigator.push({
-            screen: 'SingleCaseScreen',
+            screen: 'CaseSingleScreen',
             animated: true,
             animationType: 'fade',
             passProps: {
@@ -344,6 +303,19 @@ class CasesScreen extends Component {
         })
     };
 
+    //Create new contact in ContactSingleScreen
+    handleOnPressAddContact = (item, contact) => {
+        this.props.navigator.push({
+            screen: 'ContactsSingleScreen',
+            animated: true,
+            animationType: 'fade',
+            passProps: {
+                contact: {}
+            }
+        })
+    };
+
+    //Create new case in AddSingleCaseScreen
     handleOnPressAddCase = () => {
         console.log("### handlePressAddCases: ");
         this.props.navigator.push({
@@ -357,11 +329,7 @@ class CasesScreen extends Component {
         })
     };
 
-    calculateTopForDropdown = () => {
-        let dim = calculateDimension(98, true, this.props.screenSize);
-        return dim;
-    };
-
+    //Navigator event
     onNavigatorEvent = (event) => {
         if (event.type === 'DeepLink') {
             console.log("###");
