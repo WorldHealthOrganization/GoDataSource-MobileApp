@@ -50,8 +50,8 @@ class CaseSinglePersonalContainer extends PureComponent {
                     keyboardShouldPersistTaps={'always'}
                 >
                     {
-                        config.caseSingleScreen.personal.map((item) => {
-                            return this.handleRenderItem(item)
+                        config.caseSingleScreen.personal.map((item, index) => {
+                            return this.handleRenderItem(item, index)
                         })
                     }
                 </KeyboardAwareScrollView>
@@ -60,13 +60,13 @@ class CaseSinglePersonalContainer extends PureComponent {
     }
 
     // Please write here all the methods that are not react native lifecycle methods
-    handleRenderItem = (item) => {
-        // console.log("Item: ", item);
+    handleRenderItem = (item, index) => {
         return (
             <CardComponent
                 item={item.fields}
+                key={index}
                 followUp={this.props.item}
-                contact={this.props.contact}
+                contact={this.props.item}
                 style={style.cardStyle}
                 onChangeText={this.props.onChangeText}
                 onChangeDate={this.props.onChangeDate}

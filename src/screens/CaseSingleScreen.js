@@ -50,7 +50,9 @@ class CaseSingleScreen extends Component {
     PersonalRoute = () => (
         <CaseSinglePersonalContainer
             item={this.state.item}
-            contact={null}
+            isEditMode={this.state.isEditMode}
+            followup={this.state.item}
+            contact={this.state.item}
             onNext={this.handleNextPress}
             onChangeText={this.onChangeText}
             onChangeDate={this.onChangeDate}
@@ -63,7 +65,9 @@ class CaseSingleScreen extends Component {
     AddressRoute = () => (
         <CaseSingleAddressContainer
             item={this.state.item}
-            contact={null}
+            isEditMode={this.state.isEditMode}
+            followup={this.state.item}
+            contact={this.state.item}
             onNext={this.handleNextPress}
             onChangeText={this.onChangeText}
             onChangeDate={this.onChangeDate}
@@ -76,7 +80,9 @@ class CaseSingleScreen extends Component {
     InfectionRoute = () => (
         <CaseSingleInfectionContainer
             item={this.state.item}
-            contact={null}
+            isEditMode={this.state.isEditMode}
+            followup={this.state.item}
+            contact={this.state.item}
             onNext={this.handleNextPress}
             onChangeText={this.onChangeText}
             onChangeDate={this.onChangeDate}
@@ -89,7 +95,9 @@ class CaseSingleScreen extends Component {
     LabDataRoute = () => (
         <CaseSingleLabDataContainer
             item={this.state.item}
-            contact={null}
+            isEditMode={this.state.isEditMode}
+            followup={this.state.item}
+            contact={this.state.item}
             onNext={this.handleNextPress}
             onChangeText={this.onChangeText}
             onChangeDate={this.onChangeDate}

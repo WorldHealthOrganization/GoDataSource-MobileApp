@@ -50,8 +50,8 @@ class CaseSingleLabDataContainer extends PureComponent {
                     keyboardShouldPersistTaps={'always'}
                 >
                     {
-                        config.caseSingleScreen.labData.map((item) => {
-                            return this.handleRenderItem(item)
+                        config.caseSingleScreen.labData.map((item, index) => {
+                            return this.handleRenderItem(item, index)
                         })
                     }
                 </KeyboardAwareScrollView>
@@ -60,11 +60,12 @@ class CaseSingleLabDataContainer extends PureComponent {
     }
 
     // Please write here all the methods that are not react native lifecycle methods
-    handleRenderItem = (item) => {
+    handleRenderItem = (item, index) => {
         // console.log("Item: ", item);
         return (
             <CardComponent
                 item={item.fields}
+                key={index}
                 followUp={this.props.item}
                 contact={this.props.contact}
                 style={style.cardStyle}

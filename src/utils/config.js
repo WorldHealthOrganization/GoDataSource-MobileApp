@@ -208,11 +208,44 @@ const caseSingleScreen = {
                     labelValue: 'test',
                     type: 'DropdownInput',
                     value: '',
-                    isRequired: false,
-                    isEditMode: true,
+                    isRequired: true,
+                    isEditMode: false,
                     activeButtonColor: 'red',
                     activeBackgroundColor: 'red',
-                    objectType: 'Contact'
+                    objectType: 'Case'
+                },
+                {
+                    cardNumber: 1,
+                    id: 'dateOfReporting',
+                    label: 'Date of Reporting',
+                    value: '',
+                    type: "DatePicker",
+                    isRequired: true,
+                    isEditMode: false,
+                    format: 'YYYY-MM-dd',
+                    objectType: 'Case'
+                },
+                {
+                    cardNumber: 1,
+                    id: 'isDateOfReportingApproximate',
+                    label: 'Is Date of reporting approximate',
+                    type: 'SwitchInput',
+                    value: false,
+                    isRequired: false,
+                    isEditMode: false,
+                    activeButtonColor: styles.missedRedColor,
+                    activeBackgroundColor: styles.missedRedColorWithOpacity
+                },
+                {
+                    cardNumber: 1,
+                    id: 'transferRefused',
+                    label: 'Transfer Refused',
+                    type: 'SwitchInput',
+                    value: false,
+                    isRequired: false,
+                    isEditMode: false,
+                    activeButtonColor: styles.missedRedColor,
+                    activeBackgroundColor: styles.missedRedColorWithOpacity
                 },
                 {
                     cardNumber: 1,
@@ -220,11 +253,99 @@ const caseSingleScreen = {
                     label: 'Reason',
                     type: 'TextInput',
                     value: '',
-                    isRequired: true,
-                    isEditMode: true,
+                    isRequired: false,
+                    isEditMode: false,
                     multiline: true,
-                    objectType: 'Contact'
+                    objectType: 'Case'
                 },
+            ]
+        },
+        {
+            fields: [
+                {
+                    cardNumber: 2,
+                    id: 'firstName',
+                    label: 'First Name',
+                    type: 'TextInput',
+                    value: '',
+                    isRequired: true,
+                    isEditMode: false,
+                    objectType: 'Case'
+                },
+                {
+                    cardNumber: 2,
+                    id: 'middleName',
+                    label: 'Middle Name',
+                    type: 'TextInput',
+                    value: '',
+                    isRequired: false,
+                    isEditMode: false,
+                    objectType: 'Case'
+                },
+                {
+                    cardNumber: 2,
+                    id: 'lastName',
+                    label: 'Last Name',
+                    type: 'TextInput',
+                    value: '',
+                    isRequired: false,
+                    isEditMode: false,
+                    objectType: 'Case'
+                },
+                {
+                    cardNumber: 2,
+                    id: 'gender',
+                    label: 'Gender',
+                    labelValue: '',
+                    type: 'DropdownInput',
+                    value: '',
+                    isRequired: true,
+                    isEditMode: false,
+                    activeButtonColor: 'red',
+                    activeBackgroundColor: 'red',
+                    objectType: 'Case'
+                },
+                {
+                    cardNumber: 2,
+                    id: 'phoneNumber',
+                    label: 'Phone Number',
+                    type: 'TextInput',
+                    value: '',
+                    isRequired: false,
+                    isEditMode: false,
+                    objectType: 'Case'
+                },
+                {
+                    cardNumber: 2,
+                    id: 'occupation',
+                    label: 'Occupation',
+                    type: 'TextInput',
+                    value: '',
+                    isRequired: false,
+                    isEditMode: false,
+                    objectType: 'Case'
+                },
+                {
+                    cardNumber: 2,
+                    id: 'age',
+                    label: 'Age',
+                    type: 'TextInput',
+                    value: '',
+                    isRequired: false,
+                    isEditMode: false,
+                    objectType: 'Case'
+                },
+                // {
+                //     cardNumber: 1,
+                //     id: 'dob',
+                //     label: 'Date of Birth',
+                //     value: '',
+                //     type: "DatePicker",
+                //     isRequired: true,
+                //     isEditMode: false,
+                //     format: 'YYYY-MM-dd',
+                //     objectType: 'Case'
+                // },
             ]
         }
     ],
@@ -233,27 +354,64 @@ const caseSingleScreen = {
             fields: [
                 {
                     cardNumber: 1,
-                    id: 'riskLevel',
-                    label: 'Risk level',
-                    labelValue: 'test',
+                    id: 'typeId',
+                    label: 'Name',
                     type: 'DropdownInput',
                     value: '',
-                    isRequired: false,
-                    isEditMode: true,
-                    activeButtonColor: 'red',
-                    activeBackgroundColor: 'red',
-                    objectType: 'Contact'
+                    isRequired: true,
+                    isEditMode: false,
+                    objectType: 'Case'
                 },
                 {
                     cardNumber: 1,
-                    id: 'riskReason',
-                    label: 'Reason',
+                    id: 'date',
+                    label: 'Date',
+                    value: '',
+                    type: "DatePicker",
+                    isRequired: true,
+                    isEditMode: false,
+                    format: 'YYYY-MM-dd',
+                    objectType: 'Case'
+                },
+                {
+                    cardNumber: 1,
+                    id: 'locationId',
+                    label: 'Area',
                     type: 'TextInput',
                     value: '',
                     isRequired: true,
-                    isEditMode: true,
-                    multiline: true,
-                    objectType: 'Contact'
+                    isEditMode: false,
+                    objectType: 'Case'
+                },
+                {
+                    cardNumber: 1,
+                    id: 'city',
+                    label: 'City',
+                    type: 'TextInput',
+                    value: '',
+                    isRequired: true,
+                    isEditMode: false,
+                    objectType: 'Case'
+                },
+                {
+                    cardNumber: 1,
+                    id: 'postalCode',
+                    label: 'Zip',
+                    type: 'TextInput',
+                    value: '',
+                    isRequired: true,
+                    isEditMode: false,
+                    objectType: 'Case'
+                },
+                {
+                    cardNumber: 1,
+                    id: 'addressLine1',
+                    label: 'Address',
+                    type: 'TextInput',
+                    value: '',
+                    isRequired: true,
+                    isEditMode: false,
+                    objectType: 'Case'
                 },
             ]
         }
@@ -263,27 +421,90 @@ const caseSingleScreen = {
             fields: [
                 {
                     cardNumber: 1,
-                    id: 'riskLevel',
-                    label: 'Risk level',
-                    labelValue: 'test',
+                    id: 'classification',
+                    label: 'Classification',
                     type: 'DropdownInput',
                     value: '',
-                    isRequired: false,
-                    isEditMode: true,
-                    activeButtonColor: 'red',
-                    activeBackgroundColor: 'red',
-                    objectType: 'Contact'
+                    isRequired: true,
+                    isEditMode: false,
+                    objectType: 'Case'
                 },
                 {
                     cardNumber: 1,
-                    id: 'riskReason',
-                    label: 'Reason',
-                    type: 'TextInput',
+                    id: 'dateBecomeCase',
+                    label: 'Date of Becoming case',
                     value: '',
-                    isRequired: true,
-                    isEditMode: true,
-                    multiline: true,
-                    objectType: 'Contact'
+                    type: "DatePicker",
+                    isRequired: false,
+                    isEditMode: false,
+                    format: 'YYYY-MM-dd',
+                    objectType: 'Case'
+                },
+                {
+                    cardNumber: 1,
+                    id: 'dateOfInfection',
+                    label: 'Date of Infection',
+                    value: '',
+                    type: "DatePicker",
+                    isRequired: false,
+                    isEditMode: false,
+                    format: 'YYYY-MM-dd',
+                    objectType: 'Case'
+                },
+                {
+                    cardNumber: 1,
+                    id: 'dateOfOutcome',
+                    label: 'Date of Outcome',
+                    value: '',
+                    type: "DatePicker",
+                    isRequired: false,
+                    isEditMode: false,
+                    format: 'YYYY-MM-dd',
+                    objectType: 'Case'
+                },
+                {
+                    cardNumber: 1,
+                    id: 'dateOfOnset',
+                    label: 'Date of Onset',
+                    value: '',
+                    type: "DatePicker",
+                    isRequired: false,
+                    isEditMode: false,
+                    format: 'YYYY-MM-dd',
+                    objectType: 'Case'
+                },
+                {
+                    cardNumber: 1,
+                    id: 'isDateOfOnsetApproximate',
+                    label: 'Is Date of onset approximate?',
+                    type: 'SwitchInput',
+                    value: false,
+                    isRequired: false,
+                    isEditMode: false,
+                    activeButtonColor: styles.missedRedColor,
+                    activeBackgroundColor: styles.missedRedColorWithOpacity
+                },
+                {
+                    cardNumber: 1,
+                    id: 'deceased',
+                    label: 'Deceased',
+                    type: 'SwitchInput',
+                    value: false,
+                    isRequired: false,
+                    isEditMode: false,
+                    activeButtonColor: styles.missedRedColor,
+                    activeBackgroundColor: styles.missedRedColorWithOpacity
+                },
+                {
+                    cardNumber: 1,
+                    id: 'dateDeceased',
+                    label: 'Date of Decease',
+                    value: '',
+                    type: "DatePicker",
+                    isRequired: false,
+                    isEditMode: false,
+                    format: 'YYYY-MM-dd',
+                    objectType: 'Case'
                 },
             ]
         }

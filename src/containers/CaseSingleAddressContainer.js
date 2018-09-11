@@ -30,7 +30,7 @@ class CaseSingleAddressContainer extends PureComponent {
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
-
+        console.log('this.props.item', this.props.item);
         return (
             <View style={style.container}>
                 <Button
@@ -50,23 +50,35 @@ class CaseSingleAddressContainer extends PureComponent {
                     keyboardShouldPersistTaps={'always'}
                 >
                     {
-                        config.caseSingleScreen.address.map((item) => {
-                            return this.handleRenderItem(item)
-                        })
+                        this.handleRenderAddress()
                     }
                 </KeyboardAwareScrollView>
             </View>
         );
     }
 
+    handleRenderAddress = () => {
+        if(this.props.item.hasOwnProperty('addresses')){
+            let addressCard = [];
+            this.props.item.addresses.forEach((address) => {
+                config.caseSingleScreen.address.map((item, index) => {
+                    addressCard.push(this.handleRenderItem(item, index, address));
+                });
+
+            });
+            return addressCard;
+        }
+        return null;
+    };
+
     // Please write here all the methods that are not react native lifecycle methods
-    handleRenderItem = (item) => {
-        // console.log("Item: ", item);
+    handleRenderItem = (item, index, address) => {
         return (
             <CardComponent
                 item={item.fields}
-                followUp={this.props.item}
-                contact={this.props.contact}
+                key={index}
+                followUp={address}
+                contact={address}
                 style={style.cardStyle}
                 onChangeText={this.props.onChangeText}
                 onChangeDate={this.props.onChangeDate}
