@@ -37,74 +37,14 @@ class CaseSingleScreen extends Component {
             savePressed: false,
             item: this.props.item,
             contact: null,
-            isEditMode: false,
             routes: config.tabsValuesRoutes.casesSingle,
             index: 0,
+            isEditMode: false,
             isDateTimePickerVisible: false
         };
         // Bind here methods, or at least don't declare methods in the render method
 
     }
-
-    //Use custom container for Personal Route
-    PersonalRoute = () => (
-        <CaseSinglePersonalContainer
-            item={this.state.item}
-            isEditMode={this.state.isEditMode}
-            followup={this.state.item}
-            contact={this.state.item}
-            onNext={this.handleNextPress}
-            onChangeText={this.onChangeText}
-            onChangeDate={this.onChangeDate}
-            onChangeSwitch={this.onChangeSwitch}
-            onChangeDropDown={this.onChangeDropDown}
-        />
-    );
-
-    //Use custom container for Address Route
-    AddressRoute = () => (
-        <CaseSingleAddressContainer
-            item={this.state.item}
-            isEditMode={this.state.isEditMode}
-            followup={this.state.item}
-            contact={this.state.item}
-            onNext={this.handleNextPress}
-            onChangeText={this.onChangeText}
-            onChangeDate={this.onChangeDate}
-            onChangeSwitch={this.onChangeSwitch}
-            onChangeDropDown={this.onChangeDropDown}
-        />
-    );
-
-    //Use custom container for Infection Route
-    InfectionRoute = () => (
-        <CaseSingleInfectionContainer
-            item={this.state.item}
-            isEditMode={this.state.isEditMode}
-            followup={this.state.item}
-            contact={this.state.item}
-            onNext={this.handleNextPress}
-            onChangeText={this.onChangeText}
-            onChangeDate={this.onChangeDate}
-            onChangeSwitch={this.onChangeSwitch}
-            onChangeDropDown={this.onChangeDropDown}
-        />
-    );
-
-    //Use custom container for Lab Data Route
-    LabDataRoute = () => (
-        <CaseSingleLabDataContainer
-            item={this.state.item}
-            isEditMode={this.state.isEditMode}
-            followup={this.state.item}
-            contact={this.state.item}
-            onNext={this.handleNextPress}
-            onChangeText={this.onChangeText}
-            onChangeDate={this.onChangeDate}
-            onChangeSwitch={this.onChangeSwitch}
-            onChangeDropDown={this.onChangeDropDown}
-        />
-    );
 
     // Please add here the react lifecycle methods that you need
     static getDerivedStateFromProps(props, state) {
@@ -184,12 +124,7 @@ class CaseSingleScreen extends Component {
                 <TabView
                     navigationState={this.state}
                     onIndexChange={this.handleOnIndexChange}
-                    renderScene={SceneMap({
-                        personal: this.PersonalRoute,
-                        address: this.AddressRoute,
-                        infection: this.InfectionRoute,
-                        labData: this.LabDataRoute
-                    })}
+                    renderScene={this.handleRenderScene}
                     renderTabBar={this.handleRenderTabBar}
                     useNativeDriver
                 />
@@ -204,6 +139,69 @@ class CaseSingleScreen extends Component {
             animated: true,
             to: 'open'
         })
+    };
+
+    handleRenderScene = ({route}) => {
+        switch(route.key) {
+            case 'personal':
+                return <CaseSinglePersonalContainer
+                    item={this.state.item}
+                    isEditMode={this.state.isEditMode}
+                    followup={this.state.item}
+                    contact={this.state.item}
+                    onNext={this.handleNextPress}
+                    onPressEdit={this.handleEditPress}
+                    onPressSave={this.handleSavePress}
+                    onChangeText={this.onChangeText}
+                    onChangeDate={this.onChangeDate}
+                    onChangeSwitch={this.onChangeSwitch}
+                    onChangeDropDown={this.onChangeDropDown}
+                />;
+            case 'address':
+                return <CaseSingleAddressContainer
+                    item={this.state.item}
+                    isEditMode={this.state.isEditMode}
+                    followup={this.state.item}
+                    contact={this.state.item}
+                    onNext={this.handleNextPress}
+                    onPressEdit={this.handleEditPress}
+                    onPressSave={this.handleSavePress}
+                    onChangeText={this.onChangeText}
+                    onChangeDate={this.onChangeDate}
+                    onChangeSwitch={this.onChangeSwitch}
+                    onChangeDropDown={this.onChangeDropDown}
+                />;
+            case 'infection':
+                return <CaseSingleInfectionContainer
+                    item={this.state.item}
+                    isEditMode={this.state.isEditMode}
+                    followup={this.state.item}
+                    contact={this.state.item}
+                    onNext={this.handleNextPress}
+                    onPressEdit={this.handleEditPress}
+                    onPressSave={this.handleSavePress}
+                    onChangeText={this.onChangeText}
+                    onChangeDate={this.onChangeDate}
+                    onChangeSwitch={this.onChangeSwitch}
+                    onChangeDropDown={this.onChangeDropDown}
+                />;
+            case 'labData':
+                return <CaseSingleLabDataContainer
+                    item={this.state.item}
+                    isEditMode={this.state.isEditMode}
+                    followup={this.state.item}
+                    contact={this.state.item}
+                    onNext={this.handleNextPress}
+                    onPressEdit={this.handleEditPress}
+                    onPressSave={this.handleSavePress}
+                    onPressCancel={this.handleCancelPress}
+                    onChangeText={this.onChangeText}
+                    onChangeDate={this.onChangeDate}
+                    onChangeSwitch={this.onChangeSwitch}
+                    onChangeDropDown={this.onChangeDropDown}
+                />;
+            default: return null;
+        }
     };
 
     //Index change for TabBar
@@ -297,6 +295,34 @@ class CaseSingleScreen extends Component {
         this.handleOnIndexChange(this.state.index + 1 );
     };
 
+    //Pressed edit and change isEditMode
+    handleEditPress = () => {
+        this.setState({
+                isEditMode: true
+            }, () => {
+                console.log("handleEditPress", this.state.isEditMode);
+            }
+        )
+    };
+
+    //Pressed save and change case
+    handleSavePress = () => {
+        this.setState({
+                isEditMode: false
+            }, () => {
+                console.log("handleSavePress", this.state.isEditMode);
+            }
+        )
+    };
+
+    //Pressed cancel and go back to Cases list
+    handleCancelPress = () => {
+        this.props.navigator.pop({
+            animated: true,
+            animationType: 'fade'
+        });
+    };
+
     //Handle text change from route
     onChangeText = (value, id, objectType) => {
         this.setState(
@@ -364,27 +390,6 @@ class CaseSingleScreen extends Component {
                 console.log("onChangeDropDown", id, " ", value, " ", this.state.item);
             }
         )
-    };
-
-    editCase = () => {
-        this.setState({
-            isEditMode: true
-        });
-    };
-
-    cancelEditCase = () => {
-        this.setState({
-            isEditMode: false
-        });
-    };
-
-    saveCase = () => {
-        console.log('Save');
-    };
-
-    changeValue = (value,id) => {
-        console.log(value);
-        console.log(id);
     };
 
 }

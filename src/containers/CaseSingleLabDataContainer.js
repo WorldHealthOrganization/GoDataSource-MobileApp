@@ -30,29 +30,55 @@ class CaseSingleLabDataContainer extends PureComponent {
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
-
         return (
             <View style={style.container}>
-                <Button
-                    title={'Next'}
-                    onPress={this.props.onNext}
-                    color={styles.buttonGreen}
-                    titleColor={'white'}
-                    height={calculateDimension(25, true, this.props.screenSize)}
-                    width={calculateDimension(166, false, this.props.screenSize)}
-                    style={{
-                        marginVertical: calculateDimension(12.5, true, this.props.screenSize)
-                    }}
-                />
+                {
+                    this.props.isEditMode ?
+                        <View style={{flexDirection: 'row'}}>
+                            <Button
+                                title={'Save'}
+                                onPress={this.props.onPressSave}
+                                color={styles.buttonGreen}
+                                titleColor={'white'}
+                                height={calculateDimension(25, true, this.props.screenSize)}
+                                width={calculateDimension(166, false, this.props.screenSize)}
+                                style={{
+                                    marginVertical: calculateDimension(12.5, true, this.props.screenSize),
+                                    marginRight: 10,
+                                }}
+                            />
+                            <Button
+                                title={'Cancel'}
+                                onPress={this.props.onPressCancel}
+                                color={styles.buttonGreen}
+                                titleColor={'white'}
+                                height={calculateDimension(25, true, this.props.screenSize)}
+                                width={calculateDimension(166, false, this.props.screenSize)}
+                                style={{
+                                    marginVertical: calculateDimension(12.5, true, this.props.screenSize)
+                                }}
+                            />
+                        </View> :
+                        <Button
+                            title={'Edit'}
+                            onPress={this.props.onPressEdit}
+                            color={styles.buttonGreen}
+                            titleColor={'white'}
+                            height={calculateDimension(25, true, this.props.screenSize)}
+                            width={calculateDimension(166, false, this.props.screenSize)}
+                            style={{
+                                marginVertical: calculateDimension(12.5, true, this.props.screenSize),
+                                marginRight: 10,
+                            }}
+                        />
+                }
                 <KeyboardAwareScrollView
                     style={style.containerScrollView}
                     contentContainerStyle={[style.contentContainerStyle, {paddingBottom: this.props.screenSize.height < 600 ? 70 : 20}]}
                     keyboardShouldPersistTaps={'always'}
                 >
                     {
-                        config.caseSingleScreen.labData.map((item, index) => {
-                            return this.handleRenderItem(item, index)
-                        })
+                        this.handleRenderLabData()
                     }
                 </KeyboardAwareScrollView>
             </View>
@@ -60,14 +86,29 @@ class CaseSingleLabDataContainer extends PureComponent {
     }
 
     // Please write here all the methods that are not react native lifecycle methods
-    handleRenderItem = (item, index) => {
+
+    handleRenderLabData = () => {
+        if(this.props.item.hasOwnProperty('labResults')){
+            let labResultCard = [];
+            this.props.item.labResults.forEach((labRes) => {
+                config.caseSingleScreen.labData.map((item, index) => {
+                    labResultCard.push(this.handleRenderItem(item, index, labRes));
+                });
+
+            });
+            return labResultCard;
+        }
+        return null;
+    };
+
+    handleRenderItem = (item, index, labRes) => {
         // console.log("Item: ", item);
         return (
             <CardComponent
                 item={item.fields}
                 key={index}
-                followUp={this.props.item}
-                contact={this.props.contact}
+                followUp={labRes}
+                contact={labRes}
                 style={style.cardStyle}
                 onChangeText={this.props.onChangeText}
                 onChangeDate={this.props.onChangeDate}

@@ -514,28 +514,143 @@ const caseSingleScreen = {
             fields: [
                 {
                     cardNumber: 1,
-                    id: 'riskLevel',
-                    label: 'Risk level',
+                    id: 'sampleIdentifier',
+                    label: 'Sample Lab Id',
+                    type: 'TextInput',
+                    value: '',
+                    isRequired: false,
+                    isEditMode: false,
+                    objectType: 'LabResult'
+                },
+                {
+                    cardNumber: 1,
+                    id: 'dateSampleTaken',
+                    label: 'Sample taken',
+                    value: '',
+                    type: "DatePicker",
+                    isRequired: true,
+                    isEditMode: false,
+                    format: 'YYYY-MM-dd',
+                    objectType: 'LabResult'
+                },
+                {
+                    cardNumber: 1,
+                    id: 'dateSampleDelivered',
+                    label: 'Sample delivered to lab',
+                    value: '',
+                    type: "DatePicker",
+                    isRequired: false,
+                    isEditMode: false,
+                    format: 'YYYY-MM-dd',
+                    objectType: 'LabResult'
+                },
+                {
+                    cardNumber: 1,
+                    id: 'dateTesting',
+                    label: 'Testing Date',
+                    value: '',
+                    type: "DatePicker",
+                    isRequired: false,
+                    isEditMode: false,
+                    format: 'YYYY-MM-dd',
+                    objectType: 'LabResult'
+                },
+                {
+                    cardNumber: 1,
+                    id: 'dateOfResult',
+                    label: 'Date of the result',
+                    value: '',
+                    type: "DatePicker",
+                    isRequired: false,
+                    isEditMode: false,
+                    format: 'YYYY-MM-dd',
+                    objectType: 'LabResult'
+                },
+                {
+                    cardNumber: 1,
+                    id: 'labName',
+                    label: 'Lab Name',
                     labelValue: 'test',
                     type: 'DropdownInput',
                     value: '',
                     isRequired: false,
-                    isEditMode: true,
+                    isEditMode: false,
                     activeButtonColor: 'red',
                     activeBackgroundColor: 'red',
-                    objectType: 'Contact'
+                    objectType: 'LabResult'
                 },
                 {
                     cardNumber: 1,
-                    id: 'riskReason',
-                    label: 'Reason',
+                    id: 'sampleType',
+                    label: 'Sample type',
+                    labelValue: 'test',
+                    type: 'DropdownInput',
+                    value: '',
+                    isRequired: false,
+                    isEditMode: false,
+                    activeButtonColor: 'red',
+                    activeBackgroundColor: 'red',
+                    objectType: 'LabResult'
+                },
+                {
+                    cardNumber: 1,
+                    id: 'testType',
+                    label: 'Test type',
+                    labelValue: 'test',
+                    type: 'DropdownInput',
+                    value: '',
+                    isRequired: false,
+                    isEditMode: false,
+                    activeButtonColor: 'red',
+                    activeBackgroundColor: 'red',
+                    objectType: 'LabResult'
+                },
+                {
+                    cardNumber: 1,
+                    id: 'result',
+                    label: 'Result',
+                    labelValue: 'test',
+                    type: 'DropdownInput',
+                    value: '',
+                    isRequired: false,
+                    isEditMode: false,
+                    activeButtonColor: 'red',
+                    activeBackgroundColor: 'red',
+                    objectType: 'LabResult'
+                },
+                {
+                    cardNumber: 1,
+                    id: 'notes',
+                    label: 'Notes',
                     type: 'TextInput',
                     value: '',
-                    isRequired: true,
-                    isEditMode: true,
-                    multiline: true,
-                    objectType: 'Contact'
+                    isRequired: false,
+                    isEditMode: false,
+                    objectType: 'LabResult'
                 },
+                {
+                    cardNumber: 1,
+                    id: 'status',
+                    label: 'Status',
+                    labelValue: 'test',
+                    type: 'DropdownInput',
+                    value: '',
+                    isRequired: false,
+                    isEditMode: false,
+                    activeButtonColor: 'red',
+                    activeBackgroundColor: 'red',
+                    objectType: 'LabResult'
+                },
+                {
+                    cardNumber: 1,
+                    id: 'quantitativeResult',
+                    label: 'Quantitative Result',
+                    type: 'TextInput',
+                    value: '',
+                    isRequired: false,
+                    isEditMode: false,
+                    objectType: 'LabResult'
+                }
             ]
         }
     ]

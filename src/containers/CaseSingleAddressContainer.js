@@ -30,20 +30,48 @@ class CaseSingleAddressContainer extends PureComponent {
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
-        console.log('this.props.item', this.props.item);
         return (
             <View style={style.container}>
-                <Button
-                    title={'Next'}
-                    onPress={this.props.onNext}
-                    color={styles.buttonGreen}
-                    titleColor={'white'}
-                    height={calculateDimension(25, true, this.props.screenSize)}
-                    width={calculateDimension(166, false, this.props.screenSize)}
-                    style={{
-                        marginVertical: calculateDimension(12.5, true, this.props.screenSize)
-                    }}
-                />
+
+                <View style={{flexDirection: 'row'}}>
+                    {this.props.isEditMode ?
+                        <Button
+                            title={'Save'}
+                            onPress={this.props.onPressSave}
+                            color={styles.buttonGreen}
+                            titleColor={'white'}
+                            height={calculateDimension(25, true, this.props.screenSize)}
+                            width={calculateDimension(166, false, this.props.screenSize)}
+                            style={{
+                                marginVertical: calculateDimension(12.5, true, this.props.screenSize),
+                                marginRight: 10,
+                            }}
+                        /> :
+                        <Button
+                            title={'Edit'}
+                            onPress={this.props.onPressEdit}
+                            color={styles.buttonGreen}
+                            titleColor={'white'}
+                            height={calculateDimension(25, true, this.props.screenSize)}
+                            width={calculateDimension(166, false, this.props.screenSize)}
+                            style={{
+                                marginVertical: calculateDimension(12.5, true, this.props.screenSize),
+                                marginRight: 10,
+                            }}
+                        />
+                    }
+                    <Button
+                        title={'Next'}
+                        onPress={this.props.onNext}
+                        color={styles.buttonGreen}
+                        titleColor={'white'}
+                        height={calculateDimension(25, true, this.props.screenSize)}
+                        width={calculateDimension(166, false, this.props.screenSize)}
+                        style={{
+                            marginVertical: calculateDimension(12.5, true, this.props.screenSize)
+                        }}
+                    />
+                </View>
                 <KeyboardAwareScrollView
                     style={style.containerScrollView}
                     contentContainerStyle={[style.contentContainerStyle, {paddingBottom: this.props.screenSize.height < 600 ? 70 : 20}]}
