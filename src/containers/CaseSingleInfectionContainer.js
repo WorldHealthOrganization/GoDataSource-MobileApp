@@ -89,13 +89,15 @@ class CaseSingleInfectionContainer extends PureComponent {
 
     // Please write here all the methods that are not react native lifecycle methods
     handleRenderItem = (item, index) => {
-        // console.log("Item: ", item);
+        let fields = item.fields.map( (field) => {
+            return Object.assign({},field, {isEditMode: this.props.isEditMode})
+        });
         return (
             <CardComponent
-                item={item.fields}
+                item={fields}
                 key={index}
-                followUp={this.props.item}
-                contact={this.props.contact}
+                screen={'CaseSingleScreen'}
+                case={this.props.item}
                 style={style.cardStyle}
                 onChangeText={this.props.onChangeText}
                 onChangeDate={this.props.onChangeDate}

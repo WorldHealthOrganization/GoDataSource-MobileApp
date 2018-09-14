@@ -65,6 +65,10 @@ class CardComponent extends Component {
             return true
         }
 
+        if(this.props.case){
+            return true;
+        }
+
         return false;
     }
 
@@ -162,6 +166,20 @@ class CardComponent extends Component {
 
         if (this.props.screen === 'ContactsSingleScreenAddress') {
             console.log("ContactsSingleScreenAddress: ", item);
+        }
+
+        if (this.props.screen === 'CaseSingleScreen') {
+            let cases = this.props.case;
+            if (item.type === 'DropdownInput') {
+                item.data = this.computeDataForDropdown(item, cases);
+            }
+
+            value = this.computeValueForId(item.type, item.id, [], [], cases);
+
+            if (item.type === 'DropDown' && item.id == 'classification') {
+                data = this.computeDataForDropdown(item);
+                value = cases[item.id];
+            }
         }
 
         switch(item.type) {
@@ -315,7 +333,7 @@ class CardComponent extends Component {
         }
     };
 
-    computeValueForId = (type, id, followUp, contact) => {
+    computeValueForId = (type, id, followUp, contact, cases = []) => {
         if (type === 'DropdownInput' && id === 'exposedTo') {
             return handleExposedTo(contact, true, this.props.cases);
         }
@@ -344,7 +362,15 @@ class CardComponent extends Component {
                     return contact[id];
                 }
             } else {
-                return '';
+                if(cases[id]){
+                    if (typeof cases[id] === 'string' && cases[id].includes('LNG_')) {
+                        return this.getTranslation(cases[id]);
+                    } else {
+                        return cases[id];
+                    }
+                }else {
+                    return '';
+                }
             }
         }
     };

@@ -102,13 +102,15 @@ class CaseSingleLabDataContainer extends PureComponent {
     };
 
     handleRenderItem = (item, index, labRes) => {
-        // console.log("Item: ", item);
+        let fields = item.fields.map( (field) => {
+            return Object.assign({},field, {isEditMode: this.props.isEditMode})
+        });
         return (
             <CardComponent
-                item={item.fields}
+                item={fields}
                 key={index}
-                followUp={labRes}
-                contact={labRes}
+                screen={'CaseSingleScreen'}
+                case={labRes}
                 style={style.cardStyle}
                 onChangeText={this.props.onChangeText}
                 onChangeDate={this.props.onChangeDate}

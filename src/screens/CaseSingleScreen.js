@@ -325,13 +325,19 @@ class CaseSingleScreen extends Component {
 
     //Handle text change from route
     onChangeText = (value, id, objectType) => {
-        this.setState(
-            (prevState) => ({
-                item: Object.assign({}, prevState.item, {[id]: value})
-            }), () => {
-                console.log("onChangeText", id, " ", value, " ", this.state.item);
-            }
-        )
+        if(objectType == 'Address'){
+
+        }else if(objectType == 'LabResult'){
+
+        }else {
+            this.setState(
+                (prevState) => ({
+                    item: Object.assign({}, prevState.item, {[id]: value})
+                }), () => {
+                    console.log("onChangeText", id, " ", value, " ", this.state.item);
+                }
+            );
+        }
     };
 
     //Handle date change from route

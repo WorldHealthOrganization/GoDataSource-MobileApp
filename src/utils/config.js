@@ -234,7 +234,8 @@ const caseSingleScreen = {
                     isRequired: false,
                     isEditMode: false,
                     activeButtonColor: styles.missedRedColor,
-                    activeBackgroundColor: styles.missedRedColorWithOpacity
+                    activeBackgroundColor: styles.missedRedColorWithOpacity,
+                    objectType: 'Case'
                 },
                 {
                     cardNumber: 1,
@@ -245,7 +246,8 @@ const caseSingleScreen = {
                     isRequired: false,
                     isEditMode: false,
                     activeButtonColor: styles.missedRedColor,
-                    activeBackgroundColor: styles.missedRedColorWithOpacity
+                    activeBackgroundColor: styles.missedRedColorWithOpacity,
+                    objectType: 'Case'
                 },
                 {
                     cardNumber: 1,
@@ -360,7 +362,7 @@ const caseSingleScreen = {
                     value: '',
                     isRequired: true,
                     isEditMode: false,
-                    objectType: 'Case'
+                    objectType: 'Address'
                 },
                 {
                     cardNumber: 1,
@@ -371,7 +373,7 @@ const caseSingleScreen = {
                     isRequired: true,
                     isEditMode: false,
                     format: 'YYYY-MM-dd',
-                    objectType: 'Case'
+                    objectType: 'Address'
                 },
                 {
                     cardNumber: 1,
@@ -381,7 +383,7 @@ const caseSingleScreen = {
                     value: '',
                     isRequired: true,
                     isEditMode: false,
-                    objectType: 'Case'
+                    objectType: 'Address'
                 },
                 {
                     cardNumber: 1,
@@ -391,7 +393,7 @@ const caseSingleScreen = {
                     value: '',
                     isRequired: true,
                     isEditMode: false,
-                    objectType: 'Case'
+                    objectType: 'Address'
                 },
                 {
                     cardNumber: 1,
@@ -401,7 +403,7 @@ const caseSingleScreen = {
                     value: '',
                     isRequired: true,
                     isEditMode: false,
-                    objectType: 'Case'
+                    objectType: 'Address'
                 },
                 {
                     cardNumber: 1,
@@ -411,7 +413,7 @@ const caseSingleScreen = {
                     value: '',
                     isRequired: true,
                     isEditMode: false,
-                    objectType: 'Case'
+                    objectType: 'Address'
                 },
             ]
         }
@@ -482,7 +484,8 @@ const caseSingleScreen = {
                     isRequired: false,
                     isEditMode: false,
                     activeButtonColor: styles.missedRedColor,
-                    activeBackgroundColor: styles.missedRedColorWithOpacity
+                    activeBackgroundColor: styles.missedRedColorWithOpacity,
+                    objectType: 'Case'
                 },
                 {
                     cardNumber: 1,
@@ -493,7 +496,8 @@ const caseSingleScreen = {
                     isRequired: false,
                     isEditMode: false,
                     activeButtonColor: styles.missedRedColor,
-                    activeBackgroundColor: styles.missedRedColorWithOpacity
+                    activeBackgroundColor: styles.missedRedColorWithOpacity,
+                    objectType: 'Case'
                 },
                 {
                     cardNumber: 1,

@@ -101,12 +101,15 @@ class CaseSingleAddressContainer extends PureComponent {
 
     // Please write here all the methods that are not react native lifecycle methods
     handleRenderItem = (item, index, address) => {
+        let fields = item.fields.map( (field) => {
+            return Object.assign({},field, {isEditMode: this.props.isEditMode})
+        });
         return (
             <CardComponent
-                item={item.fields}
+                item={fields}
                 key={index}
-                followUp={address}
-                contact={address}
+                screen={'CaseSingleScreen'}
+                case={address}
                 style={style.cardStyle}
                 onChangeText={this.props.onChangeText}
                 onChangeDate={this.props.onChangeDate}
