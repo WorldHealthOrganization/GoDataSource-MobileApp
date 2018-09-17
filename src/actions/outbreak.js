@@ -3,6 +3,7 @@
  */
 import {ACTION_TYPE_STORE_OUTBREAK} from './../utils/enums';
 import {getOutbreakByIdRequest} from './../requests/outbreak';
+// import {getOutbreakByIdRequest} from './../queries/outbreak';
 import { addError } from './errors';
 import errorTypes from './../utils/errorTypes';
 import {getLocations} from './locations'
@@ -23,7 +24,7 @@ export function getOutbreakById(outbreakId, token) {
                 dispatch(addError(errorTypes.ERROR_OUTBREAK));
             }
             if (response) {
-                dispatch(getLocations(response.countries ,token));
+                // dispatch(getLocations(response.countries ,token));
                 dispatch(storeOutbreak(response));
             }
         })

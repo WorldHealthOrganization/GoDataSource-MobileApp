@@ -3,7 +3,11 @@
  */
 import errorTypes from './errorTypes';
 import config from './config';
-
+import RNFetchBlobFS from 'rn-fetch-blob/fs';
+import {unzip} from 'react-native-zip-archive';
+import {updateFileInDatabase} from './../queries/database';
+import {setSyncState} from './../actions/app';
+import bcrypt from 'react-native-bcrypt';
 
 // This method is used for handling server responses. Please add here any custom error handling
 export function handleResponse(response) {
@@ -96,4 +100,126 @@ export function handleExposedTo(contact, returnString, cases, events) {
     }
 
     return returnString ? relationshipArray.join(", ") : relationshipArray;
-};
+}
+
+export function unzipFile (source, dest, callback) {
+    RNFetchBlobFS.exists(source)
+        .then((exists) => {
+            if (exists) {
+                // Proceed to unzip the file to the specified destination
+                unzip(source, dest)
+                    .then((path) => {
+                        console.log(`unzip completed at ${path}`);
+                        callback(null, path);
+                    })
+                    .catch((error) => {
+                        console.log(error);
+                        callback(error);
+                    })
+            } else {
+                return callback('Zip file does not exist');
+            }
+        })
+        .catch((existsError) => {
+            callback(('There was an error with getting the zip file: ' + existsError));
+        });
+}
+
+export function readFile (path, callback) {
+    RNFetchBlobFS.readFile(path, 'utf8')
+        .then((data) => {
+            callback(null, JSON.parse(data));
+        })
+        .catch((errorReadFile) => {
+            console.log("Error while reading the file: ", errorReadFile);
+            callback(errorReadFile)
+        })
+}
+
+export function syncFile (path, callback) {
+    readFile(path, (errorReadFile, data) => {
+        if (errorReadFile) {
+            console.log("Error while reading the file: ", errorReadFile);
+            callback(errorReadFile)
+        }
+        if (data) {
+
+        }
+    })
+}
+
+export function readDir (path, callback) {
+    RNFetchBlobFS.ls(path)
+        .then((files) => {
+            callback(null, files);
+        })
+        .catch((errorLs) => {
+            callback(errorLs);
+        })
+}
+
+let numberOfFilesProcessed = 0;
+
+export function setNumberOfFilesProcessed(number) {
+    numberOfFilesProcessed = number;
+}
+
+export function getNumberOfFilesProcessed() {
+    return numberOfFilesProcessed;
+}
+
+export async function processFile (path, type, totalNumberOfFiles, dispatch) {
+    return new Promise((resolve, reject) => {
+        if (path) {
+            RNFetchBlobFS.exists(path)
+                .then((exists) => {
+                    if (exists) {
+                        // File exists, time to read it in order to process
+                        readFile(path, (error, data) => {
+                            if (error) {
+                                console.log("Error while reading file");
+                                reject("Error while reading file");
+                            }
+                            if (data) {
+                                // Since there is data in the file, it's time to sync it
+                                let promises = [];
+                                for (let i=0; i<data.length; i++) {
+                                    promises.push(updateFileInDatabase(data[i], type))
+                                }
+
+                                Promise.all(promises)
+                                    .then((responses) => {
+                                        console.log('Finished syncing: ', responses);
+                                        let numberOfFilesProcessedAux = getNumberOfFilesProcessed();
+                                        numberOfFilesProcessedAux += 1;
+                                        setNumberOfFilesProcessed(numberOfFilesProcessedAux);
+                                        dispatch(setSyncState(("Synced " + numberOfFilesProcessedAux + "/" + totalNumberOfFiles)));
+                                        resolve('Finished syncing');
+                                    })
+                                    .catch((error) => {
+                                        console.log("Error at syncing file of type: ", type, error);
+                                        reject("Error at syncing file");
+                                    })
+                            }
+                        })
+                    } else {
+                        reject("The file does not exist")
+                    }
+                })
+                .catch((fileNotExistsError) => {
+                    reject(fileNotExistsError);
+                })
+        } else {
+            reject("Path not defined");
+        }
+    })
+}
+
+export function comparePasswords (password, encryptedPassword, callback) {
+    bcrypt.compare(password, encryptedPassword, (errorCompare, isMatch) => {
+        if (errorCompare) {
+            return callback(errorCompare)
+        }
+        callback(null, isMatch)
+    })
+}

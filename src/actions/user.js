@@ -2,8 +2,9 @@
  * Created by florinpopa on 03/07/2018.
  */
 import {ACTION_TYPE_STORE_USER} from './../utils/enums';
-import { changeAppRoot } from './app';
-import {loginUserRequest, getUserByIdRequest} from './../requests/user';
+import { changeAppRoot, getTranslations } from './app';
+import { loginUserRequest, getUserByIdRequest} from './../requests/user';
+// import {loginUserRequest} from './../queries/user';
 import { getFollowUpsForOutbreakId } from './followUps';
 import { getContactsForOutbreakId } from './contacts';
 import { getCasesForOutbreakId } from './cases';
@@ -38,8 +39,15 @@ export function loginUser(credentials) {
                 dispatch(addError(errorTypes.ERROR_LOGIN));
             }
             if (response) {
-                if (response.userId && response.id) {
+                if (response.id) {
+                    // Don't need to get user by id since the user is returned from the local database, so, instead, we store it to the redux store
                     dispatch(getUserById(response.userId, response.id));
+
+
+                // Here is the local storage handling
+                //     dispatch(storeUser(response));
+                //     dispatch(getOutbreakById(response.activeOutbreakId, null));
+                //     dispatch(getContactsForOutbreakId(response.activeOutbreakId, config.defaultFilterForContacts, null));
                 }
             }
         })
@@ -70,6 +78,7 @@ export function getUserById(userId, token) {
                 // store also the token
                 let user = Object.assign({}, response, {token: token});
                 dispatch(storeUser(user));
+                dispatch(getTranslations(user.languageId));
                 dispatch(getFollowUpsForOutbreakId(user.activeOutbreakId, null, user.token));
                 dispatch(getContactsForOutbreakId(user.activeOutbreakId, config.defaultFilterForContacts, user.token));
                 dispatch(getCasesForOutbreakId(user.activeOutbreakId, null, user.token));

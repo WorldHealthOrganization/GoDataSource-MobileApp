@@ -53,7 +53,7 @@ class FirstConfigScreen extends Component {
     render() {
         return (
             <KeyboardAwareScrollView
-                style={[style.container, {paddingTop: Platform.OS ? this.props.screenSize.height === 812 ? 44 : 20 : 0}]}
+                style={[style.container, {paddingTop: Platform.OS === 'ios' ? this.props.screenSize.height === 812 ? 44 : 20 : 0}]}
                 contentContainerStyle={style.contentContainerStyle}
                 keyboardShouldPersistTaps={'always'}
             >
@@ -91,6 +91,7 @@ class FirstConfigScreen extends Component {
     };
 
     handlePressManual = () => {
+        console.log("Here change screen");
         this.props.navigator.push({
             screen: 'ManualConfigScreen',
             animated: true,

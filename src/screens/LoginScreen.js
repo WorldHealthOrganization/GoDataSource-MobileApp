@@ -58,7 +58,7 @@ class LoginScreen extends Component {
     render() {
         return (
             <KeyboardAwareScrollView
-                style={[style.container, {paddingTop: Platform.OS ? this.props.screenSize.height === 812 ? 44 : 20 : 0}]}
+                style={[style.container, {paddingTop: Platform.OS === 'ios' ? this.props.screenSize.height === 812 ? 44 : 20 : 0}]}
                 contentContainerStyle={style.contentContainerStyle}
                 keyboardShouldPersistTaps={'always'}
             >
@@ -76,18 +76,18 @@ class LoginScreen extends Component {
                         {/*onChange={this.handleChangeUrl}*/}
                     {/*/>*/}
                     <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'}}>
-                        <Text style={{alignSelf: 'flex-end', marginBottom: 20, fontFamily: 'Roboto-Medium', fontSize: 15}}>http://</Text>
+                        {/*<Text style={{alignSelf: 'flex-end', marginBottom: 20, fontFamily: 'Roboto-Medium', fontSize: 15}}>http://</Text>*/}
                         <TextField
                             ref={this.urlRef}
                             value={this.state.url}
                             autoCorrect={false}
                             lineWidth={1}
                             enablesReturnKeyAutomatically={true}
-                            containerStyle={[style.textInput, {width: '65%'}]}
+                            containerStyle={[style.textInput]}
                             onChangeText={this.handleTextChange}
                             label='URL'
                         />
-                        <Text style={{alignSelf: 'flex-end', marginBottom: 20, fontFamily: 'Roboto-Medium', fontSize: 15}}>/api</Text>
+                        {/*<Text style={{alignSelf: 'flex-end', marginBottom: 20, fontFamily: 'Roboto-Medium', fontSize: 15}}>/api</Text>*/}
                     </View>
                     <TextField
                         ref={this.emailRef}

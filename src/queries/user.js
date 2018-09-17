@@ -1,56 +1,70 @@
 /**
  * Created by florinpopa on 31/08/2018.
  */
-import SQLite, {encodeName} from 'react-native-sqlcipher-2';
-import {DROP_TABLE_USER, CREATE_TABLE_USER} from './../utils/enums';
+import {getDatabase} from './database';
+import {comparePasswords} from './../utils/functions';
 
-export function createTableUser(databaseName, key, version, callback) {
-    const db = SQLite.openDatabase(encodeName(databaseName, key), version, '', 1);
-    db.transaction((txn) => {
-        txn.executeSql(DROP_TABLE_USER, []);
-        txn.executeSql(CREATE_TABLE_USER, [], (tx, res) => {
-            console.log("Create table: ", tx, res);
-            callback(null, res);
-        }, (error, ceva) => {
-            console.log("Error create table: ", error, ceva);
-            callback(error);
-        });
-    })
-}
+// Credentials: {email, encryptedPassword}
+export function loginUserRequest (credentials, callback) {
+    let database = getDatabase();
 
-export function insertUser(databaseName, key, version, user, callback) {
-    // console.log("User to be inserted: ", user);
-    const db = SQLite.openDatabase(encodeName(databaseName, key), version, '', 1);
-    db.transaction((txn) => {
-        txn.executeSql('INSERT INTO User VALUES (:id, ' +
-            ':firstName, :lastName, :roleIds, :languageId, ' +
-            ':email, :deleted, :outbreakIds, :activeOutbreakId, :passwordChange, ' +
-            ':securityQuestions, :realm, :username, :emailVerified, :createdAt, ' +
-            ':updatedAt, :updatedBy, :deletedAt)',
-            [
-                user._id,
-                user.firstName,
-                user.lastName,
-                user.roleIds ? user.roleIds.toString() : 'test',
-                user.languageId,
-                user.email,
-                user.deleted,
-                user.outbreakIds ? user.outbreakIds.toString() : 'test',
-                user.activeOutbreakId,
-                user.passwordChange,
-                user.securityQuestions ? user.securityQuestions.toString() : 'test',
-                user.realm, user.username,
-                user.emailVerified,
-                user.createdAt,
-                user.updateAt,
-                user.updatedBy,
-                user.deletedAt
-            ], (tx, res) => {
-                console.log("inserted user table: ", tx, res);
-                callback(null, res);
-            }, (error, ceva) => {
-                console.log("Insert error: ", error, ceva);
-                callback(error);
-            });
+    database.createIndex({
+        index: {
+            fields: ['fileType', 'email'],
+            name: 'indexForLogging'
+        }
     })
+        .then((result) => {
+            console.log("Create index result: ", result);
+            database.find({
+                selector: {fileType: 'user.json', email: credentials.email}
+            })
+                .then((resultFind) => {
+                    console.log("Result From find: ", resultFind);
+                    comparePasswords(credentials.password, resultFind.docs[0].password, (error, isMatch) => {
+                        if (error) {
+                            console.log("Error at comparing passwords: ", error);
+                            callback(error)
+                        }
+                        if (isMatch) {
+                            console.log("Passwords match: ", resultFind.docs[0]);
+                            // Return user
+                            callback(null, resultFind.docs[0]);
+                        } else {
+                            console.log("Passwords don't match");
+                            callback("Passwords don't match");
+                        }
+                    })
+                })
+                .catch((errorFind) => {
+                    console.log("Error from find: ", errorFind);
+                })
+        })
+        .catch((errorCreateIndex) => {
+            console.log('Error while creating index: ', errorCreateIndex);
+        })
+
+    // database.query('whoIndexes/mapStuff', {key: credentials.email, include_docs: true})
+    //     .then((result) => {
+    //         // After getting the user info, it's time to confirm that the password is correct
+    //         console.log("Compare stuff: ", credentials.password, result.rows[0].doc.password);
+    //         comparePasswords(credentials.password, result.rows[0].doc.password, (error, isMatch) => {
+    //             if (error) {
+    //                 console.log("Error at comparing passwords: ", error);
+    //                 callback(error)
+    //             }
+    //             if (isMatch) {
+    //                 console.log("Passwords match: ", result.rows[0].doc);
+    //                 // Return user
+    //                 callback(null, result.rows[0].doc);
+    //             } else {
+    //                 console.log("Passwords don't match");
+    //                 callback("Passwords don't match");
+    //             }
+    //         })
+    //     })
+    //     .catch((error) => {
+    //         console.log("Error when Logging locally: ", error);
+    //         callback(error);
+    //     })
 }

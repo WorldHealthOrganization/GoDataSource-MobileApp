@@ -19,6 +19,7 @@ import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import config from './../utils/config';
 import url from './../utils/url';
 import {storeHubConfiguration} from './../actions/app';
+import {LoaderScreen} from 'react-native-ui-lib';
 
 class ManualConfigScreen extends Component {
 
@@ -49,6 +50,13 @@ class ManualConfigScreen extends Component {
                 }
             ])
         }
+        if (props.syncState && props.syncState === 'Finished processing') {
+            props.navigator.push({
+                screen: 'LoginScreen',
+                animationType: 'fade',
+                animated: true
+            })
+        }
         return null;
     }
 
@@ -58,7 +66,7 @@ class ManualConfigScreen extends Component {
     render() {
         return (
             <KeyboardAwareScrollView
-                style={[style.container, {paddingTop: Platform.OS ? this.props.screenSize.height === 812 ? 44 : 20 : 0}]}
+                style={[style.container, {paddingTop: Platform.OS === 'ios' ? this.props.screenSize.height === 812 ? 44 : 20 : 0}]}
                 contentContainerStyle={style.contentContainerStyle}
                 keyboardShouldPersistTaps={'always'}
             >
@@ -102,6 +110,13 @@ class ManualConfigScreen extends Component {
                 <View style={style.logoContainer}>
                     <Image source={{uri: 'logo_app'}} style={style.logoStyle} />
                 </View>
+                {
+                    this.props && this.props.syncState && this.props.syncState !== 'Finished processing' ? (
+                        <LoaderScreen message={this.props.syncState || ''} overlay />
+                    ) : (
+                        null
+                    )
+                }
             </KeyboardAwareScrollView>
         );
     }
@@ -181,7 +196,8 @@ const style = StyleSheet.create({
 function mapStateToProps(state) {
     return {
         screenSize: state.app.screenSize,
-        errors: state.errors
+        errors: state.errors,
+        syncState: state.app.syncState
     };
 }
 

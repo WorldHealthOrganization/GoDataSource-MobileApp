@@ -7,7 +7,8 @@ import {
     ACTION_TYPE_ADD_FILTER_FOR_SCREEN,
     ACTION_TYPE_REMOVE_FILTER_FOR_SCREEN,
     ACTION_TYPE_SAVE_TRANSLATION,
-    ACTION_TYPE_SAVE_HUB_CONFIGURATION
+    ACTION_TYPE_SAVE_HUB_CONFIGURATION,
+    ACTION_TYPE_SET_SYNC_STATE
 } from './../utils/enums';
 import url from '../utils/url';
 import config from './../utils/config';
@@ -17,7 +18,11 @@ import {Platform, NativeModules} from 'react-native';
 import {getTranslationRequest} from './../requests/translation';
 import {getDatabaseSnapshotRequest} from './../requests/sync';
 import {setInternetCredentials} from 'react-native-keychain';
-
+import {unzipFile, readDir} from './../utils/functions';
+import RNFetchBlobFs from 'rn-fetch-blob/fs';
+import {processFile} from './../utils/functions';
+import {createDatabase} from './../queries/database';
+import {setNumberOfFilesProcessed} from './../utils/functions';
 
 // Add here only the actions, not also the requests that are executed. For that purpose is the requests directory
 export function changeAppRoot(root) {
@@ -45,6 +50,13 @@ export function saveHubConfiguration(hubConfig) {
     return {
         type: ACTION_TYPE_SAVE_HUB_CONFIGURATION,
         hubConfiguration: hubConfig
+    }
+}
+
+export function setSyncState(syncState) {
+    return {
+        type: ACTION_TYPE_SET_SYNC_STATE,
+        syncState: syncState
     }
 }
 
@@ -87,19 +99,19 @@ export function removeFilterForScreen(screenName) {
 //     })
 // }
 
-export function getTranslations() {
+export function getTranslations(language) {
     return async function (dispatch) {
-        let language = '';
-        if (Platform.OS === 'ios') {
-            language = NativeModules.SettingsManager.settings.AppleLocale;
-        } else {
-            language = NativeModules.I18nManager.localeIdentifier;
-        }
-
-        console.log("### get translations for language: ", language);
-        if (language === 'en_US') {
-            language = 'english_us';
-        }
+        // let language = '';
+        // if (Platform.OS === 'ios') {
+        //     language = NativeModules.SettingsManager.settings.AppleLocale;
+        // } else {
+        //     language = NativeModules.I18nManager.localeIdentifier;
+        // }
+        //
+        // console.log("### get translations for language: ", language);
+        // if (language === 'en_US') {
+        //     language = 'english_us';
+        // }
 
         getTranslationRequest(language, (error, response) => {
             if (error) {
@@ -115,13 +127,59 @@ export function getTranslations() {
 
 export function storeHubConfiguration(hubConfiguration) {
     return async function (dispatch) {
-        // dispatch(saveHubConfiguration(hubConfiguration));
+        dispatch(setSyncState('Downloading database...'));
         // Store the HUB configuration(hubUrl, clientId, clientSecret) in the secure storage of each platform in order to be used later for syncing
         await setInternetCredentials(hubConfiguration.url, hubConfiguration.clientId, hubConfiguration.clientSecret);
 
         // After this, get the database from the hub, using the credentials
         getDatabaseSnapshotRequest(hubConfiguration, (error, response) => {
-            console.log(error, response);
+            if (error) {
+                dispatch(setSyncState(null));
+            }
+            if (response) {
+                dispatch(setSyncState("Unzipping database..."));
+                unzipFile(response, RNFetchBlobFs.dirs.DocumentDir + "/who_databases", (unzipError, responseUnzipPath) => {
+                    if (unzipError) {
+                        console.log("Error while unzipping file");
+                        dispatch(setSyncState(null));
+                    }
+                    if (responseUnzipPath) {
+                        // At this point we have the path to where the json files from the downloaded database are
+                        // We should call the method to sync those data
+                        dispatch(setSyncState("Syncing...."));
+                        setNumberOfFilesProcessed(0);
+
+                        // Create local database
+                        createDatabase('testDatabase', 'testPassword', (database) => {
+                            // Create a promise array to run syncing for all the files from the db
+                            let promises = [];
+                            readDir(responseUnzipPath, (errorReadDir, files) => {
+                                if (errorReadDir) {
+                                    console.log('Error while reading directory');
+                                    dispatch(setSyncState(null));
+                                }
+                                if (files) {
+                                    // For every file of the database dump, do sync
+                                    for(let i=0; i<files.length; i++) {
+                                        if (files[i] !== 'auditLog.json') {
+                                            promises.push(processFile(RNFetchBlobFs.dirs.DocumentDir + '/who_databases/' + files[i], files[i], files.length, dispatch));
+                                        }
+                                    }
+                                    Promise.all(promises)
+                                        .then((responses) => {
+                                            console.log('Responses promises: ', responses);
+                                            dispatch(setSyncState("Finished processing"));
+                                        })
+                                        .catch((error) => {
+                                            console.log("Error promises: ", error);
+                                            dispatch(setSyncState(null));
+                                        })
+                                }
+                            })
+                        });
+                    }
+                })
+            }
         })
     }
 }
@@ -137,7 +195,7 @@ export function appInitialized() {
         dispatch(saveScreenSize(screenSize));
 
         // Get the translations from the api and save them to the redux store
-        dispatch(getTranslations());
+        // dispatch(getTranslations());
         dispatch(changeAppRoot('login'));
 
         // dispatch(loginUser({

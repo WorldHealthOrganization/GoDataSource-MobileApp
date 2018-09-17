@@ -15,6 +15,9 @@ import {
     updateExposureForContactRequest,
     deleteExposureForContactRequest
 } from './../requests/contacts';
+// import {
+//     getContactsForOutbreakIdRequest
+// } from './../queries/contacts'
 import { addError } from './errors';
 import errorTypes from './../utils/errorTypes';
 
