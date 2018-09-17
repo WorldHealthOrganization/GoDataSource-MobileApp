@@ -7,7 +7,10 @@ import {handleResponse} from './../utils/functions';
 export function getCasesForOutbreakIdRequest(outbreakId, filter, token, callback) {
     let requestUrl = url.getOutbreaksUrl() + outbreakId + '/cases';
     if (filter) {
-        requestUrl += '?filter=' + JSON.stringify(filter);
+        let filterInclude = Object.assign({},filter,{include: "labResults"});
+        requestUrl += '?filter=' + JSON.stringify(filterInclude);
+    }else{
+        requestUrl += '?filter={"include": "labResults"}';
     }
     
     fetch(requestUrl, {
@@ -29,4 +32,28 @@ export function getCasesForOutbreakIdRequest(outbreakId, filter, token, callback
             console.log("*** getCasesForOutbreakId error: ", error);
             callback(error);
         })
-}
+};
+
+export function deleteCaseRequest(outbreakId, caseId, token, callback) {
+    let requestUrl = url.getOutbreaksUrl() + outbreakId + '/cases/' + caseId;
+
+    fetch(requestUrl, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Authorization': token,
+        }
+    })
+        .then((response) => {
+            return handleResponse(response);
+        })
+        .then((response) => {
+            console.log('### deleteCaseRequest response: ', response);
+            callback(null, response);
+        })
+        .catch((error) => {
+            console.log("*** deleteCaseRequest error: ", error);
+            callback(error);
+        })
+};

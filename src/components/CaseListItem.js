@@ -11,8 +11,8 @@ import {TextInput, View, Text, StyleSheet, Platform, Dimensions, InteractionMana
 import {ListItem, Icon} from 'react-native-material-ui';
 import {calculateDimension} from './../utils/functions';
 import config from './../utils/config';
-import {connect} from "react-redux";
-import {bindActionCreators} from "redux";
+import {connect} from 'react-redux';
+import {bindActionCreators} from 'redux';
 import {TextField} from 'react-native-material-textfield';
 import Button from './Button';
 import styles from './../styles';
@@ -37,8 +37,8 @@ class CaseListItem extends Component {
     render() {
         // Get caseItem info from the cases
 
-        let primaryText = this.props.item && ((this.props.item.firstName ? this.props.item.firstName : ' ') + (this.props.item.lastName ? (" " + this.props.item.lastName) : ' '));
-        let secondaryText = this.props.item && ((this.props.item.gender ? this.props.item.gender : ' ') + (this.props.item.age ? (" " + this.props.item.age + ' y.o.') : ' '));
+        let primaryText = this.props.item && ((this.props.item.firstName ? this.props.item.firstName : ' ') + (this.props.item.lastName ? (' ' + this.props.item.lastName) : ' '));
+        let secondaryText = this.props.item && ((this.props.item.gender ? this.props.item.gender : ' ') + (this.props.item.age ? (' ' + this.props.item.age + ' y.o.') : ' '));
 
         let addressText = ' ';
         let addressArray = []
@@ -65,7 +65,7 @@ class CaseListItem extends Component {
                             primaryText,
                             secondaryText
                         }}
-                        rightElement={<Icon name="location-on" size={32} color={styles.buttonGreen}/>}
+                        rightElement={<Icon name='location-on' size={32} color={styles.buttonGreen}/>}
                         style={{
                             container: {},
                             primaryText: {fontFamily: 'Roboto-Medium', fontSize: 18, color: 'black'},
@@ -85,8 +85,8 @@ class CaseListItem extends Component {
                     <Ripple style={[style.rippleStyle]} onPress={this.onPressCase}>
                         <Text style={[style.rippleTextStyle]}>VIEW</Text>
                     </Ripple>
-                    <Ripple style={[style.rippleStyle]}>
-                        <Text style={[style.rippleTextStyle]}>ACTION 2</Text>
+                    <Ripple style={[style.rippleStyle]}  onPress={this.onPressAddContact}>
+                        <Text style={[style.rippleTextStyle]}>ADD CONTACT</Text>
                     </Ripple>
                     <Ripple style={[style.rippleStyle]}>
                         <Text style={[style.rippleTextStyle]}>ACTION 3</Text>
@@ -101,9 +101,19 @@ class CaseListItem extends Component {
         InteractionManager.runAfterInteractions(() => {
             let contact = this.props && this.props.contacts && Array.isArray(this.props.contacts) && this.props.contacts.length > 0 ? this.props.contacts[this.props.contacts.map((e) => {return e.id}).indexOf(this.props.item.personId)] : null;
 
-            console.log("### onPressCases: ", this.props.item, contact, Object.assign({}, this.props.item, contact));
+            console.log('### onPressCases: ', this.props.item, contact, Object.assign({}, this.props.item, contact));
 
             this.props.onPressCase(this.props.item, contact);
+        });
+    };
+
+    onPressAddContact = () => {
+        InteractionManager.runAfterInteractions(() => {
+            let contact = this.props && this.props.contacts && Array.isArray(this.props.contacts) && this.props.contacts.length > 0 ? this.props.contacts[this.props.contacts.map((e) => {return e.id}).indexOf(this.props.item.personId)] : null;
+
+            console.log('### onPressCases: ', this.props.item, contact, Object.assign({}, this.props.item, contact));
+
+            this.props.onPressAddContact(this.props.item, contact);
         });
     };
 }

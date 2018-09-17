@@ -206,11 +206,16 @@ class CasesFilterScreen extends Component {
 
         filter.where.and = [];
 
-        if (filterStateClone.gender.Male) {
-            filter.where.and.push({gender: 'Male'})
-        }
-        if (filterStateClone.gender.Female) {
-            filter.where.and.push({gender: 'Female'})
+        if(filterStateClone.gender.Female && filterStateClone.gender.Male){
+            let orGender = [{gender: 'Male'},{gender: 'Female'}];
+            filter.where.and.push({or: orGender});
+        }else {
+            if (filterStateClone.gender.Male) {
+                filter.where.and.push({gender: 'Male'})
+            }
+            if (filterStateClone.gender.Female) {
+                filter.where.and.push({gender: 'Female'})
+            }
         }
 
         if (filterStateClone.age) {
@@ -220,9 +225,15 @@ class CasesFilterScreen extends Component {
 
         if(filterStateClone.classification){
             if(filterStateClone.classification.length > 0){
-                filterStateClone.classification.map((item,index) =>{
-                    filter.where.and.push({classification: item.value});
-                })
+                if(filterStateClone.classification.length == 1){
+                    filter.where.and.push({classification: filterStateClone.classification[0].value});
+                }else {
+                    let orClassification = [];
+                    filterStateClone.classification.map((item, index) => {
+                        orClassification.push({classification: item.value});
+                    });
+                    filter.where.and.push({or: orClassification});
+                }
             }
         }
 
