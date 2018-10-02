@@ -19,26 +19,41 @@ export function createDatabase(databaseName, databasePassword, callback) {
     // Define the design documents that tells the database to build indexes in order to query
     let ddocArray = [];
     let promisesArray = [];
-    ddocArray.push(createDesignDoc('getContacts1', function (doc) {
-        if (doc.fileType === 'person.json' && doc.type === 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT') {
-            if (doc.age) {
-                emit([doc.outbreakId, doc.gender, doc.age]);
-            } else {
-                if (doc.dob) {
-                    let now = new moment();
-                    let dob = new moment(doc.dob);
-                    let age = Math.round(moment.duration(now.diff(dob)).asYears());
-                    emit([doc.outbreakId, doc.gender, age]);
-                } else {
-                    emit([doc.outbreakId, doc.gender, 0]);
-                }
-            }
-        }
-    }));
+    // ddocArray.push(createDesignDoc('getContacts1', function (doc) {
+    //     if (doc.fileType === 'person.json' && doc.type === 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT') {
+    //         if (doc.age) {
+    //             emit([doc.outbreakId, doc.gender, doc.age]);
+    //         } else {
+    //             if (doc.dob) {
+    //                 let now = new moment();
+    //                 let dob = new moment(doc.dob);
+    //                 let age = Math.round(moment.duration(now.diff(dob)).asYears());
+    //                 emit([doc.outbreakId, doc.gender, age]);
+    //             } else {
+    //                 emit([doc.outbreakId, doc.gender, 0]);
+    //             }
+    //         }
+    //     }
+    // }));
 
     ddocArray.push(createDesignDoc('getUserByEmail', function (doc) {
         if (doc.fileType === 'user.json') {
             emit(doc.email);
+        } else {
+            if (doc.fileType === 'person.json' && doc.type === 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT') {
+                if (doc.age) {
+                    emit([doc.outbreakId, doc.gender, doc.age]);
+                } else {
+                    if (doc.dob) {
+                        let now = new moment();
+                        let dob = new moment(doc.dob);
+                        let age = Math.round(moment.duration(now.diff(dob)).asYears());
+                        emit([doc.outbreakId, doc.gender, age]);
+                    } else {
+                        emit([doc.outbreakId, doc.gender, 0]);
+                    }
+                }
+            }
         }
     }));
 

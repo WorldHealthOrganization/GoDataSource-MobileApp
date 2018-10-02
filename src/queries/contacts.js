@@ -26,7 +26,12 @@ export function getContactsForOutbreakIdRequest (outbreakId, filter, token, call
             })
     } else {
         if (filter) {
-            database.query('getContacts1', {startkey: [outbreakId, null, null], endkey: [outbreakId, {}, {}], include_docs: true})
+            database.query('getUserByEmail', {
+                startkey: [outbreakId, filter.gender, filter.age[0]],
+                endkey: [outbreakId, filter.gender, filter.age[1]],
+                include_docs: true,
+                group: true
+            })
                 .then((resultFilterContacts) => {
                     console.log('Result when filtering contacts: ', resultFilterContacts);
                 })
