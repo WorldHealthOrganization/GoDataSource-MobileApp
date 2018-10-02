@@ -259,7 +259,7 @@ class CasesScreen extends Component {
     };
 
     //Key extractor for case list
-    keyExtractor = (item, index) => item.id;
+    keyExtractor = (item, index) => item._id;
 
     //Item separator for case list
     renderSeparatorComponent = () => {

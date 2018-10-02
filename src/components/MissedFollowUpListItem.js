@@ -35,20 +35,23 @@ class MissedFollowUpListItem extends PureComponent {
     render() {
         // Get contact info from the follow-ups
 
-        let contact = this.props && this.props.contacts && Array.isArray(this.props.contacts) && this.props.contacts.length > 0 ? this.props.contacts[this.props.contacts.map((e) => {return e.id}).indexOf(this.props.item.personId)] : null;
+        let contact = this.props && this.props.contacts && Array.isArray(this.props.contacts) && this.props.contacts.length > 0 ? this.props.contacts[this.props.contacts.map((e) => {return e._id.split('_')[e._id.split('_').length - 1]}).indexOf(this.props.item.personId)] : null;
         let primaryText = contact && ((contact.firstName ? contact.firstName : ' ') + (contact.lastName ? (" " + contact.lastName) : ' '));
 
-        // Get last follow-up date and next follow-up date
         let currentFollowUpIndex = contact && contact.followUps && Array.isArray(contact.followUps) && contact.followUps.length > 0 ? contact.followUps.map((e) => {return e.id}).indexOf(this.props.item.id) : 0;
         let lastFollowUp = '';
         let nextFollowUp = '';
 
-        if (contact.followUps.length === 2) {
-            currentFollowUpIndex === 0 ? nextFollowUp = contact.followUps[1].date : lastFollowUp = contact.followUps[0].date;
-        } else {
-            lastFollowUp = currentFollowUpIndex === 0 ? '' : contact.followUps[currentFollowUpIndex - 1].date;
-            nextFollowUp = currentFollowUpIndex === (contact.followUps.length - 1) ? '' : contact.followUps[currentFollowUpIndex + 1].date
+        if (contact) {
+            // Get last follow-up date and next follow-up date
+            if (contact.followUps.length === 2) {
+                currentFollowUpIndex === 0 ? nextFollowUp = contact.followUps[1].date : lastFollowUp = contact.followUps[0].date;
+            } else {
+                lastFollowUp = currentFollowUpIndex === 0 ? '' : contact.followUps[currentFollowUpIndex - 1].date;
+                nextFollowUp = currentFollowUpIndex === (contact.followUps.length - 1) ? '' : contact.followUps[currentFollowUpIndex + 1].date
+            }
         }
+
 
         return (
             <ElevatedView elevation={3} style={[style.container, {

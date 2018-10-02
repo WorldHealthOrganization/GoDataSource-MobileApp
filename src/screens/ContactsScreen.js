@@ -21,6 +21,8 @@ import AnimatedListView from './../components/AnimatedListView';
 import {LoaderScreen, Colors} from 'react-native-ui-lib';
 import {getContactsForOutbreakId} from './../actions/contacts';
 import {addFilterForScreen} from './../actions/app';
+import {navigation} from './../utils/functions';
+import _ from 'lodash';
 
 const scrollAnim = new Animated.Value(0);
 const offsetAnim = new Animated.Value(0);
@@ -47,7 +49,13 @@ class ContactsScreen extends Component {
     }
 
     // Please add here the react lifecycle methods that you need
+    componentDidMount() {
+        this.props.getContactsForOutbreakId(this.props.user.activeOutbreakId, null, null);
+    }
 
+    // static getDerivedStateFromProps(props, state) {
+    //     if (props.contacts)
+    // }
 
     clampedScroll= Animated.diffClamp(
         Animated.add(
@@ -164,7 +172,7 @@ class ContactsScreen extends Component {
         })
     };
 
-    keyExtractor = (item, index) => item.id;
+    keyExtractor = (item, index) => item._id;
 
     renderContact = (item) => {
         // console.log("### item: ", item);
@@ -195,19 +203,22 @@ class ContactsScreen extends Component {
     };
 
     handleOnSubmitEditing = (text) => {
-        this.props.addFilterForScreen("ContactsScreen", this.state.filter);
-        let existingFilter = this.state.filterFromFilterScreen ? Object.assign({}, this.state.filterFromFilterScreen) : Object.assign({}, config.defaultFilterForContacts);
+        // this.props.addFilterForScreen("FollowUpsScreen", this.state.filter);
+        // let existingFilter = this.state.filterFromFilterScreen ? Object.assign({}, this.state.filterFromFilterScreen) : Object.assign({}, config.defaultFilterForContacts);
+        //
+        // if (!existingFilter.where || Object.keys(existingFilter.where).length === 0) {
+        //     existingFilter.where = {};
+        // }
+        // if (!existingFilter.where.or || existingFilter.where.or.length === 0) {
+        //     existingFilter.where.or = [];
+        // }
+        // existingFilter.where.or.push({firstName: {like: this.state.filter.searchText, options: 'i'}});
+        // existingFilter.where.or.push({lastName: {like: this.state.filter.searchText, options: 'i'}});
+        //
+        // this.props.getContactsForOutbreakId(this.props.user.activeOutbreakId, existingFilter, this.props.user.token);
 
-        if (!existingFilter.where || Object.keys(existingFilter.where).length === 0) {
-            existingFilter.where = {};
-        }
-        if (!existingFilter.where.or || existingFilter.where.or.length === 0) {
-            existingFilter.where.or = [];
-        }
-        existingFilter.where.or.push({firstName: {like: this.state.filter.searchText, options: 'i'}});
-        existingFilter.where.or.push({lastName: {like: this.state.filter.searchText, options: 'i'}});
-
-        this.props.getContactsForOutbreakId(this.props.user.activeOutbreakId, existingFilter, this.props.user.token);
+        // Filter contacts by firstName and lastName
+        this.filterContacts();
     };
 
     handlePressFilter = () => {
@@ -225,15 +236,17 @@ class ContactsScreen extends Component {
         this.setState({
             filterFromFilterScreen: filter
         }, () => {
-            if (this.state.filter.searchText) {
+            // if (this.state.filter.searchText) {
+            //
+            //     if (!filter.where.or || filter.where.or.length === 0) {
+            //         filter.where.or = [];
+            //     }
+            //     filter.where.or.push({firstName: {like: this.state.filter.searchText, options: 'i'}});
+            //     filter.where.or.push({lastName: {like: this.state.filter.searchText, options: 'i'}});
+            // }
+            // this.props.getContactsForOutbreakId(this.props.user.activeOutbreakId, filter, this.props.user.token);
 
-                if (!filter.where.or || filter.where.or.length === 0) {
-                    filter.where.or = [];
-                }
-                filter.where.or.push({firstName: {like: this.state.filter.searchText, options: 'i'}});
-                filter.where.or.push({lastName: {like: this.state.filter.searchText, options: 'i'}});
-            }
-            this.props.getContactsForOutbreakId(this.props.user.activeOutbreakId, filter, this.props.user.token);
+            this.filterContacts();
         })
     };
 
@@ -287,51 +300,12 @@ class ContactsScreen extends Component {
         })
     };
 
+    filterContacts = () => {
+       this.props.getContactsForOutbreakId(this.props.user.activeOutbreakId, this.state.filterFromFilterScreen, null);
+    };
+
     onNavigatorEvent = (event) => {
-        if (event.type === 'DeepLink') {
-            console.log("###");
-            if (event.link.includes('Navigate')) {
-                let linkComponents = event.link.split('/');
-                console.log("### linkComponents: ", linkComponents);
-                if (linkComponents.length > 0) {
-                    let screenToSwitchTo = null;
-                    let addScreen = null;
-                    switch(linkComponents[1]) {
-                        case '0':
-                            screenToSwitchTo = 'FollowUpsScreen';
-                            break;
-                        case '1':
-                            screenToSwitchTo = "ContactsScreen";
-                            break;
-                        case '2':
-                            screenToSwitchTo = "CasesScreen";
-                            break;
-                        case '2-add':
-                            screenToSwitchTo = "CasesScreen";
-                            addScreen = "AddSingleCaseScreen";
-                            break;
-                        default:
-                            screenToSwitchTo = "FollowUpsScreen";
-                            break;
-                    }
-                    this.props.navigator.resetTo({
-                        screen: screenToSwitchTo,
-                        animated: true
-                    });
-                    if(addScreen) {
-                        this.props.navigator.push({
-                            screen: addScreen,
-                            animated: true,
-                            animationType: 'fade',
-                            passProps: {
-                                item: {},
-                                filter: null
-                            }
-                        })
-                    }
-                }
-            }
-        }
+        navigation(event, this.props.navigator);
     };
 }
 

@@ -1206,6 +1206,28 @@ const contactsSingleScreen = {
     }
 };
 
+const personTypes = {
+    cases: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE',
+    contacts: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT',
+    events: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_EVENT'
+};
+
+const mongoCollections = {
+    cluster: 'cluster.json',
+    followUp: 'followUp.json',
+    labResult: 'labResult.json',
+    language: 'language.json',
+    languageToken: 'languageToken.json',
+    location: 'location.json',
+    outbreak: 'outbreak.json',
+    person: 'person.json',
+    referenceData: 'referenceData.json',
+    relationship: 'relationship.json',
+    role: 'role.json',
+    team: 'team.json',
+    user: 'user.json'
+}
+
 export default {
     designScreenSize,
     sideMenuItems,
@@ -1220,5 +1242,7 @@ export default {
     baseUrls,
     addFollowUpScreen,
     addExposureScreen,
-    contactsSingleScreen
+    contactsSingleScreen,
+    personTypes,
+    mongoCollections
 }

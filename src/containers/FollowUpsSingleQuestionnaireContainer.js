@@ -16,7 +16,7 @@ import Button from './../components/Button';
 import {LoaderScreen} from 'react-native-ui-lib'
 import {isEqual} from 'lodash';
 
-class FollowUpsFiltersContainer extends PureComponent {
+class FollowUpsSingleQuestionnaireContainer extends PureComponent {
 
     // This will be a container, so put as less business logic here as possible
     constructor(props) {
@@ -48,7 +48,7 @@ class FollowUpsFiltersContainer extends PureComponent {
     render() {
         if(!this.state.interactionComplete) {
             return (
-                <LoaderScreen overlay/>
+                <LoaderScreen overlay={true} backgroundColor={'white'}/>
             )
         }
 
@@ -61,8 +61,7 @@ class FollowUpsFiltersContainer extends PureComponent {
         return (
             <View style={style.mainContainer}>
                 {
-                    this.props.isEditMode && (
-                        <View style={[style.containerButtons, {marginVertical: marginVertical, width: viewWidth}]}>
+                    this && this.props && this.props.isEditMode ? (<View style={[style.containerButtons, {marginVertical: marginVertical, width: viewWidth}]}>
                             <Button
                                 title={'Save'}
                                 onPress={this.props.onPressSave}
@@ -79,8 +78,7 @@ class FollowUpsFiltersContainer extends PureComponent {
                                 height={buttonHeight}
                                 width={buttonWidth}
                             />
-                        </View>
-                    )
+                        </View>) : (null)
                 }
                 <KeyboardAwareScrollView
                     style={style.container}
@@ -148,4 +146,4 @@ function matchDispatchProps(dispatch) {
     }, dispatch);
 }
 
-export default connect(mapStateToProps, matchDispatchProps)(FollowUpsFiltersContainer);
+export default connect(mapStateToProps, matchDispatchProps)(FollowUpsSingleQuestionnaireContainer);

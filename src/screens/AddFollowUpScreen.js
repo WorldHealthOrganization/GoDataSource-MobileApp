@@ -19,6 +19,7 @@ import Section from './../components/Section';
 import DropdownInput from './../components/DropdownInput';
 import DatePicker from './../components/DatePicker';
 import {Dialog} from 'react-native-ui-lib';
+import {getContactsForOutbreakIdRequest} from './../queries/contacts';
 
 class AddFollowUpScreen extends PureComponent{
 
@@ -26,8 +27,22 @@ class AddFollowUpScreen extends PureComponent{
         super(props);
         this.state = {
             date: new Date(),
-            selectedContact: ''
+            selectedContact: '',
+            contacts: []
         };
+    }
+
+    componentDidMount() {
+        getContactsForOutbreakIdRequest(this.props.user.activeOutbreakId, null, null, (error, contacts) => {
+            if (error) {
+                console.log("An error occurred while getting all contacts for add contacts screen");
+            }
+            if (contacts) {
+                this.setState({
+                    contacts
+                })
+            }
+        })
     }
 
 
@@ -35,8 +50,10 @@ class AddFollowUpScreen extends PureComponent{
         let contentWidth = calculateDimension(297, false, this.props.screenSize);
         let marginHorizontal = calculateDimension(14, false, this.props.screenSize);
 
-        let contactList = this.props && this.props.contacts && this.props.contacts.map((e) => {
-            return {value: (e.firstName ? e.firstName + ' ' : '' + e.lastName ? e.lastName : ''), id: e.id}
+        let contactList = this.state.contacts ? this.state.contacts.map((e) => {
+            return {value: (e.firstName ? e.firstName + ' ' : '' + e.lastName ? e.lastName : ''), id: e._id}
+        }) : this.props && this.props.contacts && this.props.contacts.map((e) => {
+            return {value: (e.firstName ? e.firstName + ' ' : '' + e.lastName ? e.lastName : ''), id: e._id}
         });
 
         return (

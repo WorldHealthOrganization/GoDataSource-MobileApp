@@ -405,15 +405,15 @@ class CardComponent extends Component {
             data = this.props.referenceData.filter((e) => {
                 return e.categoryId === item.categoryId
             }).map((e) => {
-                return {value: this.getTranslation(e.value), id: e.id}
+                return {value: this.getTranslation(e.value), id: e._id.split('_')[e._id.split('_').length - 1]}
             });
         } else {
             if (item.id === 'exposure') {
                 if (this.props.type !== 'Contact') {
-                    data = this.props.contacts.map((e) => {return {value: ((e.firstName ? e.firstName + ' ' : '') + (e.lastName ? e.lastName : '')), id: e.id, type: 'contact'}});
+                    data = this.props.contacts.map((e) => {return {value: ((e.firstName ? e.firstName + ' ' : '') + (e.lastName ? e.lastName : '')), id: e._id.split('_')[e._id.split('_').length - 1], type: 'contact'}});
                 }
-                data = this.props.cases.map((e) => {return {value: ((e.firstName ? e.firstName + ' ' : '') + (e.lastName ? e.lastName : '')), id: e.id, type: 'case'}});
-                data = data.concat(this.props.events.map((e) => {return {value: e.name, id: e.id, type: 'event'}}));
+                data = this.props.cases.map((e) => {return {value: ((e.firstName ? e.firstName + ' ' : '') + (e.lastName ? e.lastName : '')), id: e._id.split('_')[e._id.split('_').length - 1], type: 'case'}});
+                data = data.concat(this.props.events.map((e) => {return {value: e.name, id: e._id.split('_')[e._id.split('_').length - 1], type: 'event'}}));
             } else {
                 if (item.id === 'clusterId') {
 

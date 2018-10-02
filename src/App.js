@@ -48,6 +48,18 @@ export default class App {
 
     startApp = (root) => {
         switch (root) {
+            case 'config':
+                console.log("### config startApp");
+                // this.unregister();
+                Navigation.startSingleScreenApp({
+                    screen: {
+                        screen: 'FirstConfigScreen'
+                    },
+                    appStyle: {
+                        orientation: 'portrait'
+                    }
+                });
+                break;
             case 'login':
                 console.log("### login startApp");
                 // this.unregister();
@@ -84,7 +96,7 @@ export default class App {
                 // this.unregister();
                 Navigation.startSingleScreenApp({
                     screen: {
-                        screen: 'LoginScreen',
+                        screen: 'FirstConfigScreen',
                     },
                     appStyle: {
                         orientation: 'portrait'

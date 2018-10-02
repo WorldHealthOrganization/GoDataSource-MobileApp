@@ -3,7 +3,6 @@
  */
 import { Navigation } from 'react-native-navigation';
 import { COLOR, ThemeContext, getTheme } from 'react-native-material-ui';
-import hoistNonReactStatics from 'hoist-non-react-statics';
 
 import LoginScreen from './LoginScreen';
 import FirstConfigScreen from './FirstConfigScreen';

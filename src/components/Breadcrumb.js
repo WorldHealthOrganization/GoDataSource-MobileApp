@@ -22,9 +22,7 @@ const Crumb = ({isCrumbActive, index, text, numberOfEntities, crumbPress}) => {
                 numberOfLines={1}
             >{text}</Text>
             {
-                index !== (numberOfEntities - 1) && (
-                    <Icon name="chevron-right" size={16} color={isCrumbActive && 'black'} style={style.chevronStyle} />
-                )
+                index !== (numberOfEntities - 1) ? (<Icon name="chevron-right" size={16} color={isCrumbActive && 'black'} style={style.chevronStyle} />) : (null)
             }
         </Ripple>
     )

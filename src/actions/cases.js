@@ -5,7 +5,8 @@
 
 // Add here only the actions, not also the requests that are executed. For that purpose is the requests directory
 import {ACTION_TYPE_GET_CASES, ACTION_TYPE_STORE_CASES} from './../utils/enums';
-import {getCasesForOutbreakIdRequest, deleteCaseRequest} from './../requests/cases';
+import {deleteCaseRequest} from './../requests/cases';
+import {getCasesForOutbreakIdRequest} from './../queries/cases';
 import { addError } from './errors';
 import errorTypes from './../utils/errorTypes';
 import config from './../utils/config';
@@ -19,18 +20,22 @@ export function storeCases(cases) {
     }
 };
 
-export function getCasesForOutbreakId(outbreakId, filter, token) {
-    return async function (dispatch, getState) {
+export function getCasesForOutbreakId(outbreakId, filter, token, dispatch) {
+    // return async function (dispatch, getState) {
+    return new Promise((resolve, reject) => {
         getCasesForOutbreakIdRequest(outbreakId, filter, token, (error, response) => {
             if (error) {
                 console.log("*** getCasesForOutbreakId error: ", error);
                 dispatch(addError(errorTypes.ERROR_CASES));
+                reject(error);
             }
             if (response) {
                 dispatch(storeCases(response));
+                resolve('Done cases');
             }
         })
-    }
+    })
+    // }
 };
 
 export function deleteCase(outbreakId, caseId, filter, token) {

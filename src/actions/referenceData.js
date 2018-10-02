@@ -2,7 +2,8 @@
  * Created by florinpopa on 02/08/2018.
  */
 import {ACTION_TYPE_STORE_REFERENCE_DATA} from './../utils/enums';
-import {getReferenceDataRequest} from './../requests/referenceData';
+// import {getReferenceDataRequest} from './../requests/referenceData';
+import {getReferenceDataRequest} from './../queries/referenceData';
 import { addError } from './errors';
 import errorTypes from './../utils/errorTypes';
 
@@ -15,16 +16,20 @@ export function storeReferenceData(referenceData) {
     }
 }
 
-export function getReferenceData(token) {
-    return async function (dispatch, getState) {
-        getReferenceDataRequest (token, (error, response) => {
+export function getReferenceData(token, dispatch) {
+    // return async function (dispatch, getState) {
+    return new Promise((resolve, reject) => {
+        getReferenceDataRequest (null, (error, response) => {
             if (error) {
                 console.log("*** getCasesForOutbreakId error: ", error);
                 dispatch(addError(errorTypes.ERROR_REFERENCE_DATA));
+                reject(error);
             }
             if (response) {
                 dispatch(storeReferenceData(response));
+                resolve('Done referenceData');
             }
         })
-    }
+    })
+    // }
 }

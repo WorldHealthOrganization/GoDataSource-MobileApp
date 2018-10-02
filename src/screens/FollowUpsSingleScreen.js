@@ -19,11 +19,12 @@ import FollowUpsSingleQuestionnaireContainer from './../containers/FollowUpsSing
 import Breadcrumb from './../components/Breadcrumb';
 import Menu, {MenuItem} from 'react-native-material-menu';
 import Ripple from 'react-native-material-ripple';
-import {addFollowUp, updateFollowUpAndContact, deleteFollowUp} from './../actions/followUps';
+import {createFollowUp, updateFollowUpAndContact, deleteFollowUp} from './../actions/followUps';
 import {updateContact} from './../actions/contacts';
 import {removeErrors} from './../actions/errors';
 import DateTimePicker from 'react-native-modal-datetime-picker';
 import _ from 'lodash';
+import {extractIdFromPouchId} from './../utils/functions';
 
 class FollowUpsSingleScreen extends Component {
 
@@ -390,14 +391,25 @@ class FollowUpsSingleScreen extends Component {
 
     handleOnPressSave = () => {
         // Mark followUp as performed, and then update to the server
+        let now = new Date();
         this.setState(prevState => ({
-            item: Object.assign({}, prevState.item, {performed: true}),
+            item: Object.assign({}, prevState.item,
+                {
+                    performed: true,
+                    updatedAt: now.toISOString(),
+                    updatedBy: extractIdFromPouchId(this.props.user._id, 'user.json')
+                }
+            ),
+            contact: Object.assign({}, prevState.contact, {
+                updatedAt: now.toISOString(),
+                updatedBy: extractIdFromPouchId(this.props.user._id, 'user.json')
+            }),
             savePressed: true
         }), () => {
             if (this.props.isNew) {
-                this.props.addFollowUp(this.props.outbreak.id, this.state.contact.id, this.state.item, this.props.user.token);
+                this.props.createFollowUp(this.props.outbreak.id, extractIdFromPouchId(this.state.contact._id, 'person.json'), this.state.item, this.state.contact, null, this.props.user.token);
             } else {
-                this.props.updateFollowUpAndContact(this.props.outbreak.id, this.state.contact.id, this.state.item.id, this.state.item, this.state.contact, this.props.user.token);
+                this.props.updateFollowUpAndContact(this.props.user.activeOutbreakId, extractIdFromPouchId(this.state.contact._id, 'person.json'), this.state.item.id, this.state.item, this.state.contact, this.props.user.token);
             }
         });
     };
@@ -433,7 +445,15 @@ class FollowUpsSingleScreen extends Component {
                         deletePressed: true
                     }, () => {
                         // console.log("### existing filters: ", this.props.filter);
-                        this.props.deleteFollowUp(this.props.outbreak.id, this.state.contact.id, this.state.item.id, this.props.filter, this.props.user.token);
+                        // this.props.deleteFollowUp(this.props.outbreak.id, this.state.contact.id, this.state.item.id, this.props.filter, this.props.user.token);
+                        this.setState(prevState => ({
+                            item: Object.assign({}, prevState.item, {
+                                deleted: true,
+                                deletedAt: new Date().toISOString()
+                            })
+                        }), () => {
+                            this.handleOnPressSave();
+                        })
                     })
             }
             },
@@ -495,7 +515,7 @@ function matchDispatchProps(dispatch) {
     return bindActionCreators({
         getFollowUpsForOutbreakId,
         getMissedFollowUpsForOutbreakId,
-        addFollowUp,
+        createFollowUp,
         updateFollowUpAndContact,
         deleteFollowUp,
         updateContact,

@@ -7,19 +7,25 @@ import {
     ACTION_TYPE_ADD_CONTACT
 } from './../utils/enums';
 import {
-    getContactsForOutbreakIdRequest,
+    // getContactsForOutbreakIdRequest,
     getContactByIdRequest,
-    updateContactRequest,
+    // updateContactRequest,
     addContactRequest,
+    // addExposureForContactRequest,
+    // updateExposureForContactRequest,
+    // deleteExposureForContactRequest
+} from './../requests/contacts';
+import {
+    getContactsForOutbreakIdRequest,
+    updateContactRequest,
     addExposureForContactRequest,
     updateExposureForContactRequest,
     deleteExposureForContactRequest
-} from './../requests/contacts';
-// import {
-//     getContactsForOutbreakIdRequest
-// } from './../queries/contacts'
+} from './../queries/contacts'
 import { addError } from './errors';
 import errorTypes from './../utils/errorTypes';
+import {getFollowUpsForOutbreakIdRequest} from './../queries/followUps';
+import {storeFollowUps} from  './../actions/followUps';
 
 // Add here only the actions, not also the requests that are executed. For that purpose is the requests directory
 export function storeContacts(followUps) {
@@ -43,18 +49,75 @@ export function updateContactAction(contact) {
     }
 }
 
-export function getContactsForOutbreakId(outbreakId, filter, token) {
-    return async function (dispatch, getState) {
-        getContactsForOutbreakIdRequest(outbreakId, filter, token, (error, response) => {
+export function getContactsForOutbreakIdWithPromises(outbreakId, filter, token, dispatch) {
+    // return async function (dispatch, getState) {
+    return new Promise((resolve, reject) => {
+        getContactsForOutbreakIdRequest(outbreakId, filter, null, (error, response) => {
             if (error) {
                 console.log("*** getContactsForOutbreakId error: ", error);
                 dispatch(addError(errorTypes.ERROR_CONTACT));
+                reject(error);
+            }
+            if (response) {
+                // dispatch(storeContacts(response));
+                resolve(response);
+                // getFollowUpsForOutbreakIdRequest(outbreakId, null, (errorFollowUps, responseFollowUps) => {
+                //     if (errorFollowUps) {
+                //         console.log("Error when getting followUps: ", errorFollowUps);
+                //     }
+                //     if (responseFollowUps) {
+                //         console.log('FollowUps result: ', outbreakId, responseFollowUps);
+                //         dispatch(storeFollowUps(responseFollowUps));
+                //         // Here should add the followUps to the contacts
+                //         let contacts = mapFollowUpsToContacts(response, responseFollowUps);
+                //         dispatch(storeContacts(contacts));
+                //         resolve("Done contacts");
+                //     }
+                // })
+                // dispatch(storeContacts(response))
+            }
+        })
+    })
+    // }
+}
+
+export function getContactsForOutbreakId(outbreakId, filter, token) {
+    return async function (dispatch, getState) {
+    // return new Promise((resolve, reject) => {
+        getContactsForOutbreakIdRequest(outbreakId, filter, null, (error, response) => {
+            if (error) {
+                console.log("*** getContactsForOutbreakId error: ", error);
+                dispatch(addError(errorTypes.ERROR_CONTACT));
+                // reject(error);
             }
             if (response) {
                 dispatch(storeContacts(response));
+                // getFollowUpsForOutbreakIdRequest(outbreakId, null, (errorFollowUps, responseFollowUps) => {
+                //     if (errorFollowUps) {
+                //         console.log("Error when getting followUps: ", errorFollowUps);
+                //     }
+                //     if (responseFollowUps) {
+                //         console.log('FollowUps result: ', outbreakId, responseFollowUps);
+                //         dispatch(storeFollowUps(responseFollowUps));
+                //         // Here should add the followUps to the contacts
+                //         let contacts = mapFollowUpsToContacts(response, responseFollowUps);
+                //         dispatch(storeContacts(contacts));
+                //         // resolve("Done contacts");
+                //     }
+                // })
+                // dispatch(storeContacts(response))
             }
         })
+    // })
     }
+}
+
+export function mapFollowUpsToContacts(contacts, followUps) {
+    for (let i=0; i<contacts.length; i++) {
+        let contactId = contacts[i]._id.split('_')[contacts[i]._id.split('_').length - 1];
+        contacts[i].followUps = followUps.filter((e) => {return e.personId === contactId});
+    }
+    return contacts;
 }
 
 export function getContactById(outbreakId, contactId, token) {

@@ -42,14 +42,12 @@ GeneralListItem = ({title, primaryText, secondaryText, firstComponent, secondCom
                     )
                 }
                 {
-                    hasActionsBar && (
-                        <ActionsBar
+                    hasActionsBar ? (<ActionsBar
                             textsArray={textsArray}
                             textsStyleArray={textsStyleArray}
                             onPressArray={onPressArray}
                             containerStyle={[{height: 54}]}
-                        />
-                    )
+                        />) : (null)
                 }
         </View>
     </ElevatedView>

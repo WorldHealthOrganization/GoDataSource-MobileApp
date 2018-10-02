@@ -164,10 +164,31 @@ class ExposureScreen extends Component {
         // Check if id is exposure in order to set the persons array
         // console.log("Before changing state: ", value, id, type);
         if (id === 'exposure') {
-            let personsArray = [{
-                id: value.value,
-                type: type
-            }];
+            // Do the logic here for handling all types of exposures
+            // Permitted situations are contact(target)->case/event(source) and case->case
+            // For case->case, the case that is the one that was clicked on
+            let personsArray = [];
+            if (this.props.type === 'Contact') {
+                personsArray = [{
+                    id: value.value,
+                    type: type,
+                    source: true,
+                    target: null
+                },{
+                    id: this.props.contact._id.split('_')[this.props.contact._id.split('_').length - 1],
+                    type: 'contact',
+                    source: null,
+                    target: true
+                }]
+            }
+            // Here add logic for cases/events
+            else {
+                personsArray = [{
+                    id: value.value,
+                    type: type
+                }]
+            }
+
             this.setState(prevState => ({
                 exposure: Object.assign({}, prevState.exposure, {persons: personsArray})
             }), () => {
@@ -223,12 +244,24 @@ class ExposureScreen extends Component {
             }, () => {
                 if (this.props.type === 'Contact') {
                     if (this.props.exposure) {
-                        this.props.updateExposureForContact(this.props.user.activeOutbreakId, this.props.contact.id, this.state.exposure, this.props.user.token);
+                        this.setState(prevState => ({
+                            exposure: Object.assign({}, prevState.exposure, {updatedAt: new Date().toISOString(), updatedBy: this.props.user._id.split('_')[this.props.user._id.split('_').length - 1]})
+                        }), () => {
+                          this.props.updateExposureForContact(this.props.user.activeOutbreakId, this.props.contact._id.split('_')[this.props.contact._id.split('_').length - 1], this.state.exposure, this.props.user.token);
+                        })
                     } else {
                         if (!this.props.contact) {
-                            this.props.navigator.dismissModal(this.props.saveExposure(this.state.exposure));
+                            this.setState(prevState => ({
+                                exposure: Object.assign({}, prevState.exposure, {updatedAt: new Date().toISOString(), updatedBy: this.props.user._id.split('_')[this.props.user._id.split('_').length - 1]})
+                            }), () => {
+                              this.props.navigator.dismissModal(this.props.saveExposure(this.state.exposure));
+                            })
                         } else {
-                            this.props.addExposureForContact(this.props.user.activeOutbreakId, this.props.contact.id, this.state.exposure, this.props.user.token);
+                            this.setState(prevState => ({
+                                exposure: Object.assign({}, prevState.exposure, {updatedAt: new Date().toISOString(), updatedBy: this.props.user._id.split('_')[this.props.user._id.split('_').length - 1]})
+                            }), () => {
+                              this.props.addExposureForContact(this.props.user.activeOutbreakId, this.props.contact._id.split('_')[this.props.contact._id.split('_').length - 1], this.state.exposure, this.props.user.token);
+                            })
                         }
                     }
                 }

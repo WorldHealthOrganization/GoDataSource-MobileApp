@@ -2,7 +2,7 @@
  * Created by florinpopa on 14/06/2018.
  */
 import React, {Component} from 'react';
-import {View, Text, StyleSheet, Platform, Image, Alert} from 'react-native';
+import {View, Text, StyleSheet, Platform, Image, Alert, TouchableOpacity} from 'react-native';
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import {Button} from 'react-native-material-ui';
@@ -10,12 +10,15 @@ import { TextField } from 'react-native-material-textfield';
 import styles from './../styles';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import { loginUser } from './../actions/user';
+import { loginUser, cleanDataAfterLogout } from './../actions/user';
 import { removeErrors } from './../actions/errors';
+import {changeAppRoot} from './../actions/app';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import DropdownInput from './../components/DropdownInput';
 import config from './../utils/config';
 import url from './../utils/url';
+import {LoaderScreen} from 'react-native-ui-lib';
+import {createDatabase} from './../queries/database';
 
 class LoginScreen extends Component {
 
@@ -28,7 +31,8 @@ class LoginScreen extends Component {
         this.state = {
             email: '',
             password: '',
-            url: config.baseUrls[0].value
+            url: config.baseUrls[0].value,
+            showLoading: false
         };
         // Bind here methods, or at least don't declare methods in the render method
         this.handleLogin = this.handleLogin.bind(this);
@@ -40,6 +44,16 @@ class LoginScreen extends Component {
     }
 
     // Please add here the react lifecycle methods that you need
+    componentDidMount() {
+        // createDatabase('testDatabase', 'testPassword', (database) => {
+        //     if (database) {
+                setTimeout(() => {
+                    console.log("Component LoginScreen mounted. Time to clean the redux mess");
+                    this.props.cleanDataAfterLogout();
+                }, 500);
+        //     }
+        // })
+    }
 
     static getDerivedStateFromProps(props, state) {
         if (props.errors && props.errors.type && props.errors.message) {
@@ -49,6 +63,10 @@ class LoginScreen extends Component {
                 }
             ])
         }
+        if (props.loginState && props.loginState === 'Finished logging') {
+            // props.changeAppRoot('after-login');
+            state.showLoading = false;
+        }
         return null;
     }
 
@@ -56,27 +74,23 @@ class LoginScreen extends Component {
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
+        console.log('Render method of LoginScreen');
         return (
             <KeyboardAwareScrollView
                 style={[style.container, {paddingTop: Platform.OS === 'ios' ? this.props.screenSize.height === 812 ? 44 : 20 : 0}]}
                 contentContainerStyle={style.contentContainerStyle}
                 keyboardShouldPersistTaps={'always'}
             >
+                {
+                    this.state && this.state.showLoading ? (
+                        <LoaderScreen overlay={true} backgroundColor={'white'} message={this.props && this.props.loginState ? this.props.loginState : 'Loading...'} />
+                    ) : (null)
+                }
                 <View style={[style.welcomeTextContainer]}>
                     <Text style={style.welcomeText}>Welcome!</Text>
                 </View>
                 <View style={style.inputsContainer}>
-                    {/*<DropdownInput*/}
-                        {/*id="baseUrl"*/}
-                        {/*label="Select URL"*/}
-                        {/*value={this.state.url}*/}
-                        {/*data={config.baseUrls}*/}
-                        {/*isEditMode={true}*/}
-                        {/*isRequired={false}*/}
-                        {/*onChange={this.handleChangeUrl}*/}
-                    {/*/>*/}
                     <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'}}>
-                        {/*<Text style={{alignSelf: 'flex-end', marginBottom: 20, fontFamily: 'Roboto-Medium', fontSize: 15}}>http://</Text>*/}
                         <TextField
                             ref={this.urlRef}
                             value={this.state.url}
@@ -86,8 +100,8 @@ class LoginScreen extends Component {
                             containerStyle={[style.textInput]}
                             onChangeText={this.handleTextChange}
                             label='URL'
+                            autoCapitalize={'none'}
                         />
-                        {/*<Text style={{alignSelf: 'flex-end', marginBottom: 20, fontFamily: 'Roboto-Medium', fontSize: 15}}>/api</Text>*/}
                     </View>
                     <TextField
                         ref={this.emailRef}
@@ -98,6 +112,7 @@ class LoginScreen extends Component {
                         containerStyle={style.textInput}
                         onChangeText={this.handleTextChange}
                         label='Email address'
+                        autoCapitalize={'none'}
                     />
                     <TextField
                         ref={this.passwordRef}
@@ -109,8 +124,9 @@ class LoginScreen extends Component {
                         onChangeText={this.handleTextChange}
                         label='Password'
                         secureTextEntry={true}
+                        autoCapitalize={'none'}
                     />
-                    <Button raised onPress={this.handleLogin} text="Login" style={styles.buttonLogin} />
+                    <Button raised onPress={this.handleLogin} text="Login" style={styles.buttonLogin} height={35} />
                 </View>
                 <View style={style.logoContainer}>
                     <Image source={{uri: 'logo_app'}} style={style.logoStyle} />
@@ -140,7 +156,7 @@ class LoginScreen extends Component {
                     }
                 ])
             } else {
-                let urlNew = this.state.url;
+                let urlNew = this.state.url.toLowerCase();
                 if (!urlNew.includes('http://')) {
                     urlNew = 'http://' + urlNew;
                 }
@@ -149,9 +165,13 @@ class LoginScreen extends Component {
                 }
                 url.setBaseUrl(urlNew);
 
-                this.props.loginUser({
-                    email: this.state.email.toLowerCase(),
-                    password: this.state.password
+                this.setState({
+                    showLoading: true
+                }, () => {
+                    this.props.loginUser({
+                        email: this.state.email.toLowerCase(),
+                        password: this.state.password
+                    });
                 });
             }
         }
@@ -219,14 +239,17 @@ const style = StyleSheet.create({
 function mapStateToProps(state) {
     return {
         screenSize: state.app.screenSize,
-        errors: state.errors
+        errors: state.errors,
+        loginState: state.app.loginState
     };
 }
 
 function matchDispatchToProps(dispatch) {
     return bindActionCreators({
         loginUser,
-        removeErrors
+        removeErrors,
+        cleanDataAfterLogout,
+        changeAppRoot
     }, dispatch);
 }
 

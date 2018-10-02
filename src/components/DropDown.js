@@ -63,26 +63,11 @@ class DropDown extends PureComponent {
                     onBackdropPress={() => this.setState({ showDropdown: false })}
                 >
                     <ElevatedView elevation={3} style={[{backgroundColor: 'white'}]}>
-                        {/*{*/}
-                            {/*this.props.isSectionedList ? (*/}
-                                {/*<SectionedMultiSelect*/}
-                                    {/*items={this.props.data}*/}
-                                    {/*uniqueKey='id'*/}
-                                    {/*subKey='children'*/}
-                                    {/*selectText='Choose one or more locations'*/}
-                                    {/*showDropDowns={true}*/}
-                                    {/*readOnlyHeadings={true}*/}
-                                    {/*onSelectedItemsChange={this.onSelectedItemsChange}*/}
-                                    {/*selectedItems={this.state.selectedItems}*/}
-                                {/*/>*/}
-                            {/*) : (*/}
                                 <SelectMultiple
                                     items={this.props.data}
                                     selectedItems={this.state.selectedItems}
                                     onSelectionsChange={this.handleOnselectionChange}
                                 />
-                        //     )
-                        // }
                     </ElevatedView>
                 </Modal>
             </Ripple>

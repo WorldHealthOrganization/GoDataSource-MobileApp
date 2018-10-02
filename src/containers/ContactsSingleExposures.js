@@ -71,7 +71,7 @@ class ContactsSingleExposures extends Component {
         // console.log("### contact data: ", this.props.contact);
         if(!this.state.interactionComplete) {
             return (
-                <LoaderScreen overlay/>
+                <LoaderScreen overlay={true} backgroundColor={'white'}/>
             )
         }
 

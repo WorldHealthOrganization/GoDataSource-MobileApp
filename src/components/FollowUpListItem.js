@@ -40,32 +40,34 @@ class FollowUpListItem extends PureComponent {
             contact = this.props.item;
         } else {
             contact = this.props && this.props.contacts && Array.isArray(this.props.contacts) && this.props.contacts.length > 0 ? this.props.contacts[this.props.contacts.map((e) => {
-                return e.id
+                return e._id.split('_')[e._id.split('_').length - 1]
             }).indexOf(this.props.item.personId)] : null;
         }
-        let primaryText = contact && ((contact.firstName ? contact.firstName : ' ') + (contact.lastName ? (" " + contact.lastName) : ' '));
-        let genderString = '';
-        if (contact && contact.gender) {
-            genderString = this.getTranslation(contact.gender);
-        }
-        let secondaryText = contact && ((genderString ? genderString.charAt(0) : ' ') + (contact.age ? (", " + contact.age) : ' '));
-
-
-        let addressText = '';
-
-        if (this.props && this.props.item && this.props.item.address) {
-            addressText = getAddress(this.props.item.address, true);
-        } else {
-            if (this.props.isContact) {
-                addressText = getAddress(contact.addresses[0], true);
+        // if (contact) {
+            let primaryText = contact ? ((contact.firstName ? contact.firstName : ' ') + (contact.lastName ? (" " + contact.lastName) : ' ')) : '';
+            let genderString = '';
+            if (contact && contact.gender) {
+                genderString = this.getTranslation(contact.gender);
             }
-        }
+            let secondaryText = contact ? ((genderString ? genderString.charAt(0) : ' ') + (contact.age ? (", " + contact.age) : ' ')) : '';
 
-        let relationshipText = '';
-        if (this.props && this.props.cases && this.props.events) {
-            relationshipText = handleExposedTo(contact, true, this.props.cases, this.props.events);
-        }
 
+            let addressText = '';
+
+            if (this.props && this.props.item && this.props.item.address) {
+                addressText = getAddress(this.props.item.address, true);
+            } else {
+                if (this.props.isContact) {
+                    addressText = getAddress(contact.addresses[0], true);
+                }
+            }
+
+            let relationshipText = '';
+            if (this.props && this.props.cases && this.props.events) {
+                relationshipText = handleExposedTo(contact, true, this.props.cases, this.props.events);
+            }
+
+        // }
         return (
             <ElevatedView elevation={3} style={[style.container, {
                 marginHorizontal: calculateDimension(16, false, this.props.screenSize),
@@ -129,7 +131,7 @@ class FollowUpListItem extends PureComponent {
     // Please write here all the methods that are not react native lifecycle methods
     onPressFollowUp = () => {
         InteractionManager.runAfterInteractions(() => {
-            let contact = this.props && this.props.contacts && Array.isArray(this.props.contacts) && this.props.contacts.length > 0 ? this.props.contacts[this.props.contacts.map((e) => {return e.id}).indexOf(this.props.item.personId)] : null;
+            let contact = this.props && this.props.contacts && Array.isArray(this.props.contacts) && this.props.contacts.length > 0 ? this.props.contacts[this.props.contacts.map((e) => {return e._id.split('_')[e._id.split('_').length - 1]}).indexOf(this.props.item.personId)] : null;
 
             // console.log("### onPressFollowUp: ", this.props.item, contact, Object.assign({}, this.props.item, contact));
 
@@ -139,7 +141,7 @@ class FollowUpListItem extends PureComponent {
 
     onPressMissing = () => {
         InteractionManager.runAfterInteractions(() => {
-            let contact = this.props && this.props.contacts && Array.isArray(this.props.contacts) && this.props.contacts.length > 0 ? this.props.contacts[this.props.contacts.map((e) => {return e.id}).indexOf(this.props.item.personId)] : null;
+            let contact = this.props && this.props.contacts && Array.isArray(this.props.contacts) && this.props.contacts.length > 0 ? this.props.contacts[this.props.contacts.map((e) => {return e._id.split('_')[e._id.split('_').length - 1]}).indexOf(this.props.item.personId)] : null;
 
             // console.log("### onPressFollowUp: ", this.props.item, contact, Object.assign({}, this.props.item, contact));
 
@@ -149,7 +151,7 @@ class FollowUpListItem extends PureComponent {
 
     onPressExposure = () => {
         InteractionManager.runAfterInteractions(() => {
-            let contact = this.props && this.props.contacts && Array.isArray(this.props.contacts) && this.props.contacts.length > 0 ? this.props.contacts[this.props.contacts.map((e) => {return e.id}).indexOf(this.props.item.personId)] : null;
+            let contact = this.props && this.props.contacts && Array.isArray(this.props.contacts) && this.props.contacts.length > 0 ? this.props.contacts[this.props.contacts.map((e) => {return e._id.split('_')[e._id.split('_').length - 1]}).indexOf(this.props.item.personId)] : null;
 
             // console.log("### onPressFollowUp: ", this.props.item, contact, Object.assign({}, this.props.item, contact));
 

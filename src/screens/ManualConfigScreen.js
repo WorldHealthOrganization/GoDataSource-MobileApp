@@ -112,7 +112,7 @@ class ManualConfigScreen extends Component {
                 </View>
                 {
                     this.props && this.props.syncState && this.props.syncState !== 'Finished processing' ? (
-                        <LoaderScreen message={this.props.syncState || ''} overlay />
+                        <LoaderScreen message={this.props.syncState || ''} overlay={true} backgroundColor={'white'} />
                     ) : (
                         null
                     )

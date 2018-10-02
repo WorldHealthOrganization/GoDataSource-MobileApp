@@ -3,39 +3,125 @@
  */
 import {getDatabase} from './database';
 
-// Credentials: {email, encryptedPassword}
 export function getContactsForOutbreakIdRequest (outbreakId, filter, token, callback) {
     let database = getDatabase();
 
     console.log("getContactsForOutbreakIdRequest: ", outbreakId, filter, token, callback);
 
-    database.createIndex({
-        index: {
-            fields: ['fileType', 'type', 'outbreakId'],
-            name: 'indexForPerson'
-        }
-    })
-        .then((result) => {
-            console.log("Create index result: ", result);
-            database.find({
-                selector: {fileType: 'person.json', type: 'contact', outbreakId: outbreakId}
+    if (filter && filter.keys) {
+        let keys = filter.keys.map((e) => {return `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT_false_${outbreakId}_${e}`});
+        console.log("@@@ filter keys: ", keys);
+        database.allDocs({
+            keys: keys,
+            include_docs: true
+        })
+            .then((result) => {
+                let contacts = result.rows.filter((e) => {return e.error !== 'not_found'}).map((e) => {return e.doc});
+                console.log("Result with the new index for contacts: ", contacts);
+                callback(null, contacts);
             })
-                .then((resultFind) => {
-                    console.log("Result From find: ", resultFind)
+            .catch((errorQuery) => {
+                console.log("Error with the new index for contacts: ", errorQuery);
+                callback(errorQuery);
+            })
+    } else {
+        if (filter) {
+            database.query('getContacts1', {startkey: [outbreakId, null, null], endkey: [outbreakId, {}, {}], include_docs: true})
+                .then((resultFilterContacts) => {
+                    console.log('Result when filtering contacts: ', resultFilterContacts);
                 })
-                .catch((errorFind) => {
-                    console.log("Error from find: ", errorFind);
+                .catch((errorFilterContacts) => {
+                    console.log('Error when filtering contacts: ', errorFilterContacts);
                 })
-        })
-        .catch((errorCreateIndex) => {
-            console.log('Error while creating index: ', errorCreateIndex);
-        })
+        } else {
+            database.allDocs({
+                startkey: `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT_false_${outbreakId}`,
+                endkey: `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT_false_${outbreakId}\uffff`,
+                include_docs: true
+            })
+                .then((result) => {
+                    console.log("result with the new index for contacts: ");
+                    callback(null, result.rows.map((e) => {
+                        return e.doc
+                    }));
+                })
+                .catch((errorQuery) => {
+                    console.log("Error with the new index for contacts: ", errorQuery);
+                    callback(errorQuery);
+                })
+        }
+    }
+    // }
+}
 
-    // database.query('whoIndexes/mapStuff', {startKey: [outbreakId, 0], endKey: [outbreakId, 2], include_docs: true})
-    //     .then((result) => {
-    //         console.log("Result from getting contacts for outbreak id: ", result);
-    //     })
-    //     .catch((error) => {
-    //         console.log("Error while getting contact for outbreak id: ", error);
-    //     })
+export function updateContactRequest(outbreakId, contactId, contact, token, callback) {
+    let database = getDatabase();
+
+    console.log('updateContactRequest: ', outbreakId, contactId, contact, token);
+
+    if (!contact._id.includes('person.json')) {
+        contact._id = 'person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT_false_' + contact.outbreakId + '_' + contact._id;
+    }
+
+    database.get(contact._id)
+        .then((resultGetContact) => {
+            database.put(contact)
+                .then((responseUpdateContact) => {
+                    console.log("Update contact response: ", responseUpdateContact);
+                    database.get(contact._id)
+                        .then((resultGetUpdatedContact) => {
+                            callback(null, resultGetUpdatedContact);
+                        })
+                        .catch((errorGetUpdatedContact) => {
+                            console.log("Error getUpdatedContact: ", errorGetUpdatedContact);
+                            callback(errorGetUpdatedContact);
+                        })
+                })
+                .catch((errorUpdateContact) => {
+                    console.log('Update contact error: ', errorUpdateContact);
+                    callback(errorUpdateContact);
+                })
+        })
+        .catch((errorGetContact) => {
+            console.log('Error getContact: ', errorGetContact);
+            callback(errorGetContact);
+        })
+}
+
+export function addExposureForContactRequest(outbreakId, contactId, exposure, token, callback) {
+    let database = getDatabase();
+
+    // Here should add the data as an relationship.json type, while also updating the contact to contain the new added exposure
+
+    database.put(exposure)
+        .then((result) => {
+            console.log('Result addExposureForContactRequest: ', result);
+        })
+        .catch((errorAddExposure) => {
+            console.log("Error addExposureForContactRequest: ", errorAddExposure);
+        })
+}
+
+export function updateExposureForContactRequest(outbreakId, contactId, exposure, token, callback) {
+    let database = getDatabase();
+
+    database.put(exposure)
+        .then((result) => {
+            console.log('Result updateExposureForContactRequest: ', result);
+        })
+        .catch((errorAddExposure) => {
+            console.log("Error updateExposureForContactRequest: ", errorAddExposure);
+        })
+}
+
+export function deleteExposureForContactRequest(outbreakId, contactId, exposure, token, callback) {
+    let database = getDatabase();
+
+    database.put(exposure)
+        .then((result) => {
+            console.log('Result deleteExposureForContactRequest: ', result);
+        })
+        .catch((errorAddExposure) => {
+            console.log("Error deleteExposureForContactRequest: ", errorAddExposure);
+        })
 }

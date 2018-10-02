@@ -48,18 +48,14 @@ class FollowUpsFilterScreen extends Component {
     // Please add here the react lifecycle methods that you need
     static getDerivedStateFromProps(props, state) {
         let filterClone = Object.assign({}, state.filter.filter);
-        if (props && props.activeFilters && props.activeFilters.where && props.activeFilters.where.and && Array.isArray(props.activeFilters.where.and)) {
-            for(let i=0; i<props.activeFilters.where.and.length; i++) {
-                if (props.activeFilters.where.and[i].gender) {
-                    filterClone.gender[props.activeFilters.where.and[i].gender] = true;
+        if (props && props.activeFilters) {
+                if (props.activeFilters.gender) {
+                    filterClone.gender[props.activeFilters.gender] = true;
                 }
-                if (props.activeFilters.where.and[i].age && props.activeFilters.where.and[i].age.gte) {
-                    filterClone.age[0] = props.activeFilters.where.and[i].age.gte;
+                if (props.activeFilters.age && Array.isArray(props.activeFilters.age) && props.activeFilters.age.length === 2) {
+                    filterClone.age[0] = props.activeFilters.age[0];
+                    filterClone.age[1] = props.activeFilters.age[1];
                 }
-                if (props.activeFilters.where.and[i].age && props.activeFilters.where.and[i].age.lte) {
-                    filterClone.age[1] = props.activeFilters.where.and[i].age.lte;
-                }
-            }
             console.log("### Active filters: ", filterClone);
         }
     }
@@ -90,7 +86,7 @@ class FollowUpsFilterScreen extends Component {
     // Please write here all the methods that are not react native lifecycle methods
     handlePressNavbarButton = () => {
         this.props.removeFilterForScreen('FollowUpsFilterScreen');
-        this.props.navigator.dismissModal(this.props.onApplyFilters(config.defaultFilterForContacts));
+        this.props.navigator.dismissModal(this.props.onApplyFilters(null));
     };
 
     handleOnIndexChange = (index) => {
@@ -192,22 +188,17 @@ class FollowUpsFilterScreen extends Component {
 
     handleOnPressApplyFilters = () => {
         let filterStateClone = Object.assign({}, this.state.filter.filter);
-        let filter = Object.assign({}, config.defaultFilterForContacts);
-
-        filter.where = {};
-
-        filter.where.and = [];
+        let filter = {};
 
         if (filterStateClone.gender.Male) {
-            filter.where.and.push({gender: 'Male'})
+            filter.gender = 'Male'
         }
         if (filterStateClone.gender.Female) {
-            filter.where.and.push({gender: 'Female'})
+            filter.gender = 'Female'
         }
 
         if (filterStateClone.age) {
-            filter.where.and.push({age: {gte: filterStateClone.age[0]}});
-            filter.where.and.push({age: {lte: filterStateClone.age[1]}});
+            filter.age = filterStateClone.age;
         }
 
         // this.props.getContactsForOutbreakId(this.props.user.activeOutbreakId, filter, this.props.user.token);

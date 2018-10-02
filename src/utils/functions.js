@@ -8,6 +8,8 @@ import {unzip} from 'react-native-zip-archive';
 import {updateFileInDatabase} from './../queries/database';
 import {setSyncState} from './../actions/app';
 import bcrypt from 'react-native-bcrypt';
+import uuid from 'react-native-uuid';
+import {getContactsForOutbreakId} from './../actions/contacts';
 
 // This method is used for handling server responses. Please add here any custom error handling
 export function handleResponse(response) {
@@ -68,6 +70,53 @@ export function getAddress(address, returnString) {
     return returnString ? addressArray.join(', ') : addressArray;
 }
 
+export function navigation(event, navigator) {
+    if (event.type === 'DeepLink') {
+        // console.log("###");
+        if (event.link.includes('Navigate')) {
+            let linkComponents = event.link.split('/');
+            // console.log("### linkComponents: ", linkComponents);
+            if (linkComponents.length > 0) {
+                let screenToSwitchTo = null;
+                let addScreen = null;
+                switch(linkComponents[1]) {
+                    case '0':
+                        screenToSwitchTo = 'FollowUpsScreen';
+                        break;
+                    case '1':
+                        screenToSwitchTo = "ContactsScreen";
+                        break;
+                    case '2':
+                        screenToSwitchTo = "CasesScreen";
+                        break;
+                    case '2-add':
+                        screenToSwitchTo = "CasesScreen";
+                        addScreen = "AddSingleCaseScreen";
+                        break;
+                    default:
+                        screenToSwitchTo = "FollowUpsScreen";
+                        break;
+                }
+                navigator.resetTo({
+                    screen: screenToSwitchTo,
+                    animated: true
+                });
+                if(addScreen) {
+                    navigator.push({
+                        screen: addScreen,
+                        animated: true,
+                        animationType: 'fade',
+                        passProps: {
+                            item: {},
+                            filter: null
+                        }
+                    })
+                }
+            }
+        }
+    }
+}
+
 // This method returns the cases/events that a contact has been exposed to
 // It can return either as a string or as an array of cases
 export function handleExposedTo(contact, returnString, cases, events) {
@@ -81,15 +130,20 @@ export function handleExposedTo(contact, returnString, cases, events) {
 
     for (let i=0; i<relationships.length; i++) {
         // Get only the persons that the contact has been exposed to
-        let persons = relationships[i].persons.filter((e) => {return e.id !== contact.id});
+        // Since on the local storage we keep the ids as the actual id concatenated with other strings, we must parse this
+        let contactId = contact._id.split('_');
+        contactId = contactId[contactId.length - 1];
+        let persons = relationships[i].persons.filter((e) => {return e.id !== contactId});
         for (let j=0; j<persons.length; j++) {
             if (persons[j].type === 'case' && cases && Array.isArray(cases)) {
-                let auxCase = cases[cases.map((e) => {return e.id}).indexOf(persons[j].id)];
-                relationshipArray.push((auxCase.firstName || '') + " " + (auxCase.lastName || ''));
+                let auxCase = cases[cases.map((e) => {return e._id.split('_')[e._id.split('_').length - 1]}).indexOf(persons[j].id)];
+                if (auxCase) {
+                    relationshipArray.push((auxCase.firstName || '') + " " + (auxCase.lastName || ''));
+                }
             } else {
                 if (events && Array.isArray(events)) {
                     let auxEvent = events[events.map((e) => {
-                        return e.id
+                        return e._id.split('_')[e._id.split('_').length - 1]
                     }).indexOf(persons[j].id)];
                     if (auxEvent && auxEvent.name) {
                         relationshipArray.push(auxEvent.name);
@@ -171,6 +225,7 @@ export function getNumberOfFilesProcessed() {
 export async function processFile (path, type, totalNumberOfFiles, dispatch) {
     return new Promise((resolve, reject) => {
         if (path) {
+            console.log('Process file: ', type, ' From path: ', path);
             RNFetchBlobFS.exists(path)
                 .then((exists) => {
                     if (exists) {
@@ -222,4 +277,17 @@ export function comparePasswords (password, encryptedPassword, callback) {
         }
         callback(null, isMatch)
     })
+}
+
+// Method for extracting the mongo id from the pouch id
+// type is the name of the mongo collection: (follow)
+export function extractIdFromPouchId (pouchId, type) {
+    if (!pouchId.includes(type)) {
+        return pouchId
+    }
+    return pouchId.split('_')[pouchId.split('_').length - 1];
+}
+
+export function generateId () {
+    return uuid.v4();
 }

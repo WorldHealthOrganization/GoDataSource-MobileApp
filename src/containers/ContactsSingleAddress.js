@@ -45,7 +45,7 @@ class ContactsSingleAddress extends Component {
     render() {
         if(!this.state.interactionComplete) {
             return (
-                <LoaderScreen overlay/>
+                <LoaderScreen overlay={true} backgroundColor={'white'}/>
             )
         }
 

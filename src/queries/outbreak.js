@@ -7,11 +7,13 @@ import {getDatabase} from './database';
 export function getOutbreakByIdRequest (outbreakId, token, callback) {
     let database = getDatabase();
 
+    console.log('GetOutbreakByIdRequest: ', outbreakId);
+
     // For searching by ID it is recommended to use the PouchDB allDocs method with the ID as a key, since primary indexes are much faster than secondary ones
-    database.allDocs({key: outbreakId, include_docs: true})
+    database.get('outbreak.json_false_' + outbreakId)
         .then((result) => {
             console.log("Result from getting outbreak: ", result);
-            callback(null, result.rows[0]);
+            callback(null, result);
         })
         .catch((errorGetOutbreak) => {
             console.log("Error from getting outbreak: ", errorGetOutbreak);

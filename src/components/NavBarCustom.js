@@ -53,13 +53,11 @@ class NavBarCustom extends PureComponent {
                     }
                 </View>
                 {
-                    this.props.children && (
-                        <View style={[style.containerLowerNavBar]}>
+                    this && this.props && this.props.children ? (<View style={[style.containerLowerNavBar]}>
                             {
-                                this.props.children
+                                this.props.children || null
                             }
-                        </View>
-                    )
+                        </View>) : (null)
                 }
             </View>
         );
