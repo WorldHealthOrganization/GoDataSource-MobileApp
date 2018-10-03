@@ -48,7 +48,13 @@ class SwitchInput extends PureComponent {
                         style={{
                             flex: 0.1,
                         }}
-                        onChangeState={ (state) => this.props.onChange(state, this.props.id, this.props.objectType || null)}
+                        onChangeState={ (state) => this.props.onChange(
+                            state,
+                            this.props.id,
+                            this.props.objectType ? (this.props.objectType == 'Address' ? this.props.index : (
+                                this.props.objectType == 'LabResult' ? this.props.index : this.props.objectType
+                            )) : null,
+                            this.props.objectType)}
                     /> : ( this.props.showValue &&
                         <Text style={{
                             fontFamily: 'Roboto-Light',

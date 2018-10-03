@@ -88,8 +88,8 @@ class CaseSingleAddressContainer extends PureComponent {
     handleRenderAddress = () => {
         if(this.props.item.hasOwnProperty('addresses')){
             let addressCard = [];
-            this.props.item.addresses.forEach((address) => {
-                config.caseSingleScreen.address.map((item, index) => {
+            this.props.item.addresses.forEach((address, index) => {
+                config.caseSingleScreen.address.map((item) => {
                     addressCard.push(this.handleRenderItem(item, index, address));
                 });
 
@@ -108,6 +108,7 @@ class CaseSingleAddressContainer extends PureComponent {
             <CardComponent
                 item={fields}
                 key={index}
+                index={index}
                 screen={'CaseSingleScreen'}
                 case={address}
                 style={style.cardStyle}
