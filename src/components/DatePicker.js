@@ -39,7 +39,7 @@ class DatePicker extends PureComponent {
 
     // Please write here all the methods that are not react native lifecycle methods
     editInput = () => {
-        console.log("### date from value: ", this.props.value);
+        // console.log("### date from value: ", this.props.value);
         return (
             <View style={[{
 
@@ -115,7 +115,10 @@ class DatePicker extends PureComponent {
 
     handleDatePicked = (date) => {
         console.log("### date picked: ", date, moment(date).format());
-        this.props.onChange(moment(date).format(), this.props.id, this.props.objectType || null);
+        this.props.onChange(moment(date).format(), this.props.id, this.props.objectType ?
+            (this.props.objectType === 'Address' ? this.props.index :
+                (this.props.objectType === 'LabResult' ? this.props.index : this.props.objectType)
+            ) : null, this.props.objectType);
         this.handleDateCancelled();
     };
 

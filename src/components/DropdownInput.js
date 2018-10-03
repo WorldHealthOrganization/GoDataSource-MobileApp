@@ -79,18 +79,32 @@ class DropdownInput extends PureComponent {
 
     handleOnChangeText = (state) => {
         if (this.props.labelValue) {
-            console.log("Label value branch: ", this.props.data);
+            console.log("Label value branch: ", this.props.data, state);
             if (this.props && this.props.data && Array.isArray(this.props.data)) {
-                this.props.onChange({
+                this.props.onChange(
+                    {
                     label: state, value: this.props.data[this.props.data.map((e) => {
                         return e.value
                     }).indexOf(state)].id
-                }, this.props.id, this.props.objectType ? this.props.objectType === 'Address' ? this.props.index : this.props.objectType : this.props.data[this.props.data.map((e) => {
-                        return e.value
-                    }).indexOf(state)].type || null)
+                    },
+                    this.props.id,
+                    this.props.objectType ?
+                        (this.props.objectType === 'Address' ? this.props.index :
+                            (this.props.objectType === 'LabResult' ? this.props.index : this.props.objectType )
+                        )
+                        : this.props.data[this.props.data.map((e) => {
+                                return e.value
+                            }).indexOf(state)].type || null,
+                    this.props.objectType
+                )
             }
         } else {
-            this.props.onChange(state, this.props.id, this.props.objectType ? this.props.objectType === 'Address' ? this.props.index : this.props.objectType : null)
+            this.props.onChange(
+                state,
+                this.props.id,
+                this.props.objectType ? (this.props.objectType === 'Address' ? this.props.index : (this.props.objectType === 'LabResult' ? this.props.index : this.props.objectType ) ) : null,
+                this.props.objectType
+            )
         }
     }
 }

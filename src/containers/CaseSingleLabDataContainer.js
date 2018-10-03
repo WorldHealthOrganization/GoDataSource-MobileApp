@@ -50,8 +50,8 @@ class CaseSingleLabDataContainer extends PureComponent {
                             <Button
                                 title={'Cancel'}
                                 onPress={this.props.onPressCancel}
-                                color={styles.buttonGreen}
-                                titleColor={'white'}
+                                color={'white'}
+                                titleColor={'black'}
                                 height={calculateDimension(25, true, this.props.screenSize)}
                                 width={calculateDimension(166, false, this.props.screenSize)}
                                 style={{
@@ -90,8 +90,8 @@ class CaseSingleLabDataContainer extends PureComponent {
     handleRenderLabData = () => {
         if(this.props.item.hasOwnProperty('labResults')){
             let labResultCard = [];
-            this.props.item.labResults.forEach((labRes) => {
-                config.caseSingleScreen.labData.map((item, index) => {
+            this.props.item.labResults.forEach((labRes, index) => {
+                config.caseSingleScreen.labData.map((item) => {
                     labResultCard.push(this.handleRenderItem(item, index, labRes));
                 });
 
@@ -109,6 +109,7 @@ class CaseSingleLabDataContainer extends PureComponent {
             <CardComponent
                 item={fields}
                 key={index}
+                index={index}
                 screen={'CaseSingleScreen'}
                 case={labRes}
                 style={style.cardStyle}
