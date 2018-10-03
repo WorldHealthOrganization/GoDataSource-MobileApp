@@ -27,6 +27,7 @@ import {updateContact, deleteExposureForContact, addContact} from './../actions/
 import {removeErrors} from './../actions/errors';
 import DateTimePicker from 'react-native-modal-datetime-picker';
 import _ from 'lodash';
+import {extractIdFromPouchId} from './../utils/functions';
 
 const initialLayout = {
     height: 0,
@@ -49,7 +50,7 @@ class ContactsSingleScreen extends Component {
             contact: this.props.isNew ? {
                 riskLevel: '',
                 riskReason: '',
-                outbreakId: this.props.user.activeOutbreakId,
+                outbreakId: this.props.user && this.props.user.activeOutbreakId ? this.props.user.activeOutbreakId : '',
                 firstName: '',
                 middleName: '',
                 lastName: '',
@@ -563,12 +564,16 @@ class ContactsSingleScreen extends Component {
             this.setState({
                 savePressed: true
             }, () => {
-                // If it is a new contact, save it
-                if (this.props.isNew) {
-                    this.props.addContact(this.props.user.activeOutbreakId, this.state.contact, this.props.user.token);
-                } else {
-                    this.props.updateContact(this.props.user.activeOutbreakId, this.state.contact.id, this.state.contact, this.props.user.token);
-                }
+                this.setState(prevState => ({
+                    contact: Object.assign({}, prevState.contact, {deleted: false, deletedBy: 'undefined', updatedAt: new Date().toISOString(), updatedBy: extractIdFromPouchId(this.props.user._id, 'user')})
+                }), () => {
+                    // If it is a new contact, save it
+                    if (this.props.isNew) {
+                        this.props.addContact(this.props.user.activeOutbreakId, this.state.contact, this.props.user.token);
+                    } else {
+                        this.props.updateContact(this.props.user.activeOutbreakId, this.state.contact.id, this.state.contact, this.props.user.token);
+                    }
+                })
             });
         } else {
             Alert.alert("Validation error", 'Some of the required fields are missing. Please make sure you have completed them', [

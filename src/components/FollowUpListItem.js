@@ -57,13 +57,13 @@ class FollowUpListItem extends PureComponent {
             if (this.props && this.props.item && this.props.item.address) {
                 addressText = getAddress(this.props.item.address, true);
             } else {
-                if (this.props.isContact) {
+                if (this.props.isContact && contact && contact.addresses && Array.isArray(contact.addresses)) {
                     addressText = getAddress(contact.addresses[0], true);
                 }
             }
 
             let relationshipText = '';
-            if (this.props && this.props.cases && this.props.events) {
+            if (this.props && this.props.cases && this.props.events && contact.relationships && Array.isArray(contact.relationships) && contact.relationships.length > 0) {
                 relationshipText = handleExposedTo(contact, true, this.props.cases, this.props.events);
             }
 

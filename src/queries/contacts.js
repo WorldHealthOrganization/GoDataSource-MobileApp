@@ -2,6 +2,7 @@
  * Created by florinpopa on 13/09/2018.
  */
 import {getDatabase} from './database';
+import {generateId} from './../utils/functions';
 
 export function getContactsForOutbreakIdRequest (outbreakId, filter, token, callback) {
     let database = getDatabase();
@@ -90,6 +91,33 @@ export function updateContactRequest(outbreakId, contactId, contact, token, call
         .catch((errorGetContact) => {
             console.log('Error getContact: ', errorGetContact);
             callback(errorGetContact);
+        })
+}
+
+export function addContactRequest(outbreakId, contact, token, callback) {
+    let database = getDatabase();
+
+    console.log('addContactRequest: ', outbreakId, contact);
+
+    if (!contact._id) {
+        let uuid = generateId();
+        contact._id = 'person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT_false_' + outbreakId + '_' + uuid;
+    }
+
+    database.put(contact)
+        .then((responseAddContact) => {
+            database.get(responseAddContact.id)
+                .then((responseGetAddedContact) => {
+                    callback(null, responseGetAddedContact);
+                })
+                .catch((errorGetAddedContact) => {
+                    console.log('errorGetAddedContact: ', errorGetAddedContact)
+                    callback(errorGetAddedContact)
+                })
+        })
+        .catch((errorAddContact) => {
+            console.log("errorAddContact: ", errorAddContact);
+            callback(errorAddContact)
         })
 }
 

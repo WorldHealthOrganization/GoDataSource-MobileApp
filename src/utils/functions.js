@@ -134,8 +134,9 @@ export function handleExposedTo(contact, returnString, cases, events) {
         let contactId = contact._id.split('_');
         contactId = contactId[contactId.length - 1];
         let persons = relationships[i].persons.filter((e) => {return e.id !== contactId});
+        console.log('PErsons: ', persons);
         for (let j=0; j<persons.length; j++) {
-            if (persons[j].type === 'case' && cases && Array.isArray(cases)) {
+            if ((persons[j].type === 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE' || persons[j].type === 'case') && cases && Array.isArray(cases)) {
                 let auxCase = cases[cases.map((e) => {return e._id.split('_')[e._id.split('_').length - 1]}).indexOf(persons[j].id)];
                 if (auxCase) {
                     relationshipArray.push((auxCase.firstName || '') + " " + (auxCase.lastName || ''));
@@ -152,6 +153,8 @@ export function handleExposedTo(contact, returnString, cases, events) {
             }
         }
     }
+
+    console.log('Relationship array: ', relationshipArray);
 
     return returnString ? relationshipArray.join(", ") : relationshipArray;
 }
@@ -290,4 +293,43 @@ export function extractIdFromPouchId (pouchId, type) {
 
 export function generateId () {
     return uuid.v4();
+}
+
+
+export function mapContactsAndRelationships(contacts, relationships) {
+
+    let mappedContacts = contacts;
+
+    for (let i = 0; i < relationships.length; i++) {
+        let contactObject = {};
+        if (relationships[i].persons[0].type === 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT' && mappedContacts.map((e) => {
+                return e._id
+            }).indexOf(relationships[i].persons[0].id) > -1) {
+            contactObject = Object.assign({}, contacts[contacts.map((e) => {
+                return e._id
+            }).indexOf(relationships[i].persons[0].id)]);
+
+            contactObject.relationships = [];
+            contactObject.relationships.push(relationships[i]);
+            mappedContacts[mappedContacts.map((e) => {
+                return e._id
+            }).indexOf(relationships[i].persons[0].id)] = contactObject;
+        } else {
+            if (relationships[i].persons[1].type === 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT' && mappedContacts.map((e) => {
+                    return e._id
+                }).indexOf(relationships[i].persons[1].id) > -1) {
+                contactObject = Object.assign({}, contacts[contacts.map((e) => {
+                    return e._id
+                }).indexOf(relationships[i].persons[1].id)]);
+
+                contactObject.relationships = [];
+                contactObject.relationships.push(relationships[i]);
+                mappedContacts[mappedContacts.map((e) => {
+                    return e._id
+                }).indexOf(relationships[i].persons[1].id)] = contactObject;
+            }
+        }
+    }
+
+    return mappedContacts;
 }

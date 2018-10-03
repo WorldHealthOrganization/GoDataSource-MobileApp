@@ -21,6 +21,8 @@ import {
 } from './../queries/followUps';
 import _ from 'lodash';
 import {storeContacts} from './contacts';
+import {getRelationshipsForTypeRequest} from './../queries/relationships';
+import {extractIdFromPouchId, mapContactsAndRelationships} from './../utils/functions';
 
 // Add here only the actions, not also the requests that are executed. For that purpose is the requests directory
 export function storeFollowUps(followUps) {
@@ -52,13 +54,16 @@ export function getFollowUpsForOutbreakId(outbreakId, filter, token) {
                 // After getting the followUps by date, it's time to get their respective contacts
                 let keys = response.map((e) => {return e.personId});
                 keys = _.uniq(keys);
-                console.log('### Keys for getting contacts: ', keys);
+                // console.log('### Keys for getting contacts: ', keys);
                 getContactsForOutbreakIdWithPromises(outbreakId, {keys: keys}, null, dispatch)
                     .then((responseGetContacts) => {
                         dispatch(storeFollowUps(response));
-                        let mappedContact = mapContactsAndFollowUps(responseGetContacts, response);
-                        // console.log("Mapped Contact: ", mappedContact);
-                        dispatch(storeContacts(mappedContact));
+                        getRelationshipsForTypeRequest(outbreakId, 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT', keys, (errorGetRelationships, resultGetRelationships) => {
+                            let mappedContact = mapContactsAndFollowUps(responseGetContacts, response);
+                            // console.log("Mapped Contact: ", mappedContact);
+                            mappedContact = mapContactsAndRelationships(mappedContact, resultGetRelationships);
+                            dispatch(storeContacts(mappedContact));
+                        })
                     })
                     .catch((errorGetContactsForFollowUps) => {
                         dispatch(addError(errorTypes.ERROR_CONTACT));
@@ -90,10 +95,13 @@ export function getFollowUpsForOutbreakIdWithPromises(outbreakId, filter, token,
                 getContactsForOutbreakIdWithPromises(outbreakId, {keys: keys}, null, dispatch)
                     .then((responseGetContacts) => {
                         dispatch(storeFollowUps(response));
-                        let mappedContact = mapContactsAndFollowUps(responseGetContacts, response);
-                        // console.log("Mapped Contact: ", mappedContact);
-                        dispatch(storeContacts(mappedContact));
-                        resolve('Done followUps');
+                        getRelationshipsForTypeRequest(outbreakId, 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT', keys, (errorGetRelationships, resultGetRelationships) => {
+                            let mappedContact = mapContactsAndFollowUps(responseGetContacts, response);
+                            // console.log("Mapped Contact: ", mappedContact);
+                            mappedContact = mapContactsAndRelationships(mappedContact, resultGetRelationships);
+                            dispatch(storeContacts(mappedContact));
+                            resolve('Done followUps');
+                        })
                     })
                     .catch((errorGetContactsForFollowUps) => {
                         dispatch(addError(errorTypes.ERROR_CONTACT));
@@ -109,7 +117,7 @@ function mapContactsAndFollowUps(contacts, followUps) {
     let mappedContacts = [];
     for (let i=0; i<followUps.length; i++) {
         if (mappedContacts.map((e) => {return e._id}).indexOf(followUps[i].personId) === -1) {
-            let contactObject = {}
+            let contactObject = {};
             contactObject = Object.assign({}, contacts[contacts.map((e) => {return e._id.split('_')[e._id.split('_').length - 1]}).indexOf(followUps[i].personId)], {_id: followUps[i].personId});
             contactObject.followUps = [];
             contactObject.followUps.push(followUps[i]);

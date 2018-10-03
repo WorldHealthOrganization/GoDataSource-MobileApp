@@ -10,7 +10,7 @@ import {
     // getContactsForOutbreakIdRequest,
     getContactByIdRequest,
     // updateContactRequest,
-    addContactRequest,
+    // addContactRequest,
     // addExposureForContactRequest,
     // updateExposureForContactRequest,
     // deleteExposureForContactRequest
@@ -18,6 +18,7 @@ import {
 import {
     getContactsForOutbreakIdRequest,
     updateContactRequest,
+    addContactRequest,
     addExposureForContactRequest,
     updateExposureForContactRequest,
     deleteExposureForContactRequest
@@ -26,6 +27,8 @@ import { addError } from './errors';
 import errorTypes from './../utils/errorTypes';
 import {getFollowUpsForOutbreakIdRequest} from './../queries/followUps';
 import {storeFollowUps} from  './../actions/followUps';
+import {getRelationshipsForTypeRequest} from './../queries/relationships';
+import {extractIdFromPouchId, mapContactsAndRelationships} from './../utils/functions';
 
 // Add here only the actions, not also the requests that are executed. For that purpose is the requests directory
 export function storeContacts(followUps) {
@@ -60,7 +63,17 @@ export function getContactsForOutbreakIdWithPromises(outbreakId, filter, token, 
             }
             if (response) {
                 // dispatch(storeContacts(response));
-                resolve(response);
+                getRelationshipsForTypeRequest(outbreakId, 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT', response.map((e) => {return extractIdFromPouchId(e._id, 'person')}), (errorRelationships, responseRelationships) => {
+                    if (errorRelationships) {
+                        dispatch(addError(errorTypes.ERROR_CONTACT));
+                        reject(errorRelationships);
+                    }
+
+                    if (responseRelationships) {
+                        let mappedContacts = mapContactsAndRelationships(response, responseRelationships);
+                        resolve(mappedContacts);
+                    }
+                });
                 // getFollowUpsForOutbreakIdRequest(outbreakId, null, (errorFollowUps, responseFollowUps) => {
                 //     if (errorFollowUps) {
                 //         console.log("Error when getting followUps: ", errorFollowUps);
@@ -91,33 +104,20 @@ export function getContactsForOutbreakId(outbreakId, filter, token) {
                 // reject(error);
             }
             if (response) {
-                dispatch(storeContacts(response));
-                // getFollowUpsForOutbreakIdRequest(outbreakId, null, (errorFollowUps, responseFollowUps) => {
-                //     if (errorFollowUps) {
-                //         console.log("Error when getting followUps: ", errorFollowUps);
-                //     }
-                //     if (responseFollowUps) {
-                //         console.log('FollowUps result: ', outbreakId, responseFollowUps);
-                //         dispatch(storeFollowUps(responseFollowUps));
-                //         // Here should add the followUps to the contacts
-                //         let contacts = mapFollowUpsToContacts(response, responseFollowUps);
-                //         dispatch(storeContacts(contacts));
-                //         // resolve("Done contacts");
-                //     }
-                // })
-                // dispatch(storeContacts(response))
+                getRelationshipsForTypeRequest(outbreakId, 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT', response.map((e) => {return extractIdFromPouchId(e._id, 'person')}), (errorRelationships, responseRelationships) => {
+                    if (errorRelationships) {
+                        dispatch(addError(errorTypes.ERROR_CONTACT));
+                    }
+
+                    if (responseRelationships) {
+                        let mappedContacts = mapContactsAndRelationships(response, responseRelationships);
+                        dispatch(storeContacts(mappedContacts));
+                    }
+                })
             }
         })
     // })
     }
-}
-
-export function mapFollowUpsToContacts(contacts, followUps) {
-    for (let i=0; i<contacts.length; i++) {
-        let contactId = contacts[i]._id.split('_')[contacts[i]._id.split('_').length - 1];
-        contacts[i].followUps = followUps.filter((e) => {return e.personId === contactId});
-    }
-    return contacts;
 }
 
 export function getContactById(outbreakId, contactId, token) {
