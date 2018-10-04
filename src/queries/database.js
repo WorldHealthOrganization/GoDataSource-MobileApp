@@ -44,14 +44,7 @@ export function createDatabase(databaseName, databasePassword, callback) {
                 if (doc.age) {
                     emit([doc.outbreakId, doc.gender, doc.age]);
                 } else {
-                    if (doc.dob) {
-                        let now = new moment();
-                        let dob = new moment(doc.dob);
-                        let age = Math.round(moment.duration(now.diff(dob)).asYears());
-                        emit([doc.outbreakId, doc.gender, age]);
-                    } else {
-                        emit([doc.outbreakId, doc.gender, 0]);
-                    }
+                    emit([doc.outbreakId, doc.gender, 0]);
                 }
             }
         }
@@ -81,7 +74,7 @@ export function createDatabase(databaseName, databasePassword, callback) {
             const SQLiteAdapter = SQLiteAdapterFactory(SQLite);
             PouchDB.plugin(SQLiteAdapter);
             PouchDB.plugin(PouchUpsert);
-            // PouchDB.plugin(PouchFind);
+            PouchDB.plugin(PouchFind);
             database = new PouchDB(encodeName(databaseName, databasePassword), {adapter: 'react-native-sqlite'});
             for (let i=0; i<ddocArray.length; i++) {
                 console.log("Create index: ", i);
@@ -104,7 +97,7 @@ export function createDatabase(databaseName, databasePassword, callback) {
             const SQLiteAdapter = SQLiteAdapterFactory(SQLite);
             PouchDB.plugin(SQLiteAdapter);
             PouchDB.plugin(PouchUpsert);
-            // PouchDB.plugin(PouchFind);
+            PouchDB.plugin(PouchFind);
             database = new PouchDB(encodeName(databaseName, databasePassword), {adapter: 'react-native-sqlite'});
             for (let i=0; i<ddocArray.length; i++) {
                 console.log("Create index: ", i);

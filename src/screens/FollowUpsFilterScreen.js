@@ -190,10 +190,11 @@ class FollowUpsFilterScreen extends Component {
         let filterStateClone = Object.assign({}, this.state.filter.filter);
         let filter = {};
 
-        if (filterStateClone.gender.Male) {
+     
+        if (filterStateClone.gender.Male && !filterStateClone.gender.Female ) {
             filter.gender = 'Male'
         }
-        if (filterStateClone.gender.Female) {
+        if (filterStateClone.gender.Female && !filterStateClone.gender.Male) {
             filter.gender = 'Female'
         }
 

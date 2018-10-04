@@ -48,7 +48,7 @@ export default function app(state = { root: undefined, screenSize: {width: 375, 
             if (!stateClone.filters) {
                 stateClone.filters = {};
             }
-            console.log("### log screenName and filter: ", action.payload, action.payload.screenName, action.payload.filters);
+            console.log("### log screenName and filter: ", JSON.stringify(action.payload), action.payload.screenName, action.payload.filters);
             stateClone.filters[action.payload.screenName] = action.payload.filters;
             return Object.assign({}, stateClone);
         case ACTION_TYPE_REMOVE_FILTER_FOR_SCREEN:
