@@ -38,7 +38,7 @@ class CaseListItem extends Component {
         // Get caseItem info from the cases
 
         let primaryText = this.props.item && ((this.props.item.firstName ? this.props.item.firstName : ' ') + (this.props.item.lastName ? (' ' + this.props.item.lastName) : ' '));
-        let secondaryText = this.props.item && ((this.props.item.gender ? this.props.item.gender : ' ') + (this.props.item.age ? (' ' + this.props.item.age + ' y.o.') : ' '));
+        let secondaryText = this.props.item && ((this.props.item.gender ? this.getTranslation(this.props.item.gender) : ' ') + (this.props.item.age ? (' ' + this.props.item.age + ' y.o.') : ' '));
 
         let addressText = ' ';
         let addressArray = []
@@ -116,6 +116,16 @@ class CaseListItem extends Component {
             this.props.onPressAddContact(this.props.item, contact);
         });
     };
+
+    getTranslation = (value) => {
+        let valueToBeReturned = value;
+        if (value && typeof value === 'string' && value.includes('LNG')) {
+            valueToBeReturned = value && this.props.translation && Array.isArray(this.props.translation) && this.props.translation[this.props.translation.map((e) => {return e && e.token ? e.token : null}).indexOf(value)] ? this.props.translation[this.props.translation.map((e) => {
+                return e.token
+            }).indexOf(value)].translation : '';
+        }
+        return valueToBeReturned;
+    }
 }
 
 
@@ -157,6 +167,7 @@ const style = StyleSheet.create({
 function mapStateToProps(state) {
     return {
         screenSize: state.app.screenSize,
+        translation: state.app.translation,
         cases: state.cases,
         contacts: state.contacts,
         events: state.events

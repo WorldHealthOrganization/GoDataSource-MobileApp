@@ -264,6 +264,7 @@ class CardComponent extends Component {
                     <SwitchInput
                         id={item.id}
                         label={item.label}
+                        index={this.props.index}
                         value={value}
                         showValue={true}
                         isEditMode={item.isEditMode}
@@ -281,6 +282,7 @@ class CardComponent extends Component {
                         id={item.id}
                         label={item.label}
                         value={value}
+                        index={this.props.index}
                         isEditMode={item.isEditMode}
                         isRequired={item.isRequired}
                         onChange={this.props.onChangeDate}
@@ -394,6 +396,48 @@ class CardComponent extends Component {
             return _.filter(this.props.referenceData, (o) => {
                 return o.categoryId.includes("CASE_CLASSIFICATION")
             }).map((o) => {return {label: this.getTranslation(o.value), value: o.value}})
+        }
+
+        if (item.id === 'gender') {
+            return _.filter(this.props.referenceData, (o) => {
+                return o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_GENDER'
+            }).map((o) => {return {label: this.getTranslation(o.value), value: o.value}})
+        }
+
+        if (item.id === 'typeId') {
+            return _.filter(this.props.referenceData, (o) => {
+                return o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_ADDRESS_TYPE'
+            }).map((o) => {return {label: this.getTranslation(o.value), value: o.value}})
+        }
+
+        if (item.id === 'labName') {
+            return _.filter(this.props.referenceData, (o) => {
+                return o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_LAB_NAME'
+            }).map((o) => {return {value: this.getTranslation(o.value), id: o.value}})
+        }
+
+        if (item.id === 'sampleType') {
+            return _.filter(this.props.referenceData, (o) => {
+                return o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_TYPE_OF_SAMPLE'
+            }).map((o) => {return {value: this.getTranslation(o.value), id: o.value}})
+        }
+
+        if (item.id === 'testType') {
+            return _.filter(this.props.referenceData, (o) => {
+                return o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_TYPE_OF_LAB_TEST'
+            }).map((o) => {return {value: this.getTranslation(o.value), id: o.value}})
+        }
+
+        if (item.id === 'result') {
+            return _.filter(this.props.referenceData, (o) => {
+                return o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_LAB_TEST_RESULT'
+            }).map((o) => {return {value: this.getTranslation(o.value), id: o.value}})
+        }
+
+        if (item.id === 'status') {
+            return _.filter(this.props.referenceData, (o) => {
+                return o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_LAB_TEST_RESULT_STATUS'
+            }).map((o) => {return {value: this.getTranslation(o.value), id: o.value}})
         }
 
         return [];

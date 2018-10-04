@@ -40,7 +40,9 @@ class TextInput extends PureComponent {
                     label={this.props.isRequired ? this.props.label + ' * ' : this.props.label}
                     value={this.props.value != undefined ? this.props.value : ''}
                     onChangeText={ (value) => {
-                        this.props.onChange(value, this.props.labelValue || this.props.id, this.props.objectType ? this.props.objectType === 'Address' ? this.props.index : this.props.objectType : null)
+                        this.props.onChange(value, this.props.labelValue || this.props.id, this.props.objectType ?
+                            (this.props.objectType === 'Address' ? this.props.index : (this.props.objectType === 'LabResult' ? this.props.index : this.props.objectType)
+                            ) : null, this.props.objectType)
                     }}
                     textColor='rgb(0,0,0)'
                     fontSize={15}

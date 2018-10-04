@@ -12,6 +12,8 @@ import Menu, {MenuItem} from 'react-native-material-menu';
 import Ripple from 'react-native-material-ripple';
 import styles from './../styles';
 import config from './../utils/config';
+import _ from 'lodash';
+
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 // import {Button} from 'react-native-material-ui';
@@ -40,7 +42,8 @@ class CaseSingleScreen extends Component {
             routes: config.tabsValuesRoutes.casesSingle,
             index: 0,
             isEditMode: false,
-            isDateTimePickerVisible: false
+            isDateTimePickerVisible: false,
+            isModified: false,
         };
         // Bind here methods, or at least don't declare methods in the render method
 
@@ -308,57 +311,139 @@ class CaseSingleScreen extends Component {
     //Pressed save and change case
     handleSavePress = () => {
         this.setState({
-                isEditMode: false
+                isEditMode: false,
+                isModified: false,
             }, () => {
-                console.log("handleSavePress", this.state.isEditMode);
+                console.log("handleSavePress", this.state.isEditMode, this.state.isModified);
             }
         )
     };
 
     //Pressed cancel and go back to Cases list
     handleCancelPress = () => {
-        this.props.navigator.pop({
-            animated: true,
-            animationType: 'fade'
-        });
+        if(this.state.isModified) {
+            Alert.alert("Leave without saving?", 'This will revert all changes you made for this record.', [
+                {
+                    text: 'CANCEL', onPress: () => {
+                    console.log('cancel pressed')
+                }
+                },
+                {
+                    text: 'LEAVE', onPress: () => {
+                    this.props.navigator.pop({
+                        animated: true,
+                        animationType: 'fade'
+                    });
+                }
+                }
+            ])
+        }else {
+            this.props.navigator.pop({
+                animated: true,
+                animationType: 'fade'
+            });
+        }
     };
 
     //Handle text change from route
-    onChangeText = (value, id, objectType) => {
-        if(objectType == 'Address'){
-
-        }else if(objectType == 'LabResult'){
-
-        }else {
+    onChangeText = (value, id, index, objectType) => {
+        if(objectType == 'Case'){
             this.setState(
                 (prevState) => ({
-                    item: Object.assign({}, prevState.item, {[id]: value})
+                    item: Object.assign({}, prevState.item, {[id]: value}),
+                    isModified: true
                 }), () => {
                     console.log("onChangeText", id, " ", value, " ", this.state.item);
                 }
             );
         }
-    };
+
+        if(objectType == 'LabResult'){
+            if (typeof index === 'number' && index >= 0) {
+                // Change address drop down
+                let labResultsClone = _.cloneDeep(this.state.item.labResults);
+                labResultsClone[index][id] = value && value.value ? value.value : value;
+                this.setState(
+                    (prevState) => ({
+                        item: Object.assign({}, prevState.item, {labResults: labResultsClone}),
+                        isModified: true
+                    }), () => {
+                        console.log("onChangeText", id, " ", value, " ", this.state.item);
+                    })
+            }
+        }
+
+        if(objectType == 'Address'){
+            if (typeof index === 'number' && index >= 0) {
+                // Change address drop down
+                let addressesClone = _.cloneDeep(this.state.item.addresses);
+                addressesClone[index][id] = value && value.value ? value.value : value;
+                this.setState(
+                    (prevState) => ({
+                    item: Object.assign({}, prevState.item, {addresses: addressesClone}),
+                        isModified: true
+                }), () => {
+                    console.log("onChangeText", id, " ", value, " ", this.state.item);
+                })
+            }
+        }
+
+    }
+    ;
 
     //Handle date change from route
-    onChangeDate = (value, id, objectType) => {
-        this.setState(
-            (prevState) => ({
-                item: Object.assign({}, prevState.item, {[id]: value})
-            })
-            , () => {
-                console.log("onChangeDate", id, " ", value, " ", this.state.item);
+    onChangeDate = (value, id, index, objectType) => {
+        if(objectType == 'Case'){
+            this.setState(
+                (prevState) => ({
+                    item: Object.assign({}, prevState.item, {[id]: value}),
+                    isModified: true
+                })
+                , () => {
+                    console.log("onChangeDate", id, " ", value, " ", this.state.item);
+                }
+            );
+        }
+
+        if(objectType == 'LabResult'){
+            if (typeof index === 'number' && index >= 0) {
+                // Change address drop down
+                let labResultsClone = _.cloneDeep(this.state.item.labResults);
+                labResultsClone[index][id] = value && value.value ? value.value : value;
+                this.setState(
+                    (prevState) => ({
+                        item: Object.assign({}, prevState.item, {labResults: labResultsClone}),
+                        isModified: true
+                    }), () => {
+                        console.log("onChangeDate", id, " ", value, " ", this.state.item);
+                    })
             }
-        )
+        }
+
+        if(objectType == 'Address'){
+            if (typeof index === 'number' && objectType >= 0) {
+                // Change address drop down
+                let addressesClone = _.cloneDeep(this.state.item.addresses);
+                addressesClone[objectType][id] = value && value.value ? value.value : value;
+                this.setState(
+                    (prevState) => ({
+                        item: Object.assign({}, prevState.item, {addresses: addressesClone}),
+                        isModified: true
+                    }), () => {
+                        console.log("onChangeDate", id, " ", value, " ", this.state.item);
+                    })
+            }
+        }
     };
 
     //Handle switch change from route
-    onChangeSwitch = (value, id, objectType) => {
+    onChangeSwitch = (value, id, index, objectType) => {
         if (id === 'fillGeoLocation') {
             navigator.geolocation.getCurrentPosition((position) => {
                     this.setState(
                         (prevState) => ({
-                            item: Object.assign({}, prevState.item, {[id]: value ? {lat: position.coords.latitude, lng: position.coords.longitude} : null })
+                            item: Object.assign({}, prevState.item, {[id]: value ? {lat: position.coords.latitude, lng: position.coords.longitude} : null }),
+                            isModified: true
                         }), () => {
                             console.log("onChangeSwitch", id, " ", value, " ", this.state.item);
                         }
@@ -376,26 +461,88 @@ class CaseSingleScreen extends Component {
                 }
             )
         } else {
-            this.setState(
-                (prevState) => ({
-                    item: Object.assign({}, prevState.item, {[id]: value})
-                }), () => {
-                    console.log("onChangeSwitch", id, " ", value, " ", this.state.item);
+            if(objectType == 'Case') {
+                this.setState(
+                    (prevState) => ({
+                        item: Object.assign({}, prevState.item, {[id]: value}),
+                        isModified: true
+                    }), () => {
+                        console.log("onChangeSwitch", id, " ", value, " ", this.state.item);
+                    }
+                )
+            }
+
+            if(objectType == 'LabResult'){
+                if (typeof index === 'number' && index >= 0) {
+                    let labResultsClone = _.cloneDeep(this.state.item.labResults);
+                    labResultsClone[index][id] = value && value.value ? value.value : value;
+                    this.setState(
+                        (prevState) => ({
+                            item: Object.assign({}, prevState.item, {labResults: labResultsClone}),
+                            isModified: true
+                        }), () => {
+                            console.log("onChangeSwitch", id, " ", value, " ", this.state.item);
+                        })
                 }
-            )
+            }
+
+            if(objectType == 'Address'){
+                if (typeof index === 'number' && index >= 0) {
+                    let addressesClone = _.cloneDeep(this.state.item.addresses);
+                    addressesClone[index][id] = value && value.value ? value.value : value;
+                    this.setState(
+                        (prevState) => ({
+                            item: Object.assign({}, prevState.item, {addresses: addressesClone}),
+                            isModified: true
+                        }), () => {
+                            console.log("onChangeSwitch", id, " ", value, " ", this.state.item);
+                        })
+                }
+            }
         }
 
     };
 
     //Handle drop down change from route
-    onChangeDropDown = (value, id, objectType) => {
-        this.setState(
-            (prevState) => ({
-                item: Object.assign({}, prevState.item, {[id]: value && value.value ? value.value : value})
-            }), () => {
-                console.log("onChangeDropDown", id, " ", value, " ", this.state.item);
+    onChangeDropDown = (value, id, index, objectType) => {
+        if(objectType == 'Case') {
+            this.setState(
+                (prevState) => ({
+                    item: Object.assign({}, prevState.item, {[id]: value && value.value ? value.value : value}),
+                    isModified: true
+                }), () => {
+                    console.log("onChangeDropDown", id, " ", value, " ", this.state.item);
+                }
+            )
+        }
+
+        if(objectType == 'LabResult'){
+            if (typeof index === 'number' && index >= 0) {
+                let labResultsClone = _.cloneDeep(this.state.item.labResults);
+                labResultsClone[index][id] = value && value.value ? value.value : value;
+                this.setState(
+                    (prevState) => ({
+                        item: Object.assign({}, prevState.item, {labResults: labResultsClone}),
+                        isModified: true
+                    }), () => {
+                        console.log("onChangeDropDown", id, " ", value, " ", this.state.item);
+                    })
             }
-        )
+        }
+
+        if(objectType == 'Address'){
+            if (typeof index === 'number' && index >= 0) {
+                let addressesClone = _.cloneDeep(this.state.item.addresses);
+                addressesClone[index][id] = value && value.value ? value.value : value;
+                this.setState(
+                    (prevState) => ({
+                        item: Object.assign({}, prevState.item, {addresses: addressesClone}),
+                        isModified: true
+                    }), () => {
+                        console.log("onChangeDropDown", id, " ", value, " ", this.state.item);
+                    })
+            }
+        }
     };
 
 }
