@@ -8,6 +8,7 @@ import config from './../utils/config';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import {logoutUser} from './../actions/user';
+import {sendDatabaseToServer} from './../actions/app';
 import styles from './../styles';
 import {ListItem, Icon} from 'react-native-material-ui';
 
@@ -69,7 +70,7 @@ class NavigationDrawer extends Component {
                     <View style={styles.lineStyle} />
                 </View>
                 <View style={{flex: 0.25}}>
-                    <NavigationDrawerListItem label={'Sync HUB manually'} name={'cached'}/>
+                    <NavigationDrawerListItem label={'Sync HUB manually'} name={'cached'} onPress={this.props.sendDatabaseToServer} />
                     <NavigationDrawerListItem label={'Change HUB configuration'} name={'settings'}/>
                     <View style={styles.lineStyle} />
                 </View>
@@ -155,7 +156,8 @@ function mapStateToProps(state) {
 
 function matchDispatchProps(dispatch) {
     return bindActionCreators({
-        logoutUser
+        logoutUser,
+        sendDatabaseToServer
     }, dispatch);
 }
 

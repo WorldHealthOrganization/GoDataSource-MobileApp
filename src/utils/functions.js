@@ -282,6 +282,93 @@ export function comparePasswords (password, encryptedPassword, callback) {
     })
 }
 
+export function getDataFromDatabaseFromFile (database, fileType, lastSyncDate) {
+    return new Promise((resolve, reject) => {
+        database.find({
+            selector: {
+                fileType: {$in: [fileType]},
+                updatedAt: {$gte: lastSyncDate}
+            }
+        })
+            .then((response) => {
+                // Now that we have some files, we should recreate the mongo collections
+                createFilesWithName(fileType, response.docs.toString())
+                    .then((responseFromCreate) => {
+                        resolve(responseFromCreate);
+                    })
+                    .catch((errorFromCreate) => {
+                        console.log(`An error occurred while creating file: ${errorFromCreate}`);
+                        reject(errorFromCreate);
+                    })
+            })
+            .catch((error) => {
+                console.log(`An error occurred while getting data for collection: ${fileType}`);
+                reject(error);
+            })
+    })
+}
+
+export function createFilesWithName (fileName, data) {
+    return new Promise((resolve, reject) => {
+        // First check if the directory exists
+        RNFetchBlobFS.exists(RNFetchBlobFS.dirs.DocumentDir + '/who_files')
+            .then((exists) => {
+                if (exists) {
+                    // If the file exists, proceed to check if the file exists
+                    RNFetchBlobFS.exists(`${RNFetchBlobFS.dirs.DocumentDir}/who_files/${fileName}`)
+                        .then((exists) => {
+                            if (exists) {
+                                RNFetchBlobFS.writeFile(`${RNFetchBlobFS.dirs.DocumentDir}/who_files/${fileName}`, data, 'utf8')
+                                    .then(() => {
+                                        resolve(`Done with file ${fileName}`);
+                                    })
+                                    .catch((errorWriteFile) => {
+                                        console.log(`Error while writing to file: ${fileName}`, errorWriteFile);
+                                        reject(errorWriteFile);
+                                    })
+                            } else {
+                                // If the file does not exist, create it
+                                RNFetchBlobFS.createFile(`${RNFetchBlobFS.dirs.DocumentDir}/who_files/${fileName}`, data, "utf8")
+                                    .then(() => {
+                                        resolve(`Done with ${fileName}`);
+                                    })
+                                    .catch((errorCreateFile) => {
+                                        console.log(`An error occurred while creating file: ${errorCreateFile}`, errorCreateFile);
+                                        reject(errorCreateFile);
+                                    })
+                            }
+                        })
+                        .catch((errorFileExists) => {
+                            console.log('An error occurred while trying to see if file exists: ', fileName, errorFileExists);
+                            reject(errorFileExists);
+                        })
+                } else {
+                    // Create the directory
+                    RNFetchBlobFS.mkdir(RNFetchBlobFS.dirs.DocumentDir + '/who_files')
+                        .then(() => {
+                            // Since the directory was created just now, we don't have to test if the file exists
+                            RNFetchBlobFS.createFile(RNFetchBlobFS.dirs.DocumentDir + '/who_files/' + fileName, data, "utf8")
+                                .then(() => {
+                                    resolve(`Done with ${fileName}`)
+                                })
+                                .catch((errorCreateFile) => {
+                                    console.log("An error occurred while creating file: ", fileName, errorCreateFile);
+                                    reject(errorCreateFile);
+                                })
+                        })
+                        .catch((errorCreateDir) => {
+                            console.log('An error occurred while creating directory: ', errorCreateDir);
+                            reject(errorCreateDir);
+                        })
+                }
+            })
+            .catch((errorExists) => {
+                console.log("An error occurred while getting if the root directory exists: ", errorExists);
+                reject(errorExists)
+            })
+    })
+}
+
 // Method for extracting the mongo id from the pouch id
 // type is the name of the mongo collection: (follow)
 export function extractIdFromPouchId (pouchId, type) {
@@ -294,7 +381,6 @@ export function extractIdFromPouchId (pouchId, type) {
 export function generateId () {
     return uuid.v4();
 }
-
 
 export function mapContactsAndRelationships(contacts, relationships) {
 
