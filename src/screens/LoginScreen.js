@@ -163,7 +163,7 @@ class LoginScreen extends Component {
                 if (!urlNew.includes('/api')) {
                     urlNew += '/api';
                 }
-                url.setBaseUrl(urlNew);
+                // url.setBaseUrl(urlNew);
 
                 this.setState({
                     showLoading: true

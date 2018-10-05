@@ -406,10 +406,33 @@ class FollowUpsSingleScreen extends Component {
             }),
             savePressed: true
         }), () => {
+            let followUpClone = _.cloneDeep(this.state.item);
+            let contactClone = _.cloneDeep(this.state.contact);
+
+            if (followUpClone.address && followUpClone.address.location) {
+                delete followUpClone.address.location;
+            }
+
+            if (followUpClone.fileType) {
+                delete followUpClone.fileType;
+            }
+
+            if (contactClone.followUps) {
+                delete contactClone.followUps;
+            }
+
+            if (contactClone.relationships) {
+                delete contactClone.relationships;
+            }
+
+            if (contactClone.fileType) {
+                delete contactClone.fileType;
+            }
+
             if (this.props.isNew) {
-                this.props.createFollowUp(this.props.outbreak.id, extractIdFromPouchId(this.state.contact._id, 'person.json'), this.state.item, this.state.contact, null, this.props.user.token);
+                this.props.createFollowUp(this.props.outbreak.id, extractIdFromPouchId(contactClone._id, 'person.json'), followUpClone, contactClone, null, this.props.user.token);
             } else {
-                this.props.updateFollowUpAndContact(this.props.user.activeOutbreakId, extractIdFromPouchId(this.state.contact._id, 'person.json'), this.state.item.id, this.state.item, this.state.contact, this.props.user.token);
+                this.props.updateFollowUpAndContact(this.props.user.activeOutbreakId, extractIdFromPouchId(contactClone._id, 'person.json'), followUpClone._id, followUpClone, contactClone, this.props.user.token);
             }
         });
     };

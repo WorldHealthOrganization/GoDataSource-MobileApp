@@ -4,7 +4,7 @@
 import errorTypes from './errorTypes';
 import config from './config';
 import RNFetchBlobFS from 'rn-fetch-blob/fs';
-import {unzip} from 'react-native-zip-archive';
+import {zip, unzip} from 'react-native-zip-archive';
 import {updateFileInDatabase} from './../queries/database';
 import {setSyncState} from './../actions/app';
 import bcrypt from 'react-native-bcrypt';
@@ -292,7 +292,12 @@ export function getDataFromDatabaseFromFile (database, fileType, lastSyncDate) {
         })
             .then((response) => {
                 // Now that we have some files, we should recreate the mongo collections
-                createFilesWithName(fileType, response.docs.toString())
+                createFilesWithName(fileType, JSON.stringify(response.docs.map((e) => {
+                    delete e._rev;
+                    e.id = extractIdFromPouchId(e._id, fileType);
+                    delete e._id;
+                    return e;
+                })))
                     .then((responseFromCreate) => {
                         resolve(responseFromCreate);
                     })
@@ -318,7 +323,7 @@ export function createFilesWithName (fileName, data) {
                     RNFetchBlobFS.exists(`${RNFetchBlobFS.dirs.DocumentDir}/who_files/${fileName}`)
                         .then((exists) => {
                             if (exists) {
-                                RNFetchBlobFS.writeFile(`${RNFetchBlobFS.dirs.DocumentDir}/who_files/${fileName}`, data.toString(), 'utf8')
+                                RNFetchBlobFS.writeFile(`${RNFetchBlobFS.dirs.DocumentDir}/who_files/${fileName}`, data, 'utf8')
                                     .then(() => {
                                         resolve(`Done with file ${fileName}`);
                                     })
@@ -328,7 +333,7 @@ export function createFilesWithName (fileName, data) {
                                     })
                             } else {
                                 // If the file does not exist, create it
-                                RNFetchBlobFS.createFile(`${RNFetchBlobFS.dirs.DocumentDir}/who_files/${fileName}`, data.toString(), "utf8")
+                                RNFetchBlobFS.createFile(`${RNFetchBlobFS.dirs.DocumentDir}/who_files/${fileName}`, data, "utf8")
                                     .then(() => {
                                         resolve(`Done with ${fileName}`);
                                     })
@@ -347,7 +352,7 @@ export function createFilesWithName (fileName, data) {
                     RNFetchBlobFS.mkdir(RNFetchBlobFS.dirs.DocumentDir + '/who_files')
                         .then(() => {
                             // Since the directory was created just now, we don't have to test if the file exists
-                            RNFetchBlobFS.createFile(RNFetchBlobFS.dirs.DocumentDir + '/who_files/' + fileName, data.toString(), "utf8")
+                            RNFetchBlobFS.createFile(RNFetchBlobFS.dirs.DocumentDir + '/who_files/' + fileName, data, "utf8")
                                 .then(() => {
                                     resolve(`Done with ${fileName}`)
                                 })
@@ -367,6 +372,19 @@ export function createFilesWithName (fileName, data) {
                 reject(errorExists)
             })
     })
+}
+
+export function createZipFileAtPath (source, target, callback) {
+    // We don't need to check for archives with the same name, since the zip function overwrites the previous archive
+    zip(source, target)
+        .then((path) => {
+            console.log('Zip file created at path: ', path);
+            callback(null, path);
+        })
+        .catch((errorCreateZip) => {
+            console.log('Error while creating zip file: ', errorCreateZip);
+            callback(errorCreateZip);
+        })
 }
 
 // Method for extracting the mongo id from the pouch id

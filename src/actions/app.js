@@ -18,13 +18,13 @@ import {Dimensions} from 'react-native';
 import {Platform, NativeModules} from 'react-native';
 // import {getTranslationRequest} from './../requests/translation';
 import {getTranslationRequest} from './../queries/translation';
-import {getDatabaseSnapshotRequest} from './../requests/sync';
+import {getDatabaseSnapshotRequest, postDatabaseSnapshotRequest} from './../requests/sync';
 import {setInternetCredentials, getInternetCredentials} from 'react-native-keychain';
 import {unzipFile, readDir} from './../utils/functions';
 import RNFetchBlobFs from 'rn-fetch-blob/fs';
 import {processFile, getDataFromDatabaseFromFile} from './../utils/functions';
 import {createDatabase, getDatabase} from './../queries/database';
-import {setNumberOfFilesProcessed} from './../utils/functions';
+import {setNumberOfFilesProcessed, createZipFileAtPath} from './../utils/functions';
 import {AsyncStorage} from 'react-native';
 import {getUserById} from './user';
 import {uniq} from 'lodash';
@@ -357,7 +357,7 @@ export function storeHubConfiguration(hubConfiguration) {
 }
 
 export function sendDatabaseToServer () {
-    return async function () {
+    return async function (dispatch) {
         // First get the active database
         try {
             const activeDatabase = await AsyncStorage.getItem('activeDatabase');
@@ -371,33 +371,54 @@ export function sendDatabaseToServer () {
                         console.log('lastSyncDate: ', lastSyncDate);
                         // If we also have the lastSyncDate, we should move on to create the files to be synced
                         let database = getDatabase();
-                        database.find({selector: {
-                            updatedAt: {$gte: lastSyncDate}
-                        },
-                            fields: ['fileType']
-                        })
-                            .then((resultGetRecordsByDate) => {
-                                resultGetRecordsByDate = uniq(resultGetRecordsByDate.docs);
-                                console.log('resultGetRecordsByDate: ', resultGetRecordsByDate);
-                                // Now, for each fileType, we must create a .json file, archive it and then send that archive to the server
-                                let promiseArray = [];
 
-                                for (let i=0; i<resultGetRecordsByDate.length; i++) {
-                                    promiseArray.push(getDataFromDatabaseFromFile(database, resultGetRecordsByDate[i].fileType, lastSyncDate))
-                                }
+                        let internetCredentials = await getInternetCredentials(activeDatabase);
+                        if (internetCredentials) {
+                            database.find({selector: {
+                                updatedAt: {$gte: lastSyncDate}
+                            },
+                                fields: ['fileType']
+                            })
+                                .then((resultGetRecordsByDate) => {
+                                    resultGetRecordsByDate = uniq(resultGetRecordsByDate.docs);
+                                    console.log('resultGetRecordsByDate: ', resultGetRecordsByDate);
+                                    // Now, for each fileType, we must create a .json file, archive it and then send that archive to the server
+                                    let promiseArray = [];
 
-                                Promise.all(promiseArray)
-                                    .then((resultsCreateAlFiles) => {
-                                        // After creating all the needed files, we need to make a zip file
-                                        console.log('Result from processing all the files: ', );
-                                    })
-                                    .catch((errorCreateAllFiles) => {
-                                        console.log('Error while creating all the files: ', errorCreateAllFiles);
-                                    })
-                            })
-                            .catch((errorGetRecordsByDate) => {
-                                console.log('errorGetRecordsByDate: ', errorGetRecordsByDate);
-                            })
+                                    for (let i=0; i<resultGetRecordsByDate.length; i++) {
+                                        promiseArray.push(getDataFromDatabaseFromFile(database, resultGetRecordsByDate[i].fileType, lastSyncDate))
+                                    }
+
+                                    Promise.all(promiseArray)
+                                        .then((resultsCreateAlFiles) => {
+                                            // After creating all the needed files, we need to make a zip file
+                                            console.log('Result from processing all the files');
+                                            createZipFileAtPath(`${RNFetchBlobFs.dirs.DocumentDir}/who_files`, `${RNFetchBlobFs.dirs.DocumentDir}/${activeDatabase.replace(/\/|\.|\:/g, '')}.zip`, (errorCreateZipFile, resultCreateZipFile) => {
+                                                if (errorCreateZipFile) {
+                                                    console.log("An error occurred while zipping the files: ", errorCreateZipFile);
+                                                }
+                                                if (resultCreateZipFile) {
+                                                    // After creating the zip file, it's time to send it to the server
+                                                    console.log("Response from create zip file: ", resultCreateZipFile);
+                                                    postDatabaseSnapshotRequest(internetCredentials, resultCreateZipFile, (errorSendData, resultSendData) => {
+                                                        if (errorSendData) {
+                                                            console.log('An error occurred while sending data to server: ', errorSendData);
+                                                        }
+                                                        if (resultSendData) {
+                                                            console.log("Data was successfully sent to server: ", resultSendData);
+                                                        }
+                                                    })
+                                                }
+                                            })
+                                        })
+                                        .catch((errorCreateAllFiles) => {
+                                            console.log('Error while creating all the files: ', errorCreateAllFiles);
+                                        })
+                                })
+                                .catch((errorGetRecordsByDate) => {
+                                    console.log('errorGetRecordsByDate: ', errorGetRecordsByDate);
+                                })
+                        }
                     } else {
                         console.log('Last sync date is null')
                     }
