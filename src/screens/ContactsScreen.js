@@ -301,7 +301,36 @@ class ContactsScreen extends Component {
     };
 
     filterContacts = () => {
-       this.props.getContactsForOutbreakId(this.props.user.activeOutbreakId, this.state.filterFromFilterScreen, null);
+        let allFilters = {}
+
+        if (this.state.filterFromFilterScreen && this.state.filterFromFilterScreen.age) {
+            allFilters.age = this.state.filterFromFilterScreen.age
+        } else {
+            allFilters.age = null
+        }
+
+        if (this.state.filterFromFilterScreen && this.state.filterFromFilterScreen.gender) {
+            if (this.state.filterFromFilterScreen.gender === 'Female') {
+                allFilters.gender = 'LNG_REFERENCE_DATA_CATEGORY_GENDER_FEMALE'
+            } else  if (this.state.filterFromFilterScreen.gender === 'Male') {
+                allFilters.gender = 'LNG_REFERENCE_DATA_CATEGORY_GENDER_MALE'
+            }
+        } else {
+            allFilters.gender = null
+        }
+
+        if (this.state.filter.searchText != '') {
+            let splitedFilter= this.state.filter.searchText.split(" ")
+            allFilters.searchText = new RegExp(splitedFilter.join("|"), "ig");
+        } else {
+            allFilters.searchText = null
+        }
+        
+        if (JSON.stringify(allFilters) === JSON.stringify({})) {
+            allFilters = null
+        }
+
+        this.props.getContactsForOutbreakId(this.props.user.activeOutbreakId, allFilters, null);
     };
 
     onNavigatorEvent = (event) => {

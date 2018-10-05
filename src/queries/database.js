@@ -60,7 +60,7 @@ export function createDatabase(databaseName, databasePassword, callback) {
             console.log('Create design doc: ', i);
             promisesArray.push(addDesignDocs(ddocArray[i], database));
         }
-        promisesArray.push(createIndexes());
+        // promisesArray.push(createIndexes());
         // Add al the design docs and then return the database
         Promise.all(promisesArray)
             .then((results) => {
@@ -107,7 +107,7 @@ export function createDatabase(databaseName, databasePassword, callback) {
                 console.log("Create index: ", i);
                 promisesArray.push(addDesignDocs(ddocArray[i], database));
             }
-            promisesArray.push(createIndexes());
+            // promisesArray.push(createIndexes());
             // Add al the design docs and then return the database
             Promise.all(promisesArray)
                 .then((results) => {
@@ -121,30 +121,26 @@ export function createDatabase(databaseName, databasePassword, callback) {
         });
 }
 
-function createIndexes() {
-    return new Promise ((resolve, reject) => {
-        if (database) {
-            // Index for contacts based on fileType, type, outbreakId, firstName, lastName, age, gender
-            database.createIndex({
-                index: {
-                    fields: ['fileType', 'outbreakId', 'deleted', 'persons.0.type', 'persons.0.id', 'persons.1.type', 'persons.1.id'],
-                    ddoc: 'indexRelationship',
-                    type: 'json'
-                },
-            })
-                .then(() => {
-                    console.log('Creating index');
-                    resolve('Done creating Mango index');
-                })
-                .catch((errorMangoIndex) => {
-                    console.log('Error creating mango index: ', errorMangoIndex);
-                    reject(errorMangoIndex)
-                })
-        } else {
-            reject('No database');
-        }
-    })
-}
+// function createIndexes() {
+//     return new Promise ((resolve, reject) => {
+//         if (database) {
+//             // Index for contacts based on fileType, type, outbreakId, firstName, lastName, age, gender
+//             database.createIndex({
+//                 index: {fields: ['fileType', 'type']}
+//             })
+//                 .then(() => {
+//                     console.log('Creating index');
+//                     resolve('Done creating Mango index');
+//                 })
+//                 .catch((errorMangoIndex) => {
+//                     console.log('Error creating mango index: ', errorMangoIndex);
+//                     reject(errorMangoIndex)
+//                 })
+//         } else {
+//             reject('No database');
+//         }
+//     })
+// }
 
 export function addDesignDocs(ddoc, database) {
     return new Promise((resolve, reject) => {
@@ -188,17 +184,17 @@ export function updateFileInDatabase(file, type) {
             database.upsert(file._id, (doc) => {
                 // If we have to insert the doc, then add the type property
                 if (!doc) {
-                    console.log("Insert Doc " + type);
+                    // console.log("Insert Doc " + type);
                     file.fileType = type;
                     return file;
                 }
                 // If the local version is the latest or they have the same updatedAt then we shouldn't update
                 if (doc.updatedAt > file.updatedAt || doc.updatedAt === file.updatedAt) {
-                    console.log("Don't update " + type);
+                    // console.log("Don't update " + type);
                     return false;
                 }
                 // Update the doc with the new fields: add the type and _rev fields to the file object and insert it
-                console.log("Update doc " + type);
+                // console.log("Update doc " + type);
                 file.fileType = type;
                 file._rev = doc.rev;
                 return file;

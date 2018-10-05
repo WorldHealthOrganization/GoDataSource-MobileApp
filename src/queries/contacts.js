@@ -27,18 +27,39 @@ export function getContactsForOutbreakIdRequest (outbreakId, filter, token, call
             })
     } else {
         if (filter) {
-            database.query('getUserByEmail', {
-                startkey: [outbreakId, filter.gender, filter.age[0]],
-                endkey: [outbreakId, filter.gender, filter.age[1]],
-                include_docs: true,
-                group: true
+            console.log ('myFilter', filter.searchText)
+
+            database.find({
+                selector: {
+                    fileType: {$in: ['person.json']},
+                    outbreakId: outbreakId,
+                    deleted: false,
+                    gender: filter.gender ? {$eq: filter.gender} : { $gte: null},
+                    age: filter.age ? { $gte: filter.age[0]} : { $gte: null},
+                    age: filter.age ? { $lte: filter.age[1]} : { $gte: null},
+                    $or: [
+                        {
+                            firstName: filter.searchText ? { 
+                                $regex: filter.searchText
+                            } : { $gte: null}
+                        },
+                        {
+                            lastName: filter.searchText ? { 
+                                $regex: filter.searchText
+                            } : { $gte: null}
+                        }
+                    ]
+                }
             })
                 .then((resultFilterContacts) => {
-                    console.log('Result when filtering contacts: ', resultFilterContacts);
+                    console.log('Result when filtering contacts: ', JSON.stringify(resultFilterContacts));
+                    callback(null, resultFilterContacts.docs)
                 })
                 .catch((errorFilterContacts) => {
                     console.log('Error when filtering contacts: ', errorFilterContacts);
+                    callback(errorFilterContacts);
                 })
+
         } else {
             database.allDocs({
                 startkey: `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT_false_${outbreakId}`,
@@ -57,7 +78,6 @@ export function getContactsForOutbreakIdRequest (outbreakId, filter, token, call
                 })
         }
     }
-    // }
 }
 
 export function updateContactRequest(outbreakId, contactId, contact, token, callback) {

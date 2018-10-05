@@ -614,7 +614,14 @@ class FollowUpsScreen extends Component {
 
         // Take care of search filter
         if (this.state.filter.searchText) {
-            contactsCopy = contactsCopy.filter((e) => {return e && e.firstName && e.firstName.toLowerCase().includes(this.state.filter.searchText.toLowerCase()) || e && e.lastName && e.lastName.toLowerCase().includes(this.state.filter.searchText.toLowerCase())});
+            contactsCopy = contactsCopy.filter((e) => {
+                // return e && e.firstName && e.firstName.toLowerCase().includes(this.state.filter.searchText.toLowerCase()) || e && e.lastName && e.lastName.toLowerCase().includes(this.state.filter.searchText.toLowerCase())
+
+                return  e && e.firstName && this.state.filter.searchText.toLowerCase().includes(e.firstName.toLowerCase()) ||
+                    e && e.lastName && this.state.filter.searchText.toLowerCase().includes(e.lastName.toLowerCase()) ||
+                    e && e.firstName && e.firstName.toLowerCase().includes(this.state.filter.searchText.toLowerCase()) || 
+                    e && e.lastName && e.lastName.toLowerCase().includes(this.state.filter.searchText.toLowerCase())
+            });
         }
 
         // Take care of gender filter
