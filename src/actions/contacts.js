@@ -145,7 +145,7 @@ export function addContact(outbreakId, contact, token) {
             }
             if (response) {
                 dispatch(addContactAction(response));
-                dispatch(addExposureForContact(outbreakId, response.id, relationship, token));
+                dispatch(addExposureForContact(outbreakId, response._id, relationship, token));
             }
         })
     }

@@ -1151,7 +1151,7 @@ const contactsSingleScreen = {
                 labelValue: 'test',
                 type: 'DropDownSectioned',
                 value: '',
-                isRequired: true,
+                isRequired: false,
                 isEditMode: true,
                 objectType: 'Address',
                 single: true

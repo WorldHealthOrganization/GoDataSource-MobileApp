@@ -145,6 +145,13 @@ export function addExposureForContactRequest(outbreakId, contactId, exposure, to
     let database = getDatabase();
 
     // Here should add the data as an relationship.json type, while also updating the contact to contain the new added exposure
+    if (exposure.persons[0].id === null && contactId !== null) {
+        exposure.persons[0].id = contactId;
+    } else {
+        if (exposure.persons[1].id === null && contactId !== null) {
+            exposure.persons[1].id = contactId;
+        }
+    }
 
     database.put(exposure)
         .then((result) => {

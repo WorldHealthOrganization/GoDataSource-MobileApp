@@ -154,14 +154,14 @@ export function storeHubConfiguration(hubConfiguration) {
             if (lastSyncDate !== null) {
                 getDatabaseSnapshotRequest(hubConfiguration, lastSyncDate, (error, response) => {
                     if (error) {
-                        dispatch(setSyncState(null));
+                        dispatch(setSyncState('Error'));
                     }
                     if (response) {
                         dispatch(setSyncState("Unzipping database..."));
                         unzipFile(response, RNFetchBlobFs.dirs.DocumentDir + "/who_databases", (unzipError, responseUnzipPath) => {
                             if (unzipError) {
                                 console.log("Error while unzipping file");
-                                dispatch(setSyncState(null));
+                                dispatch(setSyncState('Error'));
                             }
                             if (responseUnzipPath) {
                                 // At this point we have the path to where the json files from the downloaded database are
@@ -176,12 +176,12 @@ export function storeHubConfiguration(hubConfiguration) {
                                     readDir(responseUnzipPath, (errorReadDir, files) => {
                                         if (errorReadDir) {
                                             console.log('Error while reading directory');
-                                            dispatch(setSyncState(null));
+                                            dispatch(setSyncState('Error'));
                                         }
                                         if (files) {
                                             // For every file of the database dump, do sync
                                             for(let i=0; i<files.length; i++) {
-                                                if (files[i] !== 'auditLog.json') {
+                                                if (files[i] !== 'auditLog.json' && files[i] !== 'icon.json' && files[i] !== 'icons') {
                                                     promises.push(processFile(RNFetchBlobFs.dirs.DocumentDir + '/who_databases/' + files[i], files[i], files.length, dispatch));
                                                 }
                                             }
@@ -197,18 +197,18 @@ export function storeHubConfiguration(hubConfiguration) {
                                                                     dispatch(setSyncState("Finished processing"));
                                                                 } else {
                                                                     console.log('There was an error at storing last sync date: ', errorStoreLastSync);
-                                                                    dispatch(setSyncState(null));
+                                                                    dispatch(setSyncState('Error'));
                                                                 }
                                                             });
                                                         } else {
                                                             console.log('There was an error at storing active database: ', errorActiveDatabase);
-                                                            dispatch(setSyncState(null));
+                                                            dispatch(setSyncState('Error'));
                                                         }
                                                     });
                                                 })
                                                 .catch((error) => {
                                                     console.log("Error promises: ", error);
-                                                    dispatch(setSyncState(null));
+                                                    dispatch(setSyncState('Error'));
                                                 })
                                         }
                                     })
@@ -221,7 +221,7 @@ export function storeHubConfiguration(hubConfiguration) {
                 console.log('No last sync date found. proceed to download all database: ');
                 getDatabaseSnapshotRequest(hubConfiguration, null, (error, response) => {
                     if (error) {
-                        dispatch(setSyncState(null));
+                        dispatch(setSyncState('Error'));
                     }
                     if (response) {
                         dispatch(setSyncState("Unzipping database..."));
@@ -243,12 +243,12 @@ export function storeHubConfiguration(hubConfiguration) {
                                     readDir(responseUnzipPath, (errorReadDir, files) => {
                                         if (errorReadDir) {
                                             console.log('Error while reading directory');
-                                            dispatch(setSyncState(null));
+                                            dispatch(setSyncState('Error'));
                                         }
                                         if (files) {
                                             // For every file of the database dump, do sync
                                             for(let i=0; i<files.length; i++) {
-                                                if (files[i] !== 'auditLog.json') {
+                                                if (files[i] !== 'auditLog.json' && files[i] !== 'icon.json' && files[i] !== 'icons') {
                                                     promises.push(processFile(RNFetchBlobFs.dirs.DocumentDir + '/who_databases/' + files[i], files[i], files.length, dispatch));
                                                 }
                                             }
@@ -264,18 +264,18 @@ export function storeHubConfiguration(hubConfiguration) {
                                                                     dispatch(setSyncState("Finished processing"));
                                                                 } else {
                                                                     console.log('There was an error at storing last sync date: ', errorStoreLastSync);
-                                                                    dispatch(setSyncState(null));
+                                                                    dispatch(setSyncState('Error'));
                                                                 }
                                                             });
                                                         } else {
                                                             console.log('There was an error at storing active database: ', errorActiveDatabase);
-                                                            dispatch(setSyncState(null));
+                                                            dispatch(setSyncState('Error'));
                                                         }
                                                     });
                                                 })
                                                 .catch((error) => {
                                                     console.log("Error promises: ", error);
-                                                    dispatch(setSyncState(null));
+                                                    dispatch(setSyncState('Error'));
                                                 })
                                         }
                                     })
@@ -289,14 +289,14 @@ export function storeHubConfiguration(hubConfiguration) {
             console.log("Error at getting lastSyncDate. Proceed to download all database: ", errorGetLastSyncDate);
             getDatabaseSnapshotRequest(hubConfiguration, null, (error, response) => {
                 if (error) {
-                    dispatch(setSyncState(null));
+                    dispatch(setSyncState('Error'));
                 }
                 if (response) {
                     dispatch(setSyncState("Unzipping database..."));
                     unzipFile(response, RNFetchBlobFs.dirs.DocumentDir + "/who_databases", (unzipError, responseUnzipPath) => {
                         if (unzipError) {
                             console.log("Error while unzipping file");
-                            dispatch(setSyncState(null));
+                            dispatch(setSyncState('Error'));
                         }
                         if (responseUnzipPath) {
                             // At this point we have the path to where the json files from the downloaded database are
@@ -311,12 +311,12 @@ export function storeHubConfiguration(hubConfiguration) {
                                 readDir(responseUnzipPath, (errorReadDir, files) => {
                                     if (errorReadDir) {
                                         console.log('Error while reading directory');
-                                        dispatch(setSyncState(null));
+                                        dispatch(setSyncState('Error'));
                                     }
                                     if (files) {
                                         // For every file of the database dump, do sync
                                         for(let i=0; i<files.length; i++) {
-                                            if (files[i] !== 'auditLog.json') {
+                                            if (files[i] !== 'auditLog.json' && files[i] !== 'icon.json' && files[i] !== 'icons') {
                                                 promises.push(processFile(RNFetchBlobFs.dirs.DocumentDir + '/who_databases/' + files[i], files[i], files.length, dispatch));
                                             }
                                         }
@@ -332,18 +332,18 @@ export function storeHubConfiguration(hubConfiguration) {
                                                                 dispatch(setSyncState("Finished processing"));
                                                             } else {
                                                                 console.log('There was an error at storing last sync date: ', errorStoreLastSync);
-                                                                dispatch(setSyncState(null));
+                                                                dispatch(setSyncState('Error'));
                                                             }
                                                         });
                                                     } else {
                                                         console.log('There was an error at storing active database: ', errorActiveDatabase);
-                                                        dispatch(setSyncState(null));
+                                                        dispatch(setSyncState('Error'));
                                                     }
                                                 });
                                             })
                                             .catch((error) => {
                                                 console.log("Error promises: ", error);
-                                                dispatch(setSyncState(null));
+                                                dispatch(setSyncState('Error'));
                                             })
                                     }
                                 })

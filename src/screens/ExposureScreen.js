@@ -17,6 +17,7 @@ import {calculateDimension} from './../utils/functions';
 import CardComponent from './../components/CardComponent';
 import Ripple from 'react-native-material-ripple';
 import {removeErrors} from './../actions/errors';
+import {extractIdFromPouchId} from './../utils/functions';
 
 class ExposureScreen extends Component {
 
@@ -175,7 +176,7 @@ class ExposureScreen extends Component {
                     source: true,
                     target: null
                 },{
-                    id: this.props.contact._id.split('_')[this.props.contact._id.split('_').length - 1],
+                    id: this.props.contact && this.props.contact._id ? extractIdFromPouchId(this.props.contact._id, 'person') : null,
                     type: 'contact',
                     source: null,
                     target: true

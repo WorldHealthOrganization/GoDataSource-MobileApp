@@ -235,7 +235,7 @@ export async function processFile (path, type, totalNumberOfFiles, dispatch) {
                         // File exists, time to read it in order to process
                         readFile(path, (error, data) => {
                             if (error) {
-                                console.log("Error while reading file");
+                                console.log("Error while reading file: ", type);
                                 reject("Error while reading file");
                             }
                             if (data) {
@@ -318,7 +318,7 @@ export function createFilesWithName (fileName, data) {
                     RNFetchBlobFS.exists(`${RNFetchBlobFS.dirs.DocumentDir}/who_files/${fileName}`)
                         .then((exists) => {
                             if (exists) {
-                                RNFetchBlobFS.writeFile(`${RNFetchBlobFS.dirs.DocumentDir}/who_files/${fileName}`, data, 'utf8')
+                                RNFetchBlobFS.writeFile(`${RNFetchBlobFS.dirs.DocumentDir}/who_files/${fileName}`, data.toString(), 'utf8')
                                     .then(() => {
                                         resolve(`Done with file ${fileName}`);
                                     })
@@ -328,7 +328,7 @@ export function createFilesWithName (fileName, data) {
                                     })
                             } else {
                                 // If the file does not exist, create it
-                                RNFetchBlobFS.createFile(`${RNFetchBlobFS.dirs.DocumentDir}/who_files/${fileName}`, data, "utf8")
+                                RNFetchBlobFS.createFile(`${RNFetchBlobFS.dirs.DocumentDir}/who_files/${fileName}`, data.toString(), "utf8")
                                     .then(() => {
                                         resolve(`Done with ${fileName}`);
                                     })
@@ -347,7 +347,7 @@ export function createFilesWithName (fileName, data) {
                     RNFetchBlobFS.mkdir(RNFetchBlobFS.dirs.DocumentDir + '/who_files')
                         .then(() => {
                             // Since the directory was created just now, we don't have to test if the file exists
-                            RNFetchBlobFS.createFile(RNFetchBlobFS.dirs.DocumentDir + '/who_files/' + fileName, data, "utf8")
+                            RNFetchBlobFS.createFile(RNFetchBlobFS.dirs.DocumentDir + '/who_files/' + fileName, data.toString(), "utf8")
                                 .then(() => {
                                     resolve(`Done with ${fileName}`)
                                 })

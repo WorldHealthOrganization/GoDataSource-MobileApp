@@ -84,7 +84,7 @@ export function createDatabase(databaseName, databasePassword, callback) {
                 console.log("Create index: ", i);
                 promisesArray.push(addDesignDocs(ddocArray[i], database));
             }
-            promisesArray.push(createIndexes());
+            // promisesArray.push(createIndexes());
             // Add al the design docs and then return the database
             Promise.all(promisesArray)
                 .then((results) => {

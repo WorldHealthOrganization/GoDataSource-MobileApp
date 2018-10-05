@@ -111,7 +111,7 @@ class ManualConfigScreen extends Component {
                     <Image source={{uri: 'logo_app'}} style={style.logoStyle} />
                 </View>
                 {
-                    this.props && this.props.syncState && this.props.syncState !== 'Finished processing' ? (
+                    this.props && this.props.syncState && (this.props.syncState !== 'Finished processing' && this.props.syncState !== 'Error') ? (
                         <LoaderScreen message={this.props.syncState || ''} overlay={true} backgroundColor={'white'} />
                     ) : (
                         null
