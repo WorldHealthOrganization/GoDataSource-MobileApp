@@ -203,6 +203,7 @@ class ContactsScreen extends Component {
     };
 
     handleOnSubmitEditing = (text) => {
+        console.log ('text', text)
         // this.props.addFilterForScreen("FollowUpsScreen", this.state.filter);
         // let existingFilter = this.state.filterFromFilterScreen ? Object.assign({}, this.state.filterFromFilterScreen) : Object.assign({}, config.defaultFilterForContacts);
         //
@@ -319,14 +320,15 @@ class ContactsScreen extends Component {
             allFilters.gender = null
         }
 
-        if (this.state.filter.searchText != '') {
+        console.log('this.state.filter.searchText ', this.state.filter.searchText)
+        if (this.state.filter.searchText.trim().length > 0) {
             let splitedFilter= this.state.filter.searchText.split(" ")
             allFilters.searchText = new RegExp(splitedFilter.join("|"), "ig");
         } else {
             allFilters.searchText = null
         }
         
-        if (JSON.stringify(allFilters) === JSON.stringify({})) {
+        if (!allFilters.age && !allFilters.gender && !allFilters.searchText) {
             allFilters = null
         }
 

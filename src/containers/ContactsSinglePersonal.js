@@ -4,11 +4,12 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
-import {View, StyleSheet, InteractionManager} from 'react-native';
+import {View, StyleSheet, InteractionManager, Alert} from 'react-native';
 import {calculateDimension} from './../utils/functions';
 import config from './../utils/config';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
+import Button from './../components/Button';
 import styles from './../styles';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import CardComponent from './../components/CardComponent';
@@ -61,6 +62,26 @@ class ContactsSinglePersonal extends Component {
                         })
                     }
                 </View>
+                {
+                    this.props.isNew ? 
+                        <Button
+                        title={'Next'}
+                        onPress={this.handleNextButton}
+                        color={styles.buttonGreen}
+                        titleColor={'white'}
+                        height={calculateDimension(25, true, this.props.screenSize)}
+                        width={calculateDimension(130, false, this.props.screenSize)}
+                        style={{
+                            marginVertical: calculateDimension(5, true, this.props.screenSize),
+                            position: 'absolute',
+                            right: 0,
+                            bottom:0,
+                            marginHorizontal: calculateDimension(16, false, this.props.screenSize),
+                            marginBottom: 30
+
+                        }}/> : null
+                }
+             
             </KeyboardAwareScrollView>
         );
     }
@@ -81,6 +102,19 @@ class ContactsSinglePersonal extends Component {
             />
         )
     }
+
+    handleNextButton = () => {
+        // if(true) {
+        if (this.props.checkRequiredFieldsPersonalInfo()) {
+            this.props.handleMoveToNextScreenButton()
+        } else {
+            Alert.alert("Alert", 'Please complete all the required fields', [
+                {
+                    text: 'Ok', onPress: () => {console.log("OK pressed")}
+                }
+            ])
+        }
+    }
 }
 
 
@@ -100,7 +134,8 @@ const style = StyleSheet.create({
     },
     container: {
         flex: 1,
-        marginBottom: 30
+        marginBottom: 10
+
     }
 });
 

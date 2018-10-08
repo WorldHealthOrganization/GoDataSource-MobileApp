@@ -64,7 +64,9 @@ class ContactsSingleScreen extends Component {
             } : Object.assign({}, this.props.contact),
             savePressed: false,
             deletePressed: false,
-            isDateTimePickerVisible: false
+            isDateTimePickerVisible: false,
+            canChangeScreen: false,
+            saveContactAtFirstNextButtonPress: true,
         };
         // Bind here methods, or at least don't declare methods in the render method
     }
@@ -171,13 +173,14 @@ class ContactsSingleScreen extends Component {
                     handlePressNavbarButton={this.handlePressNavbarButton}
                 />
                 <TabView
-                    navigationState={this.state}
-                    onIndexChange={this.handleOnIndexChange}
-                    renderScene={this.renderScene}
-                    renderTabBar={this.handleRenderTabBar}
+                    navigationState={this.state} 
+                    onIndexChange={this.handleOnIndexChange} 
+                    renderScene={this.renderScene} 
+                    renderTabBar={this.handleRenderTabBar} 
                     // renderPager={this.handleRenderPager}
                     useNativeDriver
                     initialLayout={initialLayout}
+                    swipeEnabled = { this.props.isNew ? false : true}
                 />
             </View>
         );
@@ -193,8 +196,48 @@ class ContactsSingleScreen extends Component {
     };
 
     handleOnIndexChange = (index) => {
-        this.setState({index});
+        if (this.props.isNew) {
+            if (this.state.canChangeScreen) {
+                this.setState({
+                    canChangeScreen: false,
+                    index
+                });
+            }
+        } else {
+            this.setState({
+                index
+            });
+        } 
+     
     };
+
+    handleMoveToNextScreenButton = (AdressesNextButtonPressed = false) => {
+        let nextIndex = this.state.index + 1
+
+        // if (this.state.saveContactAtFirstNextButtonPress === true && AdressesNextButtonPressed === true) {
+        //     this.props.addContact(this.props.user.activeOutbreakId, this.state.contact, this.props.user.token);
+        //     this.setState({
+        //         saveContactAtFirstNextButtonPress: false,
+        //     });
+        // } else if (this.state.saveContactAtFirstNextButtonPress === false && AdressesNextButtonPressed === true){
+        //     this.props.updateContact(this.props.user.activeOutbreakId, this.state.contact.id, this.state.contact, this.props.user.token);
+        // }
+
+        this.setState({
+            canChangeScreen: true,
+        });
+        this.handleOnIndexChange(nextIndex)
+    }
+
+    handleMoveToPrevieousScreenButton = () => {
+        let nextIndex = this.state.index - 1
+
+        this.setState({
+            canChangeScreen: true,
+        });
+
+        this.handleOnIndexChange(nextIndex)
+    }
 
     handleRenderTabBar = (props) => {
         return (
@@ -248,6 +291,9 @@ class ContactsSingleScreen extends Component {
                         onChangeDropDown={this.handleOnChangeDropDown}
                         onChangeDate={this.handleOnChangeDate}
                         onChangeSwitch={this.handleOnChangeSwitch}
+                        handleMoveToNextScreenButton={this.handleMoveToNextScreenButton}
+                        checkRequiredFieldsPersonalInfo={this.checkRequiredFieldsPersonalInfo}
+                        isNew={this.props.isNew}
                     />
                 );
             case 'address':
@@ -262,6 +308,10 @@ class ContactsSingleScreen extends Component {
                         onChangeSectionedDropDown={this.handleOnChangeSectionedDropDown}
                         onDeletePress={this.handleOnDeletePress}
                         onPressAddAdrress={this.handleOnPressAddAdrress}
+                        handleMoveToNextScreenButton={this.handleMoveToNextScreenButton}
+                        handleMoveToPrevieousScreenButton={this.handleMoveToPrevieousScreenButton}
+                        checkRequiredFieldsAddresses={this.checkRequiredFieldsAddresses}
+                        isNew={this.props.isNew}
                     />
                 );
             case 'exposures':
@@ -273,6 +323,8 @@ class ContactsSingleScreen extends Component {
                         onPressDeleteExposure={this.handleOnPressDeleteExposure}
                         navigator={this.props.navigator}
                         saveExposure={this.handleSaveExposure}
+                        handleMoveToPrevieousScreenButton={this.handleMoveToPrevieousScreenButton}
+                        isNew={this.props.isNew}
                     />
                 );
             case 'calendar':
@@ -295,14 +347,25 @@ class ContactsSingleScreen extends Component {
         }
     };
 
-    handleSaveExposure = (exposure) => {
-        let relationships = _.cloneDeep(this.state.contact.relationships);
-        relationships.push(exposure);
-        this.setState(prevState => ({
-            contact: Object.assign({}, prevState.contact, {relationships})
-        }), () => {
-            console.log("After adding the exposure: ", this.state.contact);
-        })
+    handleSaveExposure = (exposure, isUpdate = false) => {
+        console.log ('exposure', JSON.stringify(exposure))
+        if (isUpdate === false){
+            let relationships = _.cloneDeep(this.state.contact.relationships);
+            relationships.push(exposure);
+            this.setState(prevState => ({
+                contact: Object.assign({}, prevState.contact, {relationships})
+            }), () => {
+                console.log("After adding the exposure: ", this.state.contact);
+            })
+        } else {
+            relationships = []
+            relationships.push(exposure);
+            this.setState(prevState => ({
+                contact: Object.assign({}, prevState.contact, {relationships})
+            }), () => {
+                console.log("After updating the exposure: ", this.state.contact);
+            })
+        }
     };
 
     handleOnChangeText = (value, id, objectType) => {
@@ -325,10 +388,11 @@ class ContactsSingleScreen extends Component {
                     }
                 )
             } else {
-                if (typeof objectType === 'number' && objectType >= 0) {
+                if (typeof objectType === 'phoneNumber' && objectType >= 0 || typeof objectType === 'number' && objectType >= 0) {
                     // Change address drop down
                     let addressesClone = _.cloneDeep(this.state.contact.addresses);
                     addressesClone[objectType][id] = value && value.value ? value.value : value;
+                    console.log ('addressesClone', addressesClone)
                     this.setState(prevState => ({
                         contact: Object.assign({}, prevState.contact, {addresses: addressesClone})
                     }), () => {
@@ -522,8 +586,9 @@ class ContactsSingleScreen extends Component {
             animated: true,
             passProps: {
                 exposure: relation,
-                contact: this.props.contact,
-                type: 'Contact'
+                contact: this.state.isNew ? this.props.contact : null,
+                type: 'Contact',
+                saveExposure: this.props.isNew ? this.handleSaveExposure : null,
             }
         })
     };
@@ -583,6 +648,32 @@ class ContactsSingleScreen extends Component {
             ])
         }
     };
+
+    checkRequiredFieldsPersonalInfo = () => {
+        for(let i=0; i<config.contactsSingleScreen.personal.length; i++) {
+            for (let j=0; j<config.contactsSingleScreen.personal[i].fields.length; j++) {
+                if (config.contactsSingleScreen.personal[i].fields[j].isRequired && !this.state.contact[config.contactsSingleScreen.personal[i].fields[j].id]) {
+                    return false;
+                }
+            }
+        }
+        return true
+    }
+
+    checkRequiredFieldsAddresses = () => {
+        if (this.state.contact && this.state.contact.addresses && Array.isArray(this.state.contact.addresses) && this.state.contact.addresses.length > 0) {
+            for (let i=0; i < this.state.contact.addresses.length; i++) {
+                for (let j=0; j<config.contactsSingleScreen.address.fields.length; j++) {
+                    if (config.contactsSingleScreen.address.fields[j].isRequired && !this.state.contact.addresses[i][config.contactsSingleScreen.address.fields[j].id]) {
+                        return false;
+                    }
+                }
+            }
+        } else {
+            return false;
+        }
+        return true
+    }
 
     checkRequiredFields = () => {
         // First check the personal info

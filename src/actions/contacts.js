@@ -8,7 +8,7 @@ import {
 } from './../utils/enums';
 import {
     // getContactsForOutbreakIdRequest,
-    getContactByIdRequest,
+    // getContactByIdRequest,
     // updateContactRequest,
     // addContactRequest,
     // addExposureForContactRequest,
@@ -17,6 +17,7 @@ import {
 } from './../requests/contacts';
 import {
     getContactsForOutbreakIdRequest,
+    getContactByIdRequest,
     updateContactRequest,
     addContactRequest,
     addExposureForContactRequest,
@@ -128,6 +129,7 @@ export function getContactById(outbreakId, contactId, token) {
                 dispatch(addError(errorTypes.ERROR_CONTACT));
             }
             if (response) {
+                console.log("*** getContactById response: ", JSON.stringify(response));
                 dispatch(updateContactAction(response));
             }
         })
@@ -136,6 +138,11 @@ export function getContactById(outbreakId, contactId, token) {
 
 export function addContact(outbreakId, contact, token) {
     let relationship = contact.relationships[0];
+    relationship.deleted = false, 
+    relationship.deletedBy = 'undefined', 
+    relationship.updatedAt = new Date().toISOString(), 
+    relationship.updatedBy =  contact.updatedBy
+    
     delete contact.relationships;
     return async function(dispatch, getState) {
         addContactRequest(outbreakId, contact, token, (error, response) => {
@@ -144,6 +151,7 @@ export function addContact(outbreakId, contact, token) {
                 dispatch(addError(errorTypes.ERROR_ADD_CONTACT));
             }
             if (response) {
+                console.log("*** addContact response: ", JSON.stringify(response));
                 dispatch(addContactAction(response));
                 dispatch(addExposureForContact(outbreakId, response._id, relationship, token));
             }
@@ -173,7 +181,7 @@ export function addExposureForContact(outbreakId, contactId, exposure, token) {
                 dispatch(addError(errorTypes.ERROR_ADD_EXPOSURE));
             }
             if (response) {
-                // console.log("Response from add exposure");
+                console.log("*** addExposureForContact response: ", JSON.stringify(response));
                 dispatch(getContactById(outbreakId, contactId, token));
             }
         })
@@ -188,7 +196,7 @@ export function updateExposureForContact(outbreakId, contactId, exposure, token)
                 dispatch(addError(errorTypes.ERROR_UPDATE_EXPOSURE));
             }
             if (response) {
-                // console.log("Response from updateExposureForContact");
+                console.log("*** updateExposureForContact response: ", JSON.stringify(response));
                 dispatch(getContactById(outbreakId, contactId, token));
             }
         })
