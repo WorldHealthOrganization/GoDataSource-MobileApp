@@ -27,7 +27,7 @@ import {updateContact, deleteExposureForContact, addContact} from './../actions/
 import {removeErrors} from './../actions/errors';
 import DateTimePicker from 'react-native-modal-datetime-picker';
 import _ from 'lodash';
-import {extractIdFromPouchId} from './../utils/functions';
+import {extractIdFromPouchId, updateRequiredFields} from './../utils/functions';
 
 const initialLayout = {
     height: 0,
@@ -629,16 +629,21 @@ class ContactsSingleScreen extends Component {
             this.setState({
                 savePressed: true
             }, () => {
-                this.setState(prevState => ({
-                    contact: Object.assign({}, prevState.contact, {deleted: false, deletedBy: 'undefined', updatedAt: new Date().toISOString(), updatedBy: extractIdFromPouchId(this.props.user._id, 'user')})
-                }), () => {
-                    // If it is a new contact, save it
-                    if (this.props.isNew) {
+                if (this.props.isNew) {
+                    let contactWithRequiredFields = updateRequiredFields(fileType = 'person.json', outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, this.state.contact), action = 'create', type = 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT')
+                    this.setState(prevState => ({
+                        contact: Object.assign({}, prevState.contact, contactWithRequiredFields)
+                    }), () => {
                         this.props.addContact(this.props.user.activeOutbreakId, this.state.contact, this.props.user.token);
-                    } else {
+                    })
+                } else {
+                    let contactWithRequiredFields = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, this.state.contact), action = 'update')
+                    this.setState(prevState => ({
+                    contact: Object.assign({}, prevState.contact, contactWithRequiredFields)
+                    }), () => {
                         this.props.updateContact(this.props.user.activeOutbreakId, this.state.contact.id, this.state.contact, this.props.user.token);
-                    }
-                })
+                    })
+                }
             });
         } else {
             Alert.alert("Validation error", 'Some of the required fields are missing. Please make sure you have completed them', [

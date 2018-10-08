@@ -400,17 +400,17 @@ export function extractIdFromPouchId (pouchId, type) {
     return pouchId.split('_')[pouchId.split('_').length - 1];
 }
 
-export function computeIdForFileType (type, outbreakId, file, typePerson) {
-    switch (type) {
+export function computeIdForFileType (fileType, outbreakId, file, type) {
+    switch (fileType) {
         case 'person.json':
-            return (type + '_' + typePerson + '_false' + '_' + outbreakId + '_' + generateId());
+            return (fileType + '_' + type + '_false' + '_' + outbreakId + '_' + generateId());
         case 'followUp.json':
-            return (type + '_false_' + outbreakId + '_' + new Date(file.date).getTime() + '_' + generateId());
+            return (fileType + '_false_' + outbreakId + '_' + new Date(file.date).getTime() + '_' + generateId());
         // return (type + '_' + file.outbreakId + '_' + file._id);
         case 'relationship.json':
-            return (type + '_file_' + outbreakId + '_' + generateId());
+            return (fileType + '_file_' + outbreakId + '_' + generateId());
         default:
-            return (type + '_false_' + generateId());
+            return (fileType + '_false_' + generateId());
     }
 }
 
@@ -454,4 +454,45 @@ export function mapContactsAndRelationships(contacts, relationships) {
     }
 
     return mappedContacts;
+}
+
+export function updateRequiredFields(fileType = '', outbreakId, userId, record, action, type = '') {
+
+    switch (action) {
+        case 'create':
+            record._id = computeIdForFileType(fileType, outbreakId, record, type);
+            record.fileType = fileType
+            record.updatedAt = new Date().toISOString()
+            record.updatedBy = extractIdFromPouchId(userId, 'user')
+            record.deleted = false
+            record.deletedAt = 'undefined'
+            if (type !== '') {
+                record.type = type
+            }
+            console.log ('updateRequiredFields create record', JSON.stringify(record))
+            return record
+
+        case 'update':
+            //required fields: userId, record
+            record.updatedAt = new Date().toISOString()
+            record.updatedBy = extractIdFromPouchId(userId, 'user')
+            record.deleted = false
+            record.deletedAt = 'undefined'
+            console.log ('updateRequiredFields update record', JSON.stringify(record))
+            return record;
+
+        case 'delete':
+            //required fields: userId, record
+            record.updatedAt = new Date().toISOString()
+            record.updatedBy = extractIdFromPouchId(userId, 'user')
+            record.deleted = true
+            record.deletedAt = new Date().toISOString()
+            console.log ('updateRequiredFields delete record', JSON.stringify(record))
+            return record;
+
+        default: 
+            console.log ('updateRequiredFields default record', JSON.stringify(record))
+            
+
+    }
 }

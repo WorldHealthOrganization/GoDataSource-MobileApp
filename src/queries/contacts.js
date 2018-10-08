@@ -128,14 +128,6 @@ export function addContactRequest(outbreakId, contact, token, callback) {
     let database = getDatabase();
 
     console.log('addContactRequest: ', outbreakId, contact);
-
-    if (!contact._id) {
-        let uuid = generateId();
-        contact._id = 'person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT_false_' + outbreakId + '_' + uuid;
-    }
-    contact.type = 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT'
-    contact.fileType = 'person.json'
-
     database.put(contact)
         .then((responseAddContact) => {
             database.get(responseAddContact.id)

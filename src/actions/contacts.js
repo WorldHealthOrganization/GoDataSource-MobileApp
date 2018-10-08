@@ -29,7 +29,7 @@ import errorTypes from './../utils/errorTypes';
 import {getFollowUpsForOutbreakIdRequest} from './../queries/followUps';
 import {storeFollowUps} from  './../actions/followUps';
 import {getRelationshipsForTypeRequest} from './../queries/relationships';
-import {extractIdFromPouchId, mapContactsAndRelationships} from './../utils/functions';
+import {extractIdFromPouchId, mapContactsAndRelationships, updateRequiredFields} from './../utils/functions';
 
 // Add here only the actions, not also the requests that are executed. For that purpose is the requests directory
 export function storeContacts(followUps) {
@@ -138,12 +138,9 @@ export function getContactById(outbreakId, contactId, token) {
 
 export function addContact(outbreakId, contact, token) {
     let relationship = contact.relationships[0];
-    relationship.deleted = false, 
-    relationship.deletedBy = 'undefined', 
-    relationship.updatedAt = new Date().toISOString(), 
-    relationship.updatedBy =  contact.updatedBy
-    
+    relationship = updateRequiredFields(fileType = 'relationship.json', outbreakId = outbreakId, userId = contact.updatedBy, record = relationship, action = 'create')
     delete contact.relationships;
+
     return async function(dispatch, getState) {
         addContactRequest(outbreakId, contact, token, (error, response) => {
             if (error) {
