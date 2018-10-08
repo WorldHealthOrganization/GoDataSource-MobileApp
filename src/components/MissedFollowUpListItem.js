@@ -6,7 +6,7 @@
 import React, {PureComponent} from 'react';
 import {TextInput, View, Text, StyleSheet, Platform, Dimensions, Image} from 'react-native';
 import {ListItem, Icon} from 'react-native-material-ui';
-import {calculateDimension} from './../utils/functions';
+import {calculateDimension, extractIdFromPouchId} from './../utils/functions';
 import config from './../utils/config';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -35,7 +35,7 @@ class MissedFollowUpListItem extends PureComponent {
     render() {
         // Get contact info from the follow-ups
 
-        let contact = this.props && this.props.contacts && Array.isArray(this.props.contacts) && this.props.contacts.length > 0 ? this.props.contacts[this.props.contacts.map((e) => {return e._id.split('_')[e._id.split('_').length - 1]}).indexOf(this.props.item.personId)] : null;
+        let contact = this.props && this.props.contacts && Array.isArray(this.props.contacts) && this.props.contacts.length > 0 ? this.props.contacts[this.props.contacts.map((e) => {return extractIdFromPouchId(e._id, 'person')}).indexOf(this.props.item.personId)] : null;
         let primaryText = contact && ((contact.firstName ? contact.firstName : ' ') + (contact.lastName ? (" " + contact.lastName) : ' '));
 
         let currentFollowUpIndex = contact && contact.followUps && Array.isArray(contact.followUps) && contact.followUps.length > 0 ? contact.followUps.map((e) => {return e.id}).indexOf(this.props.item.id) : 0;

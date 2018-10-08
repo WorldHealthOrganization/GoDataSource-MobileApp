@@ -456,14 +456,16 @@ class FollowUpsScreen extends Component {
         let now = new Date();
         date = new Date(date);
         let followUp = {
-            _id: 'followUp.json_' + this.props.user.activeOutbreakId + '_' + date.getTime() + '_' + generateId(),
+            _id: 'followUp.json_false_' + this.props.user.activeOutbreakId + '_' + date.getTime() + '_' + generateId(),
             performed: false,
             lostToFollowUp: false,
             date: date,
             outbreakId: this.props.user.activeOutbreakId,
             personId: extractIdFromPouchId(contact.value, 'person.json'),
             updatedAt: now.toISOString(),
-            updatedBy: extractIdFromPouchId(this.props.user._id, 'user.json')
+            updatedBy: extractIdFromPouchId(this.props.user._id, 'user.json'),
+            deleted: false,
+            deletedAt: null
         };
 
         this.setState({

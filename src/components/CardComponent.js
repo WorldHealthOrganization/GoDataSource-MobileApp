@@ -69,6 +69,10 @@ class CardComponent extends Component {
             return true;
         }
 
+        if (nextProps.screen === 'ExposureScreen') {
+            return true;
+        }
+
         return false;
     }
 

@@ -30,7 +30,7 @@ class ExposureScreen extends Component {
         this.state = {
             exposure: this.props.exposure || {
                 outbreakId: this.props.user.activeOutbreakId,
-                contactDate: new Date(),
+                contactDate: '',
                 contactDateEstimated: false,
                 certaintyLevelId: '',
                 exposureTypeId: '',
@@ -206,8 +206,10 @@ class ExposureScreen extends Component {
 
     handleOnChangeDate = (value, id) => {
         this.setState(prevState => ({
-            exposure: Object.assign({}, prevState.exposure, {[id]: new Date(value)})
-        }))
+            exposure: Object.assign({}, prevState.exposure, {[id]: value})
+        }), () => {
+            console.log('Exposure after changing date: ', this.state.exposure);
+        })
     };
 
     handleOnChangeText = (value, id) => {

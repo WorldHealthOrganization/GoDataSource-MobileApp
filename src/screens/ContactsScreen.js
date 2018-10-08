@@ -115,7 +115,7 @@ class ContactsScreen extends Component {
                                     flex: 1,
                                     justifyContent: 'center',
                                     alignItems: 'center'
-                                }} onPress={this.handleOnPressAddContact}>
+                                }} onPress={this.handleOnPressAddContact} hitSlop={{top: 20, bottom: 20, left: 20, right: 20}}>
                                     <Icon name="add" color={'white'} size={15}/>
                                 </Ripple>
                             </ElevatedView>

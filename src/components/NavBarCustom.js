@@ -41,7 +41,7 @@ class NavBarCustom extends PureComponent {
             ]}
             >
                 <View style={[style.containerUpperNavBar, {flex: this.props.children ? 0.5 : 1}]}>
-                    <Ripple onPress={this.handlePressNavbarButton}>
+                    <Ripple onPress={this.handlePressNavbarButton} hitSlop={{top: 20, bottom: 20, left: 20, right: 20}}>
                         <Icon name={this.props.iconName}/>
                     </Ripple>
                     {
