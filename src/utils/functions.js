@@ -296,6 +296,7 @@ export function getDataFromDatabaseFromFile (database, fileType, lastSyncDate) {
                     delete e._rev;
                     e.id = extractIdFromPouchId(e._id, fileType);
                     delete e._id;
+                    delete e.fileType;
                     return e;
                 })))
                     .then((responseFromCreate) => {
@@ -390,10 +391,27 @@ export function createZipFileAtPath (source, target, callback) {
 // Method for extracting the mongo id from the pouch id
 // type is the name of the mongo collection: (follow)
 export function extractIdFromPouchId (pouchId, type) {
+    if (!pouchId) {
+        return null;
+    }
     if (!pouchId.includes(type)) {
         return pouchId
     }
     return pouchId.split('_')[pouchId.split('_').length - 1];
+}
+
+export function computeIdForFileType (type, outbreakId, file, typePerson) {
+    switch (type) {
+        case 'person.json':
+            return (type + '_' + typePerson + '_false' + '_' + outbreakId + '_' + generateId());
+        case 'followUp.json':
+            return (type + '_false_' + outbreakId + '_' + new Date(file.date).getTime() + '_' + generateId());
+        // return (type + '_' + file.outbreakId + '_' + file._id);
+        case 'relationship.json':
+            return (type + '_file_' + outbreakId + '_' + generateId());
+        default:
+            return (type + '_false_' + generateId());
+    }
 }
 
 export function generateId () {

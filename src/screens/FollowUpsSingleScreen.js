@@ -24,7 +24,7 @@ import {updateContact} from './../actions/contacts';
 import {removeErrors} from './../actions/errors';
 import DateTimePicker from 'react-native-modal-datetime-picker';
 import _ from 'lodash';
-import {extractIdFromPouchId} from './../utils/functions';
+import {extractIdFromPouchId, computeIdForFileType} from './../utils/functions';
 
 class FollowUpsSingleScreen extends Component {
 
@@ -413,10 +413,6 @@ class FollowUpsSingleScreen extends Component {
                 delete followUpClone.address.location;
             }
 
-            if (followUpClone.fileType) {
-                delete followUpClone.fileType;
-            }
-
             if (contactClone.followUps) {
                 delete contactClone.followUps;
             }
@@ -425,12 +421,13 @@ class FollowUpsSingleScreen extends Component {
                 delete contactClone.relationships;
             }
 
-            if (contactClone.fileType) {
-                delete contactClone.fileType;
-            }
-
             if (this.props.isNew) {
+                followUpClone._id = computeIdForFileType('followUp.json', this.props.user.activeOutbreakId, this.state.item);
+                followUpClone.deleted = false;
+                followUpClone.deletedAt = null;
+
                 this.props.createFollowUp(this.props.outbreak.id, extractIdFromPouchId(contactClone._id, 'person.json'), followUpClone, contactClone, null, this.props.user.token);
+
             } else {
                 this.props.updateFollowUpAndContact(this.props.user.activeOutbreakId, extractIdFromPouchId(contactClone._id, 'person.json'), followUpClone._id, followUpClone, contactClone, this.props.user.token);
             }
