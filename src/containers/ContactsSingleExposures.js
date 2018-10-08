@@ -11,6 +11,7 @@ import {Animated, StyleSheet, InteractionManager, ScrollView, View, Text} from '
 import {calculateDimension} from './../utils/functions';
 import config from './../utils/config';
 import {connect} from "react-redux";
+import Button from './../components/Button';
 import {bindActionCreators} from "redux";
 import styles from './../styles';
 import ElevatedView from 'react-native-elevated-view';
@@ -99,14 +100,40 @@ class ContactsSingleExposures extends Component {
                         componentContainerStyle={style.componentContainerStyle}
                         onScroll={this.handleScroll}
                     />
+                    {
+                        this.props.isNew ? 
+                            <Button
+                                title={'Back'}
+                                onPress={this.handleBackButton}
+                                color={styles.buttonGreen}
+                                titleColor={'white'}
+                                height={calculateDimension(25, true, this.props.screenSize)}
+                                width={calculateDimension(130, false, this.props.screenSize)}
+                                style={{
+                                    marginVertical: calculateDimension(5, true, this.props.screenSize),
+                                    position: 'absolute',
+                                    left: 0,
+                                    bottom:0,
+                                    marginHorizontal: calculateDimension(16, false, this.props.screenSize),
+                                    marginBottom: 30
+
+                                }}/> : null
+                    }
                     <View style={{height: 30}}/>
+                   
+                 
                 </ScrollView>
             </ElevatedView>
+            
         );
     }
 
     // Please write here all the methods that are not react native lifecycle methods
     keyExtractor = (item, index) => item.id;
+
+    handleBackButton = () => {
+        this.props.handleMoveToPrevieousScreenButton()
+    }
 
     renderRelationship = (relation) => {
 

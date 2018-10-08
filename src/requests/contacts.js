@@ -32,6 +32,7 @@ export function getContactsForOutbreakIdRequest(outbreakId, filter, token, callb
 export function getContactByIdRequest(outbreakId, contactId, token, callback) {
 
     let filter = config.defaultFilterForContacts;
+    console.log ('getContactByIdRequest filter', JSON.stringify(filter))
 
     filter.where = {
         id: contactId
@@ -51,11 +52,11 @@ export function getContactByIdRequest(outbreakId, contactId, token, callback) {
             return handleResponse(response);
         })
         .then((response) => {
-            console.log('### getContactByIdRequest response: ', response);
+            console.log('### getContactByIdRequest response: ', JSON.stringify(response));
             callback(null, response[0]);
         })
         .catch((error) => {
-            console.log("*** getContactByIdRequest error: ", error);
+            console.log("*** getContactByIdRequest error: ", JSON.stringify(error));
             callback(error);
         })
 }

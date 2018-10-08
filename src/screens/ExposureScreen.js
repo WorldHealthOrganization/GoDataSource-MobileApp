@@ -245,11 +245,20 @@ class ExposureScreen extends Component {
             }, () => {
                 if (this.props.type === 'Contact') {
                     if (this.props.exposure) {
-                        this.setState(prevState => ({
-                            exposure: Object.assign({}, prevState.exposure, {updatedAt: new Date().toISOString(), updatedBy: this.props.user._id.split('_')[this.props.user._id.split('_').length - 1]})
-                        }), () => {
-                          this.props.updateExposureForContact(this.props.user.activeOutbreakId, this.props.contact._id.split('_')[this.props.contact._id.split('_').length - 1], this.state.exposure, this.props.user.token);
-                        })
+                        if (!this.props.contact) {
+                            //update exposure in create new contact case
+                            this.setState(prevState => ({
+                                exposure: Object.assign({}, prevState.exposure, {updatedAt: new Date().toISOString(), updatedBy: this.props.user._id.split('_')[this.props.user._id.split('_').length - 1]})
+                            }), () => {
+                              this.props.navigator.dismissModal(this.props.saveExposure(this.state.exposure, true));
+                            })
+                        } else {
+                            this.setState(prevState => ({
+                                exposure: Object.assign({}, prevState.exposure, {updatedAt: new Date().toISOString(), updatedBy: this.props.user._id.split('_')[this.props.user._id.split('_').length - 1]})
+                            }), () => {
+                                this.props.updateExposureForContact(this.props.user.activeOutbreakId, this.props.contact._id.split('_')[this.props.contact._id.split('_').length - 1], this.state.exposure, this.props.user.token);
+                            })
+                        }
                     } else {
                         if (!this.props.contact) {
                             this.setState(prevState => ({

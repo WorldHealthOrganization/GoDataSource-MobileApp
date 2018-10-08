@@ -2,7 +2,7 @@
  * Created by florinpopa on 13/09/2018.
  */
 import {getDatabase} from './database';
-import {generateId} from './../utils/functions';
+import {generateId, extractIdFromPouchId} from './../utils/functions';
 
 export function getContactsForOutbreakIdRequest (outbreakId, filter, token, callback) {
     let database = getDatabase();
@@ -27,27 +27,20 @@ export function getContactsForOutbreakIdRequest (outbreakId, filter, token, call
             })
     } else {
         if (filter) {
-            console.log ('myFilter', filter.searchText)
+            console.log ('myFilter', filter)
 
             database.find({
                 selector: {
-                    fileType: {$in: ['person.json']},
+                    type: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT',
+                    fileType: 'person.json',
                     outbreakId: outbreakId,
                     deleted: false,
-                    gender: filter.gender ? {$eq: filter.gender} : { $gte: null},
-                    age: filter.age ? { $gte: filter.age[0]} : { $gte: null},
-                    age: filter.age ? { $lte: filter.age[1]} : { $gte: null},
+                    gender: filter.gender ? {$eq: filter.gender} : {},
+                    age: filter.age ? { $gte: filter.age[0]} : {},
+                    age: filter.age ? { $lte: filter.age[1]} : {},
                     $or: [
-                        {
-                            firstName: filter.searchText ? { 
-                                $regex: filter.searchText
-                            } : { $gte: null}
-                        },
-                        {
-                            lastName: filter.searchText ? { 
-                                $regex: filter.searchText
-                            } : { $gte: null}
-                        }
+                        {firstName: filter.searchText ? {$regex: filter.searchText} : {}},
+                        {lastName: filter.searchText ? {$regex: filter.searchText} : {}}
                     ]
                 }
             })
@@ -67,7 +60,7 @@ export function getContactsForOutbreakIdRequest (outbreakId, filter, token, call
                 include_docs: true
             })
                 .then((result) => {
-                    console.log("result with the new index for contacts: ");
+                    console.log("result with the new index for contacts: ", JSON.stringify(result));
                     callback(null, result.rows.map((e) => {
                         return e.doc
                     }));
@@ -78,6 +71,23 @@ export function getContactsForOutbreakIdRequest (outbreakId, filter, token, call
                 })
         }
     }
+}
+
+export function getContactByIdRequest(outbreakId, contactId, token, callback) {
+
+    let database = getDatabase();
+    console.log('getContactByIdRequest: ', outbreakId, contactId);
+
+    database.get(contactId)
+        .then((resultGetContactById) => {
+            console.log("Result getContactByIdRequest: ", JSON.stringify(resultGetContactById));
+            callback(null, resultGetContactById);
+        })
+        .catch((errorGetContactById) => {
+            console.log("Error getContactByIdRequest: ", JSON.stringify(errorGetContactById));
+            callback(errorGetContactById);
+        })
+         
 }
 
 export function updateContactRequest(outbreakId, contactId, contact, token, callback) {
@@ -123,6 +133,8 @@ export function addContactRequest(outbreakId, contact, token, callback) {
         let uuid = generateId();
         contact._id = 'person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT_false_' + outbreakId + '_' + uuid;
     }
+    contact.type = 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT'
+    contact.fileType = 'person.json'
 
     database.put(contact)
         .then((responseAddContact) => {
@@ -153,12 +165,20 @@ export function addExposureForContactRequest(outbreakId, contactId, exposure, to
         }
     }
 
+    let fileType = 'relationship.json';
+    exposure._id = fileType + '_false_' + outbreakId + '_' +  generateId();
+    exposure.fileType = fileType;
+
+    console.log('exposure for put', JSON.stringify(exposure))
     database.put(exposure)
         .then((result) => {
-            console.log('Result addExposureForContactRequest: ', result);
+            console.log('Result addExposureForContactRequest: ', JSON.stringify(result));
+            callback(null, result)
         })
         .catch((errorAddExposure) => {
             console.log("Error addExposureForContactRequest: ", errorAddExposure);
+            callback(errorAddExposure)
+
         })
 }
 
