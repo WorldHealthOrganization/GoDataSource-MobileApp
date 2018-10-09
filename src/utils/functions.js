@@ -408,7 +408,7 @@ export function computeIdForFileType (fileType, outbreakId, file, type) {
             return (fileType + '_false_' + outbreakId + '_' + new Date(file.date).getTime() + '_' + generateId());
         // return (type + '_' + file.outbreakId + '_' + file._id);
         case 'relationship.json':
-            return (fileType + '_file_' + outbreakId + '_' + generateId());
+            return (fileType + '_false_' + outbreakId + '_' + generateId());
         default:
             return (fileType + '_false_' + generateId());
     }
@@ -421,43 +421,52 @@ export function generateId () {
 export function mapContactsAndRelationships(contacts, relationships) {
 
     let mappedContacts = contacts;
+    console.log ('mapContactsAndRelationships')
+    console.log ('mapContactsAndRelationships contacts', JSON.stringify(contacts))
+    console.log ('mapContactsAndRelationships relationships', JSON.stringify(relationships))
 
     for (let i = 0; i < relationships.length; i++) {
         let contactObject = {};
-        if (relationships[i].persons[0].type === 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT' && mappedContacts.map((e) => {
-                return e._id
+        if ((relationships[i].persons[0].type === 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT' || relationships[i].persons[0].type === 'contact') && mappedContacts.map((e) => {
+                return extractIdFromPouchId(e._id, 'person')
             }).indexOf(relationships[i].persons[0].id) > -1) {
+                
+            console.log ('mapContactsAndRelationships if')
             contactObject = Object.assign({}, contacts[contacts.map((e) => {
-                return e._id
+                return extractIdFromPouchId(e._id, 'person')
             }).indexOf(relationships[i].persons[0].id)]);
 
             contactObject.relationships = [];
             contactObject.relationships.push(relationships[i]);
             mappedContacts[mappedContacts.map((e) => {
-                return e._id
+                return extractIdFromPouchId(e._id, 'person')
             }).indexOf(relationships[i].persons[0].id)] = contactObject;
         } else {
-            if (relationships[i].persons[1].type === 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT' && mappedContacts.map((e) => {
-                    return e._id
+            if ((relationships[i].persons[1].type === 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT' || relationships[i].persons[1].type === 'contact') && mappedContacts.map((e) => {
+                    return extractIdFromPouchId(e._id, 'person')
                 }).indexOf(relationships[i].persons[1].id) > -1) {
+                console.log ('mapContactsAndRelationships else')
+
                 contactObject = Object.assign({}, contacts[contacts.map((e) => {
-                    return e._id
+                    return extractIdFromPouchId(e._id, 'person')
                 }).indexOf(relationships[i].persons[1].id)]);
 
                 contactObject.relationships = [];
                 contactObject.relationships.push(relationships[i]);
                 mappedContacts[mappedContacts.map((e) => {
-                    return e._id
+                    return extractIdFromPouchId(e._id, 'person')
                 }).indexOf(relationships[i].persons[1].id)] = contactObject;
             }
         }
     }
 
+    console.log ('mapContactsAndRelationships mappedContacts', JSON.stringify(mappedContacts))
     return mappedContacts;
 }
 
-export function updateRequiredFields(fileType = '', outbreakId, userId, record, action, type = '') {
+export function updateRequiredFields(outbreakId, userId, record, action, fileType = '', type = '') {
 
+    console.log ('updateRequiredFields ', record, action)
     switch (action) {
         case 'create':
             record._id = computeIdForFileType(fileType, outbreakId, record, type);
@@ -492,7 +501,5 @@ export function updateRequiredFields(fileType = '', outbreakId, userId, record, 
 
         default: 
             console.log ('updateRequiredFields default record', JSON.stringify(record))
-            
-
     }
 }

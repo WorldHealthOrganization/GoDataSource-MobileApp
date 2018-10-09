@@ -47,6 +47,7 @@ class ContactsSingleScreen extends Component {
             routes: this.props.isNew ? config.tabsValuesRoutes.contactsAdd : config.tabsValuesRoutes.contactsSingle,
             index: 0,
             item: this.props.item,
+            deleteContactButtonPressed: false,
             contact: this.props.isNew ? {
                 riskLevel: '',
                 riskReason: '',
@@ -159,6 +160,17 @@ class ContactsSingleScreen extends Component {
                                     }
                                 >
                                     <MenuItem onPress={this.handleOnPressSave}>Save</MenuItem>
+                                    {
+                                        !this.props.isNew ? (
+                                            <MenuItem onPress={this.handleOnPressDeceased}>Deceased</MenuItem>
+                                        ) : null
+                                    }
+                                      {
+                                        !this.props.isNew && !this.state.contact.deleted ? (
+                                            <MenuItem onPress={this.handleOnPressDeleteContact}>Delete</MenuItem>
+                                        ) : null
+                                    }
+                                   
                                     <DateTimePicker
                                         isVisible={this.state.isDateTimePickerVisible}
                                         onConfirm={this._handleDatePicked}
@@ -630,18 +642,24 @@ class ContactsSingleScreen extends Component {
                 savePressed: true
             }, () => {
                 if (this.props.isNew) {
-                    let contactWithRequiredFields = updateRequiredFields(fileType = 'person.json', outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, this.state.contact), action = 'create', type = 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT')
+                    let contactWithRequiredFields = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, this.state.contact), action = 'create', fileType = 'person.json', type = 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT')
                     this.setState(prevState => ({
                         contact: Object.assign({}, prevState.contact, contactWithRequiredFields)
                     }), () => {
                         this.props.addContact(this.props.user.activeOutbreakId, this.state.contact, this.props.user.token);
                     })
                 } else {
-                    let contactWithRequiredFields = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, this.state.contact), action = 'update')
+                    let contactWithRequiredFields = null
+                    if (this.state.deleteContactButtonPressed === true) {
+                        contactWithRequiredFields = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, this.state.contact), action = 'delete')
+                    } else {
+                        contactWithRequiredFields = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, this.state.contact), action = 'update')
+                    }
+
                     this.setState(prevState => ({
                     contact: Object.assign({}, prevState.contact, contactWithRequiredFields)
                     }), () => {
-                        this.props.updateContact(this.props.user.activeOutbreakId, this.state.contact.id, this.state.contact, this.props.user.token);
+                        this.props.updateContact(this.props.user.activeOutbreakId, this.state.contact._id, this.state.contact, this.props.user.token);
                     })
                 }
             });
@@ -653,6 +671,11 @@ class ContactsSingleScreen extends Component {
             ])
         }
     };
+
+    handleOnPressDeceased = () => {
+        console.log("### show date time picker: ");
+        this._showDateTimePicker();
+    }
 
     checkRequiredFieldsPersonalInfo = () => {
         for(let i=0; i<config.contactsSingleScreen.personal.length; i++) {
@@ -681,6 +704,8 @@ class ContactsSingleScreen extends Component {
     }
 
     checkRequiredFields = () => {
+        console.log ('checkRequiredFields')
+
         // First check the personal info
         for(let i=0; i<config.contactsSingleScreen.personal.length; i++) {
             for (let j=0; j<config.contactsSingleScreen.personal[i].fields.length; j++) {
@@ -715,11 +740,10 @@ class ContactsSingleScreen extends Component {
     };
 
     hideMenu = () => {
-        this.refs.menuRef.hide();
+        this.refs['menuRef'].hide();
     };
 
     _showDateTimePicker = () => {
-        // console.log("ShowDate");
         this.setState({ isDateTimePickerVisible: true });
     };
 
@@ -728,15 +752,23 @@ class ContactsSingleScreen extends Component {
     };
 
     _handleDatePicked = (date) => {
-        // console.log("Date selected: ", date);
-        // this._hideDateTimePicker();
+        console.log("Date selected: ", date);
+        this._hideDateTimePicker();
+
         this.setState(prevState => ({
             contact: Object.assign({}, prevState.contact, {deceased: true, dateDeceased: date})
         }), () => {
-            this.hideMenu();
             this.handleOnPressSave();
         });
     };
+
+    handleOnPressDeleteContact = () => {
+        this.setState ({
+            deleteContactButtonPressed: true
+        })
+        this.hideMenu()
+        this.handleOnPressSave();
+    }
 
     handleOnDeletePress = (index) => {
         console.log("DeletePressed: ", index);

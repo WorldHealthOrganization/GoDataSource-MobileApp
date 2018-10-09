@@ -95,33 +95,37 @@ export function updateContactRequest(outbreakId, contactId, contact, token, call
 
     console.log('updateContactRequest: ', outbreakId, contactId, contact, token);
 
-    if (!contact._id.includes('person.json')) {
-        contact._id = 'person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT_false_' + contact.outbreakId + '_' + contact._id;
-    }
-
-    database.get(contact._id)
-        .then((resultGetContact) => {
-            database.put(contact)
-                .then((responseUpdateContact) => {
-                    console.log("Update contact response: ", responseUpdateContact);
-                    database.get(contact._id)
-                        .then((resultGetUpdatedContact) => {
-                            callback(null, resultGetUpdatedContact);
-                        })
-                        .catch((errorGetUpdatedContact) => {
-                            console.log("Error getUpdatedContact: ", errorGetUpdatedContact);
-                            callback(errorGetUpdatedContact);
-                        })
-                })
-                .catch((errorUpdateContact) => {
-                    console.log('Update contact error: ', errorUpdateContact);
-                    callback(errorUpdateContact);
-                })
+    database.get(contact._id).then((resultGetContact) => {
+        console.log ('Get contact result: ', JSON.stringify(resultGetContact))
+        database.remove(resultGetContact).then((resultRemove) => {
+            console.log ('Remove contact result: ', JSON.stringify(resultRemove))
+            delete contact._rev;
+            database.put(contact).then((responseUpdateContact) => {
+                console.log("Update contact response: ", responseUpdateContact);
+                database.get(contact._id)
+                    .then((resultGetUpdatedContact) => {
+                        console.log("Response getUpdatedContact: ", JSON.stringify(resultGetUpdatedContact));
+                        callback(null, resultGetUpdatedContact);
+                    })
+                    .catch((errorGetUpdatedContact) => {
+                        console.log("Error getUpdatedContact: ", errorGetUpdatedContact);
+                        callback(errorGetUpdatedContact);
+                    })
+            })
+            .catch((errorUpdateContact) => {
+                console.log('Update contact error: ', errorUpdateContact);
+                callback(errorUpdateContact);
+            })
         })
-        .catch((errorGetContact) => {
-            console.log('Error getContact: ', errorGetContact);
-            callback(errorGetContact);
+        .catch((errorRemove) => {
+            console.log('Remove contact error: ', errorRemove);
+            callback(errorRemove);
         })
+    })
+    .catch((errorGetContact) => {
+        console.log('Get contact error:  ', errorGetContact);
+        callback(errorGetContact);
+    })
 }
 
 export function addContactRequest(outbreakId, contact, token, callback) {
@@ -148,20 +152,18 @@ export function addContactRequest(outbreakId, contact, token, callback) {
 export function addExposureForContactRequest(outbreakId, contactId, exposure, token, callback) {
     let database = getDatabase();
 
-    // Here should add the data as an relationship.json type, while also updating the contact to contain the new added exposure
     if (exposure.persons[0].id === null && contactId !== null) {
         exposure.persons[0].id = contactId;
+        // exposure.persons[0].type = 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT'
     } else {
         if (exposure.persons[1].id === null && contactId !== null) {
             exposure.persons[1].id = contactId;
+            // exposure.persons[1].type = 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT'
         }
     }
 
-    let fileType = 'relationship.json';
-    exposure._id = fileType + '_false_' + outbreakId + '_' +  generateId();
-    exposure.fileType = fileType;
-
     console.log('exposure for put', JSON.stringify(exposure))
+    // exposure.outbreakId = outbreakId
     database.put(exposure)
         .then((result) => {
             console.log('Result addExposureForContactRequest: ', JSON.stringify(result));
