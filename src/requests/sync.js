@@ -11,7 +11,7 @@ export function getDatabaseSnapshotRequest(hubConfig, lastSyncDate, callback) {
 
     if (lastSyncDate) {
         filter.where = {
-            fromDate: lastSyncDate
+            fromDate: new Date(lastSyncDate)
         }
     }
 
@@ -28,7 +28,7 @@ export function getDatabaseSnapshotRequest(hubConfig, lastSyncDate, callback) {
         appendExt: 'zip',
         path: dirs + '/database.zip'
     })
-        .fetch('GET', requestUrl, {
+        .fetch('GET', encodeURI(requestUrl), {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
         'Authorization': 'Basic ' + base64.encode(`${hubConfig.clientId}:${hubConfig.clientSecret}`)
@@ -67,6 +67,13 @@ export function postDatabaseSnapshotRequest(internetCredentials, path, callback)
     ])
         .then((res) => {
             console.log('Finished sending the data to the server: ', res);
+            let status = res.info().status;
+            if(status === 200) {
+                console.log("Got database");
+                callback(null, 'Finished sending data to the server')
+            } else {
+                callback('Status Code Error')
+            }
         })
         .catch((errorMessage, statusCode) => {
             // error handling

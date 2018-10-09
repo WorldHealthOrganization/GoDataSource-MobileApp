@@ -27,6 +27,7 @@ import {getCasesForOutbreakId} from './../actions/cases';
 import {removeErrors} from './../actions/errors';
 import {addFilterForScreen} from './../actions/app';
 import AnimatedListView from './../components/AnimatedListView';
+import ViewHOC from './../components/ViewHOC';
 
 let height = Dimensions.get('window').height;
 let width = Dimensions.get('window').width;
@@ -109,7 +110,9 @@ class CasesScreen extends Component {
         });
         let caseTitle = []; caseTitle[1] = 'Cases';
         return (
-            <View style={style.container}>
+            <ViewHOC style={style.container}
+                     showLoader={(this.props && this.props.syncState && (this.props.syncState !== 'Finished processing' && this.props.syncState !== 'Error')) || (this && this.state && this.state.loading)}
+                     loaderText={this.props && this.props.syncState ? this.props.syncState : 'Loading...'}>
                 <NavBarCustom
                     title={null}
                     customTitle={
@@ -180,7 +183,7 @@ class CasesScreen extends Component {
                         onRefresh={this.handleOnRefresh}
                     />
                 </View>
-            </View>
+            </ViewHOC>
         );
     }
 
@@ -405,6 +408,7 @@ function mapStateToProps(state) {
         cases: state.cases,
         filter: state.app.filters,
         screenSize: state.app.screenSize,
+        syncState: state.app.syncState,
         errors: state.errors
     };
 }

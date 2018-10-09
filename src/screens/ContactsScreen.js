@@ -11,18 +11,16 @@ import NavBarCustom from './../components/NavBarCustom';
 import ElevatedView from 'react-native-elevated-view';
 import Ripple from 'react-native-material-ripple';
 import {calculateDimension} from './../utils/functions';
-import config from './../utils/config';
-import ButtonWithIcons from './../components/ButtonWithIcons';
 import FollowUpListItem from './../components/FollowUpListItem';
 import SearchFilterView from './../components/SearchFilterView';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import AnimatedListView from './../components/AnimatedListView';
-import {LoaderScreen, Colors} from 'react-native-ui-lib';
 import {getContactsForOutbreakId} from './../actions/contacts';
 import {addFilterForScreen} from './../actions/app';
 import {navigation} from './../utils/functions';
-import _ from 'lodash';
+import ViewHOC from './../components/ViewHOC';
+
 
 const scrollAnim = new Animated.Value(0);
 const offsetAnim = new Animated.Value(0);
@@ -91,7 +89,9 @@ class ContactsScreen extends Component {
         });
 
         return (
-            <View style={style.container}>
+            <ViewHOC style={style.container}
+                     showLoader={(this.props && this.props.syncState && (this.props.syncState !== 'Finished processing' && this.props.syncState !== 'Error')) || (this && this.state && this.state.loading)}
+                     loaderText={this.props && this.props.syncState ? this.props.syncState : 'Loading...'}>
                 <NavBarCustom
                     customTitle={
                         <View style={{
@@ -156,7 +156,7 @@ class ContactsScreen extends Component {
                         // onRefresh={this.handleOnRefresh}
                     />
                 </View>
-            </View>
+            </ViewHOC>
         );
     }
 
@@ -364,6 +364,7 @@ function mapStateToProps(state) {
     return {
         user: state.user,
         screenSize: state.app.screenSize,
+        syncState: state.app.syncState,
         contacts: state.contacts,
         errors: state.errors
     };

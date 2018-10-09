@@ -70,7 +70,7 @@ class NavigationDrawer extends Component {
                     <View style={styles.lineStyle} />
                 </View>
                 <View style={{flex: 0.25}}>
-                    <NavigationDrawerListItem label={'Sync HUB manually'} name={'cached'} onPress={this.props.sendDatabaseToServer} />
+                    <NavigationDrawerListItem label={'Sync HUB manually'} name={'cached'} onPress={this.handleOnPressSync} />
                     <NavigationDrawerListItem label={'Change HUB configuration'} name={'settings'}/>
                     <View style={styles.lineStyle} />
                 </View>
@@ -124,6 +124,16 @@ class NavigationDrawer extends Component {
             }
         });
 
+    };
+
+    handleOnPressSync = () => {
+        this.props.navigator.toggleDrawer({
+            side: 'left',
+            animated: true,
+            to: 'missing'
+        });
+
+        this.props.sendDatabaseToServer();
     };
 
     handleLogout = () => {

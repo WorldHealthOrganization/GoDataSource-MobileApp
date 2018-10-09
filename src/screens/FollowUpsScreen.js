@@ -31,6 +31,7 @@ import _ from 'lodash';
 import AddFollowUpScreen from './AddFollowUpScreen';
 import {LoaderScreen, Colors} from 'react-native-ui-lib';
 import {navigation, extractIdFromPouchId, generateId} from './../utils/functions';
+import ViewHOC from './../components/ViewHOC';
 
 const scrollAnim = new Animated.Value(0);
 const offsetAnim = new Animated.Value(0);
@@ -212,7 +213,9 @@ class FollowUpsScreen extends Component {
         });
 
         return (
-            <View style={style.container}>
+            <ViewHOC style={style.container}
+                     showLoader={(this.props && this.props.syncState && (this.props.syncState !== 'Finished processing' && this.props.syncState !== 'Error')) || (this && this.state && this.state.loading)}
+                     loaderText={this.props && this.props.syncState ? this.props.syncState : 'Loading...'}>
                 <NavBarCustom
                     title="Follow-ups"
                     navigator={this.props.navigator || null}
@@ -282,15 +285,7 @@ class FollowUpsScreen extends Component {
                     onCancelPressed={this.handleOnCancelPressed}
                     onSavePressed={this.handleOnSavePressed}
                 />
-                {
-                    this && this.state && this.state.loading ? (<LoaderScreen
-                            color={Colors.blue60}
-                            message={"Loading..."}
-                            overlay={true}
-                            backgroundColor={'white'}
-                        />) : (null)
-                }
-            </View>
+            </ViewHOC>
         );
     }
 
@@ -720,6 +715,7 @@ function mapStateToProps(state) {
         user: state.user,
         screenSize: state.app.screenSize,
         filter: state.app.filters,
+        syncState: state.app.syncState,
         followUps: state.followUps,
         contacts: state.contacts,
         errors: state.errors
