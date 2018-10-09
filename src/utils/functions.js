@@ -436,7 +436,9 @@ export function mapContactsAndRelationships(contacts, relationships) {
                 return extractIdFromPouchId(e._id, 'person')
             }).indexOf(relationships[i].persons[0].id)]);
 
-            contactObject.relationships = [];
+            if (!contactObject.relationships || contactObject.relationships.length === 0) {
+                contactObject.relationships = [];
+            }
             contactObject.relationships.push(relationships[i]);
             mappedContacts[mappedContacts.map((e) => {
                 return extractIdFromPouchId(e._id, 'person')
@@ -451,7 +453,9 @@ export function mapContactsAndRelationships(contacts, relationships) {
                     return extractIdFromPouchId(e._id, 'person')
                 }).indexOf(relationships[i].persons[1].id)]);
 
-                contactObject.relationships = [];
+                if (!contactObject.relationships || contactObject.relationships.length === 0) {
+                    contactObject.relationships = [];
+                }
                 contactObject.relationships.push(relationships[i]);
                 mappedContacts[mappedContacts.map((e) => {
                     return extractIdFromPouchId(e._id, 'person')

@@ -17,7 +17,7 @@ import {calculateDimension} from './../utils/functions';
 import CardComponent from './../components/CardComponent';
 import Ripple from 'react-native-material-ripple';
 import {removeErrors} from './../actions/errors';
-import {extractIdFromPouchId} from './../utils/functions';
+import {extractIdFromPouchId, updateRequiredFields} from './../utils/functions';
 
 class ExposureScreen extends Component {
 
@@ -269,11 +269,8 @@ class ExposureScreen extends Component {
                               this.props.navigator.dismissModal(this.props.saveExposure(this.state.exposure));
                             })
                         } else {
-                            this.setState(prevState => ({
-                                exposure: Object.assign({}, prevState.exposure, {updatedAt: new Date().toISOString(), updatedBy: this.props.user._id.split('_')[this.props.user._id.split('_').length - 1]})
-                            }), () => {
-                              this.props.addExposureForContact(this.props.user.activeOutbreakId, this.props.contact._id.split('_')[this.props.contact._id.split('_').length - 1], this.state.exposure, this.props.user.token);
-                            })
+                            let exposure = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.contact.updatedBy, record = this.state.exposure, action = 'create', fileType = 'relationship.json')
+                            this.props.addExposureForContact(this.props.user.activeOutbreakId, this.props.contact._id, exposure, this.props.user.token);
                         }
                     }
                 }
