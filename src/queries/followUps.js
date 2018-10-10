@@ -23,6 +23,7 @@ export function getFollowUpsForOutbreakIdRequest (outbreakId, filter, token, cal
     database.allDocs({startkey: `followUp.json_false_${outbreakId}_${startDate}`, endkey: `followUp.json_false_${outbreakId}_${endDate}\uffff`, include_docs: true})
         .then((result) => {
             console.log("result with the new index for followUps: ", result.rows.map((e) => {return e.doc}));
+            result.rows = result.rows.filter((e) => {return e.doc.deleted === false})
             callback(null, result.rows.map((e) => {return e.doc}));
         })
         .catch((errorQuery) => {
@@ -43,39 +44,39 @@ export function updateFollowUpRequest (outbreakId, contactId, followUpId, follow
     let database = getDatabase();
 
     console.log('updateFollowUpRequest: ', outbreakId, contactId, followUpId, followUp, token);
+    
+    if (!followUp.personId) {
+        followUp.personId = contactId
+    }
 
     database.get(followUp._id)
         .then((resultGet) => {
-            // If the date of the follow-up changed, mark the current one as deleted and create a new one with the new date
             if (followUp.date !== resultGet.date) {
                 console.log('Date changed. TIme to delete the record with the previous date and insert one with the new date');
-                database.remove(followUp)
+                database.remove(resultGet)
                     .then((resultRemove) => {
-                        followUp._id = 'followUp.json_false_' +
-                            followUp.outbreakId + '_' +
-                            new Date(followUp.date).getTime() + '_' +
-                            extractIdFromPouchId(followUp._id, 'followUp');
+                        console.log('Remove follow up response : ', resultRemove);
                         delete followUp._rev;
                         database.put(followUp)
                             .then((responseUpdateFollowUp) => {
-                                // console.log("Update followUp response: ", responseUpdateFollowUp);
+                                console.log("Update followUp response: ", responseUpdateFollowUp);
                                 database.get(followUp._id)
                                     .then((resultGetUpdatedFollowUp) => {
-                                        // console.log("Updated followUp: ", resultGetUpdatedFollowUp);
+                                        console.log("Response get updated followUp: ", resultGetUpdatedFollowUp);
                                         callback(null, resultGetUpdatedFollowUp);
                                     })
                                     .catch((errorGetUpdatedFollowUp) => {
-                                        console.log("Error from updated followUp: ", errorGetUpdatedFollowUp);
+                                        console.log("Error get updated followUp: ", errorGetUpdatedFollowUp);
                                         callback(errorGetUpdatedFollowUp);
                                     })
                             })
                             .catch((errorUpdateFollowUp) => {
-                                console.log("Create followUp with new Date error: ", errorUpdateFollowUp);
+                                console.log("Update followUp response:", errorUpdateFollowUp);
                                 callback(errorUpdateFollowUp);
                             })
                     })
                     .catch((errorRemove) => {
-                        console.log('Error while removing the doc to create a new one with a new date: ', errorRemove);
+                        console.log('Remove follow up error: ', errorRemove);
                         callback(errorRemove);
                     })
             } else {
@@ -114,11 +115,16 @@ export function addFollowUpRequest (outbreakId, contactId, followUp, token, call
         let generatedId = generateId();
         followUp._id = 'followUp.json_false_' + outbreakId + '_' + new Date(followUp.date).getTime() + '_' + generatedId;
     }
+    if (!followUp.personId) {
+        followUp.personId = contactId
+    }
 
     database.put(followUp)
         .then((resultAddFollowUp) => {
+            console.log('Result add followUp: ', JSON.stringify(resultAddFollowUp));
             database.get(followUp._id)
                 .then((resultGetFollowUp) => {
+                    console.log('Result get followUp: ', JSON.stringify(resultGetFollowUp));
                     callback(null, resultGetFollowUp);
                 })
                 .catch((errorGetFollowUp) => {
@@ -129,5 +135,28 @@ export function addFollowUpRequest (outbreakId, contactId, followUp, token, call
         .catch((errorAddFollowUp) => {
             console.log('Error add followUp: ', errorAddFollowUp);
             callback(errorAddFollowUp);
+        })
+}
+
+export function getFollowUpsForContactRequest (outbreakId, keys, callback) {
+    let database = getDatabase();
+
+    console.log("getCasesForOutbreakIdRequest: ", outbreakId, keys);
+
+    database.find({
+        selector: {
+            fileType: {$in: ['followUp.json']},
+            outbreakId: outbreakId,
+            deleted: false,
+            personId: {$in: keys}
+        }
+    })
+        .then((result) => {
+            console.log('getFollowUpsForContactRequest request: ', JSON.stringify(result));
+            callback(null, result.docs)
+        })
+        .catch((error) => {
+            console.log('getFollowUpsForContactRequest error: ', error);
+            callback(error)
         })
 }

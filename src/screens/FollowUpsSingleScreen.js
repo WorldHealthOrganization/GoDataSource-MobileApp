@@ -24,7 +24,7 @@ import {updateContact} from './../actions/contacts';
 import {removeErrors} from './../actions/errors';
 import DateTimePicker from 'react-native-modal-datetime-picker';
 import _ from 'lodash';
-import {extractIdFromPouchId, computeIdForFileType} from './../utils/functions';
+import {extractIdFromPouchId, computeIdForFileType, updateRequiredFields} from './../utils/functions';
 
 class FollowUpsSingleScreen extends Component {
 
@@ -422,14 +422,18 @@ class FollowUpsSingleScreen extends Component {
             }
 
             if (this.props.isNew) {
-                followUpClone._id = computeIdForFileType('followUp.json', this.props.user.activeOutbreakId, this.state.item);
-                followUpClone.deleted = false;
-                followUpClone.deletedAt = null;
-
-                this.props.createFollowUp(this.props.outbreak.id, extractIdFromPouchId(contactClone._id, 'person.json'), followUpClone, contactClone, null, this.props.user.token);
-
+                followUpClone = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, followUpClone), action = 'create', fileType = 'followUp.json')
+                console.log ('followUpClone create', JSON.stringify(followUpClone))
+                this.props.createFollowUp(this.props.outbreak.id, contactClone._id, followUpClone, contactClone, null, this.props.user.token)
             } else {
-                this.props.updateFollowUpAndContact(this.props.user.activeOutbreakId, extractIdFromPouchId(contactClone._id, 'person.json'), followUpClone._id, followUpClone, contactClone, this.props.user.token);
+                if (this.state.deletePressed === false) {
+                    followUpClone = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, followUpClone), action = 'update')
+                    console.log ('followUpClone update', JSON.stringify(followUpClone))
+                } else {
+                    followUpClone = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, followUpClone), action = 'delete')
+                    console.log ('followUpClone delete', JSON.stringify(followUpClone))
+                }
+                this.props.updateFollowUpAndContact(this.props.user.activeOutbreakId, contactClone._id, followUpClone._id, followUpClone, contactClone, this.props.user.token);
             }
         });
     };

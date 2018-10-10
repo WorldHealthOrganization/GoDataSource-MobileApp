@@ -27,9 +27,6 @@ export default function (state=null, action) {
                 return null;
             }
             if (stateClone.map((e) => {return e.id}).indexOf(action.payload.id) > -1){
-                // for (let i=0; i<Object.keys(action.payload).length; i++) {
-                //     stateClone[stateClone.map((e) => {return e.id}).indexOf(action.payload.id)][Object.keys(action.payload)[i]] = action.payload[Object.keys(action.payload)[i]];
-                // }
                 if (action.payload.deleted === false) {
                     stateClone[stateClone.map((e) => {return e.id}).indexOf(action.payload.id)] = action.payload;
                 } else {

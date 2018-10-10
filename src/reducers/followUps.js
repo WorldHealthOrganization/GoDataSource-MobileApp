@@ -20,7 +20,16 @@ export default function (state=null, action) {
             }
             let stateClone = state.slice();
             if (state.map((e) => {return e.id}).indexOf(action.payload.id) > -1){
-                stateClone[stateClone.map((e) => {return e.id}).indexOf(action.payload.id)] = action.payload;
+                //update
+                if (action.payload.deleted === false) {
+                    stateClone[stateClone.map((e) => {return e.id}).indexOf(action.payload.id)] = action.payload;
+                } else {
+                    stateClone.splice(stateClone.map((e) => {return e.id}).indexOf(action.payload.id), 1)
+                }
+            } 
+            else if (state.map((e) => {return e.id}).indexOf(action.payload.id) === -1) {
+                //create
+                stateClone.push(action.payload);
             }
             return Object.assign([], stateClone);
         default:
