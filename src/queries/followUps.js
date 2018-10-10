@@ -114,11 +114,16 @@ export function addFollowUpRequest (outbreakId, contactId, followUp, token, call
         let generatedId = generateId();
         followUp._id = 'followUp.json_false_' + outbreakId + '_' + new Date(followUp.date).getTime() + '_' + generatedId;
     }
+    if (!followUp.personId) {
+        followUp.personId = contactId
+    }
 
     database.put(followUp)
         .then((resultAddFollowUp) => {
+            console.log('Result add followUp: ', JSON.stringify(resultAddFollowUp));
             database.get(followUp._id)
                 .then((resultGetFollowUp) => {
+                    console.log('Result get followUp: ', JSON.stringify(resultGetFollowUp));
                     callback(null, resultGetFollowUp);
                 })
                 .catch((errorGetFollowUp) => {

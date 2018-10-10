@@ -22,7 +22,7 @@ import {
 import _ from 'lodash';
 import {storeContacts} from './contacts';
 import {getRelationshipsForTypeRequest} from './../queries/relationships';
-import {extractIdFromPouchId, mapContactsAndRelationships} from './../utils/functions';
+import {extractIdFromPouchId, mapContactsAndRelationships, mapContactsAndFollowUps} from './../utils/functions';
 
 // Add here only the actions, not also the requests that are executed. For that purpose is the requests directory
 export function storeFollowUps(followUps) {
@@ -51,21 +51,20 @@ export function getFollowUpsForOutbreakId(outbreakId, filter, token) {
                 dispatch(addError(errorTypes.ERROR_FOLLOWUPS));
             }
             if (response) {
-                // After getting the followUps by date, it's time to get their respective contacts
+                console.log("*** getFollowUpsForOutbreakId response: ", JSON.stringify(response));
                 let keys = response.map((e) => {return e.personId});
                 keys = _.uniq(keys);
-                // console.log('### Keys for getting contacts: ', keys);
+                console.log ('getFollowUpsForOutbreakId keys: ', JSON.stringify(keys))
+
                 getContactsForOutbreakIdWithPromises(outbreakId, {keys: keys}, null, dispatch)
                     .then((responseGetContacts) => {
+                        console.log ('getFollowUpsForOutbreakIdRequest getContactsForOutbreakIdWithPromises response', JSON.stringify(responseGetContacts))
                         dispatch(storeFollowUps(response));
-                        getRelationshipsForTypeRequest(outbreakId, 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT', keys, (errorGetRelationships, resultGetRelationships) => {
-                            let mappedContact = mapContactsAndFollowUps(responseGetContacts, response);
-                            // console.log("Mapped Contact: ", mappedContact);
-                            mappedContact = mapContactsAndRelationships(mappedContact, resultGetRelationships);
-                            dispatch(storeContacts(mappedContact));
-                        })
+                        let mappedContact = mapContactsAndFollowUps(responseGetContacts, response);
+                        dispatch(storeContacts(mappedContact));
                     })
                     .catch((errorGetContactsForFollowUps) => {
+                        console.log ('getFollowUpsForOutbreakIdRequest getContactsForOutbreakIdWithPromises error', JSON.stringify(errorGetContactsForFollowUps))
                         dispatch(addError(errorTypes.ERROR_CONTACT));
                     })
             }
@@ -80,7 +79,7 @@ export function getFollowUpsForOutbreakIdWithPromises(outbreakId, filter, token,
             filter = {};
             filter.date = new Date();
         }
-        console.log("getFollowUpsForOutbreakIdWithPromises Filter: ", filter);
+        console.log("getFollowUpsForOutbreakId Filter: ", filter);
         getFollowUpsForOutbreakIdRequest(outbreakId, filter, token, (error, response) => {
             if (error) {
                 console.log("*** getFollowUpsForOutbreakId error: ", error);
@@ -97,7 +96,6 @@ export function getFollowUpsForOutbreakIdWithPromises(outbreakId, filter, token,
                         dispatch(storeFollowUps(response));
                         getRelationshipsForTypeRequest(outbreakId, 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT', keys, (errorGetRelationships, resultGetRelationships) => {
                             let mappedContact = mapContactsAndFollowUps(responseGetContacts, response);
-                            // console.log("Mapped Contact: ", mappedContact);
                             mappedContact = mapContactsAndRelationships(mappedContact, resultGetRelationships);
                             dispatch(storeContacts(mappedContact));
                             resolve('Done followUps');
@@ -111,22 +109,6 @@ export function getFollowUpsForOutbreakIdWithPromises(outbreakId, filter, token,
         })
     })
     // }
-}
-
-function mapContactsAndFollowUps(contacts, followUps) {
-    let mappedContacts = [];
-    for (let i=0; i<followUps.length; i++) {
-        if (mappedContacts.map((e) => {return e._id}).indexOf(followUps[i].personId) === -1) {
-            let contactObject = {};
-            contactObject = Object.assign({}, contacts[contacts.map((e) => {return e._id.split('_')[e._id.split('_').length - 1]}).indexOf(followUps[i].personId)], {_id: followUps[i].personId});
-            contactObject.followUps = [];
-            contactObject.followUps.push(followUps[i]);
-            mappedContacts.push(contactObject);
-        } else {
-            mappedContacts[mappedContacts.map((e) => {return e._id}).indexOf(followUps[i].personId)].followUps.push(followUps[i]);
-        }
-    }
-    return mappedContacts;
 }
 
 export function getMissedFollowUpsForOutbreakId(outbreakId, filter, token) {
@@ -147,6 +129,7 @@ export function getMissedFollowUpsForOutbreakId(outbreakId, filter, token) {
 }
 
 export function updateFollowUpAndContact(outbreakId, contactId, followUpId, followUp, contact, token) {
+    console.log('updateFollowUpAndContact')
     return async function(dispatch, getState) {
         updateFollowUpRequest(outbreakId, contactId, followUpId, followUp, token, (error, response) => {
             if (error) {
@@ -176,14 +159,15 @@ export function addFollowUp(outbreakId, contactId, followUp, activeFilters, toke
 }
 
 export function createFollowUp(outbreakId, contactId, followUp, contact, activeFilters, token) {
+    let contactIdForFollowUp = extractIdFromPouchId(contactId, 'person')
     return async function(dispatch, getState) {
-        addFollowUpRequest(outbreakId, contactId, followUp, token, (error, response) => {
+        addFollowUpRequest(outbreakId, contactIdForFollowUp, followUp, token, (error, response) => {
             if (error) {
                 console.log("*** addFollowUp error: ", error);
                 dispatch(addError(errorTypes.ERROR_ADD_FOLLOWUP));
             }
             if (response) {
-                // dispatch(updateFollowUpAction(response));
+                dispatch(updateFollowUpAction(response));
                 dispatch(updateContact(outbreakId, contactId, contact, token));
             }
         })

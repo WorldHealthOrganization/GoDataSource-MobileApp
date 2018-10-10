@@ -107,12 +107,12 @@ export function getContactsForOutbreakId(outbreakId, filter, token) {
             if (response) {
                 getRelationshipsForTypeRequest(outbreakId, 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT', response.map((e) => {return extractIdFromPouchId(e._id, 'person')}), (errorRelationships, responseRelationships) => {
                     if (errorRelationships) {
+                        console.log ('getContactsForOutbreakId getRelationshipsForTypeRequest error: ', errorRelationships)
                         dispatch(addError(errorTypes.ERROR_CONTACT));
                     }
-
                     if (responseRelationships) {
+                        console.log ('getContactsForOutbreakId getRelationshipsForTypeRequest response: ', JSON.stringify(responseRelationships))
                         let mappedContacts = mapContactsAndRelationships(response, responseRelationships);
-                        console.log ('mappedContacts list', JSON.stringify(mappedContacts))
                         dispatch(storeContacts(mappedContacts));
                     }
                 })
@@ -180,13 +180,12 @@ export function updateContact(outbreakId, contactId, contact, token) {
             if (response) {
                 console.log("*** updateContactRequest response: ", JSON.stringify(response));
                 console.log("*** updateContactRequest response relationships: ", JSON.stringify(relationships));
-
+                
                 let mappedContact = null
                 if (response && relationships) {
                     mappedContact = mapContactsAndRelationships([response], relationships);
                 }
                 if (mappedContact) {
-                    console.log ('ajunge aici')
                     dispatch(updateContactAction(mappedContact[0]));
                 } else {
                     dispatch(updateContactAction(response));

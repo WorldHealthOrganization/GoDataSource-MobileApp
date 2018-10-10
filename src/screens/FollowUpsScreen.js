@@ -79,57 +79,14 @@ class FollowUpsScreen extends Component {
             ])
         }
 
-        if (props.contacts && props.contacts[0].followUps) {
-            // let contactWithOneFollowUp = [];
-            // state.followUps = [];
-            // contactWithOneFollowUp = _.filter(props.contacts, (contact) => {
-            //     // console.log("### contact from filter: ", contact);
-            //     let followUp = _.filter(contact.followUps, (followUp) => {
-            //         let oneDay = 24 * 60 * 60 * 1000;
-            //         let truthValue = false;
-            //         if (!state.filter.date) {
-            //             state.filter.date = new Date();
-            //         }
-            //
-            //         // let dateString = state.filter.date.getFullYear() + '-' + (state.filter.date.getMonth() + 1) + '-' + (state.filter.date.getDate() + 1);
-            //         // let date = new Date('2018/8/10');
-            //         //
-            //         //
-            //         // console.log(date);
-            //         // console.log(new Date(followUp.date));
-            //         // console.log(new Date(new Date(state.filter.date.getFullYear() + '-' + (state.filter.date.getMonth() + 1) + '-' + (state.filter.date.getDate() + 1))));
-            //         // console.log("~~~~~~~~~~~~~~");
-            //
-            //         // Check if the followUp is from the date selected from the calendar
-            //         truthValue = (new Date(state.filter.date.getFullYear() + '/' + (state.filter.date.getMonth() + 1) + '/' + (state.filter.date.getDate() + 1)).getTime() - oneDay) <= new Date(followUp.date).getTime() &&
-            //             (new Date(new Date(state.filter.date.getFullYear() + '/' + (state.filter.date.getMonth() + 1) + '/' + (state.filter.date.getDate() + 1)).getTime()) > new Date(followUp.date).getTime());
-            //
-            //         // Check if the follow-up was performed/lost
-            //         if (state.filter.performed && state.filter.performed === 'To do') {
-            //             truthValue = truthValue && !followUp.performed && !followUp.lostToFollowUp;
-            //         } else {
-            //             if (state.filter.performed && state.filter.performed === 'Missed') {
-            //                 truthValue = truthValue && ((followUp.lostToFollowUp && followUp.performed) || (!followUp.performed && !followUp.lostToFollowUp));
-            //                 // Also check if the follow-up was in the past. You cannot miss a follow-up from the future
-            //                 let oneDay = 24 * 60 * 60 * 1000;
-            //                 let now = new Date();
-            //                 truthValue = truthValue && (new Date(followUp.date).getTime() - oneDay <= new Date(now.getFullYear() + '/' + (now.getMonth() + 1) + '/' + (now.getDate() + 1)).getTime())
-            //             }
-            //         }
-            //
-            //         if (truthValue) {
-            //             state.followUps.push(followUp);
-            //         }
-            //         return truthValue;
-            //     });
-            //     return followUp.length > 0;
-            // });
-
-
+        console.log('props.contacts', JSON.stringify(props.contacts))
+        if (props.contacts) {
             let fUps = [];
 
             for (let i=0; i<props.contacts.length; i++) {
-                fUps = fUps.concat(props.contacts[i].followUps);
+                if (props.contacts[i].followUps) {
+                    fUps = fUps.concat(props.contacts[i].followUps);
+                }
             }
 
             // state.followUps = fUps;
@@ -163,7 +120,11 @@ class FollowUpsScreen extends Component {
     }
 
     componentDidMount() {
-        this.props.getFollowUpsForOutbreakId(this.props.user.activeOutbreakId, this.state.filter, null);
+        this.setState({
+            loading: true
+        }, () => {
+            this.props.getFollowUpsForOutbreakId(this.props.user.activeOutbreakId, this.state.filter, null);
+        })
     }
 
     shouldComponentUpdate(nextProps, nextState) {
@@ -322,7 +283,7 @@ class FollowUpsScreen extends Component {
         }
     };
 
-    keyExtractor = (item, index) => item._id;
+ keyExtractor = (item, index) => item._id;
 
     renderSeparatorComponent = () => {
         return (

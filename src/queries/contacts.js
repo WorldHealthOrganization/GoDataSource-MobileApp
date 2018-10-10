@@ -10,6 +10,7 @@ export function getContactsForOutbreakIdRequest (outbreakId, filter, token, call
     console.log("getContactsForOutbreakIdRequest: ", outbreakId, filter, token, callback);
 
     if (filter && filter.keys) {
+        console.log('getContactsForOutbreakIdRequest if')
         let keys = filter.keys.map((e) => {return `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT_false_${outbreakId}_${e}`});
         console.log("@@@ filter keys: ", keys);
         database.allDocs({
@@ -27,6 +28,7 @@ export function getContactsForOutbreakIdRequest (outbreakId, filter, token, call
             })
     } else {
         if (filter) {
+            console.log('getContactsForOutbreakIdRequest else, if')
             console.log ('myFilter', filter)
 
             database.find({
@@ -54,6 +56,7 @@ export function getContactsForOutbreakIdRequest (outbreakId, filter, token, call
                 })
 
         } else {
+            console.log('getContactsForOutbreakIdRequest else')
             database.allDocs({
                 startkey: `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT_false_${outbreakId}`,
                 endkey: `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT_false_${outbreakId}\uffff`,

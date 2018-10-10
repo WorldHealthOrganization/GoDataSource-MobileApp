@@ -740,7 +740,8 @@ class ContactsSingleScreen extends Component {
     };
 
     hideMenu = () => {
-        this.refs['menuRef'].hide();
+        // this.refs['menuRef'].hide();
+        this.refs.menuRef.hide();
     };
 
     _showDateTimePicker = () => {

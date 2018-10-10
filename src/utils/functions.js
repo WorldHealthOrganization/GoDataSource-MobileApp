@@ -419,12 +419,11 @@ export function generateId () {
 }
 
 export function mapContactsAndRelationships(contacts, relationships) {
-
-    let mappedContacts = contacts;
     console.log ('mapContactsAndRelationships')
     console.log ('mapContactsAndRelationships contacts', JSON.stringify(contacts))
     console.log ('mapContactsAndRelationships relationships', JSON.stringify(relationships))
 
+    let mappedContacts = contacts;
     for (let i = 0; i < relationships.length; i++) {
         let contactObject = {};
         if ((relationships[i].persons[0].type === 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT' || relationships[i].persons[0].type === 'contact') && mappedContacts.map((e) => {
@@ -465,6 +464,27 @@ export function mapContactsAndRelationships(contacts, relationships) {
     }
 
     console.log ('mapContactsAndRelationships mappedContacts', JSON.stringify(mappedContacts))
+    return mappedContacts;
+}
+
+export function mapContactsAndFollowUps(contacts, followUps) {
+    console.log ('mapContactsAndFollowUps')
+    console.log ('mapContactsAndFollowUps contacts', JSON.stringify(contacts))
+    console.log ('mapContactsAndFollowUps followUps', JSON.stringify(followUps))
+    
+    let mappedContacts = [];
+    for (let i=0; i < followUps.length; i++) {
+        if (mappedContacts.map((e) => { return extractIdFromPouchId(e._id, 'person') }).indexOf(followUps[i].personId) === -1) {
+            let contactObject = {};
+            contactObject = Object.assign({}, contacts[contacts.map((e) => {return extractIdFromPouchId(e._id, 'person')}).indexOf(followUps[i].personId)]);
+            contactObject.followUps = [];
+            contactObject.followUps.push(followUps[i]);
+            mappedContacts.push(contactObject);
+        } else {
+            mappedContacts[mappedContacts.map((e) => {return extractIdFromPouchId(e._id, 'person')}).indexOf(followUps[i].personId)].followUps.push(followUps[i]);
+        }
+    }
+    console.log ('mapContactsAndFollowUps mappedContacts', JSON.stringify(mappedContacts))
     return mappedContacts;
 }
 
