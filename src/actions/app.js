@@ -375,7 +375,6 @@ export function getData (key) {
 //     }
 // }
 
-
 export function appInitialized() {
     return async function (dispatch, getState) {
         // Get Screen Dimensions and store them to the redux store in order to use them throughout the app

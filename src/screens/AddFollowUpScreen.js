@@ -60,7 +60,7 @@ class AddFollowUpScreen extends PureComponent{
             <Dialog
                 visible={this.props.showAddFollowUpScreen}
                 width="90%"
-                height="35%"
+                height="40%"
                 onDismiss={this.props.onCancelPressed}
             >
                 <ElevatedView elevation={3} style={{flex: 1, backgroundColor: 'white', borderRadius: 4, marginVertical: 10, justifyContent: 'space-around'}}>
