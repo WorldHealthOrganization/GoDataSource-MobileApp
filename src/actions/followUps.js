@@ -130,13 +130,15 @@ export function getMissedFollowUpsForOutbreakId(outbreakId, filter, token) {
 
 export function updateFollowUpAndContact(outbreakId, contactId, followUpId, followUp, contact, token) {
     console.log('updateFollowUpAndContact')
+    let contactIdForFollowUp = extractIdFromPouchId(contactId, 'person')
     return async function(dispatch, getState) {
-        updateFollowUpRequest(outbreakId, contactId, followUpId, followUp, token, (error, response) => {
+        updateFollowUpRequest(outbreakId, contactIdForFollowUp, followUpId, followUp, token, (error, response) => {
             if (error) {
                 console.log("*** updateFollowUp error: ", error);
                 dispatch(addError(errorTypes.ERROR_UPDATE_FOLLOWUP));
             }
             if (response) {
+                console.log("*** updateFollowUp response: ", JSON.stringify(response));
                 dispatch(updateFollowUpAction(response));
                 dispatch(updateContact(outbreakId, contactId, contact, token));
             }

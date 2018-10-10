@@ -98,37 +98,40 @@ export function updateContactRequest(outbreakId, contactId, contact, token, call
 
     console.log('updateContactRequest: ', outbreakId, contactId, contact, token);
 
-    database.get(contact._id).then((resultGetContact) => {
-        console.log ('Get contact result: ', JSON.stringify(resultGetContact))
-        database.remove(resultGetContact).then((resultRemove) => {
-            console.log ('Remove contact result: ', JSON.stringify(resultRemove))
-            delete contact._rev;
-            database.put(contact).then((responseUpdateContact) => {
-                console.log("Update contact response: ", responseUpdateContact);
-                database.get(contact._id)
-                    .then((resultGetUpdatedContact) => {
-                        console.log("Response getUpdatedContact: ", JSON.stringify(resultGetUpdatedContact));
-                        callback(null, resultGetUpdatedContact);
-                    })
-                    .catch((errorGetUpdatedContact) => {
-                        console.log("Error getUpdatedContact: ", errorGetUpdatedContact);
-                        callback(errorGetUpdatedContact);
-                    })
-            })
-            .catch((errorUpdateContact) => {
-                console.log('Update contact error: ', errorUpdateContact);
-                callback(errorUpdateContact);
-            })
+    database.get(contact._id)
+        .then((resultGetContact) => {
+            console.log ('Get contact result: ', JSON.stringify(resultGetContact))
+            database.remove(resultGetContact)
+                .then((resultRemove) => {
+                    console.log ('Remove contact result: ', JSON.stringify(resultRemove))
+                    delete contact._rev;
+                    database.put(contact)
+                        .then((responseUpdateContact) => {
+                            console.log("Update contact response: ", responseUpdateContact);
+                            database.get(contact._id)
+                                .then((resultGetUpdatedContact) => {
+                                    console.log("Response getUpdatedContact: ", JSON.stringify(resultGetUpdatedContact));
+                                    callback(null, resultGetUpdatedContact);
+                                })
+                                .catch((errorGetUpdatedContact) => {
+                                    console.log("Error getUpdatedContact: ", errorGetUpdatedContact);
+                                    callback(errorGetUpdatedContact);
+                                })
+                        })
+                        .catch((errorUpdateContact) => {
+                            console.log('Update contact error: ', errorUpdateContact);
+                            callback(errorUpdateContact);
+                        })
+                })
+                .catch((errorRemove) => {
+                    console.log('Remove contact error: ', errorRemove);
+                    callback(errorRemove);
+                })
         })
-        .catch((errorRemove) => {
-            console.log('Remove contact error: ', errorRemove);
-            callback(errorRemove);
+        .catch((errorGetContact) => {
+            console.log('Get contact error:  ', errorGetContact);
+            callback(errorGetContact);
         })
-    })
-    .catch((errorGetContact) => {
-        console.log('Get contact error:  ', errorGetContact);
-        callback(errorGetContact);
-    })
 }
 
 export function addContactRequest(outbreakId, contact, token, callback) {

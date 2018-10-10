@@ -26,10 +26,10 @@ import {
 } from './../queries/contacts'
 import { addError } from './errors';
 import errorTypes from './../utils/errorTypes';
-import {getFollowUpsForOutbreakIdRequest} from './../queries/followUps';
+import {getFollowUpsForOutbreakIdRequest, getFollowUpsForContactRequest} from './../queries/followUps';
 import {storeFollowUps} from  './../actions/followUps';
 import {getRelationshipsForTypeRequest} from './../queries/relationships';
-import {extractIdFromPouchId, mapContactsAndRelationships, updateRequiredFields} from './../utils/functions';
+import {extractIdFromPouchId, mapContactsAndRelationships, updateRequiredFields, mapContactsAndFollowUps} from './../utils/functions';
 
 // Add here only the actions, not also the requests that are executed. For that purpose is the requests directory
 export function storeContacts(followUps) {
@@ -168,8 +168,9 @@ export function addContact(outbreakId, contact, token) {
 }
 
 export function updateContact(outbreakId, contactId, contact, token) {
-    let relationships = contact.relationships
-    delete contact.relationships;
+    if (contact.relationships) {
+        delete contact.relationships;
+    }
 
     return async function(dispatch, getState) {
         updateContactRequest(outbreakId, contactId, contact, token, (error, response) => {
@@ -179,18 +180,29 @@ export function updateContact(outbreakId, contactId, contact, token) {
             }
             if (response) {
                 console.log("*** updateContactRequest response: ", JSON.stringify(response));
-                console.log("*** updateContactRequest response relationships: ", JSON.stringify(relationships));
-                
-                let mappedContact = null
-                if (response && relationships) {
-                    mappedContact = mapContactsAndRelationships([response], relationships);
-                }
-                if (mappedContact) {
-                    dispatch(updateContactAction(mappedContact[0]));
-                } else {
-                    dispatch(updateContactAction(response));
-                }
-
+                getRelationshipsForTypeRequest(outbreakId, 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT', [extractIdFromPouchId(response._id, 'person')], (errorRelationships, responseRelationships) => {
+                    if (errorRelationships) {
+                        console.log("*** getRelationshipsForTypeRequest error: ", JSON.stringify(errorRelationships));
+                        dispatch(addError(errorTypes.ERROR_CONTACT));
+                    }
+                    if (responseRelationships) {
+                        console.log("*** getRelationshipsForTypeRequest response: ", JSON.stringify(responseRelationships));
+                        let mappedContact = mapContactsAndRelationships([response], responseRelationships);
+                        getFollowUpsForContactRequest(outbreakId, [extractIdFromPouchId(response._id, 'person')], (errorFollowUps, responseFollowUps) => {
+                            if (errorFollowUps) {
+                                console.log("*** getFollowUpsForContactRequest error: ", JSON.stringify(errorFollowUps));
+                                dispatch(addError(errorTypes.ERROR_CONTACT));
+                            }
+                            if (responseFollowUps) {
+                                console.log("*** getFollowUpsForContactRequest response: ", JSON.stringify(responseFollowUps));
+                                if (responseFollowUps.length > 0) {
+                                    mappedContact = mapContactsAndFollowUps(mappedContact, responseFollowUps);
+                                }
+                                dispatch(updateContactAction(mappedContact[0]));
+                            }
+                        });
+                    }
+                });
             }
         })
     }
