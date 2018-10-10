@@ -8,7 +8,7 @@ import _ from 'lodash';
 export function getRelationshipsForTypeRequest (outbreakId, searchType, keys, callback) {
     let database = getDatabase();
 
-    console.log("getCasesForOutbreakIdRequest: ", outbreakId);
+    console.log("getCasesForOutbreakIdRequest: ", outbreakId, keys);
 
     database.find({
         selector: {
@@ -22,8 +22,7 @@ export function getRelationshipsForTypeRequest (outbreakId, searchType, keys, ca
         }
     })
         .then((result) => {
-            console.log('Result in finding relationships: ');
-            // Test something
+            console.log('Result in finding relationships: ', JSON.stringify(result));
             callback(null, result.docs)
         })
         .catch((error) => {

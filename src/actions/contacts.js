@@ -112,6 +112,7 @@ export function getContactsForOutbreakId(outbreakId, filter, token) {
 
                     if (responseRelationships) {
                         let mappedContacts = mapContactsAndRelationships(response, responseRelationships);
+                        console.log ('mappedContacts list', JSON.stringify(mappedContacts))
                         dispatch(storeContacts(mappedContacts));
                     }
                 })
@@ -130,7 +131,17 @@ export function getContactById(outbreakId, contactId, token) {
             }
             if (response) {
                 console.log("*** getContactById response: ", JSON.stringify(response));
-                dispatch(updateContactAction(response));
+                getRelationshipsForTypeRequest(outbreakId, 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT', [extractIdFromPouchId(response._id, 'person')], (errorRelationships, responseRelationships) => {
+                    if (errorRelationships) {
+                        console.log("*** getRelationshipsForTypeRequest error: ", JSON.stringify(errorRelationships));
+                        dispatch(addError(errorTypes.ERROR_CONTACT));
+                    }
+                    if (responseRelationships) {
+                        console.log("*** getRelationshipsForTypeRequest response: ", JSON.stringify(responseRelationships));
+                        let mappedContact = mapContactsAndRelationships([response], responseRelationships);
+                        dispatch(updateContactAction(mappedContact[0]));
+                    }
+                });
             }
         })
     }
@@ -138,7 +149,7 @@ export function getContactById(outbreakId, contactId, token) {
 
 export function addContact(outbreakId, contact, token) {
     let relationship = contact.relationships[0];
-    relationship = updateRequiredFields(fileType = 'relationship.json', outbreakId = outbreakId, userId = contact.updatedBy, record = relationship, action = 'create')
+    relationship = updateRequiredFields(outbreakId = outbreakId, userId = contact.updatedBy, record = relationship, action = 'create', fileType = 'relationship.json')
     delete contact.relationships;
 
     return async function(dispatch, getState) {
@@ -157,22 +168,39 @@ export function addContact(outbreakId, contact, token) {
 }
 
 export function updateContact(outbreakId, contactId, contact, token) {
+    let relationships = contact.relationships
+    delete contact.relationships;
+
     return async function(dispatch, getState) {
         updateContactRequest(outbreakId, contactId, contact, token, (error, response) => {
             if (error) {
-                console.log("*** updateFollowUp error: ", error);
+                console.log("*** updateContactRequest error: ", error);
                 dispatch(addError(errorTypes.ERROR_UPDATE_CONTACT));
             }
             if (response) {
-                dispatch(updateContactAction(response));
+                console.log("*** updateContactRequest response: ", JSON.stringify(response));
+                console.log("*** updateContactRequest response relationships: ", JSON.stringify(relationships));
+
+                let mappedContact = null
+                if (response && relationships) {
+                    mappedContact = mapContactsAndRelationships([response], relationships);
+                }
+                if (mappedContact) {
+                    console.log ('ajunge aici')
+                    dispatch(updateContactAction(mappedContact[0]));
+                } else {
+                    dispatch(updateContactAction(response));
+                }
+
             }
         })
     }
 }
 
 export function addExposureForContact(outbreakId, contactId, exposure, token) {
+    let contactIdForExposure = extractIdFromPouchId(contactId, 'person')
     return async function(dispatch, getState) {
-        addExposureForContactRequest(outbreakId, contactId, exposure, token, (error, response) => {
+        addExposureForContactRequest(outbreakId, contactIdForExposure, exposure, token, (error, response) => {
             if (error) {
                 console.log("*** addExposureForContact error: ", error);
                 dispatch(addError(errorTypes.ERROR_ADD_EXPOSURE));

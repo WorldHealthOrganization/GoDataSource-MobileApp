@@ -195,9 +195,11 @@ class ContactsSingleExposures extends Component {
 
         let caseName = '';
 
-        if (person.type === 'case') {
-            let aux = this.props.cases.filter((e) => {return e.id === person.id})[0];
-            caseName = (aux && aux.firstName ? (aux.firstName + ' ') : '') + (aux && aux.lastName ? aux.lastName : '');
+        if (person.type === 'case' ) {
+            if (this.props.cases) {
+                let aux = this.props.cases.filter((e) => {return e.id === person.id})[0];
+                caseName = (aux && aux.firstName ? (aux.firstName + ' ') : '') + (aux && aux.lastName ? aux.lastName : '');
+            }
         } else {
             let aux = this.props.events.filter((e) => {return e.id === person.id})[0];
             caseName = aux && aux.name ? aux.name : '';

@@ -30,7 +30,11 @@ export default function (state=null, action) {
                 // for (let i=0; i<Object.keys(action.payload).length; i++) {
                 //     stateClone[stateClone.map((e) => {return e.id}).indexOf(action.payload.id)][Object.keys(action.payload)[i]] = action.payload[Object.keys(action.payload)[i]];
                 // }
-                stateClone[stateClone.map((e) => {return e.id}).indexOf(action.payload.id)] = action.payload;
+                if (action.payload.deleted === false) {
+                    stateClone[stateClone.map((e) => {return e.id}).indexOf(action.payload.id)] = action.payload;
+                } else {
+                    stateClone.splice(stateClone.map((e) => {return e.id}).indexOf(action.payload.id), 1)
+                }
             }
             return Object.assign([], stateClone);
         default:

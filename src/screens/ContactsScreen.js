@@ -252,7 +252,8 @@ class ContactsScreen extends Component {
     };
 
     handlePressFollowUp = (item, contact) => {
-        console.log("### handlePressFollowUp: ", item, contact);
+        console.log("### handlePressFollowUp:", JSON.stringify(followUp));
+        console.log("### handlePressFollowUp:", JSON.stringify(contact));
         this.props.navigator.push({
             screen: 'FollowUpsSingleScreen',
             animated: true,
@@ -271,7 +272,8 @@ class ContactsScreen extends Component {
     };
 
     handleOnPressMissing = (followUp, contact) => {
-        console.log("Handle on press edit: ", followUp, contact);
+        console.log("Handle on press edit followUp: ", JSON.stringify(followUp));
+        console.log("Handle on press edit contact: ", JSON.stringify(contact));
         this.props.navigator.push({
             screen: 'ContactsSingleScreen',
             animated: true,
