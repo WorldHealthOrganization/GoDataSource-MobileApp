@@ -84,9 +84,12 @@ class FollowUpsSingleScreen extends Component {
             ])
         } else {
             if (state.savePressed || state.deletePressed) {
+                if (props.startLoadingScreen !== undefined) {
+                    props.startLoadingScreen()
+                }
                 props.navigator.pop({
                     animated: true,
-                    animationType: 'fade'
+                    animationType: 'fade',
                 })
             }
         }

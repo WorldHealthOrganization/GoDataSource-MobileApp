@@ -28,7 +28,7 @@ import { addError } from './errors';
 import errorTypes from './../utils/errorTypes';
 import {getFollowUpsForOutbreakIdRequest, getFollowUpsForContactRequest} from './../queries/followUps';
 import {storeFollowUps} from  './../actions/followUps';
-import {getRelationshipsForTypeRequest} from './../queries/relationships';
+import {getRelationshipsForTypeRequest, getRelationshipsAndFollowUpsForContactRequest} from './../queries/relationships';
 import {extractIdFromPouchId, mapContactsAndRelationships, updateRequiredFields, mapContactsAndFollowUps} from './../utils/functions';
 
 // Add here only the actions, not also the requests that are executed. For that purpose is the requests directory
@@ -180,27 +180,21 @@ export function updateContact(outbreakId, contactId, contact, token) {
             }
             if (response) {
                 console.log("*** updateContactRequest response: ", JSON.stringify(response));
-                getRelationshipsForTypeRequest(outbreakId, 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT', [extractIdFromPouchId(response._id, 'person')], (errorRelationships, responseRelationships) => {
-                    if (errorRelationships) {
-                        console.log("*** getRelationshipsForTypeRequest error: ", JSON.stringify(errorRelationships));
+                getRelationshipsAndFollowUpsForContactRequest(outbreakId, [extractIdFromPouchId(response._id, 'person')], (errorRelationshipsAndFollowUps, responseRelationshipsAndFollowUps) => {
+                    if (errorRelationshipsAndFollowUps) {
+                        console.log("*** getRelationshipsAndFollowUpsForContact error: ", JSON.stringify(errorRelationshipsAndFollowUps));
                         dispatch(addError(errorTypes.ERROR_CONTACT));
                     }
-                    if (responseRelationships) {
-                        console.log("*** getRelationshipsForTypeRequest response: ", JSON.stringify(responseRelationships));
-                        let mappedContact = mapContactsAndRelationships([response], responseRelationships);
-                        getFollowUpsForContactRequest(outbreakId, [extractIdFromPouchId(response._id, 'person')], (errorFollowUps, responseFollowUps) => {
-                            if (errorFollowUps) {
-                                console.log("*** getFollowUpsForContactRequest error: ", JSON.stringify(errorFollowUps));
-                                dispatch(addError(errorTypes.ERROR_CONTACT));
-                            }
-                            if (responseFollowUps) {
-                                console.log("*** getFollowUpsForContactRequest response: ", JSON.stringify(responseFollowUps));
-                                if (responseFollowUps.length > 0) {
-                                    mappedContact = mapContactsAndFollowUps(mappedContact, responseFollowUps);
-                                }
-                                dispatch(updateContactAction(mappedContact[0]));
-                            }
-                        });
+                    if (responseRelationshipsAndFollowUps) {
+                        console.log("*** getRelationshipsAndFollowUpsForContact response: ", JSON.stringify(responseRelationshipsAndFollowUps));
+                        let relationships = responseRelationshipsAndFollowUps.filter((e) => {if (e.persons) {return e}})
+                        let followUps = responseRelationshipsAndFollowUps.filter((e) => {if (e.personId) {return e}})
+
+                        let mappedContact = mapContactsAndRelationships([response], relationships);
+                        if (followUps.length > 0) {
+                            mappedContact = mapContactsAndFollowUps(mappedContact, followUps);
+                        }
+                        dispatch(updateContactAction(mappedContact[0]));
                     }
                 });
             }
