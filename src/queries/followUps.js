@@ -138,16 +138,24 @@ export function addFollowUpRequest (outbreakId, contactId, followUp, token, call
         })
 }
 
-export function getFollowUpsForContactRequest (outbreakId, keys, callback) {
+export function getFollowUpsForContactRequest (outbreakId, keys, contactFollowUp, callback) {
     let database = getDatabase();
 
     console.log("getCasesForOutbreakIdRequest: ", outbreakId, keys);
+    let startDate = null
+    let endDate = null
+    if (contactFollowUp) {
+        startDate = contactFollowUp.startDate
+        endDate = contactFollowUp.endDate
+    }
 
     database.find({
         selector: {
             fileType: {$in: ['followUp.json']},
             outbreakId: outbreakId,
             deleted: false,
+            date: startDate ? {$gte: startDate} : {},
+            date: endDate ? {$lte: endDate} : {},
             personId: {$in: keys}
         }
     })

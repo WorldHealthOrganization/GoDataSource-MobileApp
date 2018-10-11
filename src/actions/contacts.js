@@ -26,7 +26,6 @@ import {
 } from './../queries/contacts'
 import { addError } from './errors';
 import errorTypes from './../utils/errorTypes';
-import {getFollowUpsForOutbreakIdRequest, getFollowUpsForContactRequest} from './../queries/followUps';
 import {storeFollowUps} from  './../actions/followUps';
 import {getRelationshipsForTypeRequest, getRelationshipsAndFollowUpsForContactRequest} from './../queries/relationships';
 import {extractIdFromPouchId, mapContactsAndRelationships, updateRequiredFields, mapContactsAndFollowUps} from './../utils/functions';
@@ -170,6 +169,9 @@ export function addContact(outbreakId, contact, token) {
 export function updateContact(outbreakId, contactId, contact, token) {
     if (contact.relationships) {
         delete contact.relationships;
+    }
+    if (contact.followUps) {
+        delete contact.followUps;
     }
 
     return async function(dispatch, getState) {

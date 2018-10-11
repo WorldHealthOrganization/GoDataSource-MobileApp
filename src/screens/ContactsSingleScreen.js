@@ -28,6 +28,7 @@ import {removeErrors} from './../actions/errors';
 import DateTimePicker from 'react-native-modal-datetime-picker';
 import _ from 'lodash';
 import {extractIdFromPouchId, updateRequiredFields} from './../utils/functions';
+import {getFollowUpsForContactRequest} from './../queries/followUps'
 
 const initialLayout = {
     height: 0,
@@ -132,6 +133,28 @@ class ContactsSingleScreen extends Component {
             // }
         }
         return null;
+    }
+
+    componentDidMount() {
+        if (!this.props.isNew) {
+            getFollowUpsForContactRequest(this.props.user.activeOutbreakId, [extractIdFromPouchId(this.state.contact._id, 'person')], this.state.contact.followUp, (errorFollowUp, responseFollowUp) => {
+                if (errorFollowUp) {
+                    console.log ('getFollowUpsForContactRequest error: ', errorFollowUp)
+                }
+                if (responseFollowUp) {
+                    console.log ('getFollowUpsForContactRequest response: ', JSON.stringify(responseFollowUp))
+                    if (responseFollowUp.length > 0) {
+                        let myContact = Object.assign({}, this.state.contact)
+                        myContact.followUps = responseFollowUp
+                        this.setState({
+                            contact: myContact
+                        }, () => {
+                            console.log("After adding the followUps: ", JSON.stringify(this.state.contact));
+                        })
+                    }
+                }
+            })
+        }
     }
 
     // The render method should have at least business logic as possible,
