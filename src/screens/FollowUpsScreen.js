@@ -258,6 +258,12 @@ class FollowUpsScreen extends Component {
             to: 'open'
         })
     };
+    
+    startLoadingScreen = () => {
+        this.setState({
+            loading: true
+        })
+    }
 
     renderFollowUp = ({item}) => {
         let oneDay = 24 * 60 * 60 * 1000;
@@ -278,7 +284,7 @@ class FollowUpsScreen extends Component {
         }
     };
 
- keyExtractor = (item, index) => item._id;
+    keyExtractor = (item, index) => item._id;
 
     renderSeparatorComponent = () => {
         return (
@@ -350,7 +356,8 @@ class FollowUpsScreen extends Component {
             passProps: {
                 item: item,
                 contact: contact,
-                filter: this.state.filter
+                filter: this.state.filter,
+                startLoadingScreen: this.startLoadingScreen
             }
         })
     };

@@ -41,6 +41,7 @@ class ContactsScreen extends Component {
                 searchText: ''
             },
             filterFromFilterScreen: this.props.filter && this.props.filter['FollowUpsFilterScreen'] ? this.props.filter['FollowUpsFilterScreen'] : null,
+            loading: true,
         };
         // Bind here methods, or at least don't declare methods in the render method
         this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this));
@@ -48,12 +49,19 @@ class ContactsScreen extends Component {
 
     // Please add here the react lifecycle methods that you need
     componentDidMount() {
-        this.props.getContactsForOutbreakId(this.props.user.activeOutbreakId, null, null);
+        this.setState({
+            loading: true
+        }, () => {
+            this.props.getContactsForOutbreakId(this.props.user.activeOutbreakId, null, null);
+        })
     }
 
-    // static getDerivedStateFromProps(props, state) {
-    //     if (props.contacts)
-    // }
+    static getDerivedStateFromProps(props, state) {
+        // if (props.contacts)
+        state.loading = false;
+
+        return null;
+    }
 
     clampedScroll= Animated.diffClamp(
         Animated.add(
