@@ -48,7 +48,6 @@ class ContactsSingleScreen extends Component {
             routes: this.props.isNew ? config.tabsValuesRoutes.contactsAdd : config.tabsValuesRoutes.contactsSingle,
             index: 0,
             item: this.props.item,
-            deleteContactButtonPressed: false,
             contact: this.props.isNew ? {
                 riskLevel: '',
                 riskReason: '',
@@ -384,13 +383,15 @@ class ContactsSingleScreen extends Component {
 
     handleSaveExposure = (exposure, isUpdate = false) => {
         console.log ('exposure', JSON.stringify(exposure))
-        if (isUpdate === false){
+        if (isUpdate === true){
             let relationships = _.cloneDeep(this.state.contact.relationships);
-            relationships.push(exposure);
+            if (relationships.map((e) => {return e._id}).indexOf(exposure._id) > -1){
+                relationships[relationships.map((e) => {return e._id}).indexOf(exposure._id)] = exposure;
+            }
             this.setState(prevState => ({
                 contact: Object.assign({}, prevState.contact, {relationships})
             }), () => {
-                console.log("After adding the exposure: ", this.state.contact);
+                console.log("After updating the exposure: ", this.state.contact);
             })
         } else {
             relationships = []
@@ -398,7 +399,7 @@ class ContactsSingleScreen extends Component {
             this.setState(prevState => ({
                 contact: Object.assign({}, prevState.contact, {relationships})
             }), () => {
-                console.log("After updating the exposure: ", this.state.contact);
+                console.log("After adding the exposure: ", this.state.contact);
             })
         }
     };
@@ -621,9 +622,9 @@ class ContactsSingleScreen extends Component {
             animated: true,
             passProps: {
                 exposure: relation,
-                contact: this.state.isNew ? this.props.contact : null,
+                contact: this.props.isNew ? null: this.props.contact,
                 type: 'Contact',
-                saveExposure: this.props.isNew ? this.handleSaveExposure : null,
+                saveExposure: this.handleSaveExposure
             }
         })
     };
@@ -673,7 +674,7 @@ class ContactsSingleScreen extends Component {
                     })
                 } else {
                     let contactWithRequiredFields = null
-                    if (this.state.deleteContactButtonPressed === true) {
+                    if (this.state.deletePressed === true) {
                         contactWithRequiredFields = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, this.state.contact), action = 'delete')
                     } else {
                         contactWithRequiredFields = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, this.state.contact), action = 'update')
@@ -788,10 +789,11 @@ class ContactsSingleScreen extends Component {
 
     handleOnPressDeleteContact = () => {
         this.setState ({
-            deleteContactButtonPressed: true
+            deletePressed: true
+        }, () => {
+            this.hideMenu()
+            this.handleOnPressSave();
         })
-        this.hideMenu()
-        this.handleOnPressSave();
     }
 
     handleOnDeletePress = (index) => {

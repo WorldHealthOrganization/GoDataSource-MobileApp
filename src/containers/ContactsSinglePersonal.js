@@ -73,11 +73,8 @@ class ContactsSinglePersonal extends Component {
                         width={calculateDimension(130, false, this.props.screenSize)}
                         style={{
                             marginVertical: calculateDimension(5, true, this.props.screenSize),
-                            position: 'absolute',
-                            right: 0,
-                            bottom:0,
                             marginHorizontal: calculateDimension(16, false, this.props.screenSize),
-                            marginBottom: 30
+                            marginBottom: 20
 
                         }}/> : null
                 }

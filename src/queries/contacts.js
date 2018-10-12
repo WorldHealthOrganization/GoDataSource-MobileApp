@@ -64,9 +64,7 @@ export function getContactsForOutbreakIdRequest (outbreakId, filter, token, call
             })
                 .then((result) => {
                     console.log("result with the new index for contacts: ", JSON.stringify(result));
-                    callback(null, result.rows.map((e) => {
-                        return e.doc
-                    }));
+                    callback(null, result.rows.filter((e) => {return e.doc.deleted === false}).map((e) => {return e.doc}))
                 })
                 .catch((errorQuery) => {
                     console.log("Error with the new index for contacts: ", errorQuery);
@@ -185,12 +183,41 @@ export function addExposureForContactRequest(outbreakId, contactId, exposure, to
 export function updateExposureForContactRequest(outbreakId, contactId, exposure, token, callback) {
     let database = getDatabase();
 
-    database.put(exposure)
-        .then((result) => {
-            console.log('Result updateExposureForContactRequest: ', result);
+    console.log ('updateExposureForContactRequest', outbreakId, contactId, JSON.stringify(exposure))
+
+    database.get(exposure._id)
+        .then((resultGetExposure) => {
+            console.log ('Get exposure result: ', JSON.stringify(resultGetExposure))
+            database.remove(resultGetExposure)
+                .then((resultRemove) => {
+                    console.log ('Remove exposure result: ', JSON.stringify(resultRemove))
+                    delete exposure._rev;
+                    database.put(exposure)
+                        .then((responseUpdateExposure) => {
+                            console.log("Update exposure response: ", responseUpdateExposure);
+                            database.get(exposure._id)
+                                .then((resultGetUpdatedExposure) => {
+                                    console.log("Response getUpdatedExposure: ", JSON.stringify(resultGetUpdatedExposure));
+                                    callback(null, resultGetUpdatedExposure);
+                                })
+                                .catch((errorGetUpdatedExposure) => {
+                                    console.log("Error getUpdatedExposure: ", errorGetUpdatedExposure);
+                                    callback(errorGetUpdatedExposure);
+                                })
+                        })
+                        .catch((errorUpdateExposure) => {
+                            console.log('Update exposure error: ', errorUpdateExposure);
+                            callback(errorUpdateExposure);
+                        })
+                })
+                .catch((errorRemove) => {
+                    console.log('Remove exposure error: ', errorRemove);
+                    callback(errorRemove);
+                })
         })
-        .catch((errorAddExposure) => {
-            console.log("Error updateExposureForContactRequest: ", errorAddExposure);
+        .catch((errorGetExposure) => {
+            console.log('Get exposure error:  ', errorGetExposure);
+            callback(errorGetExposure);
         })
 }
 

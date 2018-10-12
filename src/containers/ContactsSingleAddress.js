@@ -75,44 +75,38 @@ class ContactsSingleAddress extends Component {
                     </Ripple>
                 </View>
 
-                {
-                    this.props.isNew ? 
-                        <Button
-                            title={'Next'}
-                            onPress={this.handleNextButton}
-                            color={styles.buttonGreen}
-                            titleColor={'white'}
-                            height={calculateDimension(25, true, this.props.screenSize)}
-                            width={calculateDimension(130, false, this.props.screenSize)}
-                            style={{
-                                marginVertical: calculateDimension(5, true, this.props.screenSize),
-                                position: 'absolute',
-                                right: 0,
-                                bottom:0,
-                                marginHorizontal: calculateDimension(16, false, this.props.screenSize),
-                                marginBottom: 30
-
-                            }}/> : null
-                }
-                {
-                    this.props.isNew ? 
-                        <Button
-                            title={'Back'}
-                            onPress={this.handleBackButton}
-                            color={styles.buttonGreen}
-                            titleColor={'white'}
-                            height={calculateDimension(25, true, this.props.screenSize)}
-                            width={calculateDimension(130, false, this.props.screenSize)}
-                            style={{
-                                marginVertical: calculateDimension(5, true, this.props.screenSize),
-                                position: 'absolute',
-                                left: 0,
-                                bottom:0,
-                                marginHorizontal: calculateDimension(16, false, this.props.screenSize),
-                                marginBottom: 30
-
-                            }}/> : null
-                }
+                <View style = {{flexDirection:'row'}}>          
+                    {
+                        this.props.isNew ? 
+                            <Button
+                                title={'Back'}
+                                onPress={this.handleBackButton}
+                                color={styles.buttonGreen}
+                                titleColor={'white'}
+                                height={calculateDimension(25, true, this.props.screenSize)}
+                                width={calculateDimension(130, false, this.props.screenSize)}
+                                style={{
+                                    marginVertical: calculateDimension(5, true, this.props.screenSize),
+                                    marginHorizontal: calculateDimension(16, false, this.props.screenSize),
+                                    marginBottom: 20
+                                }}/> : null
+                    }
+                    {
+                        this.props.isNew ? 
+                            <Button
+                                title={'Next'}
+                                onPress={this.handleNextButton}
+                                color={styles.buttonGreen}
+                                titleColor={'white'}
+                                height={calculateDimension(25, true, this.props.screenSize)}
+                                width={calculateDimension(130, false, this.props.screenSize)}
+                                style={{
+                                    marginVertical: calculateDimension(5, true, this.props.screenSize),
+                                    marginHorizontal: calculateDimension(16, false, this.props.screenSize),
+                                    marginBottom: 20,
+                                }}/> : null
+                    }
+                </View>
 
             </KeyboardAwareScrollView>
         );

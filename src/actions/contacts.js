@@ -74,20 +74,6 @@ export function getContactsForOutbreakIdWithPromises(outbreakId, filter, token, 
                         resolve(mappedContacts);
                     }
                 });
-                // getFollowUpsForOutbreakIdRequest(outbreakId, null, (errorFollowUps, responseFollowUps) => {
-                //     if (errorFollowUps) {
-                //         console.log("Error when getting followUps: ", errorFollowUps);
-                //     }
-                //     if (responseFollowUps) {
-                //         console.log('FollowUps result: ', outbreakId, responseFollowUps);
-                //         dispatch(storeFollowUps(responseFollowUps));
-                //         // Here should add the followUps to the contacts
-                //         let contacts = mapFollowUpsToContacts(response, responseFollowUps);
-                //         dispatch(storeContacts(contacts));
-                //         resolve("Done contacts");
-                //     }
-                // })
-                // dispatch(storeContacts(response))
             }
         })
     })
@@ -182,23 +168,27 @@ export function updateContact(outbreakId, contactId, contact, token) {
             }
             if (response) {
                 console.log("*** updateContactRequest response: ", JSON.stringify(response));
-                getRelationshipsAndFollowUpsForContactRequest(outbreakId, [extractIdFromPouchId(response._id, 'person')], (errorRelationshipsAndFollowUps, responseRelationshipsAndFollowUps) => {
-                    if (errorRelationshipsAndFollowUps) {
-                        console.log("*** getRelationshipsAndFollowUpsForContact error: ", JSON.stringify(errorRelationshipsAndFollowUps));
-                        dispatch(addError(errorTypes.ERROR_CONTACT));
-                    }
-                    if (responseRelationshipsAndFollowUps) {
-                        console.log("*** getRelationshipsAndFollowUpsForContact response: ", JSON.stringify(responseRelationshipsAndFollowUps));
-                        let relationships = responseRelationshipsAndFollowUps.filter((e) => {if (e.persons) {return e}})
-                        let followUps = responseRelationshipsAndFollowUps.filter((e) => {if (e.personId) {return e}})
-
-                        let mappedContact = mapContactsAndRelationships([response], relationships);
-                        if (followUps.length > 0) {
-                            mappedContact = mapContactsAndFollowUps(mappedContact, followUps);
+                if (response.deleted === false) {
+                    getRelationshipsAndFollowUpsForContactRequest(outbreakId, [extractIdFromPouchId(response._id, 'person')], (errorRelationshipsAndFollowUps, responseRelationshipsAndFollowUps) => {
+                        if (errorRelationshipsAndFollowUps) {
+                            console.log("*** getRelationshipsAndFollowUpsForContact error: ", JSON.stringify(errorRelationshipsAndFollowUps));
+                            dispatch(addError(errorTypes.ERROR_CONTACT));
                         }
-                        dispatch(updateContactAction(mappedContact[0]));
-                    }
-                });
+                        if (responseRelationshipsAndFollowUps) {
+                            console.log("*** getRelationshipsAndFollowUpsForContact response: ", JSON.stringify(responseRelationshipsAndFollowUps));
+                            let relationships = responseRelationshipsAndFollowUps.filter((e) => {if (e.persons) {return e}})
+                            let followUps = responseRelationshipsAndFollowUps.filter((e) => {if (e.personId) {return e}})
+    
+                            let mappedContact = mapContactsAndRelationships([response], relationships);
+                            if (followUps.length > 0) {
+                                mappedContact = mapContactsAndFollowUps(mappedContact, followUps);
+                            }
+                            dispatch(updateContactAction(mappedContact[0]));
+                        }
+                    });
+                } else {
+                    dispatch(updateContactAction(response));
+                }
             }
         })
     }
@@ -221,8 +211,9 @@ export function addExposureForContact(outbreakId, contactId, exposure, token) {
 }
 
 export function updateExposureForContact(outbreakId, contactId, exposure, token) {
+    let contactIdForExposure = extractIdFromPouchId(contactId, 'person')
     return async function(dispatch, getState) {
-        updateExposureForContactRequest(outbreakId, contactId, exposure, token, (error, response) => {
+        updateExposureForContactRequest(outbreakId, contactIdForExposure, exposure, token, (error, response) => {
             if (error) {
                 console.log("*** updateExposureForContact error: ", error);
                 dispatch(addError(errorTypes.ERROR_UPDATE_EXPOSURE));
