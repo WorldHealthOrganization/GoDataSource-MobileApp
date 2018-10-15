@@ -51,53 +51,33 @@ export function updateFollowUpRequest (outbreakId, contactId, followUpId, follow
 
     database.get(followUp._id)
         .then((resultGet) => {
-            if (followUp.date !== resultGet.date) {
-                console.log('Date changed. TIme to delete the record with the previous date and insert one with the new date');
-                database.remove(resultGet)
-                    .then((resultRemove) => {
-                        console.log('Remove follow up response : ', resultRemove);
-                        delete followUp._rev;
-                        database.put(followUp)
-                            .then((responseUpdateFollowUp) => {
-                                console.log("Update followUp response: ", responseUpdateFollowUp);
-                                database.get(followUp._id)
-                                    .then((resultGetUpdatedFollowUp) => {
-                                        console.log("Response get updated followUp: ", resultGetUpdatedFollowUp);
-                                        callback(null, resultGetUpdatedFollowUp);
-                                    })
-                                    .catch((errorGetUpdatedFollowUp) => {
-                                        console.log("Error get updated followUp: ", errorGetUpdatedFollowUp);
-                                        callback(errorGetUpdatedFollowUp);
-                                    })
-                            })
-                            .catch((errorUpdateFollowUp) => {
-                                console.log("Update followUp response:", errorUpdateFollowUp);
-                                callback(errorUpdateFollowUp);
-                            })
-                    })
-                    .catch((errorRemove) => {
-                        console.log('Remove follow up error: ', errorRemove);
-                        callback(errorRemove);
-                    })
-            } else {
-                database.put(followUp)
-                    .then((responseUpdateFollowUp) => {
-                        // console.log("Update followUp response: ", responseUpdateFollowUp);
-                        database.get(followUp._id)
-                            .then((resultGetUpdatedFollowUp) => {
-                                // console.log("Updated followUp: ", resultGetUpdatedFollowUp);
-                                callback(null, resultGetUpdatedFollowUp);
-                            })
-                            .catch((errorGetUpdatedFollowUp) => {
-                                console.log("Error from updated followUp: ", errorGetUpdatedFollowUp);
-                                callback(errorGetUpdatedFollowUp);
-                            })
-                    })
-                    .catch((errorUpdateFollowUp) => {
-                        console.log("Update followUp error: ", errorUpdateFollowUp);
-                        callback(errorUpdateFollowUp);
-                    })
-            }
+            console.log('Date changed. TIme to delete the record with the previous date and insert one with the new date');
+            database.remove(resultGet)
+                .then((resultRemove) => {
+                    console.log('Remove follow up response : ', resultRemove);
+                    delete followUp._rev;
+                    database.put(followUp)
+                        .then((responseUpdateFollowUp) => {
+                            console.log("Update followUp response: ", responseUpdateFollowUp);
+                            database.get(followUp._id)
+                                .then((resultGetUpdatedFollowUp) => {
+                                    console.log("Response get updated followUp: ", resultGetUpdatedFollowUp);
+                                    callback(null, resultGetUpdatedFollowUp);
+                                })
+                                .catch((errorGetUpdatedFollowUp) => {
+                                    console.log("Error get updated followUp: ", errorGetUpdatedFollowUp);
+                                    callback(errorGetUpdatedFollowUp);
+                                })
+                        })
+                        .catch((errorUpdateFollowUp) => {
+                            console.log("Update followUp response:", errorUpdateFollowUp);
+                            callback(errorUpdateFollowUp);
+                        })
+                })
+                .catch((errorRemove) => {
+                    console.log('Remove follow up error: ', errorRemove);
+                    callback(errorRemove);
+                })
         })
         .catch((errorGet) => {
             console.log('Error get: ', errorGet);

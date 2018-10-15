@@ -131,9 +131,8 @@ class FollowUpListItem extends PureComponent {
     // Please write here all the methods that are not react native lifecycle methods
     onPressFollowUp = () => {
         InteractionManager.runAfterInteractions(() => {
-            let contact = this.props && this.props.contacts && Array.isArray(this.props.contacts) && this.props.contacts.length > 0 ? this.props.contacts[this.props.contacts.map((e) => {return extractIdFromPouchId(e._id, 'person')}).indexOf(this.props.item.personId)] : null;
-
-            // console.log("### onPressFollowUp: ", this.props.item, contact, Object.assign({}, this.props.item, contact));
+            let contact = this.props && this.props.contacts && Array.isArray(this.props.contacts) && this.props.contacts.length > 0 ? 
+                this.props.contacts[this.props.contacts.map((e) => {return extractIdFromPouchId(e._id, 'person')}).indexOf(this.props.item.personId)] : null;
 
             this.props.onPressFollowUp(this.props.item, contact);
         });
@@ -141,9 +140,9 @@ class FollowUpListItem extends PureComponent {
 
     onPressMissing = () => {
         InteractionManager.runAfterInteractions(() => {
-            let contact = this.props && this.props.contacts && Array.isArray(this.props.contacts) && this.props.contacts.length > 0 ? this.props.contacts[this.props.contacts.map((e) => {return extractIdFromPouchId(e._id, 'person')}).indexOf(this.props.item.personId)] : null;
 
-            // console.log("### onPressFollowUp: ", this.props.item, contact, Object.assign({}, this.props.item, contact));
+            let contact = this.props && this.props.contacts && Array.isArray(this.props.contacts) && this.props.contacts.length > 0 ? 
+                this.props.contacts[this.props.contacts.map((e) => {return extractIdFromPouchId(e._id, 'person')}).indexOf(this.props.item.personId)] : null;
 
             this.props.onPressMissing(this.props.item, contact);
         })
@@ -151,9 +150,8 @@ class FollowUpListItem extends PureComponent {
 
     onPressExposure = () => {
         InteractionManager.runAfterInteractions(() => {
-            let contact = this.props && this.props.contacts && Array.isArray(this.props.contacts) && this.props.contacts.length > 0 ? this.props.contacts[this.props.contacts.map((e) => {return extractIdFromPouchId(e._id, 'person')}).indexOf(this.props.item.personId)] : null;
-
-            // console.log("### onPressFollowUp: ", this.props.item, contact, Object.assign({}, this.props.item, contact));
+            let contact = this.props && this.props.contacts && Array.isArray(this.props.contacts) && this.props.contacts.length > 0 ? 
+                this.props.contacts[this.props.contacts.map((e) => {return extractIdFromPouchId(e._id, 'person')}).indexOf(this.props.item.personId)] : null;
 
             this.props.onPressExposure(this.props.item, contact);
         })

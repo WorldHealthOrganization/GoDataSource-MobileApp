@@ -30,7 +30,7 @@ import ElevatedView from 'react-native-elevated-view';
 import _ from 'lodash';
 import AddFollowUpScreen from './AddFollowUpScreen';
 import {LoaderScreen, Colors} from 'react-native-ui-lib';
-import {navigation, extractIdFromPouchId, generateId} from './../utils/functions';
+import {navigation, extractIdFromPouchId, generateId, updateRequiredFields} from './../utils/functions';
 import ViewHOC from './../components/ViewHOC';
 
 const scrollAnim = new Animated.Value(0);
@@ -363,13 +363,19 @@ class FollowUpsScreen extends Component {
     };
 
     handleOnPressMissing = (followUp, contact) => {
-        followUp.lostToFollowUp = true;
-        followUp.performed = true;
-        followUp.updatedAt = new Date().toISOString();
-        // console.log("### ceva: ", followUp, contact);
+
+        let myFollowUp = Object.assign({}, followUp)
+        let myFollowups = Object.assign([], contact.followUps)
+
+        myFollowUp.lostToFollowUp = true;
+        myFollowUp.performed = true;
+        myFollowUp.updatedAt = new Date().toISOString();
+
+        myFollowups[myFollowups.map((e) => {return e._id}).indexOf(myFollowUp._id)] = myFollowUp
+        let myContact = Object.assign({}, contact, {followUps: myFollowups})
+
         if (this.props && this.props.user && this.props.user.activeOutbreakId) {
-            // this.props.updateFollowUpAndContact(this.props.user.activeOutbreakId, contact.id, followUp.id, followUp, contact, this.props.user.token);
-            this.props.updateFollowUpAndContact(this.props.user.activeOutbreakId, null, followUp._id, followUp, null, null);
+            this.props.updateFollowUpAndContact(this.props.user.activeOutbreakId, null, myFollowUp._id, myFollowUp, myContact, null);
         }
     };
 

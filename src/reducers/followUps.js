@@ -19,12 +19,12 @@ export default function (state=null, action) {
                 return null;
             }
             let stateClone = state.slice();
-            if (state.map((e) => {return e.id}).indexOf(action.payload.id) > -1){
+            if (state.map((e) => {return e._id}).indexOf(action.payload._id) > -1){
                 //update
                 if (action.payload.deleted === false) {
-                    stateClone[stateClone.map((e) => {return e.id}).indexOf(action.payload.id)] = action.payload;
+                    stateClone[stateClone.map((e) => {return e._id}).indexOf(action.payload._id)] = action.payload;
                 } else {
-                    stateClone.splice(stateClone.map((e) => {return e.id}).indexOf(action.payload.id), 1)
+                    stateClone.splice(stateClone.map((e) => {return e._id}).indexOf(action.payload._id), 1)
                 }
             } 
             else if (state.map((e) => {return e.id}).indexOf(action.payload.id) === -1) {
