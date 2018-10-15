@@ -158,11 +158,9 @@ export function addExposureForContactRequest(outbreakId, contactId, exposure, to
 
     if (exposure.persons[0].id === null && contactId !== null) {
         exposure.persons[0].id = contactId;
-        // exposure.persons[0].type = 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT'
     } else {
         if (exposure.persons[1].id === null && contactId !== null) {
             exposure.persons[1].id = contactId;
-            // exposure.persons[1].type = 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT'
         }
     }
 

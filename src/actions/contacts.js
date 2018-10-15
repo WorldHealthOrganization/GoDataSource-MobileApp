@@ -28,6 +28,7 @@ import { addError } from './errors';
 import errorTypes from './../utils/errorTypes';
 import {storeFollowUps} from  './../actions/followUps';
 import {getRelationshipsForTypeRequest, getRelationshipsAndFollowUpsForContactRequest} from './../queries/relationships';
+import {getFollowUpsForContactRequest} from './../queries/followUps';
 import {extractIdFromPouchId, mapContactsAndRelationships, updateRequiredFields, mapContactsAndFollowUps} from './../utils/functions';
 
 // Add here only the actions, not also the requests that are executed. For that purpose is the requests directory
@@ -107,7 +108,7 @@ export function getContactsForOutbreakId(outbreakId, filter, token) {
     }
 }
 
-export function getContactById(outbreakId, contactId, token) {
+export function getContactById(outbreakId, contactId, token, contact = null) {
     return async function (dispatch, getState) {
         getContactByIdRequest(outbreakId, contactId, token, (error, response) => {
             if (error) {
@@ -124,6 +125,9 @@ export function getContactById(outbreakId, contactId, token) {
                     if (responseRelationships) {
                         console.log("*** getRelationshipsForTypeRequest response: ", JSON.stringify(responseRelationships));
                         let mappedContact = mapContactsAndRelationships([response], responseRelationships);
+                        if (contact) {
+                            mappedContact[0].followUps = Object.assign([], contact.followUps)
+                        }
                         dispatch(updateContactAction(mappedContact[0]));
                     }
                 });
@@ -194,8 +198,11 @@ export function updateContact(outbreakId, contactId, contact, token) {
     }
 }
 
-export function addExposureForContact(outbreakId, contactId, exposure, token) {
-    let contactIdForExposure = extractIdFromPouchId(contactId, 'person')
+export function addExposureForContact(outbreakId, contactId, exposure, token, contact = null) {
+    let contactIdForExposure
+    if (contactId) {
+        contactIdForExposure = extractIdFromPouchId(contactId, 'person')
+    }
     return async function(dispatch, getState) {
         addExposureForContactRequest(outbreakId, contactIdForExposure, exposure, token, (error, response) => {
             if (error) {
@@ -204,7 +211,7 @@ export function addExposureForContact(outbreakId, contactId, exposure, token) {
             }
             if (response) {
                 console.log("*** addExposureForContact response: ", JSON.stringify(response));
-                dispatch(getContactById(outbreakId, contactId, token));
+                dispatch(getContactById(outbreakId, contactId, token, contact));
             }
         })
     }
