@@ -26,11 +26,11 @@ export default function (state=null, action) {
             if (!action.payload) {
                 return null;
             }
-            if (stateClone.map((e) => {return e.id}).indexOf(action.payload.id) > -1){
+            if (stateClone.map((e) => {return e._id}).indexOf(action.payload._id) > -1){
                 if (action.payload.deleted === false) {
-                    stateClone[stateClone.map((e) => {return e.id}).indexOf(action.payload.id)] = action.payload;
+                    stateClone[stateClone.map((e) => {return e._id}).indexOf(action.payload._id)] = action.payload;
                 } else {
-                    stateClone.splice(stateClone.map((e) => {return e.id}).indexOf(action.payload.id), 1)
+                    stateClone.splice(stateClone.map((e) => {return e._id}).indexOf(action.payload._id), 1)
                 }
             }
             return Object.assign([], stateClone);

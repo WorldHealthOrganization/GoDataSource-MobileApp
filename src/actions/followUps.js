@@ -10,7 +10,7 @@ import {
     deleteFollowUpRequest,
     generateFollowUpRequest
 } from './../requests/followUps';
-import {updateContact, getContactsForOutbreakIdWithPromises} from './contacts';
+import {updateContact, updateContactAction, getContactsForOutbreakIdWithPromises} from './contacts';
 import { addError } from './errors';
 import errorTypes from './../utils/errorTypes';
 import config from './../utils/config';
@@ -54,8 +54,8 @@ export function getFollowUpsForOutbreakId(outbreakId, filter, token) {
                 console.log("*** getFollowUpsForOutbreakId response: ");
                 let keys = response.map((e) => {return e.personId});
                 keys = _.uniq(keys);
-                console.log ('getFollowUpsForOutbreakId keys: ', JSON.stringify(keys))
-
+                keys = keys.sort()
+                
                 getContactsForOutbreakIdWithPromises(outbreakId, {keys: keys}, null, dispatch)
                     .then((responseGetContacts) => {
                         console.log ('getFollowUpsForOutbreakIdRequest getContactsForOutbreakIdWithPromises response')
@@ -129,8 +129,10 @@ export function getMissedFollowUpsForOutbreakId(outbreakId, filter, token) {
 }
 
 export function updateFollowUpAndContact(outbreakId, contactId, followUpId, followUp, contact, token) {
-    console.log('updateFollowUpAndContact')
-    let contactIdForFollowUp = extractIdFromPouchId(contactId, 'person')
+    let contactIdForFollowUp = null
+    if (contactId) {
+        contactIdForFollowUp = extractIdFromPouchId(contactId, 'person')
+    }
     return async function(dispatch, getState) {
         updateFollowUpRequest(outbreakId, contactIdForFollowUp, followUpId, followUp, token, (error, response) => {
             if (error) {
@@ -140,7 +142,12 @@ export function updateFollowUpAndContact(outbreakId, contactId, followUpId, foll
             if (response) {
                 console.log("*** updateFollowUp response: ", JSON.stringify(response));
                 dispatch(updateFollowUpAction(response));
-                dispatch(updateContact(outbreakId, contactId, contact, token));
+                if (contact && contactId) {
+                    dispatch(updateContact(outbreakId, contactId, contact, token));
+                } else if (contact){
+                    console.log ('updateContactAction')
+                    dispatch(updateContactAction(contact));
+                }
             }
         })
     }

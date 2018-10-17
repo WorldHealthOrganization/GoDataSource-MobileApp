@@ -9,7 +9,7 @@
 import React, {Component} from 'react';
 import {View, Text, StyleSheet, Platform, Dimensions, Image, FlatList, ScrollView} from 'react-native';
 import {ListItem, Icon} from 'react-native-material-ui';
-import {calculateDimension, handleExposedTo, getAddress} from './../utils/functions';
+import {calculateDimension, handleExposedTo, getAddress, extractIdFromPouchId} from './../utils/functions';
 import config from './../utils/config';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -220,7 +220,7 @@ class CardComponent extends Component {
                         labelValue={item.labelValue}
                         value={value}
                         data={item.data}
-                        isEditMode={this.props.screen === 'ExposureScreen' ? this.props.exposure.persons.length > 1 && item.id === 'exposure' ? false : item.isEditMode : item.isEditMode}
+                        isEditMode={this.props.screen === 'ExposureScreen' ? item.id === 'exposure' ? true : item.isEditMode : item.isEditMode}
                         isRequired={item.isRequired}
                         onChange={this.props.onChangeDropDown}
                         style={{width: width, marginHorizontal: marginHorizontal}}
@@ -448,6 +448,7 @@ class CardComponent extends Component {
     };
 
     computeDataForExposure = (item) => {
+        console.log ('computeDataForExposure', JSON.stringify(item))
         let data = [];
         if (item.categoryId) {
             data = this.props.referenceData.filter((e) => {
@@ -458,10 +459,10 @@ class CardComponent extends Component {
         } else {
             if (item.id === 'exposure') {
                 if (this.props.type !== 'Contact') {
-                    data = this.props.contacts.map((e) => {return {value: ((e.firstName ? e.firstName + ' ' : '') + (e.lastName ? e.lastName : '')), id: e._id.split('_')[e._id.split('_').length - 1], type: 'contact'}});
+                    data = this.props.contacts.map((e) => {return {value: ((e.firstName ? e.firstName + ' ' : '') + (e.lastName ? e.lastName : '')), id: extractIdFromPouchId(e._id, 'person'), type: 'contact'}});
                 }
-                data = this.props.cases.map((e) => {return {value: ((e.firstName ? e.firstName + ' ' : '') + (e.lastName ? e.lastName : '')), id: e._id.split('_')[e._id.split('_').length - 1], type: 'case'}});
-                data = data.concat(this.props.events.map((e) => {return {value: e.name, id: e._id.split('_')[e._id.split('_').length - 1], type: 'event'}}));
+                data = this.props.cases.map((e) => {return {value: ((e.firstName ? e.firstName + ' ' : '') + (e.lastName ? e.lastName : '')), id: extractIdFromPouchId(e._id, 'person'), type: 'case'}});
+                data = data.concat(this.props.events.map((e) => {return {value: e.name, id: extractIdFromPouchId(e._id, 'person'), type: 'event'}}));
             } else {
                 if (item.id === 'clusterId') {
 
@@ -486,6 +487,7 @@ class CardComponent extends Component {
                 value = this.extractNameForExposure(persons[0]);
             }
         }
+        console.log ('computeExposureValue', JSON.stringify(value))
 
         return this.getTranslation(value);
     };
@@ -493,18 +495,14 @@ class CardComponent extends Component {
     extractNameForExposure = (person) => {
         switch (person.type) {
             case 'case':
-                return (this.props.cases && Array.isArray(this.props.cases) && this.props.cases.map((e) => {return e.id;}).indexOf(person.id) > -1 &&
-                    this.props.cases[this.props.cases.map((e) => {return e.id}).indexOf(person.id)].firstName ? (this.props.cases[this.props.cases.map((e) => {return e.id}).indexOf(person.id)].firstName + ' ') : '') +
-                    (this.props.cases && Array.isArray(this.props.cases) && this.props.cases.map((e) => {return e.id;}).indexOf(person.id) > -1 &&
-                    this.props.cases[this.props.cases.map((e) => {return e.id}).indexOf(person.id)].lastName ? (this.props.cases[this.props.cases.map((e) => {return e.id}).indexOf(person.id)].lastName) : '');
+                return (this.props.cases && Array.isArray(this.props.cases) && this.props.cases.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id) > -1 && this.props.cases[this.props.cases.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id)].firstName ? (this.props.cases[this.props.cases.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id)].firstName + ' ') : '') +
+                (this.props.cases && Array.isArray(this.props.cases) && this.props.cases.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id) > -1 && this.props.cases[this.props.cases.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id)].lastName ? (this.props.cases[this.props.cases.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id)].lastName) : '');
             case 'event':
-                return (this.props.events && Array.isArray(this.props.events) && this.events.map((e) => {return e.id;}).indexOf(person.id) > -1 &&
-                this.props.events[this.props.events.map((e) => {return e.id}).indexOf(person.id)].name ? (this.props.events[this.props.events.map((e) => {return e.id}).indexOf(person.id)].name) : '');
+                return (this.props.events && Array.isArray(this.props.events) && this.events.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id) > -1 &&
+                this.props.events[this.props.events.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id)].name ? (this.props.events[this.props.events.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id)].name) : '');
             case 'contact':
-                return (this.props.contacts && Array.isArray(this.props.contacts) && this.props.contacts.map((e) => {return e.id;}).indexOf(person.id) > -1 &&
-                    this.props.contacts[this.props.contacts.map((e) => {return e.id}).indexOf(person.id)].firstName ? (this.props.contacts[this.props.contacts.map((e) => {return e.id}).indexOf(person.id)].firstName + ' ') : '') +
-                    (this.props.contacts && Array.isArray(this.props.contacts) && this.props.contacts.map((e) => {return e.id;}).indexOf(person.id) > -1 &&
-                    this.props.contacts[this.props.contacts.map((e) => {return e.id}).indexOf(person.id)].lastName ? (this.props.contacts[this.props.contacts.map((e) => {return e.id}).indexOf(person.id)].lastName) : '');
+                return (this.props.contacts && Array.isArray(this.props.contacts) && this.props.contacts.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id) > -1 && this.props.contacts[this.props.contacts.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id)].firstName ? (this.props.contacts[this.props.contacts.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id)].firstName + ' ') : '') +
+                (this.props.contacts && Array.isArray(this.props.contacts) && this.props.contacts.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id) > -1 && this.props.contacts[this.props.contacts.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id)].lastName ? (this.props.contacts[this.props.contacts.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id)].lastName) : '');
             default:
                 return ''
         }

@@ -248,18 +248,15 @@ class ExposureScreen extends Component {
                 if (this.props.type === 'Contact') {
                     if (this.props.exposure) {
                         if (!this.props.contact) {
-                            //update exposure in create new contact case
                             this.setState(prevState => ({
                                 exposure: Object.assign({}, prevState.exposure, {updatedAt: new Date().toISOString(), updatedBy: this.props.user._id.split('_')[this.props.user._id.split('_').length - 1]})
                             }), () => {
-                              this.props.navigator.dismissModal(this.props.saveExposure(this.state.exposure, true));
+                                this.props.navigator.dismissModal(this.props.saveExposure(this.state.exposure, true));
                             })
                         } else {
-                            this.setState(prevState => ({
-                                exposure: Object.assign({}, prevState.exposure, {updatedAt: new Date().toISOString(), updatedBy: this.props.user._id.split('_')[this.props.user._id.split('_').length - 1]})
-                            }), () => {
-                                this.props.updateExposureForContact(this.props.user.activeOutbreakId, this.props.contact._id.split('_')[this.props.contact._id.split('_').length - 1], this.state.exposure, this.props.user.token);
-                            })
+                            let exposure = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.contact.updatedBy, record = Object.assign({}, this.state.exposure), action = 'update', fileType = 'relationship.json')
+                            this.props.navigator.dismissModal(this.props.saveExposure(this.state.exposure, true));
+                            this.props.updateExposureForContact(this.props.user.activeOutbreakId, this.props.contact._id, exposure, this.props.user.token);
                         }
                     } else {
                         if (!this.props.contact) {
@@ -269,8 +266,8 @@ class ExposureScreen extends Component {
                               this.props.navigator.dismissModal(this.props.saveExposure(this.state.exposure));
                             })
                         } else {
-                            let exposure = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.contact.updatedBy, record = this.state.exposure, action = 'create', fileType = 'relationship.json')
-                            this.props.addExposureForContact(this.props.user.activeOutbreakId, this.props.contact._id, exposure, this.props.user.token);
+                            let exposure = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.contact.updatedBy, record = Object.assign({}, this.state.exposure), action = 'create', fileType = 'relationship.json')
+                            this.props.addExposureForContact(this.props.user.activeOutbreakId, this.props.contact._id, exposure, this.props.user.token, Object.assign({}, this.props.contact));
                         }
                     }
                 }

@@ -342,7 +342,11 @@ class ContactsScreen extends Component {
             allFilters = null
         }
 
-        this.props.getContactsForOutbreakId(this.props.user.activeOutbreakId, allFilters, null);
+        this.setState({
+            loading: true
+        }, () => {
+            this.props.getContactsForOutbreakId(this.props.user.activeOutbreakId, allFilters, null);
+        })
     };
 
     onNavigatorEvent = (event) => {

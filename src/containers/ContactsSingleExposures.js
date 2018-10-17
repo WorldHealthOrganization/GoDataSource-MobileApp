@@ -111,18 +111,13 @@ class ContactsSingleExposures extends Component {
                                 width={calculateDimension(130, false, this.props.screenSize)}
                                 style={{
                                     marginVertical: calculateDimension(5, true, this.props.screenSize),
-                                    position: 'absolute',
-                                    left: 0,
-                                    bottom:0,
                                     marginHorizontal: calculateDimension(16, false, this.props.screenSize),
-                                    marginBottom: 30
-
-                                }}/> : null
+                                    marginBottom: 20
+                        }}/> : null
                     }
                     <View style={{height: 30}}/>
-                   
-                 
                 </ScrollView>
+             
             </ElevatedView>
             
         );
@@ -175,15 +170,17 @@ class ContactsSingleExposures extends Component {
 
     listEmptyComponent = () => {
         return (
-            <Ripple
-                style={{
-                    height: 25,
-                    justifyContent: 'center'
-                }}
-                onPress={this.onPressAddExposure}
-            >
-                <Text style={{fontFamily: 'Roboto-Medium', fontSize: 12, color: styles.buttonGreen}}>Add another address</Text>
-            </Ripple>
+            <View style={{alignSelf: 'flex-start', marginHorizontal: calculateDimension(16, false, this.props.screenSize), marginVertical: 20}}>
+                <Ripple
+                    style={{
+                        height: 25,
+                        justifyContent: 'center'
+                    }}
+                    onPress={this.onPressAddExposure}
+                >
+                    <Text style={{fontFamily: 'Roboto-Medium', fontSize: 12, color: styles.buttonGreen}}>Add exposure</Text>
+                </Ripple>
+            </View>
         )
     };
 
