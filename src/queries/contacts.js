@@ -15,19 +15,37 @@ export function getContactsForOutbreakIdRequest (outbreakId, filter, token, call
         let keys = filter.keys.map((e) => {return `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT_false_${outbreakId}_${e}`});
         // console.log("@@@ filter keys: ", keys);
         let start =  new Date().getTime();
-        database.allDocs({
-            keys: keys,
-            include_docs: true
-        })
-            .then((result) => {
-                let contacts = result.rows.filter((e) => {return e.error !== 'not_found'}).map((e) => {return e.doc});
-                console.log("Result with the new index for contacts: ", new Date().getTime() - start);
-                callback(null, contacts);
+
+        let promiseArray = [];
+
+        for (let i=0; i<keys.length; i++) {
+            promiseArray.push(getFromDb(database, keys[i]));
+        }
+
+        Promise.all(promiseArray)
+            .then((resultGetAll) => {
+                console.log("Result from get queries: ", new Date().getTime() - start, resultGetAll.length);
+                callback(null, resultGetAll.filter((e) => {return e && e._id !== null}));
             })
-            .catch((errorQuery) => {
-                console.log("Error with the new index for contacts: ", errorQuery);
-                callback(errorQuery);
+            .catch((errorGetAll) => {
+                console.log('Error from get queries: ', new Date().getTime() - start, errorGetAll);
+                callback(errorGetAll);
             })
+
+
+        // database.allDocs({
+        //     keys: keys,
+        //     include_docs: true
+        // })
+        //     .then((result) => {
+        //         let contacts = result.rows.filter((e) => {return e.error !== 'not_found'}).map((e) => {return e.doc});
+        //         console.log("Result with the new index for contacts: ", new Date().getTime() - start);
+        //         callback(null, contacts);
+        //     })
+        //     .catch((errorQuery) => {
+        //         console.log("Error with the new index for contacts: ", errorQuery);
+        //         callback(errorQuery);
+        //     })
 
         // database.find({
         //     selector: {
@@ -106,6 +124,25 @@ export function getContactsForOutbreakIdRequest (outbreakId, filter, token, call
             //     })
         }
     }
+}
+
+function getFromDb(database, id) {
+    return new Promise((resolve, reject) => {
+        console.log('Get record with id: ', id);
+        database.get(id)
+            .then((result) => {
+                console.log('Found result. Return stuff');
+                resolve(result);
+            })
+            .catch((error) => {
+                console.log('Error get function: ', JSON.stringify(error));
+                if (error.name === 'not_found' && error.message === 'missing') {
+                    resolve(null);
+                } else {
+                    reject(error);
+                }
+            })
+    })
 }
 
 export function getContactByIdRequest(outbreakId, contactId, token, callback) {

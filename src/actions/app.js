@@ -397,9 +397,11 @@ export function appInitialized() {
                     if (activeDatabase !== null) {
                         try {
                             let databaseCredentials = await getInternetCredentials(activeDatabase);
-                            console.log('Database credentials: ', databaseCredentials);
+
                             if (databaseCredentials) {
-                                createDatabase(databaseCredentials.server.replace(/\/|\.|\:/g, ''), databaseCredentials.password, (database) => {
+                                console.log('Database credentials: ', databaseCredentials);
+                                let server = Platform.OS === 'ios' ? databaseCredentials.server : databaseCredentials.service;
+                                createDatabase(server.replace(/\/|\.|\:/g, ''), databaseCredentials.password, (database) => {
                                     dispatch(getUserById(loggedUser, null));
                                 })
                             } else {

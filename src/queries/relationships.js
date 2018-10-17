@@ -11,6 +11,9 @@ export function getRelationshipsForTypeRequest (outbreakId, searchType, keys, ca
     console.log("getRelationshipsForOutbreakIdRequest: ", outbreakId, keys);
 
     let start =  new Date().getTime();
+    if (keys.length === 0) {
+        callback(null, []);
+    }
     database.find({
         selector: {
             fileType: {$eq: ['relationship.json']},

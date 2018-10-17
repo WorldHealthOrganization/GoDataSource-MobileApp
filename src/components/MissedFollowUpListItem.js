@@ -44,11 +44,11 @@ class MissedFollowUpListItem extends PureComponent {
 
         if (contact) {
             // Get last follow-up date and next follow-up date
-            if (contact.followUps.length === 2) {
-                currentFollowUpIndex === 0 ? nextFollowUp = contact.followUps[1].date : lastFollowUp = contact.followUps[0].date;
+            if (contact.followUps && Array.isArray(contact.followUps) && contact.followUps.length === 2) {
+                currentFollowUpIndex === 0 ? contact.followUps[1].date ? nextFollowUp = contact.followUps[1].date : ' ' : contact.followUps[0].date ? lastFollowUp = contact.followUps[0].date : ' ';
             } else {
-                lastFollowUp = currentFollowUpIndex === 0 ? '' : contact.followUps[currentFollowUpIndex - 1].date;
-                nextFollowUp = currentFollowUpIndex === (contact.followUps.length - 1) ? '' : contact.followUps[currentFollowUpIndex + 1].date
+                lastFollowUp = contact && contact.followUps && Array.isArray(contact.followUps) && currentFollowUpIndex === 0 ? " " : contact.followUps[currentFollowUpIndex - 1] ? contact.followUps[currentFollowUpIndex - 1].date : '' ;
+                nextFollowUp = contact && contact.followUps && Array.isArray(contact.followUps) && currentFollowUpIndex === (contact.followUps.length - 1) ? " " : contact.followUps[currentFollowUpIndex + 1] ? contact.followUps[currentFollowUpIndex + 1].date : ''
             }
         }
 

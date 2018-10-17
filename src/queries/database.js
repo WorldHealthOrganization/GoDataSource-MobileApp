@@ -22,19 +22,9 @@ let databaseIndexes = [
         ddoc: 'translationIndex',
     },
     {
-        index: {fields: ['fileType', 'deleted']},
-        name: 'generalIndex',
-        ddoc: 'generalIndex',
-    },
-    {
         index: {fields: ['outbreakId', 'fileType', 'deleted']},
         name: 'outbreakIdIndex',
         ddoc: 'outbreakIdIndex',
-    },
-    {
-        index: {fields: ['type', 'fileType', 'outbreakId', 'deleted']},
-        name: 'personIndex',
-        ddoc: 'personIndex',
     },
     // {
     //     index: {fields: ['date', 'fileType', 'outbreakId', 'deleted']},
@@ -57,118 +47,182 @@ let databaseIndexes = [
 // We will separate the records by adding a new property called type: <collection_name>
 export function createDatabase(databaseName, databasePassword, callback) {
     // Define the design documents that tells the database to build indexes in order to query
+    let ddocArray = [];
     let promisesArray = [];
+    // ddocArray.push(createDesignDoc('getContacts1', function (doc) {
+    //     if (doc.fileType === 'person.json' && doc.type === 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT') {
+    //         if (doc.age) {
+    //             emit([doc.outbreakId, doc.gender, doc.age]);
+    //         } else {
+    //             if (doc.dob) {
+    //                 let now = new moment();
+    //                 let dob = new moment(doc.dob);
+    //                 let age = Math.round(moment.duration(now.diff(dob)).asYears());
+    //                 emit([doc.outbreakId, doc.gender, age]);
+    //             } else {
+    //                 emit([doc.outbreakId, doc.gender, 0]);
+    //             }
+    //         }
+    //     }
+    // }));
+
+    // ddocArray.push(createDesignDoc('getUserByEmail', function (doc) {
+    //     if (doc.fileType === 'user.json') {
+    //         emit(doc.email);
+    //     } else {
+    //         if (doc.fileType === 'person.json' && doc.type === 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT') {
+    //             if (doc.age) {
+    //                 emit([doc.outbreakId, doc.gender, doc.age]);
+    //             } else {
+    //                 emit([doc.outbreakId, doc.gender, 0]);
+    //             }
+    //         } else {
+    //             if (doc.fileType === 'relationship.json') {
+    //                 emit([doc.outbreakId, doc.deleted, doc.active, doc.persons[0].type, doc.persons[0].id, doc.persons[1].type, doc.persons[1].id]);
+    //             }
+    //         }
+    //     }
+    // }));
+
     // Check first if the database is cached
     if (database) {
+        // for (let i=0; i<ddocArray.length; i++) {
+        //     console.log('Create design doc: ', i);
+        //     promisesArray.push(addDesignDocs(ddocArray[i], database));
+        // }
+        // promisesArray.push(createIndexes());
+        // Add al the design docs and then return the database
+        // Promise.all(promisesArray)
+        //     .then((results) => {
+        //         console.log("Results from creating indexes: ", results);
+        //         callback(database);
+        //     })
+        //     .catch((error) => {
+        //         console.log("Error from creating indexes: ", error);
+        //         callback(database);
+        //     })
+
         callback(database);
     }
     // After that, check if there is already a database with the name and return that
-    // console.log("Database name: ", databaseName);
+    console.log("Database name: ", databaseName);
     let pathToDatabase = RNFetchBlobFS.dirs.DocumentDir + '/' + databaseName;
 
     if (Platform.OS === 'ios') {
         pathToDatabase = RNFS.LibraryDirectoryPath + '/NoCloud/' + databaseName;
     }
-    // console.log('Path to database: ', pathToDatabase);
-    RNFetchBlobFS.exists(pathToDatabase)
-        .then((exists) => {
-            console.log('Database exists? ', exists);
-            const SQLiteAdapter = SQLiteAdapterFactory(SQLite);
-            PouchDB.plugin(SQLiteAdapter);
-            PouchDB.plugin(PouchUpsert);
-            PouchDB.plugin(PouchFind);
-            // PouchDB.debug.enable('pouchdb:find');
-            database = new PouchDB(encodeName(databaseName, databasePassword), {adapter: 'react-native-sqlite'});
 
-            if (!exists) {
-                // Add all the design docs and then return the database
-                for (let i = 0; i < databaseIndexes.length; i++) {
-                    console.log("Create index: ", i);
-                    promisesArray.push(database.createIndex(databaseIndexes[i]));
-                }
-                Promise.all(promisesArray)
-                    .then((results) => {
-                        console.log("Results from creating indexes: ", results);
+    RNFetchBlobFS.ls(RNFetchBlobFS.dirs.DocumentDir)
+        .then((result) => {
+            console.log('Android list: ', result);
+            console.log('Path to database: ', pathToDatabase);
+            RNFetchBlobFS.exists(pathToDatabase)
+                .then((exists) => {
+                    console.log('Database exists? ', exists);
+                    const SQLiteAdapter = SQLiteAdapterFactory(SQLite);
+                    PouchDB.plugin(SQLiteAdapter);
+                    PouchDB.plugin(PouchUpsert);
+                    PouchDB.plugin(PouchFind);
+                    // PouchDB.debug.enable('pouchdb:find');
+                    database = new PouchDB(encodeName(databaseName, databasePassword), {adapter: 'react-native-sqlite'});
+
+                    if (!exists) {
+                        // for (let i=0; i<databaseIndexes.length; i++) {
+                        //     console.log("Create index: ", i);
+                        //     promisesArray.push(database.createIndex(databaseIndexes));
+                        // }
+                        promisesArray.push(createIndexContact());
+                        promisesArray.push(createIndex());
+                        // Add all the design docs and then return the database
+                        Promise.all(promisesArray)
+                            .then((results) => {
+                                console.log("Results from creating indexes: ", results);
+                                callback(database);
+                            })
+                            .catch((error) => {
+                                console.log("Error from creating indexes: ", error);
+                                callback(database);
+                            })
+                    } else {
                         callback(database);
-                    })
-                    .catch((error) => {
-                        console.log("Error from creating indexes: ", error);
-                        callback(database);
-                    })
-            } else {
-                callback(database);
-            }
+                    }
+                })
+                .catch((errorExistsDatabase) => {
+                    console.log("Database exists error: ", errorExistsDatabase);
+                    const SQLiteAdapter = SQLiteAdapterFactory(SQLite);
+                    PouchDB.plugin(SQLiteAdapter);
+                    PouchDB.plugin(PouchUpsert);
+                    PouchDB.plugin(PouchFind);
+                    // PouchDB.debug.enable('pouchdb:find');
+                    database = new PouchDB(encodeName(databaseName, databasePassword), {adapter: 'react-native-sqlite'});
+                    // for (let i=0; i<databaseIndexes.length; i++) {
+                    //     console.log("Create index: ", i);
+                    //     promisesArray.push(database.createIndex(databaseIndexes));
+                    // }
+                    promisesArray.push(createIndexContact());
+                    promisesArray.push(createIndex());
+                    // Add al the design docs and then return the database
+                    Promise.all(promisesArray)
+                        .then((results) => {
+                            console.log("Results from creating indexes: ", results);
+                            callback(database);
+                        })
+                        .catch((error) => {
+                            console.log("Error from creating indexes: ", error);
+                            callback(database);
+                        })
+                });
         })
-        .catch((errorExistsDatabase) => {
-            console.log("Database exists error: ", errorExistsDatabase);
-            const SQLiteAdapter = SQLiteAdapterFactory(SQLite);
-            PouchDB.plugin(SQLiteAdapter);
-            PouchDB.plugin(PouchUpsert);
-            PouchDB.plugin(PouchFind);
-            // PouchDB.debug.enable('pouchdb:find');
-            database = new PouchDB(encodeName(databaseName, databasePassword), {adapter: 'react-native-sqlite'});
-            for (let i = 0; i < databaseIndexes.length; i++) {
-                console.log("Create index: ", i);
-                promisesArray.push(database.createIndex(databaseIndexes[i]));
-            }
-            // Add al the design docs and then return the database
-            Promise.all(promisesArray)
-                .then((results) => {
-                    console.log("Results from creating indexes: ", results);
-                    callback(database);
-                })
-                .catch((error) => {
-                    console.log("Error from creating indexes: ", error);
-                    callback(database);
-                })
-        });
+        .catch((error) => {
+            console.log('Android error: ', error);
+        })
 }
 
-// function createIndexContact() {
-//     return new Promise ((resolve, reject) => {
-//         if (database) {
-//             // Index for contacts based on fileType, type, outbreakId, firstName, lastName, age, gender
-//             database.createIndex({
-//                 index: {fields: ['type', 'fileType', 'outbreakId', 'deleted']},
-//                 name: 'indexContact',
-//                 ddoc: 'indexContact',
-//             })
-//                 .then((res) => {
-//                     console.log('Creating index: ', res);
-//                     resolve('Done creating Mango index');
-//                 })
-//                 .catch((errorMangoIndex) => {
-//                     console.log('Error creating mango index: ', errorMangoIndex);
-//                     reject(errorMangoIndex)
-//                 })
-//         } else {
-//             reject('No database');
-//         }
-//     })
-// }
+function createIndexContact() {
+    return new Promise ((resolve, reject) => {
+        if (database) {
+            // Index for contacts based on fileType, type, outbreakId, firstName, lastName, age, gender
+            database.createIndex({
+                index: {fields: ['type', 'fileType', 'outbreakId', 'deleted']},
+                name: 'indexContact',
+                ddoc: 'indexContact',
+            })
+                .then((res) => {
+                    console.log('Creating index: ', res);
+                    resolve('Done creating Mango index');
+                })
+                .catch((errorMangoIndex) => {
+                    console.log('Error creating mango index: ', errorMangoIndex);
+                    reject(errorMangoIndex)
+                })
+        } else {
+            reject('No database');
+        }
+    })
+}
 
-// function createIndex() {
-//     return new Promise ((resolve, reject) => {
-//         if (database) {
-//             // Index for contacts based on fileType, type, outbreakId, firstName, lastName, age, gender
-//             database.createIndex({
-//                 index: {fields: ['languageId', 'fileType', 'deleted']},
-//                 name: 'index1',
-//                 ddoc: 'index1',
-//             })
-//                 .then((res) => {
-//                     console.log('Creating index: ', res);
-//                     resolve('Done creating Mango index');
-//                 })
-//                 .catch((errorMangoIndex) => {
-//                     console.log('Error creating mango index: ', errorMangoIndex);
-//                     reject(errorMangoIndex)
-//                 })
-//         } else {
-//             reject('No database');
-//         }
-//     })
-// }
+function createIndex() {
+    return new Promise ((resolve, reject) => {
+        if (database) {
+            // Index for contacts based on fileType, type, outbreakId, firstName, lastName, age, gender
+            database.createIndex({
+                index: {fields: ['languageId', 'fileType', 'deleted']},
+                name: 'index1',
+                ddoc: 'index1',
+            })
+                .then((res) => {
+                    console.log('Creating index: ', res);
+                    resolve('Done creating Mango index');
+                })
+                .catch((errorMangoIndex) => {
+                    console.log('Error creating mango index: ', errorMangoIndex);
+                    reject(errorMangoIndex)
+                })
+        } else {
+            reject('No database');
+        }
+    })
+}
 
 export function addDesignDocs(ddoc, database) {
     return new Promise((resolve, reject) => {
