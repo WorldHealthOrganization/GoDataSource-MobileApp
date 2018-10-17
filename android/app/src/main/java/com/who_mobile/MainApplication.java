@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.reactnativedocumentpicker.ReactNativeDocumentPicker;
+import com.rnfs.RNFSPackage;
 import dog.craftz.sqlite_2.RNSqlite2Package;
 import com.oblador.keychain.KeychainPackage;
 import com.rnziparchive.RNZipArchivePackage;
@@ -36,7 +38,8 @@ import java.util.List;
                  new RNFetchBlobPackage(),
                  new RNZipArchivePackage(),
                  new KeychainPackage(),
-                 new RNSqlite2Package()
+                 new RNSqlite2Package(),
+                 new RNFSPackage()
          );
      }
 

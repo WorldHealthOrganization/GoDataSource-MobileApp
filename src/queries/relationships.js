@@ -8,11 +8,12 @@ import _ from 'lodash';
 export function getRelationshipsForTypeRequest (outbreakId, searchType, keys, callback) {
     let database = getDatabase();
 
-    console.log("getCasesForOutbreakIdRequest: ", outbreakId, keys);
+    console.log("getRelationshipsForOutbreakIdRequest: ", outbreakId, keys);
 
+    let start =  new Date().getTime();
     database.find({
         selector: {
-            fileType: {$in: ['relationship.json']},
+            fileType: {$eq: ['relationship.json']},
             outbreakId: outbreakId,
             deleted: false,
             $or: [
@@ -22,7 +23,7 @@ export function getRelationshipsForTypeRequest (outbreakId, searchType, keys, ca
         }
     })
         .then((result) => {
-            console.log('Result in finding relationships: ', JSON.stringify(result));
+            console.log('Result in finding relationships: ', new Date().getTime() - start);
             callback(null, result.docs)
         })
         .catch((error) => {

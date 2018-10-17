@@ -31,7 +31,7 @@ class LoginScreen extends Component {
         this.state = {
             email: '',
             password: '',
-            url: config.baseUrls[0].value,
+            // url: config.baseUrls[0].value,
             showLoading: false
         };
         // Bind here methods, or at least don't declare methods in the render method
@@ -40,7 +40,7 @@ class LoginScreen extends Component {
 
         this.emailRef = this.updateRef.bind(this, 'email');
         this.passwordRef = this.updateRef.bind(this, 'password');
-        this.urlRef = this.updateRef.bind(this, 'url');
+        // this.urlRef = this.updateRef.bind(this, 'url');
     }
 
     // Please add here the react lifecycle methods that you need
@@ -90,19 +90,19 @@ class LoginScreen extends Component {
                     <Text style={style.welcomeText}>Welcome!</Text>
                 </View>
                 <View style={style.inputsContainer}>
-                    <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'}}>
-                        <TextField
-                            ref={this.urlRef}
-                            value={this.state.url}
-                            autoCorrect={false}
-                            lineWidth={1}
-                            enablesReturnKeyAutomatically={true}
-                            containerStyle={[style.textInput]}
-                            onChangeText={this.handleTextChange}
-                            label='URL'
-                            autoCapitalize={'none'}
-                        />
-                    </View>
+                    {/*<View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'}}>*/}
+                        {/*<TextField*/}
+                            {/*ref={this.urlRef}*/}
+                            {/*value={this.state.url}*/}
+                            {/*autoCorrect={false}*/}
+                            {/*lineWidth={1}*/}
+                            {/*enablesReturnKeyAutomatically={true}*/}
+                            {/*containerStyle={[style.textInput]}*/}
+                            {/*onChangeText={this.handleTextChange}*/}
+                            {/*label='URL'*/}
+                            {/*autoCapitalize={'none'}*/}
+                        {/*/>*/}
+                    {/*</View>*/}
                     <TextField
                         ref={this.emailRef}
                         value={this.state.email}
@@ -156,13 +156,13 @@ class LoginScreen extends Component {
                     }
                 ])
             } else {
-                let urlNew = this.state.url.toLowerCase();
-                if (!urlNew.includes('http://')) {
-                    urlNew = 'http://' + urlNew;
-                }
-                if (!urlNew.includes('/api')) {
-                    urlNew += '/api';
-                }
+                // let urlNew = this.state.url.toLowerCase();
+                // if (!urlNew.includes('http://')) {
+                //     urlNew = 'http://' + urlNew;
+                // }
+                // if (!urlNew.includes('/api')) {
+                //     urlNew += '/api';
+                // }
                 // url.setBaseUrl(urlNew);
 
                 this.setState({
@@ -178,7 +178,7 @@ class LoginScreen extends Component {
     };
 
     handleTextChange = (text) => {
-        ['email', 'password', 'url']
+        ['email', 'password']
             .map((name) => ({ name, ref: this[name] }))
             .forEach(({ name, ref }) => {
                 if (ref.isFocused()) {

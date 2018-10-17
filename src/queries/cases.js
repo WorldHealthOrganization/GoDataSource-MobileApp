@@ -9,13 +9,14 @@ export function getCasesForOutbreakIdRequest (outbreakId, filter, token, callbac
 
     console.log("getCasesForOutbreakIdRequest: ", outbreakId);
 
+    let start =  new Date().getTime();
     database.allDocs({
         startkey: `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE_false_${outbreakId}`,
         endkey: `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE_false_${outbreakId}\uffff`,
         include_docs: true
     })
         .then((result) => {
-            console.log("result with the new index for cases: ");
+            console.log("result with the new index for cases: ", new Date().getTime() - start);
             callback(null, result.rows.map((e) => {return e.doc}));
         })
         .catch((errorQuery) => {
@@ -23,11 +24,20 @@ export function getCasesForOutbreakIdRequest (outbreakId, filter, token, callbac
             callback(errorQuery);
         })
 
-    // database.query('whoQueries/getContactsForOutbreakId', {key: [outbreakId, 0], include_docs: true})
-    //     .then((result) => {
-    //         console.log("Result from getting contacts for outbreak id: ", result);
+    // database.find({
+    //     selector: {
+    //         type: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE',
+    //         fileType: 'person.json',
+    //         deleted: false,
+    //         outbreakId: outbreakId
+    //     }
+    // })
+    //     .then((resultFind) => {
+    //         console.log('Result for find cases time: ', new Date().getTime() - start);
+    //         callback(null, resultFind.docs)
     //     })
-    //     .catch((error) => {
-    //         console.log("Error while getting contact for outbreak id: ", error);
+    //     .catch((errorFind) => {
+    //         console.log('Error find cases: ', errorFind);
+    //         callback(errorFind);
     //     })
 }

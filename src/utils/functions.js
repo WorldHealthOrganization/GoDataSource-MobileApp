@@ -420,8 +420,8 @@ export function generateId () {
 
 export function mapContactsAndRelationships(contacts, relationships) {
     console.log ('mapContactsAndRelationships')
-    console.log ('mapContactsAndRelationships contacts', JSON.stringify(contacts))
-    console.log ('mapContactsAndRelationships relationships', JSON.stringify(relationships))
+    // console.log ('mapContactsAndRelationships contacts', JSON.stringify(contacts))
+    // console.log ('mapContactsAndRelationships relationships', JSON.stringify(relationships))
 
     let mappedContacts = contacts;
     for (let i = 0; i < relationships.length; i++) {
@@ -463,14 +463,14 @@ export function mapContactsAndRelationships(contacts, relationships) {
         }
     }
 
-    console.log ('mapContactsAndRelationships mappedContacts', JSON.stringify(mappedContacts))
+    // console.log ('mapContactsAndRelationships mappedContacts', JSON.stringify(mappedContacts))
     return mappedContacts;
 }
 
 export function mapContactsAndFollowUps(contacts, followUps) {
     console.log ('mapContactsAndFollowUps')
-    console.log ('mapContactsAndFollowUps contacts', JSON.stringify(contacts))
-    console.log ('mapContactsAndFollowUps followUps', JSON.stringify(followUps))
+    // console.log ('mapContactsAndFollowUps contacts', JSON.stringify(contacts))
+    // console.log ('mapContactsAndFollowUps followUps', JSON.stringify(followUps))
     
     let mappedContacts = [];
     for (let i=0; i < followUps.length; i++) {
@@ -484,13 +484,13 @@ export function mapContactsAndFollowUps(contacts, followUps) {
             mappedContacts[mappedContacts.map((e) => {return extractIdFromPouchId(e._id, 'person')}).indexOf(followUps[i].personId)].followUps.push(followUps[i]);
         }
     }
-    console.log ('mapContactsAndFollowUps mappedContacts', JSON.stringify(mappedContacts))
+    // console.log ('mapContactsAndFollowUps mappedContacts', JSON.stringify(mappedContacts))
     return mappedContacts;
 }
 
 export function updateRequiredFields(outbreakId, userId, record, action, fileType = '', type = '') {
 
-    console.log ('updateRequiredFields ', record, action)
+    // console.log ('updateRequiredFields ', record, action)
     switch (action) {
         case 'create':
             record._id = computeIdForFileType(fileType, outbreakId, record, type);

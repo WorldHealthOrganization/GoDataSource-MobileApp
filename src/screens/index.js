@@ -19,6 +19,7 @@ import AddSingleCaseScreen from './AddSingleCaseScreen';
 import ContactsScreen from './ContactsScreen';
 import ContactsSingleScreen from './ContactsSingleScreen';
 import ExposureScreen from './ExposureScreen';
+import MapScreen from './MapScreen';
 
 const screens = [
     {screen: 'LoginScreen', component: LoginScreen},
@@ -35,7 +36,8 @@ const screens = [
     {screen: 'AddSingleCaseScreen', component: AddSingleCaseScreen},
     {screen: 'ContactsScreen', component: ContactsScreen},
     {screen: 'ContactsSingleScreen', component: ContactsSingleScreen},
-    {screen: 'ExposureScreen', component: ExposureScreen}
+    {screen: 'ExposureScreen', component: ExposureScreen},
+    {screen: 'MapScreen', component: MapScreen}
 ];
 
 export function registerScreens(store, Provider) {

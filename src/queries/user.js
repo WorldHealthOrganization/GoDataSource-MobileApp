@@ -16,18 +16,19 @@ export function loginUserRequest (credentials, callback) {
     // })
     //     .then((result) => {
     //         console.log("Create index result: ", result);
+    let start = new Date().getTime();
             database.find({
-                selector: {fileType: 'user.json', email: credentials.email}
+                selector: {fileType: 'user.json', email: credentials.email, deleted: false}
             })
                 .then((resultFind) => {
-                    console.log("Result From find: ", resultFind);
+                    console.log("Result From find user: ", new Date().getTime() - start);
                     comparePasswords(credentials.password, resultFind.docs[0].password, (error, isMatch) => {
                         if (error) {
                             console.log("Error at comparing passwords: ", error);
                             callback(error)
                         }
                         if (isMatch) {
-                            console.log("Passwords match: ", resultFind.docs[0]);
+                            console.log("Passwords match: ");
                             // Return user
                             callback(null, resultFind.docs[0]);
                         } else {
@@ -74,7 +75,7 @@ export function getUserByIdRequest (userId, token, callback) {
 
     database.get(userId)
         .then((result) => {
-            console.log("GetUserByIdRequestQuery result: ", result);
+            console.log("GetUserByIdRequestQuery result: ");
             callback(null, result)
         })
         .catch((errorGetUserById) => {

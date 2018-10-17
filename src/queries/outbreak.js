@@ -9,10 +9,11 @@ export function getOutbreakByIdRequest (outbreakId, token, callback) {
 
     console.log('GetOutbreakByIdRequest: ', outbreakId);
 
+    let start =  new Date().getTime();
     // For searching by ID it is recommended to use the PouchDB allDocs method with the ID as a key, since primary indexes are much faster than secondary ones
     database.get('outbreak.json_false_' + outbreakId)
         .then((result) => {
-            console.log("Result from getting outbreak: ", result);
+            console.log("Result from getting outbreak: ", new Date().getTime() - start);
             callback(null, result);
         })
         .catch((errorGetOutbreak) => {

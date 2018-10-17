@@ -20,9 +20,10 @@ export function getFollowUpsForOutbreakIdRequest (outbreakId, filter, token, cal
         endDate = new Date(filter.date).getTime()  + oneDay;
     }
 
+    let start =  new Date().getTime();
     database.allDocs({startkey: `followUp.json_false_${outbreakId}_${startDate}`, endkey: `followUp.json_false_${outbreakId}_${endDate}\uffff`, include_docs: true})
         .then((result) => {
-            console.log("result with the new index for followUps: ", result.rows.map((e) => {return e.doc}));
+            console.log("result with the new index for followUps: ", new Date().getTime() - start);
             result.rows = result.rows.filter((e) => {return e.doc.deleted === false})
             callback(null, result.rows.map((e) => {return e.doc}));
         })
@@ -31,12 +32,24 @@ export function getFollowUpsForOutbreakIdRequest (outbreakId, filter, token, cal
             callback(errorQuery);
         })
 
-    // database.query('whoQueries/getContactsForOutbreakId', {key: [outbreakId, 0], include_docs: true})
-    //     .then((result) => {
-    //         console.log("Result from getting contacts for outbreak id: ", result);
+    // database.find({
+    //     selector: {
+    //         date: {
+    //             $gte: startDate,
+    //             $lte: endDate
+    //         },
+    //         fileType: 'followUp.json',
+    //         deleted: false,
+    //         outbreakId: outbreakId
+    //     }
+    // })
+    //     .then((resultFind) => {
+    //         console.log('Result for find time for followUps: ', new Date().getTime() - start);
+    //         callback(null, resultFind.docs)
     //     })
-    //     .catch((error) => {
-    //         console.log("Error while getting contact for outbreak id: ", error);
+    //     .catch((errorFind) => {
+    //         console.log('Error find for followUps: ', errorFind);
+    //         callback(errorFind);
     //     })
 }
 
@@ -160,7 +173,7 @@ export function getFollowUpsForContactRequest (outbreakId, keys, contactFollowUp
         }
     })
         .then((result) => {
-            console.log('getFollowUpsForContactRequest request: ', JSON.stringify(result));
+            console.log('getFollowUpsForContactRequest request: ');
             callback(null, result.docs)
         })
         .catch((error) => {

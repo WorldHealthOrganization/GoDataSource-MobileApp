@@ -49,7 +49,7 @@ class FollowUpListItem extends PureComponent {
             if (contact && contact.gender) {
                 genderString = this.getTranslation(contact.gender);
             }
-            let secondaryText = contact ? ((genderString ? genderString.charAt(0) : ' ') + (contact.age ? (", " + contact.age) : ' ')) : '';
+            let secondaryText = contact ? ((genderString ? genderString.charAt(0) : ' ') + (contact.age && contact.age.years ? (", " + contact.age.years) : ' ')) : '';
 
 
             let addressText = '';
@@ -86,7 +86,11 @@ class FollowUpListItem extends PureComponent {
                                 <Text style={[style.secondaryText, {flex: 1}]}>{secondaryText}</Text>
                             </View>
                         }
-                        rightElement={<Image source={{uri: 'map_icon'}} style={{width: 31, height: 31}}/>}
+                        rightElement={
+                            <Ripple onPress={this.props.onPressMap}>
+                                <Image source={{uri: 'map_icon'}} style={{width: 31, height: 31}}/>
+                            </Ripple>
+                                }
                         style={{
                             container: {marginRight: calculateDimension(13, false, this.props.screenSize)},
                             rightElementContainer: {justifyContent: 'center', alignItems: 'center'}

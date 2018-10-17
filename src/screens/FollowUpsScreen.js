@@ -80,7 +80,7 @@ class FollowUpsScreen extends Component {
             ])
         }
 
-        console.log('props.contacts', JSON.stringify(props.contacts))
+        // console.log('props.contacts', JSON.stringify(props.contacts))
         if (props.contacts) {
             let fUps = [];
 
@@ -280,6 +280,7 @@ class FollowUpsScreen extends Component {
                     onPressFollowUp={this.handlePressFollowUp}
                     onPressMissing={this.handleOnPressMissing}
                     onPressExposure={this.handleOnPressExposure}
+                    onPressMap={this.handleOnPressMap}
                 />)
         }
     };
@@ -383,6 +384,13 @@ class FollowUpsScreen extends Component {
             }
         })
     };
+
+    handleOnPressMap = () => {
+        this.props.navigator.showModal({
+            screen: 'MapScreen',
+            animated: true
+        })
+    }
 
     handlePressFilter = () => {
         this.props.navigator.showModal({

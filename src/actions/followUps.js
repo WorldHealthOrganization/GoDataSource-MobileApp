@@ -51,14 +51,14 @@ export function getFollowUpsForOutbreakId(outbreakId, filter, token) {
                 dispatch(addError(errorTypes.ERROR_FOLLOWUPS));
             }
             if (response) {
-                console.log("*** getFollowUpsForOutbreakId response: ", JSON.stringify(response));
+                console.log("*** getFollowUpsForOutbreakId response: ");
                 let keys = response.map((e) => {return e.personId});
                 keys = _.uniq(keys);
                 console.log ('getFollowUpsForOutbreakId keys: ', JSON.stringify(keys))
 
                 getContactsForOutbreakIdWithPromises(outbreakId, {keys: keys}, null, dispatch)
                     .then((responseGetContacts) => {
-                        console.log ('getFollowUpsForOutbreakIdRequest getContactsForOutbreakIdWithPromises response', JSON.stringify(responseGetContacts))
+                        console.log ('getFollowUpsForOutbreakIdRequest getContactsForOutbreakIdWithPromises response')
                         dispatch(storeFollowUps(response));
                         let mappedContact = mapContactsAndFollowUps(responseGetContacts, response);
                         dispatch(storeContacts(mappedContact));

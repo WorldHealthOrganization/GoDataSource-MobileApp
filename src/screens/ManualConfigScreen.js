@@ -83,6 +83,7 @@ class ManualConfigScreen extends Component {
                         containerStyle={style.textInput}
                         onChangeText={this.handleTextChange}
                         label='HUB URL'
+                        autoCapitalize={'none'}
                     />
                     <TextField
                         ref={this.clientIDRef}
@@ -93,6 +94,7 @@ class ManualConfigScreen extends Component {
                         containerStyle={style.textInput}
                         onChangeText={this.handleTextChange}
                         label='Client ID'
+                        autoCapitalize={'none'}
                     />
                     <TextField
                         ref={this.clientSecretRef}
@@ -104,6 +106,7 @@ class ManualConfigScreen extends Component {
                         onChangeText={this.handleTextChange}
                         label='Client secret'
                         secureTextEntry={true}
+                        autoCapitalize={'none'}
                     />
                     <Button upperCase={false} raised onPress={this.saveHubConfiguration} text="Save HUB configuration" style={styles.buttonLogin} />
                 </View>

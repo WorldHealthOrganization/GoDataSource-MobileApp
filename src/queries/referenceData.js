@@ -9,9 +9,10 @@ export function getReferenceDataRequest (token, callback) {
 
     console.log("getReferenceDataRequest: ");
 
+    let start =  new Date().getTime();
     database.allDocs({startkey: `referenceData.json_false_`, endkey: `referenceData.json_false_\uffff`, include_docs: true})
         .then((result) => {
-            console.log("result with the new index for reference data: ");
+            console.log("result with the new index for reference data: ", new Date().getTime() - start);
             callback(null, result.rows.map((e) => {return e.doc}));
         })
         .catch((errorQuery) => {
@@ -19,11 +20,18 @@ export function getReferenceDataRequest (token, callback) {
             callback(errorQuery);
         })
 
-    // database.query('whoQueries/getContactsForOutbreakId', {key: [outbreakId, 0], include_docs: true})
-    //     .then((result) => {
-    //         console.log("Result from getting contacts for outbreak id: ", result);
+    // database.find({
+    //     selector: {
+    //         fileType: 'referenceData.json',
+    //         deleted: false
+    //     }
+    // })
+    //     .then((resultFind) => {
+    //         console.log('Result for find time for reference data: ', new Date().getTime() - start);
+    //         callback(null, resultFind.docs)
     //     })
-    //     .catch((error) => {
-    //         console.log("Error while getting contact for outbreak id: ", error);
+    //     .catch((errorFind) => {
+    //         console.log('Error find for reference data: ', errorFind);
+    //         callback(errorFind);
     //     })
 }

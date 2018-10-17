@@ -9,9 +9,10 @@ export function getTranslationRequest (languageId, callback) {
 
     console.log("getTranslationRequest: ", languageId);
 
+    let start =  new Date().getTime();
     database.allDocs({startkey: `languageToken.json_false_${languageId}`, endkey: `languageToken.json_false_${languageId}\uffff`, include_docs: true})
         .then((result) => {
-            console.log("result with the new index for translation: ");
+            console.log("result with the new index for translation: ", new Date().getTime() - start);
             callback(null, result.rows.map((e) => {return e.doc}));
         })
         .catch((errorQuery) => {
@@ -19,11 +20,19 @@ export function getTranslationRequest (languageId, callback) {
             callback(errorQuery);
         })
 
-    // database.query('whoQueries/getContactsForOutbreakId', {key: [outbreakId, 0], include_docs: true})
-    //     .then((result) => {
-    //         console.log("Result from getting contacts for outbreak id: ", result);
+    // database.find({
+    //     selector: {
+    //         languageId: languageId,
+    //         fileType: 'languageToken.json',
+    //         deleted: false
+    //     }
+    // })
+    //     .then((resultFind) => {
+    //         console.log('Result for find time for translations: ', new Date().getTime() - start);
+    //         callback(null, resultFind.docs)
     //     })
-    //     .catch((error) => {
-    //         console.log("Error while getting contact for outbreak id: ", error);
+    //     .catch((errorFind) => {
+    //         console.log('Error find for translations: ', errorFind);
+    //         callback(errorFind);
     //     })
 }

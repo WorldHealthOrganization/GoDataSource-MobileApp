@@ -2,7 +2,7 @@
  * Created by florinpopa on 14/06/2018.
  */
 import React, {PureComponent} from 'react';
-import {TextInput, View, Text, StyleSheet} from 'react-native';
+import {View, StyleSheet, InteractionManager} from 'react-native';
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import {ListItem, Icon} from 'react-native-material-ui';
@@ -37,7 +37,7 @@ class NavigationDrawerListItem extends PureComponent {
                         leftElement={<Icon name={this.props.name} color={this.props.isSelected ? styles.buttonGreen : styles.navigationDrawerItemText} />}
                         centerElement={this.props.label}
                         hideChevron={false}
-                        onPress={this.props.onPress}
+                        onPress={this.onPress}
                         style={{
                             container: {
                                 backgroundColor: this.props.isSelected ? styles.backgroundGreen : 'white',
@@ -83,6 +83,11 @@ class NavigationDrawerListItem extends PureComponent {
     }
 
     // Please write here all the methods that are not react native lifecycle methods
+    onPress = () => {
+        InteractionManager.runAfterInteractions(() => {
+            this.props.onPress();
+        })
+    }
 }
 
 NavigationDrawerListItem.defaultProps = {
