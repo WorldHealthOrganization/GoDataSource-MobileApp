@@ -16,17 +16,17 @@ export function getRelationshipsForTypeRequest (outbreakId, searchType, keys, ca
     }
     database.find({
         selector: {
-            fileType: {$eq: ['relationship.json']},
+            fileType: {$eq: 'relationship.json'},
             outbreakId: outbreakId,
             deleted: false,
             $or: [
                 {'persons.0.id': {$in: keys}},
                 {'persons.1.id': {$in: keys}}
             ]
-        }
+        },
     })
         .then((result) => {
-            console.log('Result in finding relationships: ', new Date().getTime() - start);
+            console.log('Result in finding relationships: ', new Date().getTime() - start, JSON.stringify(result));
             callback(null, result.docs)
         })
         .catch((error) => {

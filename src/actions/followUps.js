@@ -60,7 +60,10 @@ export function getFollowUpsForOutbreakId(outbreakId, filter, token) {
                     .then((responseGetContacts) => {
                         console.log ('getFollowUpsForOutbreakIdRequest getContactsForOutbreakIdWithPromises response')
                         dispatch(storeFollowUps(response));
-                        let mappedContact = mapContactsAndFollowUps(responseGetContacts, response);
+                        let mappedContact = []
+                        if (response.length > 0) {
+                            mappedContact = mapContactsAndFollowUps(responseGetContacts, response);
+                        }
                         dispatch(storeContacts(mappedContact));
                     })
                     .catch((errorGetContactsForFollowUps) => {

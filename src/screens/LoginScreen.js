@@ -126,7 +126,7 @@ class LoginScreen extends Component {
                         secureTextEntry={true}
                         autoCapitalize={'none'}
                     />
-                    <Button raised onPress={this.handleLogin} text="Login" style={styles.buttonLogin} height={35} />
+                    <Button onPress={this.handleLogin} text="Login" style={styles.buttonLogin} height={35} />
                 </View>
                 <View style={style.logoContainer}>
                     <Image source={{uri: 'logo_app'}} style={style.logoStyle} />

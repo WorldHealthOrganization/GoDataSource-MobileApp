@@ -430,7 +430,6 @@ export function mapContactsAndRelationships(contacts, relationships) {
                 return extractIdFromPouchId(e._id, 'person')
             }).indexOf(relationships[i].persons[0].id) > -1) {
                 
-            console.log ('mapContactsAndRelationships if')
             contactObject = Object.assign({}, contacts[contacts.map((e) => {
                 return extractIdFromPouchId(e._id, 'person')
             }).indexOf(relationships[i].persons[0].id)]);
@@ -446,7 +445,6 @@ export function mapContactsAndRelationships(contacts, relationships) {
             if ((relationships[i].persons[1].type === 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT' || relationships[i].persons[1].type === 'contact') && mappedContacts.map((e) => {
                     return extractIdFromPouchId(e._id, 'person')
                 }).indexOf(relationships[i].persons[1].id) > -1) {
-                console.log ('mapContactsAndRelationships else')
 
                 contactObject = Object.assign({}, contacts[contacts.map((e) => {
                     return extractIdFromPouchId(e._id, 'person')
@@ -485,7 +483,7 @@ export function mapContactsAndFollowUps(contacts, followUps) {
         }
     }
     // console.log ('mapContactsAndFollowUps mappedContacts', JSON.stringify(mappedContacts))
-    return mappedContacts;
+    return mappedContacts.filter((e) => {return e._id !== undefined && e._id});
 }
 
 export function updateRequiredFields(outbreakId, userId, record, action, fileType = '', type = '') {

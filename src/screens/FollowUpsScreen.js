@@ -112,8 +112,12 @@ class FollowUpsScreen extends Component {
                 }
             }
 
-            state.followUps = fUps;
-
+            if (props.followUps && props.followUps.length > 0) {
+                state.followUps = fUps;
+            }
+            else {
+                state.followUps = []
+            }
             state.refreshing = false;
             state.loading = false;
         }
@@ -121,6 +125,7 @@ class FollowUpsScreen extends Component {
     }
 
     componentDidMount() {
+        console.log ('componentDidMount')
         this.setState({
             loading: true
         }, () => {
@@ -540,8 +545,11 @@ class FollowUpsScreen extends Component {
         //         defaultFilter.where.or.push({lastName: {like: this.state.filter.searchText, options: 'i'}});
         //     }
         // }
-
-        this.props.getFollowUpsForOutbreakId(this.props.user.activeOutbreakId, this.state.filter, null);
+        this.setState({
+            loading: true
+        }, () => {
+            this.props.getFollowUpsForOutbreakId(this.props.user.activeOutbreakId, this.state.filter, null);
+        })
     };
 
     handleOnSubmitEditing = (text) => {

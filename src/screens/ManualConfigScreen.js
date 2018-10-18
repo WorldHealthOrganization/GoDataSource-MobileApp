@@ -113,7 +113,7 @@ class ManualConfigScreen extends Component {
                         secureTextEntry={true}
                         autoCapitalize={'none'}
                     />
-                    <Button upperCase={false} raised onPress={this.saveHubConfiguration} text="Save HUB configuration" style={styles.buttonLogin} />
+                    <Button upperCase={false} onPress={this.saveHubConfiguration} text="Save HUB configuration" style={styles.buttonLogin} />
                 </View>
                 <View style={style.logoContainer}>
                     <Image source={{uri: 'logo_app'}} style={style.logoStyle} />
