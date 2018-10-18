@@ -26,7 +26,7 @@ class QRScanScreen extends Component {
     }
 
     onSuccess(e) {
-        //  TO DO get data from e
+        //  TO DO get data from e...
         this.props.navigator.dismissModal(this.props.pushNewScreen(e))
     }
 
