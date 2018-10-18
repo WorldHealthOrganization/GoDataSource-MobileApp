@@ -20,6 +20,7 @@ import ContactsScreen from './ContactsScreen';
 import ContactsSingleScreen from './ContactsSingleScreen';
 import ExposureScreen from './ExposureScreen';
 import MapScreen from './MapScreen';
+import QRScanScreen from './QRScanScreen';
 
 const screens = [
     {screen: 'LoginScreen', component: LoginScreen},
@@ -37,7 +38,8 @@ const screens = [
     {screen: 'ContactsScreen', component: ContactsScreen},
     {screen: 'ContactsSingleScreen', component: ContactsSingleScreen},
     {screen: 'ExposureScreen', component: ExposureScreen},
-    {screen: 'MapScreen', component: MapScreen}
+    {screen: 'MapScreen', component: MapScreen},
+    {screen: 'QRScanScreen', component: QRScanScreen}
 ];
 
 export function registerScreens(store, Provider) {

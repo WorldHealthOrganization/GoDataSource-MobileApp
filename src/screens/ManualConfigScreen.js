@@ -41,6 +41,11 @@ class ManualConfigScreen extends Component {
     }
 
     // Please add here the react lifecycle methods that you need
+    componentDidMount = () => {
+        if (this.props && this.props.QRCodeInfo) {
+            //TO DO map this.props.QRCodeInfo info to props
+        }
+    }
 
     static getDerivedStateFromProps(props, state) {
         if (props.errors && props.errors.type && props.errors.message) {

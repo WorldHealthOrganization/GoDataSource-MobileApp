@@ -137,6 +137,10 @@ android {
 }
 
 dependencies {
+    implementation (project(':react-native-camera')) {
+        // exclude group: "com.google.android.gms"
+        exclude group: "com.android.support"
+    }
     implementation project(':react-native-document-picker')
     implementation project(':react-native-fs')
     implementation project(':react-native-sqlcipher-2')
