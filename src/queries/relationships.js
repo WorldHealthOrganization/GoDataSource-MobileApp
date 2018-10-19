@@ -16,6 +16,10 @@ export function getRelationshipsForTypeRequest (outbreakId, searchType, keys, ca
     }
     database.find({
         selector: {
+            _id: {
+                $gt: 'relationship.json_',
+                $lt: 'relationship.json_\uffff'
+            },
             fileType: {$eq: 'relationship.json'},
             outbreakId: outbreakId,
             deleted: false,

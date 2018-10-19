@@ -60,8 +60,22 @@ class CardComponent extends Component {
             }
         }
 
-        if (this.props.followUp && this.props.contact) {
-            console.log("It's for single screen");
+        if (this.props.followUp) {
+            console.log("It's for single screen followUp");
+            return true
+        }
+
+        let myDatePickerItems = []
+        let hasDateChanged = null
+        if (nextProps && nextProps.item && nextProps.screen !== 'ExposureScreen') {
+            myDatePickerItems = nextProps.item.filter((e) => {return e.type === 'DatePicker'})
+            if (myDatePickerItems.length > 0) {
+                hasDateChanged = myDatePickerItems.filter((e) => {return this.props.contact[e.id] !== nextProps.contact[e.id]})
+            }
+        }
+       
+        if (this.props.contact && hasDateChanged && hasDateChanged.length > 0) {
+            console.log("It's for single screen contact");
             return true
         }
 
@@ -152,6 +166,7 @@ class CardComponent extends Component {
         }
 
         if (this.props.screen === 'ExposureScreen') {
+            console.log('refresh item')
             if (item.type === 'DropdownInput') {
                 item.data = this.computeDataForExposure(item);
             }
@@ -166,6 +181,10 @@ class CardComponent extends Component {
                 item.onPressArray = [this.props.onDeletePress]
             }
             value = this.computeValueForContactsSingleScreen(item, this.props.index);
+
+            if (item.type === 'DatePicker') {
+                value = this.props.contact[item.id]
+            }
         }
 
         if (this.props.screen === 'ContactsSingleScreenAddress') {
@@ -545,7 +564,6 @@ class CardComponent extends Component {
         return valueToBeReturned;
     }
 }
-
 
 // Create style outside the class, or for components that will be used by other components (buttons),
 // make a global style in the config directory

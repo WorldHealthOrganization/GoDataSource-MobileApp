@@ -440,7 +440,7 @@ class ContactsSingleScreen extends Component {
     };
 
     handleOnChangeDate = (value, id, objectType) => {
-        console.log("onChangeDate: ", value, id);
+        console.log("onChangeDate: ", value, id, objectType);
 
         if (objectType === 'FollowUp') {
             this.setState(
