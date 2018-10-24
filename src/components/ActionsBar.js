@@ -12,27 +12,30 @@ import Ripple from 'react-native-material-ripple';
 // the material ui library, since it provides design and animations out of the box
 import styles from './../styles';
 
-ActionsBar = ({textsArray, addressIndex, textsStyleArray, onPressArray, hasBorder, borderColor, containerStyle, containerTextStyle}) => (
+ActionsBar = ({textsArray, addressIndex, textsStyleArray, onPressArray, hasBorder, borderColor, containerStyle, containerTextStyle, isEditMode}) => (
     <View style={[style.containerStyle, containerStyle]}>
         <View style={[style.separatorStyle, {backgroundColor: borderColor, display: hasBorder ? 'flex' : 'none'}]}/>
-        <View style={[style.containerText, containerTextStyle]}>
-            {
-                textsArray.map((text, index) => {
-                    return (
-                        <Ripple
-                            style={style.rippleStyle}
-                            onPress={onPressArray && onPressArray[index] ? () => {onPressArray[index](addressIndex)} : () => {console.log("Default ")}}
-                        >
-                            <Text style={[
-                                textsStyleArray && Array.isArray(textsStyleArray) &&
-                                textsStyleArray[index] ? textsStyleArray[index] : style.textStyle]}
-                                  numberOfLines={1}
-                            >{text}</Text>
-                        </Ripple>
-                    )
-                })
-            }
-        </View>
+        {
+            isEditMode ? (
+                <View style={[style.containerText, containerTextStyle]}>
+                {
+                    textsArray.map((text, index) => {
+                        return (
+                            <Ripple
+                                style={style.rippleStyle}
+                                onPress={onPressArray && onPressArray[index] ? () => {onPressArray[index](addressIndex)} : () => {console.log("Default ")}}
+                            >
+                                <Text style={[
+                                    textsStyleArray && Array.isArray(textsStyleArray) &&
+                                    textsStyleArray[index] ? textsStyleArray[index] : style.textStyle]}
+                                    numberOfLines={1}
+                                >{text}</Text>
+                            </Ripple>
+                        )
+                    })
+                }
+                </View>) : null
+        }
     </View>
 );
 

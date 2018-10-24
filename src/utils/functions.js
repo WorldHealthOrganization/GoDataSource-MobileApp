@@ -91,7 +91,7 @@ export function navigation(event, navigator) {
                         break;
                     case '2-add':
                         screenToSwitchTo = "CasesScreen";
-                        addScreen = "AddSingleCaseScreen";
+                        addScreen = "CaseSingleScreen";
                         break;
                     default:
                         screenToSwitchTo = "FollowUpsScreen";

@@ -88,11 +88,9 @@ class DropdownInput extends PureComponent {
                     }).indexOf(state)].id
                     },
                     this.props.id,
-                    this.props.objectType ?
-                        (this.props.objectType === 'Address' ? this.props.index :
-                            (this.props.objectType === 'LabResult' ? this.props.index : this.props.objectType )
-                        )
-                        : this.props.data[this.props.data.map((e) => {
+                    this.props.objectType ? (
+                            this.props.objectType === 'Address' || this.props.objectType === 'LabResult' || this.props.objectType === 'Documents' ? this.props.index : this.props.objectType 
+                        ) : this.props.data[this.props.data.map((e) => {
                                 return e.value
                             }).indexOf(state)].type || null,
                     this.props.objectType
@@ -102,7 +100,7 @@ class DropdownInput extends PureComponent {
             this.props.onChange(
                 state,
                 this.props.id,
-                this.props.objectType ? (this.props.objectType === 'Address' ? this.props.index : (this.props.objectType === 'LabResult' ? this.props.index : this.props.objectType ) ) : null,
+                this.props.objectType ? (this.props.objectType === 'Address' || this.props.objectType === 'LabResult' || this.props.objectType === 'Documents' ? this.props.index : this.props.objectType) : null,
                 this.props.objectType
             )
         }

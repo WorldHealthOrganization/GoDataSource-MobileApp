@@ -11,7 +11,7 @@ import styles from './../styles';
 import NavBarCustom from './../components/NavBarCustom';
 import {Calendar} from 'react-native-calendars';
 import CalendarPicker from './../components/CalendarPicker';
-import {calculateDimension} from './../utils/functions';
+import {calculateDimension, navigation} from './../utils/functions';
 import config from './../utils/config';
 import ButtonWithIcons from './../components/ButtonWithIcons';
 import ValuePicker from './../components/ValuePicker';
@@ -294,14 +294,14 @@ class CasesScreen extends Component {
 
     //Open single case CaseSingleScreen
     handleOnPressCase = (item, contact) => {
-        console.log("### handlePressCases: ", item);
+        console.log("### handlePressCases: ", JSON.stringify(item));
         this.props.navigator.push({
             screen: 'CaseSingleScreen',
             animated: true,
             animationType: 'fade',
             passProps: {
-                item: item,
-                filter: this.state.filter
+                case: item,
+                // filter: this.state.filter
             }
         })
     };
@@ -318,66 +318,21 @@ class CasesScreen extends Component {
         })
     };
 
-    //Create new case in AddSingleCaseScreen
+    //Create new case in CaseSingleScreen
     handleOnPressAddCase = () => {
-        console.log("### handlePressAddCases: ");
         this.props.navigator.push({
-            screen: 'AddSingleCaseScreen',
+            screen: 'CaseSingleScreen',
             animated: true,
             animationType: 'fade',
             passProps: {
-                item: {},
-                filter: this.state.filter
+                isNew: true,
             }
         })
     };
 
     //Navigator event
     onNavigatorEvent = (event) => {
-        if (event.type === 'DeepLink') {
-            console.log("###");
-            if (event.link.includes('Navigate')) {
-                let linkComponents = event.link.split('/');
-                console.log("### linkComponents: ", linkComponents);
-                if (linkComponents.length > 0) {
-                    let screenToSwitchTo = null;
-                    let addScreen = null;
-                    switch(linkComponents[1]) {
-                        case '0':
-                            screenToSwitchTo = 'FollowUpsScreen';
-                            break;
-                        case '1':
-                            screenToSwitchTo = "ContactsScreen";
-                            break;
-                        case '2':
-                            screenToSwitchTo = "CasesScreen";
-                            break;
-                        case '2-add':
-                            screenToSwitchTo = "CasesScreen";
-                            addScreen = "AddSingleCaseScreen";
-                            break;
-                        default:
-                            screenToSwitchTo = "FollowUpsScreen";
-                            break;
-                    }
-                    this.props.navigator.resetTo({
-                        screen: screenToSwitchTo,
-                        animated: true
-                    });
-                    if(addScreen) {
-                        this.props.navigator.push({
-                            screen: addScreen,
-                            animated: true,
-                            animationType: 'fade',
-                            passProps: {
-                                item: {},
-                                filter: null
-                            }
-                        })
-                    }
-                }
-            }
-        }
+        navigation(event, this.props.navigator);
     };
 }
 

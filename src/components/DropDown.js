@@ -40,7 +40,10 @@ class DropDown extends PureComponent {
         if (!this.props.isEditMode) {
             return (
                 <View style={[this.props.style]}>
-                    <Text style={style.labelStyle}>{this.state.selectedItems.map((e, index) => {return e.label + (index === (this.state.selectedItems.length - 1) ? '' : ', ')})}</Text>
+                    {
+                        this.props.value.length > 0 ?
+                            <Text style={style.labelStyle}>{this.state.selectedItems.map((e, index) => {return e.label + (index === (this.state.selectedItems.length - 1) ? '' : ', ')})}</Text> : <Text></Text>
+                    }
                 </View>
             )
         }
