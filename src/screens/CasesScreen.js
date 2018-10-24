@@ -28,6 +28,7 @@ import {removeErrors} from './../actions/errors';
 import {addFilterForScreen} from './../actions/app';
 import AnimatedListView from './../components/AnimatedListView';
 import ViewHOC from './../components/ViewHOC';
+import _ from 'lodash';
 
 let height = Dimensions.get('window').height;
 let width = Dimensions.get('window').width;
@@ -47,7 +48,7 @@ class CasesScreen extends Component {
                 searchText: ''
             },
             filterFromFilterScreen: this.props.filter && this.props.filter['CasesFilterScreen'] ? this.props.filter['CasesFilterScreen'] : null,
-            cases: [],
+            cases: this.props.case,
             refreshing: false,
             loading: true
         };
@@ -90,6 +91,7 @@ class CasesScreen extends Component {
         if(props.cases){
             state.refreshing = false;
             state.loading = false;
+            state.cases = props.cases;
         }
         return null;
     }
@@ -155,7 +157,7 @@ class CasesScreen extends Component {
                 <View style={style.containerContent}>
                     <AnimatedListView
                         stickyHeaderIndices={[0]}
-                        data={this.props.cases || []}
+                        data={this.state.cases || []}
                         renderItem={this.renderCase}
                         keyExtractor={this.keyExtractor}
                         ListHeaderComponent={
@@ -198,19 +200,22 @@ class CasesScreen extends Component {
 
     //Search cases using keyword
     handleOnSubmitEditing = () => {
-        this.props.addFilterForScreen("CasesScreen", this.state.filter);
-        let existingFilter = this.state.filterFromFilterScreen ? Object.assign({}, this.state.filterFromFilterScreen) : Object.assign({}, config.defaultFilterForCases);
+        // this.props.addFilterForScreen("CasesScreen", this.state.filter);
+        // let existingFilter = this.state.filterFromFilterScreen ? Object.assign({}, this.state.filterFromFilterScreen) : Object.assign({}, config.defaultFilterForCases);
+        //
+        // if (!existingFilter.where || Object.keys(existingFilter.where).length === 0) {
+        //     existingFilter.where = {};
+        // }
+        // if (!existingFilter.where.or || existingFilter.where.or.length === 0) {
+        //     existingFilter.where.or = [];
+        // }
+        // existingFilter.where.or.push({firstName: {like: this.state.filter.searchText, options: 'i'}});
+        // existingFilter.where.or.push({lastName: {like: this.state.filter.searchText, options: 'i'}});
+        //
+        // this.props.getCasesForOutbreakId(this.props.user.activeOutbreakId, existingFilter, this.props.user.token);
 
-        if (!existingFilter.where || Object.keys(existingFilter.where).length === 0) {
-            existingFilter.where = {};
-        }
-        if (!existingFilter.where.or || existingFilter.where.or.length === 0) {
-            existingFilter.where.or = [];
-        }
-        existingFilter.where.or.push({firstName: {like: this.state.filter.searchText, options: 'i'}});
-        existingFilter.where.or.push({lastName: {like: this.state.filter.searchText, options: 'i'}});
-
-        this.props.getCasesForOutbreakId(this.props.user.activeOutbreakId, existingFilter, this.props.user.token);
+        // Filter cases by firstName and lastName
+        this.filterCases();
     };
 
     //Save keyword for search in cases
@@ -333,6 +338,25 @@ class CasesScreen extends Component {
     //Navigator event
     onNavigatorEvent = (event) => {
         navigation(event, this.props.navigator);
+    };
+
+    filterCases = () => {
+        let casesCopy = _.cloneDeep(this.props.cases);
+
+        // Take care of search filter
+        if (this.state.filter.searchText) {
+            casesCopy = casesCopy.filter((e) => {
+                return  e && e.firstName && this.state.filter.searchText.toLowerCase().includes(e.firstName.toLowerCase()) ||
+                    e && e.lastName && this.state.filter.searchText.toLowerCase().includes(e.lastName.toLowerCase()) ||
+                    e && e.firstName && e.firstName.toLowerCase().includes(this.state.filter.searchText.toLowerCase()) ||
+                    e && e.lastName && e.lastName.toLowerCase().includes(this.state.filter.searchText.toLowerCase())
+            });
+        }
+
+       
+        this.setState({
+            cases: casesCopy
+        })
     };
 }
 
