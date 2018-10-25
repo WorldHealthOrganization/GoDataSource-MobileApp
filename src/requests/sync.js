@@ -33,6 +33,9 @@ export function getDatabaseSnapshotRequest(hubConfig, lastSyncDate, callback) {
         'Accept': 'application/json',
         'Authorization': 'Basic ' + base64.encode(`${hubConfig.clientId}:${hubConfig.clientSecret}`)
     }, '0', '20000')
+        .progress({count: 1}, (received, total) => {
+            console.log(received, total)
+        })
         .then((res) => {
             let status = res.info().status;
             // After getting zip file from the server, unzip it and then proceed to the importing of the data to the SQLite database

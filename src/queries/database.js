@@ -21,11 +21,18 @@ let databaseIndexes = [
         name: 'translationIndex',
         ddoc: 'translationIndex',
     },
-    {
-        index: {fields: ['outbreakId', 'fileType', 'deleted']},
-        name: 'outbreakIdIndex',
-        ddoc: 'outbreakIdIndex',
-    },
+    // {
+    //     index: {fields: ['fileType', 'outbreakId', 'deleted']},
+    //     name: 'generalIndex',
+    //     ddoc: 'generalIndex',
+    // },
+    // {
+    //     index: {fields: [
+    //         {name: 'persons.[].id', type: 'string'}]},
+    //     name: 'arrayIndex',
+    //     ddoc: 'arrayIndex',
+    //     type: 'text'
+    // },
     // {
     //     index: {fields: ['date', 'fileType', 'outbreakId', 'deleted']},
     //     name: 'followUpIndex',
@@ -47,62 +54,11 @@ let databaseIndexes = [
 // We will separate the records by adding a new property called type: <collection_name>
 export function createDatabase(databaseName, databasePassword, callback) {
     // Define the design documents that tells the database to build indexes in order to query
-    let ddocArray = [];
     let promisesArray = [];
-    // ddocArray.push(createDesignDoc('getContacts1', function (doc) {
-    //     if (doc.fileType === 'person.json' && doc.type === 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT') {
-    //         if (doc.age) {
-    //             emit([doc.outbreakId, doc.gender, doc.age]);
-    //         } else {
-    //             if (doc.dob) {
-    //                 let now = new moment();
-    //                 let dob = new moment(doc.dob);
-    //                 let age = Math.round(moment.duration(now.diff(dob)).asYears());
-    //                 emit([doc.outbreakId, doc.gender, age]);
-    //             } else {
-    //                 emit([doc.outbreakId, doc.gender, 0]);
-    //             }
-    //         }
-    //     }
-    // }));
-
-    // ddocArray.push(createDesignDoc('getUserByEmail', function (doc) {
-    //     if (doc.fileType === 'user.json') {
-    //         emit(doc.email);
-    //     } else {
-    //         if (doc.fileType === 'person.json' && doc.type === 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT') {
-    //             if (doc.age) {
-    //                 emit([doc.outbreakId, doc.gender, doc.age]);
-    //             } else {
-    //                 emit([doc.outbreakId, doc.gender, 0]);
-    //             }
-    //         } else {
-    //             if (doc.fileType === 'relationship.json') {
-    //                 emit([doc.outbreakId, doc.deleted, doc.active, doc.persons[0].type, doc.persons[0].id, doc.persons[1].type, doc.persons[1].id]);
-    //             }
-    //         }
-    //     }
-    // }));
 
     // Check first if the database is cached
     if (database) {
-        // for (let i=0; i<ddocArray.length; i++) {
-        //     console.log('Create design doc: ', i);
-        //     promisesArray.push(addDesignDocs(ddocArray[i], database));
-        // }
-        // promisesArray.push(createIndexes());
-        // Add al the design docs and then return the database
-        // Promise.all(promisesArray)
-        //     .then((results) => {
-        //         console.log("Results from creating indexes: ", results);
-        //         callback(database);
-        //     })
-        //     .catch((error) => {
-        //         console.log("Error from creating indexes: ", error);
-        //         callback(database);
-        //     })
-
-        callback(database);
+        return callback(database);
     }
     // After that, check if there is already a database with the name and return that
     console.log("Database name: ", databaseName);
@@ -129,10 +85,11 @@ export function createDatabase(databaseName, databasePassword, callback) {
                     if (!exists) {
                         // for (let i=0; i<databaseIndexes.length; i++) {
                         //     console.log("Create index: ", i);
-                        //     promisesArray.push(database.createIndex(databaseIndexes));
+                        //     promisesArray.push(database.createIndex(databaseIndexes[i]));
                         // }
-                        promisesArray.push(createIndexContact());
-                        promisesArray.push(createIndex());
+                        // promisesArray.push(createIndexContact());
+                        // promisesArray.push(createIndex());
+                        // promisesArray.push(createIndexPerson());
                         // Add all the design docs and then return the database
                         Promise.all(promisesArray)
                             .then((results) => {
@@ -157,10 +114,11 @@ export function createDatabase(databaseName, databasePassword, callback) {
                     database = new PouchDB(encodeName(databaseName, databasePassword), {adapter: 'react-native-sqlite'});
                     // for (let i=0; i<databaseIndexes.length; i++) {
                     //     console.log("Create index: ", i);
-                    //     promisesArray.push(database.createIndex(databaseIndexes));
+                    //     promisesArray.push(database.createIndex(databaseIndexes[i]));
                     // }
-                    promisesArray.push(createIndexContact());
-                    promisesArray.push(createIndex());
+                    // promisesArray.push(createIndexContact());
+                    // promisesArray.push(createIndex());
+                    // promisesArray.push(createIndexPerson());
                     // Add al the design docs and then return the database
                     Promise.all(promisesArray)
                         .then((results) => {
@@ -209,6 +167,29 @@ function createIndex() {
                 index: {fields: ['languageId', 'fileType', 'deleted']},
                 name: 'index1',
                 ddoc: 'index1',
+            })
+                .then((res) => {
+                    console.log('Creating index: ', res);
+                    resolve('Done creating Mango index');
+                })
+                .catch((errorMangoIndex) => {
+                    console.log('Error creating mango index: ', errorMangoIndex);
+                    reject(errorMangoIndex)
+                })
+        } else {
+            reject('No database');
+        }
+    })
+}
+
+function createIndexPerson() {
+    return new Promise ((resolve, reject) => {
+        if (database) {
+            // Index for contacts based on fileType, type, outbreakId, firstName, lastName, age, gender
+            database.createIndex({
+                index: {fields: ['persons.[].id', 'outbreakId', 'fileType', 'deleted']},
+                name: 'indexPerson',
+                ddoc: 'indexPerson',
             })
                 .then((res) => {
                     console.log('Creating index: ', res);
@@ -280,6 +261,23 @@ export function updateFileInDatabase(file, type) {
                 }
                 // Update the doc with the new fields: add the type and _rev fields to the file object and insert it
                 // console.log("Update doc " + type);
+                if (type === 'relationship.json') {
+                    if (file.persons[0].source) {
+                        file.source = file.persons[0].id;
+                    } else {
+                        if (file.persons[1].source) {
+                            file.source = file.persons[1].id;
+                        }
+                    }
+
+                    if (file.persons[0].target) {
+                        file.target = file.persons[0].id;
+                    } else {
+                        if (file.persons[1].target) {
+                            file.target = file.persons[1].id;
+                        }
+                    }
+                }
                 file.fileType = type;
                 file._rev = doc.rev;
                 return file;
@@ -294,6 +292,25 @@ export function updateFileInDatabase(file, type) {
                 })
         } else {
             return reject("Nonexistent database");
+        }
+    })
+}
+
+export function processBulkDocs(data, type) {
+    return new Promise((resolve, reject) => {
+        if (database) {
+            data = data.map((e) => {return Object.assign({}, e, {_id: createIdForType(e, type)})});
+            database.bulkDocs(data)
+                .then(() => {
+                    console.log('Bulk docs finished: ');
+                    resolve('Done Bulk');
+                })
+                .catch((errorBulkDocs) => {
+                    console.log('Bulk docs encountered an error: ', errorBulkDocs);
+                    reject(errorBulkDocs)
+                })
+        } else {
+            reject('Database does not exist');
         }
     })
 }

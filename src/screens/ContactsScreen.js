@@ -160,6 +160,7 @@ class ContactsScreen extends Component {
                         style={[style.listViewStyle]}
                         componentContainerStyle={style.componentContainerStyle}
                         onScroll={this.handleScroll}
+                        getItemLayout={this.getItemLayout}
                         // refreshing={this.state.refreshing}
                         // onRefresh={this.handleOnRefresh}
                     />
@@ -196,6 +197,12 @@ class ContactsScreen extends Component {
             />
         )
     };
+
+    getItemLayout = (data, index) => ({
+        length: calculateDimension(178, true, this.props.screenSize),
+        offset: calculateDimension(178, true, this.props.screenSize) * index,
+        index
+    });
 
     renderSeparatorComponent = () => {
         return (

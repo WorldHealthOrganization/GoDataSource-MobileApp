@@ -54,7 +54,7 @@ export function getFollowUpsForOutbreakId(outbreakId, filter, token) {
                 console.log("*** getFollowUpsForOutbreakId response: ");
                 let keys = response.map((e) => {return e.personId});
                 keys = _.uniq(keys);
-                keys = keys.sort()
+                keys = keys.sort();
                 
                 getContactsForOutbreakIdWithPromises(outbreakId, {keys: keys}, null, dispatch)
                     .then((responseGetContacts) => {

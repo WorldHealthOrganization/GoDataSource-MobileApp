@@ -11,28 +11,30 @@ export function getRelationshipsForTypeRequest (outbreakId, searchType, keys, ca
     console.log("getRelationshipsForOutbreakIdRequest: ", outbreakId, keys);
 
     let start =  new Date().getTime();
-    if (keys.length === 0) {
+    if (!keys || keys.length === 0) {
         callback(null, []);
     }
+    // console.log('Use keys: ', keys);
+
     database.find({
         selector: {
-            fileType: {$eq: ['relationship.json']},
-            outbreakId: outbreakId,
-            deleted: false,
-            $or: [
-                {'persons.0.id': {$in: keys}},
-                {'persons.1.id': {$in: keys}}
-            ]
+            _id: {
+                $gt: `relationship.json_false_${outbreakId}_`,
+                $lt: `relationship.json_false_${outbreakId}_\uffff`
+            },
+            target: {$in: keys}
         }
     })
         .then((result) => {
-            console.log('Result in finding relationships: ', new Date().getTime() - start);
+            console.log('Result in finding relationships: ', new Date().getTime() - start, result.docs.length);
             callback(null, result.docs)
         })
         .catch((error) => {
             console.log('Error in finding relationships: ', error);
             callback(error)
         })
+
+
 }
 
 export function getRelationshipsAndFollowUpsForContactRequest (outbreakId, keys, callback) {

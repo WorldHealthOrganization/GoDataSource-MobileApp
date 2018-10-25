@@ -239,6 +239,7 @@ class FollowUpsScreen extends Component {
                         onScroll={this.handleScroll}
                         refreshing={this.state.refreshing}
                         onRefresh={this.handleOnRefresh}
+                        getItemLayout={this.getItemLayout}
                     />
                 </View>
                 <AddFollowUpScreen
@@ -284,6 +285,12 @@ class FollowUpsScreen extends Component {
                 />)
         }
     };
+
+    getItemLayout = (data, index) => ({
+        length: calculateDimension(178, true, this.props.screenSize),
+        offset: calculateDimension(178, true, this.props.screenSize) * index,
+        index
+    });
 
     keyExtractor = (item, index) => item._id;
 

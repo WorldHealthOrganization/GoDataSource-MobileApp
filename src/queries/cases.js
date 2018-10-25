@@ -11,8 +11,8 @@ export function getCasesForOutbreakIdRequest (outbreakId, filter, token, callbac
 
     let start =  new Date().getTime();
     database.allDocs({
-        startkey: `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE_false_${outbreakId}`,
-        endkey: `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE_false_${outbreakId}\uffff`,
+        startkey: `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE_false_${outbreakId}_`,
+        endkey: `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE_false_${outbreakId}_\uffff`,
         include_docs: true
     })
         .then((result) => {

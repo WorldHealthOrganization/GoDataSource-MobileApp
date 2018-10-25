@@ -18,6 +18,7 @@ import DropdownInput from './DropdownInput';
 import TextInput from './TextInput';
 import DropDown from './DropDown';
 import _ from 'lodash';
+import DatePicker from './DatePicker';
 
 
 class FollowUpListItem extends PureComponent {
@@ -143,6 +144,33 @@ class FollowUpListItem extends PureComponent {
                         isRequired={item.required}
                         onChange={this.props.onChangeTextAnswer}
                         multiline={true}
+                        style={{width: width, marginHorizontal: marginHorizontal}}
+                    />
+                );
+            case 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_NUMERIC':
+                return (
+                    <TextInput
+                        id={item.variable}
+                        label={'Write answer'}
+                        labelValue={item.text}
+                        value={questionAnswers}
+                        isEditMode={this.props.isEditMode}
+                        isRequired={item.required}
+                        onChange={this.props.onChangeTextAnswer}
+                        multiline={true}
+                        keyboardType={'number-pad'}
+                        style={{width: width, marginHorizontal: marginHorizontal}}
+                    />
+                );
+            case 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_DATE_TIME':
+                return (
+                    <DatePicker
+                        id={item.variable}
+                        label={item.text}
+                        value={value}
+                        isEditMode={item.props.isEditMode}
+                        isRequired={item.required}
+                        onChange={this.props.onChangeDateAnswer}
                         style={{width: width, marginHorizontal: marginHorizontal}}
                     />
                 );

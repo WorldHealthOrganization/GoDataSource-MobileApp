@@ -48,7 +48,7 @@ class AnimatedListView extends PureComponent {
         return (
             <AnimatedFlatList
                 ref={this.animatedFlatList}
-                data={this.props.data}
+                data={Array.isArray(this.props.data) ? this.props.data : []}
                 renderItem={this.props.renderItem}
                 keyExtractor={this.props.keyExtractor}
                 ItemSeparatorComponent={this.props.ItemSeparatorComponent}
@@ -63,6 +63,12 @@ class AnimatedListView extends PureComponent {
                 stickyHeaderIndices={this.props.stickyHeaderIndices}
                 onRefresh={this.props.onRefresh}
                 refreshing={this.props.refreshing}
+                removeClippedSubviews={true}
+                maxToRenderPerBatch={5}
+                updateCellsBatchingPeriod={100}
+                initialNumToRender={5}
+                windowSize={11}
+                getItemLayout={this.props.getItemLayout}
             />
         );
     }

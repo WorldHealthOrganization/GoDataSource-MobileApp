@@ -55,6 +55,7 @@ class TextInput extends PureComponent {
                     tintColor='rgb(77,176,160)'
                     multiline={this.props.multiline != undefined ? this.props.multiline : false}
                     onPress={() => {console.log("On press textInput")}}
+                    keyboardType={this.props.keyboardType ? this.props.keyboardType : 'default'}
                 />
             </View>
         );

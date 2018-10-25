@@ -58,6 +58,9 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
         let marginVertical = calculateDimension(12.5, true, this.props.screenSize);
         let viewWidth = calculateDimension(config.designScreenSize.width - 32, false, this.props.screenSize);
 
+        // Sort questions by the order field
+        let sortedQuestions = _.sortBy(this.props.questions, ['order']);
+
         return (
             <View style={style.mainContainer}>
                 {
@@ -86,7 +89,7 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
                     keyboardShouldPersistTaps={'always'}
                 >
                     {
-                        this.props.questions.map((item, index) => {
+                        sortedQuestions.map((item, index) => {
                             return this.handleRenderItem(item, index)
                         })
                     }
@@ -104,6 +107,7 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
                 source={this.props.item}
                 isEditMode={this.props.isEditMode}
                 onChangeTextAnswer={this.props.onChangeTextAnswer}
+                onChangeDateAnswer={this.props.onChangeDateAnswer}
                 onChangeSingleSelection={this.props.onChangeSingleSelection}
                 onChangeMultipleSelection={this.props.onChangeMultipleSelection}
             />

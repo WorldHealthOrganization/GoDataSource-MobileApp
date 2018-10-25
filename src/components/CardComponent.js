@@ -40,41 +40,41 @@ class CardComponent extends Component {
     }
 
     // Please add here the react lifecycle methods that you need
-    shouldComponentUpdate(nextProps, nextState) {
-        if (nextProps.screen === 'FollowUpsFilter' || nextProps.screen === 'CasesFilter') {
-            if (nextProps && nextProps.item && nextProps.item[1] && this.props && this.props.item && this.props.item[1] && nextProps.item[1].type === 'Selector' && nextProps.item[1].id === 'gender') {
-                // console.log("Return true for selector: ", nextProps.filter.filter[nextProps.item[1].id], this.props.filter.filter[this.props.item[1].id]);
-                return true;
-            }
-            if (nextProps && nextProps.item && nextProps.item[1] && this.props && this.props.item && this.props.item[1] && nextProps.item[1].type === 'IntervalPicker' && nextProps.item[1].id === 'age' && nextProps.filter.filter[nextProps.item[1].id] !== this.props.filter.filter[this.props.item[1].id]) {
-                // console.log("Return true for interval: ");
-                return true;
-            }
-            if (nextProps && nextProps.item && nextProps.item[1] && this.props && this.props.item && this.props.item[1] && nextProps.item[1].type === 'DropDownSectioned' && nextProps.item[1].id === 'selectedLocations' && nextProps.filter.filter[nextProps.item[1].id] !== this.props.filter.filter[this.props.item[1].id]) {
-                // console.log("Return true for sectioned drop down, ");
-                return true;
-            }
-            if (nextProps && nextProps.item && nextProps.item[1] && this.props && this.props.item && this.props.item[1] && nextProps.item[1].type === 'DropdownInput' && nextProps.item[1].id === 'exposure') {
-                // console.log("Return true for exposure: ");
-                return false;
-            }
-        }
-
-        if (this.props.followUp && this.props.contact) {
-            console.log("It's for single screen");
-            return true
-        }
-
-        if(this.props.case){
-            return true;
-        }
-
-        if (nextProps.screen === 'ExposureScreen') {
-            return true;
-        }
-
-        return false;
-    }
+    // shouldComponentUpdate(nextProps, nextState) {
+    //     if (nextProps.screen === 'FollowUpsFilter' || nextProps.screen === 'CasesFilter') {
+    //         if (nextProps && nextProps.item && nextProps.item[1] && this.props && this.props.item && this.props.item[1] && nextProps.item[1].type === 'Selector' && nextProps.item[1].id === 'gender') {
+    //             // console.log("Return true for selector: ", nextProps.filter.filter[nextProps.item[1].id], this.props.filter.filter[this.props.item[1].id]);
+    //             return true;
+    //         }
+    //         if (nextProps && nextProps.item && nextProps.item[1] && this.props && this.props.item && this.props.item[1] && nextProps.item[1].type === 'IntervalPicker' && nextProps.item[1].id === 'age' && nextProps.filter.filter[nextProps.item[1].id] !== this.props.filter.filter[this.props.item[1].id]) {
+    //             // console.log("Return true for interval: ");
+    //             return true;
+    //         }
+    //         if (nextProps && nextProps.item && nextProps.item[1] && this.props && this.props.item && this.props.item[1] && nextProps.item[1].type === 'DropDownSectioned' && nextProps.item[1].id === 'selectedLocations' && nextProps.filter.filter[nextProps.item[1].id] !== this.props.filter.filter[this.props.item[1].id]) {
+    //             // console.log("Return true for sectioned drop down, ");
+    //             return true;
+    //         }
+    //         if (nextProps && nextProps.item && nextProps.item[1] && this.props && this.props.item && this.props.item[1] && nextProps.item[1].type === 'DropdownInput' && nextProps.item[1].id === 'exposure') {
+    //             // console.log("Return true for exposure: ");
+    //             return false;
+    //         }
+    //     }
+    //
+    //     if (this.props.followUp && this.props.contact) {
+    //         console.log("It's for single screen");
+    //         return true
+    //     }
+    //
+    //     if(this.props.case){
+    //         return true;
+    //     }
+    //
+    //     if (nextProps.screen === 'ExposureScreen') {
+    //         return true;
+    //     }
+    //
+    //     return false;
+    // }
 
     // The render method should have at least business logic as possible,
     // because this will be called whenever there is a new setState call

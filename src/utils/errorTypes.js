@@ -5,6 +5,7 @@ export default {
     UNKNOWN_ERROR: {type: "Unknown error", message: 'The operation failed. Please verify the data entered and try again'},
     ERROR_LOGIN: {type: "Login error", message: 'An error occurred while trying to login'},
     ERROR_GET_USER: {type: "User error", message: 'An error occurred while trying to get user data'},
+    ERROR_UPDATE_USER: {type: "User error", message: 'An error occurred while trying to update user data'},
     ERROR_OUTBREAK: {type: "Outbreak error", message: 'An error occurred while trying to get outbreak data'},
     ERROR_FOLLOWUPS: {type: "Follow-ups error", message: 'An error occurred while trying to get follow-ups data'},
     ERROR_UPDATE_FOLLOWUP: {type: "Follow-up update error", message: 'An error occurred while trying to update the follow-up'},

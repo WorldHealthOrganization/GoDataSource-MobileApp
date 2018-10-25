@@ -63,7 +63,7 @@ class LoginScreen extends Component {
                 }
             ])
         }
-        if (props.loginState && props.loginState === 'Finished logging') {
+        if (props.loginState && (props.loginState === 'Finished logging' || props.loginState === 'Error')) {
             // props.changeAppRoot('after-login');
             state.showLoading = false;
         }
