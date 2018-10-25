@@ -14,7 +14,7 @@ import QuestionCard from './../components/QuestionCard';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import Button from './../components/Button';
 import {LoaderScreen} from 'react-native-ui-lib'
-import {isEqual} from 'lodash';
+import {isEqual, sortBy} from 'lodash';
 
 class FollowUpsSingleQuestionnaireContainer extends PureComponent {
 
@@ -59,7 +59,7 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
         let viewWidth = calculateDimension(config.designScreenSize.width - 32, false, this.props.screenSize);
 
         // Sort questions by the order field
-        let sortedQuestions = _.sortBy(this.props.questions, ['order']);
+        let sortedQuestions = sortBy(this.props.questions, ['order']);
 
         return (
             <View style={style.mainContainer}>

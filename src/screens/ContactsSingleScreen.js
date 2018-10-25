@@ -147,7 +147,7 @@ class ContactsSingleScreen extends Component {
                         this.setState({
                             contact: myContact
                         }, () => {
-                            console.log("After adding the followUps: ", JSON.stringify(this.state.contact));
+                            console.log("After adding the followUps: ");
                         })
                     }
                 }
@@ -383,7 +383,7 @@ class ContactsSingleScreen extends Component {
                 console.log("After updating the exposure: ", this.state.contact);
             })
         } else {
-            relationships = []
+            let relationships = []
             relationships.push(exposure);
             this.setState(prevState => ({
                 contact: Object.assign({}, prevState.contact, {relationships})

@@ -66,55 +66,6 @@ class QRScanScreen extends Component {
     }
 }
 
-CustomMarker = () => {
-    return (
-        <View style={[style.markerContainer]}>
-            <View style={[style.finder, {height: 250, width: 250}]}>
-                <View
-                    style={[
-                    { borderColor: "green" },
-                    style.topLeftEdge,
-                    {
-                        borderLeftWidth: 3,
-                        borderTopWidth: 3
-                    }
-                    ]}
-                />
-                <View
-                    style={[
-                    { borderColor: "green" },
-                    style.topRightEdge,
-                    {
-                        borderRightWidth: 3,
-                        borderTopWidth: 3
-                    }
-                    ]}
-                />
-                <View
-                    style={[
-                    { borderColor: "green" },
-                    style.bottomLeftEdge,
-                    {
-                        borderLeftWidth: 3,
-                        borderBottomWidth: 3
-                    }
-                    ]}
-                />
-                <View
-                    style={[
-                    { borderColor: "green" },
-                    style.bottomRightEdge,
-                    {
-                        borderRightWidth: 3,
-                        borderBottomWidth: 3
-                    }
-                    ]}
-                />
-            </View>
-      </View>
-    )
-}
-
 const style = StyleSheet.create({
     container: {
         flex: 1,
