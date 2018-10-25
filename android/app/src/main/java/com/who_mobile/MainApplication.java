@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import org.reactnative.camera.RNCameraPackage;
 import com.reactnativedocumentpicker.ReactNativeDocumentPicker;
 import com.rnfs.RNFSPackage;
 import dog.craftz.sqlite_2.RNSqlite2Package;
@@ -38,6 +39,7 @@ import java.util.List;
                  new RNFetchBlobPackage(),
                  new RNZipArchivePackage(),
                  new KeychainPackage(),
+                 new RNCameraPackage(),
                  new RNSqlite2Package(),
                  new RNFSPackage()
          );

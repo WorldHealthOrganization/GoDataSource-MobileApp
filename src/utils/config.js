@@ -62,7 +62,7 @@ const tabsValuesRoutes = {
         {key: 'personal', title: 'PERSONAL'},
         {key: 'address', title: 'ADDRESS'},
         {key: 'infection', title: 'INFECTION'},
-        {key: 'labData', title: 'LAB DATA'}
+        {key: 'caseInvestigation', title: 'INVESTIGATION'}
     ],
     contactsSingle: [
         {key: 'personal', title: 'PERSONAL'},
@@ -351,73 +351,114 @@ const caseSingleScreen = {
             ]
         }
     ],
-    address: [
-        {
-            fields: [
-                {
-                    cardNumber: 1,
-                    id: 'typeId',
-                    label: 'Name',
-                    type: 'DropdownInput',
-                    value: '',
-                    isRequired: true,
-                    isEditMode: false,
-                    objectType: 'Address'
-                },
-                {
-                    cardNumber: 1,
-                    id: 'date',
-                    label: 'Date',
-                    value: '',
-                    type: "DatePicker",
-                    isRequired: true,
-                    isEditMode: false,
-                    format: 'YYYY-MM-dd',
-                    objectType: 'Address'
-                },
-                {
-                    cardNumber: 1,
-                    id: 'locationId',
-                    label: 'Area',
-                    type: 'TextInput',
-                    value: '',
-                    isRequired: true,
-                    isEditMode: false,
-                    objectType: 'Address'
-                },
-                {
-                    cardNumber: 1,
-                    id: 'city',
-                    label: 'City',
-                    type: 'TextInput',
-                    value: '',
-                    isRequired: true,
-                    isEditMode: false,
-                    objectType: 'Address'
-                },
-                {
-                    cardNumber: 1,
-                    id: 'postalCode',
-                    label: 'Zip',
-                    type: 'TextInput',
-                    value: '',
-                    isRequired: true,
-                    isEditMode: false,
-                    objectType: 'Address'
-                },
-                {
-                    cardNumber: 1,
-                    id: 'addressLine1',
-                    label: 'Address',
-                    type: 'TextInput',
-                    value: '',
-                    isRequired: true,
-                    isEditMode: false,
-                    objectType: 'Address'
-                },
-            ]
-        }
-    ],
+    document: {
+       fields: [
+            {
+                cardNumber: 3,
+                id: 'documentType',
+                label: 'Document Type',
+                type: 'DropdownInput',
+                value: '',
+                isRequired: true,
+                isEditMode: true,
+                objectType: 'Documents'
+            }, 
+            {
+                cardNumber: 3,
+                id: 'documentNumber',
+                label: 'Document Number',
+                labelValue: 'test',
+                type: 'TextInput',
+                value: '',
+                isRequired: true,
+                isEditMode: true,
+                objectType: 'Documents'
+            },
+            {
+                cardNumber: 3,
+                id: 'deleteButton',
+                type: 'ActionsBar',
+                labelValue: 'test',
+                textsArray: ['Delete'],
+                textsStyleArray: [{color: styles.missedRedColor}],
+                onPressArray: [],
+                objectType: 'Documents'
+            }
+        ]
+    },
+    address: { 
+        fields: [
+            {
+                cardNumber: 1,
+                id: 'name',
+                label: 'Name',
+                labelValue: 'test',
+                type: 'DropdownInput',
+                value: '',
+                isRequired: true,
+                isEditMode: true,
+                objectType: 'Address'
+            },
+            {
+                cardNumber: 1,
+                id: 'locationId',
+                label: 'Area',
+                labelValue: 'test',
+                type: 'DropDownSectioned',
+                value: '',
+                isRequired: false,
+                isEditMode: true,
+                objectType: 'Address',
+                single: true
+            },
+            {
+                cardNumber: 1,
+                id: 'city',
+                label: 'City',
+                labelValue: 'test',
+                type: 'TextInput',
+                value: '',
+                isRequired: true,
+                isEditMode: true,
+                multiline: true,
+                objectType: 'Address'
+            },
+            {
+                cardNumber: 1,
+                id: 'postalCode',
+                label: 'ZIP',
+                labelValue: 'test',
+                type: 'TextInput',
+                value: '',
+                isRequired: true,
+                isEditMode: true,
+                multiline: true,
+                objectType: 'Address'
+            },
+            {
+                cardNumber: 1,
+                id: 'addressLine1',
+                label: 'Address',
+                labelValue: 'test',
+                type: 'TextInput',
+                value: '',
+                isRequired: true,
+                isEditMode: true,
+                multiline: true,
+                objectType: 'Address'
+            },
+            {
+                cardNumber: 1,
+                id: 'deleteButton',
+                type: 'ActionsBar',
+                labelValue: 'test',
+                textsArray: ['Delete'],
+                textsStyleArray: [{color: styles.missedRedColor}],
+                onPressArray: [],
+                objectType: 'Address'
+            }
+        ]
+    },
     infection: [
         {
             fields: [
@@ -429,6 +470,29 @@ const caseSingleScreen = {
                     value: '',
                     isRequired: true,
                     isEditMode: false,
+                    objectType: 'Case'
+                },
+                {
+                    cardNumber: 1,
+                    id: 'dateOfOnset',
+                    label: 'Date of Onset',
+                    value: '',
+                    type: "DatePicker",
+                    isRequired: false,
+                    isEditMode: false,
+                    format: 'YYYY-MM-dd',
+                    objectType: 'Case'
+                },
+                {
+                    cardNumber: 1,
+                    id: 'isDateOfOnsetApproximate',
+                    label: 'Is Date of onset approximate?',
+                    type: 'SwitchInput',
+                    value: false,
+                    isRequired: false,
+                    isEditMode: false,
+                    activeButtonColor: styles.missedRedColor,
+                    activeBackgroundColor: styles.missedRedColorWithOpacity,
                     objectType: 'Case'
                 },
                 {
@@ -455,6 +519,16 @@ const caseSingleScreen = {
                 },
                 {
                     cardNumber: 1,
+                    id: 'outcome',
+                    label: 'Outcome',
+                    type: 'DropdownInput',
+                    value: '',
+                    isRequired: false,
+                    isEditMode: false,
+                    objectType: 'Case'
+                },
+                {
+                    cardNumber: 1,
                     id: 'dateOfOutcome',
                     label: 'Date of Outcome',
                     value: '',
@@ -462,29 +536,6 @@ const caseSingleScreen = {
                     isRequired: false,
                     isEditMode: false,
                     format: 'YYYY-MM-dd',
-                    objectType: 'Case'
-                },
-                {
-                    cardNumber: 1,
-                    id: 'dateOfOnset',
-                    label: 'Date of Onset',
-                    value: '',
-                    type: "DatePicker",
-                    isRequired: false,
-                    isEditMode: false,
-                    format: 'YYYY-MM-dd',
-                    objectType: 'Case'
-                },
-                {
-                    cardNumber: 1,
-                    id: 'isDateOfOnsetApproximate',
-                    label: 'Is Date of onset approximate?',
-                    type: 'SwitchInput',
-                    value: false,
-                    isRequired: false,
-                    isEditMode: false,
-                    activeButtonColor: styles.missedRedColor,
-                    activeBackgroundColor: styles.missedRedColorWithOpacity,
                     objectType: 'Case'
                 },
                 {
@@ -513,151 +564,78 @@ const caseSingleScreen = {
             ]
         }
     ],
-    labData: [
-        {
-            fields: [
-                {
-                    cardNumber: 1,
-                    id: 'sampleIdentifier',
-                    label: 'Sample Lab Id',
-                    type: 'TextInput',
-                    value: '',
-                    isRequired: false,
-                    isEditMode: false,
-                    objectType: 'LabResult'
-                },
-                {
-                    cardNumber: 1,
-                    id: 'dateSampleTaken',
-                    label: 'Sample taken',
-                    value: '',
-                    type: "DatePicker",
-                    isRequired: true,
-                    isEditMode: false,
-                    format: 'YYYY-MM-dd',
-                    objectType: 'LabResult'
-                },
-                {
-                    cardNumber: 1,
-                    id: 'dateSampleDelivered',
-                    label: 'Sample delivered to lab',
-                    value: '',
-                    type: "DatePicker",
-                    isRequired: false,
-                    isEditMode: false,
-                    format: 'YYYY-MM-dd',
-                    objectType: 'LabResult'
-                },
-                {
-                    cardNumber: 1,
-                    id: 'dateTesting',
-                    label: 'Testing Date',
-                    value: '',
-                    type: "DatePicker",
-                    isRequired: false,
-                    isEditMode: false,
-                    format: 'YYYY-MM-dd',
-                    objectType: 'LabResult'
-                },
-                {
-                    cardNumber: 1,
-                    id: 'dateOfResult',
-                    label: 'Date of the result',
-                    value: '',
-                    type: "DatePicker",
-                    isRequired: false,
-                    isEditMode: false,
-                    format: 'YYYY-MM-dd',
-                    objectType: 'LabResult'
-                },
-                {
-                    cardNumber: 1,
-                    id: 'labName',
-                    label: 'Lab Name',
-                    labelValue: 'test',
-                    type: 'DropdownInput',
-                    value: '',
-                    isRequired: false,
-                    isEditMode: false,
-                    activeButtonColor: 'red',
-                    activeBackgroundColor: 'red',
-                    objectType: 'LabResult'
-                },
-                {
-                    cardNumber: 1,
-                    id: 'sampleType',
-                    label: 'Sample type',
-                    labelValue: 'test',
-                    type: 'DropdownInput',
-                    value: '',
-                    isRequired: false,
-                    isEditMode: false,
-                    activeButtonColor: 'red',
-                    activeBackgroundColor: 'red',
-                    objectType: 'LabResult'
-                },
-                {
-                    cardNumber: 1,
-                    id: 'testType',
-                    label: 'Test type',
-                    labelValue: 'test',
-                    type: 'DropdownInput',
-                    value: '',
-                    isRequired: false,
-                    isEditMode: false,
-                    activeButtonColor: 'red',
-                    activeBackgroundColor: 'red',
-                    objectType: 'LabResult'
-                },
-                {
-                    cardNumber: 1,
-                    id: 'result',
-                    label: 'Result',
-                    labelValue: 'test',
-                    type: 'DropdownInput',
-                    value: '',
-                    isRequired: false,
-                    isEditMode: false,
-                    activeButtonColor: 'red',
-                    activeBackgroundColor: 'red',
-                    objectType: 'LabResult'
-                },
-                {
-                    cardNumber: 1,
-                    id: 'notes',
-                    label: 'Notes',
-                    type: 'TextInput',
-                    value: '',
-                    isRequired: false,
-                    isEditMode: false,
-                    objectType: 'LabResult'
-                },
-                {
-                    cardNumber: 1,
-                    id: 'status',
-                    label: 'Status',
-                    labelValue: 'test',
-                    type: 'DropdownInput',
-                    value: '',
-                    isRequired: false,
-                    isEditMode: false,
-                    activeButtonColor: 'red',
-                    activeBackgroundColor: 'red',
-                    objectType: 'LabResult'
-                },
-                {
-                    cardNumber: 1,
-                    id: 'quantitativeResult',
-                    label: 'Quantitative Result',
-                    type: 'TextInput',
-                    value: '',
-                    isRequired: false,
-                    isEditMode: false,
-                    objectType: 'LabResult'
-                }
-            ]
-        }
-    ]
+    hospitalizationDate: {
+        fields: [
+             {
+                 cardNumber: 2,
+                 id: 'startDate',
+                 label: 'From',
+                 type: 'DatePicker',
+                 value: '',
+                 isRequired: true,
+                 isEditMode: true,
+                 format: 'YYYY-MM-dd',
+                 objectType: 'HospitalizationDates'
+             }, 
+             {
+                cardNumber: 2,
+                 id: 'endDate',
+                 label: 'To',
+                 type: 'DatePicker',
+                 value: '',
+                 isRequired: true,
+                 isEditMode: true,
+                 format: 'YYYY-MM-dd',
+                 objectType: 'HospitalizationDates'
+             },
+             {
+                 cardNumber: 2,
+                 id: 'deleteButton',
+                 type: 'ActionsBar',
+                 labelValue: 'test',
+                 textsArray: ['Delete'],
+                 textsStyleArray: [{color: styles.missedRedColor}],
+                 onPressArray: [],
+                 objectType: 'HospitalizationDates'
+             }
+         ]
+    },
+    isolationDate: {
+        fields: [
+             {
+                 cardNumber: 3,
+                 id: 'startDate',
+                 label: 'From',
+                 type: 'DatePicker',
+                 value: '',
+                 isRequired: true,
+                 isEditMode: true,
+                 format: 'YYYY-MM-dd',
+                 objectType: 'IsolationDates'
+             }, 
+             {
+                cardNumber: 3,
+                 id: 'endDate',
+                 label: 'To',
+                 type: 'DatePicker',
+                 value: '',
+                 isRequired: true,
+                 isEditMode: true,
+                 format: 'YYYY-MM-dd',
+                 objectType: 'IsolationDates'
+             },
+             {
+                 cardNumber: 3,
+                 id: 'deleteButton',
+                 type: 'ActionsBar',
+                 labelValue: 'test',
+                 textsArray: ['Delete'],
+                 textsStyleArray: [{color: styles.missedRedColor}],
+                 onPressArray: [],
+                 objectType: 'IsolationDates'
+             }
+         ]
+    },
 };
 
 const followUpsFilterScreen = {

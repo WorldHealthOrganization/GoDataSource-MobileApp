@@ -15,11 +15,11 @@ import FollowUpsSingleScreen from './FollowUpsSingleScreen';
 import CasesScreen from './CasesScreen';
 import CasesFilterScreen from './CasesFilterScreen';
 import CaseSingleScreen from './CaseSingleScreen';
-import AddSingleCaseScreen from './AddSingleCaseScreen';
 import ContactsScreen from './ContactsScreen';
 import ContactsSingleScreen from './ContactsSingleScreen';
 import ExposureScreen from './ExposureScreen';
 import MapScreen from './MapScreen';
+import QRScanScreen from './QRScanScreen';
 
 const screens = [
     {screen: 'LoginScreen', component: LoginScreen},
@@ -33,11 +33,11 @@ const screens = [
     {screen: 'CasesScreen', component: CasesScreen},
     {screen: 'CasesFilterScreen', component: CasesFilterScreen},
     {screen: 'CaseSingleScreen', component: CaseSingleScreen},
-    {screen: 'AddSingleCaseScreen', component: AddSingleCaseScreen},
     {screen: 'ContactsScreen', component: ContactsScreen},
     {screen: 'ContactsSingleScreen', component: ContactsSingleScreen},
     {screen: 'ExposureScreen', component: ExposureScreen},
-    {screen: 'MapScreen', component: MapScreen}
+    {screen: 'MapScreen', component: MapScreen},
+    {screen: 'QRScanScreen', component: QRScanScreen}
 ];
 
 export function registerScreens(store, Provider) {

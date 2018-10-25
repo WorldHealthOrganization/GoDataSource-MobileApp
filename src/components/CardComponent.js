@@ -40,41 +40,90 @@ class CardComponent extends Component {
     }
 
     // Please add here the react lifecycle methods that you need
-    // shouldComponentUpdate(nextProps, nextState) {
-    //     if (nextProps.screen === 'FollowUpsFilter' || nextProps.screen === 'CasesFilter') {
-    //         if (nextProps && nextProps.item && nextProps.item[1] && this.props && this.props.item && this.props.item[1] && nextProps.item[1].type === 'Selector' && nextProps.item[1].id === 'gender') {
-    //             // console.log("Return true for selector: ", nextProps.filter.filter[nextProps.item[1].id], this.props.filter.filter[this.props.item[1].id]);
-    //             return true;
-    //         }
-    //         if (nextProps && nextProps.item && nextProps.item[1] && this.props && this.props.item && this.props.item[1] && nextProps.item[1].type === 'IntervalPicker' && nextProps.item[1].id === 'age' && nextProps.filter.filter[nextProps.item[1].id] !== this.props.filter.filter[this.props.item[1].id]) {
-    //             // console.log("Return true for interval: ");
-    //             return true;
-    //         }
-    //         if (nextProps && nextProps.item && nextProps.item[1] && this.props && this.props.item && this.props.item[1] && nextProps.item[1].type === 'DropDownSectioned' && nextProps.item[1].id === 'selectedLocations' && nextProps.filter.filter[nextProps.item[1].id] !== this.props.filter.filter[this.props.item[1].id]) {
-    //             // console.log("Return true for sectioned drop down, ");
-    //             return true;
-    //         }
-    //         if (nextProps && nextProps.item && nextProps.item[1] && this.props && this.props.item && this.props.item[1] && nextProps.item[1].type === 'DropdownInput' && nextProps.item[1].id === 'exposure') {
-    //             // console.log("Return true for exposure: ");
-    //             return false;
-    //         }
-    //     }
-    //
-    //     if (this.props.followUp && this.props.contact) {
-    //         console.log("It's for single screen");
-    //         return true
-    //     }
-    //
-    //     if(this.props.case){
-    //         return true;
-    //     }
-    //
-    //     if (nextProps.screen === 'ExposureScreen') {
-    //         return true;
-    //     }
-    //
-    //     return false;
-    // }
+    shouldComponentUpdate(nextProps, nextState) {
+        if (nextProps.screen === 'FollowUpsFilter' || nextProps.screen === 'CasesFilter') {
+            if (nextProps && nextProps.item && nextProps.item[1] && this.props && this.props.item && this.props.item[1] && nextProps.item[1].type === 'Selector' && nextProps.item[1].id === 'gender') {
+                // console.log("Return true for selector: ", nextProps.filter.filter[nextProps.item[1].id], this.props.filter.filter[this.props.item[1].id]);
+                return true;
+            }
+            if (nextProps && nextProps.item && nextProps.item[1] && this.props && this.props.item && this.props.item[1] && nextProps.item[1].type === 'IntervalPicker' && nextProps.item[1].id === 'age' && nextProps.filter.filter[nextProps.item[1].id] !== this.props.filter.filter[this.props.item[1].id]) {
+                // console.log("Return true for interval: ");
+                return true;
+            }
+            if (nextProps && nextProps.item && nextProps.item[1] && this.props && this.props.item && this.props.item[1] && nextProps.item[1].type === 'DropDownSectioned' && nextProps.item[1].id === 'selectedLocations' && nextProps.filter.filter[nextProps.item[1].id] !== this.props.filter.filter[this.props.item[1].id]) {
+                // console.log("Return true for sectioned drop down, ");
+                return true;
+            }
+            if (nextProps && nextProps.item && nextProps.item[1] && this.props && this.props.item && this.props.item[1] && nextProps.item[1].type === 'DropdownInput' && nextProps.item[1].id === 'exposure') {
+                // console.log("Return true for exposure: ");
+                return false;
+            }
+        }
+
+        if (this.props.followUp) {
+            console.log("It's for single screen followUp");
+            return true
+        }
+
+        let myDatePickerItems = []
+        let hasDateChanged = null
+
+        if (nextProps && nextProps.item && nextProps.screen === 'ContactsSingleScreen') {
+            myDatePickerItems = nextProps.item.filter((e) => {return e.type === 'DatePicker'})
+            if (myDatePickerItems.length > 0) {
+                hasDateChanged = myDatePickerItems.filter((e) => {return this.props.contact[e.id] !== nextProps.contact[e.id]})
+            }
+        }
+
+        if (this.props.contact && hasDateChanged && hasDateChanged.length > 0) {
+            console.log("It's for single screen contact");
+            return true
+        }
+
+        //ContactsSingleScreen
+        if (nextProps && nextProps.item && nextProps.screen === 'CaseSingleScreen') {
+            myDatePickerItems = nextProps.item.filter((e) => {return e.type === 'DatePicker'})
+            if (myDatePickerItems.length > 0) {
+                hasDateChanged = myDatePickerItems.filter((e) => {return this.props.case[e.id] !== nextProps.case[e.id]})
+            }
+        }
+        if (this.props.case) {
+            if (hasDateChanged && hasDateChanged.length > 0) {
+                return true
+            } else if (this.props.case.deceased !== nextProps.case.deceased) {
+                return true
+            }
+            if (this.props.case.hospitalizationDates && this.props.case.hospitalizationDates.length > 0 && nextProps.case.hospitalizationDates && nextProps.case.hospitalizationDates.length > 0 && this.props.case.hospitalizationDates.length === nextProps.case.hospitalizationDates.length) {
+                for (let i=0; i<this.props.case.hospitalizationDates.length; i++){
+                    if (this.props.case.hospitalizationDates[i][nextProps.item[0].id] !== undefined && this.props.case.hospitalizationDates[i][nextProps.item[1].id] !== undefined) {
+                        if (this.props.case.hospitalizationDates[i][nextProps.item[0].id] !== nextProps.case.hospitalizationDates[i][nextProps.item[0].id] || this.props.case.hospitalizationDates[i][nextProps.item[1].id] !== nextProps.case.hospitalizationDates[i][nextProps.item[1].id]){
+                            return true
+                        }
+                    }
+                }
+            }
+            if (this.props.case.isolationDates && this.props.case.isolationDates.length > 0 && nextProps.case.isolationDates && nextProps.case.isolationDates.length > 0 && this.props.case.isolationDates.length === nextProps.case.isolationDates.length) {
+                for (let i=0; i<this.props.case.isolationDates.length; i++){
+                    if (this.props.case.isolationDates[i][nextProps.item[0].id] !== undefined && this.props.case.isolationDates[i][nextProps.item[1].id] !== undefined) {
+                        if (this.props.case.isolationDates[i][nextProps.item[0].id] !== nextProps.case.isolationDates[i][nextProps.item[0].id] || this.props.case.isolationDates[i][nextProps.item[1].id] !== nextProps.case.isolationDates[i][nextProps.item[1].id]){
+                            return true
+                        }
+                    }
+                }
+            }
+        }
+        if (nextProps.screen === 'CaseSingleScreen') {
+            if (this.props.isEditMode !== nextProps.isEditMode) {
+                return true
+            }
+        }
+
+        if (nextProps.screen === 'ExposureScreen') {
+            return true;
+        }
+
+        return false;
+    }
 
     // The render method should have at least business logic as possible,
     // because this will be called whenever there is a new setState call
@@ -166,6 +215,10 @@ class CardComponent extends Component {
                 item.onPressArray = [this.props.onDeletePress]
             }
             value = this.computeValueForContactsSingleScreen(item, this.props.index);
+
+            if (item.type === 'DatePicker') {
+                value = this.props.contact[item.id]
+            }
         }
 
         if (this.props.screen === 'ContactsSingleScreenAddress') {
@@ -173,16 +226,19 @@ class CardComponent extends Component {
         }
 
         if (this.props.screen === 'CaseSingleScreen') {
-            let cases = this.props.case;
             if (item.type === 'DropdownInput') {
-                item.data = this.computeDataForDropdown(item, cases);
+                item.data = this.computeDataForCasesSingleScreenDropdownInput(item, this.props.index);
+            }
+            if (item.type === 'ActionsBar') {
+                item.onPressArray = [this.props.onDeletePress]
             }
 
-            value = this.computeValueForId(item.type, item.id, [], [], cases);
+            value = this.computeValueForCasesSingleScreen(item, this.props.index);
 
-            if (item.type === 'DropDown' && item.id == 'classification') {
-                data = this.computeDataForDropdown(item);
-                value = cases[item.id];
+            if (item.type === 'DatePicker' && this.props.case[item.id] !== undefined) {
+                value = this.props.case[item.id]
+            } else if (item.type === 'SwitchInput' && this.props.case[item.id] !== undefined) {
+                value = this.props.case[item.id]
             }
         }
 
@@ -328,6 +384,7 @@ class CardComponent extends Component {
                         textsStyleArray={item.textsStyleArray}
                         onPressArray={item.onPressArray}
                         containerTextStyle={{width, marginHorizontal, height: calculateDimension(46, true, this.props.screenSize)}}
+                        isEditMode = {this.props.isEditMode}
                     />
                 );
             default:
@@ -508,6 +565,40 @@ class CardComponent extends Component {
         }
     };
 
+    computeDataForCasesSingleScreenDropdownInput = (item, index) => {
+        console.log("computeDataForCasesSingleScreenDropdownInput: ", item, this.props.case);
+        if (item.id === 'riskLevel') {
+            return _.filter(this.props.referenceData, (o) => {
+                return o.categoryId.includes("RISK_LEVEL")
+            }).map((o) => {return {value: this.getTranslation(o.value), id: o.value}})
+        }
+        if (item.id === 'gender') {
+            return _.filter(this.props.referenceData, (o) => {
+                return o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_GENDER'
+            }).map((o) => {return {value: this.getTranslation(o.value), id: o.value}})
+        }
+        if (item.id === 'name') {
+            return _.filter(this.props.referenceData, (o) => {
+                return o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_ADDRESS_TYPE'
+            }).map((o) => {return {value: this.getTranslation(o.value), id: o.value}})
+        }
+        if (item.id === 'classification') {
+            return _.filter(this.props.referenceData, (o) => {
+                return o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_CASE_CLASSIFICATION'
+            }).map((o) => {return {label: this.getTranslation(o.value), value: o.value}})
+        }
+        if (item.id === 'outcome') {
+            return _.filter(this.props.referenceData, (o) => {
+                return o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_OUTCOME'
+            }).map((o) => {return {label: this.getTranslation(o.value), value: o.value}})
+        }
+        if (item.id === 'documentType') {
+            return _.filter(this.props.referenceData, (o) => {
+                return o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_DOCUMENT_TYPE'
+            }).map((o) => {return {label: this.getTranslation(o.value), value: o.value}})
+        }
+    };
+
     computeDataForContactsSingleScreenDropdownInput = (item, index) => {
         console.log("computeDataForContactsSingleScreenDropdownInput: ", item, this.props.contact);
         if (item.id === 'riskLevel') {
@@ -525,6 +616,25 @@ class CardComponent extends Component {
                 return o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_ADDRESS_TYPE'
             }).map((o) => {return {value: this.getTranslation(o.value), id: o.value}})
         }
+    };
+
+    computeValueForCasesSingleScreen = (item, index) => {
+        if (index || index >= 0) {
+            if (item.objectType === 'Address') {
+                return this.props.case && this.props.case.addresses && Array.isArray(this.props.case.addresses) && this.props.case.addresses.length > 0 && this.props.case.addresses[index][item.id] !== undefined ?
+                this.getTranslation(this.props.case.addresses[index][item.id]) : '';
+            } else if (item.objectType === 'Documents') {
+                return this.props.case && this.props.case.documents && Array.isArray(this.props.case.documents) && this.props.case.documents.length > 0 && this.props.case.documents[index][item.id] !== undefined ?
+                this.getTranslation(this.props.case.documents[index][item.id]) : '';
+            } else if (item.objectType === 'HospitalizationDates') {
+                return this.props.case && this.props.case.hospitalizationDates && Array.isArray(this.props.case.hospitalizationDates) && this.props.case.hospitalizationDates.length > 0 && this.props.case.hospitalizationDates[index][item.id] !== undefined ?
+                this.getTranslation(this.props.case.hospitalizationDates[index][item.id]) : '';
+            } else if (item.objectType === 'IsolationDates') {
+                return this.props.case && this.props.case.isolationDates && Array.isArray(this.props.case.isolationDates) && this.props.case.isolationDates.length > 0 && this.props.case.isolationDates[index][item.id] !== undefined ?
+                this.getTranslation(this.props.case.isolationDates[index][item.id]) : '';
+            }
+        }
+        return this.props.case && this.props.case[item.id] ? this.getTranslation(this.props.case[item.id]) : '';
     };
 
     computeValueForContactsSingleScreen = (item, index) => {
@@ -545,7 +655,6 @@ class CardComponent extends Component {
         return valueToBeReturned;
     }
 }
-
 
 // Create style outside the class, or for components that will be used by other components (buttons),
 // make a global style in the config directory

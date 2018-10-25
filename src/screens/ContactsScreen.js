@@ -57,9 +57,7 @@ class ContactsScreen extends Component {
     }
 
     static getDerivedStateFromProps(props, state) {
-        // if (props.contacts)
         state.loading = false;
-
         return null;
     }
 

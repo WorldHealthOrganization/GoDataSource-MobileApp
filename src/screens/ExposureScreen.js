@@ -13,11 +13,10 @@ import {bindActionCreators} from "redux";
 import {addExposureForContact, updateExposureForContact} from './../actions/contacts';
 import NavBarCustom from './../components/NavBarCustom';
 import config from './../utils/config';
-import {calculateDimension} from './../utils/functions';
 import CardComponent from './../components/CardComponent';
 import Ripple from 'react-native-material-ripple';
 import {removeErrors} from './../actions/errors';
-import {extractIdFromPouchId, updateRequiredFields} from './../utils/functions';
+import {calculateDimension, extractIdFromPouchId, updateRequiredFields} from './../utils/functions';
 
 class ExposureScreen extends Component {
 
@@ -30,7 +29,7 @@ class ExposureScreen extends Component {
         this.state = {
             exposure: this.props.exposure || {
                 outbreakId: this.props.user.activeOutbreakId,
-                contactDate: '',
+                contactDate: new Date(),
                 contactDateEstimated: false,
                 certaintyLevelId: '',
                 exposureTypeId: '',

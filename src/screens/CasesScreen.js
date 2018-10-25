@@ -11,7 +11,7 @@ import styles from './../styles';
 import NavBarCustom from './../components/NavBarCustom';
 import {Calendar} from 'react-native-calendars';
 import CalendarPicker from './../components/CalendarPicker';
-import {calculateDimension} from './../utils/functions';
+import {calculateDimension, navigation} from './../utils/functions';
 import config from './../utils/config';
 import ButtonWithIcons from './../components/ButtonWithIcons';
 import ValuePicker from './../components/ValuePicker';
@@ -28,6 +28,7 @@ import {removeErrors} from './../actions/errors';
 import {addFilterForScreen} from './../actions/app';
 import AnimatedListView from './../components/AnimatedListView';
 import ViewHOC from './../components/ViewHOC';
+import _ from 'lodash';
 
 let height = Dimensions.get('window').height;
 let width = Dimensions.get('window').width;
@@ -47,7 +48,7 @@ class CasesScreen extends Component {
                 searchText: ''
             },
             filterFromFilterScreen: this.props.filter && this.props.filter['CasesFilterScreen'] ? this.props.filter['CasesFilterScreen'] : null,
-            cases: [],
+            cases: this.props.case,
             refreshing: false,
             loading: true
         };
@@ -90,6 +91,7 @@ class CasesScreen extends Component {
         if(props.cases){
             state.refreshing = false;
             state.loading = false;
+            state.cases = props.cases;
         }
         return null;
     }
@@ -155,7 +157,7 @@ class CasesScreen extends Component {
                 <View style={style.containerContent}>
                     <AnimatedListView
                         stickyHeaderIndices={[0]}
-                        data={this.props.cases || []}
+                        data={this.state.cases || []}
                         renderItem={this.renderCase}
                         keyExtractor={this.keyExtractor}
                         ListHeaderComponent={
@@ -198,19 +200,22 @@ class CasesScreen extends Component {
 
     //Search cases using keyword
     handleOnSubmitEditing = () => {
-        this.props.addFilterForScreen("CasesScreen", this.state.filter);
-        let existingFilter = this.state.filterFromFilterScreen ? Object.assign({}, this.state.filterFromFilterScreen) : Object.assign({}, config.defaultFilterForCases);
+        // this.props.addFilterForScreen("CasesScreen", this.state.filter);
+        // let existingFilter = this.state.filterFromFilterScreen ? Object.assign({}, this.state.filterFromFilterScreen) : Object.assign({}, config.defaultFilterForCases);
+        //
+        // if (!existingFilter.where || Object.keys(existingFilter.where).length === 0) {
+        //     existingFilter.where = {};
+        // }
+        // if (!existingFilter.where.or || existingFilter.where.or.length === 0) {
+        //     existingFilter.where.or = [];
+        // }
+        // existingFilter.where.or.push({firstName: {like: this.state.filter.searchText, options: 'i'}});
+        // existingFilter.where.or.push({lastName: {like: this.state.filter.searchText, options: 'i'}});
+        //
+        // this.props.getCasesForOutbreakId(this.props.user.activeOutbreakId, existingFilter, this.props.user.token);
 
-        if (!existingFilter.where || Object.keys(existingFilter.where).length === 0) {
-            existingFilter.where = {};
-        }
-        if (!existingFilter.where.or || existingFilter.where.or.length === 0) {
-            existingFilter.where.or = [];
-        }
-        existingFilter.where.or.push({firstName: {like: this.state.filter.searchText, options: 'i'}});
-        existingFilter.where.or.push({lastName: {like: this.state.filter.searchText, options: 'i'}});
-
-        this.props.getCasesForOutbreakId(this.props.user.activeOutbreakId, existingFilter, this.props.user.token);
+        // Filter cases by firstName and lastName
+        this.filterCases();
     };
 
     //Save keyword for search in cases
@@ -294,14 +299,14 @@ class CasesScreen extends Component {
 
     //Open single case CaseSingleScreen
     handleOnPressCase = (item, contact) => {
-        console.log("### handlePressCases: ", item);
+        console.log("### handlePressCases: ", JSON.stringify(item));
         this.props.navigator.push({
             screen: 'CaseSingleScreen',
             animated: true,
             animationType: 'fade',
             passProps: {
-                item: item,
-                filter: this.state.filter
+                case: item,
+                // filter: this.state.filter
             }
         })
     };
@@ -318,66 +323,40 @@ class CasesScreen extends Component {
         })
     };
 
-    //Create new case in AddSingleCaseScreen
+    //Create new case in CaseSingleScreen
     handleOnPressAddCase = () => {
-        console.log("### handlePressAddCases: ");
         this.props.navigator.push({
-            screen: 'AddSingleCaseScreen',
+            screen: 'CaseSingleScreen',
             animated: true,
             animationType: 'fade',
             passProps: {
-                item: {},
-                filter: this.state.filter
+                isNew: true,
             }
         })
     };
 
     //Navigator event
     onNavigatorEvent = (event) => {
-        if (event.type === 'DeepLink') {
-            console.log("###");
-            if (event.link.includes('Navigate')) {
-                let linkComponents = event.link.split('/');
-                console.log("### linkComponents: ", linkComponents);
-                if (linkComponents.length > 0) {
-                    let screenToSwitchTo = null;
-                    let addScreen = null;
-                    switch(linkComponents[1]) {
-                        case '0':
-                            screenToSwitchTo = 'FollowUpsScreen';
-                            break;
-                        case '1':
-                            screenToSwitchTo = "ContactsScreen";
-                            break;
-                        case '2':
-                            screenToSwitchTo = "CasesScreen";
-                            break;
-                        case '2-add':
-                            screenToSwitchTo = "CasesScreen";
-                            addScreen = "AddSingleCaseScreen";
-                            break;
-                        default:
-                            screenToSwitchTo = "FollowUpsScreen";
-                            break;
-                    }
-                    this.props.navigator.resetTo({
-                        screen: screenToSwitchTo,
-                        animated: true
-                    });
-                    if(addScreen) {
-                        this.props.navigator.push({
-                            screen: addScreen,
-                            animated: true,
-                            animationType: 'fade',
-                            passProps: {
-                                item: {},
-                                filter: null
-                            }
-                        })
-                    }
-                }
-            }
+        navigation(event, this.props.navigator);
+    };
+
+    filterCases = () => {
+        let casesCopy = _.cloneDeep(this.props.cases);
+
+        // Take care of search filter
+        if (this.state.filter.searchText) {
+            casesCopy = casesCopy.filter((e) => {
+                return  e && e.firstName && this.state.filter.searchText.toLowerCase().includes(e.firstName.toLowerCase()) ||
+                    e && e.lastName && this.state.filter.searchText.toLowerCase().includes(e.lastName.toLowerCase()) ||
+                    e && e.firstName && e.firstName.toLowerCase().includes(this.state.filter.searchText.toLowerCase()) ||
+                    e && e.lastName && e.lastName.toLowerCase().includes(this.state.filter.searchText.toLowerCase())
+            });
         }
+
+       
+        this.setState({
+            cases: casesCopy
+        })
     };
 }
 

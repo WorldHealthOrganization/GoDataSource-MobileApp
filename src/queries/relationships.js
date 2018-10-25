@@ -14,8 +14,6 @@ export function getRelationshipsForTypeRequest (outbreakId, searchType, keys, ca
     if (!keys || keys.length === 0) {
         callback(null, []);
     }
-    // console.log('Use keys: ', keys);
-
     database.find({
         selector: {
             _id: {
@@ -33,8 +31,6 @@ export function getRelationshipsForTypeRequest (outbreakId, searchType, keys, ca
             console.log('Error in finding relationships: ', error);
             callback(error)
         })
-
-
 }
 
 export function getRelationshipsAndFollowUpsForContactRequest (outbreakId, keys, callback) {

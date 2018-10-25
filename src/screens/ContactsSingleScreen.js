@@ -67,7 +67,6 @@ class ContactsSingleScreen extends Component {
             deletePressed: false,
             isDateTimePickerVisible: false,
             canChangeScreen: false,
-            saveContactAtFirstNextButtonPress: true,
         };
         // Bind here methods, or at least don't declare methods in the render method
     }
@@ -242,20 +241,10 @@ class ContactsSingleScreen extends Component {
                 index
             });
         } 
-     
     };
 
-    handleMoveToNextScreenButton = (AdressesNextButtonPressed = false) => {
+    handleMoveToNextScreenButton = () => {
         let nextIndex = this.state.index + 1
-
-        // if (this.state.saveContactAtFirstNextButtonPress === true && AdressesNextButtonPressed === true) {
-        //     this.props.addContact(this.props.user.activeOutbreakId, this.state.contact, this.props.user.token);
-        //     this.setState({
-        //         saveContactAtFirstNextButtonPress: false,
-        //     });
-        // } else if (this.state.saveContactAtFirstNextButtonPress === false && AdressesNextButtonPressed === true){
-        //     this.props.updateContact(this.props.user.activeOutbreakId, this.state.contact.id, this.state.contact, this.props.user.token);
-        // }
 
         this.setState({
             canChangeScreen: true,
@@ -440,7 +429,7 @@ class ContactsSingleScreen extends Component {
     };
 
     handleOnChangeDate = (value, id, objectType) => {
-        console.log("onChangeDate: ", value, id);
+        console.log("onChangeDate: ", value, id, objectType);
 
         if (objectType === 'FollowUp') {
             this.setState(

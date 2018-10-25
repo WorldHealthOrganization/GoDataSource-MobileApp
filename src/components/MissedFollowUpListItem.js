@@ -38,11 +38,11 @@ class MissedFollowUpListItem extends PureComponent {
         let contact = this.props && this.props.contacts && Array.isArray(this.props.contacts) && this.props.contacts.length > 0 ? this.props.contacts[this.props.contacts.map((e) => {return extractIdFromPouchId(e._id, 'person')}).indexOf(this.props.item.personId)] : null;
         let primaryText = contact && ((contact.firstName ? contact.firstName : ' ') + (contact.lastName ? (" " + contact.lastName) : ' '));
 
-        let currentFollowUpIndex = contact && contact.followUps && Array.isArray(contact.followUps) && contact.followUps.length > 0 ? contact.followUps.map((e) => {return e.id}).indexOf(this.props.item.id) : 0;
+        let currentFollowUpIndex = contact && contact.followUps && Array.isArray(contact.followUps) && contact.followUps.length > 0 ? contact.followUps.map((e) => {return e.personId}).indexOf(this.props.item.personId) : 0;
         let lastFollowUp = '';
         let nextFollowUp = '';
 
-        if (contact) {
+        if (contact && contact.followUps !== undefined) {
             // Get last follow-up date and next follow-up date
             if (contact.followUps && Array.isArray(contact.followUps) && contact.followUps.length === 2) {
                 currentFollowUpIndex === 0 ? contact.followUps[1].date ? nextFollowUp = contact.followUps[1].date : ' ' : contact.followUps[0].date ? lastFollowUp = contact.followUps[0].date : ' ';

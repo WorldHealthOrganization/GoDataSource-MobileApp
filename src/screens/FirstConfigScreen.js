@@ -75,11 +75,13 @@ class FirstConfigScreen extends Component {
 
     // Please write here all the methods that are not react native lifecycle methods
     handlePressScanQR = () => {
-        Alert.alert("Warning", 'Work in progress', [
-            {
-                text: 'Ok', onPress: () => {console.log('Ok pressed')}
+        this.props.navigator.showModal({
+            screen: 'QRScanScreen',
+            animated: true,
+            passProps: {
+                pushNewScreen: this.pushNewScreen
             }
-        ])
+        })
     };
 
     handlePressImport = () => {
@@ -98,6 +100,16 @@ class FirstConfigScreen extends Component {
             animationType: 'fade'
         })
     };
+    pushNewScreen = (QRCodeInfo) => {
+        this.props.navigator.push({
+            screen: 'ManualConfigScreen',
+            animated: true,
+            animationType: 'fade',
+            passProps: {
+                QRCodeInfo: QRCodeInfo
+            }
+        })
+    }
 }
 
 // Create style outside the class, or for components that will be used by other components (buttons),

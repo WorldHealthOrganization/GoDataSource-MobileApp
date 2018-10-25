@@ -7,7 +7,7 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
-import {TextInput, View, Text, StyleSheet, Platform, Dimensions, InteractionManager} from 'react-native';
+import {TextInput, View, Text, StyleSheet,Image, Platform, Dimensions, InteractionManager} from 'react-native';
 import {ListItem, Icon} from 'react-native-material-ui';
 import {calculateDimension} from './../utils/functions';
 import config from './../utils/config';
@@ -36,9 +36,19 @@ class CaseListItem extends Component {
     // and can slow down the app
     render() {
         // Get caseItem info from the cases
-
+        console.log('item:', this.props.item);
         let primaryText = this.props.item && ((this.props.item.firstName ? this.props.item.firstName : ' ') + (this.props.item.lastName ? (' ' + this.props.item.lastName) : ' '));
-        let secondaryText = this.props.item && ((this.props.item.gender ? this.getTranslation(this.props.item.gender) : ' ') + (this.props.item.age ? (' ' + this.props.item.age + ' y.o.') : ' '));
+        let genderString = '';
+        let ageString = '';
+        if (this.props.item && this.props.item.gender) {
+            genderString = this.getTranslation(this.props.item.gender);
+        }
+
+        if(this.props.item && this.props.item.age){
+            ageString = this.props.item.age.years ? this.props.item.age.years + ' y.o. ' : (this.props.item.age.months ? this.props.item.age.months + ' m.o. ' : '');
+        }
+
+        let secondaryText = this.props.item && ((genderString ? genderString.charAt(0) : ' ') + (ageString ? (' ' + ageString) : ' '));
 
         let addressText = ' ';
         let addressArray = []
@@ -53,31 +63,42 @@ class CaseListItem extends Component {
         return (
             <ElevatedView elevation={3} style={[style.container, {
                 marginHorizontal: calculateDimension(16, false, this.props.screenSize),
-                height: calculateDimension(203, true, this.props.screenSize)
+                height: calculateDimension(178, true, this.props.screenSize)
             }]}>
                 <View style={[style.firstSectionContainer, {
-                    height: calculateDimension(75, true, this.props.screenSize),
+                    height: calculateDimension(53, true, this.props.screenSize),
                     paddingBottom: calculateDimension(18, true, this.props.screenSize)
                 }]}>
                     <ListItem
-                        numberOfLines={2}
-                        centerElement={{
-                            primaryText,
-                            secondaryText
-                        }}
-                        rightElement={<Icon name='location-on' size={32} color={styles.buttonGreen}/>}
+                        numberOfLines={1}
+                        centerElement={
+                            <View style={style.centerItemContainer}>
+                                <Text style={[style.primaryText, {flex: 3}]} numberOfLines={1}>{primaryText}</Text>
+                                <Text style={[style.primaryText, {marginHorizontal: 7}]}>{'\u2022'}</Text>
+                                <Text style={[style.secondaryText, {flex: 1.5}]}>{secondaryText}</Text>
+                            </View>
+                        }
+                        rightElement={
+                            <Ripple onPress={this.props.onPressMap}>
+                                <Image source={{uri: 'map_icon'}} style={{width: 31, height: 31}}/>
+                            </Ripple>
+                        }
                         style={{
-                            container: {},
-                            primaryText: {fontFamily: 'Roboto-Medium', fontSize: 18, color: 'black'},
-                            secondaryText: {fontFamily: 'Roboto-Regular', fontSize: 13, color: 'black'},
-                            centerElementContainer: {height: '100%', justifyContent: 'center'}
+                            container: {marginRight: calculateDimension(13, false, this.props.screenSize)},
+                            rightElementContainer: {justifyContent: 'center', alignItems: 'center'}
                         }}
                     />
                 </View>
                 <View style={styles.lineStyle}/>
-                <View style={[style.secondSectionContainer, {height: calculateDimension(70, true, this.props.screenSize)}]}>
+                <View
+                    style={[style.secondSectionContainer, {height: calculateDimension(78.5, true, this.props.screenSize)}]}>
                     <Text
-                        style={[style.addressStyle, {marginHorizontal: calculateDimension(14, false, this.props.screenSize)}]}>{addressText}</Text>
+                        style={[style.addressStyle, {
+                            marginHorizontal: calculateDimension(14, false, this.props.screenSize),
+                            marginVertical: 7.5
+                        }]}
+                        numberOfLines={2}
+                    >{addressText}</Text>
                 </View>
                 <View style={styles.lineStyle}/>
                 <View
@@ -87,9 +108,6 @@ class CaseListItem extends Component {
                     </Ripple>
                     <Ripple style={[style.rippleStyle]}  onPress={this.onPressAddContact}>
                         <Text style={[style.rippleTextStyle]}>ADD CONTACT</Text>
-                    </Ripple>
-                    <Ripple style={[style.rippleStyle]}>
-                        <Text style={[style.rippleTextStyle]}>ACTION 3</Text>
                     </Ripple>
                 </View>
             </ElevatedView>
@@ -137,7 +155,7 @@ const style = StyleSheet.create({
         borderRadius: 2
     },
     firstSectionContainer: {
-        justifyContent: 'space-between'
+        justifyContent: 'space-between',
     },
     addressStyle: {
         fontFamily: 'Roboto-Light',
@@ -161,6 +179,21 @@ const style = StyleSheet.create({
         fontFamily: 'Roboto-Medium',
         fontSize: 12,
         color: styles.buttonGreen
+    },
+    centerItemContainer: {
+        flexDirection: 'row',
+        height: '100%',
+        alignItems: 'center'
+    },
+    primaryText: {
+        fontFamily: 'Roboto-Medium',
+        fontSize: 18,
+        color: 'black'
+    },
+    secondaryText: {
+        fontFamily: 'Roboto-Regular',
+        fontSize: 13,
+        color: 'black'
     }
 });
 

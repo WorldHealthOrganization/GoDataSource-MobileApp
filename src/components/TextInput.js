@@ -34,16 +34,11 @@ class TextInput extends PureComponent {
     editInput = () => {
         return (
             <View style={[{
-
             },this.props.style]}>
                 <TextField
                     label={this.props.isRequired ? this.props.label + ' * ' : this.props.label}
                     value={this.props.value != undefined ? this.props.value : ''}
-                    onChangeText={ (value) => {
-                        this.props.onChange(value, this.props.labelValue || this.props.id, this.props.objectType ?
-                            (this.props.objectType === 'Address' ? this.props.index : (this.props.objectType === 'LabResult' ? this.props.index : this.props.objectType)
-                            ) : null, this.props.objectType)
-                    }}
+                    onChangeText={this.handleOnChangeText}
                     textColor='rgb(0,0,0)'
                     fontSize={15}
                     labelFontSize={12.5}
@@ -88,6 +83,24 @@ class TextInput extends PureComponent {
         );
     }
 
+    handleOnChangeText = (state) => {
+        if (this.props.labelValue) {
+            //QuestionCard
+            console.log("textInput has this.props.labelValue: ", this.props.data, state);
+                this.props.onChange(
+                    state,
+                    this.props.id
+                )
+        } else {
+            //CardComponent
+            this.props.onChange(
+                state,
+                this.props.id,
+                this.props.objectType ? (this.props.objectType === 'Address' || this.props.objectType === 'LabResult' || this.props.objectType === 'Documents' ? this.props.index : this.props.objectType) : null,
+                this.props.objectType
+            )
+        }
+    }
 }
 
 // Create style outside the class, or for components that will be used by other components (buttons),

@@ -41,6 +41,11 @@ class ManualConfigScreen extends Component {
     }
 
     // Please add here the react lifecycle methods that you need
+    componentDidMount = () => {
+        if (this.props && this.props.QRCodeInfo) {
+            //TO DO map this.props.QRCodeInfo info to props
+        }
+    }
 
     static getDerivedStateFromProps(props, state) {
         if (props.errors && props.errors.type && props.errors.message) {
@@ -108,7 +113,7 @@ class ManualConfigScreen extends Component {
                         secureTextEntry={true}
                         autoCapitalize={'none'}
                     />
-                    <Button upperCase={false} raised onPress={this.saveHubConfiguration} text="Save HUB configuration" style={styles.buttonLogin} />
+                    <Button upperCase={false} onPress={this.saveHubConfiguration} text="Save HUB configuration" style={styles.buttonLogin} />
                 </View>
                 <View style={style.logoContainer}>
                     <Image source={{uri: 'logo_app'}} style={style.logoStyle} />

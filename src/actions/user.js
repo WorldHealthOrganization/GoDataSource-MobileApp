@@ -7,7 +7,7 @@ import { changeAppRoot, getTranslations } from './app';
 import {loginUserRequest, getUserByIdRequest, updateUserRequest} from './../queries/user';
 import { getFollowUpsForOutbreakIdWithPromises } from './followUps';
 import { getContactsForOutbreakId, getContactsForOutbreakIdWithPromises } from './contacts';
-import { getCasesForOutbreakId } from './cases';
+import { getCasesForOutbreakIdWithPromise } from './cases';
 import { getEventsForOutbreakId } from './events';
 import { getOutbreakById } from './outbreak';
 import { addError } from './errors';
@@ -141,8 +141,8 @@ export function getUserById(userId, token) {
                 // promises.push(getFollowUpsForOutbreakIdWithPromises(response.activeOutbreakId, {date: new Date().toISOString()}, null, dispatch));
                 promises.push(getTranslations(response && response.languageId ? response.languageId : 'english_us', dispatch));
                 promises.push(getReferenceData(null, dispatch));
-                // promises.push(getEventsForOutbreakId(response.activeOutbreakId, null, dispatch));
-                // promises.push(getCasesForOutbreakId(response.activeOutbreakId, null, null, dispatch));
+                promises.push(getEventsForOutbreakId(response.activeOutbreakId, null, dispatch));
+                promises.push(getCasesForOutbreakIdWithPromise(response.activeOutbreakId, null, null, dispatch));
 
                 // Store the user to the redux store, and also store the userId to the AsyncStorage
                 dispatch(storeUser(response));
