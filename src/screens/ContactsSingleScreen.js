@@ -344,6 +344,8 @@ class ContactsSingleScreen extends Component {
                         activeIndex={this.state.index}
                         onPressEditExposure={this.handleOnPressEditExposure}
                         onPressDeleteExposure={this.handleOnPressDeleteExposure}
+                        addContactFromCasesScreen={this.props.addContactFromCasesScreen}
+                        caseIdFromCasesScreen={this.props.caseIdFromCasesScreen}
                         navigator={this.props.navigator}
                         saveExposure={this.handleSaveExposure}
                         handleMoveToPrevieousScreenButton={this.handleMoveToPrevieousScreenButton}
@@ -613,7 +615,9 @@ class ContactsSingleScreen extends Component {
                 exposure: relation,
                 contact: this.props.isNew ? null: this.props.contact,
                 type: 'Contact',
-                saveExposure: this.handleSaveExposure
+                saveExposure: this.handleSaveExposure,
+                addContactFromCasesScreen: this.props.addContactFromCasesScreen,
+                caseIdFromCasesScreen: this.props.caseIdFromCasesScreen
             }
         })
     };

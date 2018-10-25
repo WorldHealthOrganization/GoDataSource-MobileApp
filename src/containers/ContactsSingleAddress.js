@@ -51,64 +51,62 @@ class ContactsSingleAddress extends Component {
         }
 
         return (
-            <KeyboardAwareScrollView
-                style={style.containerScrollView}
-                contentContainerStyle={[style.contentContainerStyle, {paddingBottom: this.props.screenSize.height < 600 ? 70 : 20}]}
-                keyboardShouldPersistTaps={'always'}
-            >
-                <View style={style.container}>
-                    {
-                        this.props.contact && this.props.contact.addresses && this.props.contact.addresses.map((item, index) => {
-                            return this.handleRenderItem(item, index)
-                        })
-                    }
-                </View>
-                <View style={{alignSelf: 'flex-start', marginHorizontal: calculateDimension(16, false, this.props.screenSize), marginVertical: 20}}>
-                    <Ripple
-                        style={{
-                            height: 25,
-                            justifyContent: 'center'
-                        }}
-                        onPress={this.props.onPressAddAdrress}
-                    >
-                        <Text style={{fontFamily: 'Roboto-Medium', fontSize: 12, color: styles.buttonGreen}}>Add another address</Text>
-                    </Ripple>
-                </View>
-
-                <View style = {{flexDirection:'row'}}>          
+            <View style={style.viewContainer}>
+                <View style={{flexDirection: 'row'}}>
                     {
                         this.props.isNew ? 
-                            <Button
-                                title={'Back'}
-                                onPress={this.handleBackButton}
-                                color={styles.buttonGreen}
-                                titleColor={'white'}
-                                height={calculateDimension(25, true, this.props.screenSize)}
-                                width={calculateDimension(130, false, this.props.screenSize)}
-                                style={{
-                                    marginVertical: calculateDimension(5, true, this.props.screenSize),
-                                    marginHorizontal: calculateDimension(16, false, this.props.screenSize),
-                                    marginBottom: 20
-                                }}/> : null
-                    }
-                    {
-                        this.props.isNew ? 
-                            <Button
-                                title={'Next'}
-                                onPress={this.handleNextButton}
-                                color={styles.buttonGreen}
-                                titleColor={'white'}
-                                height={calculateDimension(25, true, this.props.screenSize)}
-                                width={calculateDimension(130, false, this.props.screenSize)}
-                                style={{
-                                    marginVertical: calculateDimension(5, true, this.props.screenSize),
-                                    marginHorizontal: calculateDimension(16, false, this.props.screenSize),
-                                    marginBottom: 20,
-                                }}/> : null
+                            <View style = {{flexDirection:'row'}}>          
+                                 <Button
+                                     title={'Back'}
+                                     onPress={this.handleBackButton}
+                                     color={styles.buttonGreen}
+                                     titleColor={'white'}
+                                     height={calculateDimension(25, true, this.props.screenSize)}
+                                     width={calculateDimension(130, false, this.props.screenSize)}
+                                     style={{
+                                         marginVertical: calculateDimension(12.5, true, this.props.screenSize),
+                                         marginHorizontal: calculateDimension(16, false, this.props.screenSize),
+                                     }}/> 
+                                 <Button
+                                     title={'Next'}
+                                     onPress={this.handleNextButton}
+                                     color={styles.buttonGreen}
+                                     titleColor={'white'}
+                                     height={calculateDimension(25, true, this.props.screenSize)}
+                                     width={calculateDimension(130, false, this.props.screenSize)}
+                                     style={{
+                                         marginVertical: calculateDimension(12.5, true, this.props.screenSize),
+                                         marginHorizontal: calculateDimension(16, false, this.props.screenSize),
+                                     }}/> 
+                            </View> : null
                     }
                 </View>
 
-            </KeyboardAwareScrollView>
+                <KeyboardAwareScrollView
+                    style={style.containerScrollView}
+                    contentContainerStyle={[style.contentContainerStyle, {paddingBottom: this.props.screenSize.height < 600 ? 70 : 20}]}
+                    keyboardShouldPersistTaps={'always'}
+                >
+                    <View style={style.container}>
+                        {
+                            this.props.contact && this.props.contact.addresses && this.props.contact.addresses.map((item, index) => {
+                                return this.handleRenderItem(item, index)
+                            })
+                        }
+                    </View>
+                    <View style={{alignSelf: 'flex-start', marginHorizontal: calculateDimension(16, false, this.props.screenSize), marginVertical: 20}}>
+                        <Ripple
+                            style={{
+                                height: 25,
+                                justifyContent: 'center'
+                            }}
+                            onPress={this.props.onPressAddAdrress}
+                        >
+                            <Text style={{fontFamily: 'Roboto-Medium', fontSize: 12, color: styles.buttonGreen}}>Add another address</Text>
+                        </Ripple>
+                    </View>
+                </KeyboardAwareScrollView>
+            </View>
         );
     }
 
@@ -120,6 +118,7 @@ class ContactsSingleAddress extends Component {
                 item={config.contactsSingleScreen.address.fields}
                 index={index}
                 contact={this.props.contact}
+                isEditMode={true}
                 style={style.cardStyle}
                 screen={'ContactsSingleScreen'}
                 onChangeText={this.props.onChangeText}
@@ -154,6 +153,11 @@ class ContactsSingleAddress extends Component {
 // Create style outside the class, or for components that will be used by other components (buttons),
 // make a global style in the config directory
 const style = StyleSheet.create({
+    viewContainer: {
+        flex: 1,
+        backgroundColor: styles.screenBackgroundGrey,
+        alignItems: 'center',
+    },
     cardStyle: {
         marginVertical: 4,
         flex: 1
