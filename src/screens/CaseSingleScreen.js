@@ -23,8 +23,8 @@ import CaseSingleInfectionContainer from './../containers/CaseSingleInfectionCon
 import CaseSingleInvestigationContainer from '../containers/CaseSingleInvestigationContainer';
 import {Icon} from 'react-native-material-ui';
 import {removeErrors} from './../actions/errors';
-import {addCase, updateCase, deleteCase} from './../actions/cases';
-import {extractIdFromPouchId, updateRequiredFields} from './../utils/functions';
+import {addCase, updateCase} from './../actions/cases';
+import {updateRequiredFields} from './../utils/functions';
 
 const initialLayout = {
     height: 0,
@@ -330,23 +330,21 @@ class CaseSingleScreen extends Component {
    
     //Delete case
     handleOnPressDeleteCase = () => {
-        // console.log("### handleOnPressDelete");
         Alert.alert("Alert", 'Are you sure you want to delete this case?', [
             {
                 text: 'Yes', onPress: () => {
-                this.hideMenu();
-                this.setState({
-                    deletePressed: true
-                }, () => {
-                    console.log("### existing filters: ", this.props.filter, this.state);
-                    this.props.deleteCase(this.props.outbreak.id, this.state.item.id, this.props.filter, this.props.user.token);
-                })
-            }
+                    this.setState ({
+                        deletePressed: true
+                    }, () => {
+                        this.hideMenu()
+                        this.handleOnPressSave();
+                    })
+                }
             },
             {
                 text: 'No', onPress: () => {
-                this.hideMenu();
-            }
+                    this.hideMenu();
+                }
             }
         ])
     };
@@ -385,7 +383,7 @@ class CaseSingleScreen extends Component {
                     } else {
                         let caseWithRequiredFields = null
                         if (this.state.deletePressed === true) {
-                            //TO DO DELETE CASE
+                            caseWithRequiredFields = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, this.state.case), action = 'delete')
                         } else {
                             caseWithRequiredFields = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, this.state.case), action = 'update')
                         }
@@ -437,7 +435,6 @@ class CaseSingleScreen extends Component {
         }
     };
     onPressCancelEdit = () => {
-      
         if (this.state.isModified === true) {
             Alert.alert("Alert", 'Are you sure you want to discard all changes ?', [
                 {
@@ -939,7 +936,6 @@ function matchDispatchProps(dispatch) {
     return bindActionCreators({
         addCase,
         updateCase,
-        deleteCase,
         removeErrors
     }, dispatch);
 }

@@ -17,7 +17,8 @@ export function getCasesForOutbreakIdRequest (outbreakId, filter, token, callbac
     })
         .then((result) => {
             console.log("result with the new index for cases: ", new Date().getTime() - start);
-            callback(null, result.rows.map((e) => {return e.doc}));
+            callback(null, result.rows.filter((e) => {return e.doc.deleted === false}).map((e) => {return e.doc}));
+            
         })
         .catch((errorQuery) => {
             console.log("Error with the new index for cases: ", errorQuery);

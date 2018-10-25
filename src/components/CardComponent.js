@@ -93,7 +93,7 @@ class CardComponent extends Component {
             } else if (this.props.case.deceased !== nextProps.case.deceased) {
                 return true
             }
-            if (this.props.case.hospitalizationDates.length > 0 && nextProps.case.hospitalizationDates.length > 0 && this.props.case.hospitalizationDates.length === nextProps.case.hospitalizationDates.length) {
+            if (this.props.case.hospitalizationDates && this.props.case.hospitalizationDates.length > 0 && nextProps.case.hospitalizationDates && nextProps.case.hospitalizationDates.length > 0 && this.props.case.hospitalizationDates.length === nextProps.case.hospitalizationDates.length) {
                 for (let i=0; i<this.props.case.hospitalizationDates.length; i++){
                     if (this.props.case.hospitalizationDates[i][nextProps.item[0].id] !== undefined && this.props.case.hospitalizationDates[i][nextProps.item[1].id] !== undefined) {
                         if (this.props.case.hospitalizationDates[i][nextProps.item[0].id] !== nextProps.case.hospitalizationDates[i][nextProps.item[0].id] || this.props.case.hospitalizationDates[i][nextProps.item[1].id] !== nextProps.case.hospitalizationDates[i][nextProps.item[1].id]){
@@ -102,7 +102,7 @@ class CardComponent extends Component {
                     }
                 }
             }
-            if (this.props.case.isolationDates.length > 0 && nextProps.case.isolationDates.length > 0 && this.props.case.isolationDates.length === nextProps.case.isolationDates.length) {
+            if (this.props.case.isolationDates && this.props.case.isolationDates.length > 0 && nextProps.case.isolationDates && nextProps.case.isolationDates.length > 0 && this.props.case.isolationDates.length === nextProps.case.isolationDates.length) {
                 for (let i=0; i<this.props.case.isolationDates.length; i++){
                     if (this.props.case.isolationDates[i][nextProps.item[0].id] !== undefined && this.props.case.isolationDates[i][nextProps.item[1].id] !== undefined) {
                         if (this.props.case.isolationDates[i][nextProps.item[0].id] !== nextProps.case.isolationDates[i][nextProps.item[0].id] || this.props.case.isolationDates[i][nextProps.item[1].id] !== nextProps.case.isolationDates[i][nextProps.item[1].id]){
