@@ -83,18 +83,26 @@ class NavigationDrawer extends Component {
 
     // Please write here all the methods that are not react native lifecycle methods
     handlePressOnListItem = (index) => {
-        this.setState({
-           selectedScreen: index
-        }, () => {
+        if (index !== this.state.selectedScreen) {
+            this.setState({
+                selectedScreen: index
+             }, () => {
+                 this.props.navigator.toggleDrawer({
+                     side: 'left',
+                     animated: true,
+                     to: 'missing'
+                 });
+                 this.props.navigator.handleDeepLink({
+                     link: 'Navigate/' + index
+                 })
+             });
+        } else {
             this.props.navigator.toggleDrawer({
                 side: 'left',
                 animated: true,
                 to: 'missing'
             });
-            this.props.navigator.handleDeepLink({
-                link: 'Navigate/' + index
-            })
-        });
+        }
     };
 
     handleOnPressAdd = (key, index) => {

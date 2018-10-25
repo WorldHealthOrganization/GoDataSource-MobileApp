@@ -36,7 +36,7 @@ export function updateCaseAction(myCase) {
     }
 }
 
-export function getCasesForOutbreakId(outbreakId, filter, token, dispatch) {
+export function getCasesForOutbreakIdWithPromise(outbreakId, filter, token, dispatch) {
     // return async function (dispatch, getState) {
     return new Promise((resolve, reject) => {
         getCasesForOutbreakIdRequest(outbreakId, filter, token, (error, response) => {
@@ -52,6 +52,24 @@ export function getCasesForOutbreakId(outbreakId, filter, token, dispatch) {
         })
     })
     // }
+};
+
+export function getCasesForOutbreakId(outbreakId, filter, token) {
+    return async function (dispatch, getState) {
+    // return new Promise((resolve, reject) => {
+        getCasesForOutbreakIdRequest(outbreakId, filter, token, (error, response) => {
+            if (error) {
+                console.log("*** getCasesForOutbreakId error: ", error);
+                dispatch(addError(errorTypes.ERROR_CASES));
+                // reject(error);
+            }
+            if (response) {
+                dispatch(storeCases(response));
+                // resolve('Done cases');
+            }
+        })
+    // })
+    }
 };
 
 export function addCase(outbreakId, myCase, token) {
@@ -85,17 +103,3 @@ export function updateCase (outbreakId, caseId, myCase, token) {
         })
     }
 }
-
-export function deleteCase(outbreakId, caseId, filter, token) {
-    return async function(dispatch, getState) {
-        deleteCaseRequest(outbreakId, caseId, token, (error, response) => {
-            if (error) {
-                console.log("*** deleteCase error: ", error);
-                dispatch(addError(errorTypes.ERROR_DELETE_CASE));
-            }
-            if (response) {
-                dispatch(getCasesForOutbreakId(outbreakId, config.defaultFilterForCases, token));
-            }
-        })
-    }
-};
