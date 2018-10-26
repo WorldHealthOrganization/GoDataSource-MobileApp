@@ -49,9 +49,18 @@ class DropDown extends PureComponent {
         }
 
         return (
-            <Ripple style={[this.props.style, {flex: 1, marginTop: 25, marginBottom: 14, alignSelf: 'center'}]} onPress={this.handleOnPress}>
+            <Ripple style={[
+                this.props.style,
+                {
+                    flex: 1,
+                    marginTop: 25,
+                    marginBottom: 14,
+                    alignSelf: 'center'
+                }
+                ]} onPress={this.handleOnPress}>
                 <View style={style.innerTextContainer}>
-                    <Text style={style.labelStyle}>{this.state.selectedItems.length === 0 ? 'Select answer(s)' : ("Slected " + this.state.selectedItems.length + ' answer(s)')}</Text>
+                    <Text style={style.labelStyle}>
+                        {this.state.selectedItems.length === 0 ? 'Select answer(s)' : ("Selected " + this.state.selectedItems.length + ' answer(s)')}</Text>
                     <Icon name="arrow-drop-down"/>
                 </View>
                 <View style={[{height: 1, backgroundColor: styles.textFieldUnderline, marginTop: 14}]} />
@@ -97,13 +106,13 @@ class DropDown extends PureComponent {
     }
 }
 
-DropDown.defaultProps = {
-    label: 'DropDownLabel',
-    value: 'Test',
-    data: [],
-    isEditMode: true,
-    isRequired: true,
-};
+// DropDown.defaultProps = {
+//     label: 'DropDownLabel',
+//     value: 'Test',
+//     data: [],
+//     isEditMode: true,
+//     isRequired: true,
+// };
 
 // Create style outside the class, or for components that will be used by other components (buttons),
 // make a global style in the config directory

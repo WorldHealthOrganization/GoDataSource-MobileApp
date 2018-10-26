@@ -21,7 +21,7 @@ import _ from 'lodash';
 import DatePicker from './DatePicker';
 
 
-class FollowUpListItem extends PureComponent {
+class QuestionCard extends PureComponent {
 
     // This will be a dumb component, so it's best not to put any business logic in it
     constructor(props) {
@@ -112,15 +112,23 @@ class FollowUpListItem extends PureComponent {
         let questionAnswers = item.answerType === 'Free text' ? source.questionnaireAnswers[item.text] : source.questionnaireAnswers[item.variable] || null;
 
         if (item.answerType === 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_SINGLE_ANSWER') {
+            console.log('QuestionCard: ', item);
             questionAnswers = questionAnswers !== null &&
                 questionAnswers !== undefined &&
-                item.answers.map((e) => {return e.value}).indexOf(questionAnswers) > -1 &&
-                item.answers[item.answers.map((e) => {return e.value}).indexOf(questionAnswers)] ?
+                item.answers.map((e) => {return e && e.value ? e.value : null}).indexOf(questionAnswers) > -1 &&
+                item.answers[item.answers.map((e) => {return e.value ? e.value : null}).indexOf(questionAnswers)] ?
                     this.getTranslation(item.answers[item.answers.map((e) => {return e.value}).indexOf(questionAnswers)].label) : ' ';
         }
         else {
             if (item.answerType === 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_MULTIPLE_ANSWERS') {
-                questionAnswers = item.answers.filter((e) => {return questionAnswers.indexOf(e.value) > -1}).map((e) => {return {label: this.getTranslation(e.label), value: e.value}}) || [];
+                console.log('QuestionCard: ', item);
+                questionAnswers = questionAnswers !== null && questionAnswers !== undefined && Array.isArray(questionAnswers) && questionAnswers.length > 0 ?
+                    item.answers.filter((e) => {
+                    console.log('Inside filter: ', e);
+                    return e && e.value && questionAnswers.indexOf(e.value) > -1;
+                }).map((e) => {
+                    return {label: this.getTranslation(e.label), value: e.value || null}
+                }) : [];
             }
         }
 
@@ -166,9 +174,9 @@ class FollowUpListItem extends PureComponent {
                 return (
                     <DatePicker
                         id={item.variable}
-                        label={item.text}
-                        value={value}
-                        isEditMode={item.props.isEditMode}
+                        label={'Select date'}
+                        value={questionAnswers}
+                        isEditMode={this.props.isEditMode}
                         isRequired={item.required}
                         onChange={this.props.onChangeDateAnswer}
                         style={{width: width, marginHorizontal: marginHorizontal}}
@@ -215,13 +223,18 @@ class FollowUpListItem extends PureComponent {
     };
 
     getTranslation = (value) => {
-        let valueToBeReturned = value;
-        if (value && typeof value === 'string' && value.includes('LNG')) {
-            valueToBeReturned = value && this.props.translation && Array.isArray(this.props.translation) && this.props.translation[this.props.translation.map((e) => {return e && e.token ? e.token : null}).indexOf(value)] ? this.props.translation[this.props.translation.map((e) => {
-                return e.token
-            }).indexOf(value)].translation : '';
+        if (value && value !== '') {
+            let valueToBeReturned = value;
+            if (value && typeof value === 'string' && value.includes('LNG')) {
+                valueToBeReturned = value && this.props.translation && Array.isArray(this.props.translation) && this.props.translation[this.props.translation.map((e) => {
+                    return e && e.token ? e.token : null
+                }).indexOf(value)] ? this.props.translation[this.props.translation.map((e) => {
+                    return e.token
+                }).indexOf(value)].translation : '';
+            }
+            return valueToBeReturned;
         }
-        return valueToBeReturned;
+        return '';
     }
 }
 
@@ -273,4 +286,4 @@ function matchDispatchProps(dispatch) {
     }, dispatch);
 }
 
-export default connect(mapStateToProps, matchDispatchProps)(FollowUpListItem);
+export default connect(mapStateToProps, matchDispatchProps)(QuestionCard);

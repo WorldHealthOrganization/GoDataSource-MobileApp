@@ -20,7 +20,7 @@ import {
     addFollowUpRequest
 } from './../queries/followUps';
 import _ from 'lodash';
-import {storeContacts} from './contacts';
+import {storeContacts, getContactsForOutbreakId} from './contacts';
 import {getRelationshipsForTypeRequest} from './../queries/relationships';
 import {extractIdFromPouchId, mapContactsAndRelationships, mapContactsAndFollowUps} from './../utils/functions';
 
@@ -132,7 +132,7 @@ export function getMissedFollowUpsForOutbreakId(outbreakId, filter, token) {
 }
 
 export function updateFollowUpAndContact(outbreakId, contactId, followUpId, followUp, contact, token) {
-    let contactIdForFollowUp = null
+    let contactIdForFollowUp = null;
     if (contactId) {
         contactIdForFollowUp = extractIdFromPouchId(contactId, 'person')
     }
@@ -188,15 +188,16 @@ export function createFollowUp(outbreakId, contactId, followUp, contact, activeF
 
 export function generateFollowUp(outbreakId, followUpPeriod, token) {
     return async function(dispatch, getState) {
-        generateFollowUpRequest(outbreakId, followUpPeriod, token, (error, response) => {
-            if (error) {
-                console.log("*** generateFollowUp error: ", error);
-                dispatch(addError(errorTypes.ERROR_GENERATE_FOLLOWUP));
-            }
-            if (response) {
-                dispatch(getContactsForOutbreakId(outbreakId, config.defaultFilterForContacts, token))
-            }
-        })
+        // TODO add generate algorithm for follow-ups
+        // generateFollowUpRequest(outbreakId, followUpPeriod, token, (error, response) => {
+        //     if (error) {
+        //         console.log("*** generateFollowUp error: ", error);
+        //         dispatch(addError(errorTypes.ERROR_GENERATE_FOLLOWUP));
+        //     }
+        //     if (response) {
+        //         dispatch(getContactsForOutbreakId(outbreakId, config.defaultFilterForContacts, token))
+        //     }
+        // })
     }
 }
 

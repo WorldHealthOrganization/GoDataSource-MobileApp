@@ -51,12 +51,6 @@ class AddFollowUpScreen extends PureComponent{
         let contentWidth = calculateDimension(297, false, this.props.screenSize);
         let marginHorizontal = calculateDimension(14, false, this.props.screenSize);
 
-        let contactList = this.state.contacts ? this.state.contacts.map((e) => {
-            return {value: (e.firstName ? e.firstName + ' ' : '' + e.lastName ? e.lastName : ''), id: e._id}
-        }) : this.props && this.props.contacts && this.props.contacts.map((e) => {
-            return {value: (e.firstName ? e.firstName + ' ' : '' + e.lastName ? e.lastName : ''), id: e._id}
-        });
-
         return (
             <Dialog
                 visible={this.props.showAddFollowUpScreen}
@@ -91,6 +85,7 @@ class AddFollowUpScreen extends PureComponent{
                     {/*/>*/}
                     <DropdownSearchable
                         outbreakId={this.props.user.activeOutbreakId}
+                        onChange={this.onDropdownSearchableChanged}
                     />
                     <DatePicker
                         id='followUpDate'
@@ -124,7 +119,7 @@ class AddFollowUpScreen extends PureComponent{
         );
     }
 
-    onDropdownInputChanged = (value, id, objectType) => {
+    onDropdownSearchableChanged = (value) => {
         this.setState({
             selectedContact: value
         })

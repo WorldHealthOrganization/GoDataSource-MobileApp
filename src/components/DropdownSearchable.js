@@ -50,35 +50,39 @@ class DropdownSearchable extends PureComponent {
 
     // Please write here all the methods that are not react native lifecycle methods
     handleOnChangeItem = (state) => {
-        if (this.props.labelValue) {
-            console.log("Label value branch: ", this.props.data, state);
-            if (this.props && this.props.data && Array.isArray(this.props.data)) {
-                this.props.onChange(
-                    {
-                        label: state.name, value: state.id
-                    },
-                    this.props.id,
-                    this.props.objectType ?
-                        (this.props.objectType === 'Address' ? this.props.index :
-                                (this.props.objectType === 'LabResult' ? this.props.index : this.props.objectType )
-                        )
-                        : this.props.data[this.props.data.map((e) => {
-                            return e.value
-                        }).indexOf(state)].type || null,
-                    this.props.objectType
-                )
-            }
-        } else {
-            this.props.onChange(
-                state,
-                this.props.id,
-                this.props.objectType ? (this.props.objectType === 'Address' ? this.props.index : (this.props.objectType === 'LabResult' ? this.props.index : this.props.objectType ) ) : null,
-                this.props.objectType
-            )
-        }
+        // if (this.props.labelValue) {
+        //     console.log("Label value branch: ", this.props.data, state);
+        //     if (this.props && this.props.data && Array.isArray(this.props.data)) {
+        //         this.props.onChange(
+        //             {
+        //                 label: state.name, value: state.id
+        //             },
+        //             this.props.id,
+        //             this.props.objectType ?
+        //                 (this.props.objectType === 'Address' ? this.props.index :
+        //                         (this.props.objectType === 'LabResult' ? this.props.index : this.props.objectType )
+        //                 )
+        //                 : this.props.data[this.props.data.map((e) => {
+        //                     return e.value
+        //                 }).indexOf(state)].type || null,
+        //             this.props.objectType
+        //         )
+        //     }
+        // } else {
+        //     this.props.onChange(
+        //         state,
+        //         this.props.id,
+        //         this.props.objectType ? (this.props.objectType === 'Address' ? this.props.index : (this.props.objectType === 'LabResult' ? this.props.index : this.props.objectType ) ) : null,
+        //         this.props.objectType
+        //     )
+        // }
+
+        console.log("handleOnChangeItem: ", state);
+        this.props.onChange(state);
     };
 
     handleOnChangeText = (text) => {
+        console.log('handleOnChangeText: ', text);
         this.setState({
             searchText: text
         })
@@ -87,6 +91,7 @@ class DropdownSearchable extends PureComponent {
     handleOnSubmitEditing = () => {
         // here should make a query on contact for getting searched results
         // outbreakId should be passed by props
+        console.log('handleOnSubmitEditing: ', this.state.searchText)
         getContactsForOutbreakIdRequest(this.props.outbreakId, {searchText: this.state.searchText}, null, (error, response) => {
             if (error) {
                 Alert.alert("Error", 'An error occurred while getting contacts', [

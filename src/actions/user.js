@@ -7,7 +7,7 @@ import { changeAppRoot, getTranslations } from './app';
 import {loginUserRequest, getUserByIdRequest, updateUserRequest} from './../queries/user';
 import { getFollowUpsForOutbreakIdWithPromises } from './followUps';
 import { getContactsForOutbreakId, getContactsForOutbreakIdWithPromises } from './contacts';
-import { getCasesForOutbreakIdWithPromise } from './cases';
+import { getCasesForOutbreakIdWithPromise, getCasesForOutbreakId } from './cases';
 import { getEventsForOutbreakId } from './events';
 import { getOutbreakById } from './outbreak';
 import { addError } from './errors';
