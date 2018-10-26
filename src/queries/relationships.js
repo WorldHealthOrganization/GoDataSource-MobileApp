@@ -17,8 +17,8 @@ export function getRelationshipsForTypeRequest (outbreakId, searchType, keys, ca
     database.find({
         selector: {
             _id: {
-                $gt: `relationship.json_false_${outbreakId}_`,
-                $lt: `relationship.json_false_${outbreakId}_\uffff`
+                $gte: `relationship.json_false_${outbreakId}_`,
+                $lte: `relationship.json_false_${outbreakId}_\uffff`
             },
             $or: [
                 {'persons.0.id': {$in: keys}},

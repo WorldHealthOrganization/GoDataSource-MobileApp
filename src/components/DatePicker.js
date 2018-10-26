@@ -86,6 +86,8 @@ class DatePicker extends PureComponent {
                     )
                 }
                 <DateTimePicker
+                    minimumDate={this.props.minimumDate}
+                    maximumDate={this.props.maximumDate}
                     isVisible={this.state.isDateTimePickerVisible}
                     onConfirm={this.handleDatePicked}
                     onCancel={this.handleDateCancelled}
@@ -115,7 +117,7 @@ class DatePicker extends PureComponent {
                     textAlign: 'left',
                     color: 'rgb(60,60,60)',
                 }}>
-                    {this.props.value !== undefined ? this.props.value : ''}
+                    {this.props.value !== undefined ? moment(this.props.value).format('MM/DD/YYYY') : ''}
                 </Text>
             </View>
         );
@@ -136,7 +138,7 @@ class DatePicker extends PureComponent {
     handleDatePicked = (date) => {
         console.log("### date picked: ", date, moment(date).format());
         this.props.onChange(
-            moment(date).format(), 
+            date, 
             this.props.id, 
             this.props.objectType ? (this.props.objectType === 'Address' || this.props.objectType === 'LabResult' || this.props.objectType === 'HospitalizationDates' || this.props.objectType === 'IsolationDates' ? this.props.index : this.props.objectType) : null, 
             this.props.objectType

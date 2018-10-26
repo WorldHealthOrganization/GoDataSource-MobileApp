@@ -108,7 +108,8 @@ export function navigation(event, navigator) {
                         animationType: 'fade',
                         passProps: {
                             item: {},
-                            filter: null
+                            filter: null,
+                            isNew: addScreen === "CaseSingleScreen" ? true : null
                         }
                     })
                 }

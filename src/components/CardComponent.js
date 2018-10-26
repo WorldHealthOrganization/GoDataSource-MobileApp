@@ -166,6 +166,8 @@ class CardComponent extends Component {
         let width = calculateDimension(315, false, this.props.screenSize);
         let marginHorizontal = calculateDimension(14, false, this.props.screenSize);
         let value = '';
+        let minimumDate = undefined
+        let maximumDate = undefined
         let data = [];
 
         if (this.props.followUp && this.props.contact) {
@@ -191,7 +193,9 @@ class CardComponent extends Component {
             }
 
             if (item.type === 'DropDown' && item.id === 'exposure') {
-                data = this.props.cases.map((e) => {return {label: ((e.firstName ? e.firstName : '') + (e.lastName ? (" " + e.lastName) : '')), value: e.id}})
+                if (this.props.cases && this.props.cases.length > 0){
+                    data = this.props.cases.map((e) => {return {label: ((e.firstName ? e.firstName : '') + (e.lastName ? (" " + e.lastName) : '')), value: e.id}})
+                }
                 value = this.props.filter.filter[item.id];
             }
             if (item.type === 'DropDown' && item.id == 'classification') {
@@ -239,6 +243,29 @@ class CardComponent extends Component {
                 value = this.props.case[item.id]
             } else if (item.type === 'SwitchInput' && this.props.case[item.id] !== undefined) {
                 value = this.props.case[item.id]
+            }
+
+            //HospitalizationDates && IsolationDates validation
+            if (item.type === 'DatePicker') {
+                if( item.objectType === 'HospitalizationDates'){
+                    if (this.props.case && this.props.case.hospitalizationDates && Array.isArray(this.props.case.hospitalizationDates) && this.props.case.hospitalizationDates.length > 0) {
+                        if (this.props.case.hospitalizationDates[this.props.index].startDate !== null && item.id !== 'startDate') {
+                            minimumDate = this.props.case.hospitalizationDates[this.props.index].startDate 
+                        }
+                        if (this.props.case.hospitalizationDates[this.props.index].endDate !== null && item.id !== 'endDate') {
+                            maximumDate = this.props.case.hospitalizationDates[this.props.index].endDate 
+                        }
+                    }
+                } else if (item.objectType === 'IsolationDates'){
+                    if (this.props.case && this.props.case.isolationDates && Array.isArray(this.props.case.isolationDates) && this.props.case.isolationDates.length > 0) {
+                        if (this.props.case.isolationDates[this.props.index].startDate !== null && item.id !== 'startDate') {
+                            minimumDate = this.props.case.isolationDates[this.props.index].startDate 
+                        }
+                        if (this.props.case.isolationDates[this.props.index].endDate !== null && item.id !== 'endDate') {
+                            maximumDate = this.props.case.isolationDates[this.props.index].endDate 
+                        }
+                    }
+                }
             }
         }
 
@@ -346,6 +373,8 @@ class CardComponent extends Component {
                         isEditMode={item.isEditMode}
                         isRequired={item.isRequired}
                         onChange={this.props.onChangeDate}
+                        minimumDate={minimumDate}
+                        maximumDate={maximumDate}
                         style={{width: width, marginHorizontal: marginHorizontal}}
                         objectType={item.objectType}
                     />
@@ -440,7 +469,9 @@ class CardComponent extends Component {
 
     computeDataForDropdown = (item, contact) => {
         if (item.id === 'exposedTo') {
-            return this.props.cases.map((e) => {return {value: ((e.firstName ? e.firstName : '') + (e.lastName ? (" " + e.lastName) : ''))}});
+            if (this.props.cases && this.props.cases.length > 0){
+                return this.props.cases.map((e) => {return {value: ((e.firstName ? e.firstName : '') + (e.lastName ? (" " + e.lastName) : ''))}});
+            }
         }
 
         if (item.id === 'address') {
@@ -518,7 +549,9 @@ class CardComponent extends Component {
                 if (this.props.type !== 'Contact') {
                     data = this.props.contacts.map((e) => {return {value: ((e.firstName ? e.firstName + ' ' : '') + (e.lastName ? e.lastName : '')), id: extractIdFromPouchId(e._id, 'person'), type: 'contact'}});
                 }
-                data = this.props.cases.map((e) => {return {value: ((e.firstName ? e.firstName + ' ' : '') + (e.lastName ? e.lastName : '')), id: extractIdFromPouchId(e._id, 'person'), type: 'case'}});
+                if (this.props.cases && this.props.cases.length > 0){
+                    data = this.props.cases.map((e) => {return {value: ((e.firstName ? e.firstName + ' ' : '') + (e.lastName ? e.lastName : '')), id: extractIdFromPouchId(e._id, 'person'), type: 'case'}});
+                }
                 data = data.concat(this.props.events.map((e) => {return {value: e.name, id: extractIdFromPouchId(e._id, 'person'), type: 'event'}}));
             } else {
                 if (item.id === 'clusterId') {
@@ -555,8 +588,7 @@ class CardComponent extends Component {
                 return (this.props.cases && Array.isArray(this.props.cases) && this.props.cases.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id) > -1 && this.props.cases[this.props.cases.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id)].firstName ? (this.props.cases[this.props.cases.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id)].firstName + ' ') : '') +
                 (this.props.cases && Array.isArray(this.props.cases) && this.props.cases.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id) > -1 && this.props.cases[this.props.cases.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id)].lastName ? (this.props.cases[this.props.cases.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id)].lastName) : '');
             case 'event':
-                return (this.props.events && Array.isArray(this.props.events) && this.events.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id) > -1 &&
-                this.props.events[this.props.events.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id)].name ? (this.props.events[this.props.events.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id)].name) : '');
+                return (this.props.events && Array.isArray(this.props.events) && this.props.events.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id) > -1 && this.props.events[this.props.events.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id)].name ? (this.props.events[this.props.events.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id)].name) : '');
             case 'contact':
                 return (this.props.contacts && Array.isArray(this.props.contacts) && this.props.contacts.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id) > -1 && this.props.contacts[this.props.contacts.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id)].firstName ? (this.props.contacts[this.props.contacts.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id)].firstName + ' ') : '') +
                 (this.props.contacts && Array.isArray(this.props.contacts) && this.props.contacts.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id) > -1 && this.props.contacts[this.props.contacts.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id)].lastName ? (this.props.contacts[this.props.contacts.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id)].lastName) : '');
