@@ -253,7 +253,7 @@ class ExposureScreen extends Component {
                                 this.props.navigator.dismissModal(this.props.saveExposure(this.state.exposure, true));
                             })
                         } else {
-                            let exposure = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.contact.updatedBy, record = Object.assign({}, this.state.exposure), action = 'update', fileType = 'relationship.json')
+                            let exposure = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.contact.updatedBy, record = Object.assign({}, this.state.exposure), action = 'update')
                             this.props.navigator.dismissModal(this.props.saveExposure(this.state.exposure, true));
                             this.props.updateExposureForContact(this.props.user.activeOutbreakId, this.props.contact._id, exposure, this.props.user.token);
                         }

@@ -55,7 +55,7 @@ export function loginUser(credentials) {
                 promises.push(getAvailableLanguages(dispatch));
                 promises.push(getReferenceData(null, dispatch));
                 promises.push(getEventsForOutbreakId(response.activeOutbreakId, null, dispatch));
-                promises.push(getCasesForOutbreakId(response.activeOutbreakId, null, null, dispatch));
+                promises.push(getCasesForOutbreakIdWithPromise(response.activeOutbreakId, null, null, dispatch));
 
                 // Store the user to the redux store, and also store the userId to the AsyncStorage
                 dispatch(storeUser(response));

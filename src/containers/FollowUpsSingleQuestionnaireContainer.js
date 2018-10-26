@@ -15,6 +15,7 @@ import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import Button from './../components/Button';
 import {LoaderScreen} from 'react-native-ui-lib'
 import {isEqual} from 'lodash';
+import _ from 'lodash';
 
 class FollowUpsSingleQuestionnaireContainer extends PureComponent {
 
