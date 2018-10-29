@@ -72,8 +72,8 @@ export function getContactsForOutbreakIdRequest (outbreakId, filter, token, call
             database.find({
                 selector: {
                     _id: {
-                        $gt: 'person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT_',
-                        $lt: 'person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT_\uffff'
+                        $gt: `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT_false_${outbreakId}_`,
+                        $lt: `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT_false_${outbreakId}_\uffff`
                     },
                     type: {$eq: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT'},
                     gender: filter.gender ? {$eq: filter.gender} : {},

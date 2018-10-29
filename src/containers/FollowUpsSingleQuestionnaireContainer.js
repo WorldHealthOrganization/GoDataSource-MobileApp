@@ -13,7 +13,8 @@ import styles from './../styles';
 import QuestionCard from './../components/QuestionCard';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import Button from './../components/Button';
-import {LoaderScreen} from 'react-native-ui-lib'
+import {LoaderScreen} from 'react-native-ui-lib';
+import Section from './../components/Section';
 import {isEqual} from 'lodash';
 import _ from 'lodash';
 
@@ -59,8 +60,11 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
         let marginVertical = calculateDimension(12.5, true, this.props.screenSize);
         let viewWidth = calculateDimension(config.designScreenSize.width - 32, false, this.props.screenSize);
 
-        // Sort questions by the order field
-        let sortedQuestions = _.sortBy(this.props.questions, ['order']);
+        // Get all additional questions recursively
+        let sortedQuestions = this.extractAllQuestions(this.props.questions);
+
+        // mappedQuestions format: [{categoryName: 'cat1', questions: [{q1}, {q2}]}]
+        sortedQuestions = this.mapQuestions(sortedQuestions);
 
         return (
             <View style={style.mainContainer}>
@@ -91,7 +95,7 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
                 >
                     {
                         sortedQuestions.map((item, index) => {
-                            return this.handleRenderItem(item, index)
+                           return this.handleRenderSectionedList(item, index)
                         })
                     }
                 </KeyboardAwareScrollView>
@@ -100,6 +104,24 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
     }
 
     // Please write here all the methods that are not react native lifecycle methods
+    handleRenderSectionedList = (item, index) => {
+        return (
+            <View>
+                <Section
+                    label={this.getTranslation(item.categoryName)}
+                    containerStyle={{
+                        marginVertical: 10
+                    }}
+                />
+                {
+                    item.questions.map((item, index) => {
+                        return this.handleRenderItem(item, index)
+                    })
+                }
+            </View>
+        )
+    };
+
     handleRenderItem = (item, index) => {
         return (
             <QuestionCard
@@ -113,7 +135,81 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
                 onChangeMultipleSelection={this.props.onChangeMultipleSelection}
             />
         )
-    }
+    };
+
+    extractAllQuestions = (questions) => {
+        let returnedQuestions = [];
+
+        if (questions && Array.isArray(questions) && questions.length > 0) {
+            for (let i = 0; i < questions.length; i++) {
+                // First add every question
+                returnedQuestions.push(questions[i]);
+                if (questions[i] && questions[i].answerType && (questions[i].answerType === "LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_SINGLE_ANSWER" || questions[i].answerType === "LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_MULTIPLE_ANSWERS") && questions[i].answers && Array.isArray(questions[i].answers) && questions[i].answers.length > 0) {
+                    // For every answer check if the user answered that question and then proceed with the showing
+                    for (let j = 0; j < questions[i].answers.length; j++) {
+                        // First check for single select since it has only a value
+                        if (questions[i].answerType === "LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_SINGLE_ANSWER" ) {
+                            if (this.props.item && this.props.item.questionnaireAnswers && this.props.item.questionnaireAnswers[questions[i].variable] === questions[i].answers[j].value && questions[i].answers[j].additionalQuestions) {
+                                returnedQuestions = returnedQuestions.concat(this.extractAllQuestions(questions[i].answers[j].additionalQuestions))
+                            }
+                        } else {
+                            // For the multiple select the answers are in an array of values
+                            if (questions[i].answerType === "LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_MULTIPLE_ANSWERS") {
+                                if (this.props.item && this.props.item.questionnaireAnswers && this.props.item.questionnaireAnswers[questions[i].variable] && Array.isArray(this.props.item.questionnaireAnswers[questions[i].variable]) && this.props.item.questionnaireAnswers[questions[i].variable].indexOf(questions[i].answers[j].value) > -1 && questions[i].answers[j].additionalQuestions) {
+                                    returnedQuestions = returnedQuestions.concat(this.extractAllQuestions(questions[i].answers[j].additionalQuestions))
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return returnedQuestions;
+    };
+
+    mapQuestions = (questions) => {
+        // mappedQuestions format: [{categoryName: 'cat1', questions: [{q1}, {q2}]}]
+        let mappedQuestions = [];
+
+        if (questions && Array.isArray(questions) && questions.length > 0) {
+            for (let i = 0; i < questions.length; i++) {
+                if (mappedQuestions.map((e) => {return e.categoryName}).indexOf(questions[i].category) === -1) {
+                    mappedQuestions.push({categoryName: questions[i].category, questions: [questions[i]]});
+                } else {
+                    if (mappedQuestions && Array.isArray(mappedQuestions) && mappedQuestions.length > 0 && mappedQuestions.map((e) => {
+                            return e.categoryName
+                        }).indexOf(questions[i].category) > -1 && mappedQuestions[mappedQuestions.map((e) => {
+                            return e.categoryName
+                        }).indexOf(questions[i].category)] && mappedQuestions[mappedQuestions.map((e) => {
+                            return e.categoryName
+                        }).indexOf(questions[i].category)].questions && Array.isArray(mappedQuestions[mappedQuestions.map((e) => {
+                            return e.categoryName
+                        }).indexOf(questions[i].category)].questions)) {
+                            mappedQuestions[mappedQuestions.map((e) => {return e.categoryName}).indexOf(questions[i].category)].questions.push(questions[i]);
+                    }
+                }
+            }
+        }
+
+        // console.log('Mapped questions: ', mappedQuestions);
+
+        return mappedQuestions;
+    };
+
+    getTranslation = (value) => {
+        if (value && value !== '') {
+            let valueToBeReturned = value;
+            if (value && typeof value === 'string' && value.includes('LNG')) {
+                valueToBeReturned = value && this.props.translation && Array.isArray(this.props.translation) && this.props.translation[this.props.translation.map((e) => {
+                    return e && e.token ? e.token : null
+                }).indexOf(value)] ? this.props.translation[this.props.translation.map((e) => {
+                    return e.token
+                }).indexOf(value)].translation : '';
+            }
+            return valueToBeReturned;
+        }
+        return '';
+    };
 }
 
 
@@ -142,7 +238,8 @@ const style = StyleSheet.create({
 function mapStateToProps(state) {
     return {
         screenSize: state.app.screenSize,
-        questions: state.outbreak.contactFollowUpTemplate
+        questions: state.outbreak.contactFollowUpTemplate,
+        translation: state.app.translation
     };
 }
 

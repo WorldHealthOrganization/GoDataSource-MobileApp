@@ -450,7 +450,7 @@ class FollowUpsScreen extends Component {
             lostToFollowUp: false,
             date: date,
             outbreakId: this.props.user.activeOutbreakId,
-            personId: extractIdFromPouchId(contact.value, 'person.json'),
+            personId: extractIdFromPouchId(contact.id, 'person.json'),
             updatedAt: now.toISOString(),
             updatedBy: extractIdFromPouchId(this.props.user._id, 'user.json'),
             deleted: false,
@@ -460,7 +460,7 @@ class FollowUpsScreen extends Component {
         this.setState({
             showAddFollowUpScreen: !this.state.showAddFollowUpScreen
         }, () => {
-            this.props.addFollowUp(this.props.user.activeOutbreakId, contact.value, followUp, this.state.filter, this.props.user.token);
+            this.props.addFollowUp(this.props.user.activeOutbreakId, contact.id, followUp, this.state.filter, this.props.user.token);
         });
     };
 

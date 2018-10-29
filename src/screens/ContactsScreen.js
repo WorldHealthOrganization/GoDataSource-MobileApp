@@ -52,7 +52,9 @@ class ContactsScreen extends Component {
         this.setState({
             loading: true
         }, () => {
-            this.props.getContactsForOutbreakId(this.props.user.activeOutbreakId, null, null);
+            if (this.props && this.props.user && this.props.user.activeOutbreakId) {
+                this.props.getContactsForOutbreakId(this.props.user.activeOutbreakId, null, null);
+            }
         })
     }
 

@@ -38,7 +38,7 @@ class DropdownInput extends PureComponent {
                 <Dropdown
                     label={this.props.isRequired ? this.props.label + ' * ' : this.props.label}
                     data={this.props.data}
-                    value={this.props.value}
+                    value={this.props.value || ''}
                     fontSize={15}
                     labelFontSize={12.5}
                     // baseColor={}
@@ -71,11 +71,11 @@ class DropdownInput extends PureComponent {
                     textAlign: 'left',
                     color: 'rgb(60,60,60)',
                 }}>
-                    {this.props.value != undefined ? this.props.value : ''}
+                    {this.props.value !== undefined ? this.props.value : ''}
                 </Text>
             </View>
         );
-    }
+    };
 
     handleOnChangeText = (state) => {
         if (this.props.labelValue) {

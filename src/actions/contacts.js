@@ -199,7 +199,7 @@ export function updateContact(outbreakId, contactId, contact, token) {
 }
 
 export function addExposureForContact(outbreakId, contactId, exposure, token, contact = null) {
-    let contactIdForExposure
+    let contactIdForExposure;
     if (contactId) {
         contactIdForExposure = extractIdFromPouchId(contactId, 'person')
     }

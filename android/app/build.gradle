@@ -137,6 +137,7 @@ android {
 }
 
 dependencies {
+    compile project(':react-native-camera')
     implementation (project(':react-native-camera')) {
         // exclude group: "com.google.android.gms"
         exclude group: "com.android.support"

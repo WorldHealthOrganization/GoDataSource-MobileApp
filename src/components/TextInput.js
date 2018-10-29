@@ -51,6 +51,7 @@ class TextInput extends PureComponent {
                     multiline={this.props.multiline != undefined ? this.props.multiline : false}
                     onPress={() => {console.log("On press textInput")}}
                     keyboardType={this.props.keyboardType ? this.props.keyboardType : 'default'}
+                    onSubmitEditing={this.props.onSubmitEditing}
                 />
             </View>
         );

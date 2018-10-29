@@ -49,12 +49,8 @@ export default class SearchableDropDown extends Component{
     }
 
     searchedItems= (searchedText) => {
-        const onTextChange = this.props.onTextChange;
-        if (onTextChange && typeof onTextChange === 'function') {
-            setTimeout(() => {
-                onTextChange(searchedText);
-            }, 0);
-        }
+        console.log('Searched text', searchedText);
+        this.props.onTextChange(searchedText);
     };
 
     renderItems = (item) => {
@@ -76,12 +72,12 @@ export default class SearchableDropDown extends Component{
             <View keyboardShouldpersist='always' style={{...this.props.containerStyle}}>
                 <TextInput
                     ref={(e) => this.input = e}
-                    onChangeText={(text) => {
-                        this.searchedItems(text)}
-                    }
+                    onChange={this.searchedItems}
+                    isEditMode={'true'}
                     value={this.state.item.name}
                     label={this.props.placeholder}
                     onSubmitEditing={this.props.onSubmitEditing}
+                    style={{width: '90%'}}
                 />
                 <ListView
                     style={{...this.props.itemsContainerStyle}}
