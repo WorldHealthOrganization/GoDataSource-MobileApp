@@ -68,6 +68,7 @@ class CardComponent extends Component {
         let myDatePickerItems = []
         let hasDateChanged = null
 
+        //ContactsSingleScreen
         if (nextProps && nextProps.item && nextProps.screen === 'ContactsSingleScreen') {
             myDatePickerItems = nextProps.item.filter((e) => {return e.type === 'DatePicker'})
             if (myDatePickerItems.length > 0) {
@@ -78,9 +79,14 @@ class CardComponent extends Component {
         if (this.props.contact && hasDateChanged && hasDateChanged.length > 0) {
             console.log("It's for single screen contact");
             return true
+        } 
+
+        if (nextProps.screen === 'ContactsSingleScreen' && nextProps.anotherPlaceOfResidenceWasChosen !== undefined && nextProps.anotherPlaceOfResidenceWasChosen === true) {
+            this.props.anotherPlaceOfResidenceChanged()
+            return true
         }
 
-        //ContactsSingleScreen
+        //CaseSingleScreen
         if (nextProps && nextProps.item && nextProps.screen === 'CaseSingleScreen') {
             myDatePickerItems = nextProps.item.filter((e) => {return e.type === 'DatePicker'})
             if (myDatePickerItems.length > 0) {
@@ -248,7 +254,7 @@ class CardComponent extends Component {
             //HospitalizationDates && IsolationDates validation
             if (item.type === 'DatePicker') {
                 if( item.objectType === 'HospitalizationDates'){
-                    if (this.props.case && this.props.case.hospitalizationDates && Array.isArray(this.props.case.hospitalizationDates) && this.props.case.hospitalizationDates.length > 0) {
+                    if (this.props.case && this.props.case.hospitalizationDates && Array.isArray(this.props.case.hospitalizationDates) && this.props.case.hospitalizationDates.length > 0 && this.props.case.hospitalizationDates[this.props.index]) {
                         if (this.props.case.hospitalizationDates[this.props.index].startDate !== null && item.id !== 'startDate') {
                             minimumDate = this.props.case.hospitalizationDates[this.props.index].startDate 
                         }
@@ -257,7 +263,7 @@ class CardComponent extends Component {
                         }
                     }
                 } else if (item.objectType === 'IsolationDates'){
-                    if (this.props.case && this.props.case.isolationDates && Array.isArray(this.props.case.isolationDates) && this.props.case.isolationDates.length > 0) {
+                    if (this.props.case && this.props.case.isolationDates && Array.isArray(this.props.case.isolationDates) && this.props.case.isolationDates.length > 0 && this.props.case.isolationDates[this.props.index]) {
                         if (this.props.case.isolationDates[this.props.index].startDate !== null && item.id !== 'startDate') {
                             minimumDate = this.props.case.isolationDates[this.props.index].startDate 
                         }

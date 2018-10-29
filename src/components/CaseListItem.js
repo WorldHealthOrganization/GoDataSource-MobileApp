@@ -36,7 +36,7 @@ class CaseListItem extends Component {
     // and can slow down the app
     render() {
         // Get caseItem info from the cases
-        console.log('item:', this.props.item);
+        // console.log('item:', this.props.item);
         let primaryText = this.props.item && ((this.props.item.firstName ? this.props.item.firstName : ' ') + (this.props.item.lastName ? (' ' + this.props.item.lastName) : ' '));
         let genderString = '';
         let ageString = '';

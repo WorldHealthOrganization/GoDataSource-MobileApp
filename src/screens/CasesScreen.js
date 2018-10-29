@@ -48,13 +48,38 @@ class CasesScreen extends Component {
                 searchText: ''
             },
             filterFromFilterScreen: this.props.filter && this.props.filter['CasesFilterScreen'] ? this.props.filter['CasesFilterScreen'] : null,
-            cases: this.props.case,
+            cases: [],
             refreshing: false,
             loading: true
         };
 
         // Bind here methods, or at least don't declare methods in the render method
         this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this));
+    }
+
+    // Please add here the react lifecycle methods that you need
+    componentDidMount() {
+        this.setState({
+            loading: true
+        }, () => {
+            this.props.getCasesForOutbreakId(this.props.user.activeOutbreakId, null, null);
+        })
+    }
+
+    static getDerivedStateFromProps(props, state) {
+        if (props.errors && props.errors.type && props.errors.message) {
+            Alert.alert(props.errors.type, props.errors.message, [
+                {
+                    text: 'Ok', onPress: () => {
+                    props.removeErrors();
+                    state.loading = false;
+                }
+                }
+            ])
+        }
+
+        state.loading = false;
+        return null;
     }
 
     clampedScroll = Animated.diffClamp(
@@ -74,27 +99,6 @@ class CasesScreen extends Component {
         [{nativeEvent: {contentOffset: {y: scrollAnim}}}],
         {useNativeDriver: true}
     );
-
-    // Please add here the react lifecycle methods that you need
-    static getDerivedStateFromProps(props, state) {
-        if (props.errors && props.errors.type && props.errors.message) {
-            Alert.alert(props.errors.type, props.errors.message, [
-                {
-                    text: 'Ok', onPress: () => {
-                    props.removeErrors();
-                    state.loading = false;
-                }
-                }
-            ])
-        }
-
-        if(props.cases){
-            state.refreshing = false;
-            state.loading = false;
-            state.cases = props.cases;
-        }
-        return null;
-    }
 
     // The render method should have at least business logic as possible,
     // because this will be called whenever there is a new setState call
@@ -157,7 +161,7 @@ class CasesScreen extends Component {
                 <View style={style.containerContent}>
                     <AnimatedListView
                         stickyHeaderIndices={[0]}
-                        data={this.state.cases || []}
+                        data={this.props.cases || []}
                         renderItem={this.renderCase}
                         keyExtractor={this.keyExtractor}
                         ListHeaderComponent={
@@ -243,19 +247,22 @@ class CasesScreen extends Component {
         this.setState({
             filterFromFilterScreen: filter
         }, () => {
-            if (this.state.filter.searchText) {
+            // if (this.state.filter.searchText) {
+            //
+            //     if(!filter.hasOwnProperty('where')){
+            //         filter.where = {};
+            //     }
+            //
+            //     if (!filter.where.or || filter.where.or.length === 0) {
+            //         filter.where.or = [];
+            //     }
+            //     filter.where.or.push({firstName: {like: this.state.filter.searchText, options: 'i'}});
+            //     filter.where.or.push({lastName: {like: this.state.filter.searchText, options: 'i'}});
+            // }
+            // this.props.getCasesForOutbreakId(this.props.user.activeOutbreakId, filter, this.props.user.token);
 
-                if(!filter.hasOwnProperty('where')){
-                    filter.where = {};
-                }
-
-                if (!filter.where.or || filter.where.or.length === 0) {
-                    filter.where.or = [];
-                }
-                filter.where.or.push({firstName: {like: this.state.filter.searchText, options: 'i'}});
-                filter.where.or.push({lastName: {like: this.state.filter.searchText, options: 'i'}});
-            }
-            this.props.getCasesForOutbreakId(this.props.user.activeOutbreakId, filter, this.props.user.token);
+            // Filter cases
+            this.filterCases();
         })
     };
 
@@ -281,19 +288,22 @@ class CasesScreen extends Component {
         this.setState({
             refreshing: true
         }, () => {
-            this.props.addFilterForScreen("CasesScreen", this.state.filter);
-            let existingFilter = this.state.filterFromFilterScreen ? Object.assign({}, this.state.filterFromFilterScreen) : Object.assign({}, config.defaultFilterForCases);
+            // this.props.addFilterForScreen("CasesScreen", this.state.filter);
+            // let existingFilter = this.state.filterFromFilterScreen ? Object.assign({}, this.state.filterFromFilterScreen) : Object.assign({}, config.defaultFilterForCases);
+            //
+            // if (!existingFilter.where || Object.keys(existingFilter.where).length === 0) {
+            //     existingFilter.where = {};
+            // }
+            // if (!existingFilter.where.or || existingFilter.where.or.length === 0) {
+            //     existingFilter.where.or = [];
+            // }
+            // existingFilter.where.or.push({firstName: {like: this.state.filter.searchText, options: 'i'}});
+            // existingFilter.where.or.push({lastName: {like: this.state.filter.searchText, options: 'i'}});
+            //
+            // this.props.getCasesForOutbreakId(this.props.user.activeOutbreakId, existingFilter, this.props.user.token);
 
-            if (!existingFilter.where || Object.keys(existingFilter.where).length === 0) {
-                existingFilter.where = {};
-            }
-            if (!existingFilter.where.or || existingFilter.where.or.length === 0) {
-                existingFilter.where.or = [];
-            }
-            existingFilter.where.or.push({firstName: {like: this.state.filter.searchText, options: 'i'}});
-            existingFilter.where.or.push({lastName: {like: this.state.filter.searchText, options: 'i'}});
-
-            this.props.getCasesForOutbreakId(this.props.user.activeOutbreakId, existingFilter, this.props.user.token);
+            // Filter cases
+            this.filterCases();
         });
     };
 
@@ -341,21 +351,71 @@ class CasesScreen extends Component {
     };
 
     filterCases = () => {
-        let casesCopy = _.cloneDeep(this.props.cases);
+        // let casesCopy = _.cloneDeep(this.props.cases);
+        //
+        // // Take care of search filter
+        // if (this.state.filter.searchText) {
+        //     casesCopy = casesCopy.filter((e) => {
+        //         return  e && e.firstName && this.state.filter.searchText.toLowerCase().includes(e.firstName.toLowerCase()) ||
+        //             e && e.lastName && this.state.filter.searchText.toLowerCase().includes(e.lastName.toLowerCase()) ||
+        //             e && e.firstName && e.firstName.toLowerCase().includes(this.state.filter.searchText.toLowerCase()) ||
+        //             e && e.lastName && e.lastName.toLowerCase().includes(this.state.filter.searchText.toLowerCase())
+        //     });
+        // }
+        //
+        // console.log("filter:", this.state.filterFromFilterScreen);
+        // // Take care of gender filter
+        // if (this.state.filterFromFilterScreen && this.state.filterFromFilterScreen.gender) {
+        //     casesCopy = casesCopy.filter((e) => {return e.gender === this.state.filterFromFilterScreen.gender});
+        // }
+        //
+        // console.log(casesCopy);
+        //
+        // this.setState({
+        //     cases: casesCopy
+        // })
 
-        // Take care of search filter
-        if (this.state.filter.searchText) {
-            casesCopy = casesCopy.filter((e) => {
-                return  e && e.firstName && this.state.filter.searchText.toLowerCase().includes(e.firstName.toLowerCase()) ||
-                    e && e.lastName && this.state.filter.searchText.toLowerCase().includes(e.lastName.toLowerCase()) ||
-                    e && e.firstName && e.firstName.toLowerCase().includes(this.state.filter.searchText.toLowerCase()) ||
-                    e && e.lastName && e.lastName.toLowerCase().includes(this.state.filter.searchText.toLowerCase())
-            });
+        let allFilters = {}
+
+        if (this.state.filterFromFilterScreen && this.state.filterFromFilterScreen.age) {
+            allFilters.age = this.state.filterFromFilterScreen.age
+        } else {
+            allFilters.age = null
         }
 
-       
+        if (this.state.filterFromFilterScreen && this.state.filterFromFilterScreen.gender) {
+            if (this.state.filterFromFilterScreen.gender === 'Female') {
+                allFilters.gender = 'LNG_REFERENCE_DATA_CATEGORY_GENDER_FEMALE'
+            } else  if (this.state.filterFromFilterScreen.gender === 'Male') {
+                allFilters.gender = 'LNG_REFERENCE_DATA_CATEGORY_GENDER_MALE'
+            }
+        } else {
+            allFilters.gender = null
+        }
+
+        if (this.state.filterFromFilterScreen && this.state.filterFromFilterScreen.classification) {
+            //if classification is array
+            allFilters.classification = this.state.filterFromFilterScreen.classification;
+        } else {
+            // allFilters.classification = null
+        }
+
+        console.log('this.state.filter.searchText ', this.state.filter.searchText);
+        if (this.state.filter.searchText.trim().length > 0) {
+            let splitedFilter= this.state.filter.searchText.split(" ")
+            allFilters.searchText = new RegExp(splitedFilter.join("|"), "ig");
+        } else {
+            allFilters.searchText = null
+        }
+
+        if (!allFilters.age && !allFilters.gender && !allFilters.searchText && !allFilters.classification) {
+            allFilters = null
+        }
+
         this.setState({
-            cases: casesCopy
+            loading: true
+        }, () => {
+            this.props.getCasesForOutbreakId(this.props.user.activeOutbreakId, allFilters, null);
         })
     };
 }
