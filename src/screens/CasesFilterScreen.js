@@ -47,17 +47,16 @@ class CasesFilterScreen extends Component {
     // Please add here the react lifecycle methods that you need
     static getDerivedStateFromProps(props, state) {
         let filterClone = Object.assign({}, state.filter.filter);
-        if (props && props.activeFilters && props.activeFilters.where && props.activeFilters.where.and && Array.isArray(props.activeFilters.where.and)) {
-            for(let i=0; i<props.activeFilters.where.and.length; i++) {
-                if (props.activeFilters.where.and[i].gender) {
-                    filterClone.gender[props.activeFilters.where.and[i].gender] = true;
-                }
-                if (props.activeFilters.where.and[i].age && props.activeFilters.where.and[i].age.gte) {
-                    filterClone.age[0] = props.activeFilters.where.and[i].age.gte;
-                }
-                if (props.activeFilters.where.and[i].age && props.activeFilters.where.and[i].age.lte) {
-                    filterClone.age[1] = props.activeFilters.where.and[i].age.lte;
-                }
+        if (props && props.activeFilters) {
+            if (props.activeFilters.gender) {
+                filterClone.gender[props.activeFilters.gender] = true;
+            }
+            if (props.activeFilters.age && Array.isArray(props.activeFilters.age) && props.activeFilters.age.length === 2) {
+                filterClone.age[0] = props.activeFilters.age[0];
+                filterClone.age[1] = props.activeFilters.age[1];
+            }
+            if (props.activeFilters.classification && Array.isArray(props.activeFilters.classification)){
+                filterClone.classification = props.activeFilters.classification;
             }
             console.log("### Active filters: ", filterClone);
         }
@@ -165,7 +164,7 @@ class CasesFilterScreen extends Component {
                 {route.title}
             </Animated.Text>
         );
-    }
+    };
 
     handleOnSelectItem = (item, index, id) => {
         console.log("### handleOnSelectItem: ", item, index, id);
@@ -174,7 +173,7 @@ class CasesFilterScreen extends Component {
         this.setState(prevState => ({
             filter: Object.assign({}, prevState.filter, Object.assign({}, prevState.filter.filter, {[id]: filter[id]}))
         }))
-    }
+    };
 
     handleOnChangeSectionedDropDown = (selectedItems) => {
         this.setState(prevState => ({
@@ -188,7 +187,7 @@ class CasesFilterScreen extends Component {
         this.setState(prevState => ({
             filter: Object.assign({}, prevState.filter, {filter: Object.assign({}, prevState.filter.filter, {[id]: values})})
         }));
-    }
+    };
 
     handleOnChangeMultipleSelection = (selections, id) => {
         this.setState(prevState => ({
@@ -200,39 +199,30 @@ class CasesFilterScreen extends Component {
 
     handleOnPressApplyFilters = () => {
         let filterStateClone = Object.assign({}, this.state.filter.filter);
-        let filter = Object.assign({}, config.defaultFilterForCases);
+        let filter = {};
 
-        filter.where = {};
 
-        filter.where.and = [];
-
-        if(filterStateClone.gender.Female && filterStateClone.gender.Male){
-            let orGender = [{gender: 'Male'},{gender: 'Female'}];
-            filter.where.and.push({or: orGender});
-        }else {
-            if (filterStateClone.gender.Male) {
-                filter.where.and.push({gender: 'Male'})
-            }
-            if (filterStateClone.gender.Female) {
-                filter.where.and.push({gender: 'Female'})
-            }
+        if (filterStateClone.gender.Male && !filterStateClone.gender.Female ) {
+            filter.gender = 'Male'
+        }
+        if (filterStateClone.gender.Female && !filterStateClone.gender.Male) {
+            filter.gender = 'Female'
         }
 
         if (filterStateClone.age) {
-            filter.where.and.push({age: {gte: filterStateClone.age[0]}});
-            filter.where.and.push({age: {lte: filterStateClone.age[1]}});
+            filter.age = filterStateClone.age;
         }
 
         if(filterStateClone.classification){
             if(filterStateClone.classification.length > 0){
                 if(filterStateClone.classification.length == 1){
-                    filter.where.and.push({classification: filterStateClone.classification[0].value});
+                    filter.classification = filterStateClone.classification[0].value;
                 }else {
                     let orClassification = [];
                     filterStateClone.classification.map((item, index) => {
-                        orClassification.push({classification: item.value});
+                        orClassification.push({classification: item.value ? {$regex: item.value} : {}});
                     });
-                    filter.where.and.push({or: orClassification});
+                    filter.classification = orClassification;
                 }
             }
         }
@@ -240,7 +230,7 @@ class CasesFilterScreen extends Component {
         this.props.addFilterForScreen('CasesFilterScreen', filter);
 
         this.props.navigator.dismissModal(this.props.onApplyFilters(filter));
-    }
+    };
 }
 
 // Create style outside the class, or for components that will be used by other components (buttons),
@@ -258,13 +248,13 @@ function mapStateToProps(state) {
         screenSize: state.app.screenSize,
         cases: state.cases
     };
-}
+};
 
 function matchDispatchProps(dispatch) {
     return bindActionCreators({
         addFilterForScreen,
         removeFilterForScreen
     }, dispatch);
-}
+};
 
 export default connect(mapStateToProps, matchDispatchProps)(CasesFilterScreen);

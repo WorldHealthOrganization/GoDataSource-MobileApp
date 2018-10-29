@@ -6,25 +6,76 @@ import {getDatabase} from './database';
 // Credentials: {email, encryptedPassword}
 export function getCasesForOutbreakIdRequest (outbreakId, filter, token, callback) {
     let database = getDatabase();
+    let start =  new Date().getTime();
 
     console.log("getCasesForOutbreakIdRequest: ", outbreakId);
+    if (filter && filter.keys) {
+        let keys = filter.keys.map((e) => {return `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE_false_${outbreakId}_${e}`});
+        let promiseArray = [];
 
-    let start =  new Date().getTime();
-    database.allDocs({
-        startkey: `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE_false_${outbreakId}_`,
-        endkey: `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE_false_${outbreakId}_\uffff`,
-        include_docs: true
-    })
-        .then((result) => {
-            console.log("result with the new index for cases: ", new Date().getTime() - start);
-            callback(null, result.rows.filter((e) => {return e.doc.deleted === false}).map((e) => {return e.doc}));
-            
-        })
-        .catch((errorQuery) => {
-            console.log("Error with the new index for cases: ", errorQuery);
-            callback(errorQuery);
-        })
+        for (let i=0; i<keys.length; i++) {
+            promiseArray.push(getFromDb(database, keys[i]));
+        }
 
+        Promise.all(promiseArray)
+            .then((resultGetAll) => {
+                console.log("Result from get queries: ", new Date().getTime() - start, resultGetAll.length);
+                callback(null, resultGetAll.filter((e) => {return e && e._id !== null}));
+            })
+            .catch((errorGetAll) => {
+                console.log('Error from get queries: ', new Date().getTime() - start, errorGetAll);
+                callback(errorGetAll);
+            })
+    } else {
+        if (filter) {
+            console.log('getCasesForOutbreakIdRequest else, if');
+            console.log ('myFilter', filter);
+            let or = [
+                {firstName: filter.searchText ? {$regex: filter.searchText} : {}},
+                {lastName: filter.searchText ? {$regex: filter.searchText} : {}}
+            ];
+            if(filter.classification){
+                if(filter.classification.length > 1 && Array.isArray(filter.classification)){
+                    for (let i=0; i<filter.classification.length; i++) {
+                        or.push(filter.classification[i]);
+                    }
+                }
+            }
+
+            database.find({
+                selector: {
+                    type: {$eq: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE'},
+                    gender: filter.gender ? {$eq: filter.gender} : {},
+                    age: filter.age ? { $gte: filter.age[0]} : {},
+                    age: filter.age ? { $lte: filter.age[1]} : {},
+                    $or: or
+                },
+            })
+                .then((resultFilterCases) => {
+                    console.log('Result when filtering cases: ', new Date().getTime() - start);
+                    callback(null, resultFilterCases.docs)
+                })
+                .catch((errorFilterCases) => {
+                    console.log('Error when filtering contacts: ', errorFilterCases);
+                    callback(errorFilterCases);
+                })
+        } else {
+            database.allDocs({
+                startkey: `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE_false_${outbreakId}`,
+                endkey: `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE_false_${outbreakId}\uffff`,
+                include_docs: true
+            })
+                .then((result) => {
+                    console.log("result with the new index for cases: ", new Date().getTime() - start);
+                    callback(null, result.rows.filter((e) => {return e.doc.deleted === false}).map((e) => {return e.doc}));
+
+                })
+                .catch((errorQuery) => {
+                    console.log("Error with the new index for cases: ", errorQuery);
+                    callback(errorQuery);
+                });
+        }
+    }
     // database.find({
     //     selector: {
     //         type: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE',
