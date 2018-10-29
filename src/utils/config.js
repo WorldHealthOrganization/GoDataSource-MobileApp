@@ -1490,6 +1490,11 @@ const RNDBConfig = {
     }
 };
 
+const userResidenceAddress = {
+    userPlaceOfResidence: 'LNG_REFERENCE_DATA_CATEGORY_ADDRESS_TYPE_USUAL_PLACE_OF_RESIDENCE',
+    userOtherResidence: 'LNG_REFERENCE_DATA_CATEGORY_ADDRESS_TYPE_OTHER'
+}
+
 export default {
     designScreenSize,
     sideMenuItems,
@@ -1507,5 +1512,6 @@ export default {
     contactsSingleScreen,
     personTypes,
     mongoCollections,
-    RNDBConfig
+    RNDBConfig,
+    userResidenceAddress
 }
