@@ -29,6 +29,7 @@ import DateTimePicker from 'react-native-modal-datetime-picker';
 import _ from 'lodash';
 import {extractIdFromPouchId, updateRequiredFields} from './../utils/functions';
 import {getFollowUpsForContactRequest} from './../queries/followUps'
+import ios from 'rn-fetch-blob/ios';
 
 const initialLayout = {
     height: 0,
@@ -67,6 +68,8 @@ class ContactsSingleScreen extends Component {
             deletePressed: false,
             isDateTimePickerVisible: false,
             canChangeScreen: false,
+            anotherPlaceOfResidenceWasChosen: false,
+            hasPlaceOfResidence: false
         };
         // Bind here methods, or at least don't declare methods in the render method
     }
@@ -147,7 +150,7 @@ class ContactsSingleScreen extends Component {
                         this.setState({
                             contact: myContact
                         }, () => {
-                            console.log("After adding the followUps: ", JSON.stringify(this.state.contact));
+                            console.log("After adding the followUps: ");
                         })
                     }
                 }
@@ -335,6 +338,9 @@ class ContactsSingleScreen extends Component {
                         handleMoveToPrevieousScreenButton={this.handleMoveToPrevieousScreenButton}
                         checkRequiredFieldsAddresses={this.checkRequiredFieldsAddresses}
                         isNew={this.props.isNew}
+                        anotherPlaceOfResidenceWasChosen={this.state.anotherPlaceOfResidenceWasChosen}
+                        anotherPlaceOfResidenceChanged={this.anotherPlaceOfResidenceChanged}
+                        hasPlaceOfResidence={this.state.hasPlaceOfResidence}
                     />
                 );
             case 'exposures':
@@ -385,7 +391,7 @@ class ContactsSingleScreen extends Component {
                 console.log("After updating the exposure: ", this.state.contact);
             })
         } else {
-            relationships = []
+            let relationships = []
             relationships.push(exposure);
             this.setState(prevState => ({
                 contact: Object.assign({}, prevState.contact, {relationships})
@@ -511,11 +517,9 @@ class ContactsSingleScreen extends Component {
                     this.state.item[id] = {};
                 }
 
-                let address = this.state.contact && this.state.contact.addresses &&
-                Array.isArray(this.state.contact.addresses) && this.state.contact.addresses.length > 0 ? this.state.contact.addresses.filter((e) => {
-                    return value.includes(e.addressLine1 || '') && value.includes(e.addressLine2 || '') && value.includes(e.city || '') && value.includes(e.country || '') && value.includes(e.postalCode || '');
-                })
-                    : [];
+                let address = this.state.contact && this.state.contact.addresses && Array.isArray(this.state.contact.addresses) && this.state.contact.addresses.length > 0 ? 
+                    this.state.contact.addresses.filter((e) => { return value.includes(e.addressLine1 || '') && value.includes(e.addressLine2 || '') && value.includes(e.city || '') && value.includes(e.country || '') && value.includes(e.postalCode || '');
+                }) : [];
 
                 this.setState(
                     (prevState) => ({
@@ -547,9 +551,26 @@ class ContactsSingleScreen extends Component {
                 if (typeof objectType === 'number' && objectType >= 0) {
                     // Change address drop down
                     let addressesClone = _.cloneDeep(this.state.contact.addresses);
+
+                    let anotherPlaceOfResidenceWasChosen = false
+                    let hasPlaceOfResidence = false
+                    if (value && value.value){
+                       if(value.value === config.userResidenceAddress.userPlaceOfResidence){
+                            hasPlaceOfResidence = true
+                            addressesClone.forEach(element => {
+                                if (element[id] === value.value){
+                                   element[id] = config.userResidenceAddress.userOtherResidence
+                                   anotherPlaceOfResidenceWasChosen = true
+                                }
+                           });
+                       }
+                    }
+
                     addressesClone[objectType][id] = value && value.value ? value.value : value;
                     this.setState(prevState => ({
-                        contact: Object.assign({}, prevState.contact, {addresses: addressesClone})
+                        contact: Object.assign({}, prevState.contact, {addresses: addressesClone}),
+                        anotherPlaceOfResidenceWasChosen,
+                        hasPlaceOfResidence
                     }), () => {
                         console.log("onChangeDropDown", id, " ", value, " ", this.state.contact);
                     })
@@ -557,6 +578,12 @@ class ContactsSingleScreen extends Component {
             }
         }
     };
+
+    anotherPlaceOfResidenceChanged = () => {
+        this.setState({
+            anotherPlaceOfResidenceWasChosen: false
+        })
+    }
 
     handleOnChangeSectionedDropDown = (selectedItems, index) => {
         // Here selectedItems is always an array with just one value and should pe mapped to the locationId field from the address from index
@@ -655,31 +682,39 @@ class ContactsSingleScreen extends Component {
     handleOnPressSave = () => {
         // Check the required fields and then update the contact
         if (this.checkRequiredFields()) {
-            this.setState({
-                savePressed: true
-            }, () => {
-                if (this.props.isNew) {
-                    let contactWithRequiredFields = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, this.state.contact), action = 'create', fileType = 'person.json', type = 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT')
-                    this.setState(prevState => ({
-                        contact: Object.assign({}, prevState.contact, contactWithRequiredFields)
-                    }), () => {
-                        this.props.addContact(this.props.user.activeOutbreakId, this.state.contact, this.props.user.token);
-                    })
-                } else {
-                    let contactWithRequiredFields = null
-                    if (this.state.deletePressed === true) {
-                        contactWithRequiredFields = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, this.state.contact), action = 'delete')
+            if (this.state.hasPlaceOfResidence === true){
+                this.setState({
+                    savePressed: true
+                }, () => {
+                    if (this.props.isNew) {
+                        let contactWithRequiredFields = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, this.state.contact), action = 'create', fileType = 'person.json', type = 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT')
+                        this.setState(prevState => ({
+                            contact: Object.assign({}, prevState.contact, contactWithRequiredFields)
+                        }), () => {
+                            this.props.addContact(this.props.user.activeOutbreakId, this.state.contact, this.props.user.token);
+                        })
                     } else {
-                        contactWithRequiredFields = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, this.state.contact), action = 'update')
+                        let contactWithRequiredFields = null
+                        if (this.state.deletePressed === true) {
+                            contactWithRequiredFields = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, this.state.contact), action = 'delete')
+                        } else {
+                            contactWithRequiredFields = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, this.state.contact), action = 'update')
+                        }
+    
+                        this.setState(prevState => ({
+                        contact: Object.assign({}, prevState.contact, contactWithRequiredFields)
+                        }), () => {
+                            this.props.updateContact(this.props.user.activeOutbreakId, this.state.contact._id, this.state.contact, this.props.user.token);
+                        })
                     }
-
-                    this.setState(prevState => ({
-                    contact: Object.assign({}, prevState.contact, contactWithRequiredFields)
-                    }), () => {
-                        this.props.updateContact(this.props.user.activeOutbreakId, this.state.contact._id, this.state.contact, this.props.user.token);
-                    })
-                }
-            });
+                });
+            } else {
+                Alert.alert("Validation error", 'Please add your place of residence address', [
+                    {
+                        text: 'Ok', onPress: () => {console.log("Ok pressed")}
+                    }
+                ])
+            }
         } else {
             Alert.alert("Validation error", 'Some of the required fields are missing. Please make sure you have completed them', [
                 {

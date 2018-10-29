@@ -63,6 +63,7 @@ class FollowUpsSingleScreen extends Component {
             contact={this.state.contact}
             isEditMode={true}
             onChangeTextAnswer={this.onChangeTextAnswer}
+            onChangeDateAnswer={this.onChangeDateAnswer}
             onChangeSingleSelection={this.onChangeSingleSelection}
             onChangeMultipleSelection={this.onChangeMultipleSelection}
             onPressSave={this.handleOnPressSave}
@@ -138,10 +139,7 @@ class FollowUpsSingleScreen extends Component {
                 <TabView
                     navigationState={this.state}
                     onIndexChange={this.handleOnIndexChange}
-                    renderScene={SceneMap({
-                        genInfo: this.GenInfoRoute,
-                        quest: this.QuestRoute
-                    })}
+                    renderScene={this.handleRenderScene}
                     renderTabBar={this.handleRenderTabBar}
                     useNativeDriver
                 />
@@ -162,9 +160,48 @@ class FollowUpsSingleScreen extends Component {
         this.setState({index});
     };
 
-    handleRenderScene = () => {
+    handleRenderScene = ({route}) => {
 
-        return 'test';
+        switch(route.key) {
+            case 'genInfo':
+                return (
+                    <FollowUpsSingleGetInfoContainer
+                        item={this.state.item}
+                        contact={this.state.contact}
+                        onNext={this.handleNextPress}
+                        onChangeText={this.onChangeText}
+                        onChangeDate={this.onChangeDate}
+                        onChangeSwitch={this.onChangeSwitch}
+                        onChangeDropDown={this.onChangeDropDown}
+                    />
+                );
+            case 'quest':
+                return (
+                    <FollowUpsSingleQuestionnaireContainer
+                        item={this.state.item}
+                        contact={this.state.contact}
+                        isEditMode={true}
+                        onChangeTextAnswer={this.onChangeTextAnswer}
+                        onChangeDateAnswer={this.onChangeDateAnswer}
+                        onChangeSingleSelection={this.onChangeSingleSelection}
+                        onChangeMultipleSelection={this.onChangeMultipleSelection}
+                        onPressSave={this.handleOnPressSave}
+                        onPressMissing={this.handleOnPressMissing}
+                    />
+                );
+            default:
+                return (
+                    <FollowUpsSingleGetInfoContainer
+                        item={this.state.item}
+                        contact={this.state.contact}
+                        onNext={this.handleNextPress}
+                        onChangeText={this.onChangeText}
+                        onChangeDate={this.onChangeDate}
+                        onChangeSwitch={this.onChangeSwitch}
+                        onChangeDropDown={this.onChangeDropDown}
+                    />
+                );
+        }
 
     };
 
@@ -354,6 +391,19 @@ class FollowUpsSingleScreen extends Component {
     };
 
     onChangeTextAnswer = (value, id) => {
+        let itemClone = _.cloneDeep(this.state.item);
+        let questionnaireAnswers = itemClone && itemClone.questionnaireAnswers ? itemClone.questionnaireAnswers : null;
+        if (!itemClone.questionnaireAnswers) {
+            itemClone.questionnaireAnswers = {};
+            questionnaireAnswers = itemClone.questionnaireAnswers;
+        }
+        questionnaireAnswers[id] = value;
+        this.setState(prevState => ({
+            item: Object.assign({}, prevState.item, {questionnaireAnswers: questionnaireAnswers})
+        }))
+    };
+
+    onChangeDateAnswer = (value, id) => {
         let itemClone = _.cloneDeep(this.state.item);
         let questionnaireAnswers = itemClone && itemClone.questionnaireAnswers ? itemClone.questionnaireAnswers : null;
         if (!itemClone.questionnaireAnswers) {

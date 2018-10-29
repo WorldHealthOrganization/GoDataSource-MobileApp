@@ -21,7 +21,7 @@ export function getReferenceData(token, dispatch) {
     return new Promise((resolve, reject) => {
         getReferenceDataRequest (null, (error, response) => {
             if (error) {
-                console.log("*** getCasesForOutbreakId error: ", error);
+                console.log("*** getReferenceDataRequest error: ", error);
                 dispatch(addError(errorTypes.ERROR_REFERENCE_DATA));
                 reject(error);
             }

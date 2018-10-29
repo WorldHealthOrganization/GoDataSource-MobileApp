@@ -52,7 +52,9 @@ class ContactsScreen extends Component {
         this.setState({
             loading: true
         }, () => {
-            this.props.getContactsForOutbreakId(this.props.user.activeOutbreakId, null, null);
+            if (this.props && this.props.user && this.props.user.activeOutbreakId) {
+                this.props.getContactsForOutbreakId(this.props.user.activeOutbreakId, null, null);
+            }
         })
     }
 
@@ -158,6 +160,7 @@ class ContactsScreen extends Component {
                         style={[style.listViewStyle]}
                         componentContainerStyle={style.componentContainerStyle}
                         onScroll={this.handleScroll}
+                        getItemLayout={this.getItemLayout}
                         // refreshing={this.state.refreshing}
                         // onRefresh={this.handleOnRefresh}
                     />
@@ -194,6 +197,12 @@ class ContactsScreen extends Component {
             />
         )
     };
+
+    getItemLayout = (data, index) => ({
+        length: calculateDimension(178, true, this.props.screenSize),
+        offset: calculateDimension(178, true, this.props.screenSize) * index,
+        index
+    });
 
     renderSeparatorComponent = () => {
         return (

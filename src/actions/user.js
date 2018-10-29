@@ -4,10 +4,10 @@
 import {ACTION_TYPE_STORE_USER} from './../utils/enums';
 import { changeAppRoot, getTranslations } from './app';
 // import { getUserByIdRequest} from './../requests/user';
-import {loginUserRequest, getUserByIdRequest} from './../queries/user';
+import {loginUserRequest, getUserByIdRequest, updateUserRequest} from './../queries/user';
 import { getFollowUpsForOutbreakIdWithPromises } from './followUps';
 import { getContactsForOutbreakId, getContactsForOutbreakIdWithPromises } from './contacts';
-import { getCasesForOutbreakId } from './cases';
+import { getCasesForOutbreakIdWithPromise, getCasesForOutbreakId } from './cases';
 import { getEventsForOutbreakId } from './events';
 import { getOutbreakById } from './outbreak';
 import { addError } from './errors';
@@ -20,7 +20,7 @@ import {storeCases} from './cases';
 import {storeEvents} from './events';
 import {storeFollowUps} from './followUps';
 import {storeOutbreak} from './outbreak';
-import {setLoginState, storeData} from './app';
+import {setLoginState, storeData, getAvailableLanguages} from './app';
 
 // Add here only the actions, not also the requests that are executed.
 // For that purpose is the requests directory
@@ -38,6 +38,7 @@ export function loginUser(credentials) {
         loginUserRequest(credentials, (error, response) => {
             if (error) {
                 console.log("*** An error occurred while logging the user");
+                dispatch(setLoginState('Error'));
                 dispatch(addError(errorTypes.ERROR_LOGIN));
             }
             if (response) {
@@ -51,9 +52,10 @@ export function loginUser(credentials) {
                 // promises.push(getContactsForOutbreakIdWithPromises(response.activeOutbreakId, null, null, dispatch));
                 promises.push(getFollowUpsForOutbreakIdWithPromises(response.activeOutbreakId, null, null, dispatch));
                 promises.push(getTranslations(response.languageId, dispatch));
+                promises.push(getAvailableLanguages(dispatch));
                 promises.push(getReferenceData(null, dispatch));
                 promises.push(getEventsForOutbreakId(response.activeOutbreakId, null, dispatch));
-                promises.push(getCasesForOutbreakId(response.activeOutbreakId, null, null, dispatch));
+                promises.push(getCasesForOutbreakIdWithPromise(response.activeOutbreakId, null, null, dispatch));
 
                 // Store the user to the redux store, and also store the userId to the AsyncStorage
                 dispatch(storeUser(response));
@@ -70,7 +72,7 @@ export function loginUser(credentials) {
                             })
                             .catch((error) => {
                                 console.log('Getting data from local db resulted in error: ', error);
-                                dispatch(setLoginState('Finished logging'))
+                                dispatch(setLoginState('Error'))
                             })
                     }
                     if (success) {
@@ -82,7 +84,7 @@ export function loginUser(credentials) {
                             })
                             .catch((error) => {
                                 console.log('Getting data from local db resulted in error: ', error);
-                                dispatch(setLoginState('Finished logging'))
+                                dispatch(setLoginState('Error'))
                             })
                     }
                 })
@@ -129,17 +131,18 @@ export function getUserById(userId, token) {
                 // dispatch(changeAppRoot('login'));
             }
             if (response) {
-                console.log('getUserById: ', response);
+                // console.log('getUserById: ', response);
 
                 // Here is the local storage handling
                 let promises = [];
                 promises.push(getOutbreakById(response.activeOutbreakId, null, dispatch));
+                promises.push(getAvailableLanguages(dispatch));
                 // promises.push(getContactsForOutbreakIdWithPromises(response.activeOutbreakId, null, null, dispatch));
                 // promises.push(getFollowUpsForOutbreakIdWithPromises(response.activeOutbreakId, {date: new Date().toISOString()}, null, dispatch));
-                promises.push(getTranslations(response.languageId, dispatch));
+                promises.push(getTranslations(response && response.languageId ? response.languageId : 'english_us', dispatch));
                 promises.push(getReferenceData(null, dispatch));
                 promises.push(getEventsForOutbreakId(response.activeOutbreakId, null, dispatch));
-                promises.push(getCasesForOutbreakId(response.activeOutbreakId, null, null, dispatch));
+                promises.push(getCasesForOutbreakIdWithPromise(response.activeOutbreakId, null, null, dispatch));
 
                 // Store the user to the redux store, and also store the userId to the AsyncStorage
                 dispatch(storeUser(response));
@@ -158,6 +161,20 @@ export function getUserById(userId, token) {
                     })
             }
 
+        })
+    }
+}
+
+export function updateUser(user) {
+    return async function (dispatch) {
+        updateUserRequest(user, (error, newUser) => {
+            if (error) {
+                console.log('Error while updating user: ', error);
+                dispatch(addError(errorTypes.ERROR_UPDATE_USER));
+            }
+            if (newUser) {
+                dispatch(storeUser(newUser));
+            }
         })
     }
 }

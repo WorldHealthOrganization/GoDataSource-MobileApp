@@ -20,6 +20,7 @@ import DropdownInput from './../components/DropdownInput';
 import DatePicker from './../components/DatePicker';
 import {Dialog} from 'react-native-ui-lib';
 import {getContactsForOutbreakIdRequest} from './../queries/contacts';
+import DropdownSearchable from './../components/DropdownSearchable';
 
 class AddFollowUpScreen extends PureComponent{
 
@@ -33,16 +34,16 @@ class AddFollowUpScreen extends PureComponent{
     }
 
     componentDidMount() {
-        getContactsForOutbreakIdRequest(this.props.user.activeOutbreakId, null, null, (error, contacts) => {
-            if (error) {
-                console.log("An error occurred while getting all contacts for add contacts screen");
-            }
-            if (contacts) {
-                this.setState({
-                    contacts
-                })
-            }
-        })
+        // getContactsForOutbreakIdRequest(this.props.user.activeOutbreakId, null, null, (error, contacts) => {
+        //     if (error) {
+        //         console.log("An error occurred while getting all contacts for add contacts screen");
+        //     }
+        //     if (contacts) {
+        //         this.setState({
+        //             contacts
+        //         })
+        //     }
+        // })
     }
 
 
@@ -50,35 +51,41 @@ class AddFollowUpScreen extends PureComponent{
         let contentWidth = calculateDimension(297, false, this.props.screenSize);
         let marginHorizontal = calculateDimension(14, false, this.props.screenSize);
 
-        let contactList = this.state.contacts ? this.state.contacts.map((e) => {
-            return {value: (e.firstName ? e.firstName + ' ' : '' + e.lastName ? e.lastName : ''), id: e._id}
-        }) : this.props && this.props.contacts && this.props.contacts.map((e) => {
-            return {value: (e.firstName ? e.firstName + ' ' : '' + e.lastName ? e.lastName : ''), id: e._id}
-        });
-
         return (
             <Dialog
                 visible={this.props.showAddFollowUpScreen}
                 width="90%"
-                height="40%"
+                height="75%"
                 onDismiss={this.props.onCancelPressed}
             >
-                <ElevatedView elevation={3} style={{flex: 1, backgroundColor: 'white', borderRadius: 4, marginVertical: 10, justifyContent: 'space-around'}}>
+                <ElevatedView
+                    elevation={3}
+                    style={{
+                        flex: 1,
+                        backgroundColor: 'white',
+                        borderRadius: 4,
+                        marginVertical: 10,
+                        justifyContent: 'space-around'
+                    }}>
                     <Section
                         label="Add Follow-ups"
                         hasBorderBottom={false}
-                        containerStyle={{width: '100%', flex: 0.3}}
+                        containerStyle={{width: '100%', flex: 0.15}}
                     />
-                    <DropdownInput
-                        id="contact"
-                        label="Contact"
-                        labelValue="Contact"
-                        value={this.state.selectedContact}
-                        data={contactList}
-                        isEditMode={true}
-                        isRequired={false}
-                        onChange={this.onDropdownInputChanged}
-                        style={{width: contentWidth, marginHorizontal}}
+                    {/*<DropdownInput*/}
+                        {/*id="contact"*/}
+                        {/*label="Contact"*/}
+                        {/*labelValue="Contact"*/}
+                        {/*value={this.state.selectedContact}*/}
+                        {/*data={contactList}*/}
+                        {/*isEditMode={true}*/}
+                        {/*isRequired={false}*/}
+                        {/*onChange={this.onDropdownInputChanged}*/}
+                        {/*style={{width: contentWidth, marginHorizontal}}*/}
+                    {/*/>*/}
+                    <DropdownSearchable
+                        outbreakId={this.props.user.activeOutbreakId}
+                        onChange={this.onDropdownSearchableChanged}
                     />
                     <DatePicker
                         id='followUpDate'
@@ -112,7 +119,7 @@ class AddFollowUpScreen extends PureComponent{
         );
     }
 
-    onDropdownInputChanged = (value, id, objectType) => {
+    onDropdownSearchableChanged = (value) => {
         this.setState({
             selectedContact: value
         })

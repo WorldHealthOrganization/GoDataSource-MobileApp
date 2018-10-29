@@ -127,6 +127,8 @@ class ContactsSingleAddress extends Component {
                 onChangeSwitch={this.props.onChangeSwitch}
                 onChangeSectionedDropDown={this.props.onChangeSectionedDropDown}
                 onDeletePress={this.props.onDeletePress}
+                anotherPlaceOfResidenceWasChosen={this.props.anotherPlaceOfResidenceWasChosen}
+                anotherPlaceOfResidenceChanged={this.props.anotherPlaceOfResidenceChanged}
             />
         )
     }
@@ -134,7 +136,15 @@ class ContactsSingleAddress extends Component {
     handleNextButton = () => {
         // if (true) {
         if (this.props.checkRequiredFieldsAddresses()) {
-            this.props.handleMoveToNextScreenButton(true)
+            if (this.props.hasPlaceOfResidence !== undefined && this.props.hasPlaceOfResidence === true){
+                this.props.handleMoveToNextScreenButton(true)
+            } else {
+                Alert.alert("Alert", 'Please add your place of residence address', [
+                    {
+                        text: 'Ok', onPress: () => {console.log("OK pressed")}
+                    }
+                ])
+            }
         } else {
             Alert.alert("Alert", 'Please add at least one address with all the required fields completed', [
                 {

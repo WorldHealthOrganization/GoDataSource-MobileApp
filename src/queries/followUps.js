@@ -21,10 +21,14 @@ export function getFollowUpsForOutbreakIdRequest (outbreakId, filter, token, cal
     }
 
     let start =  new Date().getTime();
-    database.allDocs({startkey: `followUp.json_false_${outbreakId}_${startDate}`, endkey: `followUp.json_false_${outbreakId}_${endDate}\uffff`, include_docs: true})
+    database.allDocs({
+        startkey: `followUp.json_false_${outbreakId}_${startDate}_`,
+        endkey: `followUp.json_false_${outbreakId}_${endDate}_\uffff`,
+        include_docs: true
+    })
         .then((result) => {
-            console.log("result with the new index for followUps: ", new Date().getTime() - start);
-            result.rows = result.rows.filter((e) => {return e.doc.deleted === false})
+            console.log("result with the new index for followUps: ", new Date().getTime() - start, result.rows.length);
+            result.rows = result.rows.filter((e) => {return e.doc.deleted === false});
             callback(null, result.rows.map((e) => {return e.doc}));
         })
         .catch((errorQuery) => {

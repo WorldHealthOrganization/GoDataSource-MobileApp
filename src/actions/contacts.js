@@ -97,7 +97,7 @@ export function getContactsForOutbreakId(outbreakId, filter, token) {
                         dispatch(addError(errorTypes.ERROR_CONTACT));
                     }
                     if (responseRelationships) {
-                        console.log ('getContactsForOutbreakId getRelationshipsForTypeRequest response: ', JSON.stringify(responseRelationships))
+                        console.log ('getContactsForOutbreakId getRelationshipsForTypeRequest response: ')
                         let mappedContacts = mapContactsAndRelationships(response, responseRelationships);
                         dispatch(storeContacts(mappedContacts));
                     }
@@ -199,7 +199,7 @@ export function updateContact(outbreakId, contactId, contact, token) {
 }
 
 export function addExposureForContact(outbreakId, contactId, exposure, token, contact = null) {
-    let contactIdForExposure
+    let contactIdForExposure;
     if (contactId) {
         contactIdForExposure = extractIdFromPouchId(contactId, 'person')
     }

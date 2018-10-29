@@ -10,7 +10,11 @@ export function getReferenceDataRequest (token, callback) {
     console.log("getReferenceDataRequest: ");
 
     let start =  new Date().getTime();
-    database.allDocs({startkey: `referenceData.json_false_`, endkey: `referenceData.json_false_\uffff`, include_docs: true})
+    database.allDocs({
+        startkey: `referenceData.json_false_`,
+        endkey: `referenceData.json_false_\uffff`,
+        include_docs: true
+    })
         .then((result) => {
             console.log("result with the new index for reference data: ", new Date().getTime() - start);
             callback(null, result.rows.map((e) => {return e.doc}));

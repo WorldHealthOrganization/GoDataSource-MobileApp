@@ -7,6 +7,7 @@ import {
     ACTION_TYPE_ADD_FILTER_FOR_SCREEN,
     ACTION_TYPE_REMOVE_FILTER_FOR_SCREEN,
     ACTION_TYPE_SAVE_TRANSLATION,
+    ACTION_TYPE_SAVE_AVAILABLE_LANGUAGES,
     ACTION_TYPE_SAVE_HUB_CONFIGURATION,
     ACTION_TYPE_SET_SYNC_STATE,
     ACTION_TYPE_SET_LOGIN_STATE
@@ -17,17 +18,18 @@ import { loginUser } from './user';
 import {Dimensions} from 'react-native';
 import {Platform, NativeModules} from 'react-native';
 // import {getTranslationRequest} from './../requests/translation';
-import {getTranslationRequest} from './../queries/translation';
+import {getAvailableLanguagesRequest, getTranslationRequest} from './../queries/translation';
 import {getDatabaseSnapshotRequest, postDatabaseSnapshotRequest} from './../requests/sync';
 import {setInternetCredentials, getInternetCredentials} from 'react-native-keychain';
 import {unzipFile, readDir} from './../utils/functions';
 import RNFetchBlobFs from 'rn-fetch-blob/fs';
 import {processFile, getDataFromDatabaseFromFile} from './../utils/functions';
 import {createDatabase, getDatabase} from './../queries/database';
-import {setNumberOfFilesProcessed, createZipFileAtPath} from './../utils/functions';
+import {setNumberOfFilesProcessed, createZipFileAtPath, extractIdFromPouchId} from './../utils/functions';
 import {AsyncStorage} from 'react-native';
 import {getUserById} from './user';
 import {uniq} from 'lodash';
+// import RNDB from 'react-native-nosql-to-sqlite';
 
 // Add here only the actions, not also the requests that are executed. For that purpose is the requests directory
 export function changeAppRoot(root) {
@@ -51,6 +53,13 @@ export function saveTranslation(translation) {
     }
 }
 
+export function saveAvailableLanguages(availableLanguages) {
+    return {
+        type: ACTION_TYPE_SAVE_AVAILABLE_LANGUAGES,
+        availableLanguages: availableLanguages
+    }
+}
+
 export function saveHubConfiguration(hubConfig) {
     return {
         type: ACTION_TYPE_SAVE_HUB_CONFIGURATION,
@@ -68,7 +77,7 @@ export function setSyncState(syncState) {
 export function setLoginState(loginState) {
     return {
         type: ACTION_TYPE_SET_LOGIN_STATE,
-        syncState: loginState
+        loginState: loginState
     }
 }
 
@@ -123,6 +132,24 @@ export function getTranslations(language, dispatch) {
                 console.log("### here should have the translations: ");
                 dispatch(saveTranslation(response));
                 resolve('Done translation');
+            }
+        })
+    })
+    // }
+}
+
+export function getAvailableLanguages(dispatch) {
+    // return async function (dispatch) {
+    return new Promise((resolve, reject) => {
+        getAvailableLanguagesRequest((error, response) => {
+            if (error) {
+                console.log("*** getAvailableLanguages error: ", error);
+                reject(error);
+            }
+            if (response) {
+                console.log("### here should have available languages: ", response.map((e) => {return {id: extractIdFromPouchId(e._id, 'language'), name: e.name}}));
+                dispatch(saveAvailableLanguages(response.map((e) => {return {value: e._id.substr(20), label: e.name}})));
+                resolve('Done languages');
             }
         })
     })
@@ -187,6 +214,12 @@ function processFilesForSync(error, response, hubConfiguration) {
                     // We should call the method to sync those data
                     dispatch(setSyncState("Syncing...."));
                     setNumberOfFilesProcessed(0);
+
+                    // RNDB.configureDatabaseWithConfig(config.RNDBConfig);
+                    // RNDB.importDataWithCallback(() => {
+                    //     dispatch(setSyncState("Finished processing"));
+                    // });
+
 
                     // Create local database
                     createDatabase(hubConfiguration.url.replace(/\/|\.|\:/g, ''), hubConfiguration.clientSecret, (database) => {
@@ -273,6 +306,7 @@ export function sendDatabaseToServer () {
                                     }
 
                                     dispatch(setSyncState('Creating local files'));
+                                    console.log('Add stuff: ', promiseArray.length);
                                     Promise.all(promiseArray)
                                         .then((resultsCreateAlFiles) => {
                                             // After creating all the needed files, we need to make a zip file
@@ -294,7 +328,7 @@ export function sendDatabaseToServer () {
                                                             console.log("Data was successfully sent to server: ", resultSendData);
                                                             dispatch(setSyncState('Getting updated data from the server'));
                                                             getDatabaseSnapshotRequest({clientId: internetCredentials.username, clientSecret: internetCredentials.password}, lastSyncDate, (error, response) => {
-                                                                dispatch(processFilesForSync(error, response, {clientId: internetCredentials.username, clientSecret: internetCredentials.password}));
+                                                                dispatch(processFilesForSync(error, response, {url: Platform.OS === 'ios' ? internetCredentials.server : internetCredentials.service, clientId: internetCredentials.username, clientSecret: internetCredentials.password}));
                                                             })
                                                         }
                                                     })

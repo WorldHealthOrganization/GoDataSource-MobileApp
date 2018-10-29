@@ -5,7 +5,7 @@ import errorTypes from './errorTypes';
 import config from './config';
 import RNFetchBlobFS from 'rn-fetch-blob/fs';
 import {zip, unzip} from 'react-native-zip-archive';
-import {updateFileInDatabase} from './../queries/database';
+import {updateFileInDatabase, processBulkDocs} from './../queries/database';
 import {setSyncState} from './../actions/app';
 import bcrypt from 'react-native-bcrypt';
 import uuid from 'react-native-uuid';
@@ -108,7 +108,8 @@ export function navigation(event, navigator) {
                         animationType: 'fade',
                         passProps: {
                             item: {},
-                            filter: null
+                            filter: null,
+                            isNew: addScreen === "CaseSingleScreen" ? true : null
                         }
                     })
                 }
@@ -134,7 +135,7 @@ export function handleExposedTo(contact, returnString, cases, events) {
         let contactId = contact._id.split('_');
         contactId = contactId[contactId.length - 1];
         let persons = relationships[i].persons.filter((e) => {return e.id !== contactId});
-        console.log('PErsons: ', persons);
+        // console.log('PErsons: ', persons);
         for (let j=0; j<persons.length; j++) {
             if ((persons[j].type === 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE' || persons[j].type === 'case') && cases && Array.isArray(cases)) {
                 let auxCase = cases[cases.map((e) => {return e._id.split('_')[e._id.split('_').length - 1]}).indexOf(persons[j].id)];
@@ -154,7 +155,7 @@ export function handleExposedTo(contact, returnString, cases, events) {
         }
     }
 
-    console.log('Relationship array: ', relationshipArray);
+    // console.log('Relationship array: ', relationshipArray);
 
     return returnString ? relationshipArray.join(", ") : relationshipArray;
 }
@@ -239,6 +240,20 @@ export async function processFile (path, type, totalNumberOfFiles, dispatch) {
                                 reject("Error while reading file");
                             }
                             if (data) {
+
+
+
+                                // processBulkDocs(data, type)
+                                //     .then((resultBulk) => {
+                                //         console.log('Bulk docs: ', resultBulk);
+                                //         resolve('Finished inserting');
+                                //     })
+                                //     .catch((errorBulk) => {
+                                //         console.log('Error bulk docs: ', errorBulk);
+                                //         reject(errorBulk);
+                                //     })
+
+
                                 // Since there is data in the file, it's time to sync it
                                 let promises = [];
                                 for (let i=0; i<data.length; i++) {
@@ -292,20 +307,24 @@ export function getDataFromDatabaseFromFile (database, fileType, lastSyncDate) {
         })
             .then((response) => {
                 // Now that we have some files, we should recreate the mongo collections
-                createFilesWithName(fileType, JSON.stringify(response.docs.map((e) => {
-                    delete e._rev;
-                    e.id = extractIdFromPouchId(e._id, fileType);
-                    delete e._id;
-                    delete e.fileType;
-                    return e;
-                })))
-                    .then((responseFromCreate) => {
-                        resolve(responseFromCreate);
-                    })
-                    .catch((errorFromCreate) => {
-                        console.log(`An error occurred while creating file: ${errorFromCreate}`);
-                        reject(errorFromCreate);
-                    })
+                if (response && response.docs && Array.isArray(response.docs) && response.docs.length > 0) {
+                    createFilesWithName(fileType, JSON.stringify(response.docs.map((e) => {
+                        delete e._rev;
+                        e.id = extractIdFromPouchId(e._id, fileType);
+                        delete e._id;
+                        delete e.fileType;
+                        return e;
+                    })))
+                        .then((responseFromCreate) => {
+                            resolve(responseFromCreate);
+                        })
+                        .catch((errorFromCreate) => {
+                            console.log(`An error occurred while creating file: ${errorFromCreate}`);
+                            reject(errorFromCreate);
+                        })
+                } else {
+                    resolve(`Done with ${fileType}`);
+                }
             })
             .catch((error) => {
                 console.log(`An error occurred while getting data for collection: ${fileType}`);
@@ -500,7 +519,7 @@ export function updateRequiredFields(outbreakId, userId, record, action, fileTyp
             if (type !== '') {
                 record.type = type
             }
-            console.log ('updateRequiredFields create record', JSON.stringify(record))
+            // console.log ('updateRequiredFields create record', JSON.stringify(record))
             return record
 
         case 'update':
@@ -509,7 +528,7 @@ export function updateRequiredFields(outbreakId, userId, record, action, fileTyp
             record.updatedBy = extractIdFromPouchId(userId, 'user')
             record.deleted = false
             record.deletedAt = 'undefined'
-            console.log ('updateRequiredFields update record', JSON.stringify(record))
+            // console.log ('updateRequiredFields update record', JSON.stringify(record))
             return record;
 
         case 'delete':
@@ -518,10 +537,18 @@ export function updateRequiredFields(outbreakId, userId, record, action, fileTyp
             record.updatedBy = extractIdFromPouchId(userId, 'user')
             record.deleted = true
             record.deletedAt = new Date().toISOString()
-            console.log ('updateRequiredFields delete record', JSON.stringify(record))
+            // console.log ('updateRequiredFields delete record', JSON.stringify(record))
             return record;
 
         default: 
             console.log ('updateRequiredFields default record', JSON.stringify(record))
+    }
+}
+
+export function createName(type, firstName, lastName) {
+    if (type === 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_EVENT') {
+        return firstName;
+    } else {
+        return ((firstName ? (firstName + ' ') : '') + (lastName ? lastName : ''));
     }
 }
