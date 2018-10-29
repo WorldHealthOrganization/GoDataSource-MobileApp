@@ -111,7 +111,7 @@ class ContactsSingleExposures extends Component {
                         keyExtractor={this.keyExtractor}
                         ItemSeparatorComponent={this.renderSeparatorComponent}
                         ListEmptyComponent={this.listEmptyComponent}
-                        st yle={[style.listViewStyle]}
+                        style={[style.listViewStyle]}
                         componentContainerStyle={style.componentContainerStyle}
                         onScroll={this.handleScroll}
                     />
