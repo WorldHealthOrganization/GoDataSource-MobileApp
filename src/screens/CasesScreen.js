@@ -323,12 +323,15 @@ class CasesScreen extends Component {
 
     //Create new contact in ContactSingleScreen
     handleOnPressAddContact = (item, contact) => {
+        console.log('*** handleOnPressAddContact: ', item, contact)
         this.props.navigator.push({
             screen: 'ContactsSingleScreen',
             animated: true,
             animationType: 'fade',
             passProps: {
-                contact: {}
+                isNew: true,
+                addContactFromCasesScreen: true,
+                caseIdFromCasesScreen: item._id
             }
         })
     };

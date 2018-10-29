@@ -50,36 +50,38 @@ class ContactsSinglePersonal extends Component {
         }
 
         return (
-            <KeyboardAwareScrollView
-                style={style.containerScrollView}
-                contentContainerStyle={[style.contentContainerStyle, {paddingBottom: this.props.screenSize.height < 600 ? 70 : 20}]}
-                keyboardShouldPersistTaps={'always'}
-            >
-                <View style={style.container}>
+            <View style={style.viewContainer}>
+                <View style={{flexDirection: 'row'}}>
                     {
-                        config.contactsSingleScreen.personal.map((item) => {
-                            return this.handleRenderItem(item)
-                        })
+                        this.props.isNew ? 
+                            <Button
+                                title={'Next'}
+                                onPress={this.handleNextButton}
+                                color={styles.buttonGreen}
+                                titleColor={'white'}
+                                height={calculateDimension(25, true, this.props.screenSize)}
+                                width={calculateDimension(130, false, this.props.screenSize)}
+                                style={{
+                                    marginVertical: calculateDimension(12.5, true, this.props.screenSize),
+                                    marginRight: 10
+                                }}/> : null
                     }
                 </View>
-                {
-                    this.props.isNew ? 
-                        <Button
-                        title={'Next'}
-                        onPress={this.handleNextButton}
-                        color={styles.buttonGreen}
-                        titleColor={'white'}
-                        height={calculateDimension(25, true, this.props.screenSize)}
-                        width={calculateDimension(130, false, this.props.screenSize)}
-                        style={{
-                            marginVertical: calculateDimension(5, true, this.props.screenSize),
-                            marginHorizontal: calculateDimension(16, false, this.props.screenSize),
-                            marginBottom: 20
 
-                        }}/> : null
-                }
-             
-            </KeyboardAwareScrollView>
+                <KeyboardAwareScrollView
+                    style={style.containerScrollView}
+                    contentContainerStyle={[style.contentContainerStyle, {paddingBottom: this.props.screenSize.height < 600 ? 70 : 20}]}
+                    keyboardShouldPersistTaps={'always'}
+                >
+                    <View style={style.container}>
+                        {
+                            config.contactsSingleScreen.personal.map((item) => {
+                                return this.handleRenderItem(item)
+                            })
+                        }
+                    </View>
+                </KeyboardAwareScrollView>
+            </View>
         );
     }
 
@@ -118,6 +120,11 @@ class ContactsSinglePersonal extends Component {
 // Create style outside the class, or for components that will be used by other components (buttons),
 // make a global style in the config directory
 const style = StyleSheet.create({
+    viewContainer: {
+        flex: 1,
+        backgroundColor: styles.screenBackgroundGrey,
+        alignItems: 'center',
+    },
     cardStyle: {
         marginVertical: 4,
         flex: 1
@@ -132,7 +139,7 @@ const style = StyleSheet.create({
     container: {
         flex: 1,
         marginBottom: 10
-
+        
     }
 });
 

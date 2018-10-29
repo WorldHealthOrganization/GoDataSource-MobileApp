@@ -47,6 +47,28 @@ class ExposureScreen extends Component {
     }
 
     // Please add here the react lifecycle methods that you need
+    componentDidMount() {
+        let personsArray = [] 
+        if (this.props.addContactFromCasesScreen !== null && this.props.addContactFromCasesScreen !== undefined && this.props.caseIdFromCasesScreen !== null && this.props.caseIdFromCasesScreen !== undefined) {
+            personsArray = [{
+                id: extractIdFromPouchId(this.props.caseIdFromCasesScreen, 'person'),
+                type: 'case',
+                source: true,
+                target: null
+            },{
+                id: null,
+                type: 'contact',
+                source: null,
+                target: true
+            }]
+            this.setState(prevState => ({
+                exposure: Object.assign({}, prevState.exposure, {persons: personsArray})
+            }), () => {
+                console.log('After changing state componentDidMount: ', this.state.exposure);
+            })
+        }
+    }
+
     static getDerivedStateFromProps(props, state) {
         // console.log("FollowUpsSingleScreen: ", state);
         if (props.errors && props.errors.type && props.errors.message) {
@@ -133,6 +155,7 @@ class ExposureScreen extends Component {
                         item={config.addExposureScreen}
                         type={this.props.type}
                         exposure={this.state.exposure}
+                        addContactFromCasesScreen={this.props.addContactFromCasesScreen}
                         onChangeDropDown={this.handleOnChangeDropDown}
                         onChangeDate={this.handleOnChangeDate}
                         onChangeText={this.handleOnChangeText}

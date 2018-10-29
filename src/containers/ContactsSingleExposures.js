@@ -89,6 +89,21 @@ class ContactsSingleExposures extends Component {
 
         return (
             <ElevatedView elevation={3} style={[style.container]}>
+                {
+                    this.props.isNew ? 
+                        <View style={{alignItems: 'center'}}>
+                            <Button
+                                title={'Back'}
+                                onPress={this.handleBackButton}
+                                color={styles.buttonGreen}
+                                titleColor={'white'}
+                                height={calculateDimension(25, true, this.props.screenSize)}
+                                width={calculateDimension(130, false, this.props.screenSize)}
+                                style={{
+                                    marginVertical: calculateDimension(12.5, true, this.props.screenSize),
+                                }}/>
+                        </View> : null
+                }
                 <ScrollView contentContainerStyle={{flexGrow: 1}}>
                     <AnimatedListView
                         data={this.props.contact && this.props.contact.relationships && Array.isArray(this.props.contact.relationships) ? this.props.contact.relationships : []}
@@ -100,24 +115,9 @@ class ContactsSingleExposures extends Component {
                         componentContainerStyle={style.componentContainerStyle}
                         onScroll={this.handleScroll}
                     />
-                    {
-                        this.props.isNew ? 
-                            <Button
-                                title={'Back'}
-                                onPress={this.handleBackButton}
-                                color={styles.buttonGreen}
-                                titleColor={'white'}
-                                height={calculateDimension(25, true, this.props.screenSize)}
-                                width={calculateDimension(130, false, this.props.screenSize)}
-                                style={{
-                                    marginVertical: calculateDimension(5, true, this.props.screenSize),
-                                    marginHorizontal: calculateDimension(16, false, this.props.screenSize),
-                                    marginBottom: 20
-                        }}/> : null
-                    }
                     <View style={{height: 30}}/>
                 </ScrollView>
-             
+
             </ElevatedView>
             
         );
@@ -222,7 +222,9 @@ class ContactsSingleExposures extends Component {
             passProps: {
                 contact: null,
                 type: 'Contact',
-                saveExposure: this.props.saveExposure
+                saveExposure: this.props.saveExposure,
+                addContactFromCasesScreen: this.props.addContactFromCasesScreen,
+                caseIdFromCasesScreen: this.props.caseIdFromCasesScreen
             }
         })
     };

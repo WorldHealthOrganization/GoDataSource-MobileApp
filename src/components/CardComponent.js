@@ -171,6 +171,7 @@ class CardComponent extends Component {
 
         let width = calculateDimension(315, false, this.props.screenSize);
         let marginHorizontal = calculateDimension(14, false, this.props.screenSize);
+        let addContactFromCasesScreen = false;
         let value = '';
         let minimumDate = undefined
         let maximumDate = undefined
@@ -215,6 +216,9 @@ class CardComponent extends Component {
                 item.data = this.computeDataForExposure(item);
             }
             value = this.computeExposureValue(item);
+            if (this.props.addContactFromCasesScreen && this.props.addContactFromCasesScreen !== undefined && item.id === 'exposure') {
+                addContactFromCasesScreen = true
+            }
         }
 
         if (this.props.screen === 'ContactsSingleScreen') {
@@ -275,6 +279,8 @@ class CardComponent extends Component {
             }
         }
 
+        let isEditModeForDropDownInput = addContactFromCasesScreen ? false : (this.props.screen === 'ExposureScreen' ? item.id === 'exposure' ? true : item.isEditMode : item.isEditMode)
+
         switch(item.type) {
             case 'Section':
                 return (
@@ -309,7 +315,7 @@ class CardComponent extends Component {
                         labelValue={item.labelValue}
                         value={value}
                         data={item.data}
-                        isEditMode={this.props.screen === 'ExposureScreen' ? item.id === 'exposure' ? true : item.isEditMode : item.isEditMode}
+                        isEditMode={isEditModeForDropDownInput}
                         isRequired={item.isRequired}
                         onChange={this.props.onChangeDropDown}
                         style={{width: width, marginHorizontal: marginHorizontal}}
@@ -419,7 +425,7 @@ class CardComponent extends Component {
                         textsStyleArray={item.textsStyleArray}
                         onPressArray={item.onPressArray}
                         containerTextStyle={{width, marginHorizontal, height: calculateDimension(46, true, this.props.screenSize)}}
-                        isEditMode = {this.props.isEditMode}
+                        isEditMode = {this.props.isEditMode !== undefined && this.props.isEditMode !== null ? this.props.isEditMode : true}
                     />
                 );
             default:
