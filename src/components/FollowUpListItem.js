@@ -54,12 +54,19 @@ class FollowUpListItem extends PureComponent {
 
             let addressText = '';
 
-            if (this.props && this.props.item && this.props.item.address) {
-                addressText = getAddress(this.props.item.address, true);
-            } else {
-                if (this.props.isContact && contact && contact.addresses && Array.isArray(contact.addresses)) {
-                    addressText = getAddress(contact.addresses[0], true);
+            let followUpContact = this.props && this.props.contacts && Array.isArray(this.props.contacts) && this.props.contacts.length > 0 ? 
+                this.props.contacts[this.props.contacts.map((e) => {return extractIdFromPouchId(e._id, 'person')}).indexOf(this.props.item.personId)] : null;
+
+            if (followUpContact) {
+                let contactPlaceOfResidence = followUpContact.addresses.filter((e) => {return e.typeId === config.userResidenceAddress.userPlaceOfResidence})
+                if (contactPlaceOfResidence && contactPlaceOfResidence[0]) {
+                    addressText = getAddress(contactPlaceOfResidence[0], true);
                 }
+            }
+           
+            if (this.props.isContact && contact && contact.addresses && Array.isArray(contact.addresses)) {
+                let contactPlaceOfResidence = contact.addresses.filter((e) => {return e.typeId === config.userResidenceAddress.userPlaceOfResidence})
+                addressText = getAddress(contactPlaceOfResidence[0], true);
             }
 
             let relationshipText = '';

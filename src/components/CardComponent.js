@@ -81,9 +81,12 @@ class CardComponent extends Component {
             return true
         } 
 
-        if (nextProps.screen === 'ContactsSingleScreen' && nextProps.anotherPlaceOfResidenceWasChosen !== undefined && nextProps.anotherPlaceOfResidenceWasChosen === true) {
-            this.props.anotherPlaceOfResidenceChanged()
-            return true
+        //Usual place of residence change for Contacts and Cases
+        if (nextProps.screen === 'ContactsSingleScreen' || nextProps.screen === 'CaseSingleScreen') {
+            if (nextProps.anotherPlaceOfResidenceWasChosen !== undefined && nextProps.anotherPlaceOfResidenceWasChosen === true) {
+                this.props.anotherPlaceOfResidenceChanged()
+                return true
+            }
         }
 
         //CaseSingleScreen
@@ -621,7 +624,7 @@ class CardComponent extends Component {
                 return o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_GENDER'
             }).map((o) => {return {value: this.getTranslation(o.value), id: o.value}})
         }
-        if (item.id === 'name') {
+        if (item.id === 'typeId') {
             return _.filter(this.props.referenceData, (o) => {
                 return o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_ADDRESS_TYPE'
             }).map((o) => {return {value: this.getTranslation(o.value), id: o.value}})
@@ -655,7 +658,7 @@ class CardComponent extends Component {
                 return o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_GENDER'
             }).map((o) => {return {value: this.getTranslation(o.value), id: o.value}})
         }
-        if (item.id === 'name') {
+        if (item.id === 'typeId') {
             return _.filter(this.props.referenceData, (o) => {
                 return o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_ADDRESS_TYPE'
             }).map((o) => {return {value: this.getTranslation(o.value), id: o.value}})

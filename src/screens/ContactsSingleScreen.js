@@ -69,7 +69,7 @@ class ContactsSingleScreen extends Component {
             isDateTimePickerVisible: false,
             canChangeScreen: false,
             anotherPlaceOfResidenceWasChosen: false,
-            hasPlaceOfResidence: false
+            hasPlaceOfResidence: this.props.isNew ? false : true
         };
         // Bind here methods, or at least don't declare methods in the render method
     }
@@ -553,10 +553,8 @@ class ContactsSingleScreen extends Component {
                     let addressesClone = _.cloneDeep(this.state.contact.addresses);
 
                     let anotherPlaceOfResidenceWasChosen = false
-                    let hasPlaceOfResidence = false
                     if (value && value.value){
                        if(value.value === config.userResidenceAddress.userPlaceOfResidence){
-                            hasPlaceOfResidence = true
                             addressesClone.forEach(element => {
                                 if (element[id] === value.value){
                                    element[id] = config.userResidenceAddress.userOtherResidence
@@ -567,6 +565,12 @@ class ContactsSingleScreen extends Component {
                     }
 
                     addressesClone[objectType][id] = value && value.value ? value.value : value;
+                    let hasPlaceOfResidence = false
+                    let contactPlaceOfResidence = addressesClone.filter((e) => {return e.typeId === config.userResidenceAddress.userPlaceOfResidence})
+                    if (contactPlaceOfResidence && contactPlaceOfResidence.length > 0) {
+                        hasPlaceOfResidence = true
+                    }
+
                     this.setState(prevState => ({
                         contact: Object.assign({}, prevState.contact, {addresses: addressesClone}),
                         anotherPlaceOfResidenceWasChosen,
@@ -680,7 +684,7 @@ class ContactsSingleScreen extends Component {
     };
 
     handleOnPressSave = () => {
-        // Check the required fields and then update the contact
+        // Che ck the required fields and then update the contact
         if (this.checkRequiredFields()) {
             if (this.state.hasPlaceOfResidence === true){
                 this.setState({
@@ -691,7 +695,8 @@ class ContactsSingleScreen extends Component {
                         this.setState(prevState => ({
                             contact: Object.assign({}, prevState.contact, contactWithRequiredFields)
                         }), () => {
-                            this.props.addContact(this.props.user.activeOutbreakId, this.state.contact, this.props.user.token);
+                            let contactClone = _.cloneDeep(this.state.contact)
+                            this.props.addContact(this.props.user.activeOutbreakId, contactClone, this.props.user.token);
                         })
                     } else {
                         let contactWithRequiredFields = null
@@ -704,12 +709,13 @@ class ContactsSingleScreen extends Component {
                         this.setState(prevState => ({
                         contact: Object.assign({}, prevState.contact, contactWithRequiredFields)
                         }), () => {
-                            this.props.updateContact(this.props.user.activeOutbreakId, this.state.contact._id, this.state.contact, this.props.user.token);
+                            let contactClone = _.cloneDeep(this.state.contact)
+                            this.props.updateContact(this.props.user.activeOutbreakId, contactClone._id, contactClone, this.props.user.token);
                         })
                     }
                 });
             } else {
-                Alert.alert("Validation error", 'Please add your place of residence address', [
+                Alert.alert("Validation error", 'Please add the place of residence address', [
                     {
                         text: 'Ok', onPress: () => {console.log("Ok pressed")}
                     }
