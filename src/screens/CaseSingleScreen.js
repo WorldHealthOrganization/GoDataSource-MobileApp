@@ -24,7 +24,7 @@ import CaseSingleInvestigationContainer from '../containers/CaseSingleInvestigat
 import {Icon} from 'react-native-material-ui';
 import {removeErrors} from './../actions/errors';
 import {addCase, updateCase} from './../actions/cases';
-import {updateRequiredFields} from './../utils/functions';
+import {updateRequiredFields, extractIdFromPouchId} from './../utils/functions';
 
 const initialLayout = {
     height: 0,
@@ -259,7 +259,6 @@ class CaseSingleScreen extends Component {
                         onChangeDate={this.onChangeDate}
                         onChangeSwitch={this.onChangeSwitch}
                         onChangeDropDown={this.onChangeDropDown}
-                        onChangeSectionedDropDown={this.handleOnChangeSectionedDropDownDocuments}
                         handleMoveToNextScreenButton={this.handleMoveToNextScreenButton}
                         checkRequiredFieldsPersonalInfo={this.checkRequiredFieldsPersonalInfo}
                         isNew={this.props.isNew}
@@ -493,13 +492,6 @@ class CaseSingleScreen extends Component {
             console.log("After deleting the document: ", this.state.case);
         })
     };
-    handleOnChangeSectionedDropDownDocuments = (selectedItems, index) => {
-        let documents = _.cloneDeep(this.state.case.documents);
-        documents[index].locationId = selectedItems;
-        this.setState(prevState => ({
-            case: Object.assign({}, prevState.case, {documents})
-        }))
-    };
 
 
     // Address functions
@@ -542,7 +534,7 @@ class CaseSingleScreen extends Component {
     handleOnChangeSectionedDropDownAddress = (selectedItems, index) => {
         // Here selectedItems is always an array with just one value and should pe mapped to the locationId field from the address from index
         let addresses = _.cloneDeep(this.state.case.addresses);
-        addresses[index].locationId = selectedItems;
+        addresses[index].locationId = extractIdFromPouchId(selectedItems['0'], 'location');
         this.setState(prevState => ({
             case: Object.assign({}, prevState.case, {addresses})
         }))

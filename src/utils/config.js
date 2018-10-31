@@ -406,7 +406,7 @@ const caseSingleScreen = {
                 labelValue: 'test',
                 type: 'DropDownSectioned',
                 value: '',
-                isRequired: false,
+                isRequired: true,
                 isEditMode: true,
                 objectType: 'Address',
                 single: true
@@ -1129,7 +1129,7 @@ const contactsSingleScreen = {
                 labelValue: 'test',
                 type: 'DropDownSectioned',
                 value: '',
-                isRequired: false,
+                isRequired: true,
                 isEditMode: true,
                 objectType: 'Address',
                 single: true

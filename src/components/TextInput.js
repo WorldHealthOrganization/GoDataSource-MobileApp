@@ -59,9 +59,7 @@ class TextInput extends PureComponent {
 
     viewInput = () => {
         return (
-            <View style={[{
-
-            },this.props.style]}>
+            <View style={[{},this.props.style]}>
                 <Text style={{
                     fontFamily: 'Roboto-Regular',
                     fontSize: 15,

@@ -552,3 +552,18 @@ export function createName(type, firstName, lastName) {
         return ((firstName ? (firstName + ' ') : '') + (lastName ? lastName : ''));
     }
 }
+
+export function mapLocations(locationList, parentLocationId) {
+    let output = []
+    for (let obj of locationList) {
+        if(obj.parentLocationId === parentLocationId) {
+            let children = mapLocations(locationList, extractIdFromPouchId(obj._id, 'location'))
+
+            if (children.length) {
+                obj.children = children
+            }
+            output.push(obj)
+        }
+    }
+    return output
+}

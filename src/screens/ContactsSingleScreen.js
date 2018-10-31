@@ -586,9 +586,10 @@ class ContactsSingleScreen extends Component {
     }
 
     handleOnChangeSectionedDropDown = (selectedItems, index) => {
+        console.log ('handleOnChangeSectionedDropDown', selectedItems, index)
         // Here selectedItems is always an array with just one value and should pe mapped to the locationId field from the address from index
         let addresses = _.cloneDeep(this.state.contact.addresses);
-        addresses[index].locationId = selectedItems;
+        addresses[index].locationId = extractIdFromPouchId(selectedItems['0'], 'location');
         this.setState(prevState => ({
             contact: Object.assign({}, prevState.contact, {addresses})
         }))
