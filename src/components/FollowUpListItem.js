@@ -87,7 +87,7 @@ class FollowUpListItem extends PureComponent {
                             </View>
                         }
                         rightElement={
-                            <Ripple onPress={this.props.onPressMap}>
+                            <Ripple onPress={this.onPressMapIcon}>
                                 <Image source={{uri: 'map_icon'}} style={{width: 31, height: 31}}/>
                             </Ripple>
                                 }
@@ -160,6 +160,15 @@ class FollowUpListItem extends PureComponent {
             this.props.onPressExposure(this.props.item, contact);
         })
     };
+
+    onPressMapIcon = () => {
+        InteractionManager.runAfterInteractions(() => {
+            let contact = this.props && this.props.contacts && Array.isArray(this.props.contacts) && this.props.contacts.length > 0 ? 
+                this.props.contacts[this.props.contacts.map((e) => {return extractIdFromPouchId(e._id, 'person')}).indexOf(this.props.item.personId)] : null;
+
+            this.props.onPressMap(this.props.item, contact)
+        })
+    }
 
     getTranslation = (value) => {
         let valueToBeReturned = value;

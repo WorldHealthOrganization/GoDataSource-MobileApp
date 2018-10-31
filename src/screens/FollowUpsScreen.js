@@ -403,10 +403,14 @@ class FollowUpsScreen extends Component {
         })
     };
 
-    handleOnPressMap = () => {
+    handleOnPressMap = (followUp, contact) => {
+        // let contactPlaceOfResidence = contact.addresses.filter((e) => {return e.typeId === config.userResidenceAddress.userPlaceOfResidence})
         this.props.navigator.showModal({
             screen: 'MapScreen',
-            animated: true
+            animated: true,
+            passProps: {
+                contactPlaceOfResidence: {latitude: 48.129836,  longitude: 14.562815}
+            }
         })
     }
 
