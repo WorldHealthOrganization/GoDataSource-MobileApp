@@ -335,7 +335,6 @@ class CaseSingleScreen extends Component {
                     this.setState ({
                         deletePressed: true
                     }, () => {
-                        this.hideMenu()
                         this.handleOnPressSave();
                     })
                 }
@@ -351,7 +350,8 @@ class CaseSingleScreen extends Component {
     handleOnPressSave = () => {
         if (this.checkRequiredFields()) {
             console.log("handleSavePress case", JSON.stringify(this.state.case));
-
+            
+            this.hideMenu()
             if (this.state.saveFromEditPressed === true){
                 //update case and remain on view screen
                 this.setState({
@@ -398,7 +398,7 @@ class CaseSingleScreen extends Component {
         } else {
             Alert.alert("Validation error", 'Some of the required fields are missing. Please make sure you have completed them', [
                 {
-                    text: 'Ok', onPress: () => {console.log("Ok pressed")}
+                    text: 'Ok', onPress: () => {this.hideMenu()}
                 }
             ])
         }

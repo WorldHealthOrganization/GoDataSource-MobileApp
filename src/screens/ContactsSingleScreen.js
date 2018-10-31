@@ -687,6 +687,7 @@ class ContactsSingleScreen extends Component {
                 this.setState({
                     savePressed: true
                 }, () => {
+                    this.hideMenu()
                     if (this.props.isNew) {
                         let contactWithRequiredFields = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, this.state.contact), action = 'create', fileType = 'person.json', type = 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT')
                         this.setState(prevState => ({
@@ -712,14 +713,14 @@ class ContactsSingleScreen extends Component {
             } else {
                 Alert.alert("Validation error", 'Please add your place of residence address', [
                     {
-                        text: 'Ok', onPress: () => {console.log("Ok pressed")}
+                        text: 'Ok', onPress: () => {this.hideMenu()}
                     }
                 ])
             }
         } else {
             Alert.alert("Validation error", 'Some of the required fields are missing. Please make sure you have completed them', [
                 {
-                    text: 'Ok', onPress: () => {console.log("Ok pressed")}
+                    text: 'Ok', onPress: () => {this.hideMenu()}
                 }
             ])
         }
@@ -820,7 +821,6 @@ class ContactsSingleScreen extends Component {
         this.setState ({
             deletePressed: true
         }, () => {
-            this.hideMenu()
             this.handleOnPressSave();
         })
     }
