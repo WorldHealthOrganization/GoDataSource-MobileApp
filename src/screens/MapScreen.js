@@ -11,13 +11,7 @@ import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import ViewHOC from './../components/ViewHOC';
 import MapView from 'react-native-maps';
-
-const initialRegion = {
-    latitude: 37.78825,
-    longitude: -122.4324,
-    latitudeDelta: 0.0922,
-    longitudeDelta: 0.0421,
-}
+import { Marker } from 'react-native-maps';
 
 class MapScreen extends Component {
     static navigatorStyle = {
@@ -39,6 +33,13 @@ class MapScreen extends Component {
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
+        const initialRegion = {
+            latitude: this.props.contactPlaceOfResidence.latitude, 
+            longitude: this.props.contactPlaceOfResidence.longitude,
+            latitudeDelta: 0.0922,
+            longitudeDelta: 0.0421,
+        }
+
         return (
             <ViewHOC style={style.container}
                      showLoader={false}
@@ -53,7 +54,12 @@ class MapScreen extends Component {
                     <MapView
                         initialRegion={initialRegion}
                         style={StyleSheet.absoluteFillObject}
-                    />
+                    >
+                            <Marker
+                                coordinate={this.props.contactPlaceOfResidence}
+                                title={'Test title'}
+                                />
+                     </MapView>
                 </View>
             </ViewHOC>
         );

@@ -24,7 +24,7 @@ import CaseSingleInvestigationContainer from '../containers/CaseSingleInvestigat
 import {Icon} from 'react-native-material-ui';
 import {removeErrors} from './../actions/errors';
 import {addCase, updateCase} from './../actions/cases';
-import {updateRequiredFields} from './../utils/functions';
+import {updateRequiredFields, extractIdFromPouchId} from './../utils/functions';
 
 const initialLayout = {
     height: 0,
@@ -261,7 +261,6 @@ class CaseSingleScreen extends Component {
                         onChangeDate={this.onChangeDate}
                         onChangeSwitch={this.onChangeSwitch}
                         onChangeDropDown={this.onChangeDropDown}
-                        onChangeSectionedDropDown={this.handleOnChangeSectionedDropDownDocuments}
                         handleMoveToNextScreenButton={this.handleMoveToNextScreenButton}
                         checkRequiredFieldsPersonalInfo={this.checkRequiredFieldsPersonalInfo}
                         isNew={this.props.isNew}
@@ -341,7 +340,6 @@ class CaseSingleScreen extends Component {
                     this.setState ({
                         deletePressed: true
                     }, () => {
-                        this.hideMenu()
                         this.handleOnPressSave();
                     })
                 }
@@ -358,7 +356,8 @@ class CaseSingleScreen extends Component {
         if (this.checkRequiredFields()) {
             if (this.state.hasPlaceOfResidence === true){
                 console.log("handleSavePress case", JSON.stringify(this.state.case));
-
+                this.hideMenu()
+                
                 if (this.state.saveFromEditPressed === true){
                     //update case and remain on view screen
                     this.setState({
@@ -405,14 +404,14 @@ class CaseSingleScreen extends Component {
             } else {
                 Alert.alert("Validation error", 'Please add the place of residence address', [
                     {
-                        text: 'Ok', onPress: () => {console.log("Ok pressed")}
+                        text: 'Ok', onPress: () => {this.hideMenu()}
                     }
                 ])
             }
         } else {
             Alert.alert("Validation error", 'Some of the required fields are missing. Please make sure you have completed them', [
                 {
-                    text: 'Ok', onPress: () => {console.log("Ok pressed")}
+                    text: 'Ok', onPress: () => {this.hideMenu()}
                 }
             ])
         }
@@ -506,13 +505,6 @@ class CaseSingleScreen extends Component {
             console.log("After deleting the document: ", this.state.case);
         })
     };
-    handleOnChangeSectionedDropDownDocuments = (selectedItems, index) => {
-        let documents = _.cloneDeep(this.state.case.documents);
-        documents[index].locationId = selectedItems;
-        this.setState(prevState => ({
-            case: Object.assign({}, prevState.case, {documents})
-        }))
-    };
 
 
     // Address functions
@@ -555,7 +547,7 @@ class CaseSingleScreen extends Component {
     handleOnChangeSectionedDropDownAddress = (selectedItems, index) => {
         // Here selectedItems is always an array with just one value and should pe mapped to the locationId field from the address from index
         let addresses = _.cloneDeep(this.state.case.addresses);
-        addresses[index].locationId = selectedItems;
+        addresses[index].locationId = extractIdFromPouchId(selectedItems['0'], 'location');
         this.setState(prevState => ({
             case: Object.assign({}, prevState.case, {addresses})
         }))
