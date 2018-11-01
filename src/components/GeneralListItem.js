@@ -47,6 +47,7 @@ GeneralListItem = ({title, primaryText, secondaryText, firstComponent, secondCom
                             textsStyleArray={textsStyleArray}
                             onPressArray={onPressArray}
                             containerStyle={[{height: 54}]}
+                            isEditMode={true}
                         />) : (null)
                 }
         </View>

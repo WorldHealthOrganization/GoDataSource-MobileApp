@@ -139,7 +139,7 @@ class ContactsSingleAddress extends Component {
             if (this.props.hasPlaceOfResidence !== undefined && this.props.hasPlaceOfResidence === true){
                 this.props.handleMoveToNextScreenButton(true)
             } else {
-                Alert.alert("Alert", 'Please add your place of residence address', [
+                Alert.alert("Alert", 'Please add the place of residence address', [
                     {
                         text: 'Ok', onPress: () => {console.log("OK pressed")}
                     }

@@ -54,10 +54,12 @@ class CaseListItem extends Component {
         let addressArray = []
 
         if (this.props && this.props.item && this.props.item.addresses && this.props.item.addresses.length > 0) {
-            addressArray = [this.props.item.addresses[0].addressLine1, this.props.item.addresses[0].addressLine2, this.props.item.addresses[0].city, this.props.item.addresses[0].country, this.props.item.addresses[0].postalCode];
-            addressArray = addressArray.filter((e) => {return e});
+            let casePlaceOfResidence = this.props.item.addresses.filter((e) => {return e.typeId === config.userResidenceAddress.userPlaceOfResidence})
+            if (casePlaceOfResidence && casePlaceOfResidence[0]) {
+                addressArray = [casePlaceOfResidence[0].addressLine1, casePlaceOfResidence[0].addressLine2, casePlaceOfResidence[0].city, casePlaceOfResidence[0].country, casePlaceOfResidence[0].postalCode];
+                addressArray = addressArray.filter((e) => {return e});
+            }
         }
-
         addressText = addressArray.join(', ');
 
         return (
