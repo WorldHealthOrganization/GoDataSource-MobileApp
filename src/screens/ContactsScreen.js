@@ -20,6 +20,7 @@ import {getContactsForOutbreakId} from './../actions/contacts';
 import {addFilterForScreen} from './../actions/app';
 import {navigation} from './../utils/functions';
 import ViewHOC from './../components/ViewHOC';
+import config from './../utils/config';
 
 
 const scrollAnim = new Animated.Value(0);
@@ -269,6 +270,7 @@ class ContactsScreen extends Component {
     handlePressFollowUp = (item, contact) => {
         console.log("### handlePressFollowUp item:", JSON.stringify(item));
         console.log("### handlePressFollowUp contact:", JSON.stringify(contact));
+        let contactPlaceOfResidence = item.addresses.filter((e) => {return e.typeId === config.userResidenceAddress.userPlaceOfResidence})
         this.props.navigator.push({
             screen: 'FollowUpsSingleScreen',
             animated: true,
@@ -277,7 +279,8 @@ class ContactsScreen extends Component {
                 item: {
                     date: new Date(),
                     outbreakId: this.props.user.activeOutbreakId,
-                    lostToFollowUp: false
+                    lostToFollowUp: false,
+                    address: contactPlaceOfResidence[0]
                 },
                 contact: contact || item,
                 filter: this.state.filter,

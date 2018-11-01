@@ -12,6 +12,7 @@ import {calculateDimension} from './../utils/functions';
 import config from './../utils/config';
 import {connect} from "react-redux";
 import Button from './../components/Button';
+import {extractIdFromPouchId} from './../utils/functions';
 import {bindActionCreators} from "redux";
 import styles from './../styles';
 import ElevatedView from 'react-native-elevated-view';
@@ -134,7 +135,7 @@ class ContactsSingleExposures extends Component {
 
         let {title, primaryText, secondaryText} = this.getCaseName(relation);
 
-
+        
         return (
             <GeneralListItem
                 title={title}
@@ -188,17 +189,18 @@ class ContactsSingleExposures extends Component {
         if (relation && relation.item) {
             relation = relation.item;
         }
-        let person = relation && relation.persons && relation.persons.filter((e) => {return e.id !== this.props.contact.id})[0];
+
+        let person = relation && relation.persons && relation.persons.filter((e) => {return e.id !== extractIdFromPouchId(this.props.contact._id, 'person')})[0];
 
         let caseName = '';
 
         if (person.type === 'case' ) {
             if (this.props.cases) {
-                let aux = this.props.cases.filter((e) => {return e.id === person.id})[0];
+                let aux = this.props.cases.filter((e) => {return extractIdFromPouchId(e._id, 'person')  === person.id})[0];
                 caseName = (aux && aux.firstName ? (aux.firstName + ' ') : '') + (aux && aux.lastName ? aux.lastName : '');
             }
         } else {
-            let aux = this.props.events.filter((e) => {return e.id === person.id})[0];
+            let aux = this.props.events.filter((e) => {return extractIdFromPouchId(e._id, 'person') === person.id})[0];
             caseName = aux && aux.name ? aux.name : '';
         }
 

@@ -188,7 +188,7 @@ const followUpsSingleScreen = {
                     value: '',
                     data: [],
                     isRequired: false,
-                    isEditMode: true,
+                    isEditMode: false,
                     isAdditive: true,
                     objectType: 'FollowUp'
                 }
@@ -390,7 +390,7 @@ const caseSingleScreen = {
         fields: [
             {
                 cardNumber: 1,
-                id: 'name',
+                id: 'typeId',
                 label: 'Name',
                 labelValue: 'test',
                 type: 'DropdownInput',
@@ -1113,7 +1113,7 @@ const contactsSingleScreen = {
         fields: [
             {
                 cardNumber: 1,
-                id: 'name',
+                id: 'typeId',
                 label: 'Name',
                 labelValue: 'test',
                 type: 'DropdownInput',
