@@ -29,24 +29,25 @@ export function getOutbreakById(outbreakId, token, dispatch) {
     return new Promise((resolve, reject) => {
         getOutbreakByIdRequest(outbreakId, null, (error, response) => {
             if (error) {
-                console.log("*** getOutbreakById error: ", error);
+                console.log('*** getOutbreakById error: ', error);
                 dispatch(addError(errorTypes.ERROR_OUTBREAK));
                 reject(error);
             }
             if (response) {
-                  getLocationsByOutbreakIdRequest((error, response) => {
+                console.log ('*** getOutbreakById response: ', response)
+                getLocationsByOutbreakIdRequest(response, (error, response) => {
                     if (error) {
-                        console.log("*** getLocationsByOutbreakId error: ", error);
+                        console.log('*** getLocationsByOutbreakId error: ', error);
                         dispatch(addError(errorTypes.ERROR_LOCATIONS));
                     }
                     if (response) {
-                        console.log("*** getLocationsByOutbreakId response: ");
+                        console.log('*** getLocationsByOutbreakId response: ');
                         let treeLocationList = mapLocations(response.filter((e) => {return e.active === true}), null)
                         dispatch(storeLocations(treeLocationList));
                     }
                 })
                 dispatch(storeOutbreak(response));
-                resolve("Done outbreak");
+                resolve('Done outbreak');
             }
         })
     })

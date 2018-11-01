@@ -1,13 +1,20 @@
 
 import {getDatabase} from './database';
 
-export function getLocationsByOutbreakIdRequest (callback) {
+export function getLocationsByOutbreakIdRequest (outbreakResponse, callback) {
     let database = getDatabase();
 
-    database.allDocs({
-        startkey: `location.json_false_`,
-        endkey: `location.json_false_\uffff`,
-        include_docs: true
+    database.find({
+        selector: {
+            _id: {
+                $gte: `location.json_false_`,
+                $lte: `location.json_false_\uffff`,
+                $in: outbreakResponse.locationIds
+            },
+            parentLocationId: {
+                $in: outbreakResponse.locationIds
+            }
+        }
     })
         .then((result) => {
             console.log("result getLocationsByOutbreakIdRequest: ");
