@@ -167,6 +167,8 @@ class CaseSingleAddressContainer extends PureComponent {
                 onChangeDropDown={this.props.onChangeDropDown}
                 onChangeSectionedDropDown={this.props.onChangeSectionedDropDown}
                 onDeletePress={this.props.onDeletePress}
+                anotherPlaceOfResidenceWasChosen={this.props.anotherPlaceOfResidenceWasChosen}
+                anotherPlaceOfResidenceChanged={this.props.anotherPlaceOfResidenceChanged}
             />
         )
     }
@@ -174,7 +176,15 @@ class CaseSingleAddressContainer extends PureComponent {
     handleNextButton = () => {
         // if (true) {
         if (this.props.checkRequiredFieldsAddresses()) {
-            this.props.handleMoveToNextScreenButton(true)
+            if (this.props.hasPlaceOfResidence) {
+                this.props.handleMoveToNextScreenButton(true)
+            } else {
+                Alert.alert("Alert", 'Please add the place of residence address', [
+                    {
+                        text: 'Ok', onPress: () => {console.log("OK pressed")}
+                    }
+                ])
+            }
         } else {
             Alert.alert("Alert", 'Please add at least one address with all the required fields completed', [
                 {

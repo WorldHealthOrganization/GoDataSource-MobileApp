@@ -362,12 +362,16 @@ class FollowUpsScreen extends Component {
 
     handlePressFollowUp = (item, contact) => {
         console.log("### handlePressFollowUp: ", item);
+
+        let itemClone = Object.assign({}, item)
+        let contactPlaceOfResidence = contact.addresses.filter((e) => {return e.typeId === config.userResidenceAddress.userPlaceOfResidence})
+        itemClone.address = contactPlaceOfResidence[0]
         this.props.navigator.push({
             screen: 'FollowUpsSingleScreen',
             animated: true,
             animationType: 'fade',
             passProps: {
-                item: item,
+                item: itemClone,
                 contact: contact,
                 filter: this.state.filter,
                 startLoadingScreen: this.startLoadingScreen

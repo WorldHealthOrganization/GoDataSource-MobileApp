@@ -16,7 +16,7 @@ ActionsBar = ({textsArray, addressIndex, textsStyleArray, onPressArray, hasBorde
     <View style={[style.containerStyle, containerStyle]}>
         <View style={[style.separatorStyle, {backgroundColor: borderColor, display: hasBorder ? 'flex' : 'none'}]}/>
         {
-            isEditMode ? (
+            isEditMode !== undefined && isEditMode !== null && isEditMode === true ? (
                 <View style={[style.containerText, containerTextStyle]}>
                 {
                     textsArray.map((text, index) => {
