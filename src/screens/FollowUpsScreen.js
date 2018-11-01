@@ -438,13 +438,11 @@ class FollowUpsScreen extends Component {
         let contactPlaceOfResidence = contact.addresses.filter((e) => {return e.typeId === config.userResidenceAddress.userPlaceOfResidence})
         console.log ('contactPlaceOfResidence', contactPlaceOfResidence)
 
-        // geoLocation:
-        //     lat: 0
-        //     lng: 0
         navigator.geolocation.getCurrentPosition(
             (position) => {
               this.setState({
-                // latitude: contactPlaceOfResidence[0].geoLocation
+                latitude: contactPlaceOfResidence[0].geoLocation && contactPlaceOfResidence[0].geoLocation.lat ? contactPlaceOfResidence[0].geoLocation.lat : 0,
+                longitude: contactPlaceOfResidence[0].geoLocation && contactPlaceOfResidence[0].geoLocation.lng ? contactPlaceOfResidence[0].geoLocation.lng : 0,
                 sourceLatitude: position.coords.latitude,
                 sourceLongitude: position.coords.longitude,
                 isVisible: true, 
