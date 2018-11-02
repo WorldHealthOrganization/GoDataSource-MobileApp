@@ -352,7 +352,7 @@ const caseSingleScreen = {
         }
     ],
     document: {
-       fields: [
+        fields: [
             {
                 cardNumber: 3,
                 id: 'documentType',
@@ -362,7 +362,7 @@ const caseSingleScreen = {
                 isRequired: true,
                 isEditMode: true,
                 objectType: 'Documents'
-            }, 
+            },
             {
                 cardNumber: 3,
                 id: 'documentNumber',
@@ -386,7 +386,7 @@ const caseSingleScreen = {
             }
         ]
     },
-    address: { 
+    address: {
         fields: [
             {
                 cardNumber: 1,
@@ -566,75 +566,75 @@ const caseSingleScreen = {
     ],
     hospitalizationDate: {
         fields: [
-             {
-                 cardNumber: 2,
-                 id: 'startDate',
-                 label: 'From',
-                 type: 'DatePicker',
-                 value: '',
-                 isRequired: true,
-                 isEditMode: true,
-                 format: 'YYYY-MM-dd',
-                 objectType: 'HospitalizationDates'
-             }, 
-             {
+            {
                 cardNumber: 2,
-                 id: 'endDate',
-                 label: 'To',
-                 type: 'DatePicker',
-                 value: '',
-                 isRequired: true,
-                 isEditMode: true,
-                 format: 'YYYY-MM-dd',
-                 objectType: 'HospitalizationDates'
-             },
-             {
-                 cardNumber: 2,
-                 id: 'deleteButton',
-                 type: 'ActionsBar',
-                 labelValue: 'test',
-                 textsArray: ['Delete'],
-                 textsStyleArray: [{color: styles.missedRedColor}],
-                 onPressArray: [],
-                 objectType: 'HospitalizationDates'
-             }
-         ]
+                id: 'startDate',
+                label: 'From',
+                type: 'DatePicker',
+                value: '',
+                isRequired: true,
+                isEditMode: true,
+                format: 'YYYY-MM-dd',
+                objectType: 'HospitalizationDates'
+            },
+            {
+                cardNumber: 2,
+                id: 'endDate',
+                label: 'To',
+                type: 'DatePicker',
+                value: '',
+                isRequired: true,
+                isEditMode: true,
+                format: 'YYYY-MM-dd',
+                objectType: 'HospitalizationDates'
+            },
+            {
+                cardNumber: 2,
+                id: 'deleteButton',
+                type: 'ActionsBar',
+                labelValue: 'test',
+                textsArray: ['Delete'],
+                textsStyleArray: [{color: styles.missedRedColor}],
+                onPressArray: [],
+                objectType: 'HospitalizationDates'
+            }
+        ]
     },
     isolationDate: {
         fields: [
-             {
-                 cardNumber: 3,
-                 id: 'startDate',
-                 label: 'From',
-                 type: 'DatePicker',
-                 value: '',
-                 isRequired: true,
-                 isEditMode: true,
-                 format: 'YYYY-MM-dd',
-                 objectType: 'IsolationDates'
-             }, 
-             {
+            {
                 cardNumber: 3,
-                 id: 'endDate',
-                 label: 'To',
-                 type: 'DatePicker',
-                 value: '',
-                 isRequired: true,
-                 isEditMode: true,
-                 format: 'YYYY-MM-dd',
-                 objectType: 'IsolationDates'
-             },
-             {
-                 cardNumber: 3,
-                 id: 'deleteButton',
-                 type: 'ActionsBar',
-                 labelValue: 'test',
-                 textsArray: ['Delete'],
-                 textsStyleArray: [{color: styles.missedRedColor}],
-                 onPressArray: [],
-                 objectType: 'IsolationDates'
-             }
-         ]
+                id: 'startDate',
+                label: 'From',
+                type: 'DatePicker',
+                value: '',
+                isRequired: true,
+                isEditMode: true,
+                format: 'YYYY-MM-dd',
+                objectType: 'IsolationDates'
+            },
+            {
+                cardNumber: 3,
+                id: 'endDate',
+                label: 'To',
+                type: 'DatePicker',
+                value: '',
+                isRequired: true,
+                isEditMode: true,
+                format: 'YYYY-MM-dd',
+                objectType: 'IsolationDates'
+            },
+            {
+                cardNumber: 3,
+                id: 'deleteButton',
+                type: 'ActionsBar',
+                labelValue: 'test',
+                textsArray: ['Delete'],
+                textsStyleArray: [{color: styles.missedRedColor}],
+                onPressArray: [],
+                objectType: 'IsolationDates'
+            }
+        ]
     },
 };
 
@@ -1493,7 +1493,20 @@ const RNDBConfig = {
 const userResidenceAddress = {
     userPlaceOfResidence: 'LNG_REFERENCE_DATA_CATEGORY_ADDRESS_TYPE_USUAL_PLACE_OF_RESIDENCE',
     userOtherResidence: 'LNG_REFERENCE_DATA_CATEGORY_ADDRESS_TYPE_OTHER'
-}
+};
+
+const contactFollowUpStatuses = {
+    underFollowUp: 'LNG_REFERENCE_DATA_CONTACT_FINAL_FOLLOW_UP_STATUS_TYPE_UNDER_FOLLOW_UP',
+    followUpCompleted: 'LNG_REFERENCE_DATA_CONTACT_FINAL_FOLLOW_UP_STATUS_TYPE_FOLLOW_UP_COMPLETED',
+    lostToFollowUp: 'LNG_REFERENCE_DATA_CONTACT_FINAL_FOLLOW_UP_STATUS_TYPE_LOST_TO_FOLLOW_UP'
+};
+
+const followUpStatuses = {
+    notPerformed: 'LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE_NOT_PERFORMED',
+    seenOk: 'LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE_SEEN_OK',
+    seenNotOk: 'LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE_SEEN_NOT_OK',
+    missed: 'LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE_MISSED'
+};
 
 export default {
     designScreenSize,
@@ -1513,5 +1526,7 @@ export default {
     personTypes,
     mongoCollections,
     RNDBConfig,
-    userResidenceAddress
+    userResidenceAddress,
+    contactFollowUpStatuses,
+    followUpStatuses
 }

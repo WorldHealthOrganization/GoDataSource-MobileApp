@@ -189,12 +189,12 @@ class ContactsSingleScreen extends Component {
                                             <MenuItem onPress={this.handleOnPressDeceased}>Deceased</MenuItem>
                                         ) : null
                                     }
-                                      {
+                                    {
                                         !this.props.isNew && !this.state.contact.deleted ? (
                                             <MenuItem onPress={this.handleOnPressDeleteContact}>Delete</MenuItem>
                                         ) : null
                                     }
-                                   
+
                                     <DateTimePicker
                                         isVisible={this.state.isDateTimePickerVisible}
                                         onConfirm={this._handleDatePicked}
@@ -209,10 +209,10 @@ class ContactsSingleScreen extends Component {
                     handlePressNavbarButton={this.handlePressNavbarButton}
                 />
                 <TabView
-                    navigationState={this.state} 
-                    onIndexChange={this.handleOnIndexChange} 
-                    renderScene={this.renderScene} 
-                    renderTabBar={this.handleRenderTabBar} 
+                    navigationState={this.state}
+                    onIndexChange={this.handleOnIndexChange}
+                    renderScene={this.renderScene}
+                    renderTabBar={this.handleRenderTabBar}
                     // renderPager={this.handleRenderPager}
                     useNativeDriver
                     initialLayout={initialLayout}
@@ -243,7 +243,7 @@ class ContactsSingleScreen extends Component {
             this.setState({
                 index
             });
-        } 
+        }
     };
 
     handleMoveToNextScreenButton = () => {
@@ -517,9 +517,9 @@ class ContactsSingleScreen extends Component {
                     this.state.item[id] = {};
                 }
 
-                let address = this.state.contact && this.state.contact.addresses && Array.isArray(this.state.contact.addresses) && this.state.contact.addresses.length > 0 ? 
+                let address = this.state.contact && this.state.contact.addresses && Array.isArray(this.state.contact.addresses) && this.state.contact.addresses.length > 0 ?
                     this.state.contact.addresses.filter((e) => { return value.includes(e.addressLine1 || '') && value.includes(e.addressLine2 || '') && value.includes(e.city || '') && value.includes(e.country || '') && value.includes(e.postalCode || '');
-                }) : [];
+                    }) : [];
 
                 this.setState(
                     (prevState) => ({
@@ -554,14 +554,14 @@ class ContactsSingleScreen extends Component {
 
                     let anotherPlaceOfResidenceWasChosen = false
                     if (value && value.value){
-                       if(value.value === config.userResidenceAddress.userPlaceOfResidence){
+                        if(value.value === config.userResidenceAddress.userPlaceOfResidence){
                             addressesClone.forEach(element => {
                                 if (element[id] === value.value){
-                                   element[id] = config.userResidenceAddress.userOtherResidence
-                                   anotherPlaceOfResidenceWasChosen = true
+                                    element[id] = config.userResidenceAddress.userOtherResidence
+                                    anotherPlaceOfResidenceWasChosen = true
                                 }
-                           });
-                       }
+                            });
+                        }
                     }
 
                     addressesClone[objectType][id] = value && value.value ? value.value : value;
@@ -701,15 +701,15 @@ class ContactsSingleScreen extends Component {
                             this.props.addContact(this.props.user.activeOutbreakId, contactClone, this.props.user.token);
                         })
                     } else {
-                        let contactWithRequiredFields = null
+                        let contactWithRequiredFields = null;
                         if (this.state.deletePressed === true) {
                             contactWithRequiredFields = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, this.state.contact), action = 'delete')
                         } else {
                             contactWithRequiredFields = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, this.state.contact), action = 'update')
                         }
-    
+
                         this.setState(prevState => ({
-                        contact: Object.assign({}, prevState.contact, contactWithRequiredFields)
+                            contact: Object.assign({}, prevState.contact, contactWithRequiredFields)
                         }), () => {
                             let contactClone = _.cloneDeep(this.state.contact)
                             this.props.updateContact(this.props.user.activeOutbreakId, contactClone._id, contactClone, this.props.user.token);
@@ -735,7 +735,7 @@ class ContactsSingleScreen extends Component {
     handleOnPressDeceased = () => {
         console.log("### show date time picker: ");
         this._showDateTimePicker();
-    }
+    };
 
     checkRequiredFieldsPersonalInfo = () => {
         for(let i=0; i<config.contactsSingleScreen.personal.length; i++) {
@@ -746,7 +746,7 @@ class ContactsSingleScreen extends Component {
             }
         }
         return true
-    }
+    };
 
     checkRequiredFieldsAddresses = () => {
         if (this.state.contact && this.state.contact.addresses && Array.isArray(this.state.contact.addresses) && this.state.contact.addresses.length > 0) {
@@ -761,7 +761,7 @@ class ContactsSingleScreen extends Component {
             return false;
         }
         return true
-    }
+    };
 
     checkRequiredFields = () => {
         console.log ('checkRequiredFields')

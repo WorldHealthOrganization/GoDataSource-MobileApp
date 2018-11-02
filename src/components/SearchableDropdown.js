@@ -18,6 +18,7 @@ export default class SearchableDropDown extends Component{
     constructor(props) {
         super(props);
         this.state = {
+            searchText: '',
             item: {},
             listItems: []
         };
@@ -50,7 +51,11 @@ export default class SearchableDropDown extends Component{
 
     searchedItems= (searchedText) => {
         console.log('Searched text', searchedText);
-        this.props.onTextChange(searchedText);
+        this.setState({
+            searchText: searchedText
+        }, () => {
+            this.props.onTextChange(searchedText);
+        })
     };
 
     renderItems = (item) => {
@@ -59,7 +64,11 @@ export default class SearchableDropDown extends Component{
                 this.setState({ item: item });
                 Keyboard.dismiss();
                 setTimeout(() => {
-                    this.props.onItemSelect(item);
+                    this.setState({
+                        searchText: item.name
+                    }, () => {
+                        this.props.onItemSelect(item);
+                    });
                 }, 0);
             }}>
                 <Text style={{ ...this.props.itemTextStyle }}>{item.name}</Text>
@@ -74,7 +83,7 @@ export default class SearchableDropDown extends Component{
                     ref={(e) => this.input = e}
                     onChange={this.searchedItems}
                     isEditMode={'true'}
-                    value={this.state.item.name}
+                    value={this.state.searchText}
                     label={this.props.placeholder}
                     onSubmitEditing={this.props.onSubmitEditing}
                     style={{width: '90%'}}

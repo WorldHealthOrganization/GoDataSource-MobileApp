@@ -3,6 +3,7 @@
  */
 import {getDatabase} from './database';
 import {generateId, extractIdFromPouchId} from './../utils/functions';
+import config from './../utils/config';
 
 export function getContactsForOutbreakIdRequest (outbreakId, filter, token, callback) {
     let database = getDatabase();
@@ -130,6 +131,34 @@ export function getContactsForOutbreakIdRequest (outbreakId, filter, token, call
     }
 }
 
+export function getContactsForFollowUpPeriodRequest (outbreakId, followUpDate, callback) {
+    // Filter has followUpDate
+    let database = getDatabase();
+
+    let start = new Date().getTime();
+    database.find({
+        selector: {
+            _id: {
+                $gt: `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT_false_${outbreakId}_`,
+                $lt: `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT_false_${outbreakId}_\uffff`
+            },
+            'followUp.status': 'LNG_REFERENCE_DATA_CONTACT_FINAL_FOLLOW_UP_STATUS_TYPE_UNDER_FOLLOW_UP',
+            'followUp.startDate': {$lte: followUpDate},
+            'followUp.endDate': {$gte: followUpDate},
+            deleted: false
+        },
+        fields: ['_id']
+    })
+        .then((resultFilterContacts) => {
+            console.log('getContactsForFollowUpPeriod result: ', new Date().getTime() - start);
+            callback(null, resultFilterContacts.docs)
+        })
+        .catch((errorFilterContacts) => {
+            console.log('getContactsForFollowUpPeriod error: ', errorFilterContacts);
+            callback(errorFilterContacts);
+        })
+}
+
 function getFromDb(database, id) {
     return new Promise((resolve, reject) => {
         console.log('Get record with id: ', id);
@@ -163,7 +192,7 @@ export function getContactByIdRequest(outbreakId, contactId, token, callback) {
             console.log("Error getContactByIdRequest: ", JSON.stringify(errorGetContactById));
             callback(errorGetContactById);
         })
-         
+
 }
 
 export function updateContactRequest(outbreakId, contactId, contact, token, callback) {

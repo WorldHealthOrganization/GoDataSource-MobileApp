@@ -20,6 +20,7 @@ export function getRelationshipsForTypeRequest (outbreakId, searchType, keys, ca
                 $gte: `relationship.json_false_${outbreakId}_`,
                 $lte: `relationship.json_false_${outbreakId}_\uffff`
             },
+            deleted: false,
             $or: [
                 {'persons.0.id': {$in: keys}},
                 {'persons.1.id': {$in: keys}}
