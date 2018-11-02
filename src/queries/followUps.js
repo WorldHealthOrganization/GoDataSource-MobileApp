@@ -57,11 +57,38 @@ export function getFollowUpsForOutbreakIdRequest (outbreakId, filter, token, cal
     //     })
 }
 
+export function getFollowUpsForContactIds (outbreakId, date, contactIds, callback) {
+    let database = getDatabase();
+
+    let oneDay = 24 * 60 * 60 * 1000;
+    let startDate = new Date(date).getTime() - oneDay;
+    let endDate = new Date(date).getTime() + oneDay;
+
+    let start = new Date().getTime();
+    database.find({
+        selector: {
+            _id: {
+                $gt: `followUp.json_false_${outbreakId}_${startDate}_`,
+                $lt: `followUp.json_false_${outbreakId}_${endDate}_\uffff`
+            },
+            personId: {$in: contactIds}
+        }
+    })
+        .then((resultGetFollowUps) => {
+            console.log('getFollowUpsForContactIds result: ', new Date().getTime() - start);
+            callback(null, resultGetFollowUps.docs);
+        })
+        .catch((errorGetFollowUps) => {
+            console.log('getFollowUpsForContactIds error: ', new Date().getTime() - start);
+            callback(errorGetFollowUps);
+        })
+}
+
 export function updateFollowUpRequest (outbreakId, contactId, followUpId, followUp, token, callback) {
     let database = getDatabase();
 
     console.log('updateFollowUpRequest: ', outbreakId, contactId, followUpId, followUp, token);
-    
+
     if (!followUp.personId) {
         followUp.personId = contactId
     }
@@ -132,6 +159,20 @@ export function addFollowUpRequest (outbreakId, contactId, followUp, token, call
         .catch((errorAddFollowUp) => {
             console.log('Error add followUp: ', errorAddFollowUp);
             callback(errorAddFollowUp);
+        })
+}
+
+export function addFollowUpsBulkRequest (followUps, callback) {
+    let database = getDatabase();
+
+    database.bulkDocs(followUps)
+        .then((resultBulkInsert) => {
+            console.log('Result bulk insert: ', resultBulkInsert);
+            callback(null, 'Success')
+        })
+        .catch((errorBulkInsert) => {
+            console.log('Error bulk add follow-ups: ', errorBulkInsert);
+            callback(errorBulkInsert);
         })
 }
 

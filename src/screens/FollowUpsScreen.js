@@ -58,7 +58,7 @@ class FollowUpsScreen extends Component {
             loading: true,
 
             isVisible: false,
-            latitude: 0, 
+            latitude: 0,
             longitude: 0,
             sourceLatitude: 0,
             sourceLongitude: 0,
@@ -167,9 +167,9 @@ class FollowUpsScreen extends Component {
     );
 
     handleScroll = Animated.event(
-            [{nativeEvent: {contentOffset: {y: scrollAnim}}}],
-            {useNativeDriver: true}
-        );
+        [{nativeEvent: {contentOffset: {y: scrollAnim}}}],
+        {useNativeDriver: true}
+    );
 
     // The render method should have at least business logic as possible,
     // because this will be called whenever there is a new setState call
@@ -216,13 +216,13 @@ class FollowUpsScreen extends Component {
                             borderRadius: 4
                         }}
                     >
-                    <Ripple style={{
-                        flex: 1,
-                        justifyContent: 'center',
-                        alignItems: 'center'
-                    }} onPress={this.handleOnPressAddFollowUp}>
-                        <Icon name="add" color={'white'} size={15}/>
-                    </Ripple>
+                        <Ripple style={{
+                            flex: 1,
+                            justifyContent: 'center',
+                            alignItems: 'center'
+                        }} onPress={this.handleOnPressAddFollowUp}>
+                            <Icon name="add" color={'white'} size={15}/>
+                        </Ripple>
                     </ElevatedView>
                 </NavBarCustom>
                 <View style={style.containerContent}>
@@ -261,25 +261,25 @@ class FollowUpsScreen extends Component {
                     onSavePressed={this.handleOnSavePressed}
                 />
 
-                 <View style={styles.mapContainer}>
+                <View style={styles.mapContainer}>
                     {
                         this.state.error === null ? (
                             <Popup
-                            isVisible={this.state.isVisible}
-                            onCancelPressed={() => this.setState({ isVisible: false })}
-                            onAppPressed={() => this.setState({ isVisible: false })}
-                            onBackButtonPressed={() => this.setState({ isVisible: false })}
-                            options={{
-                                latitude: this.state.latitude,
-                                longitude: this.state.longitude,
-                                sourceLatitude: this.state.sourceLatitude,
-                                sourceLongitude: this.state.sourceLongitude,
-                                dialogTitle: 'Select the maps application that you would like to use',
-                                cancelText: 'Cancel',
-                                appsWhiteList: ['google-maps', 'apple-maps', 'waze']
-                                //other possibilities: citymapper, uber, lyft, transit, yandex, moovit
-                            }}
-                        />
+                                isVisible={this.state.isVisible}
+                                onCancelPressed={() => this.setState({ isVisible: false })}
+                                onAppPressed={() => this.setState({ isVisible: false })}
+                                onBackButtonPressed={() => this.setState({ isVisible: false })}
+                                options={{
+                                    latitude: this.state.latitude,
+                                    longitude: this.state.longitude,
+                                    sourceLatitude: this.state.sourceLatitude,
+                                    sourceLongitude: this.state.sourceLongitude,
+                                    dialogTitle: 'Select the maps application that you would like to use',
+                                    cancelText: 'Cancel',
+                                    appsWhiteList: ['google-maps', 'apple-maps', 'waze']
+                                    //other possibilities: citymapper, uber, lyft, transit, yandex, moovit
+                                }}
+                            />
                         ) : console.log('this.state.error', this.state.error)
                     }
                 </View>
@@ -295,7 +295,7 @@ class FollowUpsScreen extends Component {
             to: 'open'
         })
     };
-    
+
     startLoadingScreen = () => {
         this.setState({
             loading: true
@@ -308,17 +308,17 @@ class FollowUpsScreen extends Component {
         let now = new Date().getTime() - oneDay;
         if ((!item.performed && itemDate < now) || item.lostToFollowUp) {
             return (<MissedFollowUpListItem
-                    item={item}
-                    onPressFollowUp={this.handlePressFollowUp}
-                />)
+                item={item}
+                onPressFollowUp={this.handlePressFollowUp}
+            />)
         } else {
             return (<FollowUpListItem
-                    item={item}
-                    onPressFollowUp={this.handlePressFollowUp}
-                    onPressMissing={this.handleOnPressMissing}
-                    onPressExposure={this.handleOnPressExposure}
-                    onPressMap={this.handleOnPressMap}
-                />)
+                item={item}
+                onPressFollowUp={this.handlePressFollowUp}
+                onPressMissing={this.handleOnPressMissing}
+                onPressExposure={this.handleOnPressExposure}
+                onPressMap={this.handleOnPressMap}
+            />)
         }
     };
 
@@ -439,24 +439,25 @@ class FollowUpsScreen extends Component {
     };
 
     handleOnPressMap = (followUp, contact) => {
+
         let contactPlaceOfResidence = contact.addresses.filter((e) => {return e.typeId === config.userResidenceAddress.userPlaceOfResidence})
         console.log ('contactPlaceOfResidence', contactPlaceOfResidence)
 
         navigator.geolocation.getCurrentPosition(
             (position) => {
-              this.setState({
-                latitude: contactPlaceOfResidence[0].geoLocation && contactPlaceOfResidence[0].geoLocation.lat ? contactPlaceOfResidence[0].geoLocation.lat : 0,
-                longitude: contactPlaceOfResidence[0].geoLocation && contactPlaceOfResidence[0].geoLocation.lng ? contactPlaceOfResidence[0].geoLocation.lng : 0,
-                sourceLatitude: position.coords.latitude,
-                sourceLongitude: position.coords.longitude,
-                isVisible: true, 
-                error: null,
-              });
+                this.setState({
+                    latitude: contactPlaceOfResidence[0].geoLocation && contactPlaceOfResidence[0].geoLocation.lat ? contactPlaceOfResidence[0].geoLocation.lat : 0,
+                    longitude: contactPlaceOfResidence[0].geoLocation && contactPlaceOfResidence[0].geoLocation.lng ? contactPlaceOfResidence[0].geoLocation.lng : 0,
+                    sourceLatitude: position.coords.latitude,
+                    sourceLongitude: position.coords.longitude,
+                    isVisible: true,
+                    error: null,
+                });
             },
             (error) => {
                 this.setState({ error: error.message })
             },
-          );
+        );
 
         // this.props.navigator.showModal({
         //     screen: 'MapScreen',
@@ -500,8 +501,7 @@ class FollowUpsScreen extends Component {
         date = new Date(date);
         let followUp = {
             _id: 'followUp.json_false_' + this.props.user.activeOutbreakId + '_' + date.getTime() + '_' + generateId(),
-            performed: false,
-            lostToFollowUp: false,
+            statusId: config.followUpStatuses.notPerformed,
             date: date,
             outbreakId: this.props.user.activeOutbreakId,
             personId: extractIdFromPouchId(contact.id, 'person.json'),
@@ -519,7 +519,7 @@ class FollowUpsScreen extends Component {
     };
 
     handleGenerateFollowUps = () => {
-        this.props.generateFollowUp(this.props.user.activeOutbreakId, 1, this.props.user.token);
+        this.props.generateFollowUp(this.props.user.activeOutbreakId, this.state.filter.date, this.props.user.token);
     };
 
     // Append to the existing filter newProp={name: value}
@@ -528,7 +528,7 @@ class FollowUpsScreen extends Component {
 
         // If the filter exists, check if it has already the wanted props and change them. Otherwise add them
         if (auxFilter) {
-           auxFilter[newProp.type] = newProp.value;
+            auxFilter[newProp.type] = newProp.value;
         }
 
         this.setFilter(auxFilter);
@@ -667,7 +667,7 @@ class FollowUpsScreen extends Component {
 
                 return  e && e.firstName && this.state.filter.searchText.toLowerCase().includes(e.firstName.toLowerCase()) ||
                     e && e.lastName && this.state.filter.searchText.toLowerCase().includes(e.lastName.toLowerCase()) ||
-                    e && e.firstName && e.firstName.toLowerCase().includes(this.state.filter.searchText.toLowerCase()) || 
+                    e && e.firstName && e.firstName.toLowerCase().includes(this.state.filter.searchText.toLowerCase()) ||
                     e && e.lastName && e.lastName.toLowerCase().includes(this.state.filter.searchText.toLowerCase())
             });
         }

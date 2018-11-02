@@ -16,13 +16,18 @@ import errorTypes from './../utils/errorTypes';
 import config from './../utils/config';
 import {
     getFollowUpsForOutbreakIdRequest,
+    getFollowUpsForContactIds,
     updateFollowUpRequest,
-    addFollowUpRequest
+    addFollowUpRequest,
+    addFollowUpsBulkRequest
 } from './../queries/followUps';
 import _ from 'lodash';
 import {storeContacts, getContactsForOutbreakId} from './contacts';
 import {getRelationshipsForTypeRequest} from './../queries/relationships';
-import {extractIdFromPouchId, mapContactsAndRelationships, mapContactsAndFollowUps} from './../utils/functions';
+import {extractIdFromPouchId, mapContactsAndRelationships, mapContactsAndFollowUps, generateId, updateRequiredFields} from './../utils/functions';
+import {getContactsForFollowUpPeriodRequest} from './../queries/contacts';
+import {difference} from 'lodash';
+import {setSyncState} from './app';
 
 // Add here only the actions, not also the requests that are executed. For that purpose is the requests directory
 export function storeFollowUps(followUps) {
@@ -55,7 +60,7 @@ export function getFollowUpsForOutbreakId(outbreakId, filter, token) {
                 let keys = response.map((e) => {return e.personId});
                 keys = _.uniq(keys);
                 keys = keys.sort();
-                
+
                 getContactsForOutbreakIdWithPromises(outbreakId, {keys: keys}, null, dispatch)
                     .then((responseGetContacts) => {
                         console.log ('getFollowUpsForOutbreakIdRequest getContactsForOutbreakIdWithPromises response')
@@ -186,18 +191,68 @@ export function createFollowUp(outbreakId, contactId, followUp, contact, activeF
     }
 }
 
-export function generateFollowUp(outbreakId, followUpPeriod, token) {
+export function generateFollowUp(outbreakId, date, token) {
     return async function(dispatch, getState) {
         // TODO add generate algorithm for follow-ups
-        // generateFollowUpRequest(outbreakId, followUpPeriod, token, (error, response) => {
-        //     if (error) {
-        //         console.log("*** generateFollowUp error: ", error);
-        //         dispatch(addError(errorTypes.ERROR_GENERATE_FOLLOWUP));
-        //     }
-        //     if (response) {
-        //         dispatch(getContactsForOutbreakId(outbreakId, config.defaultFilterForContacts, token))
-        //     }
-        // })
+        // The algorithm:
+        // get all contacts that have the selected date inside their followUp period (between followUp.startDate and followUp.endDate and status under followUp)
+        // for those contacts see which of them has already follow-ups on that day
+        // create follow-ups for those that don't have already follow-ups
+
+        dispatch(setSyncState('Generating Follow-ups...'));
+        // Get contacts that are under followUp on that day
+        getContactsForFollowUpPeriodRequest(outbreakId, date.toISOString(), (errorContactIds, contactIds) => {
+            if (errorContactIds) {
+                console.log('Error while getting contacts to generate follow-ups: ', errorContactIds);
+                dispatch(setSyncState('Error'));
+                addError(errorTypes.ERROR_GENERATE_FOLLOWUP);
+            }
+            if (contactIds) {
+                // Check if they already have follow-ups on that day
+                // Map the contactIds
+                contactIds = contactIds.map((e) => {return extractIdFromPouchId(e._id, 'person')});
+                getFollowUpsForContactIds(outbreakId, date, contactIds, (errorGetFollowUps, resultGetFollowUps) => {
+                    if (errorGetFollowUps) {
+                        console.log('Error while getting followUps to generate follow-ups: ', errorContactIds);
+                        dispatch(setSyncState('Error'));
+                        addError(errorTypes.ERROR_GENERATE_FOLLOWUP);
+                    }
+                    if (resultGetFollowUps) {
+                        // Now make the difference between the two arrays by _id, respectively personId and the for the difference, generate followUps
+                        let contactsThatNeedFollowUps = difference(contactIds, resultGetFollowUps.map((e) => {return e.personId}));
+
+                        let generatedFollowUps = [];
+                        // For each contactsThatNeedFollowUps create a number of followUps equal with the number of daily followUps
+                        for (let i=0; i<contactsThatNeedFollowUps.length; i++) {
+                            // Add as many follow-ups as needed
+                            for (let j=0; j<getState().outbreak.frequencyOfFollowUpPerDay; j++) {
+                                let newFollowUp = {
+                                    date: date,
+                                    personId: contactsThatNeedFollowUps[i],
+                                    outbreakId: outbreakId,
+                                    statusId: config.followUpStatuses.notPerformed
+                                };
+                                let aux = updateRequiredFields(outbreakId, getState().user.activeOutbreakId, newFollowUp, 'create', 'followUp.json');
+                                generatedFollowUps.push(aux);
+                            }
+                        }
+
+                        // Here bulk add the followUps
+                        addFollowUpsBulkRequest(generatedFollowUps, (errorBulkInsert, resultBulkInsert) => {
+                            if (errorBulkInsert) {
+                                console.log('Error while getting followUps to generate follow-ups: ', errorContactIds);
+                                dispatch(setSyncState('Error'));
+                                addError(errorTypes.ERROR_GENERATE_FOLLOWUP);
+                            }
+                            if (resultBulkInsert) {
+                                dispatch(getFollowUpsForOutbreakId(outbreakId, {date: date}));
+                                dispatch(setSyncState('Finished processing'));
+                            }
+                        })
+                    }
+                })
+            }
+        })
     }
 }
 
