@@ -32,6 +32,7 @@ import AddFollowUpScreen from './AddFollowUpScreen';
 import {LoaderScreen, Colors} from 'react-native-ui-lib';
 import {navigation, extractIdFromPouchId, generateId, updateRequiredFields} from './../utils/functions';
 import ViewHOC from './../components/ViewHOC';
+import { Popup } from 'react-native-map-link';
 
 const scrollAnim = new Animated.Value(0);
 const offsetAnim = new Animated.Value(0);
@@ -54,7 +55,14 @@ class FollowUpsScreen extends Component {
             followUps: [],
             showAddFollowUpScreen: false,
             refreshing: false,
-            loading: true
+            loading: true,
+
+            isVisible: false,
+            latitude: 0, 
+            longitude: 0,
+            sourceLatitude: 0,
+            sourceLongitude: 0,
+            error: null
         };
         // Bind here methods, or at least don't declare methods in the render method
         this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this));
@@ -252,6 +260,29 @@ class FollowUpsScreen extends Component {
                     onCancelPressed={this.handleOnCancelPressed}
                     onSavePressed={this.handleOnSavePressed}
                 />
+
+                 <View style={styles.mapContainer}>
+                    {
+                        this.state.error === null ? (
+                            <Popup
+                            isVisible={this.state.isVisible}
+                            onCancelPressed={() => this.setState({ isVisible: false })}
+                            onAppPressed={() => this.setState({ isVisible: false })}
+                            onBackButtonPressed={() => this.setState({ isVisible: false })}
+                            options={{
+                                latitude: this.state.latitude,
+                                longitude: this.state.longitude,
+                                sourceLatitude: this.state.sourceLatitude,
+                                sourceLongitude: this.state.sourceLongitude,
+                                dialogTitle: 'Select the maps application that you would like to use',
+                                cancelText: 'Cancel',
+                                appsWhiteList: ['google-maps', 'apple-maps', 'waze']
+                                //other possibilities: citymapper, uber, lyft, transit, yandex, moovit
+                            }}
+                        />
+                        ) : console.log('this.state.error', this.state.error)
+                    }
+                </View>
             </ViewHOC>
         );
     }
@@ -408,14 +439,29 @@ class FollowUpsScreen extends Component {
     };
 
     handleOnPressMap = (followUp, contact) => {
-        // let contactPlaceOfResidence = contact.addresses.filter((e) => {return e.typeId === config.userResidenceAddress.userPlaceOfResidence})
-        this.props.navigator.showModal({
-            screen: 'MapScreen',
-            animated: true,
-            passProps: {
-                contactPlaceOfResidence: {latitude: 48.129836,  longitude: 14.562815}
-            }
-        })
+        let contactPlaceOfResidence = contact.addresses.filter((e) => {return e.typeId === config.userResidenceAddress.userPlaceOfResidence})
+        console.log ('contactPlaceOfResidence', contactPlaceOfResidence)
+
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+              this.setState({
+                latitude: contactPlaceOfResidence[0].geoLocation && contactPlaceOfResidence[0].geoLocation.lat ? contactPlaceOfResidence[0].geoLocation.lat : 0,
+                longitude: contactPlaceOfResidence[0].geoLocation && contactPlaceOfResidence[0].geoLocation.lng ? contactPlaceOfResidence[0].geoLocation.lng : 0,
+                sourceLatitude: position.coords.latitude,
+                sourceLongitude: position.coords.longitude,
+                isVisible: true, 
+                error: null,
+              });
+            },
+            (error) => {
+                this.setState({ error: error.message })
+            },
+          );
+
+        // this.props.navigator.showModal({
+        //     screen: 'MapScreen',
+        //     animated: true
+        // })
     }
 
     handlePressFilter = () => {
@@ -682,6 +728,12 @@ class FollowUpsScreen extends Component {
 // Create style outside the class, or for components that will be used by other components (buttons),
 // make a global style in the config directory
 const style = StyleSheet.create({
+    mapContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#F5FCFF'
+    },
     container: {
         flex: 1,
         backgroundColor: 'white',
