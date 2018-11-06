@@ -271,6 +271,7 @@ class ContactsScreen extends Component {
         console.log("### handlePressFollowUp item:", JSON.stringify(item));
         console.log("### handlePressFollowUp contact:", JSON.stringify(contact));
         let contactPlaceOfResidence = item.addresses.filter((e) => {return e.typeId === config.userResidenceAddress.userPlaceOfResidence})
+        
         this.props.navigator.push({
             screen: 'FollowUpsSingleScreen',
             animated: true,
