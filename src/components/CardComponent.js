@@ -613,7 +613,9 @@ class CardComponent extends Component {
                 data = data.concat(this.props.events.map((e) => {return {value: e.name, id: extractIdFromPouchId(e._id, 'person'), type: 'event'}}));
             } else {
                 if (item.id === 'clusterId') {
-
+                    // return _.filter(this.props.referenceData, (o) => {
+                    //     return o.categoryId.includes("")
+                    // }).map((o) => {return {value: this.getTranslation(o.value), id: o.value}})
                 }
             }
         }
