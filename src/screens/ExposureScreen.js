@@ -199,25 +199,29 @@ class ExposureScreen extends Component {
                     target: null
                 },{
                     id: this.props.contact && this.props.contact._id ? extractIdFromPouchId(this.props.contact._id, 'person') : null,
-                    type: 'contact',
+                    type: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT',
                     source: null,
                     target: true
-                }]
-            }
-            // Here add logic for cases/events
-            else {
+                }];
+            } else {
+                // Here add logic for cases/events
                 personsArray = [{
                     id: value.value,
                     type: type
                 }]
             }
 
+            let source = personsArray && Array.isArray(personsArray) && personsArray.length === 2 ? personsArray[0].source ? personsArray[0].id : personsArray[1].id : null;
+            let target = personsArray && Array.isArray(personsArray) && personsArray.length === 2 ? personsArray[0].target ? personsArray[0].id : personsArray[1].id : null;
+
             this.setState(prevState => ({
-                exposure: Object.assign({}, prevState.exposure, {persons: personsArray})
+                exposure: Object.assign({}, prevState.exposure, {persons: personsArray, source: source, target: target, active: true})
             }), () => {
                 console.log('After changing state: ', this.state.exposure);
             })
         } else {
+            // let source = this.state.exposure.persons && Array.isArray(this.state.exposure.persons) && this.state.exposure.persons.length === 2 ? this.state.exposure.persons[0].source ? this.state.exposure.persons[0].id : this.state.exposure.persons[1].id : null;
+            // let target = this.state.exposure.persons && Array.isArray(this.state.exposure.persons) && this.state.exposure.persons.length === 2 ? this.state.exposure.persons[0].target ? this.state.exposure.persons[0].id : this.state.exposure.persons[1].id : null;
             this.setState(prevState => ({
                 exposure: Object.assign({}, prevState.exposure, {[id]: value.value})
             }), () => {

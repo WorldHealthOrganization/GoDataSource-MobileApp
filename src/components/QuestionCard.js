@@ -3,7 +3,7 @@
  */
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
-import React, {PureComponent} from 'react';
+import React, {Component} from 'react';
 import {View, Text, StyleSheet, Platform, Dimensions, Image, FlatList, ScrollView} from 'react-native';
 import {ListItem, Icon} from 'react-native-material-ui';
 import {calculateDimension} from './../utils/functions';
@@ -21,7 +21,7 @@ import _ from 'lodash';
 import DatePicker from './DatePicker';
 
 
-class QuestionCard extends PureComponent {
+class QuestionCard extends Component {
 
     // This will be a dumb component, so it's best not to put any business logic in it
     constructor(props) {
@@ -33,11 +33,11 @@ class QuestionCard extends PureComponent {
 
     // Please add here the react lifecycle methods that you need
 
-
     // The render method should have at least business logic as possible,
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
+        console.log('Render stuff');
         return (
             <ElevatedView elevation={3} style={[this.props.style, style.container, {
                 marginHorizontal: calculateDimension(16, false, this.props.screenSize),

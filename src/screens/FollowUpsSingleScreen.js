@@ -46,30 +46,30 @@ class FollowUpsSingleScreen extends Component {
         // Bind here methods, or at least don't declare methods in the render method
     }
 
-    GenInfoRoute = () => (
-        <FollowUpsSingleGetInfoContainer
-            item={this.state.item}
-            contact={this.state.contact}
-            onNext={this.handleNextPress}
-            onChangeText={this.onChangeText}
-            onChangeDate={this.onChangeDate}
-            onChangeSwitch={this.onChangeSwitch}
-            onChangeDropDown={this.onChangeDropDown}
-        />
-    );
-    QuestRoute = () => (
-        <FollowUpsSingleQuestionnaireContainer
-            item={this.state.item}
-            contact={this.state.contact}
-            isEditMode={true}
-            onChangeTextAnswer={this.onChangeTextAnswer}
-            onChangeDateAnswer={this.onChangeDateAnswer}
-            onChangeSingleSelection={this.onChangeSingleSelection}
-            onChangeMultipleSelection={this.onChangeMultipleSelection}
-            onPressSave={this.handleOnPressSave}
-            onPressMissing={this.handleOnPressMissing}
-        />
-    );
+    // GenInfoRoute = () => (
+    //     <FollowUpsSingleGetInfoContainer
+    //         item={this.state.item}
+    //         contact={this.state.contact}
+    //         onNext={this.handleNextPress}
+    //         onChangeText={this.onChangeText}
+    //         onChangeDate={this.onChangeDate}
+    //         onChangeSwitch={this.onChangeSwitch}
+    //         onChangeDropDown={this.onChangeDropDown}
+    //     />
+    // );
+    // QuestRoute = () => (
+    //     <FollowUpsSingleQuestionnaireContainer
+    //         item={this.state.item}
+    //         contact={this.state.contact}
+    //         isEditMode={true}
+    //         onChangeTextAnswer={this.onChangeTextAnswer}
+    //         onChangeDateAnswer={this.onChangeDateAnswer}
+    //         onChangeSingleSelection={this.onChangeSingleSelection}
+    //         onChangeMultipleSelection={this.onChangeMultipleSelection}
+    //         onPressSave={this.handleOnPressSave}
+    //         onPressMissing={this.handleOnPressMissing}
+    //     />
+    // );
 
     // Please add here the react lifecycle methods that you need
     static getDerivedStateFromProps(props, state) {
@@ -121,6 +121,7 @@ class FollowUpsSingleScreen extends Component {
                                         </Ripple>
                                     }
                                 >
+                                    <MenuItem onPress={this.handleOnPressMissing}>Missing</MenuItem>
                                     <MenuItem onPress={this.handleOnPressDeceased}>Deceased</MenuItem>
                                     <MenuItem onPress={this.handleOnPressDelete}>Delete follow-up</MenuItem>
                                     <DateTimePicker
@@ -493,7 +494,7 @@ class FollowUpsSingleScreen extends Component {
 
     handleOnPressMissing = () => {
         this.setState(prevState => ({
-            item: Object.assign({}, prevState.item, {lostToFollowUp: true})
+            item: Object.assign({}, prevState.item, {statusId: config.followUpStatuses.missed})
         }), () => {
             this.handleOnPressSave();
         })

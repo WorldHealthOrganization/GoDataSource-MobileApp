@@ -28,7 +28,7 @@ export function getRelationshipsForTypeRequest (outbreakId, searchType, keys, ca
         }
     })
         .then((result) => {
-            console.log('Result in finding relationships: ', new Date().getTime() - start, result.docs.length);
+            console.log('Result in finding relationships: ', new Date().getTime() - start, result.docs);
             callback(null, result.docs)
         })
         .catch((error) => {

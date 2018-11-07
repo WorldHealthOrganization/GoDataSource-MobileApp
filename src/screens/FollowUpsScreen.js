@@ -98,26 +98,12 @@ class FollowUpsScreen extends Component {
                 }
             }
 
-            // state.followUps = fUps;
+            state.followUps = fUps;
 
             // Now filter the followUps by type (All/To do/Missed)
-            let oneDay = 24 * 60 * 60 * 1000;
-            if (state.filter && state.filter.performed && state.filter.performed !== 'All') {
-                if (state.filter.performed === 'Missed') {
-                    fUps = fUps.filter((e) => {
-                        let dateOfFollowUp = new Date(e.date).getTime();
-                        let now = new Date().getTime();
-                        let test = now - oneDay;
-                        let pass = (!e.performed && dateOfFollowUp < test) || (e.lostToFollowUp);
-                        return pass;
-                    })
-                } else {
-                    if (state.filter.performed === 'To do') {
-                        fUps = fUps.filter((e) => {
-                            return !e.performed && !e.lostToFollowUp
-                        })
-                    }
-                }
+            // let oneDay = 24 * 60 * 60 * 1000;
+            if (state.filter && state.filter.performed && state.filter.performed.value && state.filter.performed.value !== 'All') {
+                fUps = fUps.filter((e) => {return e.statusId === state.filter.performed.value});
             }
 
             if (props.followUps && props.followUps.length > 0) {
@@ -205,7 +191,7 @@ class FollowUpsScreen extends Component {
                     <ValuePicker
                         top={this.calculateTopForDropdown()}
                         onSelectValue={this.onSelectValue}
-                        value={this.state.filter.performed || config.dropDownValues[0].value}
+                        value={this.state.filter.performed && this.state.filter.performed.label ? this.state.filter.performed.label : config.dropDownValues[0].value}
                     />
                     <ElevatedView
                         elevation={3}
@@ -723,6 +709,16 @@ class FollowUpsScreen extends Component {
             this.setState({followUps});
         }
     }
+
+    getTranslation = (value) => {
+        let valueToBeReturned = value;
+        if (value && typeof value === 'string' && value.includes('LNG')) {
+            valueToBeReturned = value && this.props.translation && Array.isArray(this.props.translation) && this.props.translation[this.props.translation.map((e) => {return e && e.token ? e.token : null}).indexOf(value)] ? this.props.translation[this.props.translation.map((e) => {
+                return e.token
+            }).indexOf(value)].translation : '';
+        }
+        return valueToBeReturned;
+    }
 }
 
 // Create style outside the class, or for components that will be used by other components (buttons),
@@ -775,7 +771,8 @@ function mapStateToProps(state) {
         syncState: state.app.syncState,
         followUps: state.followUps,
         contacts: state.contacts,
-        errors: state.errors
+        errors: state.errors,
+        translation: state.app.translation
     };
 }
 

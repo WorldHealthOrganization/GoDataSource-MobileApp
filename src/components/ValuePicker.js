@@ -46,7 +46,7 @@ class ValuePicker extends PureComponent {
                 >
                     <Dropdown
                         ref='dropdown'
-                        data={config.dropDownValues}
+                        data={config.dropDownValues.map((e) => {return {label: e.value === 'All' ? e.value : this.getTranslation(e.value), value: e.value}})}
                         value={this.props.value}
                         renderAccessory={() => {
                             return null;
@@ -72,8 +72,18 @@ class ValuePicker extends PureComponent {
         // this.setState({
         //     selectedText: value
         // }, () => {
-            this.props.onSelectValue(value);
+            this.props.onSelectValue({label: data[data.map((e) => {return e.value}).indexOf(value)].label, value: value});
         // })
+    };
+
+    getTranslation = (value) => {
+        let valueToBeReturned = value;
+        if (value && typeof value === 'string' && value.includes('LNG')) {
+            valueToBeReturned = value && this.props.translation && Array.isArray(this.props.translation) && this.props.translation[this.props.translation.map((e) => {return e && e.token ? e.token : null}).indexOf(value)] ? this.props.translation[this.props.translation.map((e) => {
+                return e.token
+            }).indexOf(value)].translation : '';
+        }
+        return valueToBeReturned;
     }
 }
 
@@ -105,7 +115,8 @@ const style = StyleSheet.create({
 
 function mapStateToProps(state) {
     return {
-        screenSize: state.app.screenSize
+        screenSize: state.app.screenSize,
+        translation: state.app.translation
     };
 }
 

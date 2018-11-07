@@ -4,7 +4,7 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {PureComponent} from 'react';
-import {View, StyleSheet, InteractionManager} from 'react-native';
+import {View, StyleSheet, InteractionManager, Alert} from 'react-native';
 import {calculateDimension} from './../utils/functions';
 import config from './../utils/config';
 import {connect} from "react-redux";
@@ -24,7 +24,8 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
     constructor(props) {
         super(props);
         this.state = {
-            interactionComplete: false
+            interactionComplete: false,
+            questions: []
         };
     }
 
@@ -37,9 +38,15 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
     // }
 
     componentDidMount() {
+        // Get all additional questions recursively
+        let sortedQuestions = this.extractAllQuestions(this.props.questions);
+
+        // mappedQuestions format: [{categoryName: 'cat1', questions: [{q1}, {q2}]}]
+        sortedQuestions = this.mapQuestions(sortedQuestions);
         InteractionManager.runAfterInteractions(() => {
             this.setState({
-                interactionComplete: true
+                interactionComplete: true,
+                questions: sortedQuestions
             })
         })
     }
@@ -60,32 +67,29 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
         let marginVertical = calculateDimension(12.5, true, this.props.screenSize);
         let viewWidth = calculateDimension(config.designScreenSize.width - 32, false, this.props.screenSize);
 
-        // Get all additional questions recursively
-        let sortedQuestions = this.extractAllQuestions(this.props.questions);
 
-        // mappedQuestions format: [{categoryName: 'cat1', questions: [{q1}, {q2}]}]
-        sortedQuestions = this.mapQuestions(sortedQuestions);
 
         return (
             <View style={style.mainContainer}>
                 {
-                    this && this.props && this.props.isEditMode ? (<View style={[style.containerButtons, {marginVertical: marginVertical, width: viewWidth}]}>
+                    this && this.props && this.props.isEditMode ? (
+                        <View style={[style.containerButtons, {marginVertical: marginVertical, width: viewWidth}]}>
                             <Button
                                 title={'Save'}
-                                onPress={this.props.onPressSave}
+                                onPress={this.onPressSave}
                                 color={styles.buttonGreen}
                                 titleColor={'white'}
                                 height={buttonHeight}
                                 width={buttonWidth}
                             />
-                            <Button
-                                title={'Missing'}
-                                onPress={this.props.onPressMissing}
-                                color={'white'}
-                                titleColor={styles.buttonTextGray}
-                                height={buttonHeight}
-                                width={buttonWidth}
-                            />
+                            {/*<Button*/}
+                                {/*title={'Missing'}*/}
+                                {/*onPress={this.props.onPressMissing}*/}
+                                {/*color={'white'}*/}
+                                {/*titleColor={styles.buttonTextGray}*/}
+                                {/*height={buttonHeight}*/}
+                                {/*width={buttonWidth}*/}
+                            {/*/>*/}
                         </View>) : (null)
                 }
                 <KeyboardAwareScrollView
@@ -94,7 +98,7 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
                     keyboardShouldPersistTaps={'always'}
                 >
                     {
-                        sortedQuestions.map((item, index) => {
+                        this.state.questions.map((item, index) => {
                            return this.handleRenderSectionedList(item, index)
                         })
                     }
@@ -167,6 +171,33 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
         return returnedQuestions;
     };
 
+    onPressSave = () => {
+        // First check if all the required questions are filled
+        if (this.checkRequiredQuestions()) {
+            this.props.onPressSave();
+        } else {
+            Alert.alert('Validation error', 'Please make sure you have completed all required fields',
+                [
+                    {
+                        text: 'Ok', onPress: () => {console.log('Ok pressed')}
+                    }
+                ]
+            )
+        }
+    };
+
+    checkRequiredQuestions = () => {
+        // Loop through all categories' questions and if a required question is unanswered return false
+        for (let i=0; i<this.state.questions.length; i++) {
+            for(let j=0; j<this.state.questions[i].questions.length; j++) {
+                if (this.state.questions[i].questions[j].required && !this.props.item.questionnaireAnswers[this.state.questions[i].questions[j].variable]) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    };
+
     mapQuestions = (questions) => {
         // mappedQuestions format: [{categoryName: 'cat1', questions: [{q1}, {q2}]}]
         let mappedQuestions = [];
@@ -231,7 +262,7 @@ const style = StyleSheet.create({
     containerButtons: {
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'space-between'
+        justifyContent: 'center'
     }
 });
 

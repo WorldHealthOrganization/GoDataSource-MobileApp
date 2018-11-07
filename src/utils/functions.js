@@ -416,6 +416,9 @@ export function extractIdFromPouchId (pouchId, type) {
     if (!pouchId.includes(type)) {
         return pouchId
     }
+    if (type.includes('referenceData')) {
+        return pouchId.substr('referenceData.json_false_'.length)
+    }
     return pouchId.split('_')[pouchId.split('_').length - 1];
 }
 
@@ -515,7 +518,7 @@ export function updateRequiredFields(outbreakId, userId, record, action, fileTyp
             record.updatedAt = new Date().toISOString();
             record.updatedBy = extractIdFromPouchId(userId, 'user');
             record.deleted = false;
-            record.deletedAt = 'undefined';
+            record.deletedAt = null;
             if (type !== '') {
                 record.type = type
             }
@@ -527,7 +530,7 @@ export function updateRequiredFields(outbreakId, userId, record, action, fileTyp
             record.updatedAt = new Date().toISOString();
             record.updatedBy = extractIdFromPouchId(userId, 'user');
             record.deleted = false;
-            record.deletedAt = 'undefined';
+            record.deletedAt = null;
             // console.log ('updateRequiredFields update record', JSON.stringify(record))
             return record;
 
