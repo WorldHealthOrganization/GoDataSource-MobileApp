@@ -131,6 +131,18 @@ const followUpsSingleScreen = {
                 objectType: 'Address'
             },
             {
+                cardNumber: 1,
+                id: 'date',
+                label: 'Date',
+                labelValue: 'test',
+                value: '',
+                type: "DatePicker",
+                isRequired: false,
+                isEditMode: false,
+                format: 'MM/dd/YYYY',
+                objectType: 'Address'
+            },
+            {
                 cardNumber: 2,
                 id: 'locationId',
                 label: 'Area',
