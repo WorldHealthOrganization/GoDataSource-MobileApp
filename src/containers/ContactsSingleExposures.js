@@ -90,21 +90,32 @@ class ContactsSingleExposures extends Component {
 
         return (
             <ElevatedView elevation={3} style={[style.container]}>
-                {
-                    this.props.isNew ? 
-                        <View style={{alignItems: 'center'}}>
-                            <Button
-                                title={'Back'}
-                                onPress={this.handleBackButton}
-                                color={styles.buttonGreen}
-                                titleColor={'white'}
-                                height={calculateDimension(25, true, this.props.screenSize)}
-                                width={calculateDimension(130, false, this.props.screenSize)}
-                                style={{
-                                    marginVertical: calculateDimension(12.5, true, this.props.screenSize),
-                                }}/>
-                        </View> : null
-                }
+                <View style = {{alignItems: 'center'}}>
+                    <View style={{flexDirection: 'row'}}>
+                        <Button
+                            title={'Back'}
+                            onPress={this.handleBackButton}
+                            color={styles.buttonGreen}
+                            titleColor={'white'}
+                            height={calculateDimension(25, true, this.props.screenSize)}
+                            width={calculateDimension(130, false, this.props.screenSize)}
+                            style={{
+                                marginVertical: calculateDimension(12.5, true, this.props.screenSize),
+                                marginHorizontal: calculateDimension(16, false, this.props.screenSize),
+                        }}/>
+                        <Button
+                            title={'Save'}
+                            onPress={this.props.handleOnPressSave}
+                            color={styles.buttonGreen}
+                            titleColor={'white'}
+                            height={calculateDimension(25, true, this.props.screenSize)}
+                            width={calculateDimension(130, false, this.props.screenSize)}
+                            style={{
+                                marginVertical: calculateDimension(12.5, true, this.props.screenSize),
+                                marginHorizontal: calculateDimension(16, false, this.props.screenSize),
+                        }}/>
+                    </View>
+                </View>
                 <ScrollView contentContainerStyle={{flexGrow: 1}}>
                     <AnimatedListView
                         data={this.props.contact && this.props.contact.relationships && Array.isArray(this.props.contact.relationships) ? this.props.contact.relationships : []}

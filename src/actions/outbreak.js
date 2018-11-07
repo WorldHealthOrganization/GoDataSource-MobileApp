@@ -41,9 +41,13 @@ export function getOutbreakById(outbreakId, token, dispatch) {
                         dispatch(addError(errorTypes.ERROR_LOCATIONS));
                     }
                     if (response) {
-                        console.log('*** getLocationsByOutbreakId response: ');
-                        let treeLocationList = mapLocations(response.filter((e) => {return e.active === true}), null)
-                        dispatch(storeLocations(treeLocationList));
+                        console.log('*** getLocationsByOutbreakId response: ', response);
+                        if (response.length > 0) {
+                            let treeLocationList = mapLocations(response.filter((e) => {return e.active === true}), null)
+                            dispatch(storeLocations(treeLocationList));
+                        } else {
+                            dispatch(storeLocations(response));
+                        }
                     }
                 })
                 dispatch(storeOutbreak(response));

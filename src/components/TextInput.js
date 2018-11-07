@@ -37,7 +37,7 @@ class TextInput extends PureComponent {
             },this.props.style]}>
                 <TextField
                     label={this.props.isRequired ? this.props.label + ' * ' : this.props.label}
-                    value={this.props.value != undefined ? this.props.value : ''}
+                    value={this.props.value && this.props.value != undefined && typeof this.props.value === 'string' ? this.props.value : ''}
                     onChangeText={this.handleOnChangeText}
                     textColor='rgb(0,0,0)'
                     fontSize={15}
@@ -58,6 +58,7 @@ class TextInput extends PureComponent {
     };
 
     viewInput = () => {
+        let localValue = this.extractAgeForViewInput()
         return (
             <View style={[{},this.props.style]}>
                 <Text style={{
@@ -76,10 +77,27 @@ class TextInput extends PureComponent {
                     textAlign: 'left',
                     color: 'rgb(60,60,60)',
                 }}>
-                    {this.props.value != undefined ? this.props.value : ''}
+                    {localValue}
                 </Text>
             </View>
         );
+    }
+
+    extractAgeForViewInput = () => {
+        let localValue = ''
+        if (this.props.value && this.props.value != undefined) {
+            if (typeof this.props.value === 'string') {
+                localValue = this.props.value
+            } else {
+                if (this.props.value.years && this.props.value.years !== 0) {
+                    localValue = this.props.value.years + ' years'
+                }
+                if (this.props.value.months && this.props.value.months !== 0) {
+                    localValue = this.props.value.months + ' months'
+                }
+            }
+        }
+        return localValue
     }
 
     handleOnChangeText = (state) => {

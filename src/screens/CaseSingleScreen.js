@@ -776,6 +776,16 @@ class CaseSingleScreen extends Component {
                         }), () => {
                             console.log("onChangeDate IsolationDates", id, " ", value, " ", this.state.case);
                         })
+                } else if (objectType && objectType === 'Address') {
+                    let addressesClone = _.cloneDeep(this.state.case.addresses);
+                    addressesClone[objectTypeOrIndex][id] = value && value.value ? value.value : value;
+                    console.log ('addressesClone', addressesClone)
+                    this.setState(prevState => ({
+                        case: Object.assign({}, prevState.case, {addresses: addressesClone}),
+                        isModified: true
+                    }), () => {
+                        console.log("onChangeDate addressesClone", id, " ", value, " ", this.state.case);
+                    })
                 }
             }
         }

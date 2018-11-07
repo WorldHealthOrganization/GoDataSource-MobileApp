@@ -401,12 +401,24 @@ const caseSingleScreen = {
             },
             {
                 cardNumber: 1,
+                id: 'date',
+                label: 'Date',
+                labelValue: 'test',
+                value: '',
+                type: "DatePicker",
+                isRequired: false,
+                isEditMode: true,
+                format: 'MM/dd/YYYY',
+                objectType: 'Address'
+            },
+            {
+                cardNumber: 1,
                 id: 'locationId',
                 label: 'Area',
                 labelValue: 'test',
                 type: 'DropDownSectioned',
                 value: '',
-                isRequired: true,
+                isRequired: false,
                 isEditMode: true,
                 objectType: 'Address',
                 single: true
@@ -988,7 +1000,7 @@ const contactsSingleScreen = {
                     labelValue: 'test',
                     type: 'TextInput',
                     value: '',
-                    isRequired: true,
+                    isRequired: false,
                     isEditMode: true,
                     multiline: false,
                     objectType: 'Contact'
@@ -1000,7 +1012,7 @@ const contactsSingleScreen = {
                     labelValue: 'test',
                     type: 'TextInput',
                     value: '',
-                    isRequired: true,
+                    isRequired: false,
                     isEditMode: true,
                     multiline: false,
                     objectType: 'Contact'
@@ -1012,7 +1024,7 @@ const contactsSingleScreen = {
                     labelValue: 'test',
                     type: 'DropdownInput',
                     value: '',
-                    isRequired: true,
+                    isRequired: false,
                     isEditMode: true,
                     objectType: 'Contact'
                 },
@@ -1023,7 +1035,7 @@ const contactsSingleScreen = {
                     labelValue: 'test',
                     type: 'TextInput',
                     value: '',
-                    isRequired: true,
+                    isRequired: false,
                     isEditMode: true,
                     multiline: false,
                     objectType: 'Contact'
@@ -1035,7 +1047,7 @@ const contactsSingleScreen = {
                     label: 'Occupation',
                     type: 'TextInput',
                     value: '',
-                    isRequired: true,
+                    isRequired: false,
                     isEditMode: true,
                     multiline: false,
                     objectType: 'Contact'
@@ -1124,12 +1136,24 @@ const contactsSingleScreen = {
             },
             {
                 cardNumber: 1,
+                id: 'date',
+                label: 'Date',
+                labelValue: 'test',
+                value: '',
+                type: "DatePicker",
+                isRequired: false,
+                isEditMode: true,
+                format: 'MM/dd/YYYY',
+                objectType: 'Address'
+            },
+            {
+                cardNumber: 1,
                 id: 'locationId',
                 label: 'Area',
                 labelValue: 'test',
                 type: 'DropDownSectioned',
                 value: '',
-                isRequired: true,
+                isRequired: false,
                 isEditMode: true,
                 objectType: 'Address',
                 single: true
