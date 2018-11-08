@@ -5,7 +5,7 @@
 // the material ui library, since it provides design and animations out of the box
 import React, {PureComponent} from 'react';
 import {TextInput, View, Text, StyleSheet, FlatList} from 'react-native';
-import {calculateDimension} from '../utils/functions';
+import {calculateDimension, extractAllQuestions, mapQuestions} from '../utils/functions';
 import config from '../utils/config';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -22,13 +22,19 @@ class CaseSingleInvestigationContainer extends PureComponent {
         this.state = {
         };
     }
-    // Please add here the react lifecycle methods that you need
-
 
     // The render method should have at least business logic as possible,
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
+         // Get all additional questions recursively
+        let sortedQuestions = extractAllQuestions(this.props.questions, this.props.item);
+
+        // mappedQuestions format: [{categoryName: 'cat1', questions: [{q1}, {q2}]}]
+        sortedQuestions = mapQuestions(sortedQuestions);
+        // Please add here the react lifecycle methods that you need
+
+
         return (
             <View style={style.container}>
                 {
@@ -87,8 +93,8 @@ class CaseSingleInvestigationContainer extends PureComponent {
                     keyboardShouldPersistTaps={'always'}
                 >
                     {
-                        this.props.questions.map((item, index) => {
-                            return this.handleRenderItem(item, index)
+                        sortedQuestions.map((item, index) => {
+                            return this.handleRenderSectionedList(item, index)
                         })
                     }
                 </KeyboardAwareScrollView>
@@ -97,17 +103,36 @@ class CaseSingleInvestigationContainer extends PureComponent {
     }
 
     // Please write here all the methods that are not react native lifecycle methods
+    handleRenderSectionedList = (item, index) => {
+        return (
+            <View>
+                <Section
+                    label={this.getTranslation(item.categoryName)}
+                    containerStyle={{
+                        marginVertical: 10
+                    }}
+                />
+                {
+                    item.questions.map((item, index) => {
+                        return this.handleRenderItem(item, index)
+                    })
+                }
+            </View>
+        )
+    };
+
     handleRenderItem = (item, index) => {
         return (
             <QuestionCard
                 item={item}
                 isEditMode={this.props.isEditMode}
                 index={index + 1}
-                source={this.props.case}
+                source={this.props.item}
                 isEditMode={this.props.isEditMode}
                 onChangeTextAnswer={this.props.onChangeTextAnswer}
                 onChangeSingleSelection={this.props.onChangeSingleSelection}
                 onChangeMultipleSelection={this.props.onChangeMultipleSelection}
+                onChangeDateAnswer={this.props.onChangeDateAnswer}
             />
         )
     }
@@ -115,6 +140,21 @@ class CaseSingleInvestigationContainer extends PureComponent {
     handleBackButton = () => {
         this.props.handleMoveToPrevieousScreenButton()
     }
+
+    getTranslation = (value) => {
+        if (value && value !== '') {
+            let valueToBeReturned = value;
+            if (value && typeof value === 'string' && value.includes('LNG')) {
+                valueToBeReturned = value && this.props.translation && Array.isArray(this.props.translation) && this.props.translation[this.props.translation.map((e) => {
+                    return e && e.token ? e.token : null
+                }).indexOf(value)] ? this.props.translation[this.props.translation.map((e) => {
+                    return e.token
+                }).indexOf(value)].translation : '';
+            }
+            return valueToBeReturned;
+        }
+        return '';
+    };
 }
 
 
