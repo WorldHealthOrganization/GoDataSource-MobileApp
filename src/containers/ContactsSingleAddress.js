@@ -53,33 +53,28 @@ class ContactsSingleAddress extends Component {
         return (
             <View style={style.viewContainer}>
                 <View style={{flexDirection: 'row'}}>
-                    {
-                        this.props.isNew ? 
-                            <View style = {{flexDirection:'row'}}>          
-                                 <Button
-                                     title={'Back'}
-                                     onPress={this.handleBackButton}
-                                     color={styles.buttonGreen}
-                                     titleColor={'white'}
-                                     height={calculateDimension(25, true, this.props.screenSize)}
-                                     width={calculateDimension(130, false, this.props.screenSize)}
-                                     style={{
-                                         marginVertical: calculateDimension(12.5, true, this.props.screenSize),
-                                         marginHorizontal: calculateDimension(16, false, this.props.screenSize),
-                                     }}/> 
-                                 <Button
-                                     title={'Next'}
-                                     onPress={this.handleNextButton}
-                                     color={styles.buttonGreen}
-                                     titleColor={'white'}
-                                     height={calculateDimension(25, true, this.props.screenSize)}
-                                     width={calculateDimension(130, false, this.props.screenSize)}
-                                     style={{
-                                         marginVertical: calculateDimension(12.5, true, this.props.screenSize),
-                                         marginHorizontal: calculateDimension(16, false, this.props.screenSize),
-                                     }}/> 
-                            </View> : null
-                    }
+                    <Button
+                        title={'Back'}
+                        onPress={this.handleBackButton}
+                        color={styles.buttonGreen}
+                        titleColor={'white'}
+                        height={calculateDimension(25, true, this.props.screenSize)}
+                        width={calculateDimension(130, false, this.props.screenSize)}
+                        style={{
+                            marginVertical: calculateDimension(12.5, true, this.props.screenSize),
+                            marginHorizontal: calculateDimension(16, false, this.props.screenSize),
+                        }}/> 
+                    <Button
+                        title={'Next'}
+                        onPress={this.handleNextButton}
+                        color={styles.buttonGreen}
+                        titleColor={'white'}
+                        height={calculateDimension(25, true, this.props.screenSize)}
+                        width={calculateDimension(130, false, this.props.screenSize)}
+                        style={{
+                            marginVertical: calculateDimension(12.5, true, this.props.screenSize),
+                            marginHorizontal: calculateDimension(16, false, this.props.screenSize),
+                        }}/> 
                 </View>
 
                 <KeyboardAwareScrollView
@@ -134,23 +129,26 @@ class ContactsSingleAddress extends Component {
     }
 
     handleNextButton = () => {
-        // if (true) {
-        if (this.props.checkRequiredFieldsAddresses()) {
-            if (this.props.hasPlaceOfResidence !== undefined && this.props.hasPlaceOfResidence === true){
-                this.props.handleMoveToNextScreenButton(true)
+        if (this.props.isNew) {
+            if (this.props.checkRequiredFieldsAddresses()) {
+                if (this.props.hasPlaceOfResidence !== undefined && this.props.hasPlaceOfResidence === true){
+                    this.props.handleMoveToNextScreenButton(true)
+                } else {
+                    Alert.alert("Alert", 'Please add the place of residence address', [
+                        {
+                            text: 'Ok', onPress: () => {console.log("OK pressed")}
+                        }
+                    ])
+                }
             } else {
-                Alert.alert("Alert", 'Please add the place of residence address', [
+                Alert.alert("Alert", 'Please add at least one address with all the required fields completed', [
                     {
                         text: 'Ok', onPress: () => {console.log("OK pressed")}
                     }
                 ])
             }
         } else {
-            Alert.alert("Alert", 'Please add at least one address with all the required fields completed', [
-                {
-                    text: 'Ok', onPress: () => {console.log("OK pressed")}
-                }
-            ])
+            this.props.handleMoveToNextScreenButton(true)
         }
     }
 

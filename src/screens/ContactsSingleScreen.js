@@ -183,7 +183,6 @@ class ContactsSingleScreen extends Component {
                                         </Ripple>
                                     }
                                 >
-                                    <MenuItem onPress={this.handleOnPressSave}>Save</MenuItem>
                                     {
                                         !this.props.isNew ? (
                                             <MenuItem onPress={this.handleOnPressDeceased}>Deceased</MenuItem>
@@ -356,6 +355,7 @@ class ContactsSingleScreen extends Component {
                         saveExposure={this.handleSaveExposure}
                         handleMoveToPrevieousScreenButton={this.handleMoveToPrevieousScreenButton}
                         isNew={this.props.isNew}
+                        handleOnPressSave={this.handleOnPressSave}
                     />
                 );
             case 'calendar':
@@ -458,6 +458,18 @@ class ContactsSingleScreen extends Component {
                         console.log("onChangeDate", id, " ", value, " ", this.state.contact);
                     }
                 )
+            } else {
+                if (typeof objectType === 'phoneNumber' && objectType >= 0 || typeof objectType === 'number' && objectType >= 0) {
+                    // Change address date
+                    let addressesClone = _.cloneDeep(this.state.contact.addresses);
+                    addressesClone[objectType][id] = value && value.value ? value.value : value;
+                    console.log ('addressesClone', addressesClone)
+                    this.setState(prevState => ({
+                        contact: Object.assign({}, prevState.contact, {addresses: addressesClone})
+                    }), () => {
+                        console.log("handleOnChangeDate", id, " ", value, " ", this.state.contact);
+                    })
+                }
             }
         }
     };

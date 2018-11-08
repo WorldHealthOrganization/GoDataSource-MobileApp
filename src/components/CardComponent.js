@@ -95,6 +95,9 @@ class CardComponent extends Component {
                     for (let i = 0; i < this.props.contact.addresses.length; i++) {
                         if (this.props.contact.addresses[i].locationId !== nextProps.contact.addresses[i].locationId) {
                             return true
+                        } 
+                        if (this.props.contact.addresses[i].date !== nextProps.contact.addresses[i].date) {
+                            return true
                         }
                     }
                 }
@@ -142,6 +145,9 @@ class CardComponent extends Component {
                 if (this.props.case.addresses.length === nextProps.case.addresses.length) {
                     for (let i = 0; i < this.props.case.addresses.length; i++) {
                         if (this.props.case.addresses[i].locationId !== nextProps.case.addresses[i].locationId) {
+                            return true
+                        }
+                        if (this.props.case.addresses[i].date !== nextProps.case.addresses[i].date) {
                             return true
                         }
                     }
@@ -253,7 +259,7 @@ class CardComponent extends Component {
             if (item.type === 'ActionsBar') {
                 item.onPressArray = [this.props.onDeletePress]
             }
-            if (item.type === 'DatePicker') {
+            if (item.type === 'DatePicker' && item.objectType !== 'Address') {
                 value = this.props.contact[item.id]
             }
             if (item.type === 'DropDownSectioned') {
@@ -413,7 +419,7 @@ class CardComponent extends Component {
                     <DropDownSectioned
                         key={item.id}
                         id={item.id}
-                        label={'Location'}
+                        label={item.label}
                         index={this.props.index}
                         value={value}
                         data={this.props.locations}
