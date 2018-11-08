@@ -3,7 +3,7 @@
  */
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
-import React, {PureComponent} from 'react';
+import React, {Component} from 'react';
 import {View, Text, StyleSheet, Platform, Dimensions, Image, FlatList, ScrollView} from 'react-native';
 import {ListItem, Icon} from 'react-native-material-ui';
 import {calculateDimension} from './../utils/functions';
@@ -21,7 +21,7 @@ import _ from 'lodash';
 import DatePicker from './DatePicker';
 
 
-class QuestionCard extends PureComponent {
+class QuestionCard extends Component {
 
     // This will be a dumb component, so it's best not to put any business logic in it
     constructor(props) {
@@ -32,12 +32,11 @@ class QuestionCard extends PureComponent {
     }
 
     // Please add here the react lifecycle methods that you need
-    
-    
     // The render method should have at least business logic as possible,
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
+        console.log('Render stuff');
         return (
             <ElevatedView elevation={3} style={[this.props.style, style.container, {
                 marginHorizontal: calculateDimension(16, false, this.props.screenSize),
@@ -114,21 +113,21 @@ class QuestionCard extends PureComponent {
         if (item.answerType === 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_SINGLE_ANSWER') {
             console.log('QuestionCard: ', item);
             questionAnswers = questionAnswers !== null &&
-                questionAnswers !== undefined &&
-                item.answers.map((e) => {return e && e.value ? e.value : null}).indexOf(questionAnswers) > -1 &&
-                item.answers[item.answers.map((e) => {return e.value ? e.value : null}).indexOf(questionAnswers)] ?
-                    this.getTranslation(item.answers[item.answers.map((e) => {return e.value}).indexOf(questionAnswers)].label) : ' ';
+            questionAnswers !== undefined &&
+            item.answers.map((e) => {return e && e.value ? e.value : null}).indexOf(questionAnswers) > -1 &&
+            item.answers[item.answers.map((e) => {return e.value ? e.value : null}).indexOf(questionAnswers)] ?
+                this.getTranslation(item.answers[item.answers.map((e) => {return e.value}).indexOf(questionAnswers)].label) : ' ';
         }
         else {
             if (item.answerType === 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_MULTIPLE_ANSWERS') {
                 console.log('QuestionCard: ', item);
                 questionAnswers = questionAnswers !== null && questionAnswers !== undefined && Array.isArray(questionAnswers) && questionAnswers.length > 0 ?
                     item.answers.filter((e) => {
-                    console.log('Inside filter: ', e);
-                    return e && e.value && questionAnswers.indexOf(e.value) > -1;
-                }).map((e) => {
-                    return {label: this.getTranslation(e.label), value: e.value || null}
-                }) : [];
+                        console.log('Inside filter: ', e);
+                        return e && e.value && questionAnswers.indexOf(e.value) > -1;
+                    }).map((e) => {
+                        return {label: this.getTranslation(e.label), value: e.value || null}
+                    }) : [];
             }
         }
 
@@ -218,7 +217,7 @@ class QuestionCard extends PureComponent {
                     item.answerType !== undefined ? (
                         <View>
                             <Text>{"TODO: item type: " + item.answerType + " is not implemented yet"}</Text>
-                        </View> 
+                        </View>
                     ) : null
                 )
         }

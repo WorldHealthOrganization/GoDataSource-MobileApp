@@ -88,6 +88,7 @@ export function getContactsForOutbreakIdRequest (outbreakId, filter, token, call
             })
                 .then((resultFilterContacts) => {
                     console.log('Result when filtering contacts: ', new Date().getTime() - start);
+                    console.log("Found evidence: ", resultFilterContacts.docs);
                     callback(null, resultFilterContacts.docs)
                 })
                 .catch((errorFilterContacts) => {

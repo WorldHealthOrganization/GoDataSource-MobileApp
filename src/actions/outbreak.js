@@ -34,22 +34,22 @@ export function getOutbreakById(outbreakId, token, dispatch) {
                 reject(error);
             }
             if (response) {
-                console.log ('*** getOutbreakById response: ', response)
-                getLocationsByOutbreakIdRequest(response, (error, response) => {
+                console.log ('*** getOutbreakById response: ', response);
+                getLocationsByOutbreakIdRequest(response, (error, responseLocations) => {
                     if (error) {
                         console.log('*** getLocationsByOutbreakId error: ', error);
                         dispatch(addError(errorTypes.ERROR_LOCATIONS));
                     }
-                    if (response) {
-                        console.log('*** getLocationsByOutbreakId response: ', response);
-                        if (response.length > 0) {
-                            let treeLocationList = mapLocations(response.filter((e) => {return e.active === true}), null)
+                    if (responseLocations) {
+                        console.log('*** getLocationsByOutbreakId response: ', responseLocations);
+                        if (responseLocations.length > 0) {
+                            let treeLocationList = mapLocations(responseLocations.filter((e) => {return e.active === true}), null)
                             dispatch(storeLocations(treeLocationList));
                         } else {
-                            dispatch(storeLocations(response));
+                            dispatch(storeLocations(responseLocations));
                         }
                     }
-                })
+                });
                 dispatch(storeOutbreak(response));
                 resolve('Done outbreak');
             }
