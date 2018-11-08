@@ -21,11 +21,9 @@ class CalendarPicker extends PureComponent {
     constructor(props) {
         super(props);
         this.state = {
-            pickerOpen: false,
             label: checkIfSameDay(new Date(this.props.value), new Date()) ? 'Today' : new Date(this.props.value).toLocaleDateString()
         };
 
-        this.openCalendarModal = this.openCalendarModal.bind(this);
         this.handleDateChanged = this.handleDateChanged.bind(this);
     }
 
@@ -41,7 +39,7 @@ class CalendarPicker extends PureComponent {
                 <ButtonWithIcons
                     height={this.props.height}
                     width={this.props.width}
-                    onPress={this.openCalendarModal}
+                    onPress={this.props.openCalendarModal}
                     label={this.state.label}
                     firstIcon="calendar-blank"
                     secondIcon="arrow-drop-down"
@@ -49,7 +47,7 @@ class CalendarPicker extends PureComponent {
                     isSecondIconPureMaterial={true}
                 />
                 <CalendarPickerView
-                    showPicker={this.state.pickerOpen}
+                    showPicker={this.props.pickerOpen}
                     width={2.75 * this.props.width}
                     dateChanged={this.handleDateChanged}
                     value={this.props.value}
@@ -59,17 +57,12 @@ class CalendarPicker extends PureComponent {
     }
 
     // Please write here all the methods that are not react native lifecycle methods
-    openCalendarModal = () => {
-        console.log("You got another thing coming");
-        this.setState({pickerOpen: !this.state.pickerOpen})
-    };
-
     handleDateChanged = (date) => {
         let dateAux = checkIfSameDay(new Date(date.dateString), new Date()) ? 'Today' : new Date(date.dateString).toLocaleDateString();
         this.setState({
             label: dateAux
         }, () => {
-            this.openCalendarModal();
+            this.props.openCalendarModal();
             this.props.onDayPress(new Date(date.dateString));
         })
     };
