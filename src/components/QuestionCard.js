@@ -114,21 +114,21 @@ class QuestionCard extends Component {
         if (item.answerType === 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_SINGLE_ANSWER') {
             console.log('QuestionCard: ', item);
             questionAnswers = questionAnswers !== null &&
-                questionAnswers !== undefined &&
-                item.answers.map((e) => {return e && e.value ? e.value : null}).indexOf(questionAnswers) > -1 &&
-                item.answers[item.answers.map((e) => {return e.value ? e.value : null}).indexOf(questionAnswers)] ?
-                    this.getTranslation(item.answers[item.answers.map((e) => {return e.value}).indexOf(questionAnswers)].label) : ' ';
+            questionAnswers !== undefined &&
+            item.answers.map((e) => {return e && e.value ? e.value : null}).indexOf(questionAnswers) > -1 &&
+            item.answers[item.answers.map((e) => {return e.value ? e.value : null}).indexOf(questionAnswers)] ?
+                this.getTranslation(item.answers[item.answers.map((e) => {return e.value}).indexOf(questionAnswers)].label) : ' ';
         }
         else {
             if (item.answerType === 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_MULTIPLE_ANSWERS') {
                 console.log('QuestionCard: ', item);
                 questionAnswers = questionAnswers !== null && questionAnswers !== undefined && Array.isArray(questionAnswers) && questionAnswers.length > 0 ?
                     item.answers.filter((e) => {
-                    console.log('Inside filter: ', e);
-                    return e && e.value && questionAnswers.indexOf(e.value) > -1;
-                }).map((e) => {
-                    return {label: this.getTranslation(e.label), value: e.value || null}
-                }) : [];
+                        console.log('Inside filter: ', e);
+                        return e && e.value && questionAnswers.indexOf(e.value) > -1;
+                    }).map((e) => {
+                        return {label: this.getTranslation(e.label), value: e.value || null}
+                    }) : [];
             }
         }
 
@@ -215,9 +215,11 @@ class QuestionCard extends Component {
                 );
             default:
                 return(
-                    <View>
-                        <Text>{"TODO: item type: " + item.answerType + " is not implemented yet"}</Text>
-                    </View>
+                    item.answerType !== undefined ? (
+                        <View>
+                            <Text>{"TODO: item type: " + item.answerType + " is not implemented yet"}</Text>
+                        </View>
+                    ) : null
                 )
         }
     };

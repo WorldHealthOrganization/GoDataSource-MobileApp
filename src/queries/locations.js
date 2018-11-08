@@ -3,8 +3,6 @@ import {getDatabase} from './database';
 
 export function getLocationsByOutbreakIdRequest (outbreakResponse, callback) {
     let database = getDatabase();
-
-
     if (outbreakResponse && outbreakResponse.locationIds && Array.isArray(outbreakResponse.locationIds) && outbreakResponse.locationIds.length > 0) {
         database.find({
             selector: {
