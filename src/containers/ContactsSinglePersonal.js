@@ -94,18 +94,30 @@ class ContactsSinglePersonal extends Component {
                 contact={this.props.contact}
                 style={style.cardStyle}
                 screen={'ContactsSingleScreen'}
+                isEditMode={true}
                 onChangeText={this.props.onChangeText}
                 onChangeDropDown={this.props.onChangeDropDown}
                 onChangeDate={this.props.onChangeDate}
                 onChangeSwitch={this.props.onChangeSwitch}
+                selectedItemIndexForTextSwitchSelectorForAge={this.props.selectedItemIndexForTextSwitchSelectorForAge}
+                onChangeTextSwitchSelector={this.props.onChangeTextSwitchSelector}
+                selectedItemIndexForAgeUnitOfMeasureDropDown={this.props.selectedItemIndexForAgeUnitOfMeasureDropDown}
+                onChangeextInputWithDropDown={this.props.onChangeextInputWithDropDown}
             />
         )
     }
 
     handleNextButton = () => {
-        // if(true) {
         if (this.props.checkRequiredFieldsPersonalInfo()) {
-            this.props.handleMoveToNextScreenButton()
+            if (this.props.checkAgeRequirements()) {
+                this.props.handleMoveToNextScreenButton()
+            } else {
+                Alert.alert("Alert", this.props.ageErrorMessage, [
+                    {
+                        text: 'Ok', onPress: () => {console.log("OK pressed")}
+                    }
+                ])
+            }
         } else {
             Alert.alert("Alert", 'Please complete all the required fields', [
                 {

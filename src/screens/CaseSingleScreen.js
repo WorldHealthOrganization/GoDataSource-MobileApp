@@ -703,7 +703,6 @@ class CaseSingleScreen extends Component {
     checkRequiredFields = () => {
         return this.checkRequiredFieldsPersonalInfo() && this.checkRequiredFieldsAddresses() && this.checkRequiredFieldsInfection() && this.checkRequiredFieldsCaseInvestigationQuestionnaire()
     }
-
     
     // onChangeStuff functions
     onChangeText = (value, id, objectTypeOrIndex, objectType) => {

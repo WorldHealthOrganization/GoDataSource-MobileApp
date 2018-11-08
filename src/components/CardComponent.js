@@ -19,6 +19,8 @@ import Ripple from 'react-native-material-ripple';
 import ElevatedView from 'react-native-elevated-view';
 import DropdownInput from './DropdownInput';
 import DropDown from './DropDown';
+import TextInputWithDropDown from './TextInputWithDropDown'
+import TextSwitchSelector from './TextSwitchSelector'
 import DropDownSectioned from './DropDownSectioned';
 import TextInput from './TextInput';
 import SwitchInput from './SwitchInput';
@@ -28,6 +30,7 @@ import Section from './Section';
 import Selector from './Selector';
 import IntervalPicker from './IntervalPicker';
 import ActionsBar from './ActionsBar';
+
 
 class CardComponent extends Component {
 
@@ -153,6 +156,17 @@ class CardComponent extends Component {
             return true;
         }
 
+        if (this.props.selectedItemIndexForTextSwitchSelectorForAge !== null && this.props.selectedItemIndexForTextSwitchSelectorForAge !== undefined && nextProps.selectedItemIndexForTextSwitchSelectorForAge !== null && nextProps.selectedItemIndexForTextSwitchSelectorForAge !== undefined){
+            if (this.props.selectedItemIndexForTextSwitchSelectorForAge !== nextProps.selectedItemIndexForTextSwitchSelectorForAge) {
+                return true;
+            }
+        }
+        if (this.props.selectedItemIndexForAgeUnitOfMeasureDropDown !== null && this.props.selectedItemIndexForAgeUnitOfMeasureDropDown !== undefined && nextProps.selectedItemIndexForAgeUnitOfMeasureDropDown !== null && nextProps.selectedItemIndexForAgeUnitOfMeasureDropDown !== undefined){
+            if (this.props.selectedItemIndexForAgeUnitOfMeasureDropDown !== nextProps.selectedItemIndexForAgeUnitOfMeasureDropDown) {
+                return true
+            }
+        }
+
         return false;
     }
 
@@ -268,6 +282,16 @@ class CardComponent extends Component {
                 }
             } else {
                 value = this.computeValueForContactsSingleScreen(item, this.props.index);
+            }
+            if (this.props.selectedItemIndexForTextSwitchSelectorForAge !== null && this.props.selectedItemIndexForTextSwitchSelectorForAge !== undefined && item.objectType === 'Contact' && item.dependsOn !== undefined && item.dependsOn !== null){
+                let itemIndexInConfigTextSwitchSelectorValues = config[item.dependsOn].map((e) => {return e.value}).indexOf(item.id)
+                if (itemIndexInConfigTextSwitchSelectorValues > -1) {
+                    if (itemIndexInConfigTextSwitchSelectorValues != this.props.selectedItemIndexForTextSwitchSelectorForAge) {
+                        return
+                    } else {
+
+                    }
+                }
             }
         }
 
@@ -474,6 +498,37 @@ class CardComponent extends Component {
                         isEditMode = {this.props.isEditMode !== undefined && this.props.isEditMode !== null ? this.props.isEditMode : true}
                     />
                 );
+            case 'TextSwitchSelector':
+                return (
+                    <TextSwitchSelector 
+                        selectedItem={this.props[item.selectedItemIndexForTextSwitchSelector]}
+                        selectedItemIndexForTextSwitchSelector={item.selectedItemIndexForTextSwitchSelector}
+                        onChange={this.props.onChangeTextSwitchSelector}
+                        values={item.values}
+                        isEditMode = {this.props.isEditMode}
+                        style={{width: width, marginHorizontal: marginHorizontal}}
+                    />
+                );
+            case 'TextInputWithDropDown':
+                return (
+                    <TextInputWithDropDown 
+                        id={item.id}
+                        label={item.label}
+                        index={this.props.index}
+                        value={value}
+                        isEditMode={item.isEditMode}
+                        isRequired={item.isRequired}
+                        multiline={item.multiline}
+                        dropDownData={item.dropDownData}
+                        onChange={this.props.onChangeextInputWithDropDown}
+                        style={{width: width, marginHorizontal: marginHorizontal}}
+                        objectType={item.objectType}
+                        keyboardType={item.keyboardType}
+                        onChangeDropDown={this.props.onChangeTextSwitchSelector}
+                        selectedDropDownItemIndex={this.props[item.selectedItemIndexForAgeUnitOfMeasureDropDown]}
+                        selectedItemIndexForAgeUnitOfMeasureDropDown ={item.selectedItemIndexForAgeUnitOfMeasureDropDown}
+                    />
+                )
             default:
                 return (
                     <View style={{backgroundColor: 'red'}}>

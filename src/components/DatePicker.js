@@ -41,7 +41,7 @@ class DatePicker extends PureComponent {
     editInput = () => {
         // console.log("### date from value: ", this.props.value);
         return (
-            <View style={[{},this.props.style]}>
+            <View style={[{marginVertical: 10},this.props.style]}>
                 {
                     this.props.value !== undefined && this.props.value !== null ? (
                         <View>
@@ -98,7 +98,7 @@ class DatePicker extends PureComponent {
 
     viewInput = () => {
         return (
-            <View style={[{
+            <View style={[{ 
             },this.props.style]}>
                 <Text style={{
                     fontFamily: 'Roboto-Regular',
