@@ -331,6 +331,28 @@ class CardComponent extends Component {
             }
         }
 
+        if (this.props.screen === 'FollowUpSingle') {
+            if (item.type === 'DropdownInput') {
+                item.data = this.computeDataForFollowUpSingleScreenDropdownInput(item, this.props.index);
+            }
+            if (item.type === 'SwitchInput' && this.props.followUp[item.id] !== undefined) {
+                value = this.props.followUp[item.id]
+            }
+            if (item.type === 'DropDownSectioned') {
+                if (this.props.followUp && this.props.followUp.address && this.props.followUp.address[item.id] && this.props.followUp.address[item.id] !== "") {
+                    for (let i = 0; i < this.props.locations.length; i++) {
+                        let myLocationName = this.getLocationNameById(this.props.locations[i], this.props.followUp.address[item.id])
+                        if (myLocationName !== null){
+                            value = myLocationName
+                            break
+                        }
+                    }
+                }
+            } else {
+                value = this.computeValueForFollowUpSingleScreen(item);
+            }
+        }
+
         let isEditModeForDropDownInput = addContactFromCasesScreen ? false : (this.props.screen === 'ExposureScreen' ? item.id === 'exposure' ? true : item.isEditMode : item.isEditMode)
 
         switch(item.type) {
@@ -619,7 +641,9 @@ class CardComponent extends Component {
                 data = data.concat(this.props.events.map((e) => {return {value: e.name, id: extractIdFromPouchId(e._id, 'person'), type: 'event'}}));
             } else {
                 if (item.id === 'clusterId') {
-
+                    // return _.filter(this.props.referenceData, (o) => {
+                    //     return o.categoryId.includes("")
+                    // }).map((o) => {return {value: this.getTranslation(o.value), id: o.value}})
                 }
             }
         }
@@ -658,6 +682,20 @@ class CardComponent extends Component {
                 (this.props.contacts && Array.isArray(this.props.contacts) && this.props.contacts.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id) > -1 && this.props.contacts[this.props.contacts.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id)].lastName ? (this.props.contacts[this.props.contacts.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id)].lastName) : '');
             default:
                 return ''
+        }
+    };
+
+    computeDataForFollowUpSingleScreenDropdownInput = (item, index) => {
+        console.log("computeDataForFollowUpSingleScreenDropdownInput: ", item, this.props.case);
+        if (item.id === 'statusId') {
+            return _.filter(this.props.referenceData, (o) => {
+                return o.categoryId.includes("STATUS_TYPE")
+            }).map((o) => {return {value: this.getTranslation(o.value), id: o.value}})
+        }
+        if (item.id === 'typeId') {
+            return _.filter(this.props.referenceData, (o) => {
+                return o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_ADDRESS_TYPE'
+            }).map((o) => {return {value: this.getTranslation(o.value), id: o.value}})
         }
     };
 
@@ -730,6 +768,14 @@ class CardComponent extends Component {
             }).map((o) => {return {value: this.getTranslation(o.value), id: o.value}})
         }
     };
+
+    computeValueForFollowUpSingleScreen = (item) => {
+        if (item.objectType === 'Address') {
+            return this.props.followUp && this.props.followUp.address && this.props.followUp.address[item.id] !== undefined ?
+            this.getTranslation(this.props.followUp.address[item.id]) : '';
+        }
+        return this.props.followUp && this.props.followUp[item.id] ? this.getTranslation(this.props.followUp[item.id]) : '';
+    }
 
     computeValueForCasesSingleScreen = (item, index) => {
         if (index || index >= 0) {

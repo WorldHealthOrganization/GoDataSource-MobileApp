@@ -316,7 +316,7 @@ class CaseSingleScreen extends Component {
                 );
             case 'caseInvestigation':
                 return <CaseSingleInvestigationContainer
-                    case={this.state.case}
+                    item={this.state.case}
                     isEditMode={this.state.isEditMode}
                     onPressEdit={this.onPressEdit}
                     onPressSaveEdit={this.onPressSaveEdit}
@@ -324,6 +324,7 @@ class CaseSingleScreen extends Component {
                     onChangeTextAnswer={this.onChangeTextAnswer}
                     onChangeSingleSelection={this.onChangeSingleSelection}
                     onChangeMultipleSelection={this.onChangeMultipleSelection}
+                    onChangeDateAnswer={this.onChangeDateAnswer}
                     handleMoveToPrevieousScreenButton={this.handleMoveToPrevieousScreenButton}
                     isNew={this.props.isNew}
                 />;
@@ -939,6 +940,23 @@ class CaseSingleScreen extends Component {
                 console.log ('onChangeMultipleSelection after setState', this.state.case)
             })
     };
+    onChangeDateAnswer = (value, id) => {
+        console.log ('onChangeDateAnswer', value, id)
+        let itemClone = _.cloneDeep(this.state.case);
+        let questionnaireAnswers = itemClone && itemClone.questionnaireAnswers ? itemClone.questionnaireAnswers : null;
+        if (!itemClone.questionnaireAnswers) {
+            itemClone.questionnaireAnswers = {};
+            questionnaireAnswers = itemClone.questionnaireAnswers;
+        }
+        questionnaireAnswers[id] = value;
+        this.setState(prevState => ({
+            case: Object.assign({}, prevState.case, {questionnaireAnswers: questionnaireAnswers}),
+            isModified: true
+        }), () => {
+            console.log ('onChangeDateAnswer after setState', this.state.case)
+        })
+    };
+
 }
 
 // Create style outside the class, or for components that will be used by other components (buttons),

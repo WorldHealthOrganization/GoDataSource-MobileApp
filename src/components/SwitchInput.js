@@ -46,7 +46,7 @@ class SwitchInput extends PureComponent {
                         activeButtonColor={this.props.activeButtonColor}
                         activeBackgroundColor={this.props.activeBackgroundColor}
                         style={{
-                            flex: 0.1,
+                            flex: 0,
                         }}
                         onChangeState={ (state) => this.props.onChange(
                             state,
