@@ -567,3 +567,63 @@ export function mapLocations(locationList, parentLocationId) {
     }
     return output
 }
+
+//recursively functions for mapping questionCard questions (followUps and Cases)
+export function extractAllQuestions (questions, item) {
+    let returnedQuestions = [];
+
+    if (questions && Array.isArray(questions) && questions.length > 0) {
+        for (let i = 0; i < questions.length; i++) {
+            // First add every question
+            returnedQuestions.push(questions[i]);
+            if (questions[i] && questions[i].answerType && (questions[i].answerType === "LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_SINGLE_ANSWER" || questions[i].answerType === "LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_MULTIPLE_ANSWERS") && questions[i].answers && Array.isArray(questions[i].answers) && questions[i].answers.length > 0) {
+                // For every answer check if the user answered that question and then proceed with the showing
+                for (let j = 0; j < questions[i].answers.length; j++) {
+                    // First check for single select since it has only a value
+                    if (questions[i].answerType === "LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_SINGLE_ANSWER" ) {
+                        if (item && item.questionnaireAnswers && item.questionnaireAnswers[questions[i].variable] === questions[i].answers[j].value && questions[i].answers[j].additionalQuestions) {
+                            returnedQuestions = returnedQuestions.concat(extractAllQuestions(questions[i].answers[j].additionalQuestions, item))
+                        }
+                    } else {
+                        // For the multiple select the answers are in an array of values
+                        if (questions[i].answerType === "LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_MULTIPLE_ANSWERS") {
+                            if (item && item.questionnaireAnswers && item.questionnaireAnswers[questions[i].variable] && Array.isArray(item.questionnaireAnswers[questions[i].variable]) && item.questionnaireAnswers[questions[i].variable].indexOf(questions[i].answers[j].value) > -1 && questions[i].answers[j].additionalQuestions) {
+                                returnedQuestions = returnedQuestions.concat(extractAllQuestions(questions[i].answers[j].additionalQuestions, item))
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return returnedQuestions;
+};
+
+export function mapQuestions (questions) {
+    // mappedQuestions format: [{categoryName: 'cat1', questions: [{q1}, {q2}]}]
+    let mappedQuestions = [];
+
+    if (questions && Array.isArray(questions) && questions.length > 0) {
+        for (let i = 0; i < questions.length; i++) {
+            if (mappedQuestions.map((e) => {return e.categoryName}).indexOf(questions[i].category) === -1) {
+                mappedQuestions.push({categoryName: questions[i].category, questions: [questions[i]]});
+            } else {
+                if (mappedQuestions && Array.isArray(mappedQuestions) && mappedQuestions.length > 0 && mappedQuestions.map((e) => {
+                        return e.categoryName
+                    }).indexOf(questions[i].category) > -1 && mappedQuestions[mappedQuestions.map((e) => {
+                        return e.categoryName
+                    }).indexOf(questions[i].category)] && mappedQuestions[mappedQuestions.map((e) => {
+                        return e.categoryName
+                    }).indexOf(questions[i].category)].questions && Array.isArray(mappedQuestions[mappedQuestions.map((e) => {
+                        return e.categoryName
+                    }).indexOf(questions[i].category)].questions)) {
+                        mappedQuestions[mappedQuestions.map((e) => {return e.categoryName}).indexOf(questions[i].category)].questions.push(questions[i]);
+                }
+            }
+        }
+    }
+
+    // console.log('Mapped questions: ', mappedQuestions);
+
+    return mappedQuestions;
+};

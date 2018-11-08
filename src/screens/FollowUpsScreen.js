@@ -62,7 +62,8 @@ class FollowUpsScreen extends Component {
             longitude: 0,
             sourceLatitude: 0,
             sourceLongitude: 0,
-            error: null
+            error: null,
+            calendarPickerOpen: false
         };
         // Bind here methods, or at least don't declare methods in the render method
         this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this));
@@ -73,6 +74,7 @@ class FollowUpsScreen extends Component {
         this.listEmptyComponent = this.listEmptyComponent.bind(this);
         this.onSelectValue = this.onSelectValue.bind(this);
         this.handleDayPress = this.handleDayPress.bind(this);
+        this.openCalendarModal = this.openCalendarModal.bind(this);
     }
 
     // Please add here the react lifecycle methods that you need
@@ -201,6 +203,8 @@ class FollowUpsScreen extends Component {
                         height={calculateDimension(25, true, this.props.screenSize)}
                         onDayPress={this.handleDayPress}
                         value={this.state.filter.date || new Date().toLocaleString()}
+                        pickerOpen={this.state.calendarPickerOpen}
+                        openCalendarModal={this.openCalendarModal}
                     />
                     <ValuePicker
                         top={this.calculateTopForDropdown()}
@@ -288,11 +292,22 @@ class FollowUpsScreen extends Component {
     }
 
     // Please write here all the methods that are not react native lifecycle methods
+    openCalendarModal = () => {
+        console.log("You got another thing coming");
+        this.setState({
+            calendarPickerOpen: !this.state.calendarPickerOpen
+        })
+    };
+
     handlePressNavbarButton = () => {
-        this.props.navigator.toggleDrawer({
-            side: 'left',
-            animated: true,
-            to: 'open'
+        this.setState({
+            calendarPickerOpen: false
+        }, () => {
+            this.props.navigator.toggleDrawer({
+                side: 'left',
+                animated: true,
+                to: 'open'
+            })
         })
     };
 
@@ -412,19 +427,28 @@ class FollowUpsScreen extends Component {
 
     handleOnPressMissing = (followUp, contact) => {
 
-        let myFollowUp = Object.assign({}, followUp)
-        let myFollowups = Object.assign([], contact.followUps)
-
-        myFollowUp.lostToFollowUp = true;
-        myFollowUp.performed = true;
-        myFollowUp.updatedAt = new Date().toISOString();
-
-        myFollowups[myFollowups.map((e) => {return e._id}).indexOf(myFollowUp._id)] = myFollowUp
-        let myContact = Object.assign({}, contact, {followUps: myFollowups})
-
-        if (this.props && this.props.user && this.props.user.activeOutbreakId) {
-            this.props.updateFollowUpAndContact(this.props.user.activeOutbreakId, null, myFollowUp._id, myFollowUp, myContact, null);
-        }
+        Alert.alert('Warning', 'Are you sure you want to set this follow-up as missed?', [
+            {
+                text: 'No', onPress: () => {console.log("Cancel missing")}
+            },
+            {
+                text: 'Yes', onPress: () => {
+                    let myFollowUp = Object.assign({}, followUp)
+                    let myFollowups = Object.assign([], contact.followUps)
+            
+                    myFollowUp.statusId = config.followUpStatuses.missed
+                    myFollowUp = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, myFollowUp), action = 'update')
+            
+                    myFollowups[myFollowups.map((e) => {return e._id}).indexOf(myFollowUp._id)] = myFollowUp
+                    let myContact = Object.assign({}, contact, {followUps: myFollowups})
+            
+                    if (this.props && this.props.user && this.props.user.activeOutbreakId) {
+                        this.props.updateFollowUpAndContact(this.props.user.activeOutbreakId, null, myFollowUp._id, myFollowUp, myContact, null);
+                    }
+                }
+            }
+        ])
+     
     };
 
     handleOnPressExposure = (followUp, contact) => {

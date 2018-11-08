@@ -887,7 +887,7 @@ const addExposureScreen = [
         labelValue: 'test',
         type: 'DropdownInput',
         value: '',
-        isRequired: true,
+        isRequired: false,
         isEditMode: true,
         activeButtonColor: 'red',
         activeBackgroundColor: 'red',
@@ -901,7 +901,7 @@ const addExposureScreen = [
         labelValue: 'test',
         type: 'DropdownInput',
         value: '',
-        isRequired: true,
+        isRequired: false,
         isEditMode: true,
         activeButtonColor: 'red',
         activeBackgroundColor: 'red',
@@ -915,7 +915,7 @@ const addExposureScreen = [
         labelValue: 'test',
         type: 'DropdownInput',
         value: '',
-        isRequired: true,
+        isRequired: false,
         isEditMode: true,
         activeButtonColor: 'red',
         activeBackgroundColor: 'red',
@@ -933,6 +933,18 @@ const addExposureScreen = [
         isEditMode: true,
         activeButtonColor: 'red',
         activeBackgroundColor: 'red',
+        objectType: 'Contact'
+    },
+    {
+        cardNumber: 1,
+        id: 'socialRelationshipDetail',
+        label: 'Relationship',
+        labelValue: 'test',
+        type: 'TextInput',
+        value: '',
+        isRequired: false,
+        isEditMode: true,
+        multiline: true,
         objectType: 'Contact'
     },
     {
@@ -1489,7 +1501,7 @@ const RNDBConfig = {
 
 const userResidenceAddress = {
     userPlaceOfResidence: 'LNG_REFERENCE_DATA_CATEGORY_ADDRESS_TYPE_USUAL_PLACE_OF_RESIDENCE',
-    userOtherResidence: 'LNG_REFERENCE_DATA_CATEGORY_ADDRESS_TYPE_OTHER'
+    userOtherResidence: 'LNG_REFERENCE_DATA_CATEGORY_ADDRESS_TYPE_PREVIOUS_USUAL_PLACE_OF_RESIDENCE'
 };
 
 const contactFollowUpStatuses = {

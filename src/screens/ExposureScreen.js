@@ -17,6 +17,7 @@ import CardComponent from './../components/CardComponent';
 import Ripple from 'react-native-material-ripple';
 import {removeErrors} from './../actions/errors';
 import {calculateDimension, extractIdFromPouchId, updateRequiredFields} from './../utils/functions';
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 
 class ExposureScreen extends Component {
 
@@ -36,6 +37,7 @@ class ExposureScreen extends Component {
                 exposureFrequencyId: '',
                 exposureDurationId: '',
                 socialRelationshipTypeId: '',
+                socialRelationshipDetail: '',
                 clusterId: '',
                 comment: '',
                 persons: []
@@ -97,6 +99,7 @@ class ExposureScreen extends Component {
                         exposureFrequencyId: '',
                         exposureDurationId: '',
                         socialRelationshipTypeId: '',
+                        socialRelationshipDetail: '',
                         clusterId: '',
                         comment: '',
                         persons: []
@@ -114,8 +117,8 @@ class ExposureScreen extends Component {
         console.log('Render from ExposureScreen: ', this.state.exposure, this.props.exposure);
 
         return (
-            <View style={[style.container]}>
-                <NavBarCustom
+            <View style={style.container}>
+                <NavBarCustom style = {style.navbarContainer}
                     customTitle={
                         <View
                             style={{
@@ -127,7 +130,7 @@ class ExposureScreen extends Component {
                             }}
                         >
                             <Text style={[style.title, {marginLeft: 30}]}>Add exposure</Text>
-                            <Ripple
+                            {/* <Ripple
                                 hitSlop={{
                                     top: 20,
                                     bottom: 20,
@@ -141,7 +144,7 @@ class ExposureScreen extends Component {
                                 onPress={this.handleSaveExposure}
                             >
                                 <Text style={[style.title, {marginHorizontal: 10}]}>Save</Text>
-                            </Ripple>
+                            </Ripple> */}
                         </View>
                     }
                     title={null}
@@ -149,33 +152,43 @@ class ExposureScreen extends Component {
                     iconName="close"
                     handlePressNavbarButton={this.handlePressNavbarButton}
                 />
-                <ScrollView style={style.innerContainer}>
-                    <CardComponent
-                        screen={'ExposureScreen'}
-                        item={config.addExposureScreen}
-                        type={this.props.type}
-                        exposure={this.state.exposure}
-                        addContactFromCasesScreen={this.props.addContactFromCasesScreen}
-                        onChangeDropDown={this.handleOnChangeDropDown}
-                        onChangeDate={this.handleOnChangeDate}
-                        onChangeText={this.handleOnChangeText}
-                        onChangeSwitch={this.handleOnChangeSwitch}
-                    />
-                    {/*<View style={[style.buttonContainer, {*/}
-                        {/*marginHorizontal: calculateDimension(16, false, this.props.screenSize),*/}
-                        {/*width: calculateDimension(config.designScreenSize.width - 32, false, this.props.screenSize),*/}
-                    {/*}]}>*/}
-                        {/*<Button*/}
-                            {/*title="Add Another Exposure"*/}
-                            {/*color="white"*/}
-                            {/*onPress={this.handleAddAnotherExposure}*/}
-                            {/*height={25}*/}
-                            {/*width={'100%'}*/}
-                        {/*/>*/}
-                    {/*</View>*/}
-                </ScrollView>
+                <View style={style.containContainer}>
+                    <View style={{flexDirection: 'row'}}>
+                            <Button
+                                title={'Save'}
+                                onPress={this.handleSaveExposure}
+                                color={styles.buttonGreen}
+                                titleColor={'white'}
+                                height={calculateDimension(25, true, this.props.screenSize)}
+                                width={calculateDimension(130, false, this.props.screenSize)}
+                                style={{
+                                    marginVertical: calculateDimension(12.5, true, this.props.screenSize),
+                                    marginHorizontal: calculateDimension(16, false, this.props.screenSize),
+                                }}/>
+                        
+                    </View>
+                    <KeyboardAwareScrollView
+                    style={style.containerScrollView}
+                    contentContainerStyle={[style.contentContainerStyle, {paddingBottom: this.props.screenSize.height < 600 ? 70 : 20}]}
+                    keyboardShouldPersistTaps={'always'}
+                >
+                    <View style={style.container}>
+                        <CardComponent
+                            screen={'ExposureScreen'}
+                            item={config.addExposureScreen}
+                            type={this.props.type}
+                            exposure={this.state.exposure}
+                            addContactFromCasesScreen={this.props.addContactFromCasesScreen}
+                            onChangeDropDown={this.handleOnChangeDropDown}
+                            onChangeDate={this.handleOnChangeDate}
+                            onChangeText={this.handleOnChangeText}
+                            onChangeSwitch={this.handleOnChangeSwitch}
+                        />
+                    </View>
+                </KeyboardAwareScrollView>
+                </View>
             </View>
-        );
+        )
     }
 
     // Please write here all the methods that are not react native lifecycle methods
@@ -327,7 +340,25 @@ class ExposureScreen extends Component {
 const style = StyleSheet.create({
     container: {
         flex: 1,
+    },
+    navbarContainer: {
         backgroundColor: 'white'
+    },
+    containContainer: {
+        flex: 1,
+        backgroundColor: styles.screenBackgroundGrey,
+        alignItems: 'center',
+    },
+    cardStyle: {
+        marginVertical: 4,
+        flex: 1
+    },
+    containerScrollView: {
+        flex: 1,
+        backgroundColor: styles.screenBackgroundGrey
+    },
+    contentContainerStyle: {
+        alignItems: 'center'
     },
     innerContainer: {
         flex: 1,
