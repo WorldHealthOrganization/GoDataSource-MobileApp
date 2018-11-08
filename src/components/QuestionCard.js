@@ -32,8 +32,8 @@ class QuestionCard extends PureComponent {
     }
 
     // Please add here the react lifecycle methods that you need
-
-
+    
+    
     // The render method should have at least business logic as possible,
     // because this will be called whenever there is a new setState call
     // and can slow down the app
@@ -215,9 +215,11 @@ class QuestionCard extends PureComponent {
                 );
             default:
                 return(
-                    <View>
-                        <Text>{"TODO: item type: " + item.answerType + " is not implemented yet"}</Text>
-                    </View>
+                    item.answerType !== undefined ? (
+                        <View>
+                            <Text>{"TODO: item type: " + item.answerType + " is not implemented yet"}</Text>
+                        </View> 
+                    ) : null
                 )
         }
     };
