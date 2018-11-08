@@ -436,9 +436,8 @@ class FollowUpsScreen extends Component {
                     let myFollowUp = Object.assign({}, followUp)
                     let myFollowups = Object.assign([], contact.followUps)
             
-                    myFollowUp.lostToFollowUp = true;
-                    myFollowUp.performed = true;
-                    myFollowUp.updatedAt = new Date().toISOString();
+                    myFollowUp.statusId = config.followUpStatuses.missed
+                    myFollowUp = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, myFollowUp), action = 'update')
             
                     myFollowups[myFollowups.map((e) => {return e._id}).indexOf(myFollowUp._id)] = myFollowUp
                     let myContact = Object.assign({}, contact, {followUps: myFollowups})
