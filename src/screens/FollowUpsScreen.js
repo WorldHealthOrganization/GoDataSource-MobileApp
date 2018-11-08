@@ -427,19 +427,28 @@ class FollowUpsScreen extends Component {
 
     handleOnPressMissing = (followUp, contact) => {
 
-        let myFollowUp = Object.assign({}, followUp)
-        let myFollowups = Object.assign([], contact.followUps)
-
-        myFollowUp.lostToFollowUp = true;
-        myFollowUp.performed = true;
-        myFollowUp.updatedAt = new Date().toISOString();
-
-        myFollowups[myFollowups.map((e) => {return e._id}).indexOf(myFollowUp._id)] = myFollowUp
-        let myContact = Object.assign({}, contact, {followUps: myFollowups})
-
-        if (this.props && this.props.user && this.props.user.activeOutbreakId) {
-            this.props.updateFollowUpAndContact(this.props.user.activeOutbreakId, null, myFollowUp._id, myFollowUp, myContact, null);
-        }
+        Alert.alert('Warning', 'Are you sure you want to set this follow-up as missed?', [
+            {
+                text: 'No', onPress: () => {console.log("Cancel missing")}
+            },
+            {
+                text: 'Yes', onPress: () => {
+                    let myFollowUp = Object.assign({}, followUp)
+                    let myFollowups = Object.assign([], contact.followUps)
+            
+                    myFollowUp.statusId = config.followUpStatuses.missed
+                    myFollowUp = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, myFollowUp), action = 'update')
+            
+                    myFollowups[myFollowups.map((e) => {return e._id}).indexOf(myFollowUp._id)] = myFollowUp
+                    let myContact = Object.assign({}, contact, {followUps: myFollowups})
+            
+                    if (this.props && this.props.user && this.props.user.activeOutbreakId) {
+                        this.props.updateFollowUpAndContact(this.props.user.activeOutbreakId, null, myFollowUp._id, myFollowUp, myContact, null);
+                    }
+                }
+            }
+        ])
+     
     };
 
     handleOnPressExposure = (followUp, contact) => {
