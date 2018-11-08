@@ -61,7 +61,7 @@ const tabsValuesRoutes = {
         {key: 'sort', title: 'SORT'}
     ],
     followUpsSingle: [
-        {key: 'genInfo', title: 'GENERAL INFO'},
+        {key: 'genInfo', title: 'DETAILS'},
         {key: 'quest', title: 'QUESTIONNAIRE'}
     ],
     casesSingle: [
@@ -89,82 +89,6 @@ const followUpsSingleScreen = {
             fields: [
                 {
                     cardNumber: 1,
-                    id: 'riskLevel',
-                    label: 'Risk level',
-                    labelValue: 'test',
-                    type: 'DropdownInput',
-                    value: '',
-                    isRequired: false,
-                    isEditMode: true,
-                    activeButtonColor: 'red',
-                    activeBackgroundColor: 'red',
-                    objectType: 'Contact'
-                },
-                {
-                    cardNumber: 1,
-                    id: 'riskReason',
-                    label: 'Reason',
-                    type: 'TextInput',
-                    value: '',
-                    isRequired: true,
-                    isEditMode: true,
-                    multiline: true,
-                    objectType: 'Contact'
-                },
-            ]
-        },
-        {
-            fields: [
-                {
-                    cardNumber: 2,
-                    id: 'exposedTo',
-                    label: 'Exposed to (Case)',
-                    type: 'DropdownInput',
-                    value: 'Test',
-                    isExposure: true,
-                    isRequired: false,
-                    isEditMode: false,
-                    isAdditive: true
-                },
-                // {
-                //     cardNumber: 2,
-                //     id: 'date',
-                //     label: 'Date',
-                //     value: '',
-                //     type: "DatePicker",
-                //     isRequired: true,
-                //     isEditMode: true,
-                //     format: 'MM/dd/YYYY'
-                // },
-                // {
-                //     cardNumber: 2,
-                //     id: 'performed',
-                //     label: 'Performed',
-                //     type: 'SwitchInput',
-                //     value: false,
-                //     isRequired: false,
-                //     isEditMode: true,
-                //     activeButtonColor: styles.missedRedColor,
-                //     activeBackgroundColor: styles.missedRedColorWithOpacity
-                // },
-                // {
-                //     cardNumber: 2,
-                //     id: 'lostToFollowUp',
-                //     label: 'Lost to Follow-up',
-                //     type: 'SwitchInput',
-                //     value: false,
-                //     isRequired: false,
-                //     isEditMode: true,
-                //     activeButtonColor: styles.missedRedColor,
-                //     activeBackgroundColor: styles.missedRedColorWithOpacity
-                // },
-
-            ]
-        },
-        {
-            fields: [
-                {
-                    cardNumber: 3,
                     id: 'date',
                     label: 'Date',
                     value: '',
@@ -175,32 +99,105 @@ const followUpsSingleScreen = {
                     objectType: 'FollowUp'
                 },
                 {
-                    cardNumber: 3,
-                    id: 'fillGeoLocation',
-                    label: 'Is the contact next to you?',
+                    cardNumber: 1,
+                    id: 'statusId',
+                    label: 'Status',
+                    type: 'DropdownInput',
+                    value: '',
+                    isRequired: true,
+                    isEditMode: true,
+                    objectType: 'FollowUp'
+                },
+                {
+                    cardNumber: 1,
+                    id: 'targeted',
+                    label: 'Targeted',
                     type: 'SwitchInput',
-                    value: true,
+                    value: false,
                     isRequired: false,
                     isEditMode: true,
                     activeButtonColor: 'green',
                     activeBackgroundColor: 'green',
                     objectType: 'FollowUp'
                 },
-                {
-                    cardNumber: 3,
-                    id: 'address',
-                    label: 'Address',
-                    type: 'DropdownInput',
-                    value: '',
-                    data: [],
-                    isRequired: false,
-                    isEditMode: false,
-                    isAdditive: true,
-                    objectType: 'FollowUp'
-                }
             ]
         }
-    ]
+    ],
+    address: {
+        fields: [
+            {
+                cardNumber: 2,
+                id: 'typeId',
+                label: 'Name',
+                labelValue: 'test',
+                type: 'DropdownInput',
+                value: '',
+                isRequired: true,
+                isEditMode: false,
+                objectType: 'Address'
+            },
+            {
+                cardNumber: 1,
+                id: 'date',
+                label: 'Date',
+                labelValue: 'test',
+                value: '',
+                type: "DatePicker",
+                isRequired: false,
+                isEditMode: false,
+                format: 'MM/dd/YYYY',
+                objectType: 'Address'
+            },
+            {
+                cardNumber: 2,
+                id: 'locationId',
+                label: 'Area',
+                labelValue: 'test',
+                type: 'DropDownSectioned',
+                value: '',
+                isRequired: true,
+                isEditMode: false,
+                objectType: 'Address',
+                single: true
+            },
+            {
+                cardNumber: 2,
+                id: 'city',
+                label: 'City',
+                labelValue: 'test',
+                type: 'TextInput',
+                value: '',
+                isRequired: true,
+                isEditMode: false,
+                multiline: true,
+                objectType: 'Address'
+            },
+            {
+                cardNumber: 2,
+                id: 'postalCode',
+                label: 'ZIP',
+                labelValue: 'test',
+                type: 'TextInput',
+                value: '',
+                isRequired: true,
+                isEditMode: false,
+                multiline: true,
+                objectType: 'Address'
+            },
+            {
+                cardNumber: 2,
+                id: 'addressLine1',
+                label: 'Address',
+                labelValue: 'test',
+                type: 'TextInput',
+                value: '',
+                isRequired: true,
+                isEditMode: false,
+                multiline: true,
+                objectType: 'Address'
+            },
+        ]
+    },
 };
 
 const caseSingleScreen = {
@@ -407,12 +404,24 @@ const caseSingleScreen = {
             },
             {
                 cardNumber: 1,
+                id: 'date',
+                label: 'Date',
+                labelValue: 'test',
+                value: '',
+                type: "DatePicker",
+                isRequired: false,
+                isEditMode: true,
+                format: 'MM/dd/YYYY',
+                objectType: 'Address'
+            },
+            {
+                cardNumber: 1,
                 id: 'locationId',
                 label: 'Area',
                 labelValue: 'test',
                 type: 'DropDownSectioned',
                 value: '',
-                isRequired: true,
+                isRequired: false,
                 isEditMode: true,
                 objectType: 'Address',
                 single: true
@@ -896,7 +905,7 @@ const addExposureScreen = [
         labelValue: 'test',
         type: 'DropdownInput',
         value: '',
-        isRequired: true,
+        isRequired: false,
         isEditMode: true,
         activeButtonColor: 'red',
         activeBackgroundColor: 'red',
@@ -910,7 +919,7 @@ const addExposureScreen = [
         labelValue: 'test',
         type: 'DropdownInput',
         value: '',
-        isRequired: true,
+        isRequired: false,
         isEditMode: true,
         activeButtonColor: 'red',
         activeBackgroundColor: 'red',
@@ -924,7 +933,7 @@ const addExposureScreen = [
         labelValue: 'test',
         type: 'DropdownInput',
         value: '',
-        isRequired: true,
+        isRequired: false,
         isEditMode: true,
         activeButtonColor: 'red',
         activeBackgroundColor: 'red',
@@ -942,6 +951,18 @@ const addExposureScreen = [
         isEditMode: true,
         activeButtonColor: 'red',
         activeBackgroundColor: 'red',
+        objectType: 'Contact'
+    },
+    {
+        cardNumber: 1,
+        id: 'socialRelationshipDetail',
+        label: 'Relationship',
+        labelValue: 'test',
+        type: 'TextInput',
+        value: '',
+        isRequired: false,
+        isEditMode: true,
+        multiline: true,
         objectType: 'Contact'
     },
     {
@@ -994,7 +1015,7 @@ const contactsSingleScreen = {
                     labelValue: 'test',
                     type: 'TextInput',
                     value: '',
-                    isRequired: true,
+                    isRequired: false,
                     isEditMode: true,
                     multiline: false,
                     objectType: 'Contact'
@@ -1006,7 +1027,7 @@ const contactsSingleScreen = {
                     labelValue: 'test',
                     type: 'TextInput',
                     value: '',
-                    isRequired: true,
+                    isRequired: false,
                     isEditMode: true,
                     multiline: false,
                     objectType: 'Contact'
@@ -1018,7 +1039,7 @@ const contactsSingleScreen = {
                     labelValue: 'test',
                     type: 'DropdownInput',
                     value: '',
-                    isRequired: true,
+                    isRequired: false,
                     isEditMode: true,
                     objectType: 'Contact'
                 },
@@ -1029,7 +1050,7 @@ const contactsSingleScreen = {
                     labelValue: 'test',
                     type: 'TextInput',
                     value: '',
-                    isRequired: true,
+                    isRequired: false,
                     isEditMode: true,
                     multiline: false,
                     objectType: 'Contact'
@@ -1041,7 +1062,7 @@ const contactsSingleScreen = {
                     label: 'Occupation',
                     type: 'TextInput',
                     value: '',
-                    isRequired: true,
+                    isRequired: false,
                     isEditMode: true,
                     multiline: false,
                     objectType: 'Contact'
@@ -1130,12 +1151,24 @@ const contactsSingleScreen = {
             },
             {
                 cardNumber: 1,
+                id: 'date',
+                label: 'Date',
+                labelValue: 'test',
+                value: '',
+                type: "DatePicker",
+                isRequired: false,
+                isEditMode: true,
+                format: 'MM/dd/YYYY',
+                objectType: 'Address'
+            },
+            {
+                cardNumber: 1,
                 id: 'locationId',
                 label: 'Area',
                 labelValue: 'test',
                 type: 'DropDownSectioned',
                 value: '',
-                isRequired: true,
+                isRequired: false,
                 isEditMode: true,
                 objectType: 'Address',
                 single: true
@@ -1498,7 +1531,7 @@ const RNDBConfig = {
 
 const userResidenceAddress = {
     userPlaceOfResidence: 'LNG_REFERENCE_DATA_CATEGORY_ADDRESS_TYPE_USUAL_PLACE_OF_RESIDENCE',
-    userOtherResidence: 'LNG_REFERENCE_DATA_CATEGORY_ADDRESS_TYPE_OTHER'
+    userOtherResidence: 'LNG_REFERENCE_DATA_CATEGORY_ADDRESS_TYPE_PREVIOUS_USUAL_PLACE_OF_RESIDENCE'
 };
 
 const contactFollowUpStatuses = {
