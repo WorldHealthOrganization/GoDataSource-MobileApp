@@ -310,8 +310,8 @@ export function getDataFromDatabaseFromFile (database, fileType, lastSyncDate) {
                 if (response && response.docs && Array.isArray(response.docs) && response.docs.length > 0) {
                     createFilesWithName(fileType, JSON.stringify(response.docs.map((e) => {
                         delete e._rev;
-                        e.id = extractIdFromPouchId(e._id, fileType);
-                        delete e._id;
+                        e._id = extractIdFromPouchId(e._id, fileType);
+                        // delete e._id;
                         delete e.fileType;
                         return e;
                     })))

@@ -2,6 +2,7 @@ source 'https://github.com/CocoaPods/Specs.git'
 target ‘who_mobile’ do
   pod 'SQLCipher'
   # Add new pods below this line
+
   # pod 'react-native-document-picker', :path => '../node_modules/react-native-document-picker'
 
   # pod 'RNFS', :path => '../node_modules/react-native-fs'

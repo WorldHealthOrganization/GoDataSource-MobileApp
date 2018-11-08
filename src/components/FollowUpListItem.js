@@ -57,7 +57,7 @@ class FollowUpListItem extends PureComponent {
             let followUpContact = this.props && this.props.contacts && Array.isArray(this.props.contacts) && this.props.contacts.length > 0 ? 
                 this.props.contacts[this.props.contacts.map((e) => {return extractIdFromPouchId(e._id, 'person')}).indexOf(this.props.item.personId)] : null;
 
-            if (followUpContact) {
+            if (followUpContact && followUpContact.addresses && Array.isArray(followUpContact.addresses) && followUpContact.addresses.length > 0) {
                 let contactPlaceOfResidence = followUpContact.addresses.filter((e) => {return e.typeId === config.userResidenceAddress.userPlaceOfResidence})
                 if (contactPlaceOfResidence && contactPlaceOfResidence[0]) {
                     addressText = getAddress(contactPlaceOfResidence[0], true);
