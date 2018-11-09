@@ -4,8 +4,8 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {PureComponent} from 'react';
-import {View, StyleSheet, InteractionManager} from 'react-native';
-import {calculateDimension} from './../utils/functions';
+import {View, StyleSheet, InteractionManager, Alert} from 'react-native';
+import {calculateDimension, extractAllQuestions, mapQuestions} from './../utils/functions';
 import config from './../utils/config';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -15,8 +15,6 @@ import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import Button from './../components/Button';
 import {LoaderScreen} from 'react-native-ui-lib';
 import Section from './../components/Section';
-import {isEqual} from 'lodash';
-import _ from 'lodash';
 
 class FollowUpsSingleQuestionnaireContainer extends PureComponent {
 
@@ -24,7 +22,8 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
     constructor(props) {
         super(props);
         this.state = {
-            interactionComplete: false
+            interactionComplete: false,
+            questions: []
         };
     }
 
@@ -37,9 +36,15 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
     // }
 
     componentDidMount() {
+        // Get all additional questions recursively
+        let sortedQuestions = this.extractAllQuestions(this.props.questions);
+
+        // mappedQuestions format: [{categoryName: 'cat1', questions: [{q1}, {q2}]}]
+        sortedQuestions = this.mapQuestions(sortedQuestions);
         InteractionManager.runAfterInteractions(() => {
             this.setState({
-                interactionComplete: true
+                interactionComplete: true,
+                questions: sortedQuestions
             })
         })
     }
@@ -60,32 +65,27 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
         let marginVertical = calculateDimension(12.5, true, this.props.screenSize);
         let viewWidth = calculateDimension(config.designScreenSize.width - 32, false, this.props.screenSize);
 
-        // Get all additional questions recursively
-        let sortedQuestions = this.extractAllQuestions(this.props.questions);
-
-        // mappedQuestions format: [{categoryName: 'cat1', questions: [{q1}, {q2}]}]
-        sortedQuestions = this.mapQuestions(sortedQuestions);
-
         return (
             <View style={style.mainContainer}>
                 {
-                    this && this.props && this.props.isEditMode ? (<View style={[style.containerButtons, {marginVertical: marginVertical, width: viewWidth}]}>
+                    this && this.props && this.props.isEditMode ? (
+                        <View style={[style.containerButtons, {marginVertical: marginVertical, width: viewWidth}]}>
                             <Button
                                 title={'Save'}
-                                onPress={this.props.onPressSave}
+                                onPress={this.onPressSave}
                                 color={styles.buttonGreen}
                                 titleColor={'white'}
                                 height={buttonHeight}
                                 width={buttonWidth}
                             />
-                            <Button
-                                title={'Missing'}
-                                onPress={this.props.onPressMissing}
-                                color={'white'}
-                                titleColor={styles.buttonTextGray}
-                                height={buttonHeight}
-                                width={buttonWidth}
-                            />
+                            {/*<Button*/}
+                            {/*title={'Missing'}*/}
+                            {/*onPress={this.props.onPressMissing}*/}
+                            {/*color={'white'}*/}
+                            {/*titleColor={styles.buttonTextGray}*/}
+                            {/*height={buttonHeight}*/}
+                            {/*width={buttonWidth}*/}
+                            {/*/>*/}
                         </View>) : (null)
                 }
                 <KeyboardAwareScrollView
@@ -94,8 +94,8 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
                     keyboardShouldPersistTaps={'always'}
                 >
                     {
-                        sortedQuestions.map((item, index) => {
-                           return this.handleRenderSectionedList(item, index)
+                        this.state.questions.map((item, index) => {
+                            return this.handleRenderSectionedList(item, index)
                         })
                     }
                 </KeyboardAwareScrollView>
@@ -137,63 +137,31 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
         )
     };
 
-    extractAllQuestions = (questions) => {
-        let returnedQuestions = [];
-
-        if (questions && Array.isArray(questions) && questions.length > 0) {
-            for (let i = 0; i < questions.length; i++) {
-                // First add every question
-                returnedQuestions.push(questions[i]);
-                if (questions[i] && questions[i].answerType && (questions[i].answerType === "LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_SINGLE_ANSWER" || questions[i].answerType === "LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_MULTIPLE_ANSWERS") && questions[i].answers && Array.isArray(questions[i].answers) && questions[i].answers.length > 0) {
-                    // For every answer check if the user answered that question and then proceed with the showing
-                    for (let j = 0; j < questions[i].answers.length; j++) {
-                        // First check for single select since it has only a value
-                        if (questions[i].answerType === "LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_SINGLE_ANSWER" ) {
-                            if (this.props.item && this.props.item.questionnaireAnswers && this.props.item.questionnaireAnswers[questions[i].variable] === questions[i].answers[j].value && questions[i].answers[j].additionalQuestions) {
-                                returnedQuestions = returnedQuestions.concat(this.extractAllQuestions(questions[i].answers[j].additionalQuestions))
-                            }
-                        } else {
-                            // For the multiple select the answers are in an array of values
-                            if (questions[i].answerType === "LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_MULTIPLE_ANSWERS") {
-                                if (this.props.item && this.props.item.questionnaireAnswers && this.props.item.questionnaireAnswers[questions[i].variable] && Array.isArray(this.props.item.questionnaireAnswers[questions[i].variable]) && this.props.item.questionnaireAnswers[questions[i].variable].indexOf(questions[i].answers[j].value) > -1 && questions[i].answers[j].additionalQuestions) {
-                                    returnedQuestions = returnedQuestions.concat(this.extractAllQuestions(questions[i].answers[j].additionalQuestions))
-                                }
-                            }
-                        }
+    onPressSave = () => {
+        // First check if all the required questions are filled
+        if (this.checkRequiredQuestions()) {
+            this.props.onPressSave();
+        } else {
+            Alert.alert('Validation error', 'Please make sure you have completed all required fields',
+                [
+                    {
+                        text: 'Ok', onPress: () => {console.log('Ok pressed')}
                     }
-                }
-            }
+                ]
+            )
         }
-        return returnedQuestions;
     };
 
-    mapQuestions = (questions) => {
-        // mappedQuestions format: [{categoryName: 'cat1', questions: [{q1}, {q2}]}]
-        let mappedQuestions = [];
-
-        if (questions && Array.isArray(questions) && questions.length > 0) {
-            for (let i = 0; i < questions.length; i++) {
-                if (mappedQuestions.map((e) => {return e.categoryName}).indexOf(questions[i].category) === -1) {
-                    mappedQuestions.push({categoryName: questions[i].category, questions: [questions[i]]});
-                } else {
-                    if (mappedQuestions && Array.isArray(mappedQuestions) && mappedQuestions.length > 0 && mappedQuestions.map((e) => {
-                            return e.categoryName
-                        }).indexOf(questions[i].category) > -1 && mappedQuestions[mappedQuestions.map((e) => {
-                            return e.categoryName
-                        }).indexOf(questions[i].category)] && mappedQuestions[mappedQuestions.map((e) => {
-                            return e.categoryName
-                        }).indexOf(questions[i].category)].questions && Array.isArray(mappedQuestions[mappedQuestions.map((e) => {
-                            return e.categoryName
-                        }).indexOf(questions[i].category)].questions)) {
-                            mappedQuestions[mappedQuestions.map((e) => {return e.categoryName}).indexOf(questions[i].category)].questions.push(questions[i]);
-                    }
+    checkRequiredQuestions = () => {
+        // Loop through all categories' questions and if a required question is unanswered return false
+        for (let i=0; i<this.state.questions.length; i++) {
+            for(let j=0; j<this.state.questions[i].questions.length; j++) {
+                if (this.state.questions[i].questions[j].required && !this.props.item.questionnaireAnswers[this.state.questions[i].questions[j].variable]) {
+                    return false;
                 }
             }
         }
-
-        // console.log('Mapped questions: ', mappedQuestions);
-
-        return mappedQuestions;
+        return true;
     };
 
     getTranslation = (value) => {
@@ -231,7 +199,7 @@ const style = StyleSheet.create({
     containerButtons: {
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'space-between'
+        justifyContent: 'center'
     }
 });
 

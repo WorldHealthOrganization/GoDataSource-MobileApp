@@ -1,13 +1,22 @@
 /**
- * Created by florinpopa on 06/08/2018.
+ * Created by florinpopa on 19/07/2018.
  */
-import {ACTION_TYPE_STORE_LOCATIONS} from './../utils/enums';
-import {getLocationsRequest} from './../requests/locations';
+import {ACTION_TYPE_STORE_OUTBREAK, ACTION_TYPE_STORE_LOCATIONS} from './../utils/enums';
+// import {getOutbreakByIdRequest} from './../requests/outbreak';
+import {getOutbreakByIdRequest} from './../queries/outbreak';
 import { addError } from './errors';
 import errorTypes from './../utils/errorTypes';
-import _ from 'lodash';
+import {getLocationsByOutbreakIdRequest} from './../queries/locations'
+import {mapLocations} from './../utils/functions'
 
 // Add here only the actions, not also the requests that are executed. For that purpose is the requests directory
+export function storeOutbreak(outbreak) {
+    return {
+        type: ACTION_TYPE_STORE_OUTBREAK,
+        payload: outbreak
+    }
+}
+
 export function storeLocations(locations) {
     return {
         type: ACTION_TYPE_STORE_LOCATIONS,
@@ -15,33 +24,36 @@ export function storeLocations(locations) {
     }
 }
 
-export function getLocations(countries, token) {
-    return async function (dispatch, getState) {
-        // The countries are saved as the reference data values, so we have to map them to the translations
-
-        // console.log('Countries: ', countries);
-        //
-        // let currentState = getState();
-        // let translations = currentState && currentState.app && currentState.app.translation && Array.isArray(currentState.app.translation) && currentState.app.translation.length > 0 ? currentState.app.translation : [];
-        // let referenceData = currentState && currentState.referenceData && Array.isArray(currentState.referenceData) && currentState.referenceData.length > 0 ? currentState.referenceData : [];
-        //
-        // for(let i=0; i<countries.length; i++) {
-        //     if (countries[i].includes("LNG")) {
-        //         console.log("### translation: ", translations[translations.map((e) => {return e.token;}).indexOf(countries[i])], referenceData[referenceData.map((e) => {return e.value}).indexOf(countries[i])]);
-        //         countries[i] = translations[translations.map((e) => {return e.token;}).indexOf(countries[i])].translation;
-        //     }
-        // }
-
-        getLocationsRequest(countries, token, (error, response) => {
+export function getOutbreakById(outbreakId, token, dispatch) {
+    // return async function(dispatch, getState) {
+    return new Promise((resolve, reject) => {
+        getOutbreakByIdRequest(outbreakId, null, (error, response) => {
             if (error) {
-                // console.log("*** getLocations error: ", error);
-                dispatch(addError(errorTypes.ERROR_LOCATIONS));
+                console.log('*** getOutbreakById error: ', error);
+                dispatch(addError(errorTypes.ERROR_OUTBREAK));
+                reject(error);
             }
             if (response) {
-                // Save all the regions that the outbreak occurs along with the country
-                let locations = response.map((e) => {return {id: e.location.id, name: e.location.name, children: e.children.map((f) => {return f.location})}});
-                dispatch(storeLocations(locations));
+                console.log ('*** getOutbreakById response: ', response);
+                getLocationsByOutbreakIdRequest(response, (error, responseLocations) => {
+                    if (error) {
+                        console.log('*** getLocationsByOutbreakId error: ', error);
+                        dispatch(addError(errorTypes.ERROR_LOCATIONS));
+                    }
+                    if (responseLocations) {
+                        console.log('*** getLocationsByOutbreakId response: ', response);
+                        if (responseLocations.length > 0) {
+                            let treeLocationList = mapLocations(responseLocations.filter((e) => {return e.active === true}), null);
+                            dispatch(storeLocations(treeLocationList));
+                        } else {
+                            dispatch(storeLocations(responseLocations));
+                        }
+                    }
+                });
+                dispatch(storeOutbreak(response));
+                resolve('Done outbreak');
             }
         })
-    }
+    })
+    // }
 }

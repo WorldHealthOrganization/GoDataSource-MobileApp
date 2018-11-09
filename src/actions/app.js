@@ -138,6 +138,22 @@ export function getTranslations(language, dispatch) {
     // }
 }
 
+export function getTranslationsAsync(language) {
+    return async function (dispatch) {
+    // return new Promise((resolve, reject) => {
+        getTranslationRequest(language, (error, response) => {
+            if (error) {
+                console.log("*** getTranslations error: ", error);
+            }
+            if (response) {
+                console.log("### here should have the translations: ");
+                dispatch(saveTranslation(response));
+            }
+        })
+    // })
+    }
+};
+
 export function getAvailableLanguages(dispatch) {
     // return async function (dispatch) {
     return new Promise((resolve, reject) => {
@@ -291,12 +307,14 @@ export function sendDatabaseToServer () {
                         let internetCredentials = await getInternetCredentials(activeDatabase);
                         if (internetCredentials) {
                             database.find({selector: {
-                                updatedAt: {$gte: lastSyncDate}
+                                updatedAt: {$gte: lastSyncDate},
+                                updatedBy: {$ne: 'Sync. Client Id: test'}
                             },
                                 fields: ['fileType']
                             })
                                 .then((resultGetRecordsByDate) => {
                                     resultGetRecordsByDate = uniq(resultGetRecordsByDate.docs);
+                                    resultGetRecordsByDate = resultGetRecordsByDate.filter((e) => {return e.fileType !== 'followUp.json'});
                                     console.log('resultGetRecordsByDate: ', resultGetRecordsByDate);
                                     // Now, for each fileType, we must create a .json file, archive it and then send that archive to the server
                                     let promiseArray = [];

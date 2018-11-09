@@ -52,20 +52,16 @@ class ContactsSinglePersonal extends Component {
         return (
             <View style={style.viewContainer}>
                 <View style={{flexDirection: 'row'}}>
-                    {
-                        this.props.isNew ? 
-                            <Button
-                                title={'Next'}
-                                onPress={this.handleNextButton}
-                                color={styles.buttonGreen}
-                                titleColor={'white'}
-                                height={calculateDimension(25, true, this.props.screenSize)}
-                                width={calculateDimension(130, false, this.props.screenSize)}
-                                style={{
-                                    marginVertical: calculateDimension(12.5, true, this.props.screenSize),
-                                    marginRight: 10
-                                }}/> : null
-                    }
+                    <Button
+                        title={'Next'}
+                        onPress={this.handleNextButton}
+                        color={styles.buttonGreen}
+                        titleColor={'white'}
+                        height={calculateDimension(25, true, this.props.screenSize)}
+                        width={calculateDimension(130, false, this.props.screenSize)}
+                        style={{
+                            marginVertical: calculateDimension(12.5, true, this.props.screenSize),
+                        }}/>
                 </View>
 
                 <KeyboardAwareScrollView
@@ -108,30 +104,34 @@ class ContactsSinglePersonal extends Component {
     }
 
     handleNextButton = () => {
-        if (this.props.checkRequiredFieldsPersonalInfo()) {
-            if (this.props.checkAgeYearsRequirements()) {
-                if (this.props.checkAgeMonthsRequirements()){
-                    this.props.handleMoveToNextScreenButton()
+        if (this.props.isNew) {
+            if (this.props.checkRequiredFieldsPersonalInfo()) {
+                if (this.props.checkAgeYearsRequirements()) {
+                    if (this.props.checkAgeMonthsRequirements()){
+                        this.props.handleMoveToNextScreenButton()
+                    } else {
+                        Alert.alert("Alert", 'Number of months must be between 0 and 11', [
+                            {
+                                text: 'Ok', onPress: () => {console.log("OK pressed")}
+                            }
+                        ])
+                    }
                 } else {
-                    Alert.alert("Alert", 'Number of months must be between 0 and 11', [
+                    Alert.alert("Alert", 'Number of years must be between 0 and 150', [
                         {
                             text: 'Ok', onPress: () => {console.log("OK pressed")}
                         }
                     ])
                 }
             } else {
-                Alert.alert("Alert", 'Number of years must be between 0 and 150', [
-                    {
-                        text: 'Ok', onPress: () => {console.log("OK pressed")}
-                    }
-                ])
-            }
-        } else {
-            Alert.alert("Alert", 'Please complete all the required fields', [
-                {
-                    text: 'Ok', onPress: () => {console.log("OK pressed")}
+                    Alert.alert("Alert", 'Please complete all the required fields', [
+                        {
+                            text: 'Ok', onPress: () => {console.log("OK pressed")}
+                        }
+                    ])
                 }
-            ])
+        } else {
+            this.props.handleMoveToNextScreenButton()
         }
     }
 }

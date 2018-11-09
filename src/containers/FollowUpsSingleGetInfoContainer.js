@@ -54,6 +54,13 @@ class FollowUpsFiltersContainer extends PureComponent {
                             return this.handleRenderItem(item)
                         })
                     }
+                    <View style={style.container}>
+                        {
+                            this.props.item && this.props.item.address ? (
+                                this.handleRenderItemForAddress()
+                            ) : null
+                        }
+                    </View>
                 </KeyboardAwareScrollView>
             </View>
         );
@@ -72,6 +79,26 @@ class FollowUpsFiltersContainer extends PureComponent {
                 onChangeDate={this.props.onChangeDate}
                 onChangeSwitch={this.props.onChangeSwitch}
                 onChangeDropDown={this.props.onChangeDropDown}
+                screen={'FollowUpSingle'}
+            />
+        )
+    }
+
+    handleRenderItemForAddress = () => {
+        let fields = config.followUpsSingleScreen.address.fields
+
+        return (
+            <CardComponent
+                item={fields}
+                isEditMode = {false}
+                screen={'FollowUpSingle'}
+                followUp={this.props.item}
+                style={style.cardStyle}
+                onChangeText={this.props.onChangeText}
+                onChangeDate={this.props.onChangeDate}
+                onChangeSwitch={this.props.onChangeSwitch}
+                onChangeDropDown={this.props.onChangeDropDown}
+                onDeletePress={this.props.onDeletePress}
             />
         )
     }

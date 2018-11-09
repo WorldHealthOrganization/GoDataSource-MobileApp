@@ -8,7 +8,7 @@ import config from './../utils/config';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import {logoutUser} from './../actions/user';
-import {sendDatabaseToServer} from './../actions/app';
+import {sendDatabaseToServer, getTranslationsAsync} from './../actions/app';
 import styles from './../styles';
 import {ListItem, Icon} from 'react-native-material-ui';
 import DropdownInput from './../components/DropdownInput';
@@ -169,6 +169,7 @@ class NavigationDrawer extends Component {
     handleOnChangeLanguage = (value, label) => {
         let user = Object.assign({}, this.props.user);
         user.languageId = value;
+        this.props.getTranslationsAsync(value);
 
         user = updateRequiredFields(user.activeOutbreakId, user._id, user, 'update');
 
@@ -208,7 +209,8 @@ function matchDispatchProps(dispatch) {
     return bindActionCreators({
         logoutUser,
         sendDatabaseToServer,
-        updateUser
+        updateUser,
+        getTranslationsAsync
     }, dispatch);
 }
 
