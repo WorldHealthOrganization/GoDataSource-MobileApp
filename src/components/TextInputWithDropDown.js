@@ -2,7 +2,7 @@
  * Created by mobileclarisoft on 16/07/2018.
  */
 import React, {Component} from 'react';
-import {View, Text, StyleSheet} from 'react-native';
+import {View, Text, StyleSheet, Platform} from 'react-native';
 import config from './../utils/config'
 import PropTypes from 'prop-types';
 import { TextField } from 'react-native-material-textfield';
@@ -78,8 +78,33 @@ class TextInputWithDropDown extends Component {
     }
 
     viewInput() {
+        let smth = this.props.value[config[this.props.dropDownData][this.props.selectedDropDownItemIndex].value];
+        smth = smth.toString();
         return (
-            <View></View>
+            <View style={[{width: '100%'},this.props.style]}>
+                <View style={{flexDirection: 'row',  justifyContent: 'space-between'}}>
+                    <View style={{width: '45%'}}>
+                        <Text style={{
+                            fontFamily: 'Roboto-Regular',
+                            fontSize: 15,
+                            lineHeight: 30,
+                            textAlign: 'left',
+                            color: 'rgb(0,0,0)',
+                            marginBottom: 7.5
+                        }}>
+                            {this.props.label}
+                        </Text>
+                        <Text style={{
+                            fontFamily: 'Roboto-Light',
+                            fontSize: 12.5,
+                            textAlign: 'left',
+                            color: 'rgb(60,60,60)',
+                        }}>
+                            {smth + ' ' + config[this.props.dropDownData][this.props.selectedDropDownItemIndex].value || ''}
+                        </Text>
+                    </View>
+                </View>
+            </View>
         );
     }
 

@@ -21,6 +21,14 @@ class TextSwitchSelector extends PureComponent {
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
+        if(this.props.isEditMode){
+            return this.editInput();
+        }else{
+            return this.viewInput();
+        }
+    }
+
+    editInput() {
         return (
             <View style={[{
                 width: '100%',
@@ -41,6 +49,12 @@ class TextSwitchSelector extends PureComponent {
         );
     }
 
+    viewInput() {
+        return (
+            <View></View>
+        );
+    }
+  
     // Please write here all the methods that are not react native lifecycle methods
     onChangeItem = (selectedValue) => {
         let selectedValueIndex = config[this.props.values].map((e) => {return e.value}).indexOf(selectedValue)
@@ -55,18 +69,14 @@ const style = StyleSheet.create({
 
 });
 
-// TextSwitchSelector.propTypes = {
-//     id: PropTypes.string.isRequired,
-//     label: PropTypes.string.isRequired,
-//     value: PropTypes.bool.isRequired,
-//     showValue: PropTypes.bool.isRequired,
-//     isEditMode: PropTypes.bool.isRequired,
-//     isRequired: PropTypes.bool.isRequired,
-//     onChange: PropTypes.func.isRequired,
-//     activeButtonColor: PropTypes.string.isRequired,
-//     activeBackgroundColor: PropTypes.string.isRequired,
-//     style: PropTypes.object,
-//     labelStyle: PropTypes.object,
-// };
+TextSwitchSelector.propTypes = {
+    selectedItem: PropTypes.bool.isRequired,
+    selectedItemIndexForTextSwitchSelector: PropTypes.bool.isRequired,
+    values: PropTypes.bool.isRequired,
+    isEditMode: PropTypes.bool.isRequired,
+    onChange: PropTypes.func.isRequired,
+    style: PropTypes.object,
+    labelStyle: PropTypes.object,
+};
 
 export default TextSwitchSelector;

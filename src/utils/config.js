@@ -2,6 +2,7 @@
  * Created by florinpopa on 14/06/2018.
  */
 import styles from './../styles';
+import {Platform} from 'react-native';
 
 const baseUrls = [
     {value: 'gva11sucombee.who.int:3000'},
@@ -329,25 +330,41 @@ const caseSingleScreen = {
                 },
                 {
                     cardNumber: 2,
-                    id: 'age',
-                    label: 'Age',
-                    type: 'TextInput',
-                    value: '',
-                    isRequired: false,
-                    isEditMode: false,
+                    id: 'ageOrDob',
+                    type: 'TextSwitchSelector',
+                    values: 'TextSwitchSelectorAgeOrDobValues', //switch possibilities from config file
+                    selectedItemIndexForTextSwitchSelector: 'selectedItemIndexForTextSwitchSelectorForAge', //name of state parameter that will contain the selected index from values
+                    isEditMode: true,
                     objectType: 'Case'
                 },
-                // {
-                //     cardNumber: 1,
-                //     id: 'dob',
-                //     label: 'Date of Birth',
-                //     value: '',
-                //     type: "DatePicker",
-                //     isRequired: true,
-                //     isEditMode: false,
-                //     format: 'YYYY-MM-dd',
-                //     objectType: 'Case'
-                // },
+                {
+                    cardNumber: 2,
+                    id: 'dob',
+                    label: 'Date of birth',
+                    labelValue: 'test',
+                    value: '',
+                    type: "DatePicker",
+                    isRequired: false,
+                    isEditMode: true,
+                    dependsOn: 'TextSwitchSelectorAgeOrDobValues', //if depends on this switch item and it is not selected, don't display
+                    format: 'MM/dd/YYYY',
+                    objectType: 'Case'
+                },
+                {
+                    cardNumber: 2,
+                    id: 'age',
+                    label: 'Age',
+                    type: 'TextInputWithDropDown',
+                    value: '',
+                    isRequired: false,
+                    isEditMode: true,
+                    multiline: false,
+                    dependsOn: 'TextSwitchSelectorAgeOrDobValues',
+                    dropDownData: 'ageUnitOfMeasureDropDown', //drop down with values
+                    selectedItemIndexForAgeUnitOfMeasureDropDown: 'selectedItemIndexForAgeUnitOfMeasureDropDown', //name of state parameter that will contain the selected index from values
+                    objectType: 'Case',
+                    keyboardType: Platform.OS === 'ios' ? 'number-pad' : 'numeric'
+                },
             ]
         }
     ],
@@ -1075,7 +1092,7 @@ const contactsSingleScreen = {
                     dropDownData: 'ageUnitOfMeasureDropDown', //drop down with values
                     selectedItemIndexForAgeUnitOfMeasureDropDown: 'selectedItemIndexForAgeUnitOfMeasureDropDown', //name of state parameter that will contain the selected index from values
                     objectType: 'Contact',
-                    keyboardType: 'decimal-pad'
+                    keyboardType: Platform.OS === 'ios' ? 'number-pad' : 'numeric'
                 },
                 {
                     cardNumber: 3,
@@ -1214,7 +1231,6 @@ const personTypes = {
     contacts: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT',
     events: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_EVENT'
 };
-
 
 const mongoCollections = {
     cluster: 'cluster.json',

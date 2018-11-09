@@ -102,6 +102,15 @@ class CardComponent extends Component {
                     }
                 }
             }
+            if (this.props.contact !== null && nextProps.contact !== null && nextProps.contact.age !== null && this.props.contact.age !== null) {
+                if (this.props.contact.age.months === 0 && this.props.contact.age.years === 0 && nextProps.contact.age.months === 0 && nextProps.contact.age.years === 0) {
+                    return true
+                } else if (this.props.contact.age.months !== nextProps.contact.age.months || this.props.contact.age.years !== nextProps.contact.age.years){
+                    return true
+                } else if (nextProps.contact.age.months === 0 || this.props.contact.age.years === 0){
+                    return true
+                }
+            }
         }
 
         //CaseSingleScreen
@@ -140,7 +149,6 @@ class CardComponent extends Component {
             if (this.props.isEditMode !== nextProps.isEditMode) {
                 return true
             }
-
             if (this.props.case && this.props.case.addresses && Array.isArray(this.props.case.addresses)) {
                 if (this.props.case.addresses.length === nextProps.case.addresses.length) {
                     for (let i = 0; i < this.props.case.addresses.length; i++) {
@@ -148,6 +156,15 @@ class CardComponent extends Component {
                             return true
                         }
                     }
+                }
+            }
+            if (this.props.case !== null && nextProps.case !== null && nextProps.case.age !== null && this.props.case.age !== null) {
+                if (this.props.case.age.months === 0 && this.props.case.age.years === 0 && nextProps.case.age.months === 0 && nextProps.case.age.years === 0) {
+                    return true
+                } else if (this.props.case.age.months !== nextProps.case.age.months || this.props.case.age.years !== nextProps.case.age.years){
+                    return true
+                } else if (nextProps.case.age.months === 0 || this.props.case.age.years === 0){
+                    return true
                 }
             }
         }
@@ -288,10 +305,11 @@ class CardComponent extends Component {
                 if (itemIndexInConfigTextSwitchSelectorValues > -1) {
                     if (itemIndexInConfigTextSwitchSelectorValues != this.props.selectedItemIndexForTextSwitchSelectorForAge) {
                         return
-                    } else {
-
                     }
                 }
+            }
+            if (item.id === 'dob' && item.type === 'DatePicker' && item.objectType === 'Contact') {
+                maximumDate = new Date()
             }
         }
 
@@ -346,6 +364,17 @@ class CardComponent extends Component {
                 }
             } else {
                 value = this.computeValueForCasesSingleScreen(item, this.props.index);
+            }
+            if (this.props.selectedItemIndexForTextSwitchSelectorForAge !== null && this.props.selectedItemIndexForTextSwitchSelectorForAge !== undefined && item.objectType === 'Case' && item.dependsOn !== undefined && item.dependsOn !== null){
+                let itemIndexInConfigTextSwitchSelectorValues = config[item.dependsOn].map((e) => {return e.value}).indexOf(item.id)
+                if (itemIndexInConfigTextSwitchSelectorValues > -1) {
+                    if (itemIndexInConfigTextSwitchSelectorValues != this.props.selectedItemIndexForTextSwitchSelectorForAge) {
+                        return
+                    }
+                }
+            }
+            if (item.id === 'dob' && item.type === 'DatePicker' && item.objectType === 'Case') {
+                maximumDate = new Date()
             }
         }
 

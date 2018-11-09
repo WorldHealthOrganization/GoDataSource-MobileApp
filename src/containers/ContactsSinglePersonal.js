@@ -109,10 +109,18 @@ class ContactsSinglePersonal extends Component {
 
     handleNextButton = () => {
         if (this.props.checkRequiredFieldsPersonalInfo()) {
-            if (this.props.checkAgeRequirements()) {
-                this.props.handleMoveToNextScreenButton()
+            if (this.props.checkAgeYearsRequirements()) {
+                if (this.props.checkAgeMonthsRequirements()){
+                    this.props.handleMoveToNextScreenButton()
+                } else {
+                    Alert.alert("Alert", 'Number of months must be between 0 and 11', [
+                        {
+                            text: 'Ok', onPress: () => {console.log("OK pressed")}
+                        }
+                    ])
+                }
             } else {
-                Alert.alert("Alert", this.props.ageErrorMessage, [
+                Alert.alert("Alert", 'Number of years must be between 0 and 150', [
                     {
                         text: 'Ok', onPress: () => {console.log("OK pressed")}
                     }

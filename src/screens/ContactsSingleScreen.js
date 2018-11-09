@@ -74,9 +74,8 @@ class ContactsSingleScreen extends Component {
             canChangeScreen: false,
             anotherPlaceOfResidenceWasChosen: false,
             hasPlaceOfResidence: this.props.isNew ? false : true,
-            selectedItemIndexForTextSwitchSelectorForAge: 0,
-            selectedItemIndexForAgeUnitOfMeasureDropDown: 0,
-            ageErrorMessage: ''
+            selectedItemIndexForTextSwitchSelectorForAge: 0, // age/dob - switch tab
+            selectedItemIndexForAgeUnitOfMeasureDropDown: this.props.isNew ? 0 : this.props.contact.age.years > 0 ? 0 : 1, //default age dropdown value
         };
         // Bind here methods, or at least don't declare methods in the render method
     }
@@ -331,8 +330,8 @@ class ContactsSingleScreen extends Component {
                         onChangeTextSwitchSelector={this.handleOnChangeTextSwitchSelector}
                         selectedItemIndexForTextSwitchSelectorForAge={this.state.selectedItemIndexForTextSwitchSelectorForAge}
                         selectedItemIndexForAgeUnitOfMeasureDropDown={this.state.selectedItemIndexForAgeUnitOfMeasureDropDown}
-                        checkAgeRequirements={this.checkAgeRequirements}
-                        ageErrorMessage={this.state.ageErrorMessage}
+                        checkAgeMonthsRequirements={this.checkAgeMonthsRequirements}
+                        checkAgeYearsRequirements={this.checkAgeYearsRequirements}
                     />
                 );
             case 'address':
@@ -419,19 +418,17 @@ class ContactsSingleScreen extends Component {
 
         if (stateValue !== undefined && stateValue !== null){
             if (id === 'age'){
-                let ageClone = { years: 0, months: 0 }
-                let dobClone = null
+                let ageClone = {years: 0, months: 0}
 
-                if (this.state[stateValue] === 0) {
+                if (!isNaN(Number(value)) && !value.includes(".") && !value.includes("-") && !value.includes(",") && !value.includes(" ")) {
                     ageClone.years = Number(value)
-                }
-                if (this.state[stateValue] === 1 ) {
                     ageClone.months = Number(value)
                 }
+
                 this.setState(prevState => ({
-                    contact: Object.assign({}, prevState.contact, {age: ageClone}, {dob: dobClone}),
+                    contact: Object.assign({}, prevState.contact, {age: ageClone}, {dob: null}),
                 }), () => {
-                    console.log("handleOnChangeTextInputWithDropDown done if", id, " ", value, " ", this.state.contact);
+                    console.log("handleOnChangeTextInputWithDropDown done", id, " ", value, " ", this.state.contact);
                 })
             }
         }
@@ -474,11 +471,29 @@ class ContactsSingleScreen extends Component {
     };
 
     handleOnChangeTextSwitchSelector = (index, stateValue) => {
-        this.setState({
-            [stateValue]: index,
-        }, () => {
-            console.log ('handleOnChangeTextSwitchSelector', stateValue, this.state[stateValue])
-        })
+        if (stateValue === 'selectedItemIndexForAgeUnitOfMeasureDropDown') {
+            let ageClone = Object.assign({}, this.state.contact.age)
+            if (!this.props.isNew) {
+                if (ageClone.years === 0 && ageClone.months !== 0) {
+                    ageClone.years = ageClone.months
+                } else if (ageClone.monthsyears === 0 && ageClone.years !== 0){
+                    ageClone.months = ageClone.years
+                }
+            }
+            this.setState(prevState => ({
+                [stateValue]: index,
+                contact: Object.assign({}, prevState.contact, {dob: null}, {age: ageClone}),
+
+            }), () => {
+                console.log ('handleOnChangeTextSwitchSelector', stateValue, this.state[stateValue])
+            })
+        } else {
+            this.setState({
+                [stateValue]: index,
+            }, () => {
+                console.log ('handleOnChangeTextSwitchSelector', stateValue, this.state[stateValue])
+            })
+        }
     }
 
     handleOnChangeDate = (value, id, objectType) => {
@@ -502,9 +517,11 @@ class ContactsSingleScreen extends Component {
 
                 if (nrOFYears.years === 0 && nrOFYears.months >= 0) {
                     ageClone.months = nrOFYears.months
+                    ageClone.years = nrOFYears.months
                     selectedItemIndexForAgeUnitOfMeasureDropDown = 1
                 } else {
                     if (nrOFYears.years > 0) {
+                        ageClone.months = nrOFYears.years
                         ageClone.years = nrOFYears.years
                         selectedItemIndexForAgeUnitOfMeasureDropDown = 0
                     }
@@ -768,43 +785,65 @@ class ContactsSingleScreen extends Component {
     };
 
     handleOnPressSave = () => {
-        // Che ck the required fields and then update the contact
+        // Check the required fields and then update the contact
         if (this.checkRequiredFields()) {
-            if (this.state.hasPlaceOfResidence === true){
-                this.setState({
-                    savePressed: true
-                }, () => {
-                    this.hideMenu()
-                    if (this.props.isNew) {
-                        let contactWithRequiredFields = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, this.state.contact), action = 'create', fileType = 'person.json', type = 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT')
-                        this.setState(prevState => ({
-                            contact: Object.assign({}, prevState.contact, contactWithRequiredFields)
-                        }), () => {
-                            let contactClone = _.cloneDeep(this.state.contact)
-                            this.props.addContact(this.props.user.activeOutbreakId, contactClone, this.props.user.token);
-                        })
+            if (this.checkAgeYearsRequirements()) {
+                if (this.checkAgeMonthsRequirements()) {
+                    if (this.state.hasPlaceOfResidence === true){
+                        this.setState({
+                            savePressed: true
+                        }, () => {
+                            this.hideMenu()
+                            let ageConfig = this.ageAndDobPrepareForSave()
+                            this.setState(prevState => ({
+                                contact: Object.assign({}, prevState.contact, {age: ageConfig.ageClone}, {dob: ageConfig.dobClone}),
+                            }), () => {
+                                console.log("ageAndDobPrepareForSave done", this.state.contact);
+                                if (this.props.isNew) {
+                                    let contactWithRequiredFields = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, this.state.contact), action = 'create', fileType = 'person.json', type = 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT')
+                                    this.setState(prevState => ({
+                                        contact: Object.assign({}, prevState.contact, contactWithRequiredFields)
+                                    }), () => {
+                                        let contactClone = _.cloneDeep(this.state.contact)
+                                        this.props.addContact(this.props.user.activeOutbreakId, contactClone, this.props.user.token);
+                                    })
+                                } else {
+                                    let contactWithRequiredFields = null;
+                                    if (this.state.deletePressed === true) {
+                                        contactWithRequiredFields = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, this.state.contact), action = 'delete')
+                                    } else {
+                                        contactWithRequiredFields = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, this.state.contact), action = 'update')
+                                    }
+            
+                                    this.setState(prevState => ({
+                                        contact: Object.assign({}, prevState.contact, contactWithRequiredFields)
+                                    }), () => {
+                                        let contactClone = _.cloneDeep(this.state.contact)
+                                        this.props.updateContact(this.props.user.activeOutbreakId, contactClone._id, contactClone, this.props.user.token);
+                                    })
+                                }
+                            })
+                        });
                     } else {
-                        let contactWithRequiredFields = null;
-                        if (this.state.deletePressed === true) {
-                            contactWithRequiredFields = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, this.state.contact), action = 'delete')
-                        } else {
-                            contactWithRequiredFields = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, this.state.contact), action = 'update')
+                        Alert.alert("Validation error", 'Please add the place of residence address', [
+                            {
+                                text: 'Ok', onPress: () => {this.hideMenu()}
+                            }
+                        ])
+                    }
+                } else {
+                    Alert.alert("Alert", 'Number of months must be between 0 and 11', [
+                        {
+                            text: 'Ok', onPress: () => {console.log("OK pressed")}
                         }
-
-                        this.setState(prevState => ({
-                            contact: Object.assign({}, prevState.contact, contactWithRequiredFields)
-                        }), () => {
-                            let contactClone = _.cloneDeep(this.state.contact)
-                            this.props.updateContact(this.props.user.activeOutbreakId, contactClone._id, contactClone, this.props.user.token);
-                        })
-                    }
-                });
+                    ])
+                }
             } else {
-                Alert.alert("Validation error", 'Please add the place of residence address', [
-                    {
-                        text: 'Ok', onPress: () => {this.hideMenu()}
-                    }
-                ])
+            Alert.alert("Alert", 'Number of years must be between 0 and 150', [
+                {
+                    text: 'Ok', onPress: () => {console.log("OK pressed")}
+                }
+            ])
             }
         } else {
             Alert.alert("Validation error", 'Some of the required fields are missing. Please make sure you have completed them', [
@@ -814,6 +853,36 @@ class ContactsSingleScreen extends Component {
             ])
         }
     };
+
+    ageAndDobPrepareForSave = () => {
+        let dobClone = null
+        let ageClone = { years: 0, months: 0 }
+
+        if (this.state.contact.dob !== null) {
+            //get info from date
+            dobClone = this.state.contact.dob
+            let today = new Date()
+            let nrOFYears = this.calcDateDiff(today, dobClone);
+
+            //calc age for save
+            if (nrOFYears.years === 0 && nrOFYears.months >= 0) {
+                ageClone.months = nrOFYears.months
+            } else if (nrOFYears.years > 0) {
+                ageClone.years = nrOFYears.years
+            }
+        } else if (this.state.selectedItemIndexForAgeUnitOfMeasureDropDown === 0 && this.state.contact.dob === null) {
+            //years dropdown 
+            ageClone.years = this.state.contact.age.years
+        } else if (this.state.selectedItemIndexForAgeUnitOfMeasureDropDown === 1 && this.state.contact.dob === null) {
+            //months dropdown 
+            ageClone.months = this.state.contact.age.months
+        }
+        return {
+            ageClone: ageClone,
+            dobClone: dobClone
+        }
+       
+    }
 
     handleOnPressDeceased = () => {
         console.log("### show date time picker: ");
@@ -854,33 +923,26 @@ class ContactsSingleScreen extends Component {
         return true
     }
 
-    checkAgeRequirements = () => {
-        //years
+    checkAgeYearsRequirements = () => {
         if (this.state.selectedItemIndexForAgeUnitOfMeasureDropDown === 0) {
             if (this.state.contact.age.years < 0 || this.state.contact.age.years > 150) {
-                this.setState({
-                    ageErrorMessage: 'Number of years must be between 0 and 150'
-                }, () => {
-                })
                 return false
             }
         }
+        return true
+    }
 
-            //months
+    checkAgeMonthsRequirements = () => {
         if (this.state.selectedItemIndexForAgeUnitOfMeasureDropDown === 1) {
             if (this.state.contact.age.months < 0 || this.state.contact.age.months > 11) {
-                this.setState({
-                    ageErrorMessage: 'Number of months must be between 0 and 11'
-                }, () => {
-                    return false
-                })
+                return false
             }
         }
-    return true
+        return true
     }
 
     checkRequiredFields = () => {
-        return this.checkRequiredFieldsPersonalInfo() && this.checkRequiredFieldsAddresses() && this.checkRequiredFieldsRelationships() && this.checkAgeRequirements()
+        return this.checkRequiredFieldsPersonalInfo() && this.checkRequiredFieldsAddresses() && this.checkRequiredFieldsRelationships()
     };
 
     showMenu = () => {
