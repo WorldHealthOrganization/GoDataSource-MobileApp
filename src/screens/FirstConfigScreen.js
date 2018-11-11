@@ -20,6 +20,7 @@ import DropdownInput from './../components/DropdownInput';
 import config from './../utils/config';
 import url from './../utils/url';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import { DocumentPicker, DocumentPickerUtil } from 'react-native-document-picker';
 
 class FirstConfigScreen extends Component {
 

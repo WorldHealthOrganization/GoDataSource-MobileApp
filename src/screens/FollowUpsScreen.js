@@ -395,9 +395,13 @@ class FollowUpsScreen extends Component {
     handlePressFollowUp = (item, contact) => {
         console.log("### handlePressFollowUp: ", item);
 
-        let itemClone = Object.assign({}, item)
-        let contactPlaceOfResidence = contact.addresses.filter((e) => {return e.typeId === config.userResidenceAddress.userPlaceOfResidence})
-        itemClone.address = contactPlaceOfResidence[0]
+        let itemClone = Object.assign({}, item);
+        if (contact && contact.addresses && Array.isArray(contact.addresses) && contact.addresses.length > 0) {
+            let contactPlaceOfResidence = contact.addresses.filter((e) => {
+                return e.typeId === config.userResidenceAddress.userPlaceOfResidence
+            });
+            itemClone.address = contactPlaceOfResidence[0];
+        }
         this.props.navigator.push({
             screen: 'FollowUpsSingleScreen',
             animated: true,
@@ -419,22 +423,22 @@ class FollowUpsScreen extends Component {
             },
             {
                 text: 'Yes', onPress: () => {
-                    let myFollowUp = Object.assign({}, followUp)
-                    let myFollowups = Object.assign([], contact.followUps)
-            
-                    myFollowUp.statusId = config.followUpStatuses.missed
-                    myFollowUp = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, myFollowUp), action = 'update')
-            
-                    myFollowups[myFollowups.map((e) => {return e._id}).indexOf(myFollowUp._id)] = myFollowUp
-                    let myContact = Object.assign({}, contact, {followUps: myFollowups})
-            
-                    if (this.props && this.props.user && this.props.user.activeOutbreakId) {
-                        this.props.updateFollowUpAndContact(this.props.user.activeOutbreakId, null, myFollowUp._id, myFollowUp, myContact, null);
-                    }
+                let myFollowUp = Object.assign({}, followUp)
+                let myFollowups = Object.assign([], contact.followUps)
+
+                myFollowUp.statusId = config.followUpStatuses.missed
+                myFollowUp = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, myFollowUp), action = 'update')
+
+                myFollowups[myFollowups.map((e) => {return e._id}).indexOf(myFollowUp._id)] = myFollowUp
+                let myContact = Object.assign({}, contact, {followUps: myFollowups})
+
+                if (this.props && this.props.user && this.props.user.activeOutbreakId) {
+                    this.props.updateFollowUpAndContact(this.props.user.activeOutbreakId, null, myFollowUp._id, myFollowUp, myContact, null);
                 }
             }
+            }
         ])
-     
+
     };
 
     handleOnPressExposure = (followUp, contact) => {
@@ -450,29 +454,33 @@ class FollowUpsScreen extends Component {
 
     handleOnPressMap = (followUp, contact) => {
 
-        let contactPlaceOfResidence = contact.addresses.filter((e) => {return e.typeId === config.userResidenceAddress.userPlaceOfResidence})
-        console.log ('contactPlaceOfResidence', contactPlaceOfResidence)
+        if (contact && contact.addresses && Array.isArray(contact.addresses) && contact.addresses.length > 0) {
+            let contactPlaceOfResidence = contact.addresses.filter((e) => {
+                return e.typeId === config.userResidenceAddress.userPlaceOfResidence
+            })
+            console.log('contactPlaceOfResidence', contactPlaceOfResidence)
 
-        navigator.geolocation.getCurrentPosition(
-            (position) => {
-                this.setState({
-                    latitude: contactPlaceOfResidence[0].geoLocation && contactPlaceOfResidence[0].geoLocation.lat ? contactPlaceOfResidence[0].geoLocation.lat : 0,
-                    longitude: contactPlaceOfResidence[0].geoLocation && contactPlaceOfResidence[0].geoLocation.lng ? contactPlaceOfResidence[0].geoLocation.lng : 0,
-                    sourceLatitude: position.coords.latitude,
-                    sourceLongitude: position.coords.longitude,
-                    isVisible: true,
-                    error: null,
-                });
-            },
-            (error) => {
-                this.setState({ error: error.message })
-            },
-        );
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    this.setState({
+                        latitude: contactPlaceOfResidence[0].geoLocation && contactPlaceOfResidence[0].geoLocation.lat ? contactPlaceOfResidence[0].geoLocation.lat : 0,
+                        longitude: contactPlaceOfResidence[0].geoLocation && contactPlaceOfResidence[0].geoLocation.lng ? contactPlaceOfResidence[0].geoLocation.lng : 0,
+                        sourceLatitude: position.coords.latitude,
+                        sourceLongitude: position.coords.longitude,
+                        isVisible: true,
+                        error: null,
+                    });
+                },
+                (error) => {
+                    this.setState({error: error.message})
+                },
+            );
 
-        // this.props.navigator.showModal({
-        //     screen: 'MapScreen',
-        //     animated: true
-        // })
+            // this.props.navigator.showModal({
+            //     screen: 'MapScreen',
+            //     animated: true
+            // })
+        }
     }
 
     handlePressFilter = () => {
