@@ -304,10 +304,7 @@ class FollowUpsScreen extends Component {
     }
 
     renderFollowUp = ({item}) => {
-        let oneDay = 24 * 60 * 60 * 1000;
-        let itemDate = new Date(item.date).getTime();
-        let now = new Date().getTime() - oneDay;
-        if ((!item.performed && itemDate < now) || item.lostToFollowUp) {
+        if (item.statusId === config.followUpStatuses.missed) {
             return (<MissedFollowUpListItem
                 item={item}
                 onPressFollowUp={this.handlePressFollowUp}
