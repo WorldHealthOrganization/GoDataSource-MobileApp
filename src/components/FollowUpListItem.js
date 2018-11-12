@@ -15,6 +15,7 @@ import Button from './Button';
 import styles from './../styles';
 import Ripple from 'react-native-material-ripple';
 import ElevatedView from 'react-native-elevated-view';
+import _ from 'lodash';
 
 class FollowUpListItem extends PureComponent {
 
@@ -45,6 +46,14 @@ class FollowUpListItem extends PureComponent {
         }
         // if (contact) {
             let primaryText = contact ? ((contact.firstName ? contact.firstName : ' ') + (contact.lastName ? (" " + contact.lastName) : ' ')) : '';
+            let primaryColor = 'black'
+            if (contact && this.props.isContact){
+                let contactRiskLevelValue = this.props.riskLevelReferenceData.filter((e) => { return e.value === contact.riskLevel})
+                if (contactRiskLevelValue.length === 1) {
+                    primaryColor = contactRiskLevelValue[0].colorCode
+                }
+            }
+         
             let genderString = '';
             if (contact && contact.gender) {
                 genderString = this.getTranslation(contact.gender);
@@ -88,9 +97,9 @@ class FollowUpListItem extends PureComponent {
                         numberOfLines={1}
                         centerElement={
                             <View style={style.centerItemContainer}>
-                                <Text style={[style.primaryText, {flex: 3}]} numberOfLines={1}>{primaryText}</Text>
+                                <Text style={[style.primaryText, {flex: 3, color: primaryColor}]} numberOfLines={1}>{primaryText}</Text>
                                 <Text style={[style.primaryText, {marginHorizontal: 7}]}>{'\u2022'}</Text>
-                                <Text style={[style.secondaryText, {flex: 1}]}>{secondaryText}</Text>
+                                <Text style={[style.secondaryText, {flex: 1, color: primaryColor}]}>{secondaryText}</Text>
                             </View>
                         }
                         rightElement={
@@ -247,7 +256,7 @@ function mapStateToProps(state) {
         translation: state.app.translation,
         contacts: state.contacts,
         cases: state.cases,
-        events: state.events
+        events: state.events,
     };
 }
 
