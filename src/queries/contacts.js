@@ -8,7 +8,7 @@ import config from './../utils/config';
 export function getContactsForOutbreakIdRequest (outbreakId, filter, token, callback) {
     let database = getDatabase();
 
-    console.log("getContactsForOutbreakIdRequest: ", outbreakId, filter, token, callback);
+    // console.log("getContactsForOutbreakIdRequest: ", outbreakId, filter, token, callback);
 
     let start = new Date().getTime();
     if (filter && filter.keys) {

@@ -121,7 +121,11 @@ class FollowUpsScreen extends Component {
     }
 
     componentDidMount() {
-        console.log ('componentDidMount')
+        console.log ('componentDidMount');
+        this.props.navigator.setDrawerEnabled({
+            side: 'left',
+            enabled: true
+        })
         this.setState({
             loading: true
         }, () => {
@@ -301,23 +305,17 @@ class FollowUpsScreen extends Component {
         this.setState({
             loading: true
         })
-    }
+    };
 
     renderFollowUp = ({item}) => {
-        if (item.statusId === config.followUpStatuses.missed) {
-            return (<MissedFollowUpListItem
-                item={item}
-                onPressFollowUp={this.handlePressFollowUp}
-            />)
-        } else {
-            return (<FollowUpListItem
-                item={item}
-                onPressFollowUp={this.handlePressFollowUp}
-                onPressMissing={this.handleOnPressMissing}
-                onPressExposure={this.handleOnPressExposure}
-                onPressMap={this.handleOnPressMap}
-            />)
-        }
+        return (<FollowUpListItem
+            item={item}
+            onPressFollowUp={this.handlePressFollowUp}
+            onPressMissing={this.handleOnPressMissing}
+            onPressExposure={this.handleOnPressExposure}
+            onPressMap={this.handleOnPressMap}
+            firstActionText={this.getTranslation(item.statusId)}
+        />)
     };
 
     getItemLayout = (data, index) => ({

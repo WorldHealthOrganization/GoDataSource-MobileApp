@@ -154,10 +154,16 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
 
     checkRequiredQuestions = () => {
         // Loop through all categories' questions and if a required question is unanswered return false
-        for (let i=0; i<this.state.questions.length; i++) {
-            for(let j=0; j<this.state.questions[i].questions.length; j++) {
-                if (this.state.questions[i].questions[j].required && !this.props.item.questionnaireAnswers[this.state.questions[i].questions[j].variable]) {
-                    return false;
+        if (this.state.questions && Array.isArray(this.state.questions) && this.state.questions.length > 0) {
+            for (let i = 0; i < this.state.questions.length; i++) {
+                if (this.state.questions[i] && this.state.questions[i].questions && Array.isArray(this.state.questions[i].questions) && this.state.questions[i].questions.length > 0) {
+                    for (let j = 0; j < this.state.questions[i].questions.length; j++) {
+                        if (this.state.questions[i].questions[j].variable && this.props.item) {
+                            if (!this.props.item.questionnaireAnswers || this.state.questions[i].questions[j].required && !this.props.item.questionnaireAnswers[this.state.questions[i].questions[j].variable]) {
+                                return false;
+                            }
+                        }
+                    }
                 }
             }
         }

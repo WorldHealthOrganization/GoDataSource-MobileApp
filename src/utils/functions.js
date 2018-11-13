@@ -71,6 +71,7 @@ export function getAddress(address, returnString) {
 }
 
 export function navigation(event, navigator) {
+    console.log('Event: ', event);
     if (event.type === 'DeepLink') {
         // console.log("###");
         if (event.link.includes('Navigate')) {

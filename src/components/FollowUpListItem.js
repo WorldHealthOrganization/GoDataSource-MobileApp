@@ -128,9 +128,13 @@ class FollowUpListItem extends PureComponent {
                     <Ripple style={[style.rippleStyle]} onPress={this.onPressFollowUp}>
                         <Text style={[style.rippleTextStyle]}>{this.props.firstActionText || 'FOLLOW-UP'}</Text>
                     </Ripple>
-                    <Ripple style={[style.rippleStyle]} onPress={this.onPressMissing}>
-                        <Text style={[style.rippleTextStyle]}>{this.props.secondActionText || 'MISSING'}</Text>
-                    </Ripple>
+                    {
+                        this.props.isContact ? (
+                            <Ripple style={[style.rippleStyle]} onPress={this.onPressMissing}>
+                                <Text style={[style.rippleTextStyle]}>{this.props.secondActionText || 'MISSING'}</Text>
+                            </Ripple>
+                        ) : (null)
+                    }
                     <Ripple style={[style.rippleStyle]} onPress={this.onPressExposure}>
                         <Text style={[style.rippleTextStyle]}>{this.props.thirdActionText || 'ADD EXPOSURE'}</Text>
                     </Ripple>

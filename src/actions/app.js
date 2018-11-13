@@ -238,7 +238,7 @@ function processFilesForSync(error, response, hubConfiguration) {
 
 
                     // Create local database
-                    createDatabase(hubConfiguration.url.replace(/\/|\.|\:/g, ''), hubConfiguration.clientSecret, (database) => {
+                    createDatabase(hubConfiguration.url.replace(/\/|\.|\:/g, ''), hubConfiguration.clientSecret, true, (database) => {
                         // Create a promise array to run syncing for all the files from the db
                         let promises = [];
                         readDir(responseUnzipPath, (errorReadDir, files) => {
@@ -388,8 +388,10 @@ export function sendDatabaseToServer () {
 export function storeData (key, value, callback) {
     AsyncStorage.setItem(key, value, (error) => {
         if (error) {
+            console.log('~~~~Error while storing data: ', error);
             callback(error)
         } else {
+            console.log("~~~~Success at storing data");
             callback(null, 'Success')
         }
     });
@@ -453,7 +455,7 @@ export function appInitialized() {
                             if (databaseCredentials) {
                                 console.log('Database credentials: ', databaseCredentials);
                                 let server = Platform.OS === 'ios' ? databaseCredentials.server : databaseCredentials.service;
-                                createDatabase(server.replace(/\/|\.|\:/g, ''), databaseCredentials.password, (database) => {
+                                createDatabase(server.replace(/\/|\.|\:/g, ''), databaseCredentials.password, false, (database) => {
                                     dispatch(getUserById(loggedUser, null));
                                 })
                             } else {
@@ -483,7 +485,7 @@ export function appInitialized() {
                             let databaseCredentials = await getInternetCredentials(activeDatabase);
                             console.log('Database credentials: ', databaseCredentials);
                             if (databaseCredentials) {
-                                createDatabase(databaseCredentials.server.replace(/\/|\.|\:/g, ''), databaseCredentials.password, (database) => {
+                                createDatabase(databaseCredentials.server.replace(/\/|\.|\:/g, ''), databaseCredentials.password, false, (database) => {
                                     dispatch(changeAppRoot('login'));
                                 })
                             } else {
@@ -514,7 +516,7 @@ export function appInitialized() {
                         let databaseCredentials = await getInternetCredentials(activeDatabase);
                         console.log('Database credentials: ', databaseCredentials);
                         if (databaseCredentials) {
-                            createDatabase(databaseCredentials.server.replace(/\/|\.|\:/g, ''), databaseCredentials.password, (database) => {
+                            createDatabase(databaseCredentials.server.replace(/\/|\.|\:/g, ''), databaseCredentials.password, false, (database) => {
                                 dispatch(changeAppRoot('login'));
                             })
                         } else {
@@ -534,9 +536,6 @@ export function appInitialized() {
                 dispatch(changeAppRoot('config'));
             }
         }
-
-
-
 
 
         // getData('loggedUser', (error, loggedUser) => {
@@ -580,10 +579,6 @@ export function appInitialized() {
         //     }
         // });
 
-
-
-
-
         // Get the translations from the api and save them to the redux store
         // dispatch(getTranslations());
         // dispatch(changeAppRoot('login'));
@@ -592,7 +587,6 @@ export function appInitialized() {
         //     email: 'florin.popa@clarisoft.com',
         //     password: 'Cl@r1soft'
         // }));
-
 
         // I don't think we need this in production since before the user logs in, the translations should be already saved
         // TODO comment what's below and uncomment the code above

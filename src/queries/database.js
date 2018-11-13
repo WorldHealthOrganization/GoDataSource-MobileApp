@@ -52,12 +52,12 @@ let databaseIndexes = [
 
 // PouchDB wrapper over SQLite uses one database per user, so we will store all documents from all the mongo collection to a single database.
 // We will separate the records by adding a new property called type: <collection_name>
-export function createDatabase(databaseName, databasePassword, callback) {
+export function createDatabase(databaseName, databasePassword, forceNewDatabase, callback) {
     // Define the design documents that tells the database to build indexes in order to query
     let promisesArray = [];
 
     // Check first if the database is cached
-    if (database) {
+    if (database && !forceNewDatabase) {
         return callback(database);
     }
     // After that, check if there is already a database with the name and return that
