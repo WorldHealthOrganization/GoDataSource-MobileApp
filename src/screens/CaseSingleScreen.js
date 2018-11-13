@@ -158,7 +158,6 @@ class CaseSingleScreen extends Component {
                                         </Ripple>
                                     }
                                 >
-                                    <MenuItem onPress={this.handleOnPressSave}>Save</MenuItem>
                                     {
                                         !this.props.isNew ? (
                                             <MenuItem onPress={this.handleOnPressDeleteCase}>Delete case</MenuItem>
@@ -350,6 +349,7 @@ class CaseSingleScreen extends Component {
                     item={this.state.case}
                     isEditMode={this.state.isEditMode}
                     onPressEdit={this.onPressEdit}
+                    onPressSave={this.handleOnPressSave}
                     onPressSaveEdit={this.onPressSaveEdit}
                     onPressCancelEdit={this.onPressCancelEdit}
                     onChangeTextAnswer={this.onChangeTextAnswer}
