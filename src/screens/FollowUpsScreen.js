@@ -7,7 +7,7 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
-import {View, Text, StyleSheet, Alert, Animated, NativeModules} from 'react-native';
+import {View, Text, StyleSheet, Alert, Animated, NativeModules, BackHandler} from 'react-native';
 import {Button, Icon} from 'react-native-material-ui';
 import styles from './../styles';
 import NavBarCustom from './../components/NavBarCustom';
@@ -122,16 +122,13 @@ class FollowUpsScreen extends Component {
 
     componentDidMount() {
         console.log ('componentDidMount');
-        this.props.navigator.setDrawerEnabled({
-            side: 'left',
-            enabled: true
-        })
         this.setState({
             loading: true
         }, () => {
             this.props.getFollowUpsForOutbreakId(this.props.user.activeOutbreakId, this.state.filter, null);
         })
     }
+
 
     shouldComponentUpdate(nextProps, nextState) {
         if (!nextProps.user) {
