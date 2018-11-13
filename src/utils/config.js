@@ -261,10 +261,11 @@ const caseSingleScreen = {
                     cardNumber: 1,
                     id: 'occupation',
                     label: 'Occupation',
-                    type: 'TextInput',
+                    labelValue: 'test',
+                    type: 'DropdownInput',
                     value: '',
                     isRequired: false,
-                    isEditMode: false,
+                    isEditMode: true,
                     objectType: 'Case'
                 },
                 {
@@ -338,7 +339,6 @@ const caseSingleScreen = {
                     isEditMode: false,
                     activeButtonColor: styles.missedRedColor,
                     activeBackgroundColor: styles.missedRedColorWithOpacity,
-                    objectType: 'Case'
                 },
                 {
                     cardNumber: 2,
@@ -433,7 +433,7 @@ const caseSingleScreen = {
                 labelValue: 'test',
                 type: 'TextInput',
                 value: '',
-                isRequired: true,
+                isRequired: false,
                 isEditMode: true,
                 multiline: true,
                 objectType: 'Address'
@@ -445,7 +445,7 @@ const caseSingleScreen = {
                 labelValue: 'test',
                 type: 'TextInput',
                 value: '',
-                isRequired: true,
+                isRequired: false,
                 isEditMode: true,
                 multiline: true,
                 objectType: 'Address'
@@ -457,7 +457,7 @@ const caseSingleScreen = {
                 labelValue: 'test',
                 type: 'TextInput',
                 value: '',
-                isRequired: true,
+                isRequired: false,
                 isEditMode: true,
                 multiline: true,
                 objectType: 'Address'
@@ -1070,13 +1070,12 @@ const contactsSingleScreen = {
                 {
                     cardNumber: 1,
                     id: 'occupation',
-                    labelValue: 'test',
                     label: 'Occupation',
-                    type: 'TextInput',
+                    labelValue: 'test',
+                    type: 'DropdownInput',
                     value: '',
                     isRequired: false,
                     isEditMode: true,
-                    multiline: false,
                     objectType: 'Contact'
                 },
                 {
@@ -1192,7 +1191,7 @@ const contactsSingleScreen = {
                 labelValue: 'test',
                 type: 'TextInput',
                 value: '',
-                isRequired: true,
+                isRequired: false,
                 isEditMode: true,
                 multiline: true,
                 objectType: 'Address'
@@ -1204,7 +1203,7 @@ const contactsSingleScreen = {
                 labelValue: 'test',
                 type: 'TextInput',
                 value: '',
-                isRequired: true,
+                isRequired: false,
                 isEditMode: true,
                 multiline: true,
                 objectType: 'Address'
@@ -1216,7 +1215,7 @@ const contactsSingleScreen = {
                 labelValue: 'test',
                 type: 'TextInput',
                 value: '',
-                isRequired: true,
+                isRequired: false,
                 isEditMode: true,
                 multiline: true,
                 objectType: 'Address'
@@ -1559,6 +1558,11 @@ const followUpStatuses = {
     missed: 'LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE_MISSED'
 };
 
+const localTranslationTokens = {
+    years: 'LNG_AGE_FIELD_LABEL_YEARS',
+    months: 'LNG_AGE_FIELD_LABEL_MONTHS'
+};
+
 export default {
     designScreenSize,
     sideMenuItems,
@@ -1579,5 +1583,6 @@ export default {
     RNDBConfig,
     userResidenceAddress,
     contactFollowUpStatuses,
-    followUpStatuses
+    followUpStatuses,
+    localTranslationTokens
 }

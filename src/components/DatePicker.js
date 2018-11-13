@@ -64,7 +64,7 @@ class DatePicker extends PureComponent {
                                     color: 'rgb(60,60,60)',
                                     marginBottom: 7.5
                                 }}>
-                                    {moment(this.props.value).format('MM/DD/YYYY')}
+                                    {this.props.value !== undefined && this.props.value !== null ? moment(this.props.value).format('MM/DD/YYYY') : ''}
                                 </Text>
                             </Ripple>
                         </View>
@@ -117,7 +117,7 @@ class DatePicker extends PureComponent {
                     textAlign: 'left',
                     color: 'rgb(60,60,60)',
                 }}>
-                    {this.props.value !== undefined ? moment(this.props.value).format('MM/DD/YYYY') : ''}
+                    {this.props.value !== undefined && this.props.value !== null ? moment(this.props.value).format('MM/DD/YYYY') : ''}
                 </Text>
             </View>
         );
