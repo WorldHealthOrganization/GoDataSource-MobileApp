@@ -216,9 +216,13 @@ class ContactsScreen extends Component {
 
     renderContact = (item) => {
         // console.log("### item: ", item);
+        let riskLevelReferenceData = this.props.referenceData.filter((o) => {
+            return o.categoryId.includes("RISK_LEVEL")
+        })
         return (
             <FollowUpListItem
                 item={item.item}
+                riskLevelReferenceData={riskLevelReferenceData}
                 isContact={true}
                 firstActionText={'ADD FOLLOW-UP'}
                 secondActionText={"EDIT"}
@@ -450,7 +454,8 @@ function mapStateToProps(state) {
         screenSize: state.app.screenSize,
         syncState: state.app.syncState,
         contacts: state.contacts,
-        errors: state.errors
+        errors: state.errors,
+        referenceData: state.referenceData,
     };
 }
 
