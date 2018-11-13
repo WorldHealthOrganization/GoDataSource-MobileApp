@@ -355,6 +355,10 @@ class CardComponent extends Component {
 
         let isEditModeForDropDownInput = addContactFromCasesScreen ? false : (this.props.screen === 'ExposureScreen' ? item.id === 'exposure' ? true : item.isEditMode : item.isEditMode)
 
+        if (item.type === 'DatePicker' && value === '') {
+            value = null
+        }
+
         switch(item.type) {
             case 'Section':
                 return (
@@ -731,6 +735,11 @@ class CardComponent extends Component {
                 return o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_DOCUMENT_TYPE'
             }).map((o) => {return {label: this.getTranslation(o.value), value: o.value}})
         }
+        if (item.id === 'occupation') {
+            return _.filter(this.props.referenceData, (o) => {
+                return o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_OCCUPATION'
+            }).map((o) => {return {value: this.getTranslation(o.value), id: o.value}})
+        }
     };
 
     getLocationNameById = (element, locationId) => {
@@ -765,6 +774,11 @@ class CardComponent extends Component {
         if (item.id === 'typeId') {
             return _.filter(this.props.referenceData, (o) => {
                 return o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_ADDRESS_TYPE'
+            }).map((o) => {return {value: this.getTranslation(o.value), id: o.value}})
+        }
+        if (item.id === 'occupation') {
+            return _.filter(this.props.referenceData, (o) => {
+                return o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_OCCUPATION'
             }).map((o) => {return {value: this.getTranslation(o.value), id: o.value}})
         }
     };

@@ -410,6 +410,7 @@ class ContactsScreen extends Component {
         console.log('this.state.filter.searchText ', this.state.filter.searchText)
         if (this.state.filter.searchText.trim().length > 0) {
             let splitedFilter= this.state.filter.searchText.split(" ")
+            splitedFilter = splitedFilter.filter((e) => {return e !== ""})
             allFilters.searchText = new RegExp(splitedFilter.join("|"), "ig");
         } else {
             allFilters.searchText = null

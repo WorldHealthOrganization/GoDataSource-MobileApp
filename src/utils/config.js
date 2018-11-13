@@ -321,13 +321,14 @@ const caseSingleScreen = {
                     objectType: 'Case'
                 },
                 {
-                    cardNumber: 2,
+                    cardNumber: 1,
                     id: 'occupation',
                     label: 'Occupation',
-                    type: 'TextInput',
+                    labelValue: 'test',
+                    type: 'DropdownInput',
                     value: '',
                     isRequired: false,
-                    isEditMode: false,
+                    isEditMode: true,
                     objectType: 'Case'
                 },
                 {
@@ -433,7 +434,7 @@ const caseSingleScreen = {
                 labelValue: 'test',
                 type: 'TextInput',
                 value: '',
-                isRequired: true,
+                isRequired: false,
                 isEditMode: true,
                 multiline: true,
                 objectType: 'Address'
@@ -445,7 +446,7 @@ const caseSingleScreen = {
                 labelValue: 'test',
                 type: 'TextInput',
                 value: '',
-                isRequired: true,
+                isRequired: false,
                 isEditMode: true,
                 multiline: true,
                 objectType: 'Address'
@@ -457,7 +458,7 @@ const caseSingleScreen = {
                 labelValue: 'test',
                 type: 'TextInput',
                 value: '',
-                isRequired: true,
+                isRequired: false,
                 isEditMode: true,
                 multiline: true,
                 objectType: 'Address'
@@ -1058,13 +1059,12 @@ const contactsSingleScreen = {
                 {
                     cardNumber: 1,
                     id: 'occupation',
-                    labelValue: 'test',
                     label: 'Occupation',
-                    type: 'TextInput',
+                    labelValue: 'test',
+                    type: 'DropdownInput',
                     value: '',
                     isRequired: false,
                     isEditMode: true,
-                    multiline: false,
                     objectType: 'Contact'
                 },
                 {
@@ -1180,7 +1180,7 @@ const contactsSingleScreen = {
                 labelValue: 'test',
                 type: 'TextInput',
                 value: '',
-                isRequired: true,
+                isRequired: false,
                 isEditMode: true,
                 multiline: true,
                 objectType: 'Address'
@@ -1192,7 +1192,7 @@ const contactsSingleScreen = {
                 labelValue: 'test',
                 type: 'TextInput',
                 value: '',
-                isRequired: true,
+                isRequired: false,
                 isEditMode: true,
                 multiline: true,
                 objectType: 'Address'
@@ -1204,7 +1204,7 @@ const contactsSingleScreen = {
                 labelValue: 'test',
                 type: 'TextInput',
                 value: '',
-                isRequired: true,
+                isRequired: false,
                 isEditMode: true,
                 multiline: true,
                 objectType: 'Address'
