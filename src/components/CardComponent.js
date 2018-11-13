@@ -105,13 +105,15 @@ class CardComponent extends Component {
                     }
                 }
             }
-            if (this.props.contact !== null && nextProps.contact !== null && nextProps.contact.age !== null && this.props.contact.age !== null) {
-                if (this.props.contact.age.months === 0 && this.props.contact.age.years === 0 && nextProps.contact.age.months === 0 && nextProps.contact.age.years === 0) {
-                    return true
-                } else if (this.props.contact.age.months !== nextProps.contact.age.months || this.props.contact.age.years !== nextProps.contact.age.years){
-                    return true
-                } else if (nextProps.contact.age.months === 0 || this.props.contact.age.years === 0){
-                    return true
+            if (this.props.contact !== null && nextProps.contact !== null && nextProps.contact.age !== null && this.props.contact.age !== null && this.props.contact !== undefined && nextProps.contact !== undefined && nextProps.contact.age !== undefined && this.props.contact.age !== undefined) {
+                if (this.props.contact.age.months !== undefined && this.props.contact.age.months !== null && this.props.contact.age.years !== undefined && this.props.contact.age.years !== null) {
+                    if (this.props.contact.age.months === 0 && this.props.contact.age.years === 0 && nextProps.contact.age.months === 0 && nextProps.contact.age.years === 0) {
+                        return true
+                    } else if (this.props.contact.age.months !== nextProps.contact.age.months || this.props.contact.age.years !== nextProps.contact.age.years){
+                        return true
+                    } else if (nextProps.contact.age.months === 0 || this.props.contact.age.years === 0){
+                        return true
+                    }
                 }
             }
         }
@@ -164,13 +166,15 @@ class CardComponent extends Component {
                     }
                 }
             }
-            if (this.props.case !== null && nextProps.case !== null && nextProps.case.age !== null && this.props.case.age !== null) {
-                if (this.props.case.age.months === 0 && this.props.case.age.years === 0 && nextProps.case.age.months === 0 && nextProps.case.age.years === 0) {
-                    return true
-                } else if (this.props.case.age.months !== nextProps.case.age.months || this.props.case.age.years !== nextProps.case.age.years){
-                    return true
-                } else if (nextProps.case.age.months === 0 || this.props.case.age.years === 0){
-                    return true
+            if (this.props.case !== null && nextProps.case !== null && nextProps.case.age !== null && this.props.case.age !== null && this.props.case !== undefined && nextProps.case !== undefined && nextProps.case.age !== undefined && this.props.case.age !== undefined) {
+                if (this.props.case.age.months !== undefined && this.props.case.age.months !== null && this.props.case.age.years !== undefined && this.props.case.age.years !== null) {
+                    if (this.props.case.age.months === 0 && this.props.case.age.years === 0 && nextProps.case.age.months === 0 && nextProps.case.age.years === 0) {
+                        return true
+                    } else if (this.props.case.age.months !== nextProps.case.age.months || this.props.case.age.years !== nextProps.case.age.years){
+                        return true
+                    } else if (nextProps.case.age.months === 0 || this.props.case.age.years === 0){
+                        return true
+                    }
                 }
             }
         }

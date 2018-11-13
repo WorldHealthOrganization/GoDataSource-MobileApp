@@ -79,7 +79,11 @@ class TextInputWithDropDown extends Component {
 
     viewInput() {
         let smth = this.props.value[config[this.props.dropDownData][this.props.selectedDropDownItemIndex].value];
-        smth = smth.toString();
+        if (smth !== undefined && smth !== null){
+            smth = smth.toString();
+        } else {
+            smth = ''
+        }
         return (
             <View style={[{width: '100%'},this.props.style]}>
                 <View style={{flexDirection: 'row',  justifyContent: 'space-between'}}>
