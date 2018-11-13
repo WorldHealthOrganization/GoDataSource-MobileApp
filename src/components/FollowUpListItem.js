@@ -58,11 +58,21 @@ class FollowUpListItem extends PureComponent {
             if (contact && contact.gender) {
                 genderString = this.getTranslation(contact.gender);
             }
-            let secondaryText = contact ? ((genderString ? genderString.charAt(0) : ' ') + (contact.age && contact.age.years ? (", " + contact.age.years) : ' ')) : '';
 
+            let secondaryTextGender = contact && genderString ? genderString.charAt(0) : ' ';
+            let secondaryTextAge = '';
+            if (contact && contact.age !== undefined && contact.age !== null) {
+                if (contact.age.years !== null && contact.age.years !== undefined && contact.age.months !== null && contact.age.months !== undefined) {
+                    if (contact.age.years !== 0 && contact.age.months === 0) {
+                        secondaryTextAge = contact.age.years.toString() + this.getTranslation(config.localTranslationTokens.years).charAt(0).toLowerCase()
+                    } else if (contact.age.years === 0 && contact.age.months !== 0) {
+                        secondaryTextAge = contact.age.months.toString() + this.getTranslation(config.localTranslationTokens.months).charAt(0).toLowerCase()
+                    }
+                }
+            }
+            let secondaryText = secondaryTextGender + (secondaryTextAge && secondaryTextGender ? ', ' : '') + secondaryTextAge;
 
             let addressText = '';
-
             let followUpContact = this.props && this.props.contacts && Array.isArray(this.props.contacts) && this.props.contacts.length > 0 ? 
                 this.props.contacts[this.props.contacts.map((e) => {return extractIdFromPouchId(e._id, 'person')}).indexOf(this.props.item.personId)] : null;
 
