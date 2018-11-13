@@ -87,9 +87,27 @@ class CaseSingleScreen extends Component {
             anotherPlaceOfResidenceWasChosen: false,
             hasPlaceOfResidence: this.props.isNew ? false : true,
             selectedItemIndexForTextSwitchSelectorForAge: 0, // age/dob - switch tab
-            selectedItemIndexForAgeUnitOfMeasureDropDown: this.props.isNew ? 0 : this.props.case.age.years > 0 ? 0 : 1, //default age dropdown value
+            selectedItemIndexForAgeUnitOfMeasureDropDown: this.props.isNew ? 0 : (this.props.case.age && this.props.case.age.years !== undefined && this.props.case.age.years !== null && this.props.case.age.years > 0) ? 0 : 1, //default age dropdown value
         };
         // Bind here methods, or at least don't declare methods in the render method
+    }
+
+    componentDidMount() {
+        if (!this.props.isNew) {
+            let ageClone = {years: 0, months: 0}
+            let updateAge = false;
+            if (this.props.case.age === null || this.props.case.age === undefined || this.props.case.age.years === undefined || this.props.case.age.years === null || this.props.case.age.months === undefined || this.props.case.age.months === null) {
+                updateAge = true
+            }
+
+            if (updateAge) {
+                this.setState(prevState => ({
+                    case: Object.assign({}, prevState.case, {age: ageClone}, {dob: this.props.case.dob !== undefined ? this.props.case.dob : null}),
+                }), () => {
+                    console.log ('old case with age as string update')
+                })
+            }
+        }
     }
 
     // Please add here the react lifecycle methods that you need
@@ -737,16 +755,20 @@ class CaseSingleScreen extends Component {
     };
     checkAgeYearsRequirements = () => {
         if (this.state.selectedItemIndexForAgeUnitOfMeasureDropDown === 0) {
-            if (this.state.case.age.years < 0 || this.state.case.age.years > 150) {
-                return false
+            if (this.state.case.age && this.state.case.age.years !== undefined && this.state.case.age.years !== null) {
+                if (this.state.case.age.years < 0 || this.state.case.age.years > 150) {
+                    return false
+                }
             }
         }
         return true
     }
     checkAgeMonthsRequirements = () => {
         if (this.state.selectedItemIndexForAgeUnitOfMeasureDropDown === 1) {
-            if (this.state.case.age.months < 0 || this.state.case.age.months > 11) {
-                return false
+            if (this.state.case.age && this.state.case.age.months !== undefined && this.state.case.age.months !== null) {
+                if (this.state.case.age.months < 0 || this.state.case.age.months > 11) {
+                    return false
+                }
             }
         }
         return true
@@ -1030,7 +1052,7 @@ class CaseSingleScreen extends Component {
 
         if (this.state.case.dob !== null) {
             //get info from date
-            dobClone = this.state.case.dob
+            dobClone = Object.assign(this.state.case.dob)
             let today = new Date()
             let nrOFYears = this.calcDateDiff(today, dobClone);
 

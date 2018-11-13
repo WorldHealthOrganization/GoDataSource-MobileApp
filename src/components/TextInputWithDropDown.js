@@ -108,7 +108,7 @@ class TextInputWithDropDown extends Component {
                             textAlign: 'left',
                             color: 'rgb(60,60,60)',
                         }}>
-                            {smth + ' ' + config[this.props.dropDownData][this.props.selectedDropDownItemIndex].value || ''}
+                            {smth !== '' ? smth + ' ' + config[this.props.dropDownData][this.props.selectedDropDownItemIndex].value || '' : ''}
                         </Text>
                     </View>
                 </View>
