@@ -75,7 +75,7 @@ class ContactsSingleScreen extends Component {
             anotherPlaceOfResidenceWasChosen: false,
             hasPlaceOfResidence: this.props.isNew ? false : true,
             selectedItemIndexForTextSwitchSelectorForAge: 0, // age/dob - switch tab
-            selectedItemIndexForAgeUnitOfMeasureDropDown: this.props.isNew ? 0 : this.props.contact.age.years > 0 ? 0 : 1, //default age dropdown value
+            selectedItemIndexForAgeUnitOfMeasureDropDown: this.props.isNew ? 0 : (this.props.contact.age && this.props.contact.age.years !== undefined && this.props.contact.age.years !== null && this.props.contact.age.years > 0) ? 0 : 1, //default age dropdown value
         };
         // Bind here methods, or at least don't declare methods in the render method
     }
@@ -144,6 +144,19 @@ class ContactsSingleScreen extends Component {
 
     componentDidMount() {
         if (!this.props.isNew) {
+            let ageClone = {years: 0, months: 0}
+            let updateAge = false;
+            if (this.props.contact.age === null || this.props.contact.age === undefined || this.props.contact.age.years === undefined || this.props.contact.age.years === null || this.props.contact.age.months === undefined || this.props.contact.age.months === null) {
+                updateAge = true
+            }
+            if (updateAge) {
+                this.setState(prevState => ({
+                    contact: Object.assign({}, prevState.contact, {age: ageClone}, {dob: this.props.contact.dob !== undefined ? this.props.contact.dob : null}),
+                }), () => {
+                    console.log ('old contact with age as string update')
+                })
+            }
+
             getFollowUpsForContactRequest(this.props.user.activeOutbreakId, [extractIdFromPouchId(this.state.contact._id, 'person')], this.state.contact.followUp, (errorFollowUp, responseFollowUp) => {
                 if (errorFollowUp) {
                     console.log ('getFollowUpsForContactRequest error: ', errorFollowUp)
@@ -872,7 +885,7 @@ class ContactsSingleScreen extends Component {
 
         if (this.state.contact.dob !== null) {
             //get info from date
-            dobClone = this.state.contact.dob
+            dobClone = Object.assign(this.state.contact.dob)
             let today = new Date()
             let nrOFYears = this.calcDateDiff(today, dobClone);
 
@@ -884,10 +897,10 @@ class ContactsSingleScreen extends Component {
             }
         } else if (this.state.selectedItemIndexForAgeUnitOfMeasureDropDown === 0 && this.state.contact.dob === null) {
             //years dropdown 
-            ageClone.years = this.state.contact.age.years
+            ageClone.years = (this.state.contact.age && this.state.contact.age.years !== undefined && this.state.contact.age.years !== null) ? this.state.contact.age.years : 0
         } else if (this.state.selectedItemIndexForAgeUnitOfMeasureDropDown === 1 && this.state.contact.dob === null) {
             //months dropdown 
-            ageClone.months = this.state.contact.age.months
+            ageClone.months = (this.state.contact.age && this.state.contact.age.months !== undefined && this.state.contact.age.months !== null) ? this.state.contact.age.months : 0
         }
         return {
             ageClone: ageClone,
@@ -937,8 +950,10 @@ class ContactsSingleScreen extends Component {
 
     checkAgeYearsRequirements = () => {
         if (this.state.selectedItemIndexForAgeUnitOfMeasureDropDown === 0) {
-            if (this.state.contact.age.years < 0 || this.state.contact.age.years > 150) {
-                return false
+            if (this.state.contact.age && this.state.contact.age.years !== undefined && this.state.contact.age.years !== null) {
+                if (this.state.contact.age.years < 0 || this.state.contact.age.years > 150) {
+                    return false
+                }
             }
         }
         return true
@@ -946,8 +961,10 @@ class ContactsSingleScreen extends Component {
 
     checkAgeMonthsRequirements = () => {
         if (this.state.selectedItemIndexForAgeUnitOfMeasureDropDown === 1) {
-            if (this.state.contact.age.months < 0 || this.state.contact.age.months > 11) {
-                return false
+            if (this.state.contact.age && this.state.contact.age.years !== undefined && this.state.contact.age.years !== null) {
+                if (this.state.contact.age.months < 0 || this.state.contact.age.months > 11) {
+                    return false
+                }
             }
         }
         return true
