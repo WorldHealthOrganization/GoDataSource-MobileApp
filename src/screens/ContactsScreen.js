@@ -216,9 +216,13 @@ class ContactsScreen extends Component {
 
     renderContact = (item) => {
         // console.log("### item: ", item);
+        let riskLevelReferenceData = this.props.referenceData.filter((o) => {
+            return o.categoryId.includes("RISK_LEVEL")
+        })
         return (
             <FollowUpListItem
                 item={item.item}
+                riskLevelReferenceData={riskLevelReferenceData}
                 isContact={true}
                 firstActionText={'ADD FOLLOW-UP'}
                 secondActionText={"EDIT"}
@@ -397,6 +401,7 @@ class ContactsScreen extends Component {
         console.log('this.state.filter.searchText ', this.state.filter.searchText)
         if (this.state.filter.searchText.trim().length > 0) {
             let splitedFilter= this.state.filter.searchText.split(" ")
+            splitedFilter = splitedFilter.filter((e) => {return e !== ""})
             allFilters.searchText = new RegExp(splitedFilter.join("|"), "ig");
         } else {
             allFilters.searchText = null
@@ -450,7 +455,8 @@ function mapStateToProps(state) {
         screenSize: state.app.screenSize,
         syncState: state.app.syncState,
         contacts: state.contacts,
-        errors: state.errors
+        errors: state.errors,
+        referenceData: state.referenceData,
     };
 }
 
