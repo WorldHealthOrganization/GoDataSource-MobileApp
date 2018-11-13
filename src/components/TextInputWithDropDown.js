@@ -33,7 +33,11 @@ class TextInputWithDropDown extends Component {
 
     editInput() {
         let smth = this.props.value[config[this.props.dropDownData][this.props.selectedDropDownItemIndex].value];
-        smth = smth.toString();
+        if (smth !== undefined && smth !== null){
+            smth = smth.toString();
+        } else {
+            smth = ''
+        }
         return (
             <View style={[{   
             width: '100%',
