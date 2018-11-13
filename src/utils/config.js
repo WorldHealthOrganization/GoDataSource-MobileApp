@@ -2,6 +2,7 @@
  * Created by florinpopa on 14/06/2018.
  */
 import styles from './../styles';
+import {Platform} from 'react-native';
 
 const baseUrls = [
     {value: 'gva11sucombee.who.int:3000'},
@@ -269,26 +270,42 @@ const caseSingleScreen = {
                     objectType: 'Case'
                 },
                 {
-                    cardNumber: 1,
-                    id: 'age',
-                    label: 'Age',
-                    type: 'TextInput',
-                    value: '',
-                    isRequired: false,
-                    isEditMode: false,
+                    cardNumber: 2,
+                    id: 'ageOrDob',
+                    type: 'TextSwitchSelector',
+                    values: 'TextSwitchSelectorAgeOrDobValues', //switch possibilities from config file
+                    selectedItemIndexForTextSwitchSelector: 'selectedItemIndexForTextSwitchSelectorForAge', //name of state parameter that will contain the selected index from values
+                    isEditMode: true,
                     objectType: 'Case'
                 },
-                // {
-                //     cardNumber: 1,
-                //     id: 'dob',
-                //     label: 'Date of Birth',
-                //     value: '',
-                //     type: "DatePicker",
-                //     isRequired: true,
-                //     isEditMode: false,
-                //     format: 'YYYY-MM-dd',
-                //     objectType: 'Case'
-                // },
+                {
+                    cardNumber: 2,
+                    id: 'dob',
+                    label: 'Date of birth',
+                    labelValue: 'test',
+                    value: '',
+                    type: "DatePicker",
+                    isRequired: false,
+                    isEditMode: true,
+                    dependsOn: 'TextSwitchSelectorAgeOrDobValues', //if depends on this switch item and it is not selected, don't display
+                    format: 'MM/dd/YYYY',
+                    objectType: 'Case'
+                },
+                {
+                    cardNumber: 2,
+                    id: 'age',
+                    label: 'Age',
+                    type: 'TextInputWithDropDown',
+                    value: '',
+                    isRequired: false,
+                    isEditMode: true,
+                    multiline: false,
+                    dependsOn: 'TextSwitchSelectorAgeOrDobValues',
+                    dropDownData: 'ageUnitOfMeasureDropDown', //drop down with values
+                    selectedItemIndexForAgeUnitOfMeasureDropDown: 'selectedItemIndexForAgeUnitOfMeasureDropDown', //name of state parameter that will contain the selected index from values
+                    objectType: 'Case',
+                    keyboardType: Platform.OS === 'ios' ? 'number-pad' : 'numeric'
+                }
             ]
         },
         {
@@ -341,7 +358,6 @@ const caseSingleScreen = {
                     activeBackgroundColor: styles.missedRedColorWithOpacity,
                 },
                 {
-                    cardNumber: 2,
                     id: 'riskReason',
                     label: 'Reason',
                     type: 'TextInput',
@@ -1079,16 +1095,41 @@ const contactsSingleScreen = {
                     objectType: 'Contact'
                 },
                 {
+                    cardNumber: 2,
+                    id: 'ageOrDob',
+                    type: 'TextSwitchSelector',
+                    values: 'TextSwitchSelectorAgeOrDobValues', //switch possibilities from config file
+                    selectedItemIndexForTextSwitchSelector: 'selectedItemIndexForTextSwitchSelectorForAge', //name of state parameter that will contain the selected index from values
+                    isEditMode: true,
+                    objectType: 'Contact'
+                },
+                {
                     cardNumber: 3,
                     id: 'dob',
                     label: 'Date of birth',
                     labelValue: 'test',
                     value: '',
                     type: "DatePicker",
-                    isRequired: true,
+                    isRequired: false,
                     isEditMode: true,
+                    dependsOn: 'TextSwitchSelectorAgeOrDobValues', //if depends on this switch item and it is not selected, don't display
                     format: 'MM/dd/YYYY',
                     objectType: 'Contact'
+                },
+                {
+                    cardNumber: 2,
+                    id: 'age',
+                    label: 'Age',
+                    type: 'TextInputWithDropDown',
+                    value: '',
+                    isRequired: false,
+                    isEditMode: true,
+                    multiline: false,
+                    dependsOn: 'TextSwitchSelectorAgeOrDobValues',
+                    dropDownData: 'ageUnitOfMeasureDropDown', //drop down with values
+                    selectedItemIndexForAgeUnitOfMeasureDropDown: 'selectedItemIndexForAgeUnitOfMeasureDropDown', //name of state parameter that will contain the selected index from values
+                    objectType: 'Contact',
+                    keyboardType: Platform.OS === 'ios' ? 'number-pad' : 'numeric'
                 },
                 {
                     cardNumber: 3,
@@ -1558,6 +1599,17 @@ const followUpStatuses = {
     missed: 'LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE_MISSED'
 };
 
+const TextSwitchSelectorAgeOrDobValues = [
+     //value must be the id of the element
+    { label: 'Age', value: 'age'},
+    { label: 'Date of Birth', value: 'dob'}
+];
+
+const ageUnitOfMeasureDropDown = [
+    { label: 'Years', value: 'years', errorValidationMessage: 'This field must be smaller or equal to 150'},
+    { label: 'Months', value: 'months', errorValidationMessage: 'This field must be smaller or equal to 11'}
+];
+
 const localTranslationTokens = {
     years: 'LNG_AGE_FIELD_LABEL_YEARS',
     months: 'LNG_AGE_FIELD_LABEL_MONTHS'
@@ -1584,5 +1636,7 @@ export default {
     userResidenceAddress,
     contactFollowUpStatuses,
     followUpStatuses,
+    TextSwitchSelectorAgeOrDobValues,
+    ageUnitOfMeasureDropDown,
     localTranslationTokens
 }

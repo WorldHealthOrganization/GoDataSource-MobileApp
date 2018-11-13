@@ -19,6 +19,8 @@ import Ripple from 'react-native-material-ripple';
 import ElevatedView from 'react-native-elevated-view';
 import DropdownInput from './DropdownInput';
 import DropDown from './DropDown';
+import TextInputWithDropDown from './TextInputWithDropDown'
+import TextSwitchSelector from './TextSwitchSelector'
 import DropDownSectioned from './DropDownSectioned';
 import TextInput from './TextInput';
 import SwitchInput from './SwitchInput';
@@ -28,6 +30,7 @@ import Section from './Section';
 import Selector from './Selector';
 import IntervalPicker from './IntervalPicker';
 import ActionsBar from './ActionsBar';
+
 
 class CardComponent extends Component {
 
@@ -102,6 +105,17 @@ class CardComponent extends Component {
                     }
                 }
             }
+            if (this.props.contact !== null && nextProps.contact !== null && nextProps.contact.age !== null && this.props.contact.age !== null && this.props.contact !== undefined && nextProps.contact !== undefined && nextProps.contact.age !== undefined && this.props.contact.age !== undefined) {
+                if (this.props.contact.age.months !== undefined && this.props.contact.age.months !== null && this.props.contact.age.years !== undefined && this.props.contact.age.years !== null) {
+                    if (this.props.contact.age.months === 0 && this.props.contact.age.years === 0 && nextProps.contact.age.months === 0 && nextProps.contact.age.years === 0) {
+                        return true
+                    } else if (this.props.contact.age.months !== nextProps.contact.age.months || this.props.contact.age.years !== nextProps.contact.age.years){
+                        return true
+                    } else if (nextProps.contact.age.months === 0 || this.props.contact.age.years === 0){
+                        return true
+                    }
+                }
+            }
         }
 
         //CaseSingleScreen
@@ -140,7 +154,6 @@ class CardComponent extends Component {
             if (this.props.isEditMode !== nextProps.isEditMode) {
                 return true
             }
-
             if (this.props.case && this.props.case.addresses && Array.isArray(this.props.case.addresses)) {
                 if (this.props.case.addresses.length === nextProps.case.addresses.length) {
                     for (let i = 0; i < this.props.case.addresses.length; i++) {
@@ -153,10 +166,32 @@ class CardComponent extends Component {
                     }
                 }
             }
+            if (this.props.case !== null && nextProps.case !== null && nextProps.case.age !== null && this.props.case.age !== null && this.props.case !== undefined && nextProps.case !== undefined && nextProps.case.age !== undefined && this.props.case.age !== undefined) {
+                if (this.props.case.age.months !== undefined && this.props.case.age.months !== null && this.props.case.age.years !== undefined && this.props.case.age.years !== null) {
+                    if (this.props.case.age.months === 0 && this.props.case.age.years === 0 && nextProps.case.age.months === 0 && nextProps.case.age.years === 0) {
+                        return true
+                    } else if (this.props.case.age.months !== nextProps.case.age.months || this.props.case.age.years !== nextProps.case.age.years){
+                        return true
+                    } else if (nextProps.case.age.months === 0 || this.props.case.age.years === 0){
+                        return true
+                    }
+                }
+            }
         }
 
         if (nextProps.screen === 'ExposureScreen') {
             return true;
+        }
+
+        if (this.props.selectedItemIndexForTextSwitchSelectorForAge !== null && this.props.selectedItemIndexForTextSwitchSelectorForAge !== undefined && nextProps.selectedItemIndexForTextSwitchSelectorForAge !== null && nextProps.selectedItemIndexForTextSwitchSelectorForAge !== undefined){
+            if (this.props.selectedItemIndexForTextSwitchSelectorForAge !== nextProps.selectedItemIndexForTextSwitchSelectorForAge) {
+                return true;
+            }
+        }
+        if (this.props.selectedItemIndexForAgeUnitOfMeasureDropDown !== null && this.props.selectedItemIndexForAgeUnitOfMeasureDropDown !== undefined && nextProps.selectedItemIndexForAgeUnitOfMeasureDropDown !== null && nextProps.selectedItemIndexForAgeUnitOfMeasureDropDown !== undefined){
+            if (this.props.selectedItemIndexForAgeUnitOfMeasureDropDown !== nextProps.selectedItemIndexForAgeUnitOfMeasureDropDown) {
+                return true
+            }
         }
 
         return false;
@@ -275,6 +310,17 @@ class CardComponent extends Component {
             } else {
                 value = this.computeValueForContactsSingleScreen(item, this.props.index);
             }
+            if (this.props.selectedItemIndexForTextSwitchSelectorForAge !== null && this.props.selectedItemIndexForTextSwitchSelectorForAge !== undefined && item.objectType === 'Contact' && item.dependsOn !== undefined && item.dependsOn !== null){
+                let itemIndexInConfigTextSwitchSelectorValues = config[item.dependsOn].map((e) => {return e.value}).indexOf(item.id)
+                if (itemIndexInConfigTextSwitchSelectorValues > -1) {
+                    if (itemIndexInConfigTextSwitchSelectorValues != this.props.selectedItemIndexForTextSwitchSelectorForAge) {
+                        return
+                    }
+                }
+            }
+            if (item.id === 'dob' && item.type === 'DatePicker' && item.objectType === 'Contact') {
+                maximumDate = new Date()
+            }
         }
 
         if (this.props.screen === 'ContactsSingleScreenAddress') {
@@ -328,6 +374,17 @@ class CardComponent extends Component {
                 }
             } else {
                 value = this.computeValueForCasesSingleScreen(item, this.props.index);
+            }
+            if (this.props.selectedItemIndexForTextSwitchSelectorForAge !== null && this.props.selectedItemIndexForTextSwitchSelectorForAge !== undefined && item.objectType === 'Case' && item.dependsOn !== undefined && item.dependsOn !== null){
+                let itemIndexInConfigTextSwitchSelectorValues = config[item.dependsOn].map((e) => {return e.value}).indexOf(item.id)
+                if (itemIndexInConfigTextSwitchSelectorValues > -1) {
+                    if (itemIndexInConfigTextSwitchSelectorValues != this.props.selectedItemIndexForTextSwitchSelectorForAge) {
+                        return
+                    }
+                }
+            }
+            if (item.id === 'dob' && item.type === 'DatePicker' && item.objectType === 'Case') {
+                maximumDate = new Date()
             }
         }
 
@@ -506,6 +563,37 @@ class CardComponent extends Component {
                         isEditMode = {this.props.isEditMode !== undefined && this.props.isEditMode !== null ? this.props.isEditMode : true}
                     />
                 );
+            case 'TextSwitchSelector':
+                return (
+                    <TextSwitchSelector 
+                        selectedItem={this.props[item.selectedItemIndexForTextSwitchSelector]}
+                        selectedItemIndexForTextSwitchSelector={item.selectedItemIndexForTextSwitchSelector}
+                        onChange={this.props.onChangeTextSwitchSelector}
+                        values={item.values}
+                        isEditMode = {this.props.isEditMode}
+                        style={{width: width, marginHorizontal: marginHorizontal}}
+                    />
+                );
+            case 'TextInputWithDropDown':
+                return (
+                    <TextInputWithDropDown 
+                        id={item.id}
+                        label={item.label}
+                        index={this.props.index}
+                        value={value}
+                        isEditMode={item.isEditMode}
+                        isRequired={item.isRequired}
+                        multiline={item.multiline}
+                        dropDownData={item.dropDownData}
+                        onChange={this.props.onChangeextInputWithDropDown}
+                        style={{width: width, marginHorizontal: marginHorizontal}}
+                        objectType={item.objectType}
+                        keyboardType={item.keyboardType}
+                        onChangeDropDown={this.props.onChangeTextSwitchSelector}
+                        selectedDropDownItemIndex={this.props[item.selectedItemIndexForAgeUnitOfMeasureDropDown]}
+                        selectedItemIndexForAgeUnitOfMeasureDropDown ={item.selectedItemIndexForAgeUnitOfMeasureDropDown}
+                    />
+                )
             default:
                 return (
                     <View style={{backgroundColor: 'red'}}>

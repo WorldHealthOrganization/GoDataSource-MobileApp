@@ -141,6 +141,10 @@ class CaseSinglePersonalContainer extends PureComponent {
                 onChangeDate={this.props.onChangeDate}
                 onChangeSwitch={this.props.onChangeSwitch}
                 onChangeDropDown={this.props.onChangeDropDown}
+                selectedItemIndexForTextSwitchSelectorForAge={this.props.selectedItemIndexForTextSwitchSelectorForAge}
+                onChangeTextSwitchSelector={this.props.onChangeTextSwitchSelector}
+                selectedItemIndexForAgeUnitOfMeasureDropDown={this.props.selectedItemIndexForAgeUnitOfMeasureDropDown}
+                onChangeextInputWithDropDown={this.props.onChangeextInputWithDropDown}
             />
         )
     }
@@ -170,7 +174,23 @@ class CaseSinglePersonalContainer extends PureComponent {
     handleNextButton = () => {
         // if (true) {
         if (this.props.checkRequiredFieldsPersonalInfo()) {
-            this.props.handleMoveToNextScreenButton()
+            if (this.props.checkAgeYearsRequirements()) {
+                if (this.props.checkAgeMonthsRequirements()){
+                    this.props.handleMoveToNextScreenButton()
+                } else {
+                    Alert.alert("Alert", 'Number of months must be between 0 and 11', [
+                        {
+                            text: 'Ok', onPress: () => {console.log("OK pressed")}
+                        }
+                    ])
+                }
+            } else {
+                Alert.alert("Alert", 'Number of years must be between 0 and 150', [
+                    {
+                        text: 'Ok', onPress: () => {console.log("OK pressed")}
+                    }
+                ])
+            }
         } else {
             Alert.alert("Alert", 'Please complete all the required fields', [
                 {

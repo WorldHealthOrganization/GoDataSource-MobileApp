@@ -59,8 +59,12 @@ class CaseSingleScreen extends Component {
                 gender: '',
                 phoneNumber: '',
                 occupation: '',
-                age: '',
                 outcome: '',
+                dob: null,
+                age: {
+                    years: 0,
+                    months: 0
+                },
                 classification: '',
                 dateBecomeCase: null,
                 dateOfInfection: null,
@@ -81,10 +85,30 @@ class CaseSingleScreen extends Component {
             canChangeScreen: false,
             caseBeforeEdit: {},
             anotherPlaceOfResidenceWasChosen: false,
-            hasPlaceOfResidence: this.props.isNew ? false : true
+            hasPlaceOfResidence: this.props.isNew ? false : true,
+            selectedItemIndexForTextSwitchSelectorForAge: 0, // age/dob - switch tab
+            selectedItemIndexForAgeUnitOfMeasureDropDown: this.props.isNew ? 0 : (this.props.case.age && this.props.case.age.years !== undefined && this.props.case.age.years !== null && this.props.case.age.years > 0) ? 0 : 1, //default age dropdown value
         };
         // Bind here methods, or at least don't declare methods in the render method
         this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this));
+    }
+
+    componentDidMount() {
+        if (!this.props.isNew) {
+            let ageClone = {years: 0, months: 0}
+            let updateAge = false;
+            if (this.props.case.age === null || this.props.case.age === undefined || this.props.case.age.years === undefined || this.props.case.age.years === null || this.props.case.age.months === undefined || this.props.case.age.months === null) {
+                updateAge = true
+            }
+
+            if (updateAge) {
+                this.setState(prevState => ({
+                    case: Object.assign({}, prevState.case, {age: ageClone}, {dob: this.props.case.dob !== undefined ? this.props.case.dob : null}),
+                }), () => {
+                    console.log ('old case with age as string update')
+                })
+            }
+        }
     }
 
     // Please add here the react lifecycle methods that you need
@@ -267,6 +291,12 @@ class CaseSingleScreen extends Component {
                         isNew={this.props.isNew}
                         onPressAddDocument={this.onPressAddDocument}
                         onDeletePress={this.handleOnPressDeleteDocument}
+                        onChangeTextSwitchSelector={this.handleOnChangeTextSwitchSelector}
+                        selectedItemIndexForTextSwitchSelectorForAge={this.state.selectedItemIndexForTextSwitchSelectorForAge}
+                        selectedItemIndexForAgeUnitOfMeasureDropDown={this.state.selectedItemIndexForAgeUnitOfMeasureDropDown}
+                        checkAgeMonthsRequirements={this.checkAgeMonthsRequirements}
+                        checkAgeYearsRequirements={this.checkAgeYearsRequirements}
+                        onChangeextInputWithDropDown={this.handleOnChangeTextInputWithDropDown}
                     />
                 );
             case 'address':
@@ -333,7 +363,6 @@ class CaseSingleScreen extends Component {
         }
     };
 
-   
     //Delete case
     handleOnPressDeleteCase = () => {
         Alert.alert("Alert", 'Are you sure you want to delete this case?', [
@@ -356,55 +385,75 @@ class CaseSingleScreen extends Component {
     //Save case
     handleOnPressSave = () => {
         if (this.checkRequiredFields()) {
-            if (this.state.hasPlaceOfResidence === true){
-                console.log("handleSavePress case", JSON.stringify(this.state.case));
-                this.hideMenu()
-                
-                if (this.state.saveFromEditPressed === true){
-                    //update case and remain on view screen
-                    this.setState({
-                        saveFromEditPressed: false,
-                        isEditMode: false,
-                        isModified: false,
-                        caseBeforeEdit: {}
-                    }, () => {
-                        let caseWithRequiredFields = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, this.state.case), action = 'update')
+            if (this.checkAgeYearsRequirements()) {
+                if (this.checkAgeMonthsRequirements()) {
+                    if (this.state.hasPlaceOfResidence === true){
+                        console.log("handleSavePress case", JSON.stringify(this.state.case));
+                        this.hideMenu()
+                        let ageConfig = this.ageAndDobPrepareForSave()
                         this.setState(prevState => ({
-                            case: Object.assign({}, prevState.case, caseWithRequiredFields)
-                            }), () => {
-                                this.props.updateCase(this.props.user.activeOutbreakId, this.state.case._id, this.state.case, this.props.user.token);
-                            })
-                    });
-                } else {
-                    //global save pressed
-                    this.setState({
-                        savePressed: true
-                    }, () => {
-                        if (this.props.isNew) {
-                            let caseWithRequiredFields = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, this.state.case), action = 'create', fileType = 'person.json', type = 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE')
-                            this.setState(prevState => ({
-                                case: Object.assign({}, prevState.case, caseWithRequiredFields)
-                            }), () => {
-                                this.props.addCase(this.props.user.activeOutbreakId, this.state.case, this.props.user.token);
-                            })
-                        } else {
-                            let caseWithRequiredFields = null
-                            if (this.state.deletePressed === true) {
-                                caseWithRequiredFields = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, this.state.case), action = 'delete')
+                            case: Object.assign({}, prevState.case, {age: ageConfig.ageClone}, {dob: ageConfig.dobClone}),
+                        }), () => {
+                            if (this.state.saveFromEditPressed === true){
+                                //update case and remain on view screen
+                                this.setState({
+                                    saveFromEditPressed: false,
+                                    isEditMode: false,
+                                    isModified: false,
+                                    caseBeforeEdit: {}
+                                }, () => {
+                                    let caseWithRequiredFields = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, this.state.case), action = 'update')
+                                    this.setState(prevState => ({
+                                        case: Object.assign({}, prevState.case, caseWithRequiredFields)
+                                        }), () => {
+                                            this.props.updateCase(this.props.user.activeOutbreakId, this.state.case._id, this.state.case, this.props.user.token);
+                                        })
+                                });
                             } else {
-                                caseWithRequiredFields = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, this.state.case), action = 'update')
+                                //global save pressed
+                                this.setState({
+                                    savePressed: true
+                                }, () => {
+                                    if (this.props.isNew) {
+                                        let caseWithRequiredFields = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, this.state.case), action = 'create', fileType = 'person.json', type = 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE')
+                                        this.setState(prevState => ({
+                                            case: Object.assign({}, prevState.case, caseWithRequiredFields)
+                                        }), () => {
+                                            this.props.addCase(this.props.user.activeOutbreakId, this.state.case, this.props.user.token);
+                                        })
+                                    } else {
+                                        let caseWithRequiredFields = null
+                                        if (this.state.deletePressed === true) {
+                                            caseWithRequiredFields = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, this.state.case), action = 'delete')
+                                        } else {
+                                            caseWithRequiredFields = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, this.state.case), action = 'update')
+                                        }
+                    
+                                        this.setState(prevState => ({
+                                            case: Object.assign({}, prevState.case, caseWithRequiredFields)
+                                            }), () => {
+                                                this.props.updateCase(this.props.user.activeOutbreakId, this.state.case._id, this.state.case, this.props.user.token);
+                                            })
+                                    }
+                                });
                             }
-        
-                            this.setState(prevState => ({
-                                case: Object.assign({}, prevState.case, caseWithRequiredFields)
-                                }), () => {
-                                    this.props.updateCase(this.props.user.activeOutbreakId, this.state.case._id, this.state.case, this.props.user.token);
-                                })
+                        })
+                    } else {
+                        Alert.alert("Validation error", 'Please add the place of residence address', [
+                            {
+                                text: 'Ok', onPress: () => {this.hideMenu()}
+                            }
+                        ])
+                    }
+                } else {
+                    Alert.alert("Validation error", 'Number of months must be between 0 and 11', [
+                        {
+                            text: 'Ok', onPress: () => {this.hideMenu()}
                         }
-                    });
+                    ])
                 }
             } else {
-                Alert.alert("Validation error", 'Please add the place of residence address', [
+                Alert.alert("Validation error", 'Number of years must be between 0 and 150', [
                     {
                         text: 'Ok', onPress: () => {this.hideMenu()}
                     }
@@ -417,7 +466,7 @@ class CaseSingleScreen extends Component {
                 }
             ])
         }
-    }
+    };
 
 
     //View case actions edit/saveEdit/cancelEdit
@@ -645,7 +694,7 @@ class CaseSingleScreen extends Component {
             }
         }
         return true
-    }
+    };
     checkRequiredFieldsAddresses = () => {
         if (this.state.case && this.state.case.addresses && Array.isArray(this.state.case.addresses) && this.state.case.addresses.length > 0) {
             for (let i=0; i < this.state.case.addresses.length; i++) {
@@ -659,7 +708,7 @@ class CaseSingleScreen extends Component {
             return false;
         }
         return true
-    }
+    };
     checkRequiredFieldsInfection = () => {
         //infection general info
         for(let i=0; i<config.caseSingleScreen.infection.length; i++) {
@@ -692,7 +741,7 @@ class CaseSingleScreen extends Component {
             }
         }
         return true
-    }
+    };
     checkRequiredFieldsCaseInvestigationQuestionnaire = () => {
         for (let i = 0; i< this.props.caseInvestigationQuestions.length; i++) {
             let questionnaireAnswer = this.state.case.questionnaireAnswers[this.props.caseInvestigationQuestions[i].variable]
@@ -701,11 +750,32 @@ class CaseSingleScreen extends Component {
             }
         }
         return true
-    }
+    };
     checkRequiredFields = () => {
         return this.checkRequiredFieldsPersonalInfo() && this.checkRequiredFieldsAddresses() && this.checkRequiredFieldsInfection() && this.checkRequiredFieldsCaseInvestigationQuestionnaire()
+    };
+    checkAgeYearsRequirements = () => {
+        if (this.state.selectedItemIndexForAgeUnitOfMeasureDropDown === 0) {
+            if (this.state.case.age && this.state.case.age.years !== undefined && this.state.case.age.years !== null) {
+                if (this.state.case.age.years < 0 || this.state.case.age.years > 150) {
+                    return false
+                }
+            }
+        }
+        return true
+    }
+    checkAgeMonthsRequirements = () => {
+        if (this.state.selectedItemIndexForAgeUnitOfMeasureDropDown === 1) {
+            if (this.state.case.age && this.state.case.age.months !== undefined && this.state.case.age.months !== null) {
+                if (this.state.case.age.months < 0 || this.state.case.age.months > 11) {
+                    return false
+                }
+            }
+        }
+        return true
     }
 
+    
     
     // onChangeStuff functions
     onChangeText = (value, id, objectTypeOrIndex, objectType) => {
@@ -747,28 +817,52 @@ class CaseSingleScreen extends Component {
     };
     onChangeDate = (value, id, objectTypeOrIndex, objectType) => {
         console.log("case onChangeDate: ", value, id, objectTypeOrIndex, objectType);
-        if(objectTypeOrIndex == 'Case'){
+        if (id === 'dob') {
+            let today = new Date()
+            let nrOFYears = this.calcDateDiff(today, value);
+            let ageClone = {years: 0, months: 0}
+            let selectedItemIndexForAgeUnitOfMeasureDropDown = 0
+
+            if (nrOFYears.years === 0 && nrOFYears.months >= 0) {
+                ageClone.months = nrOFYears.months
+                ageClone.years = nrOFYears.months
+                selectedItemIndexForAgeUnitOfMeasureDropDown = 1
+            } else {
+                if (nrOFYears.years > 0) {
+                    ageClone.months = nrOFYears.years
+                    ageClone.years = nrOFYears.years
+                    selectedItemIndexForAgeUnitOfMeasureDropDown = 0
+                }
+            }
+            this.setState(prevState => ({
+                case: Object.assign({}, prevState.case, {age: ageClone}, {dob: value}),
+                selectedItemIndexForAgeUnitOfMeasureDropDown,
+                isModified: true
+            }), () => {
+                console.log("handleOnChangeDate dob", id, " ", value, " ", this.state.case);
+            })
+        } else {
+            if(objectTypeOrIndex === 'Case'){
             this.setState((prevState) => ({
                     case: Object.assign({}, prevState.case, {[id]: value}),
                     isModified: true
                 })
                 , () => {
                     console.log("onChangeDate", id, " ", value, " ", this.state.case);
-                }
-            );
-        } else {
-            if (typeof objectTypeOrIndex === 'phoneNumber' && objectTypeOrIndex >= 0 || typeof objectTypeOrIndex === 'number' && objectTypeOrIndex >= 0) {
-                if (objectType && objectType === 'HospitalizationDates') {
-                    let hospitalizationDatesClone = _.cloneDeep(this.state.case.hospitalizationDates);
-                    hospitalizationDatesClone[objectTypeOrIndex][id] = value && value.value ? value.value : value;
-                    console.log ('hospitalizationDatesClone', hospitalizationDatesClone)
-                    this.setState(prevState => ({
-                        case: Object.assign({}, prevState.case, {hospitalizationDates: hospitalizationDatesClone}),
-                        isModified: true
-                    }), () => {
-                        console.log("onChangeDate HospitalizationDates", id, " ", value, " ", this.state.case);
-                    })
-                } else if (objectType && objectType === 'IsolationDates') {
+                })
+            } else {
+                if (typeof objectTypeOrIndex === 'phoneNumber' && objectTypeOrIndex >= 0 || typeof objectTypeOrIndex === 'number' && objectTypeOrIndex >= 0) {
+                    if (objectType && objectType === 'HospitalizationDates') {
+                        let hospitalizationDatesClone = _.cloneDeep(this.state.case.hospitalizationDates);
+                        hospitalizationDatesClone[objectTypeOrIndex][id] = value && value.value ? value.value : value;
+                        console.log ('hospitalizationDatesClone', hospitalizationDatesClone)
+                        this.setState(prevState => ({
+                            case: Object.assign({}, prevState.case, {hospitalizationDates: hospitalizationDatesClone}),
+                            isModified: true
+                        }), () => {
+                            console.log("onChangeDate HospitalizationDates", id, " ", value, " ", this.state.case);
+                        })
+                    } else if (objectType && objectType === 'IsolationDates') {
                         let isolationDatesClone = _.cloneDeep(this.state.case.isolationDates);
                         isolationDatesClone[objectTypeOrIndex][id] = value && value.value ? value.value : value;
                         console.log ('isolationDatesClone', isolationDatesClone)
@@ -778,16 +872,17 @@ class CaseSingleScreen extends Component {
                         }), () => {
                             console.log("onChangeDate IsolationDates", id, " ", value, " ", this.state.case);
                         })
-                } else if (objectType && objectType === 'Address') {
-                    let addressesClone = _.cloneDeep(this.state.case.addresses);
-                    addressesClone[objectTypeOrIndex][id] = value && value.value ? value.value : value;
-                    console.log ('addressesClone', addressesClone)
-                    this.setState(prevState => ({
-                        case: Object.assign({}, prevState.case, {addresses: addressesClone}),
-                        isModified: true
-                    }), () => {
-                        console.log("onChangeDate addressesClone", id, " ", value, " ", this.state.case);
-                    })
+                    } else if (objectType && objectType === 'Address') {
+                        let addressesClone = _.cloneDeep(this.state.case.addresses);
+                        addressesClone[objectTypeOrIndex][id] = value && value.value ? value.value : value;
+                        console.log ('addressesClone', addressesClone)
+                        this.setState(prevState => ({
+                            case: Object.assign({}, prevState.case, {addresses: addressesClone}),
+                            isModified: true
+                        }), () => {
+                            console.log("onChangeDate addressesClone", id, " ", value, " ", this.state.case);
+                        })
+                    }
                 }
             }
         }
@@ -885,11 +980,102 @@ class CaseSingleScreen extends Component {
             }
         }
     };
+    handleOnChangeTextInputWithDropDown = (value, id, objectType, stateValue) => {
+        console.log("handleOnChangeTextInputWithDropDown: ",value, id, objectType, stateValue, this.state.case);
 
+        if (stateValue !== undefined && stateValue !== null){
+            if (id === 'age'){
+                let ageClone = { years: 0, months: 0 }
+                
+                if (!isNaN(Number(value)) && !value.includes(".") && !value.includes("-") && !value.includes(",") && !value.includes(" ")) {
+                    ageClone.years = Number(value)
+                    ageClone.months = Number(value)
+                }
+
+                this.setState(prevState => ({
+                    case: Object.assign({}, prevState.case, {age: ageClone}, {dob: null}),
+                    isModified: true
+                }), () => {
+                    console.log("handleOnChangeTextInputWithDropDown done", id, " ", value, " ", this.state.case);
+                })
+            }
+        }
+    };
+    handleOnChangeTextSwitchSelector = (index, stateValue) => {
+        if (stateValue === 'selectedItemIndexForAgeUnitOfMeasureDropDown') {
+            let ageClone = Object.assign({}, this.state.case.age)
+            if (!this.props.isNew) {
+                if (ageClone.years === 0 && ageClone.months !== 0) {
+                    ageClone.years = ageClone.months
+                } else if (ageClone.monthsyears === 0 && ageClone.years !== 0){
+                    ageClone.months = ageClone.years
+                }
+            }
+            this.setState(prevState => ({
+                [stateValue]: index,
+                case: Object.assign({}, prevState.case, {dob: null}, {age: ageClone}),
+                isModified: true
+            }), () => {
+                console.log ('handleOnChangeTextSwitchSelector', stateValue, this.state[stateValue])
+            })
+        } else {
+            this.setState({
+                [stateValue]: index,
+                isModified: true
+            }, () => {
+                console.log ('handleOnChangeTextSwitchSelector', stateValue, this.state[stateValue])
+            })
+        }
+    };
+
+    calcDateDiff(today, dob) {
+        let diff = Math.floor(today.getTime() - dob.getTime());
+        let day = 1000 * 60 * 60 * 24;
+
+        let days = Math.floor(diff/day);
+        let months = Math.floor(days/31);
+        let years = Math.floor(months/12);
+
+        let nrOFYears = {
+            months: months,
+            years: years
+        }
+        return nrOFYears
+    };
     anotherPlaceOfResidenceChanged = () => {
         this.setState({
             anotherPlaceOfResidenceWasChosen: false
         })
+    };
+    ageAndDobPrepareForSave = () => {
+        let dobClone = null
+        let ageClone = { years: 0, months: 0 }
+
+        if (this.state.case.dob !== null) {
+            //get info from date
+            dobClone = Object.assign(this.state.case.dob)
+            let today = new Date()
+            let nrOFYears = this.calcDateDiff(today, dobClone);
+
+            //calc age for save
+            if (nrOFYears.years === 0 && nrOFYears.months >= 0) {
+                ageClone.months = nrOFYears.months
+            } else if (nrOFYears.years > 0) {
+                ageClone.years = nrOFYears.years
+            }
+        } else if (this.state.selectedItemIndexForAgeUnitOfMeasureDropDown === 0 && this.state.case.dob === null) {
+            //years dropdown 
+            ageClone.years = this.state.case.age.years
+        } else if (this.state.selectedItemIndexForAgeUnitOfMeasureDropDown === 1 && this.state.case.dob === null) {
+            //months dropdown 
+            ageClone.months = this.state.case.age.months
+        }
+        
+        return {
+            ageClone: ageClone,
+            dobClone: dobClone
+        }
+       
     }
 
     //labData Questionnaire onChange... functions
