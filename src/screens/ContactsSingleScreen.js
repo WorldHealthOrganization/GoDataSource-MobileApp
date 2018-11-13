@@ -27,7 +27,7 @@ import {updateContact, deleteExposureForContact, addContact} from './../actions/
 import {removeErrors} from './../actions/errors';
 import DateTimePicker from 'react-native-modal-datetime-picker';
 import _ from 'lodash';
-import {extractIdFromPouchId, updateRequiredFields} from './../utils/functions';
+import {extractIdFromPouchId, updateRequiredFields, navigation} from './../utils/functions';
 import {getFollowUpsForContactRequest} from './../queries/followUps'
 import ios from 'rn-fetch-blob/ios';
 
@@ -78,6 +78,7 @@ class ContactsSingleScreen extends Component {
             selectedItemIndexForAgeUnitOfMeasureDropDown: this.props.isNew ? 0 : (this.props.contact.age && this.props.contact.age.years !== undefined && this.props.contact.age.years !== null && this.props.contact.age.years > 0) ? 0 : 1, //default age dropdown value
         };
         // Bind here methods, or at least don't declare methods in the render method
+        this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this));
     }
 
     // PersonalRoute = () => (
@@ -1044,6 +1045,10 @@ class ContactsSingleScreen extends Component {
         }), () => {
             console.log("### after updating the data: ", this.state.contact);
         })
+    };
+
+    onNavigatorEvent = (event) => {
+        navigation(event, this.props.navigator);
     };
 }
 

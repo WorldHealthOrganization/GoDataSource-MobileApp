@@ -24,7 +24,7 @@ import CaseSingleInvestigationContainer from '../containers/CaseSingleInvestigat
 import {Icon} from 'react-native-material-ui';
 import {removeErrors} from './../actions/errors';
 import {addCase, updateCase} from './../actions/cases';
-import {updateRequiredFields, extractIdFromPouchId} from './../utils/functions';
+import {updateRequiredFields, extractIdFromPouchId, navigation} from './../utils/functions';
 
 const initialLayout = {
     height: 0,
@@ -90,6 +90,7 @@ class CaseSingleScreen extends Component {
             selectedItemIndexForAgeUnitOfMeasureDropDown: this.props.isNew ? 0 : (this.props.case.age && this.props.case.age.years !== undefined && this.props.case.age.years !== null && this.props.case.age.years > 0) ? 0 : 1, //default age dropdown value
         };
         // Bind here methods, or at least don't declare methods in the render method
+        this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this));
     }
 
     componentDidMount() {
@@ -1143,6 +1144,9 @@ class CaseSingleScreen extends Component {
         })
     };
 
+    onNavigatorEvent = (event) => {
+        navigation(event, this.props.navigator);
+    };
 }
 
 // Create style outside the class, or for components that will be used by other components (buttons),

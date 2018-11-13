@@ -15,6 +15,7 @@ import Button from './Button';
 import styles from './../styles';
 import Ripple from 'react-native-material-ripple';
 import ElevatedView from 'react-native-elevated-view';
+import _ from 'lodash';
 
 class FollowUpListItem extends PureComponent {
 
@@ -45,15 +46,33 @@ class FollowUpListItem extends PureComponent {
         }
         // if (contact) {
             let primaryText = contact ? ((contact.firstName ? contact.firstName : ' ') + (contact.lastName ? (" " + contact.lastName) : ' ')) : '';
+            let primaryColor = 'black'
+            if (contact && this.props.isContact){
+                let contactRiskLevelValue = this.props.riskLevelReferenceData.filter((e) => { return e.value === contact.riskLevel})
+                if (contactRiskLevelValue.length === 1) {
+                    primaryColor = contactRiskLevelValue[0].colorCode
+                }
+            }
+         
             let genderString = '';
             if (contact && contact.gender) {
                 genderString = this.getTranslation(contact.gender);
             }
-            let secondaryText = contact ? ((genderString ? genderString.charAt(0) : ' ') + (contact.age && contact.age.years ? (", " + contact.age.years) : ' ')) : '';
 
+            let secondaryTextGender = contact && genderString ? genderString.charAt(0) : ' ';
+            let secondaryTextAge = '';
+            if (contact && contact.age !== undefined && contact.age !== null) {
+                if (contact.age.years !== null && contact.age.years !== undefined && contact.age.months !== null && contact.age.months !== undefined) {
+                    if (contact.age.years !== 0 && contact.age.months === 0) {
+                        secondaryTextAge = contact.age.years.toString() + this.getTranslation(config.localTranslationTokens.years).charAt(0).toLowerCase()
+                    } else if (contact.age.years === 0 && contact.age.months !== 0) {
+                        secondaryTextAge = contact.age.months.toString() + this.getTranslation(config.localTranslationTokens.months).charAt(0).toLowerCase()
+                    }
+                }
+            }
+            let secondaryText = secondaryTextGender + (secondaryTextAge && secondaryTextGender ? ', ' : '') + secondaryTextAge;
 
             let addressText = '';
-
             let followUpContact = this.props && this.props.contacts && Array.isArray(this.props.contacts) && this.props.contacts.length > 0 ? 
                 this.props.contacts[this.props.contacts.map((e) => {return extractIdFromPouchId(e._id, 'person')}).indexOf(this.props.item.personId)] : null;
 
@@ -88,9 +107,9 @@ class FollowUpListItem extends PureComponent {
                         numberOfLines={1}
                         centerElement={
                             <View style={style.centerItemContainer}>
-                                <Text style={[style.primaryText, {flex: 3}]} numberOfLines={1}>{primaryText}</Text>
+                                <Text style={[style.primaryText, {flex: 3, color: primaryColor}]} numberOfLines={1}>{primaryText}</Text>
                                 <Text style={[style.primaryText, {marginHorizontal: 7}]}>{'\u2022'}</Text>
-                                <Text style={[style.secondaryText, {flex: 1}]}>{secondaryText}</Text>
+                                <Text style={[style.secondaryText, {flex: 1, color: primaryColor}]}>{secondaryText}</Text>
                             </View>
                         }
                         rightElement={
@@ -247,7 +266,7 @@ function mapStateToProps(state) {
         translation: state.app.translation,
         contacts: state.contacts,
         cases: state.cases,
-        events: state.events
+        events: state.events,
     };
 }
 

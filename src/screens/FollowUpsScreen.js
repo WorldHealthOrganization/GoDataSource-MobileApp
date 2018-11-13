@@ -7,7 +7,7 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
-import {View, Text, StyleSheet, Alert, Animated, NativeModules} from 'react-native';
+import {View, Text, StyleSheet, Alert, Animated, NativeModules, BackHandler} from 'react-native';
 import {Button, Icon} from 'react-native-material-ui';
 import styles from './../styles';
 import NavBarCustom from './../components/NavBarCustom';
@@ -122,12 +122,22 @@ class FollowUpsScreen extends Component {
 
     componentDidMount() {
         console.log ('componentDidMount')
+        // BackHandler.addEventListener('hardwareBackPress', this.handleBackPress);
         this.setState({
             loading: true
         }, () => {
             this.props.getFollowUpsForOutbreakId(this.props.user.activeOutbreakId, this.state.filter, null);
         })
     }
+
+    // componentDidUnmount() {
+    //     BackHandler.removeEventListener('hardwareBackPress', this.handleBackPress);
+    // }
+
+    // handleBackPress = () => {
+    //     // this.goBack(); // works best when the goBack is async
+    //     return false;
+    //   }
 
     shouldComponentUpdate(nextProps, nextState) {
         if (!nextProps.user) {
