@@ -1547,6 +1547,11 @@ const followUpStatuses = {
     missed: 'LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE_MISSED'
 };
 
+const localTranslationTokens = {
+    years: 'LNG_AGE_FIELD_LABEL_YEARS',
+    months: 'LNG_AGE_FIELD_LABEL_MONTHS'
+};
+
 export default {
     designScreenSize,
     sideMenuItems,
@@ -1567,5 +1572,6 @@ export default {
     RNDBConfig,
     userResidenceAddress,
     contactFollowUpStatuses,
-    followUpStatuses
+    followUpStatuses,
+    localTranslationTokens
 }
