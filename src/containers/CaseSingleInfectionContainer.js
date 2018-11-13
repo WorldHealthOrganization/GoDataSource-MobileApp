@@ -172,7 +172,7 @@ class CaseSingleInfectionContainer extends PureComponent {
 
         if (this.props.case.deceased === false) {
             fields = fields.filter((field) => {
-                return field.id !== 'dateDeceased'
+                return field.id !== 'dateDeceased' && field.id !== 'safeBurial'
             });
         }
         return (

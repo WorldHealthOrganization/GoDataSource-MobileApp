@@ -206,69 +206,6 @@ const caseSingleScreen = {
             fields: [
                 {
                     cardNumber: 1,
-                    id: 'riskLevel',
-                    label: 'Risk level',
-                    labelValue: 'test',
-                    type: 'DropdownInput',
-                    value: '',
-                    isRequired: true,
-                    isEditMode: false,
-                    activeButtonColor: 'red',
-                    activeBackgroundColor: 'red',
-                    objectType: 'Case'
-                },
-                {
-                    cardNumber: 1,
-                    id: 'dateOfReporting',
-                    label: 'Date of Reporting',
-                    value: '',
-                    type: "DatePicker",
-                    isRequired: true,
-                    isEditMode: false,
-                    format: 'YYYY-MM-dd',
-                    objectType: 'Case'
-                },
-                {
-                    cardNumber: 1,
-                    id: 'isDateOfReportingApproximate',
-                    label: 'Is Date of reporting approximate',
-                    type: 'SwitchInput',
-                    value: false,
-                    isRequired: false,
-                    isEditMode: false,
-                    activeButtonColor: styles.missedRedColor,
-                    activeBackgroundColor: styles.missedRedColorWithOpacity,
-                    objectType: 'Case'
-                },
-                {
-                    cardNumber: 1,
-                    id: 'transferRefused',
-                    label: 'Transfer Refused',
-                    type: 'SwitchInput',
-                    value: false,
-                    isRequired: false,
-                    isEditMode: false,
-                    activeButtonColor: styles.missedRedColor,
-                    activeBackgroundColor: styles.missedRedColorWithOpacity,
-                    objectType: 'Case'
-                },
-                {
-                    cardNumber: 1,
-                    id: 'riskReason',
-                    label: 'Reason',
-                    type: 'TextInput',
-                    value: '',
-                    isRequired: false,
-                    isEditMode: false,
-                    multiline: true,
-                    objectType: 'Case'
-                },
-            ]
-        },
-        {
-            fields: [
-                {
-                    cardNumber: 2,
                     id: 'firstName',
                     label: 'First Name',
                     type: 'TextInput',
@@ -278,7 +215,7 @@ const caseSingleScreen = {
                     objectType: 'Case'
                 },
                 {
-                    cardNumber: 2,
+                    cardNumber: 1,
                     id: 'middleName',
                     label: 'Middle Name',
                     type: 'TextInput',
@@ -288,7 +225,7 @@ const caseSingleScreen = {
                     objectType: 'Case'
                 },
                 {
-                    cardNumber: 2,
+                    cardNumber: 1,
                     id: 'lastName',
                     label: 'Last Name',
                     type: 'TextInput',
@@ -298,20 +235,20 @@ const caseSingleScreen = {
                     objectType: 'Case'
                 },
                 {
-                    cardNumber: 2,
+                    cardNumber: 1,
                     id: 'gender',
                     label: 'Gender',
                     labelValue: '',
                     type: 'DropdownInput',
                     value: '',
-                    isRequired: true,
+                    isRequired: false,
                     isEditMode: false,
                     activeButtonColor: 'red',
                     activeBackgroundColor: 'red',
                     objectType: 'Case'
                 },
                 {
-                    cardNumber: 2,
+                    cardNumber: 1,
                     id: 'phoneNumber',
                     label: 'Phone Number',
                     type: 'TextInput',
@@ -332,7 +269,7 @@ const caseSingleScreen = {
                     objectType: 'Case'
                 },
                 {
-                    cardNumber: 2,
+                    cardNumber: 1,
                     id: 'age',
                     label: 'Age',
                     type: 'TextInput',
@@ -353,7 +290,69 @@ const caseSingleScreen = {
                 //     objectType: 'Case'
                 // },
             ]
-        }
+        },
+        {
+            fields: [
+                {
+                    cardNumber: 2,
+                    id: 'riskLevel',
+                    label: 'Risk level',
+                    labelValue: 'test',
+                    type: 'DropdownInput',
+                    value: '',
+                    isRequired: true,
+                    isEditMode: false,
+                    activeButtonColor: 'red',
+                    activeBackgroundColor: 'red',
+                    objectType: 'Case'
+                },
+                {
+                    cardNumber: 2,
+                    id: 'dateOfReporting',
+                    label: 'Date of Reporting',
+                    value: '',
+                    type: "DatePicker",
+                    isRequired: true,
+                    isEditMode: false,
+                    format: 'YYYY-MM-dd',
+                    objectType: 'Case'
+                },
+                {
+                    cardNumber: 2,
+                    id: 'isDateOfReportingApproximate',
+                    label: 'Is Date of reporting approximate',
+                    type: 'SwitchInput',
+                    value: false,
+                    isRequired: false,
+                    isEditMode: false,
+                    activeButtonColor: styles.missedRedColor,
+                    activeBackgroundColor: styles.missedRedColorWithOpacity,
+                    objectType: 'Case'
+                },
+                {
+                    cardNumber: 2,
+                    id: 'transferRefused',
+                    label: 'Transfer Refused',
+                    type: 'SwitchInput',
+                    value: false,
+                    isRequired: false,
+                    isEditMode: false,
+                    activeButtonColor: styles.missedRedColor,
+                    activeBackgroundColor: styles.missedRedColorWithOpacity,
+                },
+                {
+                    cardNumber: 2,
+                    id: 'riskReason',
+                    label: 'Reason',
+                    type: 'TextInput',
+                    value: '',
+                    isRequired: false,
+                    isEditMode: false,
+                    multiline: true,
+                    objectType: 'Case'
+                },
+            ]
+        },
     ],
     document: {
         fields: [
@@ -558,6 +557,18 @@ const caseSingleScreen = {
                     cardNumber: 1,
                     id: 'deceased',
                     label: 'Deceased',
+                    type: 'SwitchInput',
+                    value: false,
+                    isRequired: false,
+                    isEditMode: false,
+                    activeButtonColor: styles.missedRedColor,
+                    activeBackgroundColor: styles.missedRedColorWithOpacity,
+                    objectType: 'Case'
+                },
+                {
+                    cardNumber: 1,
+                    id: 'safeBurial',
+                    label: 'Was Burial Safety Performed?',
                     type: 'SwitchInput',
                     value: false,
                     isRequired: false,
