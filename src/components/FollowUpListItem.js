@@ -59,8 +59,8 @@ class FollowUpListItem extends PureComponent {
                 genderString = this.getTranslation(contact.gender);
             }
 
-            let secondaryTextGender = contact && genderString ? genderString.charAt(0) : ' '
-            let secondaryTextAge = ''
+            let secondaryTextGender = contact && genderString ? genderString.charAt(0) : ' ';
+            let secondaryTextAge = '';
             if (contact && contact.age !== undefined && contact.age !== null) {
                 if (contact.age.years !== null && contact.age.years !== undefined && contact.age.months !== null && contact.age.months !== undefined) {
                     if (contact.age.years !== 0 && contact.age.months === 0) {
@@ -70,7 +70,7 @@ class FollowUpListItem extends PureComponent {
                     }
                 }
             }
-            let secondaryText = secondaryTextGender + ', ' + secondaryTextAge
+            let secondaryText = secondaryTextGender + (secondaryTextAge && secondaryTextGender ? ', ' : '') + secondaryTextAge;
 
             let addressText = '';
             let followUpContact = this.props && this.props.contacts && Array.isArray(this.props.contacts) && this.props.contacts.length > 0 ? 
