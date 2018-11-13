@@ -86,6 +86,10 @@ export function navigation(event, navigator) {
                     case '1':
                         screenToSwitchTo = "ContactsScreen";
                         break;
+                    case '1-add':
+                        screenToSwitchTo = "ContactsScreen";
+                        addScreen = "ContactsSingleScreen";
+                        break;
                     case '2':
                         screenToSwitchTo = "CasesScreen";
                         break;
@@ -97,21 +101,27 @@ export function navigation(event, navigator) {
                         screenToSwitchTo = "FollowUpsScreen";
                         break;
                 }
-                navigator.resetTo({
-                    screen: screenToSwitchTo,
-                    animated: true
-                });
+
                 if(addScreen) {
-                    navigator.push({
-                        screen: addScreen,
-                        animated: true,
-                        animationType: 'fade',
-                        passProps: {
-                            item: {},
-                            filter: null,
-                            isNew: addScreen === "CaseSingleScreen" ? true : null
-                        }
+                    navigator.resetTo({
+                        screen: screenToSwitchTo,
                     })
+                    setTimeout(function(){ 
+                        navigator.push({
+                            screen: addScreen,
+                            animated: true,
+                            animationType: 'fade',
+                            passProps: {
+                                isNew: true,
+                            }
+                        })
+                    }, 1500);
+                } else {
+
+                    navigator.resetTo({
+                        screen: screenToSwitchTo,
+                        animated: true
+                    });
                 }
             }
         }
