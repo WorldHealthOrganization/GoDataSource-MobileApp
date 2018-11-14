@@ -484,7 +484,8 @@ class CaseSingleScreen extends Component {
         console.log("onPressSaveEdit");
         if (this.state.isModified) {
             this.setState({
-                saveFromEditPressed: true
+                saveFromEditPressed: true,
+                selectedItemIndexForTextSwitchSelectorForAge: this.state.case.dob !== null ? 1 : 0,
             }, () => {
                 console.log("onPressSaveEdit with changes");
                 this.handleOnPressSave()
@@ -521,6 +522,7 @@ class CaseSingleScreen extends Component {
         } else {
             //there are no changes
             this.setState({
+                selectedItemIndexForTextSwitchSelectorForAge: this.state.case.dob !== null ? 1 : 0,
                 isEditMode: false,
             }, () => {
                 console.log("onPressCancelEdit");
