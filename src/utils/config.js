@@ -356,6 +356,7 @@ const caseSingleScreen = {
                     isEditMode: false,
                     activeButtonColor: styles.missedRedColor,
                     activeBackgroundColor: styles.missedRedColorWithOpacity,
+                    objectType: 'Case'
                 },
                 {
                     id: 'riskReason',
@@ -550,7 +551,7 @@ const caseSingleScreen = {
                 },
                 {
                     cardNumber: 1,
-                    id: 'outcome',
+                    id: 'outcomeId',
                     label: 'Outcome',
                     type: 'DropdownInput',
                     value: '',

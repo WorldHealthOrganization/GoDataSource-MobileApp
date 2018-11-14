@@ -25,6 +25,7 @@ import {Icon} from 'react-native-material-ui';
 import {removeErrors} from './../actions/errors';
 import {addCase, updateCase} from './../actions/cases';
 import {updateRequiredFields, extractIdFromPouchId, navigation} from './../utils/functions';
+import moment from 'moment';
 
 const initialLayout = {
     height: 0,
@@ -59,7 +60,7 @@ class CaseSingleScreen extends Component {
                 gender: '',
                 phoneNumber: '',
                 occupation: '',
-                outcome: '',
+                outcomeId: '',
                 dob: null,
                 age: {
                     years: 0,
@@ -392,7 +393,7 @@ class CaseSingleScreen extends Component {
                         this.hideMenu()
                         let ageConfig = this.ageAndDobPrepareForSave()
                         this.setState(prevState => ({
-                            case: Object.assign({}, prevState.case, {age: ageConfig.ageClone}, {dob: ageConfig.dobClone}),
+                            case: Object.assign({}, prevState.case, {age: ageConfig.ageClone}, {dob: ageConfig.dobClone !== null ? moment(ageConfig.dobClone).format('MM/DD/YYYY') : ''}),
                         }), () => {
                             if (this.state.saveFromEditPressed === true){
                                 //update case and remain on view screen
@@ -924,7 +925,7 @@ class CaseSingleScreen extends Component {
     };
     onChangeDropDown = (value, id, objectTypeOrIndex, objectType) => {
         console.log("case onChangeDropDown: ", value, id, objectTypeOrIndex, this.state.case);
-        if(objectTypeOrIndex == 'Case') {
+        if(objectTypeOrIndex === 'Case') {
             this.setState(
                 (prevState) => ({
                     case: Object.assign({}, prevState.case, {[id]: value && value.value ? value.value : value}),
@@ -1053,7 +1054,7 @@ class CaseSingleScreen extends Component {
 
         if (this.state.case.dob !== null) {
             //get info from date
-            dobClone = Object.assign(this.state.case.dob)
+            dobClone = this.state.case.dob
             let today = new Date()
             let nrOFYears = this.calcDateDiff(today, dobClone);
 
