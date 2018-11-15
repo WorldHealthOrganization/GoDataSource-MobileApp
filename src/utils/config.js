@@ -375,7 +375,7 @@ const caseSingleScreen = {
         fields: [
             {
                 cardNumber: 3,
-                id: 'documentType',
+                id: 'type',
                 label: 'Document Type',
                 type: 'DropdownInput',
                 value: '',
@@ -385,7 +385,7 @@ const caseSingleScreen = {
             },
             {
                 cardNumber: 3,
-                id: 'documentNumber',
+                id: 'number',
                 label: 'Document Number',
                 labelValue: 'test',
                 type: 'TextInput',
@@ -1615,6 +1615,7 @@ const localTranslationTokens = {
     years: 'LNG_AGE_FIELD_LABEL_YEARS',
     months: 'LNG_AGE_FIELD_LABEL_MONTHS'
 };
+
 
 export default {
     designScreenSize,

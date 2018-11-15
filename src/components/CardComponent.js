@@ -815,7 +815,7 @@ class CardComponent extends Component {
                 return o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_OUTCOME'
             }).map((o) => {return {label: this.getTranslation(o.value), value: o.value}})
         }
-        if (item.id === 'documentType') {
+        if (item.id === 'type') {
             return _.filter(this.props.referenceData, (o) => {
                 return o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_DOCUMENT_TYPE'
             }).map((o) => {return {label: this.getTranslation(o.value), value: o.value}})

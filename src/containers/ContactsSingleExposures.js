@@ -20,6 +20,7 @@ import {LoaderScreen} from 'react-native-ui-lib';
 import AnimatedListView from './../components/AnimatedListView';
 import GeneralListItem from '../components/GeneralListItem';
 import Ripple from 'react-native-material-ripple';
+import moment from 'moment';
 
 const scrollAnim = new Animated.Value(0);
 const offsetAnim = new Animated.Value(0);
@@ -215,7 +216,7 @@ class ContactsSingleExposures extends Component {
             caseName = aux && aux.name ? aux.name : '';
         }
 
-        return {title: caseName, primaryText: relation.contactDate.toString(), secondaryText: this.getTranslation(relation.certaintyLevelId)};
+        return {title: caseName, primaryText: moment(relation.contactDate).format("YYYY-MM-DD").toString(), secondaryText: this.getTranslation(relation.certaintyLevelId)};
     };
 
     getTranslation = (value) => {
