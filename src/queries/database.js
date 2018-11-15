@@ -249,7 +249,7 @@ export function updateFileInDatabase(file, type) {
             file._id = createIdForType(file, type);
             database.upsert(file._id, (doc) => {
                 // If we have to insert the doc, then add the type property
-                if (!doc) {
+                if (!doc || (typeof doc === 'object' && Object.keys(doc).length === 0)) {
                     // console.log("Insert Doc " + type);
                     file.fileType = type;
                     return file;
