@@ -129,7 +129,9 @@ class ExposureScreen extends Component {
                                 height: '100%'
                             }}
                         >
-                            <Text style={[style.title, {marginLeft: 30}]}>Add exposure</Text>
+                            <Text style={[style.title, {marginLeft: 30}]}>
+                                {this.props.exposure ? "Edit exposure" : "Add exposure"}
+                            </Text>
                             {/* <Ripple
                                 hitSlop={{
                                     top: 20,
