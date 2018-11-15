@@ -154,6 +154,8 @@ class CardComponent extends Component {
             if (this.props.isEditMode !== nextProps.isEditMode) {
                 return true
             }
+
+            //SwitchInput type inputs should not update => infinite loop refresh
             if (this.props.case && this.props.case.addresses && Array.isArray(this.props.case.addresses)) {
                 if (this.props.case.addresses.length === nextProps.case.addresses.length) {
                     for (let i = 0; i < this.props.case.addresses.length; i++) {
@@ -168,11 +170,9 @@ class CardComponent extends Component {
             }
             if (this.props.case !== null && nextProps.case !== null && nextProps.case.age !== null && this.props.case.age !== null && this.props.case !== undefined && nextProps.case !== undefined && nextProps.case.age !== undefined && this.props.case.age !== undefined) {
                 if (this.props.case.age.months !== undefined && this.props.case.age.months !== null && this.props.case.age.years !== undefined && this.props.case.age.years !== null) {
-                    if (this.props.case.age.months === 0 && this.props.case.age.years === 0 && nextProps.case.age.months === 0 && nextProps.case.age.years === 0) {
+                    if (this.props.case.age.months !== nextProps.case.age.months || this.props.case.age.years !== nextProps.case.age.years){
                         return true
-                    } else if (this.props.case.age.months !== nextProps.case.age.months || this.props.case.age.years !== nextProps.case.age.years){
-                        return true
-                    } else if (nextProps.case.age.months === 0 || this.props.case.age.years === 0){
+                    } else if (nextProps.case.age.months === 0 && this.props.case.age.months !== 0 || nextProps.case.age.years === 0 && this.props.case.age.years !== 0 ){
                         return true
                     }
                 }
@@ -335,9 +335,6 @@ class CardComponent extends Component {
                 item.onPressArray = [this.props.onDeletePress]
             }
             if (item.type === 'DatePicker' && this.props.case[item.id] !== undefined) {
-                value = this.props.case[item.id]
-            }
-            if (item.type === 'SwitchInput' && this.props.case[item.id] !== undefined) {
                 value = this.props.case[item.id]
             }
             //HospitalizationDates && IsolationDates validation
@@ -801,7 +798,7 @@ class CardComponent extends Component {
         if (item.id === 'gender') {
             return _.filter(this.props.referenceData, (o) => {
                 return o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_GENDER'
-            }).map((o) => {return {value: this.getTranslation(o.value), id: o.value}})
+            }).map((o) => {return {label: this.getTranslation(o.value), value: o.value}})
         }
         if (item.id === 'typeId') {
             return _.filter(this.props.referenceData, (o) => {
@@ -813,12 +810,12 @@ class CardComponent extends Component {
                 return o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_CASE_CLASSIFICATION'
             }).map((o) => {return {label: this.getTranslation(o.value), value: o.value}})
         }
-        if (item.id === 'outcome') {
+        if (item.id === 'outcomeId') {
             return _.filter(this.props.referenceData, (o) => {
                 return o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_OUTCOME'
             }).map((o) => {return {label: this.getTranslation(o.value), value: o.value}})
         }
-        if (item.id === 'documentType') {
+        if (item.id === 'type') {
             return _.filter(this.props.referenceData, (o) => {
                 return o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_DOCUMENT_TYPE'
             }).map((o) => {return {label: this.getTranslation(o.value), value: o.value}})

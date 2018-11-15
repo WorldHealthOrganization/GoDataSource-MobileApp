@@ -30,6 +30,7 @@ import _ from 'lodash';
 import {extractIdFromPouchId, updateRequiredFields, navigation} from './../utils/functions';
 import {getFollowUpsForContactRequest} from './../queries/followUps'
 import ios from 'rn-fetch-blob/ios';
+import moment from 'moment'
 
 const initialLayout = {
     height: 0,
@@ -886,7 +887,7 @@ class ContactsSingleScreen extends Component {
 
         if (this.state.contact.dob !== null) {
             //get info from date
-            dobClone = Object.assign(this.state.contact.dob)
+            dobClone = this.state.contact.dob
             let today = new Date()
             let nrOFYears = this.calcDateDiff(today, dobClone);
 
