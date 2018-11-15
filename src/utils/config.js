@@ -374,7 +374,7 @@ const caseSingleScreen = {
         fields: [
             {
                 cardNumber: 3,
-                id: 'documentType',
+                id: 'type',
                 label: 'Document Type',
                 type: 'DropdownInput',
                 value: '',
@@ -384,7 +384,7 @@ const caseSingleScreen = {
             },
             {
                 cardNumber: 3,
-                id: 'documentNumber',
+                id: 'number',
                 label: 'Document Number',
                 labelValue: 'test',
                 type: 'TextInput',
