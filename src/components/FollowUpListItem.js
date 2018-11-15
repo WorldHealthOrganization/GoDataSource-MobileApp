@@ -83,10 +83,10 @@ class FollowUpListItem extends PureComponent {
                 }
             }
            
-            // if (this.props.isContact && contact && contact.addresses && Array.isArray(contact.addresses)) {
-            //     let contactPlaceOfResidence = contact.addresses.filter((e) => {return e.typeId === config.userResidenceAddress.userPlaceOfResidence})
-            //     addressText = getAddress(contactPlaceOfResidence[0], true);
-            // }
+            if (this.props.isContact && contact && contact.addresses && Array.isArray(contact.addresses) && contact.addresses.length > 0) {
+                let contactPlaceOfResidence = contact.addresses.filter((e) => {return e.typeId === config.userResidenceAddress.userPlaceOfResidence});
+                addressText = getAddress(contactPlaceOfResidence[0], true);
+            }
 
             let relationshipText = '';
             if (this.props && this.props.cases && this.props.events && contact && contact.relationships && Array.isArray(contact.relationships) && contact.relationships.length > 0) {
