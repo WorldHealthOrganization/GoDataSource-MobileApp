@@ -60,7 +60,7 @@ class NavigationDrawer extends Component {
                         />
                     <View style={styles.lineStyle} />
                 </View>
-                <View style={{flex: 0.35}}>
+                <View style={{flex: 0.85}}>
                     {
                         config.sideMenuItems.map((item, index) => {
                             return (
@@ -76,16 +76,10 @@ class NavigationDrawer extends Component {
                         })
                     }
                     <View style={styles.lineStyle} />
-                </View>
-                <View style={{flex: 0.15}}>
                     <NavigationDrawerListItem label={'Sync HUB manually'} name={'cached'} onPress={this.handleOnPressSync} />
                     <NavigationDrawerListItem label={'Change HUB configuration'} name={'settings'}/>
                     <View style={styles.lineStyle} />
-                </View>
-                <View style={{flex: 0.25}}>
-                    <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-                        {/*<Text>Language</Text>*/}
-                        {/*<Text>{this.props.availableLanguages[this.props.availableLanguages.map((e) => {return e.id}).indexOf(this.props.user.languageId)].name}</Text>*/}
+                    <View style={{justifyContent: 'center', alignItems: 'center'}}>
                         <DropdownInput
                             id="test"
                             label="Language"
