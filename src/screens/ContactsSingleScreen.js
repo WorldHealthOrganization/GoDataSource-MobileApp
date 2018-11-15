@@ -823,7 +823,7 @@ class ContactsSingleScreen extends Component {
                             this.hideMenu()
                             let ageConfig = this.ageAndDobPrepareForSave()
                             this.setState(prevState => ({
-                                contact: Object.assign({}, prevState.contact, {age: ageConfig.ageClone}, {dob: ageConfig.dobClone !== null ? moment(ageConfig.dobClone).format('MM/DD/YYYY') : ''}),
+                                contact: Object.assign({}, prevState.contact, {age: ageConfig.ageClone}, {dob: ageConfig.dobClone}),
                             }), () => {
                                 console.log("ageAndDobPrepareForSave done", this.state.contact);
                                 if (this.props.isNew) {

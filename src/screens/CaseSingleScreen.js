@@ -393,7 +393,7 @@ class CaseSingleScreen extends Component {
                         this.hideMenu()
                         let ageConfig = this.ageAndDobPrepareForSave()
                         this.setState(prevState => ({
-                            case: Object.assign({}, prevState.case, {age: ageConfig.ageClone}, {dob: ageConfig.dobClone !== null ? moment(ageConfig.dobClone).format('MM/DD/YYYY') : ''}),
+                            case: Object.assign({}, prevState.case, {age: ageConfig.ageClone}, {dob: ageConfig.dobClone}),
                         }), () => {
                             if (this.state.saveFromEditPressed === true){
                                 //update case and remain on view screen
