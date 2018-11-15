@@ -303,10 +303,13 @@ class ContactsScreen extends Component {
     };
 
     handlePressFollowUp = (item, contact) => {
-        console.log("### handlePressFollowUp item:", JSON.stringify(item));
-        console.log("### handlePressFollowUp contact:", JSON.stringify(contact));
-        let contactPlaceOfResidence = item.addresses.filter((e) => {return e.typeId === config.userResidenceAddress.userPlaceOfResidence})
-        
+        let contactPlaceOfResidence = [];
+        if (item && item.addresses && Array.isArray(item.addresses) && item.addresses.length > 0) {
+            contactPlaceOfResidence = item.addresses.filter((e) => {
+                return e.typeId === config.userResidenceAddress.userPlaceOfResidence
+            })
+        }
+
         this.props.navigator.push({
             screen: 'FollowUpsSingleScreen',
             animated: true,
@@ -316,7 +319,7 @@ class ContactsScreen extends Component {
                     date: new Date(),
                     outbreakId: this.props.user.activeOutbreakId,
                     lostToFollowUp: false,
-                    address: contactPlaceOfResidence[0]
+                    address: contactPlaceOfResidence[0] || null
                 },
                 contact: contact || item,
                 filter: this.state.filter,
@@ -350,25 +353,31 @@ class ContactsScreen extends Component {
     };
 
     handleOnPressMap = (followUp, contact) => {
-        console.log('Press Map');
-        let contactPlaceOfResidence = contact ? contact.addresses.filter((e) => {return e.typeId === config.userResidenceAddress.userPlaceOfResidence}) : followUp.addresses.filter((e) => {return e.typeId === config.userResidenceAddress.userPlaceOfResidence})
-        console.log ('contactPlaceOfResidence', contactPlaceOfResidence);
 
-        navigator.geolocation.getCurrentPosition(
-            (position) => {
-                this.setState({
-                    latitude: contactPlaceOfResidence[0].geoLocation && contactPlaceOfResidence[0].geoLocation.lat ? contactPlaceOfResidence[0].geoLocation.lat : 0,
-                    longitude: contactPlaceOfResidence[0].geoLocation && contactPlaceOfResidence[0].geoLocation.lng ? contactPlaceOfResidence[0].geoLocation.lng : 0,
-                    sourceLatitude: position.coords.latitude,
-                    sourceLongitude: position.coords.longitude,
-                    isVisible: true,
-                    error: null,
-                });
-            },
-            (error) => {
-                this.setState({ error: error.message })
-            },
-        );
+        if (contact && contact.addresses && Array.isArray(contact.addresses) && contact.addresses.length > 0) {
+            let contactPlaceOfResidence = contact ? contact.addresses.filter((e) => {
+                return e.typeId === config.userResidenceAddress.userPlaceOfResidence
+            }) : followUp.addresses.filter((e) => {
+                return e.typeId === config.userResidenceAddress.userPlaceOfResidence
+            })
+            console.log('contactPlaceOfResidence', contactPlaceOfResidence);
+
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    this.setState({
+                        latitude: contactPlaceOfResidence[0].geoLocation && contactPlaceOfResidence[0].geoLocation.lat ? contactPlaceOfResidence[0].geoLocation.lat : 0,
+                        longitude: contactPlaceOfResidence[0].geoLocation && contactPlaceOfResidence[0].geoLocation.lng ? contactPlaceOfResidence[0].geoLocation.lng : 0,
+                        sourceLatitude: position.coords.latitude,
+                        sourceLongitude: position.coords.longitude,
+                        isVisible: true,
+                        error: null,
+                    });
+                },
+                (error) => {
+                    this.setState({error: error.message})
+                },
+            );
+        }
     };
 
     handlePressNavbarButton = () => {
@@ -406,7 +415,7 @@ class ContactsScreen extends Component {
         } else {
             allFilters.searchText = null
         }
-        
+
         if (!allFilters.age && !allFilters.gender && !allFilters.searchText) {
             allFilters = null
         }

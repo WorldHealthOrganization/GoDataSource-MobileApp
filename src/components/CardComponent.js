@@ -82,7 +82,7 @@ class CardComponent extends Component {
         if (this.props.contact && hasDateChanged && hasDateChanged.length > 0) {
             console.log("It's for single screen contact");
             return true
-        } 
+        }
 
         //Usual place of residence change for Contacts and Cases
         if (nextProps.screen === 'ContactsSingleScreen' || nextProps.screen === 'CaseSingleScreen') {
@@ -98,7 +98,7 @@ class CardComponent extends Component {
                     for (let i = 0; i < this.props.contact.addresses.length; i++) {
                         if (this.props.contact.addresses[i].locationId !== nextProps.contact.addresses[i].locationId) {
                             return true
-                        } 
+                        }
                         if (this.props.contact.addresses[i].date !== nextProps.contact.addresses[i].date) {
                             return true
                         }
@@ -227,7 +227,7 @@ class CardComponent extends Component {
                 flex: 1
             }]} key={index}>
                 {
-                   this.handleRenderItemByType(item)
+                    this.handleRenderItemByType(item)
                 }
             </View>
         )
@@ -342,19 +342,19 @@ class CardComponent extends Component {
                 if( item.objectType === 'HospitalizationDates'){
                     if (this.props.case && this.props.case.hospitalizationDates && Array.isArray(this.props.case.hospitalizationDates) && this.props.case.hospitalizationDates.length > 0 && this.props.case.hospitalizationDates[this.props.index]) {
                         if (this.props.case.hospitalizationDates[this.props.index].startDate !== null && item.id !== 'startDate') {
-                            minimumDate = this.props.case.hospitalizationDates[this.props.index].startDate 
+                            minimumDate = this.props.case.hospitalizationDates[this.props.index].startDate
                         }
                         if (this.props.case.hospitalizationDates[this.props.index].endDate !== null && item.id !== 'endDate') {
-                            maximumDate = this.props.case.hospitalizationDates[this.props.index].endDate 
+                            maximumDate = this.props.case.hospitalizationDates[this.props.index].endDate
                         }
                     }
                 } else if (item.objectType === 'IsolationDates'){
                     if (this.props.case && this.props.case.isolationDates && Array.isArray(this.props.case.isolationDates) && this.props.case.isolationDates.length > 0 && this.props.case.isolationDates[this.props.index]) {
                         if (this.props.case.isolationDates[this.props.index].startDate !== null && item.id !== 'startDate') {
-                            minimumDate = this.props.case.isolationDates[this.props.index].startDate 
+                            minimumDate = this.props.case.isolationDates[this.props.index].startDate
                         }
                         if (this.props.case.isolationDates[this.props.index].endDate !== null && item.id !== 'endDate') {
-                            maximumDate = this.props.case.isolationDates[this.props.index].endDate 
+                            maximumDate = this.props.case.isolationDates[this.props.index].endDate
                         }
                     }
                 }
@@ -763,12 +763,12 @@ class CardComponent extends Component {
         switch (person.type) {
             case 'case':
                 return (this.props.cases && Array.isArray(this.props.cases) && this.props.cases.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id) > -1 && this.props.cases[this.props.cases.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id)].firstName ? (this.props.cases[this.props.cases.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id)].firstName + ' ') : '') +
-                (this.props.cases && Array.isArray(this.props.cases) && this.props.cases.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id) > -1 && this.props.cases[this.props.cases.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id)].lastName ? (this.props.cases[this.props.cases.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id)].lastName) : '');
+                    (this.props.cases && Array.isArray(this.props.cases) && this.props.cases.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id) > -1 && this.props.cases[this.props.cases.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id)].lastName ? (this.props.cases[this.props.cases.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id)].lastName) : '');
             case 'event':
                 return (this.props.events && Array.isArray(this.props.events) && this.props.events.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id) > -1 && this.props.events[this.props.events.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id)].name ? (this.props.events[this.props.events.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id)].name) : '');
             case 'contact':
                 return (this.props.contacts && Array.isArray(this.props.contacts) && this.props.contacts.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id) > -1 && this.props.contacts[this.props.contacts.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id)].firstName ? (this.props.contacts[this.props.contacts.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id)].firstName + ' ') : '') +
-                (this.props.contacts && Array.isArray(this.props.contacts) && this.props.contacts.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id) > -1 && this.props.contacts[this.props.contacts.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id)].lastName ? (this.props.contacts[this.props.contacts.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id)].lastName) : '');
+                    (this.props.contacts && Array.isArray(this.props.contacts) && this.props.contacts.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id) > -1 && this.props.contacts[this.props.contacts.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id)].lastName ? (this.props.contacts[this.props.contacts.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id)].lastName) : '');
             default:
                 return ''
         }
@@ -778,8 +778,8 @@ class CardComponent extends Component {
         console.log("computeDataForFollowUpSingleScreenDropdownInput: ", item, this.props.case);
         if (item.id === 'statusId') {
             return _.filter(this.props.referenceData, (o) => {
-                return o.categoryId.includes("STATUS_TYPE")
-            }).map((o) => {return {value: this.getTranslation(o.value), id: o.value}})
+                return o.categoryId.includes("LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE")
+            }).map((o) => {return {label: this.getTranslation(o.value), value: o.value}})
         }
         if (item.id === 'typeId') {
             return _.filter(this.props.referenceData, (o) => {
@@ -871,7 +871,7 @@ class CardComponent extends Component {
     computeValueForFollowUpSingleScreen = (item) => {
         if (item.objectType === 'Address') {
             return this.props.followUp && this.props.followUp.address && this.props.followUp.address[item.id] !== undefined ?
-            this.getTranslation(this.props.followUp.address[item.id]) : '';
+                this.getTranslation(this.props.followUp.address[item.id]) : '';
         }
         return this.props.followUp && this.props.followUp[item.id] ? this.getTranslation(this.props.followUp[item.id]) : '';
     }
@@ -880,16 +880,16 @@ class CardComponent extends Component {
         if (index || index >= 0) {
             if (item.objectType === 'Address') {
                 return this.props.case && this.props.case.addresses && Array.isArray(this.props.case.addresses) && this.props.case.addresses.length > 0 && this.props.case.addresses[index][item.id] !== undefined ?
-                this.getTranslation(this.props.case.addresses[index][item.id]) : '';
+                    this.getTranslation(this.props.case.addresses[index][item.id]) : '';
             } else if (item.objectType === 'Documents') {
                 return this.props.case && this.props.case.documents && Array.isArray(this.props.case.documents) && this.props.case.documents.length > 0 && this.props.case.documents[index][item.id] !== undefined ?
-                this.getTranslation(this.props.case.documents[index][item.id]) : '';
+                    this.getTranslation(this.props.case.documents[index][item.id]) : '';
             } else if (item.objectType === 'HospitalizationDates') {
                 return this.props.case && this.props.case.hospitalizationDates && Array.isArray(this.props.case.hospitalizationDates) && this.props.case.hospitalizationDates.length > 0 && this.props.case.hospitalizationDates[index][item.id] !== undefined ?
-                this.getTranslation(this.props.case.hospitalizationDates[index][item.id]) : '';
+                    this.getTranslation(this.props.case.hospitalizationDates[index][item.id]) : '';
             } else if (item.objectType === 'IsolationDates') {
                 return this.props.case && this.props.case.isolationDates && Array.isArray(this.props.case.isolationDates) && this.props.case.isolationDates.length > 0 && this.props.case.isolationDates[index][item.id] !== undefined ?
-                this.getTranslation(this.props.case.isolationDates[index][item.id]) : '';
+                    this.getTranslation(this.props.case.isolationDates[index][item.id]) : '';
             }
         }
         return this.props.case && this.props.case[item.id] ? this.getTranslation(this.props.case[item.id]) : '';
