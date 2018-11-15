@@ -171,27 +171,29 @@ export function handleExposedTo(contact, returnString, cases, events) {
     return returnString ? relationshipArray.join(", ") : relationshipArray;
 }
 
-export function unzipFile (source, dest, callback) {
-    RNFetchBlobFS.exists(source)
-        .then((exists) => {
-            if (exists) {
-                // Proceed to unzip the file to the specified destination
-                unzip(source, dest)
-                    .then((path) => {
-                        console.log(`unzip completed at ${path}`);
-                        callback(null, path);
-                    })
-                    .catch((error) => {
-                        console.log(error);
-                        callback(error);
-                    })
-            } else {
-                return callback('Zip file does not exist');
-            }
-        })
-        .catch((existsError) => {
-            callback(('There was an error with getting the zip file: ' + existsError));
-        });
+export function unzipFile (source, dest) {
+    return new Promise((resolve, reject) => {
+        RNFetchBlobFS.exists(source)
+            .then((exists) => {
+                if (exists) {
+                    // Proceed to unzip the file to the specified destination
+                    unzip(source, dest)
+                        .then((path) => {
+                            console.log(`unzip completed at ${path}`);
+                            resolve(path);
+                        })
+                        .catch((error) => {
+                            console.log(error);
+                            reject(error);
+                        })
+                } else {
+                    return reject('Zip file does not exist');
+                }
+            })
+            .catch((existsError) => {
+                reject(('There was an error with getting the zip file: ' + existsError));
+            });
+    });
 }
 
 export function readFile (path, callback) {
@@ -217,14 +219,16 @@ export function syncFile (path, callback) {
     })
 }
 
-export function readDir (path, callback) {
-    RNFetchBlobFS.ls(path)
-        .then((files) => {
-            callback(null, files);
-        })
-        .catch((errorLs) => {
-            callback(errorLs);
-        })
+export function readDir (path) {
+    return new Promise((resolve, reject) => {
+        RNFetchBlobFS.ls(path)
+            .then((files) => {
+                resolve(files);
+            })
+            .catch((errorLs) => {
+                reject(errorLs);
+            })
+    })
 }
 
 let numberOfFilesProcessed = 0;
@@ -237,7 +241,7 @@ export function getNumberOfFilesProcessed() {
     return numberOfFilesProcessed;
 }
 
-export async function processFile (path, type, totalNumberOfFiles, dispatch) {
+export async function processFile (path, type, totalNumberOfFiles, dispatch, isFirstTime) {
     return new Promise((resolve, reject) => {
         if (path) {
             console.log('Process file: ', type, ' From path: ', path);
@@ -251,41 +255,75 @@ export async function processFile (path, type, totalNumberOfFiles, dispatch) {
                                 reject("Error while reading file");
                             }
                             if (data) {
+                                if (isFirstTime) {
+                                    // If is first time processing files, do a bulk insert
+                                    processBulkDocs(data, type)
+                                        .then((resultBulk) => {
+                                            console.log('Bulk docs: ', resultBulk);
+                                            let numberOfFilesProcessedAux = getNumberOfFilesProcessed();
+                                            numberOfFilesProcessedAux += 1;
+                                            data = null;
+                                            setNumberOfFilesProcessed(numberOfFilesProcessedAux);
+                                            dispatch(setSyncState(("Synced " + numberOfFilesProcessedAux + "/" + totalNumberOfFiles)));
+                                            resolve('Finished inserting');
+                                        })
+                                        .catch((errorBulk) => {
+                                            console.log('Error bulk docs: ', errorBulk);
+                                            data = null;
+                                            reject(errorBulk);
+                                        })
+                                } else {
+                                    // Since there is data in the file, it's time to sync it
+                                    let promises = [];
+                                    for (let i=0; i<data.length; i++) {
+                                        promises.push(updateFileInDatabase(data[i], type))
+                                    }
 
-
-
-                                // processBulkDocs(data, type)
-                                //     .then((resultBulk) => {
-                                //         console.log('Bulk docs: ', resultBulk);
-                                //         resolve('Finished inserting');
-                                //     })
-                                //     .catch((errorBulk) => {
-                                //         console.log('Error bulk docs: ', errorBulk);
-                                //         reject(errorBulk);
-                                //     })
-
-
-                                // Since there is data in the file, it's time to sync it
-                                let promises = [];
-                                for (let i=0; i<data.length; i++) {
-                                    promises.push(updateFileInDatabase(data[i], type))
+                                    Promise.all(promises)
+                                        .then((responses) => {
+                                            console.log('Finished syncing: ', responses);
+                                            let numberOfFilesProcessedAux = getNumberOfFilesProcessed();
+                                            numberOfFilesProcessedAux += 1;
+                                            data = null;
+                                            setNumberOfFilesProcessed(numberOfFilesProcessedAux);
+                                            dispatch(setSyncState(("Synced " + numberOfFilesProcessedAux + "/" + totalNumberOfFiles)));
+                                            resolve('Finished syncing');
+                                        })
+                                        .catch((error) => {
+                                            console.log("Error at syncing file of type: ", type, error);
+                                            data = null;
+                                            reject("Error at syncing file");
+                                        })
                                 }
-
-                                Promise.all(promises)
-                                    .then((responses) => {
-                                        console.log('Finished syncing: ', responses);
-                                        let numberOfFilesProcessedAux = getNumberOfFilesProcessed();
-                                        numberOfFilesProcessedAux += 1;
-                                        setNumberOfFilesProcessed(numberOfFilesProcessedAux);
-                                        dispatch(setSyncState(("Synced " + numberOfFilesProcessedAux + "/" + totalNumberOfFiles)));
-                                        resolve('Finished syncing');
-                                    })
-                                    .catch((error) => {
-                                        console.log("Error at syncing file of type: ", type, error);
-                                        reject("Error at syncing file");
-                                    })
                             }
                         })
+
+
+                        // RNFetchBlobFS.readStream(path, 'utf8')
+                        //     .then((stream) => {
+                        //         let data = '';
+                        //         stream.open();
+                        //         stream.onData((chunk) => {
+                        //             if (chunk.includes('[\n')) {
+                        //                 chunk = chunk.substr(2);
+                        //             }
+                        //             // If the chunk doesn't end in " }", then the previous read object is not finished
+                        //             if (!data && chunk.substr(chunk.length -3, 2) !== ' }') {
+                        //                 data = chunk;
+                        //             } else {
+                        //                 if (data && chunk.substr(chunk.length -3, 2) !== ' }') {
+                        //
+                        //                 }
+                        //             }
+                        //         });
+                        //         stream.onEnd(() => {
+                        //             console.log(data)
+                        //         });
+                        //     })
+                        //     .catch((errorReadStream) => {
+                        //         console.log('ErrorReadStream: ', errorReadStream);
+                        //         reject(errorReadStream);
+                        //     })
                     } else {
                         reject("The file does not exist")
                     }

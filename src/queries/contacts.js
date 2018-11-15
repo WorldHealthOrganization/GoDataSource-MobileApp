@@ -203,17 +203,17 @@ export function updateContactRequest(outbreakId, contactId, contact, token, call
 
     database.get(contact._id)
         .then((resultGetContact) => {
-            console.log ('Get contact result: ', JSON.stringify(resultGetContact))
+            console.log ('Get contact result: ');
             database.remove(resultGetContact)
                 .then((resultRemove) => {
-                    console.log ('Remove contact result: ', JSON.stringify(resultRemove))
+                    console.log ('Remove contact result: ')
                     delete contact._rev;
                     database.put(contact)
                         .then((responseUpdateContact) => {
-                            console.log("Update contact response: ", responseUpdateContact);
+                            console.log("Update contact response: ");
                             database.get(contact._id)
                                 .then((resultGetUpdatedContact) => {
-                                    console.log("Response getUpdatedContact: ", JSON.stringify(resultGetUpdatedContact));
+                                    console.log("Response getUpdatedContact: ");
                                     callback(null, resultGetUpdatedContact);
                                 })
                                 .catch((errorGetUpdatedContact) => {

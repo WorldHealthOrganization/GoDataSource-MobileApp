@@ -196,93 +196,209 @@ export function storeHubConfiguration(hubConfiguration) {
             console.log("Last sync date: ", lastSyncDate);
             if (lastSyncDate !== null) {
                 getDatabaseSnapshotRequest(hubConfiguration, lastSyncDate, (error, response) => {
-                    dispatch(processFilesForSync(error, response, hubConfiguration));
+                    dispatch(processFilesForSync(error, response, hubConfiguration, true));
                 })
             } else {
                 console.log('No last sync date found. proceed to download all database: ');
                 getDatabaseSnapshotRequest(hubConfiguration, null, (error, response) => {
-                    dispatch(processFilesForSync(error, response, hubConfiguration));
+                    dispatch(processFilesForSync(error, response, hubConfiguration, true));
                 })
             }
         } catch (errorGetLastSyncDate) {
             console.log("Error at getting lastSyncDate. Proceed to download all database: ", errorGetLastSyncDate);
             getDatabaseSnapshotRequest(hubConfiguration, null, (error, response) => {
-                dispatch(processFilesForSync(error, response, hubConfiguration));
+                dispatch(processFilesForSync(error, response, hubConfiguration, true));
             })
         }
     }
 }
 
-function processFilesForSync(error, response, hubConfiguration) {
+function processFilesForSync(error, response, hubConfiguration, isFirstTime) {
     return async function (dispatch){
         if (error) {
             dispatch(setSyncState('Error'));
         }
         if (response) {
             dispatch(setSyncState("Unzipping database..."));
-            unzipFile(response, RNFetchBlobFs.dirs.DocumentDir + "/who_databases", (unzipError, responseUnzipPath) => {
-                if (unzipError) {
-                    console.log("Error while unzipping file");
-                    dispatch(setSyncState('Error'));
-                }
+
+            try {
+                let responseUnzipPath = await unzipFile(response, RNFetchBlobFs.dirs.DocumentDir + "/who_databases");
                 if (responseUnzipPath) {
-                    // At this point we have the path to where the json files from the downloaded database are
-                    // We should call the method to sync those data
+                    console.log('ResponseUnzipPath: ', responseUnzipPath);
                     dispatch(setSyncState("Syncing...."));
                     setNumberOfFilesProcessed(0);
 
-                    // RNDB.configureDatabaseWithConfig(config.RNDBConfig);
-                    // RNDB.importDataWithCallback(() => {
-                    //     dispatch(setSyncState("Finished processing"));
-                    // });
+                    try {
+                        let database = await createDatabase(hubConfiguration.url.replace(/\/|\.|\:/g, ''), hubConfiguration.clientSecret, true);
+                        if (database) {
+                            let promises = [];
+                            let promiseResponses = [];
 
+                            try {
+                                let files = await readDir(responseUnzipPath);
 
-                    // Create local database
-                    createDatabase(hubConfiguration.url.replace(/\/|\.|\:/g, ''), hubConfiguration.clientSecret, true, (database) => {
-                        // Create a promise array to run syncing for all the files from the db
-                        let promises = [];
-                        readDir(responseUnzipPath, (errorReadDir, files) => {
-                            if (errorReadDir) {
-                                console.log('Error while reading directory');
+                                if (files) {
+                                    // For every file of the database dump, do sync
+                                    for (let i = 0; i < files.length; i++) {
+                                        if (files[i] !== 'auditLog.json' && files[i] !== 'icon.json' && files[i] !== 'icons') {
+                                            // promises.push(processFile(RNFetchBlobFs.dirs.DocumentDir + '/who_databases/' + files[i], files[i], files.length, dispatch, isFirstTime));
+                                            // Process every file synchronously
+                                            try {
+                                                // console.log('Memory size of database: ', memorySizeOf(database));
+                                                let auxData = await processFile(RNFetchBlobFs.dirs.DocumentDir + '/who_databases/' + files[i], files[i], files.length, dispatch, isFirstTime);
+                                                if (auxData) {
+                                                    console.log('auxData: ', auxData);
+                                                    promiseResponses.push(auxData);
+                                                } else {
+                                                    console.log('There was an error at processing file: ', files[i]);
+                                                    dispatch(setSyncState('Error'));
+                                                    break;
+                                                }
+                                            } catch (errorProcessFile) {
+                                                console.log('There was an error at processing file: ', files[i], errorProcessFile);
+                                                dispatch(setSyncState('Error'));
+                                                break;
+                                            }
+                                        }
+                                    }
+                                    // After processing all files, store hub config
+                                    // After processing all the data store the last sync date
+                                    console.log("Now that the processing is over, proceed with storing last sync date:");
+                                    storeData('activeDatabase', hubConfiguration.url, (errorActiveDatabase) => {
+                                        if (!errorActiveDatabase) {
+                                            storeData(hubConfiguration.url, new Date(), (errorStoreLastSync) => {
+                                                if (!errorStoreLastSync) {
+                                                    console.log('Responses promises: ', promiseResponses);
+                                                    files = null;
+                                                    database = null;
+                                                    dispatch(setSyncState("Finished processing"));
+                                                } else {
+                                                    console.log('There was an error at storing last sync date: ', errorStoreLastSync);
+                                                    files = null;
+                                                    database = null;
+                                                    dispatch(setSyncState('Error'));
+                                                }
+                                            });
+                                        } else {
+                                            console.log('There was an error at storing active database: ', errorActiveDatabase);
+                                            files = null;
+                                            database = null;
+                                            dispatch(setSyncState('Error'));
+                                        }
+                                    });
+
+                                    // Promise.all(promises)
+                                    //     .then((responses) => {
+                                    //         // After processing all the data store the last sync date
+                                    //         console.log("Now that the processing is over, proceed with storing last sync date:");
+                                    //         storeData('activeDatabase', hubConfiguration.url, (errorActiveDatabase) => {
+                                    //             if (!errorActiveDatabase) {
+                                    //                 storeData(hubConfiguration.url, new Date(), (errorStoreLastSync) => {
+                                    //                     if (!errorStoreLastSync) {
+                                    //                         console.log('Responses promises: ', responses);
+                                    //                         dispatch(setSyncState("Finished processing"));
+                                    //                     } else {
+                                    //                         console.log('There was an error at storing last sync date: ', errorStoreLastSync);
+                                    //                         dispatch(setSyncState('Error'));
+                                    //                     }
+                                    //                 });
+                                    //             } else {
+                                    //                 console.log('There was an error at storing active database: ', errorActiveDatabase);
+                                    //                 dispatch(setSyncState('Error'));
+                                    //             }
+                                    //         });
+                                    //     })
+                                    //     .catch((error) => {
+                                    //         console.log("Error promises: ", error);
+                                    //         dispatch(setSyncState('Error'));
+                                    //     })
+                                } else {
+                                    console.log('No files found');
+                                    dispatch(setSyncState('Error'));
+                                }
+                            } catch(errorReadDir) {
+                                console.log('Error while reading directory: ', errorReadDir);
                                 dispatch(setSyncState('Error'));
                             }
-                            if (files) {
-                                // For every file of the database dump, do sync
-                                for(let i=0; i<files.length; i++) {
-                                    if (files[i] !== 'auditLog.json' && files[i] !== 'icon.json' && files[i] !== 'icons') {
-                                        promises.push(processFile(RNFetchBlobFs.dirs.DocumentDir + '/who_databases/' + files[i], files[i], files.length, dispatch));
-                                    }
-                                }
-                                Promise.all(promises)
-                                    .then((responses) => {
-                                        // After processing all the data store the last sync date
-                                        console.log("Now that the processing is over, proceed with storing last sync date:");
-                                        storeData('activeDatabase', hubConfiguration.url, (errorActiveDatabase) => {
-                                            if (!errorActiveDatabase) {
-                                                storeData(hubConfiguration.url, new Date(), (errorStoreLastSync) => {
-                                                    if (!errorStoreLastSync) {
-                                                        console.log('Responses promises: ', responses);
-                                                        dispatch(setSyncState("Finished processing"));
-                                                    } else {
-                                                        console.log('There was an error at storing last sync date: ', errorStoreLastSync);
-                                                        dispatch(setSyncState('Error'));
-                                                    }
-                                                });
-                                            } else {
-                                                console.log('There was an error at storing active database: ', errorActiveDatabase);
-                                                dispatch(setSyncState('Error'));
-                                            }
-                                        });
-                                    })
-                                    .catch((error) => {
-                                        console.log("Error promises: ", error);
-                                        dispatch(setSyncState('Error'));
-                                    })
-                            }
-                        })
-                    });
+                        } else {
+                            dispatch(setSyncState('Error'));
+                        }
+                    } catch (errorCreateDatabase) {
+                        console.log("Error create database: ", errorCreateDatabase);
+                        dispatch(setSyncState('Error'));
+                    }
+                } else {
+                    dispatch(setSyncState('Error'));
                 }
-            })
+            } catch (unzipError) {
+                console.log("Error promises: ", error);
+                dispatch(setSyncState('Error'));
+            }
+
+            // unzipFile(response, RNFetchBlobFs.dirs.DocumentDir + "/who_databases", (unzipError, responseUnzipPath) => {
+            //     if (unzipError) {
+            //         console.log("Error while unzipping file");
+            //         dispatch(setSyncState('Error'));
+            //     }
+            //     if (responseUnzipPath) {
+            //         // At this point we have the path to where the json files from the downloaded database are
+            //         // We should call the method to sync those data
+            //         dispatch(setSyncState("Syncing...."));
+            //         setNumberOfFilesProcessed(0);
+            //
+            //         // RNDB.configureDatabaseWithConfig(config.RNDBConfig);
+            //         // RNDB.importDataWithCallback(() => {
+            //         //     dispatch(setSyncState("Finished processing"));
+            //         // });
+            //
+            //
+            //         // Create local database
+            //         createDatabase(hubConfiguration.url.replace(/\/|\.|\:/g, ''), hubConfiguration.clientSecret, true, (database) => {
+            //             // Create a promise array to run syncing for all the files from the db
+            //             let promises = [];
+            //             let promiseResponses = [];
+            //             readDir(responseUnzipPath, (errorReadDir, files) => {
+            //                 if (errorReadDir) {
+            //                     console.log('Error while reading directory');
+            //                     dispatch(setSyncState('Error'));
+            //                 }
+            //                 if (files) {
+            //                     // For every file of the database dump, do sync
+            //                     for(let i=0; i<files.length; i++) {
+            //                         if (files[i] !== 'auditLog.json' && files[i] !== 'icon.json' && files[i] !== 'icons') {
+            //                             promises.push(processFile(RNFetchBlobFs.dirs.DocumentDir + '/who_databases/' + files[i], files[i], files.length, dispatch, isFirstTime));
+            //                         }
+            //                     }
+            //                     Promise.all(promises)
+            //                         .then((responses) => {
+            //                             // After processing all the data store the last sync date
+            //                             console.log("Now that the processing is over, proceed with storing last sync date:");
+            //                             storeData('activeDatabase', hubConfiguration.url, (errorActiveDatabase) => {
+            //                                 if (!errorActiveDatabase) {
+            //                                     storeData(hubConfiguration.url, new Date(), (errorStoreLastSync) => {
+            //                                         if (!errorStoreLastSync) {
+            //                                             console.log('Responses promises: ', responses);
+            //                                             dispatch(setSyncState("Finished processing"));
+            //                                         } else {
+            //                                             console.log('There was an error at storing last sync date: ', errorStoreLastSync);
+            //                                             dispatch(setSyncState('Error'));
+            //                                         }
+            //                                     });
+            //                                 } else {
+            //                                     console.log('There was an error at storing active database: ', errorActiveDatabase);
+            //                                     dispatch(setSyncState('Error'));
+            //                                 }
+            //                             });
+            //                         })
+            //                         .catch((error) => {
+            //                             console.log("Error promises: ", error);
+            //                             dispatch(setSyncState('Error'));
+            //                         })
+            //                 }
+            //             })
+            //         });
+            //     }
+            // })
         }
     }
 }
@@ -307,14 +423,12 @@ export function sendDatabaseToServer () {
                         let internetCredentials = await getInternetCredentials(activeDatabase);
                         if (internetCredentials) {
                             database.find({selector: {
-                                updatedAt: {$gte: lastSyncDate},
-                                updatedBy: {$ne: 'Sync. Client Id: test'}
+                                updatedAt: {$gte: lastSyncDate}
                             },
                                 fields: ['fileType']
                             })
                                 .then((resultGetRecordsByDate) => {
                                     resultGetRecordsByDate = uniq(resultGetRecordsByDate.docs);
-                                    resultGetRecordsByDate = resultGetRecordsByDate.filter((e) => {return e.fileType !== 'followUp.json'});
                                     console.log('resultGetRecordsByDate: ', resultGetRecordsByDate);
                                     // Now, for each fileType, we must create a .json file, archive it and then send that archive to the server
                                     let promiseArray = [];
@@ -455,9 +569,19 @@ export function appInitialized() {
                             if (databaseCredentials) {
                                 console.log('Database credentials: ', databaseCredentials);
                                 let server = Platform.OS === 'ios' ? databaseCredentials.server : databaseCredentials.service;
-                                createDatabase(server.replace(/\/|\.|\:/g, ''), databaseCredentials.password, false, (database) => {
-                                    dispatch(getUserById(loggedUser, null));
-                                })
+                                try {
+                                    let database = await createDatabase(server.replace(/\/|\.|\:/g, ''), databaseCredentials.password, false);
+                                    if (database) {
+                                        dispatch(getUserById(loggedUser, null));
+                                    } else {
+                                        console.log('Database does not exist');
+                                        dispatch(changeAppRoot('config'));
+                                    }
+                                } catch(errorCreateDatabase) {
+                                    console.log('errorCreateDatabase: ', errorCreateDatabase);
+                                    dispatch(changeAppRoot('config'));
+                                }
+
                             } else {
                                 console.log("Don't have database credentials, but have active database and logged user. Proceed to config screen");
                                 dispatch(changeAppRoot('config'))
@@ -485,9 +609,19 @@ export function appInitialized() {
                             let databaseCredentials = await getInternetCredentials(activeDatabase);
                             console.log('Database credentials: ', databaseCredentials);
                             if (databaseCredentials) {
-                                createDatabase(databaseCredentials.server.replace(/\/|\.|\:/g, ''), databaseCredentials.password, false, (database) => {
-                                    dispatch(changeAppRoot('login'));
-                                })
+                                let server = Platform.OS === 'ios' ? databaseCredentials.server : databaseCredentials.service;
+                                try {
+                                    let database = await createDatabase(server.replace(/\/|\.|\:/g, ''), databaseCredentials.password, false);
+                                    if (database) {
+                                        dispatch(changeAppRoot('login'));
+                                    } else {
+                                        console.log('Database does not exist');
+                                        dispatch(changeAppRoot('config'));
+                                    }
+                                } catch(errorCreateDatabase) {
+                                    console.log('errorCreateDatabase: ', errorCreateDatabase)
+                                    dispatch(changeAppRoot('config'));
+                                }
                             } else {
                                 console.log("We don't have logged user, we have active database, but we don't have credentials. Proceed to config screen");
                                 dispatch(changeAppRoot('config'));
@@ -516,9 +650,19 @@ export function appInitialized() {
                         let databaseCredentials = await getInternetCredentials(activeDatabase);
                         console.log('Database credentials: ', databaseCredentials);
                         if (databaseCredentials) {
-                            createDatabase(databaseCredentials.server.replace(/\/|\.|\:/g, ''), databaseCredentials.password, false, (database) => {
-                                dispatch(changeAppRoot('login'));
-                            })
+                            let server = Platform.OS === 'ios' ? databaseCredentials.server : databaseCredentials.service;
+                            try {
+                                let database = await createDatabase(server.replace(/\/|\.|\:/g, ''), databaseCredentials.password, false);
+                                if (database) {
+                                    dispatch(changeAppRoot('login'));
+                                } else {
+                                    console.log('Database does not exist');
+                                    dispatch(changeAppRoot('config'));
+                                }
+                            } catch(errorCreateDatabase) {
+                                console.log('errorCreateDatabase: ', errorCreateDatabase)
+                                dispatch(changeAppRoot('config'));
+                            }
                         } else {
                             console.log("We don't have logged user, we have active database, but we don't have credentials. Proceed to config screen");
                             dispatch(changeAppRoot('config'));

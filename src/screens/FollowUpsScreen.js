@@ -512,7 +512,9 @@ class FollowUpsScreen extends Component {
         let followUp = {
             _id: 'followUp.json_false_' + this.props.user.activeOutbreakId + '_' + date.getTime() + '_' + generateId(),
             statusId: config.followUpStatuses.notPerformed,
+            targeted: false,
             date: date,
+            fileType: 'followUp.json',
             outbreakId: this.props.user.activeOutbreakId,
             personId: extractIdFromPouchId(contact.id, 'person.json'),
             updatedAt: now.toISOString(),

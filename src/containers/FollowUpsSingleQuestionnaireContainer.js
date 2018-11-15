@@ -36,17 +36,24 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
     // }
 
     componentDidMount() {
-        // Get all additional questions recursively
-        let sortedQuestions = extractAllQuestions(this.props.questions);
 
-        // mappedQuestions format: [{categoryName: 'cat1', questions: [{q1}, {q2}]}]
-        sortedQuestions = mapQuestions(sortedQuestions);
         InteractionManager.runAfterInteractions(() => {
             this.setState({
                 interactionComplete: true,
-                questions: sortedQuestions
             })
         })
+    }
+
+    static getDerivedStateFromProps(props, state) {
+        // Get all additional questions recursively
+        let sortedQuestions = extractAllQuestions(props.questions, props.item);
+
+        // mappedQuestions format: [{categoryName: 'cat1', questions: [{q1}, {q2}]}]
+        sortedQuestions = mapQuestions(sortedQuestions);
+
+        state.questions = sortedQuestions;
+
+        return null;
     }
 
     // The render method should have at least business logic as possible,

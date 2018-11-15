@@ -98,11 +98,16 @@ class FirstConfigScreen extends Component {
     };
 
     handlePressImport = () => {
-        Alert.alert("Warning", 'Work in progress', [
-            {
-                text: 'Ok', onPress: () => {console.log('Ok pressed')}
-            }
-        ])
+        DocumentPicker.show({
+            filetype: [DocumentPickerUtil.allFiles()],
+        },(error,res) => {
+            // We will presume that will use the JSON file with the structure
+            // {url: '', clientId: '', clientSecret: ''}
+
+
+            // Android
+            console.log('Result from getting files: ', res);
+        });
     };
 
     handlePressManual = () => {
