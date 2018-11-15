@@ -1615,6 +1615,7 @@ const localTranslationTokens = {
     months: 'LNG_AGE_FIELD_LABEL_MONTHS'
 };
 
+
 export default {
     designScreenSize,
     sideMenuItems,
