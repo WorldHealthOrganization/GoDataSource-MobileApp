@@ -84,7 +84,7 @@ class AddFollowUpScreen extends PureComponent{
                         {/*style={{width: contentWidth, marginHorizontal}}*/}
                     {/*/>*/}
                     <DropdownSearchable
-                        outbreakId={this.props.user.activeOutbreakId}
+                        outbreakId={this.props && this.props.user && this.props.user.activeOutbreakId ? this.props.user.activeOutbreakId : null}
                         onChange={this.onDropdownSearchableChanged}
                     />
                     <DatePicker

@@ -4,6 +4,7 @@
 import {getDatabase} from './database';
 import {extractIdFromPouchId} from './../utils/functions';
 import {generateId} from './../utils/functions';
+import moment from 'moment';
 
 // Credentials: {email, encryptedPassword}
 export function getFollowUpsForOutbreakIdRequest (outbreakId, filter, token, callback) {
@@ -16,8 +17,8 @@ export function getFollowUpsForOutbreakIdRequest (outbreakId, filter, token, cal
     let startDate = '';
     let endDate = '';
     if (filter && filter.date) {
-        startDate = new Date(filter.date).getTime() - oneDay;
-        endDate = new Date(filter.date).getTime()  + oneDay;
+        startDate = new Date(`${filter.date.getMonth() + 1}/${filter.date.getDate()}/${filter.date.getFullYear()}`).getTime();
+        endDate = moment(filter.date.getTime() + oneDay).add(-1, 'second')._d.getTime();
     }
 
     let start =  new Date().getTime();
@@ -61,8 +62,10 @@ export function getFollowUpsForContactIds (outbreakId, date, contactIds, callbac
     let database = getDatabase();
 
     let oneDay = 24 * 60 * 60 * 1000;
-    let startDate = new Date(date).getTime() - oneDay;
-    let endDate = new Date(date).getTime() + oneDay;
+    let startDate = new Date(`${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`).getTime();
+    let endDate = moment(date.getTime() + oneDay).add(-1, 'second')._d.getTime();
+
+
 
     let start = new Date().getTime();
     database.find({

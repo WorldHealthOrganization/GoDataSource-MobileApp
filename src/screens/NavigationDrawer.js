@@ -8,7 +8,7 @@ import config from './../utils/config';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import {logoutUser} from './../actions/user';
-import {sendDatabaseToServer, getTranslationsAsync} from './../actions/app';
+import {sendDatabaseToServer, getTranslationsAsync, changeAppRoot} from './../actions/app';
 import styles from './../styles';
 import {ListItem, Icon} from 'react-native-material-ui';
 import DropdownInput from './../components/DropdownInput';
@@ -77,13 +77,13 @@ class NavigationDrawer extends Component {
                     }
                     <View style={styles.lineStyle} />
                     <NavigationDrawerListItem label={'Sync HUB manually'} name={'cached'} onPress={this.handleOnPressSync} />
-                    <NavigationDrawerListItem label={'Change HUB configuration'} name={'settings'}/>
+                    <NavigationDrawerListItem label={'Change HUB configuration'} name={'settings'} onPress={this.handleOnPressChangeHubConfig} />
                     <View style={styles.lineStyle} />
                     <View style={{justifyContent: 'center', alignItems: 'center'}}>
                         <DropdownInput
                             id="test"
                             label="Language"
-                            value={this.props.availableLanguages[this.props.availableLanguages.map((e) => {return e.value}).indexOf(this.props.user.languageId)].label}
+                            value={this.props.availableLanguages && this.props.user && this.props.user.languageId ? this.props.availableLanguages[this.props.availableLanguages.map((e) => {return e.value}).indexOf(this.props.user.languageId)].label : null}
                             data={this.props.availableLanguages}
                             isEditMode={true}
                             isRequired={false}
@@ -153,6 +153,10 @@ class NavigationDrawer extends Component {
         this.props.sendDatabaseToServer();
     };
 
+    handleOnPressChangeHubConfig = () => {
+        this.props.changeAppRoot('config');
+    };
+
     handleOnChangeLanguage = (value, label) => {
         let user = Object.assign({}, this.props.user);
         user.languageId = value;
@@ -197,7 +201,8 @@ function matchDispatchProps(dispatch) {
         logoutUser,
         sendDatabaseToServer,
         updateUser,
-        getTranslationsAsync
+        getTranslationsAsync,
+        changeAppRoot
     }, dispatch);
 }
 
