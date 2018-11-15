@@ -534,8 +534,8 @@ class CaseSingleScreen extends Component {
         let documents = _.cloneDeep(this.state.case.documents);
 
         documents.push({
-            documentType: '',
-            documentNumber: ''
+            type: '',
+            number: ''
         });
 
         this.setState(prevState => ({
