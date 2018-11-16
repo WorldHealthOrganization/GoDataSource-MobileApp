@@ -196,8 +196,8 @@ const style = StyleSheet.create({
 function mapStateToProps(state) {
     return {
         screenSize: state.app.screenSize,
-        questions: state.outbreak.caseInvestigationTemplate
-
+        questions: state.outbreak.caseInvestigationTemplate,
+        translation: state.app.translation
     };
 }
 

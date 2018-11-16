@@ -118,23 +118,23 @@ class ContactsScreen extends Component {
                             height: '100%'
                         }}>
                             <Text style={[style.title, {marginLeft: 30}]}>Contacts</Text>
-                            <ElevatedView
-                                elevation={3}
-                                style={{
-                                    backgroundColor: styles.buttonGreen,
-                                    width: calculateDimension(33, false, this.props.screenSize),
-                                    height: calculateDimension(25, true, this.props.screenSize),
-                                    borderRadius: 4
-                                }}
-                            >
-                                <Ripple style={{
-                                    flex: 1,
-                                    justifyContent: 'center',
-                                    alignItems: 'center'
-                                }} onPress={this.handleOnPressAddContact} hitSlop={{top: 20, bottom: 20, left: 20, right: 20}}>
-                                    <Icon name="add" color={'white'} size={15}/>
-                                </Ripple>
-                            </ElevatedView>
+                            {/*<ElevatedView*/}
+                                {/*elevation={3}*/}
+                                {/*style={{*/}
+                                    {/*backgroundColor: styles.buttonGreen,*/}
+                                    {/*width: calculateDimension(33, false, this.props.screenSize),*/}
+                                    {/*height: calculateDimension(25, true, this.props.screenSize),*/}
+                                    {/*borderRadius: 4*/}
+                                {/*}}*/}
+                            {/*>*/}
+                                {/*<Ripple style={{*/}
+                                    {/*flex: 1,*/}
+                                    {/*justifyContent: 'center',*/}
+                                    {/*alignItems: 'center'*/}
+                                {/*}} onPress={this.handleOnPressAddContact} hitSlop={{top: 20, bottom: 20, left: 20, right: 20}}>*/}
+                                    {/*<Icon name="add" color={'white'} size={15}/>*/}
+                                {/*</Ripple>*/}
+                            {/*</ElevatedView>*/}
                         </View>
                     }
                     title={null}
