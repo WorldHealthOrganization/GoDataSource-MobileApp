@@ -449,7 +449,6 @@ class FollowUpsSingleScreen extends Component {
         this.setState(prevState => ({
             item: Object.assign({}, prevState.item,
                 {
-                    performed: true,
                     updatedAt: now.toISOString(),
                     updatedBy: extractIdFromPouchId(this.props.user._id, 'user.json')
                 }
@@ -476,18 +475,18 @@ class FollowUpsSingleScreen extends Component {
             }
 
             if (this.props.isNew) {
-                followUpClone = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, followUpClone), action = 'create', fileType = 'followUp.json')
+                followUpClone = updateRequiredFields(this.props.user.activeOutbreakId, this.props.user._id, Object.assign({}, followUpClone), action = 'create', 'followUp.json');
                 console.log ('followUpClone create', JSON.stringify(followUpClone))
                 this.props.createFollowUp(this.props.outbreak.id, contactClone._id, followUpClone, contactClone, null, this.props.user.token)
             } else {
                 if (this.state.deletePressed === false) {
-                    followUpClone = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, followUpClone), action = 'update')
+                    followUpClone = updateRequiredFields(this.props.user.activeOutbreakId, this.props.user._id, Object.assign({}, followUpClone), action = 'update');
                     console.log ('followUpClone update', JSON.stringify(followUpClone))
                 } else {
-                    followUpClone = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, followUpClone), action = 'delete')
+                    followUpClone = updateRequiredFields(this.props.user.activeOutbreakId, this.props.user._id, Object.assign({}, followUpClone), action = 'delete');
                     console.log ('followUpClone delete', JSON.stringify(followUpClone))
                 }
-                this.props.updateFollowUpAndContact(this.props.user.activeOutbreakId, contactClone._id, followUpClone._id, followUpClone, contactClone, this.props.user.token);
+                this.props.updateFollowUpAndContact(this.props.user.activeOutbreakId, contactClone._id, followUpClone._id, followUpClone, contactClone, this.props.user.token, this.props.filter);
             }
         });
     };

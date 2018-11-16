@@ -37,19 +37,35 @@ class CaseSingleInvestigationContainer extends PureComponent {
 
         return (
             <View style={style.container}>
+                <View style={{flexDirection: 'row'}}>
                 {
                     this.props.isNew ? (
-                        <Button
-                        title={'Back'}
-                        onPress={this.handleBackButton}
-                        color={styles.buttonGreen}
-                        titleColor={'white'}
-                        height={calculateDimension(25, true, this.props.screenSize)}
-                        width={calculateDimension(130, false, this.props.screenSize)}
-                        style={{
-                            marginVertical: calculateDimension(12.5, true, this.props.screenSize),
-                            marginHorizontal: calculateDimension(16, false, this.props.screenSize),
-                        }}/>) : (
+                        <View style={{flexDirection: 'row'}}>
+                            <Button
+                            title={'Back'}
+                            onPress={this.handleBackButton}
+                            color={styles.buttonGreen}
+                            titleColor={'white'}
+                            height={calculateDimension(25, true, this.props.screenSize)}
+                            width={calculateDimension(130, false, this.props.screenSize)}
+                            style={{
+                                marginVertical: calculateDimension(12.5, true, this.props.screenSize),
+                                marginHorizontal: calculateDimension(16, false, this.props.screenSize),
+                            }}/>
+                            <Button
+                                title={'Save'}
+                                onPress={this.props.onPressSave}
+                                color={styles.buttonGreen}
+                                titleColor={'white'}
+                                height={calculateDimension(25, true, this.props.screenSize)}
+                                width={calculateDimension(130, false, this.props.screenSize)}
+                                style={{
+                                    marginVertical: calculateDimension(12.5, true, this.props.screenSize),
+                                    marginHorizontal: calculateDimension(16, false, this.props.screenSize),
+                                }}/>
+                        </View>
+                        )
+                        : (
                         this.props.isEditMode ? (
                             <View style={{flexDirection: 'row'}}>
                                 <Button
@@ -87,6 +103,7 @@ class CaseSingleInvestigationContainer extends PureComponent {
                                     marginRight: 10,
                                 }}/>))
                 }
+                </View>
                 <KeyboardAwareScrollView
                     style={style.containerScrollView}
                     contentContainerStyle={[style.contentContainerStyle, {paddingBottom: this.props.screenSize.height < 600 ? 70 : 20}]}
@@ -128,7 +145,6 @@ class CaseSingleInvestigationContainer extends PureComponent {
                 isEditMode={this.props.isEditMode}
                 index={index + 1}
                 source={this.props.item}
-                isEditMode={this.props.isEditMode}
                 onChangeTextAnswer={this.props.onChangeTextAnswer}
                 onChangeSingleSelection={this.props.onChangeSingleSelection}
                 onChangeMultipleSelection={this.props.onChangeMultipleSelection}
@@ -182,8 +198,8 @@ const style = StyleSheet.create({
 function mapStateToProps(state) {
     return {
         screenSize: state.app.screenSize,
-        questions: state.outbreak.caseInvestigationTemplate
-
+        questions: state.outbreak.caseInvestigationTemplate,
+        translation: state.app.translation
     };
 }
 

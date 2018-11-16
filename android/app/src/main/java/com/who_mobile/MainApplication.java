@@ -42,7 +42,8 @@ import java.util.List;
                  new KeychainPackage(),
                  new RNCameraPackage(),
                  new RNSqlite2Package(),
-                 new RNFSPackage()
+                 new RNFSPackage(),
+                 new ReactNativeDocumentPicker()
          );
      }
 

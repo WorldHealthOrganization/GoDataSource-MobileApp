@@ -30,6 +30,7 @@ import _ from 'lodash';
 import {extractIdFromPouchId, updateRequiredFields, navigation} from './../utils/functions';
 import {getFollowUpsForContactRequest} from './../queries/followUps'
 import ios from 'rn-fetch-blob/ios';
+import moment from 'moment'
 
 const initialLayout = {
     height: 0,

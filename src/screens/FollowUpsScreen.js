@@ -21,6 +21,8 @@ import SearchFilterView from './../components/SearchFilterView';
 import FollowUpListItem from './../components/FollowUpListItem';
 import MissedFollowUpListItem from './../components/MissedFollowUpListItem';
 import AnimatedListView from './../components/AnimatedListView';
+import Breadcrumb from './../components/Breadcrumb';
+import Menu, {MenuItem} from 'react-native-material-menu';
 import ValuePicker from './../components/ValuePicker';
 import {getFollowUpsForOutbreakId, getMissedFollowUpsForOutbreakId, updateFollowUpAndContact, addFollowUp, generateFollowUp} from './../actions/followUps';
 import {getContactsForOutbreakId} from './../actions/contacts';
@@ -63,7 +65,8 @@ class FollowUpsScreen extends Component {
             sourceLatitude: 0,
             sourceLongitude: 0,
             error: null,
-            calendarPickerOpen: false,
+            generating: false,
+            calendarPickerOpen: false
         };
         // Bind here methods, or at least don't declare methods in the render method
         this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this));
@@ -95,6 +98,7 @@ class FollowUpsScreen extends Component {
 
         // console.log('props.contacts', JSON.stringify(props.contacts))
         if (props.contacts) {
+            let prevFollowUps = state.followUps || [];
             let fUps = [];
 
             let contactsCopy = _.cloneDeep(props.contacts);
@@ -150,6 +154,38 @@ class FollowUpsScreen extends Component {
                 fUps = fUps.filter((e) => {return e.statusId === state.filter.performed.value});
             }
 
+
+            //if we'e generating follow-ups
+            if(state.generating) {
+                //and we received generated follow-ups
+                if(props.followUps.length) {
+                    //if we had previous generated follow-ups get difference
+                    if (prevFollowUps.length) {
+                        let number = parseInt(props.followUps.length - prevFollowUps.length);
+                        props.navigator.showInAppNotification({
+                            screen: "InAppNotificationScreen",
+                            passProps: {
+                                number: number
+                            },
+                            autoDismissTimerSec: 1
+                        });
+                    } else {
+                        //no previous follow-ups just display number of generated
+                        let number = parseInt(props.followUps.length);
+                        props.navigator.showInAppNotification({
+                            screen: "InAppNotificationScreen",
+                            passProps: {
+                                number: number
+                            },
+                            autoDismissTimerSec: 1
+                        });
+                    }
+
+                    //reset generating status
+                    state.generating = false;
+                }
+            }
+
             if (props.followUps && props.followUps.length > 0) {
                 state.followUps = fUps;
             }
@@ -163,21 +199,13 @@ class FollowUpsScreen extends Component {
     }
 
     componentDidMount() {
-        console.log ('componentDidMount')
         this.setState({
-            loading: true
+            loading: true,
+            generating: false,
         }, () => {
             this.props.getFollowUpsForOutbreakId(this.props.user.activeOutbreakId, this.state.filter, null);
         })
     };
-
-
-    // componentWillReceiveProps() {
-    //     console.log ('componentWillReceiveProps')
-    //     if (props.filter && (props.filter['FollowUpsFilterScreen'] || props.filter['FollowUpsScreen'])) {
-    //         this.filterContacts()
-    //     }
-    // };
 
     shouldComponentUpdate(nextProps, nextState) {
         if (!nextProps.user) {
@@ -222,13 +250,34 @@ class FollowUpsScreen extends Component {
             outputRange: [1, 0],
             extrapolate: 'clamp',
         });
-
+        let followUpTitle = []; followUpTitle[1] = 'Follow-ups';
         return (
             <ViewHOC style={style.container}
                      showLoader={(this.props && this.props.syncState && (this.props.syncState !== 'Finished processing' && this.props.syncState !== 'Error')) || (this && this.state && this.state.loading)}
                      loaderText={this.props && this.props.syncState ? this.props.syncState : 'Loading...'}>
                 <NavBarCustom
-                    title="Follow-ups"
+                    title={null}
+                    customTitle={
+                        <View
+                            style={[style.breadcrumbContainer]}>
+                            <Breadcrumb
+                                entities={followUpTitle}
+                                navigator={this.props.navigator || null}
+                            />
+                            <View>
+                                <Menu
+                                    ref="menuRef"
+                                    button={
+                                        <Ripple onPress={this.showMenu} hitSlop={{top: 20, bottom: 20, left: 20, right: 20}}>
+                                            <Icon name="more-vert"/>
+                                        </Ripple>
+                                    }
+                                >
+                                    <MenuItem onPress={this.handleGenerateFollowUps}>Generate for current day</MenuItem>
+                                </Menu>
+                            </View>
+                        </View>
+                    }
                     navigator={this.props.navigator || null}
                     iconName="menu"
                     handlePressNavbarButton={this.handlePressNavbarButton}
@@ -350,26 +399,17 @@ class FollowUpsScreen extends Component {
         this.setState({
             loading: true
         })
-    }
+    };
 
     renderFollowUp = ({item}) => {
-        let oneDay = 24 * 60 * 60 * 1000;
-        let itemDate = new Date(item.date).getTime();
-        let now = new Date().getTime() - oneDay;
-        if ((!item.performed && itemDate < now) || item.lostToFollowUp) {
-            return (<MissedFollowUpListItem
-                item={item}
-                onPressFollowUp={this.handlePressFollowUp}
-            />)
-        } else {
-            return (<FollowUpListItem
-                item={item}
-                onPressFollowUp={this.handlePressFollowUp}
-                onPressMissing={this.handleOnPressMissing}
-                onPressExposure={this.handleOnPressExposure}
-                onPressMap={this.handleOnPressMap}
-            />)
-        }
+        return (<FollowUpListItem
+            item={item}
+            onPressFollowUp={this.handlePressFollowUp}
+            onPressMissing={this.handleOnPressMissing}
+            onPressExposure={this.handleOnPressExposure}
+            onPressMap={this.handleOnPressMap}
+            firstActionText={this.getTranslation(item.statusId)}
+        />)
     };
 
     getItemLayout = (data, index) => ({
@@ -446,9 +486,13 @@ class FollowUpsScreen extends Component {
     handlePressFollowUp = (item, contact) => {
         console.log("### handlePressFollowUp: ", item);
 
-        let itemClone = Object.assign({}, item)
-        let contactPlaceOfResidence = contact.addresses.filter((e) => {return e.typeId === config.userResidenceAddress.userPlaceOfResidence})
-        itemClone.address = contactPlaceOfResidence[0]
+        let itemClone = Object.assign({}, item);
+        if (contact && contact.addresses && Array.isArray(contact.addresses) && contact.addresses.length > 0) {
+            let contactPlaceOfResidence = contact.addresses.filter((e) => {
+                return e.typeId === config.userResidenceAddress.userPlaceOfResidence
+            });
+            itemClone.address = contactPlaceOfResidence[0];
+        }
         this.props.navigator.push({
             screen: 'FollowUpsSingleScreen',
             animated: true,
@@ -464,28 +508,30 @@ class FollowUpsScreen extends Component {
 
     handleOnPressMissing = (followUp, contact) => {
 
-        Alert.alert('Warning', 'Are you sure you want to set this follow-up as missed?', [
-            {
-                text: 'No', onPress: () => {console.log("Cancel missing")}
-            },
-            {
-                text: 'Yes', onPress: () => {
-                    let myFollowUp = Object.assign({}, followUp)
-                    let myFollowups = Object.assign([], contact.followUps)
-            
-                    myFollowUp.statusId = config.followUpStatuses.missed
-                    myFollowUp = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, myFollowUp), action = 'update')
-            
-                    myFollowups[myFollowups.map((e) => {return e._id}).indexOf(myFollowUp._id)] = myFollowUp
-                    let myContact = Object.assign({}, contact, {followUps: myFollowups})
-            
-                    if (this.props && this.props.user && this.props.user.activeOutbreakId) {
-                        this.props.updateFollowUpAndContact(this.props.user.activeOutbreakId, null, myFollowUp._id, myFollowUp, myContact, null);
-                    }
-                }
-            }
-        ])
-     
+        // Alert.alert('Warning', 'Are you sure you want to set this follow-up as missed?', [
+        //     {
+        //         text: 'No', onPress: () => {console.log("Cancel missing")}
+        //     },
+        //     {
+        //         text: 'Yes', onPress: () => {
+        //         let myFollowUp = Object.assign({}, followUp)
+        //         let myFollowups = Object.assign([], contact.followUps)
+        //
+        //         myFollowUp.statusId = config.followUpStatuses.missed
+        //         myFollowUp = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, myFollowUp), action = 'update')
+        //
+        //         myFollowups[myFollowups.map((e) => {return e._id}).indexOf(myFollowUp._id)] = myFollowUp
+        //         let myContact = Object.assign({}, contact, {followUps: myFollowups})
+        //
+        //         if (this.props && this.props.user && this.props.user.activeOutbreakId) {
+        //             this.props.updateFollowUpAndContact(this.props.user.activeOutbreakId, null, myFollowUp._id, myFollowUp, myContact, null);
+        //         }
+        //     }
+        //     }
+        // ])
+
+        console.log('Missed button is not here anymore');
+
     };
 
     handleOnPressExposure = (followUp, contact) => {
@@ -501,29 +547,33 @@ class FollowUpsScreen extends Component {
 
     handleOnPressMap = (followUp, contact) => {
 
-        let contactPlaceOfResidence = contact.addresses.filter((e) => {return e.typeId === config.userResidenceAddress.userPlaceOfResidence})
-        console.log ('contactPlaceOfResidence', contactPlaceOfResidence)
+        if (contact && contact.addresses && Array.isArray(contact.addresses) && contact.addresses.length > 0) {
+            let contactPlaceOfResidence = contact.addresses.filter((e) => {
+                return e.typeId === config.userResidenceAddress.userPlaceOfResidence
+            })
+            console.log('contactPlaceOfResidence', contactPlaceOfResidence)
 
-        navigator.geolocation.getCurrentPosition(
-            (position) => {
-                this.setState({
-                    latitude: contactPlaceOfResidence[0].geoLocation && contactPlaceOfResidence[0].geoLocation.lat ? contactPlaceOfResidence[0].geoLocation.lat : 0,
-                    longitude: contactPlaceOfResidence[0].geoLocation && contactPlaceOfResidence[0].geoLocation.lng ? contactPlaceOfResidence[0].geoLocation.lng : 0,
-                    sourceLatitude: position.coords.latitude,
-                    sourceLongitude: position.coords.longitude,
-                    isVisible: true,
-                    error: null,
-                });
-            },
-            (error) => {
-                this.setState({ error: error.message })
-            },
-        );
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    this.setState({
+                        latitude: contactPlaceOfResidence[0].geoLocation && contactPlaceOfResidence[0].geoLocation.lat ? contactPlaceOfResidence[0].geoLocation.lat : 0,
+                        longitude: contactPlaceOfResidence[0].geoLocation && contactPlaceOfResidence[0].geoLocation.lng ? contactPlaceOfResidence[0].geoLocation.lng : 0,
+                        sourceLatitude: position.coords.latitude,
+                        sourceLongitude: position.coords.longitude,
+                        isVisible: true,
+                        error: null,
+                    });
+                },
+                (error) => {
+                    this.setState({error: error.message})
+                },
+            );
 
-        // this.props.navigator.showModal({
-        //     screen: 'MapScreen',
-        //     animated: true
-        // })
+            // this.props.navigator.showModal({
+            //     screen: 'MapScreen',
+            //     animated: true
+            // })
+        }
     }
 
     handlePressFilter = () => {
@@ -574,7 +624,9 @@ class FollowUpsScreen extends Component {
         let followUp = {
             _id: 'followUp.json_false_' + this.props.user.activeOutbreakId + '_' + date.getTime() + '_' + generateId(),
             statusId: config.followUpStatuses.notPerformed,
+            targeted: false,
             date: date,
+            fileType: 'followUp.json',
             outbreakId: this.props.user.activeOutbreakId,
             personId: extractIdFromPouchId(contact.id, 'person.json'),
             updatedAt: now.toISOString(),
@@ -591,7 +643,13 @@ class FollowUpsScreen extends Component {
     };
 
     handleGenerateFollowUps = () => {
-        this.props.generateFollowUp(this.props.user.activeOutbreakId, this.state.filter.date, this.props.user.token);
+        this.setState({
+            generating: true,
+        }, () => {
+            this.props.generateFollowUp(this.props.user.activeOutbreakId, this.state.filter.date, this.props.user.token);
+            this.hideMenu();
+        });
+
     };
 
     // Append to the existing filter newProp={name: value}
@@ -828,6 +886,14 @@ class FollowUpsScreen extends Component {
         }
         return valueToBeReturned;
     }
+
+    showMenu = () => {
+        this.refs.menuRef.show();
+    };
+
+    hideMenu = () => {
+        this.refs.menuRef.hide();
+    };
 }
 
 // Create style outside the class, or for components that will be used by other components (buttons),
@@ -869,6 +935,11 @@ const style = StyleSheet.create({
         fontFamily: 'Roboto-Regular',
         fontSize: 16.8,
         color: styles.buttonTextGray
+    },
+    breadcrumbContainer: {
+        flex: 1,
+        flexDirection: 'row',
+        justifyContent: 'space-between'
     }
 });
 

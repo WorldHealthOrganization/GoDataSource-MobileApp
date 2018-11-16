@@ -165,7 +165,7 @@ class QuestionCard extends Component {
                         isRequired={item.required}
                         onChange={this.props.onChangeTextAnswer}
                         multiline={true}
-                        keyboardType={'number-pad'}
+                        keyboardType={Platform.OS === 'ios' ? 'number-pad' : 'numeric'}
                         style={{width: width, marginHorizontal: marginHorizontal}}
                     />
                 );

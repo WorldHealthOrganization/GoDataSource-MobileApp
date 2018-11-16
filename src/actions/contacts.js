@@ -171,7 +171,7 @@ export function addContact(outbreakId, contact, outbreak, token, contactMatchFil
     }
 }
 
-export function updateContact(outbreakId, contactId, contact, token, contactMatchFilter) {
+export function updateContact(outbreakId, contactId, contact, token, filter, contactMatchFilter) {
     return async function(dispatch, getState) {
         if (contact.relationships) {
             if (Array.isArray(contact.relationships) && contact.relationships.length > 0) {
@@ -191,7 +191,7 @@ export function updateContact(outbreakId, contactId, contact, token, contactMatc
             if (response) {
                 console.log("*** updateContactRequest response: ", JSON.stringify(response));
                 if (response.deleted === false) {
-                    getRelationshipsAndFollowUpsForContactRequest(outbreakId, [extractIdFromPouchId(response._id, 'person')], (errorRelationshipsAndFollowUps, responseRelationshipsAndFollowUps) => {
+                    getRelationshipsAndFollowUpsForContactRequest(outbreakId, extractIdFromPouchId(response._id, 'person'), filter, (errorRelationshipsAndFollowUps, responseRelationshipsAndFollowUps) => {
                         if (errorRelationshipsAndFollowUps) {
                             console.log("*** getRelationshipsAndFollowUpsForContact error: ", JSON.stringify(errorRelationshipsAndFollowUps));
                             dispatch(addError(errorTypes.ERROR_CONTACT));

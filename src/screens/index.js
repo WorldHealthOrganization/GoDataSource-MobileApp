@@ -17,6 +17,7 @@ import CasesFilterScreen from './CasesFilterScreen';
 import CaseSingleScreen from './CaseSingleScreen';
 import ContactsScreen from './ContactsScreen';
 import ContactsSingleScreen from './ContactsSingleScreen';
+import InAppNotificationScreen from './InAppNotificationScreen';
 import ExposureScreen from './ExposureScreen';
 import MapScreen from './MapScreen';
 import QRScanScreen from './QRScanScreen';
@@ -35,6 +36,7 @@ const screens = [
     {screen: 'CaseSingleScreen', component: CaseSingleScreen},
     {screen: 'ContactsScreen', component: ContactsScreen},
     {screen: 'ContactsSingleScreen', component: ContactsSingleScreen},
+    {screen: 'InAppNotificationScreen', component: InAppNotificationScreen},
     {screen: 'ExposureScreen', component: ExposureScreen},
     {screen: 'MapScreen', component: MapScreen},
     {screen: 'QRScanScreen', component: QRScanScreen}

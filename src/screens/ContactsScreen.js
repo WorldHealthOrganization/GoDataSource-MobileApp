@@ -124,23 +124,23 @@ class ContactsScreen extends Component {
                             height: '100%'
                         }}>
                             <Text style={[style.title, {marginLeft: 30}]}>Contacts</Text>
-                            <ElevatedView
-                                elevation={3}
-                                style={{
-                                    backgroundColor: styles.buttonGreen,
-                                    width: calculateDimension(33, false, this.props.screenSize),
-                                    height: calculateDimension(25, true, this.props.screenSize),
-                                    borderRadius: 4
-                                }}
-                            >
-                                <Ripple style={{
-                                    flex: 1,
-                                    justifyContent: 'center',
-                                    alignItems: 'center'
-                                }} onPress={this.handleOnPressAddContact} hitSlop={{top: 20, bottom: 20, left: 20, right: 20}}>
-                                    <Icon name="add" color={'white'} size={15}/>
-                                </Ripple>
-                            </ElevatedView>
+                            {/*<ElevatedView*/}
+                                {/*elevation={3}*/}
+                                {/*style={{*/}
+                                    {/*backgroundColor: styles.buttonGreen,*/}
+                                    {/*width: calculateDimension(33, false, this.props.screenSize),*/}
+                                    {/*height: calculateDimension(25, true, this.props.screenSize),*/}
+                                    {/*borderRadius: 4*/}
+                                {/*}}*/}
+                            {/*>*/}
+                                {/*<Ripple style={{*/}
+                                    {/*flex: 1,*/}
+                                    {/*justifyContent: 'center',*/}
+                                    {/*alignItems: 'center'*/}
+                                {/*}} onPress={this.handleOnPressAddContact} hitSlop={{top: 20, bottom: 20, left: 20, right: 20}}>*/}
+                                    {/*<Icon name="add" color={'white'} size={15}/>*/}
+                                {/*</Ripple>*/}
+                            {/*</ElevatedView>*/}
                         </View>
                     }
                     title={null}
@@ -319,10 +319,13 @@ class ContactsScreen extends Component {
     };
 
     handlePressFollowUp = (item, contact) => {
-        console.log("### handlePressFollowUp item:", JSON.stringify(item));
-        console.log("### handlePressFollowUp contact:", JSON.stringify(contact));
-        let contactPlaceOfResidence = item.addresses.filter((e) => {return e.typeId === config.userResidenceAddress.userPlaceOfResidence})
-        
+        let contactPlaceOfResidence = [];
+        if (item && item.addresses && Array.isArray(item.addresses) && item.addresses.length > 0) {
+            contactPlaceOfResidence = item.addresses.filter((e) => {
+                return e.typeId === config.userResidenceAddress.userPlaceOfResidence
+            })
+        }
+
         this.props.navigator.push({
             screen: 'FollowUpsSingleScreen',
             animated: true,
@@ -332,7 +335,7 @@ class ContactsScreen extends Component {
                     date: new Date(),
                     outbreakId: this.props.user.activeOutbreakId,
                     lostToFollowUp: false,
-                    address: contactPlaceOfResidence[0]
+                    address: contactPlaceOfResidence[0] || null
                 },
                 contact: contact || item,
                 filter: this.state.filter,
@@ -366,25 +369,31 @@ class ContactsScreen extends Component {
     };
 
     handleOnPressMap = (followUp, contact) => {
-        console.log('Press Map');
-        let contactPlaceOfResidence = contact ? contact.addresses.filter((e) => {return e.typeId === config.userResidenceAddress.userPlaceOfResidence}) : followUp.addresses.filter((e) => {return e.typeId === config.userResidenceAddress.userPlaceOfResidence})
-        console.log ('contactPlaceOfResidence', contactPlaceOfResidence);
 
-        navigator.geolocation.getCurrentPosition(
-            (position) => {
-                this.setState({
-                    latitude: contactPlaceOfResidence[0].geoLocation && contactPlaceOfResidence[0].geoLocation.lat ? contactPlaceOfResidence[0].geoLocation.lat : 0,
-                    longitude: contactPlaceOfResidence[0].geoLocation && contactPlaceOfResidence[0].geoLocation.lng ? contactPlaceOfResidence[0].geoLocation.lng : 0,
-                    sourceLatitude: position.coords.latitude,
-                    sourceLongitude: position.coords.longitude,
-                    isVisible: true,
-                    error: null,
-                });
-            },
-            (error) => {
-                this.setState({ error: error.message })
-            },
-        );
+        if (contact && contact.addresses && Array.isArray(contact.addresses) && contact.addresses.length > 0) {
+            let contactPlaceOfResidence = contact ? contact.addresses.filter((e) => {
+                return e.typeId === config.userResidenceAddress.userPlaceOfResidence
+            }) : followUp.addresses.filter((e) => {
+                return e.typeId === config.userResidenceAddress.userPlaceOfResidence
+            })
+            console.log('contactPlaceOfResidence', contactPlaceOfResidence);
+
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    this.setState({
+                        latitude: contactPlaceOfResidence[0].geoLocation && contactPlaceOfResidence[0].geoLocation.lat ? contactPlaceOfResidence[0].geoLocation.lat : 0,
+                        longitude: contactPlaceOfResidence[0].geoLocation && contactPlaceOfResidence[0].geoLocation.lng ? contactPlaceOfResidence[0].geoLocation.lng : 0,
+                        sourceLatitude: position.coords.latitude,
+                        sourceLongitude: position.coords.longitude,
+                        isVisible: true,
+                        error: null,
+                    });
+                },
+                (error) => {
+                    this.setState({error: error.message})
+                },
+            );
+        }
     };
 
     handlePressNavbarButton = () => {
@@ -411,8 +420,8 @@ class ContactsScreen extends Component {
         }
 
         if (this.state.filter.searchText.trim().length > 0) {
-            let splitedFilter= this.state.filter.searchText.split(" ")
-            splitedFilter = splitedFilter.filter((e) => {return e !== ""})
+            let splitedFilter= this.state.filter.searchText.split(" ");
+            splitedFilter = splitedFilter.filter((e) => {return e !== ""});
             allFilters.searchText = new RegExp(splitedFilter.join("|"), "ig");
         } else {
             allFilters.searchText = null

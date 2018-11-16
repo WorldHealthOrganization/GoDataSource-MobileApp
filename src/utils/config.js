@@ -24,7 +24,7 @@ const sideMenuItems = [
         key: 'contacts',
         name: 'people',
         label: 'Contacts',
-        addButton: true
+        // addButton: true
     },
     {
         key: 'cases',
@@ -356,6 +356,7 @@ const caseSingleScreen = {
                     isEditMode: false,
                     activeButtonColor: styles.missedRedColor,
                     activeBackgroundColor: styles.missedRedColorWithOpacity,
+                    objectType: 'Case'
                 },
                 {
                     id: 'riskReason',
@@ -374,7 +375,7 @@ const caseSingleScreen = {
         fields: [
             {
                 cardNumber: 3,
-                id: 'documentType',
+                id: 'type',
                 label: 'Document Type',
                 type: 'DropdownInput',
                 value: '',
@@ -384,7 +385,7 @@ const caseSingleScreen = {
             },
             {
                 cardNumber: 3,
-                id: 'documentNumber',
+                id: 'number',
                 label: 'Document Number',
                 labelValue: 'test',
                 type: 'TextInput',
@@ -550,7 +551,7 @@ const caseSingleScreen = {
                 },
                 {
                     cardNumber: 1,
-                    id: 'outcome',
+                    id: 'outcomeId',
                     label: 'Outcome',
                     type: 'DropdownInput',
                     value: '',
@@ -1636,6 +1637,7 @@ const localTranslationTokens = {
     male: 'LNG_REFERENCE_DATA_CATEGORY_GENDER_MALE',
     female: 'LNG_REFERENCE_DATA_CATEGORY_GENDER_FEMALE'
 };
+
 
 export default {
     designScreenSize,

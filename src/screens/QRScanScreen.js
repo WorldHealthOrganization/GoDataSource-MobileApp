@@ -6,12 +6,12 @@ import NavBarCustom from './../components/NavBarCustom';
 import styles from './../styles';
 
 import {
-  AppRegistry,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  Dimensions,
-  View
+    AppRegistry,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    Dimensions,
+    View
 } from 'react-native';
 
 import QRCodeScanner from 'react-native-qrcode-scanner';
@@ -23,11 +23,6 @@ class QRScanScreen extends Component {
 
     constructor(props){
         super(props)
-    }
-
-    onSuccess(e) {
-        //  TO DO get data from e...
-        this.props.navigator.dismissModal(this.props.pushNewScreen(e))
     }
 
     render() {
@@ -46,13 +41,13 @@ class QRScanScreen extends Component {
                         <Text style={[style.title, {marginLeft: 30}]}>Scan QR code</Text>
                     </View>
                 }
-                title={null}
-                navigator={this.props.navigator}
-                iconName="close"
-                handlePressNavbarButton={this.handlePressNavbarButton}
+                              title={null}
+                              navigator={this.props.navigator}
+                              iconName="close"
+                              handlePressNavbarButton={this.handlePressNavbarButton}
                 />
                 <QRCodeScanner
-                    // showMarker = {true}
+                    showMarker={true}
                     onRead={this.onSuccess.bind(this)}
                     cameraStyle={style.cameraContainer}
                     // customMarker={<CustomMarker />}
@@ -60,9 +55,14 @@ class QRScanScreen extends Component {
             </View>
         );
     }
-    
+
     handlePressNavbarButton = () => {
         this.props.navigator.dismissModal()
+    }
+
+    onSuccess(e) {
+        //  TO DO get data from e...
+        this.props.navigator.dismissModal(this.props.pushNewScreen(e))
     }
 }
 
@@ -118,7 +118,7 @@ const style = StyleSheet.create({
     title: {
         fontSize: 17,
         fontFamily: 'Roboto-Medium',
-    }   
+    }
 });
 
 function mapStateToProps(state) {
