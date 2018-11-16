@@ -747,12 +747,23 @@ class CaseSingleScreen extends Component {
     };
     checkRequiredFieldsCaseInvestigationQuestionnaire = () => {
         for (let i = 0; i< this.props.caseInvestigationQuestions.length; i++) {
-            let questionnaireAnswer = this.state.case.questionnaireAnswers[this.props.caseInvestigationQuestions[i].variable]
-            if (this.props.caseInvestigationQuestions[i].required && !questionnaireAnswer) {
-                return false
+            let questionnaireAnswer = this.state.case.questionnaireAnswers[this.props.caseInvestigationQuestions[i].variable];
+            if (this.props.caseInvestigationQuestions[i].required){
+                //multiple answer question
+                if(Array.isArray(questionnaireAnswer)){
+                    //if is empty
+                    if(_.isEmpty(questionnaireAnswer))
+                        return false;
+                }else{
+                    //regular question missing answer
+                    if(!questionnaireAnswer)
+                        return false;
+                }
+
             }
         }
-        return true
+
+        return true;
     };
     checkRequiredFields = () => {
         return this.checkRequiredFieldsPersonalInfo() && this.checkRequiredFieldsAddresses() && this.checkRequiredFieldsInfection() && this.checkRequiredFieldsCaseInvestigationQuestionnaire()
