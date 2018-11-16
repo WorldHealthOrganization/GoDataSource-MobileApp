@@ -854,7 +854,7 @@ class ContactsSingleScreen extends Component {
                                         let contactClone = _.cloneDeep(this.state.contact)
                                         let contactMatchFilter = this.checkIfContactMatchFilter()
                                         console.log('contactMatchFilter', contactMatchFilter)
-                                        this.props.updateContact(this.props.user.activeOutbreakId, contactClone._id, contactClone, this.props.user.token, contactMatchFilter);
+                                        this.props.updateContact(this.props.user.activeOutbreakId, contactClone._id, contactClone, this.props.user.token, null, contactMatchFilter);
                                     })
                                 }
                             })
