@@ -6,7 +6,8 @@
 // Add here only the actions, not also the requests that are executed. For that purpose is the requests directory
 import { ACTION_TYPE_STORE_CASES,
     ACTION_TYPE_ADD_CASE,
-    ACTION_TYPE_UPDATE_CASE} from './../utils/enums';
+    ACTION_TYPE_UPDATE_CASE,
+    ACTION_TYPE_REMOVE_CASE} from './../utils/enums';
 import {deleteCaseRequest} from './../requests/cases';
 import {getCasesForOutbreakIdRequest, addCaseRequest, updateCaseRequest} from './../queries/cases';
 import { addError } from './errors';
@@ -32,6 +33,13 @@ export function addCaseAction(myCase) {
 export function updateCaseAction(myCase) {
     return {
         type: ACTION_TYPE_UPDATE_CASE,
+        payload: myCase
+    }
+}
+
+export function removeCaseAction(myCase) {
+    return {
+        type: ACTION_TYPE_REMOVE_CASE,
         payload: myCase
     }
 }
@@ -72,7 +80,7 @@ export function getCasesForOutbreakId(outbreakId, filter, token) {
     }
 };
 
-export function addCase(outbreakId, myCase, token) {
+export function addCase(outbreakId, myCase, token, caseMatchFitler) {
     console.log('addCase', JSON.stringify(myCase))
     return async function(dispatch, getState) {
         addCaseRequest(outbreakId, myCase, token, (error, response) => {
@@ -82,13 +90,17 @@ export function addCase(outbreakId, myCase, token) {
             }
             if (response) {
                 console.log("*** addCase response: ", JSON.stringify(response));
-                dispatch(addCaseAction(response));
+                if (caseMatchFitler) {
+                    dispatch(addCaseAction(response));
+                } else {
+                    dispatch(removeCaseAction(response));
+                }
             }
         })
     }
 };
 
-export function updateCase (outbreakId, caseId, myCase, token) {
+export function updateCase (outbreakId, caseId, myCase, token, caseMatchFitler) {
     console.log('updateCase', JSON.stringify(myCase))
     return async function(dispatch, getState) {
         updateCaseRequest(outbreakId, caseId, myCase, token, (error, response) => {
@@ -98,7 +110,11 @@ export function updateCase (outbreakId, caseId, myCase, token) {
             }
             if (response) {
                 console.log("*** updateCaseRequest response: ", JSON.stringify(response));
-                dispatch(updateCaseAction(response));
+                if (caseMatchFitler) {
+                    dispatch(updateCaseAction(response));
+                } else {
+                    dispatch(removeCaseAction(response));
+                }
             }
         })
     }

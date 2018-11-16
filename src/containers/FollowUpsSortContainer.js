@@ -34,6 +34,17 @@ class FollowUpsSortContainer extends PureComponent {
     render() {
         return (
             <ElevatedView elevation={3} style={[style.container]}>
+                 <Button
+                    title={'Back'}
+                    onPress={this.props.handleMoveToPrevieousScreenButton}
+                    color={styles.buttonGreen}
+                    titleColor={'white'}
+                    height={calculateDimension(25, true, this.props.screenSize)}
+                    width={calculateDimension(130, false, this.props.screenSize)}
+                    style={{
+                        marginVertical: calculateDimension(12.5, true, this.props.screenSize),
+                        marginHorizontal: calculateDimension(16, false, this.props.screenSize),
+                    }}/> 
                 <Text>To do FollowUps sort container: first create necessary components and then integrate them here</Text>
             </ElevatedView>
         );
@@ -49,7 +60,8 @@ const style = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: styles.screenBackgroundGrey,
-        borderRadius: 2
+        borderRadius: 2,
+        alignItems: 'center',
     }
 });
 

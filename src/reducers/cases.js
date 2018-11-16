@@ -4,7 +4,8 @@
 import _ from 'lodash';
 import {ACTION_TYPE_STORE_CASES, 
     ACTION_TYPE_ADD_CASE,
-    ACTION_TYPE_UPDATE_CASE} from './../utils/enums';
+    ACTION_TYPE_UPDATE_CASE,
+    ACTION_TYPE_REMOVE_CASE} from './../utils/enums';
 
 // Do not add unnecessary business logic in the reducer. Here should only be updated the store
 export default function (state=null, action) {
@@ -34,6 +35,14 @@ export default function (state=null, action) {
                 } else {
                     stateClone.splice(stateClone.map((e) => {return e._id}).indexOf(action.payload._id), 1)
                 }
+            }
+            return Object.assign([], stateClone);
+        case ACTION_TYPE_REMOVE_CASE:
+            if (!action.payload) {
+                return null;
+            }
+            if (stateClone.map((e) => {return e._id}).indexOf(action.payload._id) > -1){
+                stateClone.splice(stateClone.map((e) => {return e._id}).indexOf(action.payload._id), 1)
             }
             return Object.assign([], stateClone);
         default:

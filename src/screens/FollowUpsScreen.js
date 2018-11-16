@@ -27,7 +27,7 @@ import ValuePicker from './../components/ValuePicker';
 import {getFollowUpsForOutbreakId, getMissedFollowUpsForOutbreakId, updateFollowUpAndContact, addFollowUp, generateFollowUp} from './../actions/followUps';
 import {getContactsForOutbreakId} from './../actions/contacts';
 import {removeErrors} from './../actions/errors';
-import {addFilterForScreen} from './../actions/app';
+import {addFilterForScreen, removeFilterForScreen} from './../actions/app';
 import ElevatedView from 'react-native-elevated-view';
 import _ from 'lodash';
 import AddFollowUpScreen from './AddFollowUpScreen';
@@ -78,10 +78,13 @@ class FollowUpsScreen extends Component {
         this.onSelectValue = this.onSelectValue.bind(this);
         this.handleDayPress = this.handleDayPress.bind(this);
         this.openCalendarModal = this.openCalendarModal.bind(this);
+        this.filterContacts = this.filterContacts.bind(this);
+        this.myFunct =  this.myFunct.bind(this)
     }
 
     // Please add here the react lifecycle methods that you need
     static getDerivedStateFromProps(props, state) {
+        console.log ('getDerivedStateFromProps')
         if (props.errors && props.errors.type && props.errors.message) {
             Alert.alert(props.errors.type, props.errors.message, [
                 {
@@ -98,14 +101,53 @@ class FollowUpsScreen extends Component {
             let prevFollowUps = state.followUps || [];
             let fUps = [];
 
-            for (let i=0; i<props.contacts.length; i++) {
-                if (props.contacts[i].followUps) {
-                    fUps = fUps.concat(props.contacts[i].followUps);
+            let contactsCopy = _.cloneDeep(props.contacts);
+            if (props.filter && (props.filter['FollowUpsFilterScreen'] || props.filter['FollowUpsScreen'])) {
+                // Take care of search filter
+                if (state.filter.searchText) {
+                    contactsCopy = contactsCopy.filter((e) => {
+                        return  e && e.firstName && state.filter.searchText.toLowerCase().includes(e.firstName.toLowerCase()) ||
+                            e && e.lastName && state.filter.searchText.toLowerCase().includes(e.lastName.toLowerCase()) ||
+                            e && e.firstName && e.firstName.toLowerCase().includes(state.filter.searchText.toLowerCase()) ||
+                            e && e.lastName && e.lastName.toLowerCase().includes(state.filter.searchText.toLowerCase())
+                    });
+                }
+                // Take care of gender filter
+                if (state.filterFromFilterScreen && state.filterFromFilterScreen.gender) {
+                    contactsCopy = contactsCopy.filter((e) => {return e.gender === state.filterFromFilterScreen.gender});
+                }
+                // Take care of age range filter
+                if (state.filterFromFilterScreen && state.filterFromFilterScreen.age && Array.isArray(state.filterFromFilterScreen.age) && state.filterFromFilterScreen.age.length === 2 && (state.filterFromFilterScreen.age[0] >= 0 || state.filterFromFilterScreen.age[1] <= 150)) {
+                    contactsCopy = contactsCopy.filter((e) => {
+                        if (e.age && e.age.years !== null && e.age.years !== undefined && e.age.months !== null && e.age.months !== undefined) {
+                            if (e.age.years > 0 && e.age.months === 0) {
+                                return e.age.years >= state.filterFromFilterScreen.age[0] && e.age.years <= state.filterFromFilterScreen.age[1]
+                            } else if (e.age.years === 0 && e.age.months > 0){
+                                return e.age.months >= state.filterFromFilterScreen.age[0] && e.age.months <= state.filterFromFilterScreen.age[1]
+                            } else if (e.age.years === 0 && e.age.months === 0) {
+                                return e.age.years >= state.filterFromFilterScreen.age[0] && e.age.years <= state.filterFromFilterScreen.age[1]
+                            }
+                        }
+                    });
+                }
+                // Take care of locations filter
+                if (state.filterFromFilterScreen  && state.filterFromFilterScreen.selectedLocations && state.filterFromFilterScreen.selectedLocations.length > 0) {
+                    contactsCopy = contactsCopy.filter((e) => {
+                        let addresses = e.addresses.filter((k) => {
+                            return k.locationId !== '' && state.filterFromFilterScreen.selectedLocations.indexOf(k.locationId) >= 0
+                        })
+                        return addresses.length > 0
+                    })
+                }
+            }
+
+            for (let i=0; i < contactsCopy.length; i++) {
+                if (contactsCopy[i].followUps) {
+                    fUps = fUps.concat(contactsCopy[i].followUps);
                 }
             }
 
             state.followUps = fUps;
-
             // Now filter the followUps by type (All/To do/Missed)
             // let oneDay = 24 * 60 * 60 * 1000;
             if (state.filter && state.filter.performed && state.filter.performed.value && state.filter.performed.value !== 'All') {
@@ -157,15 +199,13 @@ class FollowUpsScreen extends Component {
     }
 
     componentDidMount() {
-        console.log ('componentDidMount');
         this.setState({
             loading: true,
             generating: false,
         }, () => {
             this.props.getFollowUpsForOutbreakId(this.props.user.activeOutbreakId, this.state.filter, null);
         })
-    }
-
+    };
 
     shouldComponentUpdate(nextProps, nextState) {
         if (!nextProps.user) {
@@ -177,8 +217,7 @@ class FollowUpsScreen extends Component {
 
         return true;
     }
-
-
+    
     clampedScroll= Animated.diffClamp(
         Animated.add(
             scrollAnim.interpolate({
@@ -379,7 +418,9 @@ class FollowUpsScreen extends Component {
         index
     });
 
-    keyExtractor = (item, index) => item._id;
+    keyExtractor = (item, index) => {
+        item._id;
+    }
 
     renderSeparatorComponent = () => {
         return (
@@ -541,7 +582,8 @@ class FollowUpsScreen extends Component {
             animated: true,
             passProps: {
                 activeFilters: this.state.filterFromFilterScreen || null,
-                onApplyFilters: this.handleOnApplyFilters
+                onApplyFilters: this.handleOnApplyFilters,
+                screen: 'FollowUpsFilterScreen'
             }
         })
     };
@@ -554,9 +596,19 @@ class FollowUpsScreen extends Component {
     };
 
     handleOnPressAddFollowUp = () => {
+        // let FilterClone = {
+        //     date: new Date(),
+        //     searchText: ''
+        // }
         this.setState({
-            showAddFollowUpScreen: !this.state.showAddFollowUpScreen
+            showAddFollowUpScreen: !this.state.showAddFollowUpScreen,
+            // filterFromFilterScreen: null,
+            // filter: FilterClone
         })
+        // , () => {
+        //     this.props.removeFilterForScreen('FollowUpsFilterScreen');
+        //     this.filterContacts();
+        // })
     };
 
     handleOnCancelPressed = () => {
@@ -711,6 +763,7 @@ class FollowUpsScreen extends Component {
     };
 
     handleOnApplyFilters = (filter) => {
+        console.log ('foolowUpsScreen handleOnApplyFilters', filter)
         this.setState({
             filterFromFilterScreen: filter
         }, () => {
@@ -741,8 +794,6 @@ class FollowUpsScreen extends Component {
         // Take care of search filter
         if (this.state.filter.searchText) {
             contactsCopy = contactsCopy.filter((e) => {
-                // return e && e.firstName && e.firstName.toLowerCase().includes(this.state.filter.searchText.toLowerCase()) || e && e.lastName && e.lastName.toLowerCase().includes(this.state.filter.searchText.toLowerCase())
-
                 return  e && e.firstName && this.state.filter.searchText.toLowerCase().includes(e.firstName.toLowerCase()) ||
                     e && e.lastName && this.state.filter.searchText.toLowerCase().includes(e.lastName.toLowerCase()) ||
                     e && e.firstName && e.firstName.toLowerCase().includes(this.state.filter.searchText.toLowerCase()) ||
@@ -756,13 +807,37 @@ class FollowUpsScreen extends Component {
         }
 
         // Take care of age range filter
-        if (this.state.filterFromFilterScreen && this.state.filterFromFilterScreen.age && Array.isArray(this.state.filterFromFilterScreen.age) && this.state.filterFromFilterScreen.age.length === 2 && (this.state.filterFromFilterScreen.age[0] > 0 || this.state.filterFromFilterScreen.age[1] < 100)) {
-            contactsCopy = contactsCopy.filter((e) => {return e.age >= this.state.filterFromFilterScreen.age[0] && e.age <= this.state.filterFromFilterScreen.age[1]});
+        if (this.state.filterFromFilterScreen && this.state.filterFromFilterScreen.age && Array.isArray(this.state.filterFromFilterScreen.age) && this.state.filterFromFilterScreen.age.length === 2 && (this.state.filterFromFilterScreen.age[0] >= 0 || this.state.filterFromFilterScreen.age[1] <= 150)) {
+            contactsCopy = contactsCopy.filter((e) => {
+                if (e.age && e.age.years !== null && e.age.years !== undefined && e.age.months !== null && e.age.months !== undefined) {
+                    if (e.age.years > 0 && e.age.months === 0) {
+                        return e.age.years >= this.state.filterFromFilterScreen.age[0] && e.age.years <= this.state.filterFromFilterScreen.age[1]
+                    } else if (e.age.years === 0 && e.age.months > 0){
+                        return e.age.months >= this.state.filterFromFilterScreen.age[0] && e.age.months <= this.state.filterFromFilterScreen.age[1]
+                    } else if (e.age.years === 0 && e.age.months === 0) {
+                        return e.age.years >= this.state.filterFromFilterScreen.age[0] && e.age.years <= this.state.filterFromFilterScreen.age[1]
+                    }
+                }
+            });
+        }
+
+        // Take care of locations filter
+        if (this.state.filterFromFilterScreen  && this.state.filterFromFilterScreen.selectedLocations && this.state.filterFromFilterScreen.selectedLocations.length > 0) {
+            contactsCopy = contactsCopy.filter((e) => {
+                let addresses = e.addresses.filter((k) => {
+                    return k.locationId !== '' && this.state.filterFromFilterScreen.selectedLocations.indexOf(k.locationId) >= 0
+                })
+                return addresses.length > 0
+            })
         }
 
         // After filtering the contacts, it's time to get their respective follow-ups to show
         this.getFollowUpsFromContacts(contactsCopy);
     };
+
+    myFunct = () => {
+        console.log ('ajunge aici si nu crapa !! ')
+    }
 
     getFollowUpsFromContacts = (contacts) => {
         let followUpsToBeShown = [];
@@ -890,6 +965,7 @@ function matchDispatchProps(dispatch) {
         getContactsForOutbreakId,
         updateFollowUpAndContact,
         addFollowUp,
+        removeFilterForScreen,
         generateFollowUp
     }, dispatch);
 }
