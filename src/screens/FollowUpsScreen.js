@@ -21,6 +21,8 @@ import SearchFilterView from './../components/SearchFilterView';
 import FollowUpListItem from './../components/FollowUpListItem';
 import MissedFollowUpListItem from './../components/MissedFollowUpListItem';
 import AnimatedListView from './../components/AnimatedListView';
+import Breadcrumb from './../components/Breadcrumb';
+import Menu, {MenuItem} from 'react-native-material-menu';
 import ValuePicker from './../components/ValuePicker';
 import {getFollowUpsForOutbreakId, getMissedFollowUpsForOutbreakId, updateFollowUpAndContact, addFollowUp, generateFollowUp} from './../actions/followUps';
 import {getContactsForOutbreakId} from './../actions/contacts';
@@ -63,6 +65,7 @@ class FollowUpsScreen extends Component {
             sourceLatitude: 0,
             sourceLongitude: 0,
             error: null,
+            generating: false,
             calendarPickerOpen: false
         };
         // Bind here methods, or at least don't declare methods in the render method
@@ -92,6 +95,7 @@ class FollowUpsScreen extends Component {
 
         // console.log('props.contacts', JSON.stringify(props.contacts))
         if (props.contacts) {
+            let prevFollowUps = state.followUps || [];
             let fUps = [];
 
             for (let i=0; i<props.contacts.length; i++) {
@@ -106,6 +110,38 @@ class FollowUpsScreen extends Component {
             // let oneDay = 24 * 60 * 60 * 1000;
             if (state.filter && state.filter.performed && state.filter.performed.value && state.filter.performed.value !== 'All') {
                 fUps = fUps.filter((e) => {return e.statusId === state.filter.performed.value});
+            }
+
+
+            //if we'e generating follow-ups
+            if(state.generating) {
+                //and we received generated follow-ups
+                if(props.followUps.length) {
+                    //if we had previous generated follow-ups get difference
+                    if (prevFollowUps.length) {
+                        let number = parseInt(props.followUps.length - prevFollowUps.length);
+                        props.navigator.showInAppNotification({
+                            screen: "InAppNotificationScreen",
+                            passProps: {
+                                number: number
+                            },
+                            autoDismissTimerSec: 1
+                        });
+                    } else {
+                        //no previous follow-ups just display number of generated
+                        let number = parseInt(props.followUps.length);
+                        props.navigator.showInAppNotification({
+                            screen: "InAppNotificationScreen",
+                            passProps: {
+                                number: number
+                            },
+                            autoDismissTimerSec: 1
+                        });
+                    }
+
+                    //reset generating status
+                    state.generating = false;
+                }
             }
 
             if (props.followUps && props.followUps.length > 0) {
@@ -123,7 +159,8 @@ class FollowUpsScreen extends Component {
     componentDidMount() {
         console.log ('componentDidMount');
         this.setState({
-            loading: true
+            loading: true,
+            generating: false,
         }, () => {
             this.props.getFollowUpsForOutbreakId(this.props.user.activeOutbreakId, this.state.filter, null);
         })
@@ -174,13 +211,34 @@ class FollowUpsScreen extends Component {
             outputRange: [1, 0],
             extrapolate: 'clamp',
         });
-
+        let followUpTitle = []; followUpTitle[1] = 'Follow-ups';
         return (
             <ViewHOC style={style.container}
                      showLoader={(this.props && this.props.syncState && (this.props.syncState !== 'Finished processing' && this.props.syncState !== 'Error')) || (this && this.state && this.state.loading)}
                      loaderText={this.props && this.props.syncState ? this.props.syncState : 'Loading...'}>
                 <NavBarCustom
-                    title="Follow-ups"
+                    title={null}
+                    customTitle={
+                        <View
+                            style={[style.breadcrumbContainer]}>
+                            <Breadcrumb
+                                entities={followUpTitle}
+                                navigator={this.props.navigator || null}
+                            />
+                            <View>
+                                <Menu
+                                    ref="menuRef"
+                                    button={
+                                        <Ripple onPress={this.showMenu} hitSlop={{top: 20, bottom: 20, left: 20, right: 20}}>
+                                            <Icon name="more-vert"/>
+                                        </Ripple>
+                                    }
+                                >
+                                    <MenuItem onPress={this.handleGenerateFollowUps}>Generate for current day</MenuItem>
+                                </Menu>
+                            </View>
+                        </View>
+                    }
                     navigator={this.props.navigator || null}
                     iconName="menu"
                     handlePressNavbarButton={this.handlePressNavbarButton}
@@ -531,7 +589,13 @@ class FollowUpsScreen extends Component {
     };
 
     handleGenerateFollowUps = () => {
-        this.props.generateFollowUp(this.props.user.activeOutbreakId, this.state.filter.date, this.props.user.token);
+        this.setState({
+            generating: true,
+        }, () => {
+            this.props.generateFollowUp(this.props.user.activeOutbreakId, this.state.filter.date, this.props.user.token);
+            this.hideMenu();
+        });
+
     };
 
     // Append to the existing filter newProp={name: value}
@@ -745,6 +809,14 @@ class FollowUpsScreen extends Component {
         }
         return valueToBeReturned;
     }
+
+    showMenu = () => {
+        this.refs.menuRef.show();
+    };
+
+    hideMenu = () => {
+        this.refs.menuRef.hide();
+    };
 }
 
 // Create style outside the class, or for components that will be used by other components (buttons),
@@ -786,6 +858,11 @@ const style = StyleSheet.create({
         fontFamily: 'Roboto-Regular',
         fontSize: 16.8,
         color: styles.buttonTextGray
+    },
+    breadcrumbContainer: {
+        flex: 1,
+        flexDirection: 'row',
+        justifyContent: 'space-between'
     }
 });
 
