@@ -119,16 +119,14 @@ class FollowUpsScreen extends Component {
                 if(props.followUps.length) {
                     //if we had previous generated follow-ups get difference
                     if (prevFollowUps.length) {
-                        if (props.followUps) {
-                            let number = parseInt(props.followUps.length - prevFollowUps.length);
-                            props.navigator.showInAppNotification({
-                                screen: "InAppNotificationScreen",
-                                passProps: {
-                                    number: number
-                                },
-                                autoDismissTimerSec: 1
-                            });
-                        }
+                        let number = parseInt(props.followUps.length - prevFollowUps.length);
+                        props.navigator.showInAppNotification({
+                            screen: "InAppNotificationScreen",
+                            passProps: {
+                                number: number
+                            },
+                            autoDismissTimerSec: 1
+                        });
                     } else {
                         //no previous follow-ups just display number of generated
                         let number = parseInt(props.followUps.length);
