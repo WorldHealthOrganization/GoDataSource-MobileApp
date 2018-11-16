@@ -17,7 +17,7 @@ import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import AnimatedListView from './../components/AnimatedListView';
 import {getContactsForOutbreakId} from './../actions/contacts';
-import {addFilterForScreen} from './../actions/app';
+import {addFilterForScreen, removeFilterForScreen} from './../actions/app';
 import {navigation} from './../utils/functions';
 import ViewHOC from './../components/ViewHOC';
 import config from './../utils/config';
@@ -41,7 +41,7 @@ class ContactsScreen extends Component {
                 date: new Date(),
                 searchText: ''
             },
-            filterFromFilterScreen: this.props.filter && this.props.filter['FollowUpsFilterScreen'] ? this.props.filter['FollowUpsFilterScreen'] : null,
+            filterFromFilterScreen: this.props.filter && this.props.filter['ContactsFilterScreen'] ? this.props.filter['ContactsFilterScreen'] : null,
             loading: true,
 
             isVisible: false,
@@ -49,7 +49,8 @@ class ContactsScreen extends Component {
             longitude: 0,
             sourceLatitude: 0,
             sourceLongitude: 0,
-            error: null
+            error: null,
+            refreshing: false
         };
         // Bind here methods, or at least don't declare methods in the render method
         this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this));
@@ -61,13 +62,18 @@ class ContactsScreen extends Component {
             loading: true
         }, () => {
             if (this.props && this.props.user && this.props.user.activeOutbreakId) {
-                this.props.getContactsForOutbreakId(this.props.user.activeOutbreakId, null, null);
+                if (this.props.filter && (this.props.filter['ContactsFilterScreen'] || this.props.filter['FollowUpsScreen'])) {
+                    this.filterContacts();
+                } else {
+                    this.props.getContactsForOutbreakId(this.props.user.activeOutbreakId, null, null);
+                }
             }
         })
     }
 
     static getDerivedStateFromProps(props, state) {
         state.loading = false;
+        state.refreshing = false
         return null;
     }
 
@@ -118,23 +124,23 @@ class ContactsScreen extends Component {
                             height: '100%'
                         }}>
                             <Text style={[style.title, {marginLeft: 30}]}>Contacts</Text>
-                            <ElevatedView
-                                elevation={3}
-                                style={{
-                                    backgroundColor: styles.buttonGreen,
-                                    width: calculateDimension(33, false, this.props.screenSize),
-                                    height: calculateDimension(25, true, this.props.screenSize),
-                                    borderRadius: 4
-                                }}
-                            >
-                                <Ripple style={{
-                                    flex: 1,
-                                    justifyContent: 'center',
-                                    alignItems: 'center'
-                                }} onPress={this.handleOnPressAddContact} hitSlop={{top: 20, bottom: 20, left: 20, right: 20}}>
-                                    <Icon name="add" color={'white'} size={15}/>
-                                </Ripple>
-                            </ElevatedView>
+                            {/*<ElevatedView*/}
+                                {/*elevation={3}*/}
+                                {/*style={{*/}
+                                    {/*backgroundColor: styles.buttonGreen,*/}
+                                    {/*width: calculateDimension(33, false, this.props.screenSize),*/}
+                                    {/*height: calculateDimension(25, true, this.props.screenSize),*/}
+                                    {/*borderRadius: 4*/}
+                                {/*}}*/}
+                            {/*>*/}
+                                {/*<Ripple style={{*/}
+                                    {/*flex: 1,*/}
+                                    {/*justifyContent: 'center',*/}
+                                    {/*alignItems: 'center'*/}
+                                {/*}} onPress={this.handleOnPressAddContact} hitSlop={{top: 20, bottom: 20, left: 20, right: 20}}>*/}
+                                    {/*<Icon name="add" color={'white'} size={15}/>*/}
+                                {/*</Ripple>*/}
+                            {/*</ElevatedView>*/}
                         </View>
                     }
                     title={null}
@@ -161,7 +167,7 @@ class ContactsScreen extends Component {
                                 onPress={this.handlePressFilter}
                                 onChangeText={this.handleOnChangeText}
                                 onSubmitEditing={this.handleOnSubmitEditing}
-                                filterText={this.state.filterFromFilterScreen && this.state.filterFromFilterScreen.where && this.state.filterFromFilterScreen.where.and && Array.isArray(this.state.filterFromFilterScreen.where.and) ? ("Filter (" + this.state.filterFromFilterScreen.where.and.length + ')') : 'Filter'}
+                                filterText={(this.state.filterFromFilterScreen && Object.keys(this.state.filterFromFilterScreen).length > 0) ? ("Filter (" + Object.keys(this.state.filterFromFilterScreen).length + ')') : 'Filter'}
                             />}
                         ItemSeparatorComponent={this.renderSeparatorComponent}
                         // ListEmptyComponent={this.listEmptyComponent}
@@ -169,8 +175,8 @@ class ContactsScreen extends Component {
                         componentContainerStyle={style.componentContainerStyle}
                         onScroll={this.handleScroll}
                         getItemLayout={this.getItemLayout}
-                        // refreshing={this.state.refreshing}
-                        // onRefresh={this.handleOnRefresh}
+                        refreshing={this.state.refreshing}
+                        onRefresh={this.handleOnRefresh}
                     />
                 </View>
 
@@ -210,6 +216,15 @@ class ContactsScreen extends Component {
                 isNew: true
             }
         })
+    };
+
+      //Refresh list of cases
+    handleOnRefresh = () => {
+        this.setState({
+            refreshing: true
+        }, () => {
+            this.filterContacts();
+        });
     };
 
     keyExtractor = (item, index) => item._id;
@@ -279,7 +294,8 @@ class ContactsScreen extends Component {
             animated: true,
             passProps: {
                 activeFilters: this.state.filterFromFilterScreen || null,
-                onApplyFilters: this.handleOnApplyFilters
+                onApplyFilters: this.handleOnApplyFilters,
+                screen: 'ContactsFilterScreen'
             }
         })
     };
@@ -398,25 +414,26 @@ class ContactsScreen extends Component {
         }
 
         if (this.state.filterFromFilterScreen && this.state.filterFromFilterScreen.gender) {
-            if (this.state.filterFromFilterScreen.gender === 'Female') {
-                allFilters.gender = 'LNG_REFERENCE_DATA_CATEGORY_GENDER_FEMALE'
-            } else  if (this.state.filterFromFilterScreen.gender === 'Male') {
-                allFilters.gender = 'LNG_REFERENCE_DATA_CATEGORY_GENDER_MALE'
-            }
+            allFilters.gender = this.state.filterFromFilterScreen.gender
         } else {
             allFilters.gender = null
         }
 
-        console.log('this.state.filter.searchText ', this.state.filter.searchText)
         if (this.state.filter.searchText.trim().length > 0) {
-            let splitedFilter= this.state.filter.searchText.split(" ")
-            splitedFilter = splitedFilter.filter((e) => {return e !== ""})
+            let splitedFilter= this.state.filter.searchText.split(" ");
+            splitedFilter = splitedFilter.filter((e) => {return e !== ""});
             allFilters.searchText = new RegExp(splitedFilter.join("|"), "ig");
         } else {
             allFilters.searchText = null
         }
 
-        if (!allFilters.age && !allFilters.gender && !allFilters.searchText) {
+        if (this.state.filterFromFilterScreen && this.state.filterFromFilterScreen.selectedLocations) {
+            allFilters.selectedLocations = this.state.filterFromFilterScreen.selectedLocations;
+        } else {
+            allFilters.selectedLocations = null
+        }
+        
+        if (!allFilters.age && !allFilters.gender && !allFilters.searchText && !allFilters.selectedLocations) {
             allFilters = null
         }
 
@@ -463,6 +480,7 @@ function mapStateToProps(state) {
         user: state.user,
         screenSize: state.app.screenSize,
         syncState: state.app.syncState,
+        filter: state.app.filters,
         contacts: state.contacts,
         errors: state.errors,
         referenceData: state.referenceData,
@@ -472,7 +490,8 @@ function mapStateToProps(state) {
 function matchDispatchProps(dispatch) {
     return bindActionCreators({
         getContactsForOutbreakId,
-        addFilterForScreen
+        addFilterForScreen,
+        removeFilterForScreen
     }, dispatch);
 }
 

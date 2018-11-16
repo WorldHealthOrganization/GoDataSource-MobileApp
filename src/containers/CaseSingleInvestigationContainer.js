@@ -37,6 +37,7 @@ class CaseSingleInvestigationContainer extends PureComponent {
 
         return (
             <View style={style.container}>
+                <View style={{flexDirection: 'row'}}>
                 {
                     this.props.isNew ? (
                         <View style={{flexDirection: 'row'}}>
@@ -102,6 +103,7 @@ class CaseSingleInvestigationContainer extends PureComponent {
                                     marginRight: 10,
                                 }}/>))
                 }
+                </View>
                 <KeyboardAwareScrollView
                     style={style.containerScrollView}
                     contentContainerStyle={[style.contentContainerStyle, {paddingBottom: this.props.screenSize.height < 600 ? 70 : 20}]}
@@ -196,8 +198,8 @@ const style = StyleSheet.create({
 function mapStateToProps(state) {
     return {
         screenSize: state.app.screenSize,
-        questions: state.outbreak.caseInvestigationTemplate
-
+        questions: state.outbreak.caseInvestigationTemplate,
+        translation: state.app.translation
     };
 }
 

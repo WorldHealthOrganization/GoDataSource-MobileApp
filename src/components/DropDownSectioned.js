@@ -53,7 +53,7 @@ class DropDownSectioned extends Component {
                     showDropDowns={true}
                     readOnlyHeadings={true}
                     onSelectedItemsChange={this.onSelectedItemsChange}
-                    selectedItems={this.props.value}
+                    selectedItems={this.props.sectionedSelectedItems !== null && this.props.sectionedSelectedItems !== undefined ? this.props.sectionedSelectedItems : [] }
                     showCancelButton={true}
                     selectChildren={false}
                     showChips={false}
