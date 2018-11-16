@@ -697,7 +697,7 @@ const followUpsFilterScreen = {
                     id: 'gender',
                     type: 'Selector',
                     value: '',
-                    data: [{value: 'Male'}, {value: 'Female'}]
+                    data: [{value: 'LNG_REFERENCE_DATA_CATEGORY_GENDER_MALE'}, {value: 'LNG_REFERENCE_DATA_CATEGORY_GENDER_FEMALE'}]
                 }
             ]
         },
@@ -716,31 +716,31 @@ const followUpsFilterScreen = {
                     type: 'IntervalPicker',
                     value: '',
                     min: 0,
-                    max: 100
+                    max: 150
                 }
             ]
         },
-        // {
-        //     fields: [
-        //         {
-        //             cardNumber: 3,
-        //             label: 'Location',
-        //             type: 'Section',
-        //             hasBorderBottom: true,
-        //             borderBottomColor: styles.navigationDrawerSeparatorGrey
-        //         },
-        //         {
-        //             cardNumber: 3,
-        //             id: 'selectedLocations',
-        //             type: 'DropDownSectioned',
-        //             label: 'Choose one or more locations',
-        //             value: '',
-        //             data: [],
-        //             isRequired: false,
-        //             isEditMode: true,
-        //         }
-        //     ]
-        // },
+        {
+            fields: [
+                {
+                    cardNumber: 3,
+                    label: 'Area',
+                    type: 'Section',
+                    hasBorderBottom: true,
+                    borderBottomColor: styles.navigationDrawerSeparatorGrey
+                },
+                {
+                    cardNumber: 3,
+                    id: 'selectedLocations',
+                    label: 'Choose one or more locations',
+                    type: 'DropDownSectioned',
+                    value: '',
+                    isRequired: false,
+                    isEditMode: true,
+                    single: false
+                }
+            ]
+        }
         // {
         //     fields: [
         //         {
@@ -781,7 +781,7 @@ const casesFilterScreen = {
                     id: 'gender',
                     type: 'Selector',
                     value: '',
-                    data: [{value: 'Male'}, {value: 'Female'}]
+                    data: [{value: 'LNG_REFERENCE_DATA_CATEGORY_GENDER_MALE'}, {value: 'LNG_REFERENCE_DATA_CATEGORY_GENDER_FEMALE'}]
                 }
             ]
         },
@@ -800,28 +800,48 @@ const casesFilterScreen = {
                     type: 'IntervalPicker',
                     value: '',
                     min: 0,
-                    max: 100
+                    max: 150
                 }
             ]
         },
         {
             fields: [
                 {
-                    cardNumber: 4,
+                    cardNumber: 3,
                     label: 'Classification',
                     type: 'Section',
                     hasBorderBottom: true,
                     borderBottomColor: styles.navigationDrawerSeparatorGrey
                 },
                 {
-                    cardNumber: 4,
+                    cardNumber: 3,
                     id: 'classification',
                     label: 'Choose one or more classification',
                     type: 'DropDown',
                     value: '',
-                    // data: [{value: 'Diana Jones'}, {value: 'Florin Popa'}],
                     isRequired: false,
                     isEditMode: true
+                }
+            ]
+        }, 
+        {
+            fields: [
+                {
+                    cardNumber: 4,
+                    label: 'Area',
+                    type: 'Section',
+                    hasBorderBottom: true,
+                    borderBottomColor: styles.navigationDrawerSeparatorGrey
+                },
+                {
+                    cardNumber: 4,
+                    id: 'selectedLocations',
+                    label: 'Choose one or more locations',
+                    type: 'DropDownSectioned',
+                    value: '',
+                    isRequired: false,
+                    isEditMode: true,
+                    single: false
                 }
             ]
         }
@@ -1612,7 +1632,9 @@ const ageUnitOfMeasureDropDown = [
 
 const localTranslationTokens = {
     years: 'LNG_AGE_FIELD_LABEL_YEARS',
-    months: 'LNG_AGE_FIELD_LABEL_MONTHS'
+    months: 'LNG_AGE_FIELD_LABEL_MONTHS',
+    male: 'LNG_REFERENCE_DATA_CATEGORY_GENDER_MALE',
+    female: 'LNG_REFERENCE_DATA_CATEGORY_GENDER_FEMALE'
 };
 
 export default {

@@ -49,6 +49,10 @@ class ContactsSingleScreen extends Component {
             routes: this.props.isNew ? config.tabsValuesRoutes.contactsAdd : config.tabsValuesRoutes.contactsSingle,
             index: 0,
             item: this.props.item,
+            filter: this.props.filter && this.props.filter['FollowUpsScreen'] ? this.props.filter['FollowUpsScreen'] : {
+                searchText: ''
+            },
+            filterFromFilterScreen: this.props.filter && this.props.filter['ContactsFilterScreen'] ? this.props.filter['ContactsFilterScreen'] : null,
             contact: this.props.isNew ? {
                 riskLevel: '',
                 riskReason: '',
@@ -831,7 +835,9 @@ class ContactsSingleScreen extends Component {
                                         contact: Object.assign({}, prevState.contact, contactWithRequiredFields)
                                     }), () => {
                                         let contactClone = _.cloneDeep(this.state.contact)
-                                        this.props.addContact(this.props.user.activeOutbreakId, contactClone, this.props.user.token);
+                                        let contactMatchFilter = this.checkIfContactMatchFilter()
+                                        console.log('contactMatchFilter', contactMatchFilter)
+                                        this.props.addContact(this.props.user.activeOutbreakId, contactClone, null, this.props.user.token, contactMatchFilter);
                                     })
                                 } else {
                                     let contactWithRequiredFields = null;
@@ -840,12 +846,14 @@ class ContactsSingleScreen extends Component {
                                     } else {
                                         contactWithRequiredFields = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, this.state.contact), action = 'update')
                                     }
-            
+                                    
                                     this.setState(prevState => ({
                                         contact: Object.assign({}, prevState.contact, contactWithRequiredFields)
                                     }), () => {
                                         let contactClone = _.cloneDeep(this.state.contact)
-                                        this.props.updateContact(this.props.user.activeOutbreakId, contactClone._id, contactClone, this.props.user.token);
+                                        let contactMatchFilter = this.checkIfContactMatchFilter()
+                                        console.log('contactMatchFilter', contactMatchFilter)
+                                        this.props.updateContact(this.props.user.activeOutbreakId, contactClone._id, contactClone, this.props.user.token, contactMatchFilter);
                                     })
                                 }
                             })
@@ -886,7 +894,7 @@ class ContactsSingleScreen extends Component {
 
         if (this.state.contact.dob !== null) {
             //get info from date
-            dobClone = Object.assign(this.state.contact.dob)
+            dobClone = this.state.contact.dob
             let today = new Date()
             let nrOFYears = this.calcDateDiff(today, dobClone);
 
@@ -974,6 +982,57 @@ class ContactsSingleScreen extends Component {
     checkRequiredFields = () => {
         return this.checkRequiredFieldsPersonalInfo() && this.checkRequiredFieldsAddresses() && this.checkRequiredFieldsRelationships()
     };
+
+    checkIfContactMatchFilter = () => {
+        if (this.props.filter && (this.props.filter['ContactsFilterScreen'] || this.props.filter['FollowUpsScreen'])) {
+            let contactCopy = [_.cloneDeep(this.state.contact)]
+
+            // Take care of search filter
+            if (this.state.filter.searchText) {
+                contactCopy = contactCopy.filter((e) => {
+                    return e && e.firstName && this.state.filter.searchText.toLowerCase().includes(e.firstName.toLowerCase()) ||
+                        e && e.lastName && this.state.filter.searchText.toLowerCase().includes(e.lastName.toLowerCase()) ||
+                        e && e.firstName && e.firstName.toLowerCase().includes(this.state.filter.searchText.toLowerCase()) ||
+                        e && e.lastName && e.lastName.toLowerCase().includes(this.state.filter.searchText.toLowerCase())
+                });
+            }
+
+            // Take care of gender filter
+            if (this.state.filterFromFilterScreen && this.state.filterFromFilterScreen.gender) {
+                contactCopy = contactCopy.filter((e) => {return e.gender === this.state.filterFromFilterScreen.gender});
+            }
+            // Take care of age range filter
+            if (this.state.filterFromFilterScreen && this.state.filterFromFilterScreen.age && Array.isArray(this.state.filterFromFilterScreen.age) && this.state.filterFromFilterScreen.age.length === 2 && (this.state.filterFromFilterScreen.age[0] >= 0 || this.state.filterFromFilterScreen.age[1] <= 150)) {
+                contactCopy = contactCopy.filter((e) => {
+                    if (e.age && e.age.years !== null && e.age.years !== undefined && e.age.months !== null && e.age.months !== undefined) {
+                        if (e.age.years > 0 && e.age.months === 0) {
+                            return e.age.years >= this.state.filterFromFilterScreen.age[0] && e.age.years <= this.state.filterFromFilterScreen.age[1]
+                        } else if (e.age.years === 0 && e.age.months > 0){
+                            return e.age.months >= this.state.filterFromFilterScreen.age[0] && e.age.months <= this.state.filterFromFilterScreen.age[1]
+                        } else if (e.age.years === 0 && e.age.months === 0) {
+                            return e.age.years >= this.state.filterFromFilterScreen.age[0] && e.age.years <= this.state.filterFromFilterScreen.age[1]
+                        }
+                    }
+                });
+            }
+            // Take care of locations filter
+            if (this.state.filterFromFilterScreen  && this.state.filterFromFilterScreen.selectedLocations && this.state.filterFromFilterScreen.selectedLocations.length > 0) {
+                contactCopy = contactCopy.filter((e) => {
+                    let addresses = e.addresses.filter((k) => {
+                        return k.locationId !== '' && this.state.filterFromFilterScreen.selectedLocations.indexOf(k.locationId) >= 0
+                    })
+                    return addresses.length > 0
+                })
+            }
+            if (contactCopy.length > 0) {
+                return true
+            } else {
+                return false
+            }
+        } else {
+            return true
+        }
+    }
 
     showMenu = () => {
         this.refs.menuRef.show();
@@ -1073,7 +1132,8 @@ function mapStateToProps(state) {
         followUps: state.followUps,
         outbreak: state.outbreak,
         errors: state.errors,
-        contacts: state.contacts
+        contacts: state.contacts,
+        filter: state.app.filters,
     };
 }
 

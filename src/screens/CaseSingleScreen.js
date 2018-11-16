@@ -40,6 +40,10 @@ class CaseSingleScreen extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            filter: this.props.filter && this.props.filter['CasesScreen'] ? this.props.filter['CasesScreen'] : {
+                searchText: ''
+            },
+            filterFromFilterScreen: this.props.filter && this.props.filter['CasesFilterScreen'] ? this.props.filter['CasesFilterScreen'] : null,
             interactionComplete: false,
             deletePressed: false,
             savePressed: false,
@@ -406,7 +410,9 @@ class CaseSingleScreen extends Component {
                                     this.setState(prevState => ({
                                         case: Object.assign({}, prevState.case, caseWithRequiredFields)
                                         }), () => {
-                                            this.props.updateCase(this.props.user.activeOutbreakId, this.state.case._id, this.state.case, this.props.user.token);
+                                            let caseMatchFitler = this.checkIfCaseMatchFilter()
+                                            console.log('caseMatchFitler', caseMatchFitler)
+                                            this.props.updateCase(this.props.user.activeOutbreakId, this.state.case._id, this.state.case, this.props.user.token, caseMatchFitler);
                                         })
                                 });
                             } else {
@@ -419,7 +425,9 @@ class CaseSingleScreen extends Component {
                                         this.setState(prevState => ({
                                             case: Object.assign({}, prevState.case, caseWithRequiredFields)
                                         }), () => {
-                                            this.props.addCase(this.props.user.activeOutbreakId, this.state.case, this.props.user.token);
+                                            let caseMatchFitler = this.checkIfCaseMatchFilter()
+                                            console.log('caseMatchFitler', caseMatchFitler)
+                                            this.props.addCase(this.props.user.activeOutbreakId, this.state.case, this.props.user.token, caseMatchFitler);
                                         })
                                     } else {
                                         let caseWithRequiredFields = null
@@ -428,11 +436,12 @@ class CaseSingleScreen extends Component {
                                         } else {
                                             caseWithRequiredFields = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, this.state.case), action = 'update')
                                         }
-                    
                                         this.setState(prevState => ({
                                             case: Object.assign({}, prevState.case, caseWithRequiredFields)
                                             }), () => {
-                                                this.props.updateCase(this.props.user.activeOutbreakId, this.state.case._id, this.state.case, this.props.user.token);
+                                                let caseMatchFitler = this.checkIfCaseMatchFilter()
+                                                console.log('caseMatchFitler', caseMatchFitler)
+                                                this.props.updateCase(this.props.user.activeOutbreakId, this.state.case._id, this.state.case, this.props.user.token, caseMatchFitler);
                                             })
                                     }
                                 });
@@ -468,6 +477,63 @@ class CaseSingleScreen extends Component {
         }
     };
 
+    checkIfCaseMatchFilter = () => {
+        if (this.props.filter && (this.props.filter['CasesFilterScreen'] || this.props.filter['CasesScreen'])) {
+            let caseCopy = [_.cloneDeep(this.state.case)]
+
+            // Take care of search filter
+            if (this.state.filter.searchText) {
+                caseCopy = caseCopy.filter((e) => {
+                    return e && e.firstName && this.state.filter.searchText.toLowerCase().includes(e.firstName.toLowerCase()) ||
+                        e && e.lastName && this.state.filter.searchText.toLowerCase().includes(e.lastName.toLowerCase()) ||
+                        e && e.firstName && e.firstName.toLowerCase().includes(this.state.filter.searchText.toLowerCase()) ||
+                        e && e.lastName && e.lastName.toLowerCase().includes(this.state.filter.searchText.toLowerCase())
+                });
+            }
+
+            // Take care of gender filter
+            if (this.state.filterFromFilterScreen && this.state.filterFromFilterScreen.gender) {
+                caseCopy = caseCopy.filter((e) => {return e.gender === this.state.filterFromFilterScreen.gender});
+            }
+            // Take care of age range filter
+            if (this.state.filterFromFilterScreen && this.state.filterFromFilterScreen.age && Array.isArray(this.state.filterFromFilterScreen.age) && this.state.filterFromFilterScreen.age.length === 2 && (this.state.filterFromFilterScreen.age[0] >= 0 || this.state.filterFromFilterScreen.age[1] <= 150)) {
+                caseCopy = caseCopy.filter((e) => {
+                    if (e.age && e.age.years !== null && e.age.years !== undefined && e.age.months !== null && e.age.months !== undefined) {
+                        if (e.age.years > 0 && e.age.months === 0) {
+                            return e.age.years >= this.state.filterFromFilterScreen.age[0] && e.age.years <= this.state.filterFromFilterScreen.age[1]
+                        } else if (e.age.years === 0 && e.age.months > 0){
+                            return e.age.months >= this.state.filterFromFilterScreen.age[0] && e.age.months <= this.state.filterFromFilterScreen.age[1]
+                        } else if (e.age.years === 0 && e.age.months === 0) {
+                            return e.age.years >= this.state.filterFromFilterScreen.age[0] && e.age.years <= this.state.filterFromFilterScreen.age[1]
+                        }
+                    }
+                });
+            }
+            // Take care of locations filter
+            if (this.state.filterFromFilterScreen  && this.state.filterFromFilterScreen.selectedLocations && this.state.filterFromFilterScreen.selectedLocations.length > 0) {
+                caseCopy = caseCopy.filter((e) => {
+                    let addresses = e.addresses.filter((k) => {
+                        return k.locationId !== '' && this.state.filterFromFilterScreen.selectedLocations.indexOf(k.locationId) >= 0
+                    })
+                    return addresses.length > 0
+                })
+            }
+            //Take care of classification filter
+            if (this.state.filterFromFilterScreen  && this.state.filterFromFilterScreen.classification && this.state.filterFromFilterScreen.classification.length > 0) {
+                caseCopy = caseCopy.filter((e) => {
+                    return this.state.filterFromFilterScreen.classification.map((f) => {return f.classification}).indexOf(e.classification) > -1
+                })
+            }
+
+            if (caseCopy.length > 0) {
+                return true
+            } else {
+                return false
+            }
+        } else {
+            return true
+        }
+    }
 
     //View case actions edit/saveEdit/cancelEdit
     onPressEdit = () => {
@@ -774,7 +840,6 @@ class CaseSingleScreen extends Component {
         }
         return true
     }
-
     
     
     // onChangeStuff functions
@@ -1176,6 +1241,7 @@ function mapStateToProps(state) {
         screenSize: state.app.screenSize,
         outbreak: state.outbreak,
         errors: state.errors,
+        filter: state.app.filters,
         cases: state.cases,
         caseInvestigationQuestions: state.outbreak.caseInvestigationTemplate
     };

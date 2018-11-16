@@ -70,6 +70,16 @@ export function getContactsForOutbreakIdRequest (outbreakId, filter, token, call
             console.log('getContactsForOutbreakIdRequest else, if');
             console.log ('myFilter', filter);
 
+            let myFilterAge = filter.age
+            if (myFilterAge) {
+                let maxAge = filter.age[1]
+                let minAge = filter.age[0]
+                while (maxAge - 1 > minAge) {
+                    myFilterAge.push(minAge + 1)
+                    minAge = minAge + 1
+                }
+            }
+
             database.find({
                 selector: {
                     _id: {
@@ -78,18 +88,43 @@ export function getContactsForOutbreakIdRequest (outbreakId, filter, token, call
                     },
                     type: {$eq: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT'},
                     gender: filter.gender ? {$eq: filter.gender} : {},
-                    age: filter.age ? { $gte: filter.age[0]} : {},
-                    age: filter.age ? { $lte: filter.age[1]} : {},
                     $or: [
                         {firstName: filter.searchText ? {$regex: filter.searchText} : {}},
                         {lastName: filter.searchText ? {$regex: filter.searchText} : {}}
+                    ],
+                    $or: [
+                        {'age.years': myFilterAge ? { $in: myFilterAge} : {}},
+                        {'age.months': myFilterAge ? { $in: myFilterAge} : {}},
                     ]
                 },
             })
                 .then((resultFilterContacts) => {
-                    console.log('Result when filtering contacts: ', new Date().getTime() - start);
-                    console.log("Found evidence: ", resultFilterContacts.docs);
-                    callback(null, resultFilterContacts.docs)
+                    console.log('Result when filtering contacts: ', new Date().getTime() - start, resultFilterContacts);
+                    //local filter for age because it can't be done in mango (can't use and in or filter
+                    let resultFilterContactsDocs = resultFilterContacts.docs
+                    if (filter.age) {
+                        resultFilterContactsDocs = resultFilterContactsDocs.filter((e) => {
+                            if (e.age && e.age.years !== null && e.age.years !== undefined && e.age.months !== null && e.age.months !== undefined ) {
+                                if (e.age.years > 0 && e.age.months === 0) {
+                                    return e.age.years >= filter.age[0] && e.age.years <= filter.age[1]
+                                } else if (e.age.years === 0 && e.age.months > 0){
+                                    return e.age.months >= filter.age[0] && e.age.months <= filter.age[1]
+                                } else if (e.age.years === 0 && e.age.months === 0) {
+                                    return e.age.years >= filter.age[0] && e.age.years <= filter.age[1]
+                                }
+                            }
+                        });
+                    }
+                     //local filter for selectedLocations bcause it can't be done in mango queries
+                     if (filter.selectedLocations && filter.selectedLocations.length > 0) {
+                        resultFilterContactsDocs = resultFilterContactsDocs.filter((e) => {
+                            let addresses = e.addresses.filter((k) => {
+                                return k.locationId !== '' && filter.selectedLocations.indexOf(k.locationId) >= 0
+                            })
+                            return addresses.length > 0
+                        })
+                    }
+                    callback(null, resultFilterContactsDocs)
                 })
                 .catch((errorFilterContacts) => {
                     console.log('Error when filtering contacts: ', errorFilterContacts);

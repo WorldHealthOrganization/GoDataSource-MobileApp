@@ -14,6 +14,7 @@ import {TextField} from 'react-native-material-textfield';
 import Button from './../components/Button';
 import styles from './../styles';
 import CardComponent from './../components/CardComponent';
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 
 class FollowUpsFiltersContainer extends PureComponent {
 
@@ -33,11 +34,27 @@ class FollowUpsFiltersContainer extends PureComponent {
     render() {
         return (
             <View style={style.container}>
+                <Button
+                    title={'Next'}
+                    onPress={this.props.handleMoveToNextScreenButton}
+                    color={styles.buttonGreen}
+                    titleColor={'white'}
+                    height={calculateDimension(25, true, this.props.screenSize)}
+                    width={calculateDimension(130, false, this.props.screenSize)}
+                    style={{
+                        marginVertical: calculateDimension(12.5, true, this.props.screenSize),
+                    }}/>
+                <KeyboardAwareScrollView
+                    style={style.containerScrollView}
+                    contentContainerStyle={[style.contentContainerStyle, {paddingBottom: this.props.screenSize.height < 600 ? 70 : 20}]}
+                    keyboardShouldPersistTaps={'always'}
+                >
                 {
                     config.followUpsFilterScreen.filter.map((item) => {
                         return this.handleRenderItem(item);
                     })
                 }
+                </KeyboardAwareScrollView>
                 <View style={style.containerButtonApplyFilters}>
                     <Button
                         title="Apply filters"
@@ -83,13 +100,19 @@ const style = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: styles.screenBackgroundGrey,
-        borderRadius: 2
+        borderRadius: 2,
+        alignItems: 'center',
     },
     containerButtonApplyFilters: {
-        flex: 1,
+        flex: 0,
         justifyContent: 'flex-end',
-        marginBottom: 22
-    }
+        marginBottom: 22,
+        marginTop: 10
+    },
+    containerScrollView: {
+        flex: 1,
+        backgroundColor: styles.screenBackgroundGrey,
+    },
 });
 
 function mapStateToProps(state) {

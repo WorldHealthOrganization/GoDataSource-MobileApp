@@ -242,6 +242,7 @@ class CardComponent extends Component {
         let minimumDate = undefined
         let maximumDate = undefined
         let data = [];
+        let sectionedSelectedItems = [];
 
         if (this.props.followUp && this.props.contact) {
             let followUp = this.props.followUp;
@@ -255,16 +256,19 @@ class CardComponent extends Component {
 
         if (this.props.screen === 'FollowUpsFilter' || this.props.screen === 'CasesFilter') {
             if (item.type === 'Selector' && item.id === 'gender') {
-                item.data = item.data.map((e) => {return {value: e.value, selected: this.props.filter && this.props.filter.filter && this.props.filter.filter.gender && this.props.filter.filter.gender[e.value] ? true : false}})
+                item.data = item.data.map((e) => {return {
+                    value: this.getTranslation(e.value), 
+                    selected: this.props.filter && this.props.filter.filter && this.props.filter.filter.gender && this.props.filter.filter.gender[e.value] ? true : false}
+                })
             }
             if (item.type === 'IntervalPicker' && item.id === 'age') {
                 item.value = this.props.filter.filter[item.id];
             }
-
             if (item.type === 'DropDownSectioned' && item.id === 'selectedLocations') {
-                item.value = this.props.filter.filter[item.id];
+                sectionedSelectedItems = this.props.filter.filter[item.id].map ((e) => {
+                    return 'location.json_false_' + e
+                })
             }
-
             if (item.type === 'DropDown' && item.id === 'exposure') {
                 if (this.props.cases && this.props.cases.length > 0){
                     data = this.props.cases.map((e) => {return {label: ((e.firstName ? e.firstName : '') + (e.lastName ? (" " + e.lastName) : '')), value: e.id}})
@@ -486,6 +490,7 @@ class CardComponent extends Component {
                         data={this.props.locations}
                         isEditMode={item.isEditMode}
                         isRequired={item.isRequired}
+                        sectionedSelectedItems={sectionedSelectedItems}
                         onChange={this.props.onChangeSectionedDropDown}
                         style={{width: width, marginHorizontal: marginHorizontal}}
                         dropDownStyle={{width: width, alignSelf: 'center'}}
@@ -801,7 +806,7 @@ class CardComponent extends Component {
         if (item.id === 'gender') {
             return _.filter(this.props.referenceData, (o) => {
                 return o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_GENDER'
-            }).map((o) => {return {value: this.getTranslation(o.value), id: o.value}})
+            }).map((o) => {return {label: this.getTranslation(o.value), value: o.value}})
         }
         if (item.id === 'typeId') {
             return _.filter(this.props.referenceData, (o) => {

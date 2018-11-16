@@ -25,7 +25,7 @@ import {Dropdown} from 'react-native-material-dropdown';
 import Breadcrumb from './../components/Breadcrumb';
 import {getCasesForOutbreakId} from './../actions/cases';
 import {removeErrors} from './../actions/errors';
-import {addFilterForScreen} from './../actions/app';
+import {addFilterForScreen, removeFilterForScreen} from './../actions/app';
 import AnimatedListView from './../components/AnimatedListView';
 import ViewHOC from './../components/ViewHOC';
 import _ from 'lodash';
@@ -62,7 +62,11 @@ class CasesScreen extends Component {
         this.setState({
             loading: true
         }, () => {
-            this.props.getCasesForOutbreakId(this.props.user.activeOutbreakId, null, null);
+            if (this.props.filter && (this.props.filter['CasesScreen'] || this.props.filter['CasesFilterScreen'])) {
+                this.filterCases();
+            } else {
+                this.props.getCasesForOutbreakId(this.props.user.activeOutbreakId, null, null);
+            }
         })
     }
 
@@ -79,6 +83,7 @@ class CasesScreen extends Component {
         }
 
         state.loading = false;
+        state.refreshing = false
         return null;
     }
 
@@ -176,9 +181,7 @@ class CasesScreen extends Component {
                                 onPress={this.handlePressFilter}
                                 onChangeText={this.handleOnChangeText}
                                 onSubmitEditing={this.handleOnSubmitEditing}
-                                filterText={this.state.filterFromFilterScreen && this.state.filterFromFilterScreen.where
-                                && this.state.filterFromFilterScreen.where.and && Array.isArray(this.state.filterFromFilterScreen.where.and) ?
-                                    ("Filter (" + this.state.filterFromFilterScreen.where.and.length + ')') : 'Filter'}
+                                filterText={(this.state.filterFromFilterScreen && Object.keys(this.state.filterFromFilterScreen).length > 0) ? ("Filter (" + Object.keys(this.state.filterFromFilterScreen).length + ')') : 'Filter'}
                             />
                         }
                         ItemSeparatorComponent={this.renderSeparatorComponent}
@@ -316,7 +319,6 @@ class CasesScreen extends Component {
             animationType: 'fade',
             passProps: {
                 case: item,
-                // filter: this.state.filter
             }
         })
     };
@@ -347,63 +349,38 @@ class CasesScreen extends Component {
             }
         })
     };
-
+    
     //Navigator event
     onNavigatorEvent = (event) => {
         navigation(event, this.props.navigator);
     };
 
     filterCases = () => {
-        // let casesCopy = _.cloneDeep(this.props.cases);
-        //
-        // // Take care of search filter
-        // if (this.state.filter.searchText) {
-        //     casesCopy = casesCopy.filter((e) => {
-        //         return  e && e.firstName && this.state.filter.searchText.toLowerCase().includes(e.firstName.toLowerCase()) ||
-        //             e && e.lastName && this.state.filter.searchText.toLowerCase().includes(e.lastName.toLowerCase()) ||
-        //             e && e.firstName && e.firstName.toLowerCase().includes(this.state.filter.searchText.toLowerCase()) ||
-        //             e && e.lastName && e.lastName.toLowerCase().includes(this.state.filter.searchText.toLowerCase())
-        //     });
-        // }
-        //
-        // console.log("filter:", this.state.filterFromFilterScreen);
-        // // Take care of gender filter
-        // if (this.state.filterFromFilterScreen && this.state.filterFromFilterScreen.gender) {
-        //     casesCopy = casesCopy.filter((e) => {return e.gender === this.state.filterFromFilterScreen.gender});
-        // }
-        //
-        // console.log(casesCopy);
-        //
-        // this.setState({
-        //     cases: casesCopy
-        // })
-
         let allFilters = {}
 
+        //age
         if (this.state.filterFromFilterScreen && this.state.filterFromFilterScreen.age) {
             allFilters.age = this.state.filterFromFilterScreen.age
         } else {
             allFilters.age = null
         }
 
+        //gender
         if (this.state.filterFromFilterScreen && this.state.filterFromFilterScreen.gender) {
-            if (this.state.filterFromFilterScreen.gender === 'Female') {
-                allFilters.gender = 'LNG_REFERENCE_DATA_CATEGORY_GENDER_FEMALE'
-            } else  if (this.state.filterFromFilterScreen.gender === 'Male') {
-                allFilters.gender = 'LNG_REFERENCE_DATA_CATEGORY_GENDER_MALE'
-            }
+            allFilters.gender = this.state.filterFromFilterScreen.gender
+
         } else {
             allFilters.gender = null
         }
 
+        //classification
         if (this.state.filterFromFilterScreen && this.state.filterFromFilterScreen.classification) {
-            //if classification is array
             allFilters.classification = this.state.filterFromFilterScreen.classification;
         } else {
-            // allFilters.classification = null
+            allFilters.classification = null
         }
 
-        console.log('this.state.filter.searchText ', this.state.filter.searchText);
+        //search text
         if (this.state.filter.searchText.trim().length > 0) {
             let splitedFilter= this.state.filter.searchText.split(" ")
             splitedFilter = splitedFilter.filter((e) => {return e !== ""})
@@ -412,7 +389,14 @@ class CasesScreen extends Component {
             allFilters.searchText = null
         }
 
-        if (!allFilters.age && !allFilters.gender && !allFilters.searchText && !allFilters.classification) {
+        //selected locations
+        if (this.state.filterFromFilterScreen && this.state.filterFromFilterScreen.selectedLocations) {
+            allFilters.selectedLocations = this.state.filterFromFilterScreen.selectedLocations;
+        } else {
+            allFilters.selectedLocations = null
+        }
+
+        if (!allFilters.age && !allFilters.gender && !allFilters.searchText && !allFilters.classification && !allFilters.selectedLocations) {
             allFilters = null
         }
 
@@ -461,6 +445,7 @@ function matchDispatchProps(dispatch) {
         getCasesForOutbreakId,
         addFilterForScreen,
         removeErrors,
+        removeFilterForScreen
     }, dispatch);
 }
 
