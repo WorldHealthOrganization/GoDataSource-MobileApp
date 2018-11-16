@@ -24,7 +24,7 @@ const sideMenuItems = [
         key: 'contacts',
         name: 'people',
         label: 'Contacts',
-        addButton: true
+        // addButton: true
     },
     {
         key: 'cases',

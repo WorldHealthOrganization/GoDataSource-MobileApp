@@ -2,7 +2,7 @@
  * Created by florinpopa on 02/10/2018.
  */
 import {getDatabase} from './database';
-import _ from 'lodash';
+import moment from 'moment';
 
 // Credentials: {email, encryptedPassword}
 export function getRelationshipsForTypeRequest (outbreakId, searchType, keys, callback) {
@@ -37,20 +37,39 @@ export function getRelationshipsForTypeRequest (outbreakId, searchType, keys, ca
         })
 }
 
-export function getRelationshipsAndFollowUpsForContactRequest (outbreakId, keys, callback) {
+export function getRelationshipsAndFollowUpsForContactRequest (outbreakId, keys, filter, callback) {
     let database = getDatabase();
 
-    console.log("getRelationshipsAndFollowUpsForContact: ", outbreakId, keys);
+    let oneDay = 24 * 60 * 60 * 1000;
+    let startDate = '';
+    let endDate = '';
+    if (filter && filter.date) {
+        startDate = new Date(`${filter.date.getMonth() + 1}/${filter.date.getDate()}/${filter.date.getFullYear()}`).getTime();
+        endDate = moment(filter.date.getTime() + oneDay).add(-1, 'second')._d.getTime();
+    }
 
     database.find({
         selector: {
-            outbreakId: outbreakId,
-            deleted: false,
-            fileType: {$in: ['followUp.json', 'relationship.json']},
             $or: [
-                {'persons.0.id': {$in: keys}},
-                {'persons.1.id': {$in: keys}},
-                {personId: {$in: keys}}
+                {
+                    _id: {
+                        $gte: `followUp.json_false_${outbreakId}_${startDate}_`,
+                        $lte: `followUp.json_false_${outbreakId}_${endDate}_\uffff`
+                    },
+                    deleted: false,
+                    outbreakId: outbreakId,
+                    personId: {$eq: keys}
+                },{
+                    _id: {
+                        $gte: `relationship.json_false_${outbreakId}_`,
+                        $lte: `relationship.json_false_${outbreakId}_\uffff`
+                    },
+                    deleted: false,
+                    $or: [
+                        {'persons.0.id': {$eq: keys}},
+                        {'persons.1.id': {$eq: keys}},
+                    ],
+                }
             ]
         }
     })

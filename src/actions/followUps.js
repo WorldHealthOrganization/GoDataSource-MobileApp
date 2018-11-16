@@ -136,7 +136,7 @@ export function getMissedFollowUpsForOutbreakId(outbreakId, filter, token) {
     }
 }
 
-export function updateFollowUpAndContact(outbreakId, contactId, followUpId, followUp, contact, token) {
+export function updateFollowUpAndContact(outbreakId, contactId, followUpId, followUp, contact, token, filter) {
     let contactIdForFollowUp = null;
     if (contactId) {
         contactIdForFollowUp = extractIdFromPouchId(contactId, 'person')
@@ -151,9 +151,9 @@ export function updateFollowUpAndContact(outbreakId, contactId, followUpId, foll
                 console.log("*** updateFollowUp response: ", JSON.stringify(response));
                 dispatch(updateFollowUpAction(response));
                 if (contact && contactId) {
-                    dispatch(updateContact(outbreakId, contactId, contact, token));
+                    dispatch(updateContact(outbreakId, contactId, contact, token, filter));
                 } else if (contact){
-                    console.log ('updateContactAction')
+                    console.log ('updateContactAction');
                     dispatch(updateContactAction(contact));
                 }
             }
