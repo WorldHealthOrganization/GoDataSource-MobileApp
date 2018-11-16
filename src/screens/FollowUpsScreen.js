@@ -65,6 +65,7 @@ class FollowUpsScreen extends Component {
             sourceLatitude: 0,
             sourceLongitude: 0,
             error: null,
+            generating: false,
             calendarPickerOpen: false
         };
         // Bind here methods, or at least don't declare methods in the render method
@@ -94,6 +95,7 @@ class FollowUpsScreen extends Component {
 
         // console.log('props.contacts', JSON.stringify(props.contacts))
         if (props.contacts) {
+            let prevFollowUps = state.followUps || [];
             let fUps = [];
 
             for (let i=0; i<props.contacts.length; i++) {
@@ -108,6 +110,40 @@ class FollowUpsScreen extends Component {
             // let oneDay = 24 * 60 * 60 * 1000;
             if (state.filter && state.filter.performed && state.filter.performed.value && state.filter.performed.value !== 'All') {
                 fUps = fUps.filter((e) => {return e.statusId === state.filter.performed.value});
+            }
+
+
+            //if we'e generating follow-ups
+            if(state.generating) {
+                //and we received generated follow-ups
+                if(props.followUps.length) {
+                    //if we had previous generated follow-ups get difference
+                    if (prevFollowUps.length) {
+                        if (props.followUps) {
+                            let number = parseInt(props.followUps.length - prevFollowUps.length);
+                            props.navigator.showInAppNotification({
+                                screen: "InAppNotificationScreen",
+                                passProps: {
+                                    number: number
+                                },
+                                autoDismissTimerSec: 1
+                            });
+                        }
+                    } else {
+                        //no previous follow-ups just display number of generated
+                        let number = parseInt(props.followUps.length);
+                        props.navigator.showInAppNotification({
+                            screen: "InAppNotificationScreen",
+                            passProps: {
+                                number: number
+                            },
+                            autoDismissTimerSec: 1
+                        });
+                    }
+
+                    //reset generating status
+                    state.generating = false;
+                }
             }
 
             if (props.followUps && props.followUps.length > 0) {
@@ -125,7 +161,8 @@ class FollowUpsScreen extends Component {
     componentDidMount() {
         console.log ('componentDidMount');
         this.setState({
-            loading: true
+            loading: true,
+            generating: false,
         }, () => {
             this.props.getFollowUpsForOutbreakId(this.props.user.activeOutbreakId, this.state.filter, null);
         })
@@ -554,7 +591,13 @@ class FollowUpsScreen extends Component {
     };
 
     handleGenerateFollowUps = () => {
-        this.props.generateFollowUp(this.props.user.activeOutbreakId, this.state.filter.date, this.props.user.token);
+        this.setState({
+            generating: true,
+        }, () => {
+            this.props.generateFollowUp(this.props.user.activeOutbreakId, this.state.filter.date, this.props.user.token);
+            this.hideMenu();
+        });
+
     };
 
     // Append to the existing filter newProp={name: value}
