@@ -151,7 +151,7 @@ export function updateFollowUpAndContact(outbreakId, contactId, followUpId, foll
                 console.log("*** updateFollowUp response: ", JSON.stringify(response));
                 dispatch(updateFollowUpAction(response));
                 if (contact && contactId) {
-                    dispatch(updateContact(outbreakId, contactId, contact, token, filter));
+                    dispatch(updateContact(outbreakId, contactId, contact, token, filter, true));
                 } else if (contact){
                     console.log ('updateContactAction');
                     dispatch(updateContactAction(contact));
@@ -185,7 +185,7 @@ export function createFollowUp(outbreakId, contactId, followUp, contact, activeF
             }
             if (response) {
                 dispatch(updateFollowUpAction(response));
-                dispatch(updateContact(outbreakId, contactId, contact, token));
+                dispatch(updateContact(outbreakId, contactId, contact, token, activeFilters, true));
             }
         })
     }

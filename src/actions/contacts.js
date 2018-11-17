@@ -318,7 +318,7 @@ export function updateExposureForContact(outbreakId, contactId, exposure, token)
                         responseContact.relationships.push(exposure);
 
                         responseContact = updateContactFollowUpFields(responseContact, getState().outbreak);
-                        dispatch(updateContact(outbreakId, contactId, responseContact, null));
+                        dispatch(updateContact(outbreakId, contactId, responseContact, null, null, true));
                         // updateContactRequest(outbreakId, responseContact._id, responseContact, null, (errorUpdateContact, responseUpdateContact) => {
                         //     if (errorUpdateContact) {
                         //         console.log("*** updateExposureForContact updateContactRequest error: ", error);
@@ -367,7 +367,7 @@ export function deleteExposureForContact(outbreakId, contactId, exposure, token)
                             if (responseGetRelationships) {
                                 responseGetContact.relationships = responseGetRelationships;
                                 responseGetContact = updateContactFollowUpFields(responseGetContact, getState().outbreak);
-                                dispatch(updateContact(outbreakId, contactId, responseGetContact, null));
+                                dispatch(updateContact(outbreakId, contactId, responseGetContact, null, null, true));
                             }
                         })
                     }
