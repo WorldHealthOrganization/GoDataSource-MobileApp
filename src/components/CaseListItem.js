@@ -81,7 +81,7 @@ class CaseListItem extends Component {
                             </View>
                         }
                         rightElement={
-                            <Ripple onPress={this.props.onPressMap}>
+                            <Ripple onPress={this.onPressMapIcon}>
                                 <Image source={{uri: 'map_icon'}} style={{width: 31, height: 31}}/>
                             </Ripple>
                         }
@@ -121,7 +121,7 @@ class CaseListItem extends Component {
         InteractionManager.runAfterInteractions(() => {
             let contact = this.props && this.props.contacts && Array.isArray(this.props.contacts) && this.props.contacts.length > 0 ? this.props.contacts[this.props.contacts.map((e) => {return e.id}).indexOf(this.props.item.personId)] : null;
 
-            console.log('### onPressCases: ', this.props.item, contact, Object.assign({}, this.props.item, contact));
+            console.log('### onPressCase: ', this.props.item, contact, Object.assign({}, this.props.item, contact));
 
             this.props.onPressCase(this.props.item, contact);
         });
@@ -131,11 +131,23 @@ class CaseListItem extends Component {
         InteractionManager.runAfterInteractions(() => {
             let contact = this.props && this.props.contacts && Array.isArray(this.props.contacts) && this.props.contacts.length > 0 ? this.props.contacts[this.props.contacts.map((e) => {return e.id}).indexOf(this.props.item.personId)] : null;
 
-            console.log('### onPressCases: ', this.props.item, contact, Object.assign({}, this.props.item, contact));
+            console.log('### onPressAddContact: ', this.props.item, contact, Object.assign({}, this.props.item, contact));
 
             this.props.onPressAddContact(this.props.item, contact);
         });
     };
+
+    onPressMapIcon = () => {
+        InteractionManager.runAfterInteractions(() => {
+            let contact = this.props && this.props.contacts && Array.isArray(this.props.contacts) && this.props.contacts.length > 0 ? this.props.contacts[this.props.contacts.map((e) => {return e.id}).indexOf(this.props.item.personId)] : null;
+
+            console.log('### onPressMapIcon: ', this.props.item, contact, Object.assign({}, this.props.item, contact));
+
+            if (this.props.onPressMap !== undefined) {
+                this.props.onPressMap(this.props.item, contact)
+            }
+        });
+    }
 
     getTranslation = (value) => {
         let valueToBeReturned = value;

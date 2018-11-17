@@ -29,6 +29,7 @@ import {addFilterForScreen, removeFilterForScreen} from './../actions/app';
 import AnimatedListView from './../components/AnimatedListView';
 import ViewHOC from './../components/ViewHOC';
 import _ from 'lodash';
+import { Popup } from 'react-native-map-link';
 
 let height = Dimensions.get('window').height;
 let width = Dimensions.get('window').width;
@@ -50,7 +51,14 @@ class CasesScreen extends Component {
             filterFromFilterScreen: this.props.filter && this.props.filter['CasesFilterScreen'] ? this.props.filter['CasesFilterScreen'] : null,
             cases: [],
             refreshing: false,
-            loading: true
+            loading: true,
+
+            isVisible: false,
+            latitude: 0,
+            longitude: 0,
+            sourceLatitude: 0,
+            sourceLongitude: 0,
+            error: null,
         };
 
         // Bind here methods, or at least don't declare methods in the render method
@@ -192,6 +200,28 @@ class CasesScreen extends Component {
                         onRefresh={this.handleOnRefresh}
                     />
                 </View>
+                <View style={styles.mapContainer}>
+                    {
+                        this.state.error === null ? (
+                            <Popup
+                                isVisible={this.state.isVisible}
+                                onCancelPressed={() => this.setState({ isVisible: false })}
+                                onAppPressed={() => this.setState({ isVisible: false })}
+                                onBackButtonPressed={() => this.setState({ isVisible: false })}
+                                options={{
+                                    latitude: this.state.latitude,
+                                    longitude: this.state.longitude,
+                                    sourceLatitude: this.state.sourceLatitude,
+                                    sourceLongitude: this.state.sourceLongitude,
+                                    dialogTitle: 'Select the maps application that you would like to use',
+                                    cancelText: 'Cancel',
+                                    appsWhiteList: ['google-maps', 'apple-maps', 'waze']
+                                    //other possibilities: citymapper, uber, lyft, transit, yandex, moovit
+                                }}
+                            />
+                        ) : console.log('this.state.error', this.state.error)
+                    }
+                </View>
             </ViewHOC>
         );
     }
@@ -272,7 +302,12 @@ class CasesScreen extends Component {
     //Render a case tile
     renderCase = ({item}) => {
         return (
-            <CaseListItem item={item} onPressCase={this.handleOnPressCase} onPressAddContact={this.handleOnPressAddContact} />
+            <CaseListItem 
+                item={item} 
+                onPressCase={this.handleOnPressCase}             
+                onPressMap={this.handleOnPressMap}
+                onPressAddContact={this.handleOnPressAddContact} 
+            />
         )
     };
 
@@ -337,6 +372,33 @@ class CasesScreen extends Component {
             }
         })
     };
+
+    handleOnPressMap = (myCase, contact) => {
+        console.log('handleOnPressMap', myCase. contact)
+        if (myCase && myCase.addresses && Array.isArray(myCase.addresses) && myCase.addresses.length > 0) {
+            let casePlaceOfResidence = myCase.addresses.filter((e) => {
+                return e.typeId === config.userResidenceAddress.userPlaceOfResidence
+            })
+            console.log('casePlaceOfResidence', casePlaceOfResidence)
+            let casePlaceOfResidenceLatitude = casePlaceOfResidence[0] && casePlaceOfResidence[0].geoLocation && casePlaceOfResidence[0].geoLocation.coordinates && Array.isArray(casePlaceOfResidence[0].geoLocation.coordinates) && casePlaceOfResidence[0].geoLocation.coordinates.length === 2 && casePlaceOfResidence[0].geoLocation.coordinates[1] !== undefined && casePlaceOfResidence[0].geoLocation.coordinates[1] !== null ? casePlaceOfResidence[0].geoLocation.coordinates[1] : 0
+            let casePlaceOfResidenceLongitude = casePlaceOfResidence[0] && casePlaceOfResidence[0].geoLocation && casePlaceOfResidence[0].geoLocation.coordinates && Array.isArray(casePlaceOfResidence[0].geoLocation.coordinates) && casePlaceOfResidence[0].geoLocation.coordinates.length === 2 && casePlaceOfResidence[0].geoLocation.coordinates[0] !== undefined && casePlaceOfResidence[0].geoLocation.coordinates[0] !== null ? casePlaceOfResidence[0].geoLocation.coordinates[0] : 0
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    this.setState({
+                        latitude: casePlaceOfResidenceLatitude,
+                        longitude: casePlaceOfResidenceLongitude,
+                        sourceLatitude: position.coords.latitude,
+                        sourceLongitude: position.coords.longitude,
+                        isVisible: true,
+                        error: null,
+                    });
+                },
+                (error) => {
+                    this.setState({error: error.message})
+                },
+            );
+        }
+    }
 
     //Create new case in CaseSingleScreen
     handleOnPressAddCase = () => {
@@ -411,6 +473,12 @@ class CasesScreen extends Component {
 // Create style outside the class, or for components that will be used by other components (buttons),
 // make a global style in the config directory
 const style = StyleSheet.create({
+    mapContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#F5FCFF'
+    },
     container: {
         flex: 1,
         backgroundColor: 'white',
