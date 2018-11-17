@@ -358,6 +358,7 @@ class ContactsScreen extends Component {
     };
 
     handleOnPressExposure = (followUp, contact) => {
+        console.log('handleOnPressExposure', followUp. contact)
         this.props.navigator.showModal({
             screen: "ExposureScreen",
             animated: true,
@@ -369,20 +370,29 @@ class ContactsScreen extends Component {
     };
 
     handleOnPressMap = (followUp, contact) => {
+        console.log("Handle on press map followUp: ", JSON.stringify(followUp));
+        console.log("Handle on press map contact: ", JSON.stringify(contact));
 
+        let contactPlaceOfResidence = null
         if (contact && contact.addresses && Array.isArray(contact.addresses) && contact.addresses.length > 0) {
-            let contactPlaceOfResidence = contact ? contact.addresses.filter((e) => {
-                return e.typeId === config.userResidenceAddress.userPlaceOfResidence
-            }) : followUp.addresses.filter((e) => {
+            contactPlaceOfResidence = contact.addresses.filter((e) => {
                 return e.typeId === config.userResidenceAddress.userPlaceOfResidence
             })
-            console.log('contactPlaceOfResidence', contactPlaceOfResidence);
+        } else if (followUp && followUp.addresses && Array.isArray(followUp.addresses) && followUp.addresses.length > 0) {
+            contactPlaceOfResidence = followUp.addresses.filter((e) => {
+                return e.typeId === config.userResidenceAddress.userPlaceOfResidence
+            })
+        }
 
+        console.log('contactPlaceOfResidence', contactPlaceOfResidence);
+        if (contactPlaceOfResidence !== undefined && contactPlaceOfResidence !== null && Array.isArray(contactPlaceOfResidence) && contactPlaceOfResidence.length > 0 && contactPlaceOfResidence[0] !== undefined && contactPlaceOfResidence[0] !== null) {
+            let contactPlaceOfResidenceLatitude = contactPlaceOfResidence[0] && contactPlaceOfResidence[0].geoLocation && contactPlaceOfResidence[0].geoLocation.coordinates && Array.isArray(contactPlaceOfResidence[0].geoLocation.coordinates) && contactPlaceOfResidence[0].geoLocation.coordinates.length === 2 && contactPlaceOfResidence[0].geoLocation.coordinates[1] !== undefined && contactPlaceOfResidence[0].geoLocation.coordinates[1] !== null ? contactPlaceOfResidence[0].geoLocation.coordinates[1] : 0
+            let contactPlaceOfResidenceLongitude = contactPlaceOfResidence[0] && contactPlaceOfResidence[0].geoLocation && contactPlaceOfResidence[0].geoLocation.coordinates && Array.isArray(contactPlaceOfResidence[0].geoLocation.coordinates) && contactPlaceOfResidence[0].geoLocation.coordinates.length === 2 && contactPlaceOfResidence[0].geoLocation.coordinates[0] !== undefined && contactPlaceOfResidence[0].geoLocation.coordinates[0] !== null ? contactPlaceOfResidence[0].geoLocation.coordinates[0] : 0
             navigator.geolocation.getCurrentPosition(
                 (position) => {
                     this.setState({
-                        latitude: contactPlaceOfResidence[0].geoLocation && contactPlaceOfResidence[0].geoLocation.lat ? contactPlaceOfResidence[0].geoLocation.lat : 0,
-                        longitude: contactPlaceOfResidence[0].geoLocation && contactPlaceOfResidence[0].geoLocation.lng ? contactPlaceOfResidence[0].geoLocation.lng : 0,
+                        latitude: contactPlaceOfResidenceLatitude,
+                        longitude: contactPlaceOfResidenceLongitude,
                         sourceLatitude: position.coords.latitude,
                         sourceLongitude: position.coords.longitude,
                         isVisible: true,
