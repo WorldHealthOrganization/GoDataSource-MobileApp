@@ -405,6 +405,7 @@ function processFilesForSync(error, response, hubConfiguration, isFirstTime) {
 
 export function sendDatabaseToServer () {
     return async function (dispatch) {
+        let operationStart = new Date().getTime();
         // First get the active database
         dispatch(setSyncState('Getting local data'));
         try {
@@ -422,6 +423,7 @@ export function sendDatabaseToServer () {
 
                         let internetCredentials = await getInternetCredentials(activeDatabase);
                         if (internetCredentials) {
+                            let startTimeForFilesChanged = new Date().getTime();
                             database.find({selector: {
                                 updatedAt: {$gte: lastSyncDate}
                             },
@@ -429,7 +431,7 @@ export function sendDatabaseToServer () {
                             })
                                 .then((resultGetRecordsByDate) => {
                                     resultGetRecordsByDate = uniq(resultGetRecordsByDate.docs);
-                                    console.log('resultGetRecordsByDate: ', resultGetRecordsByDate);
+                                    console.log('resultGetRecordsByDate: took: ', new Date().getTime() - startTimeForFilesChanged);
                                     // Now, for each fileType, we must create a .json file, archive it and then send that archive to the server
                                     let promiseArray = [];
 
@@ -438,18 +440,20 @@ export function sendDatabaseToServer () {
                                     }
 
                                     dispatch(setSyncState('Creating local files'));
+                                    let startTimeForCreatingFiles = new Date().getTime();
                                     console.log('Add stuff: ', promiseArray.length);
                                     Promise.all(promiseArray)
                                         .then((resultsCreateAlFiles) => {
                                             // After creating all the needed files, we need to make a zip file
-                                            console.log('Result from processing all the files');
+                                            console.log('Result from processing all the files: timeForCreatingFiles: ', new Date().getTime() - startTimeForCreatingFiles);
+                                            let startTimeForCreateZip = new Date().getTime();
                                             createZipFileAtPath(`${RNFetchBlobFs.dirs.DocumentDir}/who_files`, `${RNFetchBlobFs.dirs.DocumentDir}/${activeDatabase.replace(/\/|\.|\:/g, '')}.zip`, (errorCreateZipFile, resultCreateZipFile) => {
                                                 if (errorCreateZipFile) {
                                                     console.log("An error occurred while zipping the files: ", errorCreateZipFile);
                                                 }
                                                 if (resultCreateZipFile) {
                                                     // After creating the zip file, it's time to send it to the server
-                                                    console.log("Response from create zip file: ", resultCreateZipFile);
+                                                    console.log("Response from create zip file: time For zip", new Date().getTime() - startTimeForCreateZip);
                                                     dispatch(setSyncState('Sending data to the HUB'));
                                                     postDatabaseSnapshotRequest(internetCredentials, resultCreateZipFile, (errorSendData, resultSendData) => {
                                                         if (errorSendData) {
@@ -457,7 +461,7 @@ export function sendDatabaseToServer () {
                                                             dispatch(setSyncState('Error'));
                                                         }
                                                         if (resultSendData) {
-                                                            console.log("Data was successfully sent to server: ", resultSendData);
+                                                            console.log("Data was successfully sent to server: ", resultSendData, new Date().getTime() - operationStart);
                                                             dispatch(setSyncState('Getting updated data from the server'));
                                                             getDatabaseSnapshotRequest({clientId: internetCredentials.username, clientSecret: internetCredentials.password}, lastSyncDate, (error, response) => {
                                                                 dispatch(processFilesForSync(error, response, {url: Platform.OS === 'ios' ? internetCredentials.server : internetCredentials.service, clientId: internetCredentials.username, clientSecret: internetCredentials.password}));

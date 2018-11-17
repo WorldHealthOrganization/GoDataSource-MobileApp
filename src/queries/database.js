@@ -190,7 +190,7 @@ function createIndexPerson() {
         if (database) {
             // Index for contacts based on fileType, type, outbreakId, firstName, lastName, age, gender
             database.createIndex({
-                index: {fields: ['persons.[].id', 'outbreakId', 'fileType', 'deleted']},
+                index: {fields: ['updatedAt']},
                 name: 'indexPerson',
                 ddoc: 'indexPerson',
             })

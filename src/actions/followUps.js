@@ -230,7 +230,8 @@ export function generateFollowUp(outbreakId, date, token) {
                                     date: date,
                                     personId: contactsThatNeedFollowUps[i],
                                     outbreakId: outbreakId,
-                                    statusId: config.followUpStatuses.notPerformed
+                                    statusId: config.followUpStatuses.notPerformed,
+                                    targeted: false
                                 };
                                 let aux = updateRequiredFields(outbreakId, getState().user.activeOutbreakId, newFollowUp, 'create', 'followUp.json');
                                 generatedFollowUps.push(aux);

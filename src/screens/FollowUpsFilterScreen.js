@@ -82,6 +82,7 @@ class FollowUpsFilterScreen extends Component {
                     navigationState={this.state}
                     renderScene={this.handleRenderScene}
                     renderTabBar={this.handleRenderTabBar}
+                    onIndexChange={this.handleOnIndexChange}
                 />
             </View>
         );
