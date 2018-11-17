@@ -31,8 +31,9 @@ export function getCasesForOutbreakIdRequest (outbreakId, filter, token, callbac
             console.log('getCasesForOutbreakIdRequest else, if');
             console.log ('myFilter', filter);
 
-            let classificationOrFilter = []
+            let classificationOrFilter = null
             if(filter.classification){
+                classificationOrFilter = []
                 if(filter.classification.length > 0 && Array.isArray(filter.classification)){
                     for (let i=0; i<filter.classification.length; i++) {
                         if (filter.classification[i].classification !== null) {
@@ -41,8 +42,10 @@ export function getCasesForOutbreakIdRequest (outbreakId, filter, token, callbac
                     }
                 }
             }
-            let myFilterAge = filter.age
-            if (myFilterAge) {
+
+            let myFilterAge = null 
+            if (filter.age) {
+                myFilterAge = filter.age
                 let maxAge = filter.age[1]
                 let minAge = filter.age[0]
                 while (maxAge - 1 > minAge) {
@@ -62,13 +65,13 @@ export function getCasesForOutbreakIdRequest (outbreakId, filter, token, callbac
                     deleted: false,
                     classification: classificationOrFilter && classificationOrFilter.length > 0 ? {$in: classificationOrFilter} : {},
                     $or: [
+                        {'age.years': myFilterAge && myFilterAge.length > 0 ? { $in: myFilterAge} : {}},
+                        {'age.months': myFilterAge && myFilterAge.length > 0 ? { $in: myFilterAge} : {}},
+                    ],
+                    $or: [
                         {firstName: filter.searchText ? {$regex: filter.searchText} : {}},
                         {lastName: filter.searchText ? {$regex: filter.searchText} : {}}
                     ],
-                    $or: [
-                        {'age.years': myFilterAge ? { $in: myFilterAge} : {}},
-                        {'age.months': myFilterAge ? { $in: myFilterAge} : {}},
-                    ]
                 },
             })
                 .then((resultFilterCases) => {
