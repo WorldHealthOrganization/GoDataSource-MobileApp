@@ -530,27 +530,30 @@ class ContactsSingleScreen extends Component {
         } else {
             if (id === 'dob') {
                 let today = new Date()
-                let nrOFYears = this.calcDateDiff(today, value);
-                let ageClone = {years: 0, months: 0}
-                let selectedItemIndexForAgeUnitOfMeasureDropDown = 0
+                let nrOFYears = this.calcDateDiff(value, today);
+                if (nrOFYears !== undefined && nrOFYears !== null) {
+                    let ageClone = {years: 0, months: 0}
+                    let selectedItemIndexForAgeUnitOfMeasureDropDown = 0
 
-                if (nrOFYears.years === 0 && nrOFYears.months >= 0) {
-                    ageClone.months = nrOFYears.months
-                    ageClone.years = nrOFYears.months
-                    selectedItemIndexForAgeUnitOfMeasureDropDown = 1
-                } else {
-                    if (nrOFYears.years > 0) {
-                        ageClone.months = nrOFYears.years
-                        ageClone.years = nrOFYears.years
-                        selectedItemIndexForAgeUnitOfMeasureDropDown = 0
+                    if (nrOFYears.years === 0 && nrOFYears.months >= 0) {
+                        ageClone.months = nrOFYears.months
+                        ageClone.years = nrOFYears.months
+                        selectedItemIndexForAgeUnitOfMeasureDropDown = 1
+                    } else {
+                        if (nrOFYears.years > 0) {
+                            ageClone.months = nrOFYears.years
+                            ageClone.years = nrOFYears.years
+                            selectedItemIndexForAgeUnitOfMeasureDropDown = 0
+                        }
                     }
+                    console.log('ageClone', ageClone)
+                    this.setState(prevState => ({
+                        contact: Object.assign({}, prevState.contact, {age: ageClone}, {dob: value}),
+                        selectedItemIndexForAgeUnitOfMeasureDropDown
+                    }), () => {
+                        console.log("handleOnChangeDate dob", id, " ", value, " ", this.state.contact);
+                    })
                 }
-                this.setState(prevState => ({
-                    contact: Object.assign({}, prevState.contact, {age: ageClone}, {dob: value}),
-                    selectedItemIndexForAgeUnitOfMeasureDropDown
-                }), () => {
-                    console.log("handleOnChangeDate dob", id, " ", value, " ", this.state.contact);
-                })
             } else {
                 if (objectType === 'Contact') {
                     this.setState(
@@ -578,19 +581,32 @@ class ContactsSingleScreen extends Component {
         }
     };
 
-    calcDateDiff(today, dob) {
-        let diff = Math.floor(today.getTime() - dob.getTime());
-        let day = 1000 * 60 * 60 * 24;
+    calcDateDiff = (startdate, enddate) => {
+        //define moments for the startdate and enddate
+        var startdateMoment = moment(startdate);
+        var enddateMoment = moment(enddate);
 
-        let days = Math.floor(diff/day);
-        let months = Math.floor(days/31);
-        let years = Math.floor(months/12);
+        if (startdateMoment.isValid() === true && enddateMoment.isValid() === true) {
+          //getting the difference in years
+          var years = enddateMoment.diff(startdateMoment, 'years');
 
-        let nrOFYears = {
+          //moment returns the total months between the two dates, subtracting the years
+          var months = enddateMoment.diff(startdateMoment, 'months') - (years * 12);
+
+          //to calculate the days, first get the previous month and then subtract it
+          startdateMoment.add(years, 'years').add(months, 'months');
+          var days = enddateMoment.diff(startdateMoment, 'days')
+
+
+          console.log ('calcDateDiff', {months: months, years: years})
+          return nrOFYears = {
             months: months,
-            years: years
+            years: years,
+          };
         }
-        return nrOFYears
+        else {
+          return undefined;
+        }
     }
 
     handleOnChangeSwitch = (value, id, objectType) => {
@@ -893,17 +909,18 @@ class ContactsSingleScreen extends Component {
         let dobClone = null
         let ageClone = { years: 0, months: 0 }
 
-        if (this.state.contact.dob !== null) {
+        if (this.state.contact.dob !== null && this.state.contact.dob !== undefined) {
             //get info from date
             dobClone = this.state.contact.dob
             let today = new Date()
-            let nrOFYears = this.calcDateDiff(today, dobClone);
-
-            //calc age for save
-            if (nrOFYears.years === 0 && nrOFYears.months >= 0) {
-                ageClone.months = nrOFYears.months
-            } else if (nrOFYears.years > 0) {
-                ageClone.years = nrOFYears.years
+            let nrOFYears = this.calcDateDiff(dobClone, today);
+            if (nrOFYears !== undefined && nrOFYears !== null) {
+                //calc age for save
+                if (nrOFYears.years === 0 && nrOFYears.months >= 0) {
+                    ageClone.months = nrOFYears.months
+                } else if (nrOFYears.years > 0) {
+                    ageClone.years = nrOFYears.years
+                }
             }
         } else if (this.state.selectedItemIndexForAgeUnitOfMeasureDropDown === 0 && this.state.contact.dob === null) {
             //years dropdown 

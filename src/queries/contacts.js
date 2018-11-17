@@ -70,8 +70,9 @@ export function getContactsForOutbreakIdRequest (outbreakId, filter, token, call
             console.log('getContactsForOutbreakIdRequest else, if');
             console.log ('myFilter', filter);
 
-            let myFilterAge = filter.age
-            if (myFilterAge) {
+            let myFilterAge = null 
+            if (filter.age) {
+                myFilterAge = filter.age
                 let maxAge = filter.age[1]
                 let minAge = filter.age[0]
                 while (maxAge - 1 > minAge) {
@@ -88,14 +89,15 @@ export function getContactsForOutbreakIdRequest (outbreakId, filter, token, call
                     },
                     type: {$eq: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT'},
                     gender: filter.gender ? {$eq: filter.gender} : {},
+                    deleted: false,
+                    $or: [
+                        {'age.years': myFilterAge && myFilterAge.length > 0 ? { $in: myFilterAge} : {}},
+                        {'age.months': myFilterAge && myFilterAge.length > 0 ? { $in: myFilterAge} : {}},
+                    ],
                     $or: [
                         {firstName: filter.searchText ? {$regex: filter.searchText} : {}},
                         {lastName: filter.searchText ? {$regex: filter.searchText} : {}}
                     ],
-                    $or: [
-                        {'age.years': myFilterAge ? { $in: myFilterAge} : {}},
-                        {'age.months': myFilterAge ? { $in: myFilterAge} : {}},
-                    ]
                 },
             })
                 .then((resultFilterContacts) => {
