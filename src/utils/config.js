@@ -1282,6 +1282,34 @@ const contactsSingleScreen = {
                 multiline: true,
                 objectType: 'Address'
             },
+            // Add coordinates support
+            // {
+            //     cardNumber: 1,
+            //     id: 'lng',
+            //     label: 'Longitude',
+            //     labelValue: 'test',
+            //     type: 'TextInput',
+            //     value: '',
+            //     isRequired: false,
+            //     isEditMode: true,
+            //     multiline: false,
+            //     objectType: 'Address',
+            //     keyboardType: Platform.OS === 'ios' ? 'number-pad' : 'numeric'
+            // },
+            // {
+            //     cardNumber: 1,
+            //     id: 'lat',
+            //     label: 'Latitude',
+            //     labelValue: 'test',
+            //     type: 'TextInput',
+            //     value: '',
+            //     isRequired: false,
+            //     isEditMode: true,
+            //     multiline: false,
+            //     objectType: 'Address',
+            //     keyboardType: Platform.OS === 'ios' ? 'number-pad' : 'numeric'
+            // },
+
             {
                 cardNumber: 1,
                 id: 'deleteButton',

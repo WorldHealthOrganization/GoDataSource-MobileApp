@@ -56,6 +56,9 @@ export function checkIfSameDay(date1, date2) {
     if (Object.prototype.toString.call(date1) !== '[object Date]' || Object.prototype.toString.call(date2) !== '[object Date]') {
         return false;
     }
+    // Correct timezone differences
+    let date1Time = new Date(date1).getTime();
+    date1 = new Date(date1Time + (new Date(date1Time).getTimezoneOffset() * 60 * 1000));
     return date1.getDate() === date2.getDate() && date1.getMonth() === date2.getMonth() && date1.getFullYear() === date2.getFullYear();
 }
 
