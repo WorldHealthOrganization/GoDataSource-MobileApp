@@ -168,7 +168,7 @@ class ContactsSingleScreen extends Component {
                     console.log ('getFollowUpsForContactRequest error: ', errorFollowUp)
                 }
                 if (responseFollowUp) {
-                    console.log ('getFollowUpsForContactRequest response: ', JSON.stringify(responseFollowUp))
+                    // console.log ('getFollowUpsForContactRequest response: ', JSON.stringify(responseFollowUp))
                     if (responseFollowUp.length > 0) {
                         let myContact = Object.assign({}, this.state.contact)
                         myContact.followUps = responseFollowUp
@@ -477,8 +477,29 @@ class ContactsSingleScreen extends Component {
                 if (typeof objectType === 'phoneNumber' && objectType >= 0 || typeof objectType === 'number' && objectType >= 0) {
                     // Change address drop down
                     let addressesClone = _.cloneDeep(this.state.contact.addresses);
-                    addressesClone[objectType][id] = value && value.value ? value.value : value;
-                    console.log ('addressesClone', addressesClone)
+                    // Check if the lat/lng have changed
+                    if (id === 'lng') {
+                        if (!addressesClone[objectType].geoLocation) {
+                            addressesClone[objectType].geoLocation = {};
+                            if (!addressesClone[objectType].geoLocation.coordinates) {
+                                addressesClone[objectType].geoLocation.coordinates = [];
+                            }
+                        }
+                        addressesClone[objectType].geoLocation.coordinates[0] = value && value.value ? value.value : parseFloat(value);
+                    } else {
+                        if (id === 'lat') {
+                            if (!addressesClone[objectType].geoLocation) {
+                                addressesClone[objectType].geoLocation = {};
+                                if (!addressesClone[objectType].geoLocation.coordinates) {
+                                    addressesClone[objectType].geoLocation.coordinates = [];
+                                }
+                            }
+                            addressesClone[objectType].geoLocation.coordinates[1] = value && value.value ? value.value : parseFloat(value);
+                        } else {
+                            addressesClone[objectType][id] = value && value.value ? value.value : value;
+                        }
+                    }
+                    console.log ('addressesClone', addressesClone);
                     this.setState(prevState => ({
                         contact: Object.assign({}, prevState.contact, {addresses: addressesClone})
                     }), () => {

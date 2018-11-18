@@ -72,7 +72,7 @@ class FirstConfigScreen extends Component {
                 <View style={style.inputsContainer}>
                     <Text style={style.text}>Choose one of the options below to sync with your HUB:</Text>
                     <Button onPress={this.handlePressScanQR} upperCase={false} icon="photo-camera" raised text="Scan QR code" style={styles.buttonLogin} />
-                    <Button onPress={this.handlePressImport} upperCase={false} icon={<MaterialCommunityIcons size={24} name="download" />} raised text="Import config file" style={styles.buttonLogin} />
+                    {/*<Button onPress={this.handlePressImport} upperCase={false} icon={<MaterialCommunityIcons size={24} name="download" />} raised text="Import config file" style={styles.buttonLogin} />*/}
                     <Button onPress={this.handlePressManual} upperCase={false} icon="short-text" raised text="Configure manually" style={styles.buttonLogin} />
                 </View>
                 <View style={style.logoContainer}>

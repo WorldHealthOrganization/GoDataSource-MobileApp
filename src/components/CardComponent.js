@@ -440,6 +440,7 @@ class CardComponent extends Component {
                         multiline={item.multiline}
                         style={{width: width, marginHorizontal: marginHorizontal}}
                         objectType={item.objectType}
+                        keyboardType={item.keyboardType}
                     />
                 );
             case 'DropdownInput':
@@ -755,23 +756,23 @@ class CardComponent extends Component {
 
         if (item.id === 'exposure') {
             if (this.props.exposure.persons && Array.isArray(this.props.exposure.persons) && this.props.exposure.persons.length > 0) {
-                let persons = this.props.exposure.persons.filter((e) => {return e.type !== (this.props.type === 'Contact' ? 'contact' : 'contact')});
+                let persons = this.props.exposure.persons.filter((e) => {return e.type !== (this.props.type === 'Contact' ? config.personTypes.contacts : config.personTypes.contacts)});
                 value = this.extractNameForExposure(persons[0]);
             }
         }
-        console.log ('computeExposureValue', JSON.stringify(value))
+        console.log ('computeExposureValue', JSON.stringify(value));
 
         return this.getTranslation(value);
     };
 
     extractNameForExposure = (person) => {
         switch (person.type) {
-            case 'case':
+            case config.personTypes.cases:
                 return (this.props.cases && Array.isArray(this.props.cases) && this.props.cases.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id) > -1 && this.props.cases[this.props.cases.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id)].firstName ? (this.props.cases[this.props.cases.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id)].firstName + ' ') : '') +
                     (this.props.cases && Array.isArray(this.props.cases) && this.props.cases.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id) > -1 && this.props.cases[this.props.cases.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id)].lastName ? (this.props.cases[this.props.cases.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id)].lastName) : '');
-            case 'event':
+            case config.personTypes.events:
                 return (this.props.events && Array.isArray(this.props.events) && this.props.events.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id) > -1 && this.props.events[this.props.events.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id)].name ? (this.props.events[this.props.events.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id)].name) : '');
-            case 'contact':
+            case config.personTypes.contacts:
                 return (this.props.contacts && Array.isArray(this.props.contacts) && this.props.contacts.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id) > -1 && this.props.contacts[this.props.contacts.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id)].firstName ? (this.props.contacts[this.props.contacts.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id)].firstName + ' ') : '') +
                     (this.props.contacts && Array.isArray(this.props.contacts) && this.props.contacts.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id) > -1 && this.props.contacts[this.props.contacts.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id)].lastName ? (this.props.contacts[this.props.contacts.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id)].lastName) : '');
             default:
@@ -850,7 +851,7 @@ class CardComponent extends Component {
     }
 
     computeDataForContactsSingleScreenDropdownInput = (item, index) => {
-        console.log("computeDataForContactsSingleScreenDropdownInput: ", item, this.props.contact);
+        // console.log("computeDataForContactsSingleScreenDropdownInput: ", item, this.props.contact);
         if (item.id === 'riskLevel') {
             return _.filter(this.props.referenceData, (o) => {
                 return o.categoryId.includes("RISK_LEVEL")
@@ -884,8 +885,25 @@ class CardComponent extends Component {
     computeValueForCasesSingleScreen = (item, index) => {
         if (index || index >= 0) {
             if (item.objectType === 'Address') {
-                return this.props.case && this.props.case.addresses && Array.isArray(this.props.case.addresses) && this.props.case.addresses.length > 0 && this.props.case.addresses[index][item.id] !== undefined ?
-                    this.getTranslation(this.props.case.addresses[index][item.id]) : '';
+
+                if (item.id === 'lng') {
+                    return this.props.case && this.props.case.addresses && Array.isArray(this.props.case.addresses) &&
+                    this.props.case.addresses[index] && this.props.case.addresses[index].geoLocation &&
+                    this.props.case.addresses[index].geoLocation.coordinates &&
+                    Array.isArray(this.props.case.addresses[index].geoLocation.coordinates) ?
+                        this.getTranslation(this.props.case.addresses[index].geoLocation.coordinates[0]) : '';
+                } else {
+                    if (item.id === 'lat') {
+                        return this.props.case && this.props.case.addresses && Array.isArray(this.props.case.addresses) &&
+                        this.props.case.addresses[index] && this.props.case.addresses[index].geoLocation &&
+                        this.props.case.addresses[index].geoLocation.coordinates &&
+                        Array.isArray(this.props.case.addresses[index].geoLocation.coordinates) ?
+                            this.getTranslation(this.props.case.addresses[index].geoLocation.coordinates[1]) : '';
+                    } else {
+                        return this.props.case && this.props.case.addresses && Array.isArray(this.props.case.addresses) ?
+                            this.getTranslation(this.props.case.addresses[index][item.id]) : '';
+                    }
+                }
             } else if (item.objectType === 'Documents') {
                 return this.props.case && this.props.case.documents && Array.isArray(this.props.case.documents) && this.props.case.documents.length > 0 && this.props.case.documents[index][item.id] !== undefined ?
                     this.getTranslation(this.props.case.documents[index][item.id]) : '';
@@ -902,8 +920,24 @@ class CardComponent extends Component {
 
     computeValueForContactsSingleScreen = (item, index) => {
         if (index || index >= 0) {
-            return this.props.contact && this.props.contact.addresses && Array.isArray(this.props.contact.addresses) ?
-                this.getTranslation(this.props.contact.addresses[index][item.id]) : '';
+            if (item.id === 'lng') {
+                return this.props.contact && this.props.contact.addresses && Array.isArray(this.props.contact.addresses) &&
+                    this.props.contact.addresses[index] && this.props.contact.addresses[index].geoLocation &&
+                    this.props.contact.addresses[index].geoLocation.coordinates &&
+                    Array.isArray(this.props.contact.addresses[index].geoLocation.coordinates) ?
+                    this.getTranslation(this.props.contact.addresses[index].geoLocation.coordinates[0]) : '';
+            } else {
+                if (item.id === 'lat') {
+                    return this.props.contact && this.props.contact.addresses && Array.isArray(this.props.contact.addresses) &&
+                        this.props.contact.addresses[index] && this.props.contact.addresses[index].geoLocation &&
+                        this.props.contact.addresses[index].geoLocation.coordinates &&
+                        Array.isArray(this.props.contact.addresses[index].geoLocation.coordinates) ?
+                        this.getTranslation(this.props.contact.addresses[index].geoLocation.coordinates[1]) : '';
+                } else {
+                    return this.props.contact && this.props.contact.addresses && Array.isArray(this.props.contact.addresses) ?
+                                this.getTranslation(this.props.contact.addresses[index][item.id]) : '';
+                }
+            }
         }
         return this.props.contact && this.props.contact[item.id] ? this.getTranslation(this.props.contact[item.id]) : '';
     };

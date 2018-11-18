@@ -84,6 +84,7 @@ class CasesFilterScreen extends Component {
                     renderPager={this.handleRenderPager}
                     renderScene={this.handleRenderScene}
                     renderTabBar={this.handleRenderTabBar}
+                    onIndexChange={this.handleOnIndexChange}
                 />
             </View>
         );

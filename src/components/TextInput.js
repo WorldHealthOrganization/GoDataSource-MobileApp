@@ -37,7 +37,7 @@ class TextInput extends PureComponent {
             },this.props.style]}>
                 <TextField
                     label={this.props.isRequired ? this.props.label + ' * ' : this.props.label}
-                    value={this.props.value && this.props.value != undefined && typeof this.props.value === 'string' ? this.props.value : ''}
+                    value={typeof this.props.value === 'number' ? this.props.value.toString() : this.props.value && this.props.value != undefined && (typeof this.props.value === 'string' || typeof this.props.value === 'number') ? this.props.value.toString() : ''}
                     onChangeText={this.handleOnChangeText}
                     textColor='rgb(0,0,0)'
                     fontSize={15}
@@ -84,7 +84,7 @@ class TextInput extends PureComponent {
     }
 
     extractAgeForViewInput = () => {
-        let localValue = ''
+        let localValue = typeof this.props.value === 'number' ? this.props.value : '';
         if (this.props.value && this.props.value != undefined) {
             if (typeof this.props.value === 'string') {
                 localValue = this.props.value

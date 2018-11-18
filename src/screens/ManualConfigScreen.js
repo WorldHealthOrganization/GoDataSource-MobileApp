@@ -8,7 +8,7 @@ import React, {Component} from 'react';
 import {View, Text, StyleSheet, Platform, Image, Alert} from 'react-native';
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
-import {Button} from 'react-native-material-ui';
+import {Button, Icon} from 'react-native-material-ui';
 import { TextField } from 'react-native-material-textfield';
 import styles from './../styles';
 import { connect } from 'react-redux';
@@ -20,6 +20,7 @@ import config from './../utils/config';
 import url from './../utils/url';
 import {storeHubConfiguration} from './../actions/app';
 import {LoaderScreen} from 'react-native-ui-lib';
+import Ripple from 'react-native-material-ripple';
 
 class ManualConfigScreen extends Component {
 
@@ -82,6 +83,11 @@ class ManualConfigScreen extends Component {
                 contentContainerStyle={style.contentContainerStyle}
                 keyboardShouldPersistTaps={'always'}
             >
+
+                <Ripple style={{position: "absolute", top: 20, left: 20}} onPress={this.handleOnPressBack}>
+                    <Icon name="arrow-back"/>
+                </Ripple>
+
                 <View style={[style.welcomeTextContainer]}>
                     <Text style={style.welcomeText}>HUB configuration</Text>
                 </View>
@@ -137,6 +143,10 @@ class ManualConfigScreen extends Component {
     }
 
     // Please write here all the methods that are not react native lifecycle methods
+    handleOnPressBack = () => {
+        this.props.navigator.pop();
+    };
+
     updateRef(name, ref) {
         this[name] = ref;
     }

@@ -54,12 +54,12 @@ class ExposureScreen extends Component {
         if (this.props.addContactFromCasesScreen !== null && this.props.addContactFromCasesScreen !== undefined && this.props.caseIdFromCasesScreen !== null && this.props.caseIdFromCasesScreen !== undefined) {
             personsArray = [{
                 id: extractIdFromPouchId(this.props.caseIdFromCasesScreen, 'person'),
-                type: 'case',
+                type: config.personTypes.cases,
                 source: true,
                 target: null
             },{
                 id: null,
-                type: 'contact',
+                type: config.personTypes.contacts,
                 source: null,
                 target: true
             }]

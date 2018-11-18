@@ -2,7 +2,7 @@
  * Created by florinpopa on 03/07/2018.
  */
 import React, {Component} from 'react';
-import {Text, View, StyleSheet, Platform, Dimensions} from 'react-native';
+import {Text, View, StyleSheet, Platform, Alert} from 'react-native';
 import NavigationDrawerListItem from './../components/NavigationDrawerListItem';
 import config from './../utils/config';
 import {connect} from "react-redux";
@@ -149,6 +149,18 @@ class NavigationDrawer extends Component {
             animated: true,
             to: 'missing'
         });
+
+        // let arrayOfTexts = [{text: 'Get Data', status: 'OK'}, {text: 'Be cool', status: 'Ceva'}];
+        //
+        // let text = '';
+        // for (let i=0; i<arrayOfTexts.length; i++) {
+        //     text += arrayOfTexts[i].text + '\n' + 'Status: ' + arrayOfTexts[i].status + '\n';
+        // }
+        // Alert.alert("Alert", text, [
+        //     {
+        //         text: 'Ok', onPress: () => {console.log('Ok pressed')}
+        //     }
+        // ])
 
         this.props.sendDatabaseToServer();
     };

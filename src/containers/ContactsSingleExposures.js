@@ -206,7 +206,7 @@ class ContactsSingleExposures extends Component {
 
         let caseName = '';
 
-        if (person.type === 'case' ) {
+        if (person.type === config.personTypes.cases ) {
             if (this.props.cases) {
                 let aux = this.props.cases.filter((e) => {return extractIdFromPouchId(e._id, 'person')  === person.id})[0];
                 caseName = (aux && aux.firstName ? (aux.firstName + ' ') : '') + (aux && aux.lastName ? aux.lastName : '');

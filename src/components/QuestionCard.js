@@ -36,7 +36,7 @@ class QuestionCard extends Component {
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
-        console.log('Render stuff');
+        // console.log('Render stuff');
         return (
             <ElevatedView elevation={3} style={[this.props.style, style.container, {
                 marginHorizontal: calculateDimension(16, false, this.props.screenSize),
@@ -84,7 +84,7 @@ class QuestionCard extends Component {
     };
 
     handleRenderItemByType = (item) => {
-        console.log("Answers: ", item);
+        // console.log("Answers: ", item);
 
         let width = calculateDimension(315, false, this.props.screenSize);
         let marginHorizontal = calculateDimension(14, false, this.props.screenSize);
@@ -111,7 +111,7 @@ class QuestionCard extends Component {
         let questionAnswers = item.answerType === 'Free text' ? source.questionnaireAnswers[item.text] : source.questionnaireAnswers[item.variable] || null;
 
         if (item.answerType === 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_SINGLE_ANSWER') {
-            console.log('QuestionCard: ', item);
+            // console.log('QuestionCard: ', item);
             questionAnswers = questionAnswers !== null &&
             questionAnswers !== undefined &&
             item.answers.map((e) => {return e && e.value ? e.value : null}).indexOf(questionAnswers) > -1 &&
@@ -120,7 +120,7 @@ class QuestionCard extends Component {
         }
         else {
             if (item.answerType === 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_MULTIPLE_ANSWERS') {
-                console.log('QuestionCard: ', item);
+                // console.log('QuestionCard: ', item);
                 questionAnswers = questionAnswers !== null && questionAnswers !== undefined && Array.isArray(questionAnswers) && questionAnswers.length > 0 ?
                     item.answers.filter((e) => {
                         console.log('Inside filter: ', e);

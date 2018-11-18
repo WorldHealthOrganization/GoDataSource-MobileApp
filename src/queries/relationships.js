@@ -37,7 +37,8 @@ export function getRelationshipsForTypeRequest (outbreakId, searchType, keys, ca
         })
 }
 
-export function getRelationshipsAndFollowUpsForContactRequest (outbreakId, keys, filter, callback) {
+export function getRelationshipsAndFollowUpsForContactRequest(outbreakId, keys, filter, callback) {
+
     let database = getDatabase();
 
     let oneDay = 24 * 60 * 60 * 1000;
@@ -48,37 +49,40 @@ export function getRelationshipsAndFollowUpsForContactRequest (outbreakId, keys,
         endDate = moment(filter.date.getTime() + oneDay).add(-1, 'second')._d.getTime();
     }
 
-    database.find({
+    let promiseArray = [];
+    promiseArray.push(database.find({
         selector: {
+            _id: {
+                $gte: `followUp.json_false_${outbreakId}_${startDate}_`,
+                $lte: `followUp.json_false_${outbreakId}_${endDate}_\uffff`
+            },
+            deleted: false,
+            outbreakId: outbreakId,
+            personId: {$eq: keys}
+        }
+    }).then((result) => {return result.docs}));
+    promiseArray.push(database.find({
+        selector: {
+            _id: {
+                $gte: `relationship.json_false_${outbreakId}_`,
+                $lte: `relationship.json_false_${outbreakId}_\uffff`
+            },
+            deleted: false,
             $or: [
-                {
-                    _id: {
-                        $gte: `followUp.json_false_${outbreakId}_${startDate}_`,
-                        $lte: `followUp.json_false_${outbreakId}_${endDate}_\uffff`
-                    },
-                    deleted: false,
-                    outbreakId: outbreakId,
-                    personId: {$eq: keys}
-                },{
-                    _id: {
-                        $gte: `relationship.json_false_${outbreakId}_`,
-                        $lte: `relationship.json_false_${outbreakId}_\uffff`
-                    },
-                    deleted: false,
-                    $or: [
-                        {'persons.0.id': {$eq: keys}},
-                        {'persons.1.id': {$eq: keys}},
-                    ],
-                }
+                {'persons.0.id': {$eq: keys}},
+                {'persons.1.id': {$eq: keys}},
             ]
         }
-    })
-        .then((result) => {
-            console.log('Result in finding relationships and followUp: ', JSON.stringify(result));
-            callback(null, result.docs)
+    }).then((result) => {return result.docs}));
+
+    Promise.all(promiseArray)
+        .then((results) => {
+            let aux = [];
+            Array.from(results, (x) => {x.map((e) => {aux.push(e)})});
+            callback(null, aux);
         })
-        .catch((error) => {
-            console.log('Error in finding relationships and followUp: ', error);
-            callback(error)
+        .catch((errorGetData) => {
+            console.log(errorGetData);
+            callback(errorGetData);
         })
 }
