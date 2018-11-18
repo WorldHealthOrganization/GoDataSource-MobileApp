@@ -872,8 +872,29 @@ class CaseSingleScreen extends Component {
             if (typeof objectTypeOrIndex === 'phoneNumber' && objectTypeOrIndex >= 0 || typeof objectTypeOrIndex === 'number' && objectTypeOrIndex >= 0) {
                 if (objectType && objectType === 'Address') {
                     let addressesClone = _.cloneDeep(this.state.case.addresses);
-                    addressesClone[objectTypeOrIndex][id] = value && value.value ? value.value : value;
-                    console.log ('addressesClone', addressesClone)
+                    // Check if the lat/lng have changed
+                    if (id === 'lng') {
+                        if (!addressesClone[objectTypeOrIndex].geoLocation) {
+                            addressesClone[objectTypeOrIndex].geoLocation = {};
+                            if (!addressesClone[objectTypeOrIndex].geoLocation.coordinates) {
+                                addressesClone[objectTypeOrIndex].geoLocation.coordinates = [];
+                            }
+                        }
+                        addressesClone[objectTypeOrIndex].geoLocation.coordinates[0] = value && value.value ? value.value : parseFloat(value);
+                    } else {
+                        if (id === 'lat') {
+                            if (!addressesClone[objectTypeOrIndex].geoLocation) {
+                                addressesClone[objectTypeOrIndex].geoLocation = {};
+                                if (!addressesClone[objectTypeOrIndex].geoLocation.coordinates) {
+                                    addressesClone[objectTypeOrIndex].geoLocation.coordinates = [];
+                                }
+                            }
+                            addressesClone[objectTypeOrIndex].geoLocation.coordinates[1] = value && value.value ? value.value : parseFloat(value);
+                        } else {
+                            addressesClone[objectTypeOrIndex][id] = value && value.value ? value.value : value;
+                        }
+                    }
+                    console.log ('addressesClone', addressesClone);
                     this.setState(prevState => ({
                         case: Object.assign({}, prevState.case, {addresses: addressesClone}),
                         isModified: true

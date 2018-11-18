@@ -15,6 +15,7 @@ import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import Button from './../components/Button';
 import {LoaderScreen} from 'react-native-ui-lib';
 import Section from './../components/Section';
+import {sortBy} from 'lodash';
 
 class FollowUpsSingleQuestionnaireContainer extends PureComponent {
 
@@ -50,6 +51,12 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
 
         // mappedQuestions format: [{categoryName: 'cat1', questions: [{q1}, {q2}]}]
         sortedQuestions = mapQuestions(sortedQuestions);
+
+        sortedQuestions = sortBy(sortedQuestions, ['categoryName']);
+
+        for (let i=0; i<sortedQuestions.length; i++) {
+            sortedQuestions[i].questions = sortBy(sortedQuestions[i].questions, ['order', 'variable']);
+        }
 
         state.questions = sortedQuestions;
 

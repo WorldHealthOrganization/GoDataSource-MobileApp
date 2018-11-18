@@ -21,7 +21,7 @@ export function getOutbreakByIdRequest (outbreakId, token, callback) {
     //         console.log('All outbreaks: ', allOutbreaks.rows.map((e) => {return e.doc}));
             database.get('outbreak.json_false_' + outbreakId)
                 .then((result) => {
-                    console.log("Result from getting outbreak: ", new Date().getTime() - start);
+                    console.log("Result from getting outbreak: ", new Date().getTime() - start, result);
                     callback(null, result);
                 })
                 .catch((errorGetOutbreak) => {

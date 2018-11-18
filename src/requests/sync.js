@@ -72,10 +72,10 @@ export function postDatabaseSnapshotRequest(internetCredentials, path, callback)
             console.log('Finished sending the data to the server: ', res);
             let status = res.info().status;
             if(status === 200) {
-                console.log("Got database");
+            //     console.log("Got database");
                 callback(null, 'Finished sending data to the server')
             } else {
-                callback('Status Code Error')
+                callback(res);
             }
         })
         .catch((errorMessage, statusCode) => {

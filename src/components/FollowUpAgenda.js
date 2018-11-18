@@ -32,7 +32,7 @@ class FollowUpAgenda extends PureComponent {
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
-        console.log('### FollowUpAgenda followUps: ', this.props.followUps);
+        // console.log('### FollowUpAgenda followUps: ', this.props.followUps);
         return (
             <Agenda
                 items={this.props.followUps}

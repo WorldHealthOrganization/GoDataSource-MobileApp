@@ -136,8 +136,8 @@ export function getContactsForOutbreakIdRequest (outbreakId, filter, token, call
             // console.log('getContactsForOutbreakIdRequest else');
 
             database.allDocs({
-                startkey: `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT_false_${outbreakId}`,
-                endkey: `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT_false_${outbreakId}\uffff`,
+                startkey: `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT_false_${outbreakId}_`,
+                endkey: `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT_false_${outbreakId}_\uffff`,
                 include_docs: true
             })
                 .then((result) => {

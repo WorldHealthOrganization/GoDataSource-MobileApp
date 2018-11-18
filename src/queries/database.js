@@ -304,8 +304,7 @@ export function updateFileInDatabase(file, type) {
 export function processBulkDocs(data, type) {
     return new Promise((resolve, reject) => {
         if (database) {
-            data = data.map((e) => {return Object.assign({}, e, {_id: createIdForType(e, type), fileType: type})});
-            database.bulkDocs(data)
+            database.bulkDocs(data.map((e) => {return Object.assign({}, e, {_id: createIdForType(e, type), fileType: type})}))
                 .then(() => {
                     console.log('Bulk docs finished: ');
                     data = null;
@@ -313,7 +312,7 @@ export function processBulkDocs(data, type) {
                 })
                 .catch((errorBulkDocs) => {
                     console.log('Bulk docs encountered an error: ', errorBulkDocs);
-                    data = null
+                    data = null;
                     reject(errorBulkDocs)
                 })
         } else {

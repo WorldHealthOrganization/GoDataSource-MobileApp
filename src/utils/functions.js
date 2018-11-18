@@ -353,7 +353,11 @@ export function getDataFromDatabaseFromFile (database, fileType, lastSyncDate) {
     return new Promise((resolve, reject) => {
         database.find({
             selector: {
-                fileType: {$in: [fileType]},
+                _id: {
+                    $gte: `${fileType}_`,
+                    $lte: `${fileType}_\uffff`
+                },
+                fileType: {$eq: fileType},
                 updatedAt: {$gte: lastSyncDate}
             }
         })
@@ -368,17 +372,21 @@ export function getDataFromDatabaseFromFile (database, fileType, lastSyncDate) {
                         return e;
                     })))
                         .then((responseFromCreate) => {
+                            database = null;
                             resolve(responseFromCreate);
                         })
                         .catch((errorFromCreate) => {
+                            database = null;
                             console.log(`An error occurred while creating file: ${errorFromCreate}`);
                             reject(errorFromCreate);
                         })
                 } else {
+                    database = null;
                     resolve(`Done with ${fileType}`);
                 }
             })
             .catch((error) => {
+                database = null;
                 console.log(`An error occurred while getting data for collection: ${fileType}`);
                 reject(error);
             })
