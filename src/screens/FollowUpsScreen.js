@@ -31,6 +31,7 @@ import {addFilterForScreen, removeFilterForScreen} from './../actions/app';
 import ElevatedView from 'react-native-elevated-view';
 import _ from 'lodash';
 import AddFollowUpScreen from './AddFollowUpScreen';
+import GenerateFollowUpScreen from './GenerateFollowUpScreen';
 import {LoaderScreen, Colors} from 'react-native-ui-lib';
 import {navigation, extractIdFromPouchId, generateId, updateRequiredFields} from './../utils/functions';
 import ViewHOC from './../components/ViewHOC';
@@ -56,6 +57,7 @@ class FollowUpsScreen extends Component {
             filterFromFilterScreen: this.props.filter && this.props.filter['FollowUpsFilterScreen'] ? this.props.filter['FollowUpsFilterScreen'] : null,
             followUps: [],
             showAddFollowUpScreen: false,
+            showGenerateFollowUpScreen: false,
             refreshing: false,
             loading: true,
 
@@ -284,7 +286,7 @@ class FollowUpsScreen extends Component {
                                         </Ripple>
                                     }
                                 >
-                                    <MenuItem onPress={this.handleGenerateFollowUps}>Generate for current day</MenuItem>
+                                    <MenuItem onPress={this.handleModalGenerateFollowUps}>Generate follow ups</MenuItem>
                                 </Menu>
                             </View>
                         </View>
@@ -354,12 +356,12 @@ class FollowUpsScreen extends Component {
                         getItemLayout={this.getItemLayout}
                     />
                 </View>
+
                 <AddFollowUpScreen
                     showAddFollowUpScreen={this.state.showAddFollowUpScreen}
                     onCancelPressed={this.handleOnCancelPressed}
                     onSavePressed={this.handleOnSavePressed}
                 />
-
                 <View style={styles.mapContainer}>
                     {
                         this.state.error === null ? (
@@ -382,7 +384,13 @@ class FollowUpsScreen extends Component {
                         ) : console.log('this.state.error', this.state.error)
                     }
                 </View>
+                <GenerateFollowUpScreen
+                    showGenerateFollowUpScreen={this.state.showGenerateFollowUpScreen}
+                    onCancelPressed={this.handleModalGenerateFollowUps}
+                    onOkPressed={this.handleGenerateFollowUps}
+                />
             </ViewHOC>
+
         );
     }
 
@@ -456,18 +464,6 @@ class FollowUpsScreen extends Component {
         return (
             <View style={[style.emptyComponent, {height: calculateDimension((667 - 152), true, this.props.screenSize)}]}>
                 <Text style={style.emptyComponentTextView}>There are no follow-ups to display</Text>
-                <Button
-                    raised
-                    upperCase={false}
-                    text="Generate for 1 day"
-                    color="blue"
-                    titleColor="red"
-                    onPress={this.handleGenerateFollowUps}
-                    style={{
-                        text: style.buttonEmptyListText,
-                        container: {width: calculateDimension(230, false, this.props.screenSize), height: calculateDimension(35, true, this.props.screenSize)}
-                    }}
-                />
             </View>
         )
     };
@@ -656,7 +652,7 @@ class FollowUpsScreen extends Component {
         });
     };
 
-    handleGenerateFollowUps = () => {
+    handleGenerateFollowUps = (date) => {
         this.setState({
             generating: true,
         }, () => {
@@ -664,6 +660,14 @@ class FollowUpsScreen extends Component {
             this.hideMenu();
         });
 
+    };
+
+    handleModalGenerateFollowUps = () => {
+        this.setState({
+            showGenerateFollowUpScreen: !this.state.showGenerateFollowUpScreen,
+        }, () => {
+             console.log("showGenerateFollowUpScreen", this.state.showGenerateFollowUpScreen);
+        } );
     };
 
     // Append to the existing filter newProp={name: value}
