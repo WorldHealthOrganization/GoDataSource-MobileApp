@@ -71,7 +71,22 @@ class ContactsSingleScreen extends Component {
                 dateOfReporting: new Date(),
                 isDateOfReportingApproximate: false,
                 relationships: [],
-                addresses: [],
+                addresses: [
+                    {
+                        typeId: config.userResidenceAddress.userPlaceOfResidence,
+                        country: '',
+                        city: '',
+                        addressLine1: '',
+                        addressLine2: '',
+                        postalCode: '',
+                        locationId: '',
+                        geoLocation: {
+                            coordinates: [0, 0],
+                            type: 'Point'
+                        },
+                        date: new Date()
+                    }
+                ],
             } : Object.assign({}, this.props.contact),
             savePressed: false,
             deletePressed: false,
