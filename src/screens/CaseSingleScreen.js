@@ -629,8 +629,10 @@ class CaseSingleScreen extends Component {
 
     // Address functions
     handleOnPressAddAddress = () => {
-        let addresses = _.cloneDeep(this.state.case.addresses);
-
+        let addresses = [];
+        if (this.state && this.state.case && this.state.case.addresses) {
+            addresses = _.cloneDeep(this.state.case.addresses);
+        }
         addresses.push({
             typeId: '',
             country: '',
@@ -640,8 +642,8 @@ class CaseSingleScreen extends Component {
             postalCode: '',
             locationId: '',
             geoLocation: {
-                lat: 0,
-                lng: 0
+                coordinates: [0, 0],
+                type: 'Point'
             },
             date: new Date()
         });
@@ -858,16 +860,13 @@ class CaseSingleScreen extends Component {
     
     // onChangeStuff functions
     onChangeText = (value, id, objectTypeOrIndex, objectType) => {
-        console.log("case onChangeText: ", value, id, objectTypeOrIndex, objectType);
+        // console.log("case onChangeText: ", value, id, objectTypeOrIndex, objectType);
         if(objectTypeOrIndex == 'Case'){
             this.setState(
                 (prevState) => ({
                     case: Object.assign({}, prevState.case, {[id]: value}),
                     isModified: true
-                }), () => {
-                    console.log("onChangeText", id, " ", value, " ", this.state.case);
-                }
-            );
+                }));
         } else {
             if (typeof objectTypeOrIndex === 'phoneNumber' && objectTypeOrIndex >= 0 || typeof objectTypeOrIndex === 'number' && objectTypeOrIndex >= 0) {
                 if (objectType && objectType === 'Address') {
@@ -876,31 +875,43 @@ class CaseSingleScreen extends Component {
                     if (id === 'lng') {
                         if (!addressesClone[objectTypeOrIndex].geoLocation) {
                             addressesClone[objectTypeOrIndex].geoLocation = {};
+                            addressesClone[objectTypeOrIndex].geoLocation.type = 'Point';
                             if (!addressesClone[objectTypeOrIndex].geoLocation.coordinates) {
                                 addressesClone[objectTypeOrIndex].geoLocation.coordinates = [];
                             }
+                        }
+                        if (!addressesClone[objectTypeOrIndex].geoLocation.coordinates) {
+                            addressesClone[objectTypeOrIndex].geoLocation.coordinates = [];
+                        }
+                        if (!addressesClone[objectTypeOrIndex].geoLocation.type) {
+                            addressesClone[objectTypeOrIndex].geoLocation.type = 'Point';
                         }
                         addressesClone[objectTypeOrIndex].geoLocation.coordinates[0] = value && value.value ? value.value : parseFloat(value);
                     } else {
                         if (id === 'lat') {
                             if (!addressesClone[objectTypeOrIndex].geoLocation) {
                                 addressesClone[objectTypeOrIndex].geoLocation = {};
+                                addressesClone[objectTypeOrIndex].geoLocation.type = 'Point';
                                 if (!addressesClone[objectTypeOrIndex].geoLocation.coordinates) {
                                     addressesClone[objectTypeOrIndex].geoLocation.coordinates = [];
                                 }
+                            }
+                            if (!addressesClone[objectTypeOrIndex].geoLocation.coordinates) {
+                                addressesClone[objectTypeOrIndex].geoLocation.coordinates = [];
+                            }
+                            if (!addressesClone[objectTypeOrIndex].geoLocation.type) {
+                                addressesClone[objectTypeOrIndex].geoLocation.type = 'Point';
                             }
                             addressesClone[objectTypeOrIndex].geoLocation.coordinates[1] = value && value.value ? value.value : parseFloat(value);
                         } else {
                             addressesClone[objectTypeOrIndex][id] = value && value.value ? value.value : value;
                         }
                     }
-                    console.log ('addressesClone', addressesClone);
+                    // console.log ('addressesClone', addressesClone);
                     this.setState(prevState => ({
                         case: Object.assign({}, prevState.case, {addresses: addressesClone}),
                         isModified: true
-                    }), () => {
-                        console.log("onChangeText", id, " ", value, " ", this.state.case);
-                    })
+                    }))
                 } else if (objectType && objectType === 'Documents') {
                         let documentsClone = _.cloneDeep(this.state.case.documents);
                         documentsClone[objectTypeOrIndex][id] = value && value.value ? value.value : value;
@@ -908,9 +919,7 @@ class CaseSingleScreen extends Component {
                         this.setState(prevState => ({
                             case: Object.assign({}, prevState.case, {documents: documentsClone}),
                             isModified: true
-                        }), () => {
-                            console.log("onChangeText", id, " ", value, " ", this.state.case);
-                        })
+                        }))
                 }
             }
         }

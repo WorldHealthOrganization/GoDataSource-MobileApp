@@ -781,7 +781,7 @@ class CardComponent extends Component {
     };
 
     computeDataForFollowUpSingleScreenDropdownInput = (item, index) => {
-        console.log("computeDataForFollowUpSingleScreenDropdownInput: ", item, this.props.case);
+        // console.log("computeDataForFollowUpSingleScreenDropdownInput: ", item, this.props.case);
         if (item.id === 'statusId') {
             return _.filter(this.props.referenceData, (o) => {
                 return o.categoryId.includes("LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE")
@@ -795,7 +795,7 @@ class CardComponent extends Component {
     };
 
     computeDataForCasesSingleScreenDropdownInput = (item, index) => {
-        console.log("computeDataForCasesSingleScreenDropdownInput: ", item, this.props.case);
+        // console.log("computeDataForCasesSingleScreenDropdownInput: ", item, this.props.case);
         if (item.id === 'riskLevel') {
             return _.filter(this.props.referenceData, (o) => {
                 return o.categoryId.includes("RISK_LEVEL")

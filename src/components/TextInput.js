@@ -37,7 +37,7 @@ class TextInput extends PureComponent {
             },this.props.style]}>
                 <TextField
                     label={this.props.isRequired ? this.props.label + ' * ' : this.props.label}
-                    value={typeof this.props.value === 'number' ? this.props.value.toString() : this.props.value && this.props.value != undefined && (typeof this.props.value === 'string' || typeof this.props.value === 'number') ? this.props.value.toString() : ''}
+                    value={typeof this.props.value === 'number' ? isNaN(this.props.value) ? '' : this.props.value.toString() : this.props.value && this.props.value != undefined && (typeof this.props.value === 'string' || typeof this.props.value === 'number') ? this.props.value.toString() : ''}
                     onChangeText={this.handleOnChangeText}
                     textColor='rgb(0,0,0)'
                     fontSize={15}

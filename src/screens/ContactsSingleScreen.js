@@ -460,19 +460,13 @@ class ContactsSingleScreen extends Component {
             this.setState(
                 (prevState) => ({
                     item: Object.assign({}, prevState.item, {[id]: value})
-                }), () => {
-                    console.log("onChangeText", id, " ", value, " ", this.state.item);
-                }
-            )
+                }))
         } else {
             if (objectType === 'Contact') {
                 this.setState(
                     (prevState) => ({
                         contact: Object.assign({}, prevState.contact, {[id]: value})
-                    }), () => {
-                        console.log("onChangeText", id, " ", value, " ", this.state.contact);
-                    }
-                )
+                    }))
             } else {
                 if (typeof objectType === 'phoneNumber' && objectType >= 0 || typeof objectType === 'number' && objectType >= 0) {
                     // Change address drop down
@@ -481,30 +475,42 @@ class ContactsSingleScreen extends Component {
                     if (id === 'lng') {
                         if (!addressesClone[objectType].geoLocation) {
                             addressesClone[objectType].geoLocation = {};
+                            addressesClone[objectType].geoLocation.type = 'Point';
                             if (!addressesClone[objectType].geoLocation.coordinates) {
                                 addressesClone[objectType].geoLocation.coordinates = [];
                             }
                         }
+                        if (!addressesClone[objectType].geoLocation.coordinates) {
+                                addressesClone[objectType].geoLocation.coordinates = [];
+                            }
+                        if (!addressesClone[objectType].geoLocation.type) {
+                                addressesClone[objectType].geoLocation.type = 'Point';
+                            }
                         addressesClone[objectType].geoLocation.coordinates[0] = value && value.value ? value.value : parseFloat(value);
                     } else {
                         if (id === 'lat') {
                             if (!addressesClone[objectType].geoLocation) {
                                 addressesClone[objectType].geoLocation = {};
+                                addressesClone[objectType].geoLocation.type = 'Point';
                                 if (!addressesClone[objectType].geoLocation.coordinates) {
                                     addressesClone[objectType].geoLocation.coordinates = [];
                                 }
                             }
+                            if (!addressesClone[objectType].geoLocation.coordinates) {
+                                    addressesClone[objectType].geoLocation.coordinates = [];
+                                }
+                            if (!addressesClone[objectType].geoLocation.type) {
+                                    addressesClone[objectType].geoLocation.type = 'Point';
+                                }
                             addressesClone[objectType].geoLocation.coordinates[1] = value && value.value ? value.value : parseFloat(value);
                         } else {
                             addressesClone[objectType][id] = value && value.value ? value.value : value;
                         }
                     }
-                    console.log ('addressesClone', addressesClone);
+                    // console.log ('addressesClone', addressesClone);
                     this.setState(prevState => ({
                         contact: Object.assign({}, prevState.contact, {addresses: addressesClone})
-                    }), () => {
-                        console.log("onChangeText", id, " ", value, " ", this.state.contact);
-                    })
+                    }))
                 }
             }
         }
@@ -1121,7 +1127,10 @@ class ContactsSingleScreen extends Component {
     };
 
     handleOnPressAddAdrress = () => {
-        let addresses = _.cloneDeep(this.state.contact.addresses);
+        let addresses = [];
+        if (this.state && this.state.contact && this.state.contact.addresses) {
+            addresses = _.cloneDeep(this.state.contact.addresses);
+        }
 
         addresses.push({
             typeId: '',
@@ -1132,8 +1141,8 @@ class ContactsSingleScreen extends Component {
             postalCode: '',
             locationId: '',
             geoLocation: {
-                lat: 0,
-                lng: 0
+                coordinates: [0, 0],
+                type: 'Point'
             },
             date: new Date()
         });

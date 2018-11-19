@@ -223,7 +223,7 @@ export function getContactByIdRequest(outbreakId, contactId, token, callback) {
 
     database.get(contactId)
         .then((resultGetContactById) => {
-            console.log("Result getContactByIdRequest: ", JSON.stringify(resultGetContactById));
+            console.log("Result getContactByIdRequest: ");
             callback(null, resultGetContactById);
         })
         .catch((errorGetContactById) => {
@@ -236,7 +236,7 @@ export function getContactByIdRequest(outbreakId, contactId, token, callback) {
 export function updateContactRequest(outbreakId, contactId, contact, token, callback) {
     let database = getDatabase();
 
-    console.log('updateContactRequest: ', outbreakId, contactId, contact, token);
+    // console.log('updateContactRequest: ', outbreakId, contactId, contact, token);
 
     database.get(contact._id)
         .then((resultGetContact) => {
@@ -306,7 +306,7 @@ export function addExposureForContactRequest(outbreakId, contactId, exposure, to
         }
     }
 
-    console.log('exposure for put', JSON.stringify(exposure))
+    // console.log('exposure for put')
     // exposure.outbreakId = outbreakId
     database.put(exposure)
         .then((result) => {
