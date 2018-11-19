@@ -199,24 +199,24 @@ export function storeHubConfiguration(hubConfiguration) {
             console.log("Last sync date: ", lastSyncDate);
             if (lastSyncDate !== null) {
                 getDatabaseSnapshotRequest(hubConfiguration, lastSyncDate, (error, response) => {
-                    dispatch(processFilesForSync(error, response, hubConfiguration, true));
+                    dispatch(processFilesForSync(error, response, hubConfiguration, true, true));
                 })
             } else {
                 console.log('No last sync date found. proceed to download all database: ');
                 getDatabaseSnapshotRequest(hubConfiguration, null, (error, response) => {
-                    dispatch(processFilesForSync(error, response, hubConfiguration, true));
+                    dispatch(processFilesForSync(error, response, hubConfiguration, true, true));
                 })
             }
         } catch (errorGetLastSyncDate) {
             console.log("Error at getting lastSyncDate. Proceed to download all database: ", errorGetLastSyncDate);
             getDatabaseSnapshotRequest(hubConfiguration, null, (error, response) => {
-                dispatch(processFilesForSync(error, response, hubConfiguration, true));
+                dispatch(processFilesForSync(error, response, hubConfiguration, true, true));
             })
         }
     }
 }
 
-function processFilesForSync(error, response, hubConfiguration, isFirstTime) {
+function processFilesForSync(error, response, hubConfiguration, isFirstTime, syncSuccessful) {
     return async function (dispatch){
         if (error) {
             dispatch(setSyncState('Error'));
@@ -267,7 +267,7 @@ function processFilesForSync(error, response, hubConfiguration, isFirstTime) {
                                     // After processing all files, store hub config
                                     // After processing all the data store the last sync date
                                     console.log("Now that the processing is over, proceed with storing last sync date:");
-                                    if (promiseResponses.length === files.length) {
+                                    if (syncSuccessful && promiseResponses.length === files.length) {
                                         storeData('activeDatabase', hubConfiguration.url, (errorActiveDatabase) => {
                                             if (!errorActiveDatabase) {
                                                 storeData(hubConfiguration.url, new Date(), (errorStoreLastSync) => {
@@ -312,15 +312,28 @@ function processFilesForSync(error, response, hubConfiguration, isFirstTime) {
                                             }
                                         });
                                     } else {
-                                        files = null;
-                                        database = null;
-                                        arrayOfStatuses.push({
-                                            text: 'Getting updated data from the server',
-                                            status: 'Error at syncing files'
-                                        });
-                                        dispatch(setSyncState('Error'));
-                                        if (!isFirstTime) {
-                                            dispatch(parseStatusesAndShowMessage());
+                                        if (promiseResponses.length === files.length) {
+                                            files = null;
+                                            database = null;
+                                            arrayOfStatuses.push({
+                                                text: 'Getting updated data from the server',
+                                                status: 'OK'
+                                            });
+                                            dispatch(setSyncState('Error'));
+                                            if (!isFirstTime) {
+                                                dispatch(parseStatusesAndShowMessage());
+                                            }
+                                        } else {
+                                            files = null;
+                                            database = null;
+                                            arrayOfStatuses.push({
+                                                text: 'Getting updated data from the server',
+                                                status: 'Error at syncing files'
+                                            });
+                                            dispatch(setSyncState('Error'));
+                                            if (!isFirstTime) {
+                                                dispatch(parseStatusesAndShowMessage());
+                                            }
                                         }
                                     }
 
@@ -549,7 +562,7 @@ export function sendDatabaseToServer () {
                                                                 // statuses.sendData.status = 'OK';
                                                                 arrayOfStatuses.push({text: 'Sending data to the HUB', status: errorSendData ? JSON.stringify(errorSendData) : 'OK'});
                                                                 dispatch(setSyncState('Getting updated data from the server'));
-                                                                getDatabaseSnapshotRequest({clientId: internetCredentials.username, clientSecret: internetCredentials.password}, lastSyncDate, (error, response) => {
+                                                                getDatabaseSnapshotRequest({url: internetCredentials.server ? internetCredentials.server : internetCredentials.service, clientId: internetCredentials.username, clientSecret: internetCredentials.password}, lastSyncDate, (error, response) => {
                                                                     if (error) {
                                                                         arrayOfStatuses.push({text: 'Getting updated data from the server', status: JSON.stringify(error)});
                                                                         dispatch(setSyncState('Error'));
@@ -557,12 +570,12 @@ export function sendDatabaseToServer () {
                                                                     }
                                                                     if (response) {
                                                                         // statuses.gettingData.status = 'OK';
-                                                                        arrayOfStatuses.push({text: 'Getting updated data from the server', status: 'OK'});
+                                                                        // arrayOfStatuses.push({text: 'Getting updated data from the server', status: 'OK'});
                                                                         dispatch(processFilesForSync(error, response, {
                                                                             url: Platform.OS === 'ios' ? internetCredentials.server : internetCredentials.service,
                                                                             clientId: internetCredentials.username,
                                                                             clientSecret: internetCredentials.password
-                                                                        }));
+                                                                        }, null, false));
                                                                     }
                                                                 })
                                                             }
@@ -580,7 +593,7 @@ export function sendDatabaseToServer () {
                                     } else {
                                         arrayOfStatuses.push({text: 'Getting local data', status: 'Local data has not been updated'});
                                         dispatch(setSyncState('Getting updated data from the server'));
-                                        getDatabaseSnapshotRequest({clientId: internetCredentials.username, clientSecret: internetCredentials.password}, lastSyncDate, (error, response) => {
+                                        getDatabaseSnapshotRequest({url: internetCredentials.server ? internetCredentials.server : internetCredentials.service, clientId: internetCredentials.username, clientSecret: internetCredentials.password}, lastSyncDate, (error, response) => {
                                             if (error) {
                                                 arrayOfStatuses.push({text: 'Getting updated data from the server', status: JSON.stringify(error)});
                                                 dispatch(setSyncState('Error'));
@@ -593,7 +606,7 @@ export function sendDatabaseToServer () {
                                                     url: Platform.OS === 'ios' ? internetCredentials.server : internetCredentials.service,
                                                     clientId: internetCredentials.username,
                                                     clientSecret: internetCredentials.password
-                                                }));
+                                                }, null, true));
                                             }
                                         })
                                     }
@@ -605,6 +618,11 @@ export function sendDatabaseToServer () {
                                     dispatch(setSyncState('Error'));
                                     dispatch(parseStatusesAndShowMessage());
                                 })
+                        } else {
+                            console.log('No internet credentials found');
+                            arrayOfStatuses.push({text: 'Getting local data', status: 'No credentials found'});
+                            dispatch(setSyncState('Error'));
+                            dispatch(parseStatusesAndShowMessage());
                         }
                     } else {
                         console.log('Last sync date is null');
