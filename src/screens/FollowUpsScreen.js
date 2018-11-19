@@ -387,7 +387,7 @@ class FollowUpsScreen extends Component {
                 <GenerateFollowUpScreen
                     showGenerateFollowUpScreen={this.state.showGenerateFollowUpScreen}
                     onCancelPressed={this.handleModalGenerateFollowUps}
-                    onOkPressed={this.handleGenerateFollowUps}
+                    onOkPressed={this.handleGenerateNewFollowUps}
                 />
             </ViewHOC>
 
@@ -656,10 +656,18 @@ class FollowUpsScreen extends Component {
         this.setState({
             generating: true,
         }, () => {
-            this.props.generateFollowUp(this.props.user.activeOutbreakId, this.state.filter.date, this.props.user.token);
+            this.props.generateFollowUp(this.props.user.activeOutbreakId, date, this.props.user.token);
             this.hideMenu();
         });
 
+    };
+
+    handleGenerateNewFollowUps = (date) => {
+        this.setState({
+            showGenerateFollowUpScreen: !this.state.showGenerateFollowUpScreen,
+        }, () => {
+           this.handleGenerateFollowUps(date);
+        } );
     };
 
     handleModalGenerateFollowUps = () => {
