@@ -2,7 +2,7 @@
  * Created by mobileclarisoft on 23/07/2018.
  */
 import React, {Component} from 'react';
-import {View, Alert, Text, StyleSheet, Animated, ScrollView, Dimensions} from 'react-native';
+import {View, Alert, Text, StyleSheet, Animated, ScrollView, Dimensions, BackHandler} from 'react-native';
 import {TabBar, TabView, SceneMap} from 'react-native-tab-view';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -111,9 +111,11 @@ class CaseSingleScreen extends Component {
         };
         // Bind here methods, or at least don't declare methods in the render method
         this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this));
+        this.handleBackButtonClick = this.handleBackButtonClick.bind(this);
     }
 
     componentDidMount() {
+        BackHandler.addEventListener('hardwareBackPress', this.handleBackButtonClick);
         if (!this.props.isNew) {
             let ageClone = {years: 0, months: 0}
             let updateAge = false;
@@ -129,6 +131,10 @@ class CaseSingleScreen extends Component {
                 })
             }
         }
+    }
+
+    componentWillUnmount() {
+        BackHandler.removeEventListener('hardwareBackPress', this.handleBackButtonClick);
     }
 
     // Please add here the react lifecycle methods that you need
@@ -152,6 +158,15 @@ class CaseSingleScreen extends Component {
             }
         }
         return null;
+    }
+
+    handleBackButtonClick() {
+        // this.props.navigator.goBack(null);
+        this.props.navigator.pop({
+            animated: true,
+            animationType: 'fade'
+        })
+        return false;
     }
 
     // The render method should have at least business logic as possible,

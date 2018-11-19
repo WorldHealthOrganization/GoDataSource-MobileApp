@@ -4,7 +4,7 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
-import {View, StyleSheet, Dimensions, Animated, Alert, Platform} from 'react-native';
+import {View, StyleSheet, Dimensions, Animated, Alert, Platform, BackHandler} from 'react-native';
 import {Icon} from 'react-native-material-ui';
 import styles from './../styles';
 import NavBarCustom from './../components/NavBarCustom';
@@ -99,6 +99,7 @@ class ContactsSingleScreen extends Component {
         };
         // Bind here methods, or at least don't declare methods in the render method
         this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this));
+        this.handleBackButtonClick = this.handleBackButtonClick.bind(this);
     }
 
     // PersonalRoute = () => (
@@ -164,6 +165,7 @@ class ContactsSingleScreen extends Component {
     }
 
     componentDidMount() {
+        BackHandler.addEventListener('hardwareBackPress', this.handleBackButtonClick);
         if (!this.props.isNew) {
             let ageClone = {years: 0, months: 0}
             let updateAge = false;
@@ -196,6 +198,19 @@ class ContactsSingleScreen extends Component {
                 }
             })
         }
+    }
+
+    componentWillUnmount() {
+        BackHandler.removeEventListener('hardwareBackPress', this.handleBackButtonClick);
+    }
+
+    handleBackButtonClick() {
+        // this.props.navigator.goBack(null);
+        this.props.navigator.pop({
+            animated: true,
+            animationType: 'fade'
+        })
+        return false;
     }
 
     // The render method should have at least business logic as possible,
