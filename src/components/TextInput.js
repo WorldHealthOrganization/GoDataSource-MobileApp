@@ -44,7 +44,7 @@ class TextInput extends PureComponent {
                     labelFontSize={12.5}
                     labelHeight={30}
                     labelTextStyle={{
-                        fontFamily: 'Roboto-Light',
+                        fontFamily: 'Roboto',
                         textAlign: 'left'
                     }}
                     tintColor='rgb(77,176,160)'
