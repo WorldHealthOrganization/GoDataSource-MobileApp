@@ -127,6 +127,8 @@ class CasesFilterScreen extends Component {
             return (
                 <CasesSortContainer
                     handleMoveToPrevieousScreenButton={this.handleMoveToPrevieousScreenButton}
+                    onChangeSectionedDropDown={this.handleOnChangeSectionedDropDown}
+                    onPressAddSortRule={this.onPressAddSortRule}
                     filter={this.state.filter}
                     key={this.state.index}
                 />
@@ -138,6 +140,22 @@ class CasesFilterScreen extends Component {
         return (Platform.OS === 'ios') ? <PagerScroll {...props} swipeEnabled={false} animationEnabled={false} /> :
             <PagerScroll {...props} swipeEnabled={false} animationEnabled={false} />
     };
+
+    onPressAddSortRule = () => {
+        let sort = [];
+        if (this.state && this.state.filter && this.state.filter.sort) {
+            sort = _.cloneDeep(this.state.filter.sort);
+        }
+        addresses.push({
+            sortCriteria: '',
+            sortOrder: '',
+        });
+        this.setState(prevState => ({
+            filter: Object.assign({}, prevState.filter, {sort}),
+        }), () => {
+            console.log("### after adding sort rule: ", this.state.filter);
+        })
+    }
 
     handleRenderTabBar = (props) => {
         return (

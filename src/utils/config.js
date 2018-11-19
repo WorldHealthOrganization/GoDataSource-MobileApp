@@ -873,7 +873,40 @@ const casesFilterScreen = {
                 }
             ]
         }
-    ]
+    ],
+    sort: {
+        fields: [
+            {
+                // LNG_SIDE_FILTERS_ADD_ANOTHER_SORT_BUTTON         
+
+                cardNumber: 1,
+                label: 'Sort by', //LNG_SIDE_FILTERS_SORT_BY_PLACEHOLDER
+                type: 'Section',
+                hasBorderBottom: true,
+                borderBottomColor: styles.navigationDrawerSeparatorGrey
+            },
+            {
+                cardNumber: 1,
+                id: 'sortCriteria',
+                type: 'DropdownInput',
+                label: 'Sort Criteria',
+                isRequired: false,
+                isEditMode: true,
+                value: '',
+                objectType: 'Sort'
+            },
+            {
+                cardNumber: 1,
+                id: 'sortOrder',
+                type: 'DropdownInput',
+                label: 'Sort Order', //LNG_SIDE_FILTERS_SORT_DIRECTION_LABEL
+                isRequired: false,
+                isEditMode: true,
+                value: '',
+                objectType: 'Sort'
+            }
+        ]
+    }
 };
 
 const defaultFilterForContacts = {
@@ -1693,6 +1726,15 @@ const localTranslationTokens = {
     female: 'LNG_REFERENCE_DATA_CATEGORY_GENDER_FEMALE'
 };
 
+const sortOrderDropDownItems = [
+    { label: 'LNG_SIDE_FILTERS_SORT_BY_ASC_PLACEHOLDER', value: 'LNG_SIDE_FILTERS_SORT_BY_ASC_PLACEHOLDER'},
+    { label: 'LNG_SIDE_FILTERS_SORT_BY_DESC_PLACEHOLDER', value: 'LNG_SIDE_FILTERS_SORT_BY_DESC_PLACEHOLDER'}
+]
+
+const sortCriteriaDropDownItems = [
+    { label: 'First Name', value: 'firstname'},
+    { label: 'Last Name', value: 'lastname'}
+]
 
 export default {
     designScreenSize,
@@ -1717,5 +1759,7 @@ export default {
     followUpStatuses,
     TextSwitchSelectorAgeOrDobValues,
     ageUnitOfMeasureDropDown,
-    localTranslationTokens
+    localTranslationTokens,
+    sortOrderDropDownItems,
+    sortCriteriaDropDownItems
 }
