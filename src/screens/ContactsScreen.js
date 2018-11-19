@@ -2,7 +2,7 @@
  * Created by florinpopa on 18/07/2018.
  */
 import React, {Component} from 'react';
-import {View, StyleSheet, Animated, Text} from 'react-native';
+import {View, StyleSheet, Animated, Text, BackHandler} from 'react-native';
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import {Icon} from 'react-native-material-ui';
@@ -54,10 +54,12 @@ class ContactsScreen extends Component {
         };
         // Bind here methods, or at least don't declare methods in the render method
         this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this));
+        this.handleBackButtonClick = this.handleBackButtonClick.bind(this);
     }
 
     // Please add here the react lifecycle methods that you need
     componentDidMount() {
+        BackHandler.addEventListener('hardwareBackPress', this.handleBackButtonClick);
         this.setState({
             loading: true
         }, () => {
@@ -75,6 +77,15 @@ class ContactsScreen extends Component {
         state.loading = false;
         state.refreshing = false
         return null;
+    }
+
+    componentWillUnmount() {
+        BackHandler.removeEventListener('hardwareBackPress', this.handleBackButtonClick);
+    }
+
+    handleBackButtonClick() {
+        // this.props.navigator.goBack(null);
+        return true;
     }
 
     clampedScroll= Animated.diffClamp(

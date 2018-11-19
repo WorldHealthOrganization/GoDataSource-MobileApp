@@ -4,6 +4,7 @@
 import url from './../utils/url';
 import RNFetchBlob from 'rn-fetch-blob';
 import base64 from 'base-64';
+import {Platform} from 'react-native';
 
 export function getDatabaseSnapshotRequest(hubConfig, lastSyncDate, callback) {
 
@@ -15,7 +16,7 @@ export function getDatabaseSnapshotRequest(hubConfig, lastSyncDate, callback) {
         }
     }
 
-    let requestUrl = url.getDatabaseSnapshotUrl() + (lastSyncDate ? ('?filter=' + JSON.stringify(filter)) : '');
+    let requestUrl = hubConfig.url + '/sync/database-snapshot' + (lastSyncDate ? ('?filter=' + JSON.stringify(filter)) : '');
 
     console.log('Request URL: ', requestUrl);
 
@@ -55,9 +56,10 @@ export function getDatabaseSnapshotRequest(hubConfig, lastSyncDate, callback) {
 }
 
 export function postDatabaseSnapshotRequest(internetCredentials, path, callback) {
-    let requestUrl = url.postDatabaseSnapshot();
+    let requestUrl = (Platform.OS === 'ios' ? internetCredentials.server : internetCredentials.service) + '/sync/import-database-snapshot';
+    // let requestUrl = url.postDatabaseSnapshot();
 
-    console.log('Request URL: ', requestUrl);
+    console.log('Request URL:' + requestUrl);
 
     console.log('Send database to server');
 
@@ -75,7 +77,7 @@ export function postDatabaseSnapshotRequest(internetCredentials, path, callback)
             //     console.log("Got database");
                 callback(null, 'Finished sending data to the server')
             } else {
-                callback(res);
+                callback(res, 'Finished sending data to the server');
             }
         })
         .catch((errorMessage, statusCode) => {
