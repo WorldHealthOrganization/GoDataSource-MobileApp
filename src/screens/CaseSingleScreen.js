@@ -78,7 +78,22 @@ class CaseSingleScreen extends Component {
                 isDateOfOnsetApproximate: false,
                 deceased: false,
                 dateDeceased: null,
-                addresses: [],
+                addresses: [
+                    {
+                        typeId: config.userResidenceAddress.userPlaceOfResidence,
+                        country: '',
+                        city: '',
+                        addressLine1: '',
+                        addressLine2: '',
+                        postalCode: '',
+                        locationId: '',
+                        geoLocation: {
+                            coordinates: [0, 0],
+                            type: 'Point'
+                        },
+                        date: new Date()
+                    }
+                ],
                 documents: [],
                 hospitalizationDates: [],
                 isolationDates: [],
