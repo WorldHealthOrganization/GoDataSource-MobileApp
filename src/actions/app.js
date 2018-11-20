@@ -10,6 +10,7 @@ import {
     ACTION_TYPE_SAVE_AVAILABLE_LANGUAGES,
     ACTION_TYPE_SAVE_HUB_CONFIGURATION,
     ACTION_TYPE_SET_SYNC_STATE,
+    ACTION_TYPE_SAVE_GENERATED_FOLLOWUPS,
     ACTION_TYPE_SET_LOGIN_STATE
 } from './../utils/enums';
 import url from '../utils/url';
@@ -74,6 +75,13 @@ export function setSyncState(syncState) {
     return {
         type: ACTION_TYPE_SET_SYNC_STATE,
         syncState: syncState
+    }
+}
+
+export function saveGeneratedFollowUps(generatedFollowUps) {
+    return {
+        type: ACTION_TYPE_SAVE_GENERATED_FOLLOWUPS,
+        generatedFollowUps: generatedFollowUps
     }
 }
 

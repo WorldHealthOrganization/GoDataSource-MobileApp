@@ -27,7 +27,7 @@ import ValuePicker from './../components/ValuePicker';
 import {getFollowUpsForOutbreakId, getMissedFollowUpsForOutbreakId, updateFollowUpAndContact, addFollowUp, generateFollowUp} from './../actions/followUps';
 import {getContactsForOutbreakId} from './../actions/contacts';
 import {removeErrors} from './../actions/errors';
-import {addFilterForScreen, removeFilterForScreen} from './../actions/app';
+import {addFilterForScreen, removeFilterForScreen, saveGeneratedFollowUps} from './../actions/app';
 import ElevatedView from 'react-native-elevated-view';
 import _ from 'lodash';
 import AddFollowUpScreen from './AddFollowUpScreen';
@@ -87,7 +87,7 @@ class FollowUpsScreen extends Component {
 
     // Please add here the react lifecycle methods that you need
     static getDerivedStateFromProps(props, state) {
-        console.log ('getDerivedStateFromProps')
+        console.log ('getDerivedStateFromProps', props,state);
         if (props.errors && props.errors.type && props.errors.message) {
             Alert.alert(props.errors.type, props.errors.message, [
                 {
@@ -157,44 +157,31 @@ class FollowUpsScreen extends Component {
                 fUps = fUps.filter((e) => {return e.statusId === state.filter.performed.value});
             }
 
-
-            //if we'e generating follow-ups
-            if(state.generating) {
-                //and we received generated follow-ups
-                if(props.followUps.length) {
-                    //if we had previous generated follow-ups get difference
-                    if (prevFollowUps.length) {
-                        let number = parseInt(props.followUps.length - prevFollowUps.length);
-                        props.navigator.showInAppNotification({
-                            screen: "InAppNotificationScreen",
-                            passProps: {
-                                number: number
-                            },
-                            autoDismissTimerSec: 1
-                        });
-                    } else {
-                        //no previous follow-ups just display number of generated
-                        let number = parseInt(props.followUps.length);
-                        props.navigator.showInAppNotification({
-                            screen: "InAppNotificationScreen",
-                            passProps: {
-                                number: number
-                            },
-                            autoDismissTimerSec: 1
-                        });
-                    }
-
-                    //reset generating status
-                    state.generating = false;
-                }
-            }
-
             if (props.followUps && props.followUps.length > 0) {
                 state.followUps = fUps;
             }
             else {
                 state.followUps = []
             }
+
+            //if we're generating follow-ups
+            if(state.generating) {
+                if(props.generatedFollowUps){
+                    let number = parseInt(props.generatedFollowUps);
+                    props.navigator.showInAppNotification({
+                        screen: "InAppNotificationScreen",
+                        passProps: {
+                            number: number
+                        },
+                        autoDismissTimerSec: 1
+                    });
+                    //reset generating status
+                    state.generating = false;
+                    //reset number of generated followups
+                    props.saveGeneratedFollowUps(0);
+                }
+            }
+
             state.refreshing = false;
             state.loading = false;
         }
@@ -656,7 +643,7 @@ class FollowUpsScreen extends Component {
         this.setState({
             generating: true,
         }, () => {
-            this.props.generateFollowUp(this.props.user.activeOutbreakId, date, this.props.user.token);
+            this.props.generateFollowUp(this.props.user.activeOutbreakId, this.state.filter.date, date, this.props.user.token);
             this.hideMenu();
         });
 
@@ -978,6 +965,7 @@ function mapStateToProps(state) {
         screenSize: state.app.screenSize,
         filter: state.app.filters,
         syncState: state.app.syncState,
+        generatedFollowUps: state.app.generatedFollowUps,
         followUps: state.followUps,
         contacts: state.contacts,
         errors: state.errors,
@@ -994,6 +982,7 @@ function matchDispatchProps(dispatch) {
         getContactsForOutbreakId,
         updateFollowUpAndContact,
         addFollowUp,
+        saveGeneratedFollowUps,
         removeFilterForScreen,
         generateFollowUp
     }, dispatch);
