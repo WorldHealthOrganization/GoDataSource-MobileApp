@@ -31,7 +31,6 @@ class GenerateFollowUpScreen extends PureComponent{
     render () {
         let contentWidth = calculateDimension(297, false, this.props.screenSize);
         let marginHorizontal = calculateDimension(14, false, this.props.screenSize);
-        console.log("this.props.showGenerateFollowUpScreen",this.props.showGenerateFollowUpScreen);
         return (
             <Dialog
                 visible={this.props.showGenerateFollowUpScreen}
@@ -69,7 +68,7 @@ class GenerateFollowUpScreen extends PureComponent{
                             titleColor={"black"}
                             onPress={this.props.onCancelPressed}
                             height={25}
-                            width={60}
+                            width="40%"
                         />
                         <Button
                             title="OK"
@@ -77,7 +76,7 @@ class GenerateFollowUpScreen extends PureComponent{
                             titleColor={'white'}
                             onPress={this.onOkPressed}
                             height={25}
-                            width={60}
+                            width="40%"
                         />
                     </View>
                 </ElevatedView>
