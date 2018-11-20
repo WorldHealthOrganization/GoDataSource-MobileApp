@@ -671,11 +671,14 @@ class FollowUpsScreen extends Component {
     };
 
     handleModalGenerateFollowUps = () => {
-        this.setState({
-            showGenerateFollowUpScreen: !this.state.showGenerateFollowUpScreen,
-        }, () => {
-             console.log("showGenerateFollowUpScreen", this.state.showGenerateFollowUpScreen);
-        } );
+        this.hideMenu();
+        setTimeout(function(){
+            this.setState({
+                showGenerateFollowUpScreen: !this.state.showGenerateFollowUpScreen,
+            }, () => {
+                console.log("showGenerateFollowUpScreen", this.state.showGenerateFollowUpScreen);
+            } );
+        }.bind(this), 2000);
     };
 
     // Append to the existing filter newProp={name: value}
