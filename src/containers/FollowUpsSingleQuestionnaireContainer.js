@@ -4,7 +4,7 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {PureComponent} from 'react';
-import {View, StyleSheet, InteractionManager, Alert} from 'react-native';
+import {View, StyleSheet, InteractionManager, Alert, TouchableWithoutFeedback, Keyboard} from 'react-native';
 import {calculateDimension, extractAllQuestions, mapQuestions} from './../utils/functions';
 import config from './../utils/config';
 import {connect} from "react-redux";
@@ -80,40 +80,44 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
         let viewWidth = calculateDimension(config.designScreenSize.width - 32, false, this.props.screenSize);
 
         return (
-            <View style={style.mainContainer}>
-                {
-                    this && this.props && this.props.isEditMode ? (
-                        <View style={[style.containerButtons, {marginVertical: marginVertical, width: viewWidth}]}>
-                            <Button
-                                title={'Save'}
-                                onPress={this.onPressSave}
-                                color={styles.buttonGreen}
-                                titleColor={'white'}
-                                height={buttonHeight}
-                                width={buttonWidth}
-                            />
-                            {/*<Button*/}
-                            {/*title={'Missing'}*/}
-                            {/*onPress={this.props.onPressMissing}*/}
-                            {/*color={'white'}*/}
-                            {/*titleColor={styles.buttonTextGray}*/}
-                            {/*height={buttonHeight}*/}
-                            {/*width={buttonWidth}*/}
-                            {/*/>*/}
-                        </View>) : (null)
-                }
-                <KeyboardAwareScrollView
-                    style={style.container}
-                    contentContainerStyle={[style.contentContainerStyle, {paddingBottom: this.props.screenSize.height < 600 ? 70 : 20}]}
-                    keyboardShouldPersistTaps={'always'}
-                >
+            <TouchableWithoutFeedback onPress={() => {
+                Keyboard.dismiss()
+            }} accessible={false}>
+                <View style={style.mainContainer}>
                     {
-                        this.state.questions.map((item, index) => {
-                            return this.handleRenderSectionedList(item, index)
-                        })
+                        this && this.props && this.props.isEditMode ? (
+                            <View style={[style.containerButtons, {marginVertical: marginVertical, width: viewWidth}]}>
+                                <Button
+                                    title={'Save'}
+                                    onPress={this.onPressSave}
+                                    color={styles.buttonGreen}
+                                    titleColor={'white'}
+                                    height={buttonHeight}
+                                    width={buttonWidth}
+                                />
+                                {/*<Button*/}
+                                {/*title={'Missing'}*/}
+                                {/*onPress={this.props.onPressMissing}*/}
+                                {/*color={'white'}*/}
+                                {/*titleColor={styles.buttonTextGray}*/}
+                                {/*height={buttonHeight}*/}
+                                {/*width={buttonWidth}*/}
+                                {/*/>*/}
+                            </View>) : (null)
                     }
-                </KeyboardAwareScrollView>
-            </View>
+                    <KeyboardAwareScrollView
+                        style={style.container}
+                        contentContainerStyle={[style.contentContainerStyle, {paddingBottom: this.props.screenSize.height < 600 ? 70 : 20}]}
+                        keyboardShouldPersistTaps={'always'}
+                    >
+                        {
+                            this.state.questions.map((item, index) => {
+                                return this.handleRenderSectionedList(item, index)
+                            })
+                        }
+                    </KeyboardAwareScrollView>
+                </View>
+            </TouchableWithoutFeedback>
         );
     }
 

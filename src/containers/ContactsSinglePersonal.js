@@ -4,7 +4,7 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
-import {View, StyleSheet, InteractionManager, Alert} from 'react-native';
+import {View, StyleSheet, InteractionManager, Alert, TouchableWithoutFeedback, Keyboard} from 'react-native';
 import {calculateDimension} from './../utils/functions';
 import config from './../utils/config';
 import {connect} from "react-redux";
@@ -50,34 +50,38 @@ class ContactsSinglePersonal extends Component {
         }
 
         return (
-            <View style={style.viewContainer}>
-                <View style={{flexDirection: 'row'}}>
-                    <Button
-                        title={'Next'}
-                        onPress={this.handleNextButton}
-                        color={styles.buttonGreen}
-                        titleColor={'white'}
-                        height={calculateDimension(25, true, this.props.screenSize)}
-                        width={calculateDimension(130, false, this.props.screenSize)}
-                        style={{
-                            marginVertical: calculateDimension(12.5, true, this.props.screenSize),
-                        }}/>
-                </View>
-
-                <KeyboardAwareScrollView
-                    style={style.containerScrollView}
-                    contentContainerStyle={[style.contentContainerStyle, {paddingBottom: this.props.screenSize.height < 600 ? 70 : 20}]}
-                    keyboardShouldPersistTaps={'always'}
-                >
-                    <View style={style.container}>
-                        {
-                            config.contactsSingleScreen.personal.map((item) => {
-                                return this.handleRenderItem(item)
-                            })
-                        }
+            <TouchableWithoutFeedback onPress={() => {
+                Keyboard.dismiss()
+            }} accessible={false}>
+                <View style={style.viewContainer}>
+                    <View style={{flexDirection: 'row'}}>
+                        <Button
+                            title={'Next'}
+                            onPress={this.handleNextButton}
+                            color={styles.buttonGreen}
+                            titleColor={'white'}
+                            height={calculateDimension(25, true, this.props.screenSize)}
+                            width={calculateDimension(130, false, this.props.screenSize)}
+                            style={{
+                                marginVertical: calculateDimension(12.5, true, this.props.screenSize),
+                            }}/>
                     </View>
-                </KeyboardAwareScrollView>
-            </View>
+
+                    <KeyboardAwareScrollView
+                        style={style.containerScrollView}
+                        contentContainerStyle={[style.contentContainerStyle, {paddingBottom: this.props.screenSize.height < 600 ? 70 : 20}]}
+                        keyboardShouldPersistTaps={'always'}
+                    >
+                        <View style={style.container}>
+                            {
+                                config.contactsSingleScreen.personal.map((item) => {
+                                    return this.handleRenderItem(item)
+                                })
+                            }
+                        </View>
+                    </KeyboardAwareScrollView>
+                </View>
+            </TouchableWithoutFeedback>
         );
     }
 
