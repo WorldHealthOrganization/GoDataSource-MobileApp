@@ -4,7 +4,7 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {PureComponent} from 'react';
-import {TextInput, View, Text, StyleSheet, FlatList, Alert} from 'react-native';
+import {TextInput, View, Text, StyleSheet, FlatList, Alert, TouchableWithoutFeedback, Keyboard} from 'react-native';
 import {calculateDimension} from './../utils/functions';
 import config from './../utils/config';
 import {connect} from "react-redux";
@@ -35,50 +35,65 @@ class CaseSingleInfectionContainer extends PureComponent {
     // and can slow down the app
     render() {
         return (
-            <View style={style.container}>
-                <View style={{flexDirection: 'row'}}>
-                    {
-                        this.props.isNew ? (
-                            <View style={{flexDirection: 'row'}}>
-                                <Button
-                                    title={'Back'}
-                                    onPress={this.handleBackButton}
-                                    color={styles.buttonGreen}
-                                    titleColor={'white'}
-                                    height={calculateDimension(25, true, this.props.screenSize)}
-                                    width={calculateDimension(130, false, this.props.screenSize)}
-                                    style={{
-                                        marginVertical: calculateDimension(12.5, true, this.props.screenSize),
-                                        marginHorizontal: calculateDimension(16, false, this.props.screenSize),
-                                    }}/>
-                                <Button
-                                    title={'Next'}
-                                    onPress={this.handleNextButton}
-                                    color={styles.buttonGreen}
-                                    titleColor={'white'}
-                                    height={calculateDimension(25, true, this.props.screenSize)}
-                                    width={calculateDimension(130, false, this.props.screenSize)}
-                                    style={{
-                                        marginVertical: calculateDimension(12.5, true, this.props.screenSize),
-                                        marginHorizontal: calculateDimension(16, false, this.props.screenSize),
-                                    }}/> 
-                            </View>) : (
-                                this.props.isEditMode ? (
+            <TouchableWithoutFeedback onPress={() => {
+                Keyboard.dismiss()
+            }} accessible={false}>
+                <View style={style.container}>
+                    <View style={{flexDirection: 'row'}}>
+                        {
+                            this.props.isNew ? (
                                 <View style={{flexDirection: 'row'}}>
                                     <Button
-                                        title={'Save'}
-                                        onPress={this.props.onPressSaveEdit}
+                                        title={'Back'}
+                                        onPress={this.handleBackButton}
                                         color={styles.buttonGreen}
                                         titleColor={'white'}
                                         height={calculateDimension(25, true, this.props.screenSize)}
-                                        width={calculateDimension(166, false, this.props.screenSize)}
+                                        width={calculateDimension(130, false, this.props.screenSize)}
                                         style={{
                                             marginVertical: calculateDimension(12.5, true, this.props.screenSize),
-                                            marginRight: 10,
-                                    }}/>
+                                            marginHorizontal: calculateDimension(16, false, this.props.screenSize),
+                                        }}/>
                                     <Button
-                                        title={'Cancel'}
-                                        onPress={this.props.onPressCancelEdit}
+                                        title={'Next'}
+                                        onPress={this.handleNextButton}
+                                        color={styles.buttonGreen}
+                                        titleColor={'white'}
+                                        height={calculateDimension(25, true, this.props.screenSize)}
+                                        width={calculateDimension(130, false, this.props.screenSize)}
+                                        style={{
+                                            marginVertical: calculateDimension(12.5, true, this.props.screenSize),
+                                            marginHorizontal: calculateDimension(16, false, this.props.screenSize),
+                                        }}/>
+                                </View>) : (
+                                    this.props.isEditMode ? (
+                                    <View style={{flexDirection: 'row'}}>
+                                        <Button
+                                            title={'Save'}
+                                            onPress={this.props.onPressSaveEdit}
+                                            color={styles.buttonGreen}
+                                            titleColor={'white'}
+                                            height={calculateDimension(25, true, this.props.screenSize)}
+                                            width={calculateDimension(166, false, this.props.screenSize)}
+                                            style={{
+                                                marginVertical: calculateDimension(12.5, true, this.props.screenSize),
+                                                marginRight: 10,
+                                        }}/>
+                                        <Button
+                                            title={'Cancel'}
+                                            onPress={this.props.onPressCancelEdit}
+                                            color={styles.buttonGreen}
+                                            titleColor={'white'}
+                                            height={calculateDimension(25, true, this.props.screenSize)}
+                                            width={calculateDimension(166, false, this.props.screenSize)}
+                                            style={{
+                                                marginVertical: calculateDimension(12.5, true, this.props.screenSize),
+                                                marginRight: 10,
+                                        }}/>
+                                    </View>) : (
+                                    <Button
+                                        title={'Edit'}
+                                        onPress={this.props.onPressEdit}
                                         color={styles.buttonGreen}
                                         titleColor={'white'}
                                         height={calculateDimension(25, true, this.props.screenSize)}
@@ -86,81 +101,70 @@ class CaseSingleInfectionContainer extends PureComponent {
                                         style={{
                                             marginVertical: calculateDimension(12.5, true, this.props.screenSize),
                                             marginRight: 10,
-                                    }}/>
-                                </View>) : (
-                                <Button
-                                    title={'Edit'}
-                                    onPress={this.props.onPressEdit}
-                                    color={styles.buttonGreen}
-                                    titleColor={'white'}
-                                    height={calculateDimension(25, true, this.props.screenSize)}
-                                    width={calculateDimension(166, false, this.props.screenSize)}
-                                    style={{
-                                        marginVertical: calculateDimension(12.5, true, this.props.screenSize),
-                                        marginRight: 10,
-                                    }}/>))
-                    }
+                                        }}/>))
+                        }
+                    </View>
+                    <KeyboardAwareScrollView
+                        style={style.containerScrollView}
+                        contentContainerStyle={[style.contentContainerStyle, {paddingBottom: this.props.screenSize.height < 600 ? 70 : 20}]}
+                        keyboardShouldPersistTaps={'always'}
+                    >
+                        {
+                            config.caseSingleScreen.infection.map((item, index) => {
+                                return this.handleRenderItem(item, index)
+                            })
+                        }
+                        <View style={style.container}>
+                            {
+                                this.props.case && this.props.case.hospitalizationDates && this.props.case.hospitalizationDates.map((item, index) => {
+                                    return this.handleRenderItemForHospitalizationDatesList(item, index)
+                                })
+                            }
+                        </View>
+                        {
+                            this.props.isEditMode ? (
+                                <View style={{alignSelf: 'flex-start', marginHorizontal: calculateDimension(16, false, this.props.screenSize), marginVertical: 20}}>
+                                    <Ripple
+                                        style={{
+                                            height: 25,
+                                            justifyContent: 'center'
+                                        }}
+                                        onPress={this.props.onPressAddHospitalizationDate}
+                                    >
+                                        <Text style={{fontFamily: 'Roboto-Medium', fontSize: 12, color: styles.buttonGreen}}>
+                                            {this.props.case.hospitalizationDates && this.props.case.hospitalizationDates.length === 0 ? this.state.oneHospitalizationDateText : this.state.moreHospitalizationDatesText}
+                                        </Text>
+                                    </Ripple>
+                                </View>
+                            ) : null
+                        }
+                        <View style={style.container}>
+                            {
+                                this.props.case && this.props.case.isolationDates && this.props.case.isolationDates.map((item, index) => {
+                                    return this.handleRenderItemForIsolationDatesList(item, index)
+                                })
+                            }
+                        </View>
+                        {
+                            this.props.isEditMode ? (
+                                <View style={{alignSelf: 'flex-start', marginHorizontal: calculateDimension(16, false, this.props.screenSize), marginVertical: 20}}>
+                                    <Ripple
+                                        style={{
+                                            height: 25,
+                                            justifyContent: 'center'
+                                        }}
+                                        onPress={this.props.onPressAddIsolationDates}
+                                    >
+                                        <Text style={{fontFamily: 'Roboto-Medium', fontSize: 12, color: styles.buttonGreen}}>
+                                            {this.props.case.isolationDates && this.props.case.isolationDates.length === 0 ? this.state.oneIsolationDateText : this.state.moreIsolationDatesText}
+                                        </Text>
+                                    </Ripple>
+                                </View>
+                            ) : null
+                        }
+                    </KeyboardAwareScrollView>
                 </View>
-                <KeyboardAwareScrollView
-                    style={style.containerScrollView}
-                    contentContainerStyle={[style.contentContainerStyle, {paddingBottom: this.props.screenSize.height < 600 ? 70 : 20}]}
-                    keyboardShouldPersistTaps={'always'}
-                >
-                    {
-                        config.caseSingleScreen.infection.map((item, index) => {
-                            return this.handleRenderItem(item, index)
-                        })
-                    }
-                    <View style={style.container}>
-                        {
-                            this.props.case && this.props.case.hospitalizationDates && this.props.case.hospitalizationDates.map((item, index) => {
-                                return this.handleRenderItemForHospitalizationDatesList(item, index)
-                            })
-                        }
-                    </View>
-                    {
-                        this.props.isEditMode ? (
-                            <View style={{alignSelf: 'flex-start', marginHorizontal: calculateDimension(16, false, this.props.screenSize), marginVertical: 20}}>
-                                <Ripple
-                                    style={{
-                                        height: 25,
-                                        justifyContent: 'center'
-                                    }}
-                                    onPress={this.props.onPressAddHospitalizationDate}
-                                >
-                                    <Text style={{fontFamily: 'Roboto-Medium', fontSize: 12, color: styles.buttonGreen}}>
-                                        {this.props.case.hospitalizationDates && this.props.case.hospitalizationDates.length === 0 ? this.state.oneHospitalizationDateText : this.state.moreHospitalizationDatesText}
-                                    </Text>
-                                </Ripple>
-                            </View>
-                        ) : null
-                    }
-                    <View style={style.container}>
-                        {
-                            this.props.case && this.props.case.isolationDates && this.props.case.isolationDates.map((item, index) => {
-                                return this.handleRenderItemForIsolationDatesList(item, index)
-                            })
-                        }
-                    </View>
-                    {
-                        this.props.isEditMode ? (
-                            <View style={{alignSelf: 'flex-start', marginHorizontal: calculateDimension(16, false, this.props.screenSize), marginVertical: 20}}>
-                                <Ripple
-                                    style={{
-                                        height: 25,
-                                        justifyContent: 'center'
-                                    }}
-                                    onPress={this.props.onPressAddIsolationDates}
-                                >
-                                    <Text style={{fontFamily: 'Roboto-Medium', fontSize: 12, color: styles.buttonGreen}}>
-                                        {this.props.case.isolationDates && this.props.case.isolationDates.length === 0 ? this.state.oneIsolationDateText : this.state.moreIsolationDatesText}
-                                    </Text>
-                                </Ripple>
-                            </View>
-                        ) : null
-                    }
-                </KeyboardAwareScrollView>
-            </View>
+            </TouchableWithoutFeedback>
         );
     }
 
