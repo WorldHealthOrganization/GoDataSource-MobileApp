@@ -4,7 +4,7 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
-import { View, Text, StyleSheet, InteractionManager, Alert} from 'react-native';
+import { View, Text, StyleSheet, InteractionManager, Alert, TouchableWithoutFeedback, Keyboard} from 'react-native';
 import {LoaderScreen} from 'react-native-ui-lib';
 import {calculateDimension} from './../utils/functions';
 import config from './../utils/config';
@@ -51,57 +51,61 @@ class ContactsSingleAddress extends Component {
         }
 
         return (
-            <View style={style.viewContainer}>
-                <View style={{flexDirection: 'row'}}>
-                    <Button
-                        title={'Back'}
-                        onPress={this.handleBackButton}
-                        color={styles.buttonGreen}
-                        titleColor={'white'}
-                        height={calculateDimension(25, true, this.props.screenSize)}
-                        width={calculateDimension(130, false, this.props.screenSize)}
-                        style={{
-                            marginVertical: calculateDimension(12.5, true, this.props.screenSize),
-                            marginHorizontal: calculateDimension(16, false, this.props.screenSize),
-                        }}/> 
-                    <Button
-                        title={'Next'}
-                        onPress={this.handleNextButton}
-                        color={styles.buttonGreen}
-                        titleColor={'white'}
-                        height={calculateDimension(25, true, this.props.screenSize)}
-                        width={calculateDimension(130, false, this.props.screenSize)}
-                        style={{
-                            marginVertical: calculateDimension(12.5, true, this.props.screenSize),
-                            marginHorizontal: calculateDimension(16, false, this.props.screenSize),
-                        }}/> 
-                </View>
-
-                <KeyboardAwareScrollView
-                    style={style.containerScrollView}
-                    contentContainerStyle={[style.contentContainerStyle, {paddingBottom: this.props.screenSize.height < 600 ? 70 : 20}]}
-                    keyboardShouldPersistTaps={'always'}
-                >
-                    <View style={style.container}>
-                        {
-                            this.props.contact && this.props.contact.addresses && this.props.contact.addresses.map((item, index) => {
-                                return this.handleRenderItem(item, index)
-                            })
-                        }
-                    </View>
-                    <View style={{alignSelf: 'flex-start', marginHorizontal: calculateDimension(16, false, this.props.screenSize), marginVertical: 20}}>
-                        <Ripple
+            <TouchableWithoutFeedback onPress={() => {
+                Keyboard.dismiss()
+            }} accessible={false}>
+                <View style={style.viewContainer}>
+                    <View style={{flexDirection: 'row'}}>
+                        <Button
+                            title={'Back'}
+                            onPress={this.handleBackButton}
+                            color={styles.buttonGreen}
+                            titleColor={'white'}
+                            height={calculateDimension(25, true, this.props.screenSize)}
+                            width={calculateDimension(130, false, this.props.screenSize)}
                             style={{
-                                height: 25,
-                                justifyContent: 'center'
-                            }}
-                            onPress={this.props.onPressAddAdrress}
-                        >
-                            <Text style={{fontFamily: 'Roboto-Medium', fontSize: 12, color: styles.buttonGreen}}>Add another address</Text>
-                        </Ripple>
+                                marginVertical: calculateDimension(12.5, true, this.props.screenSize),
+                                marginHorizontal: calculateDimension(16, false, this.props.screenSize),
+                            }}/>
+                        <Button
+                            title={'Next'}
+                            onPress={this.handleNextButton}
+                            color={styles.buttonGreen}
+                            titleColor={'white'}
+                            height={calculateDimension(25, true, this.props.screenSize)}
+                            width={calculateDimension(130, false, this.props.screenSize)}
+                            style={{
+                                marginVertical: calculateDimension(12.5, true, this.props.screenSize),
+                                marginHorizontal: calculateDimension(16, false, this.props.screenSize),
+                            }}/>
                     </View>
-                </KeyboardAwareScrollView>
-            </View>
+
+                    <KeyboardAwareScrollView
+                        style={style.containerScrollView}
+                        contentContainerStyle={[style.contentContainerStyle, {paddingBottom: this.props.screenSize.height < 600 ? 70 : 20}]}
+                        keyboardShouldPersistTaps={'always'}
+                    >
+                        <View style={style.container}>
+                            {
+                                this.props.contact && this.props.contact.addresses && this.props.contact.addresses.map((item, index) => {
+                                    return this.handleRenderItem(item, index)
+                                })
+                            }
+                        </View>
+                        <View style={{alignSelf: 'flex-start', marginHorizontal: calculateDimension(16, false, this.props.screenSize), marginVertical: 20}}>
+                            <Ripple
+                                style={{
+                                    height: 25,
+                                    justifyContent: 'center'
+                                }}
+                                onPress={this.props.onPressAddAdrress}
+                            >
+                                <Text style={{fontFamily: 'Roboto-Medium', fontSize: 12, color: styles.buttonGreen}}>Add another address</Text>
+                            </Ripple>
+                        </View>
+                    </KeyboardAwareScrollView>
+                </View>
+            </TouchableWithoutFeedback>
         );
     }
 

@@ -80,6 +80,7 @@ class FollowUpsScreen extends Component {
         this.openCalendarModal = this.openCalendarModal.bind(this);
         this.filterContacts = this.filterContacts.bind(this);
         this.myFunct =  this.myFunct.bind(this)
+        this.handleBackButtonClick = this.handleBackButtonClick.bind(this);
     }
 
     // Please add here the react lifecycle methods that you need
@@ -166,6 +167,7 @@ class FollowUpsScreen extends Component {
     }
 
     componentDidMount() {
+        BackHandler.addEventListener('hardwareBackPress', this.handleBackButtonClick);
         this.setState({
             loading: true,
             generating: false,
@@ -182,6 +184,15 @@ class FollowUpsScreen extends Component {
             return false;
         }
 
+        return true;
+    }
+    
+    componentWillUnmount() {
+        BackHandler.removeEventListener('hardwareBackPress', this.handleBackButtonClick);
+    }
+
+    handleBackButtonClick() {
+        // this.props.navigator.goBack(null);
         return true;
     }
     

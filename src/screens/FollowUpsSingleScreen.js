@@ -4,7 +4,7 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
-import {View, StyleSheet, Platform, Animated, Alert} from 'react-native';
+import {View, StyleSheet, Platform, Animated, Alert, BackHandler} from 'react-native';
 import {Icon} from 'react-native-material-ui';
 import styles from './../styles';
 import NavBarCustom from './../components/NavBarCustom';
@@ -44,6 +44,7 @@ class FollowUpsSingleScreen extends Component {
             isDateTimePickerVisible: false
         };
         // Bind here methods, or at least don't declare methods in the render method
+        this.handleBackButtonClick = this.handleBackButtonClick.bind(this);
     }
 
     // GenInfoRoute = () => (
@@ -70,6 +71,23 @@ class FollowUpsSingleScreen extends Component {
     //         onPressMissing={this.handleOnPressMissing}
     //     />
     // );
+
+    componentDidMount() {
+        BackHandler.addEventListener('hardwareBackPress', this.handleBackButtonClick);
+    }
+
+    componentWillUnmount() {
+        BackHandler.removeEventListener('hardwareBackPress', this.handleBackButtonClick);
+    }
+
+    handleBackButtonClick() {
+        // this.props.navigator.goBack(null);
+        this.props.navigator.pop({
+            animated: true,
+            animationType: 'fade'
+        })
+        return false;
+    }
 
     // Please add here the react lifecycle methods that you need
     static getDerivedStateFromProps(props, state) {

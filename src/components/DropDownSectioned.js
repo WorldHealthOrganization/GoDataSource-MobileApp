@@ -38,7 +38,7 @@ class DropDownSectioned extends Component {
         return (
             <View style={[this.props.style, {flex: 1, alignSelf: 'center'}]}>
               <Text style={{
-                    fontFamily: 'Roboto-Light',
+                    fontFamily: 'Roboto',
                     fontSize: 12.5,
                     textAlign: 'left',
                     color: 'rgba(0,0,0,0.38)',

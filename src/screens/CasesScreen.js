@@ -4,7 +4,7 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
-import {TextInput, View, Text, Alert, StyleSheet, Dimensions, Platform, FlatList, Animated} from 'react-native';
+import {TextInput, View, Text, Alert, StyleSheet, Dimensions, Platform, FlatList, Animated, BackHandler} from 'react-native';
 import {Button, Icon} from 'react-native-material-ui';
 import { TextField } from 'react-native-material-textfield';
 import styles from './../styles';
@@ -63,10 +63,12 @@ class CasesScreen extends Component {
 
         // Bind here methods, or at least don't declare methods in the render method
         this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this));
+        this.handleBackButtonClick = this.handleBackButtonClick.bind(this);
     }
 
     // Please add here the react lifecycle methods that you need
     componentDidMount() {
+        BackHandler.addEventListener('hardwareBackPress', this.handleBackButtonClick);
         this.setState({
             loading: true
         }, () => {
@@ -76,6 +78,15 @@ class CasesScreen extends Component {
                 this.props.getCasesForOutbreakId(this.props.user.activeOutbreakId, null, null);
             }
         })
+    }
+
+    componentWillUnmount() {
+        BackHandler.removeEventListener('hardwareBackPress', this.handleBackButtonClick);
+    }
+
+    handleBackButtonClick() {
+        // this.props.navigator.goBack(null);
+        return true;
     }
 
     static getDerivedStateFromProps(props, state) {
