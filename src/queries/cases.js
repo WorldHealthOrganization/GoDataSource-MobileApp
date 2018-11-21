@@ -2,6 +2,8 @@
  * Created by florinpopa on 18/09/2018.
  */
 import {getDatabase} from './database';
+import _ from 'lodash';
+import {objSort} from './../utils/functions'
 
 // Credentials: {email, encryptedPassword}
 export function getCasesForOutbreakIdRequest (outbreakId, filter, token, callback) {
@@ -114,7 +116,10 @@ export function getCasesForOutbreakIdRequest (outbreakId, filter, token, callbac
             })
                 .then((result) => {
                     console.log("result with the new index for cases: ", new Date().getTime() - start);
-                    callback(null, result.rows.filter((e) => {return e.doc.deleted === false}).map((e) => {return e.doc}));
+                    // result.rows = _.orderBy(result.rows, [item => item.doc.lastName !== undefined ? item.doc.lastName.toLowerCase() : ''], ['asc'])
+                    let resultDocs = result.rows.filter((e) => {return e.doc.deleted === false}).map((e) => {return e.doc})
+                    resultDocs = objSort(resultDocs, ['lastName', false])
+                    callback(null, resultDocs);
 
                 })
                 .catch((errorQuery) => {

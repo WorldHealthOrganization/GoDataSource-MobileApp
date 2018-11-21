@@ -32,7 +32,7 @@ import ElevatedView from 'react-native-elevated-view';
 import _ from 'lodash';
 import AddFollowUpScreen from './AddFollowUpScreen';
 import {LoaderScreen, Colors} from 'react-native-ui-lib';
-import {navigation, extractIdFromPouchId, generateId, updateRequiredFields} from './../utils/functions';
+import {navigation, extractIdFromPouchId, generateId, updateRequiredFields, localSortContactsForFollowUps, objSort} from './../utils/functions';
 import ViewHOC from './../components/ViewHOC';
 import { Popup } from 'react-native-map-link';
 
@@ -103,42 +103,9 @@ class FollowUpsScreen extends Component {
 
             let contactsCopy = _.cloneDeep(props.contacts);
             if (props.filter && (props.filter['FollowUpsFilterScreen'] || props.filter['FollowUpsScreen'])) {
-                // Take care of search filter
-                if (state.filter.searchText) {
-                    contactsCopy = contactsCopy.filter((e) => {
-                        return  e && e.firstName && state.filter.searchText.toLowerCase().includes(e.firstName.toLowerCase()) ||
-                            e && e.lastName && state.filter.searchText.toLowerCase().includes(e.lastName.toLowerCase()) ||
-                            e && e.firstName && e.firstName.toLowerCase().includes(state.filter.searchText.toLowerCase()) ||
-                            e && e.lastName && e.lastName.toLowerCase().includes(state.filter.searchText.toLowerCase())
-                    });
-                }
-                // Take care of gender filter
-                if (state.filterFromFilterScreen && state.filterFromFilterScreen.gender) {
-                    contactsCopy = contactsCopy.filter((e) => {return e.gender === state.filterFromFilterScreen.gender});
-                }
-                // Take care of age range filter
-                if (state.filterFromFilterScreen && state.filterFromFilterScreen.age && Array.isArray(state.filterFromFilterScreen.age) && state.filterFromFilterScreen.age.length === 2 && (state.filterFromFilterScreen.age[0] >= 0 || state.filterFromFilterScreen.age[1] <= 150)) {
-                    contactsCopy = contactsCopy.filter((e) => {
-                        if (e.age && e.age.years !== null && e.age.years !== undefined && e.age.months !== null && e.age.months !== undefined) {
-                            if (e.age.years > 0 && e.age.months === 0) {
-                                return e.age.years >= state.filterFromFilterScreen.age[0] && e.age.years <= state.filterFromFilterScreen.age[1]
-                            } else if (e.age.years === 0 && e.age.months > 0){
-                                return e.age.months >= state.filterFromFilterScreen.age[0] && e.age.months <= state.filterFromFilterScreen.age[1]
-                            } else if (e.age.years === 0 && e.age.months === 0) {
-                                return e.age.years >= state.filterFromFilterScreen.age[0] && e.age.years <= state.filterFromFilterScreen.age[1]
-                            }
-                        }
-                    });
-                }
-                // Take care of locations filter
-                if (state.filterFromFilterScreen  && state.filterFromFilterScreen.selectedLocations && state.filterFromFilterScreen.selectedLocations.length > 0) {
-                    contactsCopy = contactsCopy.filter((e) => {
-                        let addresses = e.addresses.filter((k) => {
-                            return k.locationId !== '' && state.filterFromFilterScreen.selectedLocations.indexOf(k.locationId) >= 0
-                        })
-                        return addresses.length > 0
-                    })
-                }
+                contactsCopy = localSortContactsForFollowUps(contactsCopy, props.filter, state.filter, state.filterFromFilterScreen)
+            } else {
+                contactsCopy = objSort(contactsCopy, ['lastName', false])
             }
 
             for (let i=0; i < contactsCopy.length; i++) {
@@ -793,47 +760,8 @@ class FollowUpsScreen extends Component {
     // This means that on the contacts screen it has to be a filter on the database
     filterContacts = () => {
         let contactsCopy = _.cloneDeep(this.props.contacts);
-
-        // Take care of search filter
-        if (this.state.filter.searchText) {
-            contactsCopy = contactsCopy.filter((e) => {
-                return  e && e.firstName && this.state.filter.searchText.toLowerCase().includes(e.firstName.toLowerCase()) ||
-                    e && e.lastName && this.state.filter.searchText.toLowerCase().includes(e.lastName.toLowerCase()) ||
-                    e && e.firstName && e.firstName.toLowerCase().includes(this.state.filter.searchText.toLowerCase()) ||
-                    e && e.lastName && e.lastName.toLowerCase().includes(this.state.filter.searchText.toLowerCase())
-            });
-        }
-
-        // Take care of gender filter
-        if (this.state.filterFromFilterScreen && this.state.filterFromFilterScreen.gender) {
-            contactsCopy = contactsCopy.filter((e) => {return e.gender === this.state.filterFromFilterScreen.gender});
-        }
-
-        // Take care of age range filter
-        if (this.state.filterFromFilterScreen && this.state.filterFromFilterScreen.age && Array.isArray(this.state.filterFromFilterScreen.age) && this.state.filterFromFilterScreen.age.length === 2 && (this.state.filterFromFilterScreen.age[0] >= 0 || this.state.filterFromFilterScreen.age[1] <= 150)) {
-            contactsCopy = contactsCopy.filter((e) => {
-                if (e.age && e.age.years !== null && e.age.years !== undefined && e.age.months !== null && e.age.months !== undefined) {
-                    if (e.age.years > 0 && e.age.months === 0) {
-                        return e.age.years >= this.state.filterFromFilterScreen.age[0] && e.age.years <= this.state.filterFromFilterScreen.age[1]
-                    } else if (e.age.years === 0 && e.age.months > 0){
-                        return e.age.months >= this.state.filterFromFilterScreen.age[0] && e.age.months <= this.state.filterFromFilterScreen.age[1]
-                    } else if (e.age.years === 0 && e.age.months === 0) {
-                        return e.age.years >= this.state.filterFromFilterScreen.age[0] && e.age.years <= this.state.filterFromFilterScreen.age[1]
-                    }
-                }
-            });
-        }
-
-        // Take care of locations filter
-        if (this.state.filterFromFilterScreen  && this.state.filterFromFilterScreen.selectedLocations && this.state.filterFromFilterScreen.selectedLocations.length > 0) {
-            contactsCopy = contactsCopy.filter((e) => {
-                let addresses = e.addresses.filter((k) => {
-                    return k.locationId !== '' && this.state.filterFromFilterScreen.selectedLocations.indexOf(k.locationId) >= 0
-                })
-                return addresses.length > 0
-            })
-        }
-
+        contactsCopy = localSortContactsForFollowUps(contactsCopy, this.props.filter, this.state.filter, this.state.filterFromFilterScreen)
+        
         // After filtering the contacts, it's time to get their respective follow-ups to show
         this.getFollowUpsFromContacts(contactsCopy);
     };

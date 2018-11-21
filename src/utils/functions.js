@@ -9,6 +9,7 @@ import {updateFileInDatabase, processBulkDocs} from './../queries/database';
 import {setSyncState} from './../actions/app';
 import bcrypt from 'react-native-bcrypt';
 import uuid from 'react-native-uuid';
+import _ from 'lodash';
 import {getContactsForOutbreakId} from './../actions/contacts';
 
 // This method is used for handling server responses. Please add here any custom error handling
@@ -690,3 +691,113 @@ export function mapQuestions (questions) {
 
     return mappedQuestions;
 };
+
+export function localSortContactsForFollowUps (contactsCopy, propsFilter, stateFilter, filterFromFilterScreen) {
+    if (propsFilter && (propsFilter['FollowUpsFilterScreen'] || propsFilter['FollowUpsScreen'])) {
+        // Take care of search filter
+        if (stateFilter.searchText) {
+            contactsCopy = contactsCopy.filter((e) => {
+                return  e && e.firstName && stateFilter.searchText.toLowerCase().includes(e.firstName.toLowerCase()) ||
+                    e && e.lastName && stateFilter.searchText.toLowerCase().includes(e.lastName.toLowerCase()) ||
+                    e && e.firstName && e.firstName.toLowerCase().includes(stateFilter.searchText.toLowerCase()) ||
+                    e && e.lastName && e.lastName.toLowerCase().includes(stateFilter.searchText.toLowerCase())
+            });
+        }
+        // Take care of gender filter
+        if (filterFromFilterScreen && filterFromFilterScreen.gender) {
+            contactsCopy = contactsCopy.filter((e) => {return e.gender === filterFromFilterScreen.gender});
+        }
+        // Take care of age range filter
+        if (filterFromFilterScreen && filterFromFilterScreen.age && Array.isArray(filterFromFilterScreen.age) && filterFromFilterScreen.age.length === 2 && (filterFromFilterScreen.age[0] >= 0 || filterFromFilterScreen.age[1] <= 150)) {
+            contactsCopy = contactsCopy.filter((e) => {
+                if (e.age && e.age.years !== null && e.age.years !== undefined && e.age.months !== null && e.age.months !== undefined) {
+                    if (e.age.years > 0 && e.age.months === 0) {
+                        return e.age.years >= filterFromFilterScreen.age[0] && e.age.years <= filterFromFilterScreen.age[1]
+                    } else if (e.age.years === 0 && e.age.months > 0){
+                        return e.age.months >= filterFromFilterScreen.age[0] && e.age.months <= filterFromFilterScreen.age[1]
+                    } else if (e.age.years === 0 && e.age.months === 0) {
+                        return e.age.years >= filterFromFilterScreen.age[0] && e.age.years <= filterFromFilterScreen.age[1]
+                    }
+                }
+            });
+        }
+        // Take care of locations filter
+        if (filterFromFilterScreen  && filterFromFilterScreen.selectedLocations && filterFromFilterScreen.selectedLocations.length > 0) {
+            contactsCopy = contactsCopy.filter((e) => {
+                let addresses = e.addresses.filter((k) => {
+                    return k.locationId !== '' && filterFromFilterScreen.selectedLocations.indexOf(k.locationId) >= 0
+                })
+                return addresses.length > 0
+            })
+        }
+        //Take care of sort
+        if (filterFromFilterScreen  && filterFromFilterScreen.sort && filterFromFilterScreen.sort.length > 0) {
+            let sortCriteria = []
+            let sortOrder = []
+            for(let i = 0; i < filterFromFilterScreen.sort.length; i++) {
+                if (filterFromFilterScreen.sort[i].sortCriteria && filterFromFilterScreen.sort[i].sortCriteria !== '' && filterFromFilterScreen.sort[i].sortOrder && filterFromFilterScreen.sort[i].sortOrder !== ''){
+                    sortCriteria.push(filterFromFilterScreen.sort[i].sortCriteria)
+                    sortOrder.push(filterFromFilterScreen.sort[i].sortOrder === 'LNG_SIDE_FILTERS_SORT_BY_ASC_PLACEHOLDER' ? false : true)
+                }
+            }
+            if (sortCriteria.length > 0 && sortOrder.length > 0) {
+                if (sortOrder.length === 1) {
+                    contactsCopy = objSort(contactsCopy, [sortCriteria[0], sortOrder[0]])
+                } else if (sortOrder.length === 2) {
+                    contactsCopy = objSort(contactsCopy, [sortCriteria[0], sortOrder[0]], [sortCriteria[1], sortOrder[1]])
+                }
+            }
+        }
+    }
+    return contactsCopy
+}
+
+export function objSort() {
+    var args = arguments,
+        array = args[0],
+        case_sensitive, keys_length, key, desc, a, b, i;
+
+    if (typeof arguments[arguments.length - 1] === 'boolean') {
+        case_sensitive = arguments[arguments.length - 1];
+        keys_length = arguments.length - 1;
+    } else {
+        case_sensitive = false;
+        keys_length = arguments.length;
+    }
+
+    return array.sort(function (obj1, obj2) {
+        for (i = 1; i < keys_length; i++) {
+            key = args[i];
+            if (typeof key !== 'string') {
+                desc = key[1];
+                key = key[0];
+                a = obj1[args[i][0]];
+                b = obj2[args[i][0]];
+            } else {
+                desc = false;
+                a = obj1[args[i]];
+                b = obj2[args[i]];
+            }
+
+            if (case_sensitive === false && typeof a === 'string') {
+                a = a !== undefined && a.trim().length > 0 ? a.toLowerCase() : '~'; // place caracters that does not have property or has it but is '' at the end of array
+                b = b !== undefined && b.trim().length > 0 ? b.toLowerCase() : '~'; // place caracters that does not have property or has it but is '' at the end of array
+                //null if wanted at the start of array
+            }
+
+            if (! desc) {
+                if (a < b) return -1;
+                if (a > b) return 1;
+            } else {
+                if (a > b) return -1;
+                if (a < b) return 1;
+            }
+        }
+        return 0;
+    });
+    // objSort(homes, 'city') --> sort by city (ascending, case in-sensitive)
+    // objSort(homes, ['city', true]) --> sort by city (descending, case in-sensitive)
+    // objSort(homes, 'city', true) --> sort by city (ascending, case sensitive)
+    // objSort(homes, 'city', 'price') --> sort by city then price (both ascending, case in-sensitive)
+    // objSort(homes, 'city', ['price', true]) --> sort by city (ascending) then price (descending), case in-sensitive)
+}

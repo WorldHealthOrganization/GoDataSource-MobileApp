@@ -2,8 +2,10 @@
  * Created by florinpopa on 13/09/2018.
  */
 import {getDatabase} from './database';
+import {objSort} from './../utils/functions'
 import {generateId, extractIdFromPouchId} from './../utils/functions';
 import config from './../utils/config';
+import _ from 'lodash';
 
 export function getContactsForOutbreakIdRequest (outbreakId, filter, token, callback) {
     let database = getDatabase();
@@ -142,7 +144,10 @@ export function getContactsForOutbreakIdRequest (outbreakId, filter, token, call
             })
                 .then((result) => {
                     console.log("result with the new index for contacts: ", new Date().getTime() - start);
-                    callback(null, result.rows.filter((e) => {return e.doc.deleted === false}).map((e) => {return e.doc}))
+                    // result.rows = _.orderBy(result.rows, [item => item.doc.lastName !== undefined ? item.doc.lastName.toLowerCase() : ''], ['asc'])
+                    let resultDocs = result.rows.filter((e) => {return e.doc.deleted === false}).map((e) => {return e.doc})
+                    resultDocs = objSort(resultDocs, ['lastName', false])
+                    callback(null, resultDocs);
                 })
                 .catch((errorQuery) => {
                     console.log("Error with the new index for contacts: ", errorQuery);

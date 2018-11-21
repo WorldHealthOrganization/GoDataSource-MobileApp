@@ -12,6 +12,7 @@ import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import {TextField} from 'react-native-material-textfield';
 import Button from './../components/Button';
+import CardComponent from './../components/CardComponent';
 import styles from './../styles';
 import Ripple from 'react-native-material-ripple';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
@@ -35,7 +36,7 @@ class CasesSortContainer extends PureComponent {
     // and can slow down the app
     render() {
         return (
-            <ElevatedView elevation={3} style={[style.container, {padding: 10}]} key={this.props.key}>
+            <View style={[style.container]}>
                 <Button
                     title={'Back'}
                     onPress={this.props.handleMoveToPrevieousScreenButton}
@@ -54,50 +55,58 @@ class CasesSortContainer extends PureComponent {
                 >
                     <View style={style.container}>
                         {
-                            this.props.case && this.props.filter.sort && this.props.filter.sort.map((item, index) => {
+                            this.props.filter && this.props.filter.sort && this.props.filter.sort.map((item, index) => {
                                 return this.handleRenderItem(item, index)
                             })
                         }
                     </View>
-                    <View style={{alignSelf: 'flex-start', marginHorizontal: calculateDimension(16, false, this.props.screenSize), marginVertical: 20}}>
-                        <Ripple
-                            style={{
-                                height: 25,
-                                justifyContent: 'center'
-                            }}
-                            onPress={this.props.onPressAddSortRule}
-                        >
-                            <Text style={{fontFamily: 'Roboto-Medium', fontSize: 12, color: styles.buttonGreen}}>
-                                {this.state.addSortRuleText}
-                            </Text>
-                        </Ripple>
-                    </View>
-                </KeyboardAwareScrollView>            
-                </ElevatedView>
+                    {
+                        this.props.filter.sort.length < config.sortCriteriaDropDownItems.length ? 
+                            <View style={{alignSelf: 'flex-start', marginHorizontal: calculateDimension(16, false, this.props.screenSize), marginVertical: 20}}>
+                                <Ripple
+                                    style={{
+                                        height: 25,
+                                        justifyContent: 'center'
+                                    }}
+                                    onPress={this.props.onPressAddSortRule}
+                                >
+                                    <Text style={{fontFamily: 'Roboto-Medium', fontSize: 12, color: styles.buttonGreen}}>
+                                        {this.state.addSortRuleText}
+                                    </Text>
+                                </Ripple>
+                            </View> : null
+                    }
+                </KeyboardAwareScrollView>   
+                <View style={style.containerButtonApplyFilters}>
+                    <Button
+                        title="Apply filters"
+                        color={styles.buttonGreen}
+                        onPress={this.props.onPressApplyFilters}
+                        width={calculateDimension(343, false, this.props.screenSize)}
+                        height={calculateDimension(32, true, this.props.screenSize)}
+                        style={{alignSelf: 'center'}}
+                        titleStyle={{fontFamily: 'Roboto-Medium', fontSize: 14}}
+                        titleColor={'white'}
+                    />
+                </View>         
+            </View>
         );
     }
 
     // Please write here all the methods that are not react native lifecycle methods
     handleRenderItem = (item, index) => {
-        let fields = config.caseSingleScreen.address.fields.map((field) => {
-            return Object.assign({},field, {isEditMode: this.props.isEditMode})
-        });
+        let fields = config.casesFilterScreen.sort.fields
         return (
             <CardComponent
                 item={fields}
                 index={index}
-                isEditMode={this.props.isEditMode}
-                screen={'CaseSingleScreen'}
-                case={this.props.case}
-                style={style.cardStyle}
-                onChangeText={this.props.onChangeText}
-                onChangeDate={this.props.onChangeDate}
-                onChangeSwitch={this.props.onChangeSwitch}
+                isEditMode={true}
                 onChangeDropDown={this.props.onChangeDropDown}
-                onChangeSectionedDropDown={this.props.onChangeSectionedDropDown}
+                screen="CasesFilter"
+                filter={this.props.filter}
                 onDeletePress={this.props.onDeletePress}
-                anotherPlaceOfResidenceWasChosen={this.props.anotherPlaceOfResidenceWasChosen}
-                anotherPlaceOfResidenceChanged={this.props.anotherPlaceOfResidenceChanged}
+                style={style.cardStyle}
+                onChangeSectionedDropDown={this.props.onChangeSectionedDropDown}
             />
         )
     }
@@ -124,6 +133,12 @@ const style = StyleSheet.create({
     contentContainerStyle: {
         alignItems: 'center'
     },
+    containerButtonApplyFilters: {
+        flex: 0,
+        justifyContent: 'flex-end',
+        marginBottom: 22,
+        marginTop: 10
+    }
 });
 
 function mapStateToProps(state) {

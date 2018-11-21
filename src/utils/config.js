@@ -133,7 +133,7 @@ const followUpsSingleScreen = {
                 labelValue: 'test',
                 type: 'DropdownInput',
                 value: '',
-                isRequired: true,
+                isRequired: false,
                 isEditMode: false,
                 objectType: 'Address'
             },
@@ -156,7 +156,7 @@ const followUpsSingleScreen = {
                 labelValue: 'test',
                 type: 'DropDownSectioned',
                 value: '',
-                isRequired: true,
+                isRequired: false,
                 isEditMode: false,
                 objectType: 'Address',
                 single: true
@@ -168,7 +168,7 @@ const followUpsSingleScreen = {
                 labelValue: 'test',
                 type: 'TextInput',
                 value: '',
-                isRequired: true,
+                isRequired: false,
                 isEditMode: false,
                 multiline: true,
                 objectType: 'Address'
@@ -180,7 +180,7 @@ const followUpsSingleScreen = {
                 labelValue: 'test',
                 type: 'TextInput',
                 value: '',
-                isRequired: true,
+                isRequired: false,
                 isEditMode: false,
                 multiline: true,
                 objectType: 'Address'
@@ -192,7 +192,7 @@ const followUpsSingleScreen = {
                 labelValue: 'test',
                 type: 'TextInput',
                 value: '',
-                isRequired: true,
+                isRequired: false,
                 isEditMode: false,
                 multiline: true,
                 objectType: 'Address'
@@ -769,28 +769,48 @@ const followUpsFilterScreen = {
                 }
             ]
         }
-        // {
-        //     fields: [
-        //         {
-        //             cardNumber: 4,
-        //             label: 'Exposure',
-        //             type: 'Section',
-        //             hasBorderBottom: true,
-        //             borderBottomColor: styles.navigationDrawerSeparatorGrey
-        //         },
-        //         {
-        //             cardNumber: 4,
-        //             id: 'exposure',
-        //             label: 'Choose one or more cases',
-        //             type: 'DropDown',
-        //             value: '',
-        //             data: [{value: 'Diana Jones'}, {value: 'Florin Popa'}],
-        //             isRequired: false,
-        //             isEditMode: true
-        //         }
-        //     ]
-        // }
-    ]
+    ],
+    sort: {
+        fields: [
+            {      
+                cardNumber: 1,
+                label: 'Sort by',
+                type: 'Section',
+                hasBorderBottom: true,
+                borderBottomColor: styles.navigationDrawerSeparatorGrey
+            },
+            {
+                cardNumber: 1,
+                id: 'sortCriteria',
+                type: 'DropdownInput',
+                label: 'Sort Criteria',
+                isRequired: false,
+                isEditMode: true,
+                value: '',
+                objectType: 'Sort'
+            },
+            {
+                cardNumber: 1,
+                id: 'sortOrder',
+                type: 'DropdownInput',
+                label: 'Sort Order',
+                isRequired: false,
+                isEditMode: true,
+                value: '',
+                objectType: 'Sort'
+            },
+            {
+                cardNumber: 1,
+                id: 'deleteButton',
+                type: 'ActionsBar',
+                labelValue: 'test',
+                textsArray: ['Delete'],
+                textsStyleArray: [{color: styles.missedRedColor}],
+                onPressArray: [],
+                objectType: 'Sort'
+            }
+        ]
+    }
 };
 
 const casesFilterScreen = {
@@ -878,7 +898,6 @@ const casesFilterScreen = {
         fields: [
             {
                 // LNG_SIDE_FILTERS_ADD_ANOTHER_SORT_BUTTON         
-
                 cardNumber: 1,
                 label: 'Sort by', //LNG_SIDE_FILTERS_SORT_BY_PLACEHOLDER
                 type: 'Section',
@@ -903,6 +922,16 @@ const casesFilterScreen = {
                 isRequired: false,
                 isEditMode: true,
                 value: '',
+                objectType: 'Sort'
+            },
+            {
+                cardNumber: 1,
+                id: 'deleteButton',
+                type: 'ActionsBar',
+                labelValue: 'test',
+                textsArray: ['Delete'],
+                textsStyleArray: [{color: styles.missedRedColor}],
+                onPressArray: [],
                 objectType: 'Sort'
             }
         ]
@@ -1732,8 +1761,8 @@ const sortOrderDropDownItems = [
 ]
 
 const sortCriteriaDropDownItems = [
-    { label: 'First Name', value: 'firstname'},
-    { label: 'Last Name', value: 'lastname'}
+    { label: 'First Name', value: 'firstName'},
+    { label: 'Last Name', value: 'lastName'}
 ]
 
 export default {
