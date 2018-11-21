@@ -14,9 +14,8 @@ import {
 } from './../utils/enums';
 import url from '../utils/url';
 import config from './../utils/config';
-import { loginUser } from './user';
 import {Dimensions} from 'react-native';
-import {Platform, NativeModules} from 'react-native';
+import {Platform, NativeModules, Alert} from 'react-native';
 // import {getTranslationRequest} from './../requests/translation';
 import {getAvailableLanguagesRequest, getTranslationRequest} from './../queries/translation';
 import {getDatabaseSnapshotRequest, postDatabaseSnapshotRequest} from './../requests/sync';
@@ -28,6 +27,7 @@ import {createDatabase, getDatabase} from './../queries/database';
 import {setNumberOfFilesProcessed, createZipFileAtPath, extractIdFromPouchId} from './../utils/functions';
 import {AsyncStorage} from 'react-native';
 import {getUserById} from './user';
+import {getFollowUpsForOutbreakId} from './followUps';
 import {uniq} from 'lodash';
 import {addError} from './errors';
 // import RNDB from 'react-native-nosql-to-sqlite';
@@ -217,7 +217,7 @@ export function storeHubConfiguration(hubConfiguration) {
 }
 
 function processFilesForSync(error, response, hubConfiguration, isFirstTime, syncSuccessful) {
-    return async function (dispatch){
+    return async function (dispatch, getState){
         if (error) {
             dispatch(setSyncState('Error'));
         }
@@ -281,7 +281,7 @@ function processFilesForSync(error, response, hubConfiguration, isFirstTime, syn
                                                         });
                                                         dispatch(setSyncState("Finished processing"));
                                                         if (!isFirstTime) {
-                                                            dispatch(parseStatusesAndShowMessage());
+                                                            dispatch(parseStatusesAndShowMessage(getState().user._id));
                                                         }
                                                     } else {
                                                         console.log('There was an error at storing last sync date: ', errorStoreLastSync);
@@ -293,7 +293,7 @@ function processFilesForSync(error, response, hubConfiguration, isFirstTime, syn
                                                         });
                                                         dispatch(setSyncState('Error'));
                                                         if (!isFirstTime) {
-                                                            dispatch(parseStatusesAndShowMessage());
+                                                            dispatch(parseStatusesAndShowMessage(getState().user._id));
                                                         }
                                                     }
                                                 });
@@ -307,7 +307,7 @@ function processFilesForSync(error, response, hubConfiguration, isFirstTime, syn
                                                 });
                                                 dispatch(setSyncState('Error'));
                                                 if (!isFirstTime) {
-                                                    dispatch(parseStatusesAndShowMessage());
+                                                    dispatch(parseStatusesAndShowMessage(getState().user._id));
                                                 }
                                             }
                                         });
@@ -477,13 +477,22 @@ function processFilesForSync(error, response, hubConfiguration, isFirstTime, syn
     }
 }
 
-function parseStatusesAndShowMessage () {
-    return async function (dispatch) {
+function parseStatusesAndShowMessage (userId) {
+    return async function (dispatch, getState) {
         let text = '';
         for (let i=0; i<arrayOfStatuses.length; i++) {
             text += arrayOfStatuses[i].text + '\n' + 'Status: ' + arrayOfStatuses[i].status + '\n';
         }
-        dispatch(addError({type: 'Sync status info', message: text}));
+        Alert.alert('Sync status info', text, [
+            {
+                text: 'Ok', onPress: () => {
+                    // if (userId) {
+                dispatch(getUserById(userId, null, true))
+                    // }
+            }
+            }
+        ])
+        // dispatch(addError({type: 'Sync status info', message: text}));
     }
 }
 
@@ -575,7 +584,7 @@ export function sendDatabaseToServer () {
                                                                             url: Platform.OS === 'ios' ? internetCredentials.server : internetCredentials.service,
                                                                             clientId: internetCredentials.username,
                                                                             clientSecret: internetCredentials.password
-                                                                        }, null, false));
+                                                                        }, null, !errorSendData));
                                                                     }
                                                                 })
                                                             }

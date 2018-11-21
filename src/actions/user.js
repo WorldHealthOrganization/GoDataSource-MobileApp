@@ -20,7 +20,7 @@ import {storeCases} from './cases';
 import {storeEvents} from './events';
 import {storeFollowUps} from './followUps';
 import {storeOutbreak} from './outbreak';
-import {setLoginState, storeData, getAvailableLanguages} from './app';
+import {setLoginState, storeData, getAvailableLanguages, setSyncState} from './app';
 
 // Add here only the actions, not also the requests that are executed.
 // For that purpose is the requests directory
@@ -121,8 +121,8 @@ export function cleanDataAfterLogout() {
     }
 }
 
-export function getUserById(userId, token) {
-    return async function(dispatch) {
+export function getUserById(userId, token, refreshFollowUps) {
+    return async function(dispatch, getState) {
         console.log("getUserById userId: ", userId);
         getUserByIdRequest(userId, token, (error, response) => {
             if (error) {
@@ -134,11 +134,19 @@ export function getUserById(userId, token) {
                 // console.log('getUserById: ', response);
 
                 // Here is the local storage handling
+                if (refreshFollowUps) {
+                    dispatch(setSyncState('Loading'));
+                }
                 let promises = [];
                 promises.push(getOutbreakById(response.activeOutbreakId, null, dispatch));
                 promises.push(getAvailableLanguages(dispatch));
                 // promises.push(getContactsForOutbreakIdWithPromises(response.activeOutbreakId, null, null, dispatch));
-                // promises.push(getFollowUpsForOutbreakIdWithPromises(response.activeOutbreakId, {date: new Date().toISOString()}, null, dispatch));
+                if (refreshFollowUps) {
+                    promises.push(getFollowUpsForOutbreakIdWithPromises(response.activeOutbreakId, getState().app.filters['FollowUpsScreen'] || {
+                            date: new Date(),
+                            searchText: ''
+                        }, null, dispatch));
+                }
                 promises.push(getTranslations(response && response.languageId ? response.languageId : 'english_us', dispatch));
                 promises.push(getReferenceData(null, dispatch));
                 promises.push(getEventsForOutbreakId(response.activeOutbreakId, null, dispatch));
@@ -153,11 +161,17 @@ export function getUserById(userId, token) {
                     .then((result) => {
                         console.log("Finished getting data from local db: ", result);
                         dispatch(setLoginState('Finished logging'));
+                        if (refreshFollowUps) {
+                            dispatch(setSyncState('Finished processing'));
+                        }
                         dispatch(changeAppRoot('after-login'));
                     })
                     .catch((error) => {
                         console.log('Getting data from local db resulted in error: ', error);
-                        dispatch(setLoginState('Finished logging'))
+                        if (refreshFollowUps) {
+                            dispatch(setSyncState('Finished processing'));
+                        }
+                        dispatch(setLoginState('Finished logging'));
                     })
             }
 
