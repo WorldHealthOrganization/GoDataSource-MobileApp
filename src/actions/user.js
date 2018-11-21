@@ -39,7 +39,11 @@ export function loginUser(credentials) {
             if (error) {
                 console.log("*** An error occurred while logging the user");
                 dispatch(setLoginState('Error'));
-                dispatch(addError(errorTypes.ERROR_LOGIN));
+                if (error === 'There is no active Outbreak configured for your user. You have to configure an active Outbreak for your user from the web portal and resync the data with the hub') {
+                    dispatch(addError({type: 'Login error', message: error}));
+                } else {
+                    dispatch(addError(errorTypes.ERROR_LOGIN));
+                }
             }
             if (response) {
                 // if (response.id) {

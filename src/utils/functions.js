@@ -244,7 +244,7 @@ export function getNumberOfFilesProcessed() {
     return numberOfFilesProcessed;
 }
 
-export async function processFile (path, type, totalNumberOfFiles, dispatch, isFirstTime) {
+export async function processFile (path, type, totalNumberOfFiles, dispatch, isFirstTime, forceBulk) {
     return new Promise((resolve, reject) => {
         if (path) {
             console.log('Process file: ', type, ' From path: ', path);
@@ -258,7 +258,7 @@ export async function processFile (path, type, totalNumberOfFiles, dispatch, isF
                                 reject("Error while reading file");
                             }
                             if (data) {
-                                if (isFirstTime) {
+                                if (isFirstTime && forceBulk) {
                                     // If is first time processing files, do a bulk insert
                                     processBulkDocs(data, type)
                                         .then((resultBulk) => {

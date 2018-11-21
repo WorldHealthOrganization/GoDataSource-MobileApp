@@ -199,24 +199,24 @@ export function storeHubConfiguration(hubConfiguration) {
             console.log("Last sync date: ", lastSyncDate);
             if (lastSyncDate !== null) {
                 getDatabaseSnapshotRequest(hubConfiguration, lastSyncDate, (error, response) => {
-                    dispatch(processFilesForSync(error, response, hubConfiguration, true, true));
+                    dispatch(processFilesForSync(error, response, hubConfiguration, true, true, false));
                 })
             } else {
                 console.log('No last sync date found. proceed to download all database: ');
                 getDatabaseSnapshotRequest(hubConfiguration, null, (error, response) => {
-                    dispatch(processFilesForSync(error, response, hubConfiguration, true, true));
+                    dispatch(processFilesForSync(error, response, hubConfiguration, true, true, true));
                 })
             }
         } catch (errorGetLastSyncDate) {
             console.log("Error at getting lastSyncDate. Proceed to download all database: ", errorGetLastSyncDate);
             getDatabaseSnapshotRequest(hubConfiguration, null, (error, response) => {
-                dispatch(processFilesForSync(error, response, hubConfiguration, true, true));
+                dispatch(processFilesForSync(error, response, hubConfiguration, true, true, true));
             })
         }
     }
 }
 
-function processFilesForSync(error, response, hubConfiguration, isFirstTime, syncSuccessful) {
+function processFilesForSync(error, response, hubConfiguration, isFirstTime, syncSuccessful, forceBulk) {
     return async function (dispatch, getState){
         if (error) {
             dispatch(setSyncState('Error'));
@@ -248,7 +248,7 @@ function processFilesForSync(error, response, hubConfiguration, isFirstTime, syn
                                             // Process every file synchronously
                                             try {
                                                 // console.log('Memory size of database: ', memorySizeOf(database));
-                                                let auxData = await processFile(RNFetchBlobFs.dirs.DocumentDir + '/who_databases/' + files[i], files[i], files.length, dispatch, isFirstTime);
+                                                let auxData = await processFile(RNFetchBlobFs.dirs.DocumentDir + '/who_databases/' + files[i], files[i], files.length, dispatch, isFirstTime, forceBulk);
                                                 if (auxData) {
                                                     console.log('auxData: ', auxData);
                                                     promiseResponses.push(auxData);
@@ -584,7 +584,7 @@ export function sendDatabaseToServer () {
                                                                             url: Platform.OS === 'ios' ? internetCredentials.server : internetCredentials.service,
                                                                             clientId: internetCredentials.username,
                                                                             clientSecret: internetCredentials.password
-                                                                        }, null, !errorSendData));
+                                                                        }, null, !errorSendData, false));
                                                                     }
                                                                 })
                                                             }
@@ -615,7 +615,7 @@ export function sendDatabaseToServer () {
                                                     url: Platform.OS === 'ios' ? internetCredentials.server : internetCredentials.service,
                                                     clientId: internetCredentials.username,
                                                     clientSecret: internetCredentials.password
-                                                }, null, true));
+                                                }, null, true, false));
                                             }
                                         })
                                     }

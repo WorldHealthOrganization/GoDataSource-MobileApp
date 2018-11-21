@@ -8,12 +8,18 @@ export function getLocationsByOutbreakIdRequest (outbreakResponse, callback) {
             selector: {
                 _id: {
                     $gte: `location.json_false_`,
-                    $lte: `location.json_false_\uffff`,
-                    $in: outbreakResponse.locationIds
+                    $lte: `location.json_false_\uffff`
                 },
-                parentLocationId: {
-                    $in: outbreakResponse.locationIds
-                }
+                $or: [
+                    {
+                        _id: {$in: outbreakResponse.locationIds.map((e) => {return `location.json_false_${e}`})}
+                    },
+                    {
+                        parentLocationId: {
+                            $in: outbreakResponse.locationIds
+                        }
+                    }
+                ]
             }
         })
             .then((result) => {
