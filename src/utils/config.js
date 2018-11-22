@@ -946,7 +946,7 @@ const addExposureScreen = [
         isRequired: true,
         isEditMode: true,
         format: 'MM/dd/YYYY',
-        objectType: 'FollowUp'
+        objectType: 'Contact'
     },
     {
         cardNumber: 1,
