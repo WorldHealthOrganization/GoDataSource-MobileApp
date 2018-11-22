@@ -75,16 +75,23 @@ class FollowUpsSingleScreen extends Component {
 
     componentDidMount() {
         BackHandler.addEventListener('hardwareBackPress', this.handleBackButtonClick);
-        let today = new Date()
-        let itemDate = new Date(this.props.item.date)
+
+        if (this.props.isNew === false) {
+            let today = new Date()
+            let itemDate = new Date(this.props.item.date)
     
-        var todayDate = new Date(today.getFullYear(), today.getMonth(), today.getDate())
-        let followUpDate = new Date(itemDate.getFullYear(), itemDate.getMonth(), itemDate.getDate())
-        
-        if (followUpDate < todayDate) {
-            console.log('follow-ups date < today => needitabil')
+            var todayDate = new Date(today.getFullYear(), today.getMonth(), today.getDate())
+            let followUpDate = new Date(itemDate.getFullYear(), itemDate.getMonth(), itemDate.getDate())
+            
+            if (followUpDate > todayDate) {
+                console.log('follow-ups date < today => needitabil')
+                this.setState({
+                    isEditMode: false
+                })
+            }
+        } else {
             this.setState({
-                isEditMode: false
+                isEditMode: true
             })
         }
     }
@@ -198,6 +205,7 @@ class FollowUpsSingleScreen extends Component {
             case 'genInfo':
                 return (
                     <FollowUpsSingleGetInfoContainer
+                        isNew={this.props.isNew}
                         isEditMode={this.state.isEditMode}
                         item={this.state.item}
                         contact={this.state.contact}
@@ -213,6 +221,7 @@ class FollowUpsSingleScreen extends Component {
                     <FollowUpsSingleQuestionnaireContainer
                         item={this.state.item}
                         contact={this.state.contact}
+                        isNew={this.props.isNew}
                         isEditMode={this.state.isEditMode}
                         onChangeTextAnswer={this.onChangeTextAnswer}
                         onChangeDateAnswer={this.onChangeDateAnswer}

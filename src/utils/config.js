@@ -95,7 +95,7 @@ const followUpsSingleScreen = {
                     value: '',
                     type: "DatePicker",
                     isRequired: true,
-                    isEditMode: true,
+                    isEditMode: false,
                     format: 'MM/dd/YYYY',
                     objectType: 'FollowUp'
                 },
