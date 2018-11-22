@@ -17,8 +17,8 @@ export function getRelationshipsForTypeRequest (outbreakId, searchType, keys, ca
     database.find({
         selector: {
             _id: {
-                $gte: `relationship.json_false_${outbreakId}_`,
-                $lte: `relationship.json_false_${outbreakId}_\uffff`
+                $gte: `relationship.json_${outbreakId}_`,
+                $lte: `relationship.json_${outbreakId}_\uffff`
             },
             deleted: false,
             $or: [
@@ -53,8 +53,8 @@ export function getRelationshipsAndFollowUpsForContactRequest(outbreakId, keys, 
     promiseArray.push(database.find({
         selector: {
             _id: {
-                $gte: `followUp.json_false_${outbreakId}_${startDate}_`,
-                $lte: `followUp.json_false_${outbreakId}_${endDate}_\uffff`
+                $gte: `followUp.json_${outbreakId}_${startDate}_`,
+                $lte: `followUp.json_${outbreakId}_${endDate}_\uffff`
             },
             deleted: false,
             outbreakId: outbreakId,
@@ -64,8 +64,8 @@ export function getRelationshipsAndFollowUpsForContactRequest(outbreakId, keys, 
     promiseArray.push(database.find({
         selector: {
             _id: {
-                $gte: `relationship.json_false_${outbreakId}_`,
-                $lte: `relationship.json_false_${outbreakId}_\uffff`
+                $gte: `relationship.json_${outbreakId}_`,
+                $lte: `relationship.json_${outbreakId}_\uffff`
             },
             deleted: false,
             $or: [

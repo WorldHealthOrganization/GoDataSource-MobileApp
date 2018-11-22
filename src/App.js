@@ -15,7 +15,7 @@ import Modal from 'react-native-root-modal'
 
 console.disableYellowBox = true;
 
-const logger = createLogger();
+// const logger = createLogger();
 export const store = createStore(appReducers, applyMiddleware(thunk, promise));
 
 registerScreens(store, Provider);
