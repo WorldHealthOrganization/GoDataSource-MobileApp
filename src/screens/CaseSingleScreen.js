@@ -162,10 +162,28 @@ class CaseSingleScreen extends Component {
 
     handleBackButtonClick() {
         // this.props.navigator.goBack(null);
-        this.props.navigator.pop({
-            animated: true,
-            animationType: 'fade'
-        })
+        if (this.state.isModified === true) {
+            Alert.alert("", 'You have unsaved data. Are you sure you want to leave this page and lose all changes?', [
+                {
+                    text: 'Yes', onPress: () => {
+                    this.props.navigator.pop({
+                        animated: true,
+                        animationType: 'fade'
+                    })
+                }
+                },
+                {
+                    text: 'Cancel', onPress: () => {
+                    console.log("onPressCancelEdit No pressed - nothing changes")
+                }
+                }
+            ])
+        } else {
+            this.props.navigator.pop({
+                animated: true,
+                animationType: 'fade'
+            })
+        }
         return false;
     }
 
@@ -183,6 +201,7 @@ class CaseSingleScreen extends Component {
                             <Breadcrumb
                                 entities={['Cases', this.props.isNew ? "Add Case" : (this.state.case.firstName ? this.state.case.firstName : '' + " " + this.state.case.lastName ? this.state.case.lastName : '')]}
                                 navigator={this.props.navigator}
+                                onPress={this.handlePressBreadcrumb}
                             />
                             <View>
                                 <Menu
@@ -507,6 +526,31 @@ class CaseSingleScreen extends Component {
             ])
         }
     };
+    //Breadcrumb click
+    handlePressBreadcrumb = () => {
+        if (this.state.isModified === true) {
+            Alert.alert("", 'You have unsaved data. Are you sure you want to leave this page and lose all changes?', [
+                {
+                    text: 'Yes', onPress: () => {
+                    this.props.navigator.pop({
+                        animated: true,
+                        animationType: 'fade'
+                    })
+                }
+                },
+                {
+                    text: 'Cancel', onPress: () => {
+                    console.log("onPressCancelEdit No pressed - nothing changes")
+                }
+                }
+            ])
+        } else {
+            this.props.navigator.pop({
+                animated: true,
+                animationType: 'fade'
+            });
+        }
+    };
 
     checkIfCaseMatchFilter = () => {
         if (this.props.filter && (this.props.filter['CasesFilterScreen'] || this.props.filter['CasesScreen'])) {
@@ -597,7 +641,7 @@ class CaseSingleScreen extends Component {
     };
     onPressCancelEdit = () => {
         if (this.state.isModified === true) {
-            Alert.alert("Alert", 'Are you sure you want to discard all changes ?', [
+            Alert.alert("", 'You have unsaved data. Are you sure you want to leave this page and lose all changes?', [
                 {
                     text: 'Yes', onPress: () => {
                         console.log("onPressCancelEdit case", this.state.case);
@@ -611,7 +655,7 @@ class CaseSingleScreen extends Component {
                     }
                 },
                 {
-                    text: 'No', onPress: () => {
+                    text: 'Cancel', onPress: () => {
                         console.log("onPressCancelEdit No pressed - nothing changes")
                     }
                 }
