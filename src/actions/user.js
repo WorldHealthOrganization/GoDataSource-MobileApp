@@ -21,6 +21,7 @@ import {storeEvents} from './events';
 import {storeFollowUps} from './followUps';
 import {storeOutbreak} from './outbreak';
 import {setLoginState, storeData, getAvailableLanguages, setSyncState} from './app';
+import moment from 'moment';
 
 // Add here only the actions, not also the requests that are executed.
 // For that purpose is the requests directory
@@ -146,8 +147,9 @@ export function getUserById(userId, token, refreshFollowUps) {
                 promises.push(getAvailableLanguages(dispatch));
                 // promises.push(getContactsForOutbreakIdWithPromises(response.activeOutbreakId, null, null, dispatch));
                 if (refreshFollowUps) {
+                    let now = new Date();
                     promises.push(getFollowUpsForOutbreakIdWithPromises(response.activeOutbreakId, getState().app.filters['FollowUpsScreen'] || {
-                            date: new Date(),
+                            date: new Date(new Date((now.getUTCMonth() + 1) + '/' + now.getUTCDate() + '/' + now.getUTCFullYear()).getTime() - ((moment().isDST() ? now.getTimezoneOffset() : now.getTimezoneOffset() - 60) * 60 * 1000)),
                             searchText: ''
                         }, null, dispatch));
                 }

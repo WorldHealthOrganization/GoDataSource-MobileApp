@@ -167,7 +167,7 @@ export function getAvailableLanguages(dispatch) {
             }
             if (response) {
                 console.log("### here should have available languages: ", response.map((e) => {return {id: extractIdFromPouchId(e._id, 'language'), name: e.name}}));
-                dispatch(saveAvailableLanguages(response.map((e) => {return {value: e._id.substr(20), label: e.name}})));
+                dispatch(saveAvailableLanguages(response.map((e) => {return {value: e._id.substr('language.json_'.length), label: e.name}})));
                 resolve('Done languages');
             }
         })

@@ -91,7 +91,7 @@ class NavigationDrawer extends Component {
                         <DropdownInput
                             id="test"
                             label="Language"
-                            value={this.props.availableLanguages && this.props.user && this.props.user.languageId ? this.props.availableLanguages[this.props.availableLanguages.map((e) => {return e.value}).indexOf(this.props.user.languageId)].label : null}
+                            value={this.props.availableLanguages && this.props.user && this.props.user.languageId && this.props.availableLanguages[this.props.availableLanguages.map((e) => {return e.value}).indexOf(this.props.user.languageId)] ? this.props.availableLanguages[this.props.availableLanguages.map((e) => {return e.value}).indexOf(this.props.user.languageId)].label : null}
                             data={this.props.availableLanguages}
                             isEditMode={true}
                             isRequired={false}

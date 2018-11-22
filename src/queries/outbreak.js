@@ -13,13 +13,13 @@ export function getOutbreakByIdRequest (outbreakId, token, callback) {
     // For searching by ID it is recommended to use the PouchDB allDocs method with the ID as a key, since primary indexes are much faster than secondary ones
 
     // database.allDocs({
-    //     startkey: 'outbreak.json_false_',
-    //     endkey: 'outbreak.json_false_\uffff',
+    //     startkey: 'outbreak.json_',
+    //     endkey: 'outbreak.json_\uffff',
     //     include_docs: true
     // })
     //     .then((allOutbreaks) => {
     //         console.log('All outbreaks: ', allOutbreaks.rows.map((e) => {return e.doc}));
-            database.get('outbreak.json_false_' + outbreakId)
+            database.get('outbreak.json_' + outbreakId)
                 .then((result) => {
                     console.log("Result from getting outbreak: ", new Date().getTime() - start);
                     callback(null, result);

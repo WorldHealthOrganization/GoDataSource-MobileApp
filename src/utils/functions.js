@@ -477,7 +477,7 @@ export function extractIdFromPouchId (pouchId, type) {
         return pouchId
     }
     if (type.includes('referenceData')) {
-        return pouchId.substr('referenceData.json_false_'.length)
+        return pouchId.substr('referenceData.json_'.length)
     }
     return pouchId.split('_')[pouchId.split('_').length - 1];
 }
@@ -485,14 +485,14 @@ export function extractIdFromPouchId (pouchId, type) {
 export function computeIdForFileType (fileType, outbreakId, file, type) {
     switch (fileType) {
         case 'person.json':
-            return (fileType + '_' + type + '_false' + '_' + outbreakId + '_' + generateId());
+            return (fileType + '_' + type + '_' + outbreakId + '_' + generateId());
         case 'followUp.json':
-            return (fileType + '_false_' + outbreakId + '_' + new Date(file.date).getTime() + '_' + generateId());
+            return (fileType + '_' + outbreakId + '_' + new Date(file.date).getTime() + '_' + generateId());
         // return (type + '_' + file.outbreakId + '_' + file._id);
         case 'relationship.json':
-            return (fileType + '_false_' + outbreakId + '_' + generateId());
+            return (fileType + '_' + outbreakId + '_' + generateId());
         default:
-            return (fileType + '_false_' + generateId());
+            return (fileType + '_' + generateId());
     }
 }
 
