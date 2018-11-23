@@ -16,46 +16,47 @@ export function getFollowUpsForOutbreakIdRequest (outbreakId, filter, token, cal
     let oneDay = 24 * 60 * 60 * 1000;
     let startDate = '';
     let endDate = '';
+    // new Date().getTimezoneOffset()
     if (filter && filter.date) {
         startDate = new Date(`${filter.date.getMonth() + 1}/${filter.date.getDate()}/${filter.date.getFullYear()}`).getTime();
-        endDate = moment(filter.date.getTime() + oneDay).add(-1, 'second')._d.getTime();
+        endDate = moment(filter.date.getTime() + (oneDay + (moment().isDST() ? filter.date.getTimezoneOffset() : (filter.date.getTimezoneOffset() - 60)) * 60 * 1000)).add(-1, 'second')._d.getTime();
     }
 
     let start =  new Date().getTime();
-    database.allDocs({
-        startkey: `followUp.json_false_${outbreakId}_${startDate}_`,
-        endkey: `followUp.json_false_${outbreakId}_${endDate}_\uffff`,
-        include_docs: true
-    })
-        .then((result) => {
-            console.log("result with the new index for followUps: ", new Date().getTime() - start, result.rows.length);
-            result.rows = result.rows.filter((e) => {return e.doc.deleted === false});
-            callback(null, result.rows.map((e) => {return e.doc}));
-        })
-        .catch((errorQuery) => {
-            console.log("Error with the new index for followUps: ", errorQuery);
-            callback(errorQuery);
-        })
-
-    // database.find({
-    //     selector: {
-    //         date: {
-    //             $gte: startDate,
-    //             $lte: endDate
-    //         },
-    //         fileType: 'followUp.json',
-    //         deleted: false,
-    //         outbreakId: outbreakId
-    //     }
+    // database.allDocs({
+    //     startkey: `followUp.json_${outbreakId}_${startDate}_`,
+    //     endkey: `followUp.json_${outbreakId}_${endDate}_\uffff`,
+    //     include_docs: true
     // })
-    //     .then((resultFind) => {
-    //         console.log('Result for find time for followUps: ', new Date().getTime() - start);
-    //         callback(null, resultFind.docs)
+    //     .then((result) => {
+    //         console.log("result with the new index for followUps: ", new Date().getTime() - start, result.rows.length);
+    //         result.rows = result.rows.filter((e) => {return e.doc.deleted === false});
+    //         callback(null, result.rows.map((e) => {return e.doc}));
     //     })
-    //     .catch((errorFind) => {
-    //         console.log('Error find for followUps: ', errorFind);
-    //         callback(errorFind);
+    //     .catch((errorQuery) => {
+    //         console.log("Error with the new index for followUps: ", errorQuery);
+    //         callback(errorQuery);
     //     })
+
+    database.find({
+        selector: {
+            _id: {
+                $gte: `followUp.json_${outbreakId}_${startDate}_`,
+                $lte: `followUp.json_${outbreakId}_${endDate}_\uffff`
+            },
+            fileType: 'followUp.json',
+            deleted: false,
+            outbreakId: outbreakId
+        }
+    })
+        .then((resultFind) => {
+            console.log('Result for find time for followUps: ', new Date().getTime() - start);
+            callback(null, resultFind.docs)
+        })
+        .catch((errorFind) => {
+            console.log('Error find for followUps: ', errorFind);
+            callback(errorFind);
+        })
 }
 
 export function getFollowUpsForContactIds (outbreakId, date, contactIds, callback) {
@@ -63,7 +64,7 @@ export function getFollowUpsForContactIds (outbreakId, date, contactIds, callbac
 
     let oneDay = 24 * 60 * 60 * 1000;
     let startDate = new Date(`${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`).getTime();
-    let endDate = moment(date.getTime() + oneDay).add(-1, 'second')._d.getTime();
+    let endDate = moment(date.getTime() + (oneDay + (moment().isDST() ? date.getTimezoneOffset() : (date.getTimezoneOffset() - 60)) * 60 * 1000)).add(-1, 'second')._d.getTime();
 
 
 
@@ -71,10 +72,11 @@ export function getFollowUpsForContactIds (outbreakId, date, contactIds, callbac
     database.find({
         selector: {
             _id: {
-                $gt: `followUp.json_false_${outbreakId}_${startDate}_`,
-                $lt: `followUp.json_false_${outbreakId}_${endDate}_\uffff`
+                $gt: `followUp.json_${outbreakId}_${startDate}_`,
+                $lt: `followUp.json_${outbreakId}_${endDate}_\uffff`
             },
-            personId: {$in: contactIds}
+            personId: {$in: contactIds},
+            deleted: false
         }
     })
         .then((resultGetFollowUps) => {
@@ -140,7 +142,7 @@ export function addFollowUpRequest (outbreakId, contactId, followUp, token, call
             followUp.date = new Date().toISOString();
         }
         let generatedId = generateId();
-        followUp._id = 'followUp.json_false_' + outbreakId + '_' + new Date(followUp.date).getTime() + '_' + generatedId;
+        followUp._id = 'followUp.json_' + outbreakId + '_' + new Date(followUp.date).getTime() + '_' + generatedId;
     }
     if (!followUp.personId) {
         followUp.personId = contactId
@@ -192,11 +194,12 @@ export function getFollowUpsForContactRequest (outbreakId, keys, contactFollowUp
 
     database.find({
         selector: {
-            fileType: {$in: ['followUp.json']},
+            _id: {
+                $gte: `followUp.json_${outbreakId}_${startDate}_`,
+                $lte: `followUp.json_${outbreakId}_${endDate}_\uffff`
+            },
             outbreakId: outbreakId,
             deleted: false,
-            date: startDate ? {$gte: startDate} : {},
-            date: endDate ? {$lte: endDate} : {},
             personId: {$in: keys}
         }
     })
