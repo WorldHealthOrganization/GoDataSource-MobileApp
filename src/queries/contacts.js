@@ -12,6 +12,8 @@ export function getContactsForOutbreakIdRequest (outbreakId, filter, token, call
 
     let start = new Date().getTime();
     if (filter && filter.keys) {
+
+        // Review Anda : TODO mapul asta si forul urmator -> un singur map
         // console.log('getContactsForOutbreakIdRequest if')
         let keys = filter.keys.map((e) => {return `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT_false_${outbreakId}_${e}`});
         // console.log("@@@ filter keys: ", keys);
@@ -120,6 +122,7 @@ export function getContactsForOutbreakIdRequest (outbreakId, filter, token, call
                      //local filter for selectedLocations bcause it can't be done in mango queries
                      if (filter.selectedLocations && filter.selectedLocations.length > 0) {
                         resultFilterContactsDocs = resultFilterContactsDocs.filter((e) => {
+                            // Review Anda : TODO nu ai nevoie de filter dar de un find
                             let addresses = e.addresses.filter((k) => {
                                 return k.locationId !== '' && filter.selectedLocations.indexOf(k.locationId) >= 0
                             })

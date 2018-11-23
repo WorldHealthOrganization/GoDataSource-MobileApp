@@ -508,6 +508,9 @@ export function mapContactsAndRelationships(contacts, relationships) {
     let mappedContacts = contacts;
     for (let i = 0; i < relationships.length; i++) {
         let contactObject = {};
+
+        // Review Anda : TODO asta vine intr-o variabila ca e calculat de doua ori: mappedContacts.map((e) => { return extractIdFromPouchId(e._id, 'person') }).indexOf(relationships[i].persons[0].id)
+        // Review Anda si inlocuit cu un singur indexOf - in map poti sa vezi if extractId... === relationships[i].persons[0].id
         if ((relationships[i].persons[0].type === 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT' || relationships[i].persons[0].type === 'contact') && mappedContacts.map((e) => {
                 return extractIdFromPouchId(e._id, 'person')
             }).indexOf(relationships[i].persons[0].id) > -1) {
@@ -554,7 +557,9 @@ export function mapContactsAndFollowUps(contacts, followUps) {
 
     let mappedContacts = [];
     for (let i=0; i < followUps.length; i++) {
-        if (mappedContacts.map((e) => { return extractIdFromPouchId(e._id, 'person') }).indexOf(followUps[i].personId) === -1) {
+        // Review Anda : TODO asta vine intr-o variabila ca e calculat de doua ori: mappedContacts.map((e) => {return extractIdFromPouchId(e._id, 'person')}).indexOf(followUps[i].personId) 
+        // Review Anda si devine in singur indexOf
+        if (mappedContacts.map((e) => {return extractIdFromPouchId(e._id, 'person')}).indexOf(followUps[i].personId) === -1) {
             let contactObject = {};
             contactObject = Object.assign({}, contacts[contacts.map((e) => {return extractIdFromPouchId(e._id, 'person')}).indexOf(followUps[i].personId)]);
             contactObject.followUps = [];
@@ -671,7 +676,7 @@ export function mapQuestions (questions) {
             if (mappedQuestions.map((e) => {return e.categoryName}).indexOf(questions[i].category) === -1) {
                 mappedQuestions.push({categoryName: questions[i].category, questions: [questions[i]]});
             } else {
-                if (mappedQuestions && Array.isArray(mappedQuestions) && mappedQuestions.length > 0 && mappedQuestions.map((e) => {
+                if (mappedQuestions && Array.isArray(mappedQuestions) && mappedQuestions.length > 0 && mappedQuestions.map((e )=> {
                         return e.categoryName
                     }).indexOf(questions[i].category) > -1 && mappedQuestions[mappedQuestions.map((e) => {
                         return e.categoryName

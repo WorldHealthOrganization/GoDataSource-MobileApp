@@ -29,6 +29,7 @@ export default function (state=null, action) {
             if (!action.payload) {
                 return null;
             }
+            // Review Anda : TODO asta nu e optim : stateClone.map((e) => {return e._id}).indexOf(action.payload._id) vine pus intr-o variabila 
             if (stateClone.map((e) => {return e._id}).indexOf(action.payload._id) > -1){
                 if (action.payload.deleted === false) {
                     stateClone[stateClone.map((e) => {return e._id}).indexOf(action.payload._id)] = action.payload;
@@ -41,6 +42,7 @@ export default function (state=null, action) {
             if (!action.payload) {
                 return null;
             }
+            // Review Anda : TODO asta nu e optim : stateClone.map((e) => {return e._id}).indexOf(action.payload._id) vine pus intr-o variabila 
             if (stateClone.map((e) => {return e._id}).indexOf(action.payload._id) > -1){
                 stateClone.splice(stateClone.map((e) => {return e._id}).indexOf(action.payload._id), 1)
             }

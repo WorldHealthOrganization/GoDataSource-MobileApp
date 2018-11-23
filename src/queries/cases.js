@@ -10,6 +10,8 @@ export function getCasesForOutbreakIdRequest (outbreakId, filter, token, callbac
 
     console.log("getCasesForOutbreakIdRequest: ", outbreakId);
     if (filter && filter.keys) {
+
+        // Review Anda : TODO mapul asta si forul urmator -> intr un singur map
         let keys = filter.keys.map((e) => {return `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE_false_${outbreakId}_${e}`});
         let promiseArray = [];
 
@@ -94,6 +96,7 @@ export function getCasesForOutbreakIdRequest (outbreakId, filter, token, callbac
                     //local filter for selectedLocations bcause it can't be done in mango queries
                     if (filter.selectedLocations && filter.selectedLocations.length > 0) {
                         resultFilterCasesDocs = resultFilterCasesDocs.filter((e) => {
+                            // Review Anda : TODO pt addresses ai nevoie sa vezi daca exista find one 
                             let addresses = e.addresses.filter((k) => {
                                 return k.locationId !== '' && filter.selectedLocations.indexOf(k.locationId) >= 0
                             })
