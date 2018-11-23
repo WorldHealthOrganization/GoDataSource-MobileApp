@@ -13,18 +13,10 @@ export function getContactsForOutbreakIdRequest (outbreakId, filter, token, call
     let start = new Date().getTime();
     if (filter && filter.keys) {
 
-        // Review Anda : TODO mapul asta si forul urmator -> un singur map
-        // console.log('getContactsForOutbreakIdRequest if')
-        let keys = filter.keys.map((e) => {return `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT_${outbreakId}_${e}`});
-        // console.log("@@@ filter keys: ", keys);
-        let start =  new Date().getTime();
-
         let promiseArray = [];
+        promiseArray = filter.keys.map((e) => {return getFromDb(database, `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT_${outbreakId}_${e}`)});
 
-        for (let i=0; i<keys.length; i++) {
-            promiseArray.push(getFromDb(database, keys[i]));
-        }
-
+        let start =  new Date().getTime();
         Promise.all(promiseArray)
             .then((resultGetAll) => {
                 console.log("Result from get queries: ", new Date().getTime() - start, resultGetAll.length);
@@ -122,11 +114,11 @@ export function getContactsForOutbreakIdRequest (outbreakId, filter, token, call
                      //local filter for selectedLocations bcause it can't be done in mango queries
                      if (filter.selectedLocations && filter.selectedLocations.length > 0) {
                         resultFilterContactsDocs = resultFilterContactsDocs.filter((e) => {
-                            // Review Anda : TODO nu ai nevoie de filter dar de un find
-                            let addresses = e.addresses.filter((k) => {
+                            let address = e.addresses.find((k) => {
                                 return k.locationId !== '' && filter.selectedLocations.indexOf(k.locationId) >= 0
                             })
-                            return addresses.length > 0
+                        
+                            return address === undefined ? false : true
                         })
                     }
                     callback(null, resultFilterContactsDocs)

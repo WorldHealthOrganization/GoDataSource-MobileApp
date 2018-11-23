@@ -509,39 +509,29 @@ export function mapContactsAndRelationships(contacts, relationships) {
     for (let i = 0; i < relationships.length; i++) {
         let contactObject = {};
 
-        // Review Anda : TODO asta vine intr-o variabila ca e calculat de doua ori: mappedContacts.map((e) => { return extractIdFromPouchId(e._id, 'person') }).indexOf(relationships[i].persons[0].id)
-        // Review Anda si inlocuit cu un singur indexOf - in map poti sa vezi if extractId... === relationships[i].persons[0].id
-        if ((relationships[i].persons[0].type === 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT' || relationships[i].persons[0].type === 'contact') && mappedContacts.map((e) => {
-                return extractIdFromPouchId(e._id, 'person')
-            }).indexOf(relationships[i].persons[0].id) > -1) {
-
-            contactObject = Object.assign({}, contacts[contacts.map((e) => {
-                return extractIdFromPouchId(e._id, 'person')
-            }).indexOf(relationships[i].persons[0].id)]);
+        let contactIndexAsFirstPerson = mappedContacts.map((e) => {return extractIdFromPouchId(e._id, 'person')}).indexOf(relationships[i].persons[0].id)
+        let contactIndexAsSecondPerson = mappedContacts.map((e) => {return extractIdFromPouchId(e._id, 'person')}).indexOf(relationships[i].persons[1].id)
+        if ((relationships[i].persons[0].type === 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT' || relationships[i].persons[0].type === 'contact') && contactIndexAsFirstPerson > -1) {
+            contactObject = Object.assign({}, contacts.find((e) => {
+                return extractIdFromPouchId(e._id, 'person') === relationships[i].persons[0].id
+            }))
 
             if (!contactObject.relationships || contactObject.relationships.length === 0) {
                 contactObject.relationships = [];
             }
             contactObject.relationships.push(relationships[i]);
-            mappedContacts[mappedContacts.map((e) => {
-                return extractIdFromPouchId(e._id, 'person')
-            }).indexOf(relationships[i].persons[0].id)] = contactObject;
+            mappedContacts[contactIndexAsFirstPerson] = contactObject;
         } else {
-            if ((relationships[i].persons[1].type === 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT' || relationships[i].persons[1].type === 'contact') && mappedContacts.map((e) => {
-                    return extractIdFromPouchId(e._id, 'person')
-                }).indexOf(relationships[i].persons[1].id) > -1) {
-
-                contactObject = Object.assign({}, contacts[contacts.map((e) => {
-                    return extractIdFromPouchId(e._id, 'person')
-                }).indexOf(relationships[i].persons[1].id)]);
+            if ((relationships[i].persons[1].type === 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT' || relationships[i].persons[1].type === 'contact') && contactIndexAsSecondPerson > -1) {
+                contactObject = Object.assign({}, contacts.find((e) => {
+                    return extractIdFromPouchId(e._id, 'person') === relationships[i].persons[1].id
+                }))
 
                 if (!contactObject.relationships || contactObject.relationships.length === 0) {
                     contactObject.relationships = [];
                 }
                 contactObject.relationships.push(relationships[i]);
-                mappedContacts[mappedContacts.map((e) => {
-                    return extractIdFromPouchId(e._id, 'person')
-                }).indexOf(relationships[i].persons[1].id)] = contactObject;
+                mappedContacts[contactIndexAsSecondPerson] = contactObject;
             }
         }
     }
@@ -557,16 +547,20 @@ export function mapContactsAndFollowUps(contacts, followUps) {
 
     let mappedContacts = [];
     for (let i=0; i < followUps.length; i++) {
-        // Review Anda : TODO asta vine intr-o variabila ca e calculat de doua ori: mappedContacts.map((e) => {return extractIdFromPouchId(e._id, 'person')}).indexOf(followUps[i].personId) 
         // Review Anda si devine in singur indexOf
-        if (mappedContacts.map((e) => {return extractIdFromPouchId(e._id, 'person')}).indexOf(followUps[i].personId) === -1) {
+
+        let contactPersonIndex = mappedContacts.map((e) => {return extractIdFromPouchId(e._id, 'person')}).indexOf(followUps[i].personId)
+        if (contactPersonIndex === -1) {
             let contactObject = {};
-            contactObject = Object.assign({}, contacts[contacts.map((e) => {return extractIdFromPouchId(e._id, 'person')}).indexOf(followUps[i].personId)]);
+            contactObject = Object.assign({}, contacts.find((e) => {
+                return extractIdFromPouchId(e._id, 'person') === followUps[i].personId
+            }))
+                
             contactObject.followUps = [];
             contactObject.followUps.push(followUps[i]);
             mappedContacts.push(contactObject);
         } else {
-            mappedContacts[mappedContacts.map((e) => {return extractIdFromPouchId(e._id, 'person')}).indexOf(followUps[i].personId)].followUps.push(followUps[i]);
+            mappedContacts[contactPersonIndex].followUps.push(followUps[i]);
         }
     }
     // console.log ('mapContactsAndFollowUps mappedContacts', JSON.stringify(mappedContacts))

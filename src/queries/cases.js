@@ -11,13 +11,8 @@ export function getCasesForOutbreakIdRequest (outbreakId, filter, token, callbac
     console.log("getCasesForOutbreakIdRequest: ", outbreakId);
     if (filter && filter.keys) {
 
-        // Review Anda : TODO mapul asta si forul urmator -> intr un singur map
-        let keys = filter.keys.map((e) => {return `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE_${outbreakId}_${e}`});
         let promiseArray = [];
-
-        for (let i=0; i<keys.length; i++) {
-            promiseArray.push(getFromDb(database, keys[i]));
-        }
+        promiseArray = filter.keys.map((e) => {return getFromDb(database, `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE_${outbreakId}_${e}`)});
 
         Promise.all(promiseArray)
             .then((resultGetAll) => {
@@ -96,11 +91,11 @@ export function getCasesForOutbreakIdRequest (outbreakId, filter, token, callbac
                     //local filter for selectedLocations bcause it can't be done in mango queries
                     if (filter.selectedLocations && filter.selectedLocations.length > 0) {
                         resultFilterCasesDocs = resultFilterCasesDocs.filter((e) => {
-                            // Review Anda : TODO pt addresses ai nevoie sa vezi daca exista find one 
-                            let addresses = e.addresses.filter((k) => {
+                            let address = e.addresses.find((k) => {
                                 return k.locationId !== '' && filter.selectedLocations.indexOf(k.locationId) >= 0
                             })
-                            return addresses.length > 0
+                        
+                            return address === undefined ? false : true
                         })
                     }
                     callback(null, resultFilterCasesDocs)
