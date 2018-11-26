@@ -2,7 +2,7 @@
  * Created by florinpopa on 03/07/2018.
  */
 import React, {Component} from 'react';
-import {Text, View, StyleSheet, Platform, Alert} from 'react-native';
+import {Text, View, Platform, Image, StyleSheet, Alert} from 'react-native';
 import NavigationDrawerListItem from './../components/NavigationDrawerListItem';
 import config from './../utils/config';
 import {connect} from "react-redux";
@@ -13,7 +13,7 @@ import styles from './../styles';
 import {ListItem, Icon} from 'react-native-material-ui';
 import DropdownInput from './../components/DropdownInput';
 import {updateUser} from './../actions/user';
-import {updateRequiredFields} from './../utils/functions';
+import {updateRequiredFields, calculateDimension} from './../utils/functions';
 
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
@@ -40,7 +40,7 @@ class NavigationDrawer extends Component {
             <View style={style.container}>
                 <View
                     style={{
-                        flex: 0.15,
+                        flex: 0.2,
                         marginTop: Platform.OS === 'ios' ? this.props.screenSize.height === 812 ? 44 : 20 : 0,
                         justifyContent: 'space-around'
                     }}>
@@ -52,15 +52,23 @@ class NavigationDrawer extends Component {
                                 secondaryText: this.props.user && this.props.user.email ? this.props.user.email : ''
                             }}
                             style={{
-                                container: {height: '100%'},
+                                // container: {height: '75%'},
                                 primaryText: {fontFamily: 'Roboto-Medium', fontSize: 18},
                                 secondaryText: {fontFamily: 'Roboto-Regular', fontSize: 12},
                                 centerElementContainer: {height: '100%', justifyContent: 'center'}
                             }}
                         />
+                    {
+                        this.props && this.props.outbreak && this.props.outbreak.name ? (
+                            <View style={{marginHorizontal: 16}}>
+                                <Text style={{fontFamily: 'Roboto-Medium', fontSize: 15, color: styles.navigationDrawerItemText}} numberOfLines={1}>Active Outbreak: </Text>
+                                <Text style={{fontFamily: 'Roboto-Medium', fontSize: 15, color: styles.navigationDrawerItemText}} numberOfLines={1}>{this.props.outbreak.name}</Text>
+                            </View>
+                        ) : (null)
+                    }
                     <View style={styles.lineStyle} />
                 </View>
-                <View style={{flex: 0.85}}>
+                <View style={{flex: 0.8}}>
                     {
                         config.sideMenuItems.map((item, index) => {
                             return (
@@ -83,7 +91,7 @@ class NavigationDrawer extends Component {
                         <DropdownInput
                             id="test"
                             label="Language"
-                            value={this.props.availableLanguages && this.props.user && this.props.user.languageId ? this.props.availableLanguages[this.props.availableLanguages.map((e) => {return e.value}).indexOf(this.props.user.languageId)].label : null}
+                            value={this.props.availableLanguages && this.props.user && this.props.user.languageId && this.props.availableLanguages[this.props.availableLanguages.map((e) => {return e.value}).indexOf(this.props.user.languageId)] ? this.props.availableLanguages[this.props.availableLanguages.map((e) => {return e.value}).indexOf(this.props.user.languageId)].label : null}
                             data={this.props.availableLanguages}
                             isEditMode={true}
                             isRequired={false}
@@ -92,6 +100,17 @@ class NavigationDrawer extends Component {
                         />
                     </View>
                     <NavigationDrawerListItem label='Logout' name="power-settings-new" onPress={this.handleLogout} />
+
+                        {/*<Image source={{uri: 'logo_app'}} resizeMode={'contain'}*/}
+                               {/*style={{*/}
+                                   {/*width: calculateDimension(137, false, this.props.screenSize),*/}
+                                   {/*height: calculateDimension(26, true, this.props.screenSize),*/}
+                                   {/*tintColor: 'black',*/}
+                                   {/*marginHorizontal: 22.5,*/}
+                                   {/*position: 'absolute',*/}
+                                   {/*bottom: 0,*/}
+                                   {/*marginBottom: 18*/}
+                               {/*}}/>*/}
                 </View>
             </View>
         );
@@ -204,7 +223,8 @@ function mapStateToProps(state) {
     return {
         user: state.user,
         screenSize: state.app.screenSize,
-        availableLanguages: state.app.availableLanguages
+        availableLanguages: state.app.availableLanguages,
+        outbreak: state.outbreak
     };
 }
 

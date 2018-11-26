@@ -7,13 +7,20 @@ export function getLocationsByOutbreakIdRequest (outbreakResponse, callback) {
         database.find({
             selector: {
                 _id: {
-                    $gte: `location.json_false_`,
-                    $lte: `location.json_false_\uffff`,
-                    $in: outbreakResponse.locationIds
+                    $gte: `location.json_`,
+                    $lte: `location.json_\uffff`
                 },
-                parentLocationId: {
-                    $in: outbreakResponse.locationIds
-                }
+                $or: [
+                    {
+                        _id: {$in: outbreakResponse.locationIds.map((e) => {return `location.json_${e}`})}
+                    },
+                    {
+                        parentLocationId: {
+                            $in: outbreakResponse.locationIds
+                        }
+                    }
+                ],
+                deleted: false
             }
         })
             .then((result) => {
@@ -28,9 +35,10 @@ export function getLocationsByOutbreakIdRequest (outbreakResponse, callback) {
         database.find({
             selector: {
                 _id: {
-                    $gte: `location.json_false_`,
-                    $lte: `location.json_false_\uffff`
-                }
+                    $gte: `location.json_`,
+                    $lte: `location.json_\uffff`
+                },
+                deleted: false
             }
         })
             .then((result) => {
