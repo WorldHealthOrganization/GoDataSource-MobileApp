@@ -317,7 +317,7 @@ const caseSingleScreen = {
                     labelValue: 'test',
                     type: 'DropdownInput',
                     value: '',
-                    isRequired: true,
+                    isRequired: false,
                     isEditMode: false,
                     activeButtonColor: 'red',
                     activeBackgroundColor: 'red',
