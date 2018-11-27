@@ -136,7 +136,7 @@ export function getMissedFollowUpsForOutbreakId(outbreakId, filter, token) {
     }
 }
 
-export function updateFollowUpAndContact(outbreakId, contactId, followUpId, followUp, contact, token) {
+export function updateFollowUpAndContact(outbreakId, contactId, followUpId, followUp, contact, token, filter) {
     let contactIdForFollowUp = null;
     if (contactId) {
         contactIdForFollowUp = extractIdFromPouchId(contactId, 'person')
@@ -151,9 +151,9 @@ export function updateFollowUpAndContact(outbreakId, contactId, followUpId, foll
                 console.log("*** updateFollowUp response: ", JSON.stringify(response));
                 dispatch(updateFollowUpAction(response));
                 if (contact && contactId) {
-                    dispatch(updateContact(outbreakId, contactId, contact, token));
+                    dispatch(updateContact(outbreakId, contactId, contact, token, filter, true));
                 } else if (contact){
-                    console.log ('updateContactAction')
+                    console.log ('updateContactAction');
                     dispatch(updateContactAction(contact));
                 }
             }
@@ -185,7 +185,7 @@ export function createFollowUp(outbreakId, contactId, followUp, contact, activeF
             }
             if (response) {
                 dispatch(updateFollowUpAction(response));
-                dispatch(updateContact(outbreakId, contactId, contact, token));
+                dispatch(updateContact(outbreakId, contactId, contact, token, activeFilters, true));
             }
         })
     }
@@ -230,7 +230,8 @@ export function generateFollowUp(outbreakId, date, token) {
                                     date: date,
                                     personId: contactsThatNeedFollowUps[i],
                                     outbreakId: outbreakId,
-                                    statusId: config.followUpStatuses.notPerformed
+                                    statusId: config.followUpStatuses.notPerformed,
+                                    targeted: false
                                 };
                                 let aux = updateRequiredFields(outbreakId, getState().user.activeOutbreakId, newFollowUp, 'create', 'followUp.json');
                                 generatedFollowUps.push(aux);

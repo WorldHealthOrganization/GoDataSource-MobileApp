@@ -8,12 +8,12 @@ import config from './../utils/config';
 export function getContactsForOutbreakIdRequest (outbreakId, filter, token, callback) {
     let database = getDatabase();
 
-    console.log("getContactsForOutbreakIdRequest: ", outbreakId, filter, token, callback);
+    // console.log("getContactsForOutbreakIdRequest: ", outbreakId, filter, token, callback);
 
     let start = new Date().getTime();
     if (filter && filter.keys) {
         // console.log('getContactsForOutbreakIdRequest if')
-        let keys = filter.keys.map((e) => {return `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT_false_${outbreakId}_${e}`});
+        let keys = filter.keys.map((e) => {return `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT_${outbreakId}_${e}`});
         // console.log("@@@ filter keys: ", keys);
         let start =  new Date().getTime();
 
@@ -70,26 +70,63 @@ export function getContactsForOutbreakIdRequest (outbreakId, filter, token, call
             console.log('getContactsForOutbreakIdRequest else, if');
             console.log ('myFilter', filter);
 
+            let myFilterAge = null 
+            if (filter.age) {
+                myFilterAge = filter.age
+                let maxAge = filter.age[1]
+                let minAge = filter.age[0]
+                while (maxAge - 1 > minAge) {
+                    myFilterAge.push(minAge + 1)
+                    minAge = minAge + 1
+                }
+            }
+
             database.find({
                 selector: {
                     _id: {
-                        $gt: `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT_false_${outbreakId}_`,
-                        $lt: `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT_false_${outbreakId}_\uffff`
+                        $gt: `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT_${outbreakId}_`,
+                        $lt: `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT_${outbreakId}_\uffff`
                     },
                     type: {$eq: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT'},
                     gender: filter.gender ? {$eq: filter.gender} : {},
-                    age: filter.age ? { $gte: filter.age[0]} : {},
-                    age: filter.age ? { $lte: filter.age[1]} : {},
+                    deleted: false,
+                    $or: [
+                        {'age.years': myFilterAge && myFilterAge.length > 0 ? { $in: myFilterAge} : {}},
+                        {'age.months': myFilterAge && myFilterAge.length > 0 ? { $in: myFilterAge} : {}},
+                    ],
                     $or: [
                         {firstName: filter.searchText ? {$regex: filter.searchText} : {}},
                         {lastName: filter.searchText ? {$regex: filter.searchText} : {}}
-                    ]
+                    ],
                 },
             })
                 .then((resultFilterContacts) => {
-                    console.log('Result when filtering contacts: ', new Date().getTime() - start);
-                    console.log("Found evidence: ", resultFilterContacts.docs);
-                    callback(null, resultFilterContacts.docs)
+                    console.log('Result when filtering contacts: ', new Date().getTime() - start, resultFilterContacts);
+                    //local filter for age because it can't be done in mango (can't use and in or filter
+                    let resultFilterContactsDocs = resultFilterContacts.docs
+                    if (filter.age) {
+                        resultFilterContactsDocs = resultFilterContactsDocs.filter((e) => {
+                            if (e.age && e.age.years !== null && e.age.years !== undefined && e.age.months !== null && e.age.months !== undefined ) {
+                                if (e.age.years > 0 && e.age.months === 0) {
+                                    return e.age.years >= filter.age[0] && e.age.years <= filter.age[1]
+                                } else if (e.age.years === 0 && e.age.months > 0){
+                                    return e.age.months >= filter.age[0] && e.age.months <= filter.age[1]
+                                } else if (e.age.years === 0 && e.age.months === 0) {
+                                    return e.age.years >= filter.age[0] && e.age.years <= filter.age[1]
+                                }
+                            }
+                        });
+                    }
+                     //local filter for selectedLocations bcause it can't be done in mango queries
+                     if (filter.selectedLocations && filter.selectedLocations.length > 0) {
+                        resultFilterContactsDocs = resultFilterContactsDocs.filter((e) => {
+                            let addresses = e.addresses.filter((k) => {
+                                return k.locationId !== '' && filter.selectedLocations.indexOf(k.locationId) >= 0
+                            })
+                            return addresses.length > 0
+                        })
+                    }
+                    callback(null, resultFilterContactsDocs)
                 })
                 .catch((errorFilterContacts) => {
                     console.log('Error when filtering contacts: ', errorFilterContacts);
@@ -98,36 +135,37 @@ export function getContactsForOutbreakIdRequest (outbreakId, filter, token, call
         } else {
             // console.log('getContactsForOutbreakIdRequest else');
 
-            database.allDocs({
-                startkey: `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT_false_${outbreakId}`,
-                endkey: `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT_false_${outbreakId}\uffff`,
-                include_docs: true
-            })
-                .then((result) => {
-                    console.log("result with the new index for contacts: ", new Date().getTime() - start);
-                    callback(null, result.rows.filter((e) => {return e.doc.deleted === false}).map((e) => {return e.doc}))
-                })
-                .catch((errorQuery) => {
-                    console.log("Error with the new index for contacts: ", errorQuery);
-                    callback(errorQuery);
-                })
-
-            // database.find({
-            //     selector: {
-            //         type: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT',
-            //         fileType: 'person.json',
-            //         deleted: false,
-            //         outbreakId: outbreakId
-            //     }
+            // database.allDocs({
+            //     startkey: `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT_${outbreakId}_`,
+            //     endkey: `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT_${outbreakId}_\uffff`,
+            //     include_docs: true
             // })
-            //     .then((resultFind) => {
-            //         console.log('Result for find time for contacts: ', new Date().getTime() - start);
-            //         callback(null, resultFind.docs)
+            //     .then((result) => {
+            //         console.log("result with the new index for contacts: ", new Date().getTime() - start);
+            //         callback(null, result.rows.filter((e) => {return e.doc.deleted === false}).map((e) => {return e.doc}))
             //     })
-            //     .catch((errorFind) => {
-            //         console.log('Error find for contacts: ', errorFind);
-            //         callback(errorFind);
+            //     .catch((errorQuery) => {
+            //         console.log("Error with the new index for contacts: ", errorQuery);
+            //         callback(errorQuery);
             //     })
+
+            database.find({
+                selector: {
+                    _id: {
+                        $gte: `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT_${outbreakId}_`,
+                        $lte: `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT_${outbreakId}_\uffff`,
+                    },
+                    deleted: false
+                }
+            })
+                .then((resultFind) => {
+                    console.log('Result for find time for contacts: ', new Date().getTime() - start);
+                    callback(null, resultFind.docs)
+                })
+                .catch((errorFind) => {
+                    console.log('Error find for contacts: ', errorFind);
+                    callback(errorFind);
+                })
         }
     }
 }
@@ -140,8 +178,8 @@ export function getContactsForFollowUpPeriodRequest (outbreakId, followUpDate, c
     database.find({
         selector: {
             _id: {
-                $gt: `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT_false_${outbreakId}_`,
-                $lt: `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT_false_${outbreakId}_\uffff`
+                $gt: `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT_${outbreakId}_`,
+                $lt: `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT_${outbreakId}_\uffff`
             },
             'followUp.status': 'LNG_REFERENCE_DATA_CONTACT_FINAL_FOLLOW_UP_STATUS_TYPE_UNDER_FOLLOW_UP',
             'followUp.startDate': {$lte: followUpDate},
@@ -186,7 +224,7 @@ export function getContactByIdRequest(outbreakId, contactId, token, callback) {
 
     database.get(contactId)
         .then((resultGetContactById) => {
-            console.log("Result getContactByIdRequest: ", JSON.stringify(resultGetContactById));
+            console.log("Result getContactByIdRequest: ");
             callback(null, resultGetContactById);
         })
         .catch((errorGetContactById) => {
@@ -199,21 +237,21 @@ export function getContactByIdRequest(outbreakId, contactId, token, callback) {
 export function updateContactRequest(outbreakId, contactId, contact, token, callback) {
     let database = getDatabase();
 
-    console.log('updateContactRequest: ', outbreakId, contactId, contact, token);
+    // console.log('updateContactRequest: ', outbreakId, contactId, contact, token);
 
     database.get(contact._id)
         .then((resultGetContact) => {
-            console.log ('Get contact result: ', JSON.stringify(resultGetContact))
+            console.log ('Get contact result: ');
             database.remove(resultGetContact)
                 .then((resultRemove) => {
-                    console.log ('Remove contact result: ', JSON.stringify(resultRemove))
+                    console.log ('Remove contact result: ')
                     delete contact._rev;
                     database.put(contact)
                         .then((responseUpdateContact) => {
-                            console.log("Update contact response: ", responseUpdateContact);
+                            console.log("Update contact response: ");
                             database.get(contact._id)
                                 .then((resultGetUpdatedContact) => {
-                                    console.log("Response getUpdatedContact: ", JSON.stringify(resultGetUpdatedContact));
+                                    console.log("Response getUpdatedContact: ");
                                     callback(null, resultGetUpdatedContact);
                                 })
                                 .catch((errorGetUpdatedContact) => {
@@ -269,7 +307,7 @@ export function addExposureForContactRequest(outbreakId, contactId, exposure, to
         }
     }
 
-    console.log('exposure for put', JSON.stringify(exposure))
+    // console.log('exposure for put')
     // exposure.outbreakId = outbreakId
     database.put(exposure)
         .then((result) => {

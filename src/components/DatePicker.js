@@ -41,15 +41,15 @@ class DatePicker extends PureComponent {
     editInput = () => {
         // console.log("### date from value: ", this.props.value);
         return (
-            <View style={[{},this.props.style]}>
+            <View style={[{marginVertical: 10},this.props.style]}>
                 {
                     this.props.value !== undefined && this.props.value !== null ? (
                         <View>
                             <Text style={{
-                                fontFamily: 'Roboto-Light',
+                                fontFamily: 'Roboto',
                                 fontSize: 12.5,
                                 textAlign: 'left',
-                                color: style.navigationDrawerSeparatorGrey,
+                                color: 'rgba(0, 0, 0, .38)',
                             }}>
                                 {this.props.isRequired ? this.props.label + ' * ' : this.props.label}
                             </Text>
@@ -64,7 +64,7 @@ class DatePicker extends PureComponent {
                                     color: 'rgb(60,60,60)',
                                     marginBottom: 7.5
                                 }}>
-                                    {moment(this.props.value).format('MM/DD/YYYY')}
+                                    {this.props.value !== undefined && this.props.value !== null ? moment(this.props.value).format('MM/DD/YYYY') : ''}
                                 </Text>
                             </Ripple>
                         </View>
@@ -73,10 +73,10 @@ class DatePicker extends PureComponent {
                             <TextField
                                 label={this.props.isRequired ? this.props.label + ' * ' : this.props.label}
                                 textColor='rgb(0,0,0)'
-                                labelFontSize={15}
+                                labelFontSize={12.5}
                                 labelHeight={30}
                                 labelTextStyle={{
-                                    fontFamily: 'Roboto-Light',
+                                    fontFamily: 'Roboto',
                                     textAlign: 'left',
                                     marginBottom: 7.5
                                 }}
@@ -98,7 +98,7 @@ class DatePicker extends PureComponent {
 
     viewInput = () => {
         return (
-            <View style={[{
+            <View style={[{ 
             },this.props.style]}>
                 <Text style={{
                     fontFamily: 'Roboto-Regular',
@@ -117,7 +117,7 @@ class DatePicker extends PureComponent {
                     textAlign: 'left',
                     color: 'rgb(60,60,60)',
                 }}>
-                    {this.props.value !== undefined ? moment(this.props.value).format('MM/DD/YYYY') : ''}
+                    {this.props.value !== undefined && this.props.value !== null ? moment(this.props.value).format('MM/DD/YYYY') : ''}
                 </Text>
             </View>
         );

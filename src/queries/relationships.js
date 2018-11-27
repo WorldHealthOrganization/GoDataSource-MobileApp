@@ -2,13 +2,13 @@
  * Created by florinpopa on 02/10/2018.
  */
 import {getDatabase} from './database';
-import _ from 'lodash';
+import moment from 'moment';
 
 // Credentials: {email, encryptedPassword}
 export function getRelationshipsForTypeRequest (outbreakId, searchType, keys, callback) {
     let database = getDatabase();
 
-    console.log("getRelationshipsForOutbreakIdRequest: ", outbreakId, keys);
+    // console.log("getRelationshipsForOutbreakIdRequest: ", outbreakId, keys);
 
     let start =  new Date().getTime();
     if (!keys || keys.length === 0) {
@@ -17,8 +17,8 @@ export function getRelationshipsForTypeRequest (outbreakId, searchType, keys, ca
     database.find({
         selector: {
             _id: {
-                $gte: `relationship.json_false_${outbreakId}_`,
-                $lte: `relationship.json_false_${outbreakId}_\uffff`
+                $gte: `relationship.json_${outbreakId}_`,
+                $lte: `relationship.json_${outbreakId}_\uffff`
             },
             deleted: false,
             $or: [
@@ -28,7 +28,7 @@ export function getRelationshipsForTypeRequest (outbreakId, searchType, keys, ca
         }
     })
         .then((result) => {
-            console.log('Result in finding relationships: ', new Date().getTime() - start, result.docs);
+            console.log('Result in finding relationships: ', new Date().getTime() - start);
             callback(null, result.docs)
         })
         .catch((error) => {
@@ -37,29 +37,52 @@ export function getRelationshipsForTypeRequest (outbreakId, searchType, keys, ca
         })
 }
 
-export function getRelationshipsAndFollowUpsForContactRequest (outbreakId, keys, callback) {
+export function getRelationshipsAndFollowUpsForContactRequest(outbreakId, keys, filter, callback) {
+
     let database = getDatabase();
 
-    console.log("getRelationshipsAndFollowUpsForContact: ", outbreakId, keys);
+    let oneDay = 24 * 60 * 60 * 1000;
+    let startDate = '';
+    let endDate = '';
+    if (filter && filter.date) {
+        startDate = new Date(`${filter.date.getMonth() + 1}/${filter.date.getDate()}/${filter.date.getFullYear()}`).getTime();
+        endDate = moment(filter.date.getTime() + oneDay).add(-1, 'second')._d.getTime();
+    }
 
-    database.find({
+    let promiseArray = [];
+    promiseArray.push(database.find({
         selector: {
-            outbreakId: outbreakId,
+            _id: {
+                $gte: `followUp.json_${outbreakId}_${startDate}_`,
+                $lte: `followUp.json_${outbreakId}_${endDate}_\uffff`
+            },
             deleted: false,
-            fileType: {$in: ['followUp.json', 'relationship.json']},
+            outbreakId: outbreakId,
+            personId: {$eq: keys}
+        }
+    }).then((result) => {return result.docs}));
+    promiseArray.push(database.find({
+        selector: {
+            _id: {
+                $gte: `relationship.json_${outbreakId}_`,
+                $lte: `relationship.json_${outbreakId}_\uffff`
+            },
+            deleted: false,
             $or: [
-                {'persons.0.id': {$in: keys}},
-                {'persons.1.id': {$in: keys}},
-                {personId: {$in: keys}}
+                {'persons.0.id': {$eq: keys}},
+                {'persons.1.id': {$eq: keys}},
             ]
         }
-    })
-        .then((result) => {
-            console.log('Result in finding relationships and followUp: ', JSON.stringify(result));
-            callback(null, result.docs)
+    }).then((result) => {return result.docs}));
+
+    Promise.all(promiseArray)
+        .then((results) => {
+            let aux = [];
+            Array.from(results, (x) => {x.map((e) => {aux.push(e)})});
+            callback(null, aux);
         })
-        .catch((error) => {
-            console.log('Error in finding relationships and followUp: ', error);
-            callback(error)
+        .catch((errorGetData) => {
+            console.log(errorGetData);
+            callback(errorGetData);
         })
 }

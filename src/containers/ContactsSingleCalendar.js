@@ -53,7 +53,7 @@ class ContactsSingleCalendar extends Component {
         }
 
         let followUps = this.computeFollowUps();
-        console.log("### ContactsSingleCalendar: ", followUps);
+        // console.log("### ContactsSingleCalendar: ", followUps);
 
         return (
             <ElevatedView elevation={3} style={[style.container]}>

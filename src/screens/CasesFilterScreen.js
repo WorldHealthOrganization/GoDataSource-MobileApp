@@ -8,7 +8,7 @@ import {View, Text, StyleSheet, Platform, Animated} from 'react-native';
 import {Button} from 'react-native-material-ui';
 import styles from './../styles';
 import NavBarCustom from './../components/NavBarCustom';
-import {calculateDimension} from './../utils/functions';
+import {extractIdFromPouchId} from './../utils/functions';
 import config from './../utils/config';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -32,7 +32,7 @@ class CasesFilterScreen extends Component {
                         Male: false,
                         Female: false
                     },
-                    age: [0, 100],
+                    age: [0, 150],
                     selectedLocations: [],
                     classification: []
                 },
@@ -58,6 +58,9 @@ class CasesFilterScreen extends Component {
             if (props.activeFilters.classification && Array.isArray(props.activeFilters.classification)){
                 filterClone.classification = props.activeFilters.classification;
             }
+            if (props.activeFilters.selectedLocations && Array.isArray(props.activeFilters.selectedLocations)){
+                filterClone.selectedLocations = props.activeFilters.selectedLocations;
+            }
             console.log("### Active filters: ", filterClone);
         }
         return null;
@@ -67,7 +70,6 @@ class CasesFilterScreen extends Component {
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
-
         return (
             <View style={style.container}>
                 <NavBarCustom
@@ -77,11 +79,12 @@ class CasesFilterScreen extends Component {
                     handlePressNavbarButton={this.handlePressNavbarButton}
                 />
                 <TabView
+                    swipeEnabled = {false}
                     navigationState={this.state}
-                    onIndexChange={this.handleOnIndexChange}
                     renderPager={this.handleRenderPager}
                     renderScene={this.handleRenderScene}
                     renderTabBar={this.handleRenderTabBar}
+                    onIndexChange={this.handleOnIndexChange}
                 />
             </View>
         );
@@ -97,11 +100,22 @@ class CasesFilterScreen extends Component {
         this.setState({index});
     };
 
+    handleMoveToNextScreenButton = () => {
+        let nextIndex = this.state.index + 1
+        this.handleOnIndexChange(nextIndex)
+    }
+
+    handleMoveToPrevieousScreenButton = () => {
+        let nextIndex = this.state.index - 1
+        this.handleOnIndexChange(nextIndex)
+    }
+
     handleRenderScene = () => {
         if (this.state.index === 0) {
             return (
                 <CasesFiltersContainer
                     filter={this.state.filter}
+                    handleMoveToNextScreenButton={this.handleMoveToNextScreenButton}
                     onSelectItem={this.handleOnSelectItem}
                     onChangeSectionedDropDown={this.handleOnChangeSectionedDropDown}
                     onChangeInterval={this.handleOnChangeInterval}
@@ -112,6 +126,7 @@ class CasesFilterScreen extends Component {
         } else {
             return (
                 <CasesSortContainer
+                    handleMoveToPrevieousScreenButton={this.handleMoveToPrevieousScreenButton}
                     filter={this.state.filter}
                     key={this.state.index}
                 />
@@ -176,8 +191,12 @@ class CasesFilterScreen extends Component {
     };
 
     handleOnChangeSectionedDropDown = (selectedItems) => {
+        let selectedItemsWithExtractedId = selectedItems.map ((e) => {
+            return extractIdFromPouchId (e, 'location')
+        })
+
         this.setState(prevState => ({
-            filter: Object.assign({}, prevState.filter, {filter: Object.assign({}, prevState.filter.filter, {selectedLocations: selectedItems})})
+            filter: Object.assign({}, prevState.filter, {filter: Object.assign({}, prevState.filter.filter, {selectedLocations: selectedItemsWithExtractedId})})
         }), () => {
             console.log("Filters: ", this.state.filter.filter);
         })
@@ -201,34 +220,29 @@ class CasesFilterScreen extends Component {
         let filterStateClone = Object.assign({}, this.state.filter.filter);
         let filter = {};
 
-
         if (filterStateClone.gender.Male && !filterStateClone.gender.Female ) {
-            filter.gender = 'Male'
+            filter.gender = config.localTranslationTokens.male
         }
         if (filterStateClone.gender.Female && !filterStateClone.gender.Male) {
-            filter.gender = 'Female'
+            filter.gender = config.localTranslationTokens.female
         }
-
         if (filterStateClone.age) {
             filter.age = filterStateClone.age;
         }
-
-        if(filterStateClone.classification){
-            if(filterStateClone.classification.length > 0){
-                if(filterStateClone.classification.length == 1){
-                    filter.classification = filterStateClone.classification[0].value;
-                }else {
-                    let orClassification = [];
-                    filterStateClone.classification.map((item, index) => {
-                        orClassification.push({classification: item.value ? {$regex: item.value} : {}});
-                    });
-                    filter.classification = orClassification;
-                }
+        if (filterStateClone.classification) {
+            if (filterStateClone.classification.length > 0) {
+                let orClassification = [];
+                filterStateClone.classification.map((item, index) => {
+                    orClassification.push({classification: item.value ? item.value : null});
+                });
+                filter.classification = orClassification;
             }
+        }
+        if (filterStateClone.selectedLocations) {
+            filter.selectedLocations = filterStateClone.selectedLocations;
         }
 
         this.props.addFilterForScreen('CasesFilterScreen', filter);
-
         this.props.navigator.dismissModal(this.props.onApplyFilters(filter));
     };
 }

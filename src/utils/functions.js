@@ -57,6 +57,9 @@ export function checkIfSameDay(date1, date2) {
     if (Object.prototype.toString.call(date1) !== '[object Date]' || Object.prototype.toString.call(date2) !== '[object Date]') {
         return false;
     }
+    // Correct timezone differences
+    let date1Time = new Date(date1).getTime();
+    date1 = new Date(date1Time + (new Date(date1Time).getTimezoneOffset() * 60 * 1000));
     return date1.getDate() === date2.getDate() && date1.getMonth() === date2.getMonth() && date1.getFullYear() === date2.getFullYear();
 }
 
@@ -72,6 +75,7 @@ export function getAddress(address, returnString) {
 }
 
 export function navigation(event, navigator) {
+    console.log('Event: ', event);
     if (event.type === 'DeepLink') {
         // console.log("###");
         if (event.link.includes('Navigate')) {
@@ -87,6 +91,10 @@ export function navigation(event, navigator) {
                     case '1':
                         screenToSwitchTo = "ContactsScreen";
                         break;
+                    case '1-add':
+                        screenToSwitchTo = "ContactsScreen";
+                        addScreen = "ContactsSingleScreen";
+                        break;
                     case '2':
                         screenToSwitchTo = "CasesScreen";
                         break;
@@ -98,21 +106,27 @@ export function navigation(event, navigator) {
                         screenToSwitchTo = "FollowUpsScreen";
                         break;
                 }
-                navigator.resetTo({
-                    screen: screenToSwitchTo,
-                    animated: true
-                });
+
                 if(addScreen) {
-                    navigator.push({
-                        screen: addScreen,
-                        animated: true,
-                        animationType: 'fade',
-                        passProps: {
-                            item: {},
-                            filter: null,
-                            isNew: addScreen === "CaseSingleScreen" ? true : null
-                        }
+                    navigator.resetTo({
+                        screen: screenToSwitchTo,
                     })
+                    setTimeout(function(){ 
+                        navigator.push({
+                            screen: addScreen,
+                            animated: true,
+                            animationType: 'fade',
+                            passProps: {
+                                isNew: true,
+                            }
+                        })
+                    }, 1500);
+                } else {
+
+                    navigator.resetTo({
+                        screen: screenToSwitchTo,
+                        animated: true
+                    });
                 }
             }
         }
@@ -268,14 +282,16 @@ export function syncFile (path, callback) {
     })
 }
 
-export function readDir (path, callback) {
-    RNFetchBlobFS.ls(path)
-        .then((files) => {
-            callback(null, files);
-        })
-        .catch((errorLs) => {
-            callback(errorLs);
-        })
+export function readDir (path) {
+    return new Promise((resolve, reject) => {
+        RNFetchBlobFS.ls(path)
+            .then((files) => {
+                resolve(files);
+            })
+            .catch((errorLs) => {
+                reject(errorLs);
+            })
+    })
 }
 
 let numberOfFilesProcessed = 0;
@@ -288,7 +304,7 @@ export function getNumberOfFilesProcessed() {
     return numberOfFilesProcessed;
 }
 
-export async function processFile (path, type, totalNumberOfFiles, dispatch) {
+export async function processFile (path, type, totalNumberOfFiles, dispatch, isFirstTime, forceBulk) {
     return new Promise((resolve, reject) => {
         if (path) {
             console.log('Process file: ', type, ' From path: ', path);
@@ -302,41 +318,75 @@ export async function processFile (path, type, totalNumberOfFiles, dispatch) {
                                 reject("Error while reading file");
                             }
                             if (data) {
+                                if (isFirstTime && forceBulk) {
+                                    // If is first time processing files, do a bulk insert
+                                    processBulkDocs(data, type)
+                                        .then((resultBulk) => {
+                                            console.log('Bulk docs: ', resultBulk);
+                                            let numberOfFilesProcessedAux = getNumberOfFilesProcessed();
+                                            numberOfFilesProcessedAux += 1;
+                                            data = null;
+                                            setNumberOfFilesProcessed(numberOfFilesProcessedAux);
+                                            dispatch(setSyncState(("Synced " + numberOfFilesProcessedAux + "/" + totalNumberOfFiles)));
+                                            resolve('Finished inserting');
+                                        })
+                                        .catch((errorBulk) => {
+                                            console.log('Error bulk docs: ', errorBulk);
+                                            data = null;
+                                            reject(errorBulk);
+                                        })
+                                } else {
+                                    // Since there is data in the file, it's time to sync it
+                                    let promises = [];
+                                    for (let i=0; i<data.length; i++) {
+                                        promises.push(updateFileInDatabase(data[i], type))
+                                    }
 
-
-
-                                // processBulkDocs(data, type)
-                                //     .then((resultBulk) => {
-                                //         console.log('Bulk docs: ', resultBulk);
-                                //         resolve('Finished inserting');
-                                //     })
-                                //     .catch((errorBulk) => {
-                                //         console.log('Error bulk docs: ', errorBulk);
-                                //         reject(errorBulk);
-                                //     })
-
-
-                                // Since there is data in the file, it's time to sync it
-                                let promises = [];
-                                for (let i=0; i<data.length; i++) {
-                                    promises.push(updateFileInDatabase(data[i], type))
+                                    Promise.all(promises)
+                                        .then((responses) => {
+                                            console.log('Finished syncing: ', responses);
+                                            let numberOfFilesProcessedAux = getNumberOfFilesProcessed();
+                                            numberOfFilesProcessedAux += 1;
+                                            data = null;
+                                            setNumberOfFilesProcessed(numberOfFilesProcessedAux);
+                                            dispatch(setSyncState(("Synced " + numberOfFilesProcessedAux + "/" + totalNumberOfFiles)));
+                                            resolve('Finished syncing');
+                                        })
+                                        .catch((error) => {
+                                            console.log("Error at syncing file of type: ", type, error);
+                                            data = null;
+                                            reject("Error at syncing file");
+                                        })
                                 }
-
-                                Promise.all(promises)
-                                    .then((responses) => {
-                                        console.log('Finished syncing: ', responses);
-                                        let numberOfFilesProcessedAux = getNumberOfFilesProcessed();
-                                        numberOfFilesProcessedAux += 1;
-                                        setNumberOfFilesProcessed(numberOfFilesProcessedAux);
-                                        dispatch(setSyncState(("Synced " + numberOfFilesProcessedAux + "/" + totalNumberOfFiles)));
-                                        resolve('Finished syncing');
-                                    })
-                                    .catch((error) => {
-                                        console.log("Error at syncing file of type: ", type, error);
-                                        reject("Error at syncing file");
-                                    })
                             }
                         })
+
+
+                        // RNFetchBlobFS.readStream(path, 'utf8')
+                        //     .then((stream) => {
+                        //         let data = '';
+                        //         stream.open();
+                        //         stream.onData((chunk) => {
+                        //             if (chunk.includes('[\n')) {
+                        //                 chunk = chunk.substr(2);
+                        //             }
+                        //             // If the chunk doesn't end in " }", then the previous read object is not finished
+                        //             if (!data && chunk.substr(chunk.length -3, 2) !== ' }') {
+                        //                 data = chunk;
+                        //             } else {
+                        //                 if (data && chunk.substr(chunk.length -3, 2) !== ' }') {
+                        //
+                        //                 }
+                        //             }
+                        //         });
+                        //         stream.onEnd(() => {
+                        //             console.log(data)
+                        //         });
+                        //     })
+                        //     .catch((errorReadStream) => {
+                        //         console.log('ErrorReadStream: ', errorReadStream);
+                        //         reject(errorReadStream);
+                        //     })
                     } else {
                         reject("The file does not exist")
                     }
@@ -363,7 +413,11 @@ export function getDataFromDatabaseFromFile (database, fileType, lastSyncDate) {
     return new Promise((resolve, reject) => {
         database.find({
             selector: {
-                fileType: {$in: [fileType]},
+                _id: {
+                    $gte: `${fileType}_`,
+                    $lte: `${fileType}_\uffff`
+                },
+                fileType: {$eq: fileType},
                 updatedAt: {$gte: lastSyncDate}
             }
         })
@@ -372,23 +426,27 @@ export function getDataFromDatabaseFromFile (database, fileType, lastSyncDate) {
                 if (response && response.docs && Array.isArray(response.docs) && response.docs.length > 0) {
                     createFilesWithName(fileType, JSON.stringify(response.docs.map((e) => {
                         delete e._rev;
-                        e.id = extractIdFromPouchId(e._id, fileType);
-                        delete e._id;
+                        e._id = extractIdFromPouchId(e._id, fileType);
+                        // delete e._id;
                         delete e.fileType;
                         return e;
                     })))
                         .then((responseFromCreate) => {
+                            database = null;
                             resolve(responseFromCreate);
                         })
                         .catch((errorFromCreate) => {
+                            database = null;
                             console.log(`An error occurred while creating file: ${errorFromCreate}`);
                             reject(errorFromCreate);
                         })
                 } else {
+                    database = null;
                     resolve(`Done with ${fileType}`);
                 }
             })
             .catch((error) => {
+                database = null;
                 console.log(`An error occurred while getting data for collection: ${fileType}`);
                 reject(error);
             })
@@ -478,20 +536,23 @@ export function extractIdFromPouchId (pouchId, type) {
     if (!pouchId.includes(type)) {
         return pouchId
     }
+    if (type.includes('referenceData')) {
+        return pouchId.substr('referenceData.json_'.length)
+    }
     return pouchId.split('_')[pouchId.split('_').length - 1];
 }
 
 export function computeIdForFileType (fileType, outbreakId, file, type) {
     switch (fileType) {
         case 'person.json':
-            return (fileType + '_' + type + '_false' + '_' + outbreakId + '_' + generateId());
+            return (fileType + '_' + type + '_' + outbreakId + '_' + generateId());
         case 'followUp.json':
-            return (fileType + '_false_' + outbreakId + '_' + new Date(file.date).getTime() + '_' + generateId());
+            return (fileType + '_' + outbreakId + '_' + new Date(file.date).getTime() + '_' + generateId());
         // return (type + '_' + file.outbreakId + '_' + file._id);
         case 'relationship.json':
-            return (fileType + '_false_' + outbreakId + '_' + generateId());
+            return (fileType + '_' + outbreakId + '_' + generateId());
         default:
-            return (fileType + '_false_' + generateId());
+            return (fileType + '_' + generateId());
     }
 }
 
@@ -577,7 +638,7 @@ export function updateRequiredFields(outbreakId, userId, record, action, fileTyp
             record.updatedAt = new Date().toISOString();
             record.updatedBy = extractIdFromPouchId(userId, 'user');
             record.deleted = false;
-            record.deletedAt = 'undefined';
+            record.deletedAt = null;
             if (type !== '') {
                 record.type = type
             }
@@ -589,7 +650,7 @@ export function updateRequiredFields(outbreakId, userId, record, action, fileTyp
             record.updatedAt = new Date().toISOString();
             record.updatedBy = extractIdFromPouchId(userId, 'user');
             record.deleted = false;
-            record.deletedAt = 'undefined';
+            record.deletedAt = null;
             // console.log ('updateRequiredFields update record', JSON.stringify(record))
             return record;
 
@@ -629,3 +690,63 @@ export function mapLocations(locationList, parentLocationId) {
     }
     return output
 }
+
+//recursively functions for mapping questionCard questions (followUps and Cases)
+export function extractAllQuestions (questions, item) {
+    let returnedQuestions = [];
+
+    if (questions && Array.isArray(questions) && questions.length > 0) {
+        for (let i = 0; i < questions.length; i++) {
+            // First add every question
+            returnedQuestions.push(questions[i]);
+            if (questions[i] && questions[i].answerType && (questions[i].answerType === "LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_SINGLE_ANSWER" || questions[i].answerType === "LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_MULTIPLE_ANSWERS") && questions[i].answers && Array.isArray(questions[i].answers) && questions[i].answers.length > 0) {
+                // For every answer check if the user answered that question and then proceed with the showing
+                for (let j = 0; j < questions[i].answers.length; j++) {
+                    // First check for single select since it has only a value
+                    if (questions[i].answerType === "LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_SINGLE_ANSWER" ) {
+                        if (item && item.questionnaireAnswers && item.questionnaireAnswers[questions[i].variable] === questions[i].answers[j].value && questions[i].answers[j].additionalQuestions) {
+                            returnedQuestions = returnedQuestions.concat(extractAllQuestions(questions[i].answers[j].additionalQuestions, item))
+                        }
+                    } else {
+                        // For the multiple select the answers are in an array of values
+                        if (questions[i].answerType === "LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_MULTIPLE_ANSWERS") {
+                            if (item && item.questionnaireAnswers && item.questionnaireAnswers[questions[i].variable] && Array.isArray(item.questionnaireAnswers[questions[i].variable]) && item.questionnaireAnswers[questions[i].variable].indexOf(questions[i].answers[j].value) > -1 && questions[i].answers[j].additionalQuestions) {
+                                returnedQuestions = returnedQuestions.concat(extractAllQuestions(questions[i].answers[j].additionalQuestions, item))
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return returnedQuestions;
+};
+
+export function mapQuestions (questions) {
+    // mappedQuestions format: [{categoryName: 'cat1', questions: [{q1}, {q2}]}]
+    let mappedQuestions = [];
+
+    if (questions && Array.isArray(questions) && questions.length > 0) {
+        for (let i = 0; i < questions.length; i++) {
+            if (mappedQuestions.map((e) => {return e.categoryName}).indexOf(questions[i].category) === -1) {
+                mappedQuestions.push({categoryName: questions[i].category, questions: [questions[i]]});
+            } else {
+                if (mappedQuestions && Array.isArray(mappedQuestions) && mappedQuestions.length > 0 && mappedQuestions.map((e) => {
+                        return e.categoryName
+                    }).indexOf(questions[i].category) > -1 && mappedQuestions[mappedQuestions.map((e) => {
+                        return e.categoryName
+                    }).indexOf(questions[i].category)] && mappedQuestions[mappedQuestions.map((e) => {
+                        return e.categoryName
+                    }).indexOf(questions[i].category)].questions && Array.isArray(mappedQuestions[mappedQuestions.map((e) => {
+                        return e.categoryName
+                    }).indexOf(questions[i].category)].questions)) {
+                        mappedQuestions[mappedQuestions.map((e) => {return e.categoryName}).indexOf(questions[i].category)].questions.push(questions[i]);
+                }
+            }
+        }
+    }
+
+    // console.log('Mapped questions: ', mappedQuestions);
+
+    return mappedQuestions;
+};

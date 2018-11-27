@@ -58,7 +58,14 @@ class CalendarPicker extends PureComponent {
 
     // Please write here all the methods that are not react native lifecycle methods
     handleDateChanged = (date) => {
-        let dateAux = checkIfSameDay(new Date(date.dateString), new Date()) ? 'Today' : new Date(date.dateString).toLocaleDateString();
+        // Adjust timezone differences
+        let dateAux = 'Today';
+        if (!checkIfSameDay(new Date(date.dateString), new Date())) {
+            // dateAux format = "YYYY-MM-DD"
+            let date1Time = new Date(date.dateString).getTime();
+            dateAux = new Date(date1Time + (new Date(date1Time).getTimezoneOffset() * 60 * 1000)).toLocaleDateString();
+        }
+        // let dateAux = checkIfSameDay(new Date(date.dateString), new Date()) ? 'Today' : new Date(date.dateString).toLocaleDateString();
         this.setState({
             label: dateAux
         }, () => {

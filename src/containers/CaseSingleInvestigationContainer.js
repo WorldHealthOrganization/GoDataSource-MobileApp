@@ -4,7 +4,7 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {PureComponent} from 'react';
-import {TextInput, View, Text, StyleSheet, FlatList} from 'react-native';
+import {TextInput, View, Text, StyleSheet, FlatList, TouchableWithoutFeedback, Keyboard} from 'react-native';
 import {calculateDimension, extractAllQuestions, mapQuestions} from '../utils/functions';
 import config from '../utils/config';
 import {connect} from "react-redux";
@@ -13,6 +13,7 @@ import styles from '../styles';
 import QuestionCard from '../components/QuestionCard';
 import Button from '../components/Button';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import {sortBy} from 'lodash';
 
 class CaseSingleInvestigationContainer extends PureComponent {
 
@@ -32,73 +33,98 @@ class CaseSingleInvestigationContainer extends PureComponent {
 
         // mappedQuestions format: [{categoryName: 'cat1', questions: [{q1}, {q2}]}]
         sortedQuestions = mapQuestions(sortedQuestions);
+        // sortedQuestions = sortBy(sortedQuestions, ['categoryName']);
+        for (let i=0; i<sortedQuestions.length; i++) {
+            sortedQuestions[i].questions = sortBy(sortedQuestions[i].questions, ['order', 'variable']);
+        }
         // Please add here the react lifecycle methods that you need
 
 
         return (
-            <View style={style.container}>
-                {
-                    this.props.isNew ? (
-                        <Button
-                        title={'Back'}
-                        onPress={this.handleBackButton}
-                        color={styles.buttonGreen}
-                        titleColor={'white'}
-                        height={calculateDimension(25, true, this.props.screenSize)}
-                        width={calculateDimension(130, false, this.props.screenSize)}
-                        style={{
-                            marginVertical: calculateDimension(12.5, true, this.props.screenSize),
-                            marginHorizontal: calculateDimension(16, false, this.props.screenSize),
-                        }}/>) : (
-                        this.props.isEditMode ? (
+            <TouchableWithoutFeedback onPress={() => {
+                Keyboard.dismiss()
+            }} accessible={false}>
+                <View style={style.container}>
+                    <View style={{flexDirection: 'row'}}>
+                    {
+                        this.props.isNew ? (
                             <View style={{flexDirection: 'row'}}>
                                 <Button
-                                    title={'Save'}
-                                    onPress={this.props.onPressSaveEdit}
-                                    color={styles.buttonGreen}
-                                    titleColor={'white'}
-                                    height={calculateDimension(25, true, this.props.screenSize)}
-                                    width={calculateDimension(166, false, this.props.screenSize)}
-                                    style={{
-                                        marginVertical: calculateDimension(12.5, true, this.props.screenSize),
-                                        marginRight: 10,
-                                }}/>
-                                <Button
-                                    title={'Cancel'}
-                                    onPress={this.props.onPressCancelEdit}
-                                    color={styles.buttonGreen}
-                                    titleColor={'white'}
-                                    height={calculateDimension(25, true, this.props.screenSize)}
-                                    width={calculateDimension(166, false, this.props.screenSize)}
-                                    style={{
-                                        marginVertical: calculateDimension(12.5, true, this.props.screenSize),
-                                        marginRight: 10,
-                                }}/>
-                            </View>) : (
-                            <Button
-                                title={'Edit'}
-                                onPress={this.props.onPressEdit}
+                                title={'Back'}
+                                onPress={this.handleBackButton}
                                 color={styles.buttonGreen}
                                 titleColor={'white'}
                                 height={calculateDimension(25, true, this.props.screenSize)}
-                                width={calculateDimension(166, false, this.props.screenSize)}
+                                width={calculateDimension(130, false, this.props.screenSize)}
                                 style={{
                                     marginVertical: calculateDimension(12.5, true, this.props.screenSize),
-                                    marginRight: 10,
-                                }}/>))
-                }
-                <KeyboardAwareScrollView
-                    style={style.containerScrollView}
-                    contentContainerStyle={[style.contentContainerStyle, {paddingBottom: this.props.screenSize.height < 600 ? 70 : 20}]}
-                    keyboardShouldPersistTaps={'always'}
-                >
-                    {
-                        sortedQuestions.map((item, index) => {
-                            return this.handleRenderSectionedList(item, index)
-                        })
+                                    marginHorizontal: calculateDimension(16, false, this.props.screenSize),
+                                }}/>
+                                <Button
+                                    title={'Save'}
+                                    onPress={this.props.onPressSave}
+                                    color={styles.buttonGreen}
+                                    titleColor={'white'}
+                                    height={calculateDimension(25, true, this.props.screenSize)}
+                                    width={calculateDimension(130, false, this.props.screenSize)}
+                                    style={{
+                                        marginVertical: calculateDimension(12.5, true, this.props.screenSize),
+                                        marginHorizontal: calculateDimension(16, false, this.props.screenSize),
+                                    }}/>
+                            </View>
+                            )
+                            : (
+                            this.props.isEditMode ? (
+                                <View style={{flexDirection: 'row'}}>
+                                    <Button
+                                        title={'Save'}
+                                        onPress={this.props.onPressSaveEdit}
+                                        color={styles.buttonGreen}
+                                        titleColor={'white'}
+                                        height={calculateDimension(25, true, this.props.screenSize)}
+                                        width={calculateDimension(166, false, this.props.screenSize)}
+                                        style={{
+                                            marginVertical: calculateDimension(12.5, true, this.props.screenSize),
+                                            marginRight: 10,
+                                    }}/>
+                                    <Button
+                                        title={'Cancel'}
+                                        onPress={this.props.onPressCancelEdit}
+                                        color={styles.buttonGreen}
+                                        titleColor={'white'}
+                                        height={calculateDimension(25, true, this.props.screenSize)}
+                                        width={calculateDimension(166, false, this.props.screenSize)}
+                                        style={{
+                                            marginVertical: calculateDimension(12.5, true, this.props.screenSize),
+                                            marginRight: 10,
+                                    }}/>
+                                </View>) : (
+                                <Button
+                                    title={'Edit'}
+                                    onPress={this.props.onPressEdit}
+                                    color={styles.buttonGreen}
+                                    titleColor={'white'}
+                                    height={calculateDimension(25, true, this.props.screenSize)}
+                                    width={calculateDimension(166, false, this.props.screenSize)}
+                                    style={{
+                                        marginVertical: calculateDimension(12.5, true, this.props.screenSize),
+                                        marginRight: 10,
+                                    }}/>))
                     }
-                </KeyboardAwareScrollView>
-            </View>
+                    </View>
+                    <KeyboardAwareScrollView
+                        style={style.containerScrollView}
+                        contentContainerStyle={[style.contentContainerStyle, {paddingBottom: this.props.screenSize.height < 600 ? 70 : 20}]}
+                        keyboardShouldPersistTaps={'always'}
+                    >
+                        {
+                            sortedQuestions.map((item, index) => {
+                                return this.handleRenderSectionedList(item, index)
+                            })
+                        }
+                    </KeyboardAwareScrollView>
+                </View>
+            </TouchableWithoutFeedback>
         );
     }
 
@@ -128,7 +154,6 @@ class CaseSingleInvestigationContainer extends PureComponent {
                 isEditMode={this.props.isEditMode}
                 index={index + 1}
                 source={this.props.item}
-                isEditMode={this.props.isEditMode}
                 onChangeTextAnswer={this.props.onChangeTextAnswer}
                 onChangeSingleSelection={this.props.onChangeSingleSelection}
                 onChangeMultipleSelection={this.props.onChangeMultipleSelection}
@@ -182,8 +207,8 @@ const style = StyleSheet.create({
 function mapStateToProps(state) {
     return {
         screenSize: state.app.screenSize,
-        questions: state.outbreak.caseInvestigationTemplate
-
+        questions: state.outbreak.caseInvestigationTemplate,
+        translation: state.app.translation
     };
 }
 

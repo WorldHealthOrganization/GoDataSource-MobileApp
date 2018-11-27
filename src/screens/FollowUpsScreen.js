@@ -7,7 +7,7 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
-import {View, Text, StyleSheet, Alert, Animated, NativeModules} from 'react-native';
+import {View, Text, StyleSheet, Alert, Animated, NativeModules, BackHandler} from 'react-native';
 import {Button, Icon} from 'react-native-material-ui';
 import styles from './../styles';
 import NavBarCustom from './../components/NavBarCustom';
@@ -21,11 +21,13 @@ import SearchFilterView from './../components/SearchFilterView';
 import FollowUpListItem from './../components/FollowUpListItem';
 import MissedFollowUpListItem from './../components/MissedFollowUpListItem';
 import AnimatedListView from './../components/AnimatedListView';
+import Breadcrumb from './../components/Breadcrumb';
+import Menu, {MenuItem} from 'react-native-material-menu';
 import ValuePicker from './../components/ValuePicker';
 import {getFollowUpsForOutbreakId, getMissedFollowUpsForOutbreakId, updateFollowUpAndContact, addFollowUp, generateFollowUp} from './../actions/followUps';
 import {getContactsForOutbreakId} from './../actions/contacts';
 import {removeErrors} from './../actions/errors';
-import {addFilterForScreen} from './../actions/app';
+import {addFilterForScreen, removeFilterForScreen} from './../actions/app';
 import ElevatedView from 'react-native-elevated-view';
 import _ from 'lodash';
 import AddFollowUpScreen from './AddFollowUpScreen';
@@ -33,6 +35,7 @@ import {LoaderScreen, Colors} from 'react-native-ui-lib';
 import {navigation, extractIdFromPouchId, generateId, updateRequiredFields} from './../utils/functions';
 import ViewHOC from './../components/ViewHOC';
 import { Popup } from 'react-native-map-link';
+import moment from 'moment';
 
 const scrollAnim = new Animated.Value(0);
 const offsetAnim = new Animated.Value(0);
@@ -45,10 +48,11 @@ class FollowUpsScreen extends Component {
 
     constructor(props) {
         super(props);
+        let now = new Date();
         this.state = {
             // filter: this.props.filter && this.props.filter['FollowUpsScreen'] ? this.props.filter['FollowUpsScreen'] : null,
             filter: this.props.filter && this.props.filter['FollowUpsScreen'] ? this.props.filter['FollowUpsScreen'] : {
-                date: new Date(),
+                date: new Date(new Date((now.getUTCMonth() + 1) + '/' + now.getUTCDate() + '/' + now.getUTCFullYear()).getTime() - ((moment().isDST() ? now.getTimezoneOffset() : now.getTimezoneOffset() - 60) * 60 * 1000)),
                 searchText: ''
             },
             filterFromFilterScreen: this.props.filter && this.props.filter['FollowUpsFilterScreen'] ? this.props.filter['FollowUpsFilterScreen'] : null,
@@ -63,6 +67,7 @@ class FollowUpsScreen extends Component {
             sourceLatitude: 0,
             sourceLongitude: 0,
             error: null,
+            generating: false,
             calendarPickerOpen: false
         };
         // Bind here methods, or at least don't declare methods in the render method
@@ -75,10 +80,14 @@ class FollowUpsScreen extends Component {
         this.onSelectValue = this.onSelectValue.bind(this);
         this.handleDayPress = this.handleDayPress.bind(this);
         this.openCalendarModal = this.openCalendarModal.bind(this);
+        this.filterContacts = this.filterContacts.bind(this);
+        this.myFunct =  this.myFunct.bind(this)
+        this.handleBackButtonClick = this.handleBackButtonClick.bind(this);
     }
 
     // Please add here the react lifecycle methods that you need
     static getDerivedStateFromProps(props, state) {
+        console.log ('getDerivedStateFromProps')
         if (props.errors && props.errors.type && props.errors.message) {
             Alert.alert(props.errors.type, props.errors.message, [
                 {
@@ -92,20 +101,92 @@ class FollowUpsScreen extends Component {
 
         // console.log('props.contacts', JSON.stringify(props.contacts))
         if (props.contacts) {
+            let prevFollowUps = state.followUps || [];
             let fUps = [];
 
-            for (let i=0; i<props.contacts.length; i++) {
-                if (props.contacts[i].followUps) {
-                    fUps = fUps.concat(props.contacts[i].followUps);
+            let contactsCopy = _.cloneDeep(props.contacts);
+            if (props.filter && (props.filter['FollowUpsFilterScreen'] || props.filter['FollowUpsScreen'])) {
+                // Take care of search filter
+                if (state.filter.searchText) {
+                    contactsCopy = contactsCopy.filter((e) => {
+                        return  e && e.firstName && state.filter.searchText.toLowerCase().includes(e.firstName.toLowerCase()) ||
+                            e && e.lastName && state.filter.searchText.toLowerCase().includes(e.lastName.toLowerCase()) ||
+                            e && e.firstName && e.firstName.toLowerCase().includes(state.filter.searchText.toLowerCase()) ||
+                            e && e.lastName && e.lastName.toLowerCase().includes(state.filter.searchText.toLowerCase())
+                    });
+                }
+                // Take care of gender filter
+                if (state.filterFromFilterScreen && state.filterFromFilterScreen.gender) {
+                    contactsCopy = contactsCopy.filter((e) => {return e.gender === state.filterFromFilterScreen.gender});
+                }
+                // Take care of age range filter
+                if (state.filterFromFilterScreen && state.filterFromFilterScreen.age && Array.isArray(state.filterFromFilterScreen.age) && state.filterFromFilterScreen.age.length === 2 && (state.filterFromFilterScreen.age[0] >= 0 || state.filterFromFilterScreen.age[1] <= 150)) {
+                    contactsCopy = contactsCopy.filter((e) => {
+                        if (e.age && e.age.years !== null && e.age.years !== undefined && e.age.months !== null && e.age.months !== undefined) {
+                            if (e.age.years > 0 && e.age.months === 0) {
+                                return e.age.years >= state.filterFromFilterScreen.age[0] && e.age.years <= state.filterFromFilterScreen.age[1]
+                            } else if (e.age.years === 0 && e.age.months > 0){
+                                return e.age.months >= state.filterFromFilterScreen.age[0] && e.age.months <= state.filterFromFilterScreen.age[1]
+                            } else if (e.age.years === 0 && e.age.months === 0) {
+                                return e.age.years >= state.filterFromFilterScreen.age[0] && e.age.years <= state.filterFromFilterScreen.age[1]
+                            }
+                        }
+                    });
+                }
+                // Take care of locations filter
+                if (state.filterFromFilterScreen  && state.filterFromFilterScreen.selectedLocations && state.filterFromFilterScreen.selectedLocations.length > 0) {
+                    contactsCopy = contactsCopy.filter((e) => {
+                        let addresses = e.addresses.filter((k) => {
+                            return k.locationId !== '' && state.filterFromFilterScreen.selectedLocations.indexOf(k.locationId) >= 0
+                        })
+                        return addresses.length > 0
+                    })
+                }
+            }
+
+            for (let i=0; i < contactsCopy.length; i++) {
+                if (contactsCopy[i].followUps) {
+                    fUps = fUps.concat(contactsCopy[i].followUps);
                 }
             }
 
             state.followUps = fUps;
-
             // Now filter the followUps by type (All/To do/Missed)
             // let oneDay = 24 * 60 * 60 * 1000;
             if (state.filter && state.filter.performed && state.filter.performed.value && state.filter.performed.value !== 'All') {
                 fUps = fUps.filter((e) => {return e.statusId === state.filter.performed.value});
+            }
+
+
+            //if we'e generating follow-ups
+            if(state.generating) {
+                //and we received generated follow-ups
+                if(props.followUps.length) {
+                    //if we had previous generated follow-ups get difference
+                    if (prevFollowUps.length) {
+                        let number = parseInt(props.followUps.length - prevFollowUps.length);
+                        props.navigator.showInAppNotification({
+                            screen: "InAppNotificationScreen",
+                            passProps: {
+                                number: number
+                            },
+                            autoDismissTimerSec: 1
+                        });
+                    } else {
+                        //no previous follow-ups just display number of generated
+                        let number = parseInt(props.followUps.length);
+                        props.navigator.showInAppNotification({
+                            screen: "InAppNotificationScreen",
+                            passProps: {
+                                number: number
+                            },
+                            autoDismissTimerSec: 1
+                        });
+                    }
+
+                    //reset generating status
+                    state.generating = false;
+                }
             }
 
             if (props.followUps && props.followUps.length > 0) {
@@ -121,13 +202,14 @@ class FollowUpsScreen extends Component {
     }
 
     componentDidMount() {
-        console.log ('componentDidMount')
+        BackHandler.addEventListener('hardwareBackPress', this.handleBackButtonClick);
         this.setState({
-            loading: true
+            loading: true,
+            generating: false,
         }, () => {
             this.props.getFollowUpsForOutbreakId(this.props.user.activeOutbreakId, this.state.filter, null);
         })
-    }
+    };
 
     shouldComponentUpdate(nextProps, nextState) {
         if (!nextProps.user) {
@@ -139,8 +221,16 @@ class FollowUpsScreen extends Component {
 
         return true;
     }
+    
+    componentWillUnmount() {
+        BackHandler.removeEventListener('hardwareBackPress', this.handleBackButtonClick);
+    }
 
-
+    handleBackButtonClick() {
+        // this.props.navigator.goBack(null);
+        return true;
+    }
+    
     clampedScroll= Animated.diffClamp(
         Animated.add(
             scrollAnim.interpolate({
@@ -173,13 +263,34 @@ class FollowUpsScreen extends Component {
             outputRange: [1, 0],
             extrapolate: 'clamp',
         });
-
+        let followUpTitle = []; followUpTitle[1] = 'Follow-ups';
         return (
             <ViewHOC style={style.container}
                      showLoader={(this.props && this.props.syncState && (this.props.syncState !== 'Finished processing' && this.props.syncState !== 'Error')) || (this && this.state && this.state.loading)}
                      loaderText={this.props && this.props.syncState ? this.props.syncState : 'Loading...'}>
                 <NavBarCustom
-                    title="Follow-ups"
+                    title={null}
+                    customTitle={
+                        <View
+                            style={[style.breadcrumbContainer]}>
+                            <Breadcrumb
+                                entities={followUpTitle}
+                                navigator={this.props.navigator || null}
+                            />
+                            <View>
+                                <Menu
+                                    ref="menuRef"
+                                    button={
+                                        <Ripple onPress={this.showMenu} hitSlop={{top: 20, bottom: 20, left: 20, right: 20}}>
+                                            <Icon name="more-vert"/>
+                                        </Ripple>
+                                    }
+                                >
+                                    <MenuItem onPress={this.handleGenerateFollowUps}>Generate for current day</MenuItem>
+                                </Menu>
+                            </View>
+                        </View>
+                    }
                     navigator={this.props.navigator || null}
                     iconName="menu"
                     handlePressNavbarButton={this.handlePressNavbarButton}
@@ -301,26 +412,17 @@ class FollowUpsScreen extends Component {
         this.setState({
             loading: true
         })
-    }
+    };
 
     renderFollowUp = ({item}) => {
-        let oneDay = 24 * 60 * 60 * 1000;
-        let itemDate = new Date(item.date).getTime();
-        let now = new Date().getTime() - oneDay;
-        if ((!item.performed && itemDate < now) || item.lostToFollowUp) {
-            return (<MissedFollowUpListItem
-                item={item}
-                onPressFollowUp={this.handlePressFollowUp}
-            />)
-        } else {
-            return (<FollowUpListItem
-                item={item}
-                onPressFollowUp={this.handlePressFollowUp}
-                onPressMissing={this.handleOnPressMissing}
-                onPressExposure={this.handleOnPressExposure}
-                onPressMap={this.handleOnPressMap}
-            />)
-        }
+        return (<FollowUpListItem
+            item={item}
+            onPressFollowUp={this.handlePressFollowUp}
+            onPressMissing={this.handleOnPressMissing}
+            onPressExposure={this.handleOnPressExposure}
+            onPressMap={this.handleOnPressMap}
+            firstActionText={this.getTranslation(item.statusId)}
+        />)
     };
 
     getItemLayout = (data, index) => ({
@@ -329,7 +431,9 @@ class FollowUpsScreen extends Component {
         index
     });
 
-    keyExtractor = (item, index) => item._id;
+    keyExtractor = (item, index) => {
+        item._id;
+    }
 
     renderSeparatorComponent = () => {
         return (
@@ -417,27 +521,29 @@ class FollowUpsScreen extends Component {
 
     handleOnPressMissing = (followUp, contact) => {
 
-        Alert.alert('Warning', 'Are you sure you want to set this follow-up as missed?', [
-            {
-                text: 'No', onPress: () => {console.log("Cancel missing")}
-            },
-            {
-                text: 'Yes', onPress: () => {
-                let myFollowUp = Object.assign({}, followUp)
-                let myFollowups = Object.assign([], contact.followUps)
+        // Alert.alert('Warning', 'Are you sure you want to set this follow-up as missed?', [
+        //     {
+        //         text: 'No', onPress: () => {console.log("Cancel missing")}
+        //     },
+        //     {
+        //         text: 'Yes', onPress: () => {
+        //         let myFollowUp = Object.assign({}, followUp)
+        //         let myFollowups = Object.assign([], contact.followUps)
+        //
+        //         myFollowUp.statusId = config.followUpStatuses.missed
+        //         myFollowUp = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, myFollowUp), action = 'update')
+        //
+        //         myFollowups[myFollowups.map((e) => {return e._id}).indexOf(myFollowUp._id)] = myFollowUp
+        //         let myContact = Object.assign({}, contact, {followUps: myFollowups})
+        //
+        //         if (this.props && this.props.user && this.props.user.activeOutbreakId) {
+        //             this.props.updateFollowUpAndContact(this.props.user.activeOutbreakId, null, myFollowUp._id, myFollowUp, myContact, null);
+        //         }
+        //     }
+        //     }
+        // ])
 
-                myFollowUp.statusId = config.followUpStatuses.missed
-                myFollowUp = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, myFollowUp), action = 'update')
-
-                myFollowups[myFollowups.map((e) => {return e._id}).indexOf(myFollowUp._id)] = myFollowUp
-                let myContact = Object.assign({}, contact, {followUps: myFollowups})
-
-                if (this.props && this.props.user && this.props.user.activeOutbreakId) {
-                    this.props.updateFollowUpAndContact(this.props.user.activeOutbreakId, null, myFollowUp._id, myFollowUp, myContact, null);
-                }
-            }
-            }
-        ])
+        console.log('Missed button is not here anymore');
 
     };
 
@@ -453,18 +559,21 @@ class FollowUpsScreen extends Component {
     };
 
     handleOnPressMap = (followUp, contact) => {
+        console.log("Handle on press map followUp: ", JSON.stringify(followUp));
+        console.log("Handle on press map contact: ", JSON.stringify(contact));
 
         if (contact && contact.addresses && Array.isArray(contact.addresses) && contact.addresses.length > 0) {
             let contactPlaceOfResidence = contact.addresses.filter((e) => {
                 return e.typeId === config.userResidenceAddress.userPlaceOfResidence
             })
             console.log('contactPlaceOfResidence', contactPlaceOfResidence)
-
+            let contactPlaceOfResidenceLatitude = contactPlaceOfResidence[0] && contactPlaceOfResidence[0].geoLocation && contactPlaceOfResidence[0].geoLocation.coordinates && Array.isArray(contactPlaceOfResidence[0].geoLocation.coordinates) && contactPlaceOfResidence[0].geoLocation.coordinates.length === 2 && contactPlaceOfResidence[0].geoLocation.coordinates[1] !== undefined && contactPlaceOfResidence[0].geoLocation.coordinates[1] !== null ? contactPlaceOfResidence[0].geoLocation.coordinates[1] : 0
+            let contactPlaceOfResidenceLongitude = contactPlaceOfResidence[0] && contactPlaceOfResidence[0].geoLocation && contactPlaceOfResidence[0].geoLocation.coordinates && Array.isArray(contactPlaceOfResidence[0].geoLocation.coordinates) && contactPlaceOfResidence[0].geoLocation.coordinates.length === 2 && contactPlaceOfResidence[0].geoLocation.coordinates[0] !== undefined && contactPlaceOfResidence[0].geoLocation.coordinates[0] !== null ? contactPlaceOfResidence[0].geoLocation.coordinates[0] : 0
             navigator.geolocation.getCurrentPosition(
                 (position) => {
                     this.setState({
-                        latitude: contactPlaceOfResidence[0].geoLocation && contactPlaceOfResidence[0].geoLocation.lat ? contactPlaceOfResidence[0].geoLocation.lat : 0,
-                        longitude: contactPlaceOfResidence[0].geoLocation && contactPlaceOfResidence[0].geoLocation.lng ? contactPlaceOfResidence[0].geoLocation.lng : 0,
+                        latitude: contactPlaceOfResidenceLatitude,
+                        longitude: contactPlaceOfResidenceLongitude,
                         sourceLatitude: position.coords.latitude,
                         sourceLongitude: position.coords.longitude,
                         isVisible: true,
@@ -489,7 +598,8 @@ class FollowUpsScreen extends Component {
             animated: true,
             passProps: {
                 activeFilters: this.state.filterFromFilterScreen || null,
-                onApplyFilters: this.handleOnApplyFilters
+                onApplyFilters: this.handleOnApplyFilters,
+                screen: 'FollowUpsFilterScreen'
             }
         })
     };
@@ -502,9 +612,19 @@ class FollowUpsScreen extends Component {
     };
 
     handleOnPressAddFollowUp = () => {
+        // let FilterClone = {
+        //     date: new Date(),
+        //     searchText: ''
+        // }
         this.setState({
-            showAddFollowUpScreen: !this.state.showAddFollowUpScreen
+            showAddFollowUpScreen: !this.state.showAddFollowUpScreen,
+            // filterFromFilterScreen: null,
+            // filter: FilterClone
         })
+        // , () => {
+        //     this.props.removeFilterForScreen('FollowUpsFilterScreen');
+        //     this.filterContacts();
+        // })
     };
 
     handleOnCancelPressed = () => {
@@ -518,9 +638,11 @@ class FollowUpsScreen extends Component {
         let now = new Date();
         date = new Date(date);
         let followUp = {
-            _id: 'followUp.json_false_' + this.props.user.activeOutbreakId + '_' + date.getTime() + '_' + generateId(),
+            _id: 'followUp.json_' + this.props.user.activeOutbreakId + '_' + date.getTime() + '_' + generateId(),
             statusId: config.followUpStatuses.notPerformed,
+            targeted: false,
             date: date,
+            fileType: 'followUp.json',
             outbreakId: this.props.user.activeOutbreakId,
             personId: extractIdFromPouchId(contact.id, 'person.json'),
             updatedAt: now.toISOString(),
@@ -537,7 +659,13 @@ class FollowUpsScreen extends Component {
     };
 
     handleGenerateFollowUps = () => {
-        this.props.generateFollowUp(this.props.user.activeOutbreakId, this.state.filter.date, this.props.user.token);
+        this.setState({
+            generating: true,
+        }, () => {
+            this.props.generateFollowUp(this.props.user.activeOutbreakId, this.state.filter.date, this.props.user.token);
+            this.hideMenu();
+        });
+
     };
 
     // Append to the existing filter newProp={name: value}
@@ -651,6 +779,7 @@ class FollowUpsScreen extends Component {
     };
 
     handleOnApplyFilters = (filter) => {
+        console.log ('foolowUpsScreen handleOnApplyFilters', filter)
         this.setState({
             filterFromFilterScreen: filter
         }, () => {
@@ -681,8 +810,6 @@ class FollowUpsScreen extends Component {
         // Take care of search filter
         if (this.state.filter.searchText) {
             contactsCopy = contactsCopy.filter((e) => {
-                // return e && e.firstName && e.firstName.toLowerCase().includes(this.state.filter.searchText.toLowerCase()) || e && e.lastName && e.lastName.toLowerCase().includes(this.state.filter.searchText.toLowerCase())
-
                 return  e && e.firstName && this.state.filter.searchText.toLowerCase().includes(e.firstName.toLowerCase()) ||
                     e && e.lastName && this.state.filter.searchText.toLowerCase().includes(e.lastName.toLowerCase()) ||
                     e && e.firstName && e.firstName.toLowerCase().includes(this.state.filter.searchText.toLowerCase()) ||
@@ -696,13 +823,37 @@ class FollowUpsScreen extends Component {
         }
 
         // Take care of age range filter
-        if (this.state.filterFromFilterScreen && this.state.filterFromFilterScreen.age && Array.isArray(this.state.filterFromFilterScreen.age) && this.state.filterFromFilterScreen.age.length === 2 && (this.state.filterFromFilterScreen.age[0] > 0 || this.state.filterFromFilterScreen.age[1] < 100)) {
-            contactsCopy = contactsCopy.filter((e) => {return e.age >= this.state.filterFromFilterScreen.age[0] && e.age <= this.state.filterFromFilterScreen.age[1]});
+        if (this.state.filterFromFilterScreen && this.state.filterFromFilterScreen.age && Array.isArray(this.state.filterFromFilterScreen.age) && this.state.filterFromFilterScreen.age.length === 2 && (this.state.filterFromFilterScreen.age[0] >= 0 || this.state.filterFromFilterScreen.age[1] <= 150)) {
+            contactsCopy = contactsCopy.filter((e) => {
+                if (e.age && e.age.years !== null && e.age.years !== undefined && e.age.months !== null && e.age.months !== undefined) {
+                    if (e.age.years > 0 && e.age.months === 0) {
+                        return e.age.years >= this.state.filterFromFilterScreen.age[0] && e.age.years <= this.state.filterFromFilterScreen.age[1]
+                    } else if (e.age.years === 0 && e.age.months > 0){
+                        return e.age.months >= this.state.filterFromFilterScreen.age[0] && e.age.months <= this.state.filterFromFilterScreen.age[1]
+                    } else if (e.age.years === 0 && e.age.months === 0) {
+                        return e.age.years >= this.state.filterFromFilterScreen.age[0] && e.age.years <= this.state.filterFromFilterScreen.age[1]
+                    }
+                }
+            });
+        }
+
+        // Take care of locations filter
+        if (this.state.filterFromFilterScreen  && this.state.filterFromFilterScreen.selectedLocations && this.state.filterFromFilterScreen.selectedLocations.length > 0) {
+            contactsCopy = contactsCopy.filter((e) => {
+                let addresses = e.addresses.filter((k) => {
+                    return k.locationId !== '' && this.state.filterFromFilterScreen.selectedLocations.indexOf(k.locationId) >= 0
+                })
+                return addresses.length > 0
+            })
         }
 
         // After filtering the contacts, it's time to get their respective follow-ups to show
         this.getFollowUpsFromContacts(contactsCopy);
     };
+
+    myFunct = () => {
+        console.log ('ajunge aici si nu crapa !! ')
+    }
 
     getFollowUpsFromContacts = (contacts) => {
         let followUpsToBeShown = [];
@@ -751,6 +902,14 @@ class FollowUpsScreen extends Component {
         }
         return valueToBeReturned;
     }
+
+    showMenu = () => {
+        this.refs.menuRef.show();
+    };
+
+    hideMenu = () => {
+        this.refs.menuRef.hide();
+    };
 }
 
 // Create style outside the class, or for components that will be used by other components (buttons),
@@ -792,6 +951,11 @@ const style = StyleSheet.create({
         fontFamily: 'Roboto-Regular',
         fontSize: 16.8,
         color: styles.buttonTextGray
+    },
+    breadcrumbContainer: {
+        flex: 1,
+        flexDirection: 'row',
+        justifyContent: 'space-between'
     }
 });
 
@@ -817,6 +981,7 @@ function matchDispatchProps(dispatch) {
         getContactsForOutbreakId,
         updateFollowUpAndContact,
         addFollowUp,
+        removeFilterForScreen,
         generateFollowUp
     }, dispatch);
 }

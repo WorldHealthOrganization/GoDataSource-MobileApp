@@ -8,7 +8,7 @@ import {View, Text, StyleSheet, Platform, Animated} from 'react-native';
 import {Button} from 'react-native-material-ui';
 import styles from './../styles';
 import NavBarCustom from './../components/NavBarCustom';
-import {calculateDimension} from './../utils/functions';
+import {extractIdFromPouchId} from './../utils/functions';
 import config from './../utils/config';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -33,14 +33,14 @@ class FollowUpsFilterScreen extends Component {
                         Male: false,
                         Female: false
                     },
-                    age: [0, 100],
+                    age: [0, 150],
                     selectedLocations: [],
                     exposure: []
                 },
                 sort: []
             },
             routes: config.tabsValuesRoutes.followUpsFilter,
-            index: 0
+            index: 0,
         };
         // Bind here methods, or at least don't declare methods in the render method
     }
@@ -56,28 +56,33 @@ class FollowUpsFilterScreen extends Component {
                     filterClone.age[0] = props.activeFilters.age[0];
                     filterClone.age[1] = props.activeFilters.age[1];
                 }
+                if (props.activeFilters.selectedLocations && Array.isArray(props.activeFilters.selectedLocations)){
+                    filterClone.selectedLocations = props.activeFilters.selectedLocations;
+                }
             console.log("### Active filters: ", filterClone);
         }
+        return null
     }
 
     // The render method should have at least business logic as possible,
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
-
+        
         return (
             <View style={style.container}>
                 <NavBarCustom
-                    title="Follow-ups filters"
+                    title={this.props.screen === 'ContactsFilterScreen' ? 'Contacts filters' : 'Follow-ups filters'}
                     navigator={this.props.navigator}
                     iconName="close"
                     handlePressNavbarButton={this.handlePressNavbarButton}
                 />
                 <TabView
+                    swipeEnabled = {false}
                     navigationState={this.state}
-                    onIndexChange={this.handleOnIndexChange}
                     renderScene={this.handleRenderScene}
                     renderTabBar={this.handleRenderTabBar}
+                    onIndexChange={this.handleOnIndexChange}
                 />
             </View>
         );
@@ -85,13 +90,23 @@ class FollowUpsFilterScreen extends Component {
 
     // Please write here all the methods that are not react native lifecycle methods
     handlePressNavbarButton = () => {
-        this.props.removeFilterForScreen('FollowUpsFilterScreen');
+        this.props.removeFilterForScreen(this.props.screen);
         this.props.navigator.dismissModal(this.props.onApplyFilters(null));
     };
 
     handleOnIndexChange = (index) => {
         this.setState({index});
     };
+
+    handleMoveToNextScreenButton = () => {
+        let nextIndex = this.state.index + 1
+        this.handleOnIndexChange(nextIndex)
+    }
+
+    handleMoveToPrevieousScreenButton = () => {
+        let nextIndex = this.state.index - 1
+        this.handleOnIndexChange(nextIndex)
+    }
 
     handleRenderScene = () => {
         if (this.state.index === 0) {
@@ -103,14 +118,16 @@ class FollowUpsFilterScreen extends Component {
                     onChangeInterval={this.handleOnChangeInterval}
                     onChangeMultipleSelection={this.handleOnChangeMultipleSelection}
                     onPressApplyFilters={this.handleOnPressApplyFilters}
+                    handleMoveToNextScreenButton = {this.handleMoveToNextScreenButton}
                 />
-            )
+            );
         } else {
             return (
                 <FollowUpsSortContainer
+                    handleMoveToPrevieousScreenButton={this.handleMoveToPrevieousScreenButton}
                     filter={this.state.filter}
                 />
-            )
+            );
         }
     };
 
@@ -165,8 +182,12 @@ class FollowUpsFilterScreen extends Component {
     }
 
     handleOnChangeSectionedDropDown = (selectedItems) => {
+        let selectedItemsWithExtractedId = selectedItems.map ((e) => {
+            return extractIdFromPouchId (e, 'location')
+        })
+
         this.setState(prevState => ({
-            filter: Object.assign({}, prevState.filter, {filter: Object.assign({}, prevState.filter.filter, {selectedLocations: selectedItems})})
+            filter: Object.assign({}, prevState.filter, {filter: Object.assign({}, prevState.filter.filter, {selectedLocations: selectedItemsWithExtractedId})})
         }), () => {
             console.log("Filters: ", this.state.filter.filter);
         })
@@ -192,20 +213,19 @@ class FollowUpsFilterScreen extends Component {
 
      
         if (filterStateClone.gender.Male && !filterStateClone.gender.Female ) {
-            filter.gender = 'Male'
+            filter.gender = config.localTranslationTokens.male
         }
         if (filterStateClone.gender.Female && !filterStateClone.gender.Male) {
-            filter.gender = 'Female'
+            filter.gender = config.localTranslationTokens.female
         }
-
         if (filterStateClone.age) {
             filter.age = filterStateClone.age;
         }
-
+        if (filterStateClone.selectedLocations) {
+            filter.selectedLocations = filterStateClone.selectedLocations;
+        }
         // this.props.getContactsForOutbreakId(this.props.user.activeOutbreakId, filter, this.props.user.token);
-
-        this.props.addFilterForScreen('FollowUpsFilterScreen', filter);
-
+        this.props.addFilterForScreen(this.props.screen, filter);
         this.props.navigator.dismissModal(this.props.onApplyFilters(filter));
     }
 }

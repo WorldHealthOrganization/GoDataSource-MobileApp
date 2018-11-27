@@ -2,6 +2,7 @@
  * Created by florinpopa on 14/06/2018.
  */
 import styles from './../styles';
+import {Platform} from 'react-native';
 
 const baseUrls = [
     {value: 'gva11sucombee.who.int:3000'},
@@ -23,7 +24,7 @@ const sideMenuItems = [
         key: 'contacts',
         name: 'people',
         label: 'Contacts',
-        addButton: true
+        // addButton: true
     },
     {
         key: 'cases',
@@ -206,6 +207,111 @@ const caseSingleScreen = {
             fields: [
                 {
                     cardNumber: 1,
+                    id: 'firstName',
+                    label: 'First Name',
+                    type: 'TextInput',
+                    value: '',
+                    isRequired: true,
+                    isEditMode: false,
+                    objectType: 'Case'
+                },
+                {
+                    cardNumber: 1,
+                    id: 'middleName',
+                    label: 'Middle Name',
+                    type: 'TextInput',
+                    value: '',
+                    isRequired: false,
+                    isEditMode: false,
+                    objectType: 'Case'
+                },
+                {
+                    cardNumber: 1,
+                    id: 'lastName',
+                    label: 'Last Name',
+                    type: 'TextInput',
+                    value: '',
+                    isRequired: false,
+                    isEditMode: false,
+                    objectType: 'Case'
+                },
+                {
+                    cardNumber: 1,
+                    id: 'gender',
+                    label: 'Gender',
+                    labelValue: '',
+                    type: 'DropdownInput',
+                    value: '',
+                    isRequired: false,
+                    isEditMode: false,
+                    activeButtonColor: 'red',
+                    activeBackgroundColor: 'red',
+                    objectType: 'Case'
+                },
+                {
+                    cardNumber: 1,
+                    id: 'phoneNumber',
+                    label: 'Phone Number',
+                    type: 'TextInput',
+                    value: '',
+                    isRequired: false,
+                    isEditMode: false,
+                    objectType: 'Case'
+                },
+                {
+                    cardNumber: 1,
+                    id: 'occupation',
+                    label: 'Occupation',
+                    labelValue: 'test',
+                    type: 'DropdownInput',
+                    value: '',
+                    isRequired: false,
+                    isEditMode: true,
+                    objectType: 'Case'
+                },
+                {
+                    cardNumber: 2,
+                    id: 'ageOrDob',
+                    type: 'TextSwitchSelector',
+                    values: 'TextSwitchSelectorAgeOrDobValues', //switch possibilities from config file
+                    selectedItemIndexForTextSwitchSelector: 'selectedItemIndexForTextSwitchSelectorForAge', //name of state parameter that will contain the selected index from values
+                    isEditMode: true,
+                    objectType: 'Case'
+                },
+                {
+                    cardNumber: 2,
+                    id: 'dob',
+                    label: 'Date of birth',
+                    labelValue: 'test',
+                    value: '',
+                    type: "DatePicker",
+                    isRequired: false,
+                    isEditMode: true,
+                    dependsOn: 'TextSwitchSelectorAgeOrDobValues', //if depends on this switch item and it is not selected, don't display
+                    format: 'MM/dd/YYYY',
+                    objectType: 'Case'
+                },
+                {
+                    cardNumber: 2,
+                    id: 'age',
+                    label: 'Age',
+                    type: 'TextInputWithDropDown',
+                    value: '',
+                    isRequired: false,
+                    isEditMode: true,
+                    multiline: false,
+                    dependsOn: 'TextSwitchSelectorAgeOrDobValues',
+                    dropDownData: 'ageUnitOfMeasureDropDown', //drop down with values
+                    selectedItemIndexForAgeUnitOfMeasureDropDown: 'selectedItemIndexForAgeUnitOfMeasureDropDown', //name of state parameter that will contain the selected index from values
+                    objectType: 'Case',
+                    keyboardType: Platform.OS === 'ios' ? 'number-pad' : 'numeric'
+                }
+            ]
+        },
+        {
+            fields: [
+                {
+                    cardNumber: 2,
                     id: 'riskLevel',
                     label: 'Risk level',
                     labelValue: 'test',
@@ -218,7 +324,7 @@ const caseSingleScreen = {
                     objectType: 'Case'
                 },
                 {
-                    cardNumber: 1,
+                    cardNumber: 2,
                     id: 'dateOfReporting',
                     label: 'Date of Reporting',
                     value: '',
@@ -229,7 +335,7 @@ const caseSingleScreen = {
                     objectType: 'Case'
                 },
                 {
-                    cardNumber: 1,
+                    cardNumber: 2,
                     id: 'isDateOfReportingApproximate',
                     label: 'Is Date of reporting approximate',
                     type: 'SwitchInput',
@@ -241,7 +347,7 @@ const caseSingleScreen = {
                     objectType: 'Case'
                 },
                 {
-                    cardNumber: 1,
+                    cardNumber: 2,
                     id: 'transferRefused',
                     label: 'Transfer Refused',
                     type: 'SwitchInput',
@@ -253,7 +359,6 @@ const caseSingleScreen = {
                     objectType: 'Case'
                 },
                 {
-                    cardNumber: 1,
                     id: 'riskReason',
                     label: 'Reason',
                     type: 'TextInput',
@@ -265,100 +370,12 @@ const caseSingleScreen = {
                 },
             ]
         },
-        {
-            fields: [
-                {
-                    cardNumber: 2,
-                    id: 'firstName',
-                    label: 'First Name',
-                    type: 'TextInput',
-                    value: '',
-                    isRequired: true,
-                    isEditMode: false,
-                    objectType: 'Case'
-                },
-                {
-                    cardNumber: 2,
-                    id: 'middleName',
-                    label: 'Middle Name',
-                    type: 'TextInput',
-                    value: '',
-                    isRequired: false,
-                    isEditMode: false,
-                    objectType: 'Case'
-                },
-                {
-                    cardNumber: 2,
-                    id: 'lastName',
-                    label: 'Last Name',
-                    type: 'TextInput',
-                    value: '',
-                    isRequired: false,
-                    isEditMode: false,
-                    objectType: 'Case'
-                },
-                {
-                    cardNumber: 2,
-                    id: 'gender',
-                    label: 'Gender',
-                    labelValue: '',
-                    type: 'DropdownInput',
-                    value: '',
-                    isRequired: true,
-                    isEditMode: false,
-                    activeButtonColor: 'red',
-                    activeBackgroundColor: 'red',
-                    objectType: 'Case'
-                },
-                {
-                    cardNumber: 2,
-                    id: 'phoneNumber',
-                    label: 'Phone Number',
-                    type: 'TextInput',
-                    value: '',
-                    isRequired: false,
-                    isEditMode: false,
-                    objectType: 'Case'
-                },
-                {
-                    cardNumber: 2,
-                    id: 'occupation',
-                    label: 'Occupation',
-                    type: 'TextInput',
-                    value: '',
-                    isRequired: false,
-                    isEditMode: false,
-                    objectType: 'Case'
-                },
-                {
-                    cardNumber: 2,
-                    id: 'age',
-                    label: 'Age',
-                    type: 'TextInput',
-                    value: '',
-                    isRequired: false,
-                    isEditMode: false,
-                    objectType: 'Case'
-                },
-                // {
-                //     cardNumber: 1,
-                //     id: 'dob',
-                //     label: 'Date of Birth',
-                //     value: '',
-                //     type: "DatePicker",
-                //     isRequired: true,
-                //     isEditMode: false,
-                //     format: 'YYYY-MM-dd',
-                //     objectType: 'Case'
-                // },
-            ]
-        }
     ],
     document: {
         fields: [
             {
                 cardNumber: 3,
-                id: 'documentType',
+                id: 'type',
                 label: 'Document Type',
                 type: 'DropdownInput',
                 value: '',
@@ -368,7 +385,7 @@ const caseSingleScreen = {
             },
             {
                 cardNumber: 3,
-                id: 'documentNumber',
+                id: 'number',
                 label: 'Document Number',
                 labelValue: 'test',
                 type: 'TextInput',
@@ -421,7 +438,7 @@ const caseSingleScreen = {
                 labelValue: 'test',
                 type: 'DropDownSectioned',
                 value: '',
-                isRequired: false,
+                isRequired: true,
                 isEditMode: true,
                 objectType: 'Address',
                 single: true
@@ -433,7 +450,7 @@ const caseSingleScreen = {
                 labelValue: 'test',
                 type: 'TextInput',
                 value: '',
-                isRequired: true,
+                isRequired: false,
                 isEditMode: true,
                 multiline: true,
                 objectType: 'Address'
@@ -445,7 +462,7 @@ const caseSingleScreen = {
                 labelValue: 'test',
                 type: 'TextInput',
                 value: '',
-                isRequired: true,
+                isRequired: false,
                 isEditMode: true,
                 multiline: true,
                 objectType: 'Address'
@@ -457,10 +474,37 @@ const caseSingleScreen = {
                 labelValue: 'test',
                 type: 'TextInput',
                 value: '',
-                isRequired: true,
+                isRequired: false,
                 isEditMode: true,
                 multiline: true,
                 objectType: 'Address'
+            },
+            // Add coordinates support
+            {
+                cardNumber: 1,
+                id: 'lng',
+                label: 'Longitude',
+                labelValue: 'test',
+                type: 'TextInput',
+                value: '',
+                isRequired: false,
+                isEditMode: true,
+                multiline: false,
+                objectType: 'Address',
+                keyboardType: 'numeric'
+            },
+            {
+                cardNumber: 1,
+                id: 'lat',
+                label: 'Latitude',
+                labelValue: 'test',
+                type: 'TextInput',
+                value: '',
+                isRequired: false,
+                isEditMode: true,
+                multiline: false,
+                objectType: 'Address',
+                keyboardType: 'numeric'
             },
             {
                 cardNumber: 1,
@@ -534,7 +578,7 @@ const caseSingleScreen = {
                 },
                 {
                     cardNumber: 1,
-                    id: 'outcome',
+                    id: 'outcomeId',
                     label: 'Outcome',
                     type: 'DropdownInput',
                     value: '',
@@ -557,6 +601,18 @@ const caseSingleScreen = {
                     cardNumber: 1,
                     id: 'deceased',
                     label: 'Deceased',
+                    type: 'SwitchInput',
+                    value: false,
+                    isRequired: false,
+                    isEditMode: false,
+                    activeButtonColor: styles.missedRedColor,
+                    activeBackgroundColor: styles.missedRedColorWithOpacity,
+                    objectType: 'Case'
+                },
+                {
+                    cardNumber: 1,
+                    id: 'safeBurial',
+                    label: 'Was Burial Safety Performed?',
                     type: 'SwitchInput',
                     value: false,
                     isRequired: false,
@@ -669,7 +725,7 @@ const followUpsFilterScreen = {
                     id: 'gender',
                     type: 'Selector',
                     value: '',
-                    data: [{value: 'Male'}, {value: 'Female'}]
+                    data: [{value: 'LNG_REFERENCE_DATA_CATEGORY_GENDER_MALE'}, {value: 'LNG_REFERENCE_DATA_CATEGORY_GENDER_FEMALE'}]
                 }
             ]
         },
@@ -688,31 +744,31 @@ const followUpsFilterScreen = {
                     type: 'IntervalPicker',
                     value: '',
                     min: 0,
-                    max: 100
+                    max: 150
                 }
             ]
         },
-        // {
-        //     fields: [
-        //         {
-        //             cardNumber: 3,
-        //             label: 'Location',
-        //             type: 'Section',
-        //             hasBorderBottom: true,
-        //             borderBottomColor: styles.navigationDrawerSeparatorGrey
-        //         },
-        //         {
-        //             cardNumber: 3,
-        //             id: 'selectedLocations',
-        //             type: 'DropDownSectioned',
-        //             label: 'Choose one or more locations',
-        //             value: '',
-        //             data: [],
-        //             isRequired: false,
-        //             isEditMode: true,
-        //         }
-        //     ]
-        // },
+        {
+            fields: [
+                {
+                    cardNumber: 3,
+                    label: 'Area',
+                    type: 'Section',
+                    hasBorderBottom: true,
+                    borderBottomColor: styles.navigationDrawerSeparatorGrey
+                },
+                {
+                    cardNumber: 3,
+                    id: 'selectedLocations',
+                    label: 'Choose one or more locations',
+                    type: 'DropDownSectioned',
+                    value: '',
+                    isRequired: false,
+                    isEditMode: true,
+                    single: false
+                }
+            ]
+        }
         // {
         //     fields: [
         //         {
@@ -753,7 +809,7 @@ const casesFilterScreen = {
                     id: 'gender',
                     type: 'Selector',
                     value: '',
-                    data: [{value: 'Male'}, {value: 'Female'}]
+                    data: [{value: 'LNG_REFERENCE_DATA_CATEGORY_GENDER_MALE'}, {value: 'LNG_REFERENCE_DATA_CATEGORY_GENDER_FEMALE'}]
                 }
             ]
         },
@@ -772,28 +828,48 @@ const casesFilterScreen = {
                     type: 'IntervalPicker',
                     value: '',
                     min: 0,
-                    max: 100
+                    max: 150
                 }
             ]
         },
         {
             fields: [
                 {
-                    cardNumber: 4,
+                    cardNumber: 3,
                     label: 'Classification',
                     type: 'Section',
                     hasBorderBottom: true,
                     borderBottomColor: styles.navigationDrawerSeparatorGrey
                 },
                 {
-                    cardNumber: 4,
+                    cardNumber: 3,
                     id: 'classification',
                     label: 'Choose one or more classification',
                     type: 'DropDown',
                     value: '',
-                    // data: [{value: 'Diana Jones'}, {value: 'Florin Popa'}],
                     isRequired: false,
                     isEditMode: true
+                }
+            ]
+        }, 
+        {
+            fields: [
+                {
+                    cardNumber: 4,
+                    label: 'Area',
+                    type: 'Section',
+                    hasBorderBottom: true,
+                    borderBottomColor: styles.navigationDrawerSeparatorGrey
+                },
+                {
+                    cardNumber: 4,
+                    id: 'selectedLocations',
+                    label: 'Choose one or more locations',
+                    type: 'DropDownSectioned',
+                    value: '',
+                    isRequired: false,
+                    isEditMode: true,
+                    single: false
                 }
             ]
         }
@@ -1058,13 +1134,21 @@ const contactsSingleScreen = {
                 {
                     cardNumber: 1,
                     id: 'occupation',
-                    labelValue: 'test',
                     label: 'Occupation',
-                    type: 'TextInput',
+                    labelValue: 'test',
+                    type: 'DropdownInput',
                     value: '',
                     isRequired: false,
                     isEditMode: true,
-                    multiline: false,
+                    objectType: 'Contact'
+                },
+                {
+                    cardNumber: 2,
+                    id: 'ageOrDob',
+                    type: 'TextSwitchSelector',
+                    values: 'TextSwitchSelectorAgeOrDobValues', //switch possibilities from config file
+                    selectedItemIndexForTextSwitchSelector: 'selectedItemIndexForTextSwitchSelectorForAge', //name of state parameter that will contain the selected index from values
+                    isEditMode: true,
                     objectType: 'Contact'
                 },
                 {
@@ -1074,10 +1158,26 @@ const contactsSingleScreen = {
                     labelValue: 'test',
                     value: '',
                     type: "DatePicker",
-                    isRequired: true,
+                    isRequired: false,
                     isEditMode: true,
+                    dependsOn: 'TextSwitchSelectorAgeOrDobValues', //if depends on this switch item and it is not selected, don't display
                     format: 'MM/dd/YYYY',
                     objectType: 'Contact'
+                },
+                {
+                    cardNumber: 2,
+                    id: 'age',
+                    label: 'Age',
+                    type: 'TextInputWithDropDown',
+                    value: '',
+                    isRequired: false,
+                    isEditMode: true,
+                    multiline: false,
+                    dependsOn: 'TextSwitchSelectorAgeOrDobValues',
+                    dropDownData: 'ageUnitOfMeasureDropDown', //drop down with values
+                    selectedItemIndexForAgeUnitOfMeasureDropDown: 'selectedItemIndexForAgeUnitOfMeasureDropDown', //name of state parameter that will contain the selected index from values
+                    objectType: 'Contact',
+                    keyboardType: Platform.OS === 'ios' ? 'number-pad' : 'numeric'
                 },
                 {
                     cardNumber: 3,
@@ -1168,7 +1268,7 @@ const contactsSingleScreen = {
                 labelValue: 'test',
                 type: 'DropDownSectioned',
                 value: '',
-                isRequired: false,
+                isRequired: true,
                 isEditMode: true,
                 objectType: 'Address',
                 single: true
@@ -1180,7 +1280,7 @@ const contactsSingleScreen = {
                 labelValue: 'test',
                 type: 'TextInput',
                 value: '',
-                isRequired: true,
+                isRequired: false,
                 isEditMode: true,
                 multiline: true,
                 objectType: 'Address'
@@ -1192,7 +1292,7 @@ const contactsSingleScreen = {
                 labelValue: 'test',
                 type: 'TextInput',
                 value: '',
-                isRequired: true,
+                isRequired: false,
                 isEditMode: true,
                 multiline: true,
                 objectType: 'Address'
@@ -1204,11 +1304,39 @@ const contactsSingleScreen = {
                 labelValue: 'test',
                 type: 'TextInput',
                 value: '',
-                isRequired: true,
+                isRequired: false,
                 isEditMode: true,
                 multiline: true,
                 objectType: 'Address'
             },
+            // Add coordinates support
+            {
+                cardNumber: 1,
+                id: 'lng',
+                label: 'Longitude',
+                labelValue: 'test',
+                type: 'TextInput',
+                value: '',
+                isRequired: false,
+                isEditMode: true,
+                multiline: false,
+                objectType: 'Address',
+                keyboardType: 'numeric'
+            },
+            {
+                cardNumber: 1,
+                id: 'lat',
+                label: 'Latitude',
+                labelValue: 'test',
+                type: 'TextInput',
+                value: '',
+                isRequired: false,
+                isEditMode: true,
+                multiline: false,
+                objectType: 'Address',
+                keyboardType: 'numeric'
+            },
+
             {
                 cardNumber: 1,
                 id: 'deleteButton',
@@ -1547,6 +1675,25 @@ const followUpStatuses = {
     missed: 'LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE_MISSED'
 };
 
+const TextSwitchSelectorAgeOrDobValues = [
+     //value must be the id of the element
+    { label: 'Age', value: 'age'},
+    { label: 'Date of Birth', value: 'dob'}
+];
+
+const ageUnitOfMeasureDropDown = [
+    { label: 'Years', value: 'years', errorValidationMessage: 'This field must be smaller or equal to 150'},
+    { label: 'Months', value: 'months', errorValidationMessage: 'This field must be smaller or equal to 11'}
+];
+
+const localTranslationTokens = {
+    years: 'LNG_AGE_FIELD_LABEL_YEARS',
+    months: 'LNG_AGE_FIELD_LABEL_MONTHS',
+    male: 'LNG_REFERENCE_DATA_CATEGORY_GENDER_MALE',
+    female: 'LNG_REFERENCE_DATA_CATEGORY_GENDER_FEMALE'
+};
+
+
 export default {
     designScreenSize,
     sideMenuItems,
@@ -1567,5 +1714,8 @@ export default {
     RNDBConfig,
     userResidenceAddress,
     contactFollowUpStatuses,
-    followUpStatuses
+    followUpStatuses,
+    TextSwitchSelectorAgeOrDobValues,
+    ageUnitOfMeasureDropDown,
+    localTranslationTokens
 }

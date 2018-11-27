@@ -19,6 +19,8 @@ import Ripple from 'react-native-material-ripple';
 import ElevatedView from 'react-native-elevated-view';
 import DropdownInput from './DropdownInput';
 import DropDown from './DropDown';
+import TextInputWithDropDown from './TextInputWithDropDown'
+import TextSwitchSelector from './TextSwitchSelector'
 import DropDownSectioned from './DropDownSectioned';
 import TextInput from './TextInput';
 import SwitchInput from './SwitchInput';
@@ -28,6 +30,7 @@ import Section from './Section';
 import Selector from './Selector';
 import IntervalPicker from './IntervalPicker';
 import ActionsBar from './ActionsBar';
+
 
 class CardComponent extends Component {
 
@@ -102,6 +105,17 @@ class CardComponent extends Component {
                     }
                 }
             }
+            if (this.props.contact !== null && nextProps.contact !== null && nextProps.contact.age !== null && this.props.contact.age !== null && this.props.contact !== undefined && nextProps.contact !== undefined && nextProps.contact.age !== undefined && this.props.contact.age !== undefined) {
+                if (this.props.contact.age.months !== undefined && this.props.contact.age.months !== null && this.props.contact.age.years !== undefined && this.props.contact.age.years !== null) {
+                    if (this.props.contact.age.months === 0 && this.props.contact.age.years === 0 && nextProps.contact.age.months === 0 && nextProps.contact.age.years === 0) {
+                        return true
+                    } else if (this.props.contact.age.months !== nextProps.contact.age.months || this.props.contact.age.years !== nextProps.contact.age.years){
+                        return true
+                    } else if (nextProps.contact.age.months === 0 || this.props.contact.age.years === 0){
+                        return true
+                    }
+                }
+            }
         }
 
         //CaseSingleScreen
@@ -141,6 +155,7 @@ class CardComponent extends Component {
                 return true
             }
 
+            //SwitchInput type inputs should not update => infinite loop refresh
             if (this.props.case && this.props.case.addresses && Array.isArray(this.props.case.addresses)) {
                 if (this.props.case.addresses.length === nextProps.case.addresses.length) {
                     for (let i = 0; i < this.props.case.addresses.length; i++) {
@@ -153,10 +168,30 @@ class CardComponent extends Component {
                     }
                 }
             }
+            if (this.props.case !== null && nextProps.case !== null && nextProps.case.age !== null && this.props.case.age !== null && this.props.case !== undefined && nextProps.case !== undefined && nextProps.case.age !== undefined && this.props.case.age !== undefined) {
+                if (this.props.case.age.months !== undefined && this.props.case.age.months !== null && this.props.case.age.years !== undefined && this.props.case.age.years !== null) {
+                    if (this.props.case.age.months !== nextProps.case.age.months || this.props.case.age.years !== nextProps.case.age.years){
+                        return true
+                    } else if (nextProps.case.age.months === 0 && this.props.case.age.months !== 0 || nextProps.case.age.years === 0 && this.props.case.age.years !== 0 ){
+                        return true
+                    }
+                }
+            }
         }
 
         if (nextProps.screen === 'ExposureScreen') {
             return true;
+        }
+
+        if (this.props.selectedItemIndexForTextSwitchSelectorForAge !== null && this.props.selectedItemIndexForTextSwitchSelectorForAge !== undefined && nextProps.selectedItemIndexForTextSwitchSelectorForAge !== null && nextProps.selectedItemIndexForTextSwitchSelectorForAge !== undefined){
+            if (this.props.selectedItemIndexForTextSwitchSelectorForAge !== nextProps.selectedItemIndexForTextSwitchSelectorForAge) {
+                return true;
+            }
+        }
+        if (this.props.selectedItemIndexForAgeUnitOfMeasureDropDown !== null && this.props.selectedItemIndexForAgeUnitOfMeasureDropDown !== undefined && nextProps.selectedItemIndexForAgeUnitOfMeasureDropDown !== null && nextProps.selectedItemIndexForAgeUnitOfMeasureDropDown !== undefined){
+            if (this.props.selectedItemIndexForAgeUnitOfMeasureDropDown !== nextProps.selectedItemIndexForAgeUnitOfMeasureDropDown) {
+                return true
+            }
         }
 
         return false;
@@ -207,6 +242,7 @@ class CardComponent extends Component {
         let minimumDate = undefined
         let maximumDate = undefined
         let data = [];
+        let sectionedSelectedItems = [];
 
         if (this.props.followUp && this.props.contact) {
             let followUp = this.props.followUp;
@@ -220,16 +256,19 @@ class CardComponent extends Component {
 
         if (this.props.screen === 'FollowUpsFilter' || this.props.screen === 'CasesFilter') {
             if (item.type === 'Selector' && item.id === 'gender') {
-                item.data = item.data.map((e) => {return {value: e.value, selected: this.props.filter && this.props.filter.filter && this.props.filter.filter.gender && this.props.filter.filter.gender[e.value] ? true : false}})
+                item.data = item.data.map((e) => {return {
+                    value: this.getTranslation(e.value), 
+                    selected: this.props.filter && this.props.filter.filter && this.props.filter.filter.gender && this.props.filter.filter.gender[e.value] ? true : false}
+                })
             }
             if (item.type === 'IntervalPicker' && item.id === 'age') {
                 item.value = this.props.filter.filter[item.id];
             }
-
             if (item.type === 'DropDownSectioned' && item.id === 'selectedLocations') {
-                item.value = this.props.filter.filter[item.id];
+                sectionedSelectedItems = this.props.filter.filter[item.id].map ((e) => {
+                    return 'location.json_' + e
+                })
             }
-
             if (item.type === 'DropDown' && item.id === 'exposure') {
                 if (this.props.cases && this.props.cases.length > 0){
                     data = this.props.cases.map((e) => {return {label: ((e.firstName ? e.firstName : '') + (e.lastName ? (" " + e.lastName) : '')), value: e.id}})
@@ -275,6 +314,17 @@ class CardComponent extends Component {
             } else {
                 value = this.computeValueForContactsSingleScreen(item, this.props.index);
             }
+            if (this.props.selectedItemIndexForTextSwitchSelectorForAge !== null && this.props.selectedItemIndexForTextSwitchSelectorForAge !== undefined && item.objectType === 'Contact' && item.dependsOn !== undefined && item.dependsOn !== null){
+                let itemIndexInConfigTextSwitchSelectorValues = config[item.dependsOn].map((e) => {return e.value}).indexOf(item.id)
+                if (itemIndexInConfigTextSwitchSelectorValues > -1) {
+                    if (itemIndexInConfigTextSwitchSelectorValues != this.props.selectedItemIndexForTextSwitchSelectorForAge) {
+                        return
+                    }
+                }
+            }
+            if (item.id === 'dob' && item.type === 'DatePicker' && item.objectType === 'Contact') {
+                maximumDate = new Date()
+            }
         }
 
         if (this.props.screen === 'ContactsSingleScreenAddress') {
@@ -289,9 +339,6 @@ class CardComponent extends Component {
                 item.onPressArray = [this.props.onDeletePress]
             }
             if (item.type === 'DatePicker' && this.props.case[item.id] !== undefined) {
-                value = this.props.case[item.id]
-            }
-            if (item.type === 'SwitchInput' && this.props.case[item.id] !== undefined) {
                 value = this.props.case[item.id]
             }
             //HospitalizationDates && IsolationDates validation
@@ -329,6 +376,17 @@ class CardComponent extends Component {
             } else {
                 value = this.computeValueForCasesSingleScreen(item, this.props.index);
             }
+            if (this.props.selectedItemIndexForTextSwitchSelectorForAge !== null && this.props.selectedItemIndexForTextSwitchSelectorForAge !== undefined && item.objectType === 'Case' && item.dependsOn !== undefined && item.dependsOn !== null){
+                let itemIndexInConfigTextSwitchSelectorValues = config[item.dependsOn].map((e) => {return e.value}).indexOf(item.id)
+                if (itemIndexInConfigTextSwitchSelectorValues > -1) {
+                    if (itemIndexInConfigTextSwitchSelectorValues != this.props.selectedItemIndexForTextSwitchSelectorForAge) {
+                        return
+                    }
+                }
+            }
+            if (item.id === 'dob' && item.type === 'DatePicker' && item.objectType === 'Case') {
+                maximumDate = new Date()
+            }
         }
 
         if (this.props.screen === 'FollowUpSingle') {
@@ -355,6 +413,10 @@ class CardComponent extends Component {
 
         let isEditModeForDropDownInput = addContactFromCasesScreen ? false : (this.props.screen === 'ExposureScreen' ? item.id === 'exposure' ? true : item.isEditMode : item.isEditMode)
 
+        if (item.type === 'DatePicker' && value === '') {
+            value = null
+        }
+
         switch(item.type) {
             case 'Section':
                 return (
@@ -378,6 +440,7 @@ class CardComponent extends Component {
                         multiline={item.multiline}
                         style={{width: width, marginHorizontal: marginHorizontal}}
                         objectType={item.objectType}
+                        keyboardType={item.keyboardType}
                     />
                 );
             case 'DropdownInput':
@@ -425,6 +488,7 @@ class CardComponent extends Component {
                         data={this.props.locations}
                         isEditMode={item.isEditMode}
                         isRequired={item.isRequired}
+                        sectionedSelectedItems={sectionedSelectedItems}
                         onChange={this.props.onChangeSectionedDropDown}
                         style={{width: width, marginHorizontal: marginHorizontal}}
                         dropDownStyle={{width: width, alignSelf: 'center'}}
@@ -502,6 +566,37 @@ class CardComponent extends Component {
                         isEditMode = {this.props.isEditMode !== undefined && this.props.isEditMode !== null ? this.props.isEditMode : true}
                     />
                 );
+            case 'TextSwitchSelector':
+                return (
+                    <TextSwitchSelector 
+                        selectedItem={this.props[item.selectedItemIndexForTextSwitchSelector]}
+                        selectedItemIndexForTextSwitchSelector={item.selectedItemIndexForTextSwitchSelector}
+                        onChange={this.props.onChangeTextSwitchSelector}
+                        values={item.values}
+                        isEditMode = {this.props.isEditMode}
+                        style={{width: width, marginHorizontal: marginHorizontal}}
+                    />
+                );
+            case 'TextInputWithDropDown':
+                return (
+                    <TextInputWithDropDown 
+                        id={item.id}
+                        label={item.label}
+                        index={this.props.index}
+                        value={value}
+                        isEditMode={item.isEditMode}
+                        isRequired={item.isRequired}
+                        multiline={item.multiline}
+                        dropDownData={item.dropDownData}
+                        onChange={this.props.onChangeextInputWithDropDown}
+                        style={{width: width, marginHorizontal: marginHorizontal}}
+                        objectType={item.objectType}
+                        keyboardType={item.keyboardType}
+                        onChangeDropDown={this.props.onChangeTextSwitchSelector}
+                        selectedDropDownItemIndex={this.props[item.selectedItemIndexForAgeUnitOfMeasureDropDown]}
+                        selectedItemIndexForAgeUnitOfMeasureDropDown ={item.selectedItemIndexForAgeUnitOfMeasureDropDown}
+                    />
+                )
             default:
                 return (
                     <View style={{backgroundColor: 'red'}}>
@@ -661,23 +756,23 @@ class CardComponent extends Component {
 
         if (item.id === 'exposure') {
             if (this.props.exposure.persons && Array.isArray(this.props.exposure.persons) && this.props.exposure.persons.length > 0) {
-                let persons = this.props.exposure.persons.filter((e) => {return e.type !== (this.props.type === 'Contact' ? 'contact' : 'contact')});
+                let persons = this.props.exposure.persons.filter((e) => {return e.type !== (this.props.type === 'Contact' ? config.personTypes.contacts : config.personTypes.contacts)});
                 value = this.extractNameForExposure(persons[0]);
             }
         }
-        console.log ('computeExposureValue', JSON.stringify(value))
+        console.log ('computeExposureValue', JSON.stringify(value));
 
         return this.getTranslation(value);
     };
 
     extractNameForExposure = (person) => {
         switch (person.type) {
-            case 'case':
+            case config.personTypes.cases:
                 return (this.props.cases && Array.isArray(this.props.cases) && this.props.cases.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id) > -1 && this.props.cases[this.props.cases.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id)].firstName ? (this.props.cases[this.props.cases.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id)].firstName + ' ') : '') +
                     (this.props.cases && Array.isArray(this.props.cases) && this.props.cases.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id) > -1 && this.props.cases[this.props.cases.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id)].lastName ? (this.props.cases[this.props.cases.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id)].lastName) : '');
-            case 'event':
+            case config.personTypes.events:
                 return (this.props.events && Array.isArray(this.props.events) && this.props.events.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id) > -1 && this.props.events[this.props.events.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id)].name ? (this.props.events[this.props.events.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id)].name) : '');
-            case 'contact':
+            case config.personTypes.contacts:
                 return (this.props.contacts && Array.isArray(this.props.contacts) && this.props.contacts.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id) > -1 && this.props.contacts[this.props.contacts.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id)].firstName ? (this.props.contacts[this.props.contacts.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id)].firstName + ' ') : '') +
                     (this.props.contacts && Array.isArray(this.props.contacts) && this.props.contacts.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id) > -1 && this.props.contacts[this.props.contacts.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id)].lastName ? (this.props.contacts[this.props.contacts.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id)].lastName) : '');
             default:
@@ -686,10 +781,10 @@ class CardComponent extends Component {
     };
 
     computeDataForFollowUpSingleScreenDropdownInput = (item, index) => {
-        console.log("computeDataForFollowUpSingleScreenDropdownInput: ", item, this.props.case);
+        // console.log("computeDataForFollowUpSingleScreenDropdownInput: ", item, this.props.case);
         if (item.id === 'statusId') {
             return _.filter(this.props.referenceData, (o) => {
-                return o.categoryId.includes("STATUS_TYPE")
+                return o.categoryId.includes("LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE")
             }).map((o) => {return {label: this.getTranslation(o.value), value: o.value}})
         }
         if (item.id === 'typeId') {
@@ -700,7 +795,7 @@ class CardComponent extends Component {
     };
 
     computeDataForCasesSingleScreenDropdownInput = (item, index) => {
-        console.log("computeDataForCasesSingleScreenDropdownInput: ", item, this.props.case);
+        // console.log("computeDataForCasesSingleScreenDropdownInput: ", item, this.props.case);
         if (item.id === 'riskLevel') {
             return _.filter(this.props.referenceData, (o) => {
                 return o.categoryId.includes("RISK_LEVEL")
@@ -709,7 +804,7 @@ class CardComponent extends Component {
         if (item.id === 'gender') {
             return _.filter(this.props.referenceData, (o) => {
                 return o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_GENDER'
-            }).map((o) => {return {value: this.getTranslation(o.value), id: o.value}})
+            }).map((o) => {return {label: this.getTranslation(o.value), value: o.value}})
         }
         if (item.id === 'typeId') {
             return _.filter(this.props.referenceData, (o) => {
@@ -721,15 +816,20 @@ class CardComponent extends Component {
                 return o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_CASE_CLASSIFICATION'
             }).map((o) => {return {label: this.getTranslation(o.value), value: o.value}})
         }
-        if (item.id === 'outcome') {
+        if (item.id === 'outcomeId') {
             return _.filter(this.props.referenceData, (o) => {
                 return o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_OUTCOME'
             }).map((o) => {return {label: this.getTranslation(o.value), value: o.value}})
         }
-        if (item.id === 'documentType') {
+        if (item.id === 'type') {
             return _.filter(this.props.referenceData, (o) => {
                 return o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_DOCUMENT_TYPE'
             }).map((o) => {return {label: this.getTranslation(o.value), value: o.value}})
+        }
+        if (item.id === 'occupation') {
+            return _.filter(this.props.referenceData, (o) => {
+                return o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_OCCUPATION'
+            }).map((o) => {return {value: this.getTranslation(o.value), id: o.value}})
         }
     };
 
@@ -751,7 +851,7 @@ class CardComponent extends Component {
     }
 
     computeDataForContactsSingleScreenDropdownInput = (item, index) => {
-        console.log("computeDataForContactsSingleScreenDropdownInput: ", item, this.props.contact);
+        // console.log("computeDataForContactsSingleScreenDropdownInput: ", item, this.props.contact);
         if (item.id === 'riskLevel') {
             return _.filter(this.props.referenceData, (o) => {
                 return o.categoryId.includes("RISK_LEVEL")
@@ -767,6 +867,11 @@ class CardComponent extends Component {
                 return o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_ADDRESS_TYPE'
             }).map((o) => {return {value: this.getTranslation(o.value), id: o.value}})
         }
+        if (item.id === 'occupation') {
+            return _.filter(this.props.referenceData, (o) => {
+                return o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_OCCUPATION'
+            }).map((o) => {return {value: this.getTranslation(o.value), id: o.value}})
+        }
     };
 
     computeValueForFollowUpSingleScreen = (item) => {
@@ -780,8 +885,25 @@ class CardComponent extends Component {
     computeValueForCasesSingleScreen = (item, index) => {
         if (index || index >= 0) {
             if (item.objectType === 'Address') {
-                return this.props.case && this.props.case.addresses && Array.isArray(this.props.case.addresses) && this.props.case.addresses.length > 0 && this.props.case.addresses[index][item.id] !== undefined ?
-                    this.getTranslation(this.props.case.addresses[index][item.id]) : '';
+
+                if (item.id === 'lng') {
+                    return this.props.case && this.props.case.addresses && Array.isArray(this.props.case.addresses) &&
+                    this.props.case.addresses[index] && this.props.case.addresses[index].geoLocation &&
+                    this.props.case.addresses[index].geoLocation.coordinates &&
+                    Array.isArray(this.props.case.addresses[index].geoLocation.coordinates) ?
+                        this.getTranslation(this.props.case.addresses[index].geoLocation.coordinates[0]) : '';
+                } else {
+                    if (item.id === 'lat') {
+                        return this.props.case && this.props.case.addresses && Array.isArray(this.props.case.addresses) &&
+                        this.props.case.addresses[index] && this.props.case.addresses[index].geoLocation &&
+                        this.props.case.addresses[index].geoLocation.coordinates &&
+                        Array.isArray(this.props.case.addresses[index].geoLocation.coordinates) ?
+                            this.getTranslation(this.props.case.addresses[index].geoLocation.coordinates[1]) : '';
+                    } else {
+                        return this.props.case && this.props.case.addresses && Array.isArray(this.props.case.addresses) ?
+                            this.getTranslation(this.props.case.addresses[index][item.id]) : '';
+                    }
+                }
             } else if (item.objectType === 'Documents') {
                 return this.props.case && this.props.case.documents && Array.isArray(this.props.case.documents) && this.props.case.documents.length > 0 && this.props.case.documents[index][item.id] !== undefined ?
                     this.getTranslation(this.props.case.documents[index][item.id]) : '';
@@ -798,8 +920,24 @@ class CardComponent extends Component {
 
     computeValueForContactsSingleScreen = (item, index) => {
         if (index || index >= 0) {
-            return this.props.contact && this.props.contact.addresses && Array.isArray(this.props.contact.addresses) ?
-                this.getTranslation(this.props.contact.addresses[index][item.id]) : '';
+            if (item.id === 'lng') {
+                return this.props.contact && this.props.contact.addresses && Array.isArray(this.props.contact.addresses) &&
+                    this.props.contact.addresses[index] && this.props.contact.addresses[index].geoLocation &&
+                    this.props.contact.addresses[index].geoLocation.coordinates &&
+                    Array.isArray(this.props.contact.addresses[index].geoLocation.coordinates) ?
+                    this.getTranslation(this.props.contact.addresses[index].geoLocation.coordinates[0]) : '';
+            } else {
+                if (item.id === 'lat') {
+                    return this.props.contact && this.props.contact.addresses && Array.isArray(this.props.contact.addresses) &&
+                        this.props.contact.addresses[index] && this.props.contact.addresses[index].geoLocation &&
+                        this.props.contact.addresses[index].geoLocation.coordinates &&
+                        Array.isArray(this.props.contact.addresses[index].geoLocation.coordinates) ?
+                        this.getTranslation(this.props.contact.addresses[index].geoLocation.coordinates[1]) : '';
+                } else {
+                    return this.props.contact && this.props.contact.addresses && Array.isArray(this.props.contact.addresses) ?
+                                this.getTranslation(this.props.contact.addresses[index][item.id]) : '';
+                }
+            }
         }
         return this.props.contact && this.props.contact[item.id] ? this.getTranslation(this.props.contact[item.id]) : '';
     };

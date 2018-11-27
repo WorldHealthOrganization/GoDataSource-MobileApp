@@ -2,7 +2,7 @@
  * Created by florinpopa on 05/07/2018.
  */
 import React, {Component} from 'react';
-import {View, Text, StyleSheet, ScrollView, Alert} from 'react-native';
+import {View, Text, StyleSheet, ScrollView, Alert, Keyboard, TouchableWithoutFeedback} from 'react-native';
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import Button from './../components/Button';
@@ -54,12 +54,12 @@ class ExposureScreen extends Component {
         if (this.props.addContactFromCasesScreen !== null && this.props.addContactFromCasesScreen !== undefined && this.props.caseIdFromCasesScreen !== null && this.props.caseIdFromCasesScreen !== undefined) {
             personsArray = [{
                 id: extractIdFromPouchId(this.props.caseIdFromCasesScreen, 'person'),
-                type: 'case',
+                type: config.personTypes.cases,
                 source: true,
                 target: null
             },{
                 id: null,
-                type: 'contact',
+                type: config.personTypes.contacts,
                 source: null,
                 target: true
             }]
@@ -117,77 +117,83 @@ class ExposureScreen extends Component {
         console.log('Render from ExposureScreen: ', this.state.exposure, this.props.exposure);
 
         return (
-            <View style={style.container}>
-                <NavBarCustom style = {style.navbarContainer}
-                    customTitle={
-                        <View
-                            style={{
-                                flex: 1,
-                                flexDirection: 'row',
-                                alignItems: 'center',
-                                justifyContent: 'space-between',
-                                height: '100%'
-                            }}
-                        >
-                            <Text style={[style.title, {marginLeft: 30}]}>Add exposure</Text>
-                            {/* <Ripple
-                                hitSlop={{
-                                    top: 20,
-                                    bottom: 20,
-                                    left: 20,
-                                    right: 20
-                                }}
+            <TouchableWithoutFeedback onPress={() => {
+                Keyboard.dismiss()
+            }} accessible={false}>
+                <View style={style.container}>
+                    <NavBarCustom style = {style.navbarContainer}
+                        customTitle={
+                            <View
                                 style={{
-                                    height: '100%',
-                                    justifyContent: 'center'
+                                    flex: 1,
+                                    flexDirection: 'row',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
+                                    height: '100%'
                                 }}
-                                onPress={this.handleSaveExposure}
                             >
-                                <Text style={[style.title, {marginHorizontal: 10}]}>Save</Text>
-                            </Ripple> */}
+                                <Text style={[style.title, {marginLeft: 30}]}>
+                                    {this.props.exposure ? "Edit exposure" : "Add exposure"}
+                                </Text>
+                                {/* <Ripple
+                                    hitSlop={{
+                                        top: 20,
+                                        bottom: 20,
+                                        left: 20,
+                                        right: 20
+                                    }}
+                                    style={{
+                                        height: '100%',
+                                        justifyContent: 'center'
+                                    }}
+                                    onPress={this.handleSaveExposure}
+                                >
+                                    <Text style={[style.title, {marginHorizontal: 10}]}>Save</Text>
+                                </Ripple> */}
+                            </View>
+                        }
+                        title={null}
+                        navigator={this.props.navigator}
+                        iconName="close"
+                        handlePressNavbarButton={this.handlePressNavbarButton}
+                    />
+                    <View style={style.containContainer}>
+                        <View style={{flexDirection: 'row'}}>
+                                <Button
+                                    title={'Save'}
+                                    onPress={this.handleSaveExposure}
+                                    color={styles.buttonGreen}
+                                    titleColor={'white'}
+                                    height={calculateDimension(25, true, this.props.screenSize)}
+                                    width={calculateDimension(130, false, this.props.screenSize)}
+                                    style={{
+                                        marginVertical: calculateDimension(12.5, true, this.props.screenSize),
+                                        marginHorizontal: calculateDimension(16, false, this.props.screenSize),
+                                    }}/>
+
                         </View>
-                    }
-                    title={null}
-                    navigator={this.props.navigator}
-                    iconName="close"
-                    handlePressNavbarButton={this.handlePressNavbarButton}
-                />
-                <View style={style.containContainer}>
-                    <View style={{flexDirection: 'row'}}>
-                            <Button
-                                title={'Save'}
-                                onPress={this.handleSaveExposure}
-                                color={styles.buttonGreen}
-                                titleColor={'white'}
-                                height={calculateDimension(25, true, this.props.screenSize)}
-                                width={calculateDimension(130, false, this.props.screenSize)}
-                                style={{
-                                    marginVertical: calculateDimension(12.5, true, this.props.screenSize),
-                                    marginHorizontal: calculateDimension(16, false, this.props.screenSize),
-                                }}/>
-                        
+                        <KeyboardAwareScrollView
+                        style={style.containerScrollView}
+                        contentContainerStyle={[style.contentContainerStyle, {paddingBottom: this.props.screenSize.height < 600 ? 70 : 20}]}
+                        keyboardShouldPersistTaps={'always'}
+                    >
+                        <View style={style.container}>
+                            <CardComponent
+                                screen={'ExposureScreen'}
+                                item={config.addExposureScreen}
+                                type={this.props.type}
+                                exposure={this.state.exposure}
+                                addContactFromCasesScreen={this.props.addContactFromCasesScreen}
+                                onChangeDropDown={this.handleOnChangeDropDown}
+                                onChangeDate={this.handleOnChangeDate}
+                                onChangeText={this.handleOnChangeText}
+                                onChangeSwitch={this.handleOnChangeSwitch}
+                            />
+                        </View>
+                    </KeyboardAwareScrollView>
                     </View>
-                    <KeyboardAwareScrollView
-                    style={style.containerScrollView}
-                    contentContainerStyle={[style.contentContainerStyle, {paddingBottom: this.props.screenSize.height < 600 ? 70 : 20}]}
-                    keyboardShouldPersistTaps={'always'}
-                >
-                    <View style={style.container}>
-                        <CardComponent
-                            screen={'ExposureScreen'}
-                            item={config.addExposureScreen}
-                            type={this.props.type}
-                            exposure={this.state.exposure}
-                            addContactFromCasesScreen={this.props.addContactFromCasesScreen}
-                            onChangeDropDown={this.handleOnChangeDropDown}
-                            onChangeDate={this.handleOnChangeDate}
-                            onChangeText={this.handleOnChangeText}
-                            onChangeSwitch={this.handleOnChangeSwitch}
-                        />
-                    </View>
-                </KeyboardAwareScrollView>
                 </View>
-            </View>
+            </TouchableWithoutFeedback>
         )
     }
 

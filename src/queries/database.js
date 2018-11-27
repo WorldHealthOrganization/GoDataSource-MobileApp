@@ -52,37 +52,67 @@ let databaseIndexes = [
 
 // PouchDB wrapper over SQLite uses one database per user, so we will store all documents from all the mongo collection to a single database.
 // We will separate the records by adding a new property called type: <collection_name>
-export function createDatabase(databaseName, databasePassword, callback) {
-    // Define the design documents that tells the database to build indexes in order to query
-    let promisesArray = [];
+export function createDatabase(databaseName, databasePassword, forceNewDatabase) {
+    return new Promise((resolve, reject) => {
+        // Define the design documents that tells the database to build indexes in order to query
+        let promisesArray = [];
 
-    // Check first if the database is cached
-    if (database) {
-        return callback(database);
-    }
-    // After that, check if there is already a database with the name and return that
-    console.log("Database name: ", databaseName);
-    let pathToDatabase = RNFetchBlobFS.dirs.DocumentDir + '/' + databaseName;
+        // Check first if the database is cached
+        if (database && !forceNewDatabase) {
+            return resolve(database);
+        }
+        // After that, check if there is already a database with the name and return that
+        console.log("Database name: ", databaseName);
+        let pathToDatabase = RNFetchBlobFS.dirs.DocumentDir + '/' + databaseName;
 
-    if (Platform.OS === 'ios') {
-        pathToDatabase = RNFS.LibraryDirectoryPath + '/NoCloud/' + databaseName;
-    }
+        if (Platform.OS === 'ios') {
+            pathToDatabase = RNFS.LibraryDirectoryPath + '/NoCloud/' + databaseName;
+        }
 
-    RNFetchBlobFS.ls(RNFetchBlobFS.dirs.DocumentDir)
-        .then((result) => {
-            console.log('Android list: ', result);
-            console.log('Path to database: ', pathToDatabase);
-            RNFetchBlobFS.exists(pathToDatabase)
-                .then((exists) => {
-                    console.log('Database exists? ', exists);
-                    const SQLiteAdapter = SQLiteAdapterFactory(SQLite);
-                    PouchDB.plugin(SQLiteAdapter);
-                    PouchDB.plugin(PouchUpsert);
-                    PouchDB.plugin(PouchFind);
-                    // PouchDB.debug.enable('pouchdb:find');
-                    database = new PouchDB(encodeName(databaseName, databasePassword), {adapter: 'react-native-sqlite'});
+        RNFetchBlobFS.ls(RNFetchBlobFS.dirs.DocumentDir)
+            .then((result) => {
+                console.log('Android list: ', result);
+                console.log('Path to database: ', pathToDatabase);
+                RNFetchBlobFS.exists(pathToDatabase)
+                    .then((exists) => {
+                        console.log('Database exists? ', exists);
+                        const SQLiteAdapter = SQLiteAdapterFactory(SQLite);
+                        PouchDB.plugin(SQLiteAdapter);
+                        PouchDB.plugin(PouchUpsert);
+                        PouchDB.plugin(PouchFind);
+                        // PouchDB.debug.enable('pouchdb:find');
+                        database = new PouchDB(encodeName(databaseName, databasePassword), {adapter: 'react-native-sqlite'});
 
-                    if (!exists) {
+                        if (!exists) {
+                            // for (let i=0; i<databaseIndexes.length; i++) {
+                            //     console.log("Create index: ", i);
+                            //     promisesArray.push(database.createIndex(databaseIndexes[i]));
+                            // }
+                            // promisesArray.push(createIndexContact());
+                            // promisesArray.push(createIndex());
+                            // promisesArray.push(createIndexPerson());
+                            // Add all the design docs and then return the database
+                            Promise.all(promisesArray)
+                                .then((results) => {
+                                    console.log("Results from creating indexes: ", results);
+                                    resolve(database);
+                                })
+                                .catch((error) => {
+                                    console.log("Error from creating indexes: ", error);
+                                    resolve(database);
+                                })
+                        } else {
+                            resolve(database);
+                        }
+                    })
+                    .catch((errorExistsDatabase) => {
+                        console.log("Database exists error: ", errorExistsDatabase);
+                        const SQLiteAdapter = SQLiteAdapterFactory(SQLite);
+                        PouchDB.plugin(SQLiteAdapter);
+                        PouchDB.plugin(PouchUpsert);
+                        PouchDB.plugin(PouchFind);
+                        // PouchDB.debug.enable('pouchdb:find');
+                        database = new PouchDB(encodeName(databaseName, databasePassword), {adapter: 'react-native-sqlite'});
                         // for (let i=0; i<databaseIndexes.length; i++) {
                         //     console.log("Create index: ", i);
                         //     promisesArray.push(database.createIndex(databaseIndexes[i]));
@@ -90,50 +120,23 @@ export function createDatabase(databaseName, databasePassword, callback) {
                         // promisesArray.push(createIndexContact());
                         // promisesArray.push(createIndex());
                         // promisesArray.push(createIndexPerson());
-                        // Add all the design docs and then return the database
+                        // Add al the design docs and then return the database
                         Promise.all(promisesArray)
                             .then((results) => {
                                 console.log("Results from creating indexes: ", results);
-                                callback(database);
+                                resolve(database);
                             })
                             .catch((error) => {
                                 console.log("Error from creating indexes: ", error);
-                                callback(database);
+                                resolve(database);
                             })
-                    } else {
-                        callback(database);
-                    }
-                })
-                .catch((errorExistsDatabase) => {
-                    console.log("Database exists error: ", errorExistsDatabase);
-                    const SQLiteAdapter = SQLiteAdapterFactory(SQLite);
-                    PouchDB.plugin(SQLiteAdapter);
-                    PouchDB.plugin(PouchUpsert);
-                    PouchDB.plugin(PouchFind);
-                    // PouchDB.debug.enable('pouchdb:find');
-                    database = new PouchDB(encodeName(databaseName, databasePassword), {adapter: 'react-native-sqlite'});
-                    // for (let i=0; i<databaseIndexes.length; i++) {
-                    //     console.log("Create index: ", i);
-                    //     promisesArray.push(database.createIndex(databaseIndexes[i]));
-                    // }
-                    // promisesArray.push(createIndexContact());
-                    // promisesArray.push(createIndex());
-                    // promisesArray.push(createIndexPerson());
-                    // Add al the design docs and then return the database
-                    Promise.all(promisesArray)
-                        .then((results) => {
-                            console.log("Results from creating indexes: ", results);
-                            callback(database);
-                        })
-                        .catch((error) => {
-                            console.log("Error from creating indexes: ", error);
-                            callback(database);
-                        })
-                });
-        })
-        .catch((error) => {
-            console.log('Android error: ', error);
-        })
+                    });
+            })
+            .catch((error) => {
+                console.log('Android error: ', error);
+                reject(error)
+            })
+    })
 }
 
 function createIndexContact() {
@@ -187,7 +190,7 @@ function createIndexPerson() {
         if (database) {
             // Index for contacts based on fileType, type, outbreakId, firstName, lastName, age, gender
             database.createIndex({
-                index: {fields: ['persons.[].id', 'outbreakId', 'fileType', 'deleted']},
+                index: {fields: ['updatedAt']},
                 name: 'indexPerson',
                 ddoc: 'indexPerson',
             })
@@ -246,7 +249,7 @@ export function updateFileInDatabase(file, type) {
             file._id = createIdForType(file, type);
             database.upsert(file._id, (doc) => {
                 // If we have to insert the doc, then add the type property
-                if (!doc) {
+                if (!doc || (typeof doc === 'object' && Object.keys(doc).length === 0)) {
                     // console.log("Insert Doc " + type);
                     file.fileType = type;
                     return file;
@@ -284,10 +287,12 @@ export function updateFileInDatabase(file, type) {
             })
                 .then((res) => {
                     // console.log("Res: ", res);
+                    file = null;
                     resolve('Done');
                 })
                 .catch((error) => {
                     console.log("Error: ", error);
+                    file = null;
                     reject("Error at inserting: ", error);
                 })
         } else {
@@ -299,17 +304,19 @@ export function updateFileInDatabase(file, type) {
 export function processBulkDocs(data, type) {
     return new Promise((resolve, reject) => {
         if (database) {
-            data = data.map((e) => {return Object.assign({}, e, {_id: createIdForType(e, type)})});
-            database.bulkDocs(data)
+            database.bulkDocs(data.map((e) => {return Object.assign({}, e, {_id: createIdForType(e, type), fileType: type})}))
                 .then(() => {
                     console.log('Bulk docs finished: ');
+                    data = null;
                     resolve('Done Bulk');
                 })
                 .catch((errorBulkDocs) => {
                     console.log('Bulk docs encountered an error: ', errorBulkDocs);
+                    data = null;
                     reject(errorBulkDocs)
                 })
         } else {
+            data = null;
             reject('Database does not exist');
         }
     })
@@ -319,15 +326,15 @@ export function processBulkDocs(data, type) {
 export function createIdForType(file, type) {
     switch (type) {
         case 'person.json':
-            return (type + '_' + file.type + '_' + file.deleted + '_' + file.outbreakId + '_' + file._id);
+            return (type + '_' + file.type + '_' + file.outbreakId + '_' + file._id);
         case 'languageToken.json':
-            return (type + '_' + file.deleted + '_' + file.languageId + '_' + file._id);
+            return (type + '_' + file.languageId + '_' + file._id);
         case 'followUp.json':
-            return (type + '_' + file.deleted + '_' + file.outbreakId + '_' + new Date(file.date).getTime() + '_' + file._id);
+            return (type + '_' + file.outbreakId + '_' + new Date(file.date).getTime() + '_' + file._id);
             // return (type + '_' + file.outbreakId + '_' + file._id);
         case 'relationship.json':
-            return (type + '_' + file.deleted + '_' + file.outbreakId + '_' + file._id);
+            return (type + '_' + file.outbreakId + '_' + file._id);
         default:
-            return (type + '_' + file.deleted + '_' + file._id);
+            return (type + '_' + file._id);
     }
 }

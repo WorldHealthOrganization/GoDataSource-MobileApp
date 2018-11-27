@@ -10,7 +10,7 @@ export function getCasesForOutbreakIdRequest (outbreakId, filter, token, callbac
 
     console.log("getCasesForOutbreakIdRequest: ", outbreakId);
     if (filter && filter.keys) {
-        let keys = filter.keys.map((e) => {return `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE_false_${outbreakId}_${e}`});
+        let keys = filter.keys.map((e) => {return `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE_${outbreakId}_${e}`});
         let promiseArray = [];
 
         for (let i=0; i<keys.length; i++) {
@@ -30,68 +30,119 @@ export function getCasesForOutbreakIdRequest (outbreakId, filter, token, callbac
         if (filter) {
             console.log('getCasesForOutbreakIdRequest else, if');
             console.log ('myFilter', filter);
-            let or = [
-                {firstName: filter.searchText ? {$regex: filter.searchText} : {}},
-                {lastName: filter.searchText ? {$regex: filter.searchText} : {}}
-            ];
+
+            let classificationOrFilter = null
             if(filter.classification){
-                if(filter.classification.length > 1 && Array.isArray(filter.classification)){
+                classificationOrFilter = []
+                if(filter.classification.length > 0 && Array.isArray(filter.classification)){
                     for (let i=0; i<filter.classification.length; i++) {
-                        or.push(filter.classification[i]);
+                        if (filter.classification[i].classification !== null) {
+                            classificationOrFilter.push(filter.classification[i].classification);
+                        }
                     }
+                }
+            }
+
+            let myFilterAge = null 
+            if (filter.age) {
+                myFilterAge = filter.age
+                let maxAge = filter.age[1]
+                let minAge = filter.age[0]
+                while (maxAge - 1 > minAge) {
+                    myFilterAge.push(minAge + 1)
+                    minAge = minAge + 1
                 }
             }
 
             database.find({
                 selector: {
-                    type: {$eq: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE'},
+                    _id: {
+                        $gt: `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE_${outbreakId}_`,
+                        $lt: `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE_${outbreakId}_\uffff`
+                    },
+                    type: {$eq: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE'}, 
                     gender: filter.gender ? {$eq: filter.gender} : {},
-                    age: filter.age ? { $gte: filter.age[0]} : {},
-                    age: filter.age ? { $lte: filter.age[1]} : {},
-                    $or: or
+                    deleted: false,
+                    classification: classificationOrFilter && classificationOrFilter.length > 0 ? {$in: classificationOrFilter} : {},
+                    $or: [
+                        {'age.years': myFilterAge && myFilterAge.length > 0 ? { $in: myFilterAge} : {}},
+                        {'age.months': myFilterAge && myFilterAge.length > 0 ? { $in: myFilterAge} : {}},
+                    ],
+                    $or: [
+                        {firstName: filter.searchText ? {$regex: filter.searchText} : {}},
+                        {lastName: filter.searchText ? {$regex: filter.searchText} : {}}
+                    ],
                 },
             })
                 .then((resultFilterCases) => {
-                    console.log('Result when filtering cases: ', new Date().getTime() - start);
-                    callback(null, resultFilterCases.docs)
+                    console.log('Result when filtering cases: ', new Date().getTime() - start, resultFilterCases.docs);
+                    //local filter for age because it can't be done in mango (can't use and in or filter
+                    let resultFilterCasesDocs = resultFilterCases.docs
+                    if (filter.age) {
+                        resultFilterCasesDocs = resultFilterCasesDocs.filter((e) => {
+                            if (e.age && e.age.years !== null && e.age.years !== undefined && e.age.months !== null && e.age.months !== undefined) {
+                                if (e.age.years > 0 && e.age.months === 0) {
+                                    return e.age.years >= filter.age[0] && e.age.years <= filter.age[1]
+                                } else if (e.age.years === 0 && e.age.months > 0){
+                                    return e.age.months >= filter.age[0] && e.age.months <= filter.age[1]
+                                } else if (e.age.years === 0 && e.age.months === 0) {
+                                    return e.age.years >= filter.age[0] && e.age.years <= filter.age[1]
+                                }
+                            }
+                        });
+                    }
+                    //local filter for selectedLocations bcause it can't be done in mango queries
+                    if (filter.selectedLocations && filter.selectedLocations.length > 0) {
+                        resultFilterCasesDocs = resultFilterCasesDocs.filter((e) => {
+                            let addresses = e.addresses.filter((k) => {
+                                return k.locationId !== '' && filter.selectedLocations.indexOf(k.locationId) >= 0
+                            })
+                            return addresses.length > 0
+                        })
+                    }
+                    callback(null, resultFilterCasesDocs)
                 })
                 .catch((errorFilterCases) => {
-                    console.log('Error when filtering contacts: ', errorFilterCases);
+                    console.log('Error when filtering cases: ', errorFilterCases);
                     callback(errorFilterCases);
                 })
         } else {
-            database.allDocs({
-                startkey: `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE_false_${outbreakId}`,
-                endkey: `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE_false_${outbreakId}\uffff`,
-                include_docs: true
-            })
-                .then((result) => {
-                    console.log("result with the new index for cases: ", new Date().getTime() - start);
-                    callback(null, result.rows.filter((e) => {return e.doc.deleted === false}).map((e) => {return e.doc}));
+            // database.allDocs({
+            //     startkey: `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE_${outbreakId}`,
+            //     endkey: `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE_${outbreakId}\uffff`,
+            //     include_docs: true
+            // })
+            //     .then((result) => {
+            //         console.log("result with the new index for cases: ", new Date().getTime() - start);
+            //         callback(null, result.rows.filter((e) => {return e.doc.deleted === false}).map((e) => {return e.doc}));
+            //
+            //     })
+            //     .catch((errorQuery) => {
+            //         console.log("Error with the new index for cases: ", errorQuery);
+            //         callback(errorQuery);
+            //     });
 
+
+            database.find({
+                selector: {
+                    _id: {
+                        $gte: `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE_${outbreakId}`,
+                        $lte: `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE_${outbreakId}\uffff`,
+                    },
+                    deleted: false,
+                }
+            })
+                .then((resultFind) => {
+                    console.log('Result for find cases time: ', new Date().getTime() - start);
+                    callback(null, resultFind.docs)
                 })
-                .catch((errorQuery) => {
-                    console.log("Error with the new index for cases: ", errorQuery);
-                    callback(errorQuery);
-                });
+                .catch((errorFind) => {
+                    console.log('Error find cases: ', errorFind);
+                    callback(errorFind);
+                })
         }
     }
-    // database.find({
-    //     selector: {
-    //         type: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE',
-    //         fileType: 'person.json',
-    //         deleted: false,
-    //         outbreakId: outbreakId
-    //     }
-    // })
-    //     .then((resultFind) => {
-    //         console.log('Result for find cases time: ', new Date().getTime() - start);
-    //         callback(null, resultFind.docs)
-    //     })
-    //     .catch((errorFind) => {
-    //         console.log('Error find cases: ', errorFind);
-    //         callback(errorFind);
-    //     })
+
 }
 
 export function addCaseRequest (outbreakId, myCase, token, callback) {

@@ -4,7 +4,7 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
-import {TextInput, View, Text, Alert, StyleSheet, Dimensions, Platform, FlatList, Animated} from 'react-native';
+import {TextInput, View, Text, Alert, StyleSheet, Dimensions, Platform, FlatList, Animated, BackHandler} from 'react-native';
 import {Button, Icon} from 'react-native-material-ui';
 import { TextField } from 'react-native-material-textfield';
 import styles from './../styles';
@@ -25,10 +25,11 @@ import {Dropdown} from 'react-native-material-dropdown';
 import Breadcrumb from './../components/Breadcrumb';
 import {getCasesForOutbreakId} from './../actions/cases';
 import {removeErrors} from './../actions/errors';
-import {addFilterForScreen} from './../actions/app';
+import {addFilterForScreen, removeFilterForScreen} from './../actions/app';
 import AnimatedListView from './../components/AnimatedListView';
 import ViewHOC from './../components/ViewHOC';
 import _ from 'lodash';
+import { Popup } from 'react-native-map-link';
 
 let height = Dimensions.get('window').height;
 let width = Dimensions.get('window').width;
@@ -50,20 +51,42 @@ class CasesScreen extends Component {
             filterFromFilterScreen: this.props.filter && this.props.filter['CasesFilterScreen'] ? this.props.filter['CasesFilterScreen'] : null,
             cases: [],
             refreshing: false,
-            loading: true
+            loading: true,
+
+            isVisible: false,
+            latitude: 0,
+            longitude: 0,
+            sourceLatitude: 0,
+            sourceLongitude: 0,
+            error: null,
         };
 
         // Bind here methods, or at least don't declare methods in the render method
         this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this));
+        this.handleBackButtonClick = this.handleBackButtonClick.bind(this);
     }
 
     // Please add here the react lifecycle methods that you need
     componentDidMount() {
+        BackHandler.addEventListener('hardwareBackPress', this.handleBackButtonClick);
         this.setState({
             loading: true
         }, () => {
-            this.props.getCasesForOutbreakId(this.props.user.activeOutbreakId, null, null);
+            if (this.props.filter && (this.props.filter['CasesScreen'] || this.props.filter['CasesFilterScreen'])) {
+                this.filterCases();
+            } else {
+                this.props.getCasesForOutbreakId(this.props.user.activeOutbreakId, null, null);
+            }
         })
+    }
+
+    componentWillUnmount() {
+        BackHandler.removeEventListener('hardwareBackPress', this.handleBackButtonClick);
+    }
+
+    handleBackButtonClick() {
+        // this.props.navigator.goBack(null);
+        return true;
     }
 
     static getDerivedStateFromProps(props, state) {
@@ -79,6 +102,7 @@ class CasesScreen extends Component {
         }
 
         state.loading = false;
+        state.refreshing = false
         return null;
     }
 
@@ -176,9 +200,7 @@ class CasesScreen extends Component {
                                 onPress={this.handlePressFilter}
                                 onChangeText={this.handleOnChangeText}
                                 onSubmitEditing={this.handleOnSubmitEditing}
-                                filterText={this.state.filterFromFilterScreen && this.state.filterFromFilterScreen.where
-                                && this.state.filterFromFilterScreen.where.and && Array.isArray(this.state.filterFromFilterScreen.where.and) ?
-                                    ("Filter (" + this.state.filterFromFilterScreen.where.and.length + ')') : 'Filter'}
+                                filterText={(this.state.filterFromFilterScreen && Object.keys(this.state.filterFromFilterScreen).length > 0) ? ("Filter (" + Object.keys(this.state.filterFromFilterScreen).length + ')') : 'Filter'}
                             />
                         }
                         ItemSeparatorComponent={this.renderSeparatorComponent}
@@ -188,6 +210,28 @@ class CasesScreen extends Component {
                         refreshing={this.state.refreshing}
                         onRefresh={this.handleOnRefresh}
                     />
+                </View>
+                <View style={styles.mapContainer}>
+                    {
+                        this.state.error === null ? (
+                            <Popup
+                                isVisible={this.state.isVisible}
+                                onCancelPressed={() => this.setState({ isVisible: false })}
+                                onAppPressed={() => this.setState({ isVisible: false })}
+                                onBackButtonPressed={() => this.setState({ isVisible: false })}
+                                options={{
+                                    latitude: this.state.latitude,
+                                    longitude: this.state.longitude,
+                                    sourceLatitude: this.state.sourceLatitude,
+                                    sourceLongitude: this.state.sourceLongitude,
+                                    dialogTitle: 'Select the maps application that you would like to use',
+                                    cancelText: 'Cancel',
+                                    appsWhiteList: ['google-maps', 'apple-maps', 'waze']
+                                    //other possibilities: citymapper, uber, lyft, transit, yandex, moovit
+                                }}
+                            />
+                        ) : console.log('this.state.error', this.state.error)
+                    }
                 </View>
             </ViewHOC>
         );
@@ -269,7 +313,12 @@ class CasesScreen extends Component {
     //Render a case tile
     renderCase = ({item}) => {
         return (
-            <CaseListItem item={item} onPressCase={this.handleOnPressCase} onPressAddContact={this.handleOnPressAddContact} />
+            <CaseListItem 
+                item={item} 
+                onPressCase={this.handleOnPressCase}             
+                onPressMap={this.handleOnPressMap}
+                onPressAddContact={this.handleOnPressAddContact} 
+            />
         )
     };
 
@@ -316,7 +365,6 @@ class CasesScreen extends Component {
             animationType: 'fade',
             passProps: {
                 case: item,
-                // filter: this.state.filter
             }
         })
     };
@@ -336,6 +384,33 @@ class CasesScreen extends Component {
         })
     };
 
+    handleOnPressMap = (myCase, contact) => {
+        console.log('handleOnPressMap', myCase. contact)
+        if (myCase && myCase.addresses && Array.isArray(myCase.addresses) && myCase.addresses.length > 0) {
+            let casePlaceOfResidence = myCase.addresses.filter((e) => {
+                return e.typeId === config.userResidenceAddress.userPlaceOfResidence
+            })
+            console.log('casePlaceOfResidence', casePlaceOfResidence)
+            let casePlaceOfResidenceLatitude = casePlaceOfResidence[0] && casePlaceOfResidence[0].geoLocation && casePlaceOfResidence[0].geoLocation.coordinates && Array.isArray(casePlaceOfResidence[0].geoLocation.coordinates) && casePlaceOfResidence[0].geoLocation.coordinates.length === 2 && casePlaceOfResidence[0].geoLocation.coordinates[1] !== undefined && casePlaceOfResidence[0].geoLocation.coordinates[1] !== null ? casePlaceOfResidence[0].geoLocation.coordinates[1] : 0
+            let casePlaceOfResidenceLongitude = casePlaceOfResidence[0] && casePlaceOfResidence[0].geoLocation && casePlaceOfResidence[0].geoLocation.coordinates && Array.isArray(casePlaceOfResidence[0].geoLocation.coordinates) && casePlaceOfResidence[0].geoLocation.coordinates.length === 2 && casePlaceOfResidence[0].geoLocation.coordinates[0] !== undefined && casePlaceOfResidence[0].geoLocation.coordinates[0] !== null ? casePlaceOfResidence[0].geoLocation.coordinates[0] : 0
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    this.setState({
+                        latitude: casePlaceOfResidenceLatitude,
+                        longitude: casePlaceOfResidenceLongitude,
+                        sourceLatitude: position.coords.latitude,
+                        sourceLongitude: position.coords.longitude,
+                        isVisible: true,
+                        error: null,
+                    });
+                },
+                (error) => {
+                    this.setState({error: error.message})
+                },
+            );
+        }
+    }
+
     //Create new case in CaseSingleScreen
     handleOnPressAddCase = () => {
         this.props.navigator.push({
@@ -347,71 +422,54 @@ class CasesScreen extends Component {
             }
         })
     };
-
+    
     //Navigator event
     onNavigatorEvent = (event) => {
         navigation(event, this.props.navigator);
     };
 
     filterCases = () => {
-        // let casesCopy = _.cloneDeep(this.props.cases);
-        //
-        // // Take care of search filter
-        // if (this.state.filter.searchText) {
-        //     casesCopy = casesCopy.filter((e) => {
-        //         return  e && e.firstName && this.state.filter.searchText.toLowerCase().includes(e.firstName.toLowerCase()) ||
-        //             e && e.lastName && this.state.filter.searchText.toLowerCase().includes(e.lastName.toLowerCase()) ||
-        //             e && e.firstName && e.firstName.toLowerCase().includes(this.state.filter.searchText.toLowerCase()) ||
-        //             e && e.lastName && e.lastName.toLowerCase().includes(this.state.filter.searchText.toLowerCase())
-        //     });
-        // }
-        //
-        // console.log("filter:", this.state.filterFromFilterScreen);
-        // // Take care of gender filter
-        // if (this.state.filterFromFilterScreen && this.state.filterFromFilterScreen.gender) {
-        //     casesCopy = casesCopy.filter((e) => {return e.gender === this.state.filterFromFilterScreen.gender});
-        // }
-        //
-        // console.log(casesCopy);
-        //
-        // this.setState({
-        //     cases: casesCopy
-        // })
-
         let allFilters = {}
 
+        //age
         if (this.state.filterFromFilterScreen && this.state.filterFromFilterScreen.age) {
             allFilters.age = this.state.filterFromFilterScreen.age
         } else {
             allFilters.age = null
         }
 
+        //gender
         if (this.state.filterFromFilterScreen && this.state.filterFromFilterScreen.gender) {
-            if (this.state.filterFromFilterScreen.gender === 'Female') {
-                allFilters.gender = 'LNG_REFERENCE_DATA_CATEGORY_GENDER_FEMALE'
-            } else  if (this.state.filterFromFilterScreen.gender === 'Male') {
-                allFilters.gender = 'LNG_REFERENCE_DATA_CATEGORY_GENDER_MALE'
-            }
+            allFilters.gender = this.state.filterFromFilterScreen.gender
+
         } else {
             allFilters.gender = null
         }
 
+        //classification
         if (this.state.filterFromFilterScreen && this.state.filterFromFilterScreen.classification) {
-            //if classification is array
             allFilters.classification = this.state.filterFromFilterScreen.classification;
         } else {
-            // allFilters.classification = null
+            allFilters.classification = null
         }
 
-        console.log('this.state.filter.searchText ', this.state.filter.searchText);
+        //search text
         if (this.state.filter.searchText.trim().length > 0) {
             let splitedFilter= this.state.filter.searchText.split(" ")
+            splitedFilter = splitedFilter.filter((e) => {return e !== ""})
             allFilters.searchText = new RegExp(splitedFilter.join("|"), "ig");
         } else {
             allFilters.searchText = null
         }
 
-        if (!allFilters.age && !allFilters.gender && !allFilters.searchText && !allFilters.classification) {
+        //selected locations
+        if (this.state.filterFromFilterScreen && this.state.filterFromFilterScreen.selectedLocations) {
+            allFilters.selectedLocations = this.state.filterFromFilterScreen.selectedLocations;
+        } else {
+            allFilters.selectedLocations = null
+        }
+
+        if (!allFilters.age && !allFilters.gender && !allFilters.searchText && !allFilters.classification && !allFilters.selectedLocations) {
             allFilters = null
         }
 
@@ -426,6 +484,12 @@ class CasesScreen extends Component {
 // Create style outside the class, or for components that will be used by other components (buttons),
 // make a global style in the config directory
 const style = StyleSheet.create({
+    mapContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#F5FCFF'
+    },
     container: {
         flex: 1,
         backgroundColor: 'white',
@@ -460,6 +524,7 @@ function matchDispatchProps(dispatch) {
         getCasesForOutbreakId,
         addFilterForScreen,
         removeErrors,
+        removeFilterForScreen
     }, dispatch);
 }
 

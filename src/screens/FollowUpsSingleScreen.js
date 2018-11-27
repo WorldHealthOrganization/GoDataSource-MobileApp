@@ -4,7 +4,7 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
-import {View, StyleSheet, Platform, Animated, Alert} from 'react-native';
+import {View, StyleSheet, Platform, Animated, Alert, BackHandler} from 'react-native';
 import {Icon} from 'react-native-material-ui';
 import styles from './../styles';
 import NavBarCustom from './../components/NavBarCustom';
@@ -44,6 +44,7 @@ class FollowUpsSingleScreen extends Component {
             isDateTimePickerVisible: false
         };
         // Bind here methods, or at least don't declare methods in the render method
+        this.handleBackButtonClick = this.handleBackButtonClick.bind(this);
     }
 
     // GenInfoRoute = () => (
@@ -70,6 +71,23 @@ class FollowUpsSingleScreen extends Component {
     //         onPressMissing={this.handleOnPressMissing}
     //     />
     // );
+
+    componentDidMount() {
+        BackHandler.addEventListener('hardwareBackPress', this.handleBackButtonClick);
+    }
+
+    componentWillUnmount() {
+        BackHandler.removeEventListener('hardwareBackPress', this.handleBackButtonClick);
+    }
+
+    handleBackButtonClick() {
+        // this.props.navigator.goBack(null);
+        this.props.navigator.pop({
+            animated: true,
+            animationType: 'fade'
+        })
+        return false;
+    }
 
     // Please add here the react lifecycle methods that you need
     static getDerivedStateFromProps(props, state) {
@@ -449,7 +467,6 @@ class FollowUpsSingleScreen extends Component {
         this.setState(prevState => ({
             item: Object.assign({}, prevState.item,
                 {
-                    performed: true,
                     updatedAt: now.toISOString(),
                     updatedBy: extractIdFromPouchId(this.props.user._id, 'user.json')
                 }
@@ -461,6 +478,9 @@ class FollowUpsSingleScreen extends Component {
             savePressed: true
         }), () => {
             let followUpClone = _.cloneDeep(this.state.item);
+            if (followUpClone.targeted !== false && followUpClone.targeted !== true) {
+                followUpClone.targeted = false;
+            }
             let contactClone = _.cloneDeep(this.state.contact);
 
             if (followUpClone.address && followUpClone.address.location) {
@@ -476,18 +496,18 @@ class FollowUpsSingleScreen extends Component {
             }
 
             if (this.props.isNew) {
-                followUpClone = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, followUpClone), action = 'create', fileType = 'followUp.json')
+                followUpClone = updateRequiredFields(this.props.user.activeOutbreakId, this.props.user._id, Object.assign({}, followUpClone), action = 'create', 'followUp.json');
                 console.log ('followUpClone create', JSON.stringify(followUpClone))
                 this.props.createFollowUp(this.props.outbreak.id, contactClone._id, followUpClone, contactClone, null, this.props.user.token)
             } else {
                 if (this.state.deletePressed === false) {
-                    followUpClone = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, followUpClone), action = 'update')
+                    followUpClone = updateRequiredFields(this.props.user.activeOutbreakId, this.props.user._id, Object.assign({}, followUpClone), action = 'update');
                     console.log ('followUpClone update', JSON.stringify(followUpClone))
                 } else {
-                    followUpClone = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, followUpClone), action = 'delete')
+                    followUpClone = updateRequiredFields(this.props.user.activeOutbreakId, this.props.user._id, Object.assign({}, followUpClone), action = 'delete');
                     console.log ('followUpClone delete', JSON.stringify(followUpClone))
                 }
-                this.props.updateFollowUpAndContact(this.props.user.activeOutbreakId, contactClone._id, followUpClone._id, followUpClone, contactClone, this.props.user.token);
+                this.props.updateFollowUpAndContact(this.props.user.activeOutbreakId, contactClone._id, followUpClone._id, followUpClone, contactClone, this.props.user.token, this.props.filter);
             }
         });
     };

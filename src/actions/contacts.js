@@ -4,7 +4,8 @@
 import {
     ACTION_TYPE_STORE_CONTACTS,
     ACTION_TYPE_UPDATE_CONTACT,
-    ACTION_TYPE_ADD_CONTACT
+    ACTION_TYPE_ADD_CONTACT,
+    ACTION_TYPE_REMOVE_CONTACT
 } from './../utils/enums';
 import {
     // getContactsForOutbreakIdRequest,
@@ -52,6 +53,13 @@ export function addContactAction(contact) {
 export function updateContactAction(contact) {
     return {
         type: ACTION_TYPE_UPDATE_CONTACT,
+        payload: contact
+    }
+}
+
+export function removeContactAction(contact) {
+    return {
+        type: ACTION_TYPE_REMOVE_CONTACT,
         payload: contact
     }
 }
@@ -139,7 +147,7 @@ export function getContactById(outbreakId, contactId, token, contact = null) {
     }
 }
 
-export function addContact(outbreakId, contact, outbreak, token) {
+export function addContact(outbreakId, contact, outbreak, token, contactMatchFilter) {
     // Since will have only one relationship, we can set here all the data needed dateOfLastContact, followUp: {originalStartDate, startDate, endDate, status}
     let relationship = contact.relationships[0];
     relationship = updateRequiredFields(outbreakId = outbreakId, userId = contact.updatedBy, record = relationship, action = 'create', fileType = 'relationship.json')
@@ -153,14 +161,17 @@ export function addContact(outbreakId, contact, outbreak, token) {
             }
             if (response) {
                 console.log("*** addContact response: ", JSON.stringify(response));
-                dispatch(addContactAction(response));
-                dispatch(addExposureForContact(outbreakId, response._id, relationship, token));
+                if (contactMatchFilter === true) {
+                    dispatch(addContactAction(response));
+                    console.log('test ajunge aici')
+                }
+                dispatch(addExposureForContact(outbreakId, response._id, relationship, token, null));
             }
         })
     }
 }
 
-export function updateContact(outbreakId, contactId, contact, token) {
+export function updateContact(outbreakId, contactId, contact, token, filter, contactMatchFilter) {
     return async function(dispatch, getState) {
         if (contact.relationships) {
             if (Array.isArray(contact.relationships) && contact.relationships.length > 0) {
@@ -172,7 +183,6 @@ export function updateContact(outbreakId, contactId, contact, token) {
             delete contact.followUps;
         }
 
-
         updateContactRequest(outbreakId, contactId, contact, token, (error, response) => {
             if (error) {
                 console.log("*** updateContactRequest error: ", error);
@@ -181,7 +191,7 @@ export function updateContact(outbreakId, contactId, contact, token) {
             if (response) {
                 console.log("*** updateContactRequest response: ", JSON.stringify(response));
                 if (response.deleted === false) {
-                    getRelationshipsAndFollowUpsForContactRequest(outbreakId, [extractIdFromPouchId(response._id, 'person')], (errorRelationshipsAndFollowUps, responseRelationshipsAndFollowUps) => {
+                    getRelationshipsAndFollowUpsForContactRequest(outbreakId, extractIdFromPouchId(response._id, 'person'), filter, (errorRelationshipsAndFollowUps, responseRelationshipsAndFollowUps) => {
                         if (errorRelationshipsAndFollowUps) {
                             console.log("*** getRelationshipsAndFollowUpsForContact error: ", JSON.stringify(errorRelationshipsAndFollowUps));
                             dispatch(addError(errorTypes.ERROR_CONTACT));
@@ -195,11 +205,19 @@ export function updateContact(outbreakId, contactId, contact, token) {
                             if (followUps.length > 0) {
                                 mappedContact = mapContactsAndFollowUps(mappedContact, followUps);
                             }
-                            dispatch(updateContactAction(mappedContact[0]));
+                            if (contactMatchFilter) {
+                                dispatch(updateContactAction(mappedContact[0]));
+                            } else {
+                                dispatch(removeContactAction(mappedContact[0]));
+                            }
                         }
                     });
                 } else {
-                    dispatch(updateContactAction(response));
+                    if (contactMatchFilter) {
+                        dispatch(updateContactAction(response));
+                    } else {
+                        dispatch(removeContactAction(response));
+                    }
                 }
             }
         })
@@ -300,7 +318,7 @@ export function updateExposureForContact(outbreakId, contactId, exposure, token)
                         responseContact.relationships.push(exposure);
 
                         responseContact = updateContactFollowUpFields(responseContact, getState().outbreak);
-                        dispatch(updateContact(outbreakId, contactId, responseContact, null));
+                        dispatch(updateContact(outbreakId, contactId, responseContact, null, null, true));
                         // updateContactRequest(outbreakId, responseContact._id, responseContact, null, (errorUpdateContact, responseUpdateContact) => {
                         //     if (errorUpdateContact) {
                         //         console.log("*** updateExposureForContact updateContactRequest error: ", error);
@@ -349,7 +367,7 @@ export function deleteExposureForContact(outbreakId, contactId, exposure, token)
                             if (responseGetRelationships) {
                                 responseGetContact.relationships = responseGetRelationships;
                                 responseGetContact = updateContactFollowUpFields(responseGetContact, getState().outbreak);
-                                dispatch(updateContact(outbreakId, contactId, responseGetContact, null));
+                                dispatch(updateContact(outbreakId, contactId, responseGetContact, null, null, true));
                             }
                         })
                     }
