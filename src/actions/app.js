@@ -30,6 +30,7 @@ import {AsyncStorage} from 'react-native';
 import {getUserById} from './user';
 import {uniq} from 'lodash';
 // import RNDB from 'react-native-nosql-to-sqlite';
+import {getSyncEncryptPassword, encrypt, decrypt} from './../utils/encryption';
 
 // Add here only the actions, not also the requests that are executed. For that purpose is the requests directory
 export function changeAppRoot(root) {
@@ -95,31 +96,6 @@ export function removeFilterForScreen(screenName) {
     }
 }
 
-// export function getTranslations(dispatch) {
-//     return new Promise((resolve, reject) => {
-//         let language = '';
-//         if (Platform.OS === 'ios') {
-//             language = NativeModules.SettingsManager.settings.AppleLocale;
-//         } else {
-//             language = NativeModules.I18nManager.localeIdentifier;
-//         }
-//
-//         if (language === 'en_US') {
-//             language = 'english_us';
-//         }
-//
-//         getTranslationRequest(language, (error, response) => {
-//             if (error) {
-//                 console.log("*** addExposureForContact error: ", error);
-//             }
-//             if (response) {
-//                 dispatch(saveTranslation(response));
-//                 resolve();
-//             }
-//         })
-//     })
-// }
-
 export function getTranslations(language, dispatch) {
     // return async function (dispatch) {
     return new Promise((resolve, reject) => {
@@ -137,22 +113,6 @@ export function getTranslations(language, dispatch) {
     })
     // }
 }
-
-export function getTranslationsAsync(language) {
-    return async function (dispatch) {
-    // return new Promise((resolve, reject) => {
-        getTranslationRequest(language, (error, response) => {
-            if (error) {
-                console.log("*** getTranslations error: ", error);
-            }
-            if (response) {
-                console.log("### here should have the translations: ");
-                dispatch(saveTranslation(response));
-            }
-        })
-    // })
-    }
-};
 
 export function getAvailableLanguages(dispatch) {
     // return async function (dispatch) {
@@ -220,7 +180,7 @@ function processFilesForSync(error, response, hubConfiguration) {
         }
         if (response) {
             dispatch(setSyncState("Unzipping database..."));
-            unzipFile(response, RNFetchBlobFs.dirs.DocumentDir + "/who_databases", (unzipError, responseUnzipPath) => {
+            unzipFile(response, RNFetchBlobFs.dirs.DocumentDir + "/who_databases", null, hubConfiguration, (unzipError, responseUnzipPath) => {
                 if (unzipError) {
                     console.log("Error while unzipping file");
                     dispatch(setSyncState('Error'));
@@ -307,14 +267,12 @@ export function sendDatabaseToServer () {
                         let internetCredentials = await getInternetCredentials(activeDatabase);
                         if (internetCredentials) {
                             database.find({selector: {
-                                updatedAt: {$gte: lastSyncDate},
-                                updatedBy: {$ne: 'Sync. Client Id: test'}
+                                updatedAt: {$gte: lastSyncDate}
                             },
                                 fields: ['fileType']
                             })
                                 .then((resultGetRecordsByDate) => {
                                     resultGetRecordsByDate = uniq(resultGetRecordsByDate.docs);
-                                    resultGetRecordsByDate = resultGetRecordsByDate.filter((e) => {return e.fileType !== 'followUp.json'});
                                     console.log('resultGetRecordsByDate: ', resultGetRecordsByDate);
                                     // Now, for each fileType, we must create a .json file, archive it and then send that archive to the server
                                     let promiseArray = [];
@@ -410,22 +368,6 @@ export function getData (key) {
         }
     }
 }
-
-// export function getServerCredentials (serverName, callback) {
-//     return async function () {
-//         try {
-//             let credentials = await getInternetCredentials(serverName);
-//             if (credentials) {
-//                 console.log("Credentials ", credentials);
-//                 callback(null, credentials)
-//             } else {
-//                 callback('Error get credentials');
-//             }
-//         } catch (error) {
-//             callback(error);
-//         }
-//     }
-// }
 
 export function appInitialized() {
     return async function (dispatch, getState) {
@@ -535,10 +477,6 @@ export function appInitialized() {
             }
         }
 
-
-
-
-
         // getData('loggedUser', (error, loggedUser) => {
         //     console.log('Logged user: ', loggedUser);
         //     if (loggedUser) {
@@ -580,10 +518,6 @@ export function appInitialized() {
         //     }
         // });
 
-
-
-
-
         // Get the translations from the api and save them to the redux store
         // dispatch(getTranslations());
         // dispatch(changeAppRoot('login'));
@@ -592,7 +526,6 @@ export function appInitialized() {
         //     email: 'florin.popa@clarisoft.com',
         //     password: 'Cl@r1soft'
         // }));
-
 
         // I don't think we need this in production since before the user logs in, the translations should be already saved
         // TODO comment what's below and uncomment the code above

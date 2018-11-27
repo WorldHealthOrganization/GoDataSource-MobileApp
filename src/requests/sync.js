@@ -25,14 +25,13 @@ export function getDatabaseSnapshotRequest(hubConfig, lastSyncDate, callback) {
 
     RNFetchBlob.config({
         fileCache: true,
-        appendExt: 'zip',
-        path: dirs + '/database.zip'
+        path: dirs + '/database'
     })
         .fetch('GET', encodeURI(requestUrl), {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'Authorization': 'Basic ' + base64.encode(`${hubConfig.clientId}:${hubConfig.clientSecret}`)
-    }, '0', '20000')
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Authorization': 'Basic ' + base64.encode(`${hubConfig.clientId}:${hubConfig.clientSecret}`)
+        }, '0', '20000')
         .progress({count: 1}, (received, total) => {
             console.log(received, total)
         })
@@ -42,7 +41,7 @@ export function getDatabaseSnapshotRequest(hubConfig, lastSyncDate, callback) {
             if(status === 200) {
                 // After returning the database, return the path to it
                 console.log("Got database");
-                callback(null, (dirs + '/database.zip'))
+                callback(null, (dirs + '/database'))
             } else {
                 callback('Status Code Error')
             }
