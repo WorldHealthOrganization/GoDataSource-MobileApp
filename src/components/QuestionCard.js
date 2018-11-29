@@ -6,7 +6,7 @@
 import React, {Component} from 'react';
 import {View, Text, StyleSheet, Platform, Dimensions, Image, FlatList, ScrollView} from 'react-native';
 import {ListItem, Icon} from 'react-native-material-ui';
-import {calculateDimension} from './../utils/functions';
+import {calculateDimension, getTranslation} from './../utils/functions';
 import config from './../utils/config';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -19,6 +19,7 @@ import TextInput from './TextInput';
 import DropDown from './DropDown';
 import _ from 'lodash';
 import DatePicker from './DatePicker';
+import translations from './../utils/translations'
 
 
 class QuestionCard extends Component {
@@ -43,7 +44,7 @@ class QuestionCard extends Component {
                 width: calculateDimension(config.designScreenSize.width - 32, false, this.props.screenSize),
                 marginVertical: 4
             }]}
-                          onPress={() => {this.setState({showDropdown: false})}}
+                onPress={() => {this.setState({showDropdown: false})}}
             >
                 <View style={[style.containerQuestion,
                     {
@@ -52,13 +53,13 @@ class QuestionCard extends Component {
                         paddingLeft: calculateDimension(14, false, this.props.screenSize)
                     }]}>
                     <View style={style.containerQuestionNumber}>
-                        <Text style={style.questionText}>{"Q" + this.props.index}</Text>
+                        <Text style={style.questionText}>{getTranslation(translations.generalLabels.questionInitial, this.props.translation).toUpperCase() + this.props.index}</Text>
                     </View>
-                    <Text style={[style.questionText,
-                        {
+                    <Text style={[style.questionText, {
                             marginLeft: calculateDimension(8, false, this.props.screenSize),
-                            marginRight: calculateDimension(34, false, this.props.screenSize)
-                        }]} numberOfLines={2}>{this.getTranslation(this.props.item.text)}</Text>
+                            marginRight: calculateDimension(34, false, this.props.screenSize) }]} numberOfLines={2}>
+                        {this.getTranslation(this.props.item.text)}
+                    </Text>
                 </View>
                 <ScrollView scrollEnabled={false} keyboardShouldPersistTaps={'always'}>
                     {
@@ -144,7 +145,7 @@ class QuestionCard extends Component {
                 return (
                     <TextInput
                         id={item.variable}
-                        label={'Write answer'}
+                        label={getTranslation(translations.questionCardLabels.textInputLabel, this.props.translation)}
                         labelValue={item.text}
                         value={questionAnswers}
                         isEditMode={this.props.isEditMode}
@@ -152,13 +153,15 @@ class QuestionCard extends Component {
                         onChange={this.props.onChangeTextAnswer}
                         multiline={true}
                         style={{width: width, marginHorizontal: marginHorizontal}}
+                        translation={this.props.translation}
+                        screenSize={this.props.screenSize}
                     />
                 );
             case 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_NUMERIC':
                 return (
                     <TextInput
                         id={item.variable}
-                        label={'Write answer'}
+                        label={getTranslation(translations.questionCardLabels.textInputLabel, this.props.translation)}
                         labelValue={item.text}
                         value={questionAnswers}
                         isEditMode={this.props.isEditMode}
@@ -167,25 +170,28 @@ class QuestionCard extends Component {
                         multiline={true}
                         keyboardType={Platform.OS === 'ios' ? 'number-pad' : 'numeric'}
                         style={{width: width, marginHorizontal: marginHorizontal}}
+                        translation={this.props.translation}
+                        screenSize={this.props.screenSize}
                     />
                 );
             case 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_DATE_TIME':
                 return (
                     <DatePicker
                         id={item.variable}
-                        label={'Select date'}
+                        label={getTranslation(translations.questionCardLabels.datePickerLabel, this.props.translation)}
                         value={questionAnswers}
                         isEditMode={this.props.isEditMode}
                         isRequired={item.required}
                         onChange={this.props.onChangeDateAnswer}
                         style={{width: width, marginHorizontal: marginHorizontal}}
+                        translation={this.props.translation}
                     />
                 );
             case 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_SINGLE_ANSWER':
                 return (
                     <DropdownInput
                         id={item.variable}
-                        label={'Select answer'}
+                        label={getTranslation(translations.questionCardLabels.dropDownInputLabel, this.props.translation)}
                         labelValue={item.text}
                         value={questionAnswers}
                         data={item.answers.map((e) => {return {value: this.getTranslation(e.label), id: e.value}})}
@@ -193,6 +199,7 @@ class QuestionCard extends Component {
                         isRequired={item.required}
                         onChange={this.props.onChangeSingleSelection}
                         style={{width: width, marginHorizontal: marginHorizontal}}
+                        translation={this.props.translation}
                     />
                 );
             case 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_MULTIPLE_ANSWERS':
@@ -200,7 +207,7 @@ class QuestionCard extends Component {
                     <DropDown
                         key={item.variable}
                         id={item.variable}
-                        label={'Select answer(s)'}
+                        label={getTranslation(translations.questionCardLabels.dropDownLabel, this.props.translation)}
                         labelValue={item.text}
                         value={questionAnswers}
                         data={item.answers.map((e) => {return {label: this.getTranslation(e.label), value: e.value}})}

@@ -12,7 +12,6 @@ import {Button, Icon} from 'react-native-material-ui';
 import styles from './../styles';
 import NavBarCustom from './../components/NavBarCustom';
 import CalendarPicker from './../components/CalendarPicker';
-import {calculateDimension} from './../utils/functions';
 import config from './../utils/config';
 import Ripple from 'react-native-material-ripple';
 import {connect} from "react-redux";
@@ -32,10 +31,11 @@ import ElevatedView from 'react-native-elevated-view';
 import _ from 'lodash';
 import AddFollowUpScreen from './AddFollowUpScreen';
 import {LoaderScreen, Colors} from 'react-native-ui-lib';
-import {navigation, extractIdFromPouchId, generateId, updateRequiredFields} from './../utils/functions';
+import {calculateDimension, navigation, extractIdFromPouchId, generateId, updateRequiredFields, getTranslation} from './../utils/functions';
 import ViewHOC from './../components/ViewHOC';
 import { Popup } from 'react-native-map-link';
 import moment from 'moment';
+import translations from './../utils/translations'
 
 const scrollAnim = new Animated.Value(0);
 const offsetAnim = new Animated.Value(0);
@@ -81,7 +81,6 @@ class FollowUpsScreen extends Component {
         this.handleDayPress = this.handleDayPress.bind(this);
         this.openCalendarModal = this.openCalendarModal.bind(this);
         this.filterContacts = this.filterContacts.bind(this);
-        this.myFunct =  this.myFunct.bind(this)
         this.handleBackButtonClick = this.handleBackButtonClick.bind(this);
     }
 
@@ -91,10 +90,11 @@ class FollowUpsScreen extends Component {
         if (props.errors && props.errors.type && props.errors.message) {
             Alert.alert(props.errors.type, props.errors.message, [
                 {
-                    text: 'Ok', onPress: () => {
-                    props.removeErrors();
-                    state.loading = false;
-                }
+                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation), 
+                    onPress: () => {
+                        props.removeErrors();
+                        state.loading = false;
+                    }
                 }
             ])
         }
@@ -168,7 +168,8 @@ class FollowUpsScreen extends Component {
                         props.navigator.showInAppNotification({
                             screen: "InAppNotificationScreen",
                             passProps: {
-                                number: number
+                                number: number,
+                                translation: props.translation
                             },
                             autoDismissTimerSec: 1
                         });
@@ -178,7 +179,8 @@ class FollowUpsScreen extends Component {
                         props.navigator.showInAppNotification({
                             screen: "InAppNotificationScreen",
                             passProps: {
-                                number: number
+                                number: number,
+                                translation: props.translation
                             },
                             autoDismissTimerSec: 1
                         });
@@ -263,11 +265,11 @@ class FollowUpsScreen extends Component {
             outputRange: [1, 0],
             extrapolate: 'clamp',
         });
-        let followUpTitle = []; followUpTitle[1] = 'Follow-ups';
+        let followUpTitle = []; followUpTitle[1] = getTranslation(translations.followUpsScreen.followUpsTitle, this.props.translation);
         return (
             <ViewHOC style={style.container}
                      showLoader={(this.props && this.props.syncState && (this.props.syncState !== 'Finished processing' && this.props.syncState !== 'Error')) || (this && this.state && this.state.loading)}
-                     loaderText={this.props && this.props.syncState ? this.props.syncState : 'Loading...'}>
+                     loaderText={this.props && this.props.syncState ? this.props.syncState : getTranslation(translations.loadingScreenMessages.loadingMsg, this.props.translation)}>
                 <NavBarCustom
                     title={null}
                     customTitle={
@@ -286,7 +288,9 @@ class FollowUpsScreen extends Component {
                                         </Ripple>
                                     }
                                 >
-                                    <MenuItem onPress={this.handleGenerateFollowUps}>Generate for current day</MenuItem>
+                                    <MenuItem onPress={this.handleGenerateFollowUps}>
+                                        {getTranslation(translations.followUpsScreen.generateLabel, this.props.translation)}
+                                    </MenuItem>
                                 </Menu>
                             </View>
                         </View>
@@ -344,7 +348,7 @@ class FollowUpsScreen extends Component {
                                 onPress={this.handlePressFilter}
                                 onChangeText={this.handleOnChangeText}
                                 onSubmitEditing={this.handleOnSubmitEditing}
-                                filterText={(this.state.filterFromFilterScreen && Object.keys(this.state.filterFromFilterScreen).length > 0) ? ("Filter (" + Object.keys(this.state.filterFromFilterScreen).length + ')') : 'Filter'}
+                                filterText={(this.state.filterFromFilterScreen && Object.keys(this.state.filterFromFilterScreen).length > 0) ? (getTranslation(translations.generalLabels.filterTitle, this.props.translation) + ' (' + Object.keys(this.state.filterFromFilterScreen).length + ')') : getTranslation(translations.generalLabels.filterTitle, this.props.translation)}
                             />}
                         ItemSeparatorComponent={this.renderSeparatorComponent}
                         ListEmptyComponent={this.listEmptyComponent}
@@ -375,8 +379,8 @@ class FollowUpsScreen extends Component {
                                     longitude: this.state.longitude,
                                     sourceLatitude: this.state.sourceLatitude,
                                     sourceLongitude: this.state.sourceLongitude,
-                                    dialogTitle: 'Select the maps application that you would like to use',
-                                    cancelText: 'Cancel',
+                                    dialogTitle: getTranslation(translations.alertMessages.mapsPopupMessage, this.props.translation),
+                                    cancelText: getTranslation(translations.alertMessages.cancelButtonLabel, this.props.translation),
                                     appsWhiteList: ['google-maps', 'apple-maps', 'waze']
                                     //other possibilities: citymapper, uber, lyft, transit, yandex, moovit
                                 }}
@@ -457,11 +461,13 @@ class FollowUpsScreen extends Component {
     listEmptyComponent = () => {
         return (
             <View style={[style.emptyComponent, {height: calculateDimension((667 - 152), true, this.props.screenSize)}]}>
-                <Text style={style.emptyComponentTextView}>There are no follow-ups to display</Text>
+                <Text style={style.emptyComponentTextView}>
+                    {getTranslation(translations.followUpsScreen.noFollowupsMessage, this.props.translation)}
+                </Text>
                 <Button
                     raised
                     upperCase={false}
-                    text="Generate for 1 day"
+                    text={getTranslation(translations.followUpsScreen.generateButtonLabel, this.props.translation)}
                     color="blue"
                     titleColor="red"
                     onPress={this.handleGenerateFollowUps}
@@ -850,10 +856,6 @@ class FollowUpsScreen extends Component {
         // After filtering the contacts, it's time to get their respective follow-ups to show
         this.getFollowUpsFromContacts(contactsCopy);
     };
-
-    myFunct = () => {
-        console.log ('ajunge aici si nu crapa !! ')
-    }
 
     getFollowUpsFromContacts = (contacts) => {
         let followUpsToBeShown = [];

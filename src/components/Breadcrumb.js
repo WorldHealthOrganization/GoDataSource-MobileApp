@@ -12,15 +12,18 @@ import {Icon} from 'react-native-material-ui';
 import Ripple from 'react-native-material-ripple';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
-import {calculateDimension} from './../utils/functions';
+import {calculateDimension, getTranslation} from './../utils/functions';
+import translations from './../utils/translations'
 
-const Crumb = ({isCrumbActive, index, text, numberOfEntities, crumbPress}) => {
+const Crumb = ({isCrumbActive, index, text, numberOfEntities, crumbPress, translation}) => {
     return (
         <Ripple onPress={() => crumbPress(index)} style={[style.crumbStyle, {flex: 1}]}>
             <Text
                 style={[isCrumbActive ? style.activeCrumbTextStyle : style.crumbTextStyle]}
                 numberOfLines={1}
-            >{text}</Text>
+            >
+                {getTranslation(text, translation)}
+            </Text>
             {
                 index !== (numberOfEntities - 1) ? (<Icon name="chevron-right" size={16} color={isCrumbActive && 'black'} style={style.chevronStyle} />) : (null)
             }
@@ -60,6 +63,7 @@ class Breadcrumb extends PureComponent {
                                 isCrumbActive={this.state.index === index}
                                 numberOfEntities={this.props.entities.length}
                                 crumbPress={this.handleCrumbPress}
+                                translation={this.props.translation}
                             />
                         )
                     })
@@ -113,7 +117,8 @@ const style = StyleSheet.create({
 
 function mapStateToProps(state) {
     return {
-        screenSize: state.app.screenSize
+        screenSize: state.app.screenSize,
+        translation: state.app.translation
     };
 }
 

@@ -690,3 +690,13 @@ export function mapQuestions (questions) {
 
     return mappedQuestions;
 };
+
+export function getTranslation (value, allTransactions) {
+    let valueToBeReturned = value;
+    if (value && typeof value === 'string' && value.includes('LNG')) {
+        valueToBeReturned = value && allTransactions && Array.isArray(allTransactions) && allTransactions[allTransactions.map((e) => {return e && e.token ? e.token : null}).indexOf(value)] ? allTransactions[allTransactions.map((e) => {
+            return e.token
+        }).indexOf(value)].translation : '';
+    }
+    return valueToBeReturned;
+}

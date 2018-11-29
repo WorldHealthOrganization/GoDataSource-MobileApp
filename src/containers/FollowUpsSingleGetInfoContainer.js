@@ -5,7 +5,7 @@
 // the material ui library, since it provides design and animations out of the box
 import React, {PureComponent} from 'react';
 import {TextInput, View, Text, StyleSheet, FlatList} from 'react-native';
-import {calculateDimension} from './../utils/functions';
+import {calculateDimension, getTranslation} from './../utils/functions';
 import config from './../utils/config';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -13,6 +13,7 @@ import styles from './../styles';
 import CardComponent from './../components/CardComponent';
 import Button from './../components/Button';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import translations from './../utils/translations'
 
 class FollowUpsFiltersContainer extends PureComponent {
 
@@ -34,7 +35,7 @@ class FollowUpsFiltersContainer extends PureComponent {
         return (
             <View style={style.container}>
                 <Button
-                    title={'Next'}
+                    title={getTranslation(translations.generalButtons.nextButtonLabel, this.props.translation)}
                     onPress={this.props.onNext}
                     color={styles.buttonGreen}
                     titleColor={'white'}
@@ -128,7 +129,8 @@ const style = StyleSheet.create({
 
 function mapStateToProps(state) {
     return {
-        screenSize: state.app.screenSize
+        screenSize: state.app.screenSize,
+        translation: state.app.translation
     };
 }
 

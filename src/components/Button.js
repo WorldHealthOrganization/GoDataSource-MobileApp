@@ -9,6 +9,8 @@ import PropTypes from 'prop-types';
 import { RaisedTextButton } from 'react-native-material-buttons';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
+import {getTranslation} from './../utils/functions';
+import translations from './../utils/translations'
 
 class Button extends PureComponent {
 
@@ -26,7 +28,7 @@ class Button extends PureComponent {
     render() {
         return (
             <RaisedTextButton
-                title={this.props.title}
+                title={getTranslation(this.props.title, this.props.translation)}
                 color={this.props.color}
                 titleColor={this.props.titleColor}
                 titleStyle={[{
@@ -66,7 +68,8 @@ Button.propTypes = {
 
 function mapStateToProps(state) {
     return {
-        screenSize: state.app.screenSize
+        screenSize: state.app.screenSize,
+        translation: state.app.translation
     };
 }
 

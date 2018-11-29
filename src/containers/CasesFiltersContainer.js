@@ -6,7 +6,7 @@
 import React, {PureComponent} from 'react';
 import {TextInput, View, Text, StyleSheet, Platform, Dimensions, Image} from 'react-native';
 import {ListItem, Icon} from 'react-native-material-ui';
-import {calculateDimension} from './../utils/functions';
+import {calculateDimension, getTranslation} from './../utils/functions';
 import config from './../utils/config';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -15,6 +15,7 @@ import Button from './../components/Button';
 import styles from './../styles';
 import CardComponent from './../components/CardComponent';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import translations from './../utils/translations'
 
 class CasesFiltersContainer extends PureComponent {
 
@@ -35,7 +36,7 @@ class CasesFiltersContainer extends PureComponent {
         return (
             <View style={style.container}>
                 <Button
-                    title={'Next'}
+                    title={getTranslation(translations.generalButtons.nextButtonLabel, this.props.translation)}
                     onPress={this.props.handleMoveToNextScreenButton}
                     color={styles.buttonGreen}
                     titleColor={'white'}
@@ -57,7 +58,7 @@ class CasesFiltersContainer extends PureComponent {
                 </KeyboardAwareScrollView>
                 <View style={style.containerButtonApplyFilters}>
                     <Button
-                        title="Apply filters"
+                        title={getTranslation(translations.generalLabels.applyFiltersButton, this.props.translation)}
                         color={styles.buttonGreen}
                         onPress={this.props.onPressApplyFilters}
                         width={calculateDimension(343, false, this.props.screenSize)}
@@ -120,7 +121,8 @@ function mapStateToProps(state) {
         screenSize: state.app.screenSize,
         contacts: state.contacts,
         cases: state.cases,
-        events: state.events
+        events: state.events,
+        translation: state.app.translation
     };
 }
 

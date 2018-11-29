@@ -2,18 +2,11 @@
  * Created by florinpopa on 22/10/2018.
  */
 import React, { Component } from 'react';
-import {
-    StyleSheet,
-    Text,
-    ListView,
-    // TextInput,
-    View,
-    TouchableOpacity,
-    Keyboard
-} from 'react-native';
+import {StyleSheet, Text, ListView, View, TouchableOpacity, Keyboard } from 'react-native';
 import TextInput from './TextInput';
 
 var ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
+
 export default class SearchableDropDown extends Component{
     constructor(props) {
         super(props);
@@ -87,6 +80,7 @@ export default class SearchableDropDown extends Component{
                     label={this.props.placeholder}
                     onSubmitEditing={this.props.onSubmitEditing}
                     style={{width: '90%'}}
+                    translation={this.props.translation}
                 />
                 <ListView
                     style={{...this.props.itemsContainerStyle}}

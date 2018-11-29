@@ -5,9 +5,14 @@ import React, {PureComponent} from 'react';
 import {View, Text, StyleSheet} from 'react-native';
 import {Icon} from 'react-native-material-ui';
 import PropTypes from 'prop-types';
+import translations from './../utils/translations'
+import {getTranslation, calculateDimension} from './../utils/functions';
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import { TextField } from 'react-native-material-textfield';
+import ElevatedView from 'react-native-elevated-view';
+import Ripple from 'react-native-material-ripple';
+import styles from './../styles';
 
 class TextInput extends PureComponent {
 
@@ -36,7 +41,7 @@ class TextInput extends PureComponent {
             <View style={[{
             },this.props.style]}>
                 <TextField
-                    label={this.props.isRequired ? this.props.label + ' * ' : this.props.label}
+                    label={this.props.isRequired ? getTranslation(this.props.label, this.props.translation) + ' * ' : getTranslation(this.props.label, this.props.translation)}
                     value={typeof this.props.value === 'number' ? isNaN(this.props.value) ? '' : this.props.value.toString() : this.props.value && this.props.value != undefined && (typeof this.props.value === 'string' || typeof this.props.value === 'number') ? this.props.value.toString() : ''}
                     onChangeText={this.handleOnChangeText}
                     textColor='rgb(0,0,0)'
@@ -53,6 +58,24 @@ class TextInput extends PureComponent {
                     keyboardType={this.props.keyboardType ? this.props.keyboardType : 'default'}
                     onSubmitEditing={this.props.onSubmitEditing}
                 />
+                {/* <ElevatedView
+                    elevation={3}
+                    style={{
+                        flex: 0,
+                        backgroundColor: styles.buttonGreen,
+                        width: calculateDimension(33, false, this.props.screenSize),
+                        height: calculateDimension(25, true, this.props.screenSize),
+                        borderRadius: 4
+                    }}
+                >
+                    <Ripple style={{
+                        flex: 1,
+                        justifyContent: 'center',
+                        alignItems: 'center'
+                    }} onPress={this.handleOnPressAddCase}>
+                        <Icon name="add" color={'white'} size={15}/>
+                    </Ripple>
+                </ElevatedView> */}
             </View>
         );
     };
@@ -69,7 +92,7 @@ class TextInput extends PureComponent {
                     color: 'rgb(0,0,0)',
                     marginBottom: 7.5
                 }}>
-                    {this.props.label}
+                    {getTranslation(this.props.label, this.props.translation)}
                 </Text>
                 <Text style={{
                     fontFamily: 'Roboto-Light',
@@ -122,7 +145,7 @@ class TextInput extends PureComponent {
 
 // Create style outside the class, or for components that will be used by other components (buttons),
 // make a global style in the config directory
-const styles = StyleSheet.create({
+const style = StyleSheet.create({
     editLabel: {
 
     },

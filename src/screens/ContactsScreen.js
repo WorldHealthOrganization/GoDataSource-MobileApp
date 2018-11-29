@@ -10,7 +10,7 @@ import styles from './../styles';
 import NavBarCustom from './../components/NavBarCustom';
 import ElevatedView from 'react-native-elevated-view';
 import Ripple from 'react-native-material-ripple';
-import {calculateDimension} from './../utils/functions';
+import {calculateDimension, getTranslation, navigation} from './../utils/functions';
 import FollowUpListItem from './../components/FollowUpListItem';
 import SearchFilterView from './../components/SearchFilterView';
 import {connect} from "react-redux";
@@ -18,14 +18,13 @@ import {bindActionCreators} from "redux";
 import AnimatedListView from './../components/AnimatedListView';
 import {getContactsForOutbreakId} from './../actions/contacts';
 import {addFilterForScreen, removeFilterForScreen} from './../actions/app';
-import {navigation} from './../utils/functions';
 import ViewHOC from './../components/ViewHOC';
 import config from './../utils/config';
 import { Popup } from 'react-native-map-link';
+import translations from './../utils/translations'
 
 const scrollAnim = new Animated.Value(0);
 const offsetAnim = new Animated.Value(0);
-
 
 class ContactsScreen extends Component {
 
@@ -124,7 +123,7 @@ class ContactsScreen extends Component {
         return (
             <ViewHOC style={style.container}
                      showLoader={(this.props && this.props.syncState && (this.props.syncState !== 'Finished processing' && this.props.syncState !== 'Error')) || (this && this.state && this.state.loading)}
-                     loaderText={this.props && this.props.syncState ? this.props.syncState : 'Loading...'}>
+                     loaderText={this.props && this.props.syncState ? this.props.syncState : getTranslation(translations.loadingScreenMessages.loadingMsg, this.props.translation)}>
                 <NavBarCustom
                     customTitle={
                         <View style={{
@@ -134,7 +133,9 @@ class ContactsScreen extends Component {
                             justifyContent: 'space-between',
                             height: '100%'
                         }}>
-                            <Text style={[style.title, {marginLeft: 30}]}>Contacts</Text>
+                            <Text style={[style.title, {marginLeft: 30}]}>
+                                {getTranslation(translations.contactsScreen.contactsTitle, this.props.translation)}
+                            </Text>
                             {/*<ElevatedView*/}
                                 {/*elevation={3}*/}
                                 {/*style={{*/}
@@ -178,7 +179,7 @@ class ContactsScreen extends Component {
                                 onPress={this.handlePressFilter}
                                 onChangeText={this.handleOnChangeText}
                                 onSubmitEditing={this.handleOnSubmitEditing}
-                                filterText={(this.state.filterFromFilterScreen && Object.keys(this.state.filterFromFilterScreen).length > 0) ? ("Filter (" + Object.keys(this.state.filterFromFilterScreen).length + ')') : 'Filter'}
+                                filterText={(this.state.filterFromFilterScreen && Object.keys(this.state.filterFromFilterScreen).length > 0) ? (getTranslation(translations.generalLabels.filterTitle, this.props.transltion) + " (" + Object.keys(this.state.filterFromFilterScreen).length + ')') : getTranslation(translations.generalLabels.filterTitle, this.props.translation)}
                             />}
                         ItemSeparatorComponent={this.renderSeparatorComponent}
                         // ListEmptyComponent={this.listEmptyComponent}
@@ -204,8 +205,8 @@ class ContactsScreen extends Component {
                                     longitude: this.state.longitude,
                                     sourceLatitude: this.state.sourceLatitude,
                                     sourceLongitude: this.state.sourceLongitude,
-                                    dialogTitle: 'Select the maps application that you would like to use',
-                                    cancelText: 'Cancel',
+                                    dialogTitle: getTranslation(translations.alertMessages.mapsPopupMessage, this.props.translation),
+                                    cancelText: getTranslation(translations.alertMessages.cancelButtonLabel, this.props.translation),
                                     appsWhiteList: ['google-maps', 'apple-maps', 'waze']
                                     //other possibilities: citymapper, uber, lyft, transit, yandex, moovit
                                 }}
@@ -250,8 +251,8 @@ class ContactsScreen extends Component {
                 item={item.item}
                 riskLevelReferenceData={riskLevelReferenceData}
                 isContact={true}
-                firstActionText={'ADD FOLLOW-UP'}
-                secondActionText={"EDIT"}
+                firstActionText={getTranslation(translations.contactsScreen.addFollowupsButton, this.props.translation)}
+                secondActionText={getTranslation(translations.contactsScreen.editButton, this.props.translation)}
                 onPressFollowUp={this.handlePressFollowUp}
                 onPressMissing={this.handleOnPressMissing}
                 onPressExposure={this.handleOnPressExposure}
@@ -505,6 +506,7 @@ function mapStateToProps(state) {
         contacts: state.contacts,
         errors: state.errors,
         referenceData: state.referenceData,
+        translation: state.app.translation
     };
 }
 

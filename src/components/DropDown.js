@@ -16,6 +16,8 @@ import Modal from 'react-native-modal';
 import ElevatedView from "react-native-elevated-view";
 import SelectMultiple from 'react-native-select-multiple';
 import SectionedMultiSelect from 'react-native-sectioned-multi-select';
+import translations from './../utils/translations'
+import {getTranslation} from './../utils/functions';
 
 class DropDown extends PureComponent {
 
@@ -42,7 +44,7 @@ class DropDown extends PureComponent {
                 <View style={[this.props.style]}>
                     {
                         this.props.value.length > 0 ?
-                            <Text style={style.labelStyle}>{this.state.selectedItems.map((e, index) => {return e.label + (index === (this.state.selectedItems.length - 1) ? '' : ', ')})}</Text> : <Text></Text>
+                            <Text style={style.labelStyle}>{this.state.selectedItems.map((e, index) => {return getTranslation(e.label, this.props.translation) + (index === (this.state.selectedItems.length - 1) ? '' : ', ')})}</Text> : <Text></Text>
                     }
                 </View>
             )
@@ -60,7 +62,7 @@ class DropDown extends PureComponent {
                 ]} onPress={this.handleOnPress}>
                 <View style={style.innerTextContainer}>
                     <Text style={style.labelStyle}>
-                        {this.state.selectedItems.length === 0 ? 'Select answer(s)' : ("Selected " + this.state.selectedItems.length + ' answer(s)')}</Text>
+                        {this.state.selectedItems.length === 0 ? getTranslation(translations.dropDownLabels.selectedAnswersLabel, this.props.translation) : (getTranslation(translations.dropDownLabels.selectedLabel, this.props.translation) + ' ' + this.state.selectedItems.length + ' ' + getTranslation(translations.dropDownLabels.answersLabel, this.props.translation))}</Text>
                     <Icon name="arrow-drop-down"/>
                 </View>
                 <View style={[{height: 1, backgroundColor: styles.textFieldUnderline, marginTop: 14}]} />
@@ -75,11 +77,11 @@ class DropDown extends PureComponent {
                     onBackdropPress={() => this.setState({ showDropdown: false })}
                 >
                     <ElevatedView elevation={3} style={[{backgroundColor: 'white'}]}>
-                                <SelectMultiple
-                                    items={this.props.data}
-                                    selectedItems={this.state.selectedItems}
-                                    onSelectionsChange={this.handleOnselectionChange}
-                                />
+                        <SelectMultiple
+                            items={this.props.data}
+                            selectedItems={this.state.selectedItems}
+                            onSelectionsChange={this.handleOnselectionChange}
+                        />
                     </ElevatedView>
                 </Modal>
             </Ripple>
@@ -137,7 +139,8 @@ const style = StyleSheet.create({
 
 function mapStateToProps(state) {
     return {
-        screenSize: state.app.screenSize
+        screenSize: state.app.screenSize,
+        translation: state.app.translation
     };
 }
 

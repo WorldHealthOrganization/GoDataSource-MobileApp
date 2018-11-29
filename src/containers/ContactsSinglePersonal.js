@@ -5,7 +5,7 @@
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
 import {View, StyleSheet, InteractionManager, Alert, TouchableWithoutFeedback, Keyboard} from 'react-native';
-import {calculateDimension} from './../utils/functions';
+import {calculateDimension, getTranslation} from './../utils/functions';
 import config from './../utils/config';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -14,6 +14,7 @@ import styles from './../styles';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import CardComponent from './../components/CardComponent';
 import {LoaderScreen} from 'react-native-ui-lib';
+import translations from './../utils/translations'
 
 class ContactsSinglePersonal extends Component {
 
@@ -56,7 +57,7 @@ class ContactsSinglePersonal extends Component {
                 <View style={style.viewContainer}>
                     <View style={{flexDirection: 'row'}}>
                         <Button
-                            title={'Next'}
+                            title={getTranslation(translations.generalButtons.nextButtonLabel, this.props.translation)}
                             onPress={this.handleNextButton}
                             color={styles.buttonGreen}
                             titleColor={'white'}
@@ -114,26 +115,29 @@ class ContactsSinglePersonal extends Component {
                     if (this.props.checkAgeMonthsRequirements()){
                         this.props.handleMoveToNextScreenButton()
                     } else {
-                        Alert.alert("Alert", 'Number of months must be between 0 and 11', [
+                        Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.monthsValueError, this.props.translation), [
                             {
-                                text: 'Ok', onPress: () => {console.log("OK pressed")}
+                                text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation), 
+                                onPress: () => {console.log("OK pressed")}
                             }
                         ])
                     }
                 } else {
-                    Alert.alert("Alert", 'Number of years must be between 0 and 150', [
+                    Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.yearsValueError, this.props.translation), [
                         {
-                            text: 'Ok', onPress: () => {console.log("OK pressed")}
+                            text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation), 
+                            onPress: () => {console.log("OK pressed")}
                         }
                     ])
                 }
             } else {
-                    Alert.alert("Alert", 'Please complete all the required fields', [
-                        {
-                            text: 'Ok', onPress: () => {console.log("OK pressed")}
-                        }
-                    ])
-                }
+                Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.requiredFieldsMissingError, this.props.translation), [
+                    {
+                        text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation), 
+                        onPress: () => {console.log("OK pressed")}
+                    }
+                ])
+            }
         } else {
             this.props.handleMoveToNextScreenButton()
         }
@@ -172,7 +176,8 @@ function mapStateToProps(state) {
         screenSize: state.app.screenSize,
         contacts: state.contacts,
         cases: state.cases,
-        events: state.events
+        events: state.events,
+        translation: state.app.translation
     };
 }
 

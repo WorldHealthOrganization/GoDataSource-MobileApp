@@ -8,7 +8,6 @@ import {View, StyleSheet, Platform, Animated, Alert, BackHandler} from 'react-na
 import {Icon} from 'react-native-material-ui';
 import styles from './../styles';
 import NavBarCustom from './../components/NavBarCustom';
-import {calculateDimension} from './../utils/functions';
 import config from './../utils/config';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -24,7 +23,9 @@ import {updateContact} from './../actions/contacts';
 import {removeErrors} from './../actions/errors';
 import DateTimePicker from 'react-native-modal-datetime-picker';
 import _ from 'lodash';
-import {extractIdFromPouchId, computeIdForFileType, updateRequiredFields} from './../utils/functions';
+import {calculateDimension, extractIdFromPouchId, computeIdForFileType, updateRequiredFields, getTranslation} from './../utils/functions';
+import translations from './../utils/translations'
+
 
 class FollowUpsSingleScreen extends Component {
 
@@ -46,31 +47,6 @@ class FollowUpsSingleScreen extends Component {
         // Bind here methods, or at least don't declare methods in the render method
         this.handleBackButtonClick = this.handleBackButtonClick.bind(this);
     }
-
-    // GenInfoRoute = () => (
-    //     <FollowUpsSingleGetInfoContainer
-    //         item={this.state.item}
-    //         contact={this.state.contact}
-    //         onNext={this.handleNextPress}
-    //         onChangeText={this.onChangeText}
-    //         onChangeDate={this.onChangeDate}
-    //         onChangeSwitch={this.onChangeSwitch}
-    //         onChangeDropDown={this.onChangeDropDown}
-    //     />
-    // );
-    // QuestRoute = () => (
-    //     <FollowUpsSingleQuestionnaireContainer
-    //         item={this.state.item}
-    //         contact={this.state.contact}
-    //         isEditMode={true}
-    //         onChangeTextAnswer={this.onChangeTextAnswer}
-    //         onChangeDateAnswer={this.onChangeDateAnswer}
-    //         onChangeSingleSelection={this.onChangeSingleSelection}
-    //         onChangeMultipleSelection={this.onChangeMultipleSelection}
-    //         onPressSave={this.handleOnPressSave}
-    //         onPressMissing={this.handleOnPressMissing}
-    //     />
-    // );
 
     componentDidMount() {
         BackHandler.addEventListener('hardwareBackPress', this.handleBackButtonClick);
@@ -95,7 +71,8 @@ class FollowUpsSingleScreen extends Component {
         if (props.errors && props.errors.type && props.errors.message) {
             Alert.alert(props.errors.type, props.errors.message, [
                 {
-                    text: 'Ok', onPress: () => {
+                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation), 
+                    onPress: () => {
                         state.savePressed = false;
                         props.removeErrors()
                     }
@@ -127,7 +104,7 @@ class FollowUpsSingleScreen extends Component {
                         <View
                             style={[style.breadcrumbContainer]}>
                             <Breadcrumb
-                                entities={['Follow-ups', ((this.props.contact && this.props.contact.firstName ? (this.props.contact.firstName + " ") : '') + (this.props.contact && this.props.contact.lastName ? this.props.contact.lastName : ''))]}
+                                entities={[getTranslation(translations.followUpsSingleScreen.title, this.props.translation), ((this.props.contact && this.props.contact.firstName ? (this.props.contact.firstName + " ") : '') + (this.props.contact && this.props.contact.lastName ? this.props.contact.lastName : ''))]}
                                 navigator={this.props.navigator}
                             />
                             <View>
@@ -139,9 +116,15 @@ class FollowUpsSingleScreen extends Component {
                                         </Ripple>
                                     }
                                 >
-                                    <MenuItem onPress={this.handleOnPressMissing}>Missing</MenuItem>
-                                    <MenuItem onPress={this.handleOnPressDeceased}>Deceased</MenuItem>
-                                    <MenuItem onPress={this.handleOnPressDelete}>Delete follow-up</MenuItem>
+                                    <MenuItem onPress={this.handleOnPressMissing}>
+                                        {getTranslation(translations.followUpsSingleScreen.missingButton, this.props.translation)}
+                                    </MenuItem>
+                                    <MenuItem onPress={this.handleOnPressDeceased}>
+                                        {getTranslation(translations.followUpsSingleScreen.deceasedButton, this.props.translation)}
+                                    </MenuItem>
+                                    <MenuItem onPress={this.handleOnPressDelete}>
+                                        {getTranslation(translations.followUpsSingleScreen.deleteButton, this.props.translation)}
+                                    </MenuItem>
                                     <DateTimePicker
                                         isVisible={this.state.isDateTimePickerVisible}
                                         onConfirm={this._handleDatePicked}
@@ -260,7 +243,7 @@ class FollowUpsSingleScreen extends Component {
                 flex: 1,
                 alignSelf: 'center'
             }}>
-                {route.title}
+                {getTranslation(route.title, this.props.translation).toUpperCase()}
             </Animated.Text>
         );
     };
@@ -331,9 +314,10 @@ class FollowUpsSingleScreen extends Component {
                     )
                 },
                 (error) => {
-                    Alert.alert("Alert", 'There was an issue with getting your location', [
+                    Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.alertMessages.getLocationError, this.props.translation), [
                         {
-                            text: 'Ok', onPress: () => {console.log("OK pressed")}
+                            text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+                            onPress: () => {console.log("OK pressed")}
                         }
                     ])
                 },
@@ -373,11 +357,9 @@ class FollowUpsSingleScreen extends Component {
                     this.state.item[id] = {};
                 }
 
-                let address = this.state.contact && this.state.contact.addresses &&
-                                Array.isArray(this.state.contact.addresses) && this.state.contact.addresses.length > 0 ? this.state.contact.addresses.filter((e) => {
+                let address = this.state.contact && this.state.contact.addresses && Array.isArray(this.state.contact.addresses) && this.state.contact.addresses.length > 0 ? this.state.contact.addresses.filter((e) => {
                     return value.includes(e.addressLine1 || '') && value.includes(e.addressLine2 || '') && value.includes(e.city || '') && value.includes(e.country || '') && value.includes(e.postalCode || '');
-                })
-                    : [];
+                }) : [];
 
                 this.setState(
                     (prevState) => ({
@@ -535,9 +517,10 @@ class FollowUpsSingleScreen extends Component {
 
     handleOnPressDelete = () => {
         // console.log("### handleOnPressDelete");
-        Alert.alert("Alert", 'Are you sure you want to delete this follow-up?', [
+        Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.followUpsSingleScreen.deleteFollowUpAlertError, this.props.translation), [
             {
-                text: 'Yes', onPress: () => {
+                text: getTranslation(translations.alertMessages.yesButtonLabel, this.props.translation), 
+                onPress: () => {
                     this.hideMenu();
                     this.setState({
                         deletePressed: true
@@ -553,12 +536,13 @@ class FollowUpsSingleScreen extends Component {
                             this.handleOnPressSave();
                         })
                     })
-            }
+                }
             },
             {
-                text: 'No', onPress: () => {
+                text: getTranslation(translations.alertMessages.cancelButtonLabel, this.props.translation), 
+                onPress: () => {
                     this.hideMenu();
-            }
+                }
             }
         ])
     };
@@ -605,7 +589,8 @@ function mapStateToProps(state) {
         followUps: state.followUps,
         outbreak: state.outbreak,
         errors: state.errors,
-        contacts: state.contacts
+        contacts: state.contacts,
+        translation: state.app.translation
     };
 }
 

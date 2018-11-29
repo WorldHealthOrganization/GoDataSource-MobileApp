@@ -58,7 +58,7 @@ class FollowUpAgenda extends PureComponent {
                 isEditMode={false}
             />
         )
-}
+    }
 }
 
 // FollowUpAgenda.defaultProps = {
