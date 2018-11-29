@@ -214,6 +214,8 @@ const caseSingleScreen = {
                     value: '',
                     isRequired: true,
                     isEditMode: false,
+                    hasTooltip: true,
+                    tooltipMessage: 'asd asd asd as dasd asda dasd asd asd as dasd as dasd as dasd asd asdasd asd',
                     objectType: 'Case'
                 },
                 {

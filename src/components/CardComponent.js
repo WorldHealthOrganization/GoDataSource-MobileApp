@@ -444,7 +444,8 @@ class CardComponent extends Component {
                         objectType={item.objectType}
                         keyboardType={item.keyboardType}
                         translation={this.props.translation}
-                        screenSize={this.props.screenSize}
+                        hasTooltip={item.hasTooltip}
+                        tooltipMessage={item.tooltipMessage}
                     />
                 );
             case 'DropdownInput':
