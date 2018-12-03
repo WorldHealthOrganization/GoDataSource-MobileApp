@@ -256,6 +256,7 @@ const caseSingleScreen = {
                     value: '',
                     isRequired: false,
                     isEditMode: false,
+                    keyboardType: Platform.OS === 'ios' ? 'number-pad' : 'numeric',
                     objectType: 'Case'
                 },
                 {
@@ -317,7 +318,7 @@ const caseSingleScreen = {
                     labelValue: 'test',
                     type: 'DropdownInput',
                     value: '',
-                    isRequired: true,
+                    isRequired: false,
                     isEditMode: false,
                     activeButtonColor: 'red',
                     activeBackgroundColor: 'red',
@@ -491,7 +492,7 @@ const caseSingleScreen = {
                 isEditMode: true,
                 multiline: false,
                 objectType: 'Address',
-                keyboardType: 'numeric'
+                keyboardType: Platform.OS === 'ios' ? 'decimal-pad' : 'numeric'
             },
             {
                 cardNumber: 1,
@@ -504,7 +505,7 @@ const caseSingleScreen = {
                 isEditMode: true,
                 multiline: false,
                 objectType: 'Address',
-                keyboardType: 'numeric'
+                keyboardType: Platform.OS === 'ios' ? 'decimal-pad' : 'numeric'
             },
             {
                 cardNumber: 1,
@@ -1129,6 +1130,7 @@ const contactsSingleScreen = {
                     isRequired: false,
                     isEditMode: true,
                     multiline: false,
+                    keyboardType: Platform.OS === 'ios' ? 'number-pad' : 'numeric',
                     objectType: 'Contact'
                 },
                 {
@@ -1321,7 +1323,7 @@ const contactsSingleScreen = {
                 isEditMode: true,
                 multiline: false,
                 objectType: 'Address',
-                keyboardType: 'numeric'
+                keyboardType: Platform.OS === 'ios' ? 'decimal-pad' : 'numeric'
             },
             {
                 cardNumber: 1,
@@ -1334,7 +1336,7 @@ const contactsSingleScreen = {
                 isEditMode: true,
                 multiline: false,
                 objectType: 'Address',
-                keyboardType: 'numeric'
+                keyboardType: Platform.OS === 'ios' ? 'decimal-pad' : 'numeric'
             },
 
             {
