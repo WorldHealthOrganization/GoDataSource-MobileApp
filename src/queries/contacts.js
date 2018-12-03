@@ -2,11 +2,7 @@
  * Created by florinpopa on 13/09/2018.
  */
 import {getDatabase} from './database';
-import {objSort} from './../utils/functions'
-import {generateId, extractIdFromPouchId} from './../utils/functions';
-import config from './../utils/config';
-import _ from 'lodash';
-
+import {objSort} from './../utils/functions';
 export function getContactsForOutbreakIdRequest (outbreakId, filter, token, callback) {
     let database = getDatabase();
 

@@ -2,7 +2,6 @@
  * Created by florinpopa on 18/09/2018.
  */
 import {getDatabase} from './database';
-import _ from 'lodash';
 import {objSort} from './../utils/functions'
 
 // Credentials: {email, encryptedPassword}
