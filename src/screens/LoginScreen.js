@@ -5,20 +5,18 @@ import React, {Component} from 'react';
 import {View, Text, StyleSheet, Platform, Image, Alert, TouchableOpacity} from 'react-native';
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
-import {Button} from 'react-native-material-ui';
+import {Button, Icon} from 'react-native-material-ui';
 import { TextField } from 'react-native-material-textfield';
 import styles from './../styles';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { loginUser, cleanDataAfterLogout } from './../actions/user';
 import { removeErrors } from './../actions/errors';
-import {changeAppRoot} from './../actions/app';
+import {changeAppRoot, setSyncState} from './../actions/app';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
-import DropdownInput from './../components/DropdownInput';
-import config from './../utils/config';
 import url from './../utils/url';
 import {LoaderScreen} from 'react-native-ui-lib';
-import {createDatabase} from './../queries/database';
+import Ripple from 'react-native-material-ripple';
 
 class LoginScreen extends Component {
 
@@ -86,6 +84,9 @@ class LoginScreen extends Component {
                         <LoaderScreen overlay={true} backgroundColor={'white'} message={this.props && this.props.loginState ? this.props.loginState : 'Loading...'} />
                     ) : (null)
                 }
+                <Ripple style={{position: "absolute", top: 20, left: 20}} onPress={this.handleOnPressBack}>
+                    <Icon name="arrow-back"/>
+                </Ripple>
                 <View style={[style.welcomeTextContainer]}>
                     <Text style={style.welcomeText}>Welcome!</Text>
                 </View>
@@ -187,8 +188,11 @@ class LoginScreen extends Component {
             });
     };
 
-    handleChangeUrl = (value) => {
-        url.setBaseUrl(value);
+    handleOnPressBack = () => {
+        this.props.setSyncState(null);
+        this.props.navigator.resetTo({
+            screen: 'FirstConfigScreen'
+        })
     }
 }
 
@@ -249,7 +253,8 @@ function matchDispatchToProps(dispatch) {
         loginUser,
         removeErrors,
         cleanDataAfterLogout,
-        changeAppRoot
+        changeAppRoot,
+        setSyncState
     }, dispatch);
 }
 

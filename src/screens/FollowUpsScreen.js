@@ -36,6 +36,7 @@ import {LoaderScreen, Colors} from 'react-native-ui-lib';
 import {navigation, extractIdFromPouchId, generateId, updateRequiredFields} from './../utils/functions';
 import ViewHOC from './../components/ViewHOC';
 import { Popup } from 'react-native-map-link';
+import moment from 'moment';
 
 const scrollAnim = new Animated.Value(0);
 const offsetAnim = new Animated.Value(0);
@@ -48,10 +49,11 @@ class FollowUpsScreen extends Component {
 
     constructor(props) {
         super(props);
+        let now = new Date();
         this.state = {
             // filter: this.props.filter && this.props.filter['FollowUpsScreen'] ? this.props.filter['FollowUpsScreen'] : null,
             filter: this.props.filter && this.props.filter['FollowUpsScreen'] ? this.props.filter['FollowUpsScreen'] : {
-                date: new Date(),
+                date: new Date(new Date((now.getUTCMonth() + 1) + '/' + now.getUTCDate() + '/' + now.getUTCFullYear()).getTime() - ((moment().isDST() ? now.getTimezoneOffset() : now.getTimezoneOffset() - 60) * 60 * 1000)),
                 searchText: ''
             },
             filterFromFilterScreen: this.props.filter && this.props.filter['FollowUpsFilterScreen'] ? this.props.filter['FollowUpsFilterScreen'] : null,
@@ -619,7 +621,7 @@ class FollowUpsScreen extends Component {
         let now = new Date();
         date = new Date(date);
         let followUp = {
-            _id: 'followUp.json_false_' + this.props.user.activeOutbreakId + '_' + date.getTime() + '_' + generateId(),
+            _id: 'followUp.json_' + this.props.user.activeOutbreakId + '_' + date.getTime() + '_' + generateId(),
             statusId: config.followUpStatuses.notPerformed,
             targeted: false,
             date: date,
