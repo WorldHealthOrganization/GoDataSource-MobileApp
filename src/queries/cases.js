@@ -12,12 +12,9 @@ export function getCasesForOutbreakIdRequest (outbreakId, filter, token, callbac
 
     console.log("getCasesForOutbreakIdRequest: ", outbreakId);
     if (filter && filter.keys) {
-        let keys = filter.keys.map((e) => {return `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE_false_${outbreakId}_${e}`});
-        let promiseArray = [];
 
-        for (let i=0; i<keys.length; i++) {
-            promiseArray.push(getFromDb(database, keys[i]));
-        }
+        let promiseArray = [];
+        promiseArray = filter.keys.map((e) => {return getFromDb(database, `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE_${outbreakId}_${e}`)});
 
         Promise.all(promiseArray)
             .then((resultGetAll) => {
@@ -59,8 +56,8 @@ export function getCasesForOutbreakIdRequest (outbreakId, filter, token, callbac
             database.find({
                 selector: {
                     _id: {
-                        $gt: `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE_false_${outbreakId}_`,
-                        $lt: `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE_false_${outbreakId}_\uffff`
+                        $gt: `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE_${outbreakId}_`,
+                        $lt: `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE_${outbreakId}_\uffff`
                     },
                     type: {$eq: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE'}, 
                     gender: filter.gender ? {$eq: filter.gender} : {},
@@ -96,10 +93,11 @@ export function getCasesForOutbreakIdRequest (outbreakId, filter, token, callbac
                     //local filter for selectedLocations bcause it can't be done in mango queries
                     if (filter.selectedLocations && filter.selectedLocations.length > 0) {
                         resultFilterCasesDocs = resultFilterCasesDocs.filter((e) => {
-                            let addresses = e.addresses.filter((k) => {
+                            let address = e.addresses.find((k) => {
                                 return k.locationId !== '' && filter.selectedLocations.indexOf(k.locationId) >= 0
                             })
-                            return addresses.length > 0
+                        
+                            return address === undefined ? false : true
                         })
                     }
                     callback(null, resultFilterCasesDocs)
@@ -109,41 +107,42 @@ export function getCasesForOutbreakIdRequest (outbreakId, filter, token, callbac
                     callback(errorFilterCases);
                 })
         } else {
-            database.allDocs({
-                startkey: `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE_false_${outbreakId}`,
-                endkey: `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE_false_${outbreakId}\uffff`,
-                include_docs: true
-            })
-                .then((result) => {
-                    console.log("result with the new index for cases: ", new Date().getTime() - start);
-                    // result.rows = _.orderBy(result.rows, [item => item.doc.lastName !== undefined ? item.doc.lastName.toLowerCase() : ''], ['asc'])
-                    let resultDocs = result.rows.filter((e) => {return e.doc.deleted === false}).map((e) => {return e.doc})
-                    resultDocs = objSort(resultDocs, ['lastName', false])
-                    callback(null, resultDocs);
+            // database.allDocs({
+            //     startkey: `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE_${outbreakId}`,
+            //     endkey: `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE_${outbreakId}\uffff`,
+            //     include_docs: true
+            // })
+            //     .then((result) => {
+            //         console.log("result with the new index for cases: ", new Date().getTime() - start);
+            //         callback(null, result.rows.filter((e) => {return e.doc.deleted === false}).map((e) => {return e.doc}));
+            //
+            //     })
+            //     .catch((errorQuery) => {
+            //         console.log("Error with the new index for cases: ", errorQuery);
+            //         callback(errorQuery);
+            //     });
 
+
+            database.find({
+                selector: {
+                    _id: {
+                        $gte: `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE_${outbreakId}`,
+                        $lte: `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE_${outbreakId}\uffff`,
+                    },
+                    deleted: false,
+                }
+            })
+                .then((resultFind) => {
+                    console.log('Result for find cases time: ', new Date().getTime() - start);
+                    callback(null, objSort(resultFind.docs, ['lastName', false]));
                 })
-                .catch((errorQuery) => {
-                    console.log("Error with the new index for cases: ", errorQuery);
-                    callback(errorQuery);
-                });
+                .catch((errorFind) => {
+                    console.log('Error find cases: ', errorFind);
+                    callback(errorFind);
+                })
         }
     }
-    // database.find({
-    //     selector: {
-    //         type: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE',
-    //         fileType: 'person.json',
-    //         deleted: false,
-    //         outbreakId: outbreakId
-    //     }
-    // })
-    //     .then((resultFind) => {
-    //         console.log('Result for find cases time: ', new Date().getTime() - start);
-    //         callback(null, resultFind.docs)
-    //     })
-    //     .catch((errorFind) => {
-    //         console.log('Error find cases: ', errorFind);
-    //         callback(errorFind);
-    //     })
+
 }
 
 export function addCaseRequest (outbreakId, myCase, token, callback) {

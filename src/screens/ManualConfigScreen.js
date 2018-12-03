@@ -164,8 +164,7 @@ class ManualConfigScreen extends Component {
     };
 
     handleTextChange = (text) => {
-        ['url', 'clientId', 'clientSecret']
-            .map((name) => ({ name, ref: this[name] }))
+        ['url', 'clientId', 'clientSecret'].map((name) => ({ name, ref: this[name] }))
             .forEach(({ name, ref }) => {
                 if (ref.isFocused()) {
                     this.setState({ [name]: text });

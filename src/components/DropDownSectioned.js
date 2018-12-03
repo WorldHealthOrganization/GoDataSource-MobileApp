@@ -72,6 +72,11 @@ class DropDownSectioned extends Component {
                         selectToggle: {borderBottomColor: stylesGlobal.textFieldUnderline, borderBottomWidth: 1}
                     }}
                     single={this.props.single}
+                    noItemsComponent={(
+                        <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+                            <Text style={{fontFamily: 'Roboto-Medium', fontSize: 15}}>There were no elements found</Text>
+                        </View>
+                    )}
                 />
             </View>
         );

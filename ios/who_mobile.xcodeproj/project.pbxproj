@@ -76,6 +76,7 @@
 		F255A1F42170B49400D93AFE /* libRNFS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F255A1EC2170B48100D93AFE /* libRNFS.a */; };
 		F255A2632174FD7D00D93AFE /* libAirMaps.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F255A2342174FD7500D93AFE /* libAirMaps.a */; };
 		F25C2F8920EE09E8008F1CFD /* libRNVectorIcons.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F25C2F8820EE09DD008F1CFD /* libRNVectorIcons.a */; };
+		F27CB2EE21A6CCA8009A2B74 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F27CB2ED21A6CCA8009A2B74 /* StoreKit.framework */; };
 		F2A532F120D7F9AD006F1EF1 /* libReactNativeNavigation.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F2A532F020D7F95F006F1EF1 /* libReactNativeNavigation.a */; };
 /* End PBXBuildFile section */
 
@@ -527,6 +528,7 @@
 		F255A1BE2170B48100D93AFE /* RNFS.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNFS.xcodeproj; path = "../node_modules/react-native-fs/RNFS.xcodeproj"; sourceTree = "<group>"; };
 		F255A22F2174FD7500D93AFE /* AirMaps.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = AirMaps.xcodeproj; path = "../node_modules/react-native-maps/lib/ios/AirMaps.xcodeproj"; sourceTree = "<group>"; };
 		F25C2F8320EE09DD008F1CFD /* RNVectorIcons.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNVectorIcons.xcodeproj; path = "../node_modules/react-native-vector-icons/RNVectorIcons.xcodeproj"; sourceTree = "<group>"; };
+		F27CB2ED21A6CCA8009A2B74 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		F2A532C620D7F95F006F1EF1 /* ReactNativeNavigation.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = ReactNativeNavigation.xcodeproj; path = "../node_modules/react-native-navigation/ios/ReactNativeNavigation.xcodeproj"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -561,6 +563,7 @@
 				00C302E91ABCBA2D00DB3ED1 /* libRCTNetwork.a in Frameworks */,
 				139105C61AF99C1200B5F7CC /* libRCTSettings.a in Frameworks */,
 				832341BD1AAA6AB300B99B32 /* libRCTText.a in Frameworks */,
+				F27CB2EE21A6CCA8009A2B74 /* StoreKit.framework in Frameworks */,
 				00C302EA1ABCBA2D00DB3ED1 /* libRCTVibration.a in Frameworks */,
 				139FDEF61B0652A700C62182 /* libRCTWebSocket.a in Frameworks */,
 				557BCF373766454C8BC6BEAB /* libreactnativeuilib.a in Frameworks */,
@@ -734,6 +737,7 @@
 		2D16E6871FA4F8E400B85C8A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				F27CB2ED21A6CCA8009A2B74 /* StoreKit.framework */,
 				2D16E6891FA4F8E400B85C8A /* libReact.a */,
 				0920F0C3919E4A1EB5DD538C /* libz.tbd */,
 				0ECADE128F14DBEA491FB6A9 /* libPods-who_mobile.a */,
@@ -1065,8 +1069,14 @@
 					};
 					13B07F861A680F5B00A75B9A = {
 						DevelopmentTeam = HT9KH229F3;
-						ProvisioningStyle = Manual;
+						ProvisioningStyle = Automatic;
 						SystemCapabilities = {
+							com.apple.InAppPurchase = {
+								enabled = 1;
+							};
+							com.apple.Push = {
+								enabled = 1;
+							};
 							com.apple.iCloud = {
 								enabled = 1;
 							};
@@ -1815,10 +1825,10 @@
 				CODE_SIGN_ENTITLEMENTS = who_mobile/who_mobile.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = NO;
-				DEVELOPMENT_TEAM = HT9KH229F3;
+				DEVELOPMENT_TEAM = "";
 				HEADER_SEARCH_PATHS = (
 					"$(SRCROOT)/../node_modules/react-native/React",
 					"$(SRCROOT)/../node_modules/react-native-navigation/ios/**",
@@ -1840,8 +1850,8 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.clarisoft.who;
 				PRODUCT_NAME = who_mobile;
-				PROVISIONING_PROFILE = "58ffd471-182c-4e2c-872e-e07f10c80ea6";
-				PROVISIONING_PROFILE_SPECIFIER = "WHO GO.Data Development";
+				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Debug;
@@ -1854,9 +1864,9 @@
 				CODE_SIGN_ENTITLEMENTS = who_mobile/who_mobile.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = HT9KH229F3;
+				DEVELOPMENT_TEAM = "";
 				HEADER_SEARCH_PATHS = (
 					"$(SRCROOT)/../node_modules/react-native/React",
 					"$(SRCROOT)/../node_modules/react-native-navigation/ios/**",
@@ -1878,8 +1888,8 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.clarisoft.who;
 				PRODUCT_NAME = who_mobile;
-				PROVISIONING_PROFILE = "c1d24e00-efae-4070-bfdc-7fda8b851db1";
-				PROVISIONING_PROFILE_SPECIFIER = "WHO GO.Data Distribution";
+				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Release;

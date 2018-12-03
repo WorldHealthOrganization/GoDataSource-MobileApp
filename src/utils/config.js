@@ -95,7 +95,7 @@ const followUpsSingleScreen = {
                     value: '',
                     type: "DatePicker",
                     isRequired: true,
-                    isEditMode: true,
+                    isEditMode: false,
                     format: 'MM/dd/YYYY',
                     objectType: 'FollowUp'
                 },
@@ -256,6 +256,7 @@ const caseSingleScreen = {
                     value: '',
                     isRequired: false,
                     isEditMode: false,
+                    keyboardType: Platform.OS === 'ios' ? 'number-pad' : 'numeric',
                     objectType: 'Case'
                 },
                 {
@@ -317,7 +318,7 @@ const caseSingleScreen = {
                     labelValue: 'test',
                     type: 'DropdownInput',
                     value: '',
-                    isRequired: true,
+                    isRequired: false,
                     isEditMode: false,
                     activeButtonColor: 'red',
                     activeBackgroundColor: 'red',
@@ -438,7 +439,7 @@ const caseSingleScreen = {
                 labelValue: 'test',
                 type: 'DropDownSectioned',
                 value: '',
-                isRequired: false,
+                isRequired: true,
                 isEditMode: true,
                 objectType: 'Address',
                 single: true
@@ -491,7 +492,7 @@ const caseSingleScreen = {
                 isEditMode: true,
                 multiline: false,
                 objectType: 'Address',
-                keyboardType: Platform.OS === 'ios' ? 'number-pad' : 'numeric'
+                keyboardType: Platform.OS === 'ios' ? 'decimal-pad' : 'numeric'
             },
             {
                 cardNumber: 1,
@@ -504,7 +505,7 @@ const caseSingleScreen = {
                 isEditMode: true,
                 multiline: false,
                 objectType: 'Address',
-                keyboardType: Platform.OS === 'ios' ? 'number-pad' : 'numeric'
+                keyboardType: Platform.OS === 'ios' ? 'decimal-pad' : 'numeric'
             },
             {
                 cardNumber: 1,
@@ -1008,7 +1009,7 @@ const addExposureScreen = [
         isRequired: true,
         isEditMode: true,
         format: 'MM/dd/YYYY',
-        objectType: 'FollowUp'
+        objectType: 'Contact'
     },
     {
         cardNumber: 1,
@@ -1191,6 +1192,7 @@ const contactsSingleScreen = {
                     isRequired: false,
                     isEditMode: true,
                     multiline: false,
+                    keyboardType: Platform.OS === 'ios' ? 'number-pad' : 'numeric',
                     objectType: 'Contact'
                 },
                 {
@@ -1330,7 +1332,7 @@ const contactsSingleScreen = {
                 labelValue: 'test',
                 type: 'DropDownSectioned',
                 value: '',
-                isRequired: false,
+                isRequired: true,
                 isEditMode: true,
                 objectType: 'Address',
                 single: true
@@ -1383,7 +1385,7 @@ const contactsSingleScreen = {
                 isEditMode: true,
                 multiline: false,
                 objectType: 'Address',
-                keyboardType: Platform.OS === 'ios' ? 'number-pad' : 'numeric'
+                keyboardType: Platform.OS === 'ios' ? 'decimal-pad' : 'numeric'
             },
             {
                 cardNumber: 1,
@@ -1396,7 +1398,7 @@ const contactsSingleScreen = {
                 isEditMode: true,
                 multiline: false,
                 objectType: 'Address',
-                keyboardType: Platform.OS === 'ios' ? 'number-pad' : 'numeric'
+                keyboardType: Platform.OS === 'ios' ? 'decimal-pad' : 'numeric'
             },
 
             {

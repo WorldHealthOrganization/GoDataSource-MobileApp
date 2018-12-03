@@ -14,17 +14,11 @@ export function getContactsForOutbreakIdRequest (outbreakId, filter, token, call
 
     let start = new Date().getTime();
     if (filter && filter.keys) {
-        // console.log('getContactsForOutbreakIdRequest if')
-        let keys = filter.keys.map((e) => {return `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT_false_${outbreakId}_${e}`});
-        // console.log("@@@ filter keys: ", keys);
-        let start =  new Date().getTime();
 
         let promiseArray = [];
+        promiseArray = filter.keys.map((e) => {return getFromDb(database, `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT_${outbreakId}_${e}`)});
 
-        for (let i=0; i<keys.length; i++) {
-            promiseArray.push(getFromDb(database, keys[i]));
-        }
-
+        let start =  new Date().getTime();
         Promise.all(promiseArray)
             .then((resultGetAll) => {
                 console.log("Result from get queries: ", new Date().getTime() - start, resultGetAll.length);
@@ -86,8 +80,8 @@ export function getContactsForOutbreakIdRequest (outbreakId, filter, token, call
             database.find({
                 selector: {
                     _id: {
-                        $gt: `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT_false_${outbreakId}_`,
-                        $lt: `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT_false_${outbreakId}_\uffff`
+                        $gt: `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT_${outbreakId}_`,
+                        $lt: `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT_${outbreakId}_\uffff`
                     },
                     type: {$eq: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT'},
                     gender: filter.gender ? {$eq: filter.gender} : {},
@@ -122,10 +116,11 @@ export function getContactsForOutbreakIdRequest (outbreakId, filter, token, call
                      //local filter for selectedLocations bcause it can't be done in mango queries
                      if (filter.selectedLocations && filter.selectedLocations.length > 0) {
                         resultFilterContactsDocs = resultFilterContactsDocs.filter((e) => {
-                            let addresses = e.addresses.filter((k) => {
+                            let address = e.addresses.find((k) => {
                                 return k.locationId !== '' && filter.selectedLocations.indexOf(k.locationId) >= 0
                             })
-                            return addresses.length > 0
+                        
+                            return address === undefined ? false : true
                         })
                     }
                     callback(null, resultFilterContactsDocs)
@@ -137,39 +132,37 @@ export function getContactsForOutbreakIdRequest (outbreakId, filter, token, call
         } else {
             // console.log('getContactsForOutbreakIdRequest else');
 
-            database.allDocs({
-                startkey: `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT_false_${outbreakId}_`,
-                endkey: `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT_false_${outbreakId}_\uffff`,
-                include_docs: true
-            })
-                .then((result) => {
-                    console.log("result with the new index for contacts: ", new Date().getTime() - start);
-                    // result.rows = _.orderBy(result.rows, [item => item.doc.lastName !== undefined ? item.doc.lastName.toLowerCase() : ''], ['asc'])
-                    let resultDocs = result.rows.filter((e) => {return e.doc.deleted === false}).map((e) => {return e.doc})
-                    resultDocs = objSort(resultDocs, ['lastName', false])
-                    callback(null, resultDocs);
-                })
-                .catch((errorQuery) => {
-                    console.log("Error with the new index for contacts: ", errorQuery);
-                    callback(errorQuery);
-                })
-
-            // database.find({
-            //     selector: {
-            //         type: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT',
-            //         fileType: 'person.json',
-            //         deleted: false,
-            //         outbreakId: outbreakId
-            //     }
+            // database.allDocs({
+            //     startkey: `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT_${outbreakId}_`,
+            //     endkey: `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT_${outbreakId}_\uffff`,
+            //     include_docs: true
             // })
-            //     .then((resultFind) => {
-            //         console.log('Result for find time for contacts: ', new Date().getTime() - start);
-            //         callback(null, resultFind.docs)
+            //     .then((result) => {
+            //         console.log("result with the new index for contacts: ", new Date().getTime() - start);
+            //         callback(null, result.rows.filter((e) => {return e.doc.deleted === false}).map((e) => {return e.doc}))
             //     })
-            //     .catch((errorFind) => {
-            //         console.log('Error find for contacts: ', errorFind);
-            //         callback(errorFind);
+            //     .catch((errorQuery) => {
+            //         console.log("Error with the new index for contacts: ", errorQuery);
+            //         callback(errorQuery);
             //     })
+
+            database.find({
+                selector: {
+                    _id: {
+                        $gte: `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT_${outbreakId}_`,
+                        $lte: `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT_${outbreakId}_\uffff`,
+                    },
+                    deleted: false
+                }
+            })
+                .then((resultFind) => {
+                    console.log('Result for find time for contacts: ', new Date().getTime() - start);
+                    callback(null, objSort(resultFind.docs, ['lastName', false]));
+                })
+                .catch((errorFind) => {
+                    console.log('Error find for contacts: ', errorFind);
+                    callback(errorFind);
+                })
         }
     }
 }
@@ -182,8 +175,8 @@ export function getContactsForFollowUpPeriodRequest (outbreakId, followUpDate, c
     database.find({
         selector: {
             _id: {
-                $gt: `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT_false_${outbreakId}_`,
-                $lt: `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT_false_${outbreakId}_\uffff`
+                $gt: `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT_${outbreakId}_`,
+                $lt: `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT_${outbreakId}_\uffff`
             },
             'followUp.status': 'LNG_REFERENCE_DATA_CONTACT_FINAL_FOLLOW_UP_STATUS_TYPE_UNDER_FOLLOW_UP',
             'followUp.startDate': {$lte: followUpDate},

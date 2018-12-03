@@ -68,10 +68,18 @@ class FollowUpsFiltersContainer extends PureComponent {
 
     // Please write here all the methods that are not react native lifecycle methods
     handleRenderItem = (item) => {
-        // console.log("Item: ", item);
+        let fields = item.fields.map((field) => {
+            if (this.props.isNew === false && field.id === 'date') {
+                return Object.assign({},field, {isEditMode: false})
+            } else {
+                return Object.assign({},field, {isEditMode: this.props.isEditMode})
+            }
+        });
+
         return (
             <CardComponent
-                item={item.fields}
+                item={fields}
+                isEditMode={this.props.isEditMode}
                 followUp={this.props.item}
                 contact={this.props.contact}
                 style={style.cardStyle}
