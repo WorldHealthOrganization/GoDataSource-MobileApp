@@ -478,6 +478,9 @@ class FollowUpsSingleScreen extends Component {
             savePressed: true
         }), () => {
             let followUpClone = _.cloneDeep(this.state.item);
+            if (followUpClone.targeted !== false && followUpClone.targeted !== true) {
+                followUpClone.targeted = false;
+            }
             let contactClone = _.cloneDeep(this.state.contact);
 
             if (followUpClone.address && followUpClone.address.location) {

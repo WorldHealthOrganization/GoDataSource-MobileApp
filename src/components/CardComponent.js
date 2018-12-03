@@ -266,7 +266,7 @@ class CardComponent extends Component {
             }
             if (item.type === 'DropDownSectioned' && item.id === 'selectedLocations') {
                 sectionedSelectedItems = this.props.filter.filter[item.id].map ((e) => {
-                    return 'location.json_false_' + e
+                    return 'location.json_' + e
                 })
             }
             if (item.type === 'DropDown' && item.id === 'exposure') {
