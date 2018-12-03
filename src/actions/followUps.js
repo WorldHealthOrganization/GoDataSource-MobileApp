@@ -249,7 +249,7 @@ export function generateFollowUp(outbreakId, filterDate, date, token) {
                             }
                             if (resultBulkInsert) {
                                 dispatch(saveGeneratedFollowUps(nrGeneratedFollowUps));
-                                if(moment(filterDate).format('YYYY-MM-DD') == moment(date).format('YYYY-MM-DDgit ')) {
+                                if(moment(filterDate).format('YYYY-MM-DD') === moment(date).format('YYYY-MM-DD')) {
                                     dispatch(getFollowUpsForOutbreakId(outbreakId, {date: date}));
                                 }
                                 dispatch(setSyncState('Finished processing'));

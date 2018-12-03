@@ -87,7 +87,7 @@ class FollowUpsScreen extends Component {
 
     // Please add here the react lifecycle methods that you need
     static getDerivedStateFromProps(props, state) {
-        console.log ('getDerivedStateFromProps', props,state);
+        console.log ('getDerivedStateFromProps');
         if (props.errors && props.errors.type && props.errors.message) {
             Alert.alert(props.errors.type, props.errors.message, [
                 {
