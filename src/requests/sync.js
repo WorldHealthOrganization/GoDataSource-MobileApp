@@ -5,6 +5,7 @@ import url from './../utils/url';
 import RNFetchBlob from 'rn-fetch-blob';
 import base64 from 'base-64';
 import {Platform} from 'react-native';
+import {getSyncEncryptPassword} from './../utils/encryption';
 
 export function getDatabaseSnapshotRequest(hubConfig, lastSyncDate, callback) {
 
@@ -16,7 +17,9 @@ export function getDatabaseSnapshotRequest(hubConfig, lastSyncDate, callback) {
         }
     }
 
-    let requestUrl = hubConfig.url + '/sync/database-snapshot' + (lastSyncDate ? ('?filter=' + JSON.stringify(filter)) : '');
+    let password = getSyncEncryptPassword(null, hubConfig);
+
+    let requestUrl = hubConfig.url + '/sync/database-snapshot' + (lastSyncDate ? ('?filter=' + JSON.stringify(filter)) : '') + (lastSyncDate ? '&password=' + password : "?password=" + password);
 
     console.log('Request URL: ', requestUrl);
 

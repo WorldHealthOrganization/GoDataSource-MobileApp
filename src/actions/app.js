@@ -31,7 +31,7 @@ import {getFollowUpsForOutbreakId} from './followUps';
 import {uniq} from 'lodash';
 import {addError} from './errors';
 // import RNDB from 'react-native-nosql-to-sqlite';
-import {getSyncEncryptPassword, encrypt, decrypt} from './../utils/encryption';
+// import {getSyncEncryptPassword, encrypt, decrypt} from './../utils/encryption';
 
 let arrayOfStatuses = [];
 
@@ -201,7 +201,7 @@ function processFilesForSync(error, response, hubConfiguration, isFirstTime, syn
             dispatch(setSyncState("Unzipping database..."));
 
             try {
-                let responseUnzipPath = await unzipFile(response, RNFetchBlobFs.dirs.DocumentDir + "/who_databases");
+                let responseUnzipPath = await unzipFile(response, RNFetchBlobFs.dirs.DocumentDir + "/who_databases", null, hubConfiguration);
                 if (responseUnzipPath) {
                     console.log('ResponseUnzipPath: ', responseUnzipPath);
                     dispatch(setSyncState("Syncing...."));
@@ -312,32 +312,6 @@ function processFilesForSync(error, response, hubConfiguration, isFirstTime, syn
                                             }
                                         }
                                     }
-
-                                    // Promise.all(promises)
-                                    //     .then((responses) => {
-                                    //         // After processing all the data store the last sync date
-                                    //         console.log("Now that the processing is over, proceed with storing last sync date:");
-                                    //         storeData('activeDatabase', hubConfiguration.url, (errorActiveDatabase) => {
-                                    //             if (!errorActiveDatabase) {
-                                    //                 storeData(hubConfiguration.url, new Date(), (errorStoreLastSync) => {
-                                    //                     if (!errorStoreLastSync) {
-                                    //                         console.log('Responses promises: ', responses);
-                                    //                         dispatch(setSyncState("Finished processing"));
-                                    //                     } else {
-                                    //                         console.log('There was an error at storing last sync date: ', errorStoreLastSync);
-                                    //                         dispatch(setSyncState('Error'));
-                                    //                     }
-                                    //                 });
-                                    //             } else {
-                                    //                 console.log('There was an error at storing active database: ', errorActiveDatabase);
-                                    //                 dispatch(setSyncState('Error'));
-                                    //             }
-                                    //         });
-                                    //     })
-                                    //     .catch((error) => {
-                                    //         console.log("Error promises: ", error);
-                                    //         dispatch(setSyncState('Error'));
-                                    //     })
                                 } else {
                                     console.log('No files found');
                                     arrayOfStatuses.push({text: 'Getting updated data from the server', status: 'No files found'});
@@ -384,71 +358,6 @@ function processFilesForSync(error, response, hubConfiguration, isFirstTime, syn
                     dispatch(parseStatusesAndShowMessage());
                 }
             }
-
-            // unzipFile(response, RNFetchBlobFs.dirs.DocumentDir + "/who_databases", (unzipError, responseUnzipPath) => {
-            //     if (unzipError) {
-            //         console.log("Error while unzipping file");
-            //         dispatch(setSyncState('Error'));
-            //     }
-            //     if (responseUnzipPath) {
-            //         // At this point we have the path to where the json files from the downloaded database are
-            //         // We should call the method to sync those data
-            //         dispatch(setSyncState("Syncing...."));
-            //         setNumberOfFilesProcessed(0);
-            //
-            //         // RNDB.configureDatabaseWithConfig(config.RNDBConfig);
-            //         // RNDB.importDataWithCallback(() => {
-            //         //     dispatch(setSyncState("Finished processing"));
-            //         // });
-            //
-            //
-            //         // Create local database
-            //         createDatabase(hubConfiguration.url.replace(/\/|\.|\:/g, ''), hubConfiguration.clientSecret, true, (database) => {
-            //             // Create a promise array to run syncing for all the files from the db
-            //             let promises = [];
-            //             let promiseResponses = [];
-            //             readDir(responseUnzipPath, (errorReadDir, files) => {
-            //                 if (errorReadDir) {
-            //                     console.log('Error while reading directory');
-            //                     dispatch(setSyncState('Error'));
-            //                 }
-            //                 if (files) {
-            //                     // For every file of the database dump, do sync
-            //                     for(let i=0; i<files.length; i++) {
-            //                         if (files[i] !== 'auditLog.json' && files[i] !== 'icon.json' && files[i] !== 'icons') {
-            //                             promises.push(processFile(RNFetchBlobFs.dirs.DocumentDir + '/who_databases/' + files[i], files[i], files.length, dispatch, isFirstTime));
-            //                         }
-            //                     }
-            //                     Promise.all(promises)
-            //                         .then((responses) => {
-            //                             // After processing all the data store the last sync date
-            //                             console.log("Now that the processing is over, proceed with storing last sync date:");
-            //                             storeData('activeDatabase', hubConfiguration.url, (errorActiveDatabase) => {
-            //                                 if (!errorActiveDatabase) {
-            //                                     storeData(hubConfiguration.url, new Date(), (errorStoreLastSync) => {
-            //                                         if (!errorStoreLastSync) {
-            //                                             console.log('Responses promises: ', responses);
-            //                                             dispatch(setSyncState("Finished processing"));
-            //                                         } else {
-            //                                             console.log('There was an error at storing last sync date: ', errorStoreLastSync);
-            //                                             dispatch(setSyncState('Error'));
-            //                                         }
-            //                                     });
-            //                                 } else {
-            //                                     console.log('There was an error at storing active database: ', errorActiveDatabase);
-            //                                     dispatch(setSyncState('Error'));
-            //                                 }
-            //                             });
-            //                         })
-            //                         .catch((error) => {
-            //                             console.log("Error promises: ", error);
-            //                             dispatch(setSyncState('Error'));
-            //                         })
-            //                 }
-            //             })
-            //         });
-            //     }
-            // })
         }
     }
 }

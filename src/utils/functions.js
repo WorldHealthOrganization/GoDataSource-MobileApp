@@ -175,66 +175,175 @@ export function handleExposedTo(contact, returnString, cases, events) {
     return returnString ? relationshipArray.join(", ") : relationshipArray;
 }
 
-export function unzipFile (source, dest, password, clientCredentials, callback) {
-    RNFetchBlobFS.exists(source)
-        .then((exists) => {
-            if (exists) {
-                // First get the raw file in order to decrypt it
-                readRawFile(source, (errorRawFile, rawFile) => {
-                    if (errorRawFile) {
-                        return callback('Error while reading raw file');
-                    }
-                    if (rawFile) {
-                        // Decrypt the raw file
-                        // Compute password
-                        let password = getSyncEncryptPassword(password, clientCredentials);
-                        decrypt(password, rawFile)
-                            .then((decryptedFile) => {
-                                // Now that we have the decrypted zip file, it's time to write it on disk
-                                writeFile(source + '.zip', decryptedFile, (errorWriteFile, pathToZip) => {
-                                    if (errorWriteFile) {
-                                        callback(errorWriteFile);
-                                    }
-                                    if (pathToZip) {
-                                        // Proceed to unzip the file to the specified destination
-                                        unzip(pathToZip, dest)
-                                            .then((path) => {
-                                                console.log(`unzip completed at ${path}`);
-                                                callback(null, path);
-                                            })
-                                            .catch((error) => {
-                                                console.log(error);
-                                                callback(error);
-                                            })
-                                    }
-                                })
-                            })
-                            .catch((errorDecryptedFile) => {
-                                console.log('Error while decrypting file: ', errorDecryptedFile);
-                                callback(errorDecryptedFile);
-                            })
-                    }
-                })
+export function unzipFile (source, dest, password, clientCredentials) {
+    console.log('Stuff: ', source, dest, password, clientCredentials);
+    return async function () {
+    //     return new Promise((resolve, reject) => {
 
-                // let password = getSyncEncryptPassword(password, clientCredentials);
-                //
-                // // Use read/write streams to avoid memory crashes
-                // RNFetchBlobFS.readStream(source, 'base64')
-                //     .then((streamRead) => {
-                //         streamRead.open();
-                //         streamRead.onData((readChunk) => {
-                //             // Decrypt the chunk and write it to the new zip file
-                //             decrypt(password, readChunk)
-                //                 .then((decryptedChunk) => {})
-                //         })
-                //     })
+        console.log('Source: ', source);
+        try {
+            let exists = await RNFetchBlobFS.exists(source);
+
+            console.log('Exists: ', exists);
+            if (exists) {
+                let password = getSyncEncryptPassword(password, clientCredentials);
+                try {
+                    let stream = await RNFetchBlobFS.readStream(source, 'base64', 131072);
+                    if (stream) {
+                        stream.open();
+                        try {
+                            let chunk = await stream.onData();
+                            if (chunk) {
+                                try {
+                                    let decryptedChunk = await decrypt(password, chunk);
+                                    if (decryptedChunk) {
+                                        try {
+                                            let strings = await RNFetchBlobFS.appendFile(source + '.zip', decryptedChunk, 'base64');
+                                            if (strings) {
+                                                console.log('Appended string');
+                                            } else {
+                                                console.log('Not appended string');
+                                            }
+                                        } catch (errorAppendString) {
+                                            console.log('Error while writing stream: ', errorAppendString);
+                                        }
+                                    } else {
+                                        console.log('Decrypting not working')
+                                    }
+                                } catch (errorDecryptedChunk) {
+                                    console.log('Error while decrypting chunk: ', errorDecryptedChunk);
+                                }
+                            } else {
+                                // if there is no chunk that means the end?
+                            }
+                        } catch (errorChunk) {
+                            console.log('Error read chunk: ', errorChunk);
+                        }
+                        stream.onEnd(() => {
+                            console.log('Finished stuff');
+                            return Promise.resolve(source + '.zip');
+                        })
+                    } else {
+                        console.log('Stream does not exist: ');
+                    }
+                } catch (errorStream) {
+                    console.log('Error while opening read stream: ', errorStream);
+                }
             } else {
-                return callback('Zip file does not exist');
+                console.log('Source does not exist');
             }
-        })
-        .catch((existsError) => {
-            callback(('There was an error with getting the zip file: ' + existsError));
-        });
+        } catch (errorExists) {
+            console.log('Error while determining if source exists: ', errorExists);
+        }
+
+            // RNFetchBlobFS.exists(source)
+            //     .then((exists) => {
+            //         if (exists) {
+            //             // Read file as stream, decrypt the chunks and append them to the new zip
+            //             let password = getSyncEncryptPassword(password, clientCredentials);
+            //             let numberOfChunks = 0;
+            //             RNFetchBlobFS.readStream(source, 'base64', 131072)
+            //                 .then((stream) => {
+            //                     stream.open();
+            //                     stream.onData((chunk) => {
+            //                         if (chunk) {
+            //                             console.log('Chunk length: ', chunk.length);
+            //                             numberOfChunks++;
+            //                             decrypt(password, chunk)
+            //                                 .then((decryptedChunk) => {
+            //                                     RNFetchBlobFS.appendFile(`${source}.zip`, decryptedChunk, 'base64')
+            //                                         .then(() => {
+            //                                             console.log('Appended chunk');
+            //                                             if (chunk.length < 174764) {
+            //                                                 // this means that we are at the last chunk and should unzip
+            //                                                 unzip(`${source}.zip`, dest)
+            //                                                     .then((path) => {
+            //                                                         console.log(`unzip completed at ${path}`);
+            //                                                         callback(null, path);
+            //                                                     })
+            //                                                     .catch((error) => {
+            //                                                         console.log(error);
+            //                                                         callback(error);
+            //                                                     })
+            //                                             }
+            //                                         })
+            //                                         .catch((errorAppend) => {
+            //                                             console.log("Error at appending file: ", errorAppend)
+            //                                         })
+            //                                 })
+            //                                 .catch((errorDecryptChunk) => {
+            //                                     console.log('Error at decrypting chunk: ', errorDecryptChunk);
+            //                                 })
+            //                         } else {
+            //                             console.log('Not chunk: ')
+            //                         }
+            //                     });
+            //                     stream.onEnd(() => {
+            //                         // After all the decryption is done, try unzipping the file
+            //                         console.log("Finished returning all events from read stream. Number of chunks: ", numberOfChunks, numberOfChunks * 131072);
+            //                     });
+            //                 })
+            // //
+            // //
+            //             // First get the raw file in order to decrypt it
+            //             // readRawFile(source, (errorRawFile, rawFile) => {
+            //             //     if (errorRawFile) {
+            //             //         return callback('Error while reading raw file');
+            //             //     }
+            //             //     if (rawFile) {
+            //             //         // Decrypt the raw file
+            //             //         // Compute password
+            //             //         let password = getSyncEncryptPassword(password, clientCredentials);
+            //             //         decrypt(password, rawFile)
+            //             //             .then((decryptedFile) => {
+            //             //                 // Now that we have the decrypted zip file, it's time to write it on disk
+            //             //                 writeFile(source + '.zip', decryptedFile, (errorWriteFile, pathToZip) => {
+            //             //                     if (errorWriteFile) {
+            //             //                         callback(errorWriteFile);
+            //             //                     }
+            //             //                     if (pathToZip) {
+            //             //                         // Proceed to unzip the file to the specified destination
+            //             //                         unzip(pathToZip, dest)
+            //             //                             .then((path) => {
+            //             //                                 console.log(`unzip completed at ${path}`);
+            //             //                                 callback(null, path);
+            //             //                             })
+            //             //                             .catch((error) => {
+            //             //                                 console.log(error);
+            //             //                                 callback(error);
+            //             //                             })
+            //             //                     }
+            //             //                 })
+            //             //             })
+            //             //             .catch((errorDecryptedFile) => {
+            //             //                 console.log('Error while decrypting file: ', errorDecryptedFile);
+            //             //                 callback(errorDecryptedFile);
+            //             //             })
+            //             //     }
+            //             // })
+            //
+            //             // let password = getSyncEncryptPassword(password, clientCredentials);
+            //             //
+            //             // // Use read/write streams to avoid memory crashes
+            //             // RNFetchBlobFS.readStream(source, 'base64')
+            //             //     .then((streamRead) => {
+            //             //         streamRead.open();
+            //             //         streamRead.onData((readChunk) => {
+            //             //             // Decrypt the chunk and write it to the new zip file
+            //             //             decrypt(password, readChunk)
+            //             //                 .then((decryptedChunk) => {})
+            //             //         })
+            //             //     })
+            //         } else {
+            //             reject('Zip file does not exist');
+            //         }
+            //     })
+            //     .catch((existsError) => {
+            //         reject(('There was an error with getting the zip file: ' + existsError));
+            //     });
+        // })
+    }
+
 }
 
 export function readRawFile (path, callback) {
