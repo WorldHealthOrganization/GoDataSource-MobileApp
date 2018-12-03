@@ -90,6 +90,7 @@ class ContactsSingleScreen extends Component {
             } : Object.assign({}, this.props.contact),
             savePressed: false,
             deletePressed: false,
+            isModified: false,
             isDateTimePickerVisible: false,
             canChangeScreen: false,
             anotherPlaceOfResidenceWasChosen: false,
@@ -100,7 +101,7 @@ class ContactsSingleScreen extends Component {
         // Bind here methods, or at least don't declare methods in the render method
         this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this));
         this.handleBackButtonClick = this.handleBackButtonClick.bind(this);
-    }
+    };
 
     // PersonalRoute = () => (
     //     <ContactsSinglePersonal
@@ -162,7 +163,7 @@ class ContactsSingleScreen extends Component {
             // }
         }
         return null;
-    }
+    };
 
     componentDidMount() {
         BackHandler.addEventListener('hardwareBackPress', this.handleBackButtonClick);
@@ -198,20 +199,38 @@ class ContactsSingleScreen extends Component {
                 }
             })
         }
-    }
+    };
 
     componentWillUnmount() {
         BackHandler.removeEventListener('hardwareBackPress', this.handleBackButtonClick);
-    }
+    };
 
     handleBackButtonClick() {
         // this.props.navigator.goBack(null);
-        this.props.navigator.pop({
-            animated: true,
-            animationType: 'fade'
-        })
+        if (this.state.isModified === true) {
+            Alert.alert("", 'You have unsaved data. Are you sure you want to leave this page and lose all changes?', [
+                {
+                    text: 'Yes', onPress: () => {
+                    this.props.navigator.pop({
+                        animated: true,
+                        animationType: 'fade'
+                    })
+                }
+                },
+                {
+                    text: 'Cancel', onPress: () => {
+                    console.log("onPressCancelEdit No pressed - nothing changes")
+                }
+                }
+            ])
+        } else {
+            this.props.navigator.pop({
+                animated: true,
+                animationType: 'fade'
+            })
+        }
         return false;
-    }
+    };
 
     // The render method should have at least business logic as possible,
     // because this will be called whenever there is a new setState call
@@ -228,6 +247,7 @@ class ContactsSingleScreen extends Component {
                             <Breadcrumb
                                 entities={['Contacts', this.props.isNew ? "Add Contact" : ((this.props.contact && this.props.contact.firstName ? (this.props.contact.firstName + " ") : '') + (this.props.contact && this.props.contact.lastName ? this.props.contact.lastName : ''))]}
                                 navigator={this.props.navigator}
+                                onPress={this.handlePressBreadcrumb}
                             />
                             <View>
                                 <Menu
@@ -274,7 +294,7 @@ class ContactsSingleScreen extends Component {
                 />
             </View>
         );
-    }
+    };
 
     // Please write here all the methods that are not react native lifecycle methods
     handlePressNavbarButton = () => {
@@ -307,7 +327,7 @@ class ContactsSingleScreen extends Component {
             canChangeScreen: true,
         });
         this.handleOnIndexChange(nextIndex)
-    }
+    };
 
     handleMoveToPrevieousScreenButton = () => {
         let nextIndex = this.state.index - 1
@@ -317,7 +337,7 @@ class ContactsSingleScreen extends Component {
         });
 
         this.handleOnIndexChange(nextIndex)
-    }
+    };
 
     handleRenderTabBar = (props) => {
         return (
@@ -439,6 +459,31 @@ class ContactsSingleScreen extends Component {
         }
     };
 
+    handlePressBreadcrumb = () => {
+        if (this.state.isModified === true) {
+            Alert.alert("", 'You have unsaved data. Are you sure you want to leave this page and lose all changes?', [
+                {
+                    text: 'Yes', onPress: () => {
+                    this.props.navigator.pop({
+                        animated: true,
+                        animationType: 'fade'
+                    })
+                }
+                },
+                {
+                    text: 'Cancel', onPress: () => {
+                    console.log("onPressCancelEdit No pressed - nothing changes")
+                }
+                }
+            ])
+        } else {
+            this.props.navigator.pop({
+                animated: true,
+                animationType: 'fade'
+            });
+        }
+    };
+
     handleSaveExposure = (exposure, isUpdate = false) => {
         console.log ('exposure', JSON.stringify(exposure))
         if (isUpdate === true){
@@ -476,12 +521,13 @@ class ContactsSingleScreen extends Component {
 
                 this.setState(prevState => ({
                     contact: Object.assign({}, prevState.contact, {age: ageClone}, {dob: null}),
+                    isModified: true
                 }), () => {
                     console.log("handleOnChangeTextInputWithDropDown done", id, " ", value, " ", this.state.contact);
                 })
             }
         }
-    }
+    };
 
     handleOnChangeText = (value, id, objectType) => {
         console.log("onChangeText: ",value, id, objectType);
@@ -489,13 +535,15 @@ class ContactsSingleScreen extends Component {
         if (objectType === 'FollowUp') {
             this.setState(
                 (prevState) => ({
-                    item: Object.assign({}, prevState.item, {[id]: value})
+                    item: Object.assign({}, prevState.item, {[id]: value}),
+                    isModified: true
                 }))
         } else {
             if (objectType === 'Contact') {
                 this.setState(
                     (prevState) => ({
-                        contact: Object.assign({}, prevState.contact, {[id]: value})
+                        contact: Object.assign({}, prevState.contact, {[id]: value}),
+                        isModified: true
                     }))
             } else {
                 if (typeof objectType === 'phoneNumber' && objectType >= 0 || typeof objectType === 'number' && objectType >= 0) {
@@ -539,7 +587,8 @@ class ContactsSingleScreen extends Component {
                     }
                     // console.log ('addressesClone', addressesClone);
                     this.setState(prevState => ({
-                        contact: Object.assign({}, prevState.contact, {addresses: addressesClone})
+                        contact: Object.assign({}, prevState.contact, {addresses: addressesClone}),
+                        isModified: true
                     }))
                 }
             }
@@ -559,18 +608,19 @@ class ContactsSingleScreen extends Component {
             this.setState(prevState => ({
                 [stateValue]: index,
                 contact: Object.assign({}, prevState.contact, {dob: null}, {age: ageClone}),
-
+                isModified: true
             }), () => {
                 console.log ('handleOnChangeTextSwitchSelector', stateValue, this.state[stateValue])
             })
         } else {
             this.setState({
                 [stateValue]: index,
+                isModified: true
             }, () => {
                 console.log ('handleOnChangeTextSwitchSelector', stateValue, this.state[stateValue])
             })
         }
-    }
+    };
 
     handleOnChangeDate = (value, id, objectType) => {
         console.log("onChangeDate: ", value, id, objectType);
@@ -578,7 +628,8 @@ class ContactsSingleScreen extends Component {
         if (objectType === 'FollowUp') {
             this.setState(
                 (prevState) => ({
-                    item: Object.assign({}, prevState.item, {[id]: value})
+                    item: Object.assign({}, prevState.item, {[id]: value}),
+                    isModified: true
                 })
                 , () => {
                     console.log("onChangeDate", id, " ", value, " ", this.state.item);
@@ -586,7 +637,7 @@ class ContactsSingleScreen extends Component {
             )
         } else {
             if (id === 'dob') {
-                let today = new Date()
+                let today = new Date();
                 let nrOFYears = this.calcDateDiff(value, today);
                 if (nrOFYears !== undefined && nrOFYears !== null) {
                     let ageClone = {years: 0, months: 0}
@@ -606,7 +657,8 @@ class ContactsSingleScreen extends Component {
                     console.log('ageClone', ageClone)
                     this.setState(prevState => ({
                         contact: Object.assign({}, prevState.contact, {age: ageClone}, {dob: value}),
-                        selectedItemIndexForAgeUnitOfMeasureDropDown
+                        selectedItemIndexForAgeUnitOfMeasureDropDown,
+                        isModified: true
                     }), () => {
                         console.log("handleOnChangeDate dob", id, " ", value, " ", this.state.contact);
                     })
@@ -615,7 +667,8 @@ class ContactsSingleScreen extends Component {
                 if (objectType === 'Contact') {
                     this.setState(
                         (prevState) => ({
-                            contact: Object.assign({}, prevState.contact, {[id]: value})
+                            contact: Object.assign({}, prevState.contact, {[id]: value}),
+                            isModified: true
                         })
                         , () => {
                             console.log("onChangeDate", id, " ", value, " ", this.state.contact);
@@ -628,7 +681,8 @@ class ContactsSingleScreen extends Component {
                         addressesClone[objectType][id] = value && value.value ? value.value : value;
                         console.log ('addressesClone', addressesClone)
                         this.setState(prevState => ({
-                            contact: Object.assign({}, prevState.contact, {addresses: addressesClone})
+                            contact: Object.assign({}, prevState.contact, {addresses: addressesClone}),
+                            isModified: true
                         }), () => {
                             console.log("handleOnChangeDate", id, " ", value, " ", this.state.contact);
                         })
@@ -664,7 +718,7 @@ class ContactsSingleScreen extends Component {
         else {
           return undefined;
         }
-    }
+    };
 
     handleOnChangeSwitch = (value, id, objectType) => {
         // console.log("onChangeSwitch: ", value, id, this.state.item);
@@ -672,7 +726,8 @@ class ContactsSingleScreen extends Component {
             navigator.geolocation.getCurrentPosition((position) => {
                     this.setState(
                         (prevState) => ({
-                            item: Object.assign({}, prevState.item, {[id]: value ? {lat: position.coords.latitude, lng: position.coords.longitude} : null })
+                            item: Object.assign({}, prevState.item, {[id]: value ? {lat: position.coords.latitude, lng: position.coords.longitude} : null }),
+                            isModified: true
                         }), () => {
                             console.log("onChangeSwitch", id, " ", value, " ", this.state.item);
                         }
@@ -693,7 +748,8 @@ class ContactsSingleScreen extends Component {
             if (objectType === 'FollowUp') {
                 this.setState(
                     (prevState) => ({
-                        item: Object.assign({}, prevState.item, {[id]: value})
+                        item: Object.assign({}, prevState.item, {[id]: value}),
+                        isModified: true
                     }), () => {
                         console.log("onChangeSwitch", id, " ", value, " ", this.state.item);
                     }
@@ -702,7 +758,8 @@ class ContactsSingleScreen extends Component {
                 if (objectType === 'Contact') {
                     this.setState(
                         (prevState) => ({
-                            contact: Object.assign({}, prevState.contact, {[id]: value})
+                            contact: Object.assign({}, prevState.contact, {[id]: value}),
+                            isModified: true
                         }), () => {
                             console.log("onChangeSwitch", id, " ", value, " ", this.state.contact);
                         }
@@ -727,7 +784,8 @@ class ContactsSingleScreen extends Component {
 
                 this.setState(
                     (prevState) => ({
-                        item: Object.assign({}, prevState.item, {[id]: address[0]})
+                        item: Object.assign({}, prevState.item, {[id]: address[0]}),
+                        isModified: true
                     }), () => {
                         console.log("onChangeDropDown", id, " ", value, " ", this.state.item);
                     }
@@ -735,7 +793,8 @@ class ContactsSingleScreen extends Component {
             } else {
                 this.setState(
                     (prevState) => ({
-                        item: Object.assign({}, prevState.item, {[id]: value})
+                        item: Object.assign({}, prevState.item, {[id]: value}),
+                        isModified: true
                     }), () => {
                         console.log("onChangeDropDown", id, " ", value, " ", this.state.item);
                     }
@@ -746,7 +805,8 @@ class ContactsSingleScreen extends Component {
             if (objectType === 'Contact') {
                 this.setState(
                     (prevState) => ({
-                        contact: Object.assign({}, prevState.contact, {[id]: value && value.value ? value.value : value})
+                        contact: Object.assign({}, prevState.contact, {[id]: value && value.value ? value.value : value}),
+                        isModified: true
                     }), () => {
                         console.log("onChangeDropDown", id, " ", value, " ", this.state.contact);
                     }
@@ -756,7 +816,7 @@ class ContactsSingleScreen extends Component {
                     // Change address drop down
                     let addressesClone = _.cloneDeep(this.state.contact.addresses);
 
-                    let anotherPlaceOfResidenceWasChosen = false
+                    let anotherPlaceOfResidenceWasChosen = false;
                     if (value && value.value){
                         if(value.value === config.userResidenceAddress.userPlaceOfResidence){
                             addressesClone.forEach(element => {
@@ -769,14 +829,15 @@ class ContactsSingleScreen extends Component {
                     }
 
                     addressesClone[objectType][id] = value && value.value ? value.value : value;
-                    let hasPlaceOfResidence = false
-                    let contactPlaceOfResidence = addressesClone.filter((e) => {return e.typeId === config.userResidenceAddress.userPlaceOfResidence})
+                    let hasPlaceOfResidence = false;
+                    let contactPlaceOfResidence = addressesClone.filter((e) => {return e.typeId === config.userResidenceAddress.userPlaceOfResidence});
                     if (contactPlaceOfResidence && contactPlaceOfResidence.length > 0) {
                         hasPlaceOfResidence = true
                     }
 
                     this.setState(prevState => ({
                         contact: Object.assign({}, prevState.contact, {addresses: addressesClone}),
+                        isModified: true,
                         anotherPlaceOfResidenceWasChosen,
                         hasPlaceOfResidence
                     }), () => {
@@ -791,7 +852,7 @@ class ContactsSingleScreen extends Component {
         this.setState({
             anotherPlaceOfResidenceWasChosen: false
         })
-    }
+    };
 
     handleOnChangeSectionedDropDown = (selectedItems, index) => {
         console.log ('handleOnChangeSectionedDropDown', selectedItems, index)
@@ -799,7 +860,8 @@ class ContactsSingleScreen extends Component {
         let addresses = _.cloneDeep(this.state.contact.addresses);
         addresses[index].locationId = extractIdFromPouchId(selectedItems['0'], 'location');
         this.setState(prevState => ({
-            contact: Object.assign({}, prevState.contact, {addresses})
+            contact: Object.assign({}, prevState.contact, {addresses}),
+            isModified: true
         }))
     };
 
@@ -812,7 +874,8 @@ class ContactsSingleScreen extends Component {
         }
         questionnaireAnswers[id] = value;
         this.setState(prevState => ({
-            item: Object.assign({}, prevState.item, {questionnaireAnswers: questionnaireAnswers})
+            item: Object.assign({}, prevState.item, {questionnaireAnswers: questionnaireAnswers}),
+            isModified: true
         }))
     };
 
@@ -825,7 +888,8 @@ class ContactsSingleScreen extends Component {
         }
         questionnaireAnswers[id] = value.value;
         this.setState(prevState => ({
-            item: Object.assign({}, prevState.item, {questionnaireAnswers: questionnaireAnswers})
+            item: Object.assign({}, prevState.item, {questionnaireAnswers: questionnaireAnswers}),
+            isModified: true
         }))
     };
 
@@ -838,7 +902,8 @@ class ContactsSingleScreen extends Component {
         }
         questionnaireAnswers[id] = selections.map((e) => {return e.value});
         this.setState(prevState => ({
-            item: Object.assign({}, prevState.item, {questionnaireAnswers: questionnaireAnswers})
+            item: Object.assign({}, prevState.item, {questionnaireAnswers: questionnaireAnswers}),
+            isModified: true
         }))
     };
 
@@ -991,7 +1056,7 @@ class ContactsSingleScreen extends Component {
             dobClone: dobClone
         }
        
-    }
+    };
 
     handleOnPressDeceased = () => {
         console.log("### show date time picker: ");
@@ -1030,7 +1095,7 @@ class ContactsSingleScreen extends Component {
         }
 
         return true
-    }
+    };
 
     checkAgeYearsRequirements = () => {
         if (this.state.selectedItemIndexForAgeUnitOfMeasureDropDown === 0) {
@@ -1041,7 +1106,7 @@ class ContactsSingleScreen extends Component {
             }
         }
         return true
-    }
+    };
 
     checkAgeMonthsRequirements = () => {
         if (this.state.selectedItemIndexForAgeUnitOfMeasureDropDown === 1) {
@@ -1052,7 +1117,7 @@ class ContactsSingleScreen extends Component {
             }
         }
         return true
-    }
+    };
 
     checkRequiredFields = () => {
         return this.checkRequiredFieldsPersonalInfo() && this.checkRequiredFieldsAddresses() && this.checkRequiredFieldsRelationships()
@@ -1107,7 +1172,7 @@ class ContactsSingleScreen extends Component {
         } else {
             return true
         }
-    }
+    };
 
     showMenu = () => {
         this.refs.menuRef.show();
@@ -1143,7 +1208,7 @@ class ContactsSingleScreen extends Component {
         }, () => {
             this.handleOnPressSave();
         })
-    }
+    };
 
     handleOnDeletePress = (index) => {
         console.log("DeletePressed: ", index);
@@ -1213,7 +1278,7 @@ function mapStateToProps(state) {
         contacts: state.contacts,
         filter: state.app.filters,
     };
-}
+};
 
 function matchDispatchProps(dispatch) {
     return bindActionCreators({
@@ -1227,6 +1292,6 @@ function matchDispatchProps(dispatch) {
         deleteExposureForContact,
         removeErrors
     }, dispatch);
-}
+};
 
 export default connect(mapStateToProps, matchDispatchProps)(ContactsSingleScreen);
