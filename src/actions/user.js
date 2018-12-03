@@ -4,7 +4,8 @@
 import {ACTION_TYPE_STORE_USER} from './../utils/enums';
 import { changeAppRoot, getTranslations } from './app';
 // import { getUserByIdRequest} from './../requests/user';
-import {loginUserRequest, getUserByIdRequest, updateUserRequest} from './../queries/user';
+import {loginUserRequest, getUserByIdRequest, updateUserRequest, getRolesForUserRequest} from './../queries/user';
+import {getUserRoles} from './../actions/role'
 import { getFollowUpsForOutbreakIdWithPromises } from './followUps';
 import { getContactsForOutbreakId, getContactsForOutbreakIdWithPromises } from './contacts';
 import { getCasesForOutbreakIdWithPromise, getCasesForOutbreakId } from './cases';
@@ -22,6 +23,7 @@ import {storeFollowUps} from './followUps';
 import {storeOutbreak} from './outbreak';
 import {setLoginState, storeData, getAvailableLanguages, setSyncState} from './app';
 import moment from 'moment';
+import _ from 'lodash';
 
 // Add here only the actions, not also the requests that are executed.
 // For that purpose is the requests directory
@@ -61,6 +63,7 @@ export function loginUser(credentials) {
                 promises.push(getReferenceData(null, dispatch));
                 promises.push(getEventsForOutbreakId(response.activeOutbreakId, null, dispatch));
                 promises.push(getCasesForOutbreakIdWithPromise(response.activeOutbreakId, null, null, dispatch));
+                promises.push(getUserRoles(response.roleIds, dispatch))
 
                 // Store the user to the redux store, and also store the userId to the AsyncStorage
                 dispatch(storeUser(response));
