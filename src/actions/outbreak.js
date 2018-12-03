@@ -43,7 +43,7 @@ export function getOutbreakById(outbreakId, token, dispatch) {
                     if (responseLocations) {
                         console.log('*** getLocationsByOutbreakId response: ');
                         if (responseLocations.length > 0) {
-                            let treeLocationList = mapLocations(responseLocations.filter((e) => {return e.active === true}), null)
+                            let treeLocationList = mapLocations(responseLocations.filter((e) => {return e.active === true}), null);
                             dispatch(storeLocations(treeLocationList));
                         } else {
                             dispatch(storeLocations(responseLocations));

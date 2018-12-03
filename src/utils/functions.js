@@ -244,7 +244,7 @@ export function getNumberOfFilesProcessed() {
     return numberOfFilesProcessed;
 }
 
-export async function processFile (path, type, totalNumberOfFiles, dispatch, isFirstTime) {
+export async function processFile (path, type, totalNumberOfFiles, dispatch, isFirstTime, forceBulk) {
     return new Promise((resolve, reject) => {
         if (path) {
             console.log('Process file: ', type, ' From path: ', path);
@@ -258,7 +258,7 @@ export async function processFile (path, type, totalNumberOfFiles, dispatch, isF
                                 reject("Error while reading file");
                             }
                             if (data) {
-                                if (isFirstTime) {
+                                if (isFirstTime && forceBulk) {
                                     // If is first time processing files, do a bulk insert
                                     processBulkDocs(data, type)
                                         .then((resultBulk) => {
@@ -477,7 +477,7 @@ export function extractIdFromPouchId (pouchId, type) {
         return pouchId
     }
     if (type.includes('referenceData')) {
-        return pouchId.substr('referenceData.json_false_'.length)
+        return pouchId.substr('referenceData.json_'.length)
     }
     return pouchId.split('_')[pouchId.split('_').length - 1];
 }
@@ -485,14 +485,14 @@ export function extractIdFromPouchId (pouchId, type) {
 export function computeIdForFileType (fileType, outbreakId, file, type) {
     switch (fileType) {
         case 'person.json':
-            return (fileType + '_' + type + '_false' + '_' + outbreakId + '_' + generateId());
+            return (fileType + '_' + type + '_' + outbreakId + '_' + generateId());
         case 'followUp.json':
-            return (fileType + '_false_' + outbreakId + '_' + new Date(file.date).getTime() + '_' + generateId());
+            return (fileType + '_' + outbreakId + '_' + new Date(file.date).getTime() + '_' + generateId());
         // return (type + '_' + file.outbreakId + '_' + file._id);
         case 'relationship.json':
-            return (fileType + '_false_' + outbreakId + '_' + generateId());
+            return (fileType + '_' + outbreakId + '_' + generateId());
         default:
-            return (fileType + '_false_' + generateId());
+            return (fileType + '_' + generateId());
     }
 }
 
@@ -508,37 +508,30 @@ export function mapContactsAndRelationships(contacts, relationships) {
     let mappedContacts = contacts;
     for (let i = 0; i < relationships.length; i++) {
         let contactObject = {};
-        if ((relationships[i].persons[0].type === 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT' || relationships[i].persons[0].type === 'contact') && mappedContacts.map((e) => {
-                return extractIdFromPouchId(e._id, 'person')
-            }).indexOf(relationships[i].persons[0].id) > -1) {
 
-            contactObject = Object.assign({}, contacts[contacts.map((e) => {
-                return extractIdFromPouchId(e._id, 'person')
-            }).indexOf(relationships[i].persons[0].id)]);
+        let contactIndexAsFirstPerson = mappedContacts.map((e) => {return extractIdFromPouchId(e._id, 'person')}).indexOf(relationships[i].persons[0].id)
+        let contactIndexAsSecondPerson = mappedContacts.map((e) => {return extractIdFromPouchId(e._id, 'person')}).indexOf(relationships[i].persons[1].id)
+        if ((relationships[i].persons[0].type === 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT' || relationships[i].persons[0].type === 'contact') && contactIndexAsFirstPerson > -1) {
+            contactObject = Object.assign({}, contacts.find((e) => {
+                return extractIdFromPouchId(e._id, 'person') === relationships[i].persons[0].id
+            }))
 
             if (!contactObject.relationships || contactObject.relationships.length === 0) {
                 contactObject.relationships = [];
             }
             contactObject.relationships.push(relationships[i]);
-            mappedContacts[mappedContacts.map((e) => {
-                return extractIdFromPouchId(e._id, 'person')
-            }).indexOf(relationships[i].persons[0].id)] = contactObject;
+            mappedContacts[contactIndexAsFirstPerson] = contactObject;
         } else {
-            if ((relationships[i].persons[1].type === 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT' || relationships[i].persons[1].type === 'contact') && mappedContacts.map((e) => {
-                    return extractIdFromPouchId(e._id, 'person')
-                }).indexOf(relationships[i].persons[1].id) > -1) {
-
-                contactObject = Object.assign({}, contacts[contacts.map((e) => {
-                    return extractIdFromPouchId(e._id, 'person')
-                }).indexOf(relationships[i].persons[1].id)]);
+            if ((relationships[i].persons[1].type === 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT' || relationships[i].persons[1].type === 'contact') && contactIndexAsSecondPerson > -1) {
+                contactObject = Object.assign({}, contacts.find((e) => {
+                    return extractIdFromPouchId(e._id, 'person') === relationships[i].persons[1].id
+                }))
 
                 if (!contactObject.relationships || contactObject.relationships.length === 0) {
                     contactObject.relationships = [];
                 }
                 contactObject.relationships.push(relationships[i]);
-                mappedContacts[mappedContacts.map((e) => {
-                    return extractIdFromPouchId(e._id, 'person')
-                }).indexOf(relationships[i].persons[1].id)] = contactObject;
+                mappedContacts[contactIndexAsSecondPerson] = contactObject;
             }
         }
     }
@@ -554,14 +547,20 @@ export function mapContactsAndFollowUps(contacts, followUps) {
 
     let mappedContacts = [];
     for (let i=0; i < followUps.length; i++) {
-        if (mappedContacts.map((e) => { return extractIdFromPouchId(e._id, 'person') }).indexOf(followUps[i].personId) === -1) {
+        // Review Anda si devine in singur indexOf
+
+        let contactPersonIndex = mappedContacts.map((e) => {return extractIdFromPouchId(e._id, 'person')}).indexOf(followUps[i].personId)
+        if (contactPersonIndex === -1) {
             let contactObject = {};
-            contactObject = Object.assign({}, contacts[contacts.map((e) => {return extractIdFromPouchId(e._id, 'person')}).indexOf(followUps[i].personId)]);
+            contactObject = Object.assign({}, contacts.find((e) => {
+                return extractIdFromPouchId(e._id, 'person') === followUps[i].personId
+            }))
+                
             contactObject.followUps = [];
             contactObject.followUps.push(followUps[i]);
             mappedContacts.push(contactObject);
         } else {
-            mappedContacts[mappedContacts.map((e) => {return extractIdFromPouchId(e._id, 'person')}).indexOf(followUps[i].personId)].followUps.push(followUps[i]);
+            mappedContacts[contactPersonIndex].followUps.push(followUps[i]);
         }
     }
     // console.log ('mapContactsAndFollowUps mappedContacts', JSON.stringify(mappedContacts))
@@ -671,7 +670,7 @@ export function mapQuestions (questions) {
             if (mappedQuestions.map((e) => {return e.categoryName}).indexOf(questions[i].category) === -1) {
                 mappedQuestions.push({categoryName: questions[i].category, questions: [questions[i]]});
             } else {
-                if (mappedQuestions && Array.isArray(mappedQuestions) && mappedQuestions.length > 0 && mappedQuestions.map((e) => {
+                if (mappedQuestions && Array.isArray(mappedQuestions) && mappedQuestions.length > 0 && mappedQuestions.map((e )=> {
                         return e.categoryName
                     }).indexOf(questions[i].category) > -1 && mappedQuestions[mappedQuestions.map((e) => {
                         return e.categoryName

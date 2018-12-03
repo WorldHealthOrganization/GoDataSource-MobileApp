@@ -33,7 +33,7 @@ class CaseSingleInvestigationContainer extends PureComponent {
 
         // mappedQuestions format: [{categoryName: 'cat1', questions: [{q1}, {q2}]}]
         sortedQuestions = mapQuestions(sortedQuestions);
-        sortedQuestions = sortBy(sortedQuestions, ['categoryName']);
+        // sortedQuestions = sortBy(sortedQuestions, ['categoryName']);
         for (let i=0; i<sortedQuestions.length; i++) {
             sortedQuestions[i].questions = sortBy(sortedQuestions[i].questions, ['order', 'variable']);
         }
@@ -48,7 +48,7 @@ class CaseSingleInvestigationContainer extends PureComponent {
                     <View style={{flexDirection: 'row'}}>
                     {
                         this.props.isNew ? (
-                            <View style={{flexDirection: 'row'}}>
+                            <View style={{flexDirection: 'row', width: '90%', alignItems: 'center'}}>
                                 <Button
                                 title={'Back'}
                                 onPress={this.handleBackButton}
