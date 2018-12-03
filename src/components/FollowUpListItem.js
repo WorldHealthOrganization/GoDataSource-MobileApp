@@ -6,7 +6,7 @@
 import React, {PureComponent} from 'react';
 import {TextInput, View, Text, StyleSheet, Platform, Dimensions, Image, InteractionManager} from 'react-native';
 import {ListItem, Icon} from 'react-native-material-ui';
-import {calculateDimension, handleExposedTo, getAddress, extractIdFromPouchId} from './../utils/functions';
+import {calculateDimension, handleExposedTo, getAddress, extractIdFromPouchId, getTranslation} from './../utils/functions';
 import config from './../utils/config';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -16,6 +16,7 @@ import styles from './../styles';
 import Ripple from 'react-native-material-ripple';
 import ElevatedView from 'react-native-elevated-view';
 import _ from 'lodash';
+import translations from './../utils/translations'
 
 class FollowUpListItem extends PureComponent {
 
@@ -143,17 +144,17 @@ class FollowUpListItem extends PureComponent {
                 <View style={styles.lineStyle}/>
                 <View style={[style.thirdSectionContainer, {marginHorizontal: calculateDimension(14, false, this.props.screenSize)}]}>
                     <Ripple style={[style.rippleStyle]} onPress={this.onPressFollowUp}>
-                        <Text style={[style.rippleTextStyle]}>{this.props.firstActionText || 'FOLLOW-UP'}</Text>
+                        <Text style={[style.rippleTextStyle]}>{this.props.firstActionText || getTranslation(translations.followUpsScreen.editFollowUpLabel, this.props.translation).toUpperCase()}</Text>
                     </Ripple>
                     {
                         this.props.isContact ? (
                             <Ripple style={[style.rippleStyle]} onPress={this.onPressMissing}>
-                                <Text style={[style.rippleTextStyle]}>{this.props.secondActionText || 'MISSING'}</Text>
+                                <Text style={[style.rippleTextStyle]}>{this.props.secondActionText || getTranslation(translations.followUpsScreen.missingFollowUpLabel, this.props.translation).toUpperCase()}</Text>
                             </Ripple>
                         ) : (null)
                     }
                     <Ripple style={[style.rippleStyle]} onPress={this.onPressExposure}>
-                        <Text style={[style.rippleTextStyle]}>{this.props.thirdActionText || 'ADD EXPOSURE'}</Text>
+                        <Text style={[style.rippleTextStyle]}>{this.props.thirdActionText || getTranslation(translations.followUpsScreen.addExposureFollowUpLabel, this.props.translation).toUpperCase()}</Text>
                     </Ripple>
                 </View>
             </ElevatedView>

@@ -6,13 +6,14 @@ import {TextInput, View, Text, StyleSheet, Platform, Dimensions} from 'react-nat
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import {ListItem, Icon, Button} from 'react-native-material-ui';
-import {calculateDimension} from './../utils/functions';
+import {calculateDimension, getTranslation} from './../utils/functions';
 import config from './../utils/config';
 import Calendar from "react-native-calendars/src/calendar/index";
 import Modal from 'react-native-root-modal';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import ElevatedView from 'react-native-elevated-view';
+import translations from './../utils/translations'
 
 class CalendarPickerView extends PureComponent {
 
@@ -91,7 +92,8 @@ const style = StyleSheet.create({
 
 function mapStateToProps(state) {
     return {
-        screenSize: state.app.screenSize
+        screenSize: state.app.screenSize,
+        translation: state.app.translation
     };
 }
 

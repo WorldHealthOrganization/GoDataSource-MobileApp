@@ -22,6 +22,8 @@ import url from './../utils/url';
 import Ripple from 'react-native-material-ripple';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { DocumentPicker, DocumentPickerUtil } from 'react-native-document-picker';
+import translations from './../utils/translations'
+import {getTranslation} from './../utils/functions';
 
 class FirstConfigScreen extends Component {
 
@@ -42,7 +44,8 @@ class FirstConfigScreen extends Component {
         if (props.errors && props.errors.type && props.errors.message) {
             Alert.alert(props.errors.type, props.errors.message, [
                 {
-                    text: 'Ok', onPress: () => {props.removeErrors()}
+                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation), 
+                    onPress: () => {props.removeErrors()}
                 }
             ])
         }
@@ -67,13 +70,17 @@ class FirstConfigScreen extends Component {
                     ) : (null)
                 }
                 <View style={[style.welcomeTextContainer]}>
-                    <Text style={style.welcomeText}>Welcome!</Text>
+                    <Text style={style.welcomeText}>
+                        {getTranslation(translations.firstConfigScreen.welcomeMessage, this.props.translation)}
+                    </Text>
                 </View>
                 <View style={style.inputsContainer}>
-                    <Text style={style.text}>Choose one of the options below to sync with your HUB:</Text>
-                    <Button onPress={this.handlePressScanQR} upperCase={false} icon="photo-camera" raised text="Scan QR code" style={styles.buttonLogin} />
+                    <Text style={style.text}>
+                        {getTranslation(translations.firstConfigScreen.infoMessage, this.props.translation)}
+                    </Text>
+                    <Button onPress={this.handlePressScanQR} upperCase={false} icon="photo-camera" raised text={getTranslation(translations.firstConfigScreen.qrScanButton, this.props.translation)} style={styles.buttonLogin} />
                     {/*<Button onPress={this.handlePressImport} upperCase={false} icon={<MaterialCommunityIcons size={24} name="download" />} raised text="Import config file" style={styles.buttonLogin} />*/}
-                    <Button onPress={this.handlePressManual} upperCase={false} icon="short-text" raised text="Configure manually" style={styles.buttonLogin} />
+                    <Button onPress={this.handlePressManual} upperCase={false} icon="short-text" raised text={getTranslation(translations.firstConfigScreen.manualConfigButton, this.props.translation)} style={styles.buttonLogin} />
                 </View>
                 <View style={style.logoContainer}>
                     <Image source={{uri: 'logo_app'}} style={style.logoStyle} />
@@ -177,7 +184,8 @@ const style = StyleSheet.create({
 function mapStateToProps(state) {
     return {
         screenSize: state.app.screenSize,
-        errors: state.errors
+        errors: state.errors,
+        translation: state.app.translation
     };
 }
 

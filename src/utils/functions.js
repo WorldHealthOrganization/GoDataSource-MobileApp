@@ -691,6 +691,16 @@ export function mapQuestions (questions) {
     return mappedQuestions;
 };
 
+export function getTranslation (value, allTransactions) {
+    let valueToBeReturned = value;
+    if (value && typeof value === 'string' && value.includes('LNG')) {
+        valueToBeReturned = value && allTransactions && Array.isArray(allTransactions) && allTransactions[allTransactions.map((e) => {return e && e.token ? e.token : null}).indexOf(value)] ? allTransactions[allTransactions.map((e) => {
+            return e.token
+        }).indexOf(value)].translation : '';
+    }
+    return valueToBeReturned;
+}
+
 export function localSortContactsForFollowUps (contactsCopy, propsFilter, stateFilter, filterFromFilterScreen) {
     if (propsFilter && (propsFilter['FollowUpsFilterScreen'] || propsFilter['FollowUpsScreen'])) {
         // Take care of search filter

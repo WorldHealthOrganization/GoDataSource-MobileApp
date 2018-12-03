@@ -30,7 +30,8 @@ import Section from './Section';
 import Selector from './Selector';
 import IntervalPicker from './IntervalPicker';
 import ActionsBar from './ActionsBar';
-
+import translations from './../utils/translations'
+import {getTranslation} from './../utils/functions';
 
 class CardComponent extends Component {
 
@@ -417,6 +418,7 @@ class CardComponent extends Component {
                         hasBorderBottom={item.hasBorderBottom}
                         borderBottomColor={item.borderBottomColor}
                         containerStyle={{height: calculateDimension(54, true, this.props.screenSize)}}
+                        translation={this.props.translation}
                     />
                 );
             case 'TextInput':
@@ -433,6 +435,9 @@ class CardComponent extends Component {
                         style={{width: width, marginHorizontal: marginHorizontal}}
                         objectType={item.objectType}
                         keyboardType={item.keyboardType}
+                        translation={this.props.translation}
+                        hasTooltip={item.hasTooltip}
+                        tooltipMessage={item.tooltipMessage}
                     />
                 );
             case 'DropdownInput':
@@ -449,6 +454,7 @@ class CardComponent extends Component {
                         onChange={this.props.onChangeDropDown}
                         style={{width: width, marginHorizontal: marginHorizontal}}
                         objectType={item.objectType}
+                        translation={this.props.translation}
                     />
                 );
             case 'DropDown':
@@ -456,7 +462,7 @@ class CardComponent extends Component {
                     <DropDown
                         key={item.id}
                         id={item.id}
-                        label={'Select answer(s)'}
+                        label={translations.dropDownLabels.selectedAnswersLabel}
                         labelValue={item.label}
                         value={value}
                         data={data}
@@ -503,6 +509,7 @@ class CardComponent extends Component {
                         activeBackgroundColor={item.activeBackgroundColor}
                         style={{justifyContent: 'space-between', width: width, marginHorizontal: marginHorizontal}}
                         objectType={item.objectType}
+                        translation={this.props.translation}
                     />
                 );
             case 'DatePicker':
@@ -519,6 +526,7 @@ class CardComponent extends Component {
                         maximumDate={maximumDate}
                         style={{width: width, marginHorizontal: marginHorizontal}}
                         objectType={item.objectType}
+                        translation={this.props.translation}
                     />
                 );
             case 'Selector':
@@ -556,6 +564,7 @@ class CardComponent extends Component {
                         onPressArray={item.onPressArray}
                         containerTextStyle={{width, marginHorizontal, height: calculateDimension(46, true, this.props.screenSize)}}
                         isEditMode = {this.props.isEditMode !== undefined && this.props.isEditMode !== null ? this.props.isEditMode : true}
+                        translation={this.props.translation}
                     />
                 );
             case 'TextSwitchSelector':
@@ -567,6 +576,7 @@ class CardComponent extends Component {
                         values={item.values}
                         isEditMode = {this.props.isEditMode}
                         style={{width: width, marginHorizontal: marginHorizontal}}
+                        translation={this.props.translation}
                     />
                 );
             case 'TextInputWithDropDown':
@@ -587,6 +597,7 @@ class CardComponent extends Component {
                         onChangeDropDown={this.props.onChangeTextSwitchSelector}
                         selectedDropDownItemIndex={this.props[item.selectedItemIndexForAgeUnitOfMeasureDropDown]}
                         selectedItemIndexForAgeUnitOfMeasureDropDown ={item.selectedItemIndexForAgeUnitOfMeasureDropDown}
+                        translation={this.props.translation}
                     />
                 )
             default:

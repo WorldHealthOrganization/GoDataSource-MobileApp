@@ -12,7 +12,7 @@ import {calculateDimension} from './../utils/functions';
 import config from './../utils/config';
 import {connect} from "react-redux";
 import Button from './../components/Button';
-import {extractIdFromPouchId} from './../utils/functions';
+import {extractIdFromPouchId, getTranslation} from './../utils/functions';
 import {bindActionCreators} from "redux";
 import styles from './../styles';
 import ElevatedView from 'react-native-elevated-view';
@@ -21,6 +21,7 @@ import AnimatedListView from './../components/AnimatedListView';
 import GeneralListItem from '../components/GeneralListItem';
 import Ripple from 'react-native-material-ripple';
 import moment from 'moment';
+import translations from './../utils/translations'
 
 const scrollAnim = new Animated.Value(0);
 const offsetAnim = new Animated.Value(0);
@@ -94,7 +95,7 @@ class ContactsSingleExposures extends Component {
                 <View style = {{alignItems: 'center'}}>
                     <View style={{flexDirection: 'row'}}>
                         <Button
-                            title={'Back'}
+                            title={getTranslation(translations.generalButtons.backButtonLabel, this.props.translation)}
                             onPress={this.handleBackButton}
                             color={styles.buttonGreen}
                             titleColor={'white'}
@@ -105,7 +106,7 @@ class ContactsSingleExposures extends Component {
                                 marginHorizontal: calculateDimension(16, false, this.props.screenSize),
                         }}/>
                         <Button
-                            title={'Save'}
+                            title={getTranslation(translations.generalButtons.saveButtonLabel, this.props.translation)}
                             onPress={this.props.handleOnPressSave}
                             color={styles.buttonGreen}
                             titleColor={'white'}
@@ -154,7 +155,7 @@ class ContactsSingleExposures extends Component {
                 primaryText={primaryText}
                 secondaryText={secondaryText}
                 hasActionsBar={true}
-                textsArray={['Edit', 'Delete']}
+                textsArray={[getTranslation(translations.generalButtons.editButtonLabel, this.props.translation), getTranslation(translations.generalButtons.deleteButtonLabel, this.props.translation)]}
                 textsStyleArray={[
                     {
                         marginLeft: calculateDimension(14, false, this.props.screenSize),
@@ -171,6 +172,7 @@ class ContactsSingleExposures extends Component {
                 ]}
                 onPressArray={[() => {this.props.onPressEditExposure(relation.item, relation.index)}, () => {this.props.onPressDeleteExposure(relation.item, relation.index)}]}
                 containerStyle={{flex: 1, height: '100%', marginHorizontal: calculateDimension(16, false, this.props.screenSize)}}
+                translation={this.props.translation}
             />
         )
     };

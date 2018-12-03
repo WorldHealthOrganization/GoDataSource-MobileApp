@@ -4,6 +4,8 @@
 import React, {PureComponent} from 'react';
 import {View, Text, StyleSheet} from 'react-native';
 import PropTypes from 'prop-types';
+import translations from './../utils/translations'
+import {getTranslation} from './../utils/functions';
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import { Dropdown } from 'react-native-material-dropdown';
@@ -35,7 +37,7 @@ class DropdownInput extends PureComponent {
             <View style={[{
             }, this.props.style]}>
                 <Dropdown
-                    label={this.props.isRequired ? this.props.label + ' * ' : this.props.label}
+                    label={this.props.isRequired ? getTranslation(this.props.label, this.props.translation) + ' * ' : getTranslation(this.props.label, this.props.translation)}
                     data={this.props.data}
                     value={this.props.value || ''}
                     fontSize={15}
@@ -60,7 +62,7 @@ class DropdownInput extends PureComponent {
                     color: 'rgb(0,0,0)',
                     marginBottom: 7.5
                 }}>
-                    {this.props.label}
+                    {getTranslation(this.props.label, this.props.translation)}
                 </Text>
                 <Text style={{
                     fontFamily: 'Roboto-Light',

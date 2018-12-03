@@ -5,9 +5,15 @@ import React, {PureComponent} from 'react';
 import {View, Text, StyleSheet} from 'react-native';
 import {Icon} from 'react-native-material-ui';
 import PropTypes from 'prop-types';
+import translations from './../utils/translations'
+import {getTranslation, calculateDimension} from './../utils/functions';
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import { TextField } from 'react-native-material-textfield';
+import ElevatedView from 'react-native-elevated-view';
+import Ripple from 'react-native-material-ripple';
+import styles from './../styles';
+import TooltipComponent from './TooltipComponent'
 
 class TextInput extends PureComponent {
 
@@ -33,26 +39,34 @@ class TextInput extends PureComponent {
     // Please write here all the methods that are not react native lifecycle methods
     editInput = () => {
         return (
-            <View style={[{
-            },this.props.style]}>
-                <TextField
-                    label={this.props.isRequired ? this.props.label + ' * ' : this.props.label}
-                    value={typeof this.props.value === 'number' ? isNaN(this.props.value) ? '' : this.props.value.toString() : this.props.value && this.props.value != undefined && (typeof this.props.value === 'string' || typeof this.props.value === 'number') ? this.props.value.toString() : ''}
-                    onChangeText={this.handleOnChangeText}
-                    textColor='rgb(0,0,0)'
-                    fontSize={15}
-                    labelFontSize={12.5}
-                    labelHeight={30}
-                    labelTextStyle={{
-                        fontFamily: 'Roboto',
-                        textAlign: 'left'
-                    }}
-                    tintColor='rgb(77,176,160)'
-                    multiline={this.props.multiline != undefined ? this.props.multiline : false}
-                    onPress={() => {console.log("On press textInput")}}
-                    keyboardType={this.props.keyboardType ? this.props.keyboardType : 'default'}
-                    onSubmitEditing={this.props.onSubmitEditing}
-                />
+            <View style={[{flexDirection: 'row'},this.props.style]}>
+                <View style={{flex: 1}}> 
+                    <TextField
+                        label={this.props.isRequired ? getTranslation(this.props.label, this.props.translation) + ' * ' : getTranslation(this.props.label, this.props.translation)}
+                        value={typeof this.props.value === 'number' ? isNaN(this.props.value) ? '' : this.props.value.toString() : this.props.value && this.props.value != undefined && (typeof this.props.value === 'string' || typeof this.props.value === 'number') ? this.props.value.toString() : ''}
+                        onChangeText={this.handleOnChangeText}
+                        textColor='rgb(0,0,0)'
+                        fontSize={15}
+                        labelFontSize={12.5}
+                        labelHeight={30}
+                        labelTextStyle={{
+                            fontFamily: 'Roboto',
+                            textAlign: 'left'
+                        }}
+                        tintColor='rgb(77,176,160)'
+                        multiline={this.props.multiline != undefined ? this.props.multiline : false}
+                        onPress={() => {console.log("On press textInput")}}
+                        keyboardType={this.props.keyboardType ? this.props.keyboardType : 'default'}
+                        onSubmitEditing={this.props.onSubmitEditing}
+                    />
+                </View>
+                {
+                    this.props.hasTooltip !== undefined && this.props.hasTooltip !== null && this.props.hasTooltip === true ? (
+                        <TooltipComponent
+                            tooltipMessage={this.props.tooltipMessage}
+                        />
+                    ) : null
+                }
             </View>
         );
     };
@@ -60,25 +74,34 @@ class TextInput extends PureComponent {
     viewInput = () => {
         let localValue = this.extractAgeForViewInput()
         return (
-            <View style={[{},this.props.style]}>
-                <Text style={{
-                    fontFamily: 'Roboto-Regular',
-                    fontSize: 15,
-                    lineHeight: 30,
-                    textAlign: 'left',
-                    color: 'rgb(0,0,0)',
-                    marginBottom: 7.5
-                }}>
-                    {this.props.label}
-                </Text>
-                <Text style={{
-                    fontFamily: 'Roboto-Light',
-                    fontSize: 12.5,
-                    textAlign: 'left',
-                    color: 'rgb(60,60,60)',
-                }}>
-                    {localValue}
-                </Text>
+            <View style={[{flexDirection: 'row'},this.props.style]}>
+                <View style={{flex: 1}}>
+                    <Text style={{
+                        fontFamily: 'Roboto-Regular',
+                        fontSize: 15,
+                        lineHeight: 30,
+                        textAlign: 'left',
+                        color: 'rgb(0,0,0)',
+                        marginBottom: 7.5
+                    }}>
+                        {getTranslation(this.props.label, this.props.translation)}
+                    </Text>
+                    <Text style={{
+                        fontFamily: 'Roboto-Light',
+                        fontSize: 12.5,
+                        textAlign: 'left',
+                        color: 'rgb(60,60,60)',
+                    }}>
+                        {localValue}
+                    </Text>
+                </View>
+                {
+                    this.props.hasTooltip !== undefined && this.props.hasTooltip !== null && this.props.hasTooltip === true ? (
+                        <TooltipComponent
+                            tooltipMessage={this.props.tooltipMessage}
+                        />
+                    ) : null
+                }
             </View>
         );
     }
@@ -122,7 +145,7 @@ class TextInput extends PureComponent {
 
 // Create style outside the class, or for components that will be used by other components (buttons),
 // make a global style in the config directory
-const styles = StyleSheet.create({
+const style = StyleSheet.create({
     editLabel: {
 
     },

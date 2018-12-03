@@ -5,7 +5,7 @@
 // the material ui library, since it provides design and animations out of the box
 import React, {PureComponent} from 'react';
 import {View, StyleSheet, InteractionManager, Alert, TouchableWithoutFeedback, Keyboard} from 'react-native';
-import {calculateDimension, extractAllQuestions, mapQuestions} from './../utils/functions';
+import {calculateDimension, extractAllQuestions, mapQuestions, getTranslation} from './../utils/functions';
 import config from './../utils/config';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -16,6 +16,7 @@ import Button from './../components/Button';
 import {LoaderScreen} from 'react-native-ui-lib';
 import Section from './../components/Section';
 import {sortBy} from 'lodash';
+import translations from './../utils/translations'
 
 class FollowUpsSingleQuestionnaireContainer extends PureComponent {
 
@@ -88,7 +89,7 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
                         this && this.props && this.props.isEditMode ? (
                             <View style={[style.containerButtons, {marginVertical: marginVertical, width: viewWidth}]}>
                                 <Button
-                                    title={'Save'}
+                                    title={getTranslation(translations.generalButtons.saveButtonLabel, this.props.translation)}
                                     onPress={this.onPressSave}
                                     color={styles.buttonGreen}
                                     titleColor={'white'}
@@ -130,6 +131,7 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
                     containerStyle={{
                         marginVertical: 10
                     }}
+                    translation={this.props.translation}
                 />
                 {
                     item.questions.map((item, index) => {
@@ -160,13 +162,12 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
         if (this.checkRequiredQuestions()) {
             this.props.onPressSave();
         } else {
-            Alert.alert('Validation error', 'Please make sure you have completed all required fields',
-                [
-                    {
-                        text: 'Ok', onPress: () => {console.log('Ok pressed checkRequiredQuestions')}
-                    }
-                ]
-            )
+            Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.requiredFieldsMissingError, this.props.translation), [
+                {
+                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation), 
+                    onPress: () => {console.log("OK pressed")}
+                }
+            ])
         }
     };
 

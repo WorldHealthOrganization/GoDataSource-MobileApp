@@ -8,7 +8,7 @@ import {View, Text, StyleSheet, Platform, Animated} from 'react-native';
 import {Button} from 'react-native-material-ui';
 import styles from './../styles';
 import NavBarCustom from './../components/NavBarCustom';
-import {extractIdFromPouchId} from './../utils/functions';
+import {extractIdFromPouchId, getTranslation} from './../utils/functions';
 import config from './../utils/config';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -17,6 +17,7 @@ import {addFilterForScreen, removeFilterForScreen} from './../actions/app';
 import {TabBar, TabView} from 'react-native-tab-view';
 import FollowUpsFiltersContainer from './../containers/FollowUpsFiltersContainer';
 import FollowUpsSortContainer from './../containers/FollowUpsSortContainer';
+import translations from './../utils/translations';
 import _ from 'lodash';
 
 class FollowUpsFilterScreen extends Component {
@@ -73,7 +74,7 @@ class FollowUpsFilterScreen extends Component {
         return (
             <View style={style.container}>
                 <NavBarCustom
-                    title={this.props.screen === 'ContactsFilterScreen' ? 'Contacts filters' : 'Follow-ups filters'}
+                    title={this.props.screen === 'ContactsFilterScreen' ? getTranslation(translations.followUpFilter.contactFilterTitle, this.props.translation) : getTranslation(translations.followUpFilter.followUpsFilterTitle, this.props.translation)}
                     navigator={this.props.navigator}
                     iconName="close"
                     handlePressNavbarButton={this.handlePressNavbarButton}
@@ -216,7 +217,7 @@ class FollowUpsFilterScreen extends Component {
                 flex: 1,
                 alignSelf: 'center'
             }}>
-                {route.title}
+                {getTranslation(route.title, this.props.translation).toUpperCase()}
             </Animated.Text>
         );
     }
@@ -296,7 +297,8 @@ function mapStateToProps(state) {
     return {
         user: state.user,
         screenSize: state.app.screenSize,
-        followUps: state.followUps
+        followUps: state.followUps,
+        translation: state.app.translation
     };
 }
 

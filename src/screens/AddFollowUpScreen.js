@@ -13,7 +13,7 @@ import styles from './../styles';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import ElevatedView from 'react-native-elevated-view';
-import {calculateDimension} from './../utils/functions';
+import {calculateDimension, getTranslation} from './../utils/functions';
 import config from './../utils/config';
 import Section from './../components/Section';
 import DropdownInput from './../components/DropdownInput';
@@ -21,6 +21,7 @@ import DatePicker from './../components/DatePicker';
 import {Dialog} from 'react-native-ui-lib';
 import {getContactsForOutbreakIdRequest} from './../queries/contacts';
 import DropdownSearchable from './../components/DropdownSearchable';
+import translations from './../utils/translations'
 
 class AddFollowUpScreen extends PureComponent{
 
@@ -47,7 +48,6 @@ class AddFollowUpScreen extends PureComponent{
         // })
     }
 
-
     render () {
         let contentWidth = calculateDimension(297, false, this.props.screenSize);
         let marginHorizontal = calculateDimension(14, false, this.props.screenSize);
@@ -69,26 +69,30 @@ class AddFollowUpScreen extends PureComponent{
                         justifyContent: 'space-around'
                     }}>
                     <Section
-                        label="Add Follow-ups"
+                        label={getTranslation(translations.addFollowUpScreen.addFollowUpLabel, this.props.translation)}
                         hasBorderBottom={false}
                         containerStyle={{width: '100%', flex: 0.15}}
+                        translation={this.props.translation}
                     />
                     <DropdownSearchable
                         outbreakId={this.props && this.props.user && this.props.user.activeOutbreakId ? this.props.user.activeOutbreakId : null}
                         onChange={this.onDropdownSearchableChanged}
+                        placeholder={getTranslation(translations.addFollowUpScreen.searchContactPlacehodler, this.props.translation)}
+                        translation={this.props.translation}
                     />
                     <DatePicker
                         id='followUpDate'
-                        label={"Follow-up date"}
+                        label={getTranslation(translations.addFollowUpScreen.followUpDateLabel, this.props.translation)}
                         value={this.state.date}
                         isEditMode={true}
                         isRequired={false}
                         onChange={this.onDateChanged}
                         style={{width: contentWidth, marginHorizontal}}
+                        translation={this.props.translation}
                     />
                     <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-evenly'}}>
                         <Button
-                            title="Cancel"
+                            title={getTranslation(translations.generalButtons.cancelButtonLabel, this.props.translation)}
                             color="white"
                             titleColor={"black"}
                             onPress={this.onCancelPressed}
@@ -96,7 +100,7 @@ class AddFollowUpScreen extends PureComponent{
                             width="40%"
                         />
                         <Button
-                            title="Save"
+                            title={getTranslation(translations.generalButtons.saveButtonLabel, this.props.translation)}
                             color={styles.buttonGreen}
                             titleColor={'white'}
                             onPress={this.onSavePressed}
@@ -178,7 +182,8 @@ function mapStateToProps(state) {
     return {
         user: state.user,
         screenSize: state.app.screenSize,
-        contacts: state.contacts
+        contacts: state.contacts,
+        translation: state.app.translation
     };
 }
 

@@ -16,8 +16,9 @@ import config from './../utils/config';
 import CardComponent from './../components/CardComponent';
 import Ripple from 'react-native-material-ripple';
 import {removeErrors} from './../actions/errors';
-import {calculateDimension, extractIdFromPouchId, updateRequiredFields} from './../utils/functions';
+import {calculateDimension, extractIdFromPouchId, updateRequiredFields, getTranslation} from './../utils/functions';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import translations from './../utils/translations'
 
 class ExposureScreen extends Component {
 
@@ -77,10 +78,11 @@ class ExposureScreen extends Component {
         if (props.errors && props.errors.type && props.errors.message) {
             Alert.alert(props.errors.type, props.errors.message, [
                 {
-                    text: 'Ok', onPress: () => {
-                    state.savePressed = false;
-                    props.removeErrors()
-                }
+                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+                    onPress: () => {
+                        state.savePressed = false;
+                        props.removeErrors()
+                    }
                 }
             ])
         } else {
@@ -134,7 +136,7 @@ class ExposureScreen extends Component {
                                 }}
                             >
                                 <Text style={[style.title, {marginLeft: 30}]}>
-                                    {this.props.exposure ? "Edit exposure" : "Add exposure"}
+                                    {this.props.exposure ? getTranslation(translations.exposureScreen.editExposureLabel, this.props.translation) : getTranslation(translations.exposureScreen.addExposureLabel, this.props.translation)}
                                 </Text>
                             </View>
                         }
@@ -146,7 +148,7 @@ class ExposureScreen extends Component {
                     <View style={style.containContainer}>
                         <View style={{flexDirection: 'row'}}>
                                 <Button
-                                    title={'Save'}
+                                    title={getTranslation(translations.generalButtons.saveButtonLabel, this.props.translation)}
                                     onPress={this.handleSaveExposure}
                                     color={styles.buttonGreen}
                                     titleColor={'white'}
@@ -282,9 +284,10 @@ class ExposureScreen extends Component {
                 this.props.addExposureForContact(this.props.user.activeOutbreakId, this.props.contact.id, this.state.exposure, this.props.user.token);
             }
         } else {
-            Alert.alert("Missing fields error", "Please make sure you have completed all the required fields", [
+            Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.requiredFieldsMissingError, this.props.translation), [
                 {
-                    text: 'Ok', onPress: () => {console.log("Ok pressed")}
+                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+                    onPress: () => {console.log("Ok pressed")}
                 }
             ])
         }
@@ -325,9 +328,10 @@ class ExposureScreen extends Component {
                 }
             });
         } else {
-            Alert.alert("Missing fields error", "Please make sure you have completed all the required fields", [
+            Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.requiredFieldsMissingError, this.props.translation), [
                 {
-                    text: 'Ok', onPress: () => {console.log("Ok pressed")}
+                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+                    onPress: () => {console.log("Ok pressed")}
                 }
             ])
         }
@@ -397,7 +401,8 @@ function mapStateToProps(state) {
         user: state.user,
         screenSize: state.app.screenSize,
         errors: state.errors,
-        contacts: state.contacts
+        contacts: state.contacts,
+        translation: state.app.translation
     };
 }
 

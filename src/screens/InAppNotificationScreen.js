@@ -4,6 +4,9 @@
 import React, { Component } from 'react';
 import { View, ActivityIndicator, Text, Platform, Dimensions } from 'react-native';
 import styles from './../styles';
+import translations from './../utils/translations'
+import {getTranslation} from './../utils/functions';
+
 
 class InAppNotificationScreen extends Component {
 
@@ -32,7 +35,7 @@ class InAppNotificationScreen extends Component {
                         fontSize: 15
                     }}
                     numberOfLines={1}
-                >{this.props.number + " generated follow-ups. "}</Text>
+                >{this.props.number + ' ' + getTranslation(translations.inAppNotificationScreen.generatedFollowUps, this.props.translation)}</Text>
             </View>
         )
     }

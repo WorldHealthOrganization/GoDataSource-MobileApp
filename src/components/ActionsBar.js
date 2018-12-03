@@ -8,11 +8,13 @@ import React, {PureComponent} from 'react';
 import {View, Text, StyleSheet, PixelRatio} from 'react-native';
 import PropTypes from 'prop-types';
 import Ripple from 'react-native-material-ripple';
+import translations from './../utils/translations'
+import {getTranslation} from './../utils/functions';
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import styles from './../styles';
 
-ActionsBar = ({textsArray, addressIndex, textsStyleArray, onPressArray, hasBorder, borderColor, containerStyle, containerTextStyle, isEditMode}) => (
+ActionsBar = ({textsArray, addressIndex, textsStyleArray, onPressArray, hasBorder, borderColor, containerStyle, containerTextStyle, isEditMode, translation}) => (
     <View style={[style.containerStyle, containerStyle]}>
         <View style={[style.separatorStyle, {backgroundColor: borderColor, display: hasBorder ? 'flex' : 'none'}]}/>
         {
@@ -29,7 +31,9 @@ ActionsBar = ({textsArray, addressIndex, textsStyleArray, onPressArray, hasBorde
                                     textsStyleArray && Array.isArray(textsStyleArray) &&
                                     textsStyleArray[index] ? textsStyleArray[index] : style.textStyle]}
                                     numberOfLines={1}
-                                >{text}</Text>
+                                >
+                                    {getTranslation(text, translation)}
+                                </Text>
                             </Ripple>
                         )
                     })

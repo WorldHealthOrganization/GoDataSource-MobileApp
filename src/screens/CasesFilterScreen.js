@@ -8,7 +8,7 @@ import {View, Text, StyleSheet, Platform, Animated} from 'react-native';
 import {Button} from 'react-native-material-ui';
 import styles from './../styles';
 import NavBarCustom from './../components/NavBarCustom';
-import {extractIdFromPouchId} from './../utils/functions';
+import {extractIdFromPouchId, getTranslation} from './../utils/functions';
 import config from './../utils/config';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -16,6 +16,7 @@ import {addFilterForScreen, removeFilterForScreen} from './../actions/app';
 import {TabBar, TabView, PagerScroll} from 'react-native-tab-view';
 import CasesFiltersContainer from './../containers/CasesFiltersContainer';
 import CasesSortContainer from './../containers/CasesSortContainer';
+import translations from './../utils/translations';
 import _ from 'lodash';
 
 class CasesFilterScreen extends Component {
@@ -74,7 +75,7 @@ class CasesFilterScreen extends Component {
         return (
             <View style={style.container}>
                 <NavBarCustom
-                    title="Cases filters"
+                    title={getTranslation(translations.casesFilter.casesFilterTitle, this.props.translation)}
                     navigator={this.props.navigator}
                     iconName="close"
                     handlePressNavbarButton={this.handlePressNavbarButton}
@@ -224,7 +225,7 @@ class CasesFilterScreen extends Component {
                 flex: 1,
                 alignSelf: 'center'
             }}>
-                {route.title}
+                {getTranslation(route.title, this.props.translation).toUpperCase()}
             </Animated.Text>
         );
     };
@@ -312,7 +313,8 @@ function mapStateToProps(state) {
     return {
         user: state.user,
         screenSize: state.app.screenSize,
-        cases: state.cases
+        cases: state.cases,
+        translation: state.app.translation
     };
 };
 

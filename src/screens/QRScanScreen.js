@@ -4,6 +4,8 @@ import { connect } from 'react-redux';
 import {bindActionCreators} from "redux";
 import NavBarCustom from './../components/NavBarCustom';
 import styles from './../styles';
+import {getTranslation} from './../utils/functions';
+import translations from './../utils/translations'
 
 import {
     AppRegistry,
@@ -38,7 +40,9 @@ class QRScanScreen extends Component {
                             height: '100%'
                         }}
                     >
-                        <Text style={[style.title, {marginLeft: 30}]}>Scan QR code</Text>
+                        <Text style={[style.title, {marginLeft: 30}]}>
+                            {getTranslation(translations.qrScanScreen.title, this.props.translation)}
+                        </Text>
                     </View>
                 }
                               title={null}
@@ -123,6 +127,7 @@ const style = StyleSheet.create({
 
 function mapStateToProps(state) {
     return {
+        translation: state.app.translation
     };
 }
 

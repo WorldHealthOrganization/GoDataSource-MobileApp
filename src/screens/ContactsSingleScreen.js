@@ -8,7 +8,6 @@ import {View, StyleSheet, Dimensions, Animated, Alert, Platform, BackHandler} fr
 import {Icon} from 'react-native-material-ui';
 import styles from './../styles';
 import NavBarCustom from './../components/NavBarCustom';
-import {calculateDimension} from './../utils/functions';
 import config from './../utils/config';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -27,10 +26,11 @@ import {updateContact, deleteExposureForContact, addContact} from './../actions/
 import {removeErrors} from './../actions/errors';
 import DateTimePicker from 'react-native-modal-datetime-picker';
 import _ from 'lodash';
-import {extractIdFromPouchId, updateRequiredFields, navigation} from './../utils/functions';
+import {calculateDimension, extractIdFromPouchId, updateRequiredFields, navigation, getTranslation} from './../utils/functions';
 import {getFollowUpsForContactRequest} from './../queries/followUps'
 import ios from 'rn-fetch-blob/ios';
 import moment from 'moment'
+import translations from './../utils/translations'
 
 const initialLayout = {
     height: 0,
@@ -103,52 +103,17 @@ class ContactsSingleScreen extends Component {
         this.handleBackButtonClick = this.handleBackButtonClick.bind(this);
     };
 
-    // PersonalRoute = () => (
-    //     <ContactsSinglePersonal
-    //         contact={this.state.contact}
-    //         activeIndex={this.state.index}
-    //         onChangeText={this.handleOnChangeText}
-    //         onChangeDropDown={this.handleOnChangeDropDown}
-    //         onChangeDate={this.handleOnChangeDate}
-    //         onChangeSwitch={this.handleOnChangeSwitch}
-    //     />
-    // );
-    // AddressRoute = () => (
-    //     <ContactsSingleAddress
-    //         contact={this.state.contact}
-    //         activeIndex={this.state.index}
-    //         onChangeText={this.handleOnChangeText}
-    //         onChangeDropDown={this.handleOnChangeDropDown}
-    //         onChangeDate={this.handleOnChangeDate}
-    //         onChangeSwitch={this.handleOnChangeSwitch}
-    //         onChangeSectionedDropDown={this.handleOnChangeSectionedDropDown}
-    //         onDeletePress={this.handleOnDeletePress}
-    //         onPressAddAdrress={this.handleOnPressAddAdrress}
-    //     />
-    // );
-    // ExposureRoute = () => (
-    //     <ContactsSingleExposures
-    //         contact={this.state.contact}
-    //         activeIndex={this.state.index}
-    //     />
-    // );
-    // CalendarRoute = () => (
-    //     <ContactsSingleCalendar
-    //         contact={this.state.contact}
-    //         activeIndex={this.state.index}
-    //     />
-    // );
-
     // Please add here the react lifecycle methods that you need
     static getDerivedStateFromProps(props, state) {
         // console.log("FollowUpsSingleScreen: ", state);
         if (props.errors && props.errors.type && props.errors.message) {
             Alert.alert(props.errors.type, props.errors.message, [
                 {
-                    text: 'Ok', onPress: () => {
-                    state.savePressed = false;
-                    props.removeErrors()
-                }
+                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation), 
+                    onPress: () => {
+                        state.savePressed = false;
+                        props.removeErrors()
+                    }
                 }
             ])
         } else {
@@ -245,7 +210,7 @@ class ContactsSingleScreen extends Component {
                         <View
                             style={[style.breadcrumbContainer]}>
                             <Breadcrumb
-                                entities={['Contacts', this.props.isNew ? "Add Contact" : ((this.props.contact && this.props.contact.firstName ? (this.props.contact.firstName + " ") : '') + (this.props.contact && this.props.contact.lastName ? this.props.contact.lastName : ''))]}
+                                entities={[getTranslation(translations.contactSingleScreen.title, this.props.translation), this.props.isNew ? getTranslation(translations.contactSingleScreen.addContactTitle, this.props.translation) : ((this.props.contact && this.props.contact.firstName ? (this.props.contact.firstName + " ") : '') + (this.props.contact && this.props.contact.lastName ? this.props.contact.lastName : ''))]}
                                 navigator={this.props.navigator}
                                 onPress={this.handlePressBreadcrumb}
                             />
@@ -260,12 +225,16 @@ class ContactsSingleScreen extends Component {
                                 >
                                     {
                                         !this.props.isNew ? (
-                                            <MenuItem onPress={this.handleOnPressDeceased}>Deceased</MenuItem>
+                                            <MenuItem onPress={this.handleOnPressDeceased}>
+                                                {getTranslation(translations.contactSingleScreen.deceasedContactLabel, this.props.translation)}
+                                            </MenuItem>
                                         ) : null
                                     }
                                     {
                                         !this.props.isNew && !this.state.contact.deleted ? (
-                                            <MenuItem onPress={this.handleOnPressDeleteContact}>Delete</MenuItem>
+                                            <MenuItem onPress={this.handleOnPressDeleteContact}>
+                                                {getTranslation(translations.contactSingleScreen.deleteContactLabel, this.props.translation)}
+                                            </MenuItem>
                                         ) : null
                                     }
 
@@ -375,7 +344,7 @@ class ContactsSingleScreen extends Component {
                 flex: 1,
                 alignSelf: 'center'
             }}>
-                {route.title}
+                {getTranslation(route.title, this.props.translation).toUpperCase()}
             </Animated.Text>
         );
     };
@@ -734,9 +703,10 @@ class ContactsSingleScreen extends Component {
                     )
                 },
                 (error) => {
-                    Alert.alert("Alert", 'There was an issue with getting your location', [
+                    Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.alertMessages.getLocationError, this.props.translation), [
                         {
-                            text: 'Ok', onPress: () => {console.log("OK pressed")}
+                            text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation), 
+                            onPress: () => {console.log("OK pressed")}
                         }
                     ])
                 },
@@ -925,29 +895,32 @@ class ContactsSingleScreen extends Component {
 
     handleOnPressDeleteExposure = (relation, index) => {
         if (this.state.contact.relationships.length === 1) {
-            Alert.alert('Alert', "Cannot delete a contact's last exposure to a case or event", [
+            Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.alertMessages.contactDeleteLastExposureError, this.props.translation), [
                 {
-                    text: 'Ok', onPress: () => {console.log("Ok pressed")}
+                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation), 
+                    onPress: () => {console.log("Ok pressed")}
                 }
             ])
         } else {
-            Alert.alert('Warning', 'Are you sure you want to delete the exposure?', [
+            Alert.alert(getTranslation(translations.alertMessages.warningLabel, this.props.translation), getTranslation(translations.alertMessages.contactDeleteExposureConfirmation, this.props.translation), [
                 {
-                    text: 'No', onPress: () => {console.log("Cancel delete")}
+                    text: getTranslation(translations.alertMessages.cancelButtonLabel, this.props.translation), 
+                    onPress: () => {console.log("Cancel delete")}
                 },
                 {
-                    text: 'Yes', onPress: () => {
-                    let relations = _.cloneDeep(this.state.contact.relationships);
-                    if (relations && Array.isArray(relations) && relations.map((e) => {return e.id}).indexOf(relation.id) > -1) {
-                        relations.splice(relations.map((e) => {return e.id}).indexOf(relation.id), 1);
+                    text: getTranslation(translations.alertMessages.yesButtonLabel, this.props.translation), 
+                    onPress: () => {
+                        let relations = _.cloneDeep(this.state.contact.relationships);
+                        if (relations && Array.isArray(relations) && relations.map((e) => {return e.id}).indexOf(relation.id) > -1) {
+                            relations.splice(relations.map((e) => {return e.id}).indexOf(relation.id), 1);
 
-                        this.setState(prevState => ({
-                            contact: Object.assign({}, prevState.contact, {relationships: relations})
-                        }), () => {
-                            this.props.deleteExposureForContact(this.props.user.activeOutbreakId, this.props.contact.id, relation, this.props.user.token);
-                        })
+                            this.setState(prevState => ({
+                                contact: Object.assign({}, prevState.contact, {relationships: relations})
+                            }), () => {
+                                this.props.deleteExposureForContact(this.props.user.activeOutbreakId, this.props.contact.id, relation, this.props.user.token);
+                            })
+                        }
                     }
-                }
                 }
             ])
         }
@@ -998,30 +971,34 @@ class ContactsSingleScreen extends Component {
                             })
                         });
                     } else {
-                        Alert.alert("Validation error", 'Please add the place of residence address', [
+                        Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.placeOfResidenceError, this.props.translation), [
                             {
-                                text: 'Ok', onPress: () => {this.hideMenu()}
+                                text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),  
+                                onPress: () => {this.hideMenu()}
                             }
                         ])
                     }
                 } else {
-                    Alert.alert("Alert", 'Number of months must be between 0 and 11', [
+                    Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.monthsValueError, this.props.translation), [
                         {
-                            text: 'Ok', onPress: () => {console.log("OK pressed")}
+                            text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation), 
+                            onPress: () => {console.log("OK pressed")}
                         }
                     ])
                 }
             } else {
-            Alert.alert("Alert", 'Number of years must be between 0 and 150', [
+            Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.yearsValueError, this.props.translation), [
                 {
-                    text: 'Ok', onPress: () => {console.log("OK pressed")}
+                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),  
+                    onPress: () => {console.log("OK pressed")}
                 }
             ])
             }
         } else {
-            Alert.alert("Validation error", 'Some of the required fields are missing. Please make sure you have completed them', [
+            Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.requiredFieldsMissingError, this.props.translation), [
                 {
-                    text: 'Ok', onPress: () => {this.hideMenu()}
+                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation), 
+                    onPress: () => {this.hideMenu()}
                 }
             ])
         }
@@ -1277,6 +1254,7 @@ function mapStateToProps(state) {
         errors: state.errors,
         contacts: state.contacts,
         filter: state.app.filters,
+        translation: state.app.translation
     };
 };
 

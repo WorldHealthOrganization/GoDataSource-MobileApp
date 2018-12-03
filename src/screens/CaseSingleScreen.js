@@ -24,8 +24,9 @@ import CaseSingleInvestigationContainer from '../containers/CaseSingleInvestigat
 import {Icon} from 'react-native-material-ui';
 import {removeErrors} from './../actions/errors';
 import {addCase, updateCase} from './../actions/cases';
-import {updateRequiredFields, extractIdFromPouchId, navigation} from './../utils/functions';
+import {updateRequiredFields, extractIdFromPouchId, navigation, getTranslation} from './../utils/functions';
 import moment from 'moment';
+import translations from './../utils/translations'
 
 const initialLayout = {
     height: 0,
@@ -143,10 +144,11 @@ class CaseSingleScreen extends Component {
         if (props.errors && props.errors.type && props.errors.message) {
             Alert.alert(props.errors.type, props.errors.message, [
                 {
-                    text: 'Ok', onPress: () => {
-                    state.savePressed = false;
-                    props.removeErrors()
-                }
+                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation), 
+                    onPress: () => {
+                        state.savePressed = false;
+                        props.removeErrors()
+                    }   
                 }
             ])
         } else {
@@ -199,7 +201,7 @@ class CaseSingleScreen extends Component {
                         <View
                             style={[style.breadcrumbContainer]}>
                             <Breadcrumb
-                                entities={['Cases', this.props.isNew ? "Add Case" : (this.state.case.firstName ? this.state.case.firstName : '' + " " + this.state.case.lastName ? this.state.case.lastName : '')]}
+                                entities={[getTranslation(translations.caseSingleScreen.title, this.props.translation), this.props.isNew ? getTranslation(translations.caseSingleScreen.addCaseTitle, this.props.translation) : (this.state.case.firstName ? this.state.case.firstName : '' + " " + this.state.case.lastName ? this.state.case.lastName : '')]}
                                 navigator={this.props.navigator}
                                 onPress={this.handlePressBreadcrumb}
                             />
@@ -214,7 +216,9 @@ class CaseSingleScreen extends Component {
                                 >
                                     {
                                         !this.props.isNew ? (
-                                            <MenuItem onPress={this.handleOnPressDeleteCase}>Delete case</MenuItem>
+                                            <MenuItem onPress={this.handleOnPressDeleteCase}>
+                                                {getTranslation(translations.caseSingleScreen.deleteCaseLabel, this.props.translation)}
+                                            </MenuItem>
                                         ) : null
                                     }
                                 </Menu>
@@ -318,7 +322,7 @@ class CaseSingleScreen extends Component {
                 flex: 1,
                 alignSelf: 'center'
             }}>
-                {route.title}
+                {getTranslation(route.title, this.props.translation).toUpperCase()}
             </Animated.Text>
         );
     };
@@ -419,9 +423,10 @@ class CaseSingleScreen extends Component {
 
     //Delete case
     handleOnPressDeleteCase = () => {
-        Alert.alert("Alert", 'Are you sure you want to delete this case?', [
+        Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.alertMessages.caseDeleteConfirmation, this.props.translation), [
             {
-                text: 'Yes', onPress: () => {
+                text: getTranslation(translations.alertMessages.yesButtonLabel, this.props.translation),
+                onPress: () => {
                     this.setState ({
                         deletePressed: true
                     }, () => {
@@ -430,7 +435,8 @@ class CaseSingleScreen extends Component {
                 }
             },
             {
-                text: 'No', onPress: () => {
+                text: getTranslation(translations.alertMessages.cancelButtonLabel, this.props.translation),
+                onPress: () => {
                     this.hideMenu();
                 }
             }
@@ -498,30 +504,34 @@ class CaseSingleScreen extends Component {
                             }
                         })
                     } else {
-                        Alert.alert("Validation error", 'Please add the place of residence address', [
+                        Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.placeOfResidenceError, this.props.translation), [
                             {
-                                text: 'Ok', onPress: () => {this.hideMenu()}
+                                text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation), 
+                                onPress: () => {this.hideMenu()}
                             }
                         ])
                     }
                 } else {
-                    Alert.alert("Validation error", 'Number of months must be between 0 and 11', [
+                    Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.monthsValueError, this.props.translation), [
                         {
-                            text: 'Ok', onPress: () => {this.hideMenu()}
+                            text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation), 
+                            onPress: () => {this.hideMenu()}
                         }
                     ])
                 }
             } else {
-                Alert.alert("Validation error", 'Number of years must be between 0 and 150', [
+                Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.yearsValueError, this.props.translation), [
                     {
-                        text: 'Ok', onPress: () => {this.hideMenu()}
+                        text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation), 
+                        onPress: () => {this.hideMenu()}
                     }
                 ])
             }
         } else {
-            Alert.alert("Validation error", 'Some of the required fields are missing. Please make sure you have completed them', [
+            Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.requiredFieldsMissingError, this.props.translation), [
                 {
-                    text: 'Ok', onPress: () => {this.hideMenu()}
+                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation), 
+                    onPress: () => {this.hideMenu()}
                 }
             ])
         }
@@ -641,12 +651,13 @@ class CaseSingleScreen extends Component {
     };
     onPressCancelEdit = () => {
         if (this.state.isModified === true) {
-            Alert.alert("", 'You have unsaved data. Are you sure you want to leave this page and lose all changes?', [
+            Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.alertMessages.caseDiscardAllChangesConfirmation, this.props.translation), [
                 {
-                    text: 'Yes', onPress: () => {
+                    text: getTranslation(translations.alertMessages.yesButtonLabel, this.props.translation), 
+                    onPress: () => {
                         console.log("onPressCancelEdit case", this.state.case);
                         console.log("onPressCancelEdit caseBeforeEdit", this.state.caseBeforeEdit);
-                        console.log("onPressCancelEdit Yes pressed - remove changes")
+                        console.log("onPressCancelEdit Yes pressed - remove changes");
                         this.setState ({
                             case: _.cloneDeep(this.state.caseBeforeEdit),
                             isModified: false,
@@ -655,7 +666,8 @@ class CaseSingleScreen extends Component {
                     }
                 },
                 {
-                    text: 'Cancel', onPress: () => {
+                    text: getTranslation(translations.alertMessages.cancelButtonLabel, this.props.translation), 
+                    onPress: () => {
                         console.log("onPressCancelEdit No pressed - nothing changes")
                     }
                 }
@@ -901,7 +913,6 @@ class CaseSingleScreen extends Component {
                     if(!questionnaireAnswer)
                         return false;
                 }
-
             }
         }
 
@@ -1085,9 +1096,10 @@ class CaseSingleScreen extends Component {
                     )
                 },
                 (error) => {
-                    Alert.alert("Alert", 'There was an issue with getting your location', [
+                    Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.alertMessages.caseGetLocationError, this.props.translation), [
                         {
-                            text: 'Ok', onPress: () => {console.log("OK pressed")}
+                            text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation), 
+                            onPress: () => {console.log("OK pressed")}
                         }
                     ])
                 },
@@ -1376,7 +1388,8 @@ function mapStateToProps(state) {
         errors: state.errors,
         filter: state.app.filters,
         cases: state.cases,
-        caseInvestigationQuestions: state.outbreak.caseInvestigationTemplate
+        caseInvestigationQuestions: state.outbreak.caseInvestigationTemplate,
+        translation: state.app.translation
     };
 }
 
