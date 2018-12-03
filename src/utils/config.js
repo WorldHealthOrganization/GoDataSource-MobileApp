@@ -492,7 +492,7 @@ const caseSingleScreen = {
                 isEditMode: true,
                 multiline: false,
                 objectType: 'Address',
-                keyboardType: 'numeric'
+                keyboardType: Platform.OS === 'ios' ? 'decimal-pad' : 'numeric'
             },
             {
                 cardNumber: 1,
@@ -505,7 +505,7 @@ const caseSingleScreen = {
                 isEditMode: true,
                 multiline: false,
                 objectType: 'Address',
-                keyboardType: 'numeric'
+                keyboardType: Platform.OS === 'ios' ? 'decimal-pad' : 'numeric'
             },
             {
                 cardNumber: 1,
@@ -1323,7 +1323,7 @@ const contactsSingleScreen = {
                 isEditMode: true,
                 multiline: false,
                 objectType: 'Address',
-                keyboardType: 'numeric'
+                keyboardType: Platform.OS === 'ios' ? 'decimal-pad' : 'numeric'
             },
             {
                 cardNumber: 1,
@@ -1336,7 +1336,7 @@ const contactsSingleScreen = {
                 isEditMode: true,
                 multiline: false,
                 objectType: 'Address',
-                keyboardType: 'numeric'
+                keyboardType: Platform.OS === 'ios' ? 'decimal-pad' : 'numeric'
             },
 
             {
