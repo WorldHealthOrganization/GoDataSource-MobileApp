@@ -6,7 +6,7 @@
 import React, {Component} from 'react';
 import { View, Text, StyleSheet, InteractionManager, Alert, TouchableWithoutFeedback, Keyboard} from 'react-native';
 import {LoaderScreen} from 'react-native-ui-lib';
-import {calculateDimension} from './../utils/functions';
+import {calculateDimension, getTranslation} from './../utils/functions';
 import config from './../utils/config';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -15,6 +15,7 @@ import styles from './../styles';
 import Ripple from 'react-native-material-ripple';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import CardComponent from './../components/CardComponent';
+import translations from './../utils/translations'
 
 class ContactsSingleAddress extends Component {
 
@@ -57,7 +58,7 @@ class ContactsSingleAddress extends Component {
                 <View style={style.viewContainer}>
                     <View style={{flexDirection: 'row'}}>
                         <Button
-                            title={'Back'}
+                            title={getTranslation(translations.generalButtons.backButtonLabel, this.props.translation)}
                             onPress={this.handleBackButton}
                             color={styles.buttonGreen}
                             titleColor={'white'}
@@ -68,7 +69,7 @@ class ContactsSingleAddress extends Component {
                                 marginHorizontal: calculateDimension(16, false, this.props.screenSize),
                             }}/>
                         <Button
-                            title={'Next'}
+                            title={getTranslation(translations.generalButtons.nextButtonLabel, this.props.translation)}
                             onPress={this.handleNextButton}
                             color={styles.buttonGreen}
                             titleColor={'white'}
@@ -100,7 +101,9 @@ class ContactsSingleAddress extends Component {
                                 }}
                                 onPress={this.props.onPressAddAdrress}
                             >
-                                <Text style={{fontFamily: 'Roboto-Medium', fontSize: 12, color: styles.buttonGreen}}>Add another address</Text>
+                                <Text style={{fontFamily: 'Roboto-Medium', fontSize: 12, color: styles.buttonGreen}}>
+                                    {this.props.contact.addresses && this.props.contact.addresses.length === 0 ? getTranslation(translations.contactSingleScreen.oneAddressText, this.props.translation) : getTranslation(translations.contactSingleScreen.moreAddressesText, this.props.translation)}
+                                </Text>
                             </Ripple>
                         </View>
                     </KeyboardAwareScrollView>
@@ -138,16 +141,18 @@ class ContactsSingleAddress extends Component {
                 if (this.props.hasPlaceOfResidence !== undefined && this.props.hasPlaceOfResidence === true){
                     this.props.handleMoveToNextScreenButton(true)
                 } else {
-                    Alert.alert("Alert", 'Please add the place of residence address', [
+                    Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.alertMessages.addressOfResidenceError, this.props.translation), [
                         {
-                            text: 'Ok', onPress: () => {console.log("OK pressed")}
+                            text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation), 
+                            onPress: () => {console.log("OK pressed")}
                         }
                     ])
                 }
             } else {
-                Alert.alert("Alert", 'Please add at least one address with all the required fields completed', [
+                Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.alertMessages.addressRequiredFieldsMissing, this.props.translation), [
                     {
-                        text: 'Ok', onPress: () => {console.log("OK pressed")}
+                        text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation), 
+                        onPress: () => {console.log("OK pressed")}
                     }
                 ])
             }
@@ -192,7 +197,8 @@ function mapStateToProps(state) {
         screenSize: state.app.screenSize,
         contacts: state.contacts,
         cases: state.cases,
-        events: state.events
+        events: state.events,
+        translation: state.app.translation
     };
 }
 

@@ -12,6 +12,8 @@ import DateTimePicker from 'react-native-modal-datetime-picker';
 import Ripple from 'react-native-material-ripple';
 import style from './../styles';
 import moment from 'moment';
+import translations from './../utils/translations'
+import {getTranslation} from './../utils/functions';
 
 class DatePicker extends PureComponent {
 
@@ -51,7 +53,7 @@ class DatePicker extends PureComponent {
                                 textAlign: 'left',
                                 color: 'rgba(0, 0, 0, .38)',
                             }}>
-                                {this.props.isRequired ? this.props.label + ' * ' : this.props.label}
+                                {this.props.isRequired ? getTranslation(this.props.label, this.props.translation) + ' * ' : getTranslation(this.props.label, this.props.translation)}
                             </Text>
 
                             <Ripple onPress={this.handleShowDatePicker}>
@@ -71,7 +73,7 @@ class DatePicker extends PureComponent {
                     ) : ( 
                         <Ripple onPress={this.handleShowDatePicker}>
                             <TextField
-                                label={this.props.isRequired ? this.props.label + ' * ' : this.props.label}
+                                label={this.props.isRequired ? getTranslation(this.props.label, this.props.translation) + ' * ' : getTranslation(this.props.label, this.props.translation)}
                                 textColor='rgb(0,0,0)'
                                 labelFontSize={12.5}
                                 labelHeight={30}
@@ -80,7 +82,8 @@ class DatePicker extends PureComponent {
                                     textAlign: 'left',
                                     marginBottom: 7.5
                                 }}
-                                tintColor='rgb(77,176,160)'>
+                                tintColor='rgb(77,176,160)'
+                            >
                             </TextField> 
                         </Ripple>
                     )
@@ -108,7 +111,7 @@ class DatePicker extends PureComponent {
                     color: 'rgb(0,0,0)',
                     marginBottom: 7.5
                 }}>
-                    {this.props.label}
+                    {getTranslation(this.props.label, this.props.translation)}
                 </Text>
                 <Text
                 style={{

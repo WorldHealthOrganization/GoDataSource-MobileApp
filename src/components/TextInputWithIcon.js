@@ -6,13 +6,14 @@
 import React, {Component} from 'react';
 import {TextInput, View, Text, StyleSheet, Platform, Dimensions} from 'react-native';
 import {ListItem, Icon} from 'react-native-material-ui';
-import {calculateDimension} from './../utils/functions';
+import {calculateDimension, getTranslation} from './../utils/functions';
 import config from './../utils/config';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import {TextField} from 'react-native-material-textfield';
 import Button from './Button';
 import styles from './../styles';
+import translations from './../utils/translations'
 
 class TextInputWithIcon extends Component {
 
@@ -39,14 +40,15 @@ class TextInputWithIcon extends Component {
             <View style={[style.container]}>
                 <Icon name="search" size={20} style={{alignSelf: 'center'}} />
                 <TextInput
-                    label="Search"
+                    label={getTranslation(translations.generalLabels.searchLabel, this.props.translation)}
                     ref={this.searchRef}
                     value={this.props.value}
                     style={style.textInput}
-                    placeholder={"Search"}
+                    placeholder={getTranslation(translations.generalLabels.searchLabel, this.props.translation)}
                     underlineColorAndroid={'transparent'}
                     onChangeText={this.handleTextChange}
                     onSubmitEditing={this.handleOnSubmitEditing}
+                    translation={this.props.translation}
                 />
             </View>
         );
@@ -93,7 +95,8 @@ const style = StyleSheet.create({
 
 function mapStateToProps(state) {
     return {
-        screenSize: state.app.screenSize
+        screenSize: state.app.screenSize,
+        translation: state.app.translation
     };
 }
 

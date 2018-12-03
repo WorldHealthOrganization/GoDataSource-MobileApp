@@ -6,6 +6,8 @@ import {View, Text, StyleSheet} from 'react-native';
 import PropTypes from 'prop-types';
 import SwitchSelector from 'react-native-switch-selector';
 import config from './../utils/config'
+import translations from './../utils/translations'
+import {getTranslation} from './../utils/functions';
 
 class TextSwitchSelector extends PureComponent {
 
@@ -29,6 +31,11 @@ class TextSwitchSelector extends PureComponent {
     }
 
     editInput() {
+
+        let options = config[this.props.values].map((e) => {
+            return {label: getTranslation(e.label, this.props.translation), value: e.value}
+        })
+
         return (
             <View style={[{
                 width: '100%',
@@ -43,7 +50,7 @@ class TextSwitchSelector extends PureComponent {
                     hasPadding
                     fontSize={13}
                     height={30}
-                    options={config[this.props.values]}
+                    options={options}
                 />
             </View>
         );

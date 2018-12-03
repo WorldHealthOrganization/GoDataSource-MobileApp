@@ -7,6 +7,8 @@ import config from './../utils/config'
 import PropTypes from 'prop-types';
 import { TextField } from 'react-native-material-textfield';
 import { Dropdown } from 'react-native-material-dropdown';
+import translations from './../utils/translations'
+import {getTranslation} from './../utils/functions';
 
 class TextInputWithDropDown extends Component {
 
@@ -38,6 +40,10 @@ class TextInputWithDropDown extends Component {
         } else {
             smth = ''
         }
+
+        let dropDownData = config[this.props.dropDownData].map((e) => {
+            return {label: getTranslation(e.label, this.props.translation), value: e.value}
+        })
         return (
             <View style={[{   
             width: '100%',
@@ -45,7 +51,7 @@ class TextInputWithDropDown extends Component {
                 <View style={{flexDirection: 'row',  justifyContent: 'space-between'}}>
                     <View style={{width: '45%'}}>
                         <TextField
-                            label={this.props.isRequired ? this.props.label + ' * ' : this.props.label}
+                            label={this.props.isRequired ? getTranslation(this.props.label, this.props.translation) + ' * ' : getTranslation(this.props.label, this.props.translation)}
                             value={smth}
                             onChangeText={(value) => this.handleOnChangeText(value)}
                             textColor='rgb(0,0,0)'
@@ -65,8 +71,8 @@ class TextInputWithDropDown extends Component {
                     </View>
                     <View style={{width: '45%'}}>
                         <Dropdown
-                            label={config[this.props.dropDownData][this.props.selectedDropDownItemIndex].label}
-                            data={config[this.props.dropDownData]}
+                            label={getTranslation(config[this.props.dropDownData][this.props.selectedDropDownItemIndex].label, this.props.translation)}
+                            data={dropDownData}
                             onChangeText={(value) => this.changeDropdown(value)}
                             value={config[this.props.dropDownData][this.props.selectedDropDownItemIndex].value || ''}
                             fontSize={15}
@@ -100,7 +106,7 @@ class TextInputWithDropDown extends Component {
                             color: 'rgb(0,0,0)',
                             marginBottom: 7.5
                         }}>
-                            {this.props.label}
+                            {getTranslation(this.props.label, this.props.translation)}
                         </Text>
                         <Text style={{
                             fontFamily: 'Roboto-Light',

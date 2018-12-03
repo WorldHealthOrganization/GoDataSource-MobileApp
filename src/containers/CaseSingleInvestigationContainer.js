@@ -5,7 +5,7 @@
 // the material ui library, since it provides design and animations out of the box
 import React, {PureComponent} from 'react';
 import {TextInput, View, Text, StyleSheet, FlatList, TouchableWithoutFeedback, Keyboard} from 'react-native';
-import {calculateDimension, extractAllQuestions, mapQuestions} from '../utils/functions';
+import {calculateDimension, extractAllQuestions, mapQuestions, getTranslation} from '../utils/functions';
 import config from '../utils/config';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -14,6 +14,7 @@ import QuestionCard from '../components/QuestionCard';
 import Button from '../components/Button';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import {sortBy} from 'lodash';
+import translations from './../utils/translations'
 
 class CaseSingleInvestigationContainer extends PureComponent {
 
@@ -48,9 +49,9 @@ class CaseSingleInvestigationContainer extends PureComponent {
                     <View style={{flexDirection: 'row'}}>
                     {
                         this.props.isNew ? (
-                            <View style={{flexDirection: 'row'}}>
+                            <View style={{flexDirection: 'row', width: '90%', alignItems: 'center'}}>
                                 <Button
-                                title={'Back'}
+                                title={getTranslation(translations.generalButtons.backButtonLabel, this.props.translation)}
                                 onPress={this.handleBackButton}
                                 color={styles.buttonGreen}
                                 titleColor={'white'}
@@ -61,7 +62,7 @@ class CaseSingleInvestigationContainer extends PureComponent {
                                     marginHorizontal: calculateDimension(16, false, this.props.screenSize),
                                 }}/>
                                 <Button
-                                    title={'Save'}
+                                    title={getTranslation(translations.generalButtons.saveButtonLabel, this.props.translation)}
                                     onPress={this.props.onPressSave}
                                     color={styles.buttonGreen}
                                     titleColor={'white'}
@@ -77,7 +78,7 @@ class CaseSingleInvestigationContainer extends PureComponent {
                             this.props.isEditMode ? (
                                 <View style={{flexDirection: 'row'}}>
                                     <Button
-                                        title={'Save'}
+                                        title={getTranslation(translations.generalButtons.saveButtonLabel, this.props.translation)}
                                         onPress={this.props.onPressSaveEdit}
                                         color={styles.buttonGreen}
                                         titleColor={'white'}
@@ -88,7 +89,7 @@ class CaseSingleInvestigationContainer extends PureComponent {
                                             marginRight: 10,
                                     }}/>
                                     <Button
-                                        title={'Cancel'}
+                                        title={getTranslation(translations.generalButtons.cancelButtonLabel, this.props.translation)}
                                         onPress={this.props.onPressCancelEdit}
                                         color={styles.buttonGreen}
                                         titleColor={'white'}
@@ -100,7 +101,7 @@ class CaseSingleInvestigationContainer extends PureComponent {
                                     }}/>
                                 </View>) : (
                                 <Button
-                                    title={'Edit'}
+                                    title={getTranslation(translations.generalButtons.editButtonLabel, this.props.translation)}
                                     onPress={this.props.onPressEdit}
                                     color={styles.buttonGreen}
                                     titleColor={'white'}
@@ -137,6 +138,7 @@ class CaseSingleInvestigationContainer extends PureComponent {
                     containerStyle={{
                         marginVertical: 10
                     }}
+                    translation={this.props.translation}
                 />
                 {
                     item.questions.map((item, index) => {

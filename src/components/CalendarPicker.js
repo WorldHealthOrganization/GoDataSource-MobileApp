@@ -6,7 +6,7 @@ import {TextInput, View, Text, StyleSheet, Platform, Dimensions, TouchableOpacit
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import {ListItem, Icon, Button} from 'react-native-material-ui';
-import {calculateDimension, checkIfSameDay} from './../utils/functions';
+import {calculateDimension, checkIfSameDay, getTranslation} from './../utils/functions';
 import config from './../utils/config';
 import CalendarPickerView from './CalendarPickerView';
 import Ripple from 'react-native-material-ripple';
@@ -15,13 +15,14 @@ import { Calendar, CalendarList, Agenda } from 'react-native-calendars';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import ElevatedView from 'react-native-elevated-view';
+import translations from './../utils/translations'
 
 class CalendarPicker extends PureComponent {
 
     constructor(props) {
         super(props);
         this.state = {
-            label: checkIfSameDay(new Date(this.props.value), new Date()) ? 'Today' : new Date(this.props.value).toLocaleDateString()
+            label: checkIfSameDay(new Date(this.props.value), new Date()) ? getTranslation(translations.generalLabels.today, this.props.translation) : new Date(this.props.value).toLocaleDateString()
         };
 
         this.handleDateChanged = this.handleDateChanged.bind(this);
@@ -40,7 +41,7 @@ class CalendarPicker extends PureComponent {
                     height={this.props.height}
                     width={this.props.width}
                     onPress={this.props.openCalendarModal}
-                    label={this.state.label}
+                    label={getTranslation(this.state.label, this.props.translation)}
                     firstIcon="calendar-blank"
                     secondIcon="arrow-drop-down"
                     isFirstIconPureMaterial={false}
@@ -59,7 +60,7 @@ class CalendarPicker extends PureComponent {
     // Please write here all the methods that are not react native lifecycle methods
     handleDateChanged = (date) => {
         // Adjust timezone differences
-        let dateAux = 'Today';
+        let dateAux = getTranslation(translations.generalLabels.today, this.props.translation);
         if (!checkIfSameDay(new Date(date.dateString), new Date())) {
             // dateAux format = "YYYY-MM-DD"
             let date1Time = new Date(date.dateString).getTime();
@@ -97,7 +98,8 @@ const style = StyleSheet.create({
 
 function mapStateToProps(state) {
     return {
-        screenSize: state.app.screenSize
+        screenSize: state.app.screenSize,
+        translation: state.app.translation
     };
 }
 

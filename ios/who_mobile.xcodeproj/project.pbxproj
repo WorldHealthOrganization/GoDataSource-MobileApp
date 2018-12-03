@@ -1096,7 +1096,7 @@
 					};
 					13B07F861A680F5B00A75B9A = {
 						DevelopmentTeam = HT9KH229F3;
-						ProvisioningStyle = Manual;
+						ProvisioningStyle = Automatic;
 						SystemCapabilities = {
 							com.apple.InAppPurchase = {
 								enabled = 1;
@@ -1870,10 +1870,10 @@
 				CODE_SIGN_ENTITLEMENTS = who_mobile/who_mobile.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = NO;
-				DEVELOPMENT_TEAM = HT9KH229F3;
+				DEVELOPMENT_TEAM = "";
 				HEADER_SEARCH_PATHS = (
 					"$(SRCROOT)/../node_modules/react-native/React",
 					"$(SRCROOT)/../node_modules/react-native-navigation/ios/**",
@@ -1895,8 +1895,8 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.clarisoft.who;
 				PRODUCT_NAME = who_mobile;
-				PROVISIONING_PROFILE = "931e88c5-1726-401b-8502-e4abea04d2bb";
-				PROVISIONING_PROFILE_SPECIFIER = "WHO GO.Data Development";
+				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Debug;
@@ -1909,9 +1909,9 @@
 				CODE_SIGN_ENTITLEMENTS = who_mobile/who_mobile.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = HT9KH229F3;
+				DEVELOPMENT_TEAM = "";
 				HEADER_SEARCH_PATHS = (
 					"$(SRCROOT)/../node_modules/react-native/React",
 					"$(SRCROOT)/../node_modules/react-native-navigation/ios/**",
@@ -1933,8 +1933,8 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.clarisoft.who;
 				PRODUCT_NAME = who_mobile;
-				PROVISIONING_PROFILE = "10448644-9b3f-48da-bea4-987451c1dd7b";
-				PROVISIONING_PROFILE_SPECIFIER = "WHO GO.Data Distribution";
+				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Release;

@@ -4,6 +4,8 @@
 import React, {PureComponent} from 'react';
 import {View, Text, StyleSheet} from 'react-native';
 import PropTypes from 'prop-types';
+import translations from './../utils/translations'
+import {getTranslation} from './../utils/functions';
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 var Switch = require('react-native-material-switch');
@@ -32,7 +34,7 @@ class SwitchInput extends PureComponent {
                 <Text style={[{
 
                 }, this.props.labelStyle]}>
-                    {this.props.label}
+                    {getTranslation(this.props.label, this.props.translation)}
                 </Text>
                 {
                     this.props.isEditMode ?
@@ -63,7 +65,7 @@ class SwitchInput extends PureComponent {
                             color: 'rgb(60,60,60)',
                             lineHeight: 30,
                         }}>
-                            {this.props.value != true ? 'No' : 'Yes'}
+                            {this.props.value != true ? getTranslation(translations.generalLabels.noAnswer, this.props.translation) : getTranslation(translations.generalLabels.yesAnswer, this.props.translation)}
                         </Text>
                     )
                 }

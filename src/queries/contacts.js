@@ -2,9 +2,7 @@
  * Created by florinpopa on 13/09/2018.
  */
 import {getDatabase} from './database';
-import {generateId, extractIdFromPouchId} from './../utils/functions';
-import config from './../utils/config';
-
+import {objSort} from './../utils/functions';
 export function getContactsForOutbreakIdRequest (outbreakId, filter, token, callback) {
     let database = getDatabase();
 
@@ -12,17 +10,11 @@ export function getContactsForOutbreakIdRequest (outbreakId, filter, token, call
 
     let start = new Date().getTime();
     if (filter && filter.keys) {
-        // console.log('getContactsForOutbreakIdRequest if')
-        let keys = filter.keys.map((e) => {return `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT_${outbreakId}_${e}`});
-        // console.log("@@@ filter keys: ", keys);
-        let start =  new Date().getTime();
 
         let promiseArray = [];
+        promiseArray = filter.keys.map((e) => {return getFromDb(database, `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT_${outbreakId}_${e}`)});
 
-        for (let i=0; i<keys.length; i++) {
-            promiseArray.push(getFromDb(database, keys[i]));
-        }
-
+        let start =  new Date().getTime();
         Promise.all(promiseArray)
             .then((resultGetAll) => {
                 console.log("Result from get queries: ", new Date().getTime() - start, resultGetAll.length);
@@ -120,10 +112,11 @@ export function getContactsForOutbreakIdRequest (outbreakId, filter, token, call
                      //local filter for selectedLocations bcause it can't be done in mango queries
                      if (filter.selectedLocations && filter.selectedLocations.length > 0) {
                         resultFilterContactsDocs = resultFilterContactsDocs.filter((e) => {
-                            let addresses = e.addresses.filter((k) => {
+                            let address = e.addresses.find((k) => {
                                 return k.locationId !== '' && filter.selectedLocations.indexOf(k.locationId) >= 0
                             })
-                            return addresses.length > 0
+                        
+                            return address === undefined ? false : true
                         })
                     }
                     callback(null, resultFilterContactsDocs)
@@ -160,7 +153,7 @@ export function getContactsForOutbreakIdRequest (outbreakId, filter, token, call
             })
                 .then((resultFind) => {
                     console.log('Result for find time for contacts: ', new Date().getTime() - start);
-                    callback(null, resultFind.docs)
+                    callback(null, objSort(resultFind.docs, ['lastName', false]));
                 })
                 .catch((errorFind) => {
                     console.log('Error find for contacts: ', errorFind);

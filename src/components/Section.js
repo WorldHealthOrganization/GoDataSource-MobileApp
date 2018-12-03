@@ -4,14 +4,19 @@
 import React, {PureComponent} from 'react';
 import {View, Text, StyleSheet, PixelRatio} from 'react-native';
 import PropTypes from 'prop-types';
+import styles from './../styles';
+import translations from './../utils/translations'
+import {getTranslation} from './../utils/functions';
+
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
-import styles from './../styles';
 
-Section = ({label, hasBorderBottom, borderBottomColor, containerStyle}) => (
+Section = ({label, hasBorderBottom, borderBottomColor, containerStyle, translation}) => (
     <View style={[style.containerStyle, containerStyle]}>
         <View style={[style.containerText]}>
-            <Text style={style.textStyle}>{label}</Text>
+            <Text style={style.textStyle}>
+                {getTranslation(label, translation)}
+            </Text>
         </View>
         <View style={[style.separatorStyle, {backgroundColor: borderBottomColor, display: hasBorderBottom ? 'flex' : 'none'}]}/>
     </View>

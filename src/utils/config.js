@@ -3,6 +3,7 @@
  */
 import styles from './../styles';
 import {Platform} from 'react-native';
+import translations from './translations'
 
 const baseUrls = [
     {value: 'gva11sucombee.who.int:3000'},
@@ -18,69 +19,69 @@ const sideMenuItems = [
     {
         key: 'followups',
         name: 'update',
-        label: 'Follow-ups'
+        label: translations.navigationDrawer.followUpsLabel,
     },
     {
         key: 'contacts',
         name: 'people',
-        label: 'Contacts',
+        label: translations.navigationDrawer.contactsLabel,
         // addButton: true
     },
     {
         key: 'cases',
         name: 'create-new-folder',
-        label: 'Cases',
+        label: translations.navigationDrawer.casesLabel,
         addButton: true
     }
 ];
 
 const dropDownValues = [
     {
-        value: 'All'
+        value: translations.followUpsScreenStatusFilterValues.allValue
     },
     {
-        value: 'LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE_NOT_PERFORMED'
+        value: translations.followUpsScreenStatusFilterValues.notPerformedValue
     },
     {
-        value: 'LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE_SEEN_OK'
+        value: translations.followUpsScreenStatusFilterValues.seenOkValue
     },
     {
-        value: 'LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE_SEEN_NOT_OK'
+        value: translations.followUpsScreenStatusFilterValues.seenNotOkValue
     },
     {
-        value: 'LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE_MISSED'
+        value: translations.followUpsScreenStatusFilterValues.missedValue
     }
 ];
 
 const tabsValuesRoutes = {
     followUpsFilter: [
-        {key: 'filters', title: 'FILTERS'},
-        {key: 'sort', title: 'SORT'}
+        {key: 'filters', title: translations.followUpFilter.filterTitle},
+        {key: 'sort', title: translations.followUpFilter.sortTitle}
     ],
     casesFilter: [
-        {key: 'filters', title: 'FILTERS'},
-        {key: 'sort', title: 'SORT'}
+        {key: 'filters', title: translations.casesFilter.filterTitle},
+        {key: 'sort', title: translations.casesFilter.sortTitle}
     ],
     followUpsSingle: [
-        {key: 'genInfo', title: 'DETAILS'},
-        {key: 'quest', title: 'QUESTIONNAIRE'}
+        {key: 'genInfo', title: translations.followUpsSingleScreen.detailsiTitle},
+        {key: 'quest', title: translations.followUpsSingleScreen.questionnaireTitle}
     ],
     casesSingle: [
-        {key: 'personal', title: 'PERSONAL'},
-        {key: 'address', title: 'ADDRESS'},
-        {key: 'infection', title: 'INFECTION'},
-        {key: 'caseInvestigation', title: 'INVESTIGATION'}
+        {key: 'personal', title: translations.caseSingleScreen.personalTitle},
+        {key: 'address', title: translations.caseSingleScreen.addressTitle},
+        {key: 'infection', title: translations.caseSingleScreen.infectionTitle},
+        {key: 'caseInvestigation', title: translations.caseSingleScreen.investigationTitle}
     ],
     contactsSingle: [
-        {key: 'personal', title: 'PERSONAL'},
-        {key: 'address', title: 'ADDRESS'},
-        {key: 'exposures', title: 'EXPOSURES'},
-        {key: 'calendar', title: 'CALENDAR'}
+        {key: 'personal', title: translations.contactSingleScreen.personalTitle},
+        {key: 'address', title: translations.contactSingleScreen.addressTitle},
+        {key: 'exposures', title: translations.contactSingleScreen.exposuresTitle},
+        {key: 'calendar', title: translations.contactSingleScreen.calendarTitle}
     ],
     contactsAdd: [
-        {key: 'personal', title: 'PERSONAL'},
-        {key: 'address', title: 'ADDRESS'},
-        {key: 'exposures', title: 'EXPOSURES'},
+        {key: 'personal', title: translations.contactSingleScreen.personalTitle},
+        {key: 'address', title: translations.contactSingleScreen.addressTitle},
+        {key: 'exposures', title: translations.contactSingleScreen.exposuresTitle},
     ]
 };
 
@@ -91,18 +92,18 @@ const followUpsSingleScreen = {
                 {
                     cardNumber: 1,
                     id: 'date',
-                    label: 'Date',
+                    label: translations.followUpsSingleScreen.date,
                     value: '',
                     type: "DatePicker",
                     isRequired: true,
-                    isEditMode: true,
+                    isEditMode: false,
                     format: 'MM/dd/YYYY',
                     objectType: 'FollowUp'
                 },
                 {
                     cardNumber: 1,
                     id: 'statusId',
-                    label: 'Status',
+                    label: translations.followUpsSingleScreen.status,
                     type: 'DropdownInput',
                     value: '',
                     isRequired: true,
@@ -112,7 +113,7 @@ const followUpsSingleScreen = {
                 {
                     cardNumber: 1,
                     id: 'targeted',
-                    label: 'Targeted',
+                    label: translations.followUpsSingleScreen.targeted,
                     type: 'SwitchInput',
                     value: false,
                     isRequired: false,
@@ -129,18 +130,18 @@ const followUpsSingleScreen = {
             {
                 cardNumber: 2,
                 id: 'typeId',
-                label: 'Name',
+                label: translations.addressFieldLabels.name,
                 labelValue: 'test',
                 type: 'DropdownInput',
                 value: '',
-                isRequired: true,
+                isRequired: false,
                 isEditMode: false,
                 objectType: 'Address'
             },
             {
                 cardNumber: 1,
                 id: 'date',
-                label: 'Date',
+                label: translations.addressFieldLabels.date,
                 labelValue: 'test',
                 value: '',
                 type: "DatePicker",
@@ -152,11 +153,11 @@ const followUpsSingleScreen = {
             {
                 cardNumber: 2,
                 id: 'locationId',
-                label: 'Area',
+                label: translations.addressFieldLabels.area,
                 labelValue: 'test',
                 type: 'DropDownSectioned',
                 value: '',
-                isRequired: true,
+                isRequired: false,
                 isEditMode: false,
                 objectType: 'Address',
                 single: true
@@ -164,11 +165,11 @@ const followUpsSingleScreen = {
             {
                 cardNumber: 2,
                 id: 'city',
-                label: 'City',
+                label: translations.addressFieldLabels.city,
                 labelValue: 'test',
                 type: 'TextInput',
                 value: '',
-                isRequired: true,
+                isRequired: false,
                 isEditMode: false,
                 multiline: true,
                 objectType: 'Address'
@@ -176,11 +177,11 @@ const followUpsSingleScreen = {
             {
                 cardNumber: 2,
                 id: 'postalCode',
-                label: 'ZIP',
+                label: translations.addressFieldLabels.zip,
                 labelValue: 'test',
                 type: 'TextInput',
                 value: '',
-                isRequired: true,
+                isRequired: false,
                 isEditMode: false,
                 multiline: true,
                 objectType: 'Address'
@@ -188,11 +189,11 @@ const followUpsSingleScreen = {
             {
                 cardNumber: 2,
                 id: 'addressLine1',
-                label: 'Address',
+                label: translations.addressFieldLabels.address,
                 labelValue: 'test',
                 type: 'TextInput',
                 value: '',
-                isRequired: true,
+                isRequired: false,
                 isEditMode: false,
                 multiline: true,
                 objectType: 'Address'
@@ -208,17 +209,19 @@ const caseSingleScreen = {
                 {
                     cardNumber: 1,
                     id: 'firstName',
-                    label: 'First Name',
+                    label: translations.caseSingleScreen.firstNameLabel,
                     type: 'TextInput',
                     value: '',
                     isRequired: true,
                     isEditMode: false,
+                    hasTooltip: true,
+                    tooltipMessage: 'asd asd asd as dasd asda dasd asd asd as dasd as dasd as dasd asd asdasd asd',
                     objectType: 'Case'
                 },
                 {
                     cardNumber: 1,
                     id: 'middleName',
-                    label: 'Middle Name',
+                    label: translations.caseSingleScreen.middleNameLabel,
                     type: 'TextInput',
                     value: '',
                     isRequired: false,
@@ -228,7 +231,7 @@ const caseSingleScreen = {
                 {
                     cardNumber: 1,
                     id: 'lastName',
-                    label: 'Last Name',
+                    label: translations.caseSingleScreen.lastNameLabel,
                     type: 'TextInput',
                     value: '',
                     isRequired: false,
@@ -238,7 +241,7 @@ const caseSingleScreen = {
                 {
                     cardNumber: 1,
                     id: 'gender',
-                    label: 'Gender',
+                    label: translations.caseSingleScreen.gender,
                     labelValue: '',
                     type: 'DropdownInput',
                     value: '',
@@ -251,17 +254,18 @@ const caseSingleScreen = {
                 {
                     cardNumber: 1,
                     id: 'phoneNumber',
-                    label: 'Phone Number',
+                    label: translations.caseSingleScreen.phoneNumber,
                     type: 'TextInput',
                     value: '',
                     isRequired: false,
                     isEditMode: false,
+                    keyboardType: Platform.OS === 'ios' ? 'number-pad' : 'numeric',
                     objectType: 'Case'
                 },
                 {
                     cardNumber: 1,
                     id: 'occupation',
-                    label: 'Occupation',
+                    label: translations.caseSingleScreen.occupation,
                     labelValue: 'test',
                     type: 'DropdownInput',
                     value: '',
@@ -281,7 +285,7 @@ const caseSingleScreen = {
                 {
                     cardNumber: 2,
                     id: 'dob',
-                    label: 'Date of birth',
+                    label: translations.caseSingleScreen.dateOfBirth,
                     labelValue: 'test',
                     value: '',
                     type: "DatePicker",
@@ -294,7 +298,7 @@ const caseSingleScreen = {
                 {
                     cardNumber: 2,
                     id: 'age',
-                    label: 'Age',
+                    label: translations.caseSingleScreen.age,
                     type: 'TextInputWithDropDown',
                     value: '',
                     isRequired: false,
@@ -313,11 +317,11 @@ const caseSingleScreen = {
                 {
                     cardNumber: 2,
                     id: 'riskLevel',
-                    label: 'Risk level',
+                    label: translations.caseSingleScreen.riskLevel,
                     labelValue: 'test',
                     type: 'DropdownInput',
                     value: '',
-                    isRequired: true,
+                    isRequired: false,
                     isEditMode: false,
                     activeButtonColor: 'red',
                     activeBackgroundColor: 'red',
@@ -326,7 +330,7 @@ const caseSingleScreen = {
                 {
                     cardNumber: 2,
                     id: 'dateOfReporting',
-                    label: 'Date of Reporting',
+                    label: translations.caseSingleScreen.dateOfReporting,
                     value: '',
                     type: "DatePicker",
                     isRequired: true,
@@ -337,7 +341,7 @@ const caseSingleScreen = {
                 {
                     cardNumber: 2,
                     id: 'isDateOfReportingApproximate',
-                    label: 'Is Date of reporting approximate',
+                    label: translations.caseSingleScreen.isDateOfReportingApproximate,
                     type: 'SwitchInput',
                     value: false,
                     isRequired: false,
@@ -349,7 +353,7 @@ const caseSingleScreen = {
                 {
                     cardNumber: 2,
                     id: 'transferRefused',
-                    label: 'Transfer Refused',
+                    label: translations.caseSingleScreen.transferRefused,
                     type: 'SwitchInput',
                     value: false,
                     isRequired: false,
@@ -360,7 +364,7 @@ const caseSingleScreen = {
                 },
                 {
                     id: 'riskReason',
-                    label: 'Reason',
+                    label: translations.caseSingleScreen.riskReason,
                     type: 'TextInput',
                     value: '',
                     isRequired: false,
@@ -376,7 +380,7 @@ const caseSingleScreen = {
             {
                 cardNumber: 3,
                 id: 'type',
-                label: 'Document Type',
+                label: translations.caseSingleScreen.documentType,
                 type: 'DropdownInput',
                 value: '',
                 isRequired: true,
@@ -386,7 +390,7 @@ const caseSingleScreen = {
             {
                 cardNumber: 3,
                 id: 'number',
-                label: 'Document Number',
+                label: translations.caseSingleScreen.documentNumber,
                 labelValue: 'test',
                 type: 'TextInput',
                 value: '',
@@ -399,7 +403,7 @@ const caseSingleScreen = {
                 id: 'deleteButton',
                 type: 'ActionsBar',
                 labelValue: 'test',
-                textsArray: ['Delete'],
+                textsArray: [translations.caseSingleScreen.deleteButton],
                 textsStyleArray: [{color: styles.missedRedColor}],
                 onPressArray: [],
                 objectType: 'Documents'
@@ -411,7 +415,7 @@ const caseSingleScreen = {
             {
                 cardNumber: 1,
                 id: 'typeId',
-                label: 'Name',
+                label: translations.addressFieldLabels.name,
                 labelValue: 'test',
                 type: 'DropdownInput',
                 value: '',
@@ -422,7 +426,7 @@ const caseSingleScreen = {
             {
                 cardNumber: 1,
                 id: 'date',
-                label: 'Date',
+                label: translations.addressFieldLabels.date,
                 labelValue: 'test',
                 value: '',
                 type: "DatePicker",
@@ -434,7 +438,7 @@ const caseSingleScreen = {
             {
                 cardNumber: 1,
                 id: 'locationId',
-                label: 'Area',
+                label: translations.addressFieldLabels.area,
                 labelValue: 'test',
                 type: 'DropDownSectioned',
                 value: '',
@@ -446,7 +450,7 @@ const caseSingleScreen = {
             {
                 cardNumber: 1,
                 id: 'city',
-                label: 'City',
+                label: translations.addressFieldLabels.city,
                 labelValue: 'test',
                 type: 'TextInput',
                 value: '',
@@ -458,7 +462,7 @@ const caseSingleScreen = {
             {
                 cardNumber: 1,
                 id: 'postalCode',
-                label: 'ZIP',
+                label: translations.addressFieldLabels.zip,
                 labelValue: 'test',
                 type: 'TextInput',
                 value: '',
@@ -470,7 +474,7 @@ const caseSingleScreen = {
             {
                 cardNumber: 1,
                 id: 'addressLine1',
-                label: 'Address',
+                label: translations.addressFieldLabels.address,
                 labelValue: 'test',
                 type: 'TextInput',
                 value: '',
@@ -483,7 +487,7 @@ const caseSingleScreen = {
             {
                 cardNumber: 1,
                 id: 'lng',
-                label: 'Longitude',
+                label: translations.addressFieldLabels.longitude,
                 labelValue: 'test',
                 type: 'TextInput',
                 value: '',
@@ -491,12 +495,12 @@ const caseSingleScreen = {
                 isEditMode: true,
                 multiline: false,
                 objectType: 'Address',
-                keyboardType: 'numeric'
+                keyboardType: Platform.OS === 'ios' ? 'decimal-pad' : 'numeric'
             },
             {
                 cardNumber: 1,
                 id: 'lat',
-                label: 'Latitude',
+                label: translations.addressFieldLabels.latitude,
                 labelValue: 'test',
                 type: 'TextInput',
                 value: '',
@@ -504,14 +508,14 @@ const caseSingleScreen = {
                 isEditMode: true,
                 multiline: false,
                 objectType: 'Address',
-                keyboardType: 'numeric'
+                keyboardType: Platform.OS === 'ios' ? 'decimal-pad' : 'numeric'
             },
             {
                 cardNumber: 1,
                 id: 'deleteButton',
                 type: 'ActionsBar',
                 labelValue: 'test',
-                textsArray: ['Delete'],
+                textsArray: [translations.addressFieldLabels.deleteButton],
                 textsStyleArray: [{color: styles.missedRedColor}],
                 onPressArray: [],
                 objectType: 'Address'
@@ -524,7 +528,7 @@ const caseSingleScreen = {
                 {
                     cardNumber: 1,
                     id: 'classification',
-                    label: 'Classification',
+                    label: translations.caseSingleScreen.classification,
                     type: 'DropdownInput',
                     value: '',
                     isRequired: true,
@@ -534,7 +538,7 @@ const caseSingleScreen = {
                 {
                     cardNumber: 1,
                     id: 'dateOfOnset',
-                    label: 'Date of Onset',
+                    label: translations.caseSingleScreen.dateOfOnset,
                     value: '',
                     type: "DatePicker",
                     isRequired: false,
@@ -545,7 +549,7 @@ const caseSingleScreen = {
                 {
                     cardNumber: 1,
                     id: 'isDateOfOnsetApproximate',
-                    label: 'Is Date of onset approximate?',
+                    label: translations.caseSingleScreen.isDateOfOnsetApproximate,
                     type: 'SwitchInput',
                     value: false,
                     isRequired: false,
@@ -557,7 +561,7 @@ const caseSingleScreen = {
                 {
                     cardNumber: 1,
                     id: 'dateBecomeCase',
-                    label: 'Date of Becoming case',
+                    label: translations.caseSingleScreen.dateBecomeCase,
                     value: '',
                     type: "DatePicker",
                     isRequired: false,
@@ -568,7 +572,7 @@ const caseSingleScreen = {
                 {
                     cardNumber: 1,
                     id: 'dateOfInfection',
-                    label: 'Date of Infection',
+                    label: translations.caseSingleScreen.dateOfInfection,
                     value: '',
                     type: "DatePicker",
                     isRequired: false,
@@ -579,7 +583,7 @@ const caseSingleScreen = {
                 {
                     cardNumber: 1,
                     id: 'outcomeId',
-                    label: 'Outcome',
+                    label: translations.caseSingleScreen.outcomeId,
                     type: 'DropdownInput',
                     value: '',
                     isRequired: false,
@@ -589,7 +593,7 @@ const caseSingleScreen = {
                 {
                     cardNumber: 1,
                     id: 'dateOfOutcome',
-                    label: 'Date of Outcome',
+                    label: translations.caseSingleScreen.dateOfOutcome,
                     value: '',
                     type: "DatePicker",
                     isRequired: false,
@@ -600,7 +604,7 @@ const caseSingleScreen = {
                 {
                     cardNumber: 1,
                     id: 'deceased',
-                    label: 'Deceased',
+                    label: translations.caseSingleScreen.deceased,
                     type: 'SwitchInput',
                     value: false,
                     isRequired: false,
@@ -612,7 +616,7 @@ const caseSingleScreen = {
                 {
                     cardNumber: 1,
                     id: 'safeBurial',
-                    label: 'Was Burial Safety Performed?',
+                    label: translations.caseSingleScreen.safeBurial,
                     type: 'SwitchInput',
                     value: false,
                     isRequired: false,
@@ -624,7 +628,7 @@ const caseSingleScreen = {
                 {
                     cardNumber: 1,
                     id: 'dateDeceased',
-                    label: 'Date of Decease',
+                    label: translations.caseSingleScreen.dateDeceased,
                     value: '',
                     type: "DatePicker",
                     isRequired: false,
@@ -640,7 +644,7 @@ const caseSingleScreen = {
             {
                 cardNumber: 2,
                 id: 'startDate',
-                label: 'From',
+                label: translations.caseSingleScreen.hospitalisationStartDate,
                 type: 'DatePicker',
                 value: '',
                 isRequired: true,
@@ -651,7 +655,7 @@ const caseSingleScreen = {
             {
                 cardNumber: 2,
                 id: 'endDate',
-                label: 'To',
+                label: translations.caseSingleScreen.hospitalisationEndDate,
                 type: 'DatePicker',
                 value: '',
                 isRequired: true,
@@ -664,7 +668,7 @@ const caseSingleScreen = {
                 id: 'deleteButton',
                 type: 'ActionsBar',
                 labelValue: 'test',
-                textsArray: ['Delete'],
+                textsArray: [translations.caseSingleScreen.deleteButton],
                 textsStyleArray: [{color: styles.missedRedColor}],
                 onPressArray: [],
                 objectType: 'HospitalizationDates'
@@ -676,7 +680,7 @@ const caseSingleScreen = {
             {
                 cardNumber: 3,
                 id: 'startDate',
-                label: 'From',
+                label: translations.caseSingleScreen.isolationStartDate,
                 type: 'DatePicker',
                 value: '',
                 isRequired: true,
@@ -687,7 +691,7 @@ const caseSingleScreen = {
             {
                 cardNumber: 3,
                 id: 'endDate',
-                label: 'To',
+                label: translations.caseSingleScreen.isolationEndDate,
                 type: 'DatePicker',
                 value: '',
                 isRequired: true,
@@ -700,7 +704,7 @@ const caseSingleScreen = {
                 id: 'deleteButton',
                 type: 'ActionsBar',
                 labelValue: 'test',
-                textsArray: ['Delete'],
+                textsArray: [translations.caseSingleScreen.deleteButton],
                 textsStyleArray: [{color: styles.missedRedColor}],
                 onPressArray: [],
                 objectType: 'IsolationDates'
@@ -715,7 +719,7 @@ const followUpsFilterScreen = {
             fields: [
                 {
                     cardNumber: 1,
-                    label: 'Gender',
+                    label: translations.followUpFilter.gender,
                     type: 'Section',
                     hasBorderBottom: true,
                     borderBottomColor: styles.navigationDrawerSeparatorGrey
@@ -733,7 +737,7 @@ const followUpsFilterScreen = {
             fields: [
                 {
                     cardNumber: 2,
-                    label: 'Age range',
+                    label: translations.followUpFilter.ageRange,
                     type: 'Section',
                     hasBorderBottom: true,
                     borderBottomColor: styles.navigationDrawerSeparatorGrey
@@ -752,7 +756,7 @@ const followUpsFilterScreen = {
             fields: [
                 {
                     cardNumber: 3,
-                    label: 'Area',
+                    label: translations.followUpFilter.area,
                     type: 'Section',
                     hasBorderBottom: true,
                     borderBottomColor: styles.navigationDrawerSeparatorGrey
@@ -760,7 +764,7 @@ const followUpsFilterScreen = {
                 {
                     cardNumber: 3,
                     id: 'selectedLocations',
-                    label: 'Choose one or more locations',
+                    label: translations.followUpFilter.chooseLocationLabel,
                     type: 'DropDownSectioned',
                     value: '',
                     isRequired: false,
@@ -769,28 +773,48 @@ const followUpsFilterScreen = {
                 }
             ]
         }
-        // {
-        //     fields: [
-        //         {
-        //             cardNumber: 4,
-        //             label: 'Exposure',
-        //             type: 'Section',
-        //             hasBorderBottom: true,
-        //             borderBottomColor: styles.navigationDrawerSeparatorGrey
-        //         },
-        //         {
-        //             cardNumber: 4,
-        //             id: 'exposure',
-        //             label: 'Choose one or more cases',
-        //             type: 'DropDown',
-        //             value: '',
-        //             data: [{value: 'Diana Jones'}, {value: 'Florin Popa'}],
-        //             isRequired: false,
-        //             isEditMode: true
-        //         }
-        //     ]
-        // }
-    ]
+    ],
+    sort: {
+        fields: [
+            {      
+                cardNumber: 1,
+                label: 'Sort by',
+                type: 'Section',
+                hasBorderBottom: true,
+                borderBottomColor: styles.navigationDrawerSeparatorGrey
+            },
+            {
+                cardNumber: 1,
+                id: 'sortCriteria',
+                type: 'DropdownInput',
+                label: 'Sort Criteria',
+                isRequired: false,
+                isEditMode: true,
+                value: '',
+                objectType: 'Sort'
+            },
+            {
+                cardNumber: 1,
+                id: 'sortOrder',
+                type: 'DropdownInput',
+                label: 'Sort Order',
+                isRequired: false,
+                isEditMode: true,
+                value: '',
+                objectType: 'Sort'
+            },
+            {
+                cardNumber: 1,
+                id: 'deleteButton',
+                type: 'ActionsBar',
+                labelValue: 'test',
+                textsArray: ['Delete'],
+                textsStyleArray: [{color: styles.missedRedColor}],
+                onPressArray: [],
+                objectType: 'Sort'
+            }
+        ]
+    }
 };
 
 const casesFilterScreen = {
@@ -799,7 +823,7 @@ const casesFilterScreen = {
             fields: [
                 {
                     cardNumber: 1,
-                    label: 'Gender',
+                    label: translations.casesFilter.gender,
                     type: 'Section',
                     hasBorderBottom: true,
                     borderBottomColor: styles.navigationDrawerSeparatorGrey
@@ -817,7 +841,7 @@ const casesFilterScreen = {
             fields: [
                 {
                     cardNumber: 2,
-                    label: 'Age range',
+                    label: translations.casesFilter.ageRange,
                     type: 'Section',
                     hasBorderBottom: true,
                     borderBottomColor: styles.navigationDrawerSeparatorGrey
@@ -836,7 +860,7 @@ const casesFilterScreen = {
             fields: [
                 {
                     cardNumber: 3,
-                    label: 'Classification',
+                    label: translations.casesFilter.classification,
                     type: 'Section',
                     hasBorderBottom: true,
                     borderBottomColor: styles.navigationDrawerSeparatorGrey
@@ -844,7 +868,7 @@ const casesFilterScreen = {
                 {
                     cardNumber: 3,
                     id: 'classification',
-                    label: 'Choose one or more classification',
+                    label: translations.casesFilter.chooseClassificationLabel,
                     type: 'DropDown',
                     value: '',
                     isRequired: false,
@@ -856,7 +880,7 @@ const casesFilterScreen = {
             fields: [
                 {
                     cardNumber: 4,
-                    label: 'Area',
+                    label: translations.casesFilter.area,
                     type: 'Section',
                     hasBorderBottom: true,
                     borderBottomColor: styles.navigationDrawerSeparatorGrey
@@ -864,7 +888,7 @@ const casesFilterScreen = {
                 {
                     cardNumber: 4,
                     id: 'selectedLocations',
-                    label: 'Choose one or more locations',
+                    label: translations.casesFilter.chooseLocationLabel,
                     type: 'DropDownSectioned',
                     value: '',
                     isRequired: false,
@@ -873,7 +897,49 @@ const casesFilterScreen = {
                 }
             ]
         }
-    ]
+    ],
+    sort: {
+        fields: [
+            {
+                // LNG_SIDE_FILTERS_ADD_ANOTHER_SORT_BUTTON         
+                cardNumber: 1,
+                label: 'Sort by', //LNG_SIDE_FILTERS_SORT_BY_PLACEHOLDER
+                type: 'Section',
+                hasBorderBottom: true,
+                borderBottomColor: styles.navigationDrawerSeparatorGrey
+            },
+            {
+                cardNumber: 1,
+                id: 'sortCriteria',
+                type: 'DropdownInput',
+                label: 'Sort Criteria',
+                isRequired: false,
+                isEditMode: true,
+                value: '',
+                objectType: 'Sort'
+            },
+            {
+                cardNumber: 1,
+                id: 'sortOrder',
+                type: 'DropdownInput',
+                label: 'Sort Order', //LNG_SIDE_FILTERS_SORT_DIRECTION_LABEL
+                isRequired: false,
+                isEditMode: true,
+                value: '',
+                objectType: 'Sort'
+            },
+            {
+                cardNumber: 1,
+                id: 'deleteButton',
+                type: 'ActionsBar',
+                labelValue: 'test',
+                textsArray: ['Delete'],
+                textsStyleArray: [{color: styles.missedRedColor}],
+                onPressArray: [],
+                objectType: 'Sort'
+            }
+        ]
+    }
 };
 
 const defaultFilterForContacts = {
@@ -892,10 +958,11 @@ const defaultFilterForCases = {
 
 };
 
+//not used
 const addFollowUpScreen = [
     {
         cardNumber: 1,
-        label: 'Add Follow-Ups',
+        label: translations.addFollowUpScreen.addFollowUpLabel,
         type: 'Section',
         hasBorderBottom: false,
         borderBottomColor: styles.navigationDrawerSeparatorGrey
@@ -903,7 +970,7 @@ const addFollowUpScreen = [
     {
         cardNumber: 1,
         id: 'contact',
-        label: 'Contact',
+        label: translations.addFollowUpScreen.searchContactPlacehodler,
         type: 'DropdownInput',
         value: '',
         data: [],
@@ -915,7 +982,7 @@ const addFollowUpScreen = [
     {
         cardNumber: 1,
         id: 'date',
-        label: 'Date',
+        label: translations.addFollowUpScreen.followUpDateLabel,
         value: new Date,
         type: "DatePicker",
         isRequired: true,
@@ -929,29 +996,29 @@ const addExposureScreen = [
     {
         cardNumber: 1,
         id: 'exposure',
-        label: 'Choose a case/event',
+        label: translations.exposureScreen.chooseCaseOrEvent,
         labelValue: 'test',
         type: 'DropdownInput',
         value: '',
-        data: [{value: 'Diana Jones'}, {value: 'Florin Popa'}],
         isRequired: true,
-        isEditMode: true
+        isEditMode: true,
+        objectType: 'Contact'
     },
     {
         cardNumber: 1,
         id: 'contactDate',
-        label: 'Date of last contact',
+        label: translations.exposureScreen.contactDate,
         value: new Date(),
         type: "DatePicker",
         isRequired: true,
         isEditMode: true,
         format: 'MM/dd/YYYY',
-        objectType: 'FollowUp'
+        objectType: 'Contact'
     },
     {
         cardNumber: 1,
         id: 'contactDateEstimated',
-        label: 'Is Contact Date Estimated?',
+        label: translations.exposureScreen.contactDateEstimated,
         type: 'SwitchInput',
         value: false,
         isRequired: false,
@@ -963,7 +1030,7 @@ const addExposureScreen = [
         cardNumber: 1,
         id: 'certaintyLevelId',
         categoryId: 'LNG_REFERENCE_DATA_CATEGORY_CERTAINTY_LEVEL',
-        label: 'Certainty Level',
+        label: translations.exposureScreen.certaintyLevelId,
         labelValue: 'test',
         type: 'DropdownInput',
         value: '',
@@ -977,7 +1044,7 @@ const addExposureScreen = [
         cardNumber: 1,
         id: 'exposureTypeId',
         categoryId: 'LNG_REFERENCE_DATA_CATEGORY_EXPOSURE_TYPE',
-        label: 'Exposure Type',
+        label: translations.exposureScreen.exposureTypeId,
         labelValue: 'test',
         type: 'DropdownInput',
         value: '',
@@ -991,7 +1058,7 @@ const addExposureScreen = [
         cardNumber: 1,
         id: 'exposureFrequencyId',
         categoryId: "LNG_REFERENCE_DATA_CATEGORY_EXPOSURE_FREQUENCY",
-        label: 'Exposure Frequency',
+        label: translations.exposureScreen.exposureFrequencyId,
         labelValue: 'test',
         type: 'DropdownInput',
         value: '',
@@ -1005,7 +1072,7 @@ const addExposureScreen = [
         cardNumber: 1,
         id: 'exposureDurationId',
         categoryId: 'LNG_REFERENCE_DATA_CATEGORY_EXPOSURE_DURATION',
-        label: 'Exposure Duration',
+        label: translations.exposureScreen.exposureDurationId,
         labelValue: 'test',
         type: 'DropdownInput',
         value: '',
@@ -1019,7 +1086,7 @@ const addExposureScreen = [
         cardNumber: 1,
         id: 'socialRelationshipTypeId',
         categoryId: 'LNG_REFERENCE_DATA_CATEGORY_CONTEXT_OF_TRANSMISSION',
-        label: 'Relation',
+        label: translations.exposureScreen.socialRelationshipTypeId,
         labelValue: 'test',
         type: 'DropdownInput',
         value: '',
@@ -1032,7 +1099,7 @@ const addExposureScreen = [
     {
         cardNumber: 1,
         id: 'socialRelationshipDetail',
-        label: 'Relationship',
+        label: translations.exposureScreen.socialRelationshipDetail,
         labelValue: 'test',
         type: 'TextInput',
         value: '',
@@ -1044,7 +1111,7 @@ const addExposureScreen = [
     {
         cardNumber: 1,
         id: 'clusterId',
-        label: 'Cluster',
+        label: translations.exposureScreen.clusterId,
         labelValue: 'test',
         type: 'DropdownInput',
         value: '',
@@ -1057,7 +1124,7 @@ const addExposureScreen = [
     {
         cardNumber: 1,
         id: 'comment',
-        label: 'Comment',
+        label: translations.exposureScreen.comment,
         labelValue: 'test',
         type: 'TextInput',
         value: '',
@@ -1075,7 +1142,7 @@ const contactsSingleScreen = {
                 {
                     cardNumber: 1,
                     id: 'firstName',
-                    label: 'First Name',
+                    label: translations.contactSingleScreen.firstName,
                     labelValue: 'test',
                     type: 'TextInput',
                     value: '',
@@ -1087,7 +1154,7 @@ const contactsSingleScreen = {
                 {
                     cardNumber: 1,
                     id: 'middleName',
-                    label: 'Middle Name',
+                    label: translations.contactSingleScreen.middleName,
                     labelValue: 'test',
                     type: 'TextInput',
                     value: '',
@@ -1099,7 +1166,7 @@ const contactsSingleScreen = {
                 {
                     cardNumber: 1,
                     id: 'lastName',
-                    label: 'Last Name',
+                    label: translations.contactSingleScreen.lastName,
                     labelValue: 'test',
                     type: 'TextInput',
                     value: '',
@@ -1111,7 +1178,7 @@ const contactsSingleScreen = {
                 {
                     cardNumber: 1,
                     id: 'gender',
-                    label: 'Gender',
+                    label: translations.contactSingleScreen.gender,
                     labelValue: 'test',
                     type: 'DropdownInput',
                     value: '',
@@ -1122,19 +1189,20 @@ const contactsSingleScreen = {
                 {
                     cardNumber: 1,
                     id: 'phoneNumber',
-                    label: 'Phone Number',
+                    label: translations.contactSingleScreen.phoneNumber,
                     labelValue: 'test',
                     type: 'TextInput',
                     value: '',
                     isRequired: false,
                     isEditMode: true,
                     multiline: false,
+                    keyboardType: Platform.OS === 'ios' ? 'number-pad' : 'numeric',
                     objectType: 'Contact'
                 },
                 {
                     cardNumber: 1,
                     id: 'occupation',
-                    label: 'Occupation',
+                    label: translations.contactSingleScreen.occupation,
                     labelValue: 'test',
                     type: 'DropdownInput',
                     value: '',
@@ -1154,7 +1222,7 @@ const contactsSingleScreen = {
                 {
                     cardNumber: 3,
                     id: 'dob',
-                    label: 'Date of birth',
+                    label: translations.contactSingleScreen.dob,
                     labelValue: 'test',
                     value: '',
                     type: "DatePicker",
@@ -1167,7 +1235,7 @@ const contactsSingleScreen = {
                 {
                     cardNumber: 2,
                     id: 'age',
-                    label: 'Age',
+                    label: translations.contactSingleScreen.age,
                     type: 'TextInputWithDropDown',
                     value: '',
                     isRequired: false,
@@ -1182,7 +1250,7 @@ const contactsSingleScreen = {
                 {
                     cardNumber: 3,
                     id: 'dateOfReporting',
-                    label: 'Date of Reporting',
+                    label: translations.contactSingleScreen.dateOfReporting,
                     labelValue: 'test',
                     value: '',
                     type: "DatePicker",
@@ -1194,7 +1262,7 @@ const contactsSingleScreen = {
                 {
                     cardNumber: 3,
                     id: 'isDateOfReportingApproximate',
-                    label: 'Is date of reporting approximate?',
+                    label: translations.contactSingleScreen.isDateOfReportingApproximate,
                     labelValue: 'test',
                     type: 'SwitchInput',
                     value: false,
@@ -1211,7 +1279,7 @@ const contactsSingleScreen = {
                 {
                     cardNumber: 1,
                     id: 'riskLevel',
-                    label: 'Risk level',
+                    label: translations.contactSingleScreen.riskLevel,
                     labelValue: 'test',
                     type: 'DropdownInput',
                     value: '',
@@ -1224,7 +1292,7 @@ const contactsSingleScreen = {
                 {
                     cardNumber: 1,
                     id: 'riskReason',
-                    label: 'Reason',
+                    label: translations.contactSingleScreen.riskReason,
                     labelValue: 'test',
                     type: 'TextInput',
                     value: '',
@@ -1241,7 +1309,7 @@ const contactsSingleScreen = {
             {
                 cardNumber: 1,
                 id: 'typeId',
-                label: 'Name',
+                label: translations.addressFieldLabels.name,
                 labelValue: 'test',
                 type: 'DropdownInput',
                 value: '',
@@ -1252,7 +1320,7 @@ const contactsSingleScreen = {
             {
                 cardNumber: 1,
                 id: 'date',
-                label: 'Date',
+                label: translations.addressFieldLabels.date,
                 labelValue: 'test',
                 value: '',
                 type: "DatePicker",
@@ -1264,7 +1332,7 @@ const contactsSingleScreen = {
             {
                 cardNumber: 1,
                 id: 'locationId',
-                label: 'Area',
+                label: translations.addressFieldLabels.area,
                 labelValue: 'test',
                 type: 'DropDownSectioned',
                 value: '',
@@ -1276,7 +1344,7 @@ const contactsSingleScreen = {
             {
                 cardNumber: 1,
                 id: 'city',
-                label: 'City',
+                label: translations.addressFieldLabels.city,
                 labelValue: 'test',
                 type: 'TextInput',
                 value: '',
@@ -1288,7 +1356,7 @@ const contactsSingleScreen = {
             {
                 cardNumber: 1,
                 id: 'postalCode',
-                label: 'ZIP',
+                label: translations.addressFieldLabels.zip,
                 labelValue: 'test',
                 type: 'TextInput',
                 value: '',
@@ -1300,7 +1368,7 @@ const contactsSingleScreen = {
             {
                 cardNumber: 1,
                 id: 'addressLine1',
-                label: 'Address',
+                label: translations.addressFieldLabels.address,
                 labelValue: 'test',
                 type: 'TextInput',
                 value: '',
@@ -1313,7 +1381,7 @@ const contactsSingleScreen = {
             {
                 cardNumber: 1,
                 id: 'lng',
-                label: 'Longitude',
+                label: translations.addressFieldLabels.longitude,
                 labelValue: 'test',
                 type: 'TextInput',
                 value: '',
@@ -1321,12 +1389,12 @@ const contactsSingleScreen = {
                 isEditMode: true,
                 multiline: false,
                 objectType: 'Address',
-                keyboardType: 'numeric'
+                keyboardType: Platform.OS === 'ios' ? 'decimal-pad' : 'numeric'
             },
             {
                 cardNumber: 1,
                 id: 'lat',
-                label: 'Latitude',
+                label: translations.addressFieldLabels.latitude,
                 labelValue: 'test',
                 type: 'TextInput',
                 value: '',
@@ -1334,7 +1402,7 @@ const contactsSingleScreen = {
                 isEditMode: true,
                 multiline: false,
                 objectType: 'Address',
-                keyboardType: 'numeric'
+                keyboardType: Platform.OS === 'ios' ? 'decimal-pad' : 'numeric'
             },
 
             {
@@ -1342,7 +1410,7 @@ const contactsSingleScreen = {
                 id: 'deleteButton',
                 type: 'ActionsBar',
                 labelValue: 'test',
-                textsArray: ['Delete'],
+                textsArray: [translations.addressFieldLabels.deleteButton],
                 textsStyleArray: [{color: styles.missedRedColor}],
                 onPressArray: [],
                 objectType: 'Address'
@@ -1352,9 +1420,9 @@ const contactsSingleScreen = {
 };
 
 const personTypes = {
-    cases: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE',
-    contacts: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT',
-    events: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_EVENT'
+    cases: translations.personTypes.cases,
+    contacts: translations.personTypes.contacts,
+    events: translations.personTypes.events,
 };
 
 const mongoCollections = {
@@ -1658,41 +1726,50 @@ const RNDBConfig = {
 };
 
 const userResidenceAddress = {
-    userPlaceOfResidence: 'LNG_REFERENCE_DATA_CATEGORY_ADDRESS_TYPE_USUAL_PLACE_OF_RESIDENCE',
-    userOtherResidence: 'LNG_REFERENCE_DATA_CATEGORY_ADDRESS_TYPE_PREVIOUS_USUAL_PLACE_OF_RESIDENCE'
+    userPlaceOfResidence: translations.userResidenceAddress.userPlaceOfResidence,
+    userOtherResidence: translations.userResidenceAddress.userOtherResidence,
 };
 
 const contactFollowUpStatuses = {
-    underFollowUp: 'LNG_REFERENCE_DATA_CONTACT_FINAL_FOLLOW_UP_STATUS_TYPE_UNDER_FOLLOW_UP',
-    followUpCompleted: 'LNG_REFERENCE_DATA_CONTACT_FINAL_FOLLOW_UP_STATUS_TYPE_FOLLOW_UP_COMPLETED',
-    lostToFollowUp: 'LNG_REFERENCE_DATA_CONTACT_FINAL_FOLLOW_UP_STATUS_TYPE_LOST_TO_FOLLOW_UP'
+    underFollowUp: translations.contactFollowUpStatuses.underFollowUp,
+    followUpCompleted: translations.contactFollowUpStatuses.followUpCompleted,
+    lostToFollowUp: translations.contactFollowUpStatuses.lostToFollowUp,
 };
 
 const followUpStatuses = {
-    notPerformed: 'LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE_NOT_PERFORMED',
-    seenOk: 'LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE_SEEN_OK',
-    seenNotOk: 'LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE_SEEN_NOT_OK',
-    missed: 'LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE_MISSED'
+    notPerformed: translations.followUpStatuses.notPerformed,
+    seenOk: translations.followUpStatuses.seenOk,
+    seenNotOk: translations.followUpStatuses.seenNotOk,
+    missed: translations.followUpStatuses.missed,
 };
 
 const TextSwitchSelectorAgeOrDobValues = [
      //value must be the id of the element
-    { label: 'Age', value: 'age'},
-    { label: 'Date of Birth', value: 'dob'}
+    { label: translations.TextSwitchSelectorAgeOrDobValues.ageLabel, value: 'age'},
+    { label: translations.TextSwitchSelectorAgeOrDobValues.dobLabel, value: 'dob'}
 ];
 
 const ageUnitOfMeasureDropDown = [
-    { label: 'Years', value: 'years', errorValidationMessage: 'This field must be smaller or equal to 150'},
-    { label: 'Months', value: 'months', errorValidationMessage: 'This field must be smaller or equal to 11'}
+    { label: translations.ageUnitOfMeasureDropDown.yearsLabel, value: 'years'},
+    { label: translations.ageUnitOfMeasureDropDown.monthsLabel, value: 'months'}
 ];
 
 const localTranslationTokens = {
-    years: 'LNG_AGE_FIELD_LABEL_YEARS',
-    months: 'LNG_AGE_FIELD_LABEL_MONTHS',
-    male: 'LNG_REFERENCE_DATA_CATEGORY_GENDER_MALE',
-    female: 'LNG_REFERENCE_DATA_CATEGORY_GENDER_FEMALE'
+    years: translations.localTranslationTokens.years,
+    months: translations.localTranslationTokens.months,
+    male: translations.localTranslationTokens.male,
+    female: translations.localTranslationTokens.female,
 };
 
+const sortOrderDropDownItems = [
+    { label: 'LNG_SIDE_FILTERS_SORT_BY_ASC_PLACEHOLDER', value: 'LNG_SIDE_FILTERS_SORT_BY_ASC_PLACEHOLDER'},
+    { label: 'LNG_SIDE_FILTERS_SORT_BY_DESC_PLACEHOLDER', value: 'LNG_SIDE_FILTERS_SORT_BY_DESC_PLACEHOLDER'}
+]
+
+const sortCriteriaDropDownItems = [
+    { label: 'First Name', value: 'firstName'},
+    { label: 'Last Name', value: 'lastName'}
+]
 
 export default {
     designScreenSize,
@@ -1717,5 +1794,7 @@ export default {
     followUpStatuses,
     TextSwitchSelectorAgeOrDobValues,
     ageUnitOfMeasureDropDown,
-    localTranslationTokens
+    localTranslationTokens,
+    sortOrderDropDownItems,
+    sortCriteriaDropDownItems
 }
