@@ -42,7 +42,8 @@ class FollowUpsSingleScreen extends Component {
             savePressed: false,
             deletePressed: false,
             isDateTimePickerVisible: false,
-            isModified: false,
+            isEditMode: true,
+            isModified: false
         };
         // Bind here methods, or at least don't declare methods in the render method
         this.handleBackButtonClick = this.handleBackButtonClick.bind(this);
@@ -75,6 +76,25 @@ class FollowUpsSingleScreen extends Component {
 
     componentDidMount() {
         BackHandler.addEventListener('hardwareBackPress', this.handleBackButtonClick);
+
+        if (this.props.isNew === false) {
+            let today = new Date()
+            let itemDate = new Date(this.props.item.date)
+    
+            var todayDate = new Date(today.getFullYear(), today.getMonth(), today.getDate())
+            let followUpDate = new Date(itemDate.getFullYear(), itemDate.getMonth(), itemDate.getDate())
+            
+            if (followUpDate > todayDate) {
+                console.log('follow-ups date < today => needitabil')
+                this.setState({
+                    isEditMode: false
+                })
+            }
+        } else {
+            this.setState({
+                isEditMode: true
+            })
+        }
     }
 
     componentWillUnmount() {
@@ -205,6 +225,8 @@ class FollowUpsSingleScreen extends Component {
             case 'genInfo':
                 return (
                     <FollowUpsSingleGetInfoContainer
+                        isNew={this.props.isNew}
+                        isEditMode={this.state.isEditMode}
                         item={this.state.item}
                         contact={this.state.contact}
                         onNext={this.handleNextPress}
@@ -219,7 +241,8 @@ class FollowUpsSingleScreen extends Component {
                     <FollowUpsSingleQuestionnaireContainer
                         item={this.state.item}
                         contact={this.state.contact}
-                        isEditMode={true}
+                        isNew={this.props.isNew}
+                        isEditMode={this.state.isEditMode}
                         onChangeTextAnswer={this.onChangeTextAnswer}
                         onChangeDateAnswer={this.onChangeDateAnswer}
                         onChangeSingleSelection={this.onChangeSingleSelection}
@@ -232,6 +255,7 @@ class FollowUpsSingleScreen extends Component {
                 return (
                     <FollowUpsSingleGetInfoContainer
                         item={this.state.item}
+                        isEditMode={this.state.isEditMode}
                         contact={this.state.contact}
                         onNext={this.handleNextPress}
                         onChangeText={this.onChangeText}

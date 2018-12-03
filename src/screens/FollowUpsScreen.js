@@ -494,6 +494,7 @@ class FollowUpsScreen extends Component {
             animated: true,
             animationType: 'fade',
             passProps: {
+                isNew: false,
                 item: itemClone,
                 contact: contact,
                 filter: this.state.filter,
