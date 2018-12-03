@@ -266,7 +266,7 @@ class CardComponent extends Component {
             }
             if (item.type === 'DropDownSectioned' && item.id === 'selectedLocations') {
                 sectionedSelectedItems = this.props.filter.filter[item.id].map ((e) => {
-                    return 'location.json_false_' + e
+                    return 'location.json_' + e
                 })
             }
             if (item.type === 'DropDown' && item.id === 'exposure') {
@@ -661,55 +661,55 @@ class CardComponent extends Component {
 
         if (item.id === 'riskLevel') {
             return _.filter(this.props.referenceData, (o) => {
-                return o.categoryId.includes("RISK_LEVEL")
+                return o.active === true && o.categoryId.includes("RISK_LEVEL")
             }).map((o) => {return {value: this.getTranslation(o.value), id: o.value}})
         }
 
         if (item.id === 'classification') {
             return _.filter(this.props.referenceData, (o) => {
-                return o.categoryId.includes("CASE_CLASSIFICATION")
+                return o.active === true && o.categoryId.includes("CASE_CLASSIFICATION")
             }).map((o) => {return {label: this.getTranslation(o.value), value: o.value}})
         }
 
         if (item.id === 'gender') {
             return _.filter(this.props.referenceData, (o) => {
-                return o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_GENDER'
+                return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_GENDER'
             }).map((o) => {return {label: this.getTranslation(o.value), value: o.value}})
         }
 
         if (item.id === 'typeId') {
             return _.filter(this.props.referenceData, (o) => {
-                return o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_ADDRESS_TYPE'
+                return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_ADDRESS_TYPE'
             }).map((o) => {return {label: this.getTranslation(o.value), value: o.value}})
         }
 
         if (item.id === 'labName') {
             return _.filter(this.props.referenceData, (o) => {
-                return o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_LAB_NAME'
+                return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_LAB_NAME'
             }).map((o) => {return {value: this.getTranslation(o.value), id: o.value}})
         }
 
         if (item.id === 'sampleType') {
             return _.filter(this.props.referenceData, (o) => {
-                return o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_TYPE_OF_SAMPLE'
+                return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_TYPE_OF_SAMPLE'
             }).map((o) => {return {value: this.getTranslation(o.value), id: o.value}})
         }
 
         if (item.id === 'testType') {
             return _.filter(this.props.referenceData, (o) => {
-                return o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_TYPE_OF_LAB_TEST'
+                return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_TYPE_OF_LAB_TEST'
             }).map((o) => {return {value: this.getTranslation(o.value), id: o.value}})
         }
 
         if (item.id === 'result') {
             return _.filter(this.props.referenceData, (o) => {
-                return o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_LAB_TEST_RESULT'
+                return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_LAB_TEST_RESULT'
             }).map((o) => {return {value: this.getTranslation(o.value), id: o.value}})
         }
 
         if (item.id === 'status') {
             return _.filter(this.props.referenceData, (o) => {
-                return o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_LAB_TEST_RESULT_STATUS'
+                return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_LAB_TEST_RESULT_STATUS'
             }).map((o) => {return {value: this.getTranslation(o.value), id: o.value}})
         }
 
@@ -721,7 +721,7 @@ class CardComponent extends Component {
         let data = [];
         if (item.categoryId) {
             data = this.props.referenceData.filter((e) => {
-                return e.categoryId === item.categoryId
+                return e.active === true && e.categoryId === item.categoryId
             }).map((e) => {
                 return {value: this.getTranslation(e.value), id: extractIdFromPouchId(e._id, 'referenceData')}
             });
@@ -784,12 +784,12 @@ class CardComponent extends Component {
         // console.log("computeDataForFollowUpSingleScreenDropdownInput: ", item, this.props.case);
         if (item.id === 'statusId') {
             return _.filter(this.props.referenceData, (o) => {
-                return o.categoryId.includes("LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE")
+                return o.active === true && o.categoryId.includes("LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE")
             }).map((o) => {return {label: this.getTranslation(o.value), value: o.value}})
         }
         if (item.id === 'typeId') {
             return _.filter(this.props.referenceData, (o) => {
-                return o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_ADDRESS_TYPE'
+                return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_ADDRESS_TYPE'
             }).map((o) => {return {value: this.getTranslation(o.value), id: o.value}})
         }
     };
@@ -798,37 +798,37 @@ class CardComponent extends Component {
         // console.log("computeDataForCasesSingleScreenDropdownInput: ", item, this.props.case);
         if (item.id === 'riskLevel') {
             return _.filter(this.props.referenceData, (o) => {
-                return o.categoryId.includes("RISK_LEVEL")
+                return o.active === true && o.categoryId.includes("RISK_LEVEL")
             }).map((o) => {return {value: this.getTranslation(o.value), id: o.value}})
         }
         if (item.id === 'gender') {
             return _.filter(this.props.referenceData, (o) => {
-                return o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_GENDER'
+                return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_GENDER'
             }).map((o) => {return {label: this.getTranslation(o.value), value: o.value}})
         }
         if (item.id === 'typeId') {
             return _.filter(this.props.referenceData, (o) => {
-                return o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_ADDRESS_TYPE'
+                return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_ADDRESS_TYPE'
             }).map((o) => {return {value: this.getTranslation(o.value), id: o.value}})
         }
         if (item.id === 'classification') {
             return _.filter(this.props.referenceData, (o) => {
-                return o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_CASE_CLASSIFICATION'
+                return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_CASE_CLASSIFICATION'
             }).map((o) => {return {label: this.getTranslation(o.value), value: o.value}})
         }
         if (item.id === 'outcomeId') {
             return _.filter(this.props.referenceData, (o) => {
-                return o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_OUTCOME'
+                return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_OUTCOME'
             }).map((o) => {return {label: this.getTranslation(o.value), value: o.value}})
         }
         if (item.id === 'type') {
             return _.filter(this.props.referenceData, (o) => {
-                return o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_DOCUMENT_TYPE'
+                return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_DOCUMENT_TYPE'
             }).map((o) => {return {label: this.getTranslation(o.value), value: o.value}})
         }
         if (item.id === 'occupation') {
             return _.filter(this.props.referenceData, (o) => {
-                return o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_OCCUPATION'
+                return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_OCCUPATION'
             }).map((o) => {return {value: this.getTranslation(o.value), id: o.value}})
         }
     };
@@ -854,22 +854,22 @@ class CardComponent extends Component {
         // console.log("computeDataForContactsSingleScreenDropdownInput: ", item, this.props.contact);
         if (item.id === 'riskLevel') {
             return _.filter(this.props.referenceData, (o) => {
-                return o.categoryId.includes("RISK_LEVEL")
+                return o.active === true && o.categoryId.includes("RISK_LEVEL")
             }).map((o) => {return {value: this.getTranslation(o.value), id: o.value}})
         }
         if (item.id === 'gender') {
             return _.filter(this.props.referenceData, (o) => {
-                return o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_GENDER'
+                return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_GENDER'
             }).map((o) => {return {value: this.getTranslation(o.value), id: o.value}})
         }
         if (item.id === 'typeId') {
             return _.filter(this.props.referenceData, (o) => {
-                return o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_ADDRESS_TYPE'
+                return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_ADDRESS_TYPE'
             }).map((o) => {return {value: this.getTranslation(o.value), id: o.value}})
         }
         if (item.id === 'occupation') {
             return _.filter(this.props.referenceData, (o) => {
-                return o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_OCCUPATION'
+                return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_OCCUPATION'
             }).map((o) => {return {value: this.getTranslation(o.value), id: o.value}})
         }
     };

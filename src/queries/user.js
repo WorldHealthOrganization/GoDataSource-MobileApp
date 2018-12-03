@@ -30,7 +30,12 @@ export function loginUserRequest (credentials, callback) {
                         if (isMatch) {
                             console.log("Passwords match: ");
                             // Return user
-                            callback(null, resultFind.docs[0]);
+                            // If passwords match, check also if the user has an active outbreak id
+                            if (resultFind.docs[0].activeOutbreakId) {
+                                callback(null, resultFind.docs[0]);
+                            } else {
+                                callback('There is no active Outbreak configured for your user. You have to configure an active Outbreak for your user from the web portal and resync the data with the hub');
+                            }
                         } else {
                             console.log("Passwords don't match");
                             callback("Passwords don't match");

@@ -326,15 +326,15 @@ export function processBulkDocs(data, type) {
 export function createIdForType(file, type) {
     switch (type) {
         case 'person.json':
-            return (type + '_' + file.type + '_' + file.deleted + '_' + file.outbreakId + '_' + file._id);
+            return (type + '_' + file.type + '_' + file.outbreakId + '_' + file._id);
         case 'languageToken.json':
-            return (type + '_' + file.deleted + '_' + file.languageId + '_' + file._id);
+            return (type + '_' + file.languageId + '_' + file._id);
         case 'followUp.json':
-            return (type + '_' + file.deleted + '_' + file.outbreakId + '_' + new Date(file.date).getTime() + '_' + file._id);
+            return (type + '_' + file.outbreakId + '_' + new Date(file.date).getTime() + '_' + file._id);
             // return (type + '_' + file.outbreakId + '_' + file._id);
         case 'relationship.json':
-            return (type + '_' + file.deleted + '_' + file.outbreakId + '_' + file._id);
+            return (type + '_' + file.outbreakId + '_' + file._id);
         default:
-            return (type + '_' + file.deleted + '_' + file._id);
+            return (type + '_' + file._id);
     }
 }

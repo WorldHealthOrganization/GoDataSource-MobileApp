@@ -27,14 +27,16 @@ import ValuePicker from './../components/ValuePicker';
 import {getFollowUpsForOutbreakId, getMissedFollowUpsForOutbreakId, updateFollowUpAndContact, addFollowUp, generateFollowUp} from './../actions/followUps';
 import {getContactsForOutbreakId} from './../actions/contacts';
 import {removeErrors} from './../actions/errors';
-import {addFilterForScreen, removeFilterForScreen} from './../actions/app';
+import {addFilterForScreen, removeFilterForScreen, saveGeneratedFollowUps} from './../actions/app';
 import ElevatedView from 'react-native-elevated-view';
 import _ from 'lodash';
 import AddFollowUpScreen from './AddFollowUpScreen';
+import GenerateFollowUpScreen from './GenerateFollowUpScreen';
 import {LoaderScreen, Colors} from 'react-native-ui-lib';
 import {navigation, extractIdFromPouchId, generateId, updateRequiredFields} from './../utils/functions';
 import ViewHOC from './../components/ViewHOC';
 import { Popup } from 'react-native-map-link';
+import moment from 'moment';
 
 const scrollAnim = new Animated.Value(0);
 const offsetAnim = new Animated.Value(0);
@@ -47,15 +49,17 @@ class FollowUpsScreen extends Component {
 
     constructor(props) {
         super(props);
+        let now = new Date();
         this.state = {
             // filter: this.props.filter && this.props.filter['FollowUpsScreen'] ? this.props.filter['FollowUpsScreen'] : null,
             filter: this.props.filter && this.props.filter['FollowUpsScreen'] ? this.props.filter['FollowUpsScreen'] : {
-                date: new Date(),
+                date: new Date(new Date((now.getUTCMonth() + 1) + '/' + now.getUTCDate() + '/' + now.getUTCFullYear()).getTime() - ((moment().isDST() ? now.getTimezoneOffset() : now.getTimezoneOffset() - 60) * 60 * 1000)),
                 searchText: ''
             },
             filterFromFilterScreen: this.props.filter && this.props.filter['FollowUpsFilterScreen'] ? this.props.filter['FollowUpsFilterScreen'] : null,
             followUps: [],
             showAddFollowUpScreen: false,
+            showGenerateFollowUpScreen: false,
             refreshing: false,
             loading: true,
 
@@ -85,7 +89,7 @@ class FollowUpsScreen extends Component {
 
     // Please add here the react lifecycle methods that you need
     static getDerivedStateFromProps(props, state) {
-        console.log ('getDerivedStateFromProps')
+        console.log ('getDerivedStateFromProps');
         if (props.errors && props.errors.type && props.errors.message) {
             Alert.alert(props.errors.type, props.errors.message, [
                 {
@@ -155,44 +159,31 @@ class FollowUpsScreen extends Component {
                 fUps = fUps.filter((e) => {return e.statusId === state.filter.performed.value});
             }
 
-
-            //if we'e generating follow-ups
-            if(state.generating) {
-                //and we received generated follow-ups
-                if(props.followUps.length) {
-                    //if we had previous generated follow-ups get difference
-                    if (prevFollowUps.length) {
-                        let number = parseInt(props.followUps.length - prevFollowUps.length);
-                        props.navigator.showInAppNotification({
-                            screen: "InAppNotificationScreen",
-                            passProps: {
-                                number: number
-                            },
-                            autoDismissTimerSec: 1
-                        });
-                    } else {
-                        //no previous follow-ups just display number of generated
-                        let number = parseInt(props.followUps.length);
-                        props.navigator.showInAppNotification({
-                            screen: "InAppNotificationScreen",
-                            passProps: {
-                                number: number
-                            },
-                            autoDismissTimerSec: 1
-                        });
-                    }
-
-                    //reset generating status
-                    state.generating = false;
-                }
-            }
-
             if (props.followUps && props.followUps.length > 0) {
                 state.followUps = fUps;
             }
             else {
                 state.followUps = []
             }
+
+            //if we're generating follow-ups
+            if(state.generating) {
+                if(props.generatedFollowUps){
+                    let number = parseInt(props.generatedFollowUps);
+                    props.navigator.showInAppNotification({
+                        screen: "InAppNotificationScreen",
+                        passProps: {
+                            number: number
+                        },
+                        autoDismissTimerSec: 1
+                    });
+                    //reset generating status
+                    state.generating = false;
+                    //reset number of generated followups
+                    props.saveGeneratedFollowUps(0);
+                }
+            }
+
             state.refreshing = false;
             state.loading = false;
         }
@@ -284,7 +275,7 @@ class FollowUpsScreen extends Component {
                                         </Ripple>
                                     }
                                 >
-                                    <MenuItem onPress={this.handleGenerateFollowUps}>Generate for current day</MenuItem>
+                                    <MenuItem onPress={this.handleModalGenerateFollowUps}>Generate follow ups</MenuItem>
                                 </Menu>
                             </View>
                         </View>
@@ -354,12 +345,12 @@ class FollowUpsScreen extends Component {
                         getItemLayout={this.getItemLayout}
                     />
                 </View>
+
                 <AddFollowUpScreen
                     showAddFollowUpScreen={this.state.showAddFollowUpScreen}
                     onCancelPressed={this.handleOnCancelPressed}
                     onSavePressed={this.handleOnSavePressed}
                 />
-
                 <View style={styles.mapContainer}>
                     {
                         this.state.error === null ? (
@@ -382,7 +373,13 @@ class FollowUpsScreen extends Component {
                         ) : console.log('this.state.error', this.state.error)
                     }
                 </View>
+                <GenerateFollowUpScreen
+                    showGenerateFollowUpScreen={this.state.showGenerateFollowUpScreen}
+                    onCancelPressed={this.handleModalGenerateFollowUps}
+                    onOkPressed={this.handleGenerateNewFollowUps}
+                />
             </ViewHOC>
+
         );
     }
 
@@ -456,18 +453,6 @@ class FollowUpsScreen extends Component {
         return (
             <View style={[style.emptyComponent, {height: calculateDimension((667 - 152), true, this.props.screenSize)}]}>
                 <Text style={style.emptyComponentTextView}>There are no follow-ups to display</Text>
-                <Button
-                    raised
-                    upperCase={false}
-                    text="Generate for 1 day"
-                    color="blue"
-                    titleColor="red"
-                    onPress={this.handleGenerateFollowUps}
-                    style={{
-                        text: style.buttonEmptyListText,
-                        container: {width: calculateDimension(230, false, this.props.screenSize), height: calculateDimension(35, true, this.props.screenSize)}
-                    }}
-                />
             </View>
         )
     };
@@ -636,7 +621,7 @@ class FollowUpsScreen extends Component {
         let now = new Date();
         date = new Date(date);
         let followUp = {
-            _id: 'followUp.json_false_' + this.props.user.activeOutbreakId + '_' + date.getTime() + '_' + generateId(),
+            _id: 'followUp.json_' + this.props.user.activeOutbreakId + '_' + date.getTime() + '_' + generateId(),
             statusId: config.followUpStatuses.notPerformed,
             targeted: false,
             date: date,
@@ -656,14 +641,33 @@ class FollowUpsScreen extends Component {
         });
     };
 
-    handleGenerateFollowUps = () => {
+    handleGenerateFollowUps = (date) => {
         this.setState({
             generating: true,
         }, () => {
-            this.props.generateFollowUp(this.props.user.activeOutbreakId, this.state.filter.date, this.props.user.token);
+            this.props.generateFollowUp(this.props.user.activeOutbreakId, this.state.filter.date, date, this.props.user.token);
             this.hideMenu();
         });
 
+    };
+
+    handleGenerateNewFollowUps = (date) => {
+        this.setState({
+            showGenerateFollowUpScreen: !this.state.showGenerateFollowUpScreen,
+        }, () => {
+           this.handleGenerateFollowUps(date);
+        } );
+    };
+
+    handleModalGenerateFollowUps = () => {
+        this.hideMenu();
+        setTimeout(function(){
+            this.setState({
+                showGenerateFollowUpScreen: !this.state.showGenerateFollowUpScreen,
+            }, () => {
+                console.log("showGenerateFollowUpScreen", this.state.showGenerateFollowUpScreen);
+            } );
+        }.bind(this), 2000);
     };
 
     // Append to the existing filter newProp={name: value}
@@ -963,6 +967,7 @@ function mapStateToProps(state) {
         screenSize: state.app.screenSize,
         filter: state.app.filters,
         syncState: state.app.syncState,
+        generatedFollowUps: state.app.generatedFollowUps,
         followUps: state.followUps,
         contacts: state.contacts,
         errors: state.errors,
@@ -979,6 +984,7 @@ function matchDispatchProps(dispatch) {
         getContactsForOutbreakId,
         updateFollowUpAndContact,
         addFollowUp,
+        saveGeneratedFollowUps,
         removeFilterForScreen,
         generateFollowUp
     }, dispatch);
