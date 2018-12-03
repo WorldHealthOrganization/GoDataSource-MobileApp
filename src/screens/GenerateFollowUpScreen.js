@@ -1,11 +1,8 @@
 /**
- * Created by florinpopa on 13/08/2018.
- */
-/**
- * Created by florinpopa on 05/07/2018.
+ * Created by mobileclarisoft on 19/11/2018.
  */
 import React, {PureComponent} from 'react';
-import {View, StyleSheet, Platform, Alert} from 'react-native';
+import {View, StyleSheet, Platform} from 'react-native';
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import Button from './../components/Button';
@@ -14,50 +11,32 @@ import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import ElevatedView from 'react-native-elevated-view';
 import {calculateDimension} from './../utils/functions';
-import config from './../utils/config';
 import Section from './../components/Section';
-import DropdownInput from './../components/DropdownInput';
 import DatePicker from './../components/DatePicker';
 import {Dialog} from 'react-native-ui-lib';
-import {getContactsForOutbreakIdRequest} from './../queries/contacts';
-import DropdownSearchable from './../components/DropdownSearchable';
 
-class AddFollowUpScreen extends PureComponent{
+class GenerateFollowUpScreen extends PureComponent{
 
     constructor(props) {
         super(props);
         this.state = {
             date: new Date(),
-            selectedContact: '',
-            contacts: [],
-            isModified: false,
         };
     }
 
     componentDidMount() {
-        // getContactsForOutbreakIdRequest(this.props.user.activeOutbreakId, null, null, (error, contacts) => {
-        //     if (error) {
-        //         console.log("An error occurred while getting all contacts for add contacts screen");
-        //     }
-        //     if (contacts) {
-        //         this.setState({
-        //             contacts
-        //         })
-        //     }
-        // })
-    }
 
+    }
 
     render () {
         let contentWidth = calculateDimension(297, false, this.props.screenSize);
         let marginHorizontal = calculateDimension(14, false, this.props.screenSize);
-
         return (
             <Dialog
-                visible={this.props.showAddFollowUpScreen}
+                visible={this.props.showGenerateFollowUpScreen}
                 width="90%"
                 height="75%"
-                onDismiss={this.onCancelPressed}
+                onDismiss={this.props.onCancelPressed}
             >
                 <ElevatedView
                     elevation={3}
@@ -69,16 +48,12 @@ class AddFollowUpScreen extends PureComponent{
                         justifyContent: 'space-around'
                     }}>
                     <Section
-                        label="Add Follow-ups"
+                        label="Generate follow ups"
                         hasBorderBottom={false}
                         containerStyle={{width: '100%', flex: 0.15}}
                     />
-                    <DropdownSearchable
-                        outbreakId={this.props && this.props.user && this.props.user.activeOutbreakId ? this.props.user.activeOutbreakId : null}
-                        onChange={this.onDropdownSearchableChanged}
-                    />
                     <DatePicker
-                        id='followUpDate'
+                        id='generateFollowUpDate'
                         label={"Follow-up date"}
                         value={this.state.date}
                         isEditMode={true}
@@ -91,15 +66,15 @@ class AddFollowUpScreen extends PureComponent{
                             title="Cancel"
                             color="white"
                             titleColor={"black"}
-                            onPress={this.onCancelPressed}
+                            onPress={this.props.onCancelPressed}
                             height={25}
                             width="40%"
                         />
                         <Button
-                            title="Save"
+                            title="OK"
                             color={styles.buttonGreen}
                             titleColor={'white'}
-                            onPress={this.onSavePressed}
+                            onPress={this.onOkPressed}
                             height={25}
                             width="40%"
                         />
@@ -109,57 +84,15 @@ class AddFollowUpScreen extends PureComponent{
         );
     }
 
-    onDropdownSearchableChanged = (value) => {
-        this.setState({
-            selectedContact: value,
-            isModified: true
-        })
-    };
-
     onDateChanged = (date, id, objectType) => {
         this.setState({
-            date: date,
-            isModified: true
+            date: date
         })
     };
 
-    onSavePressed = () => {
-        this.setState({
-            date: new Date(),
-            isModified: false
-        }, () => {
-            this.props.onSavePressed(this.state.selectedContact, this.state.date);
-        });
-    };
-
-    onCancelPressed = () => {
-        if (this.state.isModified === true) {
-            Alert.alert("", 'You have unsaved data. Are you sure you want to leave this page and lose all changes?', [
-                {
-                    text: 'Yes', onPress: () => {
-                    this.setState({
-                        date: new Date(),
-                        isModified: false
-                    }, () => {
-                        this.props.onCancelPressed();
-                    });
-                }
-                },
-                {
-                    text: 'Cancel', onPress: () => {
-                    console.log("onPressCancelEdit No pressed - nothing changes")
-                }
-                }
-            ])
-        } else {
-            this.setState({
-                date: new Date(),
-                isModified: false
-            }, () => {
-                this.props.onCancelPressed();
-            });
-        }
-    };
+    onOkPressed = () => {
+        this.props.onOkPressed(this.state.date);
+    }
 }
 
 
@@ -187,4 +120,4 @@ function matchDispatchProps(dispatch) {
     }, dispatch);
 }
 
-export default connect(mapStateToProps, matchDispatchProps)(AddFollowUpScreen);
+export default connect(mapStateToProps, matchDispatchProps)(GenerateFollowUpScreen);

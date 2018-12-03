@@ -48,7 +48,7 @@ class CaseSingleInvestigationContainer extends PureComponent {
                     <View style={{flexDirection: 'row'}}>
                     {
                         this.props.isNew ? (
-                            <View style={{flexDirection: 'row'}}>
+                            <View style={{flexDirection: 'row', width: '90%', alignItems: 'center'}}>
                                 <Button
                                 title={'Back'}
                                 onPress={this.handleBackButton}

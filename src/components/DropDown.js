@@ -60,7 +60,7 @@ class DropDown extends PureComponent {
                 ]} onPress={this.handleOnPress}>
                 <View style={style.innerTextContainer}>
                     <Text style={style.labelStyle}>
-                        {this.state.selectedItems.length === 0 ? 'Select answer(s)' : ("Selected " + this.state.selectedItems.length + ' answer(s)')}</Text>
+                        {this.state.selectedItems.length === 0 ? this.props.isRequired === false ? this.props.label : this.props.label + '*' : ("Selected " + this.state.selectedItems.length + ' answer(s)')}</Text>
                     <Icon name="arrow-drop-down"/>
                 </View>
                 <View style={[{height: 1, backgroundColor: styles.textFieldUnderline, marginTop: 14}]} />
