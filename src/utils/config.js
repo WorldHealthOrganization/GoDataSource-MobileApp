@@ -256,6 +256,7 @@ const caseSingleScreen = {
                     value: '',
                     isRequired: false,
                     isEditMode: false,
+                    keyboardType: Platform.OS === 'ios' ? 'number-pad' : 'numeric',
                     objectType: 'Case'
                 },
                 {
@@ -1129,6 +1130,7 @@ const contactsSingleScreen = {
                     isRequired: false,
                     isEditMode: true,
                     multiline: false,
+                    keyboardType: Platform.OS === 'ios' ? 'number-pad' : 'numeric',
                     objectType: 'Contact'
                 },
                 {
