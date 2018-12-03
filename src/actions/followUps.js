@@ -14,6 +14,7 @@ import {updateContact, updateContactAction, getContactsForOutbreakIdWithPromises
 import { addError } from './errors';
 import errorTypes from './../utils/errorTypes';
 import config from './../utils/config';
+import moment from 'moment';
 import {
     getFollowUpsForOutbreakIdRequest,
     getFollowUpsForContactIds,
@@ -27,7 +28,7 @@ import {getRelationshipsForTypeRequest} from './../queries/relationships';
 import {extractIdFromPouchId, mapContactsAndRelationships, mapContactsAndFollowUps, generateId, updateRequiredFields} from './../utils/functions';
 import {getContactsForFollowUpPeriodRequest} from './../queries/contacts';
 import {difference} from 'lodash';
-import {setSyncState} from './app';
+import {setSyncState, saveGeneratedFollowUps} from './app';
 
 // Add here only the actions, not also the requests that are executed. For that purpose is the requests directory
 export function storeFollowUps(followUps) {
@@ -191,7 +192,7 @@ export function createFollowUp(outbreakId, contactId, followUp, contact, activeF
     }
 }
 
-export function generateFollowUp(outbreakId, date, token) {
+export function generateFollowUp(outbreakId, filterDate, date, token) {
     return async function(dispatch, getState) {
         // TODO add generate algorithm for follow-ups
         // The algorithm:
@@ -238,6 +239,7 @@ export function generateFollowUp(outbreakId, date, token) {
                             }
                         }
 
+                        let nrGeneratedFollowUps = generatedFollowUps ? generatedFollowUps.length : 0;
                         // Here bulk add the followUps
                         addFollowUpsBulkRequest(generatedFollowUps, (errorBulkInsert, resultBulkInsert) => {
                             if (errorBulkInsert) {
@@ -246,7 +248,10 @@ export function generateFollowUp(outbreakId, date, token) {
                                 addError(errorTypes.ERROR_GENERATE_FOLLOWUP);
                             }
                             if (resultBulkInsert) {
-                                dispatch(getFollowUpsForOutbreakId(outbreakId, {date: date}));
+                                dispatch(saveGeneratedFollowUps(nrGeneratedFollowUps));
+                                if(moment(filterDate).format('YYYY-MM-DD') === moment(date).format('YYYY-MM-DD')) {
+                                    dispatch(getFollowUpsForOutbreakId(outbreakId, {date: date}));
+                                }
                                 dispatch(setSyncState('Finished processing'));
                             }
                         })

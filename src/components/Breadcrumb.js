@@ -80,10 +80,14 @@ class Breadcrumb extends PureComponent {
         // })
         InteractionManager.runAfterInteractions(() => {
             if (index === 0) {
-                this.props.navigator.pop({
-                    animated: true,
-                    animationType: 'fade'
-                })
+                if(this.props.onPress){
+                    this.props.onPress();
+                }else {
+                    this.props.navigator.pop({
+                        animated: true,
+                        animationType: 'fade'
+                    })
+                }
             }
         });
     }

@@ -38,7 +38,7 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
     // }
 
     componentDidMount() {
-
+        
         InteractionManager.runAfterInteractions(() => {
             this.setState({
                 interactionComplete: true,
@@ -178,8 +178,10 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
                 if (this.state.questions[i] && this.state.questions[i].questions && Array.isArray(this.state.questions[i].questions) && this.state.questions[i].questions.length > 0) {
                     for (let j = 0; j < this.state.questions[i].questions.length; j++) {
                         if (this.state.questions[i].questions[j].variable && this.props.item) {
-                            if (!this.props.item.questionnaireAnswers || this.state.questions[i].questions[j].required && !this.props.item.questionnaireAnswers[this.state.questions[i].questions[j].variable]) {
-                                return false;
+                            if (this.state.questions[i].questions[j].required === true) {
+                                if (!this.props.item.questionnaireAnswers || !this.props.item.questionnaireAnswers[this.state.questions[i].questions[j].variable]) {
+                                    return false;
+                                }
                             }
                         }
                     }

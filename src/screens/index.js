@@ -10,6 +10,7 @@ import ManualConfigScreen from './ManualConfigScreen';
 import NavigationDrawer from './NavigationDrawer';
 import FollowUpsScreen from './FollowUpsScreen';
 import AddFollowUpScreen from './AddFollowUpScreen';
+import GenerateFollowUpScreen from './GenerateFollowUpScreen';
 import FollowUpsFilterScreen from './FollowUpsFilterScreen';
 import FollowUpsSingleScreen from './FollowUpsSingleScreen';
 import CasesScreen from './CasesScreen';
@@ -29,6 +30,7 @@ const screens = [
     {screen: 'NavigationDrawer', component: NavigationDrawer},
     {screen: 'FollowUpsScreen', component: FollowUpsScreen},
     {screen: 'AddFollowUpScreen', component: AddFollowUpScreen},
+    {screen: 'GenerateFollowUpScreen', component: GenerateFollowUpScreen},
     {screen: 'FollowUpsFilterScreen', component: FollowUpsFilterScreen},
     {screen: 'FollowUpsSingleScreen', component: FollowUpsSingleScreen},
     {screen: 'CasesScreen', component: CasesScreen},

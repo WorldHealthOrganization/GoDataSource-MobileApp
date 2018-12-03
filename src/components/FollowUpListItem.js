@@ -125,8 +125,7 @@ class FollowUpListItem extends PureComponent {
                     />
                 </View>
                 <View style={styles.lineStyle}/>
-                <View
-                    style={[style.secondSectionContainer, {height: calculateDimension(78.5, true, this.props.screenSize)}]}>
+                <View style={[style.secondSectionContainer, {height: calculateDimension(78.5, true, this.props.screenSize)}]}>
                     <Text
                         style={[style.addressStyle, {
                             marginHorizontal: calculateDimension(14, false, this.props.screenSize),
@@ -143,8 +142,7 @@ class FollowUpListItem extends PureComponent {
                     >{'Exposed to: ' + relationshipText}</Text>
                 </View>
                 <View style={styles.lineStyle}/>
-                <View
-                    style={[style.thirdSectionContainer, {marginHorizontal: calculateDimension(14, false, this.props.screenSize)}]}>
+                <View style={[style.thirdSectionContainer, {marginHorizontal: calculateDimension(14, false, this.props.screenSize)}]}>
                     <Ripple style={[style.rippleStyle]} onPress={this.onPressFollowUp}>
                         <Text style={[style.rippleTextStyle]}>{this.props.firstActionText || getTranslation(translations.followUpsScreen.editFollowUpLabel, this.props.translation).toUpperCase()}</Text>
                     </Ripple>

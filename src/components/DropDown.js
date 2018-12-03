@@ -62,7 +62,7 @@ class DropDown extends PureComponent {
                 ]} onPress={this.handleOnPress}>
                 <View style={style.innerTextContainer}>
                     <Text style={style.labelStyle}>
-                        {this.state.selectedItems.length === 0 ? getTranslation(translations.dropDownLabels.selectedAnswersLabel, this.props.translation) : (getTranslation(translations.dropDownLabels.selectedLabel, this.props.translation) + ' ' + this.state.selectedItems.length + ' ' + getTranslation(translations.dropDownLabels.answersLabel, this.props.translation))}</Text>
+                        {this.state.selectedItems.length === 0 ? this.props.isRequired === false ? getTranslation(translations.dropDownLabels.selectedAnswersLabel, this.props.translation) : getTranslation(translations.dropDownLabels.selectedAnswersLabel, this.props.translation) + '*' : (getTranslation(translations.dropDownLabels.selectedLabel, this.props.translation) + ' ' + this.state.selectedItems.length + ' ' + getTranslation(translations.dropDownLabels.answersLabel, this.props.translation))}</Text>
                     <Icon name="arrow-drop-down"/>
                 </View>
                 <View style={[{height: 1, backgroundColor: styles.textFieldUnderline, marginTop: 14}]} />

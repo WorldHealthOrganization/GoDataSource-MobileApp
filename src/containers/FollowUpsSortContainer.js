@@ -15,6 +15,8 @@ import Button from './../components/Button';
 import styles from './../styles';
 import Ripple from 'react-native-material-ripple';
 import ElevatedView from 'react-native-elevated-view';
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import CardComponent from './../components/CardComponent';
 
 class FollowUpsSortContainer extends PureComponent {
 
@@ -22,6 +24,7 @@ class FollowUpsSortContainer extends PureComponent {
     constructor(props) {
         super(props);
         this.state = {
+            addSortRuleText: 'Add sort rule'
         };
     }
 
@@ -33,7 +36,7 @@ class FollowUpsSortContainer extends PureComponent {
     // and can slow down the app
     render() {
         return (
-            <ElevatedView elevation={3} style={[style.container]}>
+            <View style={[style.container]}>
                  <Button
                     title={'Back'}
                     onPress={this.props.handleMoveToPrevieousScreenButton}
@@ -44,13 +47,71 @@ class FollowUpsSortContainer extends PureComponent {
                     style={{
                         marginVertical: calculateDimension(12.5, true, this.props.screenSize),
                         marginHorizontal: calculateDimension(16, false, this.props.screenSize),
-                    }}/> 
-                <Text>To do FollowUps sort container: first create necessary components and then integrate them here</Text>
-            </ElevatedView>
+                    }}
+                /> 
+
+                <KeyboardAwareScrollView
+                    style={style.containerScrollView}
+                    contentContainerStyle={[style.contentContainerStyle, {paddingBottom: this.props.screenSize.height < 600 ? 70 : 20}]}
+                    keyboardShouldPersistTaps={'always'}
+                >
+                    <View style={style.container}>
+                        {
+                            this.props.filter && this.props.filter.sort && this.props.filter.sort.map((item, index) => {
+                                return this.handleRenderItem(item, index)
+                            })
+                        }
+                    </View>
+                    {
+                        this.props.filter.sort.length < config.sortCriteriaDropDownItems.length ? 
+                            <View style={{alignSelf: 'flex-start', marginHorizontal: calculateDimension(16, false, this.props.screenSize), marginVertical: 20}}>
+                                <Ripple
+                                    style={{
+                                        height: 25,
+                                        justifyContent: 'center'
+                                    }}
+                                    onPress={this.props.onPressAddSortRule}
+                                >
+                                    <Text style={{fontFamily: 'Roboto-Medium', fontSize: 12, color: styles.buttonGreen}}>
+                                        {this.state.addSortRuleText}
+                                    </Text>
+                                </Ripple>
+                            </View> : null
+                    }
+                </KeyboardAwareScrollView>   
+                <View style={style.containerButtonApplyFilters}>
+                <Button
+                        title="Apply filters"
+                        color={styles.buttonGreen}
+                        onPress={this.props.onPressApplyFilters}
+                        width={calculateDimension(343, false, this.props.screenSize)}
+                        height={calculateDimension(32, true, this.props.screenSize)}
+                        style={{alignSelf: 'center'}}
+                        titleStyle={{fontFamily: 'Roboto-Medium', fontSize: 14}}
+                        titleColor={'white'}
+                    />
+                </View> 
+            </View>
         );
     }
 
     // Please write here all the methods that are not react native lifecycle methods
+    handleRenderItem = (item, index) => {
+        let fields = config.followUpsFilterScreen.sort.fields
+        return (
+            <CardComponent
+                item={fields}
+                index={index}
+                isEditMode={true}
+                onChangeDropDown={this.props.onChangeDropDown}
+                screen="FollowUpsFilter"
+                filter={this.props.filter}
+                onDeletePress={this.props.onDeletePress}
+                style={style.cardStyle}
+                onChangeSectionedDropDown={this.props.onChangeSectionedDropDown}
+            />
+        )
+    }
 }
 
 
@@ -62,6 +123,23 @@ const style = StyleSheet.create({
         backgroundColor: styles.screenBackgroundGrey,
         borderRadius: 2,
         alignItems: 'center',
+    },
+    cardStyle: {
+        marginVertical: 4,
+        flex: 1
+    },
+    containerScrollView: {
+        flex: 1,
+        backgroundColor: styles.screenBackgroundGrey
+    },
+    contentContainerStyle: {
+        alignItems: 'center'
+    },
+    containerButtonApplyFilters: {
+        flex: 0,
+        justifyContent: 'flex-end',
+        marginBottom: 22,
+        marginTop: 10
     }
 });
 

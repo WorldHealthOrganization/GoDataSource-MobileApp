@@ -96,7 +96,7 @@ const followUpsSingleScreen = {
                     value: '',
                     type: "DatePicker",
                     isRequired: true,
-                    isEditMode: true,
+                    isEditMode: false,
                     format: 'MM/dd/YYYY',
                     objectType: 'FollowUp'
                 },
@@ -134,7 +134,7 @@ const followUpsSingleScreen = {
                 labelValue: 'test',
                 type: 'DropdownInput',
                 value: '',
-                isRequired: true,
+                isRequired: false,
                 isEditMode: false,
                 objectType: 'Address'
             },
@@ -157,7 +157,7 @@ const followUpsSingleScreen = {
                 labelValue: 'test',
                 type: 'DropDownSectioned',
                 value: '',
-                isRequired: true,
+                isRequired: false,
                 isEditMode: false,
                 objectType: 'Address',
                 single: true
@@ -169,7 +169,7 @@ const followUpsSingleScreen = {
                 labelValue: 'test',
                 type: 'TextInput',
                 value: '',
-                isRequired: true,
+                isRequired: false,
                 isEditMode: false,
                 multiline: true,
                 objectType: 'Address'
@@ -181,7 +181,7 @@ const followUpsSingleScreen = {
                 labelValue: 'test',
                 type: 'TextInput',
                 value: '',
-                isRequired: true,
+                isRequired: false,
                 isEditMode: false,
                 multiline: true,
                 objectType: 'Address'
@@ -193,7 +193,7 @@ const followUpsSingleScreen = {
                 labelValue: 'test',
                 type: 'TextInput',
                 value: '',
-                isRequired: true,
+                isRequired: false,
                 isEditMode: false,
                 multiline: true,
                 objectType: 'Address'
@@ -259,6 +259,7 @@ const caseSingleScreen = {
                     value: '',
                     isRequired: false,
                     isEditMode: false,
+                    keyboardType: Platform.OS === 'ios' ? 'number-pad' : 'numeric',
                     objectType: 'Case'
                 },
                 {
@@ -320,7 +321,7 @@ const caseSingleScreen = {
                     labelValue: 'test',
                     type: 'DropdownInput',
                     value: '',
-                    isRequired: true,
+                    isRequired: false,
                     isEditMode: false,
                     activeButtonColor: 'red',
                     activeBackgroundColor: 'red',
@@ -494,7 +495,7 @@ const caseSingleScreen = {
                 isEditMode: true,
                 multiline: false,
                 objectType: 'Address',
-                keyboardType: 'numeric'
+                keyboardType: Platform.OS === 'ios' ? 'decimal-pad' : 'numeric'
             },
             {
                 cardNumber: 1,
@@ -507,7 +508,7 @@ const caseSingleScreen = {
                 isEditMode: true,
                 multiline: false,
                 objectType: 'Address',
-                keyboardType: 'numeric'
+                keyboardType: Platform.OS === 'ios' ? 'decimal-pad' : 'numeric'
             },
             {
                 cardNumber: 1,
@@ -772,28 +773,48 @@ const followUpsFilterScreen = {
                 }
             ]
         }
-        // {
-        //     fields: [
-        //         {
-        //             cardNumber: 4,
-        //             label: 'Exposure',
-        //             type: 'Section',
-        //             hasBorderBottom: true,
-        //             borderBottomColor: styles.navigationDrawerSeparatorGrey
-        //         },
-        //         {
-        //             cardNumber: 4,
-        //             id: 'exposure',
-        //             label: 'Choose one or more cases',
-        //             type: 'DropDown',
-        //             value: '',
-        //             data: [{value: 'Diana Jones'}, {value: 'Florin Popa'}],
-        //             isRequired: false,
-        //             isEditMode: true
-        //         }
-        //     ]
-        // }
-    ]
+    ],
+    sort: {
+        fields: [
+            {      
+                cardNumber: 1,
+                label: 'Sort by',
+                type: 'Section',
+                hasBorderBottom: true,
+                borderBottomColor: styles.navigationDrawerSeparatorGrey
+            },
+            {
+                cardNumber: 1,
+                id: 'sortCriteria',
+                type: 'DropdownInput',
+                label: 'Sort Criteria',
+                isRequired: false,
+                isEditMode: true,
+                value: '',
+                objectType: 'Sort'
+            },
+            {
+                cardNumber: 1,
+                id: 'sortOrder',
+                type: 'DropdownInput',
+                label: 'Sort Order',
+                isRequired: false,
+                isEditMode: true,
+                value: '',
+                objectType: 'Sort'
+            },
+            {
+                cardNumber: 1,
+                id: 'deleteButton',
+                type: 'ActionsBar',
+                labelValue: 'test',
+                textsArray: ['Delete'],
+                textsStyleArray: [{color: styles.missedRedColor}],
+                onPressArray: [],
+                objectType: 'Sort'
+            }
+        ]
+    }
 };
 
 const casesFilterScreen = {
@@ -876,7 +897,49 @@ const casesFilterScreen = {
                 }
             ]
         }
-    ]
+    ],
+    sort: {
+        fields: [
+            {
+                // LNG_SIDE_FILTERS_ADD_ANOTHER_SORT_BUTTON         
+                cardNumber: 1,
+                label: 'Sort by', //LNG_SIDE_FILTERS_SORT_BY_PLACEHOLDER
+                type: 'Section',
+                hasBorderBottom: true,
+                borderBottomColor: styles.navigationDrawerSeparatorGrey
+            },
+            {
+                cardNumber: 1,
+                id: 'sortCriteria',
+                type: 'DropdownInput',
+                label: 'Sort Criteria',
+                isRequired: false,
+                isEditMode: true,
+                value: '',
+                objectType: 'Sort'
+            },
+            {
+                cardNumber: 1,
+                id: 'sortOrder',
+                type: 'DropdownInput',
+                label: 'Sort Order', //LNG_SIDE_FILTERS_SORT_DIRECTION_LABEL
+                isRequired: false,
+                isEditMode: true,
+                value: '',
+                objectType: 'Sort'
+            },
+            {
+                cardNumber: 1,
+                id: 'deleteButton',
+                type: 'ActionsBar',
+                labelValue: 'test',
+                textsArray: ['Delete'],
+                textsStyleArray: [{color: styles.missedRedColor}],
+                onPressArray: [],
+                objectType: 'Sort'
+            }
+        ]
+    }
 };
 
 const defaultFilterForContacts = {
@@ -950,7 +1013,7 @@ const addExposureScreen = [
         isRequired: true,
         isEditMode: true,
         format: 'MM/dd/YYYY',
-        objectType: 'FollowUp'
+        objectType: 'Contact'
     },
     {
         cardNumber: 1,
@@ -1133,6 +1196,7 @@ const contactsSingleScreen = {
                     isRequired: false,
                     isEditMode: true,
                     multiline: false,
+                    keyboardType: Platform.OS === 'ios' ? 'number-pad' : 'numeric',
                     objectType: 'Contact'
                 },
                 {
@@ -1325,7 +1389,7 @@ const contactsSingleScreen = {
                 isEditMode: true,
                 multiline: false,
                 objectType: 'Address',
-                keyboardType: 'numeric'
+                keyboardType: Platform.OS === 'ios' ? 'decimal-pad' : 'numeric'
             },
             {
                 cardNumber: 1,
@@ -1338,7 +1402,7 @@ const contactsSingleScreen = {
                 isEditMode: true,
                 multiline: false,
                 objectType: 'Address',
-                keyboardType: 'numeric'
+                keyboardType: Platform.OS === 'ios' ? 'decimal-pad' : 'numeric'
             },
 
             {
@@ -1697,6 +1761,15 @@ const localTranslationTokens = {
     female: translations.localTranslationTokens.female,
 };
 
+const sortOrderDropDownItems = [
+    { label: 'LNG_SIDE_FILTERS_SORT_BY_ASC_PLACEHOLDER', value: 'LNG_SIDE_FILTERS_SORT_BY_ASC_PLACEHOLDER'},
+    { label: 'LNG_SIDE_FILTERS_SORT_BY_DESC_PLACEHOLDER', value: 'LNG_SIDE_FILTERS_SORT_BY_DESC_PLACEHOLDER'}
+]
+
+const sortCriteriaDropDownItems = [
+    { label: 'First Name', value: 'firstName'},
+    { label: 'Last Name', value: 'lastName'}
+]
 
 export default {
     designScreenSize,
@@ -1721,5 +1794,7 @@ export default {
     followUpStatuses,
     TextSwitchSelectorAgeOrDobValues,
     ageUnitOfMeasureDropDown,
-    localTranslationTokens
+    localTranslationTokens,
+    sortOrderDropDownItems,
+    sortCriteriaDropDownItems
 }

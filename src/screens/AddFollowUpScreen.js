@@ -5,7 +5,7 @@
  * Created by florinpopa on 05/07/2018.
  */
 import React, {PureComponent} from 'react';
-import {View, StyleSheet, Platform} from 'react-native';
+import {View, StyleSheet, Platform, Alert} from 'react-native';
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import Button from './../components/Button';
@@ -30,7 +30,8 @@ class AddFollowUpScreen extends PureComponent{
         this.state = {
             date: new Date(),
             selectedContact: '',
-            contacts: []
+            contacts: [],
+            isModified: false,
         };
     }
 
@@ -56,7 +57,7 @@ class AddFollowUpScreen extends PureComponent{
                 visible={this.props.showAddFollowUpScreen}
                 width="90%"
                 height="75%"
-                onDismiss={this.props.onCancelPressed}
+                onDismiss={this.onCancelPressed}
             >
                 <ElevatedView
                     elevation={3}
@@ -73,17 +74,6 @@ class AddFollowUpScreen extends PureComponent{
                         containerStyle={{width: '100%', flex: 0.15}}
                         translation={this.props.translation}
                     />
-                    {/*<DropdownInput*/}
-                        {/*id="contact"*/}
-                        {/*label="Contact"*/}
-                        {/*labelValue="Contact"*/}
-                        {/*value={this.state.selectedContact}*/}
-                        {/*data={contactList}*/}
-                        {/*isEditMode={true}*/}
-                        {/*isRequired={false}*/}
-                        {/*onChange={this.onDropdownInputChanged}*/}
-                        {/*style={{width: contentWidth, marginHorizontal}}*/}
-                    {/*/>*/}
                     <DropdownSearchable
                         outbreakId={this.props && this.props.user && this.props.user.activeOutbreakId ? this.props.user.activeOutbreakId : null}
                         onChange={this.onDropdownSearchableChanged}
@@ -105,7 +95,7 @@ class AddFollowUpScreen extends PureComponent{
                             title={getTranslation(translations.generalButtons.cancelButtonLabel, this.props.translation)}
                             color="white"
                             titleColor={"black"}
-                            onPress={this.props.onCancelPressed}
+                            onPress={this.onCancelPressed}
                             height={25}
                             width="40%"
                         />
@@ -125,19 +115,55 @@ class AddFollowUpScreen extends PureComponent{
 
     onDropdownSearchableChanged = (value) => {
         this.setState({
-            selectedContact: value
+            selectedContact: value,
+            isModified: true
         })
     };
 
     onDateChanged = (date, id, objectType) => {
         this.setState({
-            date: date
+            date: date,
+            isModified: true
         })
     };
 
     onSavePressed = () => {
-        this.props.onSavePressed(this.state.selectedContact, this.state.date);
-    }
+        this.setState({
+            date: new Date(),
+            isModified: false
+        }, () => {
+            this.props.onSavePressed(this.state.selectedContact, this.state.date);
+        });
+    };
+
+    onCancelPressed = () => {
+        if (this.state.isModified === true) {
+            Alert.alert("", 'You have unsaved data. Are you sure you want to leave this page and lose all changes?', [
+                {
+                    text: 'Yes', onPress: () => {
+                    this.setState({
+                        date: new Date(),
+                        isModified: false
+                    }, () => {
+                        this.props.onCancelPressed();
+                    });
+                }
+                },
+                {
+                    text: 'Cancel', onPress: () => {
+                    console.log("onPressCancelEdit No pressed - nothing changes")
+                }
+                }
+            ])
+        } else {
+            this.setState({
+                date: new Date(),
+                isModified: false
+            }, () => {
+                this.props.onCancelPressed();
+            });
+        }
+    };
 }
 
 
