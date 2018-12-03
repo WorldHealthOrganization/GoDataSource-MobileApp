@@ -439,7 +439,7 @@ class CasesScreen extends Component {
         }
 
         //gender
-        if (this.state.filterFromFilterScreen && this.state.filterFromFilterScreen.gender) {
+        if (this.state.filterFromFilterScreen && this.state.filterFromFilterScreen.gender && this.state.filterFromFilterScreen.gender !== null) {
             allFilters.gender = this.state.filterFromFilterScreen.gender
 
         } else {
@@ -454,7 +454,7 @@ class CasesScreen extends Component {
         }
 
         //search text
-        if (this.state.filter.searchText.trim().length > 0) {
+        if (this.state.filter && this.state.filter.searchText && this.state.filter.searchText.trim().length > 0) {
             let splitedFilter= this.state.filter.searchText.split(" ")
             splitedFilter = splitedFilter.filter((e) => {return e !== ""})
             allFilters.searchText = new RegExp(splitedFilter.join("|"), "ig");
@@ -463,13 +463,20 @@ class CasesScreen extends Component {
         }
 
         //selected locations
-        if (this.state.filterFromFilterScreen && this.state.filterFromFilterScreen.selectedLocations) {
+        if (this.state.filterFromFilterScreen && this.state.filterFromFilterScreen.selectedLocations && this.state.filterFromFilterScreen.selectedLocations.length > 0) {
             allFilters.selectedLocations = this.state.filterFromFilterScreen.selectedLocations;
         } else {
             allFilters.selectedLocations = null
         }
 
-        if (!allFilters.age && !allFilters.gender && !allFilters.searchText && !allFilters.classification && !allFilters.selectedLocations) {
+        //sort rules
+        if (this.state.filterFromFilterScreen && this.state.filterFromFilterScreen.sort && this.state.filterFromFilterScreen.sort.length > 0) {
+            allFilters.sort = this.state.filterFromFilterScreen.sort;
+        } else {
+            allFilters.sort = null
+        }
+
+        if (!allFilters.age && !allFilters.gender && !allFilters.searchText && !allFilters.classification && !allFilters.selectedLocations && !allFilters.sort) {
             allFilters = null
         }
 

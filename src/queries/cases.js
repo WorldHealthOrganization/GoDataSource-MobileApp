@@ -2,6 +2,7 @@
  * Created by florinpopa on 18/09/2018.
  */
 import {getDatabase} from './database';
+import {objSort} from './../utils/functions'
 
 // Credentials: {email, encryptedPassword}
 export function getCasesForOutbreakIdRequest (outbreakId, filter, token, callback) {
@@ -132,7 +133,7 @@ export function getCasesForOutbreakIdRequest (outbreakId, filter, token, callbac
             })
                 .then((resultFind) => {
                     console.log('Result for find cases time: ', new Date().getTime() - start);
-                    callback(null, resultFind.docs)
+                    callback(null, objSort(resultFind.docs, ['lastName', false]));
                 })
                 .catch((errorFind) => {
                     console.log('Error find cases: ', errorFind);

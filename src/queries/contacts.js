@@ -2,9 +2,7 @@
  * Created by florinpopa on 13/09/2018.
  */
 import {getDatabase} from './database';
-import {generateId, extractIdFromPouchId} from './../utils/functions';
-import config from './../utils/config';
-
+import {objSort} from './../utils/functions';
 export function getContactsForOutbreakIdRequest (outbreakId, filter, token, callback) {
     let database = getDatabase();
 
@@ -155,7 +153,7 @@ export function getContactsForOutbreakIdRequest (outbreakId, filter, token, call
             })
                 .then((resultFind) => {
                     console.log('Result for find time for contacts: ', new Date().getTime() - start);
-                    callback(null, resultFind.docs)
+                    callback(null, objSort(resultFind.docs, ['lastName', false]));
                 })
                 .catch((errorFind) => {
                     console.log('Error find for contacts: ', errorFind);

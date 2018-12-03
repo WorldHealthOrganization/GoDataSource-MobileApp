@@ -193,7 +193,7 @@ class CardComponent extends Component {
                 return true
             }
         }
-
+        
         return false;
     }
 
@@ -275,9 +275,23 @@ class CardComponent extends Component {
                 }
                 value = this.props.filter.filter[item.id];
             }
-            if (item.type === 'DropDown' && item.id == 'classification') {
+            if (item.type === 'DropDown' && item.id === 'classification') {
                 data = this.computeDataForDropdown(item);
                 value = this.props.filter.filter[item.id];
+            }
+            if (item.type === 'DropdownInput' && item.id === 'sortCriteria') {
+                let configSortCiteriaFilter = config.sortCriteriaDropDownItems.filter ((e) => {
+                    return this.props.filter.sort.map((k) => {return k.sortCriteria}).indexOf(this.getTranslation(e.value)) === -1
+                })
+                item.data = configSortCiteriaFilter.map((e) => { return {label: this.getTranslation(e.label), value: e.value }})
+                value = this.computeValueForCaseSortScreen(item, this.props.index);
+            }
+            if (item.type === 'DropdownInput' && item.id === 'sortOrder') {
+                item.data = config.sortOrderDropDownItems.map((e) => { return {label: this.getTranslation(e.label), value: e.value }})
+                value = this.computeValueForCaseSortScreen(item, this.props.index);
+            }
+            if (item.type === 'ActionsBar') {
+                item.onPressArray = [this.props.onDeletePress]
             }
         }
 
@@ -1064,6 +1078,16 @@ class CardComponent extends Component {
         }
         return this.props.contact && this.props.contact[item.id] ? this.getTranslation(this.props.contact[item.id]) : '';
     };
+
+    computeValueForCaseSortScreen = (item, index) => {
+        if (index && index >= 0) {
+            if (item.objectType === 'Sort') {
+                return this.props.filter && this.props.filter.sort && Array.isArray(this.props.filter.sort) && this.props.filter.sort.length > 0 && this.props.filter.sort[index][item.id] !== undefined ?
+                this.getTranslation(this.props.filter.sort[index][item.id]) : '';
+            }
+        }
+        return this.props.filter && this.props.filter[item.id] ? this.getTranslation(this.props.filter[item.id]) : '';
+    }
 
     getTranslation = (value) => {
         let valueToBeReturned = value;

@@ -163,7 +163,7 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
             Alert.alert('Validation error', 'Please make sure you have completed all required fields',
                 [
                     {
-                        text: 'Ok', onPress: () => {console.log('Ok pressed')}
+                        text: 'Ok', onPress: () => {console.log('Ok pressed checkRequiredQuestions')}
                     }
                 ]
             )

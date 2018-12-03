@@ -434,13 +434,13 @@ class ContactsScreen extends Component {
             allFilters.age = null
         }
 
-        if (this.state.filterFromFilterScreen && this.state.filterFromFilterScreen.gender) {
+        if (this.state.filterFromFilterScreen && this.state.filterFromFilterScreen.gender && this.state.filterFromFilterScreen.gender !== null) {
             allFilters.gender = this.state.filterFromFilterScreen.gender
         } else {
             allFilters.gender = null
         }
 
-        if (this.state.filter.searchText.trim().length > 0) {
+        if (this.state.filter && this.state.filter.searchText && this.state.filter.searchText.trim().length > 0) {
             let splitedFilter= this.state.filter.searchText.split(" ");
             splitedFilter = splitedFilter.filter((e) => {return e !== ""});
             allFilters.searchText = new RegExp(splitedFilter.join("|"), "ig");
@@ -448,13 +448,19 @@ class ContactsScreen extends Component {
             allFilters.searchText = null
         }
 
-        if (this.state.filterFromFilterScreen && this.state.filterFromFilterScreen.selectedLocations) {
+        if (this.state.filterFromFilterScreen && this.state.filterFromFilterScreen.selectedLocations && this.state.filterFromFilterScreen.selectedLocations.length > 0) {
             allFilters.selectedLocations = this.state.filterFromFilterScreen.selectedLocations;
         } else {
             allFilters.selectedLocations = null
         }
+
+        if (this.state.filterFromFilterScreen && this.state.filterFromFilterScreen.sort && this.state.filterFromFilterScreen.sort.length > 0) {
+            allFilters.sort = this.state.filterFromFilterScreen.sort;
+        } else {
+            allFilters.sort = null
+        }
         
-        if (!allFilters.age && !allFilters.gender && !allFilters.searchText && !allFilters.selectedLocations) {
+        if (!allFilters.age && !allFilters.gender && !allFilters.searchText && !allFilters.selectedLocations && !allFilters.sort) {
             allFilters = null
         }
 
