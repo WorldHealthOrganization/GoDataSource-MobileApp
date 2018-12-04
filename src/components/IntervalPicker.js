@@ -14,6 +14,8 @@ import {bindActionCreators} from "redux";
 import MultiSlider from '@ptomasroos/react-native-multi-slider';
 import PropTypes from 'prop-types';
 import CustomMarker from './CustomMarker';
+import translations from './../utils/translations'
+import {getTranslation} from './../utils/functions';
 
 class IntervalPicker extends PureComponent {
 
@@ -103,7 +105,8 @@ const style = StyleSheet.create({
 
 function mapStateToProps(state) {
     return {
-        screenSize: state.app.screenSize
+        screenSize: state.app.screenSize,
+        translation: state.app.translation,
     };
 }
 

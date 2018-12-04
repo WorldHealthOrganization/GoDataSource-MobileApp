@@ -9,6 +9,7 @@ import {updateFileInDatabase, processBulkDocs} from './../queries/database';
 import {setSyncState} from './../actions/app';
 import bcrypt from 'react-native-bcrypt';
 import uuid from 'react-native-uuid';
+import _ from 'lodash';
 import {getContactsForOutbreakId} from './../actions/contacts';
 
 // This method is used for handling server responses. Please add here any custom error handling
@@ -508,37 +509,30 @@ export function mapContactsAndRelationships(contacts, relationships) {
     let mappedContacts = contacts;
     for (let i = 0; i < relationships.length; i++) {
         let contactObject = {};
-        if ((relationships[i].persons[0].type === 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT' || relationships[i].persons[0].type === 'contact') && mappedContacts.map((e) => {
-                return extractIdFromPouchId(e._id, 'person')
-            }).indexOf(relationships[i].persons[0].id) > -1) {
 
-            contactObject = Object.assign({}, contacts[contacts.map((e) => {
-                return extractIdFromPouchId(e._id, 'person')
-            }).indexOf(relationships[i].persons[0].id)]);
+        let contactIndexAsFirstPerson = mappedContacts.map((e) => {return extractIdFromPouchId(e._id, 'person')}).indexOf(relationships[i].persons[0].id)
+        let contactIndexAsSecondPerson = mappedContacts.map((e) => {return extractIdFromPouchId(e._id, 'person')}).indexOf(relationships[i].persons[1].id)
+        if ((relationships[i].persons[0].type === 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT' || relationships[i].persons[0].type === 'contact') && contactIndexAsFirstPerson > -1) {
+            contactObject = Object.assign({}, contacts.find((e) => {
+                return extractIdFromPouchId(e._id, 'person') === relationships[i].persons[0].id
+            }))
 
             if (!contactObject.relationships || contactObject.relationships.length === 0) {
                 contactObject.relationships = [];
             }
             contactObject.relationships.push(relationships[i]);
-            mappedContacts[mappedContacts.map((e) => {
-                return extractIdFromPouchId(e._id, 'person')
-            }).indexOf(relationships[i].persons[0].id)] = contactObject;
+            mappedContacts[contactIndexAsFirstPerson] = contactObject;
         } else {
-            if ((relationships[i].persons[1].type === 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT' || relationships[i].persons[1].type === 'contact') && mappedContacts.map((e) => {
-                    return extractIdFromPouchId(e._id, 'person')
-                }).indexOf(relationships[i].persons[1].id) > -1) {
-
-                contactObject = Object.assign({}, contacts[contacts.map((e) => {
-                    return extractIdFromPouchId(e._id, 'person')
-                }).indexOf(relationships[i].persons[1].id)]);
+            if ((relationships[i].persons[1].type === 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT' || relationships[i].persons[1].type === 'contact') && contactIndexAsSecondPerson > -1) {
+                contactObject = Object.assign({}, contacts.find((e) => {
+                    return extractIdFromPouchId(e._id, 'person') === relationships[i].persons[1].id
+                }))
 
                 if (!contactObject.relationships || contactObject.relationships.length === 0) {
                     contactObject.relationships = [];
                 }
                 contactObject.relationships.push(relationships[i]);
-                mappedContacts[mappedContacts.map((e) => {
-                    return extractIdFromPouchId(e._id, 'person')
-                }).indexOf(relationships[i].persons[1].id)] = contactObject;
+                mappedContacts[contactIndexAsSecondPerson] = contactObject;
             }
         }
     }
@@ -554,14 +548,20 @@ export function mapContactsAndFollowUps(contacts, followUps) {
 
     let mappedContacts = [];
     for (let i=0; i < followUps.length; i++) {
-        if (mappedContacts.map((e) => { return extractIdFromPouchId(e._id, 'person') }).indexOf(followUps[i].personId) === -1) {
+        // Review Anda si devine in singur indexOf
+
+        let contactPersonIndex = mappedContacts.map((e) => {return extractIdFromPouchId(e._id, 'person')}).indexOf(followUps[i].personId)
+        if (contactPersonIndex === -1) {
             let contactObject = {};
-            contactObject = Object.assign({}, contacts[contacts.map((e) => {return extractIdFromPouchId(e._id, 'person')}).indexOf(followUps[i].personId)]);
+            contactObject = Object.assign({}, contacts.find((e) => {
+                return extractIdFromPouchId(e._id, 'person') === followUps[i].personId
+            }))
+                
             contactObject.followUps = [];
             contactObject.followUps.push(followUps[i]);
             mappedContacts.push(contactObject);
         } else {
-            mappedContacts[mappedContacts.map((e) => {return extractIdFromPouchId(e._id, 'person')}).indexOf(followUps[i].personId)].followUps.push(followUps[i]);
+            mappedContacts[contactPersonIndex].followUps.push(followUps[i]);
         }
     }
     // console.log ('mapContactsAndFollowUps mappedContacts', JSON.stringify(mappedContacts))
@@ -671,7 +671,7 @@ export function mapQuestions (questions) {
             if (mappedQuestions.map((e) => {return e.categoryName}).indexOf(questions[i].category) === -1) {
                 mappedQuestions.push({categoryName: questions[i].category, questions: [questions[i]]});
             } else {
-                if (mappedQuestions && Array.isArray(mappedQuestions) && mappedQuestions.length > 0 && mappedQuestions.map((e) => {
+                if (mappedQuestions && Array.isArray(mappedQuestions) && mappedQuestions.length > 0 && mappedQuestions.map((e )=> {
                         return e.categoryName
                     }).indexOf(questions[i].category) > -1 && mappedQuestions[mappedQuestions.map((e) => {
                         return e.categoryName
@@ -690,3 +690,123 @@ export function mapQuestions (questions) {
 
     return mappedQuestions;
 };
+
+export function getTranslation (value, allTransactions) {
+    let valueToBeReturned = value;
+    if (value && typeof value === 'string' && value.includes('LNG')) {
+        valueToBeReturned = value && allTransactions && Array.isArray(allTransactions) && allTransactions[allTransactions.map((e) => {return e && e.token ? e.token : null}).indexOf(value)] ? allTransactions[allTransactions.map((e) => {
+            return e.token
+        }).indexOf(value)].translation : '';
+    }
+    return valueToBeReturned;
+}
+
+export function localSortContactsForFollowUps (contactsCopy, propsFilter, stateFilter, filterFromFilterScreen) {
+    if (propsFilter && (propsFilter['FollowUpsFilterScreen'] || propsFilter['FollowUpsScreen'])) {
+        // Take care of search filter
+        if (stateFilter.searchText) {
+            contactsCopy = contactsCopy.filter((e) => {
+                return  e && e.firstName && stateFilter.searchText.toLowerCase().includes(e.firstName.toLowerCase()) ||
+                    e && e.lastName && stateFilter.searchText.toLowerCase().includes(e.lastName.toLowerCase()) ||
+                    e && e.firstName && e.firstName.toLowerCase().includes(stateFilter.searchText.toLowerCase()) ||
+                    e && e.lastName && e.lastName.toLowerCase().includes(stateFilter.searchText.toLowerCase())
+            });
+        }
+        // Take care of gender filter
+        if (filterFromFilterScreen && filterFromFilterScreen.gender) {
+            contactsCopy = contactsCopy.filter((e) => {return e.gender === filterFromFilterScreen.gender});
+        }
+        // Take care of age range filter
+        if (filterFromFilterScreen && filterFromFilterScreen.age && Array.isArray(filterFromFilterScreen.age) && filterFromFilterScreen.age.length === 2 && (filterFromFilterScreen.age[0] >= 0 || filterFromFilterScreen.age[1] <= 150)) {
+            contactsCopy = contactsCopy.filter((e) => {
+                if (e.age && e.age.years !== null && e.age.years !== undefined && e.age.months !== null && e.age.months !== undefined) {
+                    if (e.age.years > 0 && e.age.months === 0) {
+                        return e.age.years >= filterFromFilterScreen.age[0] && e.age.years <= filterFromFilterScreen.age[1]
+                    } else if (e.age.years === 0 && e.age.months > 0){
+                        return e.age.months >= filterFromFilterScreen.age[0] && e.age.months <= filterFromFilterScreen.age[1]
+                    } else if (e.age.years === 0 && e.age.months === 0) {
+                        return e.age.years >= filterFromFilterScreen.age[0] && e.age.years <= filterFromFilterScreen.age[1]
+                    }
+                }
+            });
+        }
+        // Take care of locations filter
+        if (filterFromFilterScreen  && filterFromFilterScreen.selectedLocations && filterFromFilterScreen.selectedLocations.length > 0) {
+            contactsCopy = contactsCopy.filter((e) => {
+                let addresses = e.addresses.filter((k) => {
+                    return k.locationId !== '' && filterFromFilterScreen.selectedLocations.indexOf(k.locationId) >= 0
+                })
+                return addresses.length > 0
+            })
+        }
+        //Take care of sort
+        if (filterFromFilterScreen  && filterFromFilterScreen.sort && filterFromFilterScreen.sort.length > 0) {
+            let sortCriteria = []
+            let sortOrder = []
+            for(let i = 0; i < filterFromFilterScreen.sort.length; i++) {
+                if (filterFromFilterScreen.sort[i].sortCriteria && filterFromFilterScreen.sort[i].sortCriteria !== '' && filterFromFilterScreen.sort[i].sortOrder && filterFromFilterScreen.sort[i].sortOrder !== ''){
+                    sortCriteria.push(filterFromFilterScreen.sort[i].sortCriteria)
+                    sortOrder.push(filterFromFilterScreen.sort[i].sortOrder === 'LNG_SIDE_FILTERS_SORT_BY_ASC_PLACEHOLDER' ? false : true)
+                }
+            }
+            if (sortCriteria.length > 0 && sortOrder.length > 0) {
+                if (sortOrder.length === 1) {
+                    contactsCopy = objSort(contactsCopy, [sortCriteria[0], sortOrder[0]])
+                } else if (sortOrder.length === 2) {
+                    contactsCopy = objSort(contactsCopy, [sortCriteria[0], sortOrder[0]], [sortCriteria[1], sortOrder[1]])
+                }
+            }
+        }
+    }
+    return contactsCopy
+}
+
+export function objSort() {
+    var args = arguments,
+        array = args[0],
+        case_sensitive, keys_length, key, desc, a, b, i;
+
+    if (typeof arguments[arguments.length - 1] === 'boolean') {
+        case_sensitive = arguments[arguments.length - 1];
+        keys_length = arguments.length - 1;
+    } else {
+        case_sensitive = false;
+        keys_length = arguments.length;
+    }
+
+    return array.sort(function (obj1, obj2) {
+        for (i = 1; i < keys_length; i++) {
+            key = args[i];
+            if (typeof key !== 'string') {
+                desc = key[1];
+                key = key[0];
+                a = obj1[args[i][0]];
+                b = obj2[args[i][0]];
+            } else {
+                desc = false;
+                a = obj1[args[i]];
+                b = obj2[args[i]];
+            }
+
+            if (case_sensitive === false && typeof a === 'string') {
+                a = a !== undefined && a.trim().length > 0 ? a.toLowerCase() : '~'; // place caracters that does not have property or has it but is '' at the end of array
+                b = b !== undefined && b.trim().length > 0 ? b.toLowerCase() : '~'; // place caracters that does not have property or has it but is '' at the end of array
+                //null if wanted at the start of array
+            }
+
+            if (! desc) {
+                if (a < b) return -1;
+                if (a > b) return 1;
+            } else {
+                if (a > b) return -1;
+                if (a < b) return 1;
+            }
+        }
+        return 0;
+    });
+    // objSort(homes, 'city') --> sort by city (ascending, case in-sensitive)
+    // objSort(homes, ['city', true]) --> sort by city (descending, case in-sensitive)
+    // objSort(homes, 'city', true) --> sort by city (ascending, case sensitive)
+    // objSort(homes, 'city', 'price') --> sort by city then price (both ascending, case in-sensitive)
+    // objSort(homes, 'city', ['price', true]) --> sort by city (ascending) then price (descending), case in-sensitive)
+}

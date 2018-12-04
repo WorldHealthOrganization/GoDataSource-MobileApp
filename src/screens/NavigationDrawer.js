@@ -13,7 +13,8 @@ import styles from './../styles';
 import {ListItem, Icon} from 'react-native-material-ui';
 import DropdownInput from './../components/DropdownInput';
 import {updateUser} from './../actions/user';
-import {updateRequiredFields, calculateDimension} from './../utils/functions';
+import {updateRequiredFields, calculateDimension, getTranslation} from './../utils/functions';
+import translations from './../utils/translations'
 
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
@@ -61,7 +62,7 @@ class NavigationDrawer extends Component {
                     {
                         this.props && this.props.outbreak && this.props.outbreak.name ? (
                             <View style={{marginHorizontal: 16}}>
-                                <Text style={{fontFamily: 'Roboto-Medium', fontSize: 15, color: styles.navigationDrawerItemText}} numberOfLines={1}>Active Outbreak: </Text>
+                                <Text style={{fontFamily: 'Roboto-Medium', fontSize: 15, color: styles.navigationDrawerItemText}} numberOfLines={1}>{getTranslation(translations.navigationDrawer.activeOutbreak, this.props.translation)}</Text>
                                 <Text style={{fontFamily: 'Roboto-Medium', fontSize: 15, color: styles.navigationDrawerItemText}} numberOfLines={1}>{this.props.outbreak.name}</Text>
                             </View>
                         ) : (null)
@@ -90,7 +91,7 @@ class NavigationDrawer extends Component {
                             return (
                                 <NavigationDrawerListItem
                                     key={index}
-                                    label={item.label} 
+                                    label={getTranslation(item.label, this.props.translation)} 
                                     name={item.name}
                                     onPress={() => this.handlePressOnListItem(index)}
                                     handleOnPressAdd={() => this.handleOnPressAdd(item.key, index)}
@@ -101,33 +102,23 @@ class NavigationDrawer extends Component {
                         })
                     }
                     <View style={styles.lineStyle} />
-                    <NavigationDrawerListItem label={'Sync HUB manually'} name={'cached'} onPress={this.handleOnPressSync} />
-                    <NavigationDrawerListItem label={'Change HUB configuration'} name={'settings'} onPress={this.handleOnPressChangeHubConfig} />
+                    <NavigationDrawerListItem label={getTranslation(translations.navigationDrawer.syncHubManually, this.props.translation)} name={'cached'} onPress={this.handleOnPressSync} />
+                    <NavigationDrawerListItem label={getTranslation(translations.navigationDrawer.changeHubConfig, this.props.translation)} name={'settings'} onPress={this.handleOnPressChangeHubConfig} />
                     <View style={styles.lineStyle} />
                     <View style={{justifyContent: 'center', alignItems: 'center'}}>
                         <DropdownInput
                             id="test"
-                            label="Language"
+                            label={getTranslation(translations.navigationDrawer.languagesLabel, this.props.translation)}
                             value={this.props.availableLanguages && this.props.user && this.props.user.languageId && this.props.availableLanguages[this.props.availableLanguages.map((e) => {return e.value}).indexOf(this.props.user.languageId)] ? this.props.availableLanguages[this.props.availableLanguages.map((e) => {return e.value}).indexOf(this.props.user.languageId)].label : null}
                             data={this.props.availableLanguages}
                             isEditMode={true}
                             isRequired={false}
                             onChange={this.handleOnChangeLanguage}
                             style={{width: '90%'}}
+                            translation={this.props.translation}
                         />
                     </View>
-                    <NavigationDrawerListItem label='Logout' name="power-settings-new" onPress={this.handleLogout} />
-
-                        {/*<Image source={{uri: 'logo_app'}} resizeMode={'contain'}*/}
-                               {/*style={{*/}
-                                   {/*width: calculateDimension(137, false, this.props.screenSize),*/}
-                                   {/*height: calculateDimension(26, true, this.props.screenSize),*/}
-                                   {/*tintColor: 'black',*/}
-                                   {/*marginHorizontal: 22.5,*/}
-                                   {/*position: 'absolute',*/}
-                                   {/*bottom: 0,*/}
-                                   {/*marginBottom: 18*/}
-                               {/*}}/>*/}
+                    <NavigationDrawerListItem label={getTranslation(translations.navigationDrawer.logoutLabel, this.props.translation)} name="power-settings-new" onPress={this.handleLogout} />
                 </View>
             </View>
         );
@@ -242,7 +233,8 @@ function mapStateToProps(state) {
         role: state.role,
         screenSize: state.app.screenSize,
         availableLanguages: state.app.availableLanguages,
-        outbreak: state.outbreak
+        outbreak: state.outbreak,
+        translation: state.app.translation
     };
 }
 

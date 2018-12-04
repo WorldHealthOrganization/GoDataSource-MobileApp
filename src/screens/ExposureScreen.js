@@ -16,8 +16,9 @@ import config from './../utils/config';
 import CardComponent from './../components/CardComponent';
 import Ripple from 'react-native-material-ripple';
 import {removeErrors} from './../actions/errors';
-import {calculateDimension, extractIdFromPouchId, updateRequiredFields} from './../utils/functions';
+import {calculateDimension, extractIdFromPouchId, updateRequiredFields, getTranslation} from './../utils/functions';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import translations from './../utils/translations'
 
 class ExposureScreen extends Component {
 
@@ -42,7 +43,8 @@ class ExposureScreen extends Component {
                 comment: '',
                 persons: []
             },
-            savePressed: false
+            savePressed: false,
+            isModified: false,
         };
         // Bind here methods, or at least don't declare methods in the render method
 
@@ -76,10 +78,11 @@ class ExposureScreen extends Component {
         if (props.errors && props.errors.type && props.errors.message) {
             Alert.alert(props.errors.type, props.errors.message, [
                 {
-                    text: 'Ok', onPress: () => {
-                    state.savePressed = false;
-                    props.removeErrors()
-                }
+                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+                    onPress: () => {
+                        state.savePressed = false;
+                        props.removeErrors()
+                    }
                 }
             ])
         } else {
@@ -133,23 +136,8 @@ class ExposureScreen extends Component {
                                 }}
                             >
                                 <Text style={[style.title, {marginLeft: 30}]}>
-                                    {this.props.exposure ? "Edit exposure" : "Add exposure"}
+                                    {this.props.exposure ? getTranslation(translations.exposureScreen.editExposureLabel, this.props.translation) : getTranslation(translations.exposureScreen.addExposureLabel, this.props.translation)}
                                 </Text>
-                                {/* <Ripple
-                                    hitSlop={{
-                                        top: 20,
-                                        bottom: 20,
-                                        left: 20,
-                                        right: 20
-                                    }}
-                                    style={{
-                                        height: '100%',
-                                        justifyContent: 'center'
-                                    }}
-                                    onPress={this.handleSaveExposure}
-                                >
-                                    <Text style={[style.title, {marginHorizontal: 10}]}>Save</Text>
-                                </Ripple> */}
                             </View>
                         }
                         title={null}
@@ -160,7 +148,7 @@ class ExposureScreen extends Component {
                     <View style={style.containContainer}>
                         <View style={{flexDirection: 'row'}}>
                                 <Button
-                                    title={'Save'}
+                                    title={getTranslation(translations.generalButtons.saveButtonLabel, this.props.translation)}
                                     onPress={this.handleSaveExposure}
                                     color={styles.buttonGreen}
                                     titleColor={'white'}
@@ -199,7 +187,22 @@ class ExposureScreen extends Component {
 
     // Please write here all the methods that are not react native lifecycle methods
     handlePressNavbarButton = () => {
-        this.props.navigator.dismissModal();
+        if (this.state.isModified === true) {
+            Alert.alert("", 'You have unsaved data. Are you sure you want to leave this page and lose all changes?', [
+                {
+                    text: 'Yes', onPress: () => {
+                    this.props.navigator.dismissModal();
+                }
+                },
+                {
+                    text: 'Cancel', onPress: () => {
+                    console.log("onPressCancelEdit No pressed - nothing changes")
+                }
+                }
+            ])
+        }else {
+            this.props.navigator.dismissModal();
+        }
     };
 
     handleOnChangeDropDown = (value, id, type) => {
@@ -234,7 +237,8 @@ class ExposureScreen extends Component {
             let target = personsArray && Array.isArray(personsArray) && personsArray.length === 2 ? personsArray[0].target ? personsArray[0].id : personsArray[1].id : null;
 
             this.setState(prevState => ({
-                exposure: Object.assign({}, prevState.exposure, {persons: personsArray, source: source, target: target, active: true})
+                exposure: Object.assign({}, prevState.exposure, {persons: personsArray, source: source, target: target, active: true}),
+                isModified: true
             }), () => {
                 console.log('After changing state: ', this.state.exposure);
             })
@@ -242,7 +246,8 @@ class ExposureScreen extends Component {
             // let source = this.state.exposure.persons && Array.isArray(this.state.exposure.persons) && this.state.exposure.persons.length === 2 ? this.state.exposure.persons[0].source ? this.state.exposure.persons[0].id : this.state.exposure.persons[1].id : null;
             // let target = this.state.exposure.persons && Array.isArray(this.state.exposure.persons) && this.state.exposure.persons.length === 2 ? this.state.exposure.persons[0].target ? this.state.exposure.persons[0].id : this.state.exposure.persons[1].id : null;
             this.setState(prevState => ({
-                exposure: Object.assign({}, prevState.exposure, {[id]: value.value})
+                exposure: Object.assign({}, prevState.exposure, {[id]: value.value}),
+                isModified: true
             }), () => {
                 console.log('After changing state: ', this.state.exposure);
             })
@@ -251,7 +256,8 @@ class ExposureScreen extends Component {
 
     handleOnChangeDate = (value, id) => {
         this.setState(prevState => ({
-            exposure: Object.assign({}, prevState.exposure, {[id]: value})
+            exposure: Object.assign({}, prevState.exposure, {[id]: value}),
+            isModified: true
         }), () => {
             console.log('Exposure after changing date: ', this.state.exposure);
         })
@@ -259,13 +265,15 @@ class ExposureScreen extends Component {
 
     handleOnChangeText = (value, id) => {
         this.setState(prevState => ({
-            exposure: Object.assign({}, prevState.exposure, {[id]: value})
+            exposure: Object.assign({}, prevState.exposure, {[id]: value}),
+            isModified: true
         }))
     };
 
     handleOnChangeSwitch = (value, id) => {
         this.setState(prevState => ({
-            exposure: Object.assign({}, prevState.exposure, {[id]: value})
+            exposure: Object.assign({}, prevState.exposure, {[id]: value}),
+            isModified: true
         }))
     };
 
@@ -276,9 +284,10 @@ class ExposureScreen extends Component {
                 this.props.addExposureForContact(this.props.user.activeOutbreakId, this.props.contact.id, this.state.exposure, this.props.user.token);
             }
         } else {
-            Alert.alert("Missing fields error", "Please make sure you have completed all the required fields", [
+            Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.requiredFieldsMissingError, this.props.translation), [
                 {
-                    text: 'Ok', onPress: () => {console.log("Ok pressed")}
+                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+                    onPress: () => {console.log("Ok pressed")}
                 }
             ])
         }
@@ -288,7 +297,8 @@ class ExposureScreen extends Component {
         if (this.checkFields()) {
             console.log("Here should save the exposure and dismiss the modal");
             this.setState({
-                savePressed: true
+                savePressed: true,
+                isModified: false,
             }, () => {
                 if (this.props.type === 'Contact') {
                     if (this.props.exposure) {
@@ -318,9 +328,10 @@ class ExposureScreen extends Component {
                 }
             });
         } else {
-            Alert.alert("Missing fields error", "Please make sure you have completed all the required fields", [
+            Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.requiredFieldsMissingError, this.props.translation), [
                 {
-                    text: 'Ok', onPress: () => {console.log("Ok pressed")}
+                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+                    onPress: () => {console.log("Ok pressed")}
                 }
             ])
         }
@@ -390,7 +401,8 @@ function mapStateToProps(state) {
         user: state.user,
         screenSize: state.app.screenSize,
         errors: state.errors,
-        contacts: state.contacts
+        contacts: state.contacts,
+        translation: state.app.translation
     };
 }
 

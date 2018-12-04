@@ -3,6 +3,7 @@
  */
 const screenBackgroundGrey = '#efefef';
 const buttonGreen = 'rgb(77, 176, 160)';
+const buttonBlack = 'rgb(0,0,0)';
 const backgroundGreen = 'rgba(77, 176, 160, 0.15)';
 const navigationDrawerItemText = 'rgb(60, 60, 60)';
 const navigationDrawerBackgroundColor = 'rgba(1, 1, 1, 0.24)';
@@ -38,5 +39,6 @@ export default {
     textFieldUnderline,
     colorLoginButtonText,
     colorUnselectedItem,
-    colorUnselectedItemText
+    colorUnselectedItemText,
+    buttonBlack
 }

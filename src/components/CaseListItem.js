@@ -9,7 +9,7 @@
 import React, {Component} from 'react';
 import {TextInput, View, Text, StyleSheet,Image, Platform, Dimensions, InteractionManager} from 'react-native';
 import {ListItem, Icon} from 'react-native-material-ui';
-import {calculateDimension} from './../utils/functions';
+import {calculateDimension, getTranslation} from './../utils/functions';
 import config from './../utils/config';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
@@ -18,6 +18,7 @@ import Button from './Button';
 import styles from './../styles';
 import Ripple from 'react-native-material-ripple';
 import ElevatedView from 'react-native-elevated-view';
+import translations from './../utils/translations'
 
 class CaseListItem extends Component {
 
@@ -45,7 +46,7 @@ class CaseListItem extends Component {
         }
 
         if(this.props.item && this.props.item.age){
-            ageString = this.props.item.age.years ? this.props.item.age.years + ' y.o. ' : (this.props.item.age.months ? this.props.item.age.months + ' m.o. ' : '');
+            ageString = this.props.item.age.years ? this.props.item.age.years + ' ' + getTranslation(translations.generalLabels.ageYearsInitials, this.props.translation) + ' ' : (this.props.item.age.months ? this.props.item.age.months + ' ' + getTranslation(translations.generalLabels.ageMonthsInitials, this.props.translation) + ' ' : '');
         }
 
         let secondaryText = this.props.item && ((genderString ? genderString.charAt(0) : ' ') + (ageString ? (' ' + ageString) : ' '));
@@ -108,14 +109,18 @@ class CaseListItem extends Component {
                     {
                         this.props.role.find((e) => e === 'read_case') !== undefined ? (
                             <Ripple style={[style.rippleStyle]} onPress={this.onPressCase}>
-                                <Text style={[style.rippleTextStyle]}>VIEW</Text>
+                                <Text style={[style.rippleTextStyle]}>
+                                    {getTranslation(translations.casesScreen.viewButtonLabel, this.props.translation).toUpperCase()}
+                                </Text>
                             </Ripple>
                         ) : null
                     }
                     {
                         this.props.role.find((e) => e === 'write_contact') !== undefined ? (
                             <Ripple style={[style.rippleStyle]}  onPress={this.onPressAddContact}>
-                                <Text style={[style.rippleTextStyle]}>ADD CONTACT</Text>
+                                <Text style={[style.rippleTextStyle]}>
+                                    {getTranslation(translations.casesScreen.addContactButtonLabel, this.props.translation).toUpperCase()}
+                                </Text>
                             </Ripple>
                         ) : null
                     }

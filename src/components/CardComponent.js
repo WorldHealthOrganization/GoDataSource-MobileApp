@@ -30,7 +30,8 @@ import Section from './Section';
 import Selector from './Selector';
 import IntervalPicker from './IntervalPicker';
 import ActionsBar from './ActionsBar';
-
+import translations from './../utils/translations'
+import {getTranslation} from './../utils/functions';
 
 class CardComponent extends Component {
 
@@ -193,7 +194,7 @@ class CardComponent extends Component {
                 return true
             }
         }
-
+        
         return false;
     }
 
@@ -275,9 +276,23 @@ class CardComponent extends Component {
                 }
                 value = this.props.filter.filter[item.id];
             }
-            if (item.type === 'DropDown' && item.id == 'classification') {
+            if (item.type === 'DropDown' && item.id === 'classification') {
                 data = this.computeDataForDropdown(item);
                 value = this.props.filter.filter[item.id];
+            }
+            if (item.type === 'DropdownInput' && item.id === 'sortCriteria') {
+                let configSortCiteriaFilter = config.sortCriteriaDropDownItems.filter ((e) => {
+                    return this.props.filter.sort.map((k) => {return k.sortCriteria}).indexOf(this.getTranslation(e.value)) === -1
+                })
+                item.data = configSortCiteriaFilter.map((e) => { return {label: this.getTranslation(e.label), value: e.value }})
+                value = this.computeValueForCaseSortScreen(item, this.props.index);
+            }
+            if (item.type === 'DropdownInput' && item.id === 'sortOrder') {
+                item.data = config.sortOrderDropDownItems.map((e) => { return {label: this.getTranslation(e.label), value: e.value }})
+                value = this.computeValueForCaseSortScreen(item, this.props.index);
+            }
+            if (item.type === 'ActionsBar') {
+                item.onPressArray = [this.props.onDeletePress]
             }
         }
 
@@ -340,30 +355,7 @@ class CardComponent extends Component {
             }
             if (item.type === 'DatePicker' && this.props.case[item.id] !== undefined) {
                 value = this.props.case[item.id]
-            }
-            //HospitalizationDates && IsolationDates validation
-            if (item.type === 'DatePicker') {
-                if( item.objectType === 'HospitalizationDates'){
-                    if (this.props.case && this.props.case.hospitalizationDates && Array.isArray(this.props.case.hospitalizationDates) && this.props.case.hospitalizationDates.length > 0 && this.props.case.hospitalizationDates[this.props.index]) {
-                        if (this.props.case.hospitalizationDates[this.props.index].startDate !== null && item.id !== 'startDate') {
-                            minimumDate = this.props.case.hospitalizationDates[this.props.index].startDate
-                        }
-                        if (this.props.case.hospitalizationDates[this.props.index].endDate !== null && item.id !== 'endDate') {
-                            maximumDate = this.props.case.hospitalizationDates[this.props.index].endDate
-                        }
-                    }
-                } else if (item.objectType === 'IsolationDates'){
-                    if (this.props.case && this.props.case.isolationDates && Array.isArray(this.props.case.isolationDates) && this.props.case.isolationDates.length > 0 && this.props.case.isolationDates[this.props.index]) {
-                        if (this.props.case.isolationDates[this.props.index].startDate !== null && item.id !== 'startDate') {
-                            minimumDate = this.props.case.isolationDates[this.props.index].startDate
-                        }
-                        if (this.props.case.isolationDates[this.props.index].endDate !== null && item.id !== 'endDate') {
-                            maximumDate = this.props.case.isolationDates[this.props.index].endDate
-                        }
-                    }
-                }
-            }
-            if (item.type === 'DropDownSectioned') {
+            } else if (item.type === 'DropDownSectioned') {
                 if (this.props.case && this.props.case.addresses && Array.isArray(this.props.case.addresses) && this.props.case.addresses[this.props.index] && this.props.case.addresses[this.props.index][item.id] && this.props.case.addresses[this.props.index][item.id] !== "") {
                     for (let i = 0; i < this.props.locations.length; i++) {
                         let myLocationName = this.getLocationNameById(this.props.locations[i], this.props.case.addresses[this.props.index][item.id])
@@ -383,9 +375,6 @@ class CardComponent extends Component {
                         return
                     }
                 }
-            }
-            if (item.id === 'dob' && item.type === 'DatePicker' && item.objectType === 'Case') {
-                maximumDate = new Date()
             }
         }
 
@@ -417,6 +406,10 @@ class CardComponent extends Component {
             value = null
         }
 
+        let dateValidation = this.setDateValidations(item)
+        minimumDate = dateValidation.minimumDate
+        maximumDate = dateValidation.maximumDate
+
         switch(item.type) {
             case 'Section':
                 return (
@@ -425,6 +418,7 @@ class CardComponent extends Component {
                         hasBorderBottom={item.hasBorderBottom}
                         borderBottomColor={item.borderBottomColor}
                         containerStyle={{height: calculateDimension(54, true, this.props.screenSize)}}
+                        translation={this.props.translation}
                     />
                 );
             case 'TextInput':
@@ -441,6 +435,9 @@ class CardComponent extends Component {
                         style={{width: width, marginHorizontal: marginHorizontal}}
                         objectType={item.objectType}
                         keyboardType={item.keyboardType}
+                        translation={this.props.translation}
+                        hasTooltip={item.hasTooltip}
+                        tooltipMessage={item.tooltipMessage}
                     />
                 );
             case 'DropdownInput':
@@ -457,6 +454,7 @@ class CardComponent extends Component {
                         onChange={this.props.onChangeDropDown}
                         style={{width: width, marginHorizontal: marginHorizontal}}
                         objectType={item.objectType}
+                        translation={this.props.translation}
                     />
                 );
             case 'DropDown':
@@ -464,7 +462,7 @@ class CardComponent extends Component {
                     <DropDown
                         key={item.id}
                         id={item.id}
-                        label={'Select answer(s)'}
+                        label={translations.dropDownLabels.selectedAnswersLabel}
                         labelValue={item.label}
                         value={value}
                         data={data}
@@ -511,6 +509,7 @@ class CardComponent extends Component {
                         activeBackgroundColor={item.activeBackgroundColor}
                         style={{justifyContent: 'space-between', width: width, marginHorizontal: marginHorizontal}}
                         objectType={item.objectType}
+                        translation={this.props.translation}
                     />
                 );
             case 'DatePicker':
@@ -527,6 +526,7 @@ class CardComponent extends Component {
                         maximumDate={maximumDate}
                         style={{width: width, marginHorizontal: marginHorizontal}}
                         objectType={item.objectType}
+                        translation={this.props.translation}
                     />
                 );
             case 'Selector':
@@ -564,6 +564,7 @@ class CardComponent extends Component {
                         onPressArray={item.onPressArray}
                         containerTextStyle={{width, marginHorizontal, height: calculateDimension(46, true, this.props.screenSize)}}
                         isEditMode = {this.props.isEditMode !== undefined && this.props.isEditMode !== null ? this.props.isEditMode : true}
+                        translation={this.props.translation}
                     />
                 );
             case 'TextSwitchSelector':
@@ -575,6 +576,7 @@ class CardComponent extends Component {
                         values={item.values}
                         isEditMode = {this.props.isEditMode}
                         style={{width: width, marginHorizontal: marginHorizontal}}
+                        translation={this.props.translation}
                     />
                 );
             case 'TextInputWithDropDown':
@@ -595,6 +597,7 @@ class CardComponent extends Component {
                         onChangeDropDown={this.props.onChangeTextSwitchSelector}
                         selectedDropDownItemIndex={this.props[item.selectedItemIndexForAgeUnitOfMeasureDropDown]}
                         selectedItemIndexForAgeUnitOfMeasureDropDown ={item.selectedItemIndexForAgeUnitOfMeasureDropDown}
+                        translation={this.props.translation}
                     />
                 )
             default:
@@ -605,6 +608,151 @@ class CardComponent extends Component {
                 )
         }
     };
+
+    setDateValidations = (item) => {
+        let minimumDate = undefined
+        let maximumDate = undefined
+
+        if (item.type === 'DatePicker') {
+            if (this.props.screen === 'CaseSingleScreen') {
+                if (item.id === 'dob' || item.id === 'dateBecomeCase' || item.id === 'dateOfOutcome' ) {
+                    maximumDate = new Date()
+                } else if (item.id === 'dateOfOnset') {
+                    if (this.props.case && this.props.case !== undefined && this.props.case.deceased !== null && this.props.case.deceased !== undefined && this.props.case.deceased === true && this.props.case.dateDeceased && this.props.case.dateDeceased !== undefined && this.props.case.dateDeceased !== ''){
+                        maximumDate = this.props.case.dateDeceased
+                    } else {
+                        maximumDate = new Date()
+                    }
+                } else if (item.id === 'dateOfReporting') {
+                    if (this.props.case && this.props.case !== undefined && this.props.case.deceased !== null && this.props.case.deceased !== undefined && this.props.case.deceased === true && this.props.case.dateDeceased && this.props.case.dateDeceased !== undefined && this.props.case.dateDeceased !== ''){
+                        maximumDate = this.props.case.dateDeceased
+                    } else {
+                        maximumDate = new Date()
+                    }
+                } else if (item.id === 'dateOfInfection') {
+                    let hasDeceasedDate = false
+                    let hasDateOfOnset = false
+                    if (this.props.case && this.props.case !== undefined && this.props.case.deceased !== null && this.props.case.deceased !== undefined && this.props.case.deceased === true && this.props.case.dateDeceased && this.props.case.dateDeceased !== undefined && this.props.case.dateDeceased !== ''){
+                        hasDeceasedDate = true
+                    }
+                    if (this.props.case && this.props.case !== undefined && this.props.case.dateOfOnset && this.props.case.dateOfOnset !== undefined && this.props.case.dateOfOnset !== ''){
+                        hasDateOfOnset = true
+                    }
+
+                    if (hasDeceasedDate === true && hasDateOfOnset === false) {
+                        maximumDate = this.props.case.dateDeceased
+                    } else if (hasDeceasedDate === false && hasDateOfOnset === true) {
+                        maximumDate = this.props.case.dateOfOnset
+                    } else if (hasDeceasedDate === true && hasDateOfOnset === true) {
+                        maximumDate = _.min([this.props.case.dateOfOnset, this.props.case.dateDeceased])
+                    } else {
+                        maximumDate = new Date()
+                    }
+                } else if (item.id === 'dateDeceased') {
+                    maximumDate = new Date()
+                    let hasDateOfOnset = false   
+                    let hasDateOfReporting = false
+                    let hasDateOfInfection = false
+
+                    if (this.props.case && this.props.case !== undefined && this.props.case.dateOfOnset && this.props.case.dateOfOnset !== undefined && this.props.case.dateOfOnset !== ''){
+                        hasDateOfOnset = true
+                    }
+                    if (this.props.case && this.props.case !== undefined && this.props.case.dateOfReporting && this.props.case.dateOfReporting !== undefined && this.props.case.dateOfReporting !== ''){
+                        hasDateOfReporting = true
+                    }
+                    if (this.props.case && this.props.case !== undefined && this.props.case.dateOfInfection && this.props.case.dateOfInfection !== undefined && this.props.case.dateOfInfection !== ''){
+                        hasDateOfInfection = true
+                    }
+
+                    if (hasDateOfOnset === false && hasDateOfReporting === false && hasDateOfInfection === true) {
+                        minimumDate = this.props.case.dateOfInfection
+                    } else if (hasDateOfOnset === false && hasDateOfReporting === true && hasDateOfInfection === false) {
+                        minimumDate = this.props.case.dateOfReporting
+                    } else if (hasDateOfOnset === true && hasDateOfReporting === false && hasDateOfInfection === false) {
+                        minimumDate = this.props.case.dateOfOnset
+                    } else if (hasDateOfOnset === false && hasDateOfReporting === true && hasDateOfInfection === true) {
+                        minimumDate = _.max([this.props.case.dateOfReporting, this.props.case.dateOfInfection])
+                    } else if (hasDateOfOnset === true && hasDateOfReporting === false && hasDateOfInfection === true) {
+                        minimumDate = _.max([this.props.case.dateOfOnset, this.props.case.dateOfInfection])
+                    } else if (hasDateOfOnset === true && hasDateOfReporting === true && hasDateOfInfection === false) {
+                        minimumDate = _.max([this.props.case.dateOfOnset, this.props.case.dateOfReporting])
+                    } else if (hasDateOfOnset === true && hasDateOfReporting === true && hasDateOfInfection === true) {
+                        minimumDate = _.max([this.props.case.dateOfOnset, this.props.case.dateOfReporting, this.props.case.dateOfInfection])
+                    }
+                } else if (item.objectType === 'HospitalizationDates'){
+                    if (this.props.case && this.props.case.hospitalizationDates && Array.isArray(this.props.case.hospitalizationDates) && this.props.case.hospitalizationDates.length > 0 && this.props.case.hospitalizationDates[this.props.index]) {
+                        if (this.props.case.hospitalizationDates[this.props.index].startDate !== null && item.id !== 'startDate') {
+                            minimumDate = this.props.case.hospitalizationDates[this.props.index].startDate
+                        }
+                        if (this.props.case.hospitalizationDates[this.props.index].endDate !== null && item.id !== 'endDate') {
+                            maximumDate = this.props.case.hospitalizationDates[this.props.index].endDate
+                        }
+                    }
+                } else if (item.objectType === 'IsolationDates'){
+                    if (this.props.case && this.props.case.isolationDates && Array.isArray(this.props.case.isolationDates) && this.props.case.isolationDates.length > 0 && this.props.case.isolationDates[this.props.index]) {
+                        if (this.props.case.isolationDates[this.props.index].startDate !== null && item.id !== 'startDate') {
+                            minimumDate = this.props.case.isolationDates[this.props.index].startDate
+                        }
+                        if (this.props.case.isolationDates[this.props.index].endDate !== null && item.id !== 'endDate') {
+                            maximumDate = this.props.case.isolationDates[this.props.index].endDate
+                        }
+                    }
+                }
+            } else if (this.props.screen === 'ContactsSingleScreen') {
+                if (item.id === 'dob' || item.id === 'dateOfReporting') {
+                    maximumDate = new Date()
+                }
+            } else if (this.props.screen === 'ExposureScreen') {
+                if (item.id === 'contactDate') {
+                    maximumDate = new Date()
+                }
+            }
+
+            if (item.objectType === 'Address' && item.id === 'date') {
+                maximumDate = new Date()
+            }
+
+            //Other validations that doesn't have to be added yet
+            // * Event:
+            //     * date
+            //         * same or before
+            //             * current date
+            //     * dateOfReporting
+            //         * same or before
+            //             * current date
+            // * Case lab:
+            //     * dateSampleTaken
+            //         * same or before
+            //             * current date
+            //             * dateSampleDelivered
+            //             * dateTesting
+            //             * dateOfResult
+            //     * dateSampleDelivered
+            //         * same or before
+            //             * current date
+            //             * dateTesting
+            //             * dateOfResult
+            //         * same or after
+            //             * dateSampleTaken
+            //     * dateTesting
+            //         * same or before
+            //             * current date
+            //             * dateOfResult
+            //         * same or after
+            //             * dateSampleDelivered
+            //             * dateSampleTaken
+            //     * dateOfResult
+            //         * same or before
+            //             * current date
+            //         * same or after
+            //             * dateTesting
+            //             * dateSampleDelivered
+            //             * dateSampleTaken
+        }
+        
+        let dateValidation = {minimumDate, maximumDate}
+        return dateValidation
+    }
 
     computeValueForId = (type, id, followUp, contact, cases = []) => {
         if (type === 'DropdownInput' && id === 'exposedTo') {
@@ -661,55 +809,55 @@ class CardComponent extends Component {
 
         if (item.id === 'riskLevel') {
             return _.filter(this.props.referenceData, (o) => {
-                return o.categoryId.includes("RISK_LEVEL")
+                return o.active === true && o.categoryId.includes("RISK_LEVEL")
             }).map((o) => {return {value: this.getTranslation(o.value), id: o.value}})
         }
 
         if (item.id === 'classification') {
             return _.filter(this.props.referenceData, (o) => {
-                return o.categoryId.includes("CASE_CLASSIFICATION")
+                return o.active === true && o.categoryId.includes("CASE_CLASSIFICATION")
             }).map((o) => {return {label: this.getTranslation(o.value), value: o.value}})
         }
 
         if (item.id === 'gender') {
             return _.filter(this.props.referenceData, (o) => {
-                return o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_GENDER'
+                return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_GENDER'
             }).map((o) => {return {label: this.getTranslation(o.value), value: o.value}})
         }
 
         if (item.id === 'typeId') {
             return _.filter(this.props.referenceData, (o) => {
-                return o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_ADDRESS_TYPE'
+                return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_ADDRESS_TYPE'
             }).map((o) => {return {label: this.getTranslation(o.value), value: o.value}})
         }
 
         if (item.id === 'labName') {
             return _.filter(this.props.referenceData, (o) => {
-                return o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_LAB_NAME'
+                return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_LAB_NAME'
             }).map((o) => {return {value: this.getTranslation(o.value), id: o.value}})
         }
 
         if (item.id === 'sampleType') {
             return _.filter(this.props.referenceData, (o) => {
-                return o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_TYPE_OF_SAMPLE'
+                return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_TYPE_OF_SAMPLE'
             }).map((o) => {return {value: this.getTranslation(o.value), id: o.value}})
         }
 
         if (item.id === 'testType') {
             return _.filter(this.props.referenceData, (o) => {
-                return o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_TYPE_OF_LAB_TEST'
+                return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_TYPE_OF_LAB_TEST'
             }).map((o) => {return {value: this.getTranslation(o.value), id: o.value}})
         }
 
         if (item.id === 'result') {
             return _.filter(this.props.referenceData, (o) => {
-                return o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_LAB_TEST_RESULT'
+                return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_LAB_TEST_RESULT'
             }).map((o) => {return {value: this.getTranslation(o.value), id: o.value}})
         }
 
         if (item.id === 'status') {
             return _.filter(this.props.referenceData, (o) => {
-                return o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_LAB_TEST_RESULT_STATUS'
+                return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_LAB_TEST_RESULT_STATUS'
             }).map((o) => {return {value: this.getTranslation(o.value), id: o.value}})
         }
 
@@ -721,7 +869,7 @@ class CardComponent extends Component {
         let data = [];
         if (item.categoryId) {
             data = this.props.referenceData.filter((e) => {
-                return e.categoryId === item.categoryId
+                return e.active === true && e.categoryId === item.categoryId
             }).map((e) => {
                 return {value: this.getTranslation(e.value), id: extractIdFromPouchId(e._id, 'referenceData')}
             });
@@ -784,12 +932,12 @@ class CardComponent extends Component {
         // console.log("computeDataForFollowUpSingleScreenDropdownInput: ", item, this.props.case);
         if (item.id === 'statusId') {
             return _.filter(this.props.referenceData, (o) => {
-                return o.categoryId.includes("LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE")
+                return o.active === true && o.categoryId.includes("LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE")
             }).map((o) => {return {label: this.getTranslation(o.value), value: o.value}})
         }
         if (item.id === 'typeId') {
             return _.filter(this.props.referenceData, (o) => {
-                return o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_ADDRESS_TYPE'
+                return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_ADDRESS_TYPE'
             }).map((o) => {return {value: this.getTranslation(o.value), id: o.value}})
         }
     };
@@ -798,37 +946,37 @@ class CardComponent extends Component {
         // console.log("computeDataForCasesSingleScreenDropdownInput: ", item, this.props.case);
         if (item.id === 'riskLevel') {
             return _.filter(this.props.referenceData, (o) => {
-                return o.categoryId.includes("RISK_LEVEL")
+                return o.active === true && o.categoryId.includes("RISK_LEVEL")
             }).map((o) => {return {value: this.getTranslation(o.value), id: o.value}})
         }
         if (item.id === 'gender') {
             return _.filter(this.props.referenceData, (o) => {
-                return o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_GENDER'
+                return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_GENDER'
             }).map((o) => {return {label: this.getTranslation(o.value), value: o.value}})
         }
         if (item.id === 'typeId') {
             return _.filter(this.props.referenceData, (o) => {
-                return o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_ADDRESS_TYPE'
+                return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_ADDRESS_TYPE'
             }).map((o) => {return {value: this.getTranslation(o.value), id: o.value}})
         }
         if (item.id === 'classification') {
             return _.filter(this.props.referenceData, (o) => {
-                return o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_CASE_CLASSIFICATION'
+                return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_CASE_CLASSIFICATION'
             }).map((o) => {return {label: this.getTranslation(o.value), value: o.value}})
         }
         if (item.id === 'outcomeId') {
             return _.filter(this.props.referenceData, (o) => {
-                return o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_OUTCOME'
+                return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_OUTCOME'
             }).map((o) => {return {label: this.getTranslation(o.value), value: o.value}})
         }
         if (item.id === 'type') {
             return _.filter(this.props.referenceData, (o) => {
-                return o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_DOCUMENT_TYPE'
+                return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_DOCUMENT_TYPE'
             }).map((o) => {return {label: this.getTranslation(o.value), value: o.value}})
         }
         if (item.id === 'occupation') {
             return _.filter(this.props.referenceData, (o) => {
-                return o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_OCCUPATION'
+                return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_OCCUPATION'
             }).map((o) => {return {value: this.getTranslation(o.value), id: o.value}})
         }
     };
@@ -854,22 +1002,22 @@ class CardComponent extends Component {
         // console.log("computeDataForContactsSingleScreenDropdownInput: ", item, this.props.contact);
         if (item.id === 'riskLevel') {
             return _.filter(this.props.referenceData, (o) => {
-                return o.categoryId.includes("RISK_LEVEL")
+                return o.active === true && o.categoryId.includes("RISK_LEVEL")
             }).map((o) => {return {value: this.getTranslation(o.value), id: o.value}})
         }
         if (item.id === 'gender') {
             return _.filter(this.props.referenceData, (o) => {
-                return o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_GENDER'
+                return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_GENDER'
             }).map((o) => {return {value: this.getTranslation(o.value), id: o.value}})
         }
         if (item.id === 'typeId') {
             return _.filter(this.props.referenceData, (o) => {
-                return o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_ADDRESS_TYPE'
+                return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_ADDRESS_TYPE'
             }).map((o) => {return {value: this.getTranslation(o.value), id: o.value}})
         }
         if (item.id === 'occupation') {
             return _.filter(this.props.referenceData, (o) => {
-                return o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_OCCUPATION'
+                return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_OCCUPATION'
             }).map((o) => {return {value: this.getTranslation(o.value), id: o.value}})
         }
     };
@@ -941,6 +1089,16 @@ class CardComponent extends Component {
         }
         return this.props.contact && this.props.contact[item.id] ? this.getTranslation(this.props.contact[item.id]) : '';
     };
+
+    computeValueForCaseSortScreen = (item, index) => {
+        if (index && index >= 0) {
+            if (item.objectType === 'Sort') {
+                return this.props.filter && this.props.filter.sort && Array.isArray(this.props.filter.sort) && this.props.filter.sort.length > 0 && this.props.filter.sort[index][item.id] !== undefined ?
+                this.getTranslation(this.props.filter.sort[index][item.id]) : '';
+            }
+        }
+        return this.props.filter && this.props.filter[item.id] ? this.getTranslation(this.props.filter[item.id]) : '';
+    }
 
     getTranslation = (value) => {
         let valueToBeReturned = value;

@@ -12,6 +12,8 @@ import stylesGlobal from './../styles';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import SectionedMultiSelect from 'react-native-sectioned-multi-select';
+import translations from './../utils/translations'
+import {getTranslation} from './../utils/functions';
 
 class DropDownSectioned extends Component {
 
@@ -43,13 +45,13 @@ class DropDownSectioned extends Component {
                     textAlign: 'left',
                     color: 'rgba(0,0,0,0.38)',
                 }}>
-                    {this.props.isRequired ? this.props.label + ' * ' : this.props.label}
+                    {this.props.isRequired ? getTranslation(this.props.label, this.props.translation) + ' * ' : getTranslation(this.props.label, this.props.translation)}
                 </Text>
                 <SectionedMultiSelect
                     items={this.props.data}
                     uniqueKey='_id'
                     subKey='children'
-                    selectText= {this.props.value !== "" ? this.props.value : this.props.single === true ? 'Choose location' : 'Choose one or more locations'}
+                    selectText= {this.props.value !== "" ? this.props.value : this.props.single === true ? getTranslation(translations.dropDownSectionedLabels.chooseOneLocation, this.props.translation) : getTranslation(translations.dropDownSectionedLabels.chooseMoreLocations, this.props.translation)}
                     showDropDowns={true}
                     readOnlyHeadings={true}
                     onSelectedItemsChange={this.onSelectedItemsChange}
@@ -58,7 +60,7 @@ class DropDownSectioned extends Component {
                     selectChildren={false}
                     showChips={false}
                     modalAnimationType="slide"
-                    searchPlaceholderText="Search regions"
+                    searchPlaceholderText={getTranslation(translations.dropDownSectionedLabels.searchPlaceholderText, this.props.translation)}
                     selectToggleIconComponent={(<Icon name="arrow-drop-down"/>)}
                     dropDownToggleIconDownComponent={(<Icon name="arrow-drop-down"/>)}
                     dropDownToggleIconUpComponent={(<Icon name="arrow-drop-up"/>)}
@@ -74,7 +76,9 @@ class DropDownSectioned extends Component {
                     single={this.props.single}
                     noItemsComponent={(
                         <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-                            <Text style={{fontFamily: 'Roboto-Medium', fontSize: 15}}>There were no elements found</Text>
+                            <Text style={{fontFamily: 'Roboto-Medium', fontSize: 15}}>
+                                {getTranslation(translations.dropDownSectionedLabels.noLocationsMessage, this.props.translation)}
+                            </Text>
                         </View>
                     )}
                 />
@@ -93,7 +97,7 @@ class DropDownSectioned extends Component {
                     color: 'rgb(0,0,0)',
                     marginBottom: 7.5
                 }}>
-                    {this.props.label}
+                    {getTranslation(this.props.label, this.props.translation)}
                 </Text>
                 <Text style={{
                     fontFamily: 'Roboto-Light',
@@ -120,7 +124,8 @@ const style = StyleSheet.create({
 
 function mapStateToProps(state) {
     return {
-        screenSize: state.app.screenSize
+        screenSize: state.app.screenSize,
+        translation: state.app.translation,
     };
 }
 

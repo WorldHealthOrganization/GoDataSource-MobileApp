@@ -74,7 +74,6 @@ class ContactsSingleCalendar extends Component {
                     followUps[moment(this.props.contact.followUps[i].date).format('YYYY-MM-DD')].push({text: this.props.contact.followUps[i]});
                 }
                 followUps[moment(this.props.contact.followUps[i].date).format('YYYY-MM-DD')] = [];
-
                 followUps[moment(this.props.contact.followUps[i].date).format('YYYY-MM-DD')].push({text: this.props.contact.followUps[i]});
             }
         }

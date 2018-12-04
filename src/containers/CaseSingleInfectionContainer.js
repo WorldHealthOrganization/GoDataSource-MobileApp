@@ -5,7 +5,7 @@
 // the material ui library, since it provides design and animations out of the box
 import React, {PureComponent} from 'react';
 import {TextInput, View, Text, StyleSheet, FlatList, Alert, TouchableWithoutFeedback, Keyboard} from 'react-native';
-import {calculateDimension} from './../utils/functions';
+import {calculateDimension, getTranslation} from './../utils/functions';
 import config from './../utils/config';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -14,6 +14,7 @@ import Ripple from 'react-native-material-ripple';
 import CardComponent from './../components/CardComponent';
 import Button from './../components/Button';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import translations from './../utils/translations'
 
 class CaseSingleInfectionContainer extends PureComponent {
 
@@ -21,10 +22,6 @@ class CaseSingleInfectionContainer extends PureComponent {
     constructor(props) {
         super(props);
         this.state = {
-            oneHospitalizationDateText: 'Add hospitalization date range',
-            moreHospitalizationDatesText: 'Add another hospitalization date range',
-            oneIsolationDateText: 'Add isolation date range',
-            moreIsolationDatesText: 'Add another isolation date range'
         };
     }
     // Please add here the react lifecycle methods that you need
@@ -44,7 +41,7 @@ class CaseSingleInfectionContainer extends PureComponent {
                             this.props.isNew ? (
                                 <View style={{flexDirection: 'row'}}>
                                     <Button
-                                        title={'Back'}
+                                        title={getTranslation(translations.generalButtons.backButtonLabel, this.props.translation)}
                                         onPress={this.handleBackButton}
                                         color={styles.buttonGreen}
                                         titleColor={'white'}
@@ -55,7 +52,7 @@ class CaseSingleInfectionContainer extends PureComponent {
                                             marginHorizontal: calculateDimension(16, false, this.props.screenSize),
                                         }}/>
                                     <Button
-                                        title={'Next'}
+                                        title={getTranslation(translations.generalButtons.nextButtonLabel, this.props.translation)}
                                         onPress={this.handleNextButton}
                                         color={styles.buttonGreen}
                                         titleColor={'white'}
@@ -69,7 +66,7 @@ class CaseSingleInfectionContainer extends PureComponent {
                                     this.props.isEditMode ? (
                                     <View style={{flexDirection: 'row'}}>
                                         <Button
-                                            title={'Save'}
+                                            title={getTranslation(translations.generalButtons.saveButtonLabel, this.props.translation)}
                                             onPress={this.props.onPressSaveEdit}
                                             color={styles.buttonGreen}
                                             titleColor={'white'}
@@ -80,7 +77,7 @@ class CaseSingleInfectionContainer extends PureComponent {
                                                 marginRight: 10,
                                         }}/>
                                         <Button
-                                            title={'Cancel'}
+                                            title={getTranslation(translations.generalButtons.cancelButtonLabel, this.props.translation)}
                                             onPress={this.props.onPressCancelEdit}
                                             color={styles.buttonGreen}
                                             titleColor={'white'}
@@ -93,7 +90,7 @@ class CaseSingleInfectionContainer extends PureComponent {
                                     </View>) : (
                                     this.props.role.find((e) => e === 'write_case') !== undefined ? (
                                         <Button
-                                            title={'Edit'}
+                                            title={getTranslation(translations.generalButtons.editButtonLabel, this.props.translation)}
                                             onPress={this.props.onPressEdit}
                                             color={styles.buttonGreen}
                                             titleColor={'white'}
@@ -135,7 +132,7 @@ class CaseSingleInfectionContainer extends PureComponent {
                                         onPress={this.props.onPressAddHospitalizationDate}
                                     >
                                         <Text style={{fontFamily: 'Roboto-Medium', fontSize: 12, color: styles.buttonGreen}}>
-                                            {this.props.case.hospitalizationDates && this.props.case.hospitalizationDates.length === 0 ? this.state.oneHospitalizationDateText : this.state.moreHospitalizationDatesText}
+                                            {this.props.case.hospitalizationDates && this.props.case.hospitalizationDates.length === 0 ? getTranslation(translations.caseSingleScreen.oneHospitalizationDateText, this.props.translation) : getTranslation(translations.caseSingleScreen.moreHospitalizationDatesText, this.props.translation)}
                                         </Text>
                                     </Ripple>
                                 </View>
@@ -159,7 +156,7 @@ class CaseSingleInfectionContainer extends PureComponent {
                                         onPress={this.props.onPressAddIsolationDates}
                                     >
                                         <Text style={{fontFamily: 'Roboto-Medium', fontSize: 12, color: styles.buttonGreen}}>
-                                            {this.props.case.isolationDates && this.props.case.isolationDates.length === 0 ? this.state.oneIsolationDateText : this.state.moreIsolationDatesText}
+                                            {this.props.case.isolationDates && this.props.case.isolationDates.length === 0 ? getTranslation(translations.caseSingleScreen.oneIsolationDateText, this.props.translation) : getTranslation(translations.caseSingleScreen.moreIsolationDatesText, this.props.translation)}
                                         </Text>
                                     </Ripple>
                                 </View>
@@ -245,9 +242,10 @@ class CaseSingleInfectionContainer extends PureComponent {
         if (this.props.checkRequiredFieldsInfection()) {
             this.props.handleMoveToNextScreenButton(true)
         } else {
-            Alert.alert("Alert", 'Please complete all the required fields', [
+            Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.alertMessages.requiredFieldsMissingError, this.props.translation), [
                 {
-                    text: 'Ok', onPress: () => {console.log("OK pressed")}
+                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation), 
+                    onPress: () => {console.log("OK pressed")}
                 }
             ])
         }
@@ -283,7 +281,8 @@ const style = StyleSheet.create({
 function mapStateToProps(state) {
     return {
         screenSize: state.app.screenSize,
-        role: state.role
+        role: state.role,
+        translation: state.app.translation,
     };
 }
 

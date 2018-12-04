@@ -12,7 +12,8 @@ import PropTypes from 'prop-types';
 import SearchableDropdown from './SearchableDropdown';
 import Ripple from 'react-native-material-ripple';
 import {getContactsForOutbreakIdRequest} from './../queries/contacts';
-import {extractIdFromPouchId, createName} from './../utils/functions';
+import {extractIdFromPouchId, createName, getTranslation} from './../utils/functions';
+import translations from './../utils/translations'
 
 class DropdownSearchable extends PureComponent {
 
@@ -33,18 +34,18 @@ class DropdownSearchable extends PureComponent {
     // and can slow down the app
     render() {
         return (
-                <SearchableDropdown
-                    onTextChange={this.handleOnChangeText}
-                    onItemSelect={this.handleOnChangeItem}
-                    containerStyle={{padding: 5, minHeight: 150}}
-                    itemTextStyle={{color: '#222'}}
-                    itemsContainerStyle={{maxHeight: 140}}
-                    items={this.state.items}
-                    defaultIndex={2}
-                    placeholder="Search Contact"
-                    resetValue={false}
-                    onSubmitEditing={this.handleOnSubmitEditing}
-                />
+            <SearchableDropdown
+                onTextChange={this.handleOnChangeText}
+                onItemSelect={this.handleOnChangeItem}
+                containerStyle={{padding: 5, minHeight: 150}}
+                itemTextStyle={{color: '#222'}}
+                itemsContainerStyle={{maxHeight: 140}}
+                items={this.state.items}
+                defaultIndex={2}
+                placeholder={getTranslation(this.props.placeholder, this.props.translation)}
+                resetValue={false}
+                onSubmitEditing={this.handleOnSubmitEditing}
+            />
         )
     }
 
@@ -94,9 +95,10 @@ class DropdownSearchable extends PureComponent {
         console.log('handleOnSubmitEditing: ', this.state.searchText)
         getContactsForOutbreakIdRequest(this.props.outbreakId, {searchText: this.state.searchText}, null, (error, response) => {
             if (error) {
-                Alert.alert("Error", 'An error occurred while getting contacts', [
+                Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.alertMessages.dropDownSearchableContactsError, this.props.translation), [
                     {
-                        text: 'Ok', onPress: () => {console.log('Ok pressed')}
+                        text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+                        onPress: () => {console.log('Ok pressed')}
                     }
                 ])
             }

@@ -6,7 +6,7 @@
 import React, {PureComponent} from 'react';
 import {TextInput, View, Text, StyleSheet, FlatList, InteractionManager, Alert, TouchableWithoutFeedback, Keyboard} from 'react-native';
 import {LoaderScreen} from 'react-native-ui-lib';
-import {calculateDimension} from './../utils/functions';
+import {calculateDimension, getTranslation} from './../utils/functions';
 import config from './../utils/config';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -15,6 +15,7 @@ import CardComponent from './../components/CardComponent';
 import Button from './../components/Button';
 import Ripple from 'react-native-material-ripple';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import translations from './../utils/translations'
 
 class CaseSingleAddressContainer extends PureComponent {
 
@@ -23,8 +24,6 @@ class CaseSingleAddressContainer extends PureComponent {
         super(props);
         this.state = {
             interactionComplete: false,
-            oneAddressText: 'Add address',
-            moreAddressesText: 'Add another address'
         };
     }
 
@@ -57,7 +56,7 @@ class CaseSingleAddressContainer extends PureComponent {
                             this.props.isNew ? (
                                 <View style={{flexDirection: 'row'}}>
                                     <Button
-                                        title={'Back'}
+                                        title={getTranslation(translations.generalButtons.backButtonLabel, this.props.translation)}
                                         onPress={this.handleBackButton}
                                         color={styles.buttonGreen}
                                         titleColor={'white'}
@@ -68,7 +67,7 @@ class CaseSingleAddressContainer extends PureComponent {
                                             marginHorizontal: calculateDimension(16, false, this.props.screenSize),
                                         }}/>
                                     <Button
-                                        title={'Next'}
+                                        title={getTranslation(translations.generalButtons.nextButtonLabel, this.props.translation)}
                                         onPress={this.handleNextButton}
                                         color={styles.buttonGreen}
                                         titleColor={'white'}
@@ -82,7 +81,7 @@ class CaseSingleAddressContainer extends PureComponent {
                                 this.props.isEditMode ? (
                                     <View style={{flexDirection: 'row'}}>
                                         <Button
-                                            title={'Save'}
+                                            title={getTranslation(translations.generalButtons.saveButtonLabel, this.props.translation)}
                                             onPress={this.props.onPressSaveEdit}
                                             color={styles.buttonGreen}
                                             titleColor={'white'}
@@ -93,7 +92,7 @@ class CaseSingleAddressContainer extends PureComponent {
                                                 marginRight: 10,
                                         }}/>
                                         <Button
-                                            title={'Cancel'}
+                                            title={getTranslation(translations.generalButtons.cancelButtonLabel, this.props.translation)}
                                             onPress={this.props.onPressCancelEdit}
                                             color={styles.buttonGreen}
                                             titleColor={'white'}
@@ -106,7 +105,7 @@ class CaseSingleAddressContainer extends PureComponent {
                                     </View>) : (
                                         this.props.role.find((e) => e === 'write_case') !== undefined ? (
                                             <Button
-                                                title={'Edit'}
+                                                title={getTranslation(translations.generalButtons.editButtonLabel, this.props.translation)}
                                                 onPress={this.props.onPressEdit}
                                                 color={styles.buttonGreen}
                                                 titleColor={'white'}
@@ -143,7 +142,7 @@ class CaseSingleAddressContainer extends PureComponent {
                                         onPress={this.props.onPressAddAddress}
                                     >
                                         <Text style={{fontFamily: 'Roboto-Medium', fontSize: 12, color: styles.buttonGreen}}>
-                                            {this.props.case.addresses && this.props.case.addresses.length === 0 ? this.state.oneAddressText : this.state.moreAddressesText}
+                                            {this.props.case.addresses && this.props.case.addresses.length === 0 ? getTranslation(translations.caseSingleScreen.oneAddressText, this.props.translation) : getTranslation(translations.caseSingleScreen.moreAddressesText, this.props.translation)}
                                         </Text>
                                     </Ripple>
                                 </View>
@@ -186,16 +185,18 @@ class CaseSingleAddressContainer extends PureComponent {
             if (this.props.hasPlaceOfResidence) {
                 this.props.handleMoveToNextScreenButton(true)
             } else {
-                Alert.alert("Alert", 'Please add the place of residence address', [
+                Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.alertMessages.addressOfResidenceError, this.props.translation), [
                     {
-                        text: 'Ok', onPress: () => {console.log("OK pressed")}
+                        text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation), 
+                        onPress: () => {console.log("OK pressed")}
                     }
                 ])
             }
         } else {
-            Alert.alert("Alert", 'Please add at least one address with all the required fields completed', [
+            Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.alertMessages.addressRequiredFieldsMissing, this.props.translation), [
                 {
-                    text: 'Ok', onPress: () => {console.log("OK pressed")}
+                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation), 
+                    onPress: () => {console.log("OK pressed")}
                 }
             ])
         }
@@ -231,7 +232,8 @@ const style = StyleSheet.create({
 function mapStateToProps(state) {
     return {
         screenSize: state.app.screenSize,
-        role: state.role
+        role: state.role,
+        translation: state.app.translation,
     };
 }
 

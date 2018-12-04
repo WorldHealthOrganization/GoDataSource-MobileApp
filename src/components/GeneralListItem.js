@@ -13,8 +13,10 @@ import styles from './../styles';
 import {ListItem} from 'react-native-ui-lib';
 import ElevatedView from 'react-native-elevated-view';
 import ActionsBar from './ActionsBar';
+import translations from './../utils/translations'
+import {getTranslation} from './../utils/functions';
 
-GeneralListItem = ({title, primaryText, secondaryText, firstComponent, secondComponent, thirdComponent, hasActionsBar, textsArray, textsStyleArray, onPressArray, actionsBarContainerStyle, containerStyle}) => (
+GeneralListItem = ({title, primaryText, secondaryText, firstComponent, secondComponent, thirdComponent, hasActionsBar, textsArray, textsStyleArray, onPressArray, actionsBarContainerStyle, containerStyle, translation}) => (
     <ElevatedView
         elevation={3}
         style={[{borderRadius: 2, height: '100%', backgroundColor: 'white'}, containerStyle]}
@@ -24,21 +26,27 @@ GeneralListItem = ({title, primaryText, secondaryText, firstComponent, secondCom
                     firstComponent ? (
                         firstComponent
                     ) : (
-                        <Text style={style.title}>{title}</Text>
+                        <Text style={style.title}>
+                            {getTranslation(title, translation)}
+                        </Text>
                     )
                 }
                 {
                     secondComponent ? (
                         secondComponent
                     ) : (
-                        <Text style={style.primaryText}>{primaryText}</Text>
+                        <Text style={style.primaryText}>
+                            {getTranslation(primaryText, translation)}
+                        </Text>
                     )
                 }
                 {
                     thirdComponent ? (
                         thirdComponent
                     ) : (
-                        <Text style={style.primaryText}>{secondaryText}</Text>
+                        <Text style={style.primaryText}>
+                            {getTranslation(secondaryText, translation)}
+                        </Text>
                     )
                 }
                 {
@@ -48,6 +56,7 @@ GeneralListItem = ({title, primaryText, secondaryText, firstComponent, secondCom
                             onPressArray={onPressArray}
                             containerStyle={[{height: 54}]}
                             isEditMode={true}
+                            translation={translation}
                         />) : (null)
                 }
         </View>

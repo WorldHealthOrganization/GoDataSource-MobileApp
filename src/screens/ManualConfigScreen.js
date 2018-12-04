@@ -21,6 +21,8 @@ import url from './../utils/url';
 import {storeHubConfiguration} from './../actions/app';
 import {LoaderScreen} from 'react-native-ui-lib';
 import Ripple from 'react-native-material-ripple';
+import {getTranslation} from './../utils/functions';
+import translations from './../utils/translations'
 
 class ManualConfigScreen extends Component {
 
@@ -59,7 +61,8 @@ class ManualConfigScreen extends Component {
         if (props.errors && props.errors.type && props.errors.message) {
             Alert.alert(props.errors.type, props.errors.message, [
                 {
-                    text: 'Ok', onPress: () => {props.removeErrors()}
+                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation), 
+                    onPress: () => {props.removeErrors()}
                 }
             ])
         }
@@ -89,7 +92,9 @@ class ManualConfigScreen extends Component {
                 </Ripple>
 
                 <View style={[style.welcomeTextContainer]}>
-                    <Text style={style.welcomeText}>HUB configuration</Text>
+                    <Text style={style.welcomeText}>
+                        {getTranslation(translations.manualConfigScreen.title, this.props.translation)}
+                    </Text>
                 </View>
                 <View style={style.inputsContainer}>
                     <TextField
@@ -100,7 +105,7 @@ class ManualConfigScreen extends Component {
                         enablesReturnKeyAutomatically={true}
                         containerStyle={style.textInput}
                         onChangeText={this.handleTextChange}
-                        label='HUB URL'
+                        label={getTranslation(translations.manualConfigScreen.hubUrlLabel, this.props.translation)}
                         autoCapitalize={'none'}
                     />
                     <TextField
@@ -111,7 +116,7 @@ class ManualConfigScreen extends Component {
                         enablesReturnKeyAutomatically={true}
                         containerStyle={style.textInput}
                         onChangeText={this.handleTextChange}
-                        label='Client ID'
+                        label={getTranslation(translations.manualConfigScreen.clientIdLabel, this.props.translation)}
                         autoCapitalize={'none'}
                     />
                     <TextField
@@ -122,11 +127,11 @@ class ManualConfigScreen extends Component {
                         enablesReturnKeyAutomatically={true}
                         containerStyle={style.textInput}
                         onChangeText={this.handleTextChange}
-                        label='Client secret'
+                        label={getTranslation(translations.manualConfigScreen.clientSecretPass, this.props.translation)}
                         secureTextEntry={true}
                         autoCapitalize={'none'}
                     />
-                    <Button upperCase={false} onPress={this.saveHubConfiguration} text="Save HUB configuration" style={styles.buttonLogin} />
+                    <Button upperCase={false} onPress={this.saveHubConfiguration} text={getTranslation(translations.manualConfigScreen.saveHubConfigButton, this.props.translation)} style={styles.buttonLogin} />
                 </View>
                 <View style={style.logoContainer}>
                     <Image source={{uri: 'logo_app'}} style={style.logoStyle} />
@@ -164,8 +169,7 @@ class ManualConfigScreen extends Component {
     };
 
     handleTextChange = (text) => {
-        ['url', 'clientId', 'clientSecret']
-            .map((name) => ({ name, ref: this[name] }))
+        ['url', 'clientId', 'clientSecret'].map((name) => ({ name, ref: this[name] }))
             .forEach(({ name, ref }) => {
                 if (ref.isFocused()) {
                     this.setState({ [name]: text });
@@ -222,7 +226,8 @@ function mapStateToProps(state) {
     return {
         screenSize: state.app.screenSize,
         errors: state.errors,
-        syncState: state.app.syncState
+        syncState: state.app.syncState,
+        translation: state.app.translation
     };
 }
 

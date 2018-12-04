@@ -6,13 +6,14 @@ import {TextInput, View, Text, StyleSheet, Platform, InteractionManager} from 'r
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import {ListItem, Icon} from 'react-native-material-ui';
-import {calculateDimension} from './../utils/functions';
+import {calculateDimension, getTranslation} from './../utils/functions';
 import config from './../utils/config';
 import CalendarPicker from './CalendarPicker';
 import Calendar from "react-native-calendars/src/calendar/index";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import Ripple from 'react-native-material-ripple';
+import translations from './../utils/translations'
 
 class NavBarCustom extends PureComponent {
 
@@ -48,7 +49,9 @@ class NavBarCustom extends PureComponent {
                         this.props.customTitle && !this.props.title ? (
                             this.props.customTitle
                         ) : (
-                            <Text style={style.title}>{this.props.title}</Text>
+                            <Text style={style.title}>
+                                {getTranslation(this.props.title, this.props.translation)}
+                            </Text>
                         )
                     }
                 </View>
@@ -103,7 +106,8 @@ const style = StyleSheet.create({
 
 function mapStateToProps(state) {
     return {
-        screenSize: state.app.screenSize
+        screenSize: state.app.screenSize,
+        translation: state.app.translation
     };
 }
 

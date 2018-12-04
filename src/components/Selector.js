@@ -15,8 +15,10 @@ import {bindActionCreators} from "redux";
 import Modal from 'react-native-modal';
 import ElevatedView from "react-native-elevated-view";
 import SelectMultiple from 'react-native-select-multiple';
+import translations from './../utils/translations'
+import {getTranslation} from './../utils/functions';
 
-class DropDown extends PureComponent {
+class Selector extends PureComponent {
 
     // This will be a dumb component, so it's best not to put any business logic in it
     constructor(props) {
@@ -33,7 +35,6 @@ class DropDown extends PureComponent {
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
-
         return (
             <View style={[this.props.style, style.container]}>
                 <FlatList
@@ -58,7 +59,9 @@ class DropDown extends PureComponent {
                     ]}
                 onPress={() => {this.handleSelectItem(item, index)}}
             >
-                <Text style={[style.itemTextStyle, {color: item.selected ? 'white' : styles.colorUnselectedItemText}]}>{item.value}</Text>
+                <Text style={[style.itemTextStyle, {color: item.selected ? 'white' : styles.colorUnselectedItemText}]}>
+                    {item.value}
+                </Text>
             </Ripple>
         )
     };
@@ -68,7 +71,7 @@ class DropDown extends PureComponent {
     }
 }
 
-DropDown.defaultProps = {
+Selector.defaultProps = {
 
 };
 
@@ -93,7 +96,8 @@ const style = StyleSheet.create({
 
 function mapStateToProps(state) {
     return {
-        screenSize: state.app.screenSize
+        screenSize: state.app.screenSize,
+        translation: state.app.translation,
     };
 }
 
@@ -102,4 +106,4 @@ function matchDispatchProps(dispatch) {
     }, dispatch);
 }
 
-export default connect(mapStateToProps, matchDispatchProps)(DropDown);
+export default connect(mapStateToProps, matchDispatchProps)(Selector);

@@ -6,7 +6,7 @@
 import React, {PureComponent} from 'react';
 import {TextInput, View, Text, StyleSheet, Platform, Dimensions, Image} from 'react-native';
 import {ListItem, Icon} from 'react-native-material-ui';
-import {calculateDimension, extractIdFromPouchId} from './../utils/functions';
+import {calculateDimension, extractIdFromPouchId, getTranslation} from './../utils/functions';
 import config from './../utils/config';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -16,6 +16,7 @@ import styles from './../styles';
 import Ripple from 'react-native-material-ripple';
 import ElevatedView from 'react-native-elevated-view';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import translations from './../utils/translations'
 
 class MissedFollowUpListItem extends PureComponent {
 
@@ -74,7 +75,9 @@ class MissedFollowUpListItem extends PureComponent {
                         rightElement={
                             <View style={{flexDirection: 'row', alignItems: 'center'}}>
                                 <Ionicons name="ios-close-circle-outline" color={styles.missedRedColor} size={13}/>
-                                <Text style={style.missedTextStyle}>Missed</Text>
+                                <Text style={style.missedTextStyle}>
+                                    {getTranslation(translations.missedFollowUpListItemLabels.missedLabel, this.props.translation)}
+                                </Text>
                             </View>
                         }
                         style={{
@@ -89,13 +92,17 @@ class MissedFollowUpListItem extends PureComponent {
                         height: calculateDimension(52, true, this.props.screenSize),
                         marginHorizontal: calculateDimension(14, false, this.props.screenSize)
                     }]}>
-                    <Text style={style.followUpPrefix}>Last follow-up: </Text>
+                    <Text style={style.followUpPrefix}>
+                        {getTranslation(translations.missedFollowUpListItemLabels.lastFollowUp, this.props.translation)}
+                    </Text>
                     <Text style={style.followUpSuffix}>{lastFollowUp}</Text>
                 </View>
                 <View style={styles.lineStyle}/>
                 <View
                     style={[style.thirdSectionContainer, {marginHorizontal: calculateDimension(14, false, this.props.screenSize)}]}>
-                    <Text style={style.followUpPrefix}>Next follow-up: </Text>
+                    <Text style={style.followUpPrefix}>
+                        {getTranslation(translations.missedFollowUpListItemLabels.nextFollowup, this.props.translation)}
+                    </Text>
                     <Text style={style.followUpSuffix}>{nextFollowUp}</Text>
                 </View>
             </ElevatedView>
@@ -180,7 +187,8 @@ const style = StyleSheet.create({
 function mapStateToProps(state) {
     return {
         screenSize: state.app.screenSize,
-        contacts: state.contacts
+        contacts: state.contacts,
+        translation: state.app.translation
     };
 }
 

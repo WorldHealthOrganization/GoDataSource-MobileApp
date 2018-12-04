@@ -8,7 +8,7 @@ import {View, Text, StyleSheet, Platform, Animated} from 'react-native';
 import {Button} from 'react-native-material-ui';
 import styles from './../styles';
 import NavBarCustom from './../components/NavBarCustom';
-import {extractIdFromPouchId} from './../utils/functions';
+import {extractIdFromPouchId, getTranslation} from './../utils/functions';
 import config from './../utils/config';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -17,6 +17,8 @@ import {addFilterForScreen, removeFilterForScreen} from './../actions/app';
 import {TabBar, TabView} from 'react-native-tab-view';
 import FollowUpsFiltersContainer from './../containers/FollowUpsFiltersContainer';
 import FollowUpsSortContainer from './../containers/FollowUpsSortContainer';
+import translations from './../utils/translations';
+import _ from 'lodash';
 
 class FollowUpsFilterScreen extends Component {
 
@@ -72,7 +74,7 @@ class FollowUpsFilterScreen extends Component {
         return (
             <View style={style.container}>
                 <NavBarCustom
-                    title={this.props.screen === 'ContactsFilterScreen' ? 'Contacts filters' : 'Follow-ups filters'}
+                    title={this.props.screen === 'ContactsFilterScreen' ? getTranslation(translations.followUpFilter.contactFilterTitle, this.props.translation) : getTranslation(translations.followUpFilter.followUpsFilterTitle, this.props.translation)}
                     navigator={this.props.navigator}
                     iconName="close"
                     handlePressNavbarButton={this.handlePressNavbarButton}
@@ -126,6 +128,11 @@ class FollowUpsFilterScreen extends Component {
                 <FollowUpsSortContainer
                     handleMoveToPrevieousScreenButton={this.handleMoveToPrevieousScreenButton}
                     filter={this.state.filter}
+                    onPressApplyFilters={this.handleOnPressApplyFilters}
+                    onPressAddSortRule={this.onPressAddSortRule}
+                    onChangeDropDown={this.onChangeDropDown}
+                    onDeletePress={this.onDeleteSortRulePress}
+                    key={this.state.index}
                 />
             );
         }
@@ -148,6 +155,49 @@ class FollowUpsFilterScreen extends Component {
         )
     };
 
+    onPressAddSortRule = () => {
+        let sort = [];
+        if (this.state && this.state.filter && this.state.filter.sort) {
+            sort = _.cloneDeep(this.state.filter.sort);
+        }
+        sort.push({
+            sortCriteria: '',
+            sortOrder: '',
+        });
+        this.setState(prevState => ({
+            filter: Object.assign({}, prevState.filter, {sort}),
+        }), () => {
+            console.log("### after adding sort rule: ", this.state.filter);
+        })
+    }
+
+    onDeleteSortRulePress = (index) => {
+        console.log("onDeleteSortRulePress: ", index);
+        let filterSortClone = _.cloneDeep(this.state.filter.sort);
+        filterSortClone.splice(index, 1);
+        this.setState(prevState => ({
+            filter: Object.assign({}, prevState.filter, {sort: filterSortClone}),
+        }), () => {
+            console.log("After onDeleteSortRulePress ", this.state.sort);
+        })
+    }
+
+    onChangeDropDown = (value, id, objectTypeOrIndex, objectType) => {
+        console.log("sort onChangeDropDown: ", value, id, objectTypeOrIndex, this.state.filter);
+        if (typeof objectTypeOrIndex === 'number' && objectTypeOrIndex >= 0) {
+            if (objectType === 'Sort') {
+                let sortClone = _.cloneDeep(this.state.filter.sort);
+                sortClone[objectTypeOrIndex][id] = value && value.value ? value.value : value;
+                console.log ('sortClone', sortClone)
+                this.setState(prevState => ({
+                    filter: Object.assign({}, prevState.filter, {sort: sortClone}),
+                }), () => {
+                    console.log("onChangeDropDown", id, " ", value, " ", this.state.filter);
+                })
+            }
+        }
+    };
+
     handleRenderLabel = (props) => ({route, index}) => {
         const inputRange = props.navigationState.routes.map((x, i) => i);
 
@@ -167,7 +217,7 @@ class FollowUpsFilterScreen extends Component {
                 flex: 1,
                 alignSelf: 'center'
             }}>
-                {route.title}
+                {getTranslation(route.title, this.props.translation).toUpperCase()}
             </Animated.Text>
         );
     }
@@ -209,8 +259,8 @@ class FollowUpsFilterScreen extends Component {
 
     handleOnPressApplyFilters = () => {
         let filterStateClone = Object.assign({}, this.state.filter.filter);
+        let filterSortClone = this.state.filter.sort.slice()
         let filter = {};
-
      
         if (filterStateClone.gender.Male && !filterStateClone.gender.Female ) {
             filter.gender = config.localTranslationTokens.male
@@ -224,6 +274,10 @@ class FollowUpsFilterScreen extends Component {
         if (filterStateClone.selectedLocations) {
             filter.selectedLocations = filterStateClone.selectedLocations;
         }
+        if (filterSortClone && filterSortClone.length > 0){
+            filter.sort = filterSortClone;
+        }
+
         // this.props.getContactsForOutbreakId(this.props.user.activeOutbreakId, filter, this.props.user.token);
         this.props.addFilterForScreen(this.props.screen, filter);
         this.props.navigator.dismissModal(this.props.onApplyFilters(filter));
@@ -243,7 +297,8 @@ function mapStateToProps(state) {
     return {
         user: state.user,
         screenSize: state.app.screenSize,
-        followUps: state.followUps
+        followUps: state.followUps,
+        translation: state.app.translation
     };
 }
 

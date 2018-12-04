@@ -11,7 +11,7 @@ import styles from './../styles';
 import NavBarCustom from './../components/NavBarCustom';
 import {Calendar} from 'react-native-calendars';
 import CalendarPicker from './../components/CalendarPicker';
-import {calculateDimension, navigation} from './../utils/functions';
+import {calculateDimension, navigation, getTranslation} from './../utils/functions';
 import config from './../utils/config';
 import ButtonWithIcons from './../components/ButtonWithIcons';
 import ValuePicker from './../components/ValuePicker';
@@ -30,6 +30,7 @@ import AnimatedListView from './../components/AnimatedListView';
 import ViewHOC from './../components/ViewHOC';
 import _ from 'lodash';
 import { Popup } from 'react-native-map-link';
+import translations from './../utils/translations'
 
 let height = Dimensions.get('window').height;
 let width = Dimensions.get('window').width;
@@ -93,7 +94,8 @@ class CasesScreen extends Component {
         if (props.errors && props.errors.type && props.errors.message) {
             Alert.alert(props.errors.type, props.errors.message, [
                 {
-                    text: 'Ok', onPress: () => {
+                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation), 
+                    onPress: () => {
                     props.removeErrors();
                     state.loading = false;
                 }
@@ -138,11 +140,11 @@ class CasesScreen extends Component {
             outputRange: [1, 0],
             extrapolate: 'clamp',
         });
-        let caseTitle = []; caseTitle[1] = 'Cases';
+        let caseTitle = []; caseTitle[1] = getTranslation(translations.casesScreen.casesTitle, this.props.translation);
         return (
             <ViewHOC style={style.container}
                      showLoader={(this.props && this.props.syncState && (this.props.syncState !== 'Finished processing' && this.props.syncState !== 'Error')) || (this && this.state && this.state.loading)}
-                     loaderText={this.props && this.props.syncState ? this.props.syncState : 'Loading...'}>
+                     loaderText={this.props && this.props.syncState ? this.props.syncState : getTranslation(translations.loadingScreenMessages.loadingMsg, this.props.translation)}>
                 <NavBarCustom
                     title={null}
                     customTitle={
@@ -204,7 +206,7 @@ class CasesScreen extends Component {
                                 onPress={this.handlePressFilter}
                                 onChangeText={this.handleOnChangeText}
                                 onSubmitEditing={this.handleOnSubmitEditing}
-                                filterText={(this.state.filterFromFilterScreen && Object.keys(this.state.filterFromFilterScreen).length > 0) ? ("Filter (" + Object.keys(this.state.filterFromFilterScreen).length + ')') : 'Filter'}
+                                filterText={(this.state.filterFromFilterScreen && Object.keys(this.state.filterFromFilterScreen).length > 0) ? (getTranslation(translations.generalLabels.filterTitle, this.props.translation) + " (" + Object.keys(this.state.filterFromFilterScreen).length + ')') : getTranslation(translations.generalLabels.filterTitle, this.props.translation)}
                             />
                         }
                         ItemSeparatorComponent={this.renderSeparatorComponent}
@@ -228,8 +230,8 @@ class CasesScreen extends Component {
                                     longitude: this.state.longitude,
                                     sourceLatitude: this.state.sourceLatitude,
                                     sourceLongitude: this.state.sourceLongitude,
-                                    dialogTitle: 'Select the maps application that you would like to use',
-                                    cancelText: 'Cancel',
+                                    dialogTitle: getTranslation(translations.alertMessages.mapsPopupMessage, this.props.translation),
+                                    cancelText: getTranslation(translations.alertMessages.cancelButtonLabel, this.props.translation),
                                     appsWhiteList: ['google-maps', 'apple-maps', 'waze']
                                     //other possibilities: citymapper, uber, lyft, transit, yandex, moovit
                                 }}
@@ -443,7 +445,7 @@ class CasesScreen extends Component {
         }
 
         //gender
-        if (this.state.filterFromFilterScreen && this.state.filterFromFilterScreen.gender) {
+        if (this.state.filterFromFilterScreen && this.state.filterFromFilterScreen.gender && this.state.filterFromFilterScreen.gender !== null) {
             allFilters.gender = this.state.filterFromFilterScreen.gender
 
         } else {
@@ -458,7 +460,7 @@ class CasesScreen extends Component {
         }
 
         //search text
-        if (this.state.filter.searchText.trim().length > 0) {
+        if (this.state.filter && this.state.filter.searchText && this.state.filter.searchText.trim().length > 0) {
             let splitedFilter= this.state.filter.searchText.split(" ")
             splitedFilter = splitedFilter.filter((e) => {return e !== ""})
             allFilters.searchText = new RegExp(splitedFilter.join("|"), "ig");
@@ -467,13 +469,20 @@ class CasesScreen extends Component {
         }
 
         //selected locations
-        if (this.state.filterFromFilterScreen && this.state.filterFromFilterScreen.selectedLocations) {
+        if (this.state.filterFromFilterScreen && this.state.filterFromFilterScreen.selectedLocations && this.state.filterFromFilterScreen.selectedLocations.length > 0) {
             allFilters.selectedLocations = this.state.filterFromFilterScreen.selectedLocations;
         } else {
             allFilters.selectedLocations = null
         }
 
-        if (!allFilters.age && !allFilters.gender && !allFilters.searchText && !allFilters.classification && !allFilters.selectedLocations) {
+        //sort rules
+        if (this.state.filterFromFilterScreen && this.state.filterFromFilterScreen.sort && this.state.filterFromFilterScreen.sort.length > 0) {
+            allFilters.sort = this.state.filterFromFilterScreen.sort;
+        } else {
+            allFilters.sort = null
+        }
+
+        if (!allFilters.age && !allFilters.gender && !allFilters.searchText && !allFilters.classification && !allFilters.selectedLocations && !allFilters.sort) {
             allFilters = null
         }
 
@@ -520,7 +529,8 @@ function mapStateToProps(state) {
         filter: state.app.filters,
         screenSize: state.app.screenSize,
         syncState: state.app.syncState,
-        errors: state.errors
+        errors: state.errors,
+        translation: state.app.translation
     };
 }
 

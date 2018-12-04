@@ -6,13 +6,14 @@ import {TextInput, View, Text, StyleSheet, Platform, Dimensions, TouchableOpacit
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import {ListItem, Icon, Button} from 'react-native-material-ui';
-import {calculateDimension} from './../utils/functions';
+import {calculateDimension, getTranslation} from './../utils/functions';
 import config from './../utils/config';
 import Ripple from 'react-native-material-ripple';
 import IconMaterial from 'react-native-vector-icons/MaterialCommunityIcons';
 import styles from './../styles';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
+import translations from './../utils/translations'
 
 class ButtonWithIcons extends PureComponent {
 
@@ -47,15 +48,17 @@ class ButtonWithIcons extends PureComponent {
                                           color={styles.buttonGreen}/>
                         )
                     }
-                    <Text>{this.props.label}</Text>
+                    <Text>
+                        {getTranslation(this.props.label, this.props.translation)}
+                    </Text>
                     {
                         this.props.isSecondIconPureMaterial ? (
                             <Icon size={calculateDimension(18, false, this.props.screenSize)} color={'black'} name={this.props.secondIcon}
                                   style={{display: this.props.isSecondIconPureMaterial ? 'flex' : 'none'}}/>
                         ) : (
                             <IconMaterial style={{display: this.props.isSecondIconPureMaterial ? 'none' : 'flex'}}
-                                          name={this.props.firstIcon} size={calculateDimension(11, false, this.props.screenSize)}
-                                          color={styles.buttonGreen}/>
+                                name={this.props.firstIcon} size={calculateDimension(11, false, this.props.screenSize)}
+                                color={styles.buttonGreen}/>
                         )
                     }
                 </View>
@@ -95,7 +98,8 @@ const style = StyleSheet.create({
 
 function mapStateToProps(state) {
     return {
-        screenSize: state.app.screenSize
+        screenSize: state.app.screenSize,
+        translation: state.app.translation
     };
 }
 

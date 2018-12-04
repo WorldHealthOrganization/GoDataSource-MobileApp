@@ -17,6 +17,8 @@ import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import url from './../utils/url';
 import {LoaderScreen} from 'react-native-ui-lib';
 import Ripple from 'react-native-material-ripple';
+import translations from './../utils/translations'
+import {getTranslation} from './../utils/functions';
 
 class LoginScreen extends Component {
 
@@ -57,7 +59,8 @@ class LoginScreen extends Component {
         if (props.errors && props.errors.type && props.errors.message) {
             Alert.alert(props.errors.type, props.errors.message, [
                 {
-                    text: 'Ok', onPress: () => {props.removeErrors()}
+                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation), 
+                    onPress: () => {props.removeErrors()}
                 }
             ])
         }
@@ -81,14 +84,16 @@ class LoginScreen extends Component {
             >
                 {
                     this.state && this.state.showLoading ? (
-                        <LoaderScreen overlay={true} backgroundColor={'white'} message={this.props && this.props.loginState ? this.props.loginState : 'Loading...'} />
+                        <LoaderScreen overlay={true} backgroundColor={'white'} message={this.props && this.props.loginState ? this.props.loginState : getTranslation(translations.loadingScreenMessages.loadingMsg, this.props.translation)} />
                     ) : (null)
                 }
                 <Ripple style={{position: "absolute", top: 20, left: 20}} onPress={this.handleOnPressBack}>
                     <Icon name="arrow-back"/>
                 </Ripple>
                 <View style={[style.welcomeTextContainer]}>
-                    <Text style={style.welcomeText}>Welcome!</Text>
+                    <Text style={style.welcomeText}>
+                        {getTranslation(translations.loginScreen.welcomeMessage, this.props.translation)}
+                    </Text>
                 </View>
                 <View style={style.inputsContainer}>
                     {/*<View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'}}>*/}
@@ -112,7 +117,7 @@ class LoginScreen extends Component {
                         enablesReturnKeyAutomatically={true}
                         containerStyle={style.textInput}
                         onChangeText={this.handleTextChange}
-                        label='Email address'
+                        label={getTranslation(translations.loginScreen.emailLabel, this.props.translation)}
                         autoCapitalize={'none'}
                     />
                     <TextField
@@ -123,11 +128,11 @@ class LoginScreen extends Component {
                         enablesReturnKeyAutomatically={true}
                         containerStyle={style.textInput}
                         onChangeText={this.handleTextChange}
-                        label='Password'
+                        label={getTranslation(translations.loginScreen.passwordLabel, this.props.translation)}
                         secureTextEntry={true}
                         autoCapitalize={'none'}
                     />
-                    <Button onPress={this.handleLogin} text="Login" style={styles.buttonLogin} height={35} />
+                    <Button onPress={this.handleLogin} text={getTranslation(translations.loginScreen.loginButtonLabel, this.props.translation)} style={styles.buttonLogin} height={35} />
                 </View>
                 <View style={style.logoContainer}>
                     <Image source={{uri: 'logo_app'}} style={style.logoStyle} />
@@ -144,16 +149,18 @@ class LoginScreen extends Component {
     handleLogin = () => {
         let re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
         if (!this.state.email || !this.state.password) {
-            Alert.alert('Invalid credentials', "Please make sure you have completed the fields", [
+            Alert.alert(getTranslation(translations.alertMessages.invalidCredentials, this.props.translation), getTranslation(translations.alertMessages.credentialsValidationError, this.props.translation), [
                 {
-                    text: 'Ok', onPress: () => {console.log('Ok pressed')}
+                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation), 
+                    onPress: () => {console.log('Ok pressed')}
                 }
             ])
         } else {
             if (!re.test(this.state.email)) {
-                Alert.alert('Invalid email', "Please make sure you have entered a valid email address", [
+                Alert.alert(getTranslation(translations.alertMessages.invalidEmail, this.props.translation), getTranslation(translations.alertMessages.emailValidationError, this.props.translation), [
                     {
-                        text: 'Ok', onPress: () => {console.log('Ok pressed')}
+                        text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation), 
+                        onPress: () => {console.log('Ok pressed')}
                     }
                 ])
             } else {
@@ -244,7 +251,8 @@ function mapStateToProps(state) {
     return {
         screenSize: state.app.screenSize,
         errors: state.errors,
-        loginState: state.app.loginState
+        loginState: state.app.loginState,
+        translation: state.app.translation
     };
 }
 
