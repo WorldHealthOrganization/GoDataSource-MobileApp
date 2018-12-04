@@ -105,12 +105,20 @@ class CaseListItem extends Component {
                 <View style={styles.lineStyle}/>
                 <View
                     style={[style.thirdSectionContainer, {marginHorizontal: calculateDimension(14, false, this.props.screenSize)}]}>
-                    <Ripple style={[style.rippleStyle]} onPress={this.onPressCase}>
-                        <Text style={[style.rippleTextStyle]}>VIEW</Text>
-                    </Ripple>
-                    <Ripple style={[style.rippleStyle]}  onPress={this.onPressAddContact}>
-                        <Text style={[style.rippleTextStyle]}>ADD CONTACT</Text>
-                    </Ripple>
+                    {
+                        this.props.role.find((e) => e === 'read_case') !== undefined ? (
+                            <Ripple style={[style.rippleStyle]} onPress={this.onPressCase}>
+                                <Text style={[style.rippleTextStyle]}>VIEW</Text>
+                            </Ripple>
+                        ) : null
+                    }
+                    {
+                        this.props.role.find((e) => e === 'write_contact') !== undefined ? (
+                            <Ripple style={[style.rippleStyle]}  onPress={this.onPressAddContact}>
+                                <Text style={[style.rippleTextStyle]}>ADD CONTACT</Text>
+                            </Ripple>
+                        ) : null
+                    }
                 </View>
             </ElevatedView>
         );
@@ -216,6 +224,7 @@ function mapStateToProps(state) {
         screenSize: state.app.screenSize,
         translation: state.app.translation,
         cases: state.cases,
+        role: state.role,
         contacts: state.contacts,
         events: state.events
     };

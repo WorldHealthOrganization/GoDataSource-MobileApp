@@ -229,33 +229,37 @@ class ContactsSingleScreen extends Component {
                                 entities={['Contacts', this.props.isNew ? "Add Contact" : ((this.props.contact && this.props.contact.firstName ? (this.props.contact.firstName + " ") : '') + (this.props.contact && this.props.contact.lastName ? this.props.contact.lastName : ''))]}
                                 navigator={this.props.navigator}
                             />
-                            <View>
-                                <Menu
-                                    ref="menuRef"
-                                    button={
-                                        <Ripple onPress={this.showMenu} hitSlop={{top: 20, bottom: 20, left: 20, right: 20}}>
-                                            <Icon name="more-vert"/>
-                                        </Ripple>
-                                    }
-                                >
-                                    {
-                                        !this.props.isNew ? (
-                                            <MenuItem onPress={this.handleOnPressDeceased}>Deceased</MenuItem>
-                                        ) : null
-                                    }
-                                    {
-                                        !this.props.isNew && !this.state.contact.deleted ? (
-                                            <MenuItem onPress={this.handleOnPressDeleteContact}>Delete</MenuItem>
-                                        ) : null
-                                    }
+                            {
+                                this.props.role.find((e) => e === 'write_case') !== undefined ? (
+                                    <View>
+                                        <Menu
+                                            ref="menuRef"
+                                            button={
+                                                <Ripple onPress={this.showMenu} hitSlop={{top: 20, bottom: 20, left: 20, right: 20}}>
+                                                    <Icon name="more-vert"/>
+                                                </Ripple>
+                                            }
+                                        >
+                                            {
+                                                !this.props.isNew ? (
+                                                    <MenuItem onPress={this.handleOnPressDeceased}>Deceased</MenuItem>
+                                                ) : null
+                                            }
+                                            {
+                                                !this.props.isNew && !this.state.contact.deleted ? (
+                                                    <MenuItem onPress={this.handleOnPressDeleteContact}>Delete</MenuItem>
+                                                ) : null
+                                            }
 
-                                    <DateTimePicker
-                                        isVisible={this.state.isDateTimePickerVisible}
-                                        onConfirm={this._handleDatePicked}
-                                        onCancel={this._hideDateTimePicker}
-                                    />
-                                </Menu>
-                            </View>
+                                            <DateTimePicker
+                                                isVisible={this.state.isDateTimePickerVisible}
+                                                onConfirm={this._handleDatePicked}
+                                                onCancel={this._hideDateTimePicker}
+                                            />
+                                        </Menu>
+                                    </View>
+                                ) : null
+                            }
                         </View>
                     }
                     navigator={this.props.navigator}
@@ -1206,6 +1210,7 @@ const style = StyleSheet.create({
 function mapStateToProps(state) {
     return {
         user: state.user,
+        role: state.role,
         screenSize: state.app.screenSize,
         followUps: state.followUps,
         outbreak: state.outbreak,

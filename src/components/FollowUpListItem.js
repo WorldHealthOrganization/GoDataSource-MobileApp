@@ -154,9 +154,14 @@ class FollowUpListItem extends PureComponent {
                             </Ripple>
                         ) : (null)
                     }
-                    <Ripple style={[style.rippleStyle]} onPress={this.onPressExposure}>
-                        <Text style={[style.rippleTextStyle]}>{this.props.thirdActionText || 'ADD EXPOSURE'}</Text>
-                    </Ripple>
+                    {
+                        this.props.role.find((e) => e === 'write_case') !== undefined && this.props.role.find((e) => e === 'write_contact') !== undefined ? (
+                            <Ripple style={[style.rippleStyle]} onPress={this.onPressExposure}>
+                                <Text style={[style.rippleTextStyle]}>{this.props.thirdActionText || 'ADD EXPOSURE'}</Text>
+                            </Ripple>
+                        ) : null
+                    }
+                  
                 </View>
             </ElevatedView>
         );
@@ -271,6 +276,7 @@ function mapStateToProps(state) {
         contacts: state.contacts,
         cases: state.cases,
         events: state.events,
+        role: state.role
     };
 }
 

@@ -160,6 +160,7 @@ export function getUserById(userId, token, refreshFollowUps) {
                 promises.push(getReferenceData(null, dispatch));
                 promises.push(getEventsForOutbreakId(response.activeOutbreakId, null, dispatch));
                 promises.push(getCasesForOutbreakIdWithPromise(response.activeOutbreakId, null, null, dispatch));
+                promises.push(getUserRoles(response.roleIds, dispatch))
 
                 // Store the user to the redux store, and also store the userId to the AsyncStorage
                 dispatch(storeUser(response));

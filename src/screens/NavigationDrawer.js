@@ -70,15 +70,32 @@ class NavigationDrawer extends Component {
                 </View>
                 <View style={{flex: 0.8}}>
                     {
+                        
                         config.sideMenuItems.map((item, index) => {
+                            let addButton = false
+                            if (item.addButton && item.addButton === true){
+                                let findPermission = undefined
+                                if (item.key === 'followups') {
+                                    findPermission = this.props.role.find((e) => e === 'write_followup' )
+                                } else if (item.key === 'contacts') {
+                                    findPermission = this.props.role.find((e) => e === 'write_contact' )
+                                } else if (item.key === 'cases') {
+                                    findPermission = this.props.role.find((e) => e === 'write_case' )
+                                }
+                                if (findPermission !== undefined) {
+                                    addButton = true
+                                }
+                            }
+
                             return (
                                 <NavigationDrawerListItem
                                     key={index}
-                                    label={item.label} name={item.name}
+                                    label={item.label} 
+                                    name={item.name}
                                     onPress={() => this.handlePressOnListItem(index)}
                                     handleOnPressAdd={() => this.handleOnPressAdd(item.key, index)}
                                     isSelected={index === this.state.selectedScreen}
-                                    addButton={item.addButton}
+                                    addButton={addButton}
                                 />
                             )
                         })
@@ -222,6 +239,7 @@ const style = StyleSheet.create({
 function mapStateToProps(state) {
     return {
         user: state.user,
+        role: state.role,
         screenSize: state.app.screenSize,
         availableLanguages: state.app.availableLanguages,
         outbreak: state.outbreak

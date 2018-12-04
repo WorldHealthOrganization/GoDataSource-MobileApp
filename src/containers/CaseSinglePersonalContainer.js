@@ -76,17 +76,20 @@ class CaseSinglePersonalContainer extends PureComponent {
                                                 marginRight: 10,
                                         }}/>
                                     </View>) : (
-                                    <Button
-                                        title={'Edit'}
-                                        onPress={this.props.onPressEdit}
-                                        color={styles.buttonGreen}
-                                        titleColor={'white'}
-                                        height={calculateDimension(25, true, this.props.screenSize)}
-                                        width={calculateDimension(166, false, this.props.screenSize)}
-                                        style={{
-                                            marginVertical: calculateDimension(12.5, true, this.props.screenSize),
-                                            marginRight: 10,
-                                        }}/>))
+                                        this.props.role.find((e) => e === 'write_case') !== undefined ? (
+                                            <Button
+                                                title={'Edit'}
+                                                onPress={this.props.onPressEdit}
+                                                color={styles.buttonGreen}
+                                                titleColor={'white'}
+                                                height={calculateDimension(25, true, this.props.screenSize)}
+                                                width={calculateDimension(166, false, this.props.screenSize)}
+                                                style={{
+                                                    marginVertical: calculateDimension(12.5, true, this.props.screenSize),
+                                                    marginRight: 10,
+                                            }}/>
+                                        ) : null
+                                    ))
                         }
                     </View>
                     <KeyboardAwareScrollView
@@ -228,7 +231,8 @@ const style = StyleSheet.create({
 
 function mapStateToProps(state) {
     return {
-        screenSize: state.app.screenSize
+        screenSize: state.app.screenSize,
+        role: state.role,
     };
 }
 
