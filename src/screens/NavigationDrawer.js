@@ -77,11 +77,11 @@ class NavigationDrawer extends Component {
                             if (item.addButton && item.addButton === true){
                                 let findPermission = undefined
                                 if (item.key === 'followups') {
-                                    findPermission = this.props.role.find((e) => e === 'write_followup' )
+                                    findPermission = this.props.role.find((e) => e === config.userPermissions.writeFollowUp )
                                 } else if (item.key === 'contacts') {
-                                    findPermission = this.props.role.find((e) => e === 'write_contact' )
+                                    findPermission = this.props.role.find((e) => e === config.userPermissions.writeContact )
                                 } else if (item.key === 'cases') {
-                                    findPermission = this.props.role.find((e) => e === 'write_case' )
+                                    findPermission = this.props.role.find((e) => e === config.userPermissions.writeCase)
                                 }
                                 if (findPermission !== undefined) {
                                     addButton = true

@@ -143,18 +143,22 @@ class FollowUpListItem extends PureComponent {
                 </View>
                 <View style={styles.lineStyle}/>
                 <View style={[style.thirdSectionContainer, {marginHorizontal: calculateDimension(14, false, this.props.screenSize)}]}>
-                    <Ripple style={[style.rippleStyle]} onPress={this.onPressFollowUp}>
-                        <Text style={[style.rippleTextStyle]}>{this.props.firstActionText || getTranslation(translations.followUpsScreen.editFollowUpLabel, this.props.translation).toUpperCase()}</Text>
-                    </Ripple>
                     {
-                        this.props.isContact ? (
+                        (this.props.isContact && this.props.role.find((e) => e === config.userPermissions.writeFollowUp) !== undefined) || !this.props.isContact && (this.props.role.find((e) => e === config.userPermissions.writeFollowUp) !== undefined || this.props.role.find((e) => e === config.userPermissions.readFollowUp) !== undefined) ? (
+                            <Ripple style={[style.rippleStyle]} onPress={this.onPressFollowUp}>
+                                <Text style={[style.rippleTextStyle]}>{this.props.firstActionText || getTranslation(translations.followUpsScreen.editFollowUpLabel, this.props.translation).toUpperCase()}</Text>
+                            </Ripple>
+                        ) : null
+                    }
+                    {
+                        this.props.isContact && (this.props.role.find((e) => e === config.userPermissions.writeContact) !== undefined || this.props.role.find((e) => e === config.userPermissions.readContact) !== undefined) ? (
                             <Ripple style={[style.rippleStyle]} onPress={this.onPressMissing}>
                                 <Text style={[style.rippleTextStyle]}>{this.props.secondActionText || getTranslation(translations.followUpsScreen.missingFollowUpLabel, this.props.translation).toUpperCase()}</Text>
                             </Ripple>
-                        ) : (null)
+                        ) : null
                     }
                     {
-                        this.props.role.find((e) => e === 'write_case') !== undefined && this.props.role.find((e) => e === 'write_contact') !== undefined ? (
+                        this.props.role.find((e) => e === config.userPermissions.writeContact) !== undefined ? (
                             <Ripple style={[style.rippleStyle]} onPress={this.onPressExposure}>
                                 <Text style={[style.rippleTextStyle]}>{this.props.thirdActionText || getTranslation(translations.followUpsScreen.addExposureFollowUpLabel, this.props.translation).toUpperCase()}</Text>
                             </Ripple>

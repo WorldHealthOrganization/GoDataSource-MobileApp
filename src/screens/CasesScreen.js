@@ -158,7 +158,7 @@ class CasesScreen extends Component {
                                 />
                             </View>
                             {
-                                this.props.role.find((e) => e === 'write_case') !== undefined ? (
+                                this.props.role.find((e) => e === config.userPermissions.writeCase) !== undefined ? (
                                     <View style={{flex: 0.1}}>
                                         <ElevatedView
                                             elevation={3}

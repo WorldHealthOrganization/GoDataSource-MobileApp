@@ -88,7 +88,7 @@ class CaseSingleInfectionContainer extends PureComponent {
                                                 marginRight: 10,
                                         }}/>
                                     </View>) : (
-                                    this.props.role.find((e) => e === 'write_case') !== undefined ? (
+                                    this.props.role.find((e) => e === config.userPermissions.writeCase) !== undefined ? (
                                         <Button
                                             title={getTranslation(translations.generalButtons.editButtonLabel, this.props.translation)}
                                             onPress={this.props.onPressEdit}

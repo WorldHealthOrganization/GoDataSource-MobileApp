@@ -107,7 +107,7 @@ class CaseListItem extends Component {
                 <View
                     style={[style.thirdSectionContainer, {marginHorizontal: calculateDimension(14, false, this.props.screenSize)}]}>
                     {
-                        this.props.role.find((e) => e === 'read_case') !== undefined ? (
+                        this.props.role.find((e) => e === config.userPermissions.readCase) !== undefined ? (
                             <Ripple style={[style.rippleStyle]} onPress={this.onPressCase}>
                                 <Text style={[style.rippleTextStyle]}>
                                     {getTranslation(translations.casesScreen.viewButtonLabel, this.props.translation).toUpperCase()}
@@ -116,7 +116,7 @@ class CaseListItem extends Component {
                         ) : null
                     }
                     {
-                        this.props.role.find((e) => e === 'write_contact') !== undefined ? (
+                        this.props.role.find((e) => e === config.userPermissions.writeContact) !== undefined ? (
                             <Ripple style={[style.rippleStyle]}  onPress={this.onPressAddContact}>
                                 <Text style={[style.rippleTextStyle]}>
                                     {getTranslation(translations.casesScreen.addContactButtonLabel, this.props.translation).toUpperCase()}
