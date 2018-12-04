@@ -55,7 +55,7 @@ class ContactsSingleScreen extends Component {
             },
             filterFromFilterScreen: this.props.filter && this.props.filter['ContactsFilterScreen'] ? this.props.filter['ContactsFilterScreen'] : null,
             contact: this.props.isNew ? {
-                riskLevel: '',
+                riskLevel: null,
                 riskReason: '',
                 outbreakId: this.props.user && this.props.user.activeOutbreakId ? this.props.user.activeOutbreakId : '',
                 firstName: '',
