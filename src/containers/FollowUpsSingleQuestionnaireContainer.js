@@ -49,16 +49,7 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
     static getDerivedStateFromProps(props, state) {
         // Get all additional questions recursively
         let sortedQuestions = extractAllQuestions(props.questions, props.item);
-
-        // mappedQuestions format: [{categoryName: 'cat1', questions: [{q1}, {q2}]}]
-        sortedQuestions = mapQuestions(sortedQuestions);
-
-        // sortedQuestions = sortBy(sortedQuestions, ['categoryName']);
-
-        for (let i=0; i<sortedQuestions.length; i++) {
-            sortedQuestions[i].questions = sortBy(sortedQuestions[i].questions, ['order', 'variable']);
-        }
-
+        sortedQuestions = sortBy(sortedQuestions, ['order', 'variable']);
         state.questions = sortedQuestions;
 
         return null;
@@ -113,7 +104,7 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
                     >
                         {
                             this.state.questions.map((item, index) => {
-                                return this.handleRenderSectionedList(item, index)
+                                return this.handleRenderItem(item, index)
                             })
                         }
                     </KeyboardAwareScrollView>
