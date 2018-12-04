@@ -17,9 +17,7 @@ export function getDatabaseSnapshotRequest(hubConfig, lastSyncDate, callback) {
         }
     }
 
-    let password = getSyncEncryptPassword(null, hubConfig);
-
-    let requestUrl = hubConfig.url + '/sync/database-snapshot' + (lastSyncDate ? ('?filter=' + JSON.stringify(filter)) : '') + (lastSyncDate ? '&password=' + password : "?password=" + password);
+    let requestUrl = hubConfig.url + '/sync/database-snapshot' + (lastSyncDate ? ('?filter=' + JSON.stringify(filter)) : '');
 
     console.log('Request URL: ', requestUrl);
 
