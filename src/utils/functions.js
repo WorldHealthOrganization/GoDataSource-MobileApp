@@ -810,3 +810,22 @@ export function objSort() {
     // objSort(homes, 'city', 'price') --> sort by city then price (both ascending, case in-sensitive)
     // objSort(homes, 'city', ['price', true]) --> sort by city (ascending) then price (descending), case in-sensitive)
 }
+
+export function getTooltip (label, translation) {
+    let hasTooltip = false
+    let tooltipMessage = ''
+
+    let labelTooltip = label + '_DESCRIPTION'
+    let tooltipTranslation = getTranslation(labelTooltip, translation)
+    if (tooltipTranslation && typeof tooltipTranslation === 'string' && !tooltipTranslation.includes('LNG') && !tooltipTranslation.includes('_DESCRIPTION') && tooltipTranslation.trim().length > 0){
+        hasTooltip = true
+        tooltipMessage = tooltipTranslation
+    }
+
+    let tooltip = {
+        hasTooltip: hasTooltip,
+        tooltipMessage: tooltipMessage
+    }
+    
+    return tooltip
+}
