@@ -251,8 +251,8 @@ class ContactsScreen extends Component {
                 item={item.item}
                 riskLevelReferenceData={riskLevelReferenceData}
                 isContact={true}
-                firstActionText={getTranslation(translations.contactsScreen.addFollowupsButton, this.props.translation)}
-                secondActionText={getTranslation(translations.contactsScreen.editButton, this.props.translation)}
+                firstActionText={getTranslation(translations.contactsScreen.addFollowupsButton, this.props.translation).toUpperCase()}
+                secondActionText={getTranslation(translations.contactsScreen.editButton, this.props.translation).toUpperCase()}
                 onPressFollowUp={this.handlePressFollowUp}
                 onPressMissing={this.handleOnPressMissing}
                 onPressExposure={this.handleOnPressExposure}
