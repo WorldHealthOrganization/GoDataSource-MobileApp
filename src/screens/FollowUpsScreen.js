@@ -243,7 +243,6 @@ class FollowUpsScreen extends Component {
                                         </Ripple>
                                     }
                                 >
-                                    <MenuItem onPress={this.handleModalGenerateFollowUps}>{getTranslation(translations.followUpsScreen.generateLabel, this.props.translation)}</MenuItem>
                                 </Menu>
                             </View>
                         </View>
