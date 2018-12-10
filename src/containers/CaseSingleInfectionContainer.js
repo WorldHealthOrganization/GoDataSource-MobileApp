@@ -190,7 +190,7 @@ class CaseSingleInfectionContainer extends PureComponent {
                 onChangeDropDown={this.props.onChangeDropDown}
             />
         )
-    }
+    };
 
     handleRenderItemForHospitalizationDatesList = (item, index) => {
         let fields = config.caseSingleScreen.hospitalizationDate.fields.map((field) => {
@@ -211,7 +211,7 @@ class CaseSingleInfectionContainer extends PureComponent {
                 onDeletePress={this.props.handleOnPressDeleteHospitalizationDates}
             />
         )
-    }
+    };
 
     handleRenderItemForIsolationDatesList = (item, index) => {
         let fields = config.caseSingleScreen.isolationDate.fields.map((field) => {
@@ -232,7 +232,7 @@ class CaseSingleInfectionContainer extends PureComponent {
                 onDeletePress={this.props.handleOnPressDeleteIsolationDates}
             />
         )
-    }
+    };
 
     handleNextButton = () => {
         // if (true) {
@@ -246,11 +246,11 @@ class CaseSingleInfectionContainer extends PureComponent {
                 }
             ])
         }
-    }
+    };
 
     handleBackButton = () => {
         this.props.handleMoveToPrevieousScreenButton()
-    }
+    };
 }
 
 
