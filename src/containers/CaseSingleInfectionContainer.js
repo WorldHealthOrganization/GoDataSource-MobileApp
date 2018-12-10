@@ -88,17 +88,20 @@ class CaseSingleInfectionContainer extends PureComponent {
                                                 marginRight: 10,
                                         }}/>
                                     </View>) : (
-                                    <Button
-                                        title={getTranslation(translations.generalButtons.editButtonLabel, this.props.translation)}
-                                        onPress={this.props.onPressEdit}
-                                        color={styles.buttonGreen}
-                                        titleColor={'white'}
-                                        height={calculateDimension(25, true, this.props.screenSize)}
-                                        width={calculateDimension(166, false, this.props.screenSize)}
-                                        style={{
-                                            marginVertical: calculateDimension(12.5, true, this.props.screenSize),
-                                            marginRight: 10,
-                                        }}/>))
+                                    this.props.role.find((e) => e === config.userPermissions.writeCase) !== undefined ? (
+                                        <Button
+                                            title={getTranslation(translations.generalButtons.editButtonLabel, this.props.translation)}
+                                            onPress={this.props.onPressEdit}
+                                            color={styles.buttonGreen}
+                                            titleColor={'white'}
+                                            height={calculateDimension(25, true, this.props.screenSize)}
+                                            width={calculateDimension(166, false, this.props.screenSize)}
+                                            style={{
+                                                marginVertical: calculateDimension(12.5, true, this.props.screenSize),
+                                                marginRight: 10,
+                                            }}/>
+                                        ) : null
+                                    ))
                         }
                     </View>
                     <KeyboardAwareScrollView
@@ -278,6 +281,7 @@ const style = StyleSheet.create({
 function mapStateToProps(state) {
     return {
         screenSize: state.app.screenSize,
+        role: state.role,
         translation: state.app.translation,
     };
 }

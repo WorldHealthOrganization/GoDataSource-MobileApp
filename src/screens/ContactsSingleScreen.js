@@ -95,6 +95,7 @@ class ContactsSingleScreen extends Component {
             canChangeScreen: false,
             anotherPlaceOfResidenceWasChosen: false,
             hasPlaceOfResidence: true,
+            isEditMode: true,
             selectedItemIndexForTextSwitchSelectorForAge: 0, // age/dob - switch tab
             selectedItemIndexForAgeUnitOfMeasureDropDown: this.props.isNew ? 0 : (this.props.contact.age && this.props.contact.age.years !== undefined && this.props.contact.age.years !== null && this.props.contact.age.years > 0) ? 0 : 1, //default age dropdown value
         };
@@ -145,6 +146,17 @@ class ContactsSingleScreen extends Component {
                     console.log ('old contact with age as string update')
                 })
             }
+
+            //permissions check
+            let isEditMode = true
+            if (this.props.role.find((e) => e === config.userPermissions.writeContact) !== undefined) {
+                isEditMode = true
+            } else if (this.props.role.find((e) => e === config.userPermissions.writeContact) === undefined && this.props.role.find((e) => e === config.userPermissions.readContact) !== undefined){
+                isEditMode = false
+            }
+            this.setState({
+                isEditMode
+            })
 
             getFollowUpsForContactRequest(this.props.user.activeOutbreakId, [extractIdFromPouchId(this.state.contact._id, 'person')], this.state.contact.followUp, (errorFollowUp, responseFollowUp) => {
                 if (errorFollowUp) {
@@ -214,37 +226,40 @@ class ContactsSingleScreen extends Component {
                                 navigator={this.props.navigator}
                                 onPress={this.handlePressBreadcrumb}
                             />
-                            <View>
-                                <Menu
-                                    ref="menuRef"
-                                    button={
-                                        <Ripple onPress={this.showMenu} hitSlop={{top: 20, bottom: 20, left: 20, right: 20}}>
-                                            <Icon name="more-vert"/>
-                                        </Ripple>
-                                    }
-                                >
-                                    {
-                                        !this.props.isNew ? (
-                                            <MenuItem onPress={this.handleOnPressDeceased}>
-                                                {getTranslation(translations.contactSingleScreen.deceasedContactLabel, this.props.translation)}
-                                            </MenuItem>
-                                        ) : null
-                                    }
-                                    {
-                                        !this.props.isNew && !this.state.contact.deleted ? (
-                                            <MenuItem onPress={this.handleOnPressDeleteContact}>
-                                                {getTranslation(translations.contactSingleScreen.deleteContactLabel, this.props.translation)}
-                                            </MenuItem>
-                                        ) : null
-                                    }
-
-                                    <DateTimePicker
-                                        isVisible={this.state.isDateTimePickerVisible}
-                                        onConfirm={this._handleDatePicked}
-                                        onCancel={this._hideDateTimePicker}
-                                    />
-                                </Menu>
-                            </View>
+                            {
+                                this.props.role.find((e) => e === config.userPermissions.writeContact) !== undefined ? (
+                                    <View>
+                                        <Menu
+                                            ref="menuRef"
+                                            button={
+                                                <Ripple onPress={this.showMenu} hitSlop={{top: 20, bottom: 20, left: 20, right: 20}}>
+                                                    <Icon name="more-vert"/>
+                                                </Ripple>
+                                            }
+                                        >
+                                            {
+                                                !this.props.isNew ? (
+                                                    <MenuItem onPress={this.handleOnPressDeceased}>
+                                                        {getTranslation(translations.contactSingleScreen.deceasedContactLabel, this.props.translation)}
+                                                    </MenuItem>
+                                                ) : null
+                                            }
+                                            {
+                                                !this.props.isNew && !this.state.contact.deleted ? (
+                                                    <MenuItem onPress={this.handleOnPressDeleteContact}>
+                                                        {getTranslation(translations.contactSingleScreen.deleteContactLabel, this.props.translation)}
+                                                    </MenuItem>
+                                                ) : null
+                                            }
+                                            <DateTimePicker
+                                                isVisible={this.state.isDateTimePickerVisible}
+                                                onConfirm={this._handleDatePicked}
+                                                onCancel={this._hideDateTimePicker}
+                                            />
+                                        </Menu>
+                                    </View>
+                                ) : null
+                            }
                         </View>
                     }
                     navigator={this.props.navigator}
@@ -369,6 +384,7 @@ class ContactsSingleScreen extends Component {
                         selectedItemIndexForAgeUnitOfMeasureDropDown={this.state.selectedItemIndexForAgeUnitOfMeasureDropDown}
                         checkAgeMonthsRequirements={this.checkAgeMonthsRequirements}
                         checkAgeYearsRequirements={this.checkAgeYearsRequirements}
+                        isEditMode={this.state.isEditMode}
                     />
                 );
             case 'address':
@@ -390,6 +406,7 @@ class ContactsSingleScreen extends Component {
                         anotherPlaceOfResidenceWasChosen={this.state.anotherPlaceOfResidenceWasChosen}
                         anotherPlaceOfResidenceChanged={this.anotherPlaceOfResidenceChanged}
                         hasPlaceOfResidence={this.state.hasPlaceOfResidence}
+                        isEditMode={this.state.isEditMode}
                     />
                 );
             case 'exposures':
@@ -406,6 +423,7 @@ class ContactsSingleScreen extends Component {
                         handleMoveToPrevieousScreenButton={this.handleMoveToPrevieousScreenButton}
                         isNew={this.props.isNew}
                         handleOnPressSave={this.handleOnPressSave}
+                        isEditMode={this.state.isEditMode}
                     />
                 );
             case 'calendar':
@@ -1248,6 +1266,7 @@ const style = StyleSheet.create({
 function mapStateToProps(state) {
     return {
         user: state.user,
+        role: state.role,
         screenSize: state.app.screenSize,
         followUps: state.followUps,
         outbreak: state.outbreak,
@@ -1268,7 +1287,7 @@ function matchDispatchProps(dispatch) {
         updateContact,
         addContact,
         deleteExposureForContact,
-        removeErrors
+        removeErrors,
     }, dispatch);
 };
 

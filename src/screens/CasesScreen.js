@@ -157,25 +157,29 @@ class CasesScreen extends Component {
                                     navigator={this.props.navigator}
                                 />
                             </View>
-                            <View style={{flex: 0.1}}>
-                                <ElevatedView
-                                    elevation={3}
-                                    style={{
-                                        backgroundColor: styles.buttonGreen,
-                                        width: calculateDimension(33, false, this.props.screenSize),
-                                        height: calculateDimension(25, true, this.props.screenSize),
-                                        borderRadius: 4
-                                    }}
-                                >
-                                    <Ripple style={{
-                                        flex: 1,
-                                        justifyContent: 'center',
-                                        alignItems: 'center'
-                                    }} onPress={this.handleOnPressAddCase}>
-                                        <Icon name="add" color={'white'} size={15}/>
-                                    </Ripple>
-                                </ElevatedView>
-                            </View>
+                            {
+                                this.props.role.find((e) => e === config.userPermissions.writeCase) !== undefined ? (
+                                    <View style={{flex: 0.1}}>
+                                        <ElevatedView
+                                            elevation={3}
+                                            style={{
+                                                backgroundColor: styles.buttonGreen,
+                                                width: calculateDimension(33, false, this.props.screenSize),
+                                                height: calculateDimension(25, true, this.props.screenSize),
+                                                borderRadius: 4
+                                            }}
+                                        >
+                                            <Ripple style={{
+                                                flex: 1,
+                                                justifyContent: 'center',
+                                                alignItems: 'center'
+                                            }} onPress={this.handleOnPressAddCase}>
+                                                <Icon name="add" color={'white'} size={15}/>
+                                            </Ripple>
+                                        </ElevatedView>
+                                    </View>
+                                ) : null
+                            }
                         </View>
                     }
                     navigator={this.props.navigator}
@@ -520,6 +524,7 @@ const style = StyleSheet.create({
 function mapStateToProps(state) {
     return {
         user: state.user,
+        role: state.role,
         cases: state.cases,
         filter: state.app.filters,
         screenSize: state.app.screenSize,
