@@ -234,18 +234,22 @@ class FollowUpsScreen extends Component {
                                 entities={followUpTitle}
                                 navigator={this.props.navigator || null}
                             />
-                            <View>
-                                <Menu
-                                    ref="menuRef"
-                                    button={
-                                        <Ripple onPress={this.showMenu} hitSlop={{top: 20, bottom: 20, left: 20, right: 20}}>
-                                            <Icon name="more-vert"/>
-                                        </Ripple>
-                                    }
-                                >
-                                    <MenuItem onPress={this.handleModalGenerateFollowUps}>{getTranslation(translations.followUpsScreen.generateLabel, this.props.translation)}</MenuItem>
-                                </Menu>
-                            </View>
+                            {
+                                this.props.role.find((e) => e === config.userPermissions.writeFollowUp) !== undefined ? (
+                                    <View>
+                                        <Menu
+                                            ref="menuRef"
+                                            button={
+                                                <Ripple onPress={this.showMenu} hitSlop={{top: 20, bottom: 20, left: 20, right: 20}}>
+                                                    <Icon name="more-vert"/>
+                                                </Ripple>
+                                            }
+                                        >
+                                            <MenuItem onPress={this.handleModalGenerateFollowUps}>{getTranslation(translations.followUpsScreen.generateLabel, this.props.translation)}</MenuItem>
+                                        </Menu>
+                                    </View>
+                                ) : null
+                            }
                         </View>
                     }
                     navigator={this.props.navigator || null}
@@ -265,24 +269,28 @@ class FollowUpsScreen extends Component {
                         onSelectValue={this.onSelectValue}
                         value={this.state.filter.performed && this.state.filter.performed.label ? this.state.filter.performed.label : config.dropDownValues[0].value}
                     />
-                    <ElevatedView
-                        elevation={3}
-                        style={{
-                            backgroundColor: styles.buttonGreen,
-                            width: calculateDimension(33, false, this.props.screenSize),
-                            height: calculateDimension(25, true, this.props.screenSize),
-                            borderRadius: 4
-                        }}
-                    >
-                        <Ripple style={{
-                            flex: 1,
-                            justifyContent: 'center',
-                            alignItems: 'center'
-                        }} onPress={this.handleOnPressAddFollowUp}>
-                            <Icon name="add" color={'white'} size={15}/>
-                        </Ripple>
-                    </ElevatedView>
-                </NavBarCustom>
+                    {
+                        this.props.role.find((e) => e === config.userPermissions.writeFollowUp) !== undefined ? (
+                            <ElevatedView
+                                elevation={3}
+                                style={{
+                                    backgroundColor: styles.buttonGreen,
+                                    width: calculateDimension(33, false, this.props.screenSize),
+                                    height: calculateDimension(25, true, this.props.screenSize),
+                                    borderRadius: 4
+                                }}
+                            >
+                                <Ripple style={{
+                                    flex: 1,
+                                    justifyContent: 'center',
+                                    alignItems: 'center'
+                                }} onPress={this.handleOnPressAddFollowUp}>
+                                    <Icon name="add" color={'white'} size={15}/>
+                                </Ripple>
+                            </ElevatedView> 
+                        ) : null
+                    }
+                    </NavBarCustom>
                 <View style={style.containerContent}>
                     <AnimatedListView
                         stickyHeaderIndices={[0]}
@@ -899,7 +907,8 @@ function mapStateToProps(state) {
         followUps: state.followUps,
         contacts: state.contacts,
         errors: state.errors,
-        translation: state.app.translation
+        translation: state.app.translation,
+        role: state.role
     };
 }
 
