@@ -176,7 +176,15 @@ class NavigationDrawer extends Component {
     };
 
     handleOnPressChangeHubConfig = () => {
-        this.props.changeAppRoot('config');
+        this.props.navigator.toggleDrawer({
+            side: 'left',
+            animated: true,
+            to: 'missing'
+        });
+        this.props.navigator.showModal({
+            screen: 'HubConfigScreen',
+            animated: true
+        })
     };
 
     handleOnChangeLanguage = (value, label) => {

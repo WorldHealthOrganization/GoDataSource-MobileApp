@@ -8,6 +8,9 @@ import {Platform} from 'react-native';
 
 export function getDatabaseSnapshotRequest(hubConfig, lastSyncDate, callback) {
 
+    // hubConfiguration = {url: databaseName, clientId: JSON.stringify({name, url, clientId, clientSecret}), clientSecret: databasePass}
+    let hubConfiguration = JSON.parse(hubConfig.clientId);
+
     let filter = {};
 
     if (lastSyncDate) {
@@ -16,7 +19,7 @@ export function getDatabaseSnapshotRequest(hubConfig, lastSyncDate, callback) {
         }
     }
 
-    let requestUrl = hubConfig.url + '/sync/database-snapshot' + (lastSyncDate ? ('?filter=' + JSON.stringify(filter)) : '');
+    let requestUrl = hubConfiguration.url + '/sync/database-snapshot' + (lastSyncDate ? ('?filter=' + JSON.stringify(filter)) : '');
 
     console.log('Request URL: ', requestUrl);
 
@@ -32,7 +35,7 @@ export function getDatabaseSnapshotRequest(hubConfig, lastSyncDate, callback) {
         .fetch('GET', encodeURI(requestUrl), {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
-        'Authorization': 'Basic ' + base64.encode(`${hubConfig.clientId}:${hubConfig.clientSecret}`)
+        'Authorization': 'Basic ' + base64.encode(`${hubConfiguration.clientId}:${hubConfiguration.clientSecret}`)
     }, '0', '20000')
         .progress({count: 1}, (received, total) => {
             console.log(received, total)
@@ -56,7 +59,9 @@ export function getDatabaseSnapshotRequest(hubConfig, lastSyncDate, callback) {
 }
 
 export function postDatabaseSnapshotRequest(internetCredentials, path, callback) {
+    // internetCredentials = {server: databaseName, username: JSON.stringify({name, url, clientId, clientSecret}), password: databasePass}
     let requestUrl = (Platform.OS === 'ios' ? internetCredentials.server : internetCredentials.service) + '/sync/import-database-snapshot';
+    let hubConfig = JSON.parse(internetCredentials.username);
     // let requestUrl = url.postDatabaseSnapshot();
 
     console.log('Request URL:' + requestUrl);
@@ -66,7 +71,7 @@ export function postDatabaseSnapshotRequest(internetCredentials, path, callback)
     RNFetchBlob.fetch('POST', requestUrl, {
         'Content-Type': 'multipart/form-data',
         'Accept': 'application/json',
-        'Authorization': 'Basic ' + base64.encode(`${internetCredentials.username}:${internetCredentials.password}`)
+        'Authorization': 'Basic ' + base64.encode(`${hubConfig.clientId}:${hubConfig.clientSecret}`)
     }, [
         {name: 'snapshot', filename: 'snapshot', data: RNFetchBlob.wrap(path)}
     ])

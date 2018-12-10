@@ -59,7 +59,7 @@ class LoginScreen extends Component {
         if (props.errors && props.errors.type && props.errors.message) {
             Alert.alert(props.errors.type, props.errors.message, [
                 {
-                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation), 
+                    text: getTranslation(translations.alertMessages.okButtonLabel, props.translation),
                     onPress: () => {props.removeErrors()}
                 }
             ])
@@ -84,7 +84,7 @@ class LoginScreen extends Component {
             >
                 {
                     this.state && this.state.showLoading ? (
-                        <LoaderScreen overlay={true} backgroundColor={'white'} message={this.props && this.props.loginState ? this.props.loginState : getTranslation(translations.loadingScreenMessages.loadingMsg, this.props.translation)} />
+                        <LoaderScreen overlay={true} backgroundColor={'white'} message={this.props && this.props.loginState ? this.props.loginState : 'Loading'} />
                     ) : (null)
                 }
                 <Ripple style={{position: "absolute", top: 20, left: 20}} onPress={this.handleOnPressBack}>

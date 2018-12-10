@@ -11,7 +11,7 @@ import appActions from './actions';
 import {appInitialized} from './actions/app';
 import { registerScreens } from './screens';
 import config from './utils/config';
-import Modal from 'react-native-root-modal'
+import Modal from 'react-native-root-modal';
 
 console.disableYellowBox = true;
 

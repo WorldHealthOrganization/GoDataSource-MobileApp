@@ -22,6 +22,7 @@ import InAppNotificationScreen from './InAppNotificationScreen';
 import ExposureScreen from './ExposureScreen';
 import MapScreen from './MapScreen';
 import QRScanScreen from './QRScanScreen';
+import HubConfigScreen from './HubConfigScreen';
 
 const screens = [
     {screen: 'LoginScreen', component: LoginScreen},
@@ -41,7 +42,8 @@ const screens = [
     {screen: 'InAppNotificationScreen', component: InAppNotificationScreen},
     {screen: 'ExposureScreen', component: ExposureScreen},
     {screen: 'MapScreen', component: MapScreen},
-    {screen: 'QRScanScreen', component: QRScanScreen}
+    {screen: 'QRScanScreen', component: QRScanScreen},
+    {screen: 'HubConfigScreen', component: HubConfigScreen}
 ];
 
 export function registerScreens(store, Provider) {

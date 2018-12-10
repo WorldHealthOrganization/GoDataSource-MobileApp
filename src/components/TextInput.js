@@ -58,6 +58,7 @@ class TextInput extends PureComponent {
                         onPress={() => {console.log("On press textInput")}}
                         keyboardType={this.props.keyboardType ? this.props.keyboardType : 'default'}
                         onSubmitEditing={this.props.onSubmitEditing}
+                        secureTextEntry={this.props.secureTextEntry}
                     />
                 </View>
                 {
