@@ -645,7 +645,6 @@ const caseSingleScreen = {
                 label: translations.caseSingleScreen.hospitalisationStartDate,
                 type: 'DatePicker',
                 value: '',
-                isRequired: true,
                 isEditMode: true,
                 format: 'YYYY-MM-dd',
                 objectType: 'HospitalizationDates'
@@ -656,7 +655,6 @@ const caseSingleScreen = {
                 label: translations.caseSingleScreen.hospitalisationEndDate,
                 type: 'DatePicker',
                 value: '',
-                isRequired: true,
                 isEditMode: true,
                 format: 'YYYY-MM-dd',
                 objectType: 'HospitalizationDates'
@@ -681,7 +679,6 @@ const caseSingleScreen = {
                 label: translations.caseSingleScreen.isolationStartDate,
                 type: 'DatePicker',
                 value: '',
-                isRequired: true,
                 isEditMode: true,
                 format: 'YYYY-MM-dd',
                 objectType: 'IsolationDates'
@@ -692,7 +689,6 @@ const caseSingleScreen = {
                 label: translations.caseSingleScreen.isolationEndDate,
                 type: 'DatePicker',
                 value: '',
-                isRequired: true,
                 isEditMode: true,
                 format: 'YYYY-MM-dd',
                 objectType: 'IsolationDates'
@@ -1769,6 +1765,15 @@ const sortCriteriaDropDownItems = [
     { label: 'Last Name', value: 'lastName'}
 ]
 
+const userPermissions = {
+    readContact: 'read_contact',
+    readCase: 'read_case',
+    readFollowUp: 'read_followup',
+    writeContact: 'write_contact',
+    writeCase: 'write_case',
+    writeFollowUp: 'write_followup',
+};
+
 export default {
     designScreenSize,
     sideMenuItems,
@@ -1794,5 +1799,6 @@ export default {
     ageUnitOfMeasureDropDown,
     localTranslationTokens,
     sortOrderDropDownItems,
-    sortCriteriaDropDownItems
+    sortCriteriaDropDownItems,
+    userPermissions
 }

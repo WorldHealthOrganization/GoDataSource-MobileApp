@@ -240,8 +240,8 @@ class CardComponent extends Component {
         let marginHorizontal = calculateDimension(14, false, this.props.screenSize);
         let addContactFromCasesScreen = false;
         let value = '';
-        let minimumDate = undefined
-        let maximumDate = undefined
+        let minimumDate = undefined;
+        let maximumDate = undefined;
         let data = [];
         let sectionedSelectedItems = [];
 
@@ -338,7 +338,7 @@ class CardComponent extends Component {
                 }
             }
             if (item.id === 'dob' && item.type === 'DatePicker' && item.objectType === 'Contact') {
-                maximumDate = new Date()
+                maximumDate = new Date();
             }
         }
 
@@ -406,9 +406,9 @@ class CardComponent extends Component {
             value = null
         }
 
-        let dateValidation = this.setDateValidations(item)
-        minimumDate = dateValidation.minimumDate
-        maximumDate = dateValidation.maximumDate
+        let dateValidation = this.setDateValidations(item);
+        minimumDate = dateValidation.minimumDate;
+        maximumDate = dateValidation.maximumDate;
 
         switch(item.type) {
             case 'Section':
@@ -608,8 +608,8 @@ class CardComponent extends Component {
     };
 
     setDateValidations = (item) => {
-        let minimumDate = undefined
-        let maximumDate = undefined
+        let minimumDate = undefined;
+        let maximumDate = undefined;
 
         if (item.type === 'DatePicker') {
             if (this.props.screen === 'CaseSingleScreen') {
@@ -617,9 +617,9 @@ class CardComponent extends Component {
                     maximumDate = new Date()
                 } else if (item.id === 'dateOfOnset') {
                     if (this.props.case && this.props.case !== undefined && this.props.case.deceased !== null && this.props.case.deceased !== undefined && this.props.case.deceased === true && this.props.case.dateDeceased && this.props.case.dateDeceased !== undefined && this.props.case.dateDeceased !== ''){
-                        maximumDate = this.props.case.dateDeceased
+                        maximumDate = new Date(this.props.case.dateDeceased);
                     } else {
-                        maximumDate = new Date()
+                        maximumDate = new Date();
                     }
                 } else if (item.id === 'dateOfReporting') {
                     if (this.props.case && this.props.case !== undefined && this.props.case.deceased !== null && this.props.case.deceased !== undefined && this.props.case.deceased === true && this.props.case.dateDeceased && this.props.case.dateDeceased !== undefined && this.props.case.dateDeceased !== ''){
@@ -628,8 +628,8 @@ class CardComponent extends Component {
                         maximumDate = new Date()
                     }
                 } else if (item.id === 'dateOfInfection') {
-                    let hasDeceasedDate = false
-                    let hasDateOfOnset = false
+                    let hasDeceasedDate = false;
+                    let hasDateOfOnset = false;
                     if (this.props.case && this.props.case !== undefined && this.props.case.deceased !== null && this.props.case.deceased !== undefined && this.props.case.deceased === true && this.props.case.dateDeceased && this.props.case.dateDeceased !== undefined && this.props.case.dateDeceased !== ''){
                         hasDeceasedDate = true
                     }
@@ -638,9 +638,9 @@ class CardComponent extends Component {
                     }
 
                     if (hasDeceasedDate === true && hasDateOfOnset === false) {
-                        maximumDate = this.props.case.dateDeceased
+                        maximumDate = new Date(this.props.case.dateDeceased);
                     } else if (hasDeceasedDate === false && hasDateOfOnset === true) {
-                        maximumDate = this.props.case.dateOfOnset
+                        maximumDate = new Date(this.props.case.dateOfOnset);
                     } else if (hasDeceasedDate === true && hasDateOfOnset === true) {
                         maximumDate = _.min([this.props.case.dateOfOnset, this.props.case.dateDeceased])
                     } else {

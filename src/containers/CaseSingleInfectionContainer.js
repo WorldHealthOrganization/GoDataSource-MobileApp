@@ -88,17 +88,20 @@ class CaseSingleInfectionContainer extends PureComponent {
                                                 marginRight: 10,
                                         }}/>
                                     </View>) : (
-                                    <Button
-                                        title={getTranslation(translations.generalButtons.editButtonLabel, this.props.translation)}
-                                        onPress={this.props.onPressEdit}
-                                        color={styles.buttonGreen}
-                                        titleColor={'white'}
-                                        height={calculateDimension(25, true, this.props.screenSize)}
-                                        width={calculateDimension(166, false, this.props.screenSize)}
-                                        style={{
-                                            marginVertical: calculateDimension(12.5, true, this.props.screenSize),
-                                            marginRight: 10,
-                                        }}/>))
+                                    this.props.role.find((e) => e === config.userPermissions.writeCase) !== undefined ? (
+                                        <Button
+                                            title={getTranslation(translations.generalButtons.editButtonLabel, this.props.translation)}
+                                            onPress={this.props.onPressEdit}
+                                            color={styles.buttonGreen}
+                                            titleColor={'white'}
+                                            height={calculateDimension(25, true, this.props.screenSize)}
+                                            width={calculateDimension(166, false, this.props.screenSize)}
+                                            style={{
+                                                marginVertical: calculateDimension(12.5, true, this.props.screenSize),
+                                                marginRight: 10,
+                                            }}/>
+                                        ) : null
+                                    ))
                         }
                     </View>
                     <KeyboardAwareScrollView
@@ -190,7 +193,7 @@ class CaseSingleInfectionContainer extends PureComponent {
                 onChangeDropDown={this.props.onChangeDropDown}
             />
         )
-    }
+    };
 
     handleRenderItemForHospitalizationDatesList = (item, index) => {
         let fields = config.caseSingleScreen.hospitalizationDate.fields.map((field) => {
@@ -211,7 +214,7 @@ class CaseSingleInfectionContainer extends PureComponent {
                 onDeletePress={this.props.handleOnPressDeleteHospitalizationDates}
             />
         )
-    }
+    };
 
     handleRenderItemForIsolationDatesList = (item, index) => {
         let fields = config.caseSingleScreen.isolationDate.fields.map((field) => {
@@ -232,12 +235,21 @@ class CaseSingleInfectionContainer extends PureComponent {
                 onDeletePress={this.props.handleOnPressDeleteIsolationDates}
             />
         )
-    }
+    };
 
     handleNextButton = () => {
         // if (true) {
         if (this.props.checkRequiredFieldsInfection()) {
-            this.props.handleMoveToNextScreenButton(true)
+            if (this.props.checkIsolationOnsetDates()) {
+                this.props.handleMoveToNextScreenButton(true);
+            } else {
+                Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.dateOfOnsetError, this.props.translation), [
+                    {
+                        text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+                        onPress: () => {console.log("OK pressed")}
+                    }
+                ])
+            }
         } else {
             Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.alertMessages.requiredFieldsMissingError, this.props.translation), [
                 {
@@ -246,11 +258,11 @@ class CaseSingleInfectionContainer extends PureComponent {
                 }
             ])
         }
-    }
+    };
 
     handleBackButton = () => {
         this.props.handleMoveToPrevieousScreenButton()
-    }
+    };
 }
 
 
@@ -278,6 +290,7 @@ const style = StyleSheet.create({
 function mapStateToProps(state) {
     return {
         screenSize: state.app.screenSize,
+        role: state.role,
         translation: state.app.translation,
     };
 }

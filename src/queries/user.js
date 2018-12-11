@@ -110,3 +110,29 @@ export function updateUserRequest (user, callback) {
             return callback(errorUpdateUser);
         })
 }
+
+export function getRolesForUserRequest (roleIds, callback) {
+    let database = getDatabase();
+
+    let roleIdsMapped = roleIds.map((e) => {
+        return 'role.json_' + e
+    })
+
+    database.find({
+        selector: {
+            _id: {
+                $gte: `role.json_`,
+                $lte: `role.json_\uffff`,
+                $in: roleIdsMapped,
+            },
+        }
+    })
+        .then((result) => {
+            console.log('Result in finding roles');
+            callback(null, result.docs)
+        })
+        .catch((error) => {
+            console.log('Error in finding roles: ', error);
+            callback(error)
+        })
+}
