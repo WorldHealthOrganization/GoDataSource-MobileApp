@@ -60,8 +60,8 @@ export function getDatabaseSnapshotRequest(hubConfig, lastSyncDate, callback) {
 
 export function postDatabaseSnapshotRequest(internetCredentials, path, callback) {
     // internetCredentials = {server: databaseName, username: JSON.stringify({name, url, clientId, clientSecret}), password: databasePass}
-    let requestUrl = (Platform.OS === 'ios' ? internetCredentials.server : internetCredentials.service) + '/sync/import-database-snapshot';
     let hubConfig = JSON.parse(internetCredentials.username);
+    let requestUrl = hubConfig.url + '/sync/import-database-snapshot';
     // let requestUrl = url.postDatabaseSnapshot();
 
     console.log('Request URL:' + requestUrl);
