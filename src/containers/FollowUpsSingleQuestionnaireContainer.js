@@ -48,8 +48,8 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
 
     static getDerivedStateFromProps(props, state) {
         // Get all additional questions recursively
-        let sortedQuestions = extractAllQuestions(props.questions, props.item);
-        sortedQuestions = sortBy(sortedQuestions, ['order', 'variable']);
+        let sortedQuestions = sortBy(props.questions, ['order', 'variable']);
+        sortedQuestions = extractAllQuestions(sortedQuestions, props.item);
         state.questions = sortedQuestions;
 
         return null;

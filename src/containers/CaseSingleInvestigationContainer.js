@@ -30,8 +30,8 @@ class CaseSingleInvestigationContainer extends PureComponent {
     // and can slow down the app
     render() {
          // Get all additional questions recursively
-        let sortedQuestions = extractAllQuestions(this.props.questions, this.props.item);
-        sortedQuestions = sortBy(sortedQuestions, ['order', 'variable']);
+        let sortedQuestions = sortBy(this.props.questions, ['order', 'variable']);
+        sortedQuestions = extractAllQuestions(sortedQuestions, this.props.item);
 
         return (
             <TouchableWithoutFeedback onPress={() => {

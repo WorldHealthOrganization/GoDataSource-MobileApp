@@ -645,13 +645,13 @@ export function extractAllQuestions (questions, item) {
                     // First check for single select since it has only a value
                     if (questions[i].answerType === "LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_SINGLE_ANSWER" ) {
                         if (item && item.questionnaireAnswers && item.questionnaireAnswers[questions[i].variable] === questions[i].answers[j].value && questions[i].answers[j].additionalQuestions) {
-                            returnedQuestions = returnedQuestions.concat(extractAllQuestions(questions[i].answers[j].additionalQuestions, item))
+                            returnedQuestions = returnedQuestions.concat(extractAllQuestions(_.sortBy(questions[i].answers[j].additionalQuestions, ['order', 'variable']), item))
                         }
                     } else {
                         // For the multiple select the answers are in an array of values
                         if (questions[i].answerType === "LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_MULTIPLE_ANSWERS") {
                             if (item && item.questionnaireAnswers && item.questionnaireAnswers[questions[i].variable] && Array.isArray(item.questionnaireAnswers[questions[i].variable]) && item.questionnaireAnswers[questions[i].variable].indexOf(questions[i].answers[j].value) > -1 && questions[i].answers[j].additionalQuestions) {
-                                returnedQuestions = returnedQuestions.concat(extractAllQuestions(questions[i].answers[j].additionalQuestions, item))
+                                returnedQuestions = returnedQuestions.concat(extractAllQuestions(_.sortBy(questions[i].answers[j].additionalQuestions, ['order', 'variable']), item))
                             }
                         }
                     }
