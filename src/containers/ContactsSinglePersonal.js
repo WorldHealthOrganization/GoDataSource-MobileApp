@@ -88,14 +88,16 @@ class ContactsSinglePersonal extends Component {
 
     // Please write here all the methods that are not react native lifecycle methods
     handleRenderItem = (item) => {
-        // console.log("Item: ", item, this.props.contact);
+        let fields = item.fields.map((field) => {
+            return Object.assign({},field, {isEditMode: this.props.isEditMode})
+        });
         return (
             <CardComponent
-                item={item.fields}
+                item={fields}
                 contact={this.props.contact}
                 style={style.cardStyle}
                 screen={'ContactsSingleScreen'}
-                isEditMode={true}
+                isEditMode={this.props.isEditMode}
                 onChangeText={this.props.onChangeText}
                 onChangeDropDown={this.props.onChangeDropDown}
                 onChangeDate={this.props.onChangeDate}

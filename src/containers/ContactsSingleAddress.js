@@ -93,19 +93,23 @@ class ContactsSingleAddress extends Component {
                                 })
                             }
                         </View>
-                        <View style={{alignSelf: 'flex-start', marginHorizontal: calculateDimension(16, false, this.props.screenSize), marginVertical: 20}}>
-                            <Ripple
-                                style={{
-                                    height: 25,
-                                    justifyContent: 'center'
-                                }}
-                                onPress={this.props.onPressAddAdrress}
-                            >
-                                <Text style={{fontFamily: 'Roboto-Medium', fontSize: 12, color: styles.buttonGreen}}>
-                                    {this.props.contact.addresses && this.props.contact.addresses.length === 0 ? getTranslation(translations.contactSingleScreen.oneAddressText, this.props.translation) : getTranslation(translations.contactSingleScreen.moreAddressesText, this.props.translation)}
-                                </Text>
-                            </Ripple>
-                        </View>
+                        {
+                            this.props.isEditMode !== null && this.props.isEditMode !== undefined && this.props.isEditMode === true ? (
+                                <View style={{alignSelf: 'flex-start', marginHorizontal: calculateDimension(16, false, this.props.screenSize), marginVertical: 20}}>
+                                    <Ripple
+                                        style={{
+                                            height: 25,
+                                            justifyContent: 'center'
+                                        }}
+                                        onPress={this.props.onPressAddAdrress}
+                                    >
+                                        <Text style={{fontFamily: 'Roboto-Medium', fontSize: 12, color: styles.buttonGreen}}>
+                                            {this.props.contact.addresses && this.props.contact.addresses.length === 0 ? getTranslation(translations.contactSingleScreen.oneAddressText, this.props.translation) : getTranslation(translations.contactSingleScreen.moreAddressesText, this.props.translation)}
+                                        </Text>
+                                    </Ripple>
+                                </View>
+                            ) : null
+                        }
                     </KeyboardAwareScrollView>
                 </View>
             </TouchableWithoutFeedback>
@@ -114,13 +118,15 @@ class ContactsSingleAddress extends Component {
 
     // Please write here all the methods that are not react native lifecycle methods
     handleRenderItem = (item, index) => {
-        // console.log("Item: ", item, this.props.contact, index);
+        let fields = config.contactsSingleScreen.address.fields.map((field) => {
+            return Object.assign({},field, {isEditMode: this.props.isEditMode})
+        });
         return (
             <CardComponent
-                item={config.contactsSingleScreen.address.fields}
+                item={fields}
                 index={index}
                 contact={this.props.contact}
-                isEditMode={true}
+                isEditMode={this.props.isEditMode}
                 style={style.cardStyle}
                 screen={'ContactsSingleScreen'}
                 onChangeText={this.props.onChangeText}

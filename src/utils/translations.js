@@ -107,6 +107,7 @@ const contactSingleScreen = {
 
     oneAddressText: 'Add address',
     moreAddressesText: 'LNG_ADDRESS_LABEL_ADD_NEW_ADDRESS',
+    exposureText: 'Add exposure',
 
     firstName: 'LNG_CONTACT_FIELD_LABEL_FIRST_NAME',
     middleName: 'LNG_CONTACT_FIELD_LABEL_MIDDLE_NAME',
@@ -278,16 +279,16 @@ const qrScanScreen = {
 const manualConfigScreen = {
     title: 'HUB configuration',
     hubUrlLabel: 'HUB URL',
-    clientIdLabel: 'LNG_UPSTREAM_SERVER_FIELD_LABEL_CLIENT_ID',
+    clientIdLabel: 'Client ID',
     clientSecretPass: 'Client secret',
     saveHubConfigButton: 'Save HUB configuration',
 }
 
 const loginScreen = {
-    welcomeMessage: 'LNG_PAGE_LOGIN_WELCOME_MESSAGE',
-    emailLabel: 'LNG_COMMON_FIELD_LABEL_EMAIL_ADDRESS',
-    passwordLabel: 'LNG_COMMON_FIELD_LABEL_PASSWORD',
-    loginButtonLabel: 'LNG_PAGE_LOGIN_ACTION_LOGIN_BUTTON',
+    welcomeMessage: 'Welcome',
+    emailLabel: 'Email',
+    passwordLabel: 'Password',
+    loginButtonLabel: 'LOGIN',
 };
 
 const addressFieldLabels = {
