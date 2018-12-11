@@ -59,6 +59,11 @@ class QuestionCard extends Component {
                             marginLeft: calculateDimension(8, false, this.props.screenSize),
                             marginRight: calculateDimension(34, false, this.props.screenSize) }]} numberOfLines={2}>
                         {this.getTranslation(this.props.item.text)}
+                        {
+                            this.props.item && this.props.item.category ?
+                                ' - ' + this.getTranslation(this.props.item.category) : ''
+
+                        }
                     </Text>
                 </View>
                 <ScrollView scrollEnabled={false} keyboardShouldPersistTaps={'always'}>
