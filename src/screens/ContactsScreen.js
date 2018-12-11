@@ -5,7 +5,6 @@ import React, {Component} from 'react';
 import {View, StyleSheet, Animated, Text, BackHandler} from 'react-native';
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
-import {Icon} from 'react-native-material-ui';
 import styles from './../styles';
 import NavBarCustom from './../components/NavBarCustom';
 import ElevatedView from 'react-native-elevated-view';
@@ -22,6 +21,9 @@ import ViewHOC from './../components/ViewHOC';
 import config from './../utils/config';
 import { Popup } from 'react-native-map-link';
 import translations from './../utils/translations'
+import {getItemByIdRequest} from './../queries/cases'
+import Breadcrumb from './../components/Breadcrumb';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const scrollAnim = new Animated.Value(0);
 const offsetAnim = new Animated.Value(0);
@@ -119,48 +121,59 @@ class ContactsScreen extends Component {
             outputRange: [1, 0],
             extrapolate: 'clamp',
         });
-
+        let contactTitle = []; contactTitle[1] = getTranslation(translations.contactsScreen.contactsTitle, this.props.translation);
         return (
             <ViewHOC style={style.container}
                      showLoader={(this.props && this.props.syncState && (this.props.syncState !== 'Finished processing' && this.props.syncState !== 'Error')) || (this && this.state && this.state.loading)}
                      loaderText={this.props && this.props.syncState ? this.props.syncState : getTranslation(translations.loadingScreenMessages.loadingMsg, this.props.translation)}>
                 <NavBarCustom
+                    title={null}
                     customTitle={
-                        <View style={{
-                            flex: 1,
-                            flexDirection: 'row',
-                            alignItems: 'center',
-                            justifyContent: 'space-between',
-                            height: '100%'
-                        }}>
-                            <Text style={[style.title, {marginLeft: 30}]}>
-                                {getTranslation(translations.contactsScreen.contactsTitle, this.props.translation)}
-                            </Text>
-                            {/*<ElevatedView*/}
-                                {/*elevation={3}*/}
-                                {/*style={{*/}
-                                    {/*backgroundColor: styles.buttonGreen,*/}
-                                    {/*width: calculateDimension(33, false, this.props.screenSize),*/}
-                                    {/*height: calculateDimension(25, true, this.props.screenSize),*/}
-                                    {/*borderRadius: 4*/}
-                                {/*}}*/}
-                            {/*>*/}
-                                {/*<Ripple style={{*/}
-                                    {/*flex: 1,*/}
-                                    {/*justifyContent: 'center',*/}
-                                    {/*alignItems: 'center'*/}
-                                {/*}} onPress={this.handleOnPressAddContact} hitSlop={{top: 20, bottom: 20, left: 20, right: 20}}>*/}
-                                    {/*<Icon name="add" color={'white'} size={15}/>*/}
-                                {/*</Ripple>*/}
-                            {/*</ElevatedView>*/}
+                        <View style={{flex: 1, flexDirection: 'row'}}>
+                            <View
+                                style={[style.breadcrumbContainer]}>
+                                <Breadcrumb
+                                    key="contactKey"
+                                    entities={contactTitle}
+                                    navigator={this.props.navigator}
+                                />
+                            </View>
+                            <View style={{flex: 0.2, marginRight: 10}}>
+                                <Ripple style={{
+                                    flex: 1,
+                                    justifyContent: 'center',
+                                    alignItems: 'center'
+                                }} onPress={this.handleOnPressQRCode}>
+                                    <Icon name="qrcode-scan" color={'black'} size={30}/>
+                                </Ripple>
+                            </View>
+                            <View style={{flex: 0.1}}>
+                                <ElevatedView
+                                    elevation={3}
+                                    style={{
+                                        backgroundColor: 'white', //styles.buttonGreen,
+                                        width: calculateDimension(33, false, this.props.screenSize),
+                                        height: calculateDimension(25, true, this.props.screenSize),
+                                        borderRadius: 4
+                                    }}
+                                >
+                                    {/* <Ripple style={{
+                                        flex: 1,
+                                        justifyContent: 'center',
+                                        alignItems: 'center'
+                                    }} onPress={this.handleOnPressAddContact}>
+                                        <Icon name="add" color={'white'} size={15}/>
+                                    </Ripple> */}
+                                </ElevatedView>
+                            </View>
                         </View>
                     }
-                    title={null}
                     navigator={this.props.navigator}
                     iconName="menu"
                     handlePressNavbarButton={this.handlePressNavbarButton}
                 >
                 </NavBarCustom>
+
                 <View style={style.containerContent}>
                     <AnimatedListView
                         stickyHeaderIndices={[0]}
@@ -500,6 +513,11 @@ const style = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: '#F5FCFF'
+    },
+    breadcrumbContainer: {
+        flex: 0.9,
+        flexDirection: 'row',
+        justifyContent: 'flex-start'
     },
 });
 

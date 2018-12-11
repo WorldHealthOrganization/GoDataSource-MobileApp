@@ -200,6 +200,7 @@ const alertMessages = {
     warningLabel: 'Warning',
     invalidCredentials: 'Invalid credentials',
     invalidEmail: 'LNG_FORM_VALIDATION_ERROR_FIELD_EMAIL',
+    noItemAlert: 'There is not any person with this informations',
 
 
     // cases
@@ -264,7 +265,7 @@ const inAppNotificationScreen = {
 };
 
 const firstConfigScreen = {
-    welcomeMessage: 'LNG_PAGE_LOGIN_WELCOME_MESSAGE',
+    welcomeMessage: 'Welcome',
     infoMessage: 'Choose one of the options below to sync with your HUB:',
     qrScanButton: 'Scan QR',
     manualConfigButton: 'Config HUB Manually'
@@ -277,16 +278,16 @@ const qrScanScreen = {
 const manualConfigScreen = {
     title: 'HUB configuration',
     hubUrlLabel: 'HUB URL',
-    clientIdLabel: 'LNG_UPSTREAM_SERVER_FIELD_LABEL_CLIENT_ID',
+    clientIdLabel: 'Client ID',
     clientSecretPass: 'Client secret',
     saveHubConfigButton: 'Save HUB configuration',
 }
 
 const loginScreen = {
-    welcomeMessage: 'LNG_PAGE_LOGIN_WELCOME_MESSAGE',
-    emailLabel: 'LNG_COMMON_FIELD_LABEL_EMAIL_ADDRESS',
-    passwordLabel: 'LNG_COMMON_FIELD_LABEL_PASSWORD',
-    loginButtonLabel: 'LNG_PAGE_LOGIN_ACTION_LOGIN_BUTTON',
+    welcomeMessage: 'Welcome',
+    emailLabel: 'Email',
+    passwordLabel: 'Password',
+    loginButtonLabel: 'Login',
 };
 
 const addressFieldLabels = {

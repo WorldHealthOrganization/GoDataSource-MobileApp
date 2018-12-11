@@ -5,23 +5,17 @@
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
 import {TextInput, View, Text, Alert, StyleSheet, Dimensions, Platform, FlatList, Animated, BackHandler} from 'react-native';
-import {Button, Icon} from 'react-native-material-ui';
-import { TextField } from 'react-native-material-textfield';
+import {Button, Icon as IconMaterial} from 'react-native-material-ui';
 import styles from './../styles';
 import NavBarCustom from './../components/NavBarCustom';
-import {Calendar} from 'react-native-calendars';
-import CalendarPicker from './../components/CalendarPicker';
 import {calculateDimension, navigation, getTranslation} from './../utils/functions';
 import config from './../utils/config';
-import ButtonWithIcons from './../components/ButtonWithIcons';
-import ValuePicker from './../components/ValuePicker';
 import Ripple from 'react-native-material-ripple';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import SearchFilterView from './../components/SearchFilterView';
 import CaseListItem from './../components/CaseListItem';
 import ElevatedView from 'react-native-elevated-view';
-import {Dropdown} from 'react-native-material-dropdown';
 import Breadcrumb from './../components/Breadcrumb';
 import {getCasesForOutbreakId} from './../actions/cases';
 import {removeErrors} from './../actions/errors';
@@ -31,6 +25,8 @@ import ViewHOC from './../components/ViewHOC';
 import _ from 'lodash';
 import { Popup } from 'react-native-map-link';
 import translations from './../utils/translations'
+import {getItemByIdRequest} from './../queries/cases'
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 let height = Dimensions.get('window').height;
 let width = Dimensions.get('window').width;
@@ -157,6 +153,15 @@ class CasesScreen extends Component {
                                     navigator={this.props.navigator}
                                 />
                             </View>
+                            <View style={{flex: 0.2, marginRight: 10}}>
+                                <Ripple style={{
+                                    flex: 1,
+                                    justifyContent: 'center',
+                                    alignItems: 'center'
+                                }} onPress={this.handleOnPressQRCode}>
+                                    <Icon name="qrcode-scan" color={'black'} size={30}/>
+                                </Ripple>
+                            </View>
                             <View style={{flex: 0.1}}>
                                 <ElevatedView
                                     elevation={3}
@@ -172,7 +177,7 @@ class CasesScreen extends Component {
                                         justifyContent: 'center',
                                         alignItems: 'center'
                                     }} onPress={this.handleOnPressAddCase}>
-                                        <Icon name="add" color={'white'} size={15}/>
+                                        <IconMaterial name="add" color={'white'} size={15}/>
                                     </Ripple>
                                 </ElevatedView>
                             </View>
@@ -487,6 +492,101 @@ class CasesScreen extends Component {
         }, () => {
             this.props.getCasesForOutbreakId(this.props.user.activeOutbreakId, allFilters, null);
         })
+    };
+
+    handleOnPressQRCode = () => {
+        console.log('handleOnPressQRCode')
+
+        this.props.navigator.showModal({
+            screen: 'QRScanScreen',
+            animated: true,
+            passProps: {
+                pushNewScreen: this.pushNewEditScreen
+            }
+        })
+    };
+
+    pushNewEditScreen = (QRCodeInfo) => {
+        console.log('pushNewEditScreen QRCodeInfo', QRCodeInfo)
+        let itemId = null
+        let itemType = null
+        let outbreakId = null
+
+        if (QRCodeInfo && QRCodeInfo !== undefined && QRCodeInfo.data && QRCodeInfo.data !== undefined){
+            let parsedData =  JSON.parse(QRCodeInfo.data)
+            if (parsedData && parsedData !== undefined){
+                console.log('parsedData', parsedData)
+
+                if (parsedData.targetResource && parsedData.targetResource !== undefined) {
+                    if (parsedData.targetResource === 'case') {
+                        itemType = 'case'
+                    } else if (parsedData.targetResource === 'contact') {
+                        itemType = 'contact'
+                    }
+                }
+
+                if (parsedData.resourceContext && parsedData.resourceContext !== undefined && 
+                    parsedData.resourceContext.outbreakId && parsedData.resourceContext.outbreakId !== undefined && 
+                    parsedData.resourceContext.caseId && parsedData.resourceContext.caseId !== undefined) {
+                        itemId = parsedData.resourceContext.caseId
+                        outbreakId = parsedData.resourceContext.outbreakId
+                }
+            }
+        }
+
+        console.log('pushNewEditScreen', itemId, itemType, outbreakId)
+        if (itemId && itemType && outbreakId) {
+            let itemPouchId = null
+            if (itemType === 'case') {
+                itemPouchId = `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE_${outbreakId}_${itemId}`
+            } else if (itemType === 'contact') {
+                itemPouchId = `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT_${outbreakId}_${itemId}`
+            }
+
+            if (itemPouchId) {
+                getItemByIdRequest(outbreakId, itemPouchId, itemType, (error, response) => {
+                    if (error) {
+                        console.log("*** getItemByIdRequest error: ", error);
+                        Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.alertMessages.noItemAlert, this.props.translation), [
+                            {
+                                text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation), 
+                                onPress: () => {console.log('Ok pressed')}
+                            }
+                        ])
+                    }
+                    if (response) {
+                        console.log("*** getItemByIdRequest response: ", response);
+
+                        if (itemType === 'case') {
+                            this.props.navigator.push({
+                                screen: 'CaseSingleScreen',
+                                animated: true,
+                                animationType: 'fade',
+                                passProps: {
+                                    case: response
+                                }
+                            })
+                        } else if (itemType === 'contact') {
+                            this.props.navigator.push({
+                                screen: 'ContactSingleScreen',
+                                animated: true,
+                                animationType: 'fade',
+                                passProps: {
+                                    contact: response
+                                }
+                            })
+                        }
+                    }
+                })
+            }
+        } else {
+            Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.alertMessages.noItemAlert, this.props.translation), [
+                {
+                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation), 
+                    onPress: () => {console.log('Ok pressed')}
+                }
+            ])
+        }
     };
 }
 
