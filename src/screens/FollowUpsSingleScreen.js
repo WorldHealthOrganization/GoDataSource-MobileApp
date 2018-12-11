@@ -53,24 +53,28 @@ class FollowUpsSingleScreen extends Component {
     componentDidMount() {
         BackHandler.addEventListener('hardwareBackPress', this.handleBackButtonClick);
 
+        isEditMode = true
+
         if (this.props.isNew === false) {
-            let today = new Date()
-            let itemDate = new Date(this.props.item.date)
-    
-            var todayDate = new Date(today.getFullYear(), today.getMonth(), today.getDate())
-            let followUpDate = new Date(itemDate.getFullYear(), itemDate.getMonth(), itemDate.getDate())
-            
-            if (followUpDate > todayDate) {
-                console.log('follow-ups date < today => needitabil')
-                this.setState({
-                    isEditMode: false
-                })
+            if (this.props.role.find((e) => e === config.userPermissions.writeFollowUp) !== undefined) {
+                let today = new Date()
+                let itemDate = new Date(this.props.item.date)
+        
+                var todayDate = new Date(today.getFullYear(), today.getMonth(), today.getDate())
+                let followUpDate = new Date(itemDate.getFullYear(), itemDate.getMonth(), itemDate.getDate())
+                
+                if (followUpDate > todayDate) {
+                    console.log('follow-ups date < today => needitabil')
+                    isEditMode = false
+                }
+            } else if (this.props.role.find((e) => e === config.userPermissions.writeFollowUp) === undefined && this.props.role.find((e) => e === config.userPermissions.readFollowUp) !== undefined){
+                isEditMode = false
             }
-        } else {
-            this.setState({
-                isEditMode: true
-            })
         }
+
+        this.setState({
+            isEditMode
+        })
     }
 
     componentWillUnmount() {
@@ -147,31 +151,35 @@ class FollowUpsSingleScreen extends Component {
                                 navigator={this.props.navigator}
                                 onPress={this.handlePressBreadcrumb}
                             />
-                            <View>
-                                <Menu
-                                    ref="menuRef"
-                                    button={
-                                        <Ripple onPress={this.showMenu} hitSlop={{top: 20, bottom: 20, left: 20, right: 20}}>
-                                            <Icon name="more-vert"/>
-                                        </Ripple>
-                                    }
-                                >
-                                    <MenuItem onPress={this.handleOnPressMissing}>
-                                        {getTranslation(translations.followUpsSingleScreen.missingButton, this.props.translation)}
-                                    </MenuItem>
-                                    <MenuItem onPress={this.handleOnPressDeceased}>
-                                        {getTranslation(translations.followUpsSingleScreen.deceasedButton, this.props.translation)}
-                                    </MenuItem>
-                                    <MenuItem onPress={this.handleOnPressDelete}>
-                                        {getTranslation(translations.followUpsSingleScreen.deleteButton, this.props.translation)}
-                                    </MenuItem>
-                                    <DateTimePicker
-                                        isVisible={this.state.isDateTimePickerVisible}
-                                        onConfirm={this._handleDatePicked}
-                                        onCancel={this._hideDateTimePicker}
-                                    />
-                                </Menu>
-                            </View>
+                            {
+                                this.props.role.find((e) => e === config.userPermissions.writeFollowUp) !== undefined ? (
+                                    <View>
+                                        <Menu
+                                            ref="menuRef"
+                                            button={
+                                                <Ripple onPress={this.showMenu} hitSlop={{top: 20, bottom: 20, left: 20, right: 20}}>
+                                                    <Icon name="more-vert"/>
+                                                </Ripple>
+                                            }
+                                        >
+                                            <MenuItem onPress={this.handleOnPressMissing}>
+                                                {getTranslation(translations.followUpsSingleScreen.missingButton, this.props.translation)}
+                                            </MenuItem>
+                                            <MenuItem onPress={this.handleOnPressDeceased}>
+                                                {getTranslation(translations.followUpsSingleScreen.deceasedButton, this.props.translation)}
+                                            </MenuItem>
+                                            <MenuItem onPress={this.handleOnPressDelete}>
+                                                {getTranslation(translations.followUpsSingleScreen.deleteButton, this.props.translation)}
+                                            </MenuItem>
+                                            <DateTimePicker
+                                                isVisible={this.state.isDateTimePickerVisible}
+                                                onConfirm={this._handleDatePicked}
+                                                onCancel={this._hideDateTimePicker}
+                                            />
+                                        </Menu>
+                                    </View>
+                                ) : null
+                            }
                         </View>
                     }
                     navigator={this.props.navigator}
@@ -675,7 +683,8 @@ function mapStateToProps(state) {
         outbreak: state.outbreak,
         errors: state.errors,
         contacts: state.contacts,
-        translation: state.app.translation
+        translation: state.app.translation,
+        role: state.role
     };
 }
 

@@ -147,25 +147,32 @@ class ContactsScreen extends Component {
                                     <Icon name="qrcode-scan" color={'black'} size={30}/>
                                 </Ripple>
                             </View>
+                           
                             <View style={{flex: 0.1}}>
                                 <ElevatedView
                                     elevation={3}
                                     style={{
-                                        backgroundColor: 'white', //styles.buttonGreen,
+                                        backgroundColor: 'white', //this.props.role.find((e) => e === config.userPermissions.writeContact) !== undefined ? styles.buttonGreen : 'white',
                                         width: calculateDimension(33, false, this.props.screenSize),
                                         height: calculateDimension(25, true, this.props.screenSize),
                                         borderRadius: 4
                                     }}
                                 >
-                                    {/* <Ripple style={{
-                                        flex: 1,
-                                        justifyContent: 'center',
-                                        alignItems: 'center'
-                                    }} onPress={this.handleOnPressAddContact}>
-                                        <Icon name="add" color={'white'} size={15}/>
-                                    </Ripple> */}
+                                {
+                                    this.props.role.find((e) => e === config.userPermissions.writeContact) !== undefined ? (
+                                        {/* <Ripple style={{
+                                            flex: 1,
+                                            justifyContent: 'center',
+                                            alignItems: 'center'
+                                        }} onPress={this.handleOnPressAddContact}>
+                                            <Icon name="add" color={'white'} size={15}/>
+                                        </Ripple> */}
+                                    ) : null
+                                }
                                 </ElevatedView>
                             </View>
+                            
+                            
                         </View>
                     }
                     navigator={this.props.navigator}
@@ -264,8 +271,8 @@ class ContactsScreen extends Component {
                 item={item.item}
                 riskLevelReferenceData={riskLevelReferenceData}
                 isContact={true}
-                firstActionText={getTranslation(translations.contactsScreen.addFollowupsButton, this.props.translation)}
-                secondActionText={getTranslation(translations.contactsScreen.editButton, this.props.translation)}
+                firstActionText={getTranslation(translations.contactsScreen.addFollowupsButton, this.props.translation).toUpperCase()}
+                secondActionText={getTranslation(translations.contactsScreen.editButton, this.props.translation).toUpperCase()}
                 onPressFollowUp={this.handlePressFollowUp}
                 onPressMissing={this.handleOnPressMissing}
                 onPressExposure={this.handleOnPressExposure}

@@ -107,6 +107,7 @@ const contactSingleScreen = {
 
     oneAddressText: 'Add address',
     moreAddressesText: 'LNG_ADDRESS_LABEL_ADD_NEW_ADDRESS',
+    exposureText: 'Add exposure',
 
     firstName: 'LNG_CONTACT_FIELD_LABEL_FIRST_NAME',
     middleName: 'LNG_CONTACT_FIELD_LABEL_MIDDLE_NAME',
@@ -287,7 +288,7 @@ const loginScreen = {
     welcomeMessage: 'Welcome',
     emailLabel: 'Email',
     passwordLabel: 'Password',
-    loginButtonLabel: 'Login',
+    loginButtonLabel: 'LOGIN',
 };
 
 const addressFieldLabels = {
