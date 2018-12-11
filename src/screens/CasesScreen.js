@@ -5,7 +5,7 @@
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
 import {TextInput, View, Text, Alert, StyleSheet, Dimensions, Platform, FlatList, Animated, BackHandler} from 'react-native';
-import {Button, Icon as IconMaterial} from 'react-native-material-ui';
+import {Button, Icon} from 'react-native-material-ui';
 import styles from './../styles';
 import NavBarCustom from './../components/NavBarCustom';
 import {calculateDimension, navigation, getTranslation} from './../utils/functions';
@@ -26,7 +26,7 @@ import _ from 'lodash';
 import { Popup } from 'react-native-map-link';
 import translations from './../utils/translations'
 import {getItemByIdRequest} from './../queries/cases'
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 let height = Dimensions.get('window').height;
 let width = Dimensions.get('window').width;
@@ -159,7 +159,7 @@ class CasesScreen extends Component {
                                     justifyContent: 'center',
                                     alignItems: 'center'
                                 }} onPress={this.handleOnPressQRCode}>
-                                    <Icon name="qrcode-scan" color={'black'} size={20}/>
+                                    <MaterialCommunityIcons name="qrcode-scan" color={'black'} size={20}/>
                                 </Ripple>
                             </View>
                             {
@@ -179,7 +179,7 @@ class CasesScreen extends Component {
                                                 justifyContent: 'center',
                                                 alignItems: 'center'
                                             }} onPress={this.handleOnPressAddCase}>
-                                                <IconMaterial name="add" color={'white'} size={15}/>
+                                                <Icon name="add" color={'white'} size={15}/>
                                             </Ripple>
                                         </ElevatedView>
                                     </View>
@@ -530,6 +530,7 @@ class CasesScreen extends Component {
                         }
                     ])
                 }, 1000)
+                return
             }
             if (parsedData && parsedData !== undefined){
                 console.log('parsedData', parsedData)
@@ -555,7 +556,6 @@ class CasesScreen extends Component {
                 }
             }
         }
-
         
         console.log('pushNewEditScreen', itemId, itemType, outbreakId)
         if (itemId && itemType && outbreakId && outbreakId === this.props.user.activeOutbreakId) {

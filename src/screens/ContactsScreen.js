@@ -23,7 +23,7 @@ import { Popup } from 'react-native-map-link';
 import translations from './../utils/translations'
 import {getItemByIdRequest} from './../queries/cases'
 import Breadcrumb from './../components/Breadcrumb';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const scrollAnim = new Animated.Value(0);
 const offsetAnim = new Animated.Value(0);
@@ -143,7 +143,7 @@ class ContactsScreen extends Component {
                                     justifyContent: 'center',
                                     alignItems: 'center'
                                 }} onPress={this.handleOnPressQRCode}>
-                                    <Icon name="qrcode-scan" color={'black'} size={20}/>
+                                    <MaterialCommunityIcons name="qrcode-scan" color={'black'} size={20}/>
                                 </Ripple>
                             </View>
                            
@@ -525,6 +525,7 @@ class ContactsScreen extends Component {
                         }
                     ])
                 }, 1000)
+                return 
             }
             if (parsedData && parsedData !== undefined){
                 console.log('parsedData', parsedData)
