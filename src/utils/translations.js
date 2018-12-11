@@ -8,6 +8,7 @@ const navigationDrawer = {
     changeHubConfig: 'Change HUB configuration',
     languagesLabel: 'LNG_LAYOUT_MENU_ITEM_LANGUAGES',
     logoutLabel: 'LNG_LAYOUT_MENU_ITEM_LOGOUT_LABEL',
+    helpLabel: 'LNG_LAYOUT_MENU_ITEM_HELP_LABEL',
 };
 
 const addFollowUpScreen = {

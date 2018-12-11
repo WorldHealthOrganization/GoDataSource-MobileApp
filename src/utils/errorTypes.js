@@ -25,5 +25,6 @@ export default {
     ERROR_UPDATE_CASE: {type: "Case update error", message: 'An error occurred while trying to update the case'},
     ERROR_EVENTS: {type: "Events error", message: 'An error occurred while trying to get events data'},
     ERROR_REFERENCE_DATA: {type: "Reference data error", message: 'An error occurred while trying to get reference data'},
+    ERROR_HELP: {type: "Help error", message: 'An error occurred while trying to get help'},
     ERROR_LOCATIONS: {type: "Location areas error", message: 'An error occurred while trying to get location areas'},
 }

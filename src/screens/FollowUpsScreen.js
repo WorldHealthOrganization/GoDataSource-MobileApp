@@ -379,7 +379,7 @@ class FollowUpsScreen extends Component {
 
     keyExtractor = (item, index) => {
         item._id;
-    }
+    };
 
     renderSeparatorComponent = () => {
         return (
@@ -527,7 +527,7 @@ class FollowUpsScreen extends Component {
             //     animated: true
             // })
         }
-    }
+    };
 
     handlePressFilter = () => {
         this.props.navigator.showModal({
@@ -804,7 +804,7 @@ class FollowUpsScreen extends Component {
 
             this.setState({followUps});
         }
-    }
+    };
 
     getTranslation = (value) => {
         let valueToBeReturned = value;
@@ -814,7 +814,7 @@ class FollowUpsScreen extends Component {
             }).indexOf(value)].translation : '';
         }
         return valueToBeReturned;
-    }
+    };
 
     showMenu = () => {
         this.refs.menuRef.show();
@@ -883,6 +883,8 @@ function mapStateToProps(state) {
         contacts: state.contacts,
         errors: state.errors,
         translation: state.app.translation,
+        helpCategory: state.helpCategory,
+        helpItem: state.helpItem,
         role: state.role
     };
 }

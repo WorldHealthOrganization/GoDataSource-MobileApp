@@ -1432,6 +1432,8 @@ const mongoCollections = {
     relationship: 'relationship.json',
     role: 'role.json',
     team: 'team.json',
+    helpCategory: 'helpCategory.json',
+    helpItem: 'helpItem.json',
     user: 'user.json'
 };
 
@@ -1700,6 +1702,53 @@ const RNDBConfig = {
         },
         "deleted": {
             "type": "BOOLEAN"
+        }
+    },
+    "helpCategory": {
+        "_id": {
+            "type": "VARCHAR(100)",
+            "pk": true
+        },
+        "name": {
+            "type": "VARCHAR(100)"
+        },
+        "order": {
+            "type": "INT"
+        },
+        "description": {
+            "type": "VARCHAR(100)"
+        },
+        "deleted": {
+            "type": "BOOLEAN"
+        },
+        "deletedAt": {
+            "type": "DATE"
+        }
+    },
+    "helpItem": {
+        "_id": {
+            "type": "VARCHAR(100)",
+            "pk": true
+        },
+        "title": {
+            "type": "VARCHAR(100)"
+        },
+        "content": {
+            "type": "VARCHAR(100)"
+        },
+        "categoryId": {
+            "type": "VARCHAR(100)",
+            "references": "language",
+            "referencesOn": "token"
+        },
+        "approved": {
+            "type": "BOOLEAN"
+        },
+        "deleted": {
+            "type": "BOOLEAN"
+        },
+        "deletedAt": {
+            "type": "DATE"
         }
     },
     "user": {
