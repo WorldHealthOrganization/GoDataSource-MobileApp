@@ -90,7 +90,7 @@ class CasesScreen extends Component {
         if (props.errors && props.errors.type && props.errors.message) {
             Alert.alert(props.errors.type, props.errors.message, [
                 {
-                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation), 
+                    text: getTranslation(translations.alertMessages.okButtonLabel, props.translation), 
                     onPress: () => {
                     props.removeErrors();
                     state.loading = false;
@@ -159,33 +159,32 @@ class CasesScreen extends Component {
                                     justifyContent: 'center',
                                     alignItems: 'center'
                                 }} onPress={this.handleOnPressQRCode}>
-                                    <Icon name="qrcode-scan" color={'black'} size={30}/>
+                                    <Icon name="qrcode-scan" color={'black'} size={20}/>
                                 </Ripple>
                             </View>
-                         
-                            <View style={{flex: 0.1}}>
-                                <ElevatedView
-                                    elevation={3}
-                                    style={{
-                                        backgroundColor: this.props.role.find((e) => e === config.userPermissions.writeContact) !== undefined ? styles.buttonGreen : 'white',
-                                        width: calculateDimension(33, false, this.props.screenSize),
-                                        height: calculateDimension(25, true, this.props.screenSize),
-                                        borderRadius: 4
-                                    }}
-                                >
-                                {
-                                    this.props.role.find((e) => e === config.userPermissions.writeCase) !== undefined ? (
-                                        <Ripple style={{
-                                            flex: 1,
-                                            justifyContent: 'center',
-                                            alignItems: 'center'
-                                        }} onPress={this.handleOnPressAddCase}>
-                                            <IconMaterial name="add" color={'white'} size={15}/>
-                                        </Ripple>
-                                    ) : null
-                                }
-                                </ElevatedView>
-                            </View>
+                            {
+                                this.props.role.find((e) => e === config.userPermissions.writeCase) !== undefined ? (
+                                    <View style={{flex: 0.1}}>
+                                        <ElevatedView
+                                            elevation={3}
+                                            style={{
+                                                backgroundColor: styles.buttonGreen,
+                                                width: calculateDimension(33, false, this.props.screenSize),
+                                                height: calculateDimension(25, true, this.props.screenSize),
+                                                borderRadius: 4
+                                            }}
+                                        >
+                                            <Ripple style={{
+                                                flex: 1,
+                                                justifyContent: 'center',
+                                                alignItems: 'center'
+                                            }} onPress={this.handleOnPressAddCase}>
+                                                <IconMaterial name="add" color={'white'} size={15}/>
+                                            </Ripple>
+                                        </ElevatedView>
+                                    </View>
+                                ) : null
+                            }
                         </View>
                     }
                     navigator={this.props.navigator}
@@ -513,34 +512,53 @@ class CasesScreen extends Component {
 
     pushNewEditScreen = (QRCodeInfo) => {
         console.log('pushNewEditScreen QRCodeInfo', QRCodeInfo)
+
         let itemId = null
         let itemType = null
         let outbreakId = null
 
         if (QRCodeInfo && QRCodeInfo !== undefined && QRCodeInfo.data && QRCodeInfo.data !== undefined){
-            let parsedData =  JSON.parse(QRCodeInfo.data)
+            let parsedData = null
+            try {
+                parsedData =  JSON.parse(QRCodeInfo.data)
+            } catch(err) {
+                setTimeout(function(){
+                    Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props && this.props.translation ? this.props.translation : null), getTranslation(translations.alertMessages.errorOccuredMsg,  this.props && this.props.translation ? this.props.translation : null), [
+                        {
+                            text: getTranslation(translations.alertMessages.okButtonLabel,  this.props && this.props.translation ? this.props.translation : null), 
+                            onPress: () => {console.log('Ok pressed')}
+                        }
+                    ])
+                }, 1000)
+            }
             if (parsedData && parsedData !== undefined){
                 console.log('parsedData', parsedData)
 
                 if (parsedData.targetResource && parsedData.targetResource !== undefined) {
                     if (parsedData.targetResource === 'case') {
                         itemType = 'case'
+                        if (parsedData.resourceContext && parsedData.resourceContext !== undefined && 
+                            parsedData.resourceContext.outbreakId && parsedData.resourceContext.outbreakId !== undefined && 
+                            parsedData.resourceContext.caseId && parsedData.resourceContext.caseId !== undefined) {
+                                itemId = parsedData.resourceContext.caseId
+                                outbreakId = parsedData.resourceContext.outbreakId
+                        }
                     } else if (parsedData.targetResource === 'contact') {
                         itemType = 'contact'
+                        if (parsedData.resourceContext && parsedData.resourceContext !== undefined && 
+                            parsedData.resourceContext.outbreakId && parsedData.resourceContext.outbreakId !== undefined && 
+                            parsedData.resourceContext.contactId && parsedData.resourceContext.contactId !== undefined) {
+                                itemId = parsedData.resourceContext.contactId
+                                outbreakId = parsedData.resourceContext.outbreakId
+                        }
                     }
-                }
-
-                if (parsedData.resourceContext && parsedData.resourceContext !== undefined && 
-                    parsedData.resourceContext.outbreakId && parsedData.resourceContext.outbreakId !== undefined && 
-                    parsedData.resourceContext.caseId && parsedData.resourceContext.caseId !== undefined) {
-                        itemId = parsedData.resourceContext.caseId
-                        outbreakId = parsedData.resourceContext.outbreakId
                 }
             }
         }
 
+        
         console.log('pushNewEditScreen', itemId, itemType, outbreakId)
-        if (itemId && itemType && outbreakId) {
+        if (itemId && itemType && outbreakId && outbreakId === this.props.user.activeOutbreakId) {
             let itemPouchId = null
             if (itemType === 'case') {
                 itemPouchId = `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE_${outbreakId}_${itemId}`
@@ -552,9 +570,9 @@ class CasesScreen extends Component {
                 getItemByIdRequest(outbreakId, itemPouchId, itemType, (error, response) => {
                     if (error) {
                         console.log("*** getItemByIdRequest error: ", error);
-                        Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.alertMessages.noItemAlert, this.props.translation), [
+                        Alert.alert(getTranslation(translations.alertMessages.alertLabel,  this.props && this.props.translation ? this.props.translation : null), getTranslation(translations.alertMessages.noItemAlert,  this.props && this.props.translation ? this.props.translation : null), [
                             {
-                                text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation), 
+                                text: getTranslation(translations.alertMessages.okButtonLabel,  this.props && this.props.translation ? this.props.translation : null), 
                                 onPress: () => {console.log('Ok pressed')}
                             }
                         ])
@@ -573,7 +591,7 @@ class CasesScreen extends Component {
                             })
                         } else if (itemType === 'contact') {
                             this.props.navigator.push({
-                                screen: 'ContactSingleScreen',
+                                screen: 'ContactsSingleScreen',
                                 animated: true,
                                 animationType: 'fade',
                                 passProps: {
@@ -585,12 +603,14 @@ class CasesScreen extends Component {
                 })
             }
         } else {
-            Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.alertMessages.noItemAlert, this.props.translation), [
-                {
-                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation), 
-                    onPress: () => {console.log('Ok pressed')}
-                }
-            ])
+            setTimeout(function(){
+                Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props && this.props.translation ? this.props.translation : null), getTranslation(translations.alertMessages.noItemAlert,  this.props && this.props.translation ? this.props.translation : null), [
+                    {
+                        text: getTranslation(translations.alertMessages.okButtonLabel,  this.props && this.props.translation ? this.props.translation : null), 
+                        onPress: () => {console.log('Ok pressed')}
+                    }
+                ])
+            }, 1000)
         }
     };
 }

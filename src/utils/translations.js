@@ -201,7 +201,8 @@ const alertMessages = {
     warningLabel: 'Warning',
     invalidCredentials: 'Invalid credentials',
     invalidEmail: 'LNG_FORM_VALIDATION_ERROR_FIELD_EMAIL',
-    noItemAlert: 'There is not any person with this informations',
+    noItemAlert: 'No person exists with this information',
+    errorOccuredMsg: 'QR code is not valid',
 
 
     // cases
