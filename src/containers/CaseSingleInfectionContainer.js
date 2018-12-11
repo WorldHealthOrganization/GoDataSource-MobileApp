@@ -240,7 +240,16 @@ class CaseSingleInfectionContainer extends PureComponent {
     handleNextButton = () => {
         // if (true) {
         if (this.props.checkRequiredFieldsInfection()) {
-            this.props.handleMoveToNextScreenButton(true)
+            if (this.props.checkIsolationOnsetDates()) {
+                this.props.handleMoveToNextScreenButton(true);
+            } else {
+                Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.dateOfOnsetError, this.props.translation), [
+                    {
+                        text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+                        onPress: () => {console.log("OK pressed")}
+                    }
+                ])
+            }
         } else {
             Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.alertMessages.requiredFieldsMissingError, this.props.translation), [
                 {

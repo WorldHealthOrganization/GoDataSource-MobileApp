@@ -400,6 +400,7 @@ class CaseSingleScreen extends Component {
                         handleOnPressDeleteHospitalizationDates={this.handleOnPressDeleteHospitalizationDates}
                         onPressAddIsolationDates={this.onPressAddIsolationDates}
                         handleOnPressDeleteIsolationDates={this.handleOnPressDeleteIsolationDates}
+                        checkIsolationOnsetDates={this.checkIsolationOnsetDates}
                     />
                 );
             case 'caseInvestigation':
