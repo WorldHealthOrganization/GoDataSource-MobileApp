@@ -13,7 +13,8 @@ import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import SectionedMultiSelect from 'react-native-sectioned-multi-select';
 import translations from './../utils/translations'
-import {getTranslation} from './../utils/functions';
+import {getTranslation, getTooltip} from './../utils/functions';
+import TooltipComponent from './TooltipComponent'
 
 class DropDownSectioned extends Component {
 
@@ -37,76 +38,101 @@ class DropDownSectioned extends Component {
 
     // Please write here all the methods that are not react native lifecycle methods
     editInput() {
+        let tooltip = getTooltip(this.props.label, this.props.translation)
         return (
-            <View style={[this.props.style, {flex: 1, alignSelf: 'center'}]}>
-              <Text style={{
-                    fontFamily: 'Roboto',
-                    fontSize: 12.5,
-                    textAlign: 'left',
-                    color: 'rgba(0,0,0,0.38)',
-                }}>
-                    {this.props.isRequired ? getTranslation(this.props.label, this.props.translation) + ' * ' : getTranslation(this.props.label, this.props.translation)}
-                </Text>
-                <SectionedMultiSelect
-                    items={this.props.data}
-                    uniqueKey='_id'
-                    subKey='children'
-                    selectText= {this.props.value !== "" ? this.props.value : this.props.single === true ? getTranslation(translations.dropDownSectionedLabels.chooseOneLocation, this.props.translation) : getTranslation(translations.dropDownSectionedLabels.chooseMoreLocations, this.props.translation)}
-                    showDropDowns={true}
-                    readOnlyHeadings={true}
-                    onSelectedItemsChange={this.onSelectedItemsChange}
-                    selectedItems={this.props.sectionedSelectedItems !== null && this.props.sectionedSelectedItems !== undefined ? this.props.sectionedSelectedItems : [] }
-                    showCancelButton={true}
-                    selectChildren={false}
-                    showChips={false}
-                    modalAnimationType="slide"
-                    searchPlaceholderText={getTranslation(translations.dropDownSectionedLabels.searchPlaceholderText, this.props.translation)}
-                    selectToggleIconComponent={(<Icon name="arrow-drop-down"/>)}
-                    dropDownToggleIconDownComponent={(<Icon name="arrow-drop-down"/>)}
-                    dropDownToggleIconUpComponent={(<Icon name="arrow-drop-up"/>)}
-                    confirmFontFamily={'Roboto-Medium'}
-                    searchTextFontFamily={'Roboo-Regular'}
-                    itemFontFamily={'Roboto-Medium'}
-                    subItemFontFamily={'Roboto-Regular'}
-                    styles={{
-                        button: {backgroundColor: stylesGlobal.buttonGreen},
-                        cancelButton: {backgroundColor: stylesGlobal.missedRedColor},
-                        selectToggle: {borderBottomColor: stylesGlobal.textFieldUnderline, borderBottomWidth: 1}
-                    }}
-                    single={this.props.single}
-                    noItemsComponent={(
-                        <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-                            <Text style={{fontFamily: 'Roboto-Medium', fontSize: 15}}>
-                                {getTranslation(translations.dropDownSectionedLabels.noLocationsMessage, this.props.translation)}
-                            </Text>
-                        </View>
-                    )}
-                />
+            <View style={[this.props.style, {flexDirection: 'row'}]}>
+                <View style = {{flex: 1}}>
+                    <Text style={{
+                        fontFamily: 'Roboto',
+                        fontSize: 12.5,
+                        textAlign: 'left',
+                        color: 'rgba(0,0,0,0.38)',
+                    }}>
+                        {this.props.isRequired ? getTranslation(this.props.label, this.props.translation) + ' * ' : getTranslation(this.props.label, this.props.translation)}
+                    </Text>
+                    <SectionedMultiSelect
+                        items={this.props.data}
+                        uniqueKey='_id'
+                        subKey='children'
+                        selectText= {this.props.value !== "" ? this.props.value : this.props.single === true ? getTranslation(translations.dropDownSectionedLabels.chooseOneLocation, this.props.translation) : getTranslation(translations.dropDownSectionedLabels.chooseMoreLocations, this.props.translation)}
+                        showDropDowns={true}
+                        readOnlyHeadings={true}
+                        onSelectedItemsChange={this.onSelectedItemsChange}
+                        selectedItems={this.props.sectionedSelectedItems !== null && this.props.sectionedSelectedItems !== undefined ? this.props.sectionedSelectedItems : [] }
+                        showCancelButton={true}
+                        selectChildren={false}
+                        showChips={false}
+                        modalAnimationType="slide"
+                        searchPlaceholderText={getTranslation(translations.dropDownSectionedLabels.searchPlaceholderText, this.props.translation)}
+                        selectToggleIconComponent={(<Icon name="arrow-drop-down"/>)}
+                        dropDownToggleIconDownComponent={(<Icon name="arrow-drop-down"/>)}
+                        dropDownToggleIconUpComponent={(<Icon name="arrow-drop-up"/>)}
+                        confirmFontFamily={'Roboto-Medium'}
+                        searchTextFontFamily={'Roboo-Regular'}
+                        itemFontFamily={'Roboto-Medium'}
+                        subItemFontFamily={'Roboto-Regular'}
+                        styles={{
+                            button: {backgroundColor: stylesGlobal.buttonGreen},
+                            cancelButton: {backgroundColor: stylesGlobal.missedRedColor},
+                            selectToggle: {borderBottomColor: stylesGlobal.textFieldUnderline, borderBottomWidth: 1}
+                        }}
+                        single={this.props.single}
+                        noItemsComponent={(
+                            <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+                                <Text style={{fontFamily: 'Roboto-Medium', fontSize: 15}}>
+                                    {getTranslation(translations.dropDownSectionedLabels.noLocationsMessage, this.props.translation)}
+                                </Text>
+                            </View>
+                        )}
+                    />
+                </View>
+                {
+                    tooltip.hasTooltip === true ? (
+                        <TooltipComponent
+                            tooltipMessage={tooltip.tooltipMessage}
+                            style = {{
+                                flex: 0,
+                                marginTop: 7,
+                                marginBottom: 0
+                            }}
+                        />
+                    ) : null
+                }
             </View>
         );
     }
 
     viewInput = () => {
+        let tooltip = getTooltip(this.props.label, this.props.translation)
         return (
-            <View style={[{flex: 1, alignSelf: 'center'}, this.props.style]}>
-                <Text style={{
-                    fontFamily: 'Roboto-Regular',
-                    fontSize: 15,
-                    lineHeight: 30,
-                    textAlign: 'left',
-                    color: 'rgb(0,0,0)',
-                    marginBottom: 7.5
-                }}>
-                    {getTranslation(this.props.label, this.props.translation)}
-                </Text>
-                <Text style={{
-                    fontFamily: 'Roboto-Light',
-                    fontSize: 12.5,
-                    textAlign: 'left',
-                    color: 'rgb(60,60,60)',
-                }}>
-                    {this.props.value}
-                </Text>
+            <View style={[{flexDirection: 'row', alignSelf: 'center'}, this.props.style]}>
+                <View style = {{flex: 1}}>
+                    <Text style={{
+                        fontFamily: 'Roboto-Regular',
+                        fontSize: 15,
+                        lineHeight: 30,
+                        textAlign: 'left',
+                        color: 'rgb(0,0,0)',
+                        marginBottom: 7.5
+                    }}>
+                        {getTranslation(this.props.label, this.props.translation)}
+                    </Text>
+                    <Text style={{
+                        fontFamily: 'Roboto-Light',
+                        fontSize: 12.5,
+                        textAlign: 'left',
+                        color: 'rgb(60,60,60)',
+                    }}>
+                        {this.props.value}
+                    </Text>
+                </View>
+                {
+                    tooltip.hasTooltip === true ? (
+                        <TooltipComponent
+                            tooltipMessage={tooltip.tooltipMessage}
+                        />
+                    ) : null
+                }
             </View>
         );
     };

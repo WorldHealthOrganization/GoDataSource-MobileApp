@@ -118,7 +118,7 @@ class ManualConfigScreen extends Component {
                         enablesReturnKeyAutomatically={true}
                         containerStyle={style.textInput}
                         onChangeText={this.handleTextChange}
-                        label={getTranslation(translations.manualConfigScreen.hubUrlLabel, this.props.translation)}
+                        label={getTranslation(translations.manualConfigScreen.hubUrlLabel, this.props && this.props.translation ? this.props.translation : null)}
                         autoCapitalize={'none'}
                     />
                     <TextField
@@ -129,7 +129,7 @@ class ManualConfigScreen extends Component {
                         enablesReturnKeyAutomatically={true}
                         containerStyle={style.textInput}
                         onChangeText={this.handleTextChange}
-                        label={getTranslation(translations.manualConfigScreen.clientIdLabel, this.props.translation)}
+                        label={getTranslation(translations.manualConfigScreen.clientIdLabel, this.props && this.props.translation ? this.props.translation : null)}
                         autoCapitalize={'none'}
                     />
                     <TextField
@@ -140,11 +140,11 @@ class ManualConfigScreen extends Component {
                         enablesReturnKeyAutomatically={true}
                         containerStyle={style.textInput}
                         onChangeText={this.handleTextChange}
-                        label={getTranslation(translations.manualConfigScreen.clientSecretPass, this.props.translation)}
+                        label={getTranslation(translations.manualConfigScreen.clientSecretPass, this.props && this.props.translation ? this.props.translation : null)}
                         secureTextEntry={true}
                         autoCapitalize={'none'}
                     />
-                    <Button upperCase={false} onPress={this.saveHubConfiguration} text={getTranslation(translations.manualConfigScreen.saveHubConfigButton, this.props.translation)} style={styles.buttonLogin} />
+                    <Button upperCase={false} onPress={this.saveHubConfiguration} text={getTranslation(translations.manualConfigScreen.saveHubConfigButton, this.props && this.props.translation ? this.props.translation : null)} style={styles.buttonLogin} />
                 </View>
                 <View style={style.logoContainer}>
                     <Image source={{uri: 'logo_app'}} style={style.logoStyle} />
