@@ -84,7 +84,7 @@ class LoginScreen extends Component {
             >
                 {
                     this.state && this.state.showLoading ? (
-                        <LoaderScreen overlay={true} backgroundColor={'white'} message={this.props && this.props.loginState ? this.props.loginState : getTranslation(translations.loadingScreenMessages.loadingMsg, this.props && this.props.translation ? this.props.translation : null)} />
+                        <LoaderScreen overlay={true} backgroundColor={'white'} message={this.props && this.props.loginState ? this.props.loginState : 'Loading'} />
                     ) : (null)
                 }
                 <Ripple style={{position: "absolute", top: 20, left: 20}} onPress={this.handleOnPressBack}>
