@@ -5,7 +5,8 @@ import React, {PureComponent} from 'react';
 import {View, Text, StyleSheet} from 'react-native';
 import PropTypes from 'prop-types';
 import translations from './../utils/translations'
-import {getTranslation} from './../utils/functions';
+import {getTranslation, getTooltip} from './../utils/functions';
+import TooltipComponent from './TooltipComponent'
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 var Switch = require('react-native-material-switch');
@@ -25,39 +26,66 @@ class SwitchInput extends PureComponent {
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
-        return (
-            <View style={[{
-                flexDirection: 'row',
-                width: '100%',
-                marginVertical: 10
-            }, this.props.style]}>
-                <Text style={[{
+        if(this.props.isEditMode){
+            return this.editInput();
+        }else{
+            return this.viewInput();
+        }
+    };
 
-                }, this.props.labelStyle]}>
+    editInput = () => {
+        let tooltip = getTooltip(this.props.label, this.props.translation)
+        return (
+            <View style={[{flexDirection: 'row', marginVertical: 10}, this.props.style]}>
+                <Text style={[{flex: 1}, this.props.labelStyle]}>
+                    {getTranslation(this.props.label, this.props.translation)}
+                </Text>
+                <Switch
+                    active={this.props.value}
+                    switchWidth={32}
+                    switchHeight={12}
+                    buttonRadius={10}
+                    inactiveButtonColor={'rgb(250,250,250)'}
+                    inactiveBackgroundColor={'rgba(0,0,0,.3)'}
+                    activeButtonColor={this.props.activeButtonColor}
+                    activeBackgroundColor={this.props.activeBackgroundColor}
+                    style={{
+                        flex: 0,
+                    }}
+                    onChangeState={ (state) => this.props.onChange(
+                        state,
+                        this.props.id,
+                        this.props.objectType ? (this.props.objectType == 'Address' ? this.props.index : (
+                            this.props.objectType == 'LabResult' ? this.props.index : this.props.objectType
+                        )) : null,
+                    this.props.objectType)}
+                /> 
+                {
+                    tooltip.hasTooltip === true ? (
+                        <TooltipComponent
+                            tooltipMessage={tooltip.tooltipMessage}
+                            style = {{
+                                flex: 0,
+                                marginTop: 0,
+                                marginBottom: 0,
+                                marginLeft: 5
+                            }}
+                        />
+                    ) : null
+                }
+            </View>
+        );
+    };
+
+    viewInput = () => {
+        let tooltip = getTooltip(this.props.label, this.props.translation)
+        return (
+            <View style={[{flexDirection: 'row', marginVertical: 10}, this.props.style]}>
+                <Text style={[{flex: 1}, this.props.labelStyle]}>
                     {getTranslation(this.props.label, this.props.translation)}
                 </Text>
                 {
-                    this.props.isEditMode ?
-                    <Switch
-                        active={this.props.value}
-                        switchWidth={32}
-                        switchHeight={12}
-                        buttonRadius={10}
-                        inactiveButtonColor={'rgb(250,250,250)'}
-                        inactiveBackgroundColor={'rgba(0,0,0,.3)'}
-                        activeButtonColor={this.props.activeButtonColor}
-                        activeBackgroundColor={this.props.activeBackgroundColor}
-                        style={{
-                            flex: 0,
-                        }}
-                        onChangeState={ (state) => this.props.onChange(
-                            state,
-                            this.props.id,
-                            this.props.objectType ? (this.props.objectType == 'Address' ? this.props.index : (
-                                this.props.objectType == 'LabResult' ? this.props.index : this.props.objectType
-                            )) : null,
-                            this.props.objectType)}
-                    /> : ( this.props.showValue &&
+                    this.props.showValue ? (
                         <Text style={{
                             fontFamily: 'Roboto-Light',
                             fontSize: 12.5,
@@ -67,11 +95,24 @@ class SwitchInput extends PureComponent {
                         }}>
                             {this.props.value != true ? getTranslation(translations.generalLabels.noAnswer, this.props.translation) : getTranslation(translations.generalLabels.yesAnswer, this.props.translation)}
                         </Text>
-                    )
+                    ) : null
+                }
+                {
+                    tooltip.hasTooltip === true ? (
+                        <TooltipComponent
+                            tooltipMessage={tooltip.tooltipMessage}
+                            style = {{
+                                flex: 0,
+                                marginTop: 0,
+                                marginBottom: 0,
+                                marginLeft: 5
+                            }}
+                        />
+                    ) : null
                 }
             </View>
-        );
-    }
+        )
+    };
 
     // Please write here all the methods that are not react native lifecycle methods
 }

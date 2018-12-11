@@ -5,10 +5,11 @@ import React, {PureComponent} from 'react';
 import {View, Text, StyleSheet} from 'react-native';
 import PropTypes from 'prop-types';
 import translations from './../utils/translations'
-import {getTranslation} from './../utils/functions';
+import {getTranslation, getTooltip} from './../utils/functions';
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import { Dropdown } from 'react-native-material-dropdown';
+import TooltipComponent from './TooltipComponent'
 
 class DropdownInput extends PureComponent {
 
@@ -33,45 +34,64 @@ class DropdownInput extends PureComponent {
 
     // Please write here all the methods that are not react native lifecycle methods
     editInput() {
+        let tooltip = getTooltip(this.props.label, this.props.translation)
         return (
-            <View style={[{
-            }, this.props.style]}>
-                <Dropdown
-                    label={this.props.isRequired ? getTranslation(this.props.label, this.props.translation) + ' * ' : getTranslation(this.props.label, this.props.translation)}
-                    data={this.props.data}
-                    value={this.props.value || ''}
-                    fontSize={15}
-                    labelFontSize={12.5}
-                    selectedItemColor={'rgb(255,60,56)'}
-                    onChangeText={this.handleOnChangeText}
-                    dropdownPosition={1}
-                    dropdownMargins={{min: 4, max: 8}}
-                />
+            <View style={[{flexDirection: 'row'}, this.props.style]}>
+                <View style = {{flex: 1}}> 
+                    <Dropdown
+                        label={this.props.isRequired ? getTranslation(this.props.label, this.props.translation) + ' * ' : getTranslation(this.props.label, this.props.translation)}
+                        data={this.props.data}
+                        value={this.props.value || ''}
+                        fontSize={15}
+                        labelFontSize={12.5}
+                        selectedItemColor={'rgb(255,60,56)'}
+                        onChangeText={this.handleOnChangeText}
+                        dropdownPosition={1}
+                        dropdownMargins={{min: 4, max: 8}}
+                    />
+                </View>
+                {
+                    tooltip.hasTooltip === true ? (
+                        <TooltipComponent
+                            tooltipMessage={tooltip.tooltipMessage}
+                        />
+                    ) : null
+                }
             </View>
         );
     }
 
     viewInput = () => {
+        let tooltip = getTooltip(this.props.label, this.props.translation)
         return (
-            <View style={[{}, this.props.style]}>
-                <Text style={{
-                    fontFamily: 'Roboto-Regular',
-                    fontSize: 15,
-                    lineHeight: 30,
-                    textAlign: 'left',
-                    color: 'rgb(0,0,0)',
-                    marginBottom: 7.5
-                }}>
-                    {getTranslation(this.props.label, this.props.translation)}
-                </Text>
-                <Text style={{
-                    fontFamily: 'Roboto-Light',
-                    fontSize: 12.5,
-                    textAlign: 'left',
-                    color: 'rgb(60,60,60)',
-                }}>
-                    {this.props.value !== undefined ? this.props.value : ''}
-                </Text>
+            <View style={[{flexDirection: 'row'}, this.props.style]}>
+                <View style={{flex: 1}}> 
+                    <Text style={{
+                        fontFamily: 'Roboto-Regular',
+                        fontSize: 15,
+                        lineHeight: 30,
+                        textAlign: 'left',
+                        color: 'rgb(0,0,0)',
+                        marginBottom: 7.5
+                    }}>
+                        {getTranslation(this.props.label, this.props.translation)}
+                    </Text>
+                    <Text style={{
+                        fontFamily: 'Roboto-Light',
+                        fontSize: 12.5,
+                        textAlign: 'left',
+                        color: 'rgb(60,60,60)',
+                    }}>
+                        {this.props.value !== undefined ? this.props.value : ''}
+                    </Text>
+                </View>
+                {
+                    tooltip.hasTooltip === true ? (
+                        <TooltipComponent
+                            tooltipMessage={tooltip.tooltipMessage}
+                        />
+                    ) : null
+                }
             </View>
         );
     };

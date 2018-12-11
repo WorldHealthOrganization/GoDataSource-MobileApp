@@ -214,6 +214,7 @@ const alertMessages = {
     contactDeleteExposureConfirmation: 'Are you sure you want to delete the exposure?',
 
     placeOfResidenceError: 'Please add the place of residence address',
+    dateOfOnsetError: 'The date of isolation should not be before date of onset',
     monthsValueError: 'Number of months must be between 0 and 11',
     yearsValueError: 'Number of years must be between 0 and 150',
     requiredFieldsMissingError: 'Some of the required fields are missing. Please make sure you have completed them',
@@ -279,6 +280,7 @@ const qrScanScreen = {
 
 const manualConfigScreen = {
     title: 'HUB configuration',
+    nameLabel: 'HUB Name',
     hubUrlLabel: 'HUB URL',
     clientIdLabel: 'Client ID',
     clientSecretPass: 'Client secret',
@@ -356,7 +358,47 @@ const dropDownSectionedLabels = {
     chooseMoreLocations: 'Choose one or more locations',
     searchPlaceholderText: 'Search regions',
     noLocationsMessage: 'There were no elements found',
-}
+};
+
+const hubConfigScreen = {
+    label:                              'HUB configuration',
+    currentHubConfigurationLabel:       'Your current hub configuration is:',
+    hubNameLabel:                       'Name',
+    hubUrlLabel:                        'URL',
+    hubClientIdLabel:                   'Client ID',
+    hubClientSecretLabel:               'Client secret',
+    lastSyncDate:                       'Last sync date',
+    scanQRButtonLabel:                  'Scan QR Code',
+    saveCurrentHubButtonLabel:          'Save',
+    connectAnotherComputerLabel:        'Do you want to connect to a different computer?',
+    addHubButtonLabel:                  'Add HUB',
+    otherHubConfigurationsLabel:        'Other hub configurations:',
+    makeActiveLabel:                    'Make Active',
+
+    // Errors
+    setActiveDatabaseTitle:             'Error set active HUB',
+    setActiveDatabaseMessage:           'An error occurred while setting the new active HUB',
+
+    saveCurrentHubTitle:                'Error save current HUB',
+    saveCurrentHubMessage:              'An error occurred while saving the update HUB info',
+
+    getOtherHubsTitle:                  'Error get HUBs',
+    getOtherHubsMessage:                'An error occurred while getting the other HUBS configurations',
+
+    getCurrentHubTitle:                 'Error get current HUB',
+    getCurrentHubMessage:               'An error occurred while getting current HUB configuration',
+
+    getCurrentHubLastSyncDateTitle:     'Error get last sync date',
+    getCurrentHubLastSyncDateMessage:   `An error occurred while getting current HUB's last sync date`,
+
+    exitWithoutSavingMessage:           'You have unsaved data. Are you sure you want to leave this page and lose all changes?',
+
+    // Success saving database
+    // successUpdatingCurrentHubTitle:     'Success updating hub',
+    successUpdatingCurrentHubMessage:   'HUB credentials were successfully updated',
+
+    successMakingHubActiveMessage:      'The HUB was successfully made as active. You will be logged out and can log in with the credentials for the new HUB configuration'
+};
 
 export default {
     navigationDrawer,
@@ -391,5 +433,6 @@ export default {
     dropDownLabels,
     dropDownSectionedLabels,
     missedFollowUpListItemLabels,
-    questionCardLabels
+    questionCardLabels,
+    hubConfigScreen
 }

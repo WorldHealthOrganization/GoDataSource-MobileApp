@@ -228,32 +228,7 @@ class FollowUpsScreen extends Component {
                      showLoader={(this.props && this.props.syncState && (this.props.syncState !== 'Finished processing' && this.props.syncState !== 'Error')) || (this && this.state && this.state.loading)}
                      loaderText={this.props && this.props.syncState ? this.props.syncState : getTranslation(translations.loadingScreenMessages.loadingMsg, this.props.translation)}>
                 <NavBarCustom
-                    title={null}
-                    customTitle={
-                        <View
-                            style={[style.breadcrumbContainer]}>
-                            <Breadcrumb
-                                entities={followUpTitle}
-                                navigator={this.props.navigator || null}
-                            />
-                            {
-                                this.props.role.find((e) => e === config.userPermissions.writeFollowUp) !== undefined ? (
-                                    <View>
-                                        <Menu
-                                            ref="menuRef"
-                                            button={
-                                                <Ripple onPress={this.showMenu} hitSlop={{top: 20, bottom: 20, left: 20, right: 20}}>
-                                                    <Icon name="more-vert"/>
-                                                </Ripple>
-                                            }
-                                        >
-                                            <MenuItem onPress={this.handleModalGenerateFollowUps}>{getTranslation(translations.followUpsScreen.generateLabel, this.props.translation)}</MenuItem>
-                                        </Menu>
-                                    </View>
-                                ) : null
-                            }
-                        </View>
-                    }
+                    title={followUpTitle[1]}
                     navigator={this.props.navigator || null}
                     iconName="menu"
                     handlePressNavbarButton={this.handlePressNavbarButton}
