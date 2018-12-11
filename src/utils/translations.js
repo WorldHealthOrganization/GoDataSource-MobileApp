@@ -212,6 +212,7 @@ const alertMessages = {
     contactDeleteExposureConfirmation: 'Are you sure you want to delete the exposure?',
 
     placeOfResidenceError: 'Please add the place of residence address',
+    dateOfOnsetError: 'The date of isolation should not be before date of onset',
     monthsValueError: 'Number of months must be between 0 and 11',
     yearsValueError: 'Number of years must be between 0 and 150',
     requiredFieldsMissingError: 'Some of the required fields are missing. Please make sure you have completed them',
