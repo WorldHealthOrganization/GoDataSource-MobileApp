@@ -106,16 +106,24 @@ class CaseListItem extends Component {
                 <View style={styles.lineStyle}/>
                 <View
                     style={[style.thirdSectionContainer, {marginHorizontal: calculateDimension(14, false, this.props.screenSize)}]}>
-                    <Ripple style={[style.rippleStyle]} onPress={this.onPressCase}>
-                        <Text style={[style.rippleTextStyle]}>
-                            {getTranslation(translations.casesScreen.viewButtonLabel, this.props.translation).toUpperCase()}
-                        </Text>
-                    </Ripple>
-                    <Ripple style={[style.rippleStyle]}  onPress={this.onPressAddContact}>
-                        <Text style={[style.rippleTextStyle]}>
-                            {getTranslation(translations.casesScreen.addContactButtonLabel, this.props.translation).toUpperCase()}
-                        </Text>
-                    </Ripple>
+                    {
+                        this.props.role.find((e) => e === config.userPermissions.readCase) !== undefined ? (
+                            <Ripple style={[style.rippleStyle]} onPress={this.onPressCase}>
+                                <Text style={[style.rippleTextStyle]}>
+                                    {getTranslation(translations.casesScreen.viewButtonLabel, this.props.translation).toUpperCase()}
+                                </Text>
+                            </Ripple>
+                        ) : null
+                    }
+                    {
+                        this.props.role.find((e) => e === config.userPermissions.writeContact) !== undefined ? (
+                            <Ripple style={[style.rippleStyle]}  onPress={this.onPressAddContact}>
+                                <Text style={[style.rippleTextStyle]}>
+                                    {getTranslation(translations.casesScreen.addContactButtonLabel, this.props.translation).toUpperCase()}
+                                </Text>
+                            </Ripple>
+                        ) : null
+                    }
                 </View>
             </ElevatedView>
         );
@@ -221,6 +229,7 @@ function mapStateToProps(state) {
         screenSize: state.app.screenSize,
         translation: state.app.translation,
         cases: state.cases,
+        role: state.role,
         contacts: state.contacts,
         events: state.events
     };

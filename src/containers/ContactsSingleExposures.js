@@ -105,17 +105,21 @@ class ContactsSingleExposures extends Component {
                                 marginVertical: calculateDimension(12.5, true, this.props.screenSize),
                                 marginHorizontal: calculateDimension(16, false, this.props.screenSize),
                         }}/>
-                        <Button
-                            title={getTranslation(translations.generalButtons.saveButtonLabel, this.props.translation)}
-                            onPress={this.props.handleOnPressSave}
-                            color={styles.buttonGreen}
-                            titleColor={'white'}
-                            height={calculateDimension(25, true, this.props.screenSize)}
-                            width={calculateDimension(130, false, this.props.screenSize)}
-                            style={{
-                                marginVertical: calculateDimension(12.5, true, this.props.screenSize),
-                                marginHorizontal: calculateDimension(16, false, this.props.screenSize),
-                        }}/>
+                        {
+                            this.props.isEditMode === true ? (
+                                <Button
+                                    title={getTranslation(translations.generalButtons.saveButtonLabel, this.props.translation)}
+                                    onPress={this.props.handleOnPressSave}
+                                    color={styles.buttonGreen}
+                                    titleColor={'white'}
+                                    height={calculateDimension(25, true, this.props.screenSize)}
+                                    width={calculateDimension(130, false, this.props.screenSize)}
+                                    style={{
+                                        marginVertical: calculateDimension(12.5, true, this.props.screenSize),
+                                        marginHorizontal: calculateDimension(16, false, this.props.screenSize),
+                                }}/> 
+                            ) : null
+                        }
                     </View>
                 </View>
                 <ScrollView contentContainerStyle={{flexGrow: 1}}>
@@ -147,15 +151,17 @@ class ContactsSingleExposures extends Component {
     renderRelationship = (relation) => {
 
         let {title, primaryText, secondaryText} = this.getCaseName(relation);
-
-        
+        let textsArray = []
+        if (this.props.isEditMode === true){
+            textsArray = [getTranslation(translations.generalButtons.editButtonLabel, this.props.translation), getTranslation(translations.generalButtons.deleteButtonLabel, this.props.translation)]
+        }
         return (
             <GeneralListItem
                 title={title}
                 primaryText={primaryText}
                 secondaryText={secondaryText}
                 hasActionsBar={true}
-                textsArray={[getTranslation(translations.generalButtons.editButtonLabel, this.props.translation), getTranslation(translations.generalButtons.deleteButtonLabel, this.props.translation)]}
+                textsArray={textsArray}
                 textsStyleArray={[
                     {
                         marginLeft: calculateDimension(14, false, this.props.screenSize),
@@ -186,15 +192,21 @@ class ContactsSingleExposures extends Component {
     listEmptyComponent = () => {
         return (
             <View style={{alignSelf: 'flex-start', marginHorizontal: calculateDimension(16, false, this.props.screenSize), marginVertical: 20}}>
-                <Ripple
-                    style={{
-                        height: 25,
-                        justifyContent: 'center'
-                    }}
-                    onPress={this.onPressAddExposure}
-                >
-                    <Text style={{fontFamily: 'Roboto-Medium', fontSize: 12, color: styles.buttonGreen}}>Add exposure</Text>
-                </Ripple>
+            {
+                this.props.isEditMode !== null && this.props.isEditMode !== undefined && this.props.isEditMode === true ? (
+                    <Ripple
+                        style={{
+                            height: 25,
+                            justifyContent: 'center'
+                        }}
+                        onPress={this.onPressAddExposure}
+                    >
+                        <Text style={{fontFamily: 'Roboto-Medium', fontSize: 12, color: styles.buttonGreen}}>
+                            {getTranslation(translations.contactSingleScreen.exposureText, this.props.translation)}
+                        </Text>
+                    </Ripple>
+                ) : null
+            }
             </View>
         )
     };
@@ -274,7 +286,8 @@ function mapStateToProps(state) {
         contacts: state.contacts,
         cases: state.cases,
         events: state.events,
-        translation: state.app.translation
+        translation: state.app.translation,
+        role: state.role
     };
 }
 
