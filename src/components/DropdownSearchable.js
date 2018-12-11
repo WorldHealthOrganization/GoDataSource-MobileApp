@@ -42,7 +42,7 @@ class DropdownSearchable extends PureComponent {
                 itemsContainerStyle={{maxHeight: 140}}
                 items={this.state.items}
                 defaultIndex={2}
-                placeholder={getTranslation(this.props.placeholder, this.props.translation)}
+                placeholder={this.props.placeholder}
                 resetValue={false}
                 onSubmitEditing={this.handleOnSubmitEditing}
             />

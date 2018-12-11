@@ -35,9 +35,9 @@ class TooltipComponent extends PureComponent {
     render() {
         let width = calculateDimension(315, false, this.props.screenSize);
         return (
-            <View style={[style.container, {
-                    width: calculateDimension(25, false, this.props.screenSize),
-                    height: calculateDimension(25, true, this.props.screenSize),
+            <View style={[this.props.style ? this.props.style : style.container, {
+                    width: 25, 
+                    height: 25
                 }]}
             > 
                 <ElevatedView elevation={3} style={style.elevatedView}>
