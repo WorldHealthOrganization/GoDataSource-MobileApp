@@ -44,7 +44,7 @@ class FirstConfigScreen extends Component {
         if (props.errors && props.errors.type && props.errors.message) {
             Alert.alert(props.errors.type, props.errors.message, [
                 {
-                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation), 
+                    text: getTranslation(translations.alertMessages.okButtonLabel, props.translation), 
                     onPress: () => {props.removeErrors()}
                 }
             ])
@@ -120,6 +120,7 @@ class FirstConfigScreen extends Component {
             animationType: 'fade'
         })
     };
+
     pushNewScreen = (QRCodeInfo) => {
         this.props.navigator.push({
             screen: 'ManualConfigScreen',
@@ -129,7 +130,7 @@ class FirstConfigScreen extends Component {
                 QRCodeInfo: QRCodeInfo
             }
         })
-    }
+    };
 }
 
 // Create style outside the class, or for components that will be used by other components (buttons),

@@ -13,7 +13,8 @@ import Ripple from 'react-native-material-ripple';
 import style from './../styles';
 import moment from 'moment';
 import translations from './../utils/translations'
-import {getTranslation} from './../utils/functions';
+import {getTranslation, getTooltip} from './../utils/functions';
+import TooltipComponent from './TooltipComponent'
 
 class DatePicker extends PureComponent {
 
@@ -41,79 +42,91 @@ class DatePicker extends PureComponent {
 
     // Please write here all the methods that are not react native lifecycle methods
     editInput = () => {
-        // console.log("### date from value: ", this.props.value);
+        let tooltip = getTooltip(this.props.label, this.props.translation)
+        let customStyle = this.props.value !== undefined && this.props.value !== null ? styles.hasDateTooltipStyle : style.emptyDateTooltipStyle
         return (
-            <View style={[{marginVertical: 10},this.props.style]}>
-                {
-                    this.props.value !== undefined && this.props.value !== null ? (
-                        <View>
-                            <Text style={{
-                                fontFamily: 'Roboto',
-                                fontSize: 12.5,
-                                textAlign: 'left',
-                                color: 'rgba(0, 0, 0, .38)',
-                            }}>
-                                {this.props.isRequired ? getTranslation(this.props.label, this.props.translation) + ' * ' : getTranslation(this.props.label, this.props.translation)}
-                            </Text>
-
-                            <Ripple onPress={this.handleShowDatePicker}>
-                                <Text 
-                                    style={{
-                                    fontFamily: 'Roboto-Regular',
-                                    fontSize: 15,
-                                    textAlign: 'left',
-                                    lineHeight: 30,
-                                    color: 'rgb(60,60,60)',
-                                    marginBottom: 7.5
-                                }}>
-                                    {this.props.value !== undefined && this.props.value !== null ? moment(this.props.value).format('MM/DD/YYYY') : ''}
-                                </Text>
-                            </Ripple>
-                        </View>
-                    ) : ( 
-                        <Ripple onPress={this.handleShowDatePicker}>
-                            <TextField
-                                label={this.props.isRequired ? getTranslation(this.props.label, this.props.translation) + ' * ' : getTranslation(this.props.label, this.props.translation)}
-                                textColor='rgb(0,0,0)'
-                                labelFontSize={12.5}
-                                labelHeight={30}
-                                labelTextStyle={{
+            <View style={[{marginVertical: 10, flexDirection: 'row'},this.props.style]}>
+                <View style = {{flex: 1}}>
+                    {
+                        this.props.value !== undefined && this.props.value !== null ? (
+                            <View>
+                                <Text style={{
                                     fontFamily: 'Roboto',
+                                    fontSize: 12.5,
                                     textAlign: 'left',
-                                    marginBottom: 7.5
-                                }}
-                                tintColor='rgb(77,176,160)'
-                            >
-                            </TextField> 
-                        </Ripple>
-                    )
+                                    color: 'rgba(0, 0, 0, .38)',
+                                }}>
+                                    {this.props.isRequired ? getTranslation(this.props.label, this.props.translation) + ' * ' : getTranslation(this.props.label, this.props.translation)}
+                                </Text>
+
+                                <Ripple onPress={this.handleShowDatePicker}>
+                                    <Text 
+                                        style={{
+                                        fontFamily: 'Roboto-Regular',
+                                        fontSize: 15,
+                                        textAlign: 'left',
+                                        lineHeight: 30,
+                                        color: 'rgb(60,60,60)',
+                                        marginBottom: 7.5
+                                    }}>
+                                        {this.props.value !== undefined && this.props.value !== null ? moment(this.props.value).format('MM/DD/YYYY') : ''}
+                                    </Text>
+                                </Ripple>
+                            </View>
+                        ) : ( 
+                            <Ripple onPress={this.handleShowDatePicker}>
+                                <TextField
+                                    label={this.props.isRequired ? getTranslation(this.props.label, this.props.translation) + ' * ' : getTranslation(this.props.label, this.props.translation)}
+                                    textColor='rgb(0,0,0)'
+                                    labelFontSize={12.5}
+                                    labelHeight={30}
+                                    labelTextStyle={{
+                                        fontFamily: 'Roboto',
+                                        textAlign: 'left',
+                                        marginBottom: 7.5
+                                    }}
+                                    tintColor='rgb(77,176,160)'
+                                >
+                                </TextField> 
+                            </Ripple>
+                        )
+                    }
+                    <DateTimePicker
+                        minimumDate={this.props.minimumDate}
+                        maximumDate={this.props.maximumDate}
+                        isVisible={this.state.isDateTimePickerVisible}
+                        onConfirm={this.handleDatePicked}
+                        onCancel={this.handleDateCancelled}
+                    />
+                </View>
+                {
+                    tooltip.hasTooltip === true ? (
+                        <TooltipComponent
+                            tooltipMessage={tooltip.tooltipMessage}
+                            style = {customStyle}
+                        />
+                    ) : null
                 }
-                <DateTimePicker
-                    minimumDate={this.props.minimumDate}
-                    maximumDate={this.props.maximumDate}
-                    isVisible={this.state.isDateTimePickerVisible}
-                    onConfirm={this.handleDatePicked}
-                    onCancel={this.handleDateCancelled}
-                />
             </View>
         );
     };
 
     viewInput = () => {
+        let tooltip = getTooltip(this.props.label, this.props.translation)
         return (
-            <View style={[{ 
-            },this.props.style]}>
-                <Text style={{
-                    fontFamily: 'Roboto-Regular',
-                    fontSize: 15,
-                    lineHeight: 30,
-                    textAlign: 'left',
-                    color: 'rgb(0,0,0)',
-                    marginBottom: 7.5
-                }}>
-                    {getTranslation(this.props.label, this.props.translation)}
-                </Text>
-                <Text
+            <View style={[{flexDirection: 'row'}, this.props.style]}>
+                <View style={{flex: 1}}> 
+                    <Text style={{
+                        fontFamily: 'Roboto-Regular',
+                        fontSize: 15,
+                        lineHeight: 30,
+                        textAlign: 'left',
+                        color: 'rgb(0,0,0)',
+                        marginBottom: 7.5
+                    }}>
+                        {getTranslation(this.props.label, this.props.translation)}
+                    </Text>
+                    <Text
                 style={{
                     fontFamily: 'Roboto-Light',
                     fontSize: 12.5,
@@ -122,6 +135,14 @@ class DatePicker extends PureComponent {
                 }}>
                     {this.props.value !== undefined && this.props.value !== null ? moment(this.props.value).format('MM/DD/YYYY') : ''}
                 </Text>
+                </View>
+                {
+                    tooltip.hasTooltip === true ? (
+                        <TooltipComponent
+                            tooltipMessage={tooltip.tooltipMessage}
+                        />
+                    ) : null
+                }
             </View>
         );
     };
@@ -159,6 +180,16 @@ const styles = StyleSheet.create({
     },
     viewLabel: {
 
+    },
+    hasDateTooltipStyle: {
+        flex: 0,
+        marginTop: 15,
+        marginBottom: 15
+    },
+    emptyDateTooltipStyle: {
+        flex: 0,
+        marginTop: 30,
+        marginBottom: 8
     }
 });
 

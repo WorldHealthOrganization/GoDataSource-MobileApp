@@ -6,7 +6,7 @@ import {View, Text, StyleSheet} from 'react-native';
 import {Icon} from 'react-native-material-ui';
 import PropTypes from 'prop-types';
 import translations from './../utils/translations'
-import {getTranslation, calculateDimension} from './../utils/functions';
+import {getTranslation, calculateDimension, getTooltip} from './../utils/functions';
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import { TextField } from 'react-native-material-textfield';
@@ -38,6 +38,7 @@ class TextInput extends PureComponent {
 
     // Please write here all the methods that are not react native lifecycle methods
     editInput = () => {
+        let tooltip = getTooltip(this.props.label, this.props.translation)
         return (
             <View style={[{flexDirection: 'row'},this.props.style]}>
                 <View style={{flex: 1}}> 
@@ -58,12 +59,13 @@ class TextInput extends PureComponent {
                         onPress={() => {console.log("On press textInput")}}
                         keyboardType={this.props.keyboardType ? this.props.keyboardType : 'default'}
                         onSubmitEditing={this.props.onSubmitEditing}
+                        secureTextEntry={this.props.secureTextEntry}
                     />
                 </View>
                 {
-                    this.props.hasTooltip !== undefined && this.props.hasTooltip !== null && this.props.hasTooltip === true ? (
+                    tooltip.hasTooltip === true ? (
                         <TooltipComponent
-                            tooltipMessage={this.props.tooltipMessage}
+                            tooltipMessage={tooltip.tooltipMessage}
                         />
                     ) : null
                 }
@@ -73,6 +75,7 @@ class TextInput extends PureComponent {
 
     viewInput = () => {
         let localValue = this.extractAgeForViewInput()
+        let tooltip = getTooltip(this.props.label, this.props.translation)
         return (
             <View style={[{flexDirection: 'row'},this.props.style]}>
                 <View style={{flex: 1}}>
@@ -96,9 +99,9 @@ class TextInput extends PureComponent {
                     </Text>
                 </View>
                 {
-                    this.props.hasTooltip !== undefined && this.props.hasTooltip !== null && this.props.hasTooltip === true ? (
+                    tooltip.hasTooltip === true ? (
                         <TooltipComponent
-                            tooltipMessage={this.props.tooltipMessage}
+                            tooltipMessage={tooltip.tooltipMessage}
                         />
                     ) : null
                 }
