@@ -150,7 +150,7 @@ class QuestionCard extends Component {
                 return (
                     <TextInput
                         id={item.variable}
-                        label={getTranslation(translations.questionCardLabels.textInputLabel, this.props.translation)}
+                        label={translations.questionCardLabels.textInputLabel}
                         labelValue={item.text}
                         value={questionAnswers}
                         isEditMode={this.props.isEditMode}
@@ -166,7 +166,7 @@ class QuestionCard extends Component {
                 return (
                     <TextInput
                         id={item.variable}
-                        label={getTranslation(translations.questionCardLabels.textInputLabel, this.props.translation)}
+                        label={translations.questionCardLabels.textInputLabel}
                         labelValue={item.text}
                         value={questionAnswers}
                         isEditMode={this.props.isEditMode}
@@ -183,7 +183,7 @@ class QuestionCard extends Component {
                 return (
                     <DatePicker
                         id={item.variable}
-                        label={getTranslation(translations.questionCardLabels.datePickerLabel, this.props.translation)}
+                        label={translations.questionCardLabels.datePickerLabel}
                         value={questionAnswers}
                         isEditMode={this.props.isEditMode}
                         isRequired={item.required}
@@ -196,7 +196,7 @@ class QuestionCard extends Component {
                 return (
                     <DropdownInput
                         id={item.variable}
-                        label={getTranslation(translations.questionCardLabels.dropDownInputLabel, this.props.translation)}
+                        label={translations.questionCardLabels.dropDownInputLabel}
                         labelValue={item.text}
                         value={questionAnswers}
                         data={item.answers.map((e) => {return {value: this.getTranslation(e.label), id: e.value}})}
@@ -212,7 +212,7 @@ class QuestionCard extends Component {
                     <DropDown
                         key={item.variable}
                         id={item.variable}
-                        label={getTranslation(translations.questionCardLabels.dropDownLabel, this.props.translation)}
+                        label={translations.questionCardLabels.dropDownLabel}
                         labelValue={item.text}
                         value={questionAnswers}
                         data={item.answers.map((e) => {return {label: this.getTranslation(e.label), value: e.value}})}

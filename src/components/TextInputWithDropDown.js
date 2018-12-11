@@ -8,7 +8,8 @@ import PropTypes from 'prop-types';
 import { TextField } from 'react-native-material-textfield';
 import { Dropdown } from 'react-native-material-dropdown';
 import translations from './../utils/translations'
-import {getTranslation} from './../utils/functions';
+import {getTranslation, getTooltip} from './../utils/functions';
+import TooltipComponent from './TooltipComponent'
 
 class TextInputWithDropDown extends Component {
 
@@ -44,10 +45,9 @@ class TextInputWithDropDown extends Component {
         let dropDownData = config[this.props.dropDownData].map((e) => {
             return {label: getTranslation(e.label, this.props.translation), value: e.value}
         })
+        let tooltip = getTooltip(this.props.label, this.props.translation)
         return (
-            <View style={[{   
-            width: '100%',
-            },this.props.style]}>
+            <View style={[{width: '100%'},this.props.style]}>
                 <View style={{flexDirection: 'row',  justifyContent: 'space-between'}}>
                     <View style={{width: '45%'}}>
                         <TextField
@@ -82,6 +82,13 @@ class TextInputWithDropDown extends Component {
                             dropdownMargins={{min: 4, max: 8}}
                         />
                     </View>
+                    {
+                        tooltip.hasTooltip === true ? (
+                            <TooltipComponent
+                                tooltipMessage={tooltip.tooltipMessage}
+                            />
+                        ) : null
+                    }
                 </View>
             </View>
         );
@@ -94,6 +101,7 @@ class TextInputWithDropDown extends Component {
         } else {
             smth = ''
         }
+        let tooltip = getTooltip(this.props.label, this.props.translation)
         return (
             <View style={[{width: '100%'},this.props.style]}>
                 <View style={{flexDirection: 'row',  justifyContent: 'space-between'}}>
@@ -117,6 +125,13 @@ class TextInputWithDropDown extends Component {
                             {smth !== '' ? smth + ' ' + config[this.props.dropDownData][this.props.selectedDropDownItemIndex].value || '' : ''}
                         </Text>
                     </View>
+                    {
+                        tooltip.hasTooltip === true ? (
+                            <TooltipComponent
+                                tooltipMessage={tooltip.tooltipMessage}
+                            />
+                        ) : null
+                    }
                 </View>
             </View>
         );

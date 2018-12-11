@@ -21,7 +21,7 @@ import url from './../utils/url';
 import {storeHubConfiguration} from './../actions/app';
 import {LoaderScreen} from 'react-native-ui-lib';
 import Ripple from 'react-native-material-ripple';
-import {getTranslation} from './../utils/functions';
+import {getTranslation, generateId} from './../utils/functions';
 import translations from './../utils/translations'
 
 class ManualConfigScreen extends Component {
@@ -33,11 +33,13 @@ class ManualConfigScreen extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            name: '',
             url: '',
             clientId: '',
             clientSecret: ''
         };
         // Bind here methods, or at least don't declare methods in the render method
+        this.nameRef = this.updateRef.bind(this, 'name');
         this.urlRef = this.updateRef.bind(this, 'url');
         this.clientIDRef = this.updateRef.bind(this, 'clientId');
         this.clientSecretRef = this.updateRef.bind(this, 'clientSecret');
@@ -98,6 +100,17 @@ class ManualConfigScreen extends Component {
                 </View>
                 <View style={style.inputsContainer}>
                     <TextField
+                        ref={this.nameRef}
+                        value={this.state.name}
+                        autoCorrect={false}
+                        lineWidth={1}
+                        enablesReturnKeyAutomatically={true}
+                        containerStyle={style.textInput}
+                        onChangeText={this.handleTextChange}
+                        label={getTranslation(translations.manualConfigScreen.nameLabel, this.props.translation)}
+                        autoCapitalize={'none'}
+                    />
+                    <TextField
                         ref={this.urlRef}
                         value={this.state.url}
                         autoCorrect={false}
@@ -105,7 +118,7 @@ class ManualConfigScreen extends Component {
                         enablesReturnKeyAutomatically={true}
                         containerStyle={style.textInput}
                         onChangeText={this.handleTextChange}
-                        label={getTranslation(translations.manualConfigScreen.hubUrlLabel, this.props.translation)}
+                        label={getTranslation(translations.manualConfigScreen.hubUrlLabel, this.props && this.props.translation ? this.props.translation : null)}
                         autoCapitalize={'none'}
                     />
                     <TextField
@@ -116,7 +129,7 @@ class ManualConfigScreen extends Component {
                         enablesReturnKeyAutomatically={true}
                         containerStyle={style.textInput}
                         onChangeText={this.handleTextChange}
-                        label={getTranslation(translations.manualConfigScreen.clientIdLabel, this.props.translation)}
+                        label={getTranslation(translations.manualConfigScreen.clientIdLabel, this.props && this.props.translation ? this.props.translation : null)}
                         autoCapitalize={'none'}
                     />
                     <TextField
@@ -127,11 +140,11 @@ class ManualConfigScreen extends Component {
                         enablesReturnKeyAutomatically={true}
                         containerStyle={style.textInput}
                         onChangeText={this.handleTextChange}
-                        label={getTranslation(translations.manualConfigScreen.clientSecretPass, this.props.translation)}
+                        label={getTranslation(translations.manualConfigScreen.clientSecretPass, this.props && this.props.translation ? this.props.translation : null)}
                         secureTextEntry={true}
                         autoCapitalize={'none'}
                     />
-                    <Button upperCase={false} onPress={this.saveHubConfiguration} text={getTranslation(translations.manualConfigScreen.saveHubConfigButton, this.props.translation)} style={styles.buttonLogin} />
+                    <Button upperCase={false} onPress={this.saveHubConfiguration} text={getTranslation(translations.manualConfigScreen.saveHubConfigButton, this.props && this.props.translation ? this.props.translation : null)} style={styles.buttonLogin} />
                 </View>
                 <View style={style.logoContainer}>
                     <Image source={{uri: 'logo_app'}} style={style.logoStyle} />
@@ -157,19 +170,25 @@ class ManualConfigScreen extends Component {
     }
 
     saveHubConfiguration = () => {
-        if (!this.state.url || !this.state.clientId || !this.state.clientSecret) {
+        if (!this.state.name || !this.state.url || !this.state.clientId || !this.state.clientSecret) {
             Alert.alert("Alert", "Please make sure you have completed all the fields before moving forward", [
                 {
                     text: 'Ok', onPress: () => {console.log('Ok pressed')}
                 }
             ])
         } else {
-            this.props.storeHubConfiguration({url: this.state.url, clientId: this.state.clientId, clientSecret: this.state.clientSecret});
+            // First generate an id and a password for the hub
+            let hubId = generateId();
+            hubId = hubId.replace(/\/|\.|\:|\-/g, '');
+            let hubPassword = generateId();
+            hubPassword = hubPassword.replace(/\/|\.|\:|\-/g, '');
+            let clientIdObject = {name: this.state.name, url: this.state.url, clientId: this.state.clientId, clientSecret: this.state.clientSecret};
+            this.props.storeHubConfiguration({url: hubId, clientId: JSON.stringify(clientIdObject), clientSecret: hubPassword});
         }
     };
 
     handleTextChange = (text) => {
-        ['url', 'clientId', 'clientSecret'].map((name) => ({ name, ref: this[name] }))
+        ['name', 'url', 'clientId', 'clientSecret'].map((name) => ({ name, ref: this[name] }))
             .forEach(({ name, ref }) => {
                 if (ref.isFocused()) {
                     this.setState({ [name]: text });
