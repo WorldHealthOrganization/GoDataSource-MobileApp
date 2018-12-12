@@ -65,8 +65,9 @@ class CardComponent extends Component {
         }
 
         if (this.props.followUp) {
-            console.log("It's for single screen followUp");
-            return true
+            if (this.props.followUp.date !== nextProps.followUp.date) {
+                return true
+            }
         }
 
         let myDatePickerItems = []
@@ -313,10 +314,10 @@ class CardComponent extends Component {
             if (item.type === 'ActionsBar') {
                 item.onPressArray = [this.props.onDeletePress]
             }
+
             if (item.type === 'DatePicker' && item.objectType !== 'Address') {
                 value = this.props.contact[item.id]
-            }
-            if (item.type === 'DropDownSectioned') {
+            } else if (item.type === 'DropDownSectioned') {
                 if (this.props.contact && this.props.contact.addresses && Array.isArray(this.props.contact.addresses) && this.props.contact.addresses[this.props.index] && this.props.contact.addresses[this.props.index][item.id] && this.props.contact.addresses[this.props.index][item.id] !== "") {
                     for (let location of this.props.locations) {
                         let myLocationName = this.getLocationNameById(location, this.props.contact.addresses[this.props.index][item.id])
@@ -326,9 +327,12 @@ class CardComponent extends Component {
                         }
                     }
                 }
+            } else if (item.type === 'SwitchInput' && this.props.contact[item.id] !== undefined) {
+                value = this.props.contact[item.id]
             } else {
                 value = this.computeValueForContactsSingleScreen(item, this.props.index);
             }
+
             if (this.props.selectedItemIndexForTextSwitchSelectorForAge !== null && this.props.selectedItemIndexForTextSwitchSelectorForAge !== undefined && item.objectType === 'Contact' && item.dependsOn !== undefined && item.dependsOn !== null){
                 let itemIndexInConfigTextSwitchSelectorValues = config[item.dependsOn].map((e) => {return e.value}).indexOf(item.id)
                 if (itemIndexInConfigTextSwitchSelectorValues > -1) {
@@ -342,10 +346,6 @@ class CardComponent extends Component {
             }
         }
 
-        if (this.props.screen === 'ContactsSingleScreenAddress') {
-            console.log("ContactsSingleScreenAddress: ", item);
-        }
-
         if (this.props.screen === 'CaseSingleScreen') {
             if (item.type === 'DropdownInput') {
                 item.data = this.computeDataForCasesSingleScreenDropdownInput(item, this.props.index);
@@ -353,6 +353,7 @@ class CardComponent extends Component {
             if (item.type === 'ActionsBar') {
                 item.onPressArray = [this.props.onDeletePress]
             }
+
             if (item.type === 'DatePicker' && this.props.case[item.id] !== undefined) {
                 value = this.props.case[item.id]
             } else if (item.type === 'DropDownSectioned') {
@@ -365,6 +366,8 @@ class CardComponent extends Component {
                         }
                     }
                 }
+            } else if (item.type === 'SwitchInput' && this.props.case[item.id] !== undefined) {
+                value = this.props.case[item.id]
             } else {
                 value = this.computeValueForCasesSingleScreen(item, this.props.index);
             }
@@ -382,10 +385,12 @@ class CardComponent extends Component {
             if (item.type === 'DropdownInput') {
                 item.data = this.computeDataForFollowUpSingleScreenDropdownInput(item, this.props.index);
             }
-            if (item.type === 'SwitchInput' && this.props.followUp[item.id] !== undefined) {
+            
+            if (item.type === 'DatePicker' && this.props.followUp[item.id] !== undefined) {
                 value = this.props.followUp[item.id]
-            }
-            if (item.type === 'DropDownSectioned') {
+            } else if (item.type === 'SwitchInput' && this.props.followUp[item.id] !== undefined) {
+                value = this.props.followUp[item.id]
+            } else if (item.type === 'DropDownSectioned') {
                 if (this.props.followUp && this.props.followUp.address && this.props.followUp.address[item.id] && this.props.followUp.address[item.id] !== "") {
                     for (let i = 0; i < this.props.locations.length; i++) {
                         let myLocationName = this.getLocationNameById(this.props.locations[i], this.props.followUp.address[item.id])

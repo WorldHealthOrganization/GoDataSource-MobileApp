@@ -2,7 +2,8 @@
  * Created by florinpopa on 13/09/2018.
  */
 import {getDatabase} from './database';
-import {objSort} from './../utils/functions';
+import {objSort, localSortItems} from './../utils/functions';
+
 export function getContactsForOutbreakIdRequest (outbreakId, filter, token, callback) {
     let database = getDatabase();
 
@@ -64,7 +65,7 @@ export function getContactsForOutbreakIdRequest (outbreakId, filter, token, call
 
             let myFilterAge = null 
             if (filter.age) {
-                myFilterAge = filter.age
+                myFilterAge = Object.assign([], filter.age)
                 let maxAge = filter.age[1]
                 let minAge = filter.age[0]
                 while (maxAge - 1 > minAge) {
@@ -94,31 +95,49 @@ export function getContactsForOutbreakIdRequest (outbreakId, filter, token, call
             })
                 .then((resultFilterContacts) => {
                     console.log('Result when filtering contacts: ', new Date().getTime() - start, resultFilterContacts);
-                    //local filter for age because it can't be done in mango (can't use and in or filter
+
                     let resultFilterContactsDocs = resultFilterContacts.docs
-                    if (filter.age) {
-                        resultFilterContactsDocs = resultFilterContactsDocs.filter((e) => {
-                            if (e.age && e.age.years !== null && e.age.years !== undefined && e.age.months !== null && e.age.months !== undefined ) {
-                                if (e.age.years > 0 && e.age.months === 0) {
-                                    return e.age.years >= filter.age[0] && e.age.years <= filter.age[1]
-                                } else if (e.age.years === 0 && e.age.months > 0){
-                                    return e.age.months >= filter.age[0] && e.age.months <= filter.age[1]
-                                } else if (e.age.years === 0 && e.age.months === 0) {
-                                    return e.age.years >= filter.age[0] && e.age.years <= filter.age[1]
+                    if (resultFilterContactsDocs && resultFilterContactsDocs !== undefined) {
+                        // Filter for age because it can't be done in mango (can't use and in or filter)
+                        if (filter.age) {
+                            resultFilterContactsDocs = resultFilterContactsDocs.filter((e) => {
+                                if (e.age && e.age.years !== null && e.age.years !== undefined && e.age.months !== null && e.age.months !== undefined ) {
+                                    if (e.age.years > 0 && e.age.months === 0) {
+                                        return e.age.years >= filter.age[0] && e.age.years <= filter.age[1]
+                                    } else if (e.age.years === 0 && e.age.months > 0){
+                                        return e.age.months >= filter.age[0] && e.age.months <= filter.age[1]
+                                    } else if (e.age.years === 0 && e.age.months === 0) {
+                                        return e.age.years >= filter.age[0] && e.age.years <= filter.age[1]
+                                    }
                                 }
-                            }
-                        });
-                    }
-                     //local filter for selectedLocations bcause it can't be done in mango queries
-                     if (filter.selectedLocations && filter.selectedLocations.length > 0) {
-                        resultFilterContactsDocs = resultFilterContactsDocs.filter((e) => {
-                            let address = e.addresses.find((k) => {
-                                return k.locationId !== '' && filter.selectedLocations.indexOf(k.locationId) >= 0
+                                if (filter.age[0] === 0 && filter.age[1] === 150) {
+                                    return e.age === null || e.age === undefined
+                                }
+                            });
+                        }
+    
+                        // Filter for selectedLocations bcause it can't be done in mango queries
+                        if (filter.selectedLocations && filter.selectedLocations.length > 0) {
+                            resultFilterContactsDocs = resultFilterContactsDocs.filter((e) => {
+                                let address = undefined
+                                if (e.addresses && e.addresses !== undefined) {
+                                    address = e.addresses.find((k) => {
+                                        return k.locationId !== '' && filter.selectedLocations.indexOf(k.locationId) >= 0
+                                    })
+                                }
+                            
+                                return address === undefined ? false : true
                             })
-                        
-                            return address === undefined ? false : true
-                        })
+                        }
+    
+                        // Sort
+                        if (filter.sort && filter.sort !== undefined && filter.sort.length > 0) {
+                            resultFilterContactsDocs = localSortItems(resultFilterContactsDocs, filter.sort)
+                        } else {
+                            resultFilterContactsDocs = objSort(resultFilterContactsDocs, ['lastName', false])
+                        }
                     }
+
                     callback(null, resultFilterContactsDocs)
                 })
                 .catch((errorFilterContacts) => {

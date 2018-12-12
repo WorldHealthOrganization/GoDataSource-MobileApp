@@ -731,7 +731,7 @@ export function localSortContactsForFollowUps (contactsCopy, propsFilter, stateF
             });
         }
         // Take care of locations filter
-        if (filterFromFilterScreen  && filterFromFilterScreen.selectedLocations && filterFromFilterScreen.selectedLocations.length > 0) {
+        if (filterFromFilterScreen && filterFromFilterScreen.selectedLocations && filterFromFilterScreen.selectedLocations.length > 0) {
             contactsCopy = contactsCopy.filter((e) => {
                 let addresses = e.addresses.filter((k) => {
                     return k.locationId !== '' && filterFromFilterScreen.selectedLocations.indexOf(k.locationId) >= 0
@@ -739,26 +739,36 @@ export function localSortContactsForFollowUps (contactsCopy, propsFilter, stateF
                 return addresses.length > 0
             })
         }
-        //Take care of sort
-        if (filterFromFilterScreen  && filterFromFilterScreen.sort && filterFromFilterScreen.sort.length > 0) {
-            let sortCriteria = []
-            let sortOrder = []
-            for(let i = 0; i < filterFromFilterScreen.sort.length; i++) {
-                if (filterFromFilterScreen.sort[i].sortCriteria && filterFromFilterScreen.sort[i].sortCriteria !== '' && filterFromFilterScreen.sort[i].sortOrder && filterFromFilterScreen.sort[i].sortOrder !== ''){
-                    sortCriteria.push(filterFromFilterScreen.sort[i].sortCriteria)
-                    sortOrder.push(filterFromFilterScreen.sort[i].sortOrder === 'LNG_SIDE_FILTERS_SORT_BY_ASC_PLACEHOLDER' ? false : true)
-                }
-            }
-            if (sortCriteria.length > 0 && sortOrder.length > 0) {
-                if (sortOrder.length === 1) {
-                    contactsCopy = objSort(contactsCopy, [sortCriteria[0], sortOrder[0]])
-                } else if (sortOrder.length === 2) {
-                    contactsCopy = objSort(contactsCopy, [sortCriteria[0], sortOrder[0]], [sortCriteria[1], sortOrder[1]])
-                }
-            }
+        // Take care of sort
+        if (filterFromFilterScreen && filterFromFilterScreen.sort && filterFromFilterScreen.sort !== undefined && filterFromFilterScreen.sort.length > 0) {
+            contactsCopy = localSortItems(contactsCopy, filterFromFilterScreen.sort)
+        } else {
+            contactsCopy = objSort(contactsCopy, ['lastName', false])
         }
     }
     return contactsCopy
+}
+
+export function localSortItems (itemsToSort, sortFilter) {
+    if (sortFilter && sortFilter !== undefined && sortFilter.length > 0) {
+        let sortCriteria = []
+        let sortOrder = []
+        for(let i = 0; i < sortFilter.length; i++) {
+            if (sortFilter[i].sortCriteria && sortFilter[i].sortCriteria.trim().length > 0 && sortFilter[i].sortOrder && sortFilter[i].sortOrder.trim().length > 0){
+                sortCriteria.push(sortFilter[i].sortCriteria)
+                sortOrder.push(sortFilter[i].sortOrder === 'LNG_SIDE_FILTERS_SORT_BY_ASC_PLACEHOLDER' ? false : true)
+            }
+        }
+        if (sortCriteria.length > 0 && sortOrder.length > 0) {
+            if (sortOrder.length === 1) {
+                itemsToSort = objSort(itemsToSort, [sortCriteria[0], sortOrder[0]])
+            } else if (sortOrder.length === 2) {
+                itemsToSort = objSort(itemsToSort, [sortCriteria[0], sortOrder[0]], [sortCriteria[1], sortOrder[1]])
+            }
+        }
+    }
+    return itemsToSort
+
 }
 
 export function objSort() {

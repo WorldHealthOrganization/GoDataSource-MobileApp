@@ -94,7 +94,7 @@ class CasesScreen extends Component {
         if (props.errors && props.errors.type && props.errors.message) {
             Alert.alert(props.errors.type, props.errors.message, [
                 {
-                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation), 
+                    text: getTranslation(translations.alertMessages.okButtonLabel, props.translation), 
                     onPress: () => {
                     props.removeErrors();
                     state.loading = false;
@@ -140,6 +140,24 @@ class CasesScreen extends Component {
             outputRange: [1, 0],
             extrapolate: 'clamp',
         });
+
+        let filterNumbers = 0
+        if (this.state.filterFromFilterScreen) {
+            if (this.state.filterFromFilterScreen.gender && this.state.filterFromFilterScreen.gender !== null && this.state.filterFromFilterScreen.gender !== undefined) {
+                ++filterNumbers
+            }
+            if (this.state.filterFromFilterScreen.age && this.state.filterFromFilterScreen.age.length > 0) {
+                ++filterNumbers
+            }
+            if (this.state.filterFromFilterScreen.selectedLocations && this.state.filterFromFilterScreen.selectedLocations.length > 0) {
+                ++filterNumbers
+            }
+            if (this.state.filterFromFilterScreen.classification && this.state.filterFromFilterScreen.classification.length > 0) {
+                ++filterNumbers
+            }
+        }
+        let filterText = filterNumbers === 0 ? `${getTranslation(translations.generalLabels.filterTitle, this.props.translation)}` : `${getTranslation(translations.generalLabels.filterTitle, this.props.translation)}(${filterNumbers})`
+       
         let caseTitle = []; caseTitle[1] = getTranslation(translations.casesScreen.casesTitle, this.props.translation);
         return (
             <ViewHOC style={style.container}
@@ -206,7 +224,7 @@ class CasesScreen extends Component {
                                 onPress={this.handlePressFilter}
                                 onChangeText={this.handleOnChangeText}
                                 onSubmitEditing={this.handleOnSubmitEditing}
-                                filterText={(this.state.filterFromFilterScreen && Object.keys(this.state.filterFromFilterScreen).length > 0) ? (getTranslation(translations.generalLabels.filterTitle, this.props.translation) + " (" + Object.keys(this.state.filterFromFilterScreen).length + ')') : getTranslation(translations.generalLabels.filterTitle, this.props.translation)}
+                                filterText={filterText}
                             />
                         }
                         ItemSeparatorComponent={this.renderSeparatorComponent}

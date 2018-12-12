@@ -120,6 +120,24 @@ class ContactsScreen extends Component {
             extrapolate: 'clamp',
         });
 
+        let filterNumbers = 0
+        if (this.state.filterFromFilterScreen) {
+            if (this.state.filterFromFilterScreen.gender && this.state.filterFromFilterScreen.gender !== null && this.state.filterFromFilterScreen.gender !== undefined) {
+                ++filterNumbers
+            }
+            if (this.state.filterFromFilterScreen.age && this.state.filterFromFilterScreen.age.length > 0) {
+                ++filterNumbers
+            }
+            if (this.state.filterFromFilterScreen.selectedLocations && this.state.filterFromFilterScreen.selectedLocations.length > 0) {
+                ++filterNumbers
+            }
+            if (this.state.filterFromFilterScreen.classification && this.state.filterFromFilterScreen.classification.length > 0) {
+                ++filterNumbers
+            }
+        }
+        let filterText = filterNumbers === 0 ? `${getTranslation(translations.generalLabels.filterTitle, this.props.translation)}` : `${getTranslation(translations.generalLabels.filterTitle, this.props.translation)}(${filterNumbers})`
+       
+
         return (
             <ViewHOC style={style.container}
                      showLoader={(this.props && this.props.syncState && (this.props.syncState !== 'Finished processing' && this.props.syncState !== 'Error')) || (this && this.state && this.state.loading)}
@@ -183,7 +201,7 @@ class ContactsScreen extends Component {
                                 onPress={this.handlePressFilter}
                                 onChangeText={this.handleOnChangeText}
                                 onSubmitEditing={this.handleOnSubmitEditing}
-                                filterText={(this.state.filterFromFilterScreen && Object.keys(this.state.filterFromFilterScreen).length > 0) ? (getTranslation(translations.generalLabels.filterTitle, this.props.transltion) + " (" + Object.keys(this.state.filterFromFilterScreen).length + ')') : getTranslation(translations.generalLabels.filterTitle, this.props.translation)}
+                                filterText={filterText}
                             />}
                         ItemSeparatorComponent={this.renderSeparatorComponent}
                         // ListEmptyComponent={this.listEmptyComponent}
