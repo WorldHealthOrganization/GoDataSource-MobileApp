@@ -159,7 +159,7 @@ export function getAvailableLanguages(dispatch) {
 
 export function storeHubConfiguration(hubConfiguration) {
     return async function (dispatch) {
-        // hubConfiguration = {url: databaseName, clientId: JSON.stringify({name, url, clientId, clientSecret}), clientSecret: databasePass}
+        // hubConfiguration = {url: databaseName, clientId: JSON.stringify({name, url, clientId, clientSecret, encryptedData}), clientSecret: databasePass}
         let hubConfig = JSON.parse(hubConfiguration.clientId);
         url.setBaseUrl(hubConfig.url);
         dispatch(setSyncState('Downloading database...'));
@@ -202,7 +202,7 @@ export function storeHubConfiguration(hubConfiguration) {
 
 function processFilesForSync(error, response, hubConfiguration, isFirstTime, syncSuccessful, forceBulk) {
     return async function (dispatch, getState){
-        // hubConfiguration = {url: databaseName, clientId: JSON.stringify({name, url, clientId, clientSecret}), clientSecret: databasePass}
+        // hubConfiguration = {url: databaseName, clientId: JSON.stringify({name, url, clientId, clientSecret, encryptedData}), clientSecret: databasePass}
         let hubConfig = JSON.parse(hubConfiguration.clientId);
         if (error) {
             dispatch(setSyncState('Error'));
@@ -227,6 +227,8 @@ function processFilesForSync(error, response, hubConfiguration, isFirstTime, syn
                                 let files = await readDir(responseUnzipPath);
 
                                 if (files) {
+                                    // First sort the files
+                                    files = files.sort();
                                     // For every file of the database dump, do sync
                                     for (let i = 0; i < files.length; i++) {
                                         if (files[i] !== 'auditLog.json' && files[i] !== 'icon.json' && files[i] !== 'icons') {
@@ -234,7 +236,7 @@ function processFilesForSync(error, response, hubConfiguration, isFirstTime, syn
                                             // Process every file synchronously
                                             try {
                                                 // console.log('Memory size of database: ', memorySizeOf(database));
-                                                let auxData = await processFile(RNFetchBlobFs.dirs.DocumentDir + '/who_databases/' + files[i], files[i], files.length, dispatch, isFirstTime, forceBulk);
+                                                let auxData = await processFile(RNFetchBlobFs.dirs.DocumentDir + '/who_databases/' + files[i], files[i], files.length, dispatch, isFirstTime, forceBulk, hubConfig.encryptedData, hubConfiguration);
                                                 if (auxData) {
                                                     console.log('auxData: ', auxData);
                                                     promiseResponses.push(auxData);

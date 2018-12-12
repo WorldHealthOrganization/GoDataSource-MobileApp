@@ -283,6 +283,7 @@ const manualConfigScreen = {
     clientIdLabel: 'Client ID',
     clientSecretPass: 'Client secret',
     saveHubConfigButton: 'Save HUB configuration',
+    encryptDataLabel: 'Encrypted connection'
 }
 
 const loginScreen = {

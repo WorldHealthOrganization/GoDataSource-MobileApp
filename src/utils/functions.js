@@ -186,33 +186,24 @@ export function unzipFile (source, dest, password, clientCredentials) {
                 .then((exists) => {
                     if (exists) {
                         // If the encrypted file exists, compute its size, and decrypt it
-                        RNFS.stat(source)
-                            .then((RNFSStatResponse) => {
+                        // RNFS.stat(source)
+                        //     .then((RNFSStatResponse) => {
                                 // Call decryptFile(filePath, fileSize, callback)
-                                let password = getSyncEncryptPassword(password, clientCredentials);
 
-                                decryptFile(source, password, RNFSStatResponse.size)
-                                    .then((decryptedFilePath) => {
-                                        console.log('Decrypted file path: ', decryptedFilePath);
-                                        unzip(decryptedFilePath, dest)
-                                            .then((path) => {
-                                                console.log(`unzip completed at ${path}`);
-                                                resolve(path);
-                                            })
-                                            .catch((error) => {
-                                                console.log(error);
-                                                reject(error);
-                                            })
-                                    })
-                                    .catch((errorDecryptedFile) => {
-                                        console.log('Error while decrypting file: ', errorDecryptedFile);
-                                        reject(errorDecryptedFile);
-                                    })
+                        unzip(source, dest)
+                            .then((path) => {
+                                console.log(`unzip completed at ${path}`);
+                                resolve(path);
                             })
-                            .catch((RNFSStatError) => {
-                                console.log('An error occurred while getting encrypted file status: ', RNFSStatError);
-                                reject(RNFSStatError);
+                            .catch((error) => {
+                                console.log(error);
+                                reject(error);
                             })
+                            // })
+                            // .catch((RNFSStatError) => {
+                            //     console.log('An error occurred while getting encrypted file status: ', RNFSStatError);
+                            //     reject(RNFSStatError);
+                            // })
 
 
 
@@ -450,7 +441,8 @@ export function getNumberOfFilesProcessed() {
     return numberOfFilesProcessed;
 }
 
-export async function processFile (path, type, totalNumberOfFiles, dispatch, isFirstTime, forceBulk) {
+// hubConfig = {name, url, clientId, clientSecret, encryptDatabase}
+export async function processFile (path, type, totalNumberOfFiles, dispatch, isFirstTime, forceBulk, encryptedData, hubConfig) {
     return new Promise((resolve, reject) => {
         if (path) {
             console.log('Process file: ', type, ' From path: ', path);
@@ -458,55 +450,140 @@ export async function processFile (path, type, totalNumberOfFiles, dispatch, isF
                 .then((exists) => {
                     if (exists) {
                         // File exists, time to read it in order to process
-                        readFile(path, (error, data) => {
-                            if (error) {
-                                console.log("Error while reading file: ", type);
-                                reject("Error while reading file");
-                            }
-                            if (data) {
-                                if (isFirstTime && forceBulk) {
-                                    // If is first time processing files, do a bulk insert
-                                    processBulkDocs(data, type)
-                                        .then((resultBulk) => {
-                                            console.log('Bulk docs: ', resultBulk);
-                                            let numberOfFilesProcessedAux = getNumberOfFilesProcessed();
-                                            numberOfFilesProcessedAux += 1;
-                                            data = null;
-                                            setNumberOfFilesProcessed(numberOfFilesProcessedAux);
-                                            dispatch(setSyncState(("Synced " + numberOfFilesProcessedAux + "/" + totalNumberOfFiles)));
-                                            resolve('Finished inserting');
-                                        })
-                                        .catch((errorBulk) => {
-                                            console.log('Error bulk docs: ', errorBulk);
-                                            data = null;
-                                            reject(errorBulk);
-                                        })
-                                } else {
-                                    // Since there is data in the file, it's time to sync it
-                                    let promises = [];
-                                    for (let i=0; i<data.length; i++) {
-                                        promises.push(updateFileInDatabase(data[i], type))
-                                    }
+                        if (encryptedData) {
+                            // If the file is encrypted, read it raw, decrypt it, unzip it, and then process the data
+                            readRawFile(path, (errorEncryptedFile, encryptedData) => {
+                                if (errorEncryptedFile) {
+                                    console.log("Error while reading file: ", type, errorEncryptedFile);
+                                    reject("Error while reading file");
+                                }
+                                if (encryptedData) {
+                                    let password = getSyncEncryptPassword(null, hubConfig);
 
-                                    Promise.all(promises)
-                                        .then((responses) => {
-                                            console.log('Finished syncing: ', responses);
-                                            let numberOfFilesProcessedAux = getNumberOfFilesProcessed();
-                                            numberOfFilesProcessedAux += 1;
-                                            data = null;
-                                            setNumberOfFilesProcessed(numberOfFilesProcessedAux);
-                                            dispatch(setSyncState(("Synced " + numberOfFilesProcessedAux + "/" + totalNumberOfFiles)));
-                                            resolve('Finished syncing');
+                                    decrypt(password, encryptedData)
+                                        .then((decryptedData) => {
+                                            encryptedData = null;
+                                            // Decrypted data is a zip file that needs first to be written to disk
+                                            RNFetchBlobFS.writeFile(`${path}.zip`, decryptedData, 'base64')
+                                                .then((bytesWritten) => {
+                                                    // Now unzip the data
+                                                    unzip(`${path}.zip`, `${path}.json`)
+                                                        .then((unzipPath) => {
+                                                            readFile(unzipPath, (error, data) => {
+                                                                if (error) {
+                                                                    console.log("Error while reading file: ", type);
+                                                                    reject("Error while reading file");
+                                                                }
+                                                                if (data) {
+                                                                    if (isFirstTime && forceBulk) {
+                                                                        // If is first time processing files, do a bulk insert
+                                                                        processBulkDocs(data, type)
+                                                                            .then((resultBulk) => {
+                                                                                console.log('Bulk docs: ', resultBulk);
+                                                                                let numberOfFilesProcessedAux = getNumberOfFilesProcessed();
+                                                                                numberOfFilesProcessedAux += 1;
+                                                                                data = null;
+                                                                                setNumberOfFilesProcessed(numberOfFilesProcessedAux);
+                                                                                dispatch(setSyncState(("Synced " + numberOfFilesProcessedAux + "/" + totalNumberOfFiles)));
+                                                                                resolve('Finished inserting');
+                                                                            })
+                                                                            .catch((errorBulk) => {
+                                                                                console.log('Error bulk docs: ', errorBulk);
+                                                                                data = null;
+                                                                                reject(errorBulk);
+                                                                            })
+                                                                    } else {
+                                                                        // Since there is data in the file, it's time to sync it
+                                                                        let promises = [];
+                                                                        for (let i=0; i<data.length; i++) {
+                                                                            promises.push(updateFileInDatabase(data[i], type))
+                                                                        }
+
+                                                                        Promise.all(promises)
+                                                                            .then((responses) => {
+                                                                                console.log('Finished syncing: ', responses);
+                                                                                let numberOfFilesProcessedAux = getNumberOfFilesProcessed();
+                                                                                numberOfFilesProcessedAux += 1;
+                                                                                data = null;
+                                                                                setNumberOfFilesProcessed(numberOfFilesProcessedAux);
+                                                                                dispatch(setSyncState(("Synced " + numberOfFilesProcessedAux + "/" + totalNumberOfFiles)));
+                                                                                resolve('Finished syncing');
+                                                                            })
+                                                                            .catch((error) => {
+                                                                                console.log("Error at syncing file of type: ", type, error);
+                                                                                data = null;
+                                                                                reject("Error at syncing file");
+                                                                            })
+                                                                    }
+                                                                }
+                                                            })
+                                                        })
+                                                        .catch((errorUnzipFile) => {
+                                                            console.log(`Error while unzipping file ${type}: ${errorUnzipFile}`);
+                                                            reject('Error while unzipping file');
+                                                        })
+                                                })
+                                                .catch((errorWriteBytes) => {
+                                                    console.log("Error while creating inner zip: ", type, errorWriteBytes);
+                                                    reject("Error while creating inner zip");
+                                                })
                                         })
-                                        .catch((error) => {
-                                            console.log("Error at syncing file of type: ", type, error);
-                                            data = null;
-                                            reject("Error at syncing file");
+                                        .catch((errorDecryptingData) => {
+                                            console.log('Error while decrypting data: ', type, errorDecryptingData);
+                                            reject('Error while decrypting file');
                                         })
                                 }
-                            }
-                        })
+                            })
+                        } else {
+                            readFile(path, (error, data) => {
+                                if (error) {
+                                    console.log("Error while reading file: ", type);
+                                    reject("Error while reading file");
+                                }
+                                if (data) {
+                                    if (isFirstTime && forceBulk) {
+                                        // If is first time processing files, do a bulk insert
+                                        processBulkDocs(data, type)
+                                            .then((resultBulk) => {
+                                                console.log('Bulk docs: ', resultBulk);
+                                                let numberOfFilesProcessedAux = getNumberOfFilesProcessed();
+                                                numberOfFilesProcessedAux += 1;
+                                                data = null;
+                                                setNumberOfFilesProcessed(numberOfFilesProcessedAux);
+                                                dispatch(setSyncState(("Synced " + numberOfFilesProcessedAux + "/" + totalNumberOfFiles)));
+                                                resolve('Finished inserting');
+                                            })
+                                            .catch((errorBulk) => {
+                                                console.log('Error bulk docs: ', errorBulk);
+                                                data = null;
+                                                reject(errorBulk);
+                                            })
+                                    } else {
+                                        // Since there is data in the file, it's time to sync it
+                                        let promises = [];
+                                        for (let i=0; i<data.length; i++) {
+                                            promises.push(updateFileInDatabase(data[i], type))
+                                        }
 
+                                        Promise.all(promises)
+                                            .then((responses) => {
+                                                console.log('Finished syncing: ', responses);
+                                                let numberOfFilesProcessedAux = getNumberOfFilesProcessed();
+                                                numberOfFilesProcessedAux += 1;
+                                                data = null;
+                                                setNumberOfFilesProcessed(numberOfFilesProcessedAux);
+                                                dispatch(setSyncState(("Synced " + numberOfFilesProcessedAux + "/" + totalNumberOfFiles)));
+                                                resolve('Finished syncing');
+                                            })
+                                            .catch((error) => {
+                                                console.log("Error at syncing file of type: ", type, error);
+                                                data = null;
+                                                reject("Error at syncing file");
+                                            })
+                                    }
+                                }
+                            })
+                        }
 
                         // RNFetchBlobFS.readStream(path, 'utf8')
                         //     .then((stream) => {
@@ -1016,7 +1093,15 @@ export function objSort() {
     // objSort(homes, 'city', ['price', true]) --> sort by city (ascending) then price (descending), case in-sensitive)
 }
 
-export function getTooltip (label, translation) {
+export function getTooltip (label, translation, forceTooltip, tooltipsMessage) {
+
+    if (forceTooltip) {
+        return {
+            hasTooltip: true,
+            tooltipMessage: tooltipsMessage
+        };
+    }
+
     let hasTooltip = false
     let tooltipMessage = ''
 

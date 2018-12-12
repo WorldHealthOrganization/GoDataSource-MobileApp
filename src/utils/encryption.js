@@ -70,19 +70,19 @@ export function encrypt(password, data) {
  * Decrypts data
  * @param password
  * @param data
- * @param iv
- * @param salt
- * @param index
  * @return {Promise<any>}
  */
-export function decrypt(password, data, iv, salt, index) {
+export function decrypt(password, data) {
     // promisify the result
     return new Promise(function (resolve, reject) {
         // convert from base64
         const cypherText = Buffer.from(data, 'base64');
-
+        // read IV
+        const iv = cypherText.slice(0, ivLength);
+        // read salt
+        const salt = cypherText.slice(ivLength, ivLength + saltLength);
         // read encrypted text
-        const encrypted = index === 0 ? cypherText.slice(ivLength + saltLength) : cypherText;
+        const encrypted = cypherText.slice(ivLength + saltLength);
         // derive key from password & salt
         crypto.pbkdf2(password, salt, iterations, keyLength, digest, function (err, key) {
             if (err) {

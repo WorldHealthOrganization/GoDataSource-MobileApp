@@ -9,7 +9,7 @@ import {getSyncEncryptPassword} from './../utils/encryption';
 
 export function getDatabaseSnapshotRequest(hubConfig, lastSyncDate, callback) {
 
-    // hubConfiguration = {url: databaseName, clientId: JSON.stringify({name, url, clientId, clientSecret}), clientSecret: databasePass}
+    // hubConfiguration = {url: databaseName, clientId: JSON.stringify({name, url, clientId, clientSecret, encryptedData}), clientSecret: databasePass}
     let hubConfiguration = JSON.parse(hubConfig.clientId);
 
     let filter = {};
@@ -20,7 +20,9 @@ export function getDatabaseSnapshotRequest(hubConfig, lastSyncDate, callback) {
         }
     }
 
-    let requestUrl = hubConfiguration.url + '/sync/database-snapshot' + (lastSyncDate ? ('?filter=' + JSON.stringify(filter)) : '');
+    // let requestUrl = hubConfiguration.url + '/sync/database-snapshot' + (lastSyncDate ? ('?filter=' + JSON.stringify(filter)) : '');
+
+    let requestUrl = `${hubConfiguration.url}/sync/database-snapshot?autoEncrypt=${hubConfiguration.encryptedData}${lastSyncDate ? `&filter=${JSON.stringify(filter)}` : ''}`;
 
     console.log('Request URL: ', requestUrl);
 
@@ -59,12 +61,12 @@ export function getDatabaseSnapshotRequest(hubConfig, lastSyncDate, callback) {
 }
 
 export function postDatabaseSnapshotRequest(internetCredentials, path, callback) {
-    // internetCredentials = {server: databaseName, username: JSON.stringify({name, url, clientId, clientSecret}), password: databasePass}
+    // internetCredentials = {server: databaseName, username: JSON.stringify({name, url, clientId, clientSecret, encryptedData}), password: databasePass}
     let hubConfig = JSON.parse(internetCredentials.username);
-    let requestUrl = hubConfig.url + '/sync/import-database-snapshot';
+    let requestUrl = `${hubConfig.url}/sync/import-database-snapshot?autoEncrypt=${hubConfig.encryptedData}`;
     // let requestUrl = url.postDatabaseSnapshot();
 
-    console.log('Request URL:' + requestUrl);
+    // console.log('Request URL:' + requestUrl);
 
     console.log('Send database to server');
 
