@@ -46,22 +46,7 @@ class CardComponent extends Component {
     // Please add here the react lifecycle methods that you need
     shouldComponentUpdate(nextProps, nextState) {
         if (nextProps.screen === 'FollowUpsFilter' || nextProps.screen === 'CasesFilter') {
-            if (nextProps && nextProps.item && nextProps.item[1] && this.props && this.props.item && this.props.item[1] && nextProps.item[1].type === 'Selector' && nextProps.item[1].id === 'gender') {
-                // console.log("Return true for selector: ", nextProps.filter.filter[nextProps.item[1].id], this.props.filter.filter[this.props.item[1].id]);
-                return true;
-            }
-            if (nextProps && nextProps.item && nextProps.item[1] && this.props && this.props.item && this.props.item[1] && nextProps.item[1].type === 'IntervalPicker' && nextProps.item[1].id === 'age' && nextProps.filter.filter[nextProps.item[1].id] !== this.props.filter.filter[this.props.item[1].id]) {
-                // console.log("Return true for interval: ");
-                return true;
-            }
-            if (nextProps && nextProps.item && nextProps.item[1] && this.props && this.props.item && this.props.item[1] && nextProps.item[1].type === 'DropDownSectioned' && nextProps.item[1].id === 'selectedLocations' && nextProps.filter.filter[nextProps.item[1].id] !== this.props.filter.filter[this.props.item[1].id]) {
-                // console.log("Return true for sectioned drop down, ");
-                return true;
-            }
-            if (nextProps && nextProps.item && nextProps.item[1] && this.props && this.props.item && this.props.item[1] && nextProps.item[1].type === 'DropdownInput' && nextProps.item[1].id === 'exposure') {
-                // console.log("Return true for exposure: ");
-                return false;
-            }
+            return true
         }
 
         if (this.props.followUp) {
@@ -283,10 +268,17 @@ class CardComponent extends Component {
             }
             if (item.type === 'DropdownInput' && item.id === 'sortCriteria') {
                 let configSortCiteriaFilter = config.sortCriteriaDropDownItems.filter ((e) => {
-                    return this.props.filter.sort.map((k) => {return k.sortCriteria}).indexOf(this.getTranslation(e.value)) === -1
+                    return this.props.filter.sort.map((k) => {return k.sortCriteria}).indexOf(e.value) === -1
                 })
+
                 item.data = configSortCiteriaFilter.map((e) => { return {label: this.getTranslation(e.label), value: e.value }})
                 value = this.computeValueForCaseSortScreen(item, this.props.index);
+                // valueFromConfig = config.sortCriteriaDropDownItems.find((e) => {
+                //     return e.value === this.props.filter.sort[this.props.index][item.id]
+                // })
+                // if (valueFromConfig !== undefined && valueFromConfig && valueFromConfig.label){
+                //     value = valueFromConfig.label
+                // }
             }
             if (item.type === 'DropdownInput' && item.id === 'sortOrder') {
                 item.data = config.sortOrderDropDownItems.map((e) => { return {label: this.getTranslation(e.label), value: e.value }})
@@ -1086,7 +1078,7 @@ class CardComponent extends Component {
                         this.getTranslation(this.props.contact.addresses[index].geoLocation.coordinates[1]) : '';
                 } else {
                     return this.props.contact && this.props.contact.addresses && Array.isArray(this.props.contact.addresses) ?
-                                this.getTranslation(this.props.contact.addresses[index][item.id]) : '';
+                        this.getTranslation(this.props.contact.addresses[index][item.id]) : '';
                 }
             }
         }
@@ -1094,7 +1086,7 @@ class CardComponent extends Component {
     };
 
     computeValueForCaseSortScreen = (item, index) => {
-        if (index && index >= 0) {
+        if (index !== null && index >= 0) {
             if (item.objectType === 'Sort') {
                 return this.props.filter && this.props.filter.sort && Array.isArray(this.props.filter.sort) && this.props.filter.sort.length > 0 && this.props.filter.sort[index][item.id] !== undefined ?
                 this.getTranslation(this.props.filter.sort[index][item.id]) : '';

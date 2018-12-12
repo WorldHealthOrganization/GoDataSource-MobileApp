@@ -728,6 +728,9 @@ export function localSortContactsForFollowUps (contactsCopy, propsFilter, stateF
                         return e.age.years >= filterFromFilterScreen.age[0] && e.age.years <= filterFromFilterScreen.age[1]
                     }
                 }
+                if (filterFromFilterScreen.age[0] === 0 && filterFromFilterScreen.age[1] === 150) {
+                    return e.age === null || e.age === undefined
+                }
             });
         }
         // Take care of locations filter
@@ -755,7 +758,7 @@ export function localSortItems (itemsToSort, sortFilter) {
         let sortOrder = []
         for(let i = 0; i < sortFilter.length; i++) {
             if (sortFilter[i].sortCriteria && sortFilter[i].sortCriteria.trim().length > 0 && sortFilter[i].sortOrder && sortFilter[i].sortOrder.trim().length > 0){
-                sortCriteria.push(sortFilter[i].sortCriteria)
+                sortCriteria.push(sortFilter[i].sortCriteria === 'First Name' ? 'firstName' : 'lastNmae')
                 sortOrder.push(sortFilter[i].sortOrder === 'LNG_SIDE_FILTERS_SORT_BY_ASC_PLACEHOLDER' ? false : true)
             }
         }

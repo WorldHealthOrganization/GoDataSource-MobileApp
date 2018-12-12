@@ -1761,8 +1761,8 @@ const sortOrderDropDownItems = [
 ]
 
 const sortCriteriaDropDownItems = [
-    { label: 'First Name', value: 'firstName'},
-    { label: 'Last Name', value: 'lastName'}
+    { label: 'First Name', value: 'First Name'},
+    { label: 'Last Name', value: 'Last Name'}
 ]
 
 const userPermissions = {
