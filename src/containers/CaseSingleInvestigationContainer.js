@@ -30,16 +30,8 @@ class CaseSingleInvestigationContainer extends PureComponent {
     // and can slow down the app
     render() {
          // Get all additional questions recursively
-        let sortedQuestions = extractAllQuestions(this.props.questions, this.props.item);
-
-        // mappedQuestions format: [{categoryName: 'cat1', questions: [{q1}, {q2}]}]
-        sortedQuestions = mapQuestions(sortedQuestions);
-        // sortedQuestions = sortBy(sortedQuestions, ['categoryName']);
-        for (let i=0; i<sortedQuestions.length; i++) {
-            sortedQuestions[i].questions = sortBy(sortedQuestions[i].questions, ['order', 'variable']);
-        }
-        // Please add here the react lifecycle methods that you need
-
+        let sortedQuestions = sortBy(this.props.questions, ['order', 'variable']);
+        sortedQuestions = extractAllQuestions(sortedQuestions, this.props.item);
 
         return (
             <TouchableWithoutFeedback onPress={() => {
@@ -123,7 +115,7 @@ class CaseSingleInvestigationContainer extends PureComponent {
                     >
                         {
                             sortedQuestions.map((item, index) => {
-                                return this.handleRenderSectionedList(item, index)
+                                return this.handleRenderItem(item, index)
                             })
                         }
                     </KeyboardAwareScrollView>
