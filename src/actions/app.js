@@ -17,8 +17,7 @@ import {
 import url from '../utils/url';
 import config from './../utils/config';
 import {Dimensions} from 'react-native';
-import {Platform, NativeModules, Alert} from 'react-native';
-// import {getTranslationRequest} from './../requests/translation';
+import {Platform, Alert} from 'react-native';
 import {getAvailableLanguagesRequest, getTranslationRequest} from './../queries/translation';
 import {getHelpCategoryRequest} from '../queries/helpCategory';
 import {getHelpItemRequest} from '../queries/helpItem';
@@ -31,10 +30,7 @@ import {createDatabase, getDatabase} from './../queries/database';
 import {setNumberOfFilesProcessed, createZipFileAtPath, extractIdFromPouchId} from './../utils/functions';
 import {AsyncStorage} from 'react-native';
 import {getUserById} from './user';
-import {getFollowUpsForOutbreakId} from './followUps';
 import {uniq} from 'lodash';
-import {addError} from './errors';
-// import RNDB from 'react-native-nosql-to-sqlite';
 
 let arrayOfStatuses = [];
 
@@ -236,7 +232,9 @@ export function getAvailableLanguages(dispatch) {
 
 export function storeHubConfiguration(hubConfiguration) {
     return async function (dispatch) {
-        url.setBaseUrl(hubConfiguration.url);
+        // hubConfiguration = {url: databaseName, clientId: JSON.stringify({name, url, clientId, clientSecret}), clientSecret: databasePass}
+        let hubConfig = JSON.parse(hubConfiguration.clientId);
+        url.setBaseUrl(hubConfig.url);
         dispatch(setSyncState('Downloading database...'));
         // Store the HUB configuration(hubUrl, clientId, clientSecret) in the secure storage of each platform in order to be used later for syncing
         await setInternetCredentials(hubConfiguration.url, hubConfiguration.clientId, hubConfiguration.clientSecret);
@@ -277,6 +275,8 @@ export function storeHubConfiguration(hubConfiguration) {
 
 function processFilesForSync(error, response, hubConfiguration, isFirstTime, syncSuccessful, forceBulk) {
     return async function (dispatch, getState){
+        // hubConfiguration = {url: databaseName, clientId: JSON.stringify({name, url, clientId, clientSecret}), clientSecret: databasePass}
+        let hubConfig = JSON.parse(hubConfiguration.clientId);
         if (error) {
             dispatch(setSyncState('Error'));
         }
@@ -331,17 +331,119 @@ function processFilesForSync(error, response, hubConfiguration, isFirstTime, syn
                                             if (!errorActiveDatabase) {
                                                 storeData(hubConfiguration.url, new Date(), (errorStoreLastSync) => {
                                                     if (!errorStoreLastSync) {
-                                                        console.log('Responses promises: ', promiseResponses);
-                                                        files = null;
-                                                        database = null;
-                                                        arrayOfStatuses.push({
-                                                            text: 'Getting updated data from the server',
-                                                            status: 'OK'
-                                                        });
-                                                        dispatch(setSyncState("Finished processing"));
-                                                        if (!isFirstTime) {
-                                                            dispatch(parseStatusesAndShowMessage(getState().user._id));
-                                                        }
+                                                        // if all was successful, then store the database in async storage
+                                                        AsyncStorage.getItem('databases')
+                                                            .then((databasesString) => {
+                                                                if (databasesString && databasesString.length > 0) {
+                                                                    let databases = JSON.parse(databasesString);
+                                                                    // Check if the database already exists
+                                                                    if (databases && Array.isArray(databases) && databases.length > 0){
+                                                                        if (databases.find((e) => {return e.id === hubConfiguration.url})) {
+                                                                            // If the database already exists, then do nothing
+                                                                            console.log('Responses promises: ', promiseResponses);
+                                                                            files = null;
+                                                                            database = null;
+                                                                            arrayOfStatuses.push({
+                                                                                text: 'Getting updated data from the server',
+                                                                                status: 'OK'
+                                                                            });
+                                                                            dispatch(setSyncState("Finished processing"));
+                                                                            if (!isFirstTime) {
+                                                                                dispatch(parseStatusesAndShowMessage(getState().user._id));
+                                                                            } else {
+                                                                                dispatch(changeAppRoot('login'));
+                                                                            }
+                                                                        } else {
+                                                                            databases.push({id: hubConfiguration.url, name: hubConfig.name});
+                                                                            storeData('databases', JSON.stringify(databases), (errorSaveDatabases) => {
+                                                                                if (!errorSaveDatabases) {
+                                                                                    console.log('Responses promises: ', promiseResponses);
+                                                                                    files = null;
+                                                                                    database = null;
+                                                                                    arrayOfStatuses.push({
+                                                                                        text: 'Getting updated data from the server',
+                                                                                        status: 'OK'
+                                                                                    });
+                                                                                    dispatch(setSyncState("Finished processing"));
+                                                                                    if (!isFirstTime) {
+                                                                                        dispatch(parseStatusesAndShowMessage(getState().user._id));
+                                                                                    } else {
+                                                                                        dispatch(changeAppRoot('login'));
+                                                                                    }
+                                                                                } else {
+                                                                                    console.log('There was an error at storing last sync date: ', errorStoreLastSync);
+                                                                                    files = null;
+                                                                                    database = null;
+                                                                                    arrayOfStatuses.push({
+                                                                                        text: 'Getting updated data from the server',
+                                                                                        status: JSON.stringify(errorStoreLastSync)
+                                                                                    });
+                                                                                    dispatch(setSyncState('Error'));
+                                                                                    if (!isFirstTime) {
+                                                                                        dispatch(parseStatusesAndShowMessage(getState().user._id));
+                                                                                    }
+                                                                                }
+                                                                            })
+                                                                        }
+                                                                    } else {
+                                                                        console.log('There was an error at storing last sync date: ', errorStoreLastSync);
+                                                                        files = null;
+                                                                        database = null;
+                                                                        arrayOfStatuses.push({
+                                                                            text: 'Getting updated data from the server',
+                                                                            status: JSON.stringify(errorStoreLastSync)
+                                                                        });
+                                                                        dispatch(setSyncState('Error'));
+                                                                        if (!isFirstTime) {
+                                                                            dispatch(parseStatusesAndShowMessage(getState().user._id));
+                                                                        }
+                                                                    }
+                                                                } else {
+                                                                    let databases = [{id: hubConfiguration.url, name: hubConfig.name}];
+                                                                    storeData('databases', JSON.stringify(databases), (errorSaveDatabases) => {
+                                                                        if (!errorSaveDatabases) {
+                                                                            console.log('Responses promises: ', promiseResponses);
+                                                                            files = null;
+                                                                            database = null;
+                                                                            arrayOfStatuses.push({
+                                                                                text: 'Getting updated data from the server',
+                                                                                status: 'OK'
+                                                                            });
+                                                                            dispatch(setSyncState("Finished processing"));
+                                                                            if (!isFirstTime) {
+                                                                                dispatch(parseStatusesAndShowMessage(getState().user._id));
+                                                                            } else {
+                                                                                dispatch(changeAppRoot('login'));
+                                                                            }
+                                                                        } else {
+                                                                            console.log('There was an error at storing last sync date: ', errorStoreLastSync);
+                                                                            files = null;
+                                                                            database = null;
+                                                                            arrayOfStatuses.push({
+                                                                                text: 'Getting updated data from the server',
+                                                                                status: JSON.stringify(errorStoreLastSync)
+                                                                            });
+                                                                            dispatch(setSyncState('Error'));
+                                                                            if (!isFirstTime) {
+                                                                                dispatch(parseStatusesAndShowMessage(getState().user._id));
+                                                                            }
+                                                                        }
+                                                                    })
+                                                                }
+                                                            })
+                                                            .catch((errorDatabasesString) => {
+                                                                console.log('There was an error at storing last sync date: ', errorStoreLastSync);
+                                                                files = null;
+                                                                database = null;
+                                                                arrayOfStatuses.push({
+                                                                    text: 'Getting updated data from the server',
+                                                                    status: JSON.stringify(errorStoreLastSync)
+                                                                });
+                                                                dispatch(setSyncState('Error'));
+                                                                if (!isFirstTime) {
+                                                                    dispatch(parseStatusesAndShowMessage(getState().user._id));
+                                                                }
+                                                            })
                                                     } else {
                                                         console.log('There was an error at storing last sync date: ', errorStoreLastSync);
                                                         files = null;
@@ -776,8 +878,6 @@ export function appInitialized() {
 
         dispatch(saveScreenSize(screenSize));
 
-
-        // Here check if the user is already logged in and which database is he using
         try {
             let loggedUser = await AsyncStorage.getItem('loggedUser');
             console.log('Logged user: ', loggedUser);
@@ -800,7 +900,7 @@ export function appInitialized() {
                                         console.log('Database does not exist');
                                         dispatch(changeAppRoot('config'));
                                     }
-                                } catch(errorCreateDatabase) {
+                                } catch (errorCreateDatabase) {
                                     console.log('errorCreateDatabase: ', errorCreateDatabase);
                                     dispatch(changeAppRoot('config'));
                                 }
@@ -841,7 +941,7 @@ export function appInitialized() {
                                         console.log('Database does not exist');
                                         dispatch(changeAppRoot('config'));
                                     }
-                                } catch(errorCreateDatabase) {
+                                } catch (errorCreateDatabase) {
                                     console.log('errorCreateDatabase: ', errorCreateDatabase)
                                     dispatch(changeAppRoot('config'));
                                 }
@@ -882,7 +982,7 @@ export function appInitialized() {
                                     console.log('Database does not exist');
                                     dispatch(changeAppRoot('config'));
                                 }
-                            } catch(errorCreateDatabase) {
+                            } catch (errorCreateDatabase) {
                                 console.log('errorCreateDatabase: ', errorCreateDatabase)
                                 dispatch(changeAppRoot('config'));
                             }
@@ -903,6 +1003,9 @@ export function appInitialized() {
                 dispatch(changeAppRoot('config'));
             }
         }
+
+
+        // Here check if the user is already logged in and which database is he using
 
 
         // getData('loggedUser', (error, loggedUser) => {

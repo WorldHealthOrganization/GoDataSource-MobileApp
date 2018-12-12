@@ -24,6 +24,7 @@ import MapScreen from './MapScreen';
 import HelpScreen from './HelpScreen';
 import HelpFilterScreen from './HelpFilterScreen';
 import QRScanScreen from './QRScanScreen';
+import HubConfigScreen from './HubConfigScreen';
 
 const screens = [
     {screen: 'LoginScreen', component: LoginScreen},
@@ -45,7 +46,8 @@ const screens = [
     {screen: 'MapScreen', component: MapScreen},
     {screen: 'HelpScreen', component: HelpScreen},
     {screen: 'HelpFilterScreen', component: HelpFilterScreen},
-    {screen: 'QRScanScreen', component: QRScanScreen}
+    {screen: 'QRScanScreen', component: QRScanScreen},
+    {screen: 'HubConfigScreen', component: HubConfigScreen}
 ];
 
 export function registerScreens(store, Provider) {

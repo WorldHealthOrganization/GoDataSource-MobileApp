@@ -120,6 +120,7 @@ class FirstConfigScreen extends Component {
             animationType: 'fade'
         })
     };
+
     pushNewScreen = (QRCodeInfo) => {
         this.props.navigator.push({
             screen: 'ManualConfigScreen',
@@ -129,7 +130,7 @@ class FirstConfigScreen extends Component {
                 QRCodeInfo: QRCodeInfo
             }
         })
-    }
+    };
 }
 
 // Create style outside the class, or for components that will be used by other components (buttons),

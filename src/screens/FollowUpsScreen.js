@@ -164,7 +164,9 @@ class FollowUpsScreen extends Component {
             loading: true,
             generating: false,
         }, () => {
-            this.props.getFollowUpsForOutbreakId(this.props.user.activeOutbreakId, this.state.filter, null);
+            if (this.props.user && this.props.user.activeOutbreakId) {
+                this.props.getFollowUpsForOutbreakId(this.props.user.activeOutbreakId, this.state.filter, null);
+            }
         })
     };
 
