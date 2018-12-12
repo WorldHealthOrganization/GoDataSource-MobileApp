@@ -58,6 +58,10 @@ const tabsValuesRoutes = {
         {key: 'filters', title: translations.followUpFilter.filterTitle},
         {key: 'sort', title: translations.followUpFilter.sortTitle}
     ],
+    helpFilter: [
+        {key: 'filters', title: translations.helpFilter.filterTitle},
+        {key: 'sort', title: translations.helpFilter.sortTitle}
+    ],
     casesFilter: [
         {key: 'filters', title: translations.casesFilter.filterTitle},
         {key: 'sort', title: translations.casesFilter.sortTitle}
@@ -771,6 +775,73 @@ const followUpsFilterScreen = {
     sort: {
         fields: [
             {      
+                cardNumber: 1,
+                label: 'Sort by',
+                type: 'Section',
+                hasBorderBottom: true,
+                borderBottomColor: styles.navigationDrawerSeparatorGrey
+            },
+            {
+                cardNumber: 1,
+                id: 'sortCriteria',
+                type: 'DropdownInput',
+                label: 'Sort Criteria',
+                isRequired: false,
+                isEditMode: true,
+                value: '',
+                objectType: 'Sort'
+            },
+            {
+                cardNumber: 1,
+                id: 'sortOrder',
+                type: 'DropdownInput',
+                label: 'Sort Order',
+                isRequired: false,
+                isEditMode: true,
+                value: '',
+                objectType: 'Sort'
+            },
+            {
+                cardNumber: 1,
+                id: 'deleteButton',
+                type: 'ActionsBar',
+                labelValue: 'test',
+                textsArray: ['Delete'],
+                textsStyleArray: [{color: styles.missedRedColor}],
+                onPressArray: [],
+                objectType: 'Sort'
+            }
+        ]
+    }
+};
+
+const helpFilterScreen = {
+    filter: [
+        {
+            fields: [
+                {
+                    cardNumber: 3,
+                    label: translations.helpFilter.category,
+                    type: 'Section',
+                    hasBorderBottom: true,
+                    borderBottomColor: styles.navigationDrawerSeparatorGrey
+                },
+                {
+                    cardNumber: 3,
+                    id: 'categories',
+                    label: translations.followUpFilter.chooseLocationLabel,
+                    type: 'DropDown',
+                    value: '',
+                    isRequired: false,
+                    isEditMode: true,
+                    single: false
+                }
+            ]
+        }
+    ],
+    sort: {
+        fields: [
+            {
                 cardNumber: 1,
                 label: 'Sort by',
                 type: 'Section',
@@ -1830,6 +1901,7 @@ export default {
     tabsValuesRoutes,
     followUpsSingleScreen,
     followUpsFilterScreen,
+    helpFilterScreen,
     casesFilterScreen,
     caseSingleScreen,
     defaultFilterForContacts,

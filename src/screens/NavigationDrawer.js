@@ -73,7 +73,7 @@ class NavigationDrawer extends Component {
                     {
                         
                         config.sideMenuItems.map((item, index) => {
-                            let addButton = false
+                            let addButton = false;
                             if (item.addButton && item.addButton === true){
                                 let findPermission = undefined
                                 if (item.key === 'followups') {
@@ -118,6 +118,7 @@ class NavigationDrawer extends Component {
                             translation={this.props.translation}
                         />
                     </View>
+                    <NavigationDrawerListItem key={'help'} label={getTranslation(translations.navigationDrawer.helpLabel, this.props.translation)} name="help" onPress={() => this.handlePressOnListItem('help')} isSelected={'help' === this.state.selectedScreen}/>
                     <NavigationDrawerListItem label={getTranslation(translations.navigationDrawer.logoutLabel, this.props.translation)} name="power-settings-new" onPress={this.handleLogout} />
                 </View>
             </View>

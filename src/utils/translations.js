@@ -35,12 +35,19 @@ const followUpFilter = {
     sortTitle:'LNG_SIDE_FILTERS_SECTION_SORT_TITLE',
     followUpsFilterTitle: 'Follow-ups filters',
     contactFilterTitle: 'Contacts filters',
-    followUpsFilterTitle: 'Follow-ups filters',
 
     gender: 'LNG_CONTACT_FIELD_LABEL_GENDER',
     ageRange: 'Age range',
     area: 'LNG_ADDRESS_FIELD_LABEL_LOCATION',
     chooseLocationLabel: 'Choose one or more locations', 
+};
+
+const helpFilter = {
+    filterTitle: 'LNG_SIDE_FILTERS_TITLE',
+    sortTitle:'LNG_SIDE_FILTERS_SECTION_SORT_TITLE',
+    helpFilterTitle: 'Help filters',
+    category: 'Category',
+    chooseCategoryLabel: 'Choose one or more categories',
 };
 
 const caseSingleScreen = {
@@ -178,11 +185,16 @@ const followUpsScreen = {
     addExposureFollowUpLabel: 'Add Exposure'
 };
 
+const helpScreen = {
+    helpTitle: 'Help',
+    viewHelpLabel: 'View'
+};
+
 const missedFollowUpListItemLabels = {
     missedLabel: 'LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE_MISSED',
     lastFollowUp: 'LNG_ENTITY_FIELD_LABEL_LAST_FOLLOW_UP',
     nextFollowup: 'Next follow-up',
-}
+};
 
 const followUpsScreenStatusFilterValues = {
     allValue: 'LNG_COMMON_LABEL_ALL',
@@ -260,7 +272,7 @@ const questionCardLabels = {
     datePickerLabel: 'LNG_QUESTIONNAIRE_LABEL_SELECT_DATE',
     dropDownInputLabel: 'LNG_QUESTIONNAIRE_LABEL_SELECT_ANSWER',
     dropDownLabel: 'LNG_QUESTIONNAIRE_LABEL_SELECT_ANSWERS',
-}
+};
 
 const inAppNotificationScreen = {
     generatedFollowUps: 'generated follow-ups'
@@ -271,11 +283,11 @@ const firstConfigScreen = {
     infoMessage: 'Choose one of the options below to sync with your HUB:',
     qrScanButton: 'Scan QR',
     manualConfigButton: 'Config HUB Manually'
-}
+};
 
 const qrScanScreen = {
     title: 'Scan QR code'
-}
+};
 
 const manualConfigScreen = {
     title: 'HUB configuration',
@@ -283,7 +295,7 @@ const manualConfigScreen = {
     clientIdLabel: 'Client ID',
     clientSecretPass: 'Client secret',
     saveHubConfigButton: 'Save HUB configuration',
-}
+};
 
 const loginScreen = {
     welcomeMessage: 'Welcome',
@@ -302,13 +314,13 @@ const addressFieldLabels = {
     deleteButton: 'LNG_PAGE_ACTION_DELETE',
     longitude: 'LNG_LOCATION_FIELD_LABEL_GEO_LOCATION_LNG',
     latitude: 'LNG_LOCATION_FIELD_LABEL_GEO_LOCATION_LAT',
-}
+};
 
 const personTypes = {
     cases: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE',
     contacts: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT',
     events: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_EVENT'
-}
+};
 
 const userResidenceAddress = {
     userPlaceOfResidence: 'LNG_REFERENCE_DATA_CATEGORY_ADDRESS_TYPE_USUAL_PLACE_OF_RESIDENCE',
@@ -356,7 +368,7 @@ const dropDownSectionedLabels = {
     chooseMoreLocations: 'Choose one or more locations',
     searchPlaceholderText: 'Search regions',
     noLocationsMessage: 'There were no elements found',
-}
+};
 
 export default {
     navigationDrawer,
@@ -371,6 +383,8 @@ export default {
     loadingScreenMessages,
     contactSingleScreen,
     exposureScreen,
+    helpScreen,
+    helpFilter,
     followUpFilter,
     followUpsSingleScreen,
     followUpsScreen,
@@ -392,4 +406,4 @@ export default {
     dropDownSectionedLabels,
     missedFollowUpListItemLabels,
     questionCardLabels
-}
+};

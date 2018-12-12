@@ -21,6 +21,8 @@ import ContactsSingleScreen from './ContactsSingleScreen';
 import InAppNotificationScreen from './InAppNotificationScreen';
 import ExposureScreen from './ExposureScreen';
 import MapScreen from './MapScreen';
+import HelpScreen from './HelpScreen';
+import HelpFilterScreen from './HelpFilterScreen';
 import QRScanScreen from './QRScanScreen';
 
 const screens = [
@@ -41,6 +43,8 @@ const screens = [
     {screen: 'InAppNotificationScreen', component: InAppNotificationScreen},
     {screen: 'ExposureScreen', component: ExposureScreen},
     {screen: 'MapScreen', component: MapScreen},
+    {screen: 'HelpScreen', component: HelpScreen},
+    {screen: 'HelpFilterScreen', component: HelpFilterScreen},
     {screen: 'QRScanScreen', component: QRScanScreen}
 ];
 

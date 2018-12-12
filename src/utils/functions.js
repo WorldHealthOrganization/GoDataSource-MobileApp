@@ -102,6 +102,9 @@ export function navigation(event, navigator) {
                         screenToSwitchTo = "CasesScreen";
                         addScreen = "CaseSingleScreen";
                         break;
+                    case 'help':
+                        screenToSwitchTo = "HelpScreen";
+                    break;
                     default:
                         screenToSwitchTo = "FollowUpsScreen";
                         break;
