@@ -187,7 +187,8 @@ const followUpsScreen = {
 
 const helpScreen = {
     helpTitle: 'Help',
-    viewHelpLabel: 'View'
+    viewHelpLabel: 'View',
+    helpViewItemTitle: 'View Help Item'
 };
 
 const missedFollowUpListItemLabels = {

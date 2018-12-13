@@ -88,7 +88,7 @@ class HelpListItem extends PureComponent {
     // Please write here all the methods that are not react native lifecycle methods
     onPressHelpItem = () => {
         InteractionManager.runAfterInteractions(() => {
-
+            this.props.onPressViewHelp(this.props.item);
         });
     };
 

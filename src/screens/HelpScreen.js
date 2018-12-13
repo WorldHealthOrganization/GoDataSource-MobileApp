@@ -64,7 +64,7 @@ class HelpScreen extends Component {
         this.renderSeparatorComponent = this.renderSeparatorComponent.bind(this);
         this.listEmptyComponent = this.listEmptyComponent.bind(this);
         this.onSelectValue = this.onSelectValue.bind(this);
-        this.filterContacts = this.filterContacts.bind(this);
+        this.filterHelp = this.filterHelp.bind(this);
         this.handleBackButtonClick = this.handleBackButtonClick.bind(this);
     }
 
@@ -213,10 +213,7 @@ class HelpScreen extends Component {
     renderHelp = ({item}) => {
         return (<HelpListItem
             item={item}
-            onPressFollowUp={this.handlePressFollowUp}
-            onPressMissing={this.handleOnPressMissing}
-            onPressExposure={this.handleOnPressExposure}
-            onPressMap={this.handleOnPressMap}
+            onPressViewHelp={this.handlePressViewHelp}
             firstActionText={this.getTranslation(item.statusId)}
         />)
     };
@@ -268,101 +265,21 @@ class HelpScreen extends Component {
         });
     };
 
-    handlePressFollowUp = (item, contact) => {
+    handlePressViewHelp = (item) => {
         console.log("### handlePressFollowUp: ", item);
 
         let itemClone = Object.assign({}, item);
-        if (contact && contact.addresses && Array.isArray(contact.addresses) && contact.addresses.length > 0) {
-            let contactPlaceOfResidence = contact.addresses.filter((e) => {
-                return e.typeId === config.userResidenceAddress.userPlaceOfResidence
-            });
-            itemClone.address = contactPlaceOfResidence[0];
-        }
         this.props.navigator.push({
-            screen: 'FollowUpsSingleScreen',
+            screen: 'HelpSingleScreen',
             animated: true,
             animationType: 'fade',
             passProps: {
                 isNew: false,
                 item: itemClone,
-                contact: contact,
                 filter: this.state.filter,
                 startLoadingScreen: this.startLoadingScreen
             }
         })
-    };
-
-    handleOnPressMissing = (followUp, contact) => {
-
-        // Alert.alert('Warning', 'Are you sure you want to set this follow-up as missed?', [
-        //     {
-        //         text: 'No', onPress: () => {console.log("Cancel missing")}
-        //     },
-        //     {
-        //         text: 'Yes', onPress: () => {
-        //         let myFollowUp = Object.assign({}, followUp)
-        //         let myFollowups = Object.assign([], contact.followUps)
-        //
-        //         myFollowUp.statusId = config.followUpStatuses.missed
-        //         myFollowUp = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, myFollowUp), action = 'update')
-        //
-        //         myFollowups[myFollowups.map((e) => {return e._id}).indexOf(myFollowUp._id)] = myFollowUp
-        //         let myContact = Object.assign({}, contact, {followUps: myFollowups})
-        //
-        //         if (this.props && this.props.user && this.props.user.activeOutbreakId) {
-        //             this.props.updateFollowUpAndContact(this.props.user.activeOutbreakId, null, myFollowUp._id, myFollowUp, myContact, null);
-        //         }
-        //     }
-        //     }
-        // ])
-
-        console.log('Missed button is not here anymore');
-
-    };
-
-    handleOnPressExposure = (followUp, contact) => {
-        this.props.navigator.showModal({
-            screen: "ExposureScreen",
-            animated: true,
-            passProps: {
-                contact: contact,
-                type: 'Contact'
-            }
-        })
-    };
-
-    handleOnPressMap = (followUp, contact) => {
-        console.log("Handle on press map followUp: ", JSON.stringify(followUp));
-        console.log("Handle on press map contact: ", JSON.stringify(contact));
-
-        if (contact && contact.addresses && Array.isArray(contact.addresses) && contact.addresses.length > 0) {
-            let contactPlaceOfResidence = contact.addresses.filter((e) => {
-                return e.typeId === config.userResidenceAddress.userPlaceOfResidence
-            })
-            console.log('contactPlaceOfResidence', contactPlaceOfResidence)
-            let contactPlaceOfResidenceLatitude = contactPlaceOfResidence[0] && contactPlaceOfResidence[0].geoLocation && contactPlaceOfResidence[0].geoLocation.coordinates && Array.isArray(contactPlaceOfResidence[0].geoLocation.coordinates) && contactPlaceOfResidence[0].geoLocation.coordinates.length === 2 && contactPlaceOfResidence[0].geoLocation.coordinates[1] !== undefined && contactPlaceOfResidence[0].geoLocation.coordinates[1] !== null ? contactPlaceOfResidence[0].geoLocation.coordinates[1] : 0
-            let contactPlaceOfResidenceLongitude = contactPlaceOfResidence[0] && contactPlaceOfResidence[0].geoLocation && contactPlaceOfResidence[0].geoLocation.coordinates && Array.isArray(contactPlaceOfResidence[0].geoLocation.coordinates) && contactPlaceOfResidence[0].geoLocation.coordinates.length === 2 && contactPlaceOfResidence[0].geoLocation.coordinates[0] !== undefined && contactPlaceOfResidence[0].geoLocation.coordinates[0] !== null ? contactPlaceOfResidence[0].geoLocation.coordinates[0] : 0
-            navigator.geolocation.getCurrentPosition(
-                (position) => {
-                    this.setState({
-                        latitude: contactPlaceOfResidenceLatitude,
-                        longitude: contactPlaceOfResidenceLongitude,
-                        sourceLatitude: position.coords.latitude,
-                        sourceLongitude: position.coords.longitude,
-                        isVisible: true,
-                        error: null,
-                    });
-                },
-                (error) => {
-                    this.setState({error: error.message})
-                },
-            );
-
-            // this.props.navigator.showModal({
-            //     screen: 'MapScreen',
-            //     animated: true
-            // })
-        }
     };
 
     handlePressFilter = () => {
@@ -414,60 +331,7 @@ class HelpScreen extends Component {
     };
 
     applyFilters = () => {
-        // let filter = {};
-        //
-        // filter.where = {};
-        // filter.where.and = [];
-        //
-        // let oneDay = 24 * 60 * 60 * 1000;
-        //
-        // if (this.state.filter.date) {
-        //     filter.where.and.push({date: {gt: new Date(this.state.filter.date.getTime() - oneDay)}});
-        //     filter.where.and.push({date: {lt: new Date(this.state.filter.date.getTime() + oneDay)}});
-        // }
-        // else {
-        //     let now = new Date();
-        //
-        //     filter.where.and.push({date: {gt: new Date(now.getTime() - oneDay)}});
-        //     filter.where.and.push({date: {lt: new Date(now.getTime() + oneDay)}});
-        // }
-
         this.props.addFilterForScreen('FollowUpsScreen', this.state.filter);
-        //
-        // if (this.state.filter.performed === 'Missed') {
-        //     this.props.getMissedFollowUpsForOutbreakId(this.props.user.activeOutbreakId, filter, this.props.user.token);
-        // } else {
-        //     this.props.getFollowUpsForOutbreakId(this.props.user.activeOutbreakId, filter, this.props.user.token);
-        // }
-
-        // let defaultFilter = Object.assign({}, config.defaultFilterForContacts);
-
-        // Check if there is an active search
-        // if (this.state.filter.searchText) {
-        //     if (!defaultFilter.where || Object.keys(defaultFilter.where).length === 0) {
-        //         defaultFilter.where = {}
-        //     }
-        //     if (!defaultFilter.where.or || defaultFilter.where.or.length === 0) {
-        //         defaultFilter.where.or = [];
-        //     }
-        //     defaultFilter.where.or.push({firstName: {like: this.state.filter.searchText, options: 'i'}});
-        //     defaultFilter.where.or.push({lastName: {like: this.state.filter.searchText, options: 'i'}});
-        // }
-
-        //Check if there are active filters
-        // if (this.state.filterFromFilterScreen) {
-        //     defaultFilter.where = this.state.filterFromFilterScreen.where;
-        //     if (this.state.filter.searchText) {
-        //         if (!defaultFilter.where || Object.keys(defaultFilter.where).length === 0) {
-        //             defaultFilter.where = {}
-        //         }
-        //         if (!defaultFilter.where.or || defaultFilter.where.or.length === 0) {
-        //             defaultFilter.where.or = [];
-        //         }
-        //         defaultFilter.where.or.push({firstName: {like: this.state.filter.searchText, options: 'i'}});
-        //         defaultFilter.where.or.push({lastName: {like: this.state.filter.searchText, options: 'i'}});
-        //     }
-        // }
         this.setState({
             loading: true
         }, () => {
@@ -476,22 +340,8 @@ class HelpScreen extends Component {
     };
 
     handleOnSubmitEditing = (text) => {
-        // this.props.addFilterForScreen("FollowUpsScreen", this.state.filter);
-        // let existingFilter = this.state.filterFromFilterScreen ? Object.assign({}, this.state.filterFromFilterScreen) : Object.assign({}, config.defaultFilterForContacts);
-        //
-        // if (!existingFilter.where || Object.keys(existingFilter.where).length === 0) {
-        //     existingFilter.where = {};
-        // }
-        // if (!existingFilter.where.or || existingFilter.where.or.length === 0) {
-        //     existingFilter.where.or = [];
-        // }
-        // existingFilter.where.or.push({firstName: {like: this.state.filter.searchText, options: 'i'}});
-        // existingFilter.where.or.push({lastName: {like: this.state.filter.searchText, options: 'i'}});
-        //
-        // this.props.getContactsForOutbreakId(this.props.user.activeOutbreakId, existingFilter, this.props.user.token);
-
-        // Filter contacts by firstName and lastName
-        this.filterContacts();
+        // Filter help by title
+        this.filterHelp();
     };
 
     handleOnApplyFilters = (filter) => {
@@ -499,17 +349,7 @@ class HelpScreen extends Component {
         this.setState({
             filterFromFilterScreen: filter
         }, () => {
-            // if (this.state.filter.searchText) {
-            //
-            //     if (!filter.where.or || filter.where.or.length === 0) {
-            //         filter.where.or = [];
-            //     }
-            //     filter.where.or.push({firstName: {like: this.state.filter.searchText, options: 'i'}});
-            //     filter.where.or.push({lastName: {like: this.state.filter.searchText, options: 'i'}});
-            // }
-            // this.props.getContactsForOutbreakId(this.props.user.activeOutbreakId, filter, this.props.user.token);
-
-            this.filterContacts();
+            this.filterHelp();
         })
     };
 
@@ -520,7 +360,7 @@ class HelpScreen extends Component {
     // Method to filter the contacts inside the screen
     // Since the date filter on the FollowUps is always active, we can filter the contacts inside the screen
     // This means that on the contacts screen it has to be a filter on the database
-    filterContacts = () => {
+    filterHelp = () => {
         let contactsCopy = _.cloneDeep(this.props.contacts);
         contactsCopy = localSortContactsForFollowUps(contactsCopy, this.props.filter, this.state.filter, this.state.filterFromFilterScreen)
 

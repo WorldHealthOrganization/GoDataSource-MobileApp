@@ -22,6 +22,7 @@ import InAppNotificationScreen from './InAppNotificationScreen';
 import ExposureScreen from './ExposureScreen';
 import MapScreen from './MapScreen';
 import HelpScreen from './HelpScreen';
+import HelpSingleScreen from './HelpSingleScreen';
 import HelpFilterScreen from './HelpFilterScreen';
 import QRScanScreen from './QRScanScreen';
 import HubConfigScreen from './HubConfigScreen';
@@ -45,6 +46,7 @@ const screens = [
     {screen: 'ExposureScreen', component: ExposureScreen},
     {screen: 'MapScreen', component: MapScreen},
     {screen: 'HelpScreen', component: HelpScreen},
+    {screen: 'HelpSingleScreen', component: HelpSingleScreen},
     {screen: 'HelpFilterScreen', component: HelpFilterScreen},
     {screen: 'QRScanScreen', component: QRScanScreen},
     {screen: 'HubConfigScreen', component: HubConfigScreen}
