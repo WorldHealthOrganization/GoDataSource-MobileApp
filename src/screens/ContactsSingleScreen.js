@@ -1209,8 +1209,16 @@ class ContactsSingleScreen extends Component {
         console.log("DeletePressed: ", index);
         let contactAddressesClone = _.cloneDeep(this.state.contact.addresses);
         contactAddressesClone.splice(index, 1);
+
+        let hasPlaceOfResidence = false
+        let caselaceOfResidence = caseAddressesClone.find((e) => {return e.typeId === config.userResidenceAddress.userPlaceOfResidence})
+        if (caselaceOfResidence !== undefined) {
+            hasPlaceOfResidence = true
+        }
+
         this.setState(prevState => ({
-            contact: Object.assign({}, prevState.contact, {addresses: contactAddressesClone})
+            contact: Object.assign({}, prevState.contact, {addresses: contactAddressesClone}),
+            hasPlaceOfResidence
         }), () => {
             console.log("After deleting the address: ", this.state.contact);
         })
