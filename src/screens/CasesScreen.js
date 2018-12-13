@@ -310,7 +310,7 @@ class CasesScreen extends Component {
         })
     };
 
-    //Filter cases by selected criteria
+    // Filter cases by selected criteria
     handleOnApplyFilters = (filter) => {
         this.setState({
             filterFromFilterScreen: filter

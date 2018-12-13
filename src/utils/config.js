@@ -772,7 +772,7 @@ const followUpsFilterScreen = {
         fields: [
             {      
                 cardNumber: 1,
-                label: 'Sort by',
+                label: translations.sortTab.sortBy,
                 type: 'Section',
                 hasBorderBottom: true,
                 borderBottomColor: styles.navigationDrawerSeparatorGrey
@@ -781,7 +781,7 @@ const followUpsFilterScreen = {
                 cardNumber: 1,
                 id: 'sortCriteria',
                 type: 'DropdownInput',
-                label: 'Sort Criteria',
+                label: translations.sortTab.sortCriteria,
                 isRequired: false,
                 isEditMode: true,
                 value: '',
@@ -791,7 +791,7 @@ const followUpsFilterScreen = {
                 cardNumber: 1,
                 id: 'sortOrder',
                 type: 'DropdownInput',
-                label: 'Sort Order',
+                label: translations.sortTab.sortOrder,
                 isRequired: false,
                 isEditMode: true,
                 value: '',
@@ -895,9 +895,8 @@ const casesFilterScreen = {
     sort: {
         fields: [
             {
-                // LNG_SIDE_FILTERS_ADD_ANOTHER_SORT_BUTTON         
                 cardNumber: 1,
-                label: 'Sort by', //LNG_SIDE_FILTERS_SORT_BY_PLACEHOLDER
+                label: translations.sortTab.sortBy,
                 type: 'Section',
                 hasBorderBottom: true,
                 borderBottomColor: styles.navigationDrawerSeparatorGrey
@@ -906,7 +905,7 @@ const casesFilterScreen = {
                 cardNumber: 1,
                 id: 'sortCriteria',
                 type: 'DropdownInput',
-                label: 'Sort Criteria',
+                label: translations.sortTab.sortCriteria,
                 isRequired: false,
                 isEditMode: true,
                 value: '',
@@ -916,7 +915,7 @@ const casesFilterScreen = {
                 cardNumber: 1,
                 id: 'sortOrder',
                 type: 'DropdownInput',
-                label: 'Sort Order', //LNG_SIDE_FILTERS_SORT_DIRECTION_LABEL
+                label: translations.sortTab.sortOrder,
                 isRequired: false,
                 isEditMode: true,
                 value: '',
