@@ -136,7 +136,7 @@ class CasesScreen extends Component {
             outputRange: [1, 0],
             extrapolate: 'clamp',
         });
-        let caseTitle = []; caseTitle[1] = getTranslation(translations.casesScreen.casesTitle, this.props.translation);
+        let caseTitle = []; caseTitle[0] = getTranslation(translations.casesScreen.casesTitle, this.props.translation);
         return (
             <ViewHOC style={style.container}
                      showLoader={(this.props && this.props.syncState && (this.props.syncState !== 'Finished processing' && this.props.syncState !== 'Error')) || (this && this.state && this.state.loading)}

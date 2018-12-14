@@ -120,7 +120,7 @@ class ContactsScreen extends Component {
             outputRange: [1, 0],
             extrapolate: 'clamp',
         });
-        let contactTitle = []; contactTitle[1] = getTranslation(translations.contactsScreen.contactsTitle, this.props.translation);
+        let contactTitle = []; contactTitle[0] = getTranslation(translations.contactsScreen.contactsTitle, this.props.translation);
         return (
             <ViewHOC style={style.container}
                      showLoader={(this.props && this.props.syncState && (this.props.syncState !== 'Finished processing' && this.props.syncState !== 'Error')) || (this && this.state && this.state.loading)}
