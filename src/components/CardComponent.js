@@ -287,10 +287,6 @@ class CardComponent extends Component {
             if (item.type === 'ActionsBar') {
                 item.onPressArray = [this.props.onDeletePress]
             }
-            if (item.type === 'DropDown' && item.id === 'categories') {
-                data = this.computeDataForDropdown(item);
-                value = this.props.filter.filter[item.id];
-            }
         }
 
         if (this.props.screen === 'HelpFilter') {
