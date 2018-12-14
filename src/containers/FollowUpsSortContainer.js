@@ -6,7 +6,7 @@
 import React, {PureComponent} from 'react';
 import {TextInput, View, Text, StyleSheet, Platform, Dimensions, Image} from 'react-native';
 import {ListItem, Icon} from 'react-native-material-ui';
-import {calculateDimension} from './../utils/functions';
+import {calculateDimension, getTranslation} from './../utils/functions';
 import config from './../utils/config';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -17,6 +17,7 @@ import Ripple from 'react-native-material-ripple';
 import ElevatedView from 'react-native-elevated-view';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import CardComponent from './../components/CardComponent';
+import translations from './../utils/translations'
 
 class FollowUpsSortContainer extends PureComponent {
 
@@ -24,7 +25,7 @@ class FollowUpsSortContainer extends PureComponent {
     constructor(props) {
         super(props);
         this.state = {
-            addSortRuleText: 'Add sort rule'
+            addSortRuleText: getTranslation(translations.sortTab.addSortRule, this.props.translation)
         };
     }
 
@@ -81,7 +82,7 @@ class FollowUpsSortContainer extends PureComponent {
                 </KeyboardAwareScrollView>   
                 <View style={style.containerButtonApplyFilters}>
                 <Button
-                        title="Apply filters"
+                        title={getTranslation(translations.generalLabels.applyFiltersButton, this.props.translation)}
                         color={styles.buttonGreen}
                         onPress={this.props.onPressApplyFilters}
                         width={calculateDimension(343, false, this.props.screenSize)}
@@ -148,7 +149,8 @@ function mapStateToProps(state) {
         screenSize: state.app.screenSize,
         contacts: state.contacts,
         cases: state.cases,
-        events: state.events
+        events: state.events,
+        translation: state.app.translation,
     };
 }
 

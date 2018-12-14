@@ -46,27 +46,13 @@ class CardComponent extends Component {
     // Please add here the react lifecycle methods that you need
     shouldComponentUpdate(nextProps, nextState) {
         if (nextProps.screen === 'FollowUpsFilter' || nextProps.screen === 'CasesFilter') {
-            if (nextProps && nextProps.item && nextProps.item[1] && this.props && this.props.item && this.props.item[1] && nextProps.item[1].type === 'Selector' && nextProps.item[1].id === 'gender') {
-                // console.log("Return true for selector: ", nextProps.filter.filter[nextProps.item[1].id], this.props.filter.filter[this.props.item[1].id]);
-                return true;
-            }
-            if (nextProps && nextProps.item && nextProps.item[1] && this.props && this.props.item && this.props.item[1] && nextProps.item[1].type === 'IntervalPicker' && nextProps.item[1].id === 'age' && nextProps.filter.filter[nextProps.item[1].id] !== this.props.filter.filter[this.props.item[1].id]) {
-                // console.log("Return true for interval: ");
-                return true;
-            }
-            if (nextProps && nextProps.item && nextProps.item[1] && this.props && this.props.item && this.props.item[1] && nextProps.item[1].type === 'DropDownSectioned' && nextProps.item[1].id === 'selectedLocations' && nextProps.filter.filter[nextProps.item[1].id] !== this.props.filter.filter[this.props.item[1].id]) {
-                // console.log("Return true for sectioned drop down, ");
-                return true;
-            }
-            if (nextProps && nextProps.item && nextProps.item[1] && this.props && this.props.item && this.props.item[1] && nextProps.item[1].type === 'DropdownInput' && nextProps.item[1].id === 'exposure') {
-                // console.log("Return true for exposure: ");
-                return false;
-            }
+            return true
         }
 
         if (this.props.followUp) {
-            console.log("It's for single screen followUp");
-            return true
+            if (this.props.followUp.date !== nextProps.followUp.date) {
+                return true
+            }
         }
 
         let myDatePickerItems = []
@@ -282,10 +268,17 @@ class CardComponent extends Component {
             }
             if (item.type === 'DropdownInput' && item.id === 'sortCriteria') {
                 let configSortCiteriaFilter = config.sortCriteriaDropDownItems.filter ((e) => {
-                    return this.props.filter.sort.map((k) => {return k.sortCriteria}).indexOf(this.getTranslation(e.value)) === -1
+                    return this.props.filter.sort.map((k) => {return k.sortCriteria}).indexOf(e.value) === -1
                 })
+
                 item.data = configSortCiteriaFilter.map((e) => { return {label: this.getTranslation(e.label), value: e.value }})
                 value = this.computeValueForCaseSortScreen(item, this.props.index);
+                // valueFromConfig = config.sortCriteriaDropDownItems.find((e) => {
+                //     return e.value === this.props.filter.sort[this.props.index][item.id]
+                // })
+                // if (valueFromConfig !== undefined && valueFromConfig && valueFromConfig.label){
+                //     value = valueFromConfig.label
+                // }
             }
             if (item.type === 'DropdownInput' && item.id === 'sortOrder') {
                 item.data = config.sortOrderDropDownItems.map((e) => { return {label: this.getTranslation(e.label), value: e.value }})
@@ -313,10 +306,10 @@ class CardComponent extends Component {
             if (item.type === 'ActionsBar') {
                 item.onPressArray = [this.props.onDeletePress]
             }
+
             if (item.type === 'DatePicker' && item.objectType !== 'Address') {
                 value = this.props.contact[item.id]
-            }
-            if (item.type === 'DropDownSectioned') {
+            } else if (item.type === 'DropDownSectioned') {
                 if (this.props.contact && this.props.contact.addresses && Array.isArray(this.props.contact.addresses) && this.props.contact.addresses[this.props.index] && this.props.contact.addresses[this.props.index][item.id] && this.props.contact.addresses[this.props.index][item.id] !== "") {
                     for (let location of this.props.locations) {
                         let myLocationName = this.getLocationNameById(location, this.props.contact.addresses[this.props.index][item.id])
@@ -326,9 +319,12 @@ class CardComponent extends Component {
                         }
                     }
                 }
+            } else if (item.type === 'SwitchInput' && this.props.contact[item.id] !== undefined) {
+                value = this.props.contact[item.id]
             } else {
                 value = this.computeValueForContactsSingleScreen(item, this.props.index);
             }
+
             if (this.props.selectedItemIndexForTextSwitchSelectorForAge !== null && this.props.selectedItemIndexForTextSwitchSelectorForAge !== undefined && item.objectType === 'Contact' && item.dependsOn !== undefined && item.dependsOn !== null){
                 let itemIndexInConfigTextSwitchSelectorValues = config[item.dependsOn].map((e) => {return e.value}).indexOf(item.id)
                 if (itemIndexInConfigTextSwitchSelectorValues > -1) {
@@ -342,10 +338,6 @@ class CardComponent extends Component {
             }
         }
 
-        if (this.props.screen === 'ContactsSingleScreenAddress') {
-            console.log("ContactsSingleScreenAddress: ", item);
-        }
-
         if (this.props.screen === 'CaseSingleScreen') {
             if (item.type === 'DropdownInput') {
                 item.data = this.computeDataForCasesSingleScreenDropdownInput(item, this.props.index);
@@ -353,6 +345,7 @@ class CardComponent extends Component {
             if (item.type === 'ActionsBar') {
                 item.onPressArray = [this.props.onDeletePress]
             }
+
             if (item.type === 'DatePicker' && this.props.case[item.id] !== undefined) {
                 value = this.props.case[item.id]
             } else if (item.type === 'DropDownSectioned') {
@@ -365,6 +358,8 @@ class CardComponent extends Component {
                         }
                     }
                 }
+            } else if (item.type === 'SwitchInput' && this.props.case[item.id] !== undefined) {
+                value = this.props.case[item.id]
             } else {
                 value = this.computeValueForCasesSingleScreen(item, this.props.index);
             }
@@ -382,10 +377,12 @@ class CardComponent extends Component {
             if (item.type === 'DropdownInput') {
                 item.data = this.computeDataForFollowUpSingleScreenDropdownInput(item, this.props.index);
             }
-            if (item.type === 'SwitchInput' && this.props.followUp[item.id] !== undefined) {
+            
+            if (item.type === 'DatePicker' && this.props.followUp[item.id] !== undefined) {
                 value = this.props.followUp[item.id]
-            }
-            if (item.type === 'DropDownSectioned') {
+            } else if (item.type === 'SwitchInput' && this.props.followUp[item.id] !== undefined) {
+                value = this.props.followUp[item.id]
+            } else if (item.type === 'DropDownSectioned') {
                 if (this.props.followUp && this.props.followUp.address && this.props.followUp.address[item.id] && this.props.followUp.address[item.id] !== "") {
                     for (let i = 0; i < this.props.locations.length; i++) {
                         let myLocationName = this.getLocationNameById(this.props.locations[i], this.props.followUp.address[item.id])
@@ -1081,7 +1078,7 @@ class CardComponent extends Component {
                         this.getTranslation(this.props.contact.addresses[index].geoLocation.coordinates[1]) : '';
                 } else {
                     return this.props.contact && this.props.contact.addresses && Array.isArray(this.props.contact.addresses) ?
-                                this.getTranslation(this.props.contact.addresses[index][item.id]) : '';
+                        this.getTranslation(this.props.contact.addresses[index][item.id]) : '';
                 }
             }
         }
@@ -1089,7 +1086,7 @@ class CardComponent extends Component {
     };
 
     computeValueForCaseSortScreen = (item, index) => {
-        if (index && index >= 0) {
+        if (index !== null && index >= 0) {
             if (item.objectType === 'Sort') {
                 return this.props.filter && this.props.filter.sort && Array.isArray(this.props.filter.sort) && this.props.filter.sort.length > 0 && this.props.filter.sort[index][item.id] !== undefined ?
                 this.getTranslation(this.props.filter.sort[index][item.id]) : '';

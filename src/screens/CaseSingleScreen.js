@@ -144,7 +144,7 @@ class CaseSingleScreen extends Component {
         if (props.errors && props.errors.type && props.errors.message) {
             Alert.alert(props.errors.type, props.errors.message, [
                 {
-                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation), 
+                    text: getTranslation(translations.alertMessages.okButtonLabel, props.translation), 
                     onPress: () => {
                         state.savePressed = false;
                         props.removeErrors()
@@ -755,9 +755,17 @@ class CaseSingleScreen extends Component {
         console.log("DeletePressed: ", index);
         let caseAddressesClone = _.cloneDeep(this.state.case.addresses);
         caseAddressesClone.splice(index, 1);
+
+        let hasPlaceOfResidence = false
+        let caselaceOfResidence = caseAddressesClone.find((e) => {return e.typeId === config.userResidenceAddress.userPlaceOfResidence})
+        if (caselaceOfResidence !== undefined) {
+            hasPlaceOfResidence = true
+        }
+
         this.setState(prevState => ({
             case: Object.assign({}, prevState.case, {addresses: caseAddressesClone}),
-            isModified: true
+            isModified: true,
+            hasPlaceOfResidence
         }), () => {
             console.log("After deleting the address: ", this.state.case);
         })

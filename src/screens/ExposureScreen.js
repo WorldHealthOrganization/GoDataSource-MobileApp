@@ -78,7 +78,7 @@ class ExposureScreen extends Component {
         if (props.errors && props.errors.type && props.errors.message) {
             Alert.alert(props.errors.type, props.errors.message, [
                 {
-                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+                    text: getTranslation(translations.alertMessages.okButtonLabel, props.translation),
                     onPress: () => {
                         state.savePressed = false;
                         props.removeErrors()

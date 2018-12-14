@@ -98,7 +98,8 @@ function mapStateToProps(state) {
         screenSize: state.app.screenSize,
         contacts: state.contacts,
         cases: state.cases,
-        events: state.events
+        events: state.events,
+        translation: state.app.translation,
     };
 }
 

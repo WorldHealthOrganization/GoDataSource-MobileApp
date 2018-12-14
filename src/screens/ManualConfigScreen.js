@@ -63,7 +63,7 @@ class ManualConfigScreen extends Component {
         if (props.errors && props.errors.type && props.errors.message) {
             Alert.alert(props.errors.type, props.errors.message, [
                 {
-                    text: getTranslation(translations.alertMessages.okButtonLabel, null), 
+                    text: getTranslation(translations.alertMessages.okButtonLabel, null),
                     onPress: () => {props.removeErrors()}
                 }
             ])

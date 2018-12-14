@@ -136,6 +136,24 @@ class CasesScreen extends Component {
             outputRange: [1, 0],
             extrapolate: 'clamp',
         });
+
+        let filterNumbers = 0;
+        if (this.state.filterFromFilterScreen) {
+            if (this.state.filterFromFilterScreen.gender && this.state.filterFromFilterScreen.gender !== null && this.state.filterFromFilterScreen.gender !== undefined) {
+                ++filterNumbers
+            }
+            if (this.state.filterFromFilterScreen.age && this.state.filterFromFilterScreen.age.length > 0) {
+                ++filterNumbers
+            }
+            if (this.state.filterFromFilterScreen.selectedLocations && this.state.filterFromFilterScreen.selectedLocations.length > 0) {
+                ++filterNumbers
+            }
+            if (this.state.filterFromFilterScreen.classification && this.state.filterFromFilterScreen.classification.length > 0) {
+                ++filterNumbers
+            }
+        }
+        let filterText = filterNumbers === 0 ? `${getTranslation(translations.generalLabels.filterTitle, this.props.translation)}` : `${getTranslation(translations.generalLabels.filterTitle, this.props.translation)}(${filterNumbers})`
+
         let caseTitle = []; caseTitle[0] = getTranslation(translations.casesScreen.casesTitle, this.props.translation);
         return (
             <ViewHOC style={style.container}
@@ -211,7 +229,7 @@ class CasesScreen extends Component {
                                 onPress={this.handlePressFilter}
                                 onChangeText={this.handleOnChangeText}
                                 onSubmitEditing={this.handleOnSubmitEditing}
-                                filterText={(this.state.filterFromFilterScreen && Object.keys(this.state.filterFromFilterScreen).length > 0) ? (getTranslation(translations.generalLabels.filterTitle, this.props.translation) + " (" + Object.keys(this.state.filterFromFilterScreen).length + ')') : getTranslation(translations.generalLabels.filterTitle, this.props.translation)}
+                                filterText={filterText}
                             />
                         }
                         ItemSeparatorComponent={this.renderSeparatorComponent}
@@ -297,7 +315,7 @@ class CasesScreen extends Component {
         })
     };
 
-    //Filter cases by selected criteria
+    // Filter cases by selected criteria
     handleOnApplyFilters = (filter) => {
         this.setState({
             filterFromFilterScreen: filter
