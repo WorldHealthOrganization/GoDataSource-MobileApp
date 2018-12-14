@@ -4,7 +4,7 @@ import { createStore, applyMiddleware } from 'redux';
 import thunk from 'redux-thunk';
 import promise from 'redux-promise';
 import { createLogger } from 'redux-logger';
-import { Platform } from 'react-native';
+import { Platform, DeviceEventEmitter } from 'react-native';
 
 import appReducers from './reducers';
 import appActions from './actions';
@@ -23,6 +23,9 @@ registerScreens(store, Provider);
 export default class App {
 
     constructor() {
+        DeviceEventEmitter.addListener('onPushReceived', (item) => {
+            console.log('~~~ TODO onPushReceived ~~~', item)
+        })
         store.subscribe(this.onStoreUpdate);
         store.dispatch(appActions.appInitialized());
     };

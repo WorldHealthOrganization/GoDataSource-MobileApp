@@ -42,6 +42,7 @@
 		2DF0FFEE2056DD460020B375 /* libReact.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DAD3EA31DF850E9000B6D8A /* libReact.a */; };
 		3424E5E84C7944318A7900BD /* Roboto-ThinItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 4EEF426F4A7B44068C424A73 /* Roboto-ThinItalic.ttf */; };
 		375529ADF1CB461D91661EF3 /* Octicons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = D76C7890181046A1AA3452BD /* Octicons.ttf */; };
+		3B06BE0721C3DBFA0012D9C0 /* APNSEventEmitter.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B06BE0621C3DBFA0012D9C0 /* APNSEventEmitter.m */; };
 		40F9574B44134A71916EAD47 /* libRNKeychain.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4610B02DCF40411D92FB00ED /* libRNKeychain.a */; };
 		4AED598218A74F9CA423E6C6 /* SimpleLineIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 1167A5CFED3D417C93EF4604 /* SimpleLineIcons.ttf */; };
 		4FA28C1F731A478998412FD9 /* Roboto-Black.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 5A1454C683FF43BEA12EA238 /* Roboto-Black.ttf */; };
@@ -76,7 +77,6 @@
 		F255A1F42170B49400D93AFE /* libRNFS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F255A1EC2170B48100D93AFE /* libRNFS.a */; };
 		F255A2632174FD7D00D93AFE /* libAirMaps.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F255A2342174FD7500D93AFE /* libAirMaps.a */; };
 		F25C2F8920EE09E8008F1CFD /* libRNVectorIcons.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F25C2F8820EE09DD008F1CFD /* libRNVectorIcons.a */; };
-		F27CB2EE21A6CCA8009A2B74 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F27CB2ED21A6CCA8009A2B74 /* StoreKit.framework */; };
 		F2A532F120D7F9AD006F1EF1 /* libReactNativeNavigation.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F2A532F020D7F95F006F1EF1 /* libReactNativeNavigation.a */; };
 /* End PBXBuildFile section */
 
@@ -488,6 +488,8 @@
 		35B2425CB10C49F3AA11270F /* libreactnativeuilib.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libreactnativeuilib.a; sourceTree = "<group>"; };
 		36CD33FF1E2440C090C0C138 /* MaterialIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = MaterialIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/MaterialIcons.ttf"; sourceTree = "<group>"; };
 		3AE4AE468ABF483A96273BDA /* Roboto-Bold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Roboto-Bold.ttf"; path = "../assets/fonts/Roboto/Roboto-Bold.ttf"; sourceTree = "<group>"; };
+		3B06BE0521C3DBFA0012D9C0 /* APNSEventEmitter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = APNSEventEmitter.h; sourceTree = "<group>"; };
+		3B06BE0621C3DBFA0012D9C0 /* APNSEventEmitter.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = APNSEventEmitter.m; sourceTree = "<group>"; };
 		3F94250387284F21930E14C1 /* libRNFS.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRNFS.a; sourceTree = "<group>"; };
 		402AC17241C218224A7E12DA /* Pods-who_mobile.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-who_mobile.release.xcconfig"; path = "Pods/Target Support Files/Pods-who_mobile/Pods-who_mobile.release.xcconfig"; sourceTree = "<group>"; };
 		4610B02DCF40411D92FB00ED /* libRNKeychain.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRNKeychain.a; sourceTree = "<group>"; };
@@ -528,7 +530,6 @@
 		F255A1BE2170B48100D93AFE /* RNFS.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNFS.xcodeproj; path = "../node_modules/react-native-fs/RNFS.xcodeproj"; sourceTree = "<group>"; };
 		F255A22F2174FD7500D93AFE /* AirMaps.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = AirMaps.xcodeproj; path = "../node_modules/react-native-maps/lib/ios/AirMaps.xcodeproj"; sourceTree = "<group>"; };
 		F25C2F8320EE09DD008F1CFD /* RNVectorIcons.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNVectorIcons.xcodeproj; path = "../node_modules/react-native-vector-icons/RNVectorIcons.xcodeproj"; sourceTree = "<group>"; };
-		F27CB2ED21A6CCA8009A2B74 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		F2A532C620D7F95F006F1EF1 /* ReactNativeNavigation.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = ReactNativeNavigation.xcodeproj; path = "../node_modules/react-native-navigation/ios/ReactNativeNavigation.xcodeproj"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -563,7 +564,6 @@
 				00C302E91ABCBA2D00DB3ED1 /* libRCTNetwork.a in Frameworks */,
 				139105C61AF99C1200B5F7CC /* libRCTSettings.a in Frameworks */,
 				832341BD1AAA6AB300B99B32 /* libRCTText.a in Frameworks */,
-				F27CB2EE21A6CCA8009A2B74 /* StoreKit.framework in Frameworks */,
 				00C302EA1ABCBA2D00DB3ED1 /* libRCTVibration.a in Frameworks */,
 				139FDEF61B0652A700C62182 /* libRCTWebSocket.a in Frameworks */,
 				557BCF373766454C8BC6BEAB /* libreactnativeuilib.a in Frameworks */,
@@ -691,6 +691,8 @@
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				13B07FB11A68108700A75B9A /* LaunchScreen.xib */,
 				13B07FB71A68108700A75B9A /* main.m */,
+				3B06BE0521C3DBFA0012D9C0 /* APNSEventEmitter.h */,
+				3B06BE0621C3DBFA0012D9C0 /* APNSEventEmitter.m */,
 			);
 			name = who_mobile;
 			sourceTree = "<group>";
@@ -737,7 +739,6 @@
 		2D16E6871FA4F8E400B85C8A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				F27CB2ED21A6CCA8009A2B74 /* StoreKit.framework */,
 				2D16E6891FA4F8E400B85C8A /* libReact.a */,
 				0920F0C3919E4A1EB5DD538C /* libz.tbd */,
 				0ECADE128F14DBEA491FB6A9 /* libPods-who_mobile.a */,
@@ -1006,6 +1007,7 @@
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
+				07E4873D9D3013C60C5F5FDE /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -1069,16 +1071,19 @@
 					};
 					13B07F861A680F5B00A75B9A = {
 						DevelopmentTeam = HT9KH229F3;
-						ProvisioningStyle = Manual;
+						ProvisioningStyle = Automatic;
 						SystemCapabilities = {
+							com.apple.GameCenter.iOS = {
+								enabled = 0;
+							};
 							com.apple.InAppPurchase = {
-								enabled = 1;
+								enabled = 0;
 							};
 							com.apple.Push = {
 								enabled = 1;
 							};
 							com.apple.iCloud = {
-								enabled = 1;
+								enabled = 0;
 							};
 						};
 					};
@@ -1646,6 +1651,24 @@
 			shellPath = /bin/sh;
 			shellScript = "export NODE_BINARY=node\n../node_modules/react-native/scripts/react-native-xcode.sh";
 		};
+		07E4873D9D3013C60C5F5FDE /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${SRCROOT}/Pods/Target Support Files/Pods-who_mobile/Pods-who_mobile-resources.sh",
+				"${PODS_CONFIGURATION_BUILD_DIR}/Parse/Parse.bundle",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Parse.bundle",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-who_mobile/Pods-who_mobile-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
 		2D02E4CB1E0B4B27006451C7 /* Bundle React Native Code And Images */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -1695,6 +1718,7 @@
 			files = (
 				13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */,
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
+				3B06BE0721C3DBFA0012D9C0 /* APNSEventEmitter.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1747,6 +1771,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
 				DEVELOPMENT_TEAM = HT9KH229F3;
@@ -1786,6 +1811,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
 				COPY_PHASE_STRIP = NO;
 				DEVELOPMENT_TEAM = HT9KH229F3;
@@ -1825,7 +1851,7 @@
 				CODE_SIGN_ENTITLEMENTS = who_mobile/who_mobile.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = NO;
 				DEVELOPMENT_TEAM = HT9KH229F3;
@@ -1850,8 +1876,8 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.clarisoft.who;
 				PRODUCT_NAME = who_mobile;
-				PROVISIONING_PROFILE = "931e88c5-1726-401b-8502-e4abea04d2bb";
-				PROVISIONING_PROFILE_SPECIFIER = "WHO GO.Data Development";
+				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Debug;
@@ -1864,7 +1890,7 @@
 				CODE_SIGN_ENTITLEMENTS = who_mobile/who_mobile.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = HT9KH229F3;
 				HEADER_SEARCH_PATHS = (
@@ -1888,8 +1914,8 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.clarisoft.who;
 				PRODUCT_NAME = who_mobile;
-				PROVISIONING_PROFILE = "931e88c5-1726-401b-8502-e4abea04d2bb";
-				PROVISIONING_PROFILE_SPECIFIER = "WHO GO.Data Development";
+				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Release;
