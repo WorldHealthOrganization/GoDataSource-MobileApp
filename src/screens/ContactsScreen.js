@@ -146,7 +146,7 @@ class ContactsScreen extends Component {
                                     justifyContent: 'center',
                                     alignItems: 'center'
                                 }} onPress={console.log('merge from another branch')}>
-                                    <Icon name="qrcode-scan" color={'black'} size={20}/>
+                                    <MaterialCommunityIcons name="qrcode-scan" color={'black'} size={20}/>
                                 </Ripple>
                             </View>
 
