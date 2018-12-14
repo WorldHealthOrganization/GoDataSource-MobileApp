@@ -54,19 +54,23 @@ class Breadcrumb extends PureComponent {
                 marginLeft: calculateDimension(16, false, this.props.screenSize)
             }]}>
                 {
-                    this.props.entities.map((item, index) => {
-                        return (
-                            <Crumb
-                                key={index}
-                                text={item}
-                                index={index}
-                                isCrumbActive={this.state.index === index}
-                                numberOfEntities={this.props.entities.length}
-                                crumbPress={this.handleCrumbPress}
-                                translation={this.props.translation}
-                            />
-                        )
-                    })
+                    this.props.entities.length === 1 ? (
+                        <Text style={[style.activeCrumbTextStyle, style.crumbStyle]}>{this.props.entities[0]}</Text>
+                    ) : (
+                        this.props.entities.map((item, index) => {
+                            return (
+                                <Crumb
+                                    key={index}
+                                    text={item}
+                                    index={index}
+                                    isCrumbActive={this.state.index === index}
+                                    numberOfEntities={this.props.entities.length}
+                                    crumbPress={this.handleCrumbPress}
+                                    translation={this.props.translation}
+                                />
+                            )
+                        })
+                    )
                 }
             </View>
         );

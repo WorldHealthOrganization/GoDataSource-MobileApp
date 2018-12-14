@@ -6,22 +6,16 @@
 import React, {Component} from 'react';
 import {TextInput, View, Text, Alert, StyleSheet, Dimensions, Platform, FlatList, Animated, BackHandler} from 'react-native';
 import {Button, Icon} from 'react-native-material-ui';
-import { TextField } from 'react-native-material-textfield';
 import styles from './../styles';
 import NavBarCustom from './../components/NavBarCustom';
-import {Calendar} from 'react-native-calendars';
-import CalendarPicker from './../components/CalendarPicker';
 import {calculateDimension, navigation, getTranslation} from './../utils/functions';
 import config from './../utils/config';
-import ButtonWithIcons from './../components/ButtonWithIcons';
-import ValuePicker from './../components/ValuePicker';
 import Ripple from 'react-native-material-ripple';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import SearchFilterView from './../components/SearchFilterView';
 import CaseListItem from './../components/CaseListItem';
 import ElevatedView from 'react-native-elevated-view';
-import {Dropdown} from 'react-native-material-dropdown';
 import Breadcrumb from './../components/Breadcrumb';
 import {getCasesForOutbreakId} from './../actions/cases';
 import {removeErrors} from './../actions/errors';
@@ -31,6 +25,7 @@ import ViewHOC from './../components/ViewHOC';
 import _ from 'lodash';
 import { Popup } from 'react-native-map-link';
 import translations from './../utils/translations'
+import {getItemByIdRequest} from './../queries/cases'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 let height = Dimensions.get('window').height;
@@ -95,7 +90,7 @@ class CasesScreen extends Component {
         if (props.errors && props.errors.type && props.errors.message) {
             Alert.alert(props.errors.type, props.errors.message, [
                 {
-                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation), 
+                    text: getTranslation(translations.alertMessages.okButtonLabel, props.translation), 
                     onPress: () => {
                     props.removeErrors();
                     state.loading = false;
@@ -141,7 +136,25 @@ class CasesScreen extends Component {
             outputRange: [1, 0],
             extrapolate: 'clamp',
         });
-        let caseTitle = []; caseTitle[1] = getTranslation(translations.casesScreen.casesTitle, this.props.translation);
+
+        let filterNumbers = 0;
+        if (this.state.filterFromFilterScreen) {
+            if (this.state.filterFromFilterScreen.gender && this.state.filterFromFilterScreen.gender !== null && this.state.filterFromFilterScreen.gender !== undefined) {
+                ++filterNumbers
+            }
+            if (this.state.filterFromFilterScreen.age && this.state.filterFromFilterScreen.age.length > 0) {
+                ++filterNumbers
+            }
+            if (this.state.filterFromFilterScreen.selectedLocations && this.state.filterFromFilterScreen.selectedLocations.length > 0) {
+                ++filterNumbers
+            }
+            if (this.state.filterFromFilterScreen.classification && this.state.filterFromFilterScreen.classification.length > 0) {
+                ++filterNumbers
+            }
+        }
+        let filterText = filterNumbers === 0 ? `${getTranslation(translations.generalLabels.filterTitle, this.props.translation)}` : `${getTranslation(translations.generalLabels.filterTitle, this.props.translation)}(${filterNumbers})`
+
+        let caseTitle = []; caseTitle[0] = getTranslation(translations.casesScreen.casesTitle, this.props.translation);
         return (
             <ViewHOC style={style.container}
                      showLoader={(this.props && this.props.syncState && (this.props.syncState !== 'Finished processing' && this.props.syncState !== 'Error')) || (this && this.state && this.state.loading)}
@@ -158,13 +171,12 @@ class CasesScreen extends Component {
                                     navigator={this.props.navigator}
                                 />
                             </View>
-
                             <View style={{flex: 0.15, marginRight: 10}}>
                                 <Ripple style={{
                                     flex: 1,
                                     justifyContent: 'center',
                                     alignItems: 'center'
-                                }} onPress={console.log('merge from another branch')}>
+                                }} onPress={this.handleOnPressQRCode}>
                                     <MaterialCommunityIcons name="qrcode-scan" color={'black'} size={20}/>
                                 </Ripple>
                             </View>
@@ -188,7 +200,6 @@ class CasesScreen extends Component {
                                     </Ripple>
                                 </ElevatedView> 
                             </View>
-
                             {
                                 this.props.role.find((e) => e === config.userPermissions.writeCase) !== undefined ? (
                                     <View style={{flex: 0.15}}>
@@ -238,7 +249,7 @@ class CasesScreen extends Component {
                                 onPress={this.handlePressFilter}
                                 onChangeText={this.handleOnChangeText}
                                 onSubmitEditing={this.handleOnSubmitEditing}
-                                filterText={(this.state.filterFromFilterScreen && Object.keys(this.state.filterFromFilterScreen).length > 0) ? (getTranslation(translations.generalLabels.filterTitle, this.props.translation) + " (" + Object.keys(this.state.filterFromFilterScreen).length + ')') : getTranslation(translations.generalLabels.filterTitle, this.props.translation)}
+                                filterText={filterText}
                             />
                         }
                         ItemSeparatorComponent={this.renderSeparatorComponent}
@@ -325,7 +336,7 @@ class CasesScreen extends Component {
         })
     };
 
-    //Filter cases by selected criteria
+    // Filter cases by selected criteria
     handleOnApplyFilters = (filter) => {
         this.setState({
             filterFromFilterScreen: filter
@@ -535,7 +546,123 @@ class CasesScreen extends Component {
                 pageAskingHelpFrom: pageAskingHelpFrom
             }
         });
-    }
+    };
+
+    handleOnPressQRCode = () => {
+        console.log('handleOnPressQRCode')
+
+        this.props.navigator.showModal({
+            screen: 'QRScanScreen',
+            animated: true,
+            passProps: {
+                pushNewScreen: this.pushNewEditScreen
+            }
+        })
+    };
+
+    pushNewEditScreen = (QRCodeInfo) => {
+        console.log('pushNewEditScreen QRCodeInfo', QRCodeInfo)
+
+        let itemId = null
+        let itemType = null
+        let outbreakId = null
+
+        if (QRCodeInfo && QRCodeInfo !== undefined && QRCodeInfo.data && QRCodeInfo.data !== undefined){
+            let parsedData = null
+            try {
+                parsedData =  JSON.parse(QRCodeInfo.data)
+            } catch(err) {
+                setTimeout(function(){
+                    Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props && this.props.translation ? this.props.translation : null), getTranslation(translations.alertMessages.errorOccuredMsg,  this.props && this.props.translation ? this.props.translation : null), [
+                        {
+                            text: getTranslation(translations.alertMessages.okButtonLabel,  this.props && this.props.translation ? this.props.translation : null), 
+                            onPress: () => {console.log('Ok pressed')}
+                        }
+                    ])
+                }, 1000)
+                return
+            }
+            if (parsedData && parsedData !== undefined){
+                console.log('parsedData', parsedData)
+
+                if (parsedData.targetResource && parsedData.targetResource !== undefined) {
+                    if (parsedData.targetResource === 'case') {
+                        itemType = 'case'
+                        if (parsedData.resourceContext && parsedData.resourceContext !== undefined && 
+                            parsedData.resourceContext.outbreakId && parsedData.resourceContext.outbreakId !== undefined && 
+                            parsedData.resourceContext.caseId && parsedData.resourceContext.caseId !== undefined) {
+                                itemId = parsedData.resourceContext.caseId
+                                outbreakId = parsedData.resourceContext.outbreakId
+                        }
+                    } else if (parsedData.targetResource === 'contact') {
+                        itemType = 'contact'
+                        if (parsedData.resourceContext && parsedData.resourceContext !== undefined && 
+                            parsedData.resourceContext.outbreakId && parsedData.resourceContext.outbreakId !== undefined && 
+                            parsedData.resourceContext.contactId && parsedData.resourceContext.contactId !== undefined) {
+                                itemId = parsedData.resourceContext.contactId
+                                outbreakId = parsedData.resourceContext.outbreakId
+                        }
+                    }
+                }
+            }
+        }
+        
+        console.log('pushNewEditScreen', itemId, itemType, outbreakId)
+        if (itemId && itemType && outbreakId && outbreakId === this.props.user.activeOutbreakId) {
+            let itemPouchId = null
+            if (itemType === 'case') {
+                itemPouchId = `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE_${outbreakId}_${itemId}`
+            } else if (itemType === 'contact') {
+                itemPouchId = `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT_${outbreakId}_${itemId}`
+            }
+
+            if (itemPouchId) {
+                getItemByIdRequest(outbreakId, itemPouchId, itemType, (error, response) => {
+                    if (error) {
+                        console.log("*** getItemByIdRequest error: ", error);
+                        Alert.alert(getTranslation(translations.alertMessages.alertLabel,  this.props && this.props.translation ? this.props.translation : null), getTranslation(translations.alertMessages.noItemAlert,  this.props && this.props.translation ? this.props.translation : null), [
+                            {
+                                text: getTranslation(translations.alertMessages.okButtonLabel,  this.props && this.props.translation ? this.props.translation : null), 
+                                onPress: () => {console.log('Ok pressed')}
+                            }
+                        ])
+                    }
+                    if (response) {
+                        console.log("*** getItemByIdRequest response: ", response);
+
+                        if (itemType === 'case') {
+                            this.props.navigator.push({
+                                screen: 'CaseSingleScreen',
+                                animated: true,
+                                animationType: 'fade',
+                                passProps: {
+                                    case: response
+                                }
+                            })
+                        } else if (itemType === 'contact') {
+                            this.props.navigator.push({
+                                screen: 'ContactsSingleScreen',
+                                animated: true,
+                                animationType: 'fade',
+                                passProps: {
+                                    contact: response
+                                }
+                            })
+                        }
+                    }
+                })
+            }
+        } else {
+            setTimeout(function(){
+                Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props && this.props.translation ? this.props.translation : null), getTranslation(translations.alertMessages.noItemAlert,  this.props && this.props.translation ? this.props.translation : null), [
+                    {
+                        text: getTranslation(translations.alertMessages.okButtonLabel,  this.props && this.props.translation ? this.props.translation : null), 
+                        onPress: () => {console.log('Ok pressed')}
+                    }
+                ])
+            }, 1000)
+        }
+    };
 }
 
 // Create style outside the class, or for components that will be used by other components (buttons),

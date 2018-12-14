@@ -2,10 +2,9 @@
  * Created by florinpopa on 18/07/2018.
  */
 import React, {Component} from 'react';
-import {View, StyleSheet, Animated, Text, BackHandler} from 'react-native';
+import {View, StyleSheet, Animated, Text, BackHandler, Alert} from 'react-native';
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
-import {Icon} from 'react-native-material-ui';
 import styles from './../styles';
 import NavBarCustom from './../components/NavBarCustom';
 import ElevatedView from 'react-native-elevated-view';
@@ -22,14 +21,14 @@ import ViewHOC from './../components/ViewHOC';
 import config from './../utils/config';
 import { Popup } from 'react-native-map-link';
 import translations from './../utils/translations'
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import {getItemByIdRequest} from './../queries/cases'
 import Breadcrumb from './../components/Breadcrumb';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const scrollAnim = new Animated.Value(0);
 const offsetAnim = new Animated.Value(0);
 
 class ContactsScreen extends Component {
-
     static navigatorStyle = {
         navBarHidden: true
     };
@@ -123,6 +122,25 @@ class ContactsScreen extends Component {
         });
         let contactTitle = []; contactTitle[1] = getTranslation(translations.contactsScreen.contactsTitle, this.props.translation);
 
+        let filterNumbers = 0
+        if (this.state.filterFromFilterScreen) {
+            if (this.state.filterFromFilterScreen.gender && this.state.filterFromFilterScreen.gender !== null && this.state.filterFromFilterScreen.gender !== undefined) {
+                ++filterNumbers
+            }
+            if (this.state.filterFromFilterScreen.age && this.state.filterFromFilterScreen.age.length > 0) {
+                ++filterNumbers
+            }
+            if (this.state.filterFromFilterScreen.selectedLocations && this.state.filterFromFilterScreen.selectedLocations.length > 0) {
+                ++filterNumbers
+            }
+            if (this.state.filterFromFilterScreen.classification && this.state.filterFromFilterScreen.classification.length > 0) {
+                ++filterNumbers
+            }
+        }
+        let filterText = filterNumbers === 0 ? `${getTranslation(translations.generalLabels.filterTitle, this.props.translation)}` : `${getTranslation(translations.generalLabels.filterTitle, this.props.translation)}(${filterNumbers})`
+
+        let contactTitle = []; contactTitle[0] = getTranslation(translations.contactsScreen.contactsTitle, this.props.translation);
+
         return (
             <ViewHOC style={style.container}
                      showLoader={(this.props && this.props.syncState && (this.props.syncState !== 'Finished processing' && this.props.syncState !== 'Error')) || (this && this.state && this.state.loading)}
@@ -139,13 +157,12 @@ class ContactsScreen extends Component {
                                     navigator={this.props.navigator}
                                 />
                             </View>
-
                             <View style={{flex: 0.15, marginRight: 10}}>
                                 <Ripple style={{
                                     flex: 1,
                                     justifyContent: 'center',
                                     alignItems: 'center'
-                                }} onPress={console.log('merge from another branch')}>
+                                }} onPress={this.handleOnPressQRCode}>
                                     <MaterialCommunityIcons name="qrcode-scan" color={'black'} size={20}/>
                                 </Ripple>
                             </View>
@@ -170,9 +187,10 @@ class ContactsScreen extends Component {
                                 </ElevatedView> 
                             </View>
 
+                           
                             {/* {
                                 this.props.role.find((e) => e === config.userPermissions.writeContact) !== undefined ? (
-                                    <View style={{flex: 0.15}}>
+                                    <View style={{flex: 0.1}}>
                                         <ElevatedView
                                             elevation={3}
                                             style={{
@@ -200,7 +218,6 @@ class ContactsScreen extends Component {
                     handlePressNavbarButton={this.handlePressNavbarButton}
                 >
                 </NavBarCustom>
-                
                 <View style={style.containerContent}>
                     <AnimatedListView
                         stickyHeaderIndices={[0]}
@@ -219,7 +236,7 @@ class ContactsScreen extends Component {
                                 onPress={this.handlePressFilter}
                                 onChangeText={this.handleOnChangeText}
                                 onSubmitEditing={this.handleOnSubmitEditing}
-                                filterText={(this.state.filterFromFilterScreen && Object.keys(this.state.filterFromFilterScreen).length > 0) ? (getTranslation(translations.generalLabels.filterTitle, this.props.transltion) + " (" + Object.keys(this.state.filterFromFilterScreen).length + ')') : getTranslation(translations.generalLabels.filterTitle, this.props.translation)}
+                                filterText={filterText}
                             />}
                         ItemSeparatorComponent={this.renderSeparatorComponent}
                         // ListEmptyComponent={this.listEmptyComponent}
@@ -525,7 +542,122 @@ class ContactsScreen extends Component {
                 pageAskingHelpFrom: pageAskingHelpFrom
             }
         });
-    }
+    };
+
+    handleOnPressQRCode = () => {
+        console.log('handleOnPressQRCode');
+
+        this.props.navigator.showModal({
+            screen: 'QRScanScreen',
+            animated: true,
+            passProps: {
+                pushNewScreen: this.pushNewEditScreen
+            }
+        })
+    };
+
+    pushNewEditScreen = (QRCodeInfo) => {
+        console.log('pushNewEditScreen QRCodeInfo', QRCodeInfo)
+
+        let itemId = null
+        let itemType = null
+        let outbreakId = null
+
+        if (QRCodeInfo && QRCodeInfo !== undefined && QRCodeInfo.data && QRCodeInfo.data !== undefined){
+            let parsedData = null
+            try {
+                parsedData =  JSON.parse(QRCodeInfo.data)
+            } catch(err) {
+                setTimeout(function(){
+                    Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props && this.props.translation ? this.props.translation : null), getTranslation(translations.alertMessages.errorOccuredMsg,  this.props && this.props.translation ? this.props.translation : null), [
+                        {
+                            text: getTranslation(translations.alertMessages.okButtonLabel,  this.props && this.props.translation ? this.props.translation : null), 
+                            onPress: () => {console.log('Ok pressed')}
+                        }
+                    ])
+                }, 1000)
+                return 
+            }
+            if (parsedData && parsedData !== undefined){
+                console.log('parsedData', parsedData)
+
+                if (parsedData.targetResource && parsedData.targetResource !== undefined) {
+                    if (parsedData.targetResource === 'case' || parsedData.targetResource === 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE') {
+                        itemType = 'case'
+                        if (parsedData.resourceContext && parsedData.resourceContext !== undefined && 
+                            parsedData.resourceContext.outbreakId && parsedData.resourceContext.outbreakId !== undefined && 
+                            parsedData.resourceContext.caseId && parsedData.resourceContext.caseId !== undefined) {
+                                itemId = parsedData.resourceContext.caseId
+                                outbreakId = parsedData.resourceContext.outbreakId
+                        }
+                    } else if (parsedData.targetResource === 'contact' || parsedData.targetResource === 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT') {
+                        itemType = 'contact'
+                        if (parsedData.resourceContext && parsedData.resourceContext !== undefined && 
+                            parsedData.resourceContext.outbreakId && parsedData.resourceContext.outbreakId !== undefined && 
+                            parsedData.resourceContext.contactId && parsedData.resourceContext.contactId !== undefined) {
+                                itemId = parsedData.resourceContext.contactId
+                                outbreakId = parsedData.resourceContext.outbreakId
+                        }
+                    }
+                }
+            }
+        }
+
+        console.log('pushNewEditScreen', itemId, itemType, outbreakId)
+        if (itemId && itemType && outbreakId && outbreakId === this.props.user.activeOutbreakId) {
+            let itemPouchId = null
+            if (itemType === 'case') {
+                itemPouchId = `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE_${outbreakId}_${itemId}`
+            } else if (itemType === 'contact') {
+                itemPouchId = `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT_${outbreakId}_${itemId}`
+            }
+
+            if (itemPouchId) {
+                getItemByIdRequest(outbreakId, itemPouchId, itemType, (error, response) => {
+                    if (error) {
+                        console.log("*** getItemByIdRequest error: ", error);
+                        Alert.alert(getTranslation(translations.alertMessages.alertLabel,  this.props && this.props.translation ? this.props.translation : null), getTranslation(translations.alertMessages.noItemAlert,  this.props && this.props.translation ? this.props.translation : null), [
+                            {
+                                text: getTranslation(translations.alertMessages.okButtonLabel,  this.props && this.props.translation ? this.props.translation : null), 
+                                onPress: () => {console.log('Ok pressed')}
+                            }
+                        ])
+                    }
+                    if (response) {
+                        console.log("*** getItemByIdRequest response: ", response);
+                        if (itemType === 'case') {
+                            this.props.navigator.push({
+                                screen: 'CaseSingleScreen',
+                                animated: true,
+                                animationType: 'fade',
+                                passProps: {
+                                    case: response
+                                }
+                            })
+                        } else if (itemType === 'contact') {
+                            this.props.navigator.push({
+                                screen: 'ContactsSingleScreen',
+                                animated: true,
+                                animationType: 'fade',
+                                passProps: {
+                                    contact: response
+                                }
+                            })
+                        }
+                    }
+                })
+            }
+        } else {
+            setTimeout(function(){
+                Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props && this.props.translation ? this.props.translation : null), getTranslation(translations.alertMessages.noItemAlert,  this.props && this.props.translation ? this.props.translation : null), [
+                    {
+                        text: getTranslation(translations.alertMessages.okButtonLabel,  this.props && this.props.translation ? this.props.translation : null), 
+                        onPress: () => {console.log('Ok pressed')}
+                    }
+                ])
+            }, 1000)
+        }
+    };
 }
 
 // Create style outside the class, or for components that will be used by other components (buttons),
@@ -569,7 +701,7 @@ function mapStateToProps(state) {
         errors: state.errors,
         role: state.role,
         referenceData: state.referenceData,
-        translation: state.app.translation
+        translation: state.app.translation,
     };
 }
 

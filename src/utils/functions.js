@@ -741,23 +741,11 @@ export function localSortContactsForFollowUps (contactsCopy, propsFilter, stateF
             return addresses.length > 0
         })
     }
-    //Take care of sort
-    if (filterFromFilterScreen  && filterFromFilterScreen.sort && filterFromFilterScreen.sort.length > 0) {
-        let sortCriteria = []
-        let sortOrder = []
-        for(let i = 0; i < filterFromFilterScreen.sort.length; i++) {
-            if (filterFromFilterScreen.sort[i].sortCriteria && filterFromFilterScreen.sort[i].sortCriteria !== '' && filterFromFilterScreen.sort[i].sortOrder && filterFromFilterScreen.sort[i].sortOrder !== ''){
-                sortCriteria.push(filterFromFilterScreen.sort[i].sortCriteria)
-                sortOrder.push(filterFromFilterScreen.sort[i].sortOrder === 'LNG_SIDE_FILTERS_SORT_BY_ASC_PLACEHOLDER' ? false : true)
-            }
-        }
-        if (sortCriteria.length > 0 && sortOrder.length > 0) {
-            if (sortOrder.length === 1) {
-                contactsCopy = objSort(contactsCopy, [sortCriteria[0], sortOrder[0]])
-            } else if (sortOrder.length === 2) {
-                contactsCopy = objSort(contactsCopy, [sortCriteria[0], sortOrder[0]], [sortCriteria[1], sortOrder[1]])
-            }
-        }
+    // Take care of sort
+    if (filterFromFilterScreen && filterFromFilterScreen.sort && filterFromFilterScreen.sort !== undefined && filterFromFilterScreen.sort.length > 0) {
+        contactsCopy = localSortItems(contactsCopy, filterFromFilterScreen.sort)
+    } else {
+        contactsCopy = objSort(contactsCopy, ['lastName', false])
     }
 
     return contactsCopy
@@ -777,9 +765,8 @@ export function localSortHelpItem (helpItemsCopy, propsFilter, stateFilter, filt
         helpItemsCopy = helpItemsCopy.filter((e) => {
             let findItem = filterFromFilterScreen.categories.find((k) => {
                 return k.value === `helpCategory.json_${e.categoryId}`
-            })
-            return findItem !== undefined
-        })
+            });
+        }
     }
 
     // Take care of sort
@@ -792,6 +779,7 @@ export function localSortHelpItem (helpItemsCopy, propsFilter, stateFilter, filt
                 sortOrder.push(filterFromFilterScreen.sort[i].sortOrder === 'LNG_SIDE_FILTERS_SORT_BY_ASC_PLACEHOLDER' ? false : true)
             }
         }
+
         let helpItemsCopyMapped = helpItemsCopy.map((e) => {
             if (e.title) {
                 e.title = getTranslation(e.title, translations) 
@@ -817,63 +805,85 @@ export function localSortHelpItem (helpItemsCopy, propsFilter, stateFilter, filt
 }
 
 export function filterItemsForEachPage (helpItemsCopy, pageAskingHelpFrom) {
-    helpItemsCopy = helpItemsCopy.filter((e) => { 
+    helpItemsCopy = helpItemsCopy.filter((e) => {
         let itemPage = null
         if (e.page && e.page !== undefined) {
             itemPage = e.page
         }
         if (itemPage) {
             if (pageAskingHelpFrom === 'followUps') {
-                return e.page.toLowerCase().includes('followups') && !e.page.toLowerCase().includes('modify') && !e.page.toLowerCase().includes('edit') && 
-                !e.page.toLowerCase().includes('view') && !e.page.toLowerCase().includes('add') && !e.page.toLowerCase().includes('create')
+                return e.page.toLowerCase().includes('followups') && !e.page.toLowerCase().includes('modify') && !e.page.toLowerCase().includes('edit') &&
+                    !e.page.toLowerCase().includes('view') && !e.page.toLowerCase().includes('add') && !e.page.toLowerCase().includes('create')
             } else if (pageAskingHelpFrom === 'contacts') {
-                return e.page.toLowerCase().includes('contacts') && !e.page.toLowerCase().includes('modify') && !e.page.toLowerCase().includes('edit') && 
-                !e.page.toLowerCase().includes('view') && !e.page.toLowerCase().includes('add') && !e.page.toLowerCase().includes('create')
+                return e.page.toLowerCase().includes('contacts') && !e.page.toLowerCase().includes('modify') && !e.page.toLowerCase().includes('edit') &&
+                    !e.page.toLowerCase().includes('view') && !e.page.toLowerCase().includes('add') && !e.page.toLowerCase().includes('create')
             } else if (pageAskingHelpFrom === 'cases') {
-                return e.page.toLowerCase().includes('cases') && !e.page.toLowerCase().includes('modify') && !e.page.toLowerCase().includes('edit') && 
-                !e.page.toLowerCase().includes('view') && !e.page.toLowerCase().includes('add') && !e.page.toLowerCase().includes('create')
-            } 
+                return e.page.toLowerCase().includes('cases') && !e.page.toLowerCase().includes('modify') && !e.page.toLowerCase().includes('edit') &&
+                    !e.page.toLowerCase().includes('view') && !e.page.toLowerCase().includes('add') && !e.page.toLowerCase().includes('create')
+            }
             else if (pageAskingHelpFrom === 'followUpSingleScreenAdd') {
-                return e.page.toLowerCase().includes('followups') && !e.page.toLowerCase().includes('modify') && !e.page.toLowerCase().includes('edit') && 
-                !e.page.toLowerCase().includes('view') && (e.page.toLowerCase().includes('add') || e.page.toLowerCase().includes('create'))
+                return e.page.toLowerCase().includes('followups') && !e.page.toLowerCase().includes('modify') && !e.page.toLowerCase().includes('edit') &&
+                    !e.page.toLowerCase().includes('view') && (e.page.toLowerCase().includes('add') || e.page.toLowerCase().includes('create'))
             } else if (pageAskingHelpFrom === 'contactsSingleScreenAdd') {
-                return e.page.toLowerCase().includes('contacts') && !e.page.toLowerCase().includes('modify') && !e.page.toLowerCase().includes('edit') && 
-                !e.page.toLowerCase().includes('view') && (e.page.toLowerCase().includes('add') || e.page.toLowerCase().includes('create'))
+                return e.page.toLowerCase().includes('contacts') && !e.page.toLowerCase().includes('modify') && !e.page.toLowerCase().includes('edit') &&
+                    !e.page.toLowerCase().includes('view') && (e.page.toLowerCase().includes('add') || e.page.toLowerCase().includes('create'))
             } else if (pageAskingHelpFrom === 'casesSingleScreenAdd') {
-                return e.page.toLowerCase().includes('cases') && !e.page.toLowerCase().includes('modify') && !e.page.toLowerCase().includes('edit') && 
-                !e.page.toLowerCase().includes('view') && (e.page.toLowerCase().includes('add') || e.page.toLowerCase().includes('create'))
-            } 
+                return e.page.toLowerCase().includes('cases') && !e.page.toLowerCase().includes('modify') && !e.page.toLowerCase().includes('edit') &&
+                    !e.page.toLowerCase().includes('view') && (e.page.toLowerCase().includes('add') || e.page.toLowerCase().includes('create'))
+            }
             else if (pageAskingHelpFrom === 'followUpSingleScreenEdit') {
-                return e.page.toLowerCase().includes('followups') && (e.page.toLowerCase().includes('modify') || e.page.toLowerCase().includes('edit')) && 
-                !e.page.toLowerCase().includes('view') && !e.page.toLowerCase().includes('add') && !e.page.toLowerCase().includes('create')
+                return e.page.toLowerCase().includes('followups') && (e.page.toLowerCase().includes('modify') || e.page.toLowerCase().includes('edit')) &&
+                    !e.page.toLowerCase().includes('view') && !e.page.toLowerCase().includes('add') && !e.page.toLowerCase().includes('create')
             } else if (pageAskingHelpFrom === 'contactsSingleScreenEdit') {
-                return e.page.toLowerCase().includes('contacts') && (e.page.toLowerCase().includes('modify') || e.page.toLowerCase().includes('edit')) && 
-                !e.page.toLowerCase().includes('view') && !e.page.toLowerCase().includes('add') && !e.page.toLowerCase().includes('create')
+                return e.page.toLowerCase().includes('contacts') && (e.page.toLowerCase().includes('modify') || e.page.toLowerCase().includes('edit')) &&
+                    !e.page.toLowerCase().includes('view') && !e.page.toLowerCase().includes('add') && !e.page.toLowerCase().includes('create')
             } else if (pageAskingHelpFrom === 'casesSingleScreenEdit') {
-                return e.page.toLowerCase().includes('cases') && (e.page.toLowerCase().includes('modify') || e.page.toLowerCase().includes('edit')) && 
-                !e.page.toLowerCase().includes('view') && !e.page.toLowerCase().includes('add') && !e.page.toLowerCase().includes('create')
-            } 
+                return e.page.toLowerCase().includes('cases') && (e.page.toLowerCase().includes('modify') || e.page.toLowerCase().includes('edit')) &&
+                    !e.page.toLowerCase().includes('view') && !e.page.toLowerCase().includes('add') && !e.page.toLowerCase().includes('create')
+            }
             else if (pageAskingHelpFrom === 'followUpSingleScreenView') {
-                return e.page.toLowerCase().includes('followups') && !e.page.toLowerCase().includes('modify') && !e.page.toLowerCase().includes('edit') && 
-                e.page.toLowerCase().includes('view') && !e.page.toLowerCase().includes('add') && !e.page.toLowerCase().includes('create')
+                return e.page.toLowerCase().includes('followups') && !e.page.toLowerCase().includes('modify') && !e.page.toLowerCase().includes('edit') &&
+                    e.page.toLowerCase().includes('view') && !e.page.toLowerCase().includes('add') && !e.page.toLowerCase().includes('create')
             } else if (pageAskingHelpFrom === 'contactsSingleScreenView') {
-                return e.page.toLowerCase().includes('contacts') && !e.page.toLowerCase().includes('modify') && !e.page.toLowerCase().includes('edit') && 
-                e.page.toLowerCase().includes('view') && !e.page.toLowerCase().includes('add') && !e.page.toLowerCase().includes('create')
+                return e.page.toLowerCase().includes('contacts') && !e.page.toLowerCase().includes('modify') && !e.page.toLowerCase().includes('edit') &&
+                    e.page.toLowerCase().includes('view') && !e.page.toLowerCase().includes('add') && !e.page.toLowerCase().includes('create')
             } else if (pageAskingHelpFrom === 'casesSingleScreenView') {
-                return e.page.toLowerCase().includes('cases') && !e.page.toLowerCase().includes('modify') && !e.page.toLowerCase().includes('edit') && 
-                e.page.toLowerCase().includes('view') && !e.page.toLowerCase().includes('add') && !e.page.toLowerCase().includes('create')
+                return e.page.toLowerCase().includes('cases') && !e.page.toLowerCase().includes('modify') && !e.page.toLowerCase().includes('edit') &&
+                    e.page.toLowerCase().includes('view') && !e.page.toLowerCase().includes('add') && !e.page.toLowerCase().includes('create')
             }
             else if (pageAskingHelpFrom === 'exposureAdd') {
-                return e.page.toLowerCase().includes('relationships') && !e.page.toLowerCase().includes('modify') && !e.page.toLowerCase().includes('edit') && 
-                !e.page.toLowerCase().includes('view') && (e.page.toLowerCase().includes('add') || e.page.toLowerCase().includes('create'))
+                return e.page.toLowerCase().includes('relationships') && !e.page.toLowerCase().includes('modify') && !e.page.toLowerCase().includes('edit') &&
+                    !e.page.toLowerCase().includes('view') && (e.page.toLowerCase().includes('add') || e.page.toLowerCase().includes('create'))
             } else if (pageAskingHelpFrom === 'exposureEdit') {
-                return e.page.toLowerCase().includes('relationships') && (e.page.toLowerCase().includes('modify') || e.page.toLowerCase().includes('edit') || 
-                e.page.toLowerCase().includes('view')) && !e.page.toLowerCase().includes('add') && !e.page.toLowerCase().includes('create')
+                return e.page.toLowerCase().includes('relationships') && (e.page.toLowerCase().includes('modify') || e.page.toLowerCase().includes('edit') ||
+                    e.page.toLowerCase().includes('view')) && !e.page.toLowerCase().includes('add') && !e.page.toLowerCase().includes('create')
             }
         }
     })
 
     return helpItemsCopy
+}
+
+export function localSortItems (itemsToSort, sortFilter) {
+    if (sortFilter && sortFilter !== undefined && sortFilter.length > 0) {
+        let sortCriteria = []
+        let sortOrder = []
+        for(let i = 0; i < sortFilter.length; i++) {
+            if (sortFilter[i].sortCriteria && sortFilter[i].sortCriteria.trim().length > 0 && sortFilter[i].sortOrder && sortFilter[i].sortOrder.trim().length > 0){
+                sortCriteria.push(sortFilter[i].sortCriteria === 'First Name' ? 'firstName' : 'lastNmae')
+                sortOrder.push(sortFilter[i].sortOrder === 'LNG_SIDE_FILTERS_SORT_BY_ASC_PLACEHOLDER' ? false : true)
+            }
+        }
+        if (sortCriteria.length > 0 && sortOrder.length > 0) {
+            if (sortOrder.length === 1) {
+                itemsToSort = objSort(itemsToSort, [sortCriteria[0], sortOrder[0]])
+            } else if (sortOrder.length === 2) {
+                itemsToSort = objSort(itemsToSort, [sortCriteria[0], sortOrder[0]], [sortCriteria[1], sortOrder[1]])
+            }
+        }
+    }
+    return itemsToSort
+
 }
 
 export function objSort() {
