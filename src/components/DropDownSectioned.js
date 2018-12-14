@@ -22,6 +22,7 @@ class DropDownSectioned extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            selectedItems: this.props.single === false ? ((this.props.sectionedSelectedItems !== null && this.props.sectionedSelectedItems !== undefined) ? this.props.sectionedSelectedItems : []) : []
         };
     }
 
@@ -58,7 +59,7 @@ class DropDownSectioned extends Component {
                         showDropDowns={true}
                         readOnlyHeadings={true}
                         onSelectedItemsChange={this.onSelectedItemsChange}
-                        selectedItems={this.props.sectionedSelectedItems !== null && this.props.sectionedSelectedItems !== undefined ? this.props.sectionedSelectedItems : [] }
+                        selectedItems={this.props.single === true ? ((this.props.sectionedSelectedItems !== null && this.props.sectionedSelectedItems !== undefined) ? this.props.sectionedSelectedItems : []) : this.state.selectedItems}
                         showCancelButton={true}
                         selectChildren={false}
                         showChips={false}
@@ -71,6 +72,8 @@ class DropDownSectioned extends Component {
                         searchTextFontFamily={'Roboo-Regular'}
                         itemFontFamily={'Roboto-Medium'}
                         subItemFontFamily={'Roboto-Regular'}
+                        onCancel={this.onCancelHandler}
+                        onConfirm={this.onConfirmHandler}
                         styles={{
                             button: {backgroundColor: stylesGlobal.buttonGreen},
                             cancelButton: {backgroundColor: stylesGlobal.missedRedColor},
@@ -138,8 +141,31 @@ class DropDownSectioned extends Component {
     };
     // Please write here all the methods that are not react native lifecycle methods;
 
+    onCancelHandler = () => {
+        if (this.props.single === false) {
+        let selectedItems = this.props.sectionedSelectedItems !== null && this.props.sectionedSelectedItems !== undefined ? this.props.sectionedSelectedItems : []
+            this.setState({
+                selectedItems
+            }, () => {
+                this.props.onChange(selectedItems, this.props.index);
+            })
+        }
+    };
+
+    onConfirmHandler = () => {
+        if (this.props.single === false) {
+            this.props.onChange(this.state.selectedItems, this.props.index);
+        }
+    }
+
     onSelectedItemsChange = (selectedItems) => {
-        this.props.onChange(selectedItems, this.props.index);
+        if (this.props.single === true) {
+            this.props.onChange(selectedItems, this.props.index);
+        } else {
+            this.setState({
+                selectedItems
+            })
+        }
     };
 }
 

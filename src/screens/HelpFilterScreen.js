@@ -1,5 +1,5 @@
 /**
- * Created by mobileclarisoft on 13/08/2018.
+ * Created by mobileclarisoft on 12/12/2018.
  */
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
@@ -12,14 +12,16 @@ import {extractIdFromPouchId, getTranslation} from './../utils/functions';
 import config from './../utils/config';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
+import {getContactsForOutbreakId} from './../actions/contacts';
 import {addFilterForScreen, removeFilterForScreen} from './../actions/app';
-import {TabBar, TabView, PagerScroll} from 'react-native-tab-view';
-import CasesFiltersContainer from './../containers/CasesFiltersContainer';
-import CasesSortContainer from './../containers/CasesSortContainer';
+import {TabBar, TabView} from 'react-native-tab-view';
+import HelpFilterContainer from './../containers/HelpFilterContainer';
+import HelpSortContainer from './../containers/HelpSortContainer';
+import FollowUpsSortContainer from './../containers/FollowUpsSortContainer';
 import translations from './../utils/translations';
 import _ from 'lodash';
 
-class CasesFilterScreen extends Component {
+class HelpFilterScreen extends Component {
 
     static navigatorStyle = {
         navBarHidden: true
@@ -30,60 +32,28 @@ class CasesFilterScreen extends Component {
         this.state = {
             filter: {
                 filter: {
-                    gender: {
-                        Male: false,
-                        Female: false
-                    },
-                    age: [0, 150],
-                    selectedLocations: [],
-                    classification: []
+                    categories: []
                 },
                 sort: []
             },
-            routes: config.tabsValuesRoutes.casesFilter,
-            index: 0
+            routes: config.tabsValuesRoutes.helpFilter,
+            index: 0,
         };
         // Bind here methods, or at least don't declare methods in the render method
     }
 
     // Please add here the react lifecycle methods that you need
     static getDerivedStateFromProps(props, state) {
-        console.log ('getDerivedStateFromProps', props.activeFilters)
-        let filterClone = _.cloneDeep(state.filter.filter);
-        let sortClone = _.cloneDeep(state.filter.sort);
-
+        let filterClone = Object.assign({}, state.filter.filter);
         if (props && props.activeFilters) {
-            if (props.activeFilters.gender) {
-                if (props.activeFilters.gender === config.localTranslationTokens.male && filterClone.gender.Male === false) {
-                    filterClone.gender.Male = true
-                    filterClone.gender.Female = false
-                } else if (props.activeFilters.gender === config.localTranslationTokens.female && filterClone.gender.Female === false) {
-                    filterClone.gender.Female = true
-                    filterClone.gender.Male = false
-                }
+            if (props.activeFilters.categories && Array.isArray(props.activeFilters.categories)){
+                filterClone.categories = props.activeFilters.categories;
             }
-
-            if (props.activeFilters.age && Array.isArray(props.activeFilters.age) && props.activeFilters.age.length === 2) {
-                filterClone.age[0] = props.activeFilters.age[0];
-                filterClone.age[1] = props.activeFilters.age[1];
-            }
-
-            if (props.activeFilters.selectedLocations && Array.isArray(props.activeFilters.selectedLocations) && props.activeFilters.selectedLocations.length > 0){
-                filterClone.selectedLocations = props.activeFilters.selectedLocations;
-            }
-
-            if (props.activeFilters.classification && Array.isArray(props.activeFilters.classification) && props.activeFilters.classification.length > 0){
-                filterClone.classification = props.activeFilters.classification;
-            }
-
-            // if (props.activeFilters.sort && props.activeFilters.sort !== undefined && Array.isArray(props.activeFilters.sort) && props.activeFilters.sort.length > 0){
-            //     sortClone.sort = props.activeFilters.sort
-            // }
+            console.log("### Active filters: ", filterClone);
         }
         state.filter.filter = filterClone
-        // state.filter.sort = sortClone
         return null
-    }
+    };
 
     // The render method should have at least business logic as possible,
     // because this will be called whenever there is a new setState call
@@ -92,15 +62,13 @@ class CasesFilterScreen extends Component {
         return (
             <View style={style.container}>
                 <NavBarCustom
-                    title={getTranslation(translations.casesFilter.casesFilterTitle, this.props.translation)}
+                    title={getTranslation(translations.helpFilter.helpFilterTitle, this.props.translation)}
                     navigator={this.props.navigator}
                     iconName="close"
                     handlePressNavbarButton={this.handlePressNavbarButton}
                 />
                 <TabView
-                    swipeEnabled = {false}
                     navigationState={this.state}
-                    renderPager={this.handleRenderPager}
                     renderScene={this.handleRenderScene}
                     renderTabBar={this.handleRenderTabBar}
                     onIndexChange={this.handleOnIndexChange}
@@ -109,57 +77,30 @@ class CasesFilterScreen extends Component {
         );
     }
 
-    // Please write here all the methods that are not react native lifecycle methods
-    handlePressNavbarButton = () => {
-        this.props.removeFilterForScreen('CasesFilterScreen');
-        this.props.navigator.dismissModal(this.props.onApplyFilters(config.defaultFilterForCases));
-    };
-
     handleOnIndexChange = (index) => {
         this.setState({index});
     };
 
-    handleMoveToNextScreenButton = () => {
-        let nextIndex = this.state.index + 1
-        this.handleOnIndexChange(nextIndex)
-    }
-
-    handleMoveToPrevieousScreenButton = () => {
-        let nextIndex = this.state.index - 1
-        this.handleOnIndexChange(nextIndex)
-    }
-
     handleRenderScene = () => {
         if (this.state.index === 0) {
             return (
-                <CasesFiltersContainer
+                <HelpFilterContainer
                     filter={this.state.filter}
-                    handleMoveToNextScreenButton={this.handleMoveToNextScreenButton}
-                    onSelectItem={this.handleOnSelectItem}
-                    onChangeSectionedDropDown={this.handleOnChangeSectionedDropDown}
-                    onChangeInterval={this.handleOnChangeInterval}
                     onChangeMultipleSelection={this.handleOnChangeMultipleSelection}
                     onPressApplyFilters={this.handleOnPressApplyFilters}
                 />
-            )
+            );
         } else {
             return (
-                <CasesSortContainer
-                    handleMoveToPrevieousScreenButton={this.handleMoveToPrevieousScreenButton}
+                <HelpSortContainer
+                    filter={this.state.filter}
                     onPressApplyFilters={this.handleOnPressApplyFilters}
                     onPressAddSortRule={this.onPressAddSortRule}
                     onChangeDropDown={this.onChangeDropDown}
-                    filter={this.state.filter}
                     onDeletePress={this.onDeleteSortRulePress}
-                    key={this.state.index}
                 />
-            )
+            );
         }
-    };
-
-    handleRenderPager = (props) => {
-        return (Platform.OS === 'ios') ? <PagerScroll {...props} swipeEnabled={false} animationEnabled={false} /> :
-            <PagerScroll {...props} swipeEnabled={false} animationEnabled={false} />
     };
 
     onPressAddSortRule = () => {
@@ -176,7 +117,7 @@ class CasesFilterScreen extends Component {
         }), () => {
             console.log("### after adding sort rule: ", this.state.filter);
         })
-    }
+    };
 
     onDeleteSortRulePress = (index) => {
         console.log("onDeleteSortRulePress: ", index);
@@ -187,7 +128,7 @@ class CasesFilterScreen extends Component {
         }), () => {
             console.log("After onDeleteSortRulePress ", this.state.sort);
         })
-    }
+    };
 
     onChangeDropDown = (value, id, objectTypeOrIndex, objectType) => {
         console.log("sort onChangeDropDown: ", value, id, objectTypeOrIndex, this.state.filter);
@@ -205,11 +146,11 @@ class CasesFilterScreen extends Component {
         }
     };
 
+
     handleRenderTabBar = (props) => {
         return (
             <TabBar
                 {...props}
-                scrollEnabled={false}
                 indicatorStyle={{
                     backgroundColor: styles.buttonGreen,
                     height: 2
@@ -245,74 +186,37 @@ class CasesFilterScreen extends Component {
                 {getTranslation(route.title, this.props.translation).toUpperCase()}
             </Animated.Text>
         );
-    };
+    }
 
-    handleOnSelectItem = (item, index, id) => {
-        console.log("### handleOnSelectItem: ", item, index, id);
-        let filter = Object.assign({}, this.state.filter.filter);
-        filter[id][item.value] = !filter[id][item.value];
-        this.setState(prevState => ({
-            filter: Object.assign({}, prevState.filter, Object.assign({}, prevState.filter.filter, {[id]: filter[id]}))
-        }))
-    };
-
-    handleOnChangeSectionedDropDown = (selectedItems) => {
-        let selectedItemsWithExtractedId = selectedItems.map ((e) => {
-            return extractIdFromPouchId (e, 'location')
-        })
-
-        this.setState(prevState => ({
-            filter: Object.assign({}, prevState.filter, {filter: Object.assign({}, prevState.filter.filter, {selectedLocations: selectedItemsWithExtractedId})})
-        }), () => {
-            console.log("Filters: ", this.state.filter.filter);
-        })
-    };
-
-    handleOnChangeInterval = (values, id) => {
-        this.setState(prevState => ({
-            filter: Object.assign({}, prevState.filter, {filter: Object.assign({}, prevState.filter.filter, {[id]: values})})
-        }));
+    // Please write here all the methods that are not react native lifecycle methods
+    handlePressNavbarButton = () => {
+        this.props.removeFilterForScreen(this.props.screen);
+        this.props.navigator.dismissModal(this.props.onApplyFilters(null));
     };
 
     handleOnChangeMultipleSelection = (selections, id) => {
         this.setState(prevState => ({
             filter: Object.assign({}, prevState.filter, {filter: Object.assign({}, prevState.filter.filter, {[id]: selections})})
         }), () => {
-            console.log("### selections: ", this.state.filter.filter);
+            console.log("### handleOnChangeMultipleSelection: ", this.state.filter.filter);
         })
     };
 
     handleOnPressApplyFilters = () => {
         let filterStateClone = Object.assign({}, this.state.filter.filter);
         let filterSortClone = this.state.filter.sort.slice()
+
         let filter = {};
 
-        if (filterStateClone.gender.Male && !filterStateClone.gender.Female ) {
-            filter.gender = config.localTranslationTokens.male
+        if (filterStateClone.categories) {
+            filter.categories = filterStateClone.categories;
         }
-        if (filterStateClone.gender.Female && !filterStateClone.gender.Male) {
-            filter.gender = config.localTranslationTokens.female
-        }
-        if (filterStateClone.age) {
-            filter.age = filterStateClone.age;
-        }
-        if (filterStateClone.classification) {
-            if (filterStateClone.classification.length > 0) {
-                let orClassification = [];
-                filterStateClone.classification.map((item, index) => {
-                    orClassification.push({classification: item.value ? item.value : null});
-                });
-                filter.classification = orClassification;
-            }
-        }
-        if (filterStateClone.selectedLocations) {
-            filter.selectedLocations = filterStateClone.selectedLocations;
-        }
+
         if (filterSortClone && filterSortClone.length > 0){
             filter.sort = filterSortClone;
         }
 
-        this.props.addFilterForScreen('CasesFilterScreen', filter);
+        this.props.addFilterForScreen(this.props.screen, filter);
         this.props.navigator.dismissModal(this.props.onApplyFilters(filter));
     };
 }
@@ -330,16 +234,17 @@ function mapStateToProps(state) {
     return {
         user: state.user,
         screenSize: state.app.screenSize,
-        cases: state.cases,
+        helpCategory: state.helpCategory,
         translation: state.app.translation
     };
 };
 
 function matchDispatchProps(dispatch) {
     return bindActionCreators({
+        getContactsForOutbreakId,
         addFilterForScreen,
         removeFilterForScreen
     }, dispatch);
 };
 
-export default connect(mapStateToProps, matchDispatchProps)(CasesFilterScreen);
+export default connect(mapStateToProps, matchDispatchProps)(HelpFilterScreen);

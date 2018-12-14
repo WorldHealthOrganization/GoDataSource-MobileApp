@@ -49,20 +49,36 @@ class FollowUpsFilterScreen extends Component {
 
     // Please add here the react lifecycle methods that you need
     static getDerivedStateFromProps(props, state) {
-        let filterClone = Object.assign({}, state.filter.filter);
+        console.log ('getDerivedStateFromProps', props.activeFilters)
+        let filterClone = _.cloneDeep(state.filter.filter);
+        let sortClone = _.cloneDeep(state.filter.sort);
+
         if (props && props.activeFilters) {
-                if (props.activeFilters.gender) {
-                    filterClone.gender[props.activeFilters.gender] = true;
+            if (props.activeFilters.gender) {
+                if (props.activeFilters.gender === config.localTranslationTokens.male && filterClone.gender.Male === false) {
+                    filterClone.gender.Male = true
+                    filterClone.gender.Female = false
+                } else if (props.activeFilters.gender === config.localTranslationTokens.female && filterClone.gender.Female === false) {
+                    filterClone.gender.Female = true
+                    filterClone.gender.Male = false
                 }
-                if (props.activeFilters.age && Array.isArray(props.activeFilters.age) && props.activeFilters.age.length === 2) {
-                    filterClone.age[0] = props.activeFilters.age[0];
-                    filterClone.age[1] = props.activeFilters.age[1];
-                }
-                if (props.activeFilters.selectedLocations && Array.isArray(props.activeFilters.selectedLocations)){
-                    filterClone.selectedLocations = props.activeFilters.selectedLocations;
-                }
-            console.log("### Active filters: ", filterClone);
+            }
+
+            if (props.activeFilters.age && Array.isArray(props.activeFilters.age) && props.activeFilters.age.length === 2) {
+                filterClone.age[0] = props.activeFilters.age[0];
+                filterClone.age[1] = props.activeFilters.age[1];
+            }
+
+            if (props.activeFilters.selectedLocations && Array.isArray(props.activeFilters.selectedLocations) && props.activeFilters.selectedLocations.length > 0){
+                filterClone.selectedLocations = props.activeFilters.selectedLocations;
+            }
+           
+            // if (props.activeFilters.sort && props.activeFilters.sort !== undefined && Array.isArray(props.activeFilters.sort) && props.activeFilters.sort.length > 0){
+            //     sortClone = props.activeFilters.sort
+            // }
         }
+        state.filter.filter = filterClone
+        // state.filter.sort = sortClone
         return null
     }
 

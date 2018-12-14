@@ -5,20 +5,24 @@ import {ACTION_TYPE_STORE_USER} from './../utils/enums';
 import { changeAppRoot, getTranslations } from './app';
 // import { getUserByIdRequest} from './../requests/user';
 import {loginUserRequest, getUserByIdRequest, updateUserRequest, getRolesForUserRequest} from './../queries/user';
-import {getUserRoles} from './../actions/role'
+import {getUserRoles} from './../actions/role';
 import { getFollowUpsForOutbreakIdWithPromises } from './followUps';
 import { getContactsForOutbreakId, getContactsForOutbreakIdWithPromises } from './contacts';
 import { getCasesForOutbreakIdWithPromise, getCasesForOutbreakId } from './cases';
 import { getEventsForOutbreakId } from './events';
 import { getOutbreakById } from './outbreak';
 import { addError } from './errors';
-import {getReferenceData} from './referenceData'
-import {getLocations} from './locations'
+import {getReferenceData} from './referenceData';
+import {getHelpCategory} from './helpCategory';
+import {getHelpItem} from './helpItem';
+import {getLocations} from './locations';
 import errorTypes from './../utils/errorTypes';
 import config from './../utils/config';
 import {storeContacts} from './contacts';
 import {storeCases} from './cases';
 import {storeEvents} from './events';
+import {storeHelpCategory} from './helpCategory';
+import {storeHelpItem} from './helpItem';
 import {storeFollowUps} from './followUps';
 import {storeOutbreak} from './outbreak';
 import {setLoginState, storeData, getAvailableLanguages, setSyncState} from './app';
@@ -62,6 +66,8 @@ export function loginUser(credentials) {
                         promises.push(getTranslations(response.languageId, dispatch));
                         promises.push(getAvailableLanguages(dispatch));
                         promises.push(getReferenceData(null, dispatch));
+                        promises.push(getHelpCategory(null, dispatch));
+                        promises.push(getHelpItem(null, dispatch));
                         promises.push(getEventsForOutbreakId(response.activeOutbreakId, null, dispatch));
                         promises.push(getCasesForOutbreakIdWithPromise(response.activeOutbreakId, null, null, dispatch));
                         promises.push(getUserRoles(response.roleIds, dispatch));
@@ -126,6 +132,8 @@ export function cleanDataAfterLogout() {
             dispatch(storeCases(null));
             dispatch(storeEvents(null));
             dispatch(storeOutbreak(null));
+            dispatch(storeHelpCategory(null));
+            dispatch(storeHelpItem(null));
         });
     }
 }
@@ -159,6 +167,8 @@ export function getUserById(userId, token, refreshFollowUps) {
                 }
                 promises.push(getTranslations(response && response.languageId ? response.languageId : 'english_us', dispatch));
                 promises.push(getReferenceData(null, dispatch));
+                promises.push(getHelpCategory(null, dispatch));
+                promises.push(getHelpItem(null, dispatch));
                 promises.push(getEventsForOutbreakId(response.activeOutbreakId, null, dispatch));
                 promises.push(getCasesForOutbreakIdWithPromise(response.activeOutbreakId, null, null, dispatch));
                 promises.push(getUserRoles(response.roleIds, dispatch))

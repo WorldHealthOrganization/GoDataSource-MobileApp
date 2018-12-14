@@ -94,6 +94,9 @@ class MapScreen extends Component {
                             screenToSwitchTo = "CasesScreen";
                             addScreen = "CaseSingleScreen";
                             break;
+                        case 'help':
+                            screenToSwitchTo = "HelpScreen";
+                            break;
                         default:
                             screenToSwitchTo = "FollowUpsScreen";
                             break;

@@ -7,6 +7,7 @@ import {View, Text, StyleSheet, ScrollView, Alert, Keyboard, TouchableWithoutFee
 // the material ui library, since it provides design and animations out of the box
 import Button from './../components/Button';
 import { TextField } from 'react-native-material-textfield';
+import {Icon} from 'react-native-material-ui';
 import styles from './../styles';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -19,6 +20,7 @@ import {removeErrors} from './../actions/errors';
 import {calculateDimension, extractIdFromPouchId, updateRequiredFields, getTranslation} from './../utils/functions';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import translations from './../utils/translations'
+import ElevatedView from 'react-native-elevated-view';
 
 class ExposureScreen extends Component {
 
@@ -78,7 +80,7 @@ class ExposureScreen extends Component {
         if (props.errors && props.errors.type && props.errors.message) {
             Alert.alert(props.errors.type, props.errors.message, [
                 {
-                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+                    text: getTranslation(translations.alertMessages.okButtonLabel, props.translation),
                     onPress: () => {
                         state.savePressed = false;
                         props.removeErrors()
@@ -138,6 +140,23 @@ class ExposureScreen extends Component {
                                 <Text style={[style.title, {marginLeft: 30}]}>
                                     {this.props.exposure ? getTranslation(translations.exposureScreen.editExposureLabel, this.props.translation) : getTranslation(translations.exposureScreen.addExposureLabel, this.props.translation)}
                                 </Text>
+                                <ElevatedView
+                                    elevation={3}
+                                    style={{
+                                        backgroundColor: styles.buttonGreen,
+                                        width: calculateDimension(33, false, this.props.screenSize),
+                                        height: calculateDimension(25, true, this.props.screenSize),
+                                        borderRadius: 4
+                                    }}
+                                >
+                                    <Ripple style={{
+                                        flex: 1,
+                                        justifyContent: 'center',
+                                        alignItems: 'center'
+                                    }} onPress={this.goToHelpScreen}>
+                                        <Icon name="help" color={'white'} size={15}/>
+                                    </Ripple>
+                                </ElevatedView> 
                             </View>
                         }
                         title={null}
@@ -353,6 +372,24 @@ class ExposureScreen extends Component {
             }
         }
         return pass;
+    }
+
+    goToHelpScreen = () => {
+        let pageAskingHelpFrom = null
+
+        if (this.props.exposure) {
+            pageAskingHelpFrom = 'exposureEdit'
+        } else {
+            pageAskingHelpFrom = 'exposureAdd'
+        }
+
+        this.props.navigator.showModal({
+            screen: 'HelpScreen',
+            animated: true,
+            passProps: {
+                pageAskingHelpFrom: pageAskingHelpFrom
+            }
+        });
     }
 }
 
