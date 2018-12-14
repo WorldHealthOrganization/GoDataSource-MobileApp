@@ -705,63 +705,175 @@ export function getTranslation (value, allTransactions) {
 }
 
 export function localSortContactsForFollowUps (contactsCopy, propsFilter, stateFilter, filterFromFilterScreen) {
-    if (propsFilter && (propsFilter['FollowUpsFilterScreen'] || propsFilter['FollowUpsScreen'])) {
-        // Take care of search filter
-        if (stateFilter.searchText) {
-            contactsCopy = contactsCopy.filter((e) => {
-                return  e && e.firstName && stateFilter.searchText.toLowerCase().includes(e.firstName.toLowerCase()) ||
-                    e && e.lastName && stateFilter.searchText.toLowerCase().includes(e.lastName.toLowerCase()) ||
-                    e && e.firstName && e.firstName.toLowerCase().includes(stateFilter.searchText.toLowerCase()) ||
-                    e && e.lastName && e.lastName.toLowerCase().includes(stateFilter.searchText.toLowerCase())
-            });
-        }
-        // Take care of gender filter
-        if (filterFromFilterScreen && filterFromFilterScreen.gender) {
-            contactsCopy = contactsCopy.filter((e) => {return e.gender === filterFromFilterScreen.gender});
-        }
-        // Take care of age range filter
-        if (filterFromFilterScreen && filterFromFilterScreen.age && Array.isArray(filterFromFilterScreen.age) && filterFromFilterScreen.age.length === 2 && (filterFromFilterScreen.age[0] >= 0 || filterFromFilterScreen.age[1] <= 150)) {
-            contactsCopy = contactsCopy.filter((e) => {
-                if (e.age && e.age.years !== null && e.age.years !== undefined && e.age.months !== null && e.age.months !== undefined) {
-                    if (e.age.years > 0 && e.age.months === 0) {
-                        return e.age.years >= filterFromFilterScreen.age[0] && e.age.years <= filterFromFilterScreen.age[1]
-                    } else if (e.age.years === 0 && e.age.months > 0){
-                        return e.age.months >= filterFromFilterScreen.age[0] && e.age.months <= filterFromFilterScreen.age[1]
-                    } else if (e.age.years === 0 && e.age.months === 0) {
-                        return e.age.years >= filterFromFilterScreen.age[0] && e.age.years <= filterFromFilterScreen.age[1]
-                    }
-                }
-            });
-        }
-        // Take care of locations filter
-        if (filterFromFilterScreen  && filterFromFilterScreen.selectedLocations && filterFromFilterScreen.selectedLocations.length > 0) {
-            contactsCopy = contactsCopy.filter((e) => {
-                let addresses = e.addresses.filter((k) => {
-                    return k.locationId !== '' && filterFromFilterScreen.selectedLocations.indexOf(k.locationId) >= 0
-                })
-                return addresses.length > 0
-            })
-        }
-        //Take care of sort
-        if (filterFromFilterScreen  && filterFromFilterScreen.sort && filterFromFilterScreen.sort.length > 0) {
-            let sortCriteria = []
-            let sortOrder = []
-            for(let i = 0; i < filterFromFilterScreen.sort.length; i++) {
-                if (filterFromFilterScreen.sort[i].sortCriteria && filterFromFilterScreen.sort[i].sortCriteria !== '' && filterFromFilterScreen.sort[i].sortOrder && filterFromFilterScreen.sort[i].sortOrder !== ''){
-                    sortCriteria.push(filterFromFilterScreen.sort[i].sortCriteria)
-                    sortOrder.push(filterFromFilterScreen.sort[i].sortOrder === 'LNG_SIDE_FILTERS_SORT_BY_ASC_PLACEHOLDER' ? false : true)
+    // Take care of search filter
+    if (stateFilter.searchText) {
+        contactsCopy = contactsCopy.filter((e) => {
+            return  e && e.firstName && stateFilter.searchText.toLowerCase().includes(e.firstName.toLowerCase()) ||
+                e && e.lastName && stateFilter.searchText.toLowerCase().includes(e.lastName.toLowerCase()) ||
+                e && e.firstName && e.firstName.toLowerCase().includes(stateFilter.searchText.toLowerCase()) ||
+                e && e.lastName && e.lastName.toLowerCase().includes(stateFilter.searchText.toLowerCase())
+        });
+    }
+    // Take care of gender filter
+    if (filterFromFilterScreen && filterFromFilterScreen.gender) {
+        contactsCopy = contactsCopy.filter((e) => {return e.gender === filterFromFilterScreen.gender});
+    }
+    // Take care of age range filter
+    if (filterFromFilterScreen && filterFromFilterScreen.age && Array.isArray(filterFromFilterScreen.age) && filterFromFilterScreen.age.length === 2 && (filterFromFilterScreen.age[0] >= 0 || filterFromFilterScreen.age[1] <= 150)) {
+        contactsCopy = contactsCopy.filter((e) => {
+            if (e.age && e.age.years !== null && e.age.years !== undefined && e.age.months !== null && e.age.months !== undefined) {
+                if (e.age.years > 0 && e.age.months === 0) {
+                    return e.age.years >= filterFromFilterScreen.age[0] && e.age.years <= filterFromFilterScreen.age[1]
+                } else if (e.age.years === 0 && e.age.months > 0){
+                    return e.age.months >= filterFromFilterScreen.age[0] && e.age.months <= filterFromFilterScreen.age[1]
+                } else if (e.age.years === 0 && e.age.months === 0) {
+                    return e.age.years >= filterFromFilterScreen.age[0] && e.age.years <= filterFromFilterScreen.age[1]
                 }
             }
-            if (sortCriteria.length > 0 && sortOrder.length > 0) {
-                if (sortOrder.length === 1) {
-                    contactsCopy = objSort(contactsCopy, [sortCriteria[0], sortOrder[0]])
-                } else if (sortOrder.length === 2) {
-                    contactsCopy = objSort(contactsCopy, [sortCriteria[0], sortOrder[0]], [sortCriteria[1], sortOrder[1]])
-                }
+        });
+    }
+    // Take care of locations filter
+    if (filterFromFilterScreen  && filterFromFilterScreen.selectedLocations && filterFromFilterScreen.selectedLocations.length > 0) {
+        contactsCopy = contactsCopy.filter((e) => {
+            let addresses = e.addresses.filter((k) => {
+                return k.locationId !== '' && filterFromFilterScreen.selectedLocations.indexOf(k.locationId) >= 0
+            })
+            return addresses.length > 0
+        })
+    }
+    //Take care of sort
+    if (filterFromFilterScreen  && filterFromFilterScreen.sort && filterFromFilterScreen.sort.length > 0) {
+        let sortCriteria = []
+        let sortOrder = []
+        for(let i = 0; i < filterFromFilterScreen.sort.length; i++) {
+            if (filterFromFilterScreen.sort[i].sortCriteria && filterFromFilterScreen.sort[i].sortCriteria !== '' && filterFromFilterScreen.sort[i].sortOrder && filterFromFilterScreen.sort[i].sortOrder !== ''){
+                sortCriteria.push(filterFromFilterScreen.sort[i].sortCriteria)
+                sortOrder.push(filterFromFilterScreen.sort[i].sortOrder === 'LNG_SIDE_FILTERS_SORT_BY_ASC_PLACEHOLDER' ? false : true)
+            }
+        }
+        if (sortCriteria.length > 0 && sortOrder.length > 0) {
+            if (sortOrder.length === 1) {
+                contactsCopy = objSort(contactsCopy, [sortCriteria[0], sortOrder[0]])
+            } else if (sortOrder.length === 2) {
+                contactsCopy = objSort(contactsCopy, [sortCriteria[0], sortOrder[0]], [sortCriteria[1], sortOrder[1]])
             }
         }
     }
+
     return contactsCopy
+}
+
+export function localSortHelpItem (helpItemsCopy, propsFilter, stateFilter, filterFromFilterScreen, translations) {
+    // Take care of search filter
+    if (stateFilter.searchText) {
+        helpItemsCopy = helpItemsCopy.filter((e) => {
+            return  e && e.title && stateFilter.searchText.toLowerCase().includes(getTranslation(e.title, translations).toLowerCase()) ||
+                e && e.title && getTranslation(e.title, translations).toLowerCase().includes(stateFilter.searchText.toLowerCase()) 
+        });
+    }
+    
+    // Take care of category filter
+    if (filterFromFilterScreen && filterFromFilterScreen.categories && filterFromFilterScreen.categories.length > 0) {
+        helpItemsCopy = helpItemsCopy.filter((e) => {
+            let findItem = filterFromFilterScreen.categories.find((k) => {
+                return k.value === `helpCategory.json_${e.categoryId}`
+            })
+            return findItem !== undefined
+        })
+    }
+
+    // Take care of sort
+    if (filterFromFilterScreen && filterFromFilterScreen.sort && filterFromFilterScreen.sort !== undefined && filterFromFilterScreen.sort.length > 0) {
+        let sortCriteria = []
+        let sortOrder = []
+        for(let i = 0; i < filterFromFilterScreen.sort.length; i++) {
+            if (filterFromFilterScreen.sort[i].sortCriteria && filterFromFilterScreen.sort[i].sortCriteria.trim().length > 0 && filterFromFilterScreen.sort[i].sortOrder && filterFromFilterScreen.sort[i].sortOrder.trim().length > 0){
+                sortCriteria.push(filterFromFilterScreen.sort[i].sortCriteria === 'Title' ? 'title' : 'categoryId')
+                sortOrder.push(filterFromFilterScreen.sort[i].sortOrder === 'LNG_SIDE_FILTERS_SORT_BY_ASC_PLACEHOLDER' ? false : true)
+            }
+        }
+        let helpItemsCopyMapped = helpItemsCopy.map((e) => {
+            if (e.title) {
+                e.title = getTranslation(e.title, translations) 
+            }
+            if (e.categoryId) {
+                e.categoryId = getTranslation(e.categoryId, translations) 
+            }
+            return e
+        })
+
+        helpItemsCopy = helpItemsCopyMapped
+
+        if (sortCriteria.length > 0 && sortOrder.length > 0) {
+            if (sortOrder.length === 1) {
+                helpItemsCopy = objSort(helpItemsCopy, [sortCriteria[0], sortOrder[0]])
+            } else if (sortOrder.length === 2) {
+                helpItemsCopy = objSort(helpItemsCopy, [sortCriteria[0], sortOrder[0]], [sortCriteria[1], sortOrder[1]])
+            }
+        }
+    }
+
+    return helpItemsCopy
+}
+
+export function filterItemsForEachPage (helpItemsCopy, pageAskingHelpFrom) {
+    helpItemsCopy = helpItemsCopy.filter((e) => { 
+        let itemPage = null
+        if (e.page && e.page !== undefined) {
+            itemPage = e.page
+        }
+        if (itemPage) {
+            if (pageAskingHelpFrom === 'followUps') {
+                return e.page.toLowerCase().includes('followups') && !e.page.toLowerCase().includes('modify') && !e.page.toLowerCase().includes('edit') && 
+                !e.page.toLowerCase().includes('view') && !e.page.toLowerCase().includes('add') && !e.page.toLowerCase().includes('create')
+            } else if (pageAskingHelpFrom === 'contacts') {
+                return e.page.toLowerCase().includes('contacts') && !e.page.toLowerCase().includes('modify') && !e.page.toLowerCase().includes('edit') && 
+                !e.page.toLowerCase().includes('view') && !e.page.toLowerCase().includes('add') && !e.page.toLowerCase().includes('create')
+            } else if (pageAskingHelpFrom === 'cases') {
+                return e.page.toLowerCase().includes('cases') && !e.page.toLowerCase().includes('modify') && !e.page.toLowerCase().includes('edit') && 
+                !e.page.toLowerCase().includes('view') && !e.page.toLowerCase().includes('add') && !e.page.toLowerCase().includes('create')
+            } 
+            else if (pageAskingHelpFrom === 'followUpSingleScreenAdd') {
+                return e.page.toLowerCase().includes('followups') && !e.page.toLowerCase().includes('modify') && !e.page.toLowerCase().includes('edit') && 
+                !e.page.toLowerCase().includes('view') && (e.page.toLowerCase().includes('add') || e.page.toLowerCase().includes('create'))
+            } else if (pageAskingHelpFrom === 'contactsSingleScreenAdd') {
+                return e.page.toLowerCase().includes('contacts') && !e.page.toLowerCase().includes('modify') && !e.page.toLowerCase().includes('edit') && 
+                !e.page.toLowerCase().includes('view') && (e.page.toLowerCase().includes('add') || e.page.toLowerCase().includes('create'))
+            } else if (pageAskingHelpFrom === 'casesSingleScreenAdd') {
+                return e.page.toLowerCase().includes('cases') && !e.page.toLowerCase().includes('modify') && !e.page.toLowerCase().includes('edit') && 
+                !e.page.toLowerCase().includes('view') && (e.page.toLowerCase().includes('add') || e.page.toLowerCase().includes('create'))
+            } 
+            else if (pageAskingHelpFrom === 'followUpSingleScreenEdit') {
+                return e.page.toLowerCase().includes('followups') && (e.page.toLowerCase().includes('modify') || e.page.toLowerCase().includes('edit')) && 
+                !e.page.toLowerCase().includes('view') && !e.page.toLowerCase().includes('add') && !e.page.toLowerCase().includes('create')
+            } else if (pageAskingHelpFrom === 'contactsSingleScreenEdit') {
+                return e.page.toLowerCase().includes('contacts') && (e.page.toLowerCase().includes('modify') || e.page.toLowerCase().includes('edit')) && 
+                !e.page.toLowerCase().includes('view') && !e.page.toLowerCase().includes('add') && !e.page.toLowerCase().includes('create')
+            } else if (pageAskingHelpFrom === 'casesSingleScreenEdit') {
+                return e.page.toLowerCase().includes('cases') && (e.page.toLowerCase().includes('modify') || e.page.toLowerCase().includes('edit')) && 
+                !e.page.toLowerCase().includes('view') && !e.page.toLowerCase().includes('add') && !e.page.toLowerCase().includes('create')
+            } 
+            else if (pageAskingHelpFrom === 'followUpSingleScreenView') {
+                return e.page.toLowerCase().includes('followups') && !e.page.toLowerCase().includes('modify') && !e.page.toLowerCase().includes('edit') && 
+                e.page.toLowerCase().includes('view') && !e.page.toLowerCase().includes('add') && !e.page.toLowerCase().includes('create')
+            } else if (pageAskingHelpFrom === 'contactsSingleScreenView') {
+                return e.page.toLowerCase().includes('contacts') && !e.page.toLowerCase().includes('modify') && !e.page.toLowerCase().includes('edit') && 
+                e.page.toLowerCase().includes('view') && !e.page.toLowerCase().includes('add') && !e.page.toLowerCase().includes('create')
+            } else if (pageAskingHelpFrom === 'casesSingleScreenView') {
+                return e.page.toLowerCase().includes('cases') && !e.page.toLowerCase().includes('modify') && !e.page.toLowerCase().includes('edit') && 
+                e.page.toLowerCase().includes('view') && !e.page.toLowerCase().includes('add') && !e.page.toLowerCase().includes('create')
+            }
+            else if (pageAskingHelpFrom === 'exposureAdd') {
+                return e.page.toLowerCase().includes('relationships') && !e.page.toLowerCase().includes('modify') && !e.page.toLowerCase().includes('edit') && 
+                !e.page.toLowerCase().includes('view') && (e.page.toLowerCase().includes('add') || e.page.toLowerCase().includes('create'))
+            } else if (pageAskingHelpFrom === 'exposureEdit') {
+                return e.page.toLowerCase().includes('relationships') && (e.page.toLowerCase().includes('modify') || e.page.toLowerCase().includes('edit') || 
+                e.page.toLowerCase().includes('view')) && !e.page.toLowerCase().includes('add') && !e.page.toLowerCase().includes('create')
+            }
+        }
+    })
+
+    return helpItemsCopy
 }
 
 export function objSort() {

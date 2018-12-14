@@ -4,31 +4,19 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
-import {View, Text, StyleSheet, Alert, Animated, NativeModules, BackHandler} from 'react-native';
-import {Button, Icon} from 'react-native-material-ui';
+import {View, Text, StyleSheet, Alert, Animated, BackHandler} from 'react-native';
 import styles from './../styles';
 import NavBarCustom from './../components/NavBarCustom';
-import config from './../utils/config';
-import Ripple from 'react-native-material-ripple';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import SearchFilterView from './../components/SearchFilterView';
 import HelpListItem from './../components/HelpListItem';
 import AnimatedListView from './../components/AnimatedListView';
-import Breadcrumb from './../components/Breadcrumb';
-import Menu, {MenuItem} from 'react-native-material-menu';
-import ValuePicker from './../components/ValuePicker';
-import {getFollowUpsForOutbreakId, getMissedFollowUpsForOutbreakId, updateFollowUpAndContact, addFollowUp, generateFollowUp} from './../actions/followUps';
-import {getContactsForOutbreakId} from './../actions/contacts';
 import {removeErrors} from './../actions/errors';
-import {addFilterForScreen, removeFilterForScreen, saveGeneratedFollowUps} from './../actions/app';
-import ElevatedView from 'react-native-elevated-view';
+import {addFilterForScreen, removeFilterForScreen} from './../actions/app';
 import _ from 'lodash';
-import {LoaderScreen, Colors} from 'react-native-ui-lib';
-import {calculateDimension, navigation, extractIdFromPouchId, generateId, updateRequiredFields, getTranslation, localSortContactsForFollowUps, objSort} from './../utils/functions';
+import {calculateDimension, navigation, getTranslation, localSortHelpItem, filterItemsForEachPage} from './../utils/functions';
 import ViewHOC from './../components/ViewHOC';
-import { Popup } from 'react-native-map-link';
-import moment from 'moment';
 import translations from './../utils/translations'
 
 const scrollAnim = new Animated.Value(0);
@@ -42,28 +30,26 @@ class HelpScreen extends Component {
 
     constructor(props) {
         super(props);
-        let now = new Date();
         this.state = {
-            filter: this.props.filter && this.props.filter['HelpScreen'] ? this.props.filter['HelpScreen'] : {searchText: ''},
+            filter: this.props.filter && this.props.filter['HelpScreen'] ? this.props.filter['HelpScreen'] : { searchText: '' },
             filterFromFilterScreen: this.props.filter && this.props.filter['HelpFilterScreen'] ? this.props.filter['HelpFilterScreen'] : null,
             helpItems: [],
+
             refreshing: false,
             loading: false,
-            isVisible: false,
-            latitude: 0,
-            longitude: 0,
-            sourceLatitude: 0,
-            sourceLongitude: 0,
             error: null,
-            calendarPickerOpen: false
+
+            displayModalFormat: false,
+            pageAskingHelpFrom: this.props.pageAskingHelpFrom && this.props.pageAskingHelpFrom !== undefined ? this.props.pageAskingHelpFrom : null,
+            pageAskingHelpFromNameToDisplay: '',
         };
+
         // Bind here methods, or at least don't declare methods in the render method
         this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this));
         this.renderHelp = this.renderHelp.bind(this);
         this.keyExtractor = this.keyExtractor.bind(this);
         this.renderSeparatorComponent = this.renderSeparatorComponent.bind(this);
         this.listEmptyComponent = this.listEmptyComponent.bind(this);
-        this.onSelectValue = this.onSelectValue.bind(this);
         this.filterHelp = this.filterHelp.bind(this);
         this.handleBackButtonClick = this.handleBackButtonClick.bind(this);
     }
@@ -83,14 +69,38 @@ class HelpScreen extends Component {
             ])
         }
 
-        if(props.helpCategory){
-            state.helpItems = props.helpItem;
+        let helpItemClone = _.cloneDeep(props.helpItem);
+        if (state.filter || state.filterFromFilterScreen) {
+            helpItemClone = localSortHelpItem(helpItemClone, props.filter, state.filter, state.filterFromFilterScreen, props.translation)
+        }
+
+        if (state.pageAskingHelpFrom && state.pageAskingHelpFrom !== undefined) {
+            helpItemClone = filterItemsForEachPage(helpItemClone, state.pageAskingHelpFrom)
+        }
+
+        if(helpItemClone){
+            state.helpItems = helpItemClone;
         }
         return null;
     }
 
     componentDidMount() {
         BackHandler.addEventListener('hardwareBackPress', this.handleBackButtonClick);
+        
+        this.props.removeFilterForScreen('HelpFilterScreen');
+
+        console.log('componentDidMount HelpScreen', this.props.pageAskingHelpFrom)
+        if (this.state.pageAskingHelpFrom && this.state.pageAskingHelpFrom !== undefined) {
+            let itemsToSetInState = this.prepareFieldsForHelpFromPage()
+            this.setState({
+                filter: itemsToSetInState.filter,
+                filterFromFilterScreen: null,
+                displayModalFormat: true,
+                pageAskingHelpFromNameToDisplay: itemsToSetInState.pageAskingHelpFromNameToDisplay,
+            }, () => {
+                console.log ('filter removed')
+            })
+        }
     };
 
     shouldComponentUpdate(nextProps, nextState) {
@@ -106,7 +116,7 @@ class HelpScreen extends Component {
     }
 
     handleBackButtonClick() {
-        return true;
+        return false;
     }
 
     clampedScroll= Animated.diffClamp(
@@ -142,18 +152,51 @@ class HelpScreen extends Component {
             extrapolate: 'clamp',
         });
         let helpTitle = []; helpTitle[1] = getTranslation(translations.helpScreen.helpTitle, this.props.translation);
+
+        let filterNumbers = 0
+        if (this.state.filterFromFilterScreen) {
+            if (this.state.filterFromFilterScreen.categories && this.state.filterFromFilterScreen.categories.length > 0) {
+                ++filterNumbers
+            }
+        }
+        let filterText = filterNumbers === 0 ? `${getTranslation(translations.generalLabels.filterTitle, this.props.translation)}` : `${getTranslation(translations.generalLabels.filterTitle, this.props.translation)}(${filterNumbers})`
+
         return (
             <ViewHOC style={style.container}
                      showLoader={(this.props && this.props.syncState && (this.props.syncState !== 'Finished processing' && this.props.syncState !== 'Error')) || (this && this.state && this.state.loading)}
                      loaderText={this.props && this.props.syncState ? this.props.syncState : getTranslation(translations.loadingScreenMessages.loadingMsg, this.props.translation)}>
-                <NavBarCustom
-                    title={helpTitle[1]}
-                    navigator={this.props.navigator || null}
-                    iconName="menu"
-                    handlePressNavbarButton={this.handlePressNavbarButton}
-                >
-
-                </NavBarCustom>
+                {
+                    this.state.displayModalFormat === true ? (
+                        <NavBarCustom customTitle={
+                            <View
+                                style={{
+                                    flex: 1,
+                                    flexDirection: 'row',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
+                                    height: '100%'
+                                }}
+                            >
+                                <Text style={[style.title, {marginLeft: 30}]}>
+                                    {`${helpTitle[1]} ${getTranslation(translations.helpScreen.itemsForMessage, this.props.translation)} ${this.state.pageAskingHelpFromNameToDisplay}`}
+                                </Text>
+                            </View>
+                        }
+                            title={null}
+                            navigator={this.props.navigator}
+                            iconName="close"
+                            handlePressNavbarButton={this.handlePressNavbarButton}
+                        />
+                    ) : (
+                    <NavBarCustom
+                        title={helpTitle[1]}
+                        navigator={this.props.navigator || null}
+                        iconName="menu"
+                        handlePressNavbarButton={this.handlePressNavbarButton}
+                    >
+                    </NavBarCustom>
+                    )
+                }
                 <View style={style.containerContent}>
                     <AnimatedListView
                         stickyHeaderIndices={[0]}
@@ -172,10 +215,7 @@ class HelpScreen extends Component {
                                 onPress={this.handlePressFilter}
                                 onChangeText={this.handleOnChangeText}
                                 onSubmitEditing={this.handleOnSubmitEditing}
-                                filterText={
-                                    (this.state.filterFromFilterScreen && Object.keys(this.state.filterFromFilterScreen).length > 0)
-                                        ? (getTranslation(translations.generalLabels.filterTitle, this.props.translation) + ' (' + Object.keys(this.state.filterFromFilterScreen).length + ')')
-                                        : getTranslation(translations.generalLabels.filterTitle, this.props.translation)}
+                                filterText={filterText}
                             />}
                         ItemSeparatorComponent={this.renderSeparatorComponent}
                         ListEmptyComponent={this.listEmptyComponent}
@@ -193,15 +233,19 @@ class HelpScreen extends Component {
 
     // Please write here all the methods that are not react native lifecycle methods
     handlePressNavbarButton = () => {
-        this.setState({
-            calendarPickerOpen: false
-        }, () => {
-            this.props.navigator.toggleDrawer({
-                side: 'left',
-                animated: true,
-                to: 'open'
+        this.state.displayModalFormat === true ? (
+            this.props.navigator.dismissModal()
+        ) : (
+            this.setState({
+                calendarPickerOpen: false
+            }, () => {
+                this.props.navigator.toggleDrawer({
+                    side: 'left',
+                    animated: true,
+                    to: 'open'
+                })
             })
-        })
+        )
     };
 
     startLoadingScreen = () => {
@@ -225,7 +269,7 @@ class HelpScreen extends Component {
     });
 
     keyExtractor = (item, index) => {
-        item._id;
+       return item._id;
     };
 
     renderSeparatorComponent = () => {
@@ -238,31 +282,26 @@ class HelpScreen extends Component {
         this.setState({
             refreshing: true
         }, () => {
-            this.props.getFollowUpsForOutbreakId(this.props.user.activeOutbreakId, this.state.filter, null);
+            this.filterHelp()
         });
     };
 
     listEmptyComponent = () => {
         return (
             <View style={[style.emptyComponent, {height: calculateDimension((667 - 152), true, this.props.screenSize)}]}>
-                <Text style={style.emptyComponentTextView}>
-                    {getTranslation(translations.followUpsScreen.noFollowupsMessage, this.props.translation)}
-                </Text>
+                {
+                    this.state.displayModalFormat === true ? (
+                        <Text style={style.emptyComponentTextView}>
+                            {`${getTranslation(translations.helpScreen.noHelpItemsToShowMessage, this.props.translation)} for ${this.state.pageAskingHelpFromNameToDisplay}`} 
+                        </Text>
+                    ) : (
+                        <Text style={style.emptyComponentTextView}>
+                            {`${getTranslation(translations.helpScreen.noHelpItemsToShowMessage, this.props.translation)}`} 
+                        </Text>
+                    )
+                }
             </View>
         )
-    };
-
-    onSelectValue = (value) => {
-        this.setState(prevState => ({
-            filter: Object.assign({}, prevState.filter, {performed: value})
-        }), () => {
-            console.log("### filter from onSelectValue: ", this.state.filter);
-            if (value === 'All') {
-                this.removeFromFilter({type: 'performed'});
-            } else {
-                this.appendToFilter({type: 'performed', value});
-            }
-        });
     };
 
     handlePressViewHelp = (item) => {
@@ -279,6 +318,89 @@ class HelpScreen extends Component {
                 filter: this.state.filter,
                 startLoadingScreen: this.startLoadingScreen
             }
+        })
+    };
+
+    //PrepareFieldsForHelpFromPage
+    prepareFieldsForHelpFromPage = () => {
+        let filter = {searchText: ''}
+        let pageAskingHelpFromNameToDisplay = ''
+
+        if (this.state.pageAskingHelpFrom === 'followUps') {
+            pageAskingHelpFromNameToDisplay = getTranslation(translations.followUpsScreen.followUpsTitle, this.props.translation)
+        } else if (this.state.pageAskingHelpFrom === 'contacts') {
+            pageAskingHelpFromNameToDisplay = getTranslation(translations.contactsScreen.contactsTitle, this.props.translation)
+        } else if (this.state.pageAskingHelpFrom === 'cases') {
+            pageAskingHelpFromNameToDisplay = getTranslation(translations.casesScreen.casesTitle, this.props.translation)
+        } 
+        else if (this.state.pageAskingHelpFrom === 'followUpSingleScreenAdd') {
+            pageAskingHelpFromNameToDisplay = `${getTranslation(translations.helpScreen.addMessage, this.props.translation)} ${getTranslation(translations.followUpsSingleScreen.title, this.props.translation)}`
+        } else if (this.state.pageAskingHelpFrom === 'contactsSingleScreenAdd') {
+            pageAskingHelpFromNameToDisplay = `${getTranslation(translations.helpScreen.addMessage, this.props.translation)} ${getTranslation(translations.contactSingleScreen.title, this.props.translation)}`
+        } else if (this.state.pageAskingHelpFrom === 'casesSingleScreenAdd') {
+            pageAskingHelpFromNameToDisplay = `${getTranslation(translations.helpScreen.addMessage, this.props.translation)} ${getTranslation(translations.caseSingleScreen.title, this.props.translation)}`
+        } 
+        else if (this.state.pageAskingHelpFrom === 'followUpSingleScreenEdit') {
+            pageAskingHelpFromNameToDisplay = `${getTranslation(translations.helpScreen.editMessage, this.props.translation)} ${getTranslation(translations.followUpsSingleScreen.title, this.props.translation)}`
+        } else if (this.state.pageAskingHelpFrom === 'contactsSingleScreenEdit') {
+            pageAskingHelpFromNameToDisplay = `${getTranslation(translations.helpScreen.editMessage, this.props.translation)} ${getTranslation(translations.contactSingleScreen.title, this.props.translation)}`
+        } else if (this.state.pageAskingHelpFrom === 'casesSingleScreenEdit') {
+            pageAskingHelpFromNameToDisplay = `${getTranslation(translations.helpScreen.editMessage, this.props.translation)} ${getTranslation(translations.caseSingleScreen.title, this.props.translation)}`
+        } 
+        else if (this.state.pageAskingHelpFrom === 'followUpSingleScreenView') {
+            pageAskingHelpFromNameToDisplay = `${getTranslation(translations.helpScreen.viewMessage, this.props.translation)} ${getTranslation(translations.followUpsSingleScreen.title, this.props.translation)}`
+        } else if (this.state.pageAskingHelpFrom === 'contactsSingleScreenView') {
+            pageAskingHelpFromNameToDisplay = `${getTranslation(translations.helpScreen.viewMessage, this.props.translation)} ${getTranslation(translations.contactSingleScreen.title, this.props.translation)}`
+        } else if (this.state.pageAskingHelpFrom === 'casesSingleScreenView') {
+            pageAskingHelpFromNameToDisplay = `${getTranslation(translations.helpScreen.viewMessage, this.props.translation)} ${getTranslation(translations.caseSingleScreen.title, this.props.translation)}`
+        }
+        else if (this.state.pageAskingHelpFrom === 'exposureAdd') {
+            pageAskingHelpFromNameToDisplay = `${getTranslation(translations.exposureScreen.editExposureLabel, this.props.translation)}`
+        } else if (this.state.pageAskingHelpFrom === 'exposureEdit') {
+            pageAskingHelpFromNameToDisplay = `${getTranslation(translations.exposureScreen.editExposureLabel, this.props.translation)}`
+        }
+
+        return {
+            filter: filter,
+            pageAskingHelpFromNameToDisplay: pageAskingHelpFromNameToDisplay
+        }
+    }
+
+    //Filters 
+    applyFilters = () => {
+        this.props.addFilterForScreen('HelpScreen', this.state.filter);
+        this.setState({
+            loading: true
+        }, () => {
+            this.filterHelp()
+        })
+    };
+
+    handleOnSubmitEditing = (text) => {
+        this.filterHelp();
+    };
+
+    handleOnApplyFilters = (filter) => {
+        console.log ('foolowUpsScreen handleOnApplyFilters', filter)
+        this.setState({
+            filterFromFilterScreen: filter
+        }, () => {
+            this.filterHelp();
+        })
+    };
+
+    filterHelp = () => {
+        let helpItemClone = _.cloneDeep(this.props.helpItem);
+        if (this.state.filter || this.state.filterFromFilterScreen){
+            helpItemClone = localSortHelpItem(helpItemClone, this.props.filter, this.state.filter, this.state.filterFromFilterScreen, this.props.translation)
+        }
+        if (this.state.pageAskingHelpFrom && this.state.pageAskingHelpFrom !== undefined) {
+            helpItemClone = filterItemsForEachPage(helpItemClone, this.state.pageAskingHelpFrom)
+        }
+
+        this.setState ({
+            helpItems: helpItemClone,
+            refreshing: false
         })
     };
 
@@ -301,87 +423,8 @@ class HelpScreen extends Component {
         }), console.log('### filter after changed text: ', this.state.filter))
     };
 
-    // Append to the existing filter newProp={name: value}
-    appendToFilter = (newProp) => {
-        let auxFilter = Object.assign({}, this.state.filter);
 
-        // If the filter exists, check if it has already the wanted props and change them. Otherwise add them
-        if (auxFilter) {
-            auxFilter[newProp.type] = newProp.value;
-        }
-
-        this.setFilter(auxFilter);
-    };
-
-    removeFromFilter = (newProp) => {
-        let auxFilter = Object.assign({}, this.state.filter);
-
-        if (auxFilter && auxFilter[newProp.type]) {
-            delete auxFilter[newProp.type];
-        }
-
-        this.setFilter(auxFilter);
-    };
-
-    setFilter = (filter) => {
-        this.setState({filter}, () => {
-            // After setting the filter, we want to apply it
-            this.applyFilters();
-        });
-    };
-
-    applyFilters = () => {
-        this.props.addFilterForScreen('FollowUpsScreen', this.state.filter);
-        this.setState({
-            loading: true
-        }, () => {
-            this.props.getFollowUpsForOutbreakId(this.props.user.activeOutbreakId, this.state.filter, null);
-        })
-    };
-
-    handleOnSubmitEditing = (text) => {
-        // Filter help by title
-        this.filterHelp();
-    };
-
-    handleOnApplyFilters = (filter) => {
-        console.log ('foolowUpsScreen handleOnApplyFilters', filter)
-        this.setState({
-            filterFromFilterScreen: filter
-        }, () => {
-            this.filterHelp();
-        })
-    };
-
-    onNavigatorEvent = (event) => {
-        navigation(event, this.props.navigator);
-    };
-
-    // Method to filter the contacts inside the screen
-    // Since the date filter on the FollowUps is always active, we can filter the contacts inside the screen
-    // This means that on the contacts screen it has to be a filter on the database
-    filterHelp = () => {
-        let contactsCopy = _.cloneDeep(this.props.contacts);
-        contactsCopy = localSortContactsForFollowUps(contactsCopy, this.props.filter, this.state.filter, this.state.filterFromFilterScreen)
-
-        // After filtering the contacts, it's time to get their respective follow-ups to show
-        this.getFollowUpsFromContacts(contactsCopy);
-    };
-
-    getFollowUpsFromContacts = (contacts) => {
-        let followUpsToBeShown = [];
-
-        if (contacts && Array.isArray(contacts) && contacts.length > 0) {
-            for (let i=0; i<contacts.length; i++) {
-                followUpsToBeShown = followUpsToBeShown.concat(contacts[i].followUps);
-            }
-        }
-
-        this.setState({
-            followUps: followUpsToBeShown
-        })
-    };
-
+    //Other
     getTranslation = (value) => {
         let valueToBeReturned = value;
         if (value && typeof value === 'string' && value.includes('LNG')) {
@@ -398,6 +441,10 @@ class HelpScreen extends Component {
 
     hideMenu = () => {
         this.refs.menuRef.hide();
+    };
+
+    onNavigatorEvent = (event) => {
+        navigation(event, this.props.navigator);
     };
 }
 
@@ -454,8 +501,6 @@ function mapStateToProps(state) {
         screenSize: state.app.screenSize,
         filter: state.app.filters,
         syncState: state.app.syncState,
-        followUps: state.followUps,
-        contacts: state.contacts,
         errors: state.errors,
         translation: state.app.translation,
         helpCategory: state.helpCategory,
@@ -466,15 +511,9 @@ function mapStateToProps(state) {
 
 function matchDispatchProps(dispatch) {
     return bindActionCreators({
-        getFollowUpsForOutbreakId,
-        getMissedFollowUpsForOutbreakId,
         removeErrors,
         addFilterForScreen,
-        getContactsForOutbreakId,
-        updateFollowUpAndContact,
-        saveGeneratedFollowUps,
         removeFilterForScreen,
-        generateFollowUp
     }, dispatch);
 }
 

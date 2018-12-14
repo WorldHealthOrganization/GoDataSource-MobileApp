@@ -16,6 +16,7 @@ import {getContactsForOutbreakId} from './../actions/contacts';
 import {addFilterForScreen, removeFilterForScreen} from './../actions/app';
 import {TabBar, TabView} from 'react-native-tab-view';
 import HelpFilterContainer from './../containers/HelpFilterContainer';
+import HelpSortContainer from './../containers/HelpSortContainer';
 import FollowUpsSortContainer from './../containers/FollowUpsSortContainer';
 import translations from './../utils/translations';
 import _ from 'lodash';
@@ -50,6 +51,7 @@ class HelpFilterScreen extends Component {
             }
             console.log("### Active filters: ", filterClone);
         }
+        state.filter.filter = filterClone
         return null
     };
 
@@ -57,7 +59,6 @@ class HelpFilterScreen extends Component {
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
-
         return (
             <View style={style.container}>
                 <NavBarCustom
@@ -67,7 +68,6 @@ class HelpFilterScreen extends Component {
                     handlePressNavbarButton={this.handlePressNavbarButton}
                 />
                 <TabView
-                    swipeEnabled = {false}
                     navigationState={this.state}
                     renderScene={this.handleRenderScene}
                     renderTabBar={this.handleRenderTabBar}
@@ -77,24 +77,8 @@ class HelpFilterScreen extends Component {
         );
     }
 
-    // Please write here all the methods that are not react native lifecycle methods
-    handlePressNavbarButton = () => {
-        this.props.removeFilterForScreen(this.props.screen);
-        this.props.navigator.dismissModal(this.props.onApplyFilters(null));
-    };
-
     handleOnIndexChange = (index) => {
         this.setState({index});
-    };
-
-    handleMoveToNextScreenButton = () => {
-        let nextIndex = this.state.index + 1
-        this.handleOnIndexChange(nextIndex)
-    };
-
-    handleMoveToPrevieousScreenButton = () => {
-        let nextIndex = this.state.index - 1
-        this.handleOnIndexChange(nextIndex)
     };
 
     handleRenderScene = () => {
@@ -102,44 +86,21 @@ class HelpFilterScreen extends Component {
             return (
                 <HelpFilterContainer
                     filter={this.state.filter}
-                    onSelectItem={this.handleOnSelectItem}
-                    onChangeSectionedDropDown={this.handleOnChangeSectionedDropDown}
-                    onChangeInterval={this.handleOnChangeInterval}
                     onChangeMultipleSelection={this.handleOnChangeMultipleSelection}
                     onPressApplyFilters={this.handleOnPressApplyFilters}
-                    handleMoveToNextScreenButton = {this.handleMoveToNextScreenButton}
                 />
             );
         } else {
             return (
-                <FollowUpsSortContainer
-                    handleMoveToPrevieousScreenButton={this.handleMoveToPrevieousScreenButton}
+                <HelpSortContainer
                     filter={this.state.filter}
                     onPressApplyFilters={this.handleOnPressApplyFilters}
                     onPressAddSortRule={this.onPressAddSortRule}
                     onChangeDropDown={this.onChangeDropDown}
                     onDeletePress={this.onDeleteSortRulePress}
-                    key={this.state.index}
                 />
             );
         }
-    };
-
-    handleRenderTabBar = (props) => {
-        return (
-            <TabBar
-                {...props}
-                indicatorStyle={{
-                    backgroundColor: styles.buttonGreen,
-                    height: 2
-                }}
-                style={{
-                    height: 41,
-                    backgroundColor: 'white'
-                }}
-                renderLabel={this.handleRenderLabel(props)}
-            />
-        )
     };
 
     onPressAddSortRule = () => {
@@ -185,6 +146,24 @@ class HelpFilterScreen extends Component {
         }
     };
 
+
+    handleRenderTabBar = (props) => {
+        return (
+            <TabBar
+                {...props}
+                indicatorStyle={{
+                    backgroundColor: styles.buttonGreen,
+                    height: 2
+                }}
+                style={{
+                    height: 41,
+                    backgroundColor: 'white'
+                }}
+                renderLabel={this.handleRenderLabel(props)}
+            />
+        )
+    };
+
     handleRenderLabel = (props) => ({route, index}) => {
         const inputRange = props.navigationState.routes.map((x, i) => i);
 
@@ -207,51 +186,32 @@ class HelpFilterScreen extends Component {
                 {getTranslation(route.title, this.props.translation).toUpperCase()}
             </Animated.Text>
         );
-    };
+    }
 
-    handleOnSelectItem = (item, index, id) => {
-        console.log("### handleOnSelectItem: ", item, index, id);
-        let filter = Object.assign({}, this.state.filter.filter);
-        filter[id][item.value] = !filter[id][item.value];
-        this.setState(prevState => ({
-            filter: Object.assign({}, prevState.filter, Object.assign({}, prevState.filter.filter, {[id]: filter[id]}))
-        }))
-    };
-
-    handleOnChangeSectionedDropDown = (selectedItems) => {
-        let selectedItemsWithExtractedId = selectedItems.map ((e) => {
-            return extractIdFromPouchId (e, 'location')
-        })
-
-        this.setState(prevState => ({
-            filter: Object.assign({}, prevState.filter, {filter: Object.assign({}, prevState.filter.filter, {selectedLocations: selectedItemsWithExtractedId})})
-        }), () => {
-            console.log("Filters: ", this.state.filter.filter);
-        })
-    };
-
-    handleOnChangeInterval = (values, id) => {
-        this.setState(prevState => ({
-            filter: Object.assign({}, prevState.filter, {filter: Object.assign({}, prevState.filter.filter, {[id]: values})})
-        }));
+    // Please write here all the methods that are not react native lifecycle methods
+    handlePressNavbarButton = () => {
+        this.props.removeFilterForScreen(this.props.screen);
+        this.props.navigator.dismissModal(this.props.onApplyFilters(null));
     };
 
     handleOnChangeMultipleSelection = (selections, id) => {
         this.setState(prevState => ({
             filter: Object.assign({}, prevState.filter, {filter: Object.assign({}, prevState.filter.filter, {[id]: selections})})
         }), () => {
-            console.log("### selections: ", this.state.filter.filter);
+            console.log("### handleOnChangeMultipleSelection: ", this.state.filter.filter);
         })
     };
 
     handleOnPressApplyFilters = () => {
         let filterStateClone = Object.assign({}, this.state.filter.filter);
-        let filterSortClone = this.state.filter.sort.slice();
+        let filterSortClone = this.state.filter.sort.slice()
+
         let filter = {};
 
-        if (filterStateClone.selectedLocations) {
+        if (filterStateClone.categories) {
             filter.categories = filterStateClone.categories;
         }
+
         if (filterSortClone && filterSortClone.length > 0){
             filter.sort = filterSortClone;
         }

@@ -69,9 +69,9 @@ class NavigationDrawer extends Component {
                     }
                     <View style={styles.lineStyle} />
                 </View>
+                
                 <View style={{flex: 0.8}}>
                     {
-                        
                         config.sideMenuItems.map((item, index) => {
                             let addButton = false;
                             if (item.addButton && item.addButton === true){

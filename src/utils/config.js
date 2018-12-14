@@ -59,8 +59,8 @@ const tabsValuesRoutes = {
         {key: 'sort', title: translations.followUpFilter.sortTitle}
     ],
     helpFilter: [
-        {key: 'filters', title: translations.helpFilter.filterTitle},
-        {key: 'sort', title: translations.helpFilter.sortTitle}
+        {key: 'filters', title: translations.followUpFilter.filterTitle},
+        {key: 'sort', title: translations.followUpFilter.sortTitle}
     ],
     casesFilter: [
         {key: 'filters', title: translations.casesFilter.filterTitle},
@@ -69,6 +69,9 @@ const tabsValuesRoutes = {
     followUpsSingle: [
         {key: 'genInfo', title: translations.followUpsSingleScreen.detailsiTitle},
         {key: 'quest', title: translations.followUpsSingleScreen.questionnaireTitle}
+    ],
+    helpSingle: [
+        {key: 'details', title: translations.helpScreen.helpSingleScreenTab},
     ],
     casesSingle: [
         {key: 'personal', title: translations.caseSingleScreen.personalTitle},
@@ -829,7 +832,7 @@ const helpFilterScreen = {
                 {
                     cardNumber: 3,
                     id: 'categories',
-                    label: translations.followUpFilter.chooseLocationLabel,
+                    label: translations.helpFilter.chooseCategoryLabel,
                     type: 'DropDown',
                     value: '',
                     isRequired: false,
@@ -843,7 +846,7 @@ const helpFilterScreen = {
         fields: [
             {
                 cardNumber: 1,
-                label: 'Sort by',
+                label: translations.sortTab.sortBy,
                 type: 'Section',
                 hasBorderBottom: true,
                 borderBottomColor: styles.navigationDrawerSeparatorGrey
@@ -852,7 +855,7 @@ const helpFilterScreen = {
                 cardNumber: 1,
                 id: 'sortCriteria',
                 type: 'DropdownInput',
-                label: 'Sort Criteria',
+                label: translations.sortTab.sortCriteria,
                 isRequired: false,
                 isEditMode: true,
                 value: '',
@@ -862,7 +865,7 @@ const helpFilterScreen = {
                 cardNumber: 1,
                 id: 'sortOrder',
                 type: 'DropdownInput',
-                label: 'Sort Order',
+                label: translations.sortTab.sortOrder,
                 isRequired: false,
                 isEditMode: true,
                 value: '',
@@ -1020,7 +1023,70 @@ const defaultFilterForContacts = {
 };
 
 const defaultFilterForCases = {
+};
 
+const helpSingleScreen = {
+    details: [
+        {
+            fields: [
+                {
+                    cardNumber: 1,
+                    id: 'title',
+                    label: translations.helpScreen.helpTitleLabel,
+                    type: 'TextInput',
+                    value: '',
+                    isRequired: false,
+                    isEditMode: false,
+                    multiline: true,
+                    objectType: 'Help'
+                },
+                {
+                    cardNumber: 1,
+                    id: 'categoryId',
+                    label: translations.helpScreen.helpCategoryLabel,
+                    type: 'TextInput',
+                    value: '',
+                    isRequired: false,
+                    isEditMode: false,
+                    multiline: true,
+                    objectType: 'Help'
+                },
+                {
+                    cardNumber: 1,
+                    id: 'content',
+                    label: translations.helpScreen.helpDescriptionLabel,
+                    type: 'TextInput',
+                    value: '',
+                    isRequired: false,
+                    isEditMode: false,
+                    multiline: true,
+                    objectType: 'Help'
+                },
+                {
+                    cardNumber: 1,
+                    id: 'comment',
+                    label: translations.helpScreen.helpCommentLabel,
+                    type: 'TextInput',
+                    value: '',
+                    isRequired: false,
+                    isEditMode: false,
+                    multiline: true,
+                    objectType: 'Help'
+                },
+                {
+                    cardNumber: 1,
+                    id: 'page',
+                    label: translations.helpScreen.helpPageLabel,
+                    type: 'TextInput',
+                    value: '',
+                    isRequired: false,
+                    isEditMode: false,
+                    multiline: true,
+                    objectType: 'Help'
+                },
+            ]
+        }
+    ]
 };
 
 //not used
@@ -1883,7 +1949,12 @@ const sortOrderDropDownItems = [
 const sortCriteriaDropDownItems = [
     { label: 'First Name', value: 'firstName'},
     { label: 'Last Name', value: 'lastName'}
-]
+];
+
+const helpItemsSortCriteriaDropDownItems = [
+    { label: 'Title', value: 'Title'},
+    { label: 'Category', value: 'Category'}
+];
 
 const userPermissions = {
     readContact: 'read_contact',
@@ -1921,5 +1992,7 @@ export default {
     localTranslationTokens,
     sortOrderDropDownItems,
     sortCriteriaDropDownItems,
-    userPermissions
+    userPermissions,
+    helpSingleScreen,
+    helpItemsSortCriteriaDropDownItems
 }

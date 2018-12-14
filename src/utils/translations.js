@@ -50,6 +50,31 @@ const helpFilter = {
     chooseCategoryLabel: 'Choose one or more categories',
 };
 
+const helpScreen = {
+    helpTitle: 'Help',
+    viewHelpLabel: 'View',
+    helpViewItemTitle: 'View Help Item',
+    noHelpItemsToShowMessage: 'There are not help items to display',
+    itemsForMessage: 'items for',
+
+    addMessage: 'Add',
+    editMessage: 'Edit',
+    viewMessage: 'View',
+
+    helpTitleLabel: 'Title',
+    helpCategoryLabel: 'Category',
+    helpDescriptionLabel: 'Description',
+    helpCommentLabel: 'Comment',
+    helpPageLabel: 'Page'
+};
+
+const sortTab = {
+    addSortRule: 'add sort rule',
+    SortBy: 'sort by',
+    sortCriteria: 'sort criteria',
+    sortOrder: 'sort order',
+};
+
 const caseSingleScreen = {
     personalTitle: 'LNG_PAGE_CREATE_CASE_TAB_PERSONAL_TITLE',
     addressTitle: 'LNG_PAGE_CREATE_CASE_TAB_ADDRESS_TITLE',
@@ -185,11 +210,6 @@ const followUpsScreen = {
     addExposureFollowUpLabel: 'Add Exposure'
 };
 
-const helpScreen = {
-    helpTitle: 'Help',
-    viewHelpLabel: 'View',
-    helpViewItemTitle: 'View Help Item'
-};
 
 const missedFollowUpListItemLabels = {
     missedLabel: 'LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE_MISSED',
@@ -448,5 +468,6 @@ export default {
     dropDownSectionedLabels,
     missedFollowUpListItemLabels,
     questionCardLabels,
-    hubConfigScreen
+    hubConfigScreen,
+    sortTab
 };

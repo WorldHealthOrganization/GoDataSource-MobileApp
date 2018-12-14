@@ -107,7 +107,7 @@ class FollowUpsScreen extends Component {
             let fUps = [];
 
             let contactsCopy = _.cloneDeep(props.contacts);
-            if (props.filter && (props.filter['FollowUpsFilterScreen'] || props.filter['FollowUpsScreen'])) {
+            if (state.filter || state.filterFromFilterScreen) {
                 contactsCopy = localSortContactsForFollowUps(contactsCopy, props.filter, state.filter, state.filterFromFilterScreen)
             } else {
                 contactsCopy = objSort(contactsCopy, ['lastName', false])
@@ -151,7 +151,6 @@ class FollowUpsScreen extends Component {
                     props.saveGeneratedFollowUps(0);
                 }
             }
-
             state.refreshing = false;
             state.loading = false;
         }
@@ -232,6 +231,8 @@ class FollowUpsScreen extends Component {
                     navigator={this.props.navigator || null}
                     iconName="menu"
                     handlePressNavbarButton={this.handlePressNavbarButton}
+                    hasHelpItems={true}
+                    goToHelpScreen={this.goToHelpScreen}
                 >
                     <CalendarPicker
                         width={calculateDimension(124, false, this.props.screenSize)}
@@ -825,6 +826,17 @@ class FollowUpsScreen extends Component {
     hideMenu = () => {
         this.refs.menuRef.hide();
     };
+
+    goToHelpScreen = () => {
+        let pageAskingHelpFrom = 'followUps'
+        this.props.navigator.showModal({
+            screen: 'HelpScreen',
+            animated: true,
+            passProps: {
+                pageAskingHelpFrom: pageAskingHelpFrom
+            }
+        });
+    }
 }
 
 // Create style outside the class, or for components that will be used by other components (buttons),

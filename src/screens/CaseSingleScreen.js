@@ -24,9 +24,10 @@ import CaseSingleInvestigationContainer from '../containers/CaseSingleInvestigat
 import {Icon} from 'react-native-material-ui';
 import {removeErrors} from './../actions/errors';
 import {addCase, updateCase} from './../actions/cases';
-import {updateRequiredFields, extractIdFromPouchId, navigation, getTranslation} from './../utils/functions';
+import {updateRequiredFields, extractIdFromPouchId, navigation, getTranslation, calculateDimension} from './../utils/functions';
 import moment from 'moment';
 import translations from './../utils/translations'
+import ElevatedView from 'react-native-elevated-view';
 
 const initialLayout = {
     height: 0,
@@ -205,23 +206,43 @@ class CaseSingleScreen extends Component {
                                 navigator={this.props.navigator}
                                 onPress={this.handlePressBreadcrumb}
                             />
-                            <View>
-                                <Menu
-                                    ref="menuRef"
-                                    button={
-                                        <Ripple onPress={this.showMenu} hitSlop={{top: 20, bottom: 20, left: 20, right: 20}}>
-                                            <Icon name="more-vert"/>
-                                        </Ripple>
-                                    }
+
+                            <View style={{flexDirection: 'row', marginRight: calculateDimension(16, false, this.props.screenSize)}}>
+                                <ElevatedView
+                                    elevation={3}
+                                    style={{
+                                        backgroundColor: styles.buttonGreen,
+                                        width: calculateDimension(33, false, this.props.screenSize),
+                                        height: calculateDimension(25, true, this.props.screenSize),
+                                        borderRadius: 4
+                                    }}
                                 >
-                                    {
-                                        !this.props.isNew ? (
-                                            <MenuItem onPress={this.handleOnPressDeleteCase}>
-                                                {getTranslation(translations.caseSingleScreen.deleteCaseLabel, this.props.translation)}
-                                            </MenuItem>
-                                        ) : null
-                                    }
-                                </Menu>
+                                    <Ripple style={{
+                                        flex: 1,
+                                        justifyContent: 'center',
+                                        alignItems: 'center'
+                                    }} onPress={this.goToHelpScreen}>
+                                        <Icon name="help" color={'white'} size={15}/>
+                                    </Ripple>
+                                </ElevatedView> 
+                                <View>
+                                    <Menu
+                                        ref="menuRef"
+                                        button={
+                                            <Ripple onPress={this.showMenu} hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}>
+                                                <Icon name="more-vert"/>
+                                            </Ripple>
+                                        }
+                                    >
+                                        {
+                                            !this.props.isNew ? (
+                                                <MenuItem onPress={this.handleOnPressDeleteCase}>
+                                                    {getTranslation(translations.caseSingleScreen.deleteCaseLabel, this.props.translation)}
+                                                </MenuItem>
+                                            ) : null
+                                        }
+                                    </Menu>
+                                </View>
                             </View>
                         </View>
                     }
@@ -1381,6 +1402,27 @@ class CaseSingleScreen extends Component {
     onNavigatorEvent = (event) => {
         navigation(event, this.props.navigator);
     };
+
+    goToHelpScreen = () => {
+        let pageAskingHelpFrom = null
+        if (this.props.isNew !== null && this.props.isNew !== undefined && this.props.isNew === true ){
+            pageAskingHelpFrom = 'casesSingleScreenAdd'
+        } else {
+            if (this.state.isEditMode === true) {
+                pageAskingHelpFrom = 'casesSingleScreenEdit'
+            } else if (this.state.isEditMode === false) {
+                pageAskingHelpFrom = 'casesSingleScreenView'
+            }
+        }
+
+        this.props.navigator.showModal({
+            screen: 'HelpScreen',
+            animated: true,
+            passProps: {
+                pageAskingHelpFrom: pageAskingHelpFrom
+            }
+        });
+    }
 }
 
 // Create style outside the class, or for components that will be used by other components (buttons),

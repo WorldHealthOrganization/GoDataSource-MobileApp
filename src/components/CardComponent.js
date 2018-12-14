@@ -45,23 +45,8 @@ class CardComponent extends Component {
 
     // Please add here the react lifecycle methods that you need
     shouldComponentUpdate(nextProps, nextState) {
-        if (nextProps.screen === 'FollowUpsFilter' || nextProps.screen === 'CasesFilter') {
-            if (nextProps && nextProps.item && nextProps.item[1] && this.props && this.props.item && this.props.item[1] && nextProps.item[1].type === 'Selector' && nextProps.item[1].id === 'gender') {
-                // console.log("Return true for selector: ", nextProps.filter.filter[nextProps.item[1].id], this.props.filter.filter[this.props.item[1].id]);
-                return true;
-            }
-            if (nextProps && nextProps.item && nextProps.item[1] && this.props && this.props.item && this.props.item[1] && nextProps.item[1].type === 'IntervalPicker' && nextProps.item[1].id === 'age' && nextProps.filter.filter[nextProps.item[1].id] !== this.props.filter.filter[this.props.item[1].id]) {
-                // console.log("Return true for interval: ");
-                return true;
-            }
-            if (nextProps && nextProps.item && nextProps.item[1] && this.props && this.props.item && this.props.item[1] && nextProps.item[1].type === 'DropDownSectioned' && nextProps.item[1].id === 'selectedLocations' && nextProps.filter.filter[nextProps.item[1].id] !== this.props.filter.filter[this.props.item[1].id]) {
-                // console.log("Return true for sectioned drop down, ");
-                return true;
-            }
-            if (nextProps && nextProps.item && nextProps.item[1] && this.props && this.props.item && this.props.item[1] && nextProps.item[1].type === 'DropdownInput' && nextProps.item[1].id === 'exposure') {
-                // console.log("Return true for exposure: ");
-                return false;
-            }
+        if (nextProps.screen === 'FollowUpsFilter' || nextProps.screen === 'CasesFilter' || nextProps.screen === 'HelpFilter') {
+            return true
         }
 
         if (this.props.followUp) {
@@ -294,6 +279,31 @@ class CardComponent extends Component {
             if (item.type === 'ActionsBar') {
                 item.onPressArray = [this.props.onDeletePress]
             }
+            if (item.type === 'DropDown' && item.id === 'categories') {
+                data = this.computeDataForDropdown(item);
+                value = this.props.filter.filter[item.id];
+            }
+        }
+
+        if (this.props.screen === 'HelpFilter') {
+            if (item.type === 'DropdownInput' && item.id === 'sortCriteria') {
+                let configSortCiteriaFilter = config.helpItemsSortCriteriaDropDownItems.filter ((e) => {
+                    return this.props.filter.sort.map((k) => {return k.sortCriteria}).indexOf(e.value) === -1
+                })
+                item.data = configSortCiteriaFilter.map((e) => { return {label: this.getTranslation(e.label), value: e.value }})
+                value = this.computeValueForCaseSortScreen(item, this.props.index);
+            }
+            if (item.type === 'DropdownInput' && item.id === 'sortOrder') {
+                item.data = config.sortOrderDropDownItems.map((e) => { return {label: this.getTranslation(e.label), value: e.value }})
+                value = this.computeValueForCaseSortScreen(item, this.props.index);
+            }
+            if (item.type === 'ActionsBar') {
+                item.onPressArray = [this.props.onDeletePress]
+            }
+            if (item.type === 'DropDown' && item.id === 'categories') {
+                data = this.computeDataForDropdown(item);
+                value = this.props.filter.filter[item.id];
+            }
         }
 
         if (this.props.screen === 'ExposureScreen') {
@@ -398,6 +408,10 @@ class CardComponent extends Component {
             } else {
                 value = this.computeValueForFollowUpSingleScreen(item);
             }
+        }
+
+        if (this.props.screen === 'HelpSingleScreen') {
+            value = this.computeValueForHelpSingleScreen(item)
         }
 
         let isEditModeForDropDownInput = addContactFromCasesScreen ? false : (this.props.screen === 'ExposureScreen' ? item.id === 'exposure' ? true : item.isEditMode : item.isEditMode)
@@ -859,6 +873,12 @@ class CardComponent extends Component {
             }).map((o) => {return {value: this.getTranslation(o.value), id: o.value}})
         }
 
+        if (item.id === 'categories') {
+            return _.filter(this.props.helpCategory, (o) => {
+                return o.deleted === false && o.fileType === 'helpCategory.json'
+            }).map((o) => {return {label: this.getTranslation(o.name), value: o._id}})
+        }
+
         return [];
     };
 
@@ -1089,13 +1109,17 @@ class CardComponent extends Component {
     };
 
     computeValueForCaseSortScreen = (item, index) => {
-        if (index && index >= 0) {
+        if (index !== null && index >= 0) {
             if (item.objectType === 'Sort') {
                 return this.props.filter && this.props.filter.sort && Array.isArray(this.props.filter.sort) && this.props.filter.sort.length > 0 && this.props.filter.sort[index][item.id] !== undefined ?
                 this.getTranslation(this.props.filter.sort[index][item.id]) : '';
             }
         }
         return this.props.filter && this.props.filter[item.id] ? this.getTranslation(this.props.filter[item.id]) : '';
+    }
+
+    computeValueForHelpSingleScreen = (item) => {
+        return this.props.helpItem && this.props.helpItem[item.id] ? this.getTranslation(this.props.helpItem[item.id]) : '';
     }
 
     getTranslation = (value) => {
@@ -1130,7 +1154,8 @@ function mapStateToProps(state) {
         events: state.events,
         referenceData: state.referenceData,
         locations: state.locations,
-        translation: state.app.translation
+        translation: state.app.translation,
+        helpCategory: state.helpCategory
     };
 }
 

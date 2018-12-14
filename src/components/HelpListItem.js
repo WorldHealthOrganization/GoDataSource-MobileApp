@@ -34,14 +34,11 @@ class HelpListItem extends PureComponent {
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
-        // Get contact info from the follow-ups
-
         let help = this.props && this.props.item ? this.props.item : null;
 
         let primaryText = help ? (help.title ? getTranslation(help.title, this.props.translation) : ' ') : '';
         let primaryColor = 'black';
-
-        let categoryText = help ? (help.categoryId ? getTranslation(help.categoryId, this.props.translation) : ' ') : '';
+        let categoryText = help ? (help.categoryId ? `${getTranslation(translations.helpScreen.helpCategoryLabel, this.props.translation)}: ${getTranslation(help.categoryId, this.props.translation)}` : ' ') : '';
 
         return (
             <ElevatedView elevation={3} style={[style.container, {
