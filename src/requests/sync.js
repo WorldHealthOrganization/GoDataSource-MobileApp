@@ -5,8 +5,9 @@ import url from './../utils/url';
 import RNFetchBlob from 'rn-fetch-blob';
 import base64 from 'base-64';
 import {Platform} from 'react-native';
+import {setSyncState} from './../actions/app';
 
-export function getDatabaseSnapshotRequest(hubConfig, lastSyncDate, callback) {
+export function getDatabaseSnapshotRequest(hubConfig, lastSyncDate, dispatch, callback) {
 
     // hubConfiguration = {url: databaseName, clientId: JSON.stringify({name, url, clientId, clientSecret}), clientSecret: databasePass}
     let hubConfiguration = JSON.parse(hubConfig.clientId);
@@ -37,7 +38,8 @@ export function getDatabaseSnapshotRequest(hubConfig, lastSyncDate, callback) {
         'Accept': 'application/json',
         'Authorization': 'Basic ' + base64.encode(`${hubConfiguration.clientId}:${hubConfiguration.clientSecret}`)
     }, '0', '20000')
-        .progress({count: 1}, (received, total) => {
+        .progress({count: 500}, (received, total) => {
+            dispatch(setSyncState(`Downloading database\nReceived ${received} bytes`));
             console.log(received, total)
         })
         .then((res) => {

@@ -205,18 +205,18 @@ export function storeHubConfiguration(hubConfiguration) {
             let lastSyncDate = await AsyncStorage.getItem(hubConfiguration.url);
             console.log("Last sync date: ", lastSyncDate);
             if (lastSyncDate !== null) {
-                getDatabaseSnapshotRequest(hubConfiguration, lastSyncDate, (error, response) => {
+                getDatabaseSnapshotRequest(hubConfiguration, lastSyncDate, dispatch, (error, response) => {
                      dispatch(processFilesForSync(error, response, hubConfiguration, true, true, false));
                 })
             } else {
                 console.log('No last sync date found. proceed to download all database: ');
-                getDatabaseSnapshotRequest(hubConfiguration, null, (error, response) => {
+                getDatabaseSnapshotRequest(hubConfiguration, null, dispatch, (error, response) => {
                      dispatch(processFilesForSync(error, response, hubConfiguration, true, true, true));
                 })
             }
         } catch (errorGetLastSyncDate) {
             console.log("Error at getting lastSyncDate. Proceed to download all database: ", errorGetLastSyncDate);
-            getDatabaseSnapshotRequest(hubConfiguration, null, (error, response) => {
+            getDatabaseSnapshotRequest(hubConfiguration, null, dispatch, (error, response) => {
                  dispatch(processFilesForSync(error, response, hubConfiguration, true, true, true));
             })
         }
@@ -711,7 +711,7 @@ export function sendDatabaseToServer () {
                                                                 // statuses.sendData.status = 'OK';
                                                                 arrayOfStatuses.push({text: 'Sending data to the HUB', status: errorSendData ? JSON.stringify(errorSendData) : 'OK'});
                                                                 dispatch(setSyncState('Getting updated data from the server'));
-                                                                getDatabaseSnapshotRequest({url: internetCredentials.server ? internetCredentials.server : internetCredentials.service, clientId: internetCredentials.username, clientSecret: internetCredentials.password}, lastSyncDate, (error, response) => {
+                                                                getDatabaseSnapshotRequest({url: internetCredentials.server ? internetCredentials.server : internetCredentials.service, clientId: internetCredentials.username, clientSecret: internetCredentials.password}, lastSyncDate, dispatch, (error, response) => {
                                                                     if (error) {
                                                                         arrayOfStatuses.push({text: 'Getting updated data from the server', status: JSON.stringify(error)});
                                                                         dispatch(setSyncState('Error'));
@@ -742,7 +742,7 @@ export function sendDatabaseToServer () {
                                     } else {
                                         arrayOfStatuses.push({text: 'Getting local data', status: 'Local data has not been updated'});
                                         dispatch(setSyncState('Getting updated data from the server'));
-                                        getDatabaseSnapshotRequest({url: internetCredentials.server ? internetCredentials.server : internetCredentials.service, clientId: internetCredentials.username, clientSecret: internetCredentials.password}, lastSyncDate, (error, response) => {
+                                        getDatabaseSnapshotRequest({url: internetCredentials.server ? internetCredentials.server : internetCredentials.service, clientId: internetCredentials.username, clientSecret: internetCredentials.password}, lastSyncDate, dispatch, (error, response) => {
                                             if (error) {
                                                 arrayOfStatuses.push({text: 'Getting updated data from the server', status: JSON.stringify(error)});
                                                 dispatch(setSyncState('Error'));
