@@ -51,7 +51,7 @@ export function getDatabaseSnapshotRequest(hubConfig, lastSyncDate, dispatch, ca
                 console.log("Got database");
                 callback(null, (dirs + '/database.zip'));
             } else {
-                callback(`Status Code Error: ${status}. Please make sure you entered the correct data`);
+                callback(`Cannot connect to HUB, please check URL, Client ID and Client secret.\nStatus code: ${status}`);
             }
         })
         .catch((errorMessage, statusCode) => {
