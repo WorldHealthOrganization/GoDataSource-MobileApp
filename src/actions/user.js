@@ -55,37 +55,44 @@ export function loginUser(credentials) {
 
                 // Here is the local storage handling
                 let promises = [];
-                promises.push(getOutbreakById(response.activeOutbreakId, null, dispatch));
-                // promises.push(getContactsForOutbreakIdWithPromises(response.activeOutbreakId, null, null, dispatch));
-                promises.push(getFollowUpsForOutbreakIdWithPromises(response.activeOutbreakId, null, null, dispatch));
-                promises.push(getTranslations(response.languageId, dispatch));
-                promises.push(getAvailableLanguages(dispatch));
-                promises.push(getReferenceData(null, dispatch));
-                promises.push(getEventsForOutbreakId(response.activeOutbreakId, null, dispatch));
-                promises.push(getCasesForOutbreakIdWithPromise(response.activeOutbreakId, null, null, dispatch));
-                promises.push(getUserRoles(response.roleIds, dispatch));
+                getOutbreakById(response.activeOutbreakId, null, dispatch)
+                    .then((responseOutbreak) => {
+                        // promises.push(getContactsForOutbreakIdWithPromises(response.activeOutbreakId, null, null, dispatch));
+                        promises.push(getFollowUpsForOutbreakIdWithPromises(response.activeOutbreakId, null, null, dispatch));
+                        promises.push(getTranslations(response.languageId, dispatch));
+                        promises.push(getAvailableLanguages(dispatch));
+                        promises.push(getReferenceData(null, dispatch));
+                        promises.push(getEventsForOutbreakId(response.activeOutbreakId, null, dispatch));
+                        promises.push(getCasesForOutbreakIdWithPromise(response.activeOutbreakId, null, null, dispatch));
+                        promises.push(getUserRoles(response.roleIds, dispatch));
 
 
 
-                Promise.all(promises)
-                    .then((result) => {
-                        console.log("Finished getting data from local db: ", result);
-                        storeData('loggedUser', response._id, (error, success) => {
-                            if (error) {
-                                console.log("An error occurred while trying to save logged user. Proceed to log: ", error);
-                                dispatch(setLoginState('Error'));
-                            }
-                            if (success) {
-                                dispatch(storeUser(response));
-                                dispatch(setLoginState('Finished logging'));
-                                dispatch(changeAppRoot('after-login'));
-                            }
-                        })
+                        Promise.all(promises)
+                            .then((result) => {
+                                console.log("Finished getting data from local db: ", result);
+                                storeData('loggedUser', response._id, (error, success) => {
+                                    if (error) {
+                                        console.log("An error occurred while trying to save logged user. Proceed to log: ", error);
+                                        dispatch(setLoginState('Error'));
+                                    }
+                                    if (success) {
+                                        dispatch(storeUser(response));
+                                        dispatch(setLoginState('Finished logging'));
+                                        dispatch(changeAppRoot('after-login'));
+                                    }
+                                })
+                            })
+                            .catch((error) => {
+                                console.log('Getting data from local db resulted in error: ', error);
+                                dispatch(setLoginState('Error'))
+                            });
                     })
-                    .catch((error) => {
+                    .catch((errorOutbreak) => {
                         console.log('Getting data from local db resulted in error: ', error);
                         dispatch(setLoginState('Error'))
-                    });
+                    })
+
 
                 // Store the user to the redux store, and also store the userId to the AsyncStorage
                 // dispatch(storeUser(response));
