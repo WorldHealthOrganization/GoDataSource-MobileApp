@@ -155,44 +155,51 @@ export function getUserById(userId, token, refreshFollowUps) {
                     dispatch(setSyncState('Loading'));
                 }
                 let promises = [];
-                promises.push(getOutbreakById(response.activeOutbreakId, null, dispatch));
-                promises.push(getAvailableLanguages(dispatch));
-                // promises.push(getContactsForOutbreakIdWithPromises(response.activeOutbreakId, null, null, dispatch));
-                if (refreshFollowUps) {
-                    let now = new Date();
-                    promises.push(getFollowUpsForOutbreakIdWithPromises(response.activeOutbreakId, getState().app.filters['FollowUpsScreen'] || {
-                            date: new Date(new Date((now.getUTCMonth() + 1) + '/' + now.getUTCDate() + '/' + now.getUTCFullYear()).getTime() - ((moment().isDST() ? now.getTimezoneOffset() : now.getTimezoneOffset() - 60) * 60 * 1000)),
-                            searchText: ''
-                        }, null, dispatch));
-                }
-                promises.push(getTranslations(response && response.languageId ? response.languageId : 'english_us', dispatch));
-                promises.push(getReferenceData(null, dispatch));
-                promises.push(getHelpCategory(null, dispatch));
-                promises.push(getHelpItem(null, dispatch));
-                promises.push(getEventsForOutbreakId(response.activeOutbreakId, null, dispatch));
-                promises.push(getCasesForOutbreakIdWithPromise(response.activeOutbreakId, null, null, dispatch));
-                promises.push(getUserRoles(response.roleIds, dispatch))
-
-                // Store the user to the redux store, and also store the userId to the AsyncStorage
-                dispatch(storeUser(response));
-                // dispatch(storeData("loggedUser", response._id, () => {}));
-
-
-                Promise.all(promises)
-                    .then((result) => {
-                        console.log("Finished getting data from local db: ", result);
-                        dispatch(setLoginState('Finished logging'));
+                // promises.push(getOutbreakById(response.activeOutbreakId, null, dispatch));
+                getOutbreakById(response.activeOutbreakId, null, dispatch)
+                    .then((responseOutbreak) => {
+                        promises.push(getAvailableLanguages(dispatch));
+                        // promises.push(getContactsForOutbreakIdWithPromises(response.activeOutbreakId, null, null, dispatch));
                         if (refreshFollowUps) {
-                            dispatch(setSyncState('Finished processing'));
+                            let now = new Date();
+                            promises.push(getFollowUpsForOutbreakIdWithPromises(response.activeOutbreakId, getState().app.filters['FollowUpsScreen'] || {
+                                    date: new Date(new Date((now.getUTCMonth() + 1) + '/' + now.getUTCDate() + '/' + now.getUTCFullYear()).getTime() - ((moment().isDST() ? now.getTimezoneOffset() : now.getTimezoneOffset() - 60) * 60 * 1000)),
+                                    searchText: ''
+                                }, null, dispatch));
                         }
-                        dispatch(changeAppRoot('after-login'));
+                        promises.push(getTranslations(response && response.languageId ? response.languageId : 'english_us', dispatch));
+                        promises.push(getReferenceData(null, dispatch));
+                        promises.push(getHelpCategory(null, dispatch));
+                        promises.push(getHelpItem(null, dispatch));
+                        promises.push(getEventsForOutbreakId(response.activeOutbreakId, null, dispatch));
+                        promises.push(getCasesForOutbreakIdWithPromise(response.activeOutbreakId, null, null, dispatch));
+                        promises.push(getUserRoles(response.roleIds, dispatch));
+
+                        // Store the user to the redux store, and also store the userId to the AsyncStorage
+                        dispatch(storeUser(response));
+                        // dispatch(storeData("loggedUser", response._id, () => {}));
+
+
+                        Promise.all(promises)
+                            .then((result) => {
+                                console.log("Finished getting data from local db: ", result);
+                                dispatch(setLoginState('Finished logging'));
+                                if (refreshFollowUps) {
+                                    dispatch(setSyncState('Finished processing'));
+                                }
+                                dispatch(changeAppRoot('after-login'));
+                            })
+                            .catch((error) => {
+                                console.log('Getting data from local db resulted in error: ', error);
+                                if (refreshFollowUps) {
+                                    dispatch(setSyncState('Finished processing'));
+                                }
+                                dispatch(setLoginState('Finished logging'));
+                            })
                     })
-                    .catch((error) => {
+                    .catch((errorOutbreak) => {
                         console.log('Getting data from local db resulted in error: ', error);
-                        if (refreshFollowUps) {
-                            dispatch(setSyncState('Finished processing'));
-                        }
-                        dispatch(setLoginState('Finished logging'));
+                        dispatch(setLoginState('Error'))
                     })
             }
 
