@@ -3,6 +3,8 @@
  */
 import {getDatabase} from './database';
 import {objSort, localSortItems} from './../utils/functions'
+import {getRelationshipsAndFollowUpsForContactRequest} from './relationships';
+import {extractIdFromPouchId, mapContactsAndRelationships, mapContactsAndFollowUps} from './../utils/functions';
 
 // Credentials: {email, encryptedPassword}
 export function getCasesForOutbreakIdRequest (outbreakId, filter, token, callback) {
@@ -221,3 +223,37 @@ export function updateCaseRequest (outbreakId, caseId, myCase, token, callback) 
         })
 }
 
+export function getItemByIdRequest (outbreakId, itemId, itemType, callback) {
+    let database = getDatabase();
+
+    database.get(itemId)
+        .then((result) => {
+            console.log('getItemByIdRequest result', result);
+            if (itemType === 'contact') {
+                getRelationshipsAndFollowUpsForContactRequest(outbreakId, extractIdFromPouchId(itemId, 'person'), null, (errorRelationshipsAndFollowUps, responseRelationshipsAndFollowUps) => {
+                    if (errorRelationshipsAndFollowUps) {
+                        console.log("*** getItemByIdRequest getRelationshipsAndFollowUpsForContact error: ", JSON.stringify(errorRelationshipsAndFollowUps));
+                        callback(errorRelationshipsAndFollowUps);
+                    }
+                    if (responseRelationshipsAndFollowUps) {
+                        console.log("*** getItemByIdRequest getRelationshipsAndFollowUpsForContact response: ", JSON.stringify(responseRelationshipsAndFollowUps));
+                        let relationships = responseRelationshipsAndFollowUps.filter((e) => {if (e.persons) {return e}});
+                        let followUps = responseRelationshipsAndFollowUps.filter((e) => {if (e.personId) {return e}});
+
+                        let mappedContact = mapContactsAndRelationships([result], relationships);
+                        if (followUps.length > 0) {
+                            mappedContact = mapContactsAndFollowUps(mappedContact, followUps);
+                        }
+                        callback(null, mappedContact[0]);
+                    }
+                });
+            } else if (itemType === 'case'){
+                callback(null, result);
+            }
+        })
+        .catch((error) => {
+            console.log('getItemByIdRequest error: ', error);
+            callback(error);
+        })
+        
+}

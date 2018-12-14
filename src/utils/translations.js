@@ -219,6 +219,8 @@ const alertMessages = {
     invalidCredentials: 'Invalid credentials',
     invalidEmail: 'Invalid email address',
     emailValidationError: 'Please make sure you have entered a valid email address',
+    noItemAlert: 'No person exists with this information',
+    errorOccuredMsg: 'QR code is not valid',
 
     // cases
     caseDeleteConfirmation: 'LNG_DIALOG_ALERT_MESSAGE_ARE_YOU_SURE_YOU_WANT_TO_DELETE_THIS_CASE',

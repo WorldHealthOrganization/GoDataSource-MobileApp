@@ -44,7 +44,7 @@ class FirstConfigScreen extends Component {
         if (props.errors && props.errors.type && props.errors.message) {
             Alert.alert(props.errors.type, props.errors.message, [
                 {
-                    text: getTranslation(translations.alertMessages.okButtonLabel, props.translation), 
+                    text: getTranslation(translations.alertMessages.okButtonLabel, null), 
                     onPress: () => {props.removeErrors()}
                 }
             ])
@@ -71,16 +71,16 @@ class FirstConfigScreen extends Component {
                 }
                 <View style={[style.welcomeTextContainer]}>
                     <Text style={style.welcomeText}>
-                        {getTranslation(translations.firstConfigScreen.welcomeMessage, this.props.translation)}
+                        {getTranslation(translations.firstConfigScreen.welcomeMessage, null)}
                     </Text>
                 </View>
                 <View style={style.inputsContainer}>
                     <Text style={style.text}>
-                        {getTranslation(translations.firstConfigScreen.infoMessage, this.props.translation)}
+                        {getTranslation(translations.firstConfigScreen.infoMessage, null)}
                     </Text>
-                    <Button onPress={this.handlePressScanQR} upperCase={false} icon="photo-camera" raised text={getTranslation(translations.firstConfigScreen.qrScanButton, this.props.translation)} style={styles.buttonLogin} />
+                    <Button onPress={this.handlePressScanQR} upperCase={false} icon="photo-camera" raised text={getTranslation(translations.firstConfigScreen.qrScanButton, null)} style={styles.buttonLogin} />
                     {/*<Button onPress={this.handlePressImport} upperCase={false} icon={<MaterialCommunityIcons size={24} name="download" />} raised text="Import config file" style={styles.buttonLogin} />*/}
-                    <Button onPress={this.handlePressManual} upperCase={false} icon="short-text" raised text={getTranslation(translations.firstConfigScreen.manualConfigButton, this.props.translation)} style={styles.buttonLogin} />
+                    <Button onPress={this.handlePressManual} upperCase={false} icon="short-text" raised text={getTranslation(translations.firstConfigScreen.manualConfigButton, null)} style={styles.buttonLogin} />
                 </View>
                 <View style={style.logoContainer}>
                     <Image source={{uri: 'logo_app'}} style={style.logoStyle} />
@@ -186,7 +186,6 @@ function mapStateToProps(state) {
     return {
         screenSize: state.app.screenSize,
         errors: state.errors,
-        translation: state.app.translation
     };
 }
 
