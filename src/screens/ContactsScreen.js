@@ -9,6 +9,7 @@ import styles from './../styles';
 import NavBarCustom from './../components/NavBarCustom';
 import ElevatedView from 'react-native-elevated-view';
 import Ripple from 'react-native-material-ripple';
+import {Button, Icon} from 'react-native-material-ui';
 import {calculateDimension, getTranslation, navigation} from './../utils/functions';
 import FollowUpListItem from './../components/FollowUpListItem';
 import SearchFilterView from './../components/SearchFilterView';
@@ -156,7 +157,7 @@ class ContactsScreen extends Component {
                                     navigator={this.props.navigator}
                                 />
                             </View>
-                            <View style={{flex: 0.1, marginRight: 10}}>
+                            <View style={{flex: 0.15, marginRight: 10}}>
                                 <Ripple style={{
                                     flex: 1,
                                     justifyContent: 'center',
@@ -165,6 +166,27 @@ class ContactsScreen extends Component {
                                     <MaterialCommunityIcons name="qrcode-scan" color={'black'} size={20}/>
                                 </Ripple>
                             </View>
+
+                            <View style={{flex: 0.11 /*, marginRight: 10*/}}>
+                                <ElevatedView
+                                    elevation={3}
+                                    style={{
+                                        backgroundColor: styles.buttonGreen,
+                                        width: calculateDimension(33, false, this.props.screenSize),
+                                        height: calculateDimension(25, true, this.props.screenSize),
+                                        borderRadius: 4
+                                    }}
+                                >
+                                    <Ripple style={{
+                                        flex: 1,
+                                        justifyContent: 'center',
+                                        alignItems: 'center'
+                                    }} onPress={this.goToHelpScreen}>
+                                        <Icon name="help" color={'white'} size={15}/>
+                                    </Ripple>
+                                </ElevatedView> 
+                            </View>
+
                            
                             {/* {
                                 this.props.role.find((e) => e === config.userPermissions.writeContact) !== undefined ? (
@@ -196,7 +218,6 @@ class ContactsScreen extends Component {
                     handlePressNavbarButton={this.handlePressNavbarButton}
                 >
                 </NavBarCustom>
-
                 <View style={style.containerContent}>
                     <AnimatedListView
                         stickyHeaderIndices={[0]}
@@ -512,8 +533,19 @@ class ContactsScreen extends Component {
         navigation(event, this.props.navigator);
     };
 
+    goToHelpScreen = () => {
+        let pageAskingHelpFrom = 'contacts'
+        this.props.navigator.showModal({
+            screen: 'HelpScreen',
+            animated: true,
+            passProps: {
+                pageAskingHelpFrom: pageAskingHelpFrom
+            }
+        });
+    };
+
     handleOnPressQRCode = () => {
-        console.log('handleOnPressQRCode')
+        console.log('handleOnPressQRCode');
 
         this.props.navigator.showModal({
             screen: 'QRScanScreen',
@@ -653,7 +685,7 @@ const style = StyleSheet.create({
         backgroundColor: '#F5FCFF'
     },
     breadcrumbContainer: {
-        flex: 0.9,
+        flex: 0.8,
         flexDirection: 'row',
         justifyContent: 'flex-start'
     },
@@ -667,9 +699,9 @@ function mapStateToProps(state) {
         filter: state.app.filters,
         contacts: state.contacts,
         errors: state.errors,
+        role: state.role,
         referenceData: state.referenceData,
         translation: state.app.translation,
-        role: state.role,
     };
 }
 

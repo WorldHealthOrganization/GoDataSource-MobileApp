@@ -39,6 +39,14 @@ function getLocationsUrl () {
     return getBaseUrl() + '/locations';
 }
 
+function getHelpItemsUrl () {
+    return getBaseUrl() + '/help-items';
+}
+
+function getHelpCategoryUrl () {
+    return getBaseUrl() + '/help-categories';
+};
+
 function getLanguagesUrl () {
     return getBaseUrl() + '/languages';
 }
@@ -64,6 +72,8 @@ export default {
     getLanguagesUrl,
     getBaseUrl,
     setBaseUrl,
+    getHelpItemsUrl,
+    getHelpCategoryUrl,
     getDatabaseSnapshotUrl,
     postDatabaseSnapshot
 }

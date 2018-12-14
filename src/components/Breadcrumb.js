@@ -50,7 +50,7 @@ class Breadcrumb extends PureComponent {
     render() {
         return (
             <View style={[style.crumbsContainerStyle, {
-                width: calculateDimension(270, false, this.props.screenSize),
+                width: calculateDimension(250, false, this.props.screenSize),
                 marginLeft: calculateDimension(16, false, this.props.screenSize)
             }]}>
                 {

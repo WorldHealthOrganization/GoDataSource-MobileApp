@@ -1,4 +1,3 @@
-
 const navigationDrawer = {
     activeOutbreak: 'LNG_NAVIGATION_DRAWER_ACTIVE_OUTBREAK',
     followUpsLabel: 'LNG_NAVIGATION_DRAWER_FOLLOW_UPS',
@@ -8,6 +7,7 @@ const navigationDrawer = {
     changeHubConfig: 'LNG_NAVIGATION_DRAWER_CHANGE_HUB_CONFIG',
     languagesLabel: 'LNG_NAVIGATION_DRAWER_LANGUAGES',
     logoutLabel: 'LNG_NAVIGATION_DRAWER_LOGOUT',
+    helpLabel: 'LNG_LAYOUT_MENU_ITEM_HELP_LABEL',
 };
 
 const addFollowUpScreen = {
@@ -42,12 +42,38 @@ const followUpFilter = {
     chooseLocationLabel: 'LNG_FILTER_SCREEN_CHOOSE_LOCATIONS_MESSAGE', 
 };
 
+const helpFilter = {
+    filterTitle: 'LNG_SIDE_FILTERS_TITLE',
+    sortTitle:'LNG_SIDE_FILTERS_SECTION_SORT_TITLE',
+    helpFilterTitle: 'Help filters',
+    category: 'Category',
+    chooseCategoryLabel: 'Choose one or more categories',
+};
+
+const helpScreen = {
+    helpTitle: 'Help',
+    viewHelpLabel: 'View',
+    helpViewItemTitle: 'View Help Item',
+    noHelpItemsToShowMessage: 'There are not help items to display',
+    itemsForMessage: 'items for',
+
+    addMessage: 'Add',
+    editMessage: 'Edit',
+    viewMessage: 'View',
+
+    helpTitleLabel: 'Title',
+    helpCategoryLabel: 'Category',
+    helpDescriptionLabel: 'Description',
+    helpCommentLabel: 'Comment',
+    helpPageLabel: 'Page'
+};
+
 const sortTab = {
     addSortRule: 'LNG_SORT_SCREEN_ADD_SORT_RULE_MESSAGE',
     SortBy: 'LNG_SORT_SCREEN_ADD_SORT_CARD_LABEL_TITLE',
     sortCriteria: 'LNG_SORT_SCREEN_CRITERIA_LABEL',
     sortOrder: 'LNG_SORT_SCREEN_ORDER_LABEL',
-}
+};
 
 const caseSingleScreen = {
     title: 'LNG_CASE_SINGLE_SCREEN_TITLE',
@@ -191,12 +217,11 @@ const followUpsScreen = {
     generateButtonLabel: 'Generate for 1 day',
 };
 
-//not used
 const missedFollowUpListItemLabels = {
     missedLabel: 'Missed',
     lastFollowUp: 'Last follow-up',
     nextFollowup: 'Next follow-up',
-}
+};
 
 const followUpsScreenStatusFilterValues = {
     allValue: 'LNG_FOLLOW_UPS_DROP_DOWN_FILTER_STATUS_LABEL_ALL',
@@ -279,7 +304,7 @@ const questionCardLabels = {
     datePickerLabel: 'LNG_QUESTIONNAIRE_LABEL_SELECT_DATE',
     dropDownInputLabel: 'LNG_QUESTIONNAIRE_LABEL_SELECT_ANSWER',
     dropDownLabel: 'LNG_QUESTIONNAIRE_LABEL_SELECT_ANSWERS',
-}
+};
 
 const inAppNotificationScreen = {
     generatedFollowUps: 'generated follow-ups'
@@ -290,7 +315,7 @@ const firstConfigScreen = {
     infoMessage: 'Choose one of the options below to sync with your HUB:',
     qrScanButton: 'Scan QR Code',
     manualConfigButton: 'Config HUB Manually'
-}
+};
 
 const qrScanScreen = {
     title: 'LNG_SCAN_QR_CODE_SCREEN_TITLE'
@@ -303,7 +328,7 @@ const manualConfigScreen = {
     clientIdLabel: 'Client ID',
     clientSecretPass: 'Client secret',
     saveHubConfigButton: 'Save HUB configuration',
-}
+};
 
 const loginScreen = {
     welcomeMessage: 'Welcome',
@@ -322,13 +347,13 @@ const addressFieldLabels = {
     longitude: 'LNG_ADDRESS_FIELD_LABEL_LONGITUDE',
     latitude: 'LNG_ADDRESS_FIELD_LABEL_LATITUDE',
     deleteButton: 'LNG_COMMON_BUTTON_DELETE',
-}
+};
 
 const personTypes = {
     cases: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE',
     contacts: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT',
     events: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_EVENT'
-}
+};
 
 const userResidenceAddress = {
     userPlaceOfResidence: 'LNG_REFERENCE_DATA_CATEGORY_ADDRESS_TYPE_USUAL_PLACE_OF_RESIDENCE',
@@ -431,6 +456,8 @@ export default {
     loadingScreenMessages,
     contactSingleScreen,
     exposureScreen,
+    helpScreen,
+    helpFilter,
     followUpFilter,
     followUpsSingleScreen,
     followUpsScreen,
@@ -454,4 +481,4 @@ export default {
     questionCardLabels,
     hubConfigScreen,
     sortTab
-}
+};

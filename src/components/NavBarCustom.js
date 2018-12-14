@@ -13,7 +13,9 @@ import Calendar from "react-native-calendars/src/calendar/index";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import Ripple from 'react-native-material-ripple';
-import translations from './../utils/translations'
+import translations from './../utils/translations';
+import ElevatedView from 'react-native-elevated-view';
+import styles from './../styles';
 
 class NavBarCustom extends PureComponent {
 
@@ -41,18 +43,42 @@ class NavBarCustom extends PureComponent {
                 Platform.OS === 'ios' && {zIndex: 99}
             ]}
             >
-                <View style={[style.containerUpperNavBar, {flex: this.props.children ? 0.5 : 1}]}>
-                    <Ripple onPress={this.handlePressNavbarButton} hitSlop={{top: 20, bottom: 20, left: 20, right: 20}}>
-                        <Icon name={this.props.iconName}/>
-                    </Ripple>
+                <View style={[style.containerUpperNavBar, {flex: this.props.children ? 0.5 : 1, justifyContent: 'space-between'}]}>
+                    <View style={[style.containerUpperNavBar, {flex: 1}]}>
+                        <Ripple onPress={this.handlePressNavbarButton} hitSlop={{top: 20, bottom: 20, left: 20, right: 20}}>
+                            <Icon name={this.props.iconName}/>
+                        </Ripple>
+                        {
+                            this.props.customTitle && !this.props.title ? (
+                                this.props.customTitle
+                            ) : (
+                                <Text style={style.title}>
+                                    {getTranslation(this.props.title, this.props.translation)}
+                                </Text>
+                            )
+                        }
+                    </View>
                     {
-                        this.props.customTitle && !this.props.title ? (
-                            this.props.customTitle
-                        ) : (
-                            <Text style={style.title}>
-                                {getTranslation(this.props.title, this.props.translation)}
-                            </Text>
-                        )
+                        this.props.hasHelpItems !== null && this.props.hasHelpItems !== undefined && this.props.hasHelpItems === true ? (
+                            <ElevatedView
+                                elevation={3}
+                                style={{
+                                    flex: 0,
+                                    backgroundColor: styles.buttonGreen,
+                                    width: calculateDimension(33, false, this.props.screenSize),
+                                    height: calculateDimension(25, true, this.props.screenSize),
+                                    borderRadius: 4
+                                }}
+                            >
+                                <Ripple style={{
+                                    flex: 1,
+                                    justifyContent: 'center',
+                                    alignItems: 'center'
+                                }} onPress={this.handleHelpIconClick}>
+                                    <Icon name="help" color={'white'} size={15}/>
+                                </Ripple>
+                            </ElevatedView> 
+                        ) : null
                     }
                 </View>
                 {
@@ -70,6 +96,12 @@ class NavBarCustom extends PureComponent {
     handlePressNavbarButton = () => {
         InteractionManager.runAfterInteractions(() => {
             this.props.handlePressNavbarButton();
+        })
+    }
+
+    handleHelpIconClick = () => {
+        InteractionManager.runAfterInteractions(() => {
+            this.props.goToHelpScreen();
         })
     }
 }

@@ -45,7 +45,7 @@ class CardComponent extends Component {
 
     // Please add here the react lifecycle methods that you need
     shouldComponentUpdate(nextProps, nextState) {
-        if (nextProps.screen === 'FollowUpsFilter' || nextProps.screen === 'CasesFilter') {
+        if (nextProps.screen === 'FollowUpsFilter' || nextProps.screen === 'CasesFilter' || nextProps.screen === 'HelpFilter') {
             return true
         }
 
@@ -289,6 +289,27 @@ class CardComponent extends Component {
             }
         }
 
+        if (this.props.screen === 'HelpFilter') {
+            if (item.type === 'DropdownInput' && item.id === 'sortCriteria') {
+                let configSortCiteriaFilter = config.helpItemsSortCriteriaDropDownItems.filter ((e) => {
+                    return this.props.filter.sort.map((k) => {return k.sortCriteria}).indexOf(e.value) === -1
+                })
+                item.data = configSortCiteriaFilter.map((e) => { return {label: this.getTranslation(e.label), value: e.value }})
+                value = this.computeValueForCaseSortScreen(item, this.props.index);
+            }
+            if (item.type === 'DropdownInput' && item.id === 'sortOrder') {
+                item.data = config.sortOrderDropDownItems.map((e) => { return {label: this.getTranslation(e.label), value: e.value }})
+                value = this.computeValueForCaseSortScreen(item, this.props.index);
+            }
+            if (item.type === 'ActionsBar') {
+                item.onPressArray = [this.props.onDeletePress]
+            }
+            if (item.type === 'DropDown' && item.id === 'categories') {
+                data = this.computeDataForDropdown(item);
+                value = this.props.filter.filter[item.id];
+            }
+        }
+
         if (this.props.screen === 'ExposureScreen') {
             if (item.type === 'DropdownInput') {
                 item.data = this.computeDataForExposure(item);
@@ -395,6 +416,10 @@ class CardComponent extends Component {
             } else {
                 value = this.computeValueForFollowUpSingleScreen(item);
             }
+        }
+
+        if (this.props.screen === 'HelpSingleScreen') {
+            value = this.computeValueForHelpSingleScreen(item)
         }
 
         let isEditModeForDropDownInput = addContactFromCasesScreen ? false : (this.props.screen === 'ExposureScreen' ? item.id === 'exposure' ? true : item.isEditMode : item.isEditMode)
@@ -856,6 +881,12 @@ class CardComponent extends Component {
             }).map((o) => {return {value: this.getTranslation(o.value), id: o.value}})
         }
 
+        if (item.id === 'categories') {
+            return _.filter(this.props.helpCategory, (o) => {
+                return o.deleted === false && o.fileType === 'helpCategory.json'
+            }).map((o) => {return {label: this.getTranslation(o.name), value: o._id}})
+        }
+
         return [];
     };
 
@@ -1095,6 +1126,10 @@ class CardComponent extends Component {
         return this.props.filter && this.props.filter[item.id] ? this.getTranslation(this.props.filter[item.id]) : '';
     }
 
+    computeValueForHelpSingleScreen = (item) => {
+        return this.props.helpItem && this.props.helpItem[item.id] ? this.getTranslation(this.props.helpItem[item.id]) : '';
+    }
+
     getTranslation = (value) => {
         let valueToBeReturned = value;
         if (value && typeof value === 'string' && value.includes('LNG')) {
@@ -1127,7 +1162,8 @@ function mapStateToProps(state) {
         events: state.events,
         referenceData: state.referenceData,
         locations: state.locations,
-        translation: state.app.translation
+        translation: state.app.translation,
+        helpCategory: state.helpCategory
     };
 }
 

@@ -7,6 +7,7 @@ import {
     ACTION_TYPE_ADD_FILTER_FOR_SCREEN,
     ACTION_TYPE_REMOVE_FILTER_FOR_SCREEN,
     ACTION_TYPE_SAVE_TRANSLATION,
+    ACTION_TYPE_SAVE_HELP_CATEGORY,
     ACTION_TYPE_SAVE_AVAILABLE_LANGUAGES,
     ACTION_TYPE_SAVE_HUB_CONFIGURATION,
     ACTION_TYPE_SET_SYNC_STATE,
@@ -18,6 +19,8 @@ import config from './../utils/config';
 import {Dimensions} from 'react-native';
 import {Platform, Alert} from 'react-native';
 import {getAvailableLanguagesRequest, getTranslationRequest} from './../queries/translation';
+import {getHelpCategoryRequest} from '../queries/helpCategory';
+import {getHelpItemRequest} from '../queries/helpItem';
 import {getDatabaseSnapshotRequest, postDatabaseSnapshotRequest} from './../requests/sync';
 import {setInternetCredentials, getInternetCredentials} from 'react-native-keychain';
 import {unzipFile, readDir} from './../utils/functions';
@@ -50,6 +53,19 @@ export function saveTranslation(translation) {
     return {
         type: ACTION_TYPE_SAVE_TRANSLATION,
         translation: translation
+    }
+}
+
+export function saveHelpCategory(helpCategory) {
+    return {
+        type: ACTION_TYPE_SAVE_HELP_CATEGORY,
+        helpCategory: helpCategory
+    }
+}
+export function saveHelpItem(helpItem) {
+    return {
+        type: ACTION_TYPE_SAVE_HELP_ITEM,
+        helpItem: helpItem
     }
 }
 
@@ -139,6 +155,41 @@ export function getTranslations(language, dispatch) {
                 console.log("### here should have the translations: ");
                 dispatch(saveTranslation(response));
                 resolve('Done translation');
+            }
+        })
+    })
+    // }
+}
+
+export function getHelpCategory(help, dispatch) {
+    // return async function (dispatch) {
+    return new Promise((resolve, reject) => {
+        getHelpCategoryRequest(language, (error, response) => {
+            if (error) {
+                console.log("*** getHelpCategory error: ", error);
+                reject(error);
+            }
+            if (response) {
+                console.log("### here should have the translations: ");
+                dispatch(saveHelpCategory(response));
+                resolve('Done help category');
+            }
+        })
+    })
+    // }
+}
+export function getHelpItem(help, dispatch) {
+    // return async function (dispatch) {
+    return new Promise((resolve, reject) => {
+        getHelpItemRequest(language, (error, response) => {
+            if (error) {
+                console.log("*** getHelpItem error: ", error);
+                reject(error);
+            }
+            if (response) {
+                console.log("### here should have the translations: ");
+                dispatch(saveHelpItem(response));
+                resolve('Done help item');
             }
         })
     })

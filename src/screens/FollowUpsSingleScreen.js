@@ -25,6 +25,7 @@ import DateTimePicker from 'react-native-modal-datetime-picker';
 import _ from 'lodash';
 import {calculateDimension, extractIdFromPouchId, computeIdForFileType, updateRequiredFields, getTranslation} from './../utils/functions';
 import translations from './../utils/translations'
+import ElevatedView from 'react-native-elevated-view';
 
 
 class FollowUpsSingleScreen extends Component {
@@ -151,35 +152,54 @@ class FollowUpsSingleScreen extends Component {
                                 navigator={this.props.navigator}
                                 onPress={this.handlePressBreadcrumb}
                             />
-                            {
-                                this.props.role.find((e) => e === config.userPermissions.writeFollowUp) !== undefined ? (
-                                    <View>
-                                        <Menu
-                                            ref="menuRef"
-                                            button={
-                                                <Ripple onPress={this.showMenu} hitSlop={{top: 20, bottom: 20, left: 20, right: 20}}>
-                                                    <Icon name="more-vert"/>
-                                                </Ripple>
-                                            }
-                                        >
-                                            <MenuItem onPress={this.handleOnPressMissing}>
-                                                {getTranslation(translations.followUpsSingleScreen.missingButton, this.props.translation)}
-                                            </MenuItem>
-                                            <MenuItem onPress={this.handleOnPressDeceased}>
-                                                {getTranslation(translations.followUpsSingleScreen.deceasedButton, this.props.translation)}
-                                            </MenuItem>
-                                            <MenuItem onPress={this.handleOnPressDelete}>
-                                                {getTranslation(translations.followUpsSingleScreen.deleteButton, this.props.translation)}
-                                            </MenuItem>
-                                            <DateTimePicker
-                                                isVisible={this.state.isDateTimePickerVisible}
-                                                onConfirm={this._handleDatePicked}
-                                                onCancel={this._hideDateTimePicker}
-                                            />
-                                        </Menu>
-                                    </View>
-                                ) : null
-                            }
+                            <View style={{flexDirection: 'row', marginRight: calculateDimension(16, false, this.props.screenSize)}}>
+                                <ElevatedView
+                                    elevation={3}
+                                    style={{
+                                        backgroundColor: styles.buttonGreen,
+                                        width: calculateDimension(33, false, this.props.screenSize),
+                                        height: calculateDimension(25, true, this.props.screenSize),
+                                        borderRadius: 4
+                                    }}
+                                >
+                                    <Ripple style={{
+                                        flex: 1,
+                                        justifyContent: 'center',
+                                        alignItems: 'center'
+                                    }} onPress={this.goToHelpScreen}>
+                                        <Icon name="help" color={'white'} size={15}/>
+                                    </Ripple>
+                                </ElevatedView> 
+                                {
+                                    this.props.role.find((e) => e === config.userPermissions.writeFollowUp) !== undefined ? (
+                                        <View>
+                                            <Menu
+                                                ref="menuRef"
+                                                button={
+                                                    <Ripple onPress={this.showMenu} hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}>
+                                                        <Icon name="more-vert"/>
+                                                    </Ripple>
+                                                }
+                                            >
+                                                <MenuItem onPress={this.handleOnPressMissing}>
+                                                    {getTranslation(translations.followUpsSingleScreen.missingButton, this.props.translation)}
+                                                </MenuItem>
+                                                <MenuItem onPress={this.handleOnPressDeceased}>
+                                                    {getTranslation(translations.followUpsSingleScreen.deceasedButton, this.props.translation)}
+                                                </MenuItem>
+                                                <MenuItem onPress={this.handleOnPressDelete}>
+                                                    {getTranslation(translations.followUpsSingleScreen.deleteButton, this.props.translation)}
+                                                </MenuItem>
+                                                <DateTimePicker
+                                                    isVisible={this.state.isDateTimePickerVisible}
+                                                    onConfirm={this._handleDatePicked}
+                                                    onCancel={this._hideDateTimePicker}
+                                                />
+                                            </Menu>
+                                        </View>
+                                    ) : null
+                                }
+                            </View>
                         </View>
                     }
                     navigator={this.props.navigator}
@@ -275,6 +295,16 @@ class FollowUpsSingleScreen extends Component {
             />
         )
     };
+
+    goToHelpScreen = () => {
+        this.props.navigator.showModal({
+            screen: 'HelpScreen',
+            animated: true,
+            passProps: {
+                pageAskingHelpFrom: 'followUps'
+            }
+        });
+    }
 
     handleRenderLabel = (props) => ({route, index}) => {
         const inputRange = props.navigationState.routes.map((x, i) => i);
@@ -659,6 +689,26 @@ class FollowUpsSingleScreen extends Component {
             this.handleOnPressSave();
         });
     };
+
+    goToHelpScreen = () => {
+        let pageAskingHelpFrom = null
+        if (this.props.isNew !== null && this.props.isNew !== undefined && this.props.isNew === true ){
+            pageAskingHelpFrom = 'followUpSingleScreenAdd'
+        } else {
+            if (this.state.isEditMode === true) {
+                pageAskingHelpFrom = 'followUpSingleScreenEdit'
+            } else if (this.state.isEditMode === false) {
+                pageAskingHelpFrom = 'followUpSingleScreenView'
+            }
+        }
+        this.props.navigator.showModal({
+            screen: 'HelpScreen',
+            animated: true,
+            passProps: {
+                pageAskingHelpFrom: pageAskingHelpFrom
+            }
+        });
+    }
 }
 
 // Create style outside the class, or for components that will be used by other components (buttons),
@@ -671,7 +721,7 @@ const style = StyleSheet.create({
     breadcrumbContainer: {
         flex: 1,
         flexDirection: 'row',
-        justifyContent: 'space-between'
+        justifyContent: 'space-between',
     }
 });
 

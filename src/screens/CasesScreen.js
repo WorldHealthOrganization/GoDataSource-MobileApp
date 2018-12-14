@@ -171,7 +171,7 @@ class CasesScreen extends Component {
                                     navigator={this.props.navigator}
                                 />
                             </View>
-                            <View style={{flex: 0.2, marginRight: 10}}>
+                            <View style={{flex: 0.15, marginRight: 10}}>
                                 <Ripple style={{
                                     flex: 1,
                                     justifyContent: 'center',
@@ -180,9 +180,29 @@ class CasesScreen extends Component {
                                     <MaterialCommunityIcons name="qrcode-scan" color={'black'} size={20}/>
                                 </Ripple>
                             </View>
+
+                            <View style={{flex: 0.15, marginRight: 10}}>
+                                <ElevatedView
+                                    elevation={3}
+                                    style={{
+                                        backgroundColor: styles.buttonGreen,
+                                        width: calculateDimension(33, false, this.props.screenSize),
+                                        height: calculateDimension(25, true, this.props.screenSize),
+                                        borderRadius: 4
+                                    }}
+                                >
+                                    <Ripple style={{
+                                        flex: 1,
+                                        justifyContent: 'center',
+                                        alignItems: 'center'
+                                    }} onPress={this.goToHelpScreen}>
+                                        <Icon name="help" color={'white'} size={15}/>
+                                    </Ripple>
+                                </ElevatedView> 
+                            </View>
                             {
                                 this.props.role.find((e) => e === config.userPermissions.writeCase) !== undefined ? (
-                                    <View style={{flex: 0.1}}>
+                                    <View style={{flex: 0.15}}>
                                         <ElevatedView
                                             elevation={3}
                                             style={{
@@ -209,8 +229,8 @@ class CasesScreen extends Component {
                     iconName="menu"
                     handlePressNavbarButton={this.handlePressNavbarButton}
                 >
-
                 </NavBarCustom>
+
                 <View style={style.containerContent}>
                     <AnimatedListView
                         stickyHeaderIndices={[0]}
@@ -240,6 +260,7 @@ class CasesScreen extends Component {
                         onRefresh={this.handleOnRefresh}
                     />
                 </View>
+               
                 <View style={styles.mapContainer}>
                     {
                         this.state.error === null ? (
@@ -516,6 +537,17 @@ class CasesScreen extends Component {
         })
     };
 
+    goToHelpScreen = () => {
+        let pageAskingHelpFrom = 'cases'
+        this.props.navigator.showModal({
+            screen: 'HelpScreen',
+            animated: true,
+            passProps: {
+                pageAskingHelpFrom: pageAskingHelpFrom
+            }
+        });
+    };
+
     handleOnPressQRCode = () => {
         console.log('handleOnPressQRCode')
 
@@ -654,7 +686,7 @@ const style = StyleSheet.create({
         height: 8
     },
     breadcrumbContainer: {
-        flex: 0.9,
+        flex: 0.8,
         flexDirection: 'row',
         justifyContent: 'flex-start'
     },

@@ -12,5 +12,8 @@ const errors = require('./errors');
 const referenceData = require('./referenceData');
 const locations = require('./locations');
 const role = require('./role');
+const helpCategory = require('./helpCategory');
+const helpItem = require('./helpItem');
 
-module.exports = Object.assign({}, app, user, outbreak, cases, followUps, contacts, events, errors, referenceData, locations, role);
+module.exports = Object.assign({}, app, user, outbreak, cases, followUps, contacts, events, errors, referenceData, locations, role, helpCategory, helpItem);
+
