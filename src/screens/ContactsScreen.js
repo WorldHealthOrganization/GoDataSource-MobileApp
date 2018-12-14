@@ -9,6 +9,7 @@ import styles from './../styles';
 import NavBarCustom from './../components/NavBarCustom';
 import ElevatedView from 'react-native-elevated-view';
 import Ripple from 'react-native-material-ripple';
+import {Button, Icon} from 'react-native-material-ui';
 import {calculateDimension, getTranslation, navigation} from './../utils/functions';
 import FollowUpListItem from './../components/FollowUpListItem';
 import SearchFilterView from './../components/SearchFilterView';
@@ -120,7 +121,6 @@ class ContactsScreen extends Component {
             outputRange: [1, 0],
             extrapolate: 'clamp',
         });
-        let contactTitle = []; contactTitle[1] = getTranslation(translations.contactsScreen.contactsTitle, this.props.translation);
 
         let filterNumbers = 0
         if (this.state.filterFromFilterScreen) {

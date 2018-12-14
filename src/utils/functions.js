@@ -766,7 +766,8 @@ export function localSortHelpItem (helpItemsCopy, propsFilter, stateFilter, filt
             let findItem = filterFromFilterScreen.categories.find((k) => {
                 return k.value === `helpCategory.json_${e.categoryId}`
             });
-        }
+            return findItem !== undefined
+        })
     }
 
     // Take care of sort
