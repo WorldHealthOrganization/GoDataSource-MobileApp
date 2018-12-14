@@ -69,10 +69,10 @@ const helpScreen = {
 };
 
 const sortTab = {
-    addSortRule: 'add sort rule',
-    SortBy: 'sort by',
-    sortCriteria: 'sort criteria',
-    sortOrder: 'sort order',
+    addSortRule: 'LNG_SORT_SCREEN_ADD_SORT_RULE_MESSAGE',
+    SortBy: 'LNG_SORT_SCREEN_ADD_SORT_CARD_LABEL_TITLE',
+    sortCriteria: 'LNG_SORT_SCREEN_CRITERIA_LABEL',
+    sortOrder: 'LNG_SORT_SCREEN_ORDER_LABEL',
 };
 
 const caseSingleScreen = {
