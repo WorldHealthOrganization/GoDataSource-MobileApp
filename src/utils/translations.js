@@ -201,6 +201,8 @@ const alertMessages = {
     warningLabel: 'Warning',
     invalidCredentials: 'Invalid credentials',
     invalidEmail: 'LNG_FORM_VALIDATION_ERROR_FIELD_EMAIL',
+    noItemAlert: 'No person exists with this information',
+    errorOccuredMsg: 'QR code is not valid',
 
 
     // cases
@@ -266,7 +268,7 @@ const inAppNotificationScreen = {
 };
 
 const firstConfigScreen = {
-    welcomeMessage: 'LNG_PAGE_LOGIN_WELCOME_MESSAGE',
+    welcomeMessage: 'Welcome',
     infoMessage: 'Choose one of the options below to sync with your HUB:',
     qrScanButton: 'Scan QR',
     manualConfigButton: 'Config HUB Manually'
