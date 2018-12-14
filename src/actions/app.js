@@ -31,6 +31,7 @@ import {setNumberOfFilesProcessed, createZipFileAtPath, extractIdFromPouchId} fr
 import {AsyncStorage} from 'react-native';
 import {getUserById} from './user';
 import {uniq} from 'lodash';
+import {addError} from './errors';
 
 let arrayOfStatuses = [];
 
@@ -255,19 +256,19 @@ export function storeHubConfiguration(hubConfiguration) {
             let lastSyncDate = await AsyncStorage.getItem(hubConfiguration.url);
             console.log("Last sync date: ", lastSyncDate);
             if (lastSyncDate !== null) {
-                getDatabaseSnapshotRequest(hubConfiguration, lastSyncDate, (error, response) => {
-                    dispatch(processFilesForSync(error, response, hubConfiguration, true, true, false));
+                getDatabaseSnapshotRequest(hubConfiguration, lastSyncDate, dispatch, (error, response) => {
+                     dispatch(processFilesForSync(error, response, hubConfiguration, true, true, false));
                 })
             } else {
                 console.log('No last sync date found. proceed to download all database: ');
-                getDatabaseSnapshotRequest(hubConfiguration, null, (error, response) => {
-                    dispatch(processFilesForSync(error, response, hubConfiguration, true, true, true));
+                getDatabaseSnapshotRequest(hubConfiguration, null, dispatch, (error, response) => {
+                     dispatch(processFilesForSync(error, response, hubConfiguration, true, true, true));
                 })
             }
         } catch (errorGetLastSyncDate) {
             console.log("Error at getting lastSyncDate. Proceed to download all database: ", errorGetLastSyncDate);
-            getDatabaseSnapshotRequest(hubConfiguration, null, (error, response) => {
-                dispatch(processFilesForSync(error, response, hubConfiguration, true, true, true));
+            getDatabaseSnapshotRequest(hubConfiguration, null, dispatch, (error, response) => {
+                 dispatch(processFilesForSync(error, response, hubConfiguration, true, true, true));
             })
         }
     }
@@ -279,6 +280,7 @@ function processFilesForSync(error, response, hubConfiguration, isFirstTime, syn
         let hubConfig = JSON.parse(hubConfiguration.clientId);
         if (error) {
             dispatch(setSyncState('Error'));
+            dispatch(addError({type: 'Error downloading database', message: error}));
         }
         if (response) {
             dispatch(setSyncState("Unzipping database..."));
@@ -381,6 +383,8 @@ function processFilesForSync(error, response, hubConfiguration, isFirstTime, syn
                                                                                     dispatch(setSyncState('Error'));
                                                                                     if (!isFirstTime) {
                                                                                         dispatch(parseStatusesAndShowMessage(getState().user._id));
+                                                                                    } else {
+                                                                                        dispatch(addError({type: 'Sync error', message: `Error at storing database name: \n${JSON.stringify(errorSaveDatabases)}`}));
                                                                                     }
                                                                                 }
                                                                             })
@@ -396,6 +400,8 @@ function processFilesForSync(error, response, hubConfiguration, isFirstTime, syn
                                                                         dispatch(setSyncState('Error'));
                                                                         if (!isFirstTime) {
                                                                             dispatch(parseStatusesAndShowMessage(getState().user._id));
+                                                                        } else {
+                                                                            dispatch(addError({type: 'Sync error', message: `Error at storing last sync date: \n${JSON.stringify(errorStoreLastSync)}`}));
                                                                         }
                                                                     }
                                                                 } else {
@@ -426,6 +432,8 @@ function processFilesForSync(error, response, hubConfiguration, isFirstTime, syn
                                                                             dispatch(setSyncState('Error'));
                                                                             if (!isFirstTime) {
                                                                                 dispatch(parseStatusesAndShowMessage(getState().user._id));
+                                                                            } else {
+                                                                                dispatch(addError({type: 'Sync error', message: `Error at storing database name: \n${JSON.stringify(errorSaveDatabases)}`}));
                                                                             }
                                                                         }
                                                                     })
@@ -442,6 +450,8 @@ function processFilesForSync(error, response, hubConfiguration, isFirstTime, syn
                                                                 dispatch(setSyncState('Error'));
                                                                 if (!isFirstTime) {
                                                                     dispatch(parseStatusesAndShowMessage(getState().user._id));
+                                                                } else {
+                                                                    dispatch(addError({type: 'Sync error', message: `Error at getting local hubs: \n${JSON.stringify(errorDatabasesString)}`}));
                                                                 }
                                                             })
                                                     } else {
@@ -455,6 +465,8 @@ function processFilesForSync(error, response, hubConfiguration, isFirstTime, syn
                                                         dispatch(setSyncState('Error'));
                                                         if (!isFirstTime) {
                                                             dispatch(parseStatusesAndShowMessage(getState().user._id));
+                                                        } else {
+                                                            dispatch(addError({type: 'Sync error', message: `Error at storing last sync date: \n${JSON.stringify(errorStoreLastSync)}`}));
                                                         }
                                                     }
                                                 });
@@ -469,6 +481,8 @@ function processFilesForSync(error, response, hubConfiguration, isFirstTime, syn
                                                 dispatch(setSyncState('Error'));
                                                 if (!isFirstTime) {
                                                     dispatch(parseStatusesAndShowMessage(getState().user._id));
+                                                } else {
+                                                    dispatch(addError({type: 'Sync error', message: `Error at storing active database info: \n${JSON.stringify(errorActiveDatabase)}`}));
                                                 }
                                             }
                                         });
@@ -483,6 +497,8 @@ function processFilesForSync(error, response, hubConfiguration, isFirstTime, syn
                                             dispatch(setSyncState('Error'));
                                             if (!isFirstTime) {
                                                 dispatch(parseStatusesAndShowMessage());
+                                            } else {
+                                                dispatch(addError({type: 'Sync error', message: `Error at syncing data`}));
                                             }
                                         } else {
                                             files = null;
@@ -494,6 +510,8 @@ function processFilesForSync(error, response, hubConfiguration, isFirstTime, syn
                                             dispatch(setSyncState('Error'));
                                             if (!isFirstTime) {
                                                 dispatch(parseStatusesAndShowMessage());
+                                            } else {
+                                                dispatch(addError({type: 'Sync error', message: `Error at syncing data`}));
                                             }
                                         }
                                     }
@@ -529,6 +547,8 @@ function processFilesForSync(error, response, hubConfiguration, isFirstTime, syn
                                     dispatch(setSyncState('Error'));
                                     if (!isFirstTime) {
                                         dispatch(parseStatusesAndShowMessage());
+                                    }else {
+                                        dispatch(addError({type: 'Error import', message: `Error while importing downloaded data: \nNo downloaded files found`}));
                                     }
                                 }
                             } catch(errorReadDir) {
@@ -537,6 +557,8 @@ function processFilesForSync(error, response, hubConfiguration, isFirstTime, syn
                                 dispatch(setSyncState('Error'));
                                 if (!isFirstTime) {
                                     dispatch(parseStatusesAndShowMessage());
+                                } else {
+                                    dispatch(addError({type: 'Error import', message: `Error while importing downloaded data: \n${JSON.stringify(errorReadDir)}`}));
                                 }
                             }
                         } else {
@@ -544,6 +566,8 @@ function processFilesForSync(error, response, hubConfiguration, isFirstTime, syn
                             dispatch(setSyncState('Error'));
                             if (!isFirstTime) {
                                 dispatch(parseStatusesAndShowMessage());
+                            } else {
+                                dispatch(addError({type: 'Error creating database', message: `Local database could not be created`}));
                             }
                         }
                     } catch (errorCreateDatabase) {
@@ -552,6 +576,8 @@ function processFilesForSync(error, response, hubConfiguration, isFirstTime, syn
                         dispatch(setSyncState('Error'));
                         if (!isFirstTime) {
                             dispatch(parseStatusesAndShowMessage());
+                        } else {
+                            dispatch(addError({type: 'Error creating local database', message: JSON.stringify(errorCreateDatabase)}));
                         }
                     }
                 } else {
@@ -559,14 +585,18 @@ function processFilesForSync(error, response, hubConfiguration, isFirstTime, syn
                     arrayOfStatuses.push({text: 'Getting updated data from the server', status: 'No zip file'});
                     if (!isFirstTime) {
                         dispatch(parseStatusesAndShowMessage());
+                    } else {
+                        dispatch(addError({type: 'Error downloading database', message: `Error while unzipping the file from the server`}));
                     }
                 }
             } catch (unzipError) {
                 console.log("Error promises: ", error);
-                arrayOfStatuses.push({text: 'Getting updated data from the server', status: JSON.stringify(unzipError)});
+                arrayOfStatuses.push({text: 'Getting updated data from the server', status: `Error while unzipping the file from the server: \n${JSON.stringify(unzipError)}`});
                 dispatch(setSyncState('Error'));
                 if (!isFirstTime) {
                     dispatch(parseStatusesAndShowMessage());
+                } else {
+                    dispatch(addError({type: 'Error downloading database', message: JSON.stringify(unzipError)}));
                 }
             }
 
@@ -732,7 +762,7 @@ export function sendDatabaseToServer () {
                                                                 // statuses.sendData.status = 'OK';
                                                                 arrayOfStatuses.push({text: 'Sending data to the HUB', status: errorSendData ? JSON.stringify(errorSendData) : 'OK'});
                                                                 dispatch(setSyncState('Getting updated data from the server'));
-                                                                getDatabaseSnapshotRequest({url: internetCredentials.server ? internetCredentials.server : internetCredentials.service, clientId: internetCredentials.username, clientSecret: internetCredentials.password}, lastSyncDate, (error, response) => {
+                                                                getDatabaseSnapshotRequest({url: internetCredentials.server ? internetCredentials.server : internetCredentials.service, clientId: internetCredentials.username, clientSecret: internetCredentials.password}, lastSyncDate, dispatch, (error, response) => {
                                                                     if (error) {
                                                                         arrayOfStatuses.push({text: 'Getting updated data from the server', status: JSON.stringify(error)});
                                                                         dispatch(setSyncState('Error'));
@@ -763,7 +793,7 @@ export function sendDatabaseToServer () {
                                     } else {
                                         arrayOfStatuses.push({text: 'Getting local data', status: 'Local data has not been updated'});
                                         dispatch(setSyncState('Getting updated data from the server'));
-                                        getDatabaseSnapshotRequest({url: internetCredentials.server ? internetCredentials.server : internetCredentials.service, clientId: internetCredentials.username, clientSecret: internetCredentials.password}, lastSyncDate, (error, response) => {
+                                        getDatabaseSnapshotRequest({url: internetCredentials.server ? internetCredentials.server : internetCredentials.service, clientId: internetCredentials.username, clientSecret: internetCredentials.password}, lastSyncDate, dispatch, (error, response) => {
                                             if (error) {
                                                 arrayOfStatuses.push({text: 'Getting updated data from the server', status: JSON.stringify(error)});
                                                 dispatch(setSyncState('Error'));

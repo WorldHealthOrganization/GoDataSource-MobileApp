@@ -36,7 +36,8 @@ class ManualConfigScreen extends Component {
             name: '',
             url: '',
             clientId: '',
-            clientSecret: ''
+            clientSecret: '',
+            hasAlert: false
         };
         // Bind here methods, or at least don't declare methods in the render method
         this.nameRef = this.updateRef.bind(this, 'name');
@@ -60,11 +61,15 @@ class ManualConfigScreen extends Component {
     };
 
     static getDerivedStateFromProps(props, state) {
-        if (props.errors && props.errors.type && props.errors.message) {
+        if (props.errors && props.errors.type && props.errors.message && !state.hasAlert) {
+            state.hasAlert = true;
             Alert.alert(props.errors.type, props.errors.message, [
                 {
-                    text: getTranslation(translations.alertMessages.okButtonLabel, null),
-                    onPress: () => {props.removeErrors()}
+                    text: getTranslation(translations.alertMessages.okButtonLabel, props.translation),
+                    onPress: () => {
+                        state.hasAlert = false;
+                        props.removeErrors();
+                    }
                 }
             ])
         }

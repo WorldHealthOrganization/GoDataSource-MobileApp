@@ -5,8 +5,9 @@ import url from './../utils/url';
 import RNFetchBlob from 'rn-fetch-blob';
 import base64 from 'base-64';
 import {Platform} from 'react-native';
+import {setSyncState} from './../actions/app';
 
-export function getDatabaseSnapshotRequest(hubConfig, lastSyncDate, callback) {
+export function getDatabaseSnapshotRequest(hubConfig, lastSyncDate, dispatch, callback) {
 
     // hubConfiguration = {url: databaseName, clientId: JSON.stringify({name, url, clientId, clientSecret}), clientSecret: databasePass}
     let hubConfiguration = JSON.parse(hubConfig.clientId);
@@ -37,24 +38,26 @@ export function getDatabaseSnapshotRequest(hubConfig, lastSyncDate, callback) {
         'Accept': 'application/json',
         'Authorization': 'Basic ' + base64.encode(`${hubConfiguration.clientId}:${hubConfiguration.clientSecret}`)
     }, '0', '20000')
-        .progress({count: 1}, (received, total) => {
+        .progress({count: 500}, (received, total) => {
+            dispatch(setSyncState(`Downloading database\nReceived ${received} bytes`));
             console.log(received, total)
         })
         .then((res) => {
             let status = res.info().status;
+            let info = res.info();
             // After getting zip file from the server, unzip it and then proceed to the importing of the data to the SQLite database
             if(status === 200) {
                 // After returning the database, return the path to it
                 console.log("Got database");
-                callback(null, (dirs + '/database.zip'))
+                callback(null, (dirs + '/database.zip'));
             } else {
-                callback('Status Code Error')
+                callback(`Cannot connect to HUB, please check URL, Client ID and Client secret.\nStatus code: ${status}`);
             }
         })
         .catch((errorMessage, statusCode) => {
             // error handling
             console.log("*** getDatabaseSnapshotRequest error: ", JSON.stringify(errorMessage));
-            callback(errorMessage);
+            callback(errorMessage.message);
         });
 }
 

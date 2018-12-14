@@ -914,7 +914,7 @@ export function objSort() {
                 b = obj2[args[i]];
             }
 
-            if (case_sensitive === false && typeof a === 'string') {
+            if (case_sensitive === false && typeof a === 'string' && typeof b === "string") {
                 a = a !== undefined && a.trim().length > 0 ? a.toLowerCase() : '~'; // place caracters that does not have property or has it but is '' at the end of array
                 b = b !== undefined && b.trim().length > 0 ? b.toLowerCase() : '~'; // place caracters that does not have property or has it but is '' at the end of array
                 //null if wanted at the start of array

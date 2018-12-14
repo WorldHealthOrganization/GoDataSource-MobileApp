@@ -32,7 +32,8 @@ class LoginScreen extends Component {
             email: '',
             password: '',
             // url: config.baseUrls[0].value,
-            showLoading: false
+            showLoading: false,
+            hasAlert: false
         };
         // Bind here methods, or at least don't declare methods in the render method
         this.handleLogin = this.handleLogin.bind(this);
@@ -56,11 +57,15 @@ class LoginScreen extends Component {
     }
 
     static getDerivedStateFromProps(props, state) {
-        if (props.errors && props.errors.type && props.errors.message) {
+        if (props.errors && props.errors.type && props.errors.message && !state.hasAlert) {
+            state.hasAlert = true;
             Alert.alert(props.errors.type, props.errors.message, [
                 {
-                    text: getTranslation(translations.alertMessages.okButtonLabel, props.translation), 
-                    onPress: () => {props.removeErrors()}
+                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props && this.props.translation ? this.props.translation : null),
+                    onPress: () => {
+                        state.hasAlert = false;
+                        props.removeErrors();
+                    }
                 }
             ])
         }
