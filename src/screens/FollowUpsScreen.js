@@ -262,7 +262,7 @@ class FollowUpsScreen extends Component {
                                 </Ripple>
                             </View>
 
-                            <View style={{flex: 0.11 /*, marginRight: 10*/}}>
+                            <View style={{flex: 0.135 /*, marginRight: 10*/}}>
                                 <ElevatedView
                                     elevation={3}
                                     style={{
