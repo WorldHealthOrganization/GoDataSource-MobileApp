@@ -776,7 +776,7 @@ export function localSortHelpItem (helpItemsCopy, propsFilter, stateFilter, filt
         let sortOrder = []
         for(let i = 0; i < filterFromFilterScreen.sort.length; i++) {
             if (filterFromFilterScreen.sort[i].sortCriteria && filterFromFilterScreen.sort[i].sortCriteria.trim().length > 0 && filterFromFilterScreen.sort[i].sortOrder && filterFromFilterScreen.sort[i].sortOrder.trim().length > 0){
-                sortCriteria.push(filterFromFilterScreen.sort[i].sortCriteria === 'Title' ? 'title' : 'categoryId')
+                sortCriteria.push(filterFromFilterScreen.sort[i].sortCriteria === 'LNG_HELP_ITEMS_FIELD_LABEL_TITLE' ? 'title' : 'categoryId')
                 sortOrder.push(filterFromFilterScreen.sort[i].sortOrder === 'LNG_SIDE_FILTERS_SORT_BY_ASC_PLACEHOLDER' ? false : true)
             }
         }
@@ -871,7 +871,7 @@ export function localSortItems (itemsToSort, sortFilter) {
         let sortOrder = []
         for(let i = 0; i < sortFilter.length; i++) {
             if (sortFilter[i].sortCriteria && sortFilter[i].sortCriteria.trim().length > 0 && sortFilter[i].sortOrder && sortFilter[i].sortOrder.trim().length > 0){
-                sortCriteria.push(sortFilter[i].sortCriteria === 'First Name' ? 'firstName' : 'lastNmae')
+                sortCriteria.push(sortFilter[i].sortCriteria === 'LNG_CONTACT_FIELD_LABEL_FIRST_NAME' ? 'firstName' : 'lastNmae')
                 sortOrder.push(sortFilter[i].sortOrder === 'LNG_SIDE_FILTERS_SORT_BY_ASC_PLACEHOLDER' ? false : true)
             }
         }

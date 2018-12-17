@@ -45,27 +45,27 @@ const followUpFilter = {
 const helpFilter = {
     filterTitle: 'LNG_SIDE_FILTERS_TITLE',
     sortTitle:'LNG_SIDE_FILTERS_SECTION_SORT_TITLE',
-    helpFilterTitle: 'Help filters',
-    category: 'Category',
-    chooseCategoryLabel: 'Choose one or more categories',
+    helpFilterTitle: 'LNG_HELP_ITEMS_FILTER_SCREEN_TITLE',
+    category: 'LNG_HELP_ITEMS_FILTER_CATEGORY_LABEL', 
+    chooseCategoryLabel: 'LNG_HELP_ITEMS_FILTER_CATEGORY_MESSAGE_LABEL', 
 };
 
 const helpScreen = {
-    helpTitle: 'Help',
-    viewHelpLabel: 'View',
-    helpViewItemTitle: 'View Help Item',
-    noHelpItemsToShowMessage: 'There are not help items to display',
-    itemsForMessage: 'items for',
+    helpTitle: 'LNG_HELP_ITEMS_LIST_TITLE', 
+    viewHelpLabel: 'LNG_HELP_ITEMS_VIEW_ACTION_LABEL', 
+    helpViewItemTitle: 'LNG_HELP_ITEMS_SINGLE_SCREEN_VIEW_TITLE_LABEL', 
+    noHelpItemsToShowMessage: 'LNG_HELP_ITEMS_EMPTY_LIST_MESSAGE', 
+    itemsForMessage: 'LNG_HELP_ITEMS_ITEMS_FOR_MESSAGE', 
 
-    addMessage: 'Add',
-    editMessage: 'Edit',
-    viewMessage: 'View',
+    addMessage: 'LNG_HELP_ITEMS_ADD_MESSAGE',
+    editMessage: 'LNG_HELP_ITEMS_EDIT_MESSAGE',
+    viewMessage: 'LNG_HELP_ITEMS_VIEW_MESSAGE',
 
-    helpTitleLabel: 'Title',
-    helpCategoryLabel: 'Category',
-    helpDescriptionLabel: 'Description',
-    helpCommentLabel: 'Comment',
-    helpPageLabel: 'Page'
+    helpTitleLabel: 'LNG_HELP_ITEMS_FIELD_LABEL_TITLE',
+    helpCategoryLabel: 'LNG_HELP_ITEMS_FIELD_LABEL_CATEGORY',
+    helpDescriptionLabel: 'LNG_HELP_ITEMS_FIELD_LABEL_DESCRIPTION',
+    helpCommentLabel: 'LNG_HELP_ITEMS_FIELD_LABEL_COMMENT',
+    helpPageLabel: 'LNG_HELP_ITEMS_FIELD_LABEL_PAGE',
 };
 
 const sortTab = {
@@ -73,6 +73,13 @@ const sortTab = {
     SortBy: 'LNG_SORT_SCREEN_ADD_SORT_CARD_LABEL_TITLE',
     sortCriteria: 'LNG_SORT_SCREEN_CRITERIA_LABEL',
     sortOrder: 'LNG_SORT_SCREEN_ORDER_LABEL',
+
+    sortFirstName: 'LNG_CONTACT_FIELD_LABEL_FIRST_NAME',
+    sortLastName: 'LNG_CONTACT_FIELD_LABEL_LAST_NAME',
+    sortCategory: 'LNG_HELP_ITEMS_FIELD_LABEL_CATEGORY',
+    sortTitle: 'LNG_HELP_ITEMS_FIELD_LABEL_TITLE',
+    sortOrderAsc: 'LNG_SIDE_FILTERS_SORT_BY_ASC_PLACEHOLDER',
+    sortOrderDesc: 'LNG_SIDE_FILTERS_SORT_BY_DESC_PLACEHOLDER'
 };
 
 const caseSingleScreen = {

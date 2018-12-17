@@ -103,7 +103,7 @@ class CasesSortContainer extends PureComponent {
                 index={index}
                 isEditMode={true}
                 onChangeDropDown={this.props.onChangeDropDown}
-                screen="CasesFilter"
+                screen="CasesSort"
                 filter={this.props.filter}
                 onDeletePress={this.props.onDeletePress}
                 style={style.cardStyle}
