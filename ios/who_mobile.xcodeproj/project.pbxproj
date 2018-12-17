@@ -43,6 +43,7 @@
 		3424E5E84C7944318A7900BD /* Roboto-ThinItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 4EEF426F4A7B44068C424A73 /* Roboto-ThinItalic.ttf */; };
 		375529ADF1CB461D91661EF3 /* Octicons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = D76C7890181046A1AA3452BD /* Octicons.ttf */; };
 		3B06BE0721C3DBFA0012D9C0 /* APNSEventEmitter.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B06BE0621C3DBFA0012D9C0 /* APNSEventEmitter.m */; };
+		3B38880421C79AD300ADBE5C /* APNSEventManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B38880321C79AD300ADBE5C /* APNSEventManager.m */; };
 		40F9574B44134A71916EAD47 /* libRNKeychain.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4610B02DCF40411D92FB00ED /* libRNKeychain.a */; };
 		4AED598218A74F9CA423E6C6 /* SimpleLineIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 1167A5CFED3D417C93EF4604 /* SimpleLineIcons.ttf */; };
 		4FA28C1F731A478998412FD9 /* Roboto-Black.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 5A1454C683FF43BEA12EA238 /* Roboto-Black.ttf */; };
@@ -490,6 +491,8 @@
 		3AE4AE468ABF483A96273BDA /* Roboto-Bold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Roboto-Bold.ttf"; path = "../assets/fonts/Roboto/Roboto-Bold.ttf"; sourceTree = "<group>"; };
 		3B06BE0521C3DBFA0012D9C0 /* APNSEventEmitter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = APNSEventEmitter.h; sourceTree = "<group>"; };
 		3B06BE0621C3DBFA0012D9C0 /* APNSEventEmitter.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = APNSEventEmitter.m; sourceTree = "<group>"; };
+		3B38880221C79AD300ADBE5C /* APNSEventManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = APNSEventManager.h; sourceTree = "<group>"; };
+		3B38880321C79AD300ADBE5C /* APNSEventManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = APNSEventManager.m; sourceTree = "<group>"; };
 		3F94250387284F21930E14C1 /* libRNFS.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRNFS.a; sourceTree = "<group>"; };
 		402AC17241C218224A7E12DA /* Pods-who_mobile.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-who_mobile.release.xcconfig"; path = "Pods/Target Support Files/Pods-who_mobile/Pods-who_mobile.release.xcconfig"; sourceTree = "<group>"; };
 		4610B02DCF40411D92FB00ED /* libRNKeychain.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRNKeychain.a; sourceTree = "<group>"; };
@@ -691,6 +694,8 @@
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				13B07FB11A68108700A75B9A /* LaunchScreen.xib */,
 				13B07FB71A68108700A75B9A /* main.m */,
+				3B38880221C79AD300ADBE5C /* APNSEventManager.h */,
+				3B38880321C79AD300ADBE5C /* APNSEventManager.m */,
 				3B06BE0521C3DBFA0012D9C0 /* APNSEventEmitter.h */,
 				3B06BE0621C3DBFA0012D9C0 /* APNSEventEmitter.m */,
 			);
@@ -1716,6 +1721,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3B38880421C79AD300ADBE5C /* APNSEventManager.m in Sources */,
 				13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */,
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
 				3B06BE0721C3DBFA0012D9C0 /* APNSEventEmitter.m in Sources */,

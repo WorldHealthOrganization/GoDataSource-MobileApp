@@ -11,6 +11,7 @@
 #import "RCCManager.h"
 
 #import "APNSEventEmitter.h"
+#import "APNSEventManager.h"
 
 #import <React/RCTRootView.h>
 
@@ -18,8 +19,6 @@
 #import <Parse.h>
 
 @interface AppDelegate () <UNUserNotificationCenterDelegate>
-
-@property (nonatomic, strong) APNSEventEmitter *emitter;
 
 @end
 
@@ -59,16 +58,15 @@
 - (void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
   [[PFInstallation currentInstallation] setDeviceTokenFromData:deviceToken];
   [[PFInstallation currentInstallation] saveEventually:^(BOOL succeeded, NSError * _Nullable error) {
-    self.emitter = [[APNSEventEmitter alloc] init];
   }];
 }
 
 - (void)userNotificationCenter:(UNUserNotificationCenter *)center willPresentNotification:(UNNotification *)notification withCompletionHandler:(void (^)(UNNotificationPresentationOptions))completionHandler {
-  [[self emitter] onPushReceived:notification.request.content.userInfo];
+  [[APNSEventManager sharedInstance] dispatch:@"onPushReceived" body:notification.request.content.userInfo];
 }
 
 - (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler {
-  [[self emitter] onPushReceived:userInfo];
+  [[APNSEventManager sharedInstance] dispatch:@"onPushReceived" body:userInfo];
 }
 
 @end

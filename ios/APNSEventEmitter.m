@@ -7,13 +7,23 @@
 //
 
 #import "APNSEventEmitter.h"
+#import <React/RCTEventEmitter.h>
+#import "APNSEventManager.h"
 
 @implementation APNSEventEmitter
 
 RCT_EXPORT_MODULE();
 
+- (instancetype)init {
+  if (self = [super init]) {
+    [[APNSEventManager sharedInstance] registerEventEmitter:self];
+  }
+  return self;
+}
+
 - (NSArray<NSString *> *)supportedEvents {
-  return @[@"onPushReceived"];
+  return [APNSEventManager sharedInstance].allowedEvents;
+//  return @[@"onPushReceived"];
 }
 
 - (void)onPushReceived:(NSDictionary *)userInfo {
@@ -26,4 +36,5 @@ RCT_EXPORT_MODULE();
 //  NSString *jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
   [self sendEventWithName:@"onPushReceived" body:@{@"name": @"TODO"}];
 }
+
 @end

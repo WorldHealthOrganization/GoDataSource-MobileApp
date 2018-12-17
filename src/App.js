@@ -4,7 +4,7 @@ import { createStore, applyMiddleware } from 'redux';
 import thunk from 'redux-thunk';
 import promise from 'redux-promise';
 import { createLogger } from 'redux-logger';
-import { Platform, DeviceEventEmitter } from 'react-native';
+import { Platform, DeviceEventEmitter, NativeEventEmitter, NativeModules } from 'react-native';
 
 import appReducers from './reducers';
 import appActions from './actions';
@@ -23,8 +23,14 @@ registerScreens(store, Provider);
 export default class App {
 
     constructor() {
-        DeviceEventEmitter.addListener('onPushReceived', (item) => {
-            console.log('~~~ TODO onPushReceived ~~~', item)
+        let NativeModule = null
+        if (Platform.OS === 'ios') {
+            NativeModule = new NativeEventEmitter(NativeModules.APNSEventEmitter)
+        } else {
+            NativeModule = DeviceEventEmitter
+        }
+        NativeModule.addListener('onPushReceived', (item) => {
+            console.log('~~~ TODO WIPE onPushReceived ~~~', item)
         })
         store.subscribe(this.onStoreUpdate);
         store.dispatch(appActions.appInitialized());
