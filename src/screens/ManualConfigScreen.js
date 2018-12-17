@@ -36,7 +36,8 @@ class ManualConfigScreen extends Component {
             name: '',
             url: '',
             clientId: '',
-            clientSecret: ''
+            clientSecret: '',
+            hasAlert: false
         };
         // Bind here methods, or at least don't declare methods in the render method
         this.nameRef = this.updateRef.bind(this, 'name');
@@ -60,11 +61,15 @@ class ManualConfigScreen extends Component {
     };
 
     static getDerivedStateFromProps(props, state) {
-        if (props.errors && props.errors.type && props.errors.message) {
+        if (props.errors && props.errors.type && props.errors.message && !state.hasAlert) {
+            state.hasAlert = true;
             Alert.alert(props.errors.type, props.errors.message, [
                 {
-                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation), 
-                    onPress: () => {props.removeErrors()}
+                    text: getTranslation(translations.alertMessages.okButtonLabel, props.translation),
+                    onPress: () => {
+                        state.hasAlert = false;
+                        props.removeErrors();
+                    }
                 }
             ])
         }
@@ -95,7 +100,7 @@ class ManualConfigScreen extends Component {
 
                 <View style={[style.welcomeTextContainer]}>
                     <Text style={style.welcomeText}>
-                        {getTranslation(translations.manualConfigScreen.title, this.props.translation)}
+                        {getTranslation(translations.manualConfigScreen.title, null)}
                     </Text>
                 </View>
                 <View style={style.inputsContainer}>
@@ -118,7 +123,7 @@ class ManualConfigScreen extends Component {
                         enablesReturnKeyAutomatically={true}
                         containerStyle={style.textInput}
                         onChangeText={this.handleTextChange}
-                        label={getTranslation(translations.manualConfigScreen.hubUrlLabel, this.props && this.props.translation ? this.props.translation : null)}
+                        label={getTranslation(translations.manualConfigScreen.hubUrlLabel, null)}
                         autoCapitalize={'none'}
                     />
                     <TextField
@@ -129,7 +134,7 @@ class ManualConfigScreen extends Component {
                         enablesReturnKeyAutomatically={true}
                         containerStyle={style.textInput}
                         onChangeText={this.handleTextChange}
-                        label={getTranslation(translations.manualConfigScreen.clientIdLabel, this.props && this.props.translation ? this.props.translation : null)}
+                        label={getTranslation(translations.manualConfigScreen.clientIdLabel, null)}
                         autoCapitalize={'none'}
                     />
                     <TextField
@@ -140,11 +145,11 @@ class ManualConfigScreen extends Component {
                         enablesReturnKeyAutomatically={true}
                         containerStyle={style.textInput}
                         onChangeText={this.handleTextChange}
-                        label={getTranslation(translations.manualConfigScreen.clientSecretPass, this.props && this.props.translation ? this.props.translation : null)}
+                        label={getTranslation(translations.manualConfigScreen.clientSecretPass, null)}
                         secureTextEntry={true}
                         autoCapitalize={'none'}
                     />
-                    <Button upperCase={false} onPress={this.saveHubConfiguration} text={getTranslation(translations.manualConfigScreen.saveHubConfigButton, this.props && this.props.translation ? this.props.translation : null)} style={styles.buttonLogin} />
+                    <Button upperCase={false} onPress={this.saveHubConfiguration} text={getTranslation(translations.manualConfigScreen.saveHubConfigButton, null)} style={styles.buttonLogin} />
                 </View>
                 <View style={style.logoContainer}>
                     <Image source={{uri: 'logo_app'}} style={style.logoStyle} />
@@ -246,7 +251,6 @@ function mapStateToProps(state) {
         screenSize: state.app.screenSize,
         errors: state.errors,
         syncState: state.app.syncState,
-        translation: state.app.translation
     };
 }
 

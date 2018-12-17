@@ -31,6 +31,7 @@ import {getFollowUpsForContactRequest} from './../queries/followUps'
 import ios from 'rn-fetch-blob/ios';
 import moment from 'moment'
 import translations from './../utils/translations'
+import ElevatedView from 'react-native-elevated-view';
 
 const initialLayout = {
     height: 0,
@@ -110,7 +111,7 @@ class ContactsSingleScreen extends Component {
         if (props.errors && props.errors.type && props.errors.message) {
             Alert.alert(props.errors.type, props.errors.message, [
                 {
-                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation), 
+                    text: getTranslation(translations.alertMessages.okButtonLabel, props.translation), 
                     onPress: () => {
                         state.savePressed = false;
                         props.removeErrors()
@@ -226,40 +227,59 @@ class ContactsSingleScreen extends Component {
                                 navigator={this.props.navigator}
                                 onPress={this.handlePressBreadcrumb}
                             />
-                            {
-                                this.props.role.find((e) => e === config.userPermissions.writeContact) !== undefined ? (
-                                    <View>
-                                        <Menu
-                                            ref="menuRef"
-                                            button={
-                                                <Ripple onPress={this.showMenu} hitSlop={{top: 20, bottom: 20, left: 20, right: 20}}>
-                                                    <Icon name="more-vert"/>
-                                                </Ripple>
-                                            }
-                                        >
-                                            {
-                                                !this.props.isNew ? (
-                                                    <MenuItem onPress={this.handleOnPressDeceased}>
-                                                        {getTranslation(translations.contactSingleScreen.deceasedContactLabel, this.props.translation)}
-                                                    </MenuItem>
-                                                ) : null
-                                            }
-                                            {
-                                                !this.props.isNew && !this.state.contact.deleted ? (
-                                                    <MenuItem onPress={this.handleOnPressDeleteContact}>
-                                                        {getTranslation(translations.contactSingleScreen.deleteContactLabel, this.props.translation)}
-                                                    </MenuItem>
-                                                ) : null
-                                            }
-                                            <DateTimePicker
-                                                isVisible={this.state.isDateTimePickerVisible}
-                                                onConfirm={this._handleDatePicked}
-                                                onCancel={this._hideDateTimePicker}
-                                            />
-                                        </Menu>
-                                    </View>
-                                ) : null
-                            }
+                            <View style={{flexDirection: 'row', marginRight: calculateDimension(16, false, this.props.screenSize)}}>
+                                <ElevatedView
+                                    elevation={3}
+                                    style={{
+                                        backgroundColor: styles.buttonGreen,
+                                        width: calculateDimension(33, false, this.props.screenSize),
+                                        height: calculateDimension(25, true, this.props.screenSize),
+                                        borderRadius: 4
+                                    }}
+                                >
+                                    <Ripple style={{
+                                        flex: 1,
+                                        justifyContent: 'center',
+                                        alignItems: 'center'
+                                    }} onPress={this.goToHelpScreen}>
+                                        <Icon name="help" color={'white'} size={15}/>
+                                    </Ripple>
+                                </ElevatedView> 
+                                {
+                                    this.props.role.find((e) => e === config.userPermissions.writeContact) !== undefined ? (
+                                        <View>
+                                            <Menu
+                                                ref="menuRef"
+                                                button={
+                                                    <Ripple onPress={this.showMenu} hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}>
+                                                        <Icon name="more-vert"/>
+                                                    </Ripple>
+                                                }
+                                            >
+                                                {
+                                                    !this.props.isNew ? (
+                                                        <MenuItem onPress={this.handleOnPressDeceased}>
+                                                            {getTranslation(translations.contactSingleScreen.deceasedContactLabel, this.props.translation)}
+                                                        </MenuItem>
+                                                    ) : null
+                                                }
+                                                {
+                                                    !this.props.isNew && !this.state.contact.deleted ? (
+                                                        <MenuItem onPress={this.handleOnPressDeleteContact}>
+                                                            {getTranslation(translations.contactSingleScreen.deleteContactLabel, this.props.translation)}
+                                                        </MenuItem>
+                                                    ) : null
+                                                }
+                                                <DateTimePicker
+                                                    isVisible={this.state.isDateTimePickerVisible}
+                                                    onConfirm={this._handleDatePicked}
+                                                    onCancel={this._hideDateTimePicker}
+                                                />
+                                            </Menu>
+                                        </View>
+                                    ) : null
+                                }
+                            </View>
                         </View>
                     }
                     navigator={this.props.navigator}
@@ -1209,8 +1229,16 @@ class ContactsSingleScreen extends Component {
         console.log("DeletePressed: ", index);
         let contactAddressesClone = _.cloneDeep(this.state.contact.addresses);
         contactAddressesClone.splice(index, 1);
+
+        let hasPlaceOfResidence = false
+        let caselaceOfResidence = caseAddressesClone.find((e) => {return e.typeId === config.userResidenceAddress.userPlaceOfResidence})
+        if (caselaceOfResidence !== undefined) {
+            hasPlaceOfResidence = true
+        }
+
         this.setState(prevState => ({
-            contact: Object.assign({}, prevState.contact, {addresses: contactAddressesClone})
+            contact: Object.assign({}, prevState.contact, {addresses: contactAddressesClone}),
+            hasPlaceOfResidence
         }), () => {
             console.log("After deleting the address: ", this.state.contact);
         })
@@ -1247,6 +1275,27 @@ class ContactsSingleScreen extends Component {
     onNavigatorEvent = (event) => {
         navigation(event, this.props.navigator);
     };
+
+    goToHelpScreen = () => {
+        let pageAskingHelpFrom = null
+        if (this.props.isNew !== null && this.props.isNew !== undefined && this.props.isNew === true ){
+            pageAskingHelpFrom = 'contactsSingleScreenAdd'
+        } else {
+            if (this.state.isEditMode === true) {
+                pageAskingHelpFrom = 'contactsSingleScreenEdit'
+            } else if (this.state.isEditMode === false) {
+                pageAskingHelpFrom = 'contactsSingleScreenView'
+            }
+        }
+
+        this.props.navigator.showModal({
+            screen: 'HelpScreen',
+            animated: true,
+            passProps: {
+                pageAskingHelpFrom: pageAskingHelpFrom
+            }
+        });
+    }
 }
 
 // Create style outside the class, or for components that will be used by other components (buttons),

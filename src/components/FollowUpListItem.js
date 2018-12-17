@@ -139,7 +139,7 @@ class FollowUpListItem extends PureComponent {
                             marginVertical: 7.5
                         }]}
                         numberOfLines={2}
-                    >{'Exposed to: ' + relationshipText}</Text>
+                    >{`${getTranslation(translations.followUpsScreen.exposedToMessage, this.props.translation)} ${relationshipText}`}</Text>
                 </View>
                 <View style={styles.lineStyle}/>
                 <View style={[style.thirdSectionContainer, {marginHorizontal: calculateDimension(14, false, this.props.screenSize)}]}>
