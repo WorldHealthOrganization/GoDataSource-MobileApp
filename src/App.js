@@ -23,39 +23,51 @@ registerScreens(store, Provider);
 export default class App {
 
     constructor() {
-        let NativeModule = null
+        let ParseNativeModule = null
         if (Platform.OS === 'ios') {
-            NativeModule = new NativeEventEmitter(NativeModules.APNSEventEmitter)
+            ParseNativeModule = new NativeEventEmitter(NativeModules.APNSEventEmitter)
         } else {
-            NativeModule = DeviceEventEmitter
+            ParseNativeModule = DeviceEventEmitter
         }
-        NativeModule.addListener('onPushReceived', (item) => {
+        ParseNativeModule.addListener('onParseInit', (item) => {
+            console.log('~~~ TODO save installation Id onParseInit ~~~', item)
+        })
+        ParseNativeModule.addListener('onPushReceived', (item) => {
             console.log('~~~ TODO WIPE onPushReceived ~~~', item)
         })
+
         store.subscribe(this.onStoreUpdate);
         store.dispatch(appActions.appInitialized());
     };
 
     onStoreUpdate = () => {
         const { root } = store.getState().app;
-
+        const oldRoot = this.currentRoot
         if (this.currentRoot !== root) {
             this.currentRoot = root;
             if (Platform.OS === 'ios') {
-                this.startApp(root);
+                this.startApp(root, oldRoot);
             } else {
                 Navigation.isAppLaunched()
                     .then((appLaunched) => {
                         if (appLaunched) {
-                            this.startApp(root);
+                            this.startApp(root, oldRoot);
                         }
-                        new NativeEventsReceiver().appLaunched(this.startApp(root));
+                        new NativeEventsReceiver().appLaunched(this.startApp(root, oldRoot));
                     })
             }
         }
     };
 
-    startApp = (root) => {
+    startApp = (root, oldRoot) => {
+        if (!oldRoot) {
+            if (Platform.OS === 'ios') {
+                ParseNativeModule = NativeModules.APNSEventEmitter
+            } else {
+                ParseNativeModule = NativeModules.APNSEventEmitter
+            }
+            ParseNativeModule.initParse()
+        }
         switch (root) {
             case 'config':
                 console.log("### config startApp");

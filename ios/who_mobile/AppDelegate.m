@@ -33,6 +33,10 @@
   jsCodeLocation = [[NSBundle mainBundle] URLForResource:@"main" withExtension:@"jsbundle"];
 #endif
   
+  self.window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
+  self.window.backgroundColor = [UIColor whiteColor];
+  [[RCCManager sharedInstance] initBridgeWithBundleURL:jsCodeLocation launchOptions:launchOptions];
+  
   [UNUserNotificationCenter currentNotificationCenter].delegate = self;
   [[UNUserNotificationCenter currentNotificationCenter] requestAuthorizationWithOptions:UNAuthorizationOptionAlert | UNAuthorizationOptionBadge | UNAuthorizationOptionSound
                                                                       completionHandler:^(BOOL granted, NSError * _Nullable error) {
@@ -49,13 +53,11 @@
   }];
   [Parse initializeWithConfiguration:config];
   
-  self.window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
-  self.window.backgroundColor = [UIColor whiteColor];
-  [[RCCManager sharedInstance] initBridgeWithBundleURL:jsCodeLocation launchOptions:launchOptions];
   return YES;
 }
 
 - (void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
+
   [[PFInstallation currentInstallation] setDeviceTokenFromData:deviceToken];
   [[PFInstallation currentInstallation] saveEventually:^(BOOL succeeded, NSError * _Nullable error) {
   }];
