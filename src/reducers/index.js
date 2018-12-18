@@ -13,6 +13,8 @@ import errors from './errors';
 import referenceData from './referenceData';
 import locations from './locations';
 import role from './role';
+import helpCategory from './helpCategory';
+import helpItem from './helpItem';
 
 const allReducers = combineReducers({
     app,
@@ -22,6 +24,8 @@ const allReducers = combineReducers({
     followUps,
     contacts,
     events,
+    helpCategory,
+    helpItem,
     errors,
     referenceData,
     locations,

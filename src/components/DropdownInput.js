@@ -107,8 +107,10 @@ class DropdownInput extends PureComponent {
                     }).indexOf(state)].id
                     },
                     this.props.id,
-                    this.props.objectType ? (
-                            this.props.objectType === 'Address' || this.props.objectType === 'LabResult' || this.props.objectType === 'Documents' || this.props.objectType === 'Sort' ? this.props.index : this.props.objectType 
+                    this.props.id === 'exposure' ? this.props.data[this.props.data.map((e) => {
+                        return e.value
+                    }).indexOf(state)].type : this.props.objectType ? (
+                            this.props.objectType === 'Address' || this.props.objectType === 'LabResult' || this.props.objectType === 'Documents' || this.props.objectType === 'Sort' ? this.props.index : this.props.objectType
                         ) : this.props.data[this.props.data.map((e) => {
                                 return e.value
                             }).indexOf(state)].type || null,

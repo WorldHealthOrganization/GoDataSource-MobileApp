@@ -24,9 +24,10 @@ import CaseSingleInvestigationContainer from '../containers/CaseSingleInvestigat
 import {Icon} from 'react-native-material-ui';
 import {removeErrors} from './../actions/errors';
 import {addCase, updateCase} from './../actions/cases';
-import {updateRequiredFields, extractIdFromPouchId, navigation, getTranslation} from './../utils/functions';
+import {updateRequiredFields, extractIdFromPouchId, navigation, getTranslation, calculateDimension} from './../utils/functions';
 import moment from 'moment';
 import translations from './../utils/translations'
+import ElevatedView from 'react-native-elevated-view';
 
 const initialLayout = {
     height: 0,
@@ -144,7 +145,7 @@ class CaseSingleScreen extends Component {
         if (props.errors && props.errors.type && props.errors.message) {
             Alert.alert(props.errors.type, props.errors.message, [
                 {
-                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation), 
+                    text: getTranslation(translations.alertMessages.okButtonLabel, props.translation), 
                     onPress: () => {
                         state.savePressed = false;
                         props.removeErrors()
@@ -201,27 +202,47 @@ class CaseSingleScreen extends Component {
                         <View
                             style={[style.breadcrumbContainer]}>
                             <Breadcrumb
-                                entities={[getTranslation(translations.caseSingleScreen.title, this.props.translation), this.props.isNew ? getTranslation(translations.caseSingleScreen.addCaseTitle, this.props.translation) : (this.state.case.firstName ? this.state.case.firstName : '' + " " + this.state.case.lastName ? this.state.case.lastName : '')]}
+                                entities={[getTranslation(translations.caseSingleScreen.title, this.props.translation), this.props.isNew ? getTranslation(translations.caseSingleScreen.addCaseTitle, this.props.translation) : ((this.props.case && this.props.case.firstName ? (this.props.case.firstName + " ") : '') + (this.props.case && this.props.case.lastName ? this.props.case.lastName : ''))]}
                                 navigator={this.props.navigator}
                                 onPress={this.handlePressBreadcrumb}
                             />
-                            <View>
-                                <Menu
-                                    ref="menuRef"
-                                    button={
-                                        <Ripple onPress={this.showMenu} hitSlop={{top: 20, bottom: 20, left: 20, right: 20}}>
-                                            <Icon name="more-vert"/>
-                                        </Ripple>
-                                    }
+
+                            <View style={{flexDirection: 'row', marginRight: calculateDimension(16, false, this.props.screenSize)}}>
+                                <ElevatedView
+                                    elevation={3}
+                                    style={{
+                                        backgroundColor: styles.buttonGreen,
+                                        width: calculateDimension(33, false, this.props.screenSize),
+                                        height: calculateDimension(25, true, this.props.screenSize),
+                                        borderRadius: 4
+                                    }}
                                 >
-                                    {
-                                        !this.props.isNew ? (
-                                            <MenuItem onPress={this.handleOnPressDeleteCase}>
-                                                {getTranslation(translations.caseSingleScreen.deleteCaseLabel, this.props.translation)}
-                                            </MenuItem>
-                                        ) : null
-                                    }
-                                </Menu>
+                                    <Ripple style={{
+                                        flex: 1,
+                                        justifyContent: 'center',
+                                        alignItems: 'center'
+                                    }} onPress={this.goToHelpScreen}>
+                                        <Icon name="help" color={'white'} size={15}/>
+                                    </Ripple>
+                                </ElevatedView> 
+                                <View>
+                                    <Menu
+                                        ref="menuRef"
+                                        button={
+                                            <Ripple onPress={this.showMenu} hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}>
+                                                <Icon name="more-vert"/>
+                                            </Ripple>
+                                        }
+                                    >
+                                        {
+                                            !this.props.isNew ? (
+                                                <MenuItem onPress={this.handleOnPressDeleteCase}>
+                                                    {getTranslation(translations.caseSingleScreen.deleteCaseLabel, this.props.translation)}
+                                                </MenuItem>
+                                            ) : null
+                                        }
+                                    </Menu>
+                                </View>
                             </View>
                         </View>
                     }
@@ -755,9 +776,17 @@ class CaseSingleScreen extends Component {
         console.log("DeletePressed: ", index);
         let caseAddressesClone = _.cloneDeep(this.state.case.addresses);
         caseAddressesClone.splice(index, 1);
+
+        let hasPlaceOfResidence = false
+        let caselaceOfResidence = caseAddressesClone.find((e) => {return e.typeId === config.userResidenceAddress.userPlaceOfResidence})
+        if (caselaceOfResidence !== undefined) {
+            hasPlaceOfResidence = true
+        }
+
         this.setState(prevState => ({
             case: Object.assign({}, prevState.case, {addresses: caseAddressesClone}),
-            isModified: true
+            isModified: true,
+            hasPlaceOfResidence
         }), () => {
             console.log("After deleting the address: ", this.state.case);
         })
@@ -1381,6 +1410,27 @@ class CaseSingleScreen extends Component {
     onNavigatorEvent = (event) => {
         navigation(event, this.props.navigator);
     };
+
+    goToHelpScreen = () => {
+        let pageAskingHelpFrom = null
+        if (this.props.isNew !== null && this.props.isNew !== undefined && this.props.isNew === true ){
+            pageAskingHelpFrom = 'casesSingleScreenAdd'
+        } else {
+            if (this.state.isEditMode === true) {
+                pageAskingHelpFrom = 'casesSingleScreenEdit'
+            } else if (this.state.isEditMode === false) {
+                pageAskingHelpFrom = 'casesSingleScreenView'
+            }
+        }
+
+        this.props.navigator.showModal({
+            screen: 'HelpScreen',
+            animated: true,
+            passProps: {
+                pageAskingHelpFrom: pageAskingHelpFrom
+            }
+        });
+    }
 }
 
 // Create style outside the class, or for components that will be used by other components (buttons),

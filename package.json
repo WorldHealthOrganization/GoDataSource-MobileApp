@@ -56,7 +56,7 @@
     "react-native-tab-view": "^1.0.2",
     "react-native-ui-lib": "3.3.263",
     "react-native-uuid": "^1.4.9",
-    "react-native-vector-icons": "^4.6.0",
+    "react-native-vector-icons": "^6.1.0",
     "react-native-zip-archive": "^2.2.6",
     "react-redux": "^5.0.7",
     "redux": "^4.0.0",
