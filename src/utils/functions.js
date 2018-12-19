@@ -695,12 +695,24 @@ export function mapQuestions (questions) {
 };
 
 export function getTranslation (value, allTransactions) {
+    if (!getTranslation.cache) {
+        getTranslation.cache = {}
+    }
+    let key = `${value}`
+    if (allTransactions && Array.isArray(allTransactions) && allTransactions[0] && allTransactions[0].languageId) {
+        key = `${key}-${allTransactions[0].languageId}`
+    }
+    
+    if (getTranslation.cache[key] !== undefined) {
+        // console.log('~~~ return cache value ~~~', key)
+        return getTranslation.cache[key]
+    }
     let valueToBeReturned = value;
     if (value && typeof value === 'string' && value.includes('LNG')) {
-        valueToBeReturned = value && allTransactions && Array.isArray(allTransactions) && allTransactions[allTransactions.map((e) => {return e && e.token ? e.token : null}).indexOf(value)] ? allTransactions[allTransactions.map((e) => {
-            return e.token
-        }).indexOf(value)].translation : '';
+        const item = value && allTransactions && Array.isArray(allTransactions) && allTransactions[allTransactions.map((e) => {return e && e.token ? e.token : null}).indexOf(value)]
+        valueToBeReturned = item ? item.translation : '';
     }
+    getTranslation.cache[key] = valueToBeReturned
     return valueToBeReturned;
 }
 
