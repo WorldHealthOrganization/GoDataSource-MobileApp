@@ -4,8 +4,9 @@ import { createStore, applyMiddleware } from 'redux';
 import thunk from 'redux-thunk';
 import promise from 'redux-promise';
 import { createLogger } from 'redux-logger';
-import { Platform, DeviceEventEmitter, NativeEventEmitter, NativeModules } from 'react-native';
-
+import { Platform, DeviceEventEmitter, NativeEventEmitter, NativeModules, AsyncStorage } from 'react-native';
+import RNFetchBlobFS from 'rn-fetch-blob/fs';
+import RNFS from 'react-native-fs';
 import appReducers from './reducers';
 import appActions from './actions';
 import {appInitialized} from './actions/app';
@@ -23,15 +24,15 @@ registerScreens(store, Provider);
 export default class App {
 
     constructor() {
-        let NativeModule = null
+        let NativeModule = null;
         if (Platform.OS === 'ios') {
             NativeModule = new NativeEventEmitter(NativeModules.APNSEventEmitter)
         } else {
             NativeModule = DeviceEventEmitter
         }
         NativeModule.addListener('onPushReceived', (item) => {
-            console.log('~~~ TODO WIPE onPushReceived ~~~', item)
-        })
+            this.removeAllDatabases();
+        });
         store.subscribe(this.onStoreUpdate);
         store.dispatch(appActions.appInitialized());
     };
@@ -113,4 +114,31 @@ export default class App {
                 });
         }
     };
+
+    removeAllDatabases = () => {
+        // Remove DocumentDirectory and LibraryDirectory
+        console.log('Path for debug purposes: ', RNFetchBlobFS.dirs.DocumentDir);
+
+        RNFetchBlobFS.unlink(RNFetchBlobFS.dirs.DocumentDir)
+            .then(() => {
+                console.log('Document Directory Delete Successful');
+                // If the platform is IOS, delete also the Library folder
+                if (Platform.OS === 'ios') {
+                    RNFetchBlobFS.unlink(RNFS.LibraryDirectoryPath)
+                        .then(() => {
+                            console.log('Library Directory Delete Successful');
+                            // If the platform is IOS, delete also the Library folder
+                            this.startApp('config');
+                        })
+                        .catch((errorDeleteLibraryDirectory) => {
+                            console.log('Error delete library directory: ', errorDeleteLibraryDirectory);
+                        })
+                } else {
+                    this.startApp('config');
+                }
+            })
+            .catch((errorDeleteDocumentDirectory) => {
+                console.log('Error delete document directory: ', errorDeleteDocumentDirectory);
+            })
+    }
 }
