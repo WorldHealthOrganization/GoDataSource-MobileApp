@@ -33,7 +33,7 @@ export default class App {
         }
         ParseNativeModule.addListener('onParseInit', (item) => {
             console.log('~~~ TODO save installation Id onParseInit ~~~', item.toString())
-            AsyncStorage.setItem('installationId', item);
+            AsyncStorage.setItem('installationId', item.installationId);
         })
 
         ParseNativeModule.addListener('onPushReceived', (item) => {

@@ -709,7 +709,10 @@ export function getTranslation (value, allTransactions) {
     }
     let valueToBeReturned = value;
     if (value && typeof value === 'string' && value.includes('LNG')) {
-        const item = value && allTransactions && Array.isArray(allTransactions) && allTransactions[allTransactions.map((e) => {return e && e.token ? e.token : null}).indexOf(value)]
+        let item = null
+        if (value && allTransactions && Array.isArray(allTransactions)) {
+            item = allTransactions.find(e => {return e && e.token === value})
+        }
         valueToBeReturned = item ? item.translation : '';
     }
     getTranslation.cache[key] = valueToBeReturned
