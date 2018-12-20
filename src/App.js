@@ -42,56 +42,63 @@ export default class App {
             console.log('~~~ TODO WIPE onPushReceived ~~~', item)
 
             //Request to server after finish wipe data
-            AsyncStorage.getItem('installationId')
-            .then((installationId) => {
-                console.log('Response installationId', installationId);
-                if (installationId) {
-                    AsyncStorage.getItem('activeDatabase')
-                    .then((activeDatabase) => {
-                        console.log('Response activeDatabase', activeDatabase);
-                        if (activeDatabase) {
-                            AsyncStorage.getItem(activeDatabase)
-                            .then((lastSyncDate) => {
-                                console.log('Response lastSyncDate: ', lastSyncDate);
-                                if (lastSyncDate) {
-                                    lastSyncDate = new Date(lastSyncDate).toUTCString();
-                                    getInternetCredentials(activeDatabase)
-                                    .then((activeDatabaseCredentials) => {
-                                        if (activeDatabaseCredentials) {
-                                            console.log('Response activeDatabaseCredentials ', activeDatabaseCredentials);
-                                            let currentHubConfig = JSON.parse(activeDatabaseCredentials.username);
-                                            if (currentHubConfig && currentHubConfig !== undefined && currentHubConfig.url && currentHubConfig.url !== undefined && currentHubConfig.url.trim().length > 0 && installationId && installationId !== undefined) {
-                                                // console.log ('configHubInfo', currentHubConfig)
-                                                // console.log ('installationId', installationId)
+            this.removeAllDatabases((errorWipe, success) => {
+                if (errorWipe) {
+                    console.log('error at wiping data: ', errorWipe)
+                }
+                if (success) {
+                    AsyncStorage.getItem('installationId')
+                        .then((installationId) => {
+                            console.log('Response installationId', installationId);
+                            if (installationId) {
+                                AsyncStorage.getItem('activeDatabase')
+                                    .then((activeDatabase) => {
+                                        console.log('Response activeDatabase', activeDatabase);
+                                        if (activeDatabase) {
+                                            AsyncStorage.getItem(activeDatabase)
+                                                .then((lastSyncDate) => {
+                                                    console.log('Response lastSyncDate: ', lastSyncDate);
+                                                    if (lastSyncDate) {
+                                                        lastSyncDate = new Date(lastSyncDate).toUTCString();
+                                                        getInternetCredentials(activeDatabase)
+                                                            .then((activeDatabaseCredentials) => {
+                                                                if (activeDatabaseCredentials) {
+                                                                    console.log('Response activeDatabaseCredentials ', activeDatabaseCredentials);
+                                                                    let currentHubConfig = JSON.parse(activeDatabaseCredentials.username);
+                                                                    if (currentHubConfig && currentHubConfig !== undefined && currentHubConfig.url && currentHubConfig.url !== undefined && currentHubConfig.url.trim().length > 0 && installationId && installationId !== undefined) {
+                                                                        // console.log ('configHubInfo', currentHubConfig)
+                                                                        // console.log ('installationId', installationId)
 
-                                                wipeCompleteRequest(currentHubConfig.url, installationId, currentHubConfig.clientId, currentHubConfig.clientSecret, (error, response) => {
-                                                    if (error) {
-                                                        console.log ('wipeCompleteRequest error: ', error)
-                                                    }
-                                                    if (response) {
-                                                        console.log ('wipeCompleteRequest response: ', response)
+                                                                        wipeCompleteRequest(currentHubConfig.url, installationId, currentHubConfig.clientId, currentHubConfig.clientSecret, (error, response) => {
+                                                                            if (error) {
+                                                                                console.log ('wipeCompleteRequest error: ', error)
+                                                                            }
+                                                                            if (response) {
+                                                                                this.startApp('config');
+                                                                            }
+                                                                        })
+                                                                    }
+                                                                }
+                                                            })
+                                                            .catch((errorActiveDatabaseCredentials) => {
+                                                                console.log('Error active database credentials: ', errorActiveDatabaseCredentials);
+                                                            })
                                                     }
                                                 })
-                                            }
+                                                .catch((errorLastSyncDate) => {
+                                                    console.log('Error while getting last sync date: ', errorLastSyncDate);
+                                                })
                                         }
                                     })
-                                    .catch((errorActiveDatabaseCredentials) => {
-                                        console.log('Error active database credentials: ', errorActiveDatabaseCredentials);
-                                    })
-                                }
-                            })
-                            .catch((errorLastSyncDate) => {
-                                console.log('Error while getting last sync date: ', errorLastSyncDate);
-                            })
-                        }
-                    })
-                    .catch((errorActiveDatabase) => {
-                        console.log("Error while getting active database: ", errorActiveDatabase);
-                    });
+                                    .catch((errorActiveDatabase) => {
+                                        console.log("Error while getting active database: ", errorActiveDatabase);
+                                    });
+                            }
+                        })
+                        .catch((errorInstallationId) => {
+                            console.log('Error device id: ', errorInstallationId);
+                        })
                 }
-            })
-            .catch((errorInstallationId) => {
-                console.log('Error device id: ', errorInstallationId);
             })
         })
 
@@ -101,7 +108,7 @@ export default class App {
 
     onStoreUpdate = () => {
         const { root } = store.getState().app;
-        const oldRoot = this.currentRoot
+        const oldRoot = this.currentRoot;
         if (this.currentRoot !== root) {
             this.currentRoot = root;
             if (Platform.OS === 'ios') {
@@ -185,9 +192,9 @@ export default class App {
         }
     };
 
-    removeAllDatabases = () => {
+    removeAllDatabases = (callback) => {
         // Remove DocumentDirectory and LibraryDirectory
-        console.log('Path for debug purposes: ', RNFetchBlobFS.dirs.DocumentDir);
+        // console.log('Path for debug purposes: ', RNFetchBlobFS.dirs.DocumentDir);
 
         RNFetchBlobFS.unlink(RNFetchBlobFS.dirs.DocumentDir)
             .then(() => {
@@ -198,17 +205,19 @@ export default class App {
                         .then(() => {
                             console.log('Library Directory Delete Successful');
                             // If the platform is IOS, delete also the Library folder
-                            this.startApp('config');
+                            callback(null, 'success');
                         })
                         .catch((errorDeleteLibraryDirectory) => {
                             console.log('Error delete library directory: ', errorDeleteLibraryDirectory);
+                            callback(errorDeleteLibraryDirectory)
                         })
                 } else {
-                    this.startApp('config');
+                    callback(null, 'success');
                 }
             })
             .catch((errorDeleteDocumentDirectory) => {
                 console.log('Error delete document directory: ', errorDeleteDocumentDirectory);
+                callback(errorDeleteDocumentDirectory);
             })
     }
 }
