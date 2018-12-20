@@ -14,8 +14,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface APNSEventEmitter : RCTEventEmitter <RCTBridgeModule>
 
-- (void)onPushReceived:(NSDictionary *)userInfo;
-
 @end
 
 NS_ASSUME_NONNULL_END

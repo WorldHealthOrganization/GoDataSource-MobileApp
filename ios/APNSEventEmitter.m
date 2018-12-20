@@ -9,6 +9,7 @@
 #import "APNSEventEmitter.h"
 #import <React/RCTEventEmitter.h>
 #import "APNSEventManager.h"
+#import <Parse.h>
 
 @implementation APNSEventEmitter
 
@@ -23,18 +24,11 @@ RCT_EXPORT_MODULE();
 
 - (NSArray<NSString *> *)supportedEvents {
   return [APNSEventManager sharedInstance].allowedEvents;
-//  return @[@"onPushReceived"];
 }
 
-- (void)onPushReceived:(NSDictionary *)userInfo {
-//  NSData *jsonData = [NSJSONSerialization dataWithJSONObject:userInfo
-//                                                     options:NSJSONWritingPrettyPrinted
-//                                                       error:nil];
-//  if (!jsonData) {
-//    // TODO user info is not dictionary
-//  }
-//  NSString *jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
-  [self sendEventWithName:@"onPushReceived" body:@{@"name": @"TODO"}];
+RCT_EXPORT_METHOD(initParse) {
+  NSString *installationId = [PFInstallation currentInstallation].installationId;
+  [[APNSEventManager sharedInstance] dispatch:@"onParseInit" body:@{ @"installationId" : installationId}];
 }
 
 @end

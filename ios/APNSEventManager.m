@@ -30,7 +30,7 @@ static APNSEventEmitter *_eventEmitter;
 }
 
 - (NSArray *)allowedEvents {
-  return @[@"onPushReceived"];
+  return @[@"onPushReceived", @"onParseInit"];
 }
 
 - (void)registerEventEmitter:(APNSEventEmitter *)eventEmitter {
@@ -38,7 +38,7 @@ static APNSEventEmitter *_eventEmitter;
 }
 
 - (void)dispatch:(NSString *)name body:(NSDictionary *)body {
-  [[self class].eventEmitter onPushReceived:body];
+  [[self class].eventEmitter sendEventWithName:name body:body];
 }
 
 @end

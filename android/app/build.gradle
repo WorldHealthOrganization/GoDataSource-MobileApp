@@ -154,6 +154,8 @@ dependencies {
     implementation project(':rn-fetch-blob')
     implementation project(':react-native-vector-icons')
     implementation project(':react-native-navigation')
+    implementation project(':react-native-device-info')
+
     implementation fileTree(include: ['*.jar'], dir: 'libs')
 
     implementation 'com.google.firebase:firebase-messaging:16.0.1'
