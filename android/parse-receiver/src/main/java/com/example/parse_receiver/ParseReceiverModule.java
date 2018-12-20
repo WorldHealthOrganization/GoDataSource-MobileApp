@@ -6,6 +6,9 @@ import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.parse.ParseInstallation;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class ParseReceiverModule extends ReactContextBaseJavaModule {
 
     public ParseReceiverModule(ReactApplicationContext reactContext) {
@@ -16,8 +19,10 @@ public class ParseReceiverModule extends ReactContextBaseJavaModule {
     @ReactMethod
     public void initParse() {
         String installationId = ParseInstallation.getCurrentInstallation().getInstallationId();
+        Map<String, String> dictionary = new HashMap<String, String>();
+        dictionary.put("installationId", installationId);
         if (this.getReactApplicationContext() != null) {
-            this.getReactApplicationContext().getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("onParseInit", installationId);
+            this.getReactApplicationContext().getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("onParseInit", dictionary);
         }
     }
 
