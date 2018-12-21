@@ -154,7 +154,9 @@ dependencies {
     implementation project(':rn-fetch-blob')
     implementation project(':react-native-vector-icons')
     implementation project(':react-native-navigation')
-    implementation project(':react-native-device-info')
+    implementation (project(':react-native-device-info')) {
+        exclude group: "com.google.android.gms"
+    }
 
     implementation fileTree(include: ['*.jar'], dir: 'libs')
 

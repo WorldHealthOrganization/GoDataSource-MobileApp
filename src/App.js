@@ -32,7 +32,7 @@ export default class App {
             ParseNativeModule = DeviceEventEmitter
         }
         ParseNativeModule.addListener('onParseInit', (item) => {
-            console.log('~~~ TODO save installation Id onParseInit ~~~', item.toString())
+            console.log('~~~ TODO save installation Id onParseInit ~~~', item);
             AsyncStorage.setItem('installationId', item.installationId);
         })
 
@@ -123,6 +123,7 @@ export default class App {
             } else {
                 ParseNativeModule = NativeModules.ParseReceiver
             }
+            console.log('~~~ Calling native module ready to start init parse ~~~')
             ParseNativeModule.initParse()
         }
         switch (root) {
