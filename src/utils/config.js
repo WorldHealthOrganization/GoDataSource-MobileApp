@@ -779,7 +779,7 @@ const followUpsFilterScreen = {
         fields: [
             {      
                 cardNumber: 1,
-                label: translations.sortTab.sortBy,
+                label: translations.sortTab.SortBy,
                 type: 'Section',
                 hasBorderBottom: true,
                 borderBottomColor: styles.navigationDrawerSeparatorGrey
@@ -846,7 +846,7 @@ const helpFilterScreen = {
         fields: [
             {
                 cardNumber: 1,
-                label: translations.sortTab.sortBy,
+                label: translations.sortTab.SortBy,
                 type: 'Section',
                 hasBorderBottom: true,
                 borderBottomColor: styles.navigationDrawerSeparatorGrey
@@ -970,7 +970,7 @@ const casesFilterScreen = {
         fields: [
             {
                 cardNumber: 1,
-                label: translations.sortTab.sortBy,
+                label: translations.sortTab.SortBy,
                 type: 'Section',
                 hasBorderBottom: true,
                 borderBottomColor: styles.navigationDrawerSeparatorGrey
