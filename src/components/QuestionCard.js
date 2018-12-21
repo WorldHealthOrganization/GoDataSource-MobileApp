@@ -53,7 +53,7 @@ class QuestionCard extends Component {
                         paddingLeft: calculateDimension(14, false, this.props.screenSize)
                     }]}>
                     <View style={style.containerQuestionNumber}>
-                        <Text style={style.questionText}>{getTranslation(translations.generalLabels.questionInitial, this.props.translation).toUpperCase() + this.props.index}</Text>
+                        <Text style={style.questionText}>{getTranslation(translations.generalLabels.questionInitial, this.props.translation).charAt(0).toUpperCase() + this.props.index}</Text>
                     </View>
                     <Text style={[style.questionText, {
                             marginLeft: calculateDimension(8, false, this.props.screenSize),

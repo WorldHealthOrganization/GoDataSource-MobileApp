@@ -50,23 +50,27 @@ class Breadcrumb extends PureComponent {
     render() {
         return (
             <View style={[style.crumbsContainerStyle, {
-                width: calculateDimension(270, false, this.props.screenSize),
+                width: calculateDimension(250, false, this.props.screenSize),
                 marginLeft: calculateDimension(16, false, this.props.screenSize)
             }]}>
                 {
-                    this.props.entities.map((item, index) => {
-                        return (
-                            <Crumb
-                                key={index}
-                                text={item}
-                                index={index}
-                                isCrumbActive={this.state.index === index}
-                                numberOfEntities={this.props.entities.length}
-                                crumbPress={this.handleCrumbPress}
-                                translation={this.props.translation}
-                            />
-                        )
-                    })
+                    this.props.entities.length === 1 ? (
+                        <Text style={[style.activeCrumbTextStyle, style.crumbStyle]}>{this.props.entities[0]}</Text>
+                    ) : (
+                        this.props.entities.map((item, index) => {
+                            return (
+                                <Crumb
+                                    key={index}
+                                    text={item}
+                                    index={index}
+                                    isCrumbActive={this.state.index === index}
+                                    numberOfEntities={this.props.entities.length}
+                                    crumbPress={this.handleCrumbPress}
+                                    translation={this.props.translation}
+                                />
+                            )
+                        })
+                    )
                 }
             </View>
         );

@@ -2,7 +2,7 @@
  * Created by florinpopa on 03/07/2018.
  */
 import React, {Component} from 'react';
-import {Text, View, Platform, Image, StyleSheet, Alert} from 'react-native';
+import {Text, View, Platform, Image, StyleSheet, ScrollView} from 'react-native';
 import NavigationDrawerListItem from './../components/NavigationDrawerListItem';
 import config from './../utils/config';
 import {connect} from "react-redux";
@@ -69,11 +69,11 @@ class NavigationDrawer extends Component {
                     }
                     <View style={styles.lineStyle} />
                 </View>
-                <View style={{flex: 0.8}}>
+
+                <ScrollView scrollEnabled={true} style={{flex: 0.8}} contentContainerStyle={{flexGrow: 1}}>
                     {
-                        
                         config.sideMenuItems.map((item, index) => {
-                            let addButton = false
+                            let addButton = false;
                             if (item.addButton && item.addButton === true){
                                 let findPermission = undefined
                                 if (item.key === 'followups') {
@@ -118,8 +118,9 @@ class NavigationDrawer extends Component {
                             translation={this.props.translation}
                         />
                     </View>
+                    <NavigationDrawerListItem key={'help'} label={getTranslation(translations.navigationDrawer.helpLabel, this.props.translation)} name="help" onPress={() => this.handlePressOnListItem('help')} isSelected={'help' === this.state.selectedScreen}/>
                     <NavigationDrawerListItem label={getTranslation(translations.navigationDrawer.logoutLabel, this.props.translation)} name="power-settings-new" onPress={this.handleLogout} />
-                </View>
+                </ScrollView>
             </View>
         );
     }

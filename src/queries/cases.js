@@ -2,7 +2,9 @@
  * Created by florinpopa on 18/09/2018.
  */
 import {getDatabase} from './database';
-import {objSort} from './../utils/functions'
+import {objSort, localSortItems} from './../utils/functions'
+import {getRelationshipsAndFollowUpsForContactRequest} from './relationships';
+import {extractIdFromPouchId, mapContactsAndRelationships, mapContactsAndFollowUps} from './../utils/functions';
 
 // Credentials: {email, encryptedPassword}
 export function getCasesForOutbreakIdRequest (outbreakId, filter, token, callback) {
@@ -43,7 +45,7 @@ export function getCasesForOutbreakIdRequest (outbreakId, filter, token, callbac
 
             let myFilterAge = null 
             if (filter.age) {
-                myFilterAge = filter.age
+                myFilterAge = Object.assign([], filter.age)
                 let maxAge = filter.age[1]
                 let minAge = filter.age[0]
                 while (maxAge - 1 > minAge) {
@@ -86,19 +88,33 @@ export function getCasesForOutbreakIdRequest (outbreakId, filter, token, callbac
                                 } else if (e.age.years === 0 && e.age.months === 0) {
                                     return e.age.years >= filter.age[0] && e.age.years <= filter.age[1]
                                 }
+                            } 
+                            if (filter.age[0] === 0 && filter.age[1] === 150) {
+                                return e.age === null || e.age === undefined
                             }
                         });
                     }
                     //local filter for selectedLocations bcause it can't be done in mango queries
                     if (filter.selectedLocations && filter.selectedLocations.length > 0) {
                         resultFilterCasesDocs = resultFilterCasesDocs.filter((e) => {
-                            let address = e.addresses.find((k) => {
-                                return k.locationId !== '' && filter.selectedLocations.indexOf(k.locationId) >= 0
-                            })
+                            let address = undefined
+                            if (e.addresses && e.addresses !== undefined) {
+                                address = e.addresses.find((k) => {
+                                    return k.locationId !== '' && filter.selectedLocations.indexOf(k.locationId) >= 0
+                                })
+                            }
                         
                             return address === undefined ? false : true
                         })
                     }
+
+                    //sort 
+                    if (filter.sort && filter.sort !== undefined && filter.sort.length > 0) {
+                        resultFilterCasesDocs = localSortItems(resultFilterCasesDocs, filter.sort)
+                    } else {
+                        resultFilterCasesDocs = objSort(resultFilterCasesDocs, ['lastName', false])
+                    }
+
                     callback(null, resultFilterCasesDocs)
                 })
                 .catch((errorFilterCases) => {
@@ -207,3 +223,37 @@ export function updateCaseRequest (outbreakId, caseId, myCase, token, callback) 
         })
 }
 
+export function getItemByIdRequest (outbreakId, itemId, itemType, callback) {
+    let database = getDatabase();
+
+    database.get(itemId)
+        .then((result) => {
+            console.log('getItemByIdRequest result', result);
+            if (itemType === 'contact') {
+                getRelationshipsAndFollowUpsForContactRequest(outbreakId, extractIdFromPouchId(itemId, 'person'), null, (errorRelationshipsAndFollowUps, responseRelationshipsAndFollowUps) => {
+                    if (errorRelationshipsAndFollowUps) {
+                        console.log("*** getItemByIdRequest getRelationshipsAndFollowUpsForContact error: ", JSON.stringify(errorRelationshipsAndFollowUps));
+                        callback(errorRelationshipsAndFollowUps);
+                    }
+                    if (responseRelationshipsAndFollowUps) {
+                        console.log("*** getItemByIdRequest getRelationshipsAndFollowUpsForContact response: ", JSON.stringify(responseRelationshipsAndFollowUps));
+                        let relationships = responseRelationshipsAndFollowUps.filter((e) => {if (e.persons) {return e}});
+                        let followUps = responseRelationshipsAndFollowUps.filter((e) => {if (e.personId) {return e}});
+
+                        let mappedContact = mapContactsAndRelationships([result], relationships);
+                        if (followUps.length > 0) {
+                            mappedContact = mapContactsAndFollowUps(mappedContact, followUps);
+                        }
+                        callback(null, mappedContact[0]);
+                    }
+                });
+            } else if (itemType === 'case'){
+                callback(null, result);
+            }
+        })
+        .catch((error) => {
+            console.log('getItemByIdRequest error: ', error);
+            callback(error);
+        })
+        
+}

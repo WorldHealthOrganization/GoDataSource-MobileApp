@@ -1,25 +1,22 @@
 /**
- * Created by mobileclarisoft on 30/08/2018.
+ * Created by florinpopa on 25/07/2018.
  */
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {PureComponent} from 'react';
-import {TextInput, View, Text, StyleSheet, Platform, Dimensions, Image} from 'react-native';
-import {ListItem, Icon} from 'react-native-material-ui';
+import {View, Text, StyleSheet} from 'react-native';
 import {calculateDimension, getTranslation} from './../utils/functions';
 import config from './../utils/config';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
-import {TextField} from 'react-native-material-textfield';
 import Button from './../components/Button';
-import CardComponent from './../components/CardComponent';
 import styles from './../styles';
 import Ripple from 'react-native-material-ripple';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
-import ElevatedView from 'react-native-elevated-view';
+import CardComponent from './../components/CardComponent';
 import translations from './../utils/translations'
 
-class CasesSortContainer extends PureComponent {
+class HelpSortContainer extends PureComponent {
 
     // This will be a container, so put as less business logic here as possible
     constructor(props) {
@@ -28,7 +25,6 @@ class CasesSortContainer extends PureComponent {
             addSortRuleText: getTranslation(translations.sortTab.addSortRule, this.props.translation)
         };
     }
-
     // Please add here the react lifecycle methods that you need
 
 
@@ -38,17 +34,6 @@ class CasesSortContainer extends PureComponent {
     render() {
         return (
             <View style={[style.container]}>
-                <Button
-                    title={'Back'}
-                    onPress={this.props.handleMoveToPrevieousScreenButton}
-                    color={styles.buttonGreen}
-                    titleColor={'white'}
-                    height={calculateDimension(25, true, this.props.screenSize)}
-                    width={calculateDimension(130, false, this.props.screenSize)}
-                    style={{
-                        marginVertical: calculateDimension(12.5, true, this.props.screenSize),
-                        marginHorizontal: calculateDimension(16, false, this.props.screenSize),
-                    }}/> 
                 <KeyboardAwareScrollView
                     style={style.containerScrollView}
                     contentContainerStyle={[style.contentContainerStyle, {paddingBottom: this.props.screenSize.height < 600 ? 70 : 20}]}
@@ -62,7 +47,7 @@ class CasesSortContainer extends PureComponent {
                         }
                     </View>
                     {
-                        this.props.filter.sort.length < config.sortCriteriaDropDownItems.length ? 
+                        this.props.filter.sort.length < config.helpItemsSortCriteriaDropDownItems.length ? 
                             <View style={{alignSelf: 'flex-start', marginHorizontal: calculateDimension(16, false, this.props.screenSize), marginVertical: 20}}>
                                 <Ripple
                                     style={{
@@ -79,7 +64,7 @@ class CasesSortContainer extends PureComponent {
                     }
                 </KeyboardAwareScrollView>   
                 <View style={style.containerButtonApplyFilters}>
-                    <Button
+                <Button
                         title={getTranslation(translations.generalLabels.applyFiltersButton, this.props.translation)}
                         color={styles.buttonGreen}
                         onPress={this.props.onPressApplyFilters}
@@ -89,21 +74,21 @@ class CasesSortContainer extends PureComponent {
                         titleStyle={{fontFamily: 'Roboto-Medium', fontSize: 14}}
                         titleColor={'white'}
                     />
-                </View>         
+                </View> 
             </View>
         );
     }
 
     // Please write here all the methods that are not react native lifecycle methods
     handleRenderItem = (item, index) => {
-        let fields = config.casesFilterScreen.sort.fields
+        let fields = config.helpFilterScreen.sort.fields
         return (
             <CardComponent
                 item={fields}
                 index={index}
                 isEditMode={true}
                 onChangeDropDown={this.props.onChangeDropDown}
-                screen="CasesSort"
+                screen="HelpSort"
                 filter={this.props.filter}
                 onDeletePress={this.props.onDeletePress}
                 style={style.cardStyle}
@@ -157,4 +142,4 @@ function matchDispatchProps(dispatch) {
     }, dispatch);
 }
 
-export default connect(mapStateToProps, matchDispatchProps)(CasesSortContainer);
+export default connect(mapStateToProps, matchDispatchProps)(HelpSortContainer);

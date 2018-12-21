@@ -6,8 +6,9 @@ import RNFetchBlob from 'rn-fetch-blob';
 import base64 from 'base-64';
 import {Platform} from 'react-native';
 import {getSyncEncryptPassword} from './../utils/encryption';
+import {setSyncState} from './../actions/app';
 
-export function getDatabaseSnapshotRequest(hubConfig, lastSyncDate, callback) {
+export function getDatabaseSnapshotRequest(hubConfig, lastSyncDate, dispatch, callback) {
 
     // hubConfiguration = {url: databaseName, clientId: JSON.stringify({name, url, clientId, clientSecret, encryptedData}), clientSecret: databasePass}
     let hubConfiguration = JSON.parse(hubConfig.clientId);
@@ -42,7 +43,8 @@ export function getDatabaseSnapshotRequest(hubConfig, lastSyncDate, callback) {
         'Accept': 'application/json',
         'Authorization': 'Basic ' + base64.encode(`${hubConfiguration.clientId}:${hubConfiguration.clientSecret}`)
     })
-        .progress({count: 1}, (received, total) => {
+        .progress({count: 500}, (received, total) => {
+            dispatch(setSyncState(`Downloading database\nReceived ${received} bytes`));
             console.log(received, total)
         })
         .then((res) => {
@@ -53,13 +55,13 @@ export function getDatabaseSnapshotRequest(hubConfig, lastSyncDate, callback) {
                 console.log("Got database");
                 callback(null, databaseLocation)
             } else {
-                callback('Status Code Error')
+                callback(`Cannot connect to HUB, please check URL, Client ID and Client secret.\nStatus code: ${status}`);
             }
         })
         .catch((errorMessage, statusCode) => {
             // error handling
-            console.log("*** getDatabaseSnapshotRequest error: ", JSON.stringify(errorMessage), statusCode);
-            callback(errorMessage);
+            console.log("*** getDatabaseSnapshotRequest error: ", JSON.stringify(errorMessage));
+            callback(errorMessage.message);
         });
 }
 

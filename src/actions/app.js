@@ -7,6 +7,7 @@ import {
     ACTION_TYPE_ADD_FILTER_FOR_SCREEN,
     ACTION_TYPE_REMOVE_FILTER_FOR_SCREEN,
     ACTION_TYPE_SAVE_TRANSLATION,
+    ACTION_TYPE_SAVE_HELP_CATEGORY,
     ACTION_TYPE_SAVE_AVAILABLE_LANGUAGES,
     ACTION_TYPE_SAVE_HUB_CONFIGURATION,
     ACTION_TYPE_SET_SYNC_STATE,
@@ -18,6 +19,8 @@ import config from './../utils/config';
 import {Dimensions} from 'react-native';
 import {Platform, Alert} from 'react-native';
 import {getAvailableLanguagesRequest, getTranslationRequest} from './../queries/translation';
+import {getHelpCategoryRequest} from '../queries/helpCategory';
+import {getHelpItemRequest} from '../queries/helpItem';
 import {getDatabaseSnapshotRequest, postDatabaseSnapshotRequest} from './../requests/sync';
 import {setInternetCredentials, getInternetCredentials} from 'react-native-keychain';
 import {unzipFile, readDir} from './../utils/functions';
@@ -28,6 +31,7 @@ import {setNumberOfFilesProcessed, createZipFileAtPath, extractIdFromPouchId} fr
 import {AsyncStorage} from 'react-native';
 import {getUserById} from './user';
 import {uniq} from 'lodash';
+import {addError} from './errors';
 // import {addError} from './errors';
 // import RNDB from 'react-native-nosql-to-sqlite';
 import {getSyncEncryptPassword} from './../utils/encryption';
@@ -53,6 +57,19 @@ export function saveTranslation(translation) {
     return {
         type: ACTION_TYPE_SAVE_TRANSLATION,
         translation: translation
+    }
+}
+
+export function saveHelpCategory(helpCategory) {
+    return {
+        type: ACTION_TYPE_SAVE_HELP_CATEGORY,
+        helpCategory: helpCategory
+    }
+}
+export function saveHelpItem(helpItem) {
+    return {
+        type: ACTION_TYPE_SAVE_HELP_ITEM,
+        helpItem: helpItem
     }
 }
 
@@ -123,6 +140,41 @@ export function getTranslations(language, dispatch) {
     // }
 }
 
+export function getHelpCategory(help, dispatch) {
+    // return async function (dispatch) {
+    return new Promise((resolve, reject) => {
+        getHelpCategoryRequest(language, (error, response) => {
+            if (error) {
+                console.log("*** getHelpCategory error: ", error);
+                reject(error);
+            }
+            if (response) {
+                console.log("### here should have the translations: ");
+                dispatch(saveHelpCategory(response));
+                resolve('Done help category');
+            }
+        })
+    })
+    // }
+}
+export function getHelpItem(help, dispatch) {
+    // return async function (dispatch) {
+    return new Promise((resolve, reject) => {
+        getHelpItemRequest(language, (error, response) => {
+            if (error) {
+                console.log("*** getHelpItem error: ", error);
+                reject(error);
+            }
+            if (response) {
+                console.log("### here should have the translations: ");
+                dispatch(saveHelpItem(response));
+                resolve('Done help item');
+            }
+        })
+    })
+    // }
+}
+
 export function getTranslationsAsync(language) {
     return async function (dispatch) {
     // return new Promise((resolve, reject) => {
@@ -182,19 +234,19 @@ export function storeHubConfiguration(hubConfiguration) {
             let lastSyncDate = await AsyncStorage.getItem(hubConfiguration.url);
             console.log("Last sync date: ", lastSyncDate);
             if (lastSyncDate !== null) {
-                getDatabaseSnapshotRequest(hubConfiguration, lastSyncDate, (error, response) => {
-                    dispatch(processFilesForSync(error, response, hubConfiguration, true, true, false));
+                getDatabaseSnapshotRequest(hubConfiguration, lastSyncDate, dispatch, (error, response) => {
+                     dispatch(processFilesForSync(error, response, hubConfiguration, true, true, false));
                 })
             } else {
                 console.log('No last sync date found. proceed to download all database: ');
-                getDatabaseSnapshotRequest(hubConfiguration, null, (error, response) => {
-                    dispatch(processFilesForSync(error, response, hubConfiguration, true, true, true));
+                getDatabaseSnapshotRequest(hubConfiguration, null, dispatch, (error, response) => {
+                     dispatch(processFilesForSync(error, response, hubConfiguration, true, true, true));
                 })
             }
         } catch (errorGetLastSyncDate) {
             console.log("Error at getting lastSyncDate. Proceed to download all database: ", errorGetLastSyncDate);
-            getDatabaseSnapshotRequest(hubConfiguration, null, (error, response) => {
-                dispatch(processFilesForSync(error, response, hubConfiguration, true, true, true));
+            getDatabaseSnapshotRequest(hubConfiguration, null, dispatch, (error, response) => {
+                 dispatch(processFilesForSync(error, response, hubConfiguration, true, true, true));
             })
         }
     }
@@ -206,6 +258,7 @@ function processFilesForSync(error, response, hubConfiguration, isFirstTime, syn
         let hubConfig = JSON.parse(hubConfiguration.clientId);
         if (error) {
             dispatch(setSyncState('Error'));
+            dispatch(addError({type: 'Error downloading database', message: error}));
         }
         if (response) {
             dispatch(setSyncState("Unzipping database..."));
@@ -322,6 +375,8 @@ function processFilesForSync(error, response, hubConfiguration, isFirstTime, syn
                                                                                             dispatch(setSyncState('Error'));
                                                                                             if (!isFirstTime) {
                                                                                                 dispatch(parseStatusesAndShowMessage(getState().user._id));
+                                                                                            } else {
+                                                                                                dispatch(addError({type: 'Sync error', message: `Error at storing database name: \n${JSON.stringify(errorSaveDatabases)}`}));
                                                                                             }
                                                                                         }
                                                                                     })
@@ -337,6 +392,8 @@ function processFilesForSync(error, response, hubConfiguration, isFirstTime, syn
                                                                                 dispatch(setSyncState('Error'));
                                                                                 if (!isFirstTime) {
                                                                                     dispatch(parseStatusesAndShowMessage(getState().user._id));
+                                                                                } else {
+                                                                                    dispatch(addError({type: 'Sync error', message: `Error at storing last sync date: \n${JSON.stringify(errorStoreLastSync)}`}));
                                                                                 }
                                                                             }
                                                                         } else {
@@ -367,6 +424,8 @@ function processFilesForSync(error, response, hubConfiguration, isFirstTime, syn
                                                                                     dispatch(setSyncState('Error'));
                                                                                     if (!isFirstTime) {
                                                                                         dispatch(parseStatusesAndShowMessage(getState().user._id));
+                                                                                    } else {
+                                                                                        dispatch(addError({type: 'Sync error', message: `Error at storing database name: \n${JSON.stringify(errorSaveDatabases)}`}));
                                                                                     }
                                                                                 }
                                                                             })
@@ -383,6 +442,8 @@ function processFilesForSync(error, response, hubConfiguration, isFirstTime, syn
                                                                         dispatch(setSyncState('Error'));
                                                                         if (!isFirstTime) {
                                                                             dispatch(parseStatusesAndShowMessage(getState().user._id));
+                                                                        } else {
+                                                                            dispatch(addError({type: 'Sync error', message: `Error at getting local hubs: \n${JSON.stringify(errorDatabasesString)}`}));
                                                                         }
                                                                     })
                                                             } else {
@@ -396,6 +457,8 @@ function processFilesForSync(error, response, hubConfiguration, isFirstTime, syn
                                                                 dispatch(setSyncState('Error'));
                                                                 if (!isFirstTime) {
                                                                     dispatch(parseStatusesAndShowMessage(getState().user._id));
+                                                                } else {
+                                                                    dispatch(addError({type: 'Sync error', message: `Error at storing last sync date: \n${JSON.stringify(errorStoreLastSync)}`}));
                                                                 }
                                                             }
                                                         });
@@ -410,6 +473,8 @@ function processFilesForSync(error, response, hubConfiguration, isFirstTime, syn
                                                         dispatch(setSyncState('Error'));
                                                         if (!isFirstTime) {
                                                             dispatch(parseStatusesAndShowMessage(getState().user._id));
+                                                        } else {
+                                                            dispatch(addError({type: 'Sync error', message: `Error at storing active database info: \n${JSON.stringify(errorActiveDatabase)}`}));
                                                         }
                                                     }
                                                 });
@@ -424,6 +489,8 @@ function processFilesForSync(error, response, hubConfiguration, isFirstTime, syn
                                                     dispatch(setSyncState('Error'));
                                                     if (!isFirstTime) {
                                                         dispatch(parseStatusesAndShowMessage());
+                                                    } else {
+                                                        dispatch(addError({type: 'Sync error', message: `Error at syncing data`}));
                                                     }
                                                 } else {
                                                     files = null;
@@ -435,6 +502,8 @@ function processFilesForSync(error, response, hubConfiguration, isFirstTime, syn
                                                     dispatch(setSyncState('Error'));
                                                     if (!isFirstTime) {
                                                         dispatch(parseStatusesAndShowMessage());
+                                                    } else {
+                                                        dispatch(addError({type: 'Sync error', message: `Error at syncing data`}));
                                                     }
                                                 }
                                             }
@@ -619,6 +688,8 @@ function processFilesForSync(error, response, hubConfiguration, isFirstTime, syn
                                     dispatch(setSyncState('Error'));
                                     if (!isFirstTime) {
                                         dispatch(parseStatusesAndShowMessage());
+                                    }else {
+                                        dispatch(addError({type: 'Error import', message: `Error while importing downloaded data: \nNo downloaded files found`}));
                                     }
                                 }
                             } catch(errorReadDir) {
@@ -627,6 +698,8 @@ function processFilesForSync(error, response, hubConfiguration, isFirstTime, syn
                                 dispatch(setSyncState('Error'));
                                 if (!isFirstTime) {
                                     dispatch(parseStatusesAndShowMessage());
+                                } else {
+                                    dispatch(addError({type: 'Error import', message: `Error while importing downloaded data: \n${JSON.stringify(errorReadDir)}`}));
                                 }
                             }
                         } else {
@@ -634,6 +707,8 @@ function processFilesForSync(error, response, hubConfiguration, isFirstTime, syn
                             dispatch(setSyncState('Error'));
                             if (!isFirstTime) {
                                 dispatch(parseStatusesAndShowMessage());
+                            } else {
+                                dispatch(addError({type: 'Error creating database', message: `Local database could not be created`}));
                             }
                         }
                     } catch (errorCreateDatabase) {
@@ -642,6 +717,8 @@ function processFilesForSync(error, response, hubConfiguration, isFirstTime, syn
                         dispatch(setSyncState('Error'));
                         if (!isFirstTime) {
                             dispatch(parseStatusesAndShowMessage());
+                        } else {
+                            dispatch(addError({type: 'Error creating local database', message: JSON.stringify(errorCreateDatabase)}));
                         }
                     }
                 } else {
@@ -649,14 +726,18 @@ function processFilesForSync(error, response, hubConfiguration, isFirstTime, syn
                     arrayOfStatuses.push({text: 'Getting updated data from the server', status: 'No zip file'});
                     if (!isFirstTime) {
                         dispatch(parseStatusesAndShowMessage());
+                    } else {
+                        dispatch(addError({type: 'Error downloading database', message: `Error while unzipping the file from the server`}));
                     }
                 }
             } catch (unzipError) {
-                console.log("Error promises: ", unzipError);
-                arrayOfStatuses.push({text: 'Getting updated data from the server', status: JSON.stringify(unzipError)});
+                console.log("Error promises: ", error);
+                arrayOfStatuses.push({text: 'Getting updated data from the server', status: `Error while unzipping the file from the server: \n${JSON.stringify(unzipError)}`});
                 dispatch(setSyncState('Error'));
                 if (!isFirstTime) {
                     dispatch(parseStatusesAndShowMessage());
+                } else {
+                    dispatch(addError({type: 'Error downloading database', message: JSON.stringify(unzipError)}));
                 }
             }
         }

@@ -58,6 +58,10 @@ const tabsValuesRoutes = {
         {key: 'filters', title: translations.followUpFilter.filterTitle},
         {key: 'sort', title: translations.followUpFilter.sortTitle}
     ],
+    helpFilter: [
+        {key: 'filters', title: translations.followUpFilter.filterTitle},
+        {key: 'sort', title: translations.followUpFilter.sortTitle}
+    ],
     casesFilter: [
         {key: 'filters', title: translations.casesFilter.filterTitle},
         {key: 'sort', title: translations.casesFilter.sortTitle}
@@ -65,6 +69,9 @@ const tabsValuesRoutes = {
     followUpsSingle: [
         {key: 'genInfo', title: translations.followUpsSingleScreen.detailsiTitle},
         {key: 'quest', title: translations.followUpsSingleScreen.questionnaireTitle}
+    ],
+    helpSingle: [
+        {key: 'details', title: translations.helpScreen.helpSingleScreenTab},
     ],
     casesSingle: [
         {key: 'personal', title: translations.caseSingleScreen.personalTitle},
@@ -772,7 +779,7 @@ const followUpsFilterScreen = {
         fields: [
             {      
                 cardNumber: 1,
-                label: 'Sort by',
+                label: translations.sortTab.sortBy,
                 type: 'Section',
                 hasBorderBottom: true,
                 borderBottomColor: styles.navigationDrawerSeparatorGrey
@@ -781,7 +788,7 @@ const followUpsFilterScreen = {
                 cardNumber: 1,
                 id: 'sortCriteria',
                 type: 'DropdownInput',
-                label: 'Sort Criteria',
+                label: translations.sortTab.sortCriteria,
                 isRequired: false,
                 isEditMode: true,
                 value: '',
@@ -791,7 +798,74 @@ const followUpsFilterScreen = {
                 cardNumber: 1,
                 id: 'sortOrder',
                 type: 'DropdownInput',
-                label: 'Sort Order',
+                label: translations.sortTab.sortOrder,
+                isRequired: false,
+                isEditMode: true,
+                value: '',
+                objectType: 'Sort'
+            },
+            {
+                cardNumber: 1,
+                id: 'deleteButton',
+                type: 'ActionsBar',
+                labelValue: 'test',
+                textsArray: ['Delete'],
+                textsStyleArray: [{color: styles.missedRedColor}],
+                onPressArray: [],
+                objectType: 'Sort'
+            }
+        ]
+    }
+};
+
+const helpFilterScreen = {
+    filter: [
+        {
+            fields: [
+                {
+                    cardNumber: 3,
+                    label: translations.helpFilter.category,
+                    type: 'Section',
+                    hasBorderBottom: true,
+                    borderBottomColor: styles.navigationDrawerSeparatorGrey
+                },
+                {
+                    cardNumber: 3,
+                    id: 'categories',
+                    label: translations.helpFilter.chooseCategoryLabel,
+                    type: 'DropDown',
+                    value: '',
+                    isRequired: false,
+                    isEditMode: true,
+                    single: false
+                }
+            ]
+        }
+    ],
+    sort: {
+        fields: [
+            {
+                cardNumber: 1,
+                label: translations.sortTab.sortBy,
+                type: 'Section',
+                hasBorderBottom: true,
+                borderBottomColor: styles.navigationDrawerSeparatorGrey
+            },
+            {
+                cardNumber: 1,
+                id: 'sortCriteria',
+                type: 'DropdownInput',
+                label: translations.sortTab.sortCriteria,
+                isRequired: false,
+                isEditMode: true,
+                value: '',
+                objectType: 'Sort'
+            },
+            {
+                cardNumber: 1,
+                id: 'sortOrder',
+                type: 'DropdownInput',
+                label: translations.sortTab.sortOrder,
                 isRequired: false,
                 isEditMode: true,
                 value: '',
@@ -895,9 +969,8 @@ const casesFilterScreen = {
     sort: {
         fields: [
             {
-                // LNG_SIDE_FILTERS_ADD_ANOTHER_SORT_BUTTON         
                 cardNumber: 1,
-                label: 'Sort by', //LNG_SIDE_FILTERS_SORT_BY_PLACEHOLDER
+                label: translations.sortTab.sortBy,
                 type: 'Section',
                 hasBorderBottom: true,
                 borderBottomColor: styles.navigationDrawerSeparatorGrey
@@ -906,7 +979,7 @@ const casesFilterScreen = {
                 cardNumber: 1,
                 id: 'sortCriteria',
                 type: 'DropdownInput',
-                label: 'Sort Criteria',
+                label: translations.sortTab.sortCriteria,
                 isRequired: false,
                 isEditMode: true,
                 value: '',
@@ -916,7 +989,7 @@ const casesFilterScreen = {
                 cardNumber: 1,
                 id: 'sortOrder',
                 type: 'DropdownInput',
-                label: 'Sort Order', //LNG_SIDE_FILTERS_SORT_DIRECTION_LABEL
+                label: translations.sortTab.sortOrder,
                 isRequired: false,
                 isEditMode: true,
                 value: '',
@@ -949,7 +1022,70 @@ const defaultFilterForContacts = {
 };
 
 const defaultFilterForCases = {
+};
 
+const helpSingleScreen = {
+    details: [
+        {
+            fields: [
+                {
+                    cardNumber: 1,
+                    id: 'title',
+                    label: translations.helpScreen.helpTitleLabel,
+                    type: 'TextInput',
+                    value: '',
+                    isRequired: false,
+                    isEditMode: false,
+                    multiline: true,
+                    objectType: 'Help'
+                },
+                {
+                    cardNumber: 1,
+                    id: 'categoryId',
+                    label: translations.helpScreen.helpCategoryLabel,
+                    type: 'TextInput',
+                    value: '',
+                    isRequired: false,
+                    isEditMode: false,
+                    multiline: true,
+                    objectType: 'Help'
+                },
+                {
+                    cardNumber: 1,
+                    id: 'content',
+                    label: translations.helpScreen.helpDescriptionLabel,
+                    type: 'TextInput',
+                    value: '',
+                    isRequired: false,
+                    isEditMode: false,
+                    multiline: true,
+                    objectType: 'Help'
+                },
+                {
+                    cardNumber: 1,
+                    id: 'comment',
+                    label: translations.helpScreen.helpCommentLabel,
+                    type: 'TextInput',
+                    value: '',
+                    isRequired: false,
+                    isEditMode: false,
+                    multiline: true,
+                    objectType: 'Help'
+                },
+                {
+                    cardNumber: 1,
+                    id: 'page',
+                    label: translations.helpScreen.helpPageLabel,
+                    type: 'TextInput',
+                    value: '',
+                    isRequired: false,
+                    isEditMode: false,
+                    multiline: true,
+                    objectType: 'Help'
+                },
+            ]
+        }
+    ]
 };
 
 //not used
@@ -967,7 +1103,6 @@ const addFollowUpScreen = [
         label: translations.addFollowUpScreen.searchContactPlacehodler,
         type: 'DropdownInput',
         value: '',
-        data: [],
         isRequired: false,
         isEditMode: true,
         isAdditive: true,
@@ -1432,6 +1567,8 @@ const mongoCollections = {
     relationship: 'relationship.json',
     role: 'role.json',
     team: 'team.json',
+    helpCategory: 'helpCategory.json',
+    helpItem: 'helpItem.json',
     user: 'user.json'
 };
 
@@ -1710,6 +1847,53 @@ const RNDBConfig = {
             "type": "BOOLEAN"
         }
     },
+    "helpCategory": {
+        "_id": {
+            "type": "VARCHAR(100)",
+            "pk": true
+        },
+        "name": {
+            "type": "VARCHAR(100)"
+        },
+        "order": {
+            "type": "INT"
+        },
+        "description": {
+            "type": "VARCHAR(100)"
+        },
+        "deleted": {
+            "type": "BOOLEAN"
+        },
+        "deletedAt": {
+            "type": "DATE"
+        }
+    },
+    "helpItem": {
+        "_id": {
+            "type": "VARCHAR(100)",
+            "pk": true
+        },
+        "title": {
+            "type": "VARCHAR(100)"
+        },
+        "content": {
+            "type": "VARCHAR(100)"
+        },
+        "categoryId": {
+            "type": "VARCHAR(100)",
+            "references": "language",
+            "referencesOn": "token"
+        },
+        "approved": {
+            "type": "BOOLEAN"
+        },
+        "deleted": {
+            "type": "BOOLEAN"
+        },
+        "deletedAt": {
+            "type": "DATE"
+        }
+    },
     "user": {
         "_id": {
             "type": "VARCHAR(100)",
@@ -1764,14 +1948,19 @@ const localTranslationTokens = {
 };
 
 const sortOrderDropDownItems = [
-    { label: 'LNG_SIDE_FILTERS_SORT_BY_ASC_PLACEHOLDER', value: 'LNG_SIDE_FILTERS_SORT_BY_ASC_PLACEHOLDER'},
-    { label: 'LNG_SIDE_FILTERS_SORT_BY_DESC_PLACEHOLDER', value: 'LNG_SIDE_FILTERS_SORT_BY_DESC_PLACEHOLDER'}
-]
+    { value: translations.sortTab.sortOrderAsc },
+    { value: translations.sortTab.sortOrderDesc }
+];
 
 const sortCriteriaDropDownItems = [
-    { label: 'First Name', value: 'firstName'},
-    { label: 'Last Name', value: 'lastName'}
-]
+    { value: translations.sortTab.sortFirstName },
+    { value: translations.sortTab.sortLastName  }
+];
+
+const helpItemsSortCriteriaDropDownItems = [
+    { value: translations.sortTab.sortCategory},
+    { value: translations.sortTab.sortTitle}
+];
 
 const userPermissions = {
     readContact: 'read_contact',
@@ -1789,6 +1978,7 @@ export default {
     tabsValuesRoutes,
     followUpsSingleScreen,
     followUpsFilterScreen,
+    helpFilterScreen,
     casesFilterScreen,
     caseSingleScreen,
     defaultFilterForContacts,
@@ -1809,5 +1999,7 @@ export default {
     localTranslationTokens,
     sortOrderDropDownItems,
     sortCriteriaDropDownItems,
-    userPermissions
+    userPermissions,
+    helpSingleScreen,
+    helpItemsSortCriteriaDropDownItems,
 }

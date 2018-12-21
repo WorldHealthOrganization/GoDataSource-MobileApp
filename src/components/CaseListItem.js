@@ -46,10 +46,10 @@ class CaseListItem extends Component {
         }
 
         if(this.props.item && this.props.item.age){
-            ageString = this.props.item.age.years ? this.props.item.age.years + ' ' + getTranslation(translations.generalLabels.ageYearsInitials, this.props.translation) + ' ' : (this.props.item.age.months ? this.props.item.age.months + ' ' + getTranslation(translations.generalLabels.ageMonthsInitials, this.props.translation) + ' ' : '');
+            ageString = this.props.item.age.years ? this.props.item.age.years + getTranslation(translations.generalLabels.ageYearsInitials, this.props.translation).charAt(0).toLowerCase() + ' ' : (this.props.item.age.months ? this.props.item.age.months + getTranslation(translations.generalLabels.ageMonthsInitials, this.props.translation).charAt(0).toLowerCase() + ' ' : '');
         }
 
-        let secondaryText = this.props.item && ((genderString ? genderString.charAt(0) : ' ') + (ageString ? (' ' + ageString) : ' '));
+        let secondaryText = this.props.item && ((genderString.charAt(0) + (ageString && genderString.charAt(0) ? ', ': '') + ageString))
 
         let addressText = ' ';
         let addressArray = []
