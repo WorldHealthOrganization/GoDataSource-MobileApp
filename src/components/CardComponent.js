@@ -49,6 +49,10 @@ class CardComponent extends Component {
             return true
         }
 
+        if (nextProps.screen === 'FollowUpsSort' || nextProps.screen === 'CasesSort' || nextProps.screen === 'HelpSort') {
+            return false
+        }
+
         if (this.props.followUp) {
             if (this.props.followUp.date !== nextProps.followUp.date) {
                 return true
@@ -241,7 +245,7 @@ class CardComponent extends Component {
             value = this.computeValueForId(item.type, item.id, followUp, contact);
         }
 
-        if (this.props.screen === 'FollowUpsFilter' || this.props.screen === 'CasesFilter') {
+        if (this.props.screen === 'FollowUpsFilter' || this.props.screen === 'CasesFilter' || this.props.screen === 'HelpFilter') {
             if (item.type === 'Selector' && item.id === 'gender') {
                 item.data = item.data.map((e) => {return {
                     value: this.getTranslation(e.value), 
@@ -266,22 +270,23 @@ class CardComponent extends Component {
                 data = this.computeDataForDropdown(item);
                 value = this.props.filter.filter[item.id];
             }
+            if (item.type === 'DropDown' && item.id === 'categories') {
+                data = this.computeDataForDropdown(item);
+                value = this.props.filter.filter[item.id];
+            }
+        }
+
+        if (this.props.screen === 'FollowUpsSort' || this.props.screen === 'CasesSort') {
             if (item.type === 'DropdownInput' && item.id === 'sortCriteria') {
                 let configSortCiteriaFilter = config.sortCriteriaDropDownItems.filter ((e) => {
                     return this.props.filter.sort.map((k) => {return k.sortCriteria}).indexOf(e.value) === -1
                 })
 
-                item.data = configSortCiteriaFilter.map((e) => { return {label: this.getTranslation(e.label), value: e.value }})
+                item.data = configSortCiteriaFilter.map((e) => { return {label: this.getTranslation(e.value), value: e.value }})
                 value = this.computeValueForCaseSortScreen(item, this.props.index);
-                // valueFromConfig = config.sortCriteriaDropDownItems.find((e) => {
-                //     return e.value === this.props.filter.sort[this.props.index][item.id]
-                // })
-                // if (valueFromConfig !== undefined && valueFromConfig && valueFromConfig.label){
-                //     value = valueFromConfig.label
-                // }
             }
             if (item.type === 'DropdownInput' && item.id === 'sortOrder') {
-                item.data = config.sortOrderDropDownItems.map((e) => { return {label: this.getTranslation(e.label), value: e.value }})
+                item.data = config.sortOrderDropDownItems.map((e) => { return {label: this.getTranslation(e.value), value: e.value }})
                 value = this.computeValueForCaseSortScreen(item, this.props.index);
             }
             if (item.type === 'ActionsBar') {
@@ -289,25 +294,23 @@ class CardComponent extends Component {
             }
         }
 
-        if (this.props.screen === 'HelpFilter') {
+        if (this.props.screen === 'HelpSort') {
             if (item.type === 'DropdownInput' && item.id === 'sortCriteria') {
                 let configSortCiteriaFilter = config.helpItemsSortCriteriaDropDownItems.filter ((e) => {
                     return this.props.filter.sort.map((k) => {return k.sortCriteria}).indexOf(e.value) === -1
                 })
-                item.data = configSortCiteriaFilter.map((e) => { return {label: this.getTranslation(e.label), value: e.value }})
+
+                item.data = configSortCiteriaFilter.map((e) => { return {label: this.getTranslation(e.value), value: e.value }})
                 value = this.computeValueForCaseSortScreen(item, this.props.index);
             }
             if (item.type === 'DropdownInput' && item.id === 'sortOrder') {
-                item.data = config.sortOrderDropDownItems.map((e) => { return {label: this.getTranslation(e.label), value: e.value }})
+                item.data = config.sortOrderDropDownItems.map((e) => { return {label: this.getTranslation(e.value), value: e.value }})
                 value = this.computeValueForCaseSortScreen(item, this.props.index);
             }
             if (item.type === 'ActionsBar') {
                 item.onPressArray = [this.props.onDeletePress]
             }
-            if (item.type === 'DropDown' && item.id === 'categories') {
-                data = this.computeDataForDropdown(item);
-                value = this.props.filter.filter[item.id];
-            }
+          
         }
 
         if (this.props.screen === 'ExposureScreen') {
