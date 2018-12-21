@@ -27,18 +27,21 @@ export function getDatabaseSnapshotRequest(hubConfig, lastSyncDate, callback) {
     console.log('Request URL: ', requestUrl);
 
     let dirs = RNFetchBlob.fs.dirs.DocumentDir;
+    let databaseLocation = `${dirs}/database.zip`;
 
     console.log('Get database');
 
     RNFetchBlob.config({
+        timeout: (60 * 10 * 1000),
+        followRedirect: false,
         fileCache: true,
-        path: dirs + '/database'
+        path: `${dirs}/database.zip`
     })
         .fetch('GET', encodeURI(requestUrl), {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
         'Authorization': 'Basic ' + base64.encode(`${hubConfiguration.clientId}:${hubConfiguration.clientSecret}`)
-    }, '0', '20000')
+    })
         .progress({count: 1}, (received, total) => {
             console.log(received, total)
         })
@@ -48,14 +51,14 @@ export function getDatabaseSnapshotRequest(hubConfig, lastSyncDate, callback) {
             if(status === 200) {
                 // After returning the database, return the path to it
                 console.log("Got database");
-                callback(null, (dirs + '/database'))
+                callback(null, databaseLocation)
             } else {
                 callback('Status Code Error')
             }
         })
         .catch((errorMessage, statusCode) => {
             // error handling
-            console.log("*** getDatabaseSnapshotRequest error: ", JSON.stringify(errorMessage));
+            console.log("*** getDatabaseSnapshotRequest error: ", JSON.stringify(errorMessage), statusCode);
             callback(errorMessage);
         });
 }
@@ -63,20 +66,21 @@ export function getDatabaseSnapshotRequest(hubConfig, lastSyncDate, callback) {
 export function postDatabaseSnapshotRequest(internetCredentials, path, callback) {
     // internetCredentials = {server: databaseName, username: JSON.stringify({name, url, clientId, clientSecret, encryptedData}), password: databasePass}
     let hubConfig = JSON.parse(internetCredentials.username);
-    let requestUrl = `${hubConfig.url}/sync/import-database-snapshot?autoEncrypt=${hubConfig.encryptedData}`;
-    // let requestUrl = url.postDatabaseSnapshot();
+    let requestUrl = `${hubConfig.url}/sync/import-database-snapshot`;
 
     // console.log('Request URL:' + requestUrl);
 
     console.log('Send database to server');
 
-    RNFetchBlob.fetch('POST', requestUrl, {
+    RNFetchBlob.config({timeout: (60 * 10 * 1000)})
+        .fetch('POST', requestUrl, {
         'Content-Type': 'multipart/form-data',
         'Accept': 'application/json',
         'Authorization': 'Basic ' + base64.encode(`${hubConfig.clientId}:${hubConfig.clientSecret}`)
     }, [
-        {name: 'snapshot', filename: 'snapshot', data: RNFetchBlob.wrap(path)}
-    ])
+        {name: 'snapshot', filename: 'snapshot', data: RNFetchBlob.wrap(path)},
+        {name: 'autoEncrypt', data: `${hubConfig.encryptedData}`}
+    ], '0', '6000000')
         .then((res) => {
             console.log('Finished sending the data to the server: ', res);
             let status = res.info().status;

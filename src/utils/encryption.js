@@ -54,6 +54,8 @@ export function encrypt(password, data) {
     // promisify the result
     return new Promise(function (resolve, reject) {
         // prepare encryption key & IV
+        // convert from base64
+        data = Buffer.from(data, 'base64');
         createKeyIv(password, function (err, key) {
             if (err) {
                 return reject(err);
@@ -61,7 +63,7 @@ export function encrypt(password, data) {
             // encipher data
             const cipher = crypto.createCipheriv(algorithm, key.key, key.iv);
             const result = Buffer.concat([key.iv, key.salt, cipher.update(data), cipher.final()]);
-            resolve(result);
+            resolve(result.toString('base64'));
         });
     });
 }

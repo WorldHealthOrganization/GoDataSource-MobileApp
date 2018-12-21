@@ -1435,6 +1435,14 @@ const mongoCollections = {
     user: 'user.json'
 };
 
+const changingMongoCollections = [
+    'followUp.json',
+    'labResult.json',
+    'person.json',
+    'relationship.json',
+    'user.json'
+];
+
 const RNDBConfig = {
     "cluster": {
         "_id": {
@@ -1791,6 +1799,7 @@ export default {
     contactsSingleScreen,
     personTypes,
     mongoCollections,
+    changingMongoCollections,
     RNDBConfig,
     userResidenceAddress,
     contactFollowUpStatuses,

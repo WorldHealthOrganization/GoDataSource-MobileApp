@@ -30,7 +30,7 @@ import {getUserById} from './user';
 import {uniq} from 'lodash';
 // import {addError} from './errors';
 // import RNDB from 'react-native-nosql-to-sqlite';
-// import {getSyncEncryptPassword, encrypt, decrypt} from './../utils/encryption';
+import {getSyncEncryptPassword} from './../utils/encryption';
 
 let arrayOfStatuses = [];
 
@@ -228,7 +228,16 @@ function processFilesForSync(error, response, hubConfiguration, isFirstTime, syn
 
                                 if (files) {
                                     // First sort the files
-                                    files = files.sort();
+                                    files = files.sort((a, b) => {
+                                        if (a.split('.')[0] <= b.split('.')[0] && parseInt(a.split('.')[1]) < parseInt(b.split('.')[1])) {
+                                            return -1;
+                                        }
+                                        if (a.split('.')[0] >= b.split('.')[0] && parseInt(a.split('.')[1]) > parseInt(b.split('.')[1])) {
+                                            return 1;
+                                        }
+                                        return 0;
+                                    });
+                                    console.log('Sorted files: ', files);
                                     // For every file of the database dump, do sync
                                     for (let i = 0; i < files.length; i++) {
                                         if (files[i] !== 'auditLog.json' && files[i] !== 'icon.json' && files[i] !== 'icons') {
@@ -236,7 +245,7 @@ function processFilesForSync(error, response, hubConfiguration, isFirstTime, syn
                                             // Process every file synchronously
                                             try {
                                                 // console.log('Memory size of database: ', memorySizeOf(database));
-                                                let auxData = await processFile(RNFetchBlobFs.dirs.DocumentDir + '/who_databases/' + files[i], files[i], files.length, dispatch, isFirstTime, forceBulk, hubConfig.encryptedData, hubConfiguration);
+                                                let auxData = await processFile(RNFetchBlobFs.dirs.DocumentDir + '/who_databases/' + files[i], files[i], files.length, dispatch, isFirstTime, forceBulk, hubConfig.encryptedData, hubConfig);
                                                 if (auxData) {
                                                     console.log('auxData: ', auxData);
                                                     promiseResponses.push(auxData);
@@ -255,35 +264,83 @@ function processFilesForSync(error, response, hubConfiguration, isFirstTime, syn
                                     // After processing all files, store hub config
                                     // After processing all the data store the last sync date
                                     console.log("Now that the processing is over, proceed with storing last sync date:");
-                                    if (syncSuccessful && promiseResponses.length === files.length) {
-                                        storeData('activeDatabase', hubConfiguration.url, (errorActiveDatabase) => {
-                                            if (!errorActiveDatabase) {
-                                                storeData(hubConfiguration.url, new Date(), (errorStoreLastSync) => {
-                                                    if (!errorStoreLastSync) {
-                                                        // if all was successful, then store the database in async storage
-                                                        AsyncStorage.getItem('databases')
-                                                            .then((databasesString) => {
-                                                                if (databasesString && databasesString.length > 0) {
-                                                                    let databases = JSON.parse(databasesString);
-                                                                    // Check if the database already exists
-                                                                    if (databases && Array.isArray(databases) && databases.length > 0){
-                                                                        if (databases.find((e) => {return e.id === hubConfiguration.url})) {
-                                                                            // If the database already exists, then do nothing
-                                                                            console.log('Responses promises: ', promiseResponses);
-                                                                            files = null;
-                                                                            database = null;
-                                                                            arrayOfStatuses.push({
-                                                                                text: 'Getting updated data from the server',
-                                                                                status: 'OK'
-                                                                            });
-                                                                            dispatch(setSyncState("Finished processing"));
-                                                                            if (!isFirstTime) {
-                                                                                dispatch(parseStatusesAndShowMessage(getState().user._id));
+                                    // First clean up the files
+                                    RNFetchBlobFs.unlink(`${RNFetchBlobFs.dirs.DocumentDir}/who_databases`)
+                                        .then(() => {
+                                            if (syncSuccessful && promiseResponses.length === files.length) {
+                                                storeData('activeDatabase', hubConfiguration.url, (errorActiveDatabase) => {
+                                                    if (!errorActiveDatabase) {
+                                                        storeData(hubConfiguration.url, new Date(), (errorStoreLastSync) => {
+                                                            if (!errorStoreLastSync) {
+                                                                // if all was successful, then store the database in async storage
+                                                                AsyncStorage.getItem('databases')
+                                                                    .then((databasesString) => {
+                                                                        if (databasesString && databasesString.length > 0) {
+                                                                            let databases = JSON.parse(databasesString);
+                                                                            // Check if the database already exists
+                                                                            if (databases && Array.isArray(databases) && databases.length > 0){
+                                                                                if (databases.find((e) => {return e.id === hubConfiguration.url})) {
+                                                                                    // If the database already exists, then do nothing
+                                                                                    console.log('Responses promises: ', promiseResponses);
+                                                                                    files = null;
+                                                                                    database = null;
+                                                                                    arrayOfStatuses.push({
+                                                                                        text: 'Getting updated data from the server',
+                                                                                        status: 'OK'
+                                                                                    });
+                                                                                    dispatch(setSyncState("Finished processing"));
+                                                                                    if (!isFirstTime) {
+                                                                                        dispatch(parseStatusesAndShowMessage(getState().user._id));
+                                                                                    } else {
+                                                                                        dispatch(changeAppRoot('login'));
+                                                                                    }
+                                                                                } else {
+                                                                                    databases.push({id: hubConfiguration.url, name: hubConfig.name});
+                                                                                    storeData('databases', JSON.stringify(databases), (errorSaveDatabases) => {
+                                                                                        if (!errorSaveDatabases) {
+                                                                                            console.log('Responses promises: ', promiseResponses);
+                                                                                            files = null;
+                                                                                            database = null;
+                                                                                            arrayOfStatuses.push({
+                                                                                                text: 'Getting updated data from the server',
+                                                                                                status: 'OK'
+                                                                                            });
+                                                                                            dispatch(setSyncState("Finished processing"));
+                                                                                            if (!isFirstTime) {
+                                                                                                dispatch(parseStatusesAndShowMessage(getState().user._id));
+                                                                                            } else {
+                                                                                                dispatch(changeAppRoot('login'));
+                                                                                            }
+                                                                                        } else {
+                                                                                            console.log('There was an error at storing last sync date: ', errorStoreLastSync);
+                                                                                            files = null;
+                                                                                            database = null;
+                                                                                            arrayOfStatuses.push({
+                                                                                                text: 'Getting updated data from the server',
+                                                                                                status: JSON.stringify(errorStoreLastSync)
+                                                                                            });
+                                                                                            dispatch(setSyncState('Error'));
+                                                                                            if (!isFirstTime) {
+                                                                                                dispatch(parseStatusesAndShowMessage(getState().user._id));
+                                                                                            }
+                                                                                        }
+                                                                                    })
+                                                                                }
                                                                             } else {
-                                                                                dispatch(changeAppRoot('login'));
+                                                                                console.log('There was an error at storing last sync date: ', errorStoreLastSync);
+                                                                                files = null;
+                                                                                database = null;
+                                                                                arrayOfStatuses.push({
+                                                                                    text: 'Getting updated data from the server',
+                                                                                    status: JSON.stringify(errorStoreLastSync)
+                                                                                });
+                                                                                dispatch(setSyncState('Error'));
+                                                                                if (!isFirstTime) {
+                                                                                    dispatch(parseStatusesAndShowMessage(getState().user._id));
+                                                                                }
                                                                             }
                                                                         } else {
-                                                                            databases.push({id: hubConfiguration.url, name: hubConfig.name});
+                                                                            let databases = [{id: hubConfiguration.url, name: hubConfig.name}];
                                                                             storeData('databases', JSON.stringify(databases), (errorSaveDatabases) => {
                                                                                 if (!errorSaveDatabases) {
                                                                                     console.log('Responses promises: ', promiseResponses);
@@ -314,7 +371,8 @@ function processFilesForSync(error, response, hubConfiguration, isFirstTime, syn
                                                                                 }
                                                                             })
                                                                         }
-                                                                    } else {
+                                                                    })
+                                                                    .catch((errorDatabasesString) => {
                                                                         console.log('There was an error at storing last sync date: ', errorStoreLastSync);
                                                                         files = null;
                                                                         database = null;
@@ -326,41 +384,8 @@ function processFilesForSync(error, response, hubConfiguration, isFirstTime, syn
                                                                         if (!isFirstTime) {
                                                                             dispatch(parseStatusesAndShowMessage(getState().user._id));
                                                                         }
-                                                                    }
-                                                                } else {
-                                                                    let databases = [{id: hubConfiguration.url, name: hubConfig.name}];
-                                                                    storeData('databases', JSON.stringify(databases), (errorSaveDatabases) => {
-                                                                        if (!errorSaveDatabases) {
-                                                                            console.log('Responses promises: ', promiseResponses);
-                                                                            files = null;
-                                                                            database = null;
-                                                                            arrayOfStatuses.push({
-                                                                                text: 'Getting updated data from the server',
-                                                                                status: 'OK'
-                                                                            });
-                                                                            dispatch(setSyncState("Finished processing"));
-                                                                            if (!isFirstTime) {
-                                                                                dispatch(parseStatusesAndShowMessage(getState().user._id));
-                                                                            } else {
-                                                                                dispatch(changeAppRoot('login'));
-                                                                            }
-                                                                        } else {
-                                                                            console.log('There was an error at storing last sync date: ', errorStoreLastSync);
-                                                                            files = null;
-                                                                            database = null;
-                                                                            arrayOfStatuses.push({
-                                                                                text: 'Getting updated data from the server',
-                                                                                status: JSON.stringify(errorStoreLastSync)
-                                                                            });
-                                                                            dispatch(setSyncState('Error'));
-                                                                            if (!isFirstTime) {
-                                                                                dispatch(parseStatusesAndShowMessage(getState().user._id));
-                                                                            }
-                                                                        }
                                                                     })
-                                                                }
-                                                            })
-                                                            .catch((errorDatabasesString) => {
+                                                            } else {
                                                                 console.log('There was an error at storing last sync date: ', errorStoreLastSync);
                                                                 files = null;
                                                                 database = null;
@@ -372,14 +397,15 @@ function processFilesForSync(error, response, hubConfiguration, isFirstTime, syn
                                                                 if (!isFirstTime) {
                                                                     dispatch(parseStatusesAndShowMessage(getState().user._id));
                                                                 }
-                                                            })
+                                                            }
+                                                        });
                                                     } else {
-                                                        console.log('There was an error at storing last sync date: ', errorStoreLastSync);
+                                                        console.log('There was an error at storing active database: ', errorActiveDatabase);
                                                         files = null;
                                                         database = null;
                                                         arrayOfStatuses.push({
                                                             text: 'Getting updated data from the server',
-                                                            status: JSON.stringify(errorStoreLastSync)
+                                                            status: JSON.stringify(errorActiveDatabase)
                                                         });
                                                         dispatch(setSyncState('Error'));
                                                         if (!isFirstTime) {
@@ -388,44 +414,205 @@ function processFilesForSync(error, response, hubConfiguration, isFirstTime, syn
                                                     }
                                                 });
                                             } else {
-                                                console.log('There was an error at storing active database: ', errorActiveDatabase);
-                                                files = null;
-                                                database = null;
-                                                arrayOfStatuses.push({
-                                                    text: 'Getting updated data from the server',
-                                                    status: JSON.stringify(errorActiveDatabase)
-                                                });
-                                                dispatch(setSyncState('Error'));
-                                                if (!isFirstTime) {
-                                                    dispatch(parseStatusesAndShowMessage(getState().user._id));
+                                                if (promiseResponses.length === files.length) {
+                                                    files = null;
+                                                    database = null;
+                                                    arrayOfStatuses.push({
+                                                        text: 'Getting updated data from the server',
+                                                        status: 'OK'
+                                                    });
+                                                    dispatch(setSyncState('Error'));
+                                                    if (!isFirstTime) {
+                                                        dispatch(parseStatusesAndShowMessage());
+                                                    }
+                                                } else {
+                                                    files = null;
+                                                    database = null;
+                                                    arrayOfStatuses.push({
+                                                        text: 'Getting updated data from the server',
+                                                        status: 'Error at syncing files'
+                                                    });
+                                                    dispatch(setSyncState('Error'));
+                                                    if (!isFirstTime) {
+                                                        dispatch(parseStatusesAndShowMessage());
+                                                    }
                                                 }
                                             }
-                                        });
-                                    } else {
-                                        if (promiseResponses.length === files.length) {
-                                            files = null;
-                                            database = null;
-                                            arrayOfStatuses.push({
-                                                text: 'Getting updated data from the server',
-                                                status: 'OK'
-                                            });
-                                            dispatch(setSyncState('Error'));
-                                            if (!isFirstTime) {
-                                                dispatch(parseStatusesAndShowMessage());
+                                        })
+                                        .catch((errorDelete) => {
+                                            console.log('Error while doing cleanup: ', errorDelete);
+                                            if (syncSuccessful && promiseResponses.length === files.length) {
+                                                storeData('activeDatabase', hubConfiguration.url, (errorActiveDatabase) => {
+                                                    if (!errorActiveDatabase) {
+                                                        storeData(hubConfiguration.url, new Date(), (errorStoreLastSync) => {
+                                                            if (!errorStoreLastSync) {
+                                                                // if all was successful, then store the database in async storage
+                                                                AsyncStorage.getItem('databases')
+                                                                    .then((databasesString) => {
+                                                                        if (databasesString && databasesString.length > 0) {
+                                                                            let databases = JSON.parse(databasesString);
+                                                                            // Check if the database already exists
+                                                                            if (databases && Array.isArray(databases) && databases.length > 0){
+                                                                                if (databases.find((e) => {return e.id === hubConfiguration.url})) {
+                                                                                    // If the database already exists, then do nothing
+                                                                                    console.log('Responses promises: ', promiseResponses);
+                                                                                    files = null;
+                                                                                    database = null;
+                                                                                    arrayOfStatuses.push({
+                                                                                        text: 'Getting updated data from the server',
+                                                                                        status: 'OK'
+                                                                                    });
+                                                                                    dispatch(setSyncState("Finished processing"));
+                                                                                    if (!isFirstTime) {
+                                                                                        dispatch(parseStatusesAndShowMessage(getState().user._id));
+                                                                                    } else {
+                                                                                        dispatch(changeAppRoot('login'));
+                                                                                    }
+                                                                                } else {
+                                                                                    databases.push({id: hubConfiguration.url, name: hubConfig.name});
+                                                                                    storeData('databases', JSON.stringify(databases), (errorSaveDatabases) => {
+                                                                                        if (!errorSaveDatabases) {
+                                                                                            console.log('Responses promises: ', promiseResponses);
+                                                                                            files = null;
+                                                                                            database = null;
+                                                                                            arrayOfStatuses.push({
+                                                                                                text: 'Getting updated data from the server',
+                                                                                                status: 'OK'
+                                                                                            });
+                                                                                            dispatch(setSyncState("Finished processing"));
+                                                                                            if (!isFirstTime) {
+                                                                                                dispatch(parseStatusesAndShowMessage(getState().user._id));
+                                                                                            } else {
+                                                                                                dispatch(changeAppRoot('login'));
+                                                                                            }
+                                                                                        } else {
+                                                                                            console.log('There was an error at storing last sync date: ', errorStoreLastSync);
+                                                                                            files = null;
+                                                                                            database = null;
+                                                                                            arrayOfStatuses.push({
+                                                                                                text: 'Getting updated data from the server',
+                                                                                                status: JSON.stringify(errorStoreLastSync)
+                                                                                            });
+                                                                                            dispatch(setSyncState('Error'));
+                                                                                            if (!isFirstTime) {
+                                                                                                dispatch(parseStatusesAndShowMessage(getState().user._id));
+                                                                                            }
+                                                                                        }
+                                                                                    })
+                                                                                }
+                                                                            } else {
+                                                                                console.log('There was an error at storing last sync date: ', errorStoreLastSync);
+                                                                                files = null;
+                                                                                database = null;
+                                                                                arrayOfStatuses.push({
+                                                                                    text: 'Getting updated data from the server',
+                                                                                    status: JSON.stringify(errorStoreLastSync)
+                                                                                });
+                                                                                dispatch(setSyncState('Error'));
+                                                                                if (!isFirstTime) {
+                                                                                    dispatch(parseStatusesAndShowMessage(getState().user._id));
+                                                                                }
+                                                                            }
+                                                                        } else {
+                                                                            let databases = [{id: hubConfiguration.url, name: hubConfig.name}];
+                                                                            storeData('databases', JSON.stringify(databases), (errorSaveDatabases) => {
+                                                                                if (!errorSaveDatabases) {
+                                                                                    console.log('Responses promises: ', promiseResponses);
+                                                                                    files = null;
+                                                                                    database = null;
+                                                                                    arrayOfStatuses.push({
+                                                                                        text: 'Getting updated data from the server',
+                                                                                        status: 'OK'
+                                                                                    });
+                                                                                    dispatch(setSyncState("Finished processing"));
+                                                                                    if (!isFirstTime) {
+                                                                                        dispatch(parseStatusesAndShowMessage(getState().user._id));
+                                                                                    } else {
+                                                                                        dispatch(changeAppRoot('login'));
+                                                                                    }
+                                                                                } else {
+                                                                                    console.log('There was an error at storing last sync date: ', errorStoreLastSync);
+                                                                                    files = null;
+                                                                                    database = null;
+                                                                                    arrayOfStatuses.push({
+                                                                                        text: 'Getting updated data from the server',
+                                                                                        status: JSON.stringify(errorStoreLastSync)
+                                                                                    });
+                                                                                    dispatch(setSyncState('Error'));
+                                                                                    if (!isFirstTime) {
+                                                                                        dispatch(parseStatusesAndShowMessage(getState().user._id));
+                                                                                    }
+                                                                                }
+                                                                            })
+                                                                        }
+                                                                    })
+                                                                    .catch((errorDatabasesString) => {
+                                                                        console.log('There was an error at storing last sync date: ', errorStoreLastSync);
+                                                                        files = null;
+                                                                        database = null;
+                                                                        arrayOfStatuses.push({
+                                                                            text: 'Getting updated data from the server',
+                                                                            status: JSON.stringify(errorStoreLastSync)
+                                                                        });
+                                                                        dispatch(setSyncState('Error'));
+                                                                        if (!isFirstTime) {
+                                                                            dispatch(parseStatusesAndShowMessage(getState().user._id));
+                                                                        }
+                                                                    })
+                                                            } else {
+                                                                console.log('There was an error at storing last sync date: ', errorStoreLastSync);
+                                                                files = null;
+                                                                database = null;
+                                                                arrayOfStatuses.push({
+                                                                    text: 'Getting updated data from the server',
+                                                                    status: JSON.stringify(errorStoreLastSync)
+                                                                });
+                                                                dispatch(setSyncState('Error'));
+                                                                if (!isFirstTime) {
+                                                                    dispatch(parseStatusesAndShowMessage(getState().user._id));
+                                                                }
+                                                            }
+                                                        });
+                                                    } else {
+                                                        console.log('There was an error at storing active database: ', errorActiveDatabase);
+                                                        files = null;
+                                                        database = null;
+                                                        arrayOfStatuses.push({
+                                                            text: 'Getting updated data from the server',
+                                                            status: JSON.stringify(errorActiveDatabase)
+                                                        });
+                                                        dispatch(setSyncState('Error'));
+                                                        if (!isFirstTime) {
+                                                            dispatch(parseStatusesAndShowMessage(getState().user._id));
+                                                        }
+                                                    }
+                                                });
+                                            } else {
+                                                if (promiseResponses.length === files.length) {
+                                                    files = null;
+                                                    database = null;
+                                                    arrayOfStatuses.push({
+                                                        text: 'Getting updated data from the server',
+                                                        status: 'OK'
+                                                    });
+                                                    dispatch(setSyncState('Error'));
+                                                    if (!isFirstTime) {
+                                                        dispatch(parseStatusesAndShowMessage());
+                                                    }
+                                                } else {
+                                                    files = null;
+                                                    database = null;
+                                                    arrayOfStatuses.push({
+                                                        text: 'Getting updated data from the server',
+                                                        status: 'Error at syncing files'
+                                                    });
+                                                    dispatch(setSyncState('Error'));
+                                                    if (!isFirstTime) {
+                                                        dispatch(parseStatusesAndShowMessage());
+                                                    }
+                                                }
                                             }
-                                        } else {
-                                            files = null;
-                                            database = null;
-                                            arrayOfStatuses.push({
-                                                text: 'Getting updated data from the server',
-                                                status: 'Error at syncing files'
-                                            });
-                                            dispatch(setSyncState('Error'));
-                                            if (!isFirstTime) {
-                                                dispatch(parseStatusesAndShowMessage());
-                                            }
-                                        }
-                                    }
+                                        })
                                 } else {
                                     console.log('No files found');
                                     arrayOfStatuses.push({text: 'Getting updated data from the server', status: 'No files found'});
@@ -465,7 +652,7 @@ function processFilesForSync(error, response, hubConfiguration, isFirstTime, syn
                     }
                 }
             } catch (unzipError) {
-                console.log("Error promises: ", error);
+                console.log("Error promises: ", unzipError);
                 arrayOfStatuses.push({text: 'Getting updated data from the server', status: JSON.stringify(unzipError)});
                 dispatch(setSyncState('Error'));
                 if (!isFirstTime) {
@@ -496,7 +683,7 @@ function parseStatusesAndShowMessage (userId) {
 }
 
 export function sendDatabaseToServer () {
-    return async function (dispatch) {
+    return async function (dispatch, getState) {
         let operationStart = new Date().getTime();
         // empty the array of global statuses
         arrayOfStatuses = [];
@@ -518,114 +705,195 @@ export function sendDatabaseToServer () {
                         let internetCredentials = await getInternetCredentials(activeDatabase);
                         if (internetCredentials) {
                             let startTimeForFilesChanged = new Date().getTime();
-                            database.find({selector: {
-                                updatedAt: {$gte: lastSyncDate}
-                            },
-                                fields: ['fileType']
-                            })
-                                .then((resultGetRecordsByDate) => {
-                                    resultGetRecordsByDate = uniq(resultGetRecordsByDate.docs);
-                                    console.log('resultGetRecordsByDate: took: ', new Date().getTime() - startTimeForFilesChanged);
-                                    // Now, for each fileType, we must create a .json file, archive it and then send that archive to the server
-                                    let promiseArray = [];
 
-                                    if (resultGetRecordsByDate && Array.isArray(resultGetRecordsByDate) && resultGetRecordsByDate.length > 0) {
-                                        for (let i=0; i<resultGetRecordsByDate.length; i++) {
-                                            promiseArray.push(getDataFromDatabaseFromFile(database, resultGetRecordsByDate[i].fileType, lastSyncDate))
-                                        }
+                            // To avoid performance issues, go through all the collections that can change and see if anything actually changed
 
-                                        // statuses.gettingLocalFiles.status = 'OK';
-                                        arrayOfStatuses.push({text: 'Getting local data', status: 'OK'});
-                                        dispatch(setSyncState('Creating local files'));
-                                        let startTimeForCreatingFiles = new Date().getTime();
-                                        console.log('Add stuff: ', promiseArray.length);
-                                        Promise.all(promiseArray)
-                                            .then((resultsCreateAlFiles) => {
-                                                // After creating all the needed files, we need to make a zip file
-                                                console.log('Result from processing all the files: timeForCreatingFiles: ', new Date().getTime() - startTimeForCreatingFiles);
-                                                let startTimeForCreateZip = new Date().getTime();
-                                                createZipFileAtPath(`${RNFetchBlobFs.dirs.DocumentDir}/who_files`, `${RNFetchBlobFs.dirs.DocumentDir}/${activeDatabase.replace(/\/|\.|\:/g, '')}.zip`, (errorCreateZipFile, resultCreateZipFile) => {
-                                                    if (errorCreateZipFile) {
-                                                        console.log("An error occurred while zipping the files: ", errorCreateZipFile);
-                                                        arrayOfStatuses.push({text: 'Creating local files', status: JSON.stringify(errorCreateZipFile)});
+                            arrayOfStatuses.push({text: 'Getting local data', status: 'OK'});
+                            dispatch(setSyncState('Creating local files'));
+                            let statusArray = [];
+                            for (let i=0; i<config.changingMongoCollections.length; i++) {
+                                try {
+                                    let credentials = JSON.parse(internetCredentials.username);
+                                    let password = credentials.encryptedData ? getSyncEncryptPassword(null, credentials) : null;
+                                    let status = await getDataFromDatabaseFromFile(database, config.changingMongoCollections[i], lastSyncDate, password);
+                                    // if (status) {
+                                        statusArray.push(status);
+                                    // } else {
+                                    //     console.log('An error occurred while getting data from the local store');
+                                    //     arrayOfStatuses.push({text: 'Getting local data', status: 'An error occurred while getting data from the local store'});
+                                    //     dispatch(setSyncState('Error'));
+                                    //     dispatch(parseStatusesAndShowMessage());
+                                    //     break;
+                                    // }
+                                } catch (errorGetDatabaseFromFile) {
+                                    console.log('ErrorGetDatabaseFromFile: ', errorGetDatabaseFromFile);
+                                    arrayOfStatuses.push({text: 'Getting local data', status: JSON.stringify(errorGetDatabaseFromFile)});
+                                    dispatch(setSyncState('Error'));
+                                    dispatch(parseStatusesAndShowMessage());
+                                    break;
+                                }
+                            }
+
+                            if (statusArray.length === config.changingMongoCollections.length) {
+                                // console.log('Result from processing all the files: timeForCreatingFiles: ', new Date().getTime() - startTimeForCreatingFiles);
+                                // let startTimeForCreateZip = new Date().getTime();
+                                createZipFileAtPath(`${RNFetchBlobFs.dirs.DocumentDir}/who_files`, `${RNFetchBlobFs.dirs.DocumentDir}/${activeDatabase.replace(/\/|\.|\:/g, '')}.zip`, (errorCreateZipFile, resultCreateZipFile) => {
+                                    if (errorCreateZipFile) {
+                                        console.log("An error occurred while zipping the files: ", errorCreateZipFile);
+                                        arrayOfStatuses.push({text: 'Creating local files', status: JSON.stringify(errorCreateZipFile)});
+                                        dispatch(parseStatusesAndShowMessage());
+                                    }
+                                    if (resultCreateZipFile) {
+                                        // After creating the zip file, it's time to send it to the server
+                                        // console.log("Response from create zip file: time For zip", new Date().getTime() - startTimeForCreateZip);
+                                        // statuses.createLocalFiles.status = 'OK';
+                                        arrayOfStatuses.push({text: 'Creating local files', status: 'OK'});
+                                        dispatch(setSyncState('Sending data to the HUB'));
+                                        postDatabaseSnapshotRequest(internetCredentials, resultCreateZipFile, (errorSendData, resultSendData) => {
+                                            if (errorSendData && !resultSendData) {
+                                                console.log('An error occurred while sending data to server: ', errorSendData);
+                                                dispatch(setSyncState('Error'));
+                                                // statuses.sendData.status = JSON.stringify(errorSendData);
+                                                arrayOfStatuses.push({text: 'Sending data to the HUB', status: JSON.stringify(errorSendData)});
+                                                dispatch(parseStatusesAndShowMessage());
+                                                // dispatch(addError({type: 'Sync Error', message: JSON.stringify(errorSendData)}));
+                                            }
+                                            if (resultSendData) {
+                                                console.log("Data was successfully sent to server: ", resultSendData, new Date().getTime() - operationStart);
+                                                // statuses.sendData.status = 'OK';
+                                                arrayOfStatuses.push({text: 'Sending data to the HUB', status: errorSendData ? JSON.stringify(errorSendData) : 'OK'});
+                                                dispatch(setSyncState('Getting updated data from the server'));
+                                                getDatabaseSnapshotRequest({url: internetCredentials.server ? internetCredentials.server : internetCredentials.service, clientId: internetCredentials.username, clientSecret: internetCredentials.password}, lastSyncDate, (error, response) => {
+                                                    if (error) {
+                                                        arrayOfStatuses.push({text: 'Getting updated data from the server', status: JSON.stringify(error)});
+                                                        dispatch(setSyncState('Error'));
                                                         dispatch(parseStatusesAndShowMessage());
                                                     }
-                                                    if (resultCreateZipFile) {
-                                                        // After creating the zip file, it's time to send it to the server
-                                                        console.log("Response from create zip file: time For zip", new Date().getTime() - startTimeForCreateZip);
-                                                        // statuses.createLocalFiles.status = 'OK';
-                                                        arrayOfStatuses.push({text: 'Creating local files', status: 'OK'});
-                                                        dispatch(setSyncState('Sending data to the HUB'));
-                                                        postDatabaseSnapshotRequest(internetCredentials, resultCreateZipFile, (errorSendData, resultSendData) => {
-                                                            if (errorSendData && !resultSendData) {
-                                                                console.log('An error occurred while sending data to server: ', errorSendData);
-                                                                dispatch(setSyncState('Error'));
-                                                                // statuses.sendData.status = JSON.stringify(errorSendData);
-                                                                arrayOfStatuses.push({text: 'Sending data to the HUB', status: JSON.stringify(errorSendData)});
-                                                                dispatch(parseStatusesAndShowMessage());
-                                                                // dispatch(addError({type: 'Sync Error', message: JSON.stringify(errorSendData)}));
-                                                            }
-                                                            if (resultSendData) {
-                                                                console.log("Data was successfully sent to server: ", resultSendData, new Date().getTime() - operationStart);
-                                                                // statuses.sendData.status = 'OK';
-                                                                arrayOfStatuses.push({text: 'Sending data to the HUB', status: errorSendData ? JSON.stringify(errorSendData) : 'OK'});
-                                                                dispatch(setSyncState('Getting updated data from the server'));
-                                                                getDatabaseSnapshotRequest({url: internetCredentials.server ? internetCredentials.server : internetCredentials.service, clientId: internetCredentials.username, clientSecret: internetCredentials.password}, lastSyncDate, (error, response) => {
-                                                                    if (error) {
-                                                                        arrayOfStatuses.push({text: 'Getting updated data from the server', status: JSON.stringify(error)});
-                                                                        dispatch(setSyncState('Error'));
-                                                                        dispatch(parseStatusesAndShowMessage());
-                                                                    }
-                                                                    if (response) {
-                                                                        // statuses.gettingData.status = 'OK';
-                                                                        // arrayOfStatuses.push({text: 'Getting updated data from the server', status: 'OK'});
-                                                                        dispatch(processFilesForSync(error, response, {
-                                                                            url: Platform.OS === 'ios' ? internetCredentials.server : internetCredentials.service,
-                                                                            clientId: internetCredentials.username,
-                                                                            clientSecret: internetCredentials.password
-                                                                        }, null, !errorSendData, false));
-                                                                    }
-                                                                })
-                                                            }
-                                                        })
+                                                    if (response) {
+                                                        // statuses.gettingData.status = 'OK';
+                                                        // arrayOfStatuses.push({text: 'Getting updated data from the server', status: 'OK'});
+                                                        dispatch(processFilesForSync(error, response, {
+                                                            url: Platform.OS === 'ios' ? internetCredentials.server : internetCredentials.service,
+                                                            clientId: internetCredentials.username,
+                                                            clientSecret: internetCredentials.password
+                                                        }, null, !errorSendData, false));
                                                     }
                                                 })
-                                            })
-                                            .catch((errorCreateAllFiles) => {
-                                                console.log('Error while creating all the files: ', errorCreateAllFiles);
-                                                // statuses.createLocalFiles.status = JSON.stringify(errorCreateAllFiles);
-                                                arrayOfStatuses.push({text: 'Creating local files', status: JSON.stringify(errorCreateAllFiles)});
-                                                dispatch(setSyncState('Error'));
-                                                dispatch(parseStatusesAndShowMessage());
-                                            })
-                                    } else {
-                                        arrayOfStatuses.push({text: 'Getting local data', status: 'Local data has not been updated'});
-                                        dispatch(setSyncState('Getting updated data from the server'));
-                                        getDatabaseSnapshotRequest({url: internetCredentials.server ? internetCredentials.server : internetCredentials.service, clientId: internetCredentials.username, clientSecret: internetCredentials.password}, lastSyncDate, (error, response) => {
-                                            if (error) {
-                                                arrayOfStatuses.push({text: 'Getting updated data from the server', status: JSON.stringify(error)});
-                                                dispatch(setSyncState('Error'));
-                                                dispatch(parseStatusesAndShowMessage());
-                                            }
-                                            if (response) {
-                                                // statuses.gettingData.status = 'OK';
-                                                arrayOfStatuses.push({text: 'Getting updated data from the server', status: 'OK'});
-                                                dispatch(processFilesForSync(error, response, {
-                                                    url: Platform.OS === 'ios' ? internetCredentials.server : internetCredentials.service,
-                                                    clientId: internetCredentials.username,
-                                                    clientSecret: internetCredentials.password
-                                                }, null, true, false));
                                             }
                                         })
                                     }
                                 })
-                                .catch((errorGetRecordsByDate) => {
-                                    console.log('errorGetRecordsByDate: ', errorGetRecordsByDate);
-                                    // statuses.gettingLocalFiles.status = JSON.stringify(errorGetRecordsByDate);
-                                    arrayOfStatuses.push({text: 'Getting local data', status: JSON.stringify(errorGetRecordsByDate)});
-                                    dispatch(setSyncState('Error'));
-                                    dispatch(parseStatusesAndShowMessage());
-                                })
+                            }
+
+
+                            // database.find({selector: {
+                            //     updatedAt: {$gte: lastSyncDate}
+                            // },
+                            //     fields: ['fileType']
+                            // })
+                            //     .then((resultGetRecordsByDate) => {
+                            //         resultGetRecordsByDate = uniq(resultGetRecordsByDate.docs);
+                            //         console.log('resultGetRecordsByDate: took: ', new Date().getTime() - startTimeForFilesChanged);
+                            //         // Now, for each fileType, we must create a .json file, archive it and then send that archive to the server
+                            //         let promiseArray = [];
+                            //
+                            //         if (resultGetRecordsByDate && Array.isArray(resultGetRecordsByDate) && resultGetRecordsByDate.length > 0) {
+                            //             for (let i=0; i<resultGetRecordsByDate.length; i++) {
+                            //                 promiseArray.push(getDataFromDatabaseFromFile(database, resultGetRecordsByDate[i].fileType, lastSyncDate))
+                            //             }
+                            //
+                            //             // statuses.gettingLocalFiles.status = 'OK';
+                            //             arrayOfStatuses.push({text: 'Getting local data', status: 'OK'});
+                            //             dispatch(setSyncState('Creating local files'));
+                            //             let startTimeForCreatingFiles = new Date().getTime();
+                            //             console.log('Add stuff: ', promiseArray.length);
+                            //             Promise.all(promiseArray)
+                            //                 .then((resultsCreateAlFiles) => {
+                            //                     // After creating all the needed files, we need to make a zip file
+                            //                     console.log('Result from processing all the files: timeForCreatingFiles: ', new Date().getTime() - startTimeForCreatingFiles);
+                            //                     let startTimeForCreateZip = new Date().getTime();
+                            //                     createZipFileAtPath(`${RNFetchBlobFs.dirs.DocumentDir}/who_files`, `${RNFetchBlobFs.dirs.DocumentDir}/${activeDatabase.replace(/\/|\.|\:/g, '')}.zip`, (errorCreateZipFile, resultCreateZipFile) => {
+                            //                         if (errorCreateZipFile) {
+                            //                             console.log("An error occurred while zipping the files: ", errorCreateZipFile);
+                            //                             arrayOfStatuses.push({text: 'Creating local files', status: JSON.stringify(errorCreateZipFile)});
+                            //                             dispatch(parseStatusesAndShowMessage());
+                            //                         }
+                            //                         if (resultCreateZipFile) {
+                            //                             // After creating the zip file, it's time to send it to the server
+                            //                             console.log("Response from create zip file: time For zip", new Date().getTime() - startTimeForCreateZip);
+                            //                             // statuses.createLocalFiles.status = 'OK';
+                            //                             arrayOfStatuses.push({text: 'Creating local files', status: 'OK'});
+                            //                             dispatch(setSyncState('Sending data to the HUB'));
+                            //                             postDatabaseSnapshotRequest(internetCredentials, resultCreateZipFile, (errorSendData, resultSendData) => {
+                            //                                 if (errorSendData && !resultSendData) {
+                            //                                     console.log('An error occurred while sending data to server: ', errorSendData);
+                            //                                     dispatch(setSyncState('Error'));
+                            //                                     // statuses.sendData.status = JSON.stringify(errorSendData);
+                            //                                     arrayOfStatuses.push({text: 'Sending data to the HUB', status: JSON.stringify(errorSendData)});
+                            //                                     dispatch(parseStatusesAndShowMessage());
+                            //                                     // dispatch(addError({type: 'Sync Error', message: JSON.stringify(errorSendData)}));
+                            //                                 }
+                            //                                 if (resultSendData) {
+                            //                                     console.log("Data was successfully sent to server: ", resultSendData, new Date().getTime() - operationStart);
+                            //                                     // statuses.sendData.status = 'OK';
+                            //                                     arrayOfStatuses.push({text: 'Sending data to the HUB', status: errorSendData ? JSON.stringify(errorSendData) : 'OK'});
+                            //                                     dispatch(setSyncState('Getting updated data from the server'));
+                            //                                     getDatabaseSnapshotRequest({url: internetCredentials.server ? internetCredentials.server : internetCredentials.service, clientId: internetCredentials.username, clientSecret: internetCredentials.password}, lastSyncDate, (error, response) => {
+                            //                                         if (error) {
+                            //                                             arrayOfStatuses.push({text: 'Getting updated data from the server', status: JSON.stringify(error)});
+                            //                                             dispatch(setSyncState('Error'));
+                            //                                             dispatch(parseStatusesAndShowMessage());
+                            //                                         }
+                            //                                         if (response) {
+                            //                                             // statuses.gettingData.status = 'OK';
+                            //                                             // arrayOfStatuses.push({text: 'Getting updated data from the server', status: 'OK'});
+                            //                                             dispatch(processFilesForSync(error, response, {
+                            //                                                 url: Platform.OS === 'ios' ? internetCredentials.server : internetCredentials.service,
+                            //                                                 clientId: internetCredentials.username,
+                            //                                                 clientSecret: internetCredentials.password
+                            //                                             }, null, !errorSendData, false));
+                            //                                         }
+                            //                                     })
+                            //                                 }
+                            //                             })
+                            //                         }
+                            //                     })
+                            //                 })
+                            //                 .catch((errorCreateAllFiles) => {
+                            //                     console.log('Error while creating all the files: ', errorCreateAllFiles);
+                            //                     // statuses.createLocalFiles.status = JSON.stringify(errorCreateAllFiles);
+                            //                     arrayOfStatuses.push({text: 'Creating local files', status: JSON.stringify(errorCreateAllFiles)});
+                            //                     dispatch(setSyncState('Error'));
+                            //                     dispatch(parseStatusesAndShowMessage());
+                            //                 })
+                            //         } else {
+                            //             arrayOfStatuses.push({text: 'Getting local data', status: 'Local data has not been updated'});
+                            //             dispatch(setSyncState('Getting updated data from the server'));
+                            //             getDatabaseSnapshotRequest({url: internetCredentials.server ? internetCredentials.server : internetCredentials.service, clientId: internetCredentials.username, clientSecret: internetCredentials.password}, lastSyncDate, (error, response) => {
+                            //                 if (error) {
+                            //                     arrayOfStatuses.push({text: 'Getting updated data from the server', status: JSON.stringify(error)});
+                            //                     dispatch(setSyncState('Error'));
+                            //                     dispatch(parseStatusesAndShowMessage());
+                            //                 }
+                            //                 if (response) {
+                            //                     // statuses.gettingData.status = 'OK';
+                            //                     arrayOfStatuses.push({text: 'Getting updated data from the server', status: 'OK'});
+                            //                     dispatch(processFilesForSync(error, response, {
+                            //                         url: Platform.OS === 'ios' ? internetCredentials.server : internetCredentials.service,
+                            //                         clientId: internetCredentials.username,
+                            //                         clientSecret: internetCredentials.password
+                            //                     }, null, true, false));
+                            //                 }
+                            //             })
+                            //         }
+                            //     })
+                            //     .catch((errorGetRecordsByDate) => {
+                            //         console.log('errorGetRecordsByDate: ', errorGetRecordsByDate);
+                            //         // statuses.gettingLocalFiles.status = JSON.stringify(errorGetRecordsByDate);
+                            //         arrayOfStatuses.push({text: 'Getting local data', status: JSON.stringify(errorGetRecordsByDate)});
+                            //         dispatch(setSyncState('Error'));
+                            //         dispatch(parseStatusesAndShowMessage());
+                            //     })
                         } else {
                             console.log('No internet credentials found');
                             arrayOfStatuses.push({text: 'Getting local data', status: 'No credentials found'});
