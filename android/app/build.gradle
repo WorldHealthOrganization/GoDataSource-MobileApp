@@ -150,6 +150,7 @@ dependencies {
     implementation project(':react-native-keychain')
     implementation project(':react-native-zip-archive')
     implementation project(':rn-fetch-blob')
+    implementation project(':randombytes')
     implementation project(':react-native-vector-icons')
     implementation project(':react-native-navigation')
     implementation fileTree(include: ['*.jar'], dir: 'libs')

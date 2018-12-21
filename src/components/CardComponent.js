@@ -141,10 +141,12 @@ class CardComponent extends Component {
                 }
             }
         }
+
+        if (this.props.isEditMode !== nextProps.isEditMode) {
+            return true
+        }
+
         if (nextProps.screen === 'CaseSingleScreen') {
-            if (this.props.isEditMode !== nextProps.isEditMode) {
-                return true
-            }
 
             //SwitchInput type inputs should not update => infinite loop refresh
             if (this.props.case && this.props.case.addresses && Array.isArray(this.props.case.addresses)) {

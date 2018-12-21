@@ -18,6 +18,7 @@ import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
 import com.facebook.soloader.SoLoader;
+import com.bitgo.randombytes.RandomBytesPackage;
 
 import java.util.Arrays;
 import java.util.List;
@@ -43,7 +44,8 @@ import java.util.List;
                  new RNCameraPackage(),
                  new RNSqlite2Package(),
                  new RNFSPackage(),
-                 new ReactNativeDocumentPicker()
+                 new ReactNativeDocumentPicker(),
+                 new RandomBytesPackage()
          );
      }
 

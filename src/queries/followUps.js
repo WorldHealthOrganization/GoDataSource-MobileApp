@@ -195,8 +195,8 @@ export function getFollowUpsForContactRequest (outbreakId, keys, contactFollowUp
     database.find({
         selector: {
             _id: {
-                $gte: `followUp.json_${outbreakId}_${startDate}_`,
-                $lte: `followUp.json_${outbreakId}_${endDate}_\uffff`
+                $gte: `followUp.json_${outbreakId}_`,
+                $lte: `followUp.json_${outbreakId}_\uffff`
             },
             outbreakId: outbreakId,
             deleted: false,

@@ -15,8 +15,8 @@ ViewHOC = ({style, children, showLoader, loaderText}) => (
                     <LoaderScreen 
                         overlay={true} 
                         backgroundColor={'rgba(255, 255, 255, 0.8)'} 
-                        message={loaderText}
-                        // message={loaderText === 'Finished processing' || loaderText === 'Error' ? 'Loading' : loaderText}
+                        // message={loaderText}
+                        message={loaderText === 'Finished processing' || loaderText === 'Error' ? 'Loading' : loaderText}
                     />
                 ) : (null)
             }

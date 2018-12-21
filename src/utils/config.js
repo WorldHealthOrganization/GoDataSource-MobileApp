@@ -779,7 +779,7 @@ const followUpsFilterScreen = {
         fields: [
             {      
                 cardNumber: 1,
-                label: translations.sortTab.sortBy,
+                label: translations.sortTab.SortBy,
                 type: 'Section',
                 hasBorderBottom: true,
                 borderBottomColor: styles.navigationDrawerSeparatorGrey
@@ -846,7 +846,7 @@ const helpFilterScreen = {
         fields: [
             {
                 cardNumber: 1,
-                label: translations.sortTab.sortBy,
+                label: translations.sortTab.SortBy,
                 type: 'Section',
                 hasBorderBottom: true,
                 borderBottomColor: styles.navigationDrawerSeparatorGrey
@@ -970,7 +970,7 @@ const casesFilterScreen = {
         fields: [
             {
                 cardNumber: 1,
-                label: translations.sortTab.sortBy,
+                label: translations.sortTab.SortBy,
                 type: 'Section',
                 hasBorderBottom: true,
                 borderBottomColor: styles.navigationDrawerSeparatorGrey
@@ -1572,6 +1572,14 @@ const mongoCollections = {
     user: 'user.json'
 };
 
+const changingMongoCollections = [
+    'followUp.json',
+    'labResult.json',
+    'person.json',
+    'relationship.json',
+    'user.json'
+];
+
 const RNDBConfig = {
     "cluster": {
         "_id": {
@@ -1981,6 +1989,7 @@ export default {
     contactsSingleScreen,
     personTypes,
     mongoCollections,
+    changingMongoCollections,
     RNDBConfig,
     userResidenceAddress,
     contactFollowUpStatuses,
