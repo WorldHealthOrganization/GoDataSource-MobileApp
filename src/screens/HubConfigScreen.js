@@ -26,6 +26,7 @@ import Ripple from 'react-native-material-ripple';
 import translations from './../utils/translations';
 import {setInternetCredentials, getInternetCredentials} from 'react-native-keychain';
 import {createDatabase} from './../queries/database';
+import SwitchInput from "../components/SwitchInput";
 
 
 let textFieldsStructure = [
@@ -63,13 +64,23 @@ let textFieldsStructure = [
         secureTextEntry: true
     },
     {
+        id: 'encryptedData',
+        label: translations.manualConfigScreen.encryptDataLabel,
+        type: 'SwitchInput',
+        value: '',
+        isRequired: false,
+        isEditMode: true,
+        activeButtonColor: 'green',
+        activeBackgroundColor: 'green',
+    },
+    {
         id: 'lastSyncDate',
         label: translations.hubConfigScreen.lastSyncDate,
         type: 'TextInput',
         value: '',
         isRequired: false,
         isEditMode: false
-    },
+    }
 ];
 
 class FirstConfigScreen extends Component {
@@ -87,6 +98,7 @@ class FirstConfigScreen extends Component {
             url: '',
             clientId: '',
             clientSecret: '',
+            encryptedData: false,
             allDatabases: [],
             lastSyncDate: null,
             isModified: false
@@ -116,6 +128,7 @@ class FirstConfigScreen extends Component {
                                     url: currentHubConfig.url,
                                     clientId: currentHubConfig.clientId,
                                     clientSecret: currentHubConfig.clientSecret,
+                                    encryptedData: currentHubConfig.encryptedData,
                                     lastSyncDate: lastSyncDate
                                 }, () => {
                                     // console.log('State after: ', this.state);
@@ -324,6 +337,28 @@ class FirstConfigScreen extends Component {
                         tooltipMessage={item.tooltipMessage}
                         secureTextEntry={item.secureTextEntry}
                     />
+                );
+            case 'SwitchInput' :
+                return (
+                    <SwitchInput
+                        id={item.id}
+                        label={getTranslation(item.label, this.props.translation)}
+                        index={this.props.index}
+                        value={this.state[item.id]}
+                        showValue={true}
+                        isEditMode={item.isEditMode}
+                        isRequired={item.isRequired}
+                        onChange={this.onChangeSwitch}
+                        activeButtonColor={item.activeButtonColor}
+                        activeBackgroundColor={item.activeBackgroundColor}
+                        style={{justifyContent: 'space-between', width: 315, marginHorizontal: 15}}
+                        objectType={item.objectType}
+                        translation={this.props.translation}
+                    />
+                );
+            default:
+                return (
+                    <Text>No component found</Text>
                 )
         }
     };
@@ -331,6 +366,12 @@ class FirstConfigScreen extends Component {
     onChangeText = (text, id) => {
         this.setState({[id]: text, isModified: true}, () => {
             console.log('OnChangeText: ', this.state);
+        })
+    };
+
+    onChangeSwitch = (value, itemId) => {
+        this.setState({[itemId]: value, isModified: true}, () => {
+            console.log('onChangeSwitch: ', this.state);
         })
     };
 
@@ -374,27 +415,35 @@ class FirstConfigScreen extends Component {
             .then((previousInternetCredentials) => {
                 console.log("Previous internet credentials: ", previousInternetCredentials);
                 let server = Platform.OS === 'ios' ? previousInternetCredentials.server : previousInternetCredentials.service;
-                previousInternetCredentials.username = JSON.stringify({name: this.state.name, url: this.state.url, clientId: this.state.clientId, clientSecret: this.state.clientSecret});
+                previousInternetCredentials.username = JSON.stringify({name: this.state.name, url: this.state.url, clientId: this.state.clientId, clientSecret: this.state.clientSecret, encryptedData: this.state.encryptedData});
                 setInternetCredentials(server, previousInternetCredentials.username, previousInternetCredentials.password)
                     .then(() => {
                         // Edit the all databases store with the potential new name
-                        let allDatabases = this.state.allDatabases.slice();
-                        let index = allDatabases.findIndex(elem => elem.id === this.state.databaseId);
-                        if (index !== -1) {
-                            allDatabases[index].name = this.state.name;
-                            AsyncStorage.setItem('allDatabases', JSON.stringify(allDatabases), (errorSetDatabases) => {
-                                if (errorSetDatabases) {
-                                    this.showAlert(getTranslation(translations.hubConfigScreen.saveCurrentHubTitle, this.props.translation), getTranslation(translations.hubConfigScreen.saveCurrentHubMessage, this.props.translation));
-                                } else {
-                                    this.setState({
-                                        allDatabases
-                                    }, () => {
-                                        console.log('Finished updating current credentials');
-                                        this.showAlert('', getTranslation(translations.hubConfigScreen.successUpdatingCurrentHubMessage, this.props.translation));
+                        AsyncStorage.getItem('databases')
+                            .then((allDatabases) => {
+                                allDatabases = JSON.parse(allDatabases);
+                                let index = allDatabases.findIndex(elem => elem.id === this.state.databaseId);
+                                if (index !== -1) {
+                                    allDatabases[index].name = this.state.name;
+                                    AsyncStorage.setItem('databases', JSON.stringify(allDatabases), (errorSetDatabases) => {
+                                        if (errorSetDatabases) {
+                                            this.showAlert(getTranslation(translations.hubConfigScreen.saveCurrentHubTitle, this.props.translation), getTranslation(translations.hubConfigScreen.saveCurrentHubMessage, this.props.translation));
+                                        } else {
+                                            this.setState({
+                                                allDatabases,
+                                                isModified: false
+                                            }, () => {
+                                                console.log('Finished updating current credentials');
+                                                this.showAlert('', getTranslation(translations.hubConfigScreen.successUpdatingCurrentHubMessage, this.props.translation));
+                                            })
+                                        }
                                     })
                                 }
                             })
-                        }
+                            .catch((errorAllDatabases) => {
+                                console.log('Error while setting internet credentials: ', errorAllDatabases);
+                                this.showAlert(getTranslation(translations.hubConfigScreen.saveCurrentHubTitle, this.props.translation), getTranslation(translations.hubConfigScreen.saveCurrentHubMessage, this.props.translation));
+                            });
                     })
                     .catch((errorSetInternetCredentials) => {
                         console.log('Error while setting internet credentials: ', errorSetInternetCredentials);

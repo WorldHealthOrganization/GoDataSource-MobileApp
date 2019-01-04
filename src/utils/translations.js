@@ -24,7 +24,7 @@ const casesFilter = {
     gender: 'LNG_FILTER_SCREEN_GENDER_LABEL',
     ageRange: 'LNG_FILTER_SCREEN_AGE_RANGE_LABEL',
     area: 'LNG_FILTER_SCREEN_AREA_LABEL',
-    chooseLocationLabel: 'LNG_FILTER_SCREEN_CHOOSE_LOCATIONS_MESSAGE', 
+    chooseLocationLabel: 'LNG_FILTER_SCREEN_CHOOSE_LOCATIONS_MESSAGE',
     classification: 'LNG_FILTER_SCREEN_CLASSIFICATION_LABEL',
     chooseClassificationLabel: 'LNG_FILTER_SCREEN_CHOOSE_CLASSIFICATIONS_MESSAGE',
 };
@@ -39,33 +39,33 @@ const followUpFilter = {
     gender: 'LNG_FILTER_SCREEN_GENDER_LABEL',
     ageRange: 'LNG_FILTER_SCREEN_AGE_RANGE_LABEL',
     area: 'LNG_FILTER_SCREEN_AREA_LABEL',
-    chooseLocationLabel: 'LNG_FILTER_SCREEN_CHOOSE_LOCATIONS_MESSAGE', 
+    chooseLocationLabel: 'LNG_FILTER_SCREEN_CHOOSE_LOCATIONS_MESSAGE',
 };
 
 const helpFilter = {
     filterTitle: 'LNG_SIDE_FILTERS_TITLE',
     sortTitle:'LNG_SIDE_FILTERS_SECTION_SORT_TITLE',
-    helpFilterTitle: 'Help filters',
-    category: 'Category',
-    chooseCategoryLabel: 'Choose one or more categories',
+    helpFilterTitle: 'LNG_HELP_ITEMS_FILTER_SCREEN_TITLE',
+    category: 'LNG_HELP_ITEMS_FILTER_CATEGORY_LABEL',
+    chooseCategoryLabel: 'LNG_HELP_ITEMS_FILTER_CATEGORY_MESSAGE_LABEL',
 };
 
 const helpScreen = {
-    helpTitle: 'Help',
-    viewHelpLabel: 'View',
-    helpViewItemTitle: 'View Help Item',
-    noHelpItemsToShowMessage: 'There are not help items to display',
-    itemsForMessage: 'items for',
+    helpTitle: 'LNG_HELP_ITEMS_LIST_TITLE',
+    viewHelpLabel: 'LNG_HELP_ITEMS_VIEW_ACTION_LABEL',
+    helpViewItemTitle: 'LNG_HELP_ITEMS_SINGLE_SCREEN_VIEW_TITLE_LABEL',
+    noHelpItemsToShowMessage: 'LNG_HELP_ITEMS_EMPTY_LIST_MESSAGE',
+    itemsForMessage: 'LNG_HELP_ITEMS_ITEMS_FOR_MESSAGE',
 
-    addMessage: 'Add',
-    editMessage: 'Edit',
-    viewMessage: 'View',
+    addMessage: 'LNG_HELP_ITEMS_ADD_MESSAGE',
+    editMessage: 'LNG_HELP_ITEMS_EDIT_MESSAGE',
+    viewMessage: 'LNG_HELP_ITEMS_VIEW_MESSAGE',
 
-    helpTitleLabel: 'Title',
-    helpCategoryLabel: 'Category',
-    helpDescriptionLabel: 'Description',
-    helpCommentLabel: 'Comment',
-    helpPageLabel: 'Page'
+    helpTitleLabel: 'LNG_HELP_ITEMS_FIELD_LABEL_TITLE',
+    helpCategoryLabel: 'LNG_HELP_ITEMS_FIELD_LABEL_CATEGORY',
+    helpDescriptionLabel: 'LNG_HELP_ITEMS_FIELD_LABEL_DESCRIPTION',
+    helpCommentLabel: 'LNG_HELP_ITEMS_FIELD_LABEL_COMMENT',
+    helpPageLabel: 'LNG_HELP_ITEMS_FIELD_LABEL_PAGE',
 };
 
 const sortTab = {
@@ -73,6 +73,13 @@ const sortTab = {
     SortBy: 'LNG_SORT_SCREEN_ADD_SORT_CARD_LABEL_TITLE',
     sortCriteria: 'LNG_SORT_SCREEN_CRITERIA_LABEL',
     sortOrder: 'LNG_SORT_SCREEN_ORDER_LABEL',
+
+    sortFirstName: 'LNG_CONTACT_FIELD_LABEL_FIRST_NAME',
+    sortLastName: 'LNG_CONTACT_FIELD_LABEL_LAST_NAME',
+    sortCategory: 'LNG_HELP_ITEMS_FIELD_LABEL_CATEGORY',
+    sortTitle: 'LNG_HELP_ITEMS_FIELD_LABEL_TITLE',
+    sortOrderAsc: 'LNG_SIDE_FILTERS_SORT_BY_ASC_PLACEHOLDER',
+    sortOrderDesc: 'LNG_SIDE_FILTERS_SORT_BY_DESC_PLACEHOLDER'
 };
 
 const caseSingleScreen = {
@@ -139,7 +146,7 @@ const contactSingleScreen = {
     addContactTitle: 'LNG_CONTACT_SINGLE_SCREEN_ADD_NEW_CONTACT_TITLE_LABEL',
     deceasedContactLabel: 'LNG_CONTACT_SINGLE_SCREEN_DECEASED_CONTACT_ACTION',
     deleteContactLabel: 'LNG_CONTACT_SINGLE_SCREEN_DELETE_CONTACT_ACTION',
-   
+
     oneAddressText: 'LNG_ADDRESS_ADD_NEW_ADDRESS_MESSAGE',
     moreAddressesText: 'LNG_ADDRESS_ADD_ANOTHER_ADDRESS_MESSAGE',
     exposureText: 'LNG_EXPOSURE_ADD_NEW_EXPOSURE_MESSAGE',
@@ -239,7 +246,7 @@ const alertMessages = {
     alertLabel: 'LNG_DIALOG_ALERT_TITLE_LABEL',
     validationErrorLabel: 'LNG_DIALOG_VALIDATION_ERROR_TITLE_LABEL',
     warningLabel: 'LNG_DIALOG_WARNING_TITLE_LABEL',
-    
+
     //not used with translation
     invalidCredentials: 'Invalid credentials',
     invalidEmail: 'Invalid email address',
@@ -296,7 +303,7 @@ const generalLabels = {
     //take just first letter
     ageYearsInitials: 'LNG_AGE_FIELD_LABEL_YEARS',
     ageMonthsInitials: 'LNG_AGE_FIELD_LABEL_MONTHS',
-    questionInitial: 'LNG_COMMON_LABEL_QUESTION', 
+    questionInitial: 'LNG_COMMON_LABEL_QUESTION',
 };
 
 const questionCardLabels = {
@@ -328,6 +335,7 @@ const manualConfigScreen = {
     clientIdLabel: 'Client ID',
     clientSecretPass: 'Client secret',
     saveHubConfigButton: 'Save HUB configuration',
+    encryptDataLabel: 'Encrypted connection'
 };
 
 const loginScreen = {
