@@ -7,11 +7,15 @@ import base64 from 'base-64';
 import {Platform} from 'react-native';
 import {getSyncEncryptPassword} from './../utils/encryption';
 import {setSyncState} from './../actions/app';
+import translations from './../utils/translations';
 
 export function getDatabaseSnapshotRequest(hubConfig, lastSyncDate, dispatch, callback) {
 
     // hubConfiguration = {url: databaseName, clientId: JSON.stringify({name, url, clientId, clientSecret, encryptedData}), clientSecret: databasePass}
     let hubConfiguration = JSON.parse(hubConfig.clientId);
+
+    // let arrayOfTokens = getAllLanguageTokens();
+    // console.log("Array of Tokens: ", JSON.stringify(arrayOfTokens));
 
     let filter = {};
 
@@ -31,9 +35,10 @@ export function getDatabaseSnapshotRequest(hubConfig, lastSyncDate, dispatch, ca
     let databaseLocation = `${dirs}/database.zip`;
 
     console.log('Get database');
+    let startDownload = new Date().getTime();
 
     RNFetchBlob.config({
-        timeout: (60 * 10 * 1000),
+        timeout: (30 * 60 * 10 * 1000),
         followRedirect: false,
         fileCache: true,
         path: `${dirs}/database.zip`
@@ -42,12 +47,18 @@ export function getDatabaseSnapshotRequest(hubConfig, lastSyncDate, dispatch, ca
         'Content-Type': 'application/json',
         'Accept': 'application/json',
         'Authorization': 'Basic ' + base64.encode(`${hubConfiguration.clientId}:${hubConfiguration.clientSecret}`)
-    })
+    }
+    // , [
+    //         {name: 'test', data: arrayOfTokens},
+    //         {name: 'chunkSize', data: 5000}
+    //     ]
+        )
         .progress({count: 500}, (received, total) => {
             dispatch(setSyncState(`Downloading database\nReceived ${received} bytes`));
             console.log(received, total)
         })
         .then((res) => {
+            console.log('Download time: ', new Date().getTime() - startDownload);
             let status = res.info().status;
             // After getting zip file from the server, unzip it and then proceed to the importing of the data to the SQLite database
             if(status === 200) {
@@ -74,7 +85,7 @@ export function postDatabaseSnapshotRequest(internetCredentials, path, callback)
 
     console.log('Send database to server');
 
-    RNFetchBlob.config({timeout: (60 * 10 * 1000)})
+    RNFetchBlob.config({timeout: (30 * 60 * 10 * 1000)})
         .fetch('POST', requestUrl, {
         'Content-Type': 'multipart/form-data',
         'Accept': 'application/json',
@@ -98,4 +109,19 @@ export function postDatabaseSnapshotRequest(internetCredentials, path, callback)
             console.log("*** postDatabaseSnapshotRequest error: ", JSON.stringify(errorMessage));
             callback(errorMessage);
         });
+}
+
+function getAllLanguageTokens () {
+    let arrayOfTokens = [];
+    let translationKeys = Object.keys(translations);
+    for (let i=0; i<translationKeys.length; i++) {
+        let objectKeys = Object.keys(translations[translationKeys[i]]);
+        for (let j=0; j<objectKeys.length; j++) {
+            if (translations[translationKeys[i]][objectKeys[j]].includes('LNG_')) {
+                arrayOfTokens.push(translations[translationKeys[i]][objectKeys[j]]);
+            }
+        }
+    }
+
+    return arrayOfTokens;
 }
