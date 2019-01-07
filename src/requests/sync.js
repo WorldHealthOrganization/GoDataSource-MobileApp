@@ -15,8 +15,8 @@ export function getDatabaseSnapshotRequest(hubConfig, lastSyncDate, dispatch, ca
     // hubConfiguration = {url: databaseName, clientId: JSON.stringify({name, url, clientId, clientSecret, encryptedData}), clientSecret: databasePass}
     let hubConfiguration = JSON.parse(hubConfig.clientId);
 
-    // let arrayOfTokens = getAllLanguageTokens();
-    // console.log("Array of Tokens: ", JSON.stringify(arrayOfTokens));
+    let arrayOfTokens = getAllLanguageTokens();
+    console.log("Array of Tokens: ", JSON.stringify(arrayOfTokens));
 
     let filter = {};
 
@@ -28,7 +28,7 @@ export function getDatabaseSnapshotRequest(hubConfig, lastSyncDate, dispatch, ca
 
     // let requestUrl = hubConfiguration.url + '/sync/database-snapshot' + (lastSyncDate ? ('?filter=' + JSON.stringify(filter)) : '');
 
-    let requestUrl = `${hubConfiguration.url}/sync/database-snapshot?autoEncrypt=${hubConfiguration.encryptedData}${lastSyncDate ? `&filter=${JSON.stringify(filter)}` : ''}`;
+    let requestUrl = `${hubConfiguration.url}/sync/get-mobile-database-snapshot?autoEncrypt=${hubConfiguration.encryptedData}${lastSyncDate ? `&filter=${JSON.stringify(filter)}` : ''}&chunkSize=5000`;
 
     console.log('Request URL: ', requestUrl);
 
@@ -52,15 +52,14 @@ export function getDatabaseSnapshotRequest(hubConfig, lastSyncDate, dispatch, ca
                 fileCache: true,
                 path: `${dirs}/database.zip`
             })
-                .fetch('GET', encodeURI(requestUrl), {
+                .fetch('POST', encodeURI(requestUrl), {
                         'Content-Type': 'application/json',
                         'Accept': 'application/json',
                         'Authorization': 'Basic ' + base64.encode(`${hubConfiguration.clientId}:${hubConfiguration.clientSecret}`)
-                    }
-                    // , [
-                    //         {name: 'test', data: arrayOfTokens},
-                    //         {name: 'chunkSize', data: 5000}
-                    //     ]
+                    },
+                    JSON.stringify({
+                        languageTokens: arrayOfTokens
+                    })
                 )
                 .progress({count: 500}, (received, total) => {
                     dispatch(setSyncState(`Downloading database\nReceived ${received} bytes`));
