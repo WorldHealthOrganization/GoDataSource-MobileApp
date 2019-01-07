@@ -88,7 +88,7 @@ class HelpSortContainer extends PureComponent {
                 index={index}
                 isEditMode={true}
                 onChangeDropDown={this.props.onChangeDropDown}
-                screen="HelpFilter"
+                screen="HelpSort"
                 filter={this.props.filter}
                 onDeletePress={this.props.onDeletePress}
                 style={style.cardStyle}

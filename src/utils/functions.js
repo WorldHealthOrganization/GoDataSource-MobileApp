@@ -11,6 +11,10 @@ import bcrypt from 'react-native-bcrypt';
 import uuid from 'react-native-uuid';
 import _ from 'lodash';
 import {getContactsForOutbreakId} from './../actions/contacts';
+import {getSyncEncryptPassword, encrypt, decrypt} from './../utils/encryption';
+import RNFS from 'react-native-fs';
+import {Buffer} from 'buffer';
+
 
 // This method is used for handling server responses. Please add here any custom error handling
 export function handleResponse(response) {
@@ -178,29 +182,237 @@ export function handleExposedTo(contact, returnString, cases, events) {
     return returnString ? relationshipArray.join(", ") : relationshipArray;
 }
 
-export function unzipFile (source, dest) {
-    return new Promise((resolve, reject) => {
-        RNFetchBlobFS.exists(source)
-            .then((exists) => {
-                if (exists) {
-                    // Proceed to unzip the file to the specified destination
-                    unzip(source, dest)
-                        .then((path) => {
-                            console.log(`unzip completed at ${path}`);
-                            resolve(path);
-                        })
-                        .catch((error) => {
-                            console.log(error);
-                            reject(error);
-                        })
-                } else {
-                    return reject('Zip file does not exist');
+export function unzipFile (source, dest, password, clientCredentials) {
+    console.log('Stuff: ', source, dest, password, clientCredentials);
+        return new Promise((resolve, reject) => {
+            RNFetchBlobFS.exists(source)
+                .then((exists) => {
+                    if (exists) {
+                        // If the encrypted file exists, compute its size, and decrypt it
+                        // RNFS.stat(source)
+                        //     .then((RNFSStatResponse) => {
+                                // Call decryptFile(filePath, fileSize, callback)
+
+                        unzip(source, dest)
+                            .then((path) => {
+                                console.log(`unzip completed at ${path}`);
+                                // Delete the zip file after unzipping
+                                RNFetchBlobFS.unlink(source)
+                                    .then(() => {
+                                        resolve(path);
+                                    })
+                                    .catch((errorDelete) => {
+                                        console.log('Error delete: ', errorDelete);
+                                        resolve(path);
+                                    })
+                            })
+                            .catch((error) => {
+                                console.log(error);
+                                // Delete the zip file after unzipping
+                                RNFetchBlobFS.unlink(source)
+                                    .then(() => {
+                                        reject(error);
+                                    })
+                                    .catch((errorDelete) => {
+                                        console.log('Error delete: ', errorDelete);
+                                        reject(error);
+                                    });
+                            })
+                            // })
+                            // .catch((RNFSStatError) => {
+                            //     console.log('An error occurred while getting encrypted file status: ', RNFSStatError);
+                            //     reject(RNFSStatError);
+                            // })
+
+
+
+
+                        // Read file as stream, decrypt the chunks and append them to the new zip
+            // let password = getSyncEncryptPassword(password, clientCredentials);
+            // let numberOfChunks = 0;
+            // RNFetchBlobFS.readStream(source, 'base64', 131072, 10)
+            //     .then((stream) => {
+            //         stream.open();
+            //         let iv = '';
+            //         let salt = '';
+            //         stream.onData((chunk) => {
+            //             if (chunk) {
+            //                 console.log('Chunk length: ', chunk.length);
+            //                 if (numberOfChunks === 0) {
+            //                     let buffer = Buffer.from(chunk, 'base64');
+            //                     // read IV
+            //                     iv = buffer.slice(0, 16);
+            //                     // read salt
+            //                     salt = buffer.slice(16, 16 + 8);
+            //                     console.log('Time to create iv and salt: ', iv, salt);
+            //                 }
+            //                 decrypt(password, chunk, iv, salt, numberOfChunks)
+            //                     .then((decryptedChunk) => {
+            //                         RNFetchBlobFS.appendFile(`${source}.zip`, decryptedChunk, 'base64')
+            //                             .then(() => {
+            //                                 console.log('Appended chunk');
+            //                                 numberOfChunks++;
+            //                                 if (chunk.length < 174764) {
+            //                                     // this means that we are at the last chunk and should unzip
+            //                                     unzip(`${source}.zip`, dest)
+            //                                         .then((path) => {
+            //                                             console.log(`unzip completed at ${path}`);
+            //                                             resolve(path);
+            //                                         })
+            //                                         .catch((error) => {
+            //                                             console.log(error);
+            //                                             reject(error);
+            //                                         })
+            //                                 } else {
+            //                                     chunk = null;
+            //                                 }
+            //                             })
+            //                             .catch((errorAppend) => {
+            //                                 console.log("Error at appending file: ", errorAppend)
+            //                             })
+            //                     })
+            //                     .catch((errorDecryptChunk) => {
+            //                         console.log('Error at decrypting chunk: ', errorDecryptChunk);
+            //                     })
+            //             } else {
+            //                 console.log('Not chunk: ')
+            //             }
+            //         });
+            //         stream.onEnd(() => {
+            //             // After all the decryption is done, try unzipping the file
+            //             console.log("Finished returning all events from read stream. Number of chunks: ", numberOfChunks, numberOfChunks * 131072);
+            //         });
+            //     })
+
+                        // First get the raw file in order to decrypt it
+                        // readRawFile(source, (errorRawFile, rawFile) => {
+                        //     if (errorRawFile) {
+                        //         return callback('Error while reading raw file');
+                        //     }
+                        //     if (rawFile) {
+                        //         // Decrypt the raw file
+                        //         // Compute password
+                        //         let password = getSyncEncryptPassword(password, clientCredentials);
+                        //         decrypt(password, rawFile)
+                        //             .then((decryptedFile) => {
+                        //                 // Now that we have the decrypted zip file, it's time to write it on disk
+                        //                 writeFile(source + '.zip', decryptedFile, (errorWriteFile, pathToZip) => {
+                        //                     if (errorWriteFile) {
+                        //                         callback(errorWriteFile);
+                        //                     }
+                        //                     if (pathToZip) {
+                        //                         // Proceed to unzip the file to the specified destination
+                        //                         unzip(pathToZip, dest)
+                        //                             .then((path) => {
+                        //                                 console.log(`unzip completed at ${path}`);
+                        //                                 callback(null, path);
+                        //                             })
+                        //                             .catch((error) => {
+                        //                                 console.log(error);
+                        //                                 callback(error);
+                        //                             })
+                        //                     }
+                        //                 })
+                        //             })
+                        //             .catch((errorDecryptedFile) => {
+                        //                 console.log('Error while decrypting file: ', errorDecryptedFile);
+                        //                 callback(errorDecryptedFile);
+                        //             })
+                        //     }
+                        // })
+                    } else {
+                        reject('Zip file does not exist');
+                    }
+                })
+                .catch((existsError) => {
+                    reject(('There was an error with getting the zip file: ' + existsError));
+                });
+        })
+
+}
+
+async function decryptFile(filePath, password, fileSize) {
+    let numberOfBytes = 524288;
+    let numberOfIterations = Math.floor(fileSize / numberOfBytes);
+    let remainder = fileSize % numberOfBytes;
+    let iv = null;
+    let salt = null;
+
+    for (let i = 0; i < numberOfIterations; i++) {
+        try {
+            console.log(`Iteration ${i}/${numberOfIterations}`);
+            console.log(`Read from ${i === 0 ? 0 : (i * numberOfBytes)}, ${i === numberOfIterations - 1 ? remainder : numberOfBytes} number of bytes`);
+            let encryptedString = await RNFS.read(filePath, i === numberOfIterations - 1 ? remainder : numberOfBytes, i === 0 ? 0 : (i * numberOfBytes), 'base64');
+            if (encryptedString) {
+                console.log('Encrypted string length: ', encryptedString.length, encryptedString);
+                try {
+                    if (i === 0){
+                            let buffer = await Buffer.from(encryptedString, 'base64');
+                            // read IV
+                            iv = buffer.slice(0, 16);
+                            // read salt
+                            salt = buffer.slice(16, 16 + 8);
+                            console.log('Time to create iv and salt: ', iv, salt);
+                    }
+                    let decryptedString = await decrypt(password, encryptedString, iv, salt, i);
+                    if (decryptedString) {
+                        console.log('Decrypted string length: ', decryptedString.length, decryptedString);
+                        try {
+                            let appendedNumberOfBytes = await RNFetchBlobFS.appendFile(`${filePath}.zip`, decryptedString, 'base64');
+                            if (appendedNumberOfBytes > 0) {
+                                console.log(`Appended ${appendedNumberOfBytes} bytes i=${i}`);
+                                encryptedString = null;
+                                decryptedString = null;
+                                appendedNumberOfBytes = null;
+                            } else {
+                                console.log('Could not append file');
+                                return Promise.reject('Could not append file');
+                            }
+                        } catch (errorAppendFile) {
+                            console.log('Error while appending file: ', errorAppendFile);
+                            return Promise.reject(errorAppendFile);
+                        }
+                    } else {
+                        console.log('Could not decrypt');
+                        return Promise.reject('Could not decrypt')
+                    }
+                } catch (errorDecrypt) {
+                    console.log('Error while decrypting: ', errorDecrypt);
+                    return Promise.reject(errorDecrypt);
                 }
-            })
-            .catch((existsError) => {
-                reject(('There was an error with getting the zip file: ' + existsError));
-            });
-    });
+            } else {
+                console.log('No encrypted string found');
+                return Promise.reject('No encrypted string found');
+            }
+        } catch (errorReadEncryptedString) {
+            console.log('Error while reading stream: ', errorReadEncryptedString);
+            return Promise.reject(errorReadEncryptedString);
+        }
+    }
+
+    return Promise.resolve(`${filePath}.zip`);
+}
+
+export function readRawFile (path, callback) {
+    RNFetchBlobFS.readFile(path, 'base64')
+        .then((data) => {
+            callback(null, data);
+        })
+        .catch((errorReadFile) => {
+            console.log("Error while reading the file: ", errorReadFile);
+            callback(errorReadFile)
+        })
+}
+
+export function writeFile (path, content, callback) {
+    RNFetchBlobFS.writeFile(path, content, 'base64')
+        .then(() => {
+            callback(null, path);
+        })
+        .catch((errorWriteFile) => {
+            console.log('Error while writing file: ', errorWriteFile);
+            callback(errorWriteFile);
+        })
 }
 
 export function readFile (path, callback) {
@@ -248,7 +460,9 @@ export function getNumberOfFilesProcessed() {
     return numberOfFilesProcessed;
 }
 
-export async function processFile (path, type, totalNumberOfFiles, dispatch, isFirstTime, forceBulk) {
+
+// hubConfig = {name, url, clientId, clientSecret, encryptDatabase}
+export async function processFile (path, type, totalNumberOfFiles, dispatch, isFirstTime, forceBulk, encryptedData, hubConfig) {
     return new Promise((resolve, reject) => {
         if (path) {
             console.log('Process file: ', type, ' From path: ', path);
@@ -256,55 +470,156 @@ export async function processFile (path, type, totalNumberOfFiles, dispatch, isF
                 .then((exists) => {
                     if (exists) {
                         // File exists, time to read it in order to process
-                        readFile(path, (error, data) => {
-                            if (error) {
-                                console.log("Error while reading file: ", type);
-                                reject("Error while reading file");
-                            }
-                            if (data) {
-                                if (isFirstTime && forceBulk) {
-                                    // If is first time processing files, do a bulk insert
-                                    processBulkDocs(data, type)
-                                        .then((resultBulk) => {
-                                            console.log('Bulk docs: ', resultBulk);
-                                            let numberOfFilesProcessedAux = getNumberOfFilesProcessed();
-                                            numberOfFilesProcessedAux += 1;
-                                            data = null;
-                                            setNumberOfFilesProcessed(numberOfFilesProcessedAux);
-                                            dispatch(setSyncState(("Synced " + numberOfFilesProcessedAux + "/" + totalNumberOfFiles)));
-                                            resolve('Finished inserting');
-                                        })
-                                        .catch((errorBulk) => {
-                                            console.log('Error bulk docs: ', errorBulk);
-                                            data = null;
-                                            reject(errorBulk);
-                                        })
-                                } else {
-                                    // Since there is data in the file, it's time to sync it
-                                    let promises = [];
-                                    for (let i=0; i<data.length; i++) {
-                                        promises.push(updateFileInDatabase(data[i], type))
-                                    }
+                        if (encryptedData) {
+                            // If the file is encrypted, read it raw, decrypt it, unzip it, and then process the data
+                            readRawFile(path, (errorEncryptedFile, encryptedData) => {
+                                if (errorEncryptedFile) {
+                                    console.log("Error while reading file: ", type, errorEncryptedFile);
+                                    reject("Error while reading file");
+                                }
+                                if (encryptedData) {
+                                    let password = getSyncEncryptPassword(null, hubConfig);
 
-                                    Promise.all(promises)
-                                        .then((responses) => {
-                                            console.log('Finished syncing: ', responses);
-                                            let numberOfFilesProcessedAux = getNumberOfFilesProcessed();
-                                            numberOfFilesProcessedAux += 1;
-                                            data = null;
-                                            setNumberOfFilesProcessed(numberOfFilesProcessedAux);
-                                            dispatch(setSyncState(("Synced " + numberOfFilesProcessedAux + "/" + totalNumberOfFiles)));
-                                            resolve('Finished syncing');
+                                    decrypt(password, encryptedData)
+                                        .then((decryptedData) => {
+                                            encryptedData = null;
+                                            // Decrypted data is a zip file that needs first to be written to disk
+                                            RNFetchBlobFS.writeFile(`${path}`, decryptedData, 'base64')
+                                                .then((bytesWritten) => {
+                                                    // Now unzip the data
+                                                    let fileName = path.split('/')[path.split('/').length - 1];
+                                                    let unzipLocation = path.substr(0, (path.length - fileName.length));
+                                                    unzip(`${path}`, `${unzipLocation}`)
+                                                        .then((unzipPath) => {
+                                                            readFile(`${unzipPath}/${fileName.substring(0, fileName.length - 4)}`, (error, data) => {
+                                                                if (error) {
+                                                                    console.log("Error while reading file: ", type);
+                                                                    reject("Error while reading file");
+                                                                }
+                                                                if (data) {
+                                                                    if (isFirstTime && forceBulk) {
+                                                                        // If is first time processing files, do a bulk insert
+                                                                        processBulkDocs(data, type)
+                                                                            .then((resultBulk) => {
+                                                                                console.log('Bulk docs: ', resultBulk);
+                                                                                let numberOfFilesProcessedAux = getNumberOfFilesProcessed();
+                                                                                numberOfFilesProcessedAux += 1;
+                                                                                data = null;
+                                                                                setNumberOfFilesProcessed(numberOfFilesProcessedAux);
+                                                                                dispatch(setSyncState(("Synced " + numberOfFilesProcessedAux + "/" + totalNumberOfFiles)));
+                                                                                resolve('Finished inserting');
+                                                                            })
+                                                                            .catch((errorBulk) => {
+                                                                                console.log('Error bulk docs: ', errorBulk);
+                                                                                data = null;
+                                                                                reject(errorBulk);
+                                                                            })
+                                                                    } else {
+                                                                        // Since there is data in the file, it's time to sync it
+                                                                        let promises = [];
+                                                                        for (let i=0; i<data.length; i++) {
+                                                                            promises.push(updateFileInDatabase(data[i], type))
+                                                                        }
+
+                                                                        Promise.all(promises)
+                                                                            .then((responses) => {
+                                                                                console.log('Finished syncing: ', responses);
+                                                                                let numberOfFilesProcessedAux = getNumberOfFilesProcessed();
+                                                                                numberOfFilesProcessedAux += 1;
+                                                                                data = null;
+                                                                                promises = null;
+                                                                                setNumberOfFilesProcessed(numberOfFilesProcessedAux);
+                                                                                dispatch(setSyncState(("Synced " + numberOfFilesProcessedAux + "/" + totalNumberOfFiles)));
+                                                                                resolve('Finished syncing');
+                                                                            })
+                                                                            .catch((error) => {
+                                                                                console.log("Error at syncing file of type: ", type, error);
+                                                                                data = null;
+                                                                                promises = null;
+                                                                                reject("Error at syncing file");
+                                                                            })
+                                                                    }
+                                                                }
+                                                            })
+                                                        })
+                                                        .catch((errorUnzipFile) => {
+                                                            console.log(`Error while unzipping file ${type}: ${errorUnzipFile}`);
+                                                            reject('Error while unzipping file');
+                                                        })
+                                                })
+                                                .catch((errorWriteBytes) => {
+                                                    console.log("Error while creating inner zip: ", type, errorWriteBytes);
+                                                    reject("Error while creating inner zip");
+                                                })
                                         })
-                                        .catch((error) => {
-                                            console.log("Error at syncing file of type: ", type, error);
-                                            data = null;
-                                            reject("Error at syncing file");
+                                        .catch((errorDecryptingData) => {
+                                            console.log('Error while decrypting data: ', type, errorDecryptingData);
+                                            reject('Error while decrypting file');
                                         })
                                 }
-                            }
-                        })
+                            })
+                        } else {
+                            let fileName = path.split('/')[path.split('/').length - 1];
+                            let unzipLocation = path.substr(0, (path.length - fileName.length));
 
+                            unzip(`${path}`, `${unzipLocation}`)
+                                .then((unzipPath) => {
+                                    readFile(`${unzipPath}/${fileName.substring(0, fileName.length - 4)}`, (error, data) => {
+                                        if (error) {
+                                            console.log("Error while reading file: ", type);
+                                            reject("Error while reading file");
+                                        }
+                                        if (data) {
+                                            if (isFirstTime && forceBulk) {
+                                                // If is first time processing files, do a bulk insert
+                                                processBulkDocs(data, type)
+                                                    .then((resultBulk) => {
+                                                        console.log('Bulk docs: ', resultBulk);
+                                                        let numberOfFilesProcessedAux = getNumberOfFilesProcessed();
+                                                        numberOfFilesProcessedAux += 1;
+                                                        data = null;
+                                                        setNumberOfFilesProcessed(numberOfFilesProcessedAux);
+                                                        dispatch(setSyncState(("Synced " + numberOfFilesProcessedAux + "/" + totalNumberOfFiles)));
+                                                        resolve('Finished inserting');
+                                                    })
+                                                    .catch((errorBulk) => {
+                                                        console.log('Error bulk docs: ', errorBulk);
+                                                        data = null;
+                                                        reject(errorBulk);
+                                                    })
+                                            } else {
+                                                // Since there is data in the file, it's time to sync it
+                                                let promises = [];
+                                                for (let i=0; i<data.length; i++) {
+                                                    promises.push(updateFileInDatabase(data[i], type))
+                                                }
+
+                                                Promise.all(promises)
+                                                    .then((responses) => {
+                                                        console.log('Finished syncing: ', responses);
+                                                        let numberOfFilesProcessedAux = getNumberOfFilesProcessed();
+                                                        promises = null;
+                                                        numberOfFilesProcessedAux += 1;
+                                                        data = null;
+                                                        setNumberOfFilesProcessed(numberOfFilesProcessedAux);
+                                                        dispatch(setSyncState(("Synced " + numberOfFilesProcessedAux + "/" + totalNumberOfFiles)));
+                                                        resolve('Finished syncing');
+                                                    })
+                                                    .catch((error) => {
+                                                        console.log("Error at syncing file of type: ", type, error);
+                                                        data = null;
+                                                        promises = null;
+                                                        reject("Error at syncing file");
+                                                    })
+                                            }
+                                        }
+                                    })
+                                })
+                                .catch((errorUnzipFile) => {
+                                    console.log(`Error while unzipping file ${type}: ${errorUnzipFile}`);
+                                    reject('Error while unzipping file');
+                                })
+                        }
 
                         // RNFetchBlobFS.readStream(path, 'utf8')
                         //     .then((stream) => {
@@ -353,7 +668,51 @@ export function comparePasswords (password, encryptedPassword, callback) {
     })
 }
 
-export function getDataFromDatabaseFromFile (database, fileType, lastSyncDate) {
+function extractFromDatabase(database, fileType, lastSyncDate, startKey) {
+    return new Promise((resolve, reject) => {
+        if(startKey) {
+            database.find({
+                selector: {
+                    _id: {
+                        $gte: `${fileType}_`,
+                        $lte: `${fileType}_\uffff`
+                    },
+                    fileType: {$eq: fileType},
+                    updatedAt: {$gte: lastSyncDate}
+                },
+                limit: 1000
+            })
+                .then((response) => {
+                    resolve(response.docs);
+                })
+                .catch((error) => {
+                    console.log('Error while getting data: ', error);
+                    reject(error);
+                })
+        } else {
+            database.find({
+                selector: {
+                    _id: {
+                        $gte: `${startKey}`,
+                        $lte: `${fileType}_\uffff`
+                    },
+                    fileType: {$eq: fileType},
+                    updatedAt: {$gte: lastSyncDate}
+                },
+                limit: 1000
+            })
+                .then((response) => {
+                    resolve(response.docs);
+                })
+                .catch((error) => {
+                    console.log('Error while getting data: ', error);
+                    reject(error);
+                })
+        }
+    })
+}
+
+export function getDataFromDatabaseFromFile (database, fileType, lastSyncDate, password) {
     return new Promise((resolve, reject) => {
         database.find({
             selector: {
@@ -367,14 +726,16 @@ export function getDataFromDatabaseFromFile (database, fileType, lastSyncDate) {
         })
             .then((response) => {
                 // Now that we have some files, we should recreate the mongo collections
-                if (response && response.docs && Array.isArray(response.docs) && response.docs.length > 0) {
-                    createFilesWithName(fileType, JSON.stringify(response.docs.map((e) => {
-                        delete e._rev;
-                        e._id = extractIdFromPouchId(e._id, fileType);
-                        // delete e._id;
-                        delete e.fileType;
-                        return e;
-                    })))
+                // If there are more than 1000 collections split in chunks of 1000 records
+                let responseArray = response.docs.map((e) => {
+                    delete e._rev;
+                    e._id = extractIdFromPouchId(e._id, fileType);
+                    // delete e._id;
+                    delete e.fileType;
+                    return e;
+                });
+                if (responseArray && Array.isArray(responseArray) && responseArray.length > 0) {
+                    createFilesWithName(fileType, responseArray, password)
                         .then((responseFromCreate) => {
                             database = null;
                             resolve(responseFromCreate);
@@ -395,67 +756,209 @@ export function getDataFromDatabaseFromFile (database, fileType, lastSyncDate) {
                 reject(error);
             })
     })
+
+
+    // try {
+    //     let dataFromDb = await extractFromDatabase(database, fileType, lastSyncDate);
+    //     if (dataFromDb && Array.isArray(dataFromDb)) {
+    //         if (dataFromDb.length === 1000) {
+    //
+    //         } else {
+    //             createFilesWithName(fileType, JSON.stringify(dataFromDb), password)
+    //                 .then((responseFromCreate) => {
+    //                     database = null;
+    //                     return Promise.resolve(responseFromCreate);
+    //                 })
+    //                 .catch((errorFromCreate) => {
+    //                     database = null;
+    //                     console.log(`An error occurred while creating file: ${errorFromCreate}`);
+    //                     return Promise.reject(errorFromCreate);
+    //                 })
+    //         }
+    //     } else {
+    //         console.log(`Error while extracting first time from the database. fileType: ${fileType}, errorExtractFromDb: ${errorExtractFromDb}`);
+    //         return Promise.reject(`Error while extracting first time from the database`);
+    //     }
+    // } catch(errorExtractFromDb) {
+    //     console.log(`Error while extracting first time from the database. fileType: ${fileType}, errorExtractFromDb: ${errorExtractFromDb}`);
+    //     return Promise.reject(errorExtractFromDb);
+    // }
 }
 
-export function createFilesWithName (fileName, data) {
+function writeOperations (collectionName, index, data, password, jsonPath) {
     return new Promise((resolve, reject) => {
-        // First check if the directory exists
-        RNFetchBlobFS.exists(RNFetchBlobFS.dirs.DocumentDir + '/who_files')
+        RNFetchBlobFS.createFile(jsonPath, JSON.stringify(data), 'utf8')
+            .then((writtenBytes) => {
+                // After creating the json file, is time to create the zip
+                zip(jsonPath, `${jsonPath}.zip`)
+                    .then((zipPath) => {
+                        // After creating the zip file, delete the .json file and proceed to encrypt the zip file
+                        // First we have to read the base64 file
+                        RNFetchBlobFS.unlink(jsonPath)
+                            .then(() => {
+                                // If the password is null, then don't encrypt data
+                                if (password) {
+                                    RNFetchBlobFS.readFile(zipPath, 'base64')
+                                        .then((rawZipFile) => {
+                                            // Encrypt the file and overwrite the previous zip file
+                                            encrypt(password, rawZipFile)
+                                                .then((encryptedData) => {
+                                                    RNFetchBlobFS.writeFile(zipPath, encryptedData, 'base64')
+                                                        .then((writtenEncryptedData) => {
+                                                            console.log(`Finished creating file: ${collectionName}, index: ${index}, writtenEncryptedData: ${writtenEncryptedData}`);
+                                                            resolve('Finished creating file')
+                                                        })
+                                                        .catch((errorWrittenEncryptedData) => {
+                                                            console.log(`createFileWithIndex collectionName: ${collectionName}, index: ${index}, error: ${errorWrittenEncryptedData}`);
+                                                            reject(errorWrittenEncryptedData);
+                                                        })
+                                                })
+                                                .catch((errorEncryptedData) => {
+                                                    console.log(`createFileWithIndex collectionName: ${collectionName}, index: ${index}, error: ${errorEncryptedData}`);
+                                                    reject(errorEncryptedData);
+                                                })
+                                        })
+                                        .catch((errorRawZipFile) => {
+                                            console.log(`writeOperations collectionName: ${collectionName}, index: ${index}, error: ${errorRawZipFile}`);
+                                            reject(errorRawZipFile);
+                                        })
+                                } else {
+                                    resolve('Success');
+                                }
+                            })
+                            .catch((errorDeleteJsonFile) => {
+                                console.log(`writeOperations collectionName: ${collectionName}, index: ${index}, error: ${errorDeleteJsonFile}`);
+                                reject(errorDeleteJsonFile);
+                            });
+                    })
+                    .catch((zipPathError) => {
+                        console.log(`writeOperations collectionName: ${collectionName}, index: ${index}, error: ${zipPathError}`);
+                        reject(zipPathError);
+                    })
+            })
+            .catch((errorWriteBytes) => {
+                console.log(`writeOperations collectionName: ${collectionName}, index: ${index}, error: ${errorWriteBytes}`);
+                reject(errorWriteBytes);
+            })
+    });
+};
+
+// This method creates the json file, archives it and encrypts it
+export function createFileWithIndex (collectionName, index, data, password) {
+    return new Promise((resolve, reject) => {
+        let jsonPath = `${RNFetchBlobFS.dirs.DocumentDir}/who_files/${collectionName.split('.')[0]}.${index}.json`;
+        // Check if the file exists. If it exists, delete and recreate it, else continue
+
+        RNFetchBlobFS.exists(jsonPath)
             .then((exists) => {
                 if (exists) {
-                    // If the file exists, proceed to check if the file exists
-                    RNFetchBlobFS.exists(`${RNFetchBlobFS.dirs.DocumentDir}/who_files/${fileName}`)
-                        .then((exists) => {
-                            if (exists) {
-                                RNFetchBlobFS.writeFile(`${RNFetchBlobFS.dirs.DocumentDir}/who_files/${fileName}`, data, 'utf8')
-                                    .then(() => {
-                                        resolve(`Done with file ${fileName}`);
-                                    })
-                                    .catch((errorWriteFile) => {
-                                        console.log(`Error while writing to file: ${fileName}`, errorWriteFile);
-                                        reject(errorWriteFile);
-                                    })
-                            } else {
-                                // If the file does not exist, create it
-                                RNFetchBlobFS.createFile(`${RNFetchBlobFS.dirs.DocumentDir}/who_files/${fileName}`, data, "utf8")
-                                    .then(() => {
-                                        resolve(`Done with ${fileName}`);
-                                    })
-                                    .catch((errorCreateFile) => {
-                                        console.log(`An error occurred while creating file: ${errorCreateFile}`, errorCreateFile);
-                                        reject(errorCreateFile);
-                                    })
-                            }
+                    // Delete the file
+                    RNFetchBlobFS.unlink(jsonPath)
+                        .then(() => {
+                            writeOperations(collectionName, index, data, password, jsonPath)
+                                .then((result) => {
+                                    resolve('Success')
+                                })
+                                .catch((errorWriteOperations) => {
+                                    console.log(`Error write operations: method: createFileWithIndex collectionName: ${collectionName} index: ${index} error: ${JSON.stringify(errorWriteOperations)}`);
+                                    reject(errorWriteOperations)
+                                })
                         })
-                        .catch((errorFileExists) => {
-                            console.log('An error occurred while trying to see if file exists: ', fileName, errorFileExists);
-                            reject(errorFileExists);
+                        .catch((errorDeleteFile) => {
+                            console.log(`Error delete existing file: method: createFileWithIndex collectionName: ${collectionName} index: ${index} error: ${JSON.stringify(errorDeleteFile)}`);
+                            reject(errorDeleteFile);
                         })
                 } else {
-                    // Create the directory
-                    RNFetchBlobFS.mkdir(RNFetchBlobFS.dirs.DocumentDir + '/who_files')
-                        .then(() => {
-                            // Since the directory was created just now, we don't have to test if the file exists
-                            RNFetchBlobFS.createFile(RNFetchBlobFS.dirs.DocumentDir + '/who_files/' + fileName, data, "utf8")
-                                .then(() => {
-                                    resolve(`Done with ${fileName}`)
-                                })
-                                .catch((errorCreateFile) => {
-                                    console.log("An error occurred while creating file: ", fileName, errorCreateFile);
-                                    reject(errorCreateFile);
-                                })
+                    writeOperations(collectionName, index, data, password, jsonPath)
+                        .then((result) => {
+                            resolve('Success')
                         })
-                        .catch((errorCreateDir) => {
-                            console.log('An error occurred while creating directory: ', errorCreateDir);
-                            reject(errorCreateDir);
+                        .catch((errorWriteOperations) => {
+                            console.log(`Error write operations: method: createFileWithIndex collectionName: ${collectionName} index: ${index} error: ${JSON.stringify(errorWriteOperations)}`);
+                            reject(errorWriteOperations)
                         })
                 }
             })
-            .catch((errorExists) => {
-                console.log("An error occurred while getting if the root directory exists: ", errorExists);
-                reject(errorExists)
+            .catch((errorFileExists) => {
+                console.log(`Error file exists: method: createFileWithIndex collectionName: ${collectionName} index: ${index} error: ${JSON.stringify(errorFileExists)}`);
+                writeOperations(collectionName, index, data, password, jsonPath)
+                    .then((result) => {
+                        resolve('Success')
+                    })
+                    .catch((errorWriteOperations) => {
+                        console.log(`Error write operations: method: createFileWithIndex collectionName: ${collectionName} index: ${index} error: ${JSON.stringify(errorWriteOperations)}`);
+                        reject(errorWriteOperations)
+                    })
             })
     })
+}
+
+export async function createFilesWithName (fileName, data, password) {
+    // return new Promise((resolve, reject) => {
+    // First check if the directory exists
+    try {
+        let exists = await RNFetchBlobFS.exists(RNFetchBlobFS.dirs.DocumentDir + '/who_files');
+        if (exists) {
+            let numberOfChunks = parseInt(data.length / 1000);
+            let remainder = data.length % 1000;
+            let arrayOfResponses = [];
+
+            for (let i=0; i<=numberOfChunks; i++) {
+                try {
+                    let response = await createFileWithIndex(fileName, i, data.slice(i * 1000, i * 1000 + 1000), password);
+                    if (response) {
+                        arrayOfResponses.push(response);
+                    } else {
+                        console.log(`No response received from createFileWithIndex. fileName: ${fileName}, index: ${i}`);
+                        return reject('No response received from createFileWithIndex');
+                    }
+                } catch (errorCreateFileWithIndex) {
+                    console.log('An error occurred while creating directory: ', errorCreateFileWithIndex);
+                return Promise.reject(errorCreateFileWithIndex);
+                }
+            }
+
+            if (arrayOfResponses.length === numberOfChunks) {
+                return Promise.resolve('Success');
+            }
+        } else {
+            // If the directory does not exists, then create it
+            try {
+                let directory = await RNFetchBlobFS.mkdir(RNFetchBlobFS.dirs.DocumentDir + '/who_files');
+                // Do not check if directory exists, since the mkdir method does not return anything
+                let numberOfChunks = parseInt(data.length / 1000);
+                let remainder = data.length % 1000;
+                let arrayOfResponses = [];
+
+                for (let i=0; i<=numberOfChunks; i++) {
+                    try {
+                        let response = await createFileWithIndex(fileName, i, data.slice(i * 1000, i * 1000 + 1000), password);
+                        if (response) {
+                            arrayOfResponses.push(response);
+                        } else {
+                            console.log(`No response received from createFileWithIndex. fileName: ${fileName}, index: ${i}`);
+                            return reject('No response received from createFileWithIndex');
+                        }
+                    } catch (errorCreateFileWithIndex) {
+                        console.log('An error occurred while creating directory: ', errorCreateFileWithIndex);
+                return Promise.reject(errorCreateFileWithIndex);
+                    }
+                }
+
+                if (arrayOfResponses.length === numberOfChunks) {
+                    return Promise.resolve('Success');
+                }
+            } catch (errorCreateDir) {
+                console.log('An error occurred while creating directory: ', errorCreateDir);
+                return Promise.reject(errorCreateDir);
+            }
+        }
+    } catch(errorExists) {
+        console.log("An error occurred while getting if the root directory exists: ", errorExists);
+        return Promise.reject(errorExists);
+    }
+
+    // })
 }
 
 export function createZipFileAtPath (source, target, callback) {
@@ -791,7 +1294,7 @@ export function localSortHelpItem (helpItemsCopy, propsFilter, stateFilter, filt
         let sortOrder = []
         for(let i = 0; i < filterFromFilterScreen.sort.length; i++) {
             if (filterFromFilterScreen.sort[i].sortCriteria && filterFromFilterScreen.sort[i].sortCriteria.trim().length > 0 && filterFromFilterScreen.sort[i].sortOrder && filterFromFilterScreen.sort[i].sortOrder.trim().length > 0){
-                sortCriteria.push(filterFromFilterScreen.sort[i].sortCriteria === 'Title' ? 'title' : 'categoryId')
+                sortCriteria.push(filterFromFilterScreen.sort[i].sortCriteria === 'LNG_HELP_ITEMS_FIELD_LABEL_TITLE' ? 'title' : 'categoryId')
                 sortOrder.push(filterFromFilterScreen.sort[i].sortOrder === 'LNG_SIDE_FILTERS_SORT_BY_ASC_PLACEHOLDER' ? false : true)
             }
         }
@@ -886,7 +1389,7 @@ export function localSortItems (itemsToSort, sortFilter) {
         let sortOrder = []
         for(let i = 0; i < sortFilter.length; i++) {
             if (sortFilter[i].sortCriteria && sortFilter[i].sortCriteria.trim().length > 0 && sortFilter[i].sortOrder && sortFilter[i].sortOrder.trim().length > 0){
-                sortCriteria.push(sortFilter[i].sortCriteria === 'First Name' ? 'firstName' : 'lastNmae')
+                sortCriteria.push(sortFilter[i].sortCriteria === 'LNG_CONTACT_FIELD_LABEL_FIRST_NAME' ? 'firstName' : 'lastNmae')
                 sortOrder.push(sortFilter[i].sortOrder === 'LNG_SIDE_FILTERS_SORT_BY_ASC_PLACEHOLDER' ? false : true)
             }
         }
@@ -952,7 +1455,15 @@ export function objSort() {
     // objSort(homes, 'city', ['price', true]) --> sort by city (ascending) then price (descending), case in-sensitive)
 }
 
-export function getTooltip (label, translation) {
+export function getTooltip (label, translation, forceTooltip, tooltipsMessage) {
+
+    if (forceTooltip) {
+        return {
+            hasTooltip: true,
+            tooltipMessage: tooltipsMessage
+        };
+    }
+
     let hasTooltip = false
     let tooltipMessage = ''
 

@@ -34,7 +34,7 @@ class SwitchInput extends PureComponent {
     };
 
     editInput = () => {
-        let tooltip = getTooltip(this.props.label, this.props.translation)
+        let tooltip = getTooltip(this.props.label, this.props.translation, this.props.tooltipsMessage, this.props.tooltipsMessage);
         return (
             <View style={[{flexDirection: 'row', marginVertical: 10}, this.props.style]}>
                 <Text style={[{flex: 1}, this.props.labelStyle]}>

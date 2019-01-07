@@ -779,7 +779,7 @@ const followUpsFilterScreen = {
         fields: [
             {      
                 cardNumber: 1,
-                label: translations.sortTab.sortBy,
+                label: translations.sortTab.SortBy,
                 type: 'Section',
                 hasBorderBottom: true,
                 borderBottomColor: styles.navigationDrawerSeparatorGrey
@@ -846,7 +846,7 @@ const helpFilterScreen = {
         fields: [
             {
                 cardNumber: 1,
-                label: translations.sortTab.sortBy,
+                label: translations.sortTab.SortBy,
                 type: 'Section',
                 hasBorderBottom: true,
                 borderBottomColor: styles.navigationDrawerSeparatorGrey
@@ -970,7 +970,7 @@ const casesFilterScreen = {
         fields: [
             {
                 cardNumber: 1,
-                label: translations.sortTab.sortBy,
+                label: translations.sortTab.SortBy,
                 type: 'Section',
                 hasBorderBottom: true,
                 borderBottomColor: styles.navigationDrawerSeparatorGrey
@@ -1103,7 +1103,6 @@ const addFollowUpScreen = [
         label: translations.addFollowUpScreen.searchContactPlacehodler,
         type: 'DropdownInput',
         value: '',
-        data: [],
         isRequired: false,
         isEditMode: true,
         isAdditive: true,
@@ -1573,6 +1572,14 @@ const mongoCollections = {
     user: 'user.json'
 };
 
+const changingMongoCollections = [
+    'followUp.json',
+    'labResult.json',
+    'person.json',
+    'relationship.json',
+    'user.json'
+];
+
 const RNDBConfig = {
     "cluster": {
         "_id": {
@@ -1941,18 +1948,18 @@ const localTranslationTokens = {
 };
 
 const sortOrderDropDownItems = [
-    { label: 'LNG_SIDE_FILTERS_SORT_BY_ASC_PLACEHOLDER', value: 'LNG_SIDE_FILTERS_SORT_BY_ASC_PLACEHOLDER'},
-    { label: 'LNG_SIDE_FILTERS_SORT_BY_DESC_PLACEHOLDER', value: 'LNG_SIDE_FILTERS_SORT_BY_DESC_PLACEHOLDER'}
-]
+    { value: translations.sortTab.sortOrderAsc },
+    { value: translations.sortTab.sortOrderDesc }
+];
 
 const sortCriteriaDropDownItems = [
-    { label: 'First Name', value: 'First Name'},
-    { label: 'Last Name', value: 'Last Name'}
-]
+    { value: translations.sortTab.sortFirstName },
+    { value: translations.sortTab.sortLastName  }
+];
 
 const helpItemsSortCriteriaDropDownItems = [
-    { label: 'Title', value: 'Title'},
-    { label: 'Category', value: 'Category'}
+    { value: translations.sortTab.sortCategory},
+    { value: translations.sortTab.sortTitle}
 ];
 
 const userPermissions = {
@@ -1982,6 +1989,7 @@ export default {
     contactsSingleScreen,
     personTypes,
     mongoCollections,
+    changingMongoCollections,
     RNDBConfig,
     userResidenceAddress,
     contactFollowUpStatuses,
@@ -1993,5 +2001,5 @@ export default {
     sortCriteriaDropDownItems,
     userPermissions,
     helpSingleScreen,
-    helpItemsSortCriteriaDropDownItems
+    helpItemsSortCriteriaDropDownItems,
 }

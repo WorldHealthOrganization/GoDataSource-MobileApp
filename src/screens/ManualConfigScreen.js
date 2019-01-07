@@ -22,7 +22,8 @@ import {storeHubConfiguration} from './../actions/app';
 import {LoaderScreen} from 'react-native-ui-lib';
 import Ripple from 'react-native-material-ripple';
 import {getTranslation, generateId} from './../utils/functions';
-import translations from './../utils/translations'
+import translations from './../utils/translations';
+import SwitchInput from './../components/SwitchInput';
 
 class ManualConfigScreen extends Component {
 
@@ -37,6 +38,7 @@ class ManualConfigScreen extends Component {
             url: '',
             clientId: '',
             clientSecret: '',
+            encryptData: true,
             hasAlert: false
         };
         // Bind here methods, or at least don't declare methods in the render method
@@ -149,6 +151,21 @@ class ManualConfigScreen extends Component {
                         secureTextEntry={true}
                         autoCapitalize={'none'}
                     />
+                    <SwitchInput
+                        id="encryptData"
+                        label={'Encrypted connection'}
+                        value={this.state.encryptData}
+                        showValue={true}
+                        isEditMode={true}
+                        isRequired={false}
+                        onChange={this.handleCheck}
+                        activeButtonColor={'green'}
+                        activeBackgroundColor={'white'}
+                        style={{width: '100%'}}
+                        labelStyle={{fontFamily: 'Roboto-Medium', fontSize: 18, color: 'white'}}
+                        hasTooltip={true}
+                        tooltipsMessage={'Encrypted connection is more secure but the sync will take more time'}
+                    />
                     <Button upperCase={false} onPress={this.saveHubConfiguration} text={getTranslation(translations.manualConfigScreen.saveHubConfigButton, null)} style={styles.buttonLogin} />
                 </View>
                 <View style={style.logoContainer}>
@@ -187,7 +204,7 @@ class ManualConfigScreen extends Component {
             hubId = hubId.replace(/\/|\.|\:|\-/g, '');
             let hubPassword = generateId();
             hubPassword = hubPassword.replace(/\/|\.|\:|\-/g, '');
-            let clientIdObject = {name: this.state.name, url: this.state.url, clientId: this.state.clientId, clientSecret: this.state.clientSecret};
+            let clientIdObject = {name: this.state.name, url: this.state.url, clientId: this.state.clientId, clientSecret: this.state.clientSecret, encryptedData: this.state.encryptData};
             this.props.storeHubConfiguration({url: hubId, clientId: JSON.stringify(clientIdObject), clientSecret: hubPassword});
         }
     };
@@ -200,6 +217,14 @@ class ManualConfigScreen extends Component {
                 }
             });
     };
+
+    handleCheck = (check) => {
+        this.setState({
+            encryptData: check
+        }, () => {
+            console.log('State: ', this.state);
+        })
+    }
 }
 
 // Create style outside the class, or for components that will be used by other components (buttons),

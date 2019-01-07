@@ -550,7 +550,7 @@ class FollowUpsScreen extends Component {
     handleOnPressMap = (followUp, contact) => {
         console.log("Handle on press map followUp: ", JSON.stringify(followUp));
         console.log("Handle on press map contact: ", JSON.stringify(contact));
-        
+
         if (contact && contact.addresses && Array.isArray(contact.addresses) && contact.addresses.length > 0) {
             let contactPlaceOfResidence = contact.addresses.filter((e) => {
                 return e.typeId === config.userResidenceAddress.userPlaceOfResidence
