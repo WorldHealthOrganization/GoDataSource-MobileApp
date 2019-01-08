@@ -212,6 +212,7 @@ class CaseSingleInfectionContainer extends PureComponent {
                 onChangeSwitch={this.props.onChangeSwitch}
                 onChangeDropDown={this.props.onChangeDropDown}
                 onDeletePress={this.props.handleOnPressDeleteHospitalizationDates}
+                onChangeSectionedDropDown={this.props.onChangeSectionedDropDownHospitalization}
             />
         )
     };
@@ -233,6 +234,7 @@ class CaseSingleInfectionContainer extends PureComponent {
                 onChangeSwitch={this.props.onChangeSwitch}
                 onChangeDropDown={this.props.onChangeDropDown}
                 onDeletePress={this.props.handleOnPressDeleteIsolationDates}
+                onChangeSectionedDropDown={this.props.onChangeSectionedDropDownIsolation}
             />
         )
     };

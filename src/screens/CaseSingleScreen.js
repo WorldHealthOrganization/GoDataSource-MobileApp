@@ -422,6 +422,8 @@ class CaseSingleScreen extends Component {
                         onPressAddIsolationDates={this.onPressAddIsolationDates}
                         handleOnPressDeleteIsolationDates={this.handleOnPressDeleteIsolationDates}
                         checkIsolationOnsetDates={this.checkIsolationOnsetDates}
+                        onChangeSectionedDropDownHospitalization={this.onChangeSectionedDropDownHospitalization}
+                        onChangeSectionedDropDownIsolation={this.onChangeSectionedDropDownIsolation}
                     />
                 );
             case 'caseInvestigation':
@@ -807,7 +809,10 @@ class CaseSingleScreen extends Component {
 
         hospitalizationDates.push({
             startDate: null,
-            endDate: null
+            endDate: null,
+            centerName: null,
+            locationId: null,
+            comments: null
         });
 
         this.setState(prevState => ({
@@ -828,6 +833,16 @@ class CaseSingleScreen extends Component {
             console.log("After deleting the hospitalizationDates: ", this.state.case);
         })
     };
+    onChangeSectionedDropDownHospitalization = (selectedItems, index) => {
+        console.log ('handleOnChangeSectionedDropDown', selectedItems, index);
+        // Here selectedItems is always an array with just one value and should pe mapped to the locationId field from the address from index
+        let hospitalizationDates = _.cloneDeep(this.state.case.hospitalizationDates);
+        hospitalizationDates[index].locationId = extractIdFromPouchId(selectedItems['0'], 'location');
+        this.setState(prevState => ({
+            case: Object.assign({}, prevState.case, {hospitalizationDates}),
+            isModified: true
+        }))
+    };
 
 
     //isolationDates functions
@@ -836,7 +851,10 @@ class CaseSingleScreen extends Component {
 
         isolationDates.push({
             startDate: null,
-            endDate: null
+            endDate: null,
+            centerName: null,
+            locationId: null,
+            comments: null
         });
 
         this.setState(prevState => ({
@@ -856,6 +874,16 @@ class CaseSingleScreen extends Component {
         }), () => {
             console.log("After deleting the isolationDates: ", this.state.case);
         })
+    };
+    onChangeSectionedDropDownIsolation = (selectedItems, index) => {
+        console.log ('handleOnChangeSectionedDropDown', selectedItems, index);
+        // Here selectedItems is always an array with just one value and should pe mapped to the locationId field from the address from index
+        let isolationDates = _.cloneDeep(this.state.case.isolationDates);
+        isolationDates[index].locationId = extractIdFromPouchId(selectedItems['0'], 'location');
+        this.setState(prevState => ({
+            case: Object.assign({}, prevState.case, {isolationDates}),
+            isModified: true
+        }))
     };
 
 
@@ -994,7 +1022,6 @@ class CaseSingleScreen extends Component {
         }
         return true;
     };
-    
     
     // onChangeStuff functions
     onChangeText = (value, id, objectTypeOrIndex, objectType) => {

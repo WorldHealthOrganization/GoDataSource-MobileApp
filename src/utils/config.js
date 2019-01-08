@@ -668,6 +668,39 @@ const caseSingleScreen = {
             },
             {
                 cardNumber: 2,
+                id: 'centerName',
+                label: null,
+                type: 'TextInput',
+                value: '',
+                isRequired: false,
+                isEditMode: false,
+                objectType: 'HospitalizationDates'
+            },
+            {
+                cardNumber: 2,
+                id: 'locationId',
+                label: null,
+                labelValue: 'test',
+                type: 'DropDownSectioned',
+                value: '',
+                isRequired: false,
+                isEditMode: true,
+                objectType: 'HospitalizationDates',
+                single: true
+            },
+            {
+                cardNumber: 2,
+                id: 'comments',
+                label: null,
+                type: 'TextInput',
+                value: '',
+                isRequired: false,
+                isEditMode: false,
+                objectType: 'HospitalizationDates',
+                multiline: true
+            },
+            {
+                cardNumber: 2,
                 id: 'deleteButton',
                 type: 'ActionsBar',
                 labelValue: 'test',
@@ -699,6 +732,39 @@ const caseSingleScreen = {
                 isEditMode: true,
                 format: 'YYYY-MM-dd',
                 objectType: 'IsolationDates'
+            },
+            {
+                cardNumber: 3,
+                id: 'centerName',
+                label: null,
+                type: 'TextInput',
+                value: '',
+                isRequired: false,
+                isEditMode: false,
+                objectType: 'IsolationDates'
+            },
+            {
+                cardNumber: 3,
+                id: 'locationId',
+                label: null,
+                labelValue: 'test',
+                type: 'DropDownSectioned',
+                value: '',
+                isRequired: false,
+                isEditMode: true,
+                objectType: 'IsolationDates',
+                single: true
+            },
+            {
+                cardNumber: 3,
+                id: 'comments',
+                label: null,
+                type: 'TextInput',
+                value: '',
+                isRequired: false,
+                isEditMode: false,
+                objectType: 'IsolationDates',
+                multiline: true
             },
             {
                 cardNumber: 3,
