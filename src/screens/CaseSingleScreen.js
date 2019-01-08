@@ -1085,6 +1085,26 @@ class CaseSingleScreen extends Component {
                             case: Object.assign({}, prevState.case, {documents: documentsClone}),
                             isModified: true
                         }))
+                } else {
+                    if (objectType && objectType === 'HospitalizationDates') {
+                        let hospitalizationDatesClone = _.cloneDeep(this.state.case.hospitalizationDates);
+                        hospitalizationDatesClone[objectTypeOrIndex][id] = value && value.value ? value.value : value;
+                        // console.log ('hospitalizationDatesClone', hospitalizationDatesClone);
+                        this.setState(prevState => ({
+                            case: Object.assign({}, prevState.case, {hospitalizationDates: hospitalizationDatesClone}),
+                            isModified: true
+                        }))
+                    } else {
+                        if (objectType && objectType === 'IsolationDates') {
+                            let isolationDatesClone = _.cloneDeep(this.state.case.isolationDates);
+                            isolationDatesClone[objectTypeOrIndex][id] = value && value.value ? value.value : value;
+                            // console.log ('isolationDatesClone', isolationDatesClone);
+                            this.setState(prevState => ({
+                                case: Object.assign({}, prevState.case, {isolationDates: isolationDatesClone}),
+                                isModified: true
+                            }))
+                        }
+                    }
                 }
             }
         }
