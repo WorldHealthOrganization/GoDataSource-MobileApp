@@ -174,11 +174,12 @@ class CaseSingleInfectionContainer extends PureComponent {
             return Object.assign({},field, {isEditMode: this.props.isEditMode})
         });
 
-        if (this.props.case.deceased === false) {
+        if (this.props.case.outcomeId !== config.caseFieldsForHardCodeCheck.outcomeIdDeceasedValue) {
             fields = fields.filter((field) => {
-                return field.id !== 'dateDeceased' && field.id !== 'safeBurial'
+                return field.id !== 'safeBurial' && field.id !== 'dateOfBurial'
             });
         }
+
         return (
             <CardComponent
                 item={fields}

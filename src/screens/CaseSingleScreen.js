@@ -78,8 +78,8 @@ class CaseSingleScreen extends Component {
                 dateOfOutcome: null,
                 dateOfOnset: null,
                 isDateOfOnsetApproximate: false,
-                deceased: false,
-                dateDeceased: null,
+                safeBurial: false,
+                dateOfBurial: null,
                 addresses: [
                     {
                         typeId: config.userResidenceAddress.userPlaceOfResidence,
@@ -474,8 +474,15 @@ class CaseSingleScreen extends Component {
                             console.log("handleSavePress case", JSON.stringify(this.state.case));
                             this.hideMenu();
                             let ageConfig = this.ageAndDobPrepareForSave();
+                            let caseClone = _.cloneDeep(this.state.case)
+                            caseClone.age = ageConfig.ageClone
+                            caseClone.dob = ageConfig.dobClone
+                            if (caseClone.outcomeId !== config.caseFieldsForHardCodeCheck.outcomeIdDeceasedValue) {
+                                caseClone.safeBurial = false
+                                caseClone.dateOfBurial = null
+                            }
                             this.setState(prevState => ({
-                                case: Object.assign({}, prevState.case, {age: ageConfig.ageClone}, {dob: ageConfig.dobClone}),
+                                case: Object.assign({}, prevState.case, caseClone),
                             }), () => {
                                 if (this.state.saveFromEditPressed === true) {
                                     //update case and remain on view screen

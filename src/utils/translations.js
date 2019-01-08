@@ -129,6 +129,7 @@ const caseSingleScreen = {
     deceased: 'LNG_CASE_FIELD_LABEL_DECEASED',
     safeBurial: 'LNG_CASE_FIELD_LABEL_SAFETY_BURIAL',
     dateDeceased: 'LNG_CASE_FIELD_LABEL_DATE_OF_DECEASE',
+    dateOfBurial: 'LNG_CASE_FIELD_LABEL_DATE_OF_BURIAL',
 
     hospitalisationStartDate: 'LNG_DATE_FIELD_LABEL_FROM',
     hospitalisationEndDate: 'LNG_DATE_FIELD_LABEL_TO',

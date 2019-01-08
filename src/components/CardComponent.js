@@ -119,7 +119,7 @@ class CardComponent extends Component {
         if (this.props.case) {
             if (hasDateChanged && hasDateChanged.length > 0) {
                 return true
-            } else if (this.props.case.deceased !== nextProps.case.deceased) {
+            } else if (this.props.case.outcomeId !== nextProps.case.outcomeId) {
                 return true
             }
             if (this.props.case.hospitalizationDates && this.props.case.hospitalizationDates.length > 0 && nextProps.case.hospitalizationDates && nextProps.case.hospitalizationDates.length > 0 && this.props.case.hospitalizationDates.length === nextProps.case.hospitalizationDates.length) {
@@ -640,69 +640,17 @@ class CardComponent extends Component {
 
         if (item.type === 'DatePicker') {
             if (this.props.screen === 'CaseSingleScreen') {
-                if (item.id === 'dob' || item.id === 'dateBecomeCase' || item.id === 'dateOfOutcome' ) {
+                if (item.id === 'dob' || item.id === 'dateBecomeCase' || item.id === 'dateOfOutcome' || item.id === 'dateOfBurial') {
                     maximumDate = new Date()
                 } else if (item.id === 'dateOfOnset') {
-                    if (this.props.case && this.props.case !== undefined && this.props.case.deceased !== null && this.props.case.deceased !== undefined && this.props.case.deceased === true && this.props.case.dateDeceased && this.props.case.dateDeceased !== undefined && this.props.case.dateDeceased !== ''){
-                        maximumDate = new Date(this.props.case.dateDeceased);
-                    } else {
                         maximumDate = new Date();
-                    }
                 } else if (item.id === 'dateOfReporting') {
-                    if (this.props.case && this.props.case !== undefined && this.props.case.deceased !== null && this.props.case.deceased !== undefined && this.props.case.deceased === true && this.props.case.dateDeceased && this.props.case.dateDeceased !== undefined && this.props.case.dateDeceased !== ''){
-                        maximumDate = this.props.case.dateDeceased
-                    } else {
                         maximumDate = new Date()
-                    }
                 } else if (item.id === 'dateOfInfection') {
-                    let hasDeceasedDate = false;
-                    let hasDateOfOnset = false;
-                    if (this.props.case && this.props.case !== undefined && this.props.case.deceased !== null && this.props.case.deceased !== undefined && this.props.case.deceased === true && this.props.case.dateDeceased && this.props.case.dateDeceased !== undefined && this.props.case.dateDeceased !== ''){
-                        hasDeceasedDate = true
-                    }
                     if (this.props.case && this.props.case !== undefined && this.props.case.dateOfOnset && this.props.case.dateOfOnset !== undefined && this.props.case.dateOfOnset !== ''){
-                        hasDateOfOnset = true
-                    }
-
-                    if (hasDeceasedDate === true && hasDateOfOnset === false) {
-                        maximumDate = new Date(this.props.case.dateDeceased);
-                    } else if (hasDeceasedDate === false && hasDateOfOnset === true) {
                         maximumDate = new Date(this.props.case.dateOfOnset);
-                    } else if (hasDeceasedDate === true && hasDateOfOnset === true) {
-                        maximumDate = _.min([this.props.case.dateOfOnset, this.props.case.dateDeceased])
                     } else {
                         maximumDate = new Date()
-                    }
-                } else if (item.id === 'dateDeceased') {
-                    maximumDate = new Date()
-                    let hasDateOfOnset = false   
-                    let hasDateOfReporting = false
-                    let hasDateOfInfection = false
-
-                    if (this.props.case && this.props.case !== undefined && this.props.case.dateOfOnset && this.props.case.dateOfOnset !== undefined && this.props.case.dateOfOnset !== ''){
-                        hasDateOfOnset = true
-                    }
-                    if (this.props.case && this.props.case !== undefined && this.props.case.dateOfReporting && this.props.case.dateOfReporting !== undefined && this.props.case.dateOfReporting !== ''){
-                        hasDateOfReporting = true
-                    }
-                    if (this.props.case && this.props.case !== undefined && this.props.case.dateOfInfection && this.props.case.dateOfInfection !== undefined && this.props.case.dateOfInfection !== ''){
-                        hasDateOfInfection = true
-                    }
-
-                    if (hasDateOfOnset === false && hasDateOfReporting === false && hasDateOfInfection === true) {
-                        minimumDate = this.props.case.dateOfInfection
-                    } else if (hasDateOfOnset === false && hasDateOfReporting === true && hasDateOfInfection === false) {
-                        minimumDate = this.props.case.dateOfReporting
-                    } else if (hasDateOfOnset === true && hasDateOfReporting === false && hasDateOfInfection === false) {
-                        minimumDate = this.props.case.dateOfOnset
-                    } else if (hasDateOfOnset === false && hasDateOfReporting === true && hasDateOfInfection === true) {
-                        minimumDate = _.max([this.props.case.dateOfReporting, this.props.case.dateOfInfection])
-                    } else if (hasDateOfOnset === true && hasDateOfReporting === false && hasDateOfInfection === true) {
-                        minimumDate = _.max([this.props.case.dateOfOnset, this.props.case.dateOfInfection])
-                    } else if (hasDateOfOnset === true && hasDateOfReporting === true && hasDateOfInfection === false) {
-                        minimumDate = _.max([this.props.case.dateOfOnset, this.props.case.dateOfReporting])
-                    } else if (hasDateOfOnset === true && hasDateOfReporting === true && hasDateOfInfection === true) {
-                        minimumDate = _.max([this.props.case.dateOfOnset, this.props.case.dateOfReporting, this.props.case.dateOfInfection])
                     }
                 } else if (item.objectType === 'HospitalizationDates'){
                     if (this.props.case && this.props.case.hospitalizationDates && Array.isArray(this.props.case.hospitalizationDates) && this.props.case.hospitalizationDates.length > 0 && this.props.case.hospitalizationDates[this.props.index]) {
