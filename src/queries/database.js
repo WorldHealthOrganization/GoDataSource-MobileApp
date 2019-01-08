@@ -304,7 +304,9 @@ export function updateFileInDatabase(file, type) {
 export function processBulkDocs(data, type) {
     return new Promise((resolve, reject) => {
         if (database) {
-            database.bulkDocs(data.map((e) => {return Object.assign({}, e, {_id: createIdForType(e, type), fileType: type})}))
+            // New types: fileType.number.json
+            let fileType = `${type.split('.')[0]}.${type.split('.')[2]}`;
+            database.bulkDocs(data.map((e) => {return Object.assign({}, e, {_id: createIdForType(e, fileType), fileType})}))
                 .then(() => {
                     console.log('Bulk docs finished: ');
                     data = null;
