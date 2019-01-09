@@ -77,6 +77,16 @@ class FollowUpsFiltersContainer extends PureComponent {
             }
         });
 
+        // if (this.props.followUp && this.props.contact) {
+        //     let followUp = this.props.followUp;
+        //     let contact = this.props.contact;
+        //     if (item.type === 'DropdownInput') {
+        //         item.data = this.computeDataForDropdown(item, contact);
+        //     }
+
+        //     value = this.computeValueForId(item.type, item.id, followUp, contact);
+        // }
+
         return (
             <CardComponent
                 item={fields}

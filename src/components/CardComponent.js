@@ -7,14 +7,11 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {Component, PureComponent} from 'react';
-import {View, Text, StyleSheet, Platform, Dimensions, Image, FlatList, ScrollView} from 'react-native';
+import {View, Text, StyleSheet} from 'react-native';
 import {calculateDimension, handleExposedTo, getAddress, extractIdFromPouchId} from './../utils/functions';
 import config from './../utils/config';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
-import Button from './Button';
-import styles from './../styles';
-import Ripple from 'react-native-material-ripple';
 import DropdownInput from './DropdownInput';
 import DropDown from './DropDown';
 import TextInputWithDropDown from './TextInputWithDropDown'
@@ -249,12 +246,8 @@ class CardComponent extends PureComponent {
 
     handleRenderItemByType = (item) => {
 
-        let width = calculateDimension(315, false, this.props.screenSize);
-        let marginHorizontal = calculateDimension(14, false, this.props.screenSize);
         let addContactFromCasesScreen = false;
         let value = '';
-        let minimumDate = undefined;
-        let maximumDate = undefined;
         let data = [];
         let sectionedSelectedItems = [];
 
@@ -300,12 +293,6 @@ class CardComponent extends PureComponent {
 
                 item.data = configSortCiteriaFilter.map((e) => { return {label: this.getTranslation(e.label), value: e.value }})
                 value = this.computeValueForCaseSortScreen(item, this.props.index);
-                // valueFromConfig = config.sortCriteriaDropDownItems.find((e) => {
-                //     return e.value === this.props.filter.sort[this.props.index][item.id]
-                // })
-                // if (valueFromConfig !== undefined && valueFromConfig && valueFromConfig.label){
-                //     value = valueFromConfig.label
-                // }
             }
             if (item.type === 'DropdownInput' && item.id === 'sortOrder') {
                 item.data = config.sortOrderDropDownItems.map((e) => { return {label: this.getTranslation(e.label), value: e.value }})
@@ -386,41 +373,6 @@ class CardComponent extends PureComponent {
             }
         }
 
-        if (this.props.screen === 'CaseSingleScreen') {
-            if (item.type === 'DropdownInput') {
-                item.data = this.computeDataForCasesSingleScreenDropdownInput(item, this.props.index);
-            }
-            if (item.type === 'ActionsBar') {
-                item.onPressArray = [this.props.onDeletePress]
-            }
-
-            if (item.type === 'DatePicker' && this.props.case[item.id] !== undefined) {
-                value = this.props.case[item.id]
-            } else if (item.type === 'DropDownSectioned') {
-                if (this.props.case && this.props.case.addresses && Array.isArray(this.props.case.addresses) && this.props.case.addresses[this.props.index] && this.props.case.addresses[this.props.index][item.id] && this.props.case.addresses[this.props.index][item.id] !== "") {
-                    for (let i = 0; i < this.props.locations.length; i++) {
-                        let myLocationName = this.getLocationNameById(this.props.locations[i], this.props.case.addresses[this.props.index][item.id])
-                        if (myLocationName !== null){
-                            value = myLocationName
-                            break
-                        }
-                    }
-                }
-            } else if (item.type === 'SwitchInput' && this.props.case[item.id] !== undefined) {
-                value = this.props.case[item.id]
-            } else {
-                value = this.computeValueForCasesSingleScreen(item, this.props.index);
-            }
-            if (this.props.selectedItemIndexForTextSwitchSelectorForAge !== null && this.props.selectedItemIndexForTextSwitchSelectorForAge !== undefined && item.objectType === 'Case' && item.dependsOn !== undefined && item.dependsOn !== null){
-                let itemIndexInConfigTextSwitchSelectorValues = config[item.dependsOn].map((e) => {return e.value}).indexOf(item.id)
-                if (itemIndexInConfigTextSwitchSelectorValues > -1) {
-                    if (itemIndexInConfigTextSwitchSelectorValues != this.props.selectedItemIndexForTextSwitchSelectorForAge) {
-                        return
-                    }
-                }
-            }
-        }
-
         if (this.props.screen === 'FollowUpSingle') {
             if (item.type === 'DropdownInput') {
                 item.data = this.computeDataForFollowUpSingleScreenDropdownInput(item, this.props.index);
@@ -458,7 +410,6 @@ class CardComponent extends PureComponent {
         let dateValidation = this.setDateValidations(item);
         minimumDate = dateValidation.minimumDate;
         maximumDate = dateValidation.maximumDate;
-
     };
 
     computeValueForCasesSingleScreen = (item, index) => {
@@ -497,8 +448,6 @@ class CardComponent extends PureComponent {
         return this.props.case && this.props.case[item.id] ? this.getTranslation(this.props.case[item.id]) : '';
     };
 
-    // Please write here all the methods that are not react native lifecycle methods
-    
     setDateValidations = (item) => {
         let minimumDate = undefined;
         let maximumDate = undefined;
@@ -796,7 +745,6 @@ class CardComponent extends PureComponent {
     };
 
     computeDataForContactsSingleScreenDropdownInput = (item, index) => {
-        // console.log("computeDataForContactsSingleScreenDropdownInput: ", item, this.props.contact);
         if (item.id === 'riskLevel') {
             return _.filter(this.props.referenceData, (o) => {
                 return o.active === true && o.categoryId.includes("RISK_LEVEL")

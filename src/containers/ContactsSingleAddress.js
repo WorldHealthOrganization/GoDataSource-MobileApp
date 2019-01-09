@@ -3,10 +3,10 @@
  */
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
-import React, {Component} from 'react';
-import { View, Text, StyleSheet, InteractionManager, Alert, TouchableWithoutFeedback, Keyboard} from 'react-native';
+import React, {PureComponent} from 'react';
+import { View, Text, StyleSheet, InteractionManager, Alert, ScrollView, TouchableWithoutFeedback, Keyboard} from 'react-native';
 import {LoaderScreen} from 'react-native-ui-lib';
-import {calculateDimension, getTranslation} from './../utils/functions';
+import {calculateDimension, getTranslation, extractIdFromPouchId} from './../utils/functions';
 import config from './../utils/config';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -16,8 +16,10 @@ import Ripple from 'react-native-material-ripple';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import CardComponent from './../components/CardComponent';
 import translations from './../utils/translations'
+import ElevatedView from 'react-native-elevated-view';
+import _ from 'lodash';
 
-class ContactsSingleAddress extends Component {
+class ContactsSingleAddress extends PureComponent {
 
     // This will be a container, so put as less business logic here as possible
     constructor(props) {
@@ -28,10 +30,6 @@ class ContactsSingleAddress extends Component {
     }
 
     // Please add here the react lifecycle methods that you need
-    // shouldComponentUpdate(nextProps, nextState) {
-    //     // console.log("NextPropsIndex ContactsSingleAddress: ", nextProps.activeIndex, this.props.activeIndex);
-    //     return nextProps.activeIndex === 1;
-    // }
 
     componentDidMount() {
         InteractionManager.runAfterInteractions(() => {
@@ -121,25 +119,157 @@ class ContactsSingleAddress extends Component {
         let fields = config.contactsSingleScreen.address.fields.map((field) => {
             return Object.assign({},field, {isEditMode: this.props.isEditMode})
         });
+        return this.renderItemCardComponent(fields, index)
+    };
+
+    renderItemCardComponent = (fields, cardIndex = null) => {
+        return (
+            <ElevatedView elevation={3} style={[style.containerCardComponent, {
+                marginHorizontal: calculateDimension(16, false, this.props.screenSize),
+                width: calculateDimension(config.designScreenSize.width - 32, false, this.props.screenSize),
+                marginVertical: 4,
+                minHeight: calculateDimension(72, true, this.props.screenSize)
+            }, style.cardStyle]}>
+                <ScrollView scrollEnabled={false} style={{flex: 1}} contentContainerStyle={{flexGrow: 1}}>
+                    {
+                        fields && fields.map((item, index) => {
+                            return this.handleRenderItemCardComponent(item, index, cardIndex);
+                        })
+                    }
+                </ScrollView>
+            </ElevatedView>
+        );
+    };
+
+    handleRenderItemCardComponent = (item, index, cardIndex) => {
+        return (
+            <View style={[style.subcontainerCardComponent, {flex: 1}]} key={index}>
+                {
+                    this.handleRenderItemByType(item, cardIndex)
+                }
+            </View>
+        )
+    };
+
+    handleRenderItemByType = (item, cardIndex) => {
+        let value = '';
+        let minimumDate = undefined;
+        let maximumDate = undefined;
+
+        if (item.type === 'DropdownInput') {
+            item.data = this.computeDataForContactsSingleScreenDropdownInput(item, cardIndex);
+        } else if (item.type === 'ActionsBar') {
+            item.onPressArray = [this.props.onDeletePress]
+        }
+
+        if (item.type === 'DropDownSectioned') {
+            if (this.props.contact && this.props.contact.addresses && Array.isArray(this.props.contact.addresses) && this.props.contact.addresses[cardIndex] && this.props.contact.addresses[cardIndex][item.id] && this.props.contact.addresses[cardIndex][item.id] !== "") {
+                for (let location of this.props.locations) {
+                    let myLocationName = this.getLocationNameById(location, this.props.contact.addresses[cardIndex][item.id])
+                    if (myLocationName !== null){
+                        value = myLocationName
+                        break
+                    }
+                }
+            }
+        } else {
+            value = this.computeValueForContactsSingleScreen(item, cardIndex);
+        }
+       
+        if (item.type === 'DatePicker' && value === '') {
+            value = null
+        }
+
+        let dateValidation = this.setDateValidations(item);
+        minimumDate = dateValidation.minimumDate;
+        maximumDate = dateValidation.maximumDate;
+
         return (
             <CardComponent
-                item={fields}
-                index={index}
-                contact={this.props.contact}
+                item={item}
                 isEditMode={this.props.isEditMode}
-                style={style.cardStyle}
-                screen={'ContactsSingleScreen'}
+                isEditModeForDropDownInput={this.props.isEditMode}
+                contact={this.props.contact}
+                value={value}
+                minimumDate={minimumDate}
+                maximumDate={maximumDate}
+                index={cardIndex}
+
                 onChangeText={this.props.onChangeText}
-                onChangeDropDown={this.props.onChangeDropDown}
                 onChangeDate={this.props.onChangeDate}
                 onChangeSwitch={this.props.onChangeSwitch}
+                onChangeDropDown={this.props.onChangeDropDown}
+                onChangeTextSwitchSelector={this.props.onChangeTextSwitchSelector}
                 onChangeSectionedDropDown={this.props.onChangeSectionedDropDown}
                 onDeletePress={this.props.onDeletePress}
                 anotherPlaceOfResidenceWasChosen={this.props.anotherPlaceOfResidenceWasChosen}
                 anotherPlaceOfResidenceChanged={this.props.anotherPlaceOfResidenceChanged}
             />
         )
-    }
+    };
+
+    getLocationNameById = (element, locationId) => {
+        if(extractIdFromPouchId(element._id, 'location') === locationId) {
+            return element.name;
+        } else {
+            if (element.children && element.children.length > 0) {
+                let i;
+                let result = null;
+
+                for(i=0; result === null && i < element.children.length; i++){
+                    result = this.getLocationNameById(element.children[i], locationId);
+                }
+                return result;
+            }
+        }
+        return null;
+    };
+
+    computeValueForContactsSingleScreen = (item, index) => {
+        if (index !== null || index >= 0) {
+            if (item.id === 'lng') {
+                return this.props.contact && this.props.contact.addresses && Array.isArray(this.props.contact.addresses) &&
+                    this.props.contact.addresses[index] && this.props.contact.addresses[index].geoLocation &&
+                    this.props.contact.addresses[index].geoLocation.coordinates &&
+                    Array.isArray(this.props.contact.addresses[index].geoLocation.coordinates) ?
+                    getTranslation(this.props.contact.addresses[index].geoLocation.coordinates[0], this.props.translation) : '';
+            } else {
+                if (item.id === 'lat') {
+                    return this.props.contact && this.props.contact.addresses && Array.isArray(this.props.contact.addresses) &&
+                        this.props.contact.addresses[index] && this.props.contact.addresses[index].geoLocation &&
+                        this.props.contact.addresses[index].geoLocation.coordinates &&
+                        Array.isArray(this.props.contact.addresses[index].geoLocation.coordinates) ?
+                        getTranslation(this.props.contact.addresses[index].geoLocation.coordinates[1], this.props.translation) : '';
+                } else {
+                    return this.props.contact && this.props.contact.addresses && Array.isArray(this.props.contact.addresses) ?
+                        getTranslation(this.props.contact.addresses[index][item.id], this.props.translation) : '';
+                }
+            }
+        }
+        return this.props.contact && this.props.contact[item.id] ? getTranslation(this.props.contact[item.id], this.props.translation) : '';
+    };
+
+    setDateValidations = (item) => {
+        let minimumDate = undefined;
+        let maximumDate = undefined;
+
+        if (item.type === 'DatePicker') {
+            if (item.objectType === 'Address' && item.id === 'date') {
+                maximumDate = new Date()
+            }
+        }
+        
+        let dateValidation = {minimumDate, maximumDate}
+        return dateValidation
+    };
+
+    computeDataForContactsSingleScreenDropdownInput = (item, index) => {
+        if (item.id === 'typeId') {
+            return _.filter(this.props.referenceData, (o) => {
+                return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_ADDRESS_TYPE'
+            }).map((o) => {return {value: getTranslation(o.value, this.props.translation), id: o.value}})
+        }
+    };
 
     handleNextButton = () => {
         if (this.props.isNew) {
@@ -165,17 +295,25 @@ class ContactsSingleAddress extends Component {
         } else {
             this.props.handleMoveToNextScreenButton(true)
         }
-    }
+    };
 
     handleBackButton = () => {
         this.props.handleMoveToPrevieousScreenButton()
-    }
+    };
 }
 
 
 // Create style outside the class, or for components that will be used by other components (buttons),
 // make a global style in the config directory
 const style = StyleSheet.create({
+    containerCardComponent: {
+        backgroundColor: 'white',
+        borderRadius: 2
+    },
+    subcontainerCardComponent: {
+        alignItems: 'center',
+        flex: 1
+    },
     viewContainer: {
         flex: 1,
         backgroundColor: styles.screenBackgroundGrey,
@@ -203,8 +341,9 @@ function mapStateToProps(state) {
         screenSize: state.app.screenSize,
         contacts: state.contacts,
         cases: state.cases,
-        events: state.events,
-        translation: state.app.translation
+        translation: state.app.translation,
+        referenceData: state.referenceData,
+        locations: state.locations,
     };
 }
 

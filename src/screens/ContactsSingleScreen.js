@@ -150,9 +150,9 @@ class ContactsSingleScreen extends Component {
 
             //permissions check
             let isEditMode = true
-            if (this.props.role.find((e) => e === config.userPermissions.writeContact) !== undefined) {
+            if (this.props.role && this.props.role.find((e) => e === config.userPermissions.writeContact) !== undefined) {
                 isEditMode = true
-            } else if (this.props.role.find((e) => e === config.userPermissions.writeContact) === undefined && this.props.role.find((e) => e === config.userPermissions.readContact) !== undefined){
+            } else if (this.props.role && this.props.role.find((e) => e === config.userPermissions.writeContact) === undefined && this.props.role.find((e) => e === config.userPermissions.readContact) !== undefined){
                 isEditMode = false
             }
             this.setState({
@@ -246,7 +246,7 @@ class ContactsSingleScreen extends Component {
                                     </Ripple>
                                 </ElevatedView> 
                                 {
-                                    this.props.role.find((e) => e === config.userPermissions.writeContact) !== undefined ? (
+                                    this.props.role && this.props.role.find((e) => e === config.userPermissions.writeContact) !== undefined ? (
                                         <View>
                                             <Menu
                                                 ref="menuRef"
@@ -1231,8 +1231,8 @@ class ContactsSingleScreen extends Component {
         contactAddressesClone.splice(index, 1);
 
         let hasPlaceOfResidence = false
-        let caselaceOfResidence = caseAddressesClone.find((e) => {return e.typeId === config.userResidenceAddress.userPlaceOfResidence})
-        if (caselaceOfResidence !== undefined) {
+        let contactPlaceOfResidence = contactAddressesClone.find((e) => {return e.typeId === config.userResidenceAddress.userPlaceOfResidence})
+        if (contactPlaceOfResidence !== undefined) {
             hasPlaceOfResidence = true
         }
 

@@ -72,7 +72,9 @@ class CasesScreen extends Component {
             if (this.props.filter && (this.props.filter['CasesScreen'] || this.props.filter['CasesFilterScreen'])) {
                 this.filterCases();
             } else {
-                this.props.getCasesForOutbreakId(this.props.user.activeOutbreakId, null, null);
+                if (this.props.user && this.props.user.activeOutbreakId) {
+                    this.props.getCasesForOutbreakId(this.props.user.activeOutbreakId, null, null);
+                }
             }
         })
     }
@@ -201,7 +203,7 @@ class CasesScreen extends Component {
                                 </ElevatedView> 
                             </View>
                             {
-                                this.props.role.find((e) => e === config.userPermissions.writeCase) !== undefined ? (
+                                this.props.role !== null && this.props.role.find((e) => e === config.userPermissions.writeCase) !== undefined ? (
                                     <View style={{flex: 0.15}}>
                                         <ElevatedView
                                             elevation={3}

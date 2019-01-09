@@ -4,7 +4,7 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {PureComponent} from 'react';
-import {TextInput, View, Text, StyleSheet, FlatList, InteractionManager, ScrollView, Alert, TouchableWithoutFeedback, Keyboard} from 'react-native';
+import {View, Text, StyleSheet, InteractionManager, ScrollView, Alert, TouchableWithoutFeedback, Keyboard} from 'react-native';
 import {LoaderScreen} from 'react-native-ui-lib';
 import {calculateDimension, getTranslation, extractIdFromPouchId} from './../utils/functions';
 import config from './../utils/config';
@@ -161,10 +161,10 @@ class CaseSingleAddressContainer extends PureComponent {
         let fields = config.caseSingleScreen.address.fields.map((field) => {
             return Object.assign({},field, {isEditMode: this.props.isEditMode})
         });
-        return this.rederItemCardComponent(fields, index)
+        return this.renderItemCardComponent(fields, index)
     }
 
-    rederItemCardComponent = (fields, cardIndex = null) => {
+    renderItemCardComponent = (fields, cardIndex = null) => {
         return (
             <ElevatedView elevation={3} style={[style.containerCardComponent, {
                 marginHorizontal: calculateDimension(16, false, this.props.screenSize),
@@ -195,7 +195,6 @@ class CaseSingleAddressContainer extends PureComponent {
 
     handleRenderItemByType = (item, cardIndex) => {
         let value = '';
-        let isEditModeForDropDownInput = true
         let minimumDate = undefined;
         let maximumDate = undefined;
 
@@ -222,7 +221,6 @@ class CaseSingleAddressContainer extends PureComponent {
         if (item.type === 'DatePicker' && value === '') {
             value = null
         }
-        isEditModeForDropDownInput = this.props.isEditMode
 
         let dateValidation = this.setDateValidations(item);
         minimumDate = dateValidation.minimumDate;
@@ -232,15 +230,12 @@ class CaseSingleAddressContainer extends PureComponent {
             <CardComponent
                 item={item}
                 isEditMode={this.props.isEditMode}
+                isEditModeForDropDownInput={this.props.isEditMode}
                 case={this.props.case}
-                selectedItemIndexForAgeUnitOfMeasureDropDown={this.props.selectedItemIndexForAgeUnitOfMeasureDropDown}
-                onChangeextInputWithDropDown={this.props.onChangeextInputWithDropDown}
                 value={value}
                 minimumDate={minimumDate}
                 maximumDate={maximumDate}
-                isEditModeForDropDownInput={isEditModeForDropDownInput}
                 index={cardIndex}
-                style={style.cardStyle}
 
                 onChangeText={this.props.onChangeText}
                 onChangeDate={this.props.onChangeDate}
@@ -285,39 +280,9 @@ class CaseSingleAddressContainer extends PureComponent {
     };
 
     computeDataForCasesSingleScreenDropdownInput = (item) => {
-        if (item.id === 'riskLevel') {
-            return _.filter(this.props.referenceData, (o) => {
-                return o.active === true && o.categoryId.includes("RISK_LEVEL")
-            }).map((o) => {return {value: getTranslation(o.value, this.props.translation), id: o.value}})
-        }
-        if (item.id === 'gender') {
-            return _.filter(this.props.referenceData, (o) => {
-                return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_GENDER'
-            }).map((o) => {return {label: getTranslation(o.value, this.props.translation), value: o.value}})
-        }
         if (item.id === 'typeId') {
             return _.filter(this.props.referenceData, (o) => {
                 return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_ADDRESS_TYPE'
-            }).map((o) => {return {value: getTranslation(o.value, this.props.translation), id: o.value}})
-        }
-        if (item.id === 'classification') {
-            return _.filter(this.props.referenceData, (o) => {
-                return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_CASE_CLASSIFICATION'
-            }).map((o) => {return {label: getTranslation(o.value, this.props.translation), value: o.value}})
-        }
-        if (item.id === 'outcomeId') {
-            return _.filter(this.props.referenceData, (o) => {
-                return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_OUTCOME'
-            }).map((o) => {return {label: getTranslation(o.value, this.props.translation), value: o.value}})
-        }
-        if (item.id === 'type') {
-            return _.filter(this.props.referenceData, (o) => {
-                return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_DOCUMENT_TYPE'
-            }).map((o) => {return {label: getTranslation(o.value, this.props.translation), value: o.value}})
-        }
-        if (item.id === 'occupation') {
-            return _.filter(this.props.referenceData, (o) => {
-                return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_OCCUPATION'
             }).map((o) => {return {value: getTranslation(o.value, this.props.translation), id: o.value}})
         }
     };
