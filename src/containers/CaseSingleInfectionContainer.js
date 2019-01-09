@@ -4,7 +4,7 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {PureComponent} from 'react';
-import {TextInput, View, Text, StyleSheet, FlatList, Alert, TouchableWithoutFeedback, Keyboard} from 'react-native';
+import {TextInput, View, Text, StyleSheet, FlatList, Alert, ScrollView, TouchableWithoutFeedback, Keyboard} from 'react-native';
 import {calculateDimension, getTranslation} from './../utils/functions';
 import config from './../utils/config';
 import {connect} from "react-redux";
@@ -15,6 +15,8 @@ import CardComponent from './../components/CardComponent';
 import Button from './../components/Button';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import translations from './../utils/translations'
+import ElevatedView from 'react-native-elevated-view';
+import _ from 'lodash';
 
 class CaseSingleInfectionContainer extends PureComponent {
 
@@ -169,7 +171,7 @@ class CaseSingleInfectionContainer extends PureComponent {
     }
 
     // Please write here all the methods that are not react native lifecycle methods
-    handleRenderItem = (item, index) => {
+    handleRenderItem = (item) => {
         let fields = item.fields.map( (field) => {
             return Object.assign({},field, {isEditMode: this.props.isEditMode})
         });
@@ -179,66 +181,252 @@ class CaseSingleInfectionContainer extends PureComponent {
                 return field.id !== 'dateDeceased' && field.id !== 'safeBurial'
             });
         }
-        return (
-            <CardComponent
-                item={fields}
-                index={index}
-                isEditMode={this.props.isEditMode}
-                screen={'CaseSingleScreen'}
-                case={this.props.case}
-                style={style.cardStyle}
-                onChangeText={this.props.onChangeText}
-                onChangeDate={this.props.onChangeDate}
-                onChangeSwitch={this.props.onChangeSwitch}
-                onChangeDropDown={this.props.onChangeDropDown}
-            />
-        )
+
+        return this.rederItemCardComponent(fields)
     };
 
     handleRenderItemForHospitalizationDatesList = (item, index) => {
         let fields = config.caseSingleScreen.hospitalizationDate.fields.map((field) => {
             return Object.assign({},field, {isEditMode: this.props.isEditMode})
         });
-        return (
-            <CardComponent
-                item={fields}
-                index={index}
-                screen={'CaseSingleScreen'}
-                isEditMode={this.props.isEditMode}
-                case={this.props.case}
-                style={style.cardStyle}
-                onChangeText={this.props.onChangeText}
-                onChangeDate={this.props.onChangeDate}
-                onChangeSwitch={this.props.onChangeSwitch}
-                onChangeDropDown={this.props.onChangeDropDown}
-                onDeletePress={this.props.handleOnPressDeleteHospitalizationDates}
-            />
-        )
+        return this.rederItemCardComponent(fields, index)
     };
 
     handleRenderItemForIsolationDatesList = (item, index) => {
         let fields = config.caseSingleScreen.isolationDate.fields.map((field) => {
             return Object.assign({},field, {isEditMode: this.props.isEditMode})
         });
+
+        return this.rederItemCardComponent(fields, index)
+    };
+
+    rederItemCardComponent = (fields, cardIndex = null) => {
+        return (
+            <ElevatedView elevation={3} style={[style.containerCardComponent, {
+                marginHorizontal: calculateDimension(16, false, this.props.screenSize),
+                width: calculateDimension(config.designScreenSize.width - 32, false, this.props.screenSize),
+                marginVertical: 4,
+                minHeight: calculateDimension(72, true, this.props.screenSize)
+            }, style.cardStyle]}>
+                <ScrollView scrollEnabled={false} style={{flex: 1}} contentContainerStyle={{flexGrow: 1}}>
+                    {
+                        fields && fields.map((item, index) => {
+                            return this.handleRenderItemCardComponent(item, index, cardIndex);
+                        })
+                    }
+                </ScrollView>
+            </ElevatedView>
+        );
+    };
+
+    handleRenderItemCardComponent = (item, index, cardIndex) => {
+        return (
+            <View style={[style.subcontainerCardComponent, {flex: 1}]} key={index}>
+                {
+                    this.handleRenderItemByType(item, cardIndex)
+                }
+            </View>
+        )
+    };
+
+    handleRenderItemByType = (item, cardIndex) => {
+        let value = '';
+        let isEditModeForDropDownInput = true
+        let minimumDate = undefined;
+        let maximumDate = undefined;
+
+        if (item.type === 'DropdownInput') {
+            item.data = this.computeDataForCasesSingleScreenDropdownInput(item);
+        } else if (item.type === 'ActionsBar') {
+            if (item.objectType !== null && item.objectType !== undefined && item.objectType === 'HospitalizationDates') { 
+                item.onPressArray = [this.props.handleOnPressDeleteHospitalizationDates]
+            } else if (item.objectType !== null && item.objectType !== undefined && item.objectType === 'IsolationDates') {
+                item.onPressArray = [this.props.handleOnPressDeleteIsolationDates]
+            }
+        }
+
+        if (item.type === 'DatePicker' && this.props.case[item.id] !== undefined) {
+            value = this.props.case[item.id]
+        } else if (item.type === 'SwitchInput' && this.props.case[item.id] !== undefined) {
+            value = this.props.case[item.id]
+        } else {
+            value = this.computeValueForCasesSingleScreen(item, cardIndex);
+        }
+        
+        if (item.type === 'DatePicker' && value === '') {
+            value = null
+        }
+        isEditModeForDropDownInput = this.props.isEditMode
+
+        let dateValidation = this.setDateValidations(item, cardIndex);
+        minimumDate = dateValidation.minimumDate;
+        maximumDate = dateValidation.maximumDate;
+
         return (
             <CardComponent
-                item={fields}
-                index={index}
+                item={item}
                 isEditMode={this.props.isEditMode}
-                screen={'CaseSingleScreen'}
                 case={this.props.case}
-                style={style.cardStyle}
+                value={value}
+                minimumDate={minimumDate}
+                maximumDate={maximumDate}
+                isEditModeForDropDownInput={isEditModeForDropDownInput}
+                index={cardIndex}
+                
                 onChangeText={this.props.onChangeText}
                 onChangeDate={this.props.onChangeDate}
                 onChangeSwitch={this.props.onChangeSwitch}
                 onChangeDropDown={this.props.onChangeDropDown}
-                onDeletePress={this.props.handleOnPressDeleteIsolationDates}
+                onChangeTextSwitchSelector={this.props.onChangeTextSwitchSelector}
+                onDeletePress={item.objectType !== null && item.objectType !== undefined && item.objectType === 'HospitalizationDates' ? 
+                                this.props.handleOnPressDeleteHospitalizationDates : 
+                                item.objectType !== null && item.objectType !== undefined && item.objectType === 'IsolationDates' ? 
+                                this.props.handleOnPressDeleteIsolationDates : 
+                                null}
             />
         )
     };
 
+    setDateValidations = (item, cardIndex) => {
+        let minimumDate = undefined;
+        let maximumDate = undefined;
+
+        if (item.type === 'DatePicker') {
+            if (item.id === 'dateBecomeCase' || item.id === 'dateOfOutcome' ) {
+                maximumDate = new Date()
+            } else if (item.id === 'dateOfOnset') {
+                if (this.props.case && this.props.case !== undefined && this.props.case.deceased !== null && this.props.case.deceased !== undefined && this.props.case.deceased === true && this.props.case.dateDeceased && this.props.case.dateDeceased !== undefined && this.props.case.dateDeceased !== ''){
+                    maximumDate = new Date(this.props.case.dateDeceased);
+                } else {
+                    maximumDate = new Date();
+                }
+            } else if (item.id === 'dateOfInfection') {
+                let hasDeceasedDate = false;
+                let hasDateOfOnset = false;
+                if (this.props.case && this.props.case !== undefined && this.props.case.deceased !== null && this.props.case.deceased !== undefined && this.props.case.deceased === true && this.props.case.dateDeceased && this.props.case.dateDeceased !== undefined && this.props.case.dateDeceased !== ''){
+                    hasDeceasedDate = true
+                }
+                if (this.props.case && this.props.case !== undefined && this.props.case.dateOfOnset && this.props.case.dateOfOnset !== undefined && this.props.case.dateOfOnset !== ''){
+                    hasDateOfOnset = true
+                }
+
+                if (hasDeceasedDate === true && hasDateOfOnset === false) {
+                    maximumDate = new Date(this.props.case.dateDeceased);
+                } else if (hasDeceasedDate === false && hasDateOfOnset === true) {
+                    maximumDate = new Date(this.props.case.dateOfOnset);
+                } else if (hasDeceasedDate === true && hasDateOfOnset === true) {
+                    maximumDate = _.min([this.props.case.dateOfOnset, this.props.case.dateDeceased])
+                } else {
+                    maximumDate = new Date()
+                }
+            } else if (item.id === 'dateDeceased') {
+                maximumDate = new Date()
+                let hasDateOfOnset = false   
+                let hasDateOfReporting = false
+                let hasDateOfInfection = false
+
+                if (this.props.case && this.props.case !== undefined && this.props.case.dateOfOnset && this.props.case.dateOfOnset !== undefined && this.props.case.dateOfOnset !== ''){
+                    hasDateOfOnset = true
+                }
+                if (this.props.case && this.props.case !== undefined && this.props.case.dateOfReporting && this.props.case.dateOfReporting !== undefined && this.props.case.dateOfReporting !== ''){
+                    hasDateOfReporting = true
+                }
+                if (this.props.case && this.props.case !== undefined && this.props.case.dateOfInfection && this.props.case.dateOfInfection !== undefined && this.props.case.dateOfInfection !== ''){
+                    hasDateOfInfection = true
+                }
+
+                if (hasDateOfOnset === false && hasDateOfReporting === false && hasDateOfInfection === true) {
+                    minimumDate = this.props.case.dateOfInfection
+                } else if (hasDateOfOnset === false && hasDateOfReporting === true && hasDateOfInfection === false) {
+                    minimumDate = this.props.case.dateOfReporting
+                } else if (hasDateOfOnset === true && hasDateOfReporting === false && hasDateOfInfection === false) {
+                    minimumDate = this.props.case.dateOfOnset
+                } else if (hasDateOfOnset === false && hasDateOfReporting === true && hasDateOfInfection === true) {
+                    minimumDate = _.max([this.props.case.dateOfReporting, this.props.case.dateOfInfection])
+                } else if (hasDateOfOnset === true && hasDateOfReporting === false && hasDateOfInfection === true) {
+                    minimumDate = _.max([this.props.case.dateOfOnset, this.props.case.dateOfInfection])
+                } else if (hasDateOfOnset === true && hasDateOfReporting === true && hasDateOfInfection === false) {
+                    minimumDate = _.max([this.props.case.dateOfOnset, this.props.case.dateOfReporting])
+                } else if (hasDateOfOnset === true && hasDateOfReporting === true && hasDateOfInfection === true) {
+                    minimumDate = _.max([this.props.case.dateOfOnset, this.props.case.dateOfReporting, this.props.case.dateOfInfection])
+                }
+            } else if (item.objectType === 'HospitalizationDates'){
+                if (this.props.case && this.props.case.hospitalizationDates && Array.isArray(this.props.case.hospitalizationDates) && this.props.case.hospitalizationDates.length > 0 && this.props.case.hospitalizationDates[cardIndex]) {
+                    if (this.props.case.hospitalizationDates[cardIndex].startDate !== null && item.id !== 'startDate') {
+                        minimumDate = this.props.case.hospitalizationDates[cardIndex].startDate
+                    }
+                    if (this.props.case.hospitalizationDates[cardIndex].endDate !== null && item.id !== 'endDate') {
+                        maximumDate = this.props.case.hospitalizationDates[cardIndex].endDate
+                    }
+                }
+            } else if (item.objectType === 'IsolationDates'){
+                if (this.props.case && this.props.case.isolationDates && Array.isArray(this.props.case.isolationDates) && this.props.case.isolationDates.length > 0 && this.props.case.isolationDates[cardIndex]) {
+                    if (this.props.case.isolationDates[cardIndex].startDate !== null && item.id !== 'startDate') {
+                        minimumDate = this.props.case.isolationDates[cardIndex].startDate
+                    }
+                    if (this.props.case.isolationDates[cardIndex].endDate !== null && item.id !== 'endDate') {
+                        maximumDate = this.props.case.isolationDates[cardIndex].endDate
+                    }
+                }
+            }
+        }
+        
+        let dateValidation = {minimumDate, maximumDate}
+        return dateValidation
+    }
+
+    computeDataForCasesSingleScreenDropdownInput = (item) => {
+        if (item.id === 'riskLevel') {
+            return _.filter(this.props.referenceData, (o) => {
+                return o.active === true && o.categoryId.includes("RISK_LEVEL")
+            }).map((o) => {return {value: getTranslation(o.value, this.props.translation), id: o.value}})
+        }
+        if (item.id === 'gender') {
+            return _.filter(this.props.referenceData, (o) => {
+                return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_GENDER'
+            }).map((o) => {return {label: getTranslation(o.value, this.props.translation), value: o.value}})
+        }
+        if (item.id === 'typeId') {
+            return _.filter(this.props.referenceData, (o) => {
+                return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_ADDRESS_TYPE'
+            }).map((o) => {return {value: getTranslation(o.value, this.props.translation), id: o.value}})
+        }
+        if (item.id === 'classification') {
+            return _.filter(this.props.referenceData, (o) => {
+                return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_CASE_CLASSIFICATION'
+            }).map((o) => {return {label: getTranslation(o.value, this.props.translation), value: o.value}})
+        }
+        if (item.id === 'outcomeId') {
+            return _.filter(this.props.referenceData, (o) => {
+                return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_OUTCOME'
+            }).map((o) => {return {label: getTranslation(o.value, this.props.translation), value: o.value}})
+        }
+        if (item.id === 'type') {
+            return _.filter(this.props.referenceData, (o) => {
+                return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_DOCUMENT_TYPE'
+            }).map((o) => {return {label: getTranslation(o.value, this.props.translation), value: o.value}})
+        }
+        if (item.id === 'occupation') {
+            return _.filter(this.props.referenceData, (o) => {
+                return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_OCCUPATION'
+            }).map((o) => {return {value: getTranslation(o.value, this.props.translation), id: o.value}})
+        }
+    };
+
+    computeValueForCasesSingleScreen = (item, index) => {
+        if (index !== null || index >= 0) {
+            if (item.objectType === 'HospitalizationDates') {
+                return this.props.case && this.props.case.hospitalizationDates && Array.isArray(this.props.case.hospitalizationDates) && this.props.case.hospitalizationDates.length > 0 && this.props.case.hospitalizationDates[index][item.id] !== undefined ?
+                    getTranslation(this.props.case.hospitalizationDates[index][item.id], this.props.translation) : '';
+            } else if (item.objectType === 'IsolationDates') {
+                return this.props.case && this.props.case.isolationDates && Array.isArray(this.props.case.isolationDates) && this.props.case.isolationDates.length > 0 && this.props.case.isolationDates[index][item.id] !== undefined ?
+                    getTranslation(this.props.case.isolationDates[index][item.id], this.props.translation) : '';
+            }
+        }
+        return this.props.case && this.props.case[item.id] ? getTranslation(this.props.case[item.id], this.props.translation) : '';
+    };
+
     handleNextButton = () => {
-        // if (true) {
         if (this.props.checkRequiredFieldsInfection()) {
             if (this.props.checkIsolationOnsetDates()) {
                 this.props.handleMoveToNextScreenButton(true);
@@ -269,6 +457,14 @@ class CaseSingleInfectionContainer extends PureComponent {
 // Create style outside the class, or for components that will be used by other components (buttons),
 // make a global style in the config directory
 const style = StyleSheet.create({
+    containerCardComponent: {
+        backgroundColor: 'white',
+        borderRadius: 2
+    },
+    subcontainerCardComponent: {
+        alignItems: 'center',
+        flex: 1
+    },
     container: {
         flex: 1,
         backgroundColor: styles.screenBackgroundGrey,
@@ -292,6 +488,7 @@ function mapStateToProps(state) {
         screenSize: state.app.screenSize,
         role: state.role,
         translation: state.app.translation,
+        referenceData: state.referenceData,
     };
 }
 

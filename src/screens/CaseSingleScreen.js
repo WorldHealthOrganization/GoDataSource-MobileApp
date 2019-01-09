@@ -359,7 +359,6 @@ class CaseSingleScreen extends Component {
                         onPressEdit={this.onPressEdit}
                         onPressSaveEdit={this.onPressSaveEdit}
                         onPressCancelEdit={this.onPressCancelEdit}
-                        onPressSave={this.handleSavePress}
                         onChangeText={this.onChangeText}
                         onChangeDate={this.onChangeDate}
                         onChangeSwitch={this.onChangeSwitch}
@@ -377,68 +376,68 @@ class CaseSingleScreen extends Component {
                         onChangeextInputWithDropDown={this.handleOnChangeTextInputWithDropDown}
                     />
                 );
-            // case 'address':
-            //     return (
-            //         <CaseSingleAddressContainer
-            //             case={this.state.case}
-            //             isEditMode={this.state.isEditMode}
-            //             onPressEdit={this.onPressEdit}
-            //             onPressSaveEdit={this.onPressSaveEdit}
-            //             onPressCancelEdit={this.onPressCancelEdit}
-            //             onChangeText={this.onChangeText}
-            //             onChangeDropDown={this.onChangeDropDown}
-            //             onChangeDate={this.onChangeDate}
-            //             onChangeSwitch={this.onChangeSwitch}
-            //             onChangeSectionedDropDown={this.handleOnChangeSectionedDropDownAddress}
-            //             onDeletePress={this.handleOnPressDeleteAddress}
-            //             onPressAddAddress={this.handleOnPressAddAddress}
-            //             handleMoveToNextScreenButton={this.handleMoveToNextScreenButton}
-            //             handleMoveToPrevieousScreenButton={this.handleMoveToPrevieousScreenButton}
-            //             checkRequiredFieldsAddresses={this.checkRequiredFieldsAddresses}
-            //             isNew={this.props.isNew}
-            //             anotherPlaceOfResidenceWasChosen={this.state.anotherPlaceOfResidenceWasChosen}
-            //             anotherPlaceOfResidenceChanged={this.anotherPlaceOfResidenceChanged}
-            //             hasPlaceOfResidence={this.state.hasPlaceOfResidence}
-            //         />
-            //     );
-            // case 'infection':
-            //     return (
-            //         <CaseSingleInfectionContainer
-            //             case={this.state.case}
-            //             isEditMode={this.state.isEditMode}
-            //             onPressEdit={this.onPressEdit}
-            //             onPressSaveEdit={this.onPressSaveEdit}
-            //             onPressCancelEdit={this.onPressCancelEdit}
-            //             onChangeText={this.onChangeText}
-            //             onChangeDropDown={this.onChangeDropDown}
-            //             onChangeDate={this.onChangeDate}
-            //             onChangeSwitch={this.onChangeSwitch}
-            //             handleMoveToNextScreenButton={this.handleMoveToNextScreenButton}
-            //             handleMoveToPrevieousScreenButton={this.handleMoveToPrevieousScreenButton}
-            //             checkRequiredFieldsInfection={this.checkRequiredFieldsInfection}
-            //             isNew={this.props.isNew}
-            //             onPressAddHospitalizationDate={this.onPressAddHospitalizationDate}
-            //             handleOnPressDeleteHospitalizationDates={this.handleOnPressDeleteHospitalizationDates}
-            //             onPressAddIsolationDates={this.onPressAddIsolationDates}
-            //             handleOnPressDeleteIsolationDates={this.handleOnPressDeleteIsolationDates}
-            //             checkIsolationOnsetDates={this.checkIsolationOnsetDates}
-            //         />
-            //     );
-            // case 'caseInvestigation':
-            //     return <CaseSingleInvestigationContainer
-            //         item={this.state.case}
-            //         isEditMode={this.state.isEditMode}
-            //         onPressEdit={this.onPressEdit}
-            //         onPressSave={this.handleOnPressSave}
-            //         onPressSaveEdit={this.onPressSaveEdit}
-            //         onPressCancelEdit={this.onPressCancelEdit}
-            //         onChangeTextAnswer={this.onChangeTextAnswer}
-            //         onChangeSingleSelection={this.onChangeSingleSelection}
-            //         onChangeMultipleSelection={this.onChangeMultipleSelection}
-            //         onChangeDateAnswer={this.onChangeDateAnswer}
-            //         handleMoveToPrevieousScreenButton={this.handleMoveToPrevieousScreenButton}
-            //         isNew={this.props.isNew}
-            //     />;
+            case 'address':
+                return (
+                    <CaseSingleAddressContainer
+                        case={this.state.case}
+                        isEditMode={this.state.isEditMode}
+                        onPressEdit={this.onPressEdit}
+                        onPressSaveEdit={this.onPressSaveEdit}
+                        onPressCancelEdit={this.onPressCancelEdit}
+                        onChangeText={this.onChangeText}
+                        onChangeDropDown={this.onChangeDropDown}
+                        onChangeDate={this.onChangeDate}
+                        onChangeSwitch={this.onChangeSwitch}
+                        onChangeSectionedDropDown={this.handleOnChangeSectionedDropDownAddress}
+                        onDeletePress={this.handleOnPressDeleteAddress}
+                        onPressAddAddress={this.handleOnPressAddAddress}
+                        handleMoveToNextScreenButton={this.handleMoveToNextScreenButton}
+                        handleMoveToPrevieousScreenButton={this.handleMoveToPrevieousScreenButton}
+                        checkRequiredFieldsAddresses={this.checkRequiredFieldsAddresses}
+                        isNew={this.props.isNew}
+                        anotherPlaceOfResidenceWasChosen={this.state.anotherPlaceOfResidenceWasChosen}
+                        anotherPlaceOfResidenceChanged={this.anotherPlaceOfResidenceChanged}
+                        hasPlaceOfResidence={this.state.hasPlaceOfResidence}
+                    />
+                );
+            case 'infection':
+                return (
+                    <CaseSingleInfectionContainer
+                        case={this.state.case}
+                        isEditMode={this.state.isEditMode}
+                        onPressEdit={this.onPressEdit}
+                        onPressSaveEdit={this.onPressSaveEdit}
+                        onPressCancelEdit={this.onPressCancelEdit}
+                        onChangeText={this.onChangeText}
+                        onChangeDropDown={this.onChangeDropDown}
+                        onChangeDate={this.onChangeDate}
+                        onChangeSwitch={this.onChangeSwitch}
+                        handleMoveToNextScreenButton={this.handleMoveToNextScreenButton}
+                        handleMoveToPrevieousScreenButton={this.handleMoveToPrevieousScreenButton}
+                        checkRequiredFieldsInfection={this.checkRequiredFieldsInfection}
+                        isNew={this.props.isNew}
+                        onPressAddHospitalizationDate={this.onPressAddHospitalizationDate}
+                        handleOnPressDeleteHospitalizationDates={this.handleOnPressDeleteHospitalizationDates}
+                        onPressAddIsolationDates={this.onPressAddIsolationDates}
+                        handleOnPressDeleteIsolationDates={this.handleOnPressDeleteIsolationDates}
+                        checkIsolationOnsetDates={this.checkIsolationOnsetDates}
+                    />
+                );
+            case 'caseInvestigation':
+                return <CaseSingleInvestigationContainer
+                    item={this.state.case}
+                    isEditMode={this.state.isEditMode}
+                    onPressEdit={this.onPressEdit}
+                    onPressSave={this.handleOnPressSave}
+                    onPressSaveEdit={this.onPressSaveEdit}
+                    onPressCancelEdit={this.onPressCancelEdit}
+                    onChangeTextAnswer={this.onChangeTextAnswer}
+                    onChangeSingleSelection={this.onChangeSingleSelection}
+                    onChangeMultipleSelection={this.onChangeMultipleSelection}
+                    onChangeDateAnswer={this.onChangeDateAnswer}
+                    handleMoveToPrevieousScreenButton={this.handleMoveToPrevieousScreenButton}
+                    isNew={this.props.isNew}
+                />;
             default: return null;
         }
     };

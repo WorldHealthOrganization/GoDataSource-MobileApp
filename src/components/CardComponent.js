@@ -54,9 +54,9 @@ class CardComponent extends PureComponent {
             case 'Section':
                 return (
                     <Section
-                        label={item.label}
-                        hasBorderBottom={item.hasBorderBottom}
-                        borderBottomColor={item.borderBottomColor}
+                        label={this.props.item.label}
+                        hasBorderBottom={this.props.item.hasBorderBottom}
+                        borderBottomColor={this.props.item.borderBottomColor}
                         containerStyle={{height: calculateDimension(54, true, this.props.screenSize)}}
                         translation={this.props.translation}
                     />
@@ -98,38 +98,38 @@ class CardComponent extends PureComponent {
             case 'DropDown':
                 return (
                     <DropDown
-                        key={item.id}
-                        id={item.id}
+                        key={this.props.item.id}
+                        id={this.props.item.id}
                         label={translations.dropDownLabels.selectedAnswersLabel}
-                        labelValue={item.label}
-                        value={value}
-                        data={data}
+                        labelValue={this.props.item.label}
+                        value={this.props.value}
+                        data={this.props.data}
                         isEditMode={true}
-                        isRequired={item.required}
+                        isRequired={this.props.item.required}
                         onChange={this.props.onChangeMultipleSelection}
                         style={{width: width, marginHorizontal: marginHorizontal}}
                         dropDownStyle={{width: width, alignSelf: 'center'}}
                         showDropdown={this.state.showDropdown}
-                        objectType={item.objectType}
+                        objectType={this.props.item.objectType}
                     />
                 );
             case 'DropDownSectioned':
                 return (
                     <DropDownSectioned
-                        key={item.id}
-                        id={item.id}
-                        label={item.label}
+                        key={this.props.item.id}
+                        id={this.props.item.id}
+                        label={this.props.item.label}
                         index={this.props.index}
-                        value={value}
+                        value={this.props.value}
                         data={this.props.locations}
-                        isEditMode={item.isEditMode}
-                        isRequired={item.isRequired}
-                        sectionedSelectedItems={sectionedSelectedItems}
+                        isEditMode={this.props.item.isEditMode}
+                        isRequired={this.props.item.isRequired}
+                        sectionedSelectedItems={this.props.sectionedSelectedItems}
                         onChange={this.props.onChangeSectionedDropDown}
                         style={{width: width, marginHorizontal: marginHorizontal}}
                         dropDownStyle={{width: width, alignSelf: 'center'}}
-                        objectType={item.objectType}
-                        single={item.single}
+                        objectType={this.props.item.objectType}
+                        single={this.props.item.single}
                     />
                 );
             case 'SwitchInput':
@@ -170,25 +170,25 @@ class CardComponent extends PureComponent {
             case 'Selector':
                 return (
                     <Selector
-                        id={item.id}
-                        key={item.id}
-                        data={item.data}
+                        id={this.props.item.id}
+                        key={this.props.item.id}
+                        data={this.props.item.data}
                         selectItem={this.props.onSelectItem}
                         style={{width: width, height: '100%', marginHorizontal: marginHorizontal}}
-                        objectType={item.objectType}
+                        objectType={this.props.item.objectType}
                     />
                 );
             case 'IntervalPicker':
                 return (
                     <IntervalPicker
-                        id={item.id}
-                        label={item.label}
-                        value={item.value}
-                        min={item.min}
-                        max={item.max}
+                        id={this.props.item.id}
+                        label={this.props.item.label}
+                        value={this.props.item.value}
+                        min={this.props.item.min}
+                        max={this.props.item.max}
                         style={{width, marginHorizontal}}
                         onChange={this.props.onChangeInterval}
-                        objectType={item.objectType}
+                        objectType={this.props.item.objectType}
                     />
                 );
             case 'ActionsBar':
@@ -247,414 +247,255 @@ class CardComponent extends PureComponent {
         }
     }
 
-    // handleRenderItemByType = (item) => {
+    handleRenderItemByType = (item) => {
 
-    //     let width = calculateDimension(315, false, this.props.screenSize);
-    //     let marginHorizontal = calculateDimension(14, false, this.props.screenSize);
-    //     let addContactFromCasesScreen = false;
-    //     let value = '';
-    //     let minimumDate = undefined;
-    //     let maximumDate = undefined;
-    //     let data = [];
-    //     let sectionedSelectedItems = [];
+        let width = calculateDimension(315, false, this.props.screenSize);
+        let marginHorizontal = calculateDimension(14, false, this.props.screenSize);
+        let addContactFromCasesScreen = false;
+        let value = '';
+        let minimumDate = undefined;
+        let maximumDate = undefined;
+        let data = [];
+        let sectionedSelectedItems = [];
 
-    //     if (this.props.followUp && this.props.contact) {
-    //         let followUp = this.props.followUp;
-    //         let contact = this.props.contact;
-    //         if (item.type === 'DropdownInput') {
-    //             item.data = this.computeDataForDropdown(item, contact);
-    //         }
+        if (this.props.followUp && this.props.contact) {
+            let followUp = this.props.followUp;
+            let contact = this.props.contact;
+            if (item.type === 'DropdownInput') {
+                item.data = this.computeDataForDropdown(item, contact);
+            }
 
-    //         value = this.computeValueForId(item.type, item.id, followUp, contact);
-    //     }
+            value = this.computeValueForId(item.type, item.id, followUp, contact);
+        }
 
-    //     if (this.props.screen === 'FollowUpsFilter' || this.props.screen === 'CasesFilter') {
-    //         if (item.type === 'Selector' && item.id === 'gender') {
-    //             item.data = item.data.map((e) => {return {
-    //                 value: this.getTranslation(e.value), 
-    //                 selected: this.props.filter && this.props.filter.filter && this.props.filter.filter.gender && this.props.filter.filter.gender[e.value] ? true : false}
-    //             })
-    //         }
-    //         if (item.type === 'IntervalPicker' && item.id === 'age') {
-    //             item.value = this.props.filter.filter[item.id];
-    //         }
-    //         if (item.type === 'DropDownSectioned' && item.id === 'selectedLocations') {
-    //             sectionedSelectedItems = this.props.filter.filter[item.id].map ((e) => {
-    //                 return 'location.json_' + e
-    //             })
-    //         }
-    //         if (item.type === 'DropDown' && item.id === 'exposure') {
-    //             if (this.props.cases && this.props.cases.length > 0){
-    //                 data = this.props.cases.map((e) => {return {label: ((e.firstName ? e.firstName : '') + (e.lastName ? (" " + e.lastName) : '')), value: e.id}})
-    //             }
-    //             value = this.props.filter.filter[item.id];
-    //         }
-    //         if (item.type === 'DropDown' && item.id === 'classification') {
-    //             data = this.computeDataForDropdown(item);
-    //             value = this.props.filter.filter[item.id];
-    //         }
-    //         if (item.type === 'DropdownInput' && item.id === 'sortCriteria') {
-    //             let configSortCiteriaFilter = config.sortCriteriaDropDownItems.filter ((e) => {
-    //                 return this.props.filter.sort.map((k) => {return k.sortCriteria}).indexOf(e.value) === -1
-    //             })
+        if (this.props.screen === 'FollowUpsFilter' || this.props.screen === 'CasesFilter') {
+            if (item.type === 'Selector' && item.id === 'gender') {
+                item.data = item.data.map((e) => {return {
+                    value: this.getTranslation(e.value), 
+                    selected: this.props.filter && this.props.filter.filter && this.props.filter.filter.gender && this.props.filter.filter.gender[e.value] ? true : false}
+                })
+            }
+            if (item.type === 'IntervalPicker' && item.id === 'age') {
+                item.value = this.props.filter.filter[item.id];
+            }
+            if (item.type === 'DropDownSectioned' && item.id === 'selectedLocations') {
+                sectionedSelectedItems = this.props.filter.filter[item.id].map ((e) => {
+                    return 'location.json_' + e
+                })
+            }
+            if (item.type === 'DropDown' && item.id === 'exposure') {
+                if (this.props.cases && this.props.cases.length > 0){
+                    data = this.props.cases.map((e) => {return {label: ((e.firstName ? e.firstName : '') + (e.lastName ? (" " + e.lastName) : '')), value: e.id}})
+                }
+                value = this.props.filter.filter[item.id];
+            }
+            if (item.type === 'DropDown' && item.id === 'classification') {
+                data = this.computeDataForDropdown(item);
+                value = this.props.filter.filter[item.id];
+            }
+            if (item.type === 'DropdownInput' && item.id === 'sortCriteria') {
+                let configSortCiteriaFilter = config.sortCriteriaDropDownItems.filter ((e) => {
+                    return this.props.filter.sort.map((k) => {return k.sortCriteria}).indexOf(e.value) === -1
+                })
 
-    //             item.data = configSortCiteriaFilter.map((e) => { return {label: this.getTranslation(e.label), value: e.value }})
-    //             value = this.computeValueForCaseSortScreen(item, this.props.index);
-    //             // valueFromConfig = config.sortCriteriaDropDownItems.find((e) => {
-    //             //     return e.value === this.props.filter.sort[this.props.index][item.id]
-    //             // })
-    //             // if (valueFromConfig !== undefined && valueFromConfig && valueFromConfig.label){
-    //             //     value = valueFromConfig.label
-    //             // }
-    //         }
-    //         if (item.type === 'DropdownInput' && item.id === 'sortOrder') {
-    //             item.data = config.sortOrderDropDownItems.map((e) => { return {label: this.getTranslation(e.label), value: e.value }})
-    //             value = this.computeValueForCaseSortScreen(item, this.props.index);
-    //         }
-    //         if (item.type === 'ActionsBar') {
-    //             item.onPressArray = [this.props.onDeletePress]
-    //         }
-    //     }
+                item.data = configSortCiteriaFilter.map((e) => { return {label: this.getTranslation(e.label), value: e.value }})
+                value = this.computeValueForCaseSortScreen(item, this.props.index);
+                // valueFromConfig = config.sortCriteriaDropDownItems.find((e) => {
+                //     return e.value === this.props.filter.sort[this.props.index][item.id]
+                // })
+                // if (valueFromConfig !== undefined && valueFromConfig && valueFromConfig.label){
+                //     value = valueFromConfig.label
+                // }
+            }
+            if (item.type === 'DropdownInput' && item.id === 'sortOrder') {
+                item.data = config.sortOrderDropDownItems.map((e) => { return {label: this.getTranslation(e.label), value: e.value }})
+                value = this.computeValueForCaseSortScreen(item, this.props.index);
+            }
+            if (item.type === 'ActionsBar') {
+                item.onPressArray = [this.props.onDeletePress]
+            }
+        }
 
-    //     if (this.props.screen === 'HelpFilter') {
-    //         if (item.type === 'DropdownInput' && item.id === 'sortCriteria') {
-    //             let configSortCiteriaFilter = config.helpItemsSortCriteriaDropDownItems.filter ((e) => {
-    //                 return this.props.filter.sort.map((k) => {return k.sortCriteria}).indexOf(e.value) === -1
-    //             })
-    //             item.data = configSortCiteriaFilter.map((e) => { return {label: this.getTranslation(e.label), value: e.value }})
-    //             value = this.computeValueForCaseSortScreen(item, this.props.index);
-    //         }
-    //         if (item.type === 'DropdownInput' && item.id === 'sortOrder') {
-    //             item.data = config.sortOrderDropDownItems.map((e) => { return {label: this.getTranslation(e.label), value: e.value }})
-    //             value = this.computeValueForCaseSortScreen(item, this.props.index);
-    //         }
-    //         if (item.type === 'ActionsBar') {
-    //             item.onPressArray = [this.props.onDeletePress]
-    //         }
-    //         if (item.type === 'DropDown' && item.id === 'categories') {
-    //             data = this.computeDataForDropdown(item);
-    //             value = this.props.filter.filter[item.id];
-    //         }
-    //     }
+        if (this.props.screen === 'HelpFilter') {
+            if (item.type === 'DropdownInput' && item.id === 'sortCriteria') {
+                let configSortCiteriaFilter = config.helpItemsSortCriteriaDropDownItems.filter ((e) => {
+                    return this.props.filter.sort.map((k) => {return k.sortCriteria}).indexOf(e.value) === -1
+                })
+                item.data = configSortCiteriaFilter.map((e) => { return {label: this.getTranslation(e.label), value: e.value }})
+                value = this.computeValueForCaseSortScreen(item, this.props.index);
+            }
+            if (item.type === 'DropdownInput' && item.id === 'sortOrder') {
+                item.data = config.sortOrderDropDownItems.map((e) => { return {label: this.getTranslation(e.label), value: e.value }})
+                value = this.computeValueForCaseSortScreen(item, this.props.index);
+            }
+            if (item.type === 'ActionsBar') {
+                item.onPressArray = [this.props.onDeletePress]
+            }
+            if (item.type === 'DropDown' && item.id === 'categories') {
+                data = this.computeDataForDropdown(item);
+                value = this.props.filter.filter[item.id];
+            }
+        }
 
-    //     if (this.props.screen === 'ExposureScreen') {
-    //         if (item.type === 'DropdownInput') {
-    //             item.data = this.computeDataForExposure(item);
-    //         }
-    //         value = this.computeExposureValue(item);
-    //         if (this.props.addContactFromCasesScreen && this.props.addContactFromCasesScreen !== undefined && item.id === 'exposure') {
-    //             addContactFromCasesScreen = true
-    //         }
-    //     }
+        if (this.props.screen === 'ExposureScreen') {
+            if (item.type === 'DropdownInput') {
+                item.data = this.computeDataForExposure(item);
+            }
+            value = this.computeExposureValue(item);
+            if (this.props.addContactFromCasesScreen && this.props.addContactFromCasesScreen !== undefined && item.id === 'exposure') {
+                addContactFromCasesScreen = true
+            }
+        }
 
-    //     if (this.props.screen === 'ContactsSingleScreen') {
-    //         if (item.type === 'DropdownInput') {
-    //             item.data = this.computeDataForContactsSingleScreenDropdownInput(item, this.props.index);
-    //         }
-    //         if (item.type === 'ActionsBar') {
-    //             item.onPressArray = [this.props.onDeletePress]
-    //         }
+        if (this.props.screen === 'ContactsSingleScreen') {
+            if (item.type === 'DropdownInput') {
+                item.data = this.computeDataForContactsSingleScreenDropdownInput(item, this.props.index);
+            }
+            if (item.type === 'ActionsBar') {
+                item.onPressArray = [this.props.onDeletePress]
+            }
 
-    //         if (item.type === 'DatePicker' && item.objectType !== 'Address') {
-    //             value = this.props.contact[item.id]
-    //         } else if (item.type === 'DropDownSectioned') {
-    //             if (this.props.contact && this.props.contact.addresses && Array.isArray(this.props.contact.addresses) && this.props.contact.addresses[this.props.index] && this.props.contact.addresses[this.props.index][item.id] && this.props.contact.addresses[this.props.index][item.id] !== "") {
-    //                 for (let location of this.props.locations) {
-    //                     let myLocationName = this.getLocationNameById(location, this.props.contact.addresses[this.props.index][item.id])
-    //                     if (myLocationName !== null){
-    //                         value = myLocationName
-    //                         break
-    //                     }
-    //                 }
-    //             }
-    //         } else if (item.type === 'SwitchInput' && this.props.contact[item.id] !== undefined) {
-    //             value = this.props.contact[item.id]
-    //         } else {
-    //             value = this.computeValueForContactsSingleScreen(item, this.props.index);
-    //         }
+            if (item.type === 'DatePicker' && item.objectType !== 'Address') {
+                value = this.props.contact[item.id]
+            } else if (item.type === 'DropDownSectioned') {
+                if (this.props.contact && this.props.contact.addresses && Array.isArray(this.props.contact.addresses) && this.props.contact.addresses[this.props.index] && this.props.contact.addresses[this.props.index][item.id] && this.props.contact.addresses[this.props.index][item.id] !== "") {
+                    for (let location of this.props.locations) {
+                        let myLocationName = this.getLocationNameById(location, this.props.contact.addresses[this.props.index][item.id])
+                        if (myLocationName !== null){
+                            value = myLocationName
+                            break
+                        }
+                    }
+                }
+            } else if (item.type === 'SwitchInput' && this.props.contact[item.id] !== undefined) {
+                value = this.props.contact[item.id]
+            } else {
+                value = this.computeValueForContactsSingleScreen(item, this.props.index);
+            }
 
-    //         if (this.props.selectedItemIndexForTextSwitchSelectorForAge !== null && this.props.selectedItemIndexForTextSwitchSelectorForAge !== undefined && item.objectType === 'Contact' && item.dependsOn !== undefined && item.dependsOn !== null){
-    //             let itemIndexInConfigTextSwitchSelectorValues = config[item.dependsOn].map((e) => {return e.value}).indexOf(item.id)
-    //             if (itemIndexInConfigTextSwitchSelectorValues > -1) {
-    //                 if (itemIndexInConfigTextSwitchSelectorValues != this.props.selectedItemIndexForTextSwitchSelectorForAge) {
-    //                     return
-    //                 }
-    //             }
-    //         }
-    //         if (item.id === 'dob' && item.type === 'DatePicker' && item.objectType === 'Contact') {
-    //             maximumDate = new Date();
-    //         }
-    //     }
+            if (this.props.selectedItemIndexForTextSwitchSelectorForAge !== null && this.props.selectedItemIndexForTextSwitchSelectorForAge !== undefined && item.objectType === 'Contact' && item.dependsOn !== undefined && item.dependsOn !== null){
+                let itemIndexInConfigTextSwitchSelectorValues = config[item.dependsOn].map((e) => {return e.value}).indexOf(item.id)
+                if (itemIndexInConfigTextSwitchSelectorValues > -1) {
+                    if (itemIndexInConfigTextSwitchSelectorValues != this.props.selectedItemIndexForTextSwitchSelectorForAge) {
+                        return
+                    }
+                }
+            }
+            if (item.id === 'dob' && item.type === 'DatePicker' && item.objectType === 'Contact') {
+                maximumDate = new Date();
+            }
+        }
 
-    //     if (this.props.screen === 'CaseSingleScreen') {
-    //         if (item.type === 'DropdownInput') {
-    //             item.data = this.computeDataForCasesSingleScreenDropdownInput(item, this.props.index);
-    //         }
-    //         if (item.type === 'ActionsBar') {
-    //             item.onPressArray = [this.props.onDeletePress]
-    //         }
+        if (this.props.screen === 'CaseSingleScreen') {
+            if (item.type === 'DropdownInput') {
+                item.data = this.computeDataForCasesSingleScreenDropdownInput(item, this.props.index);
+            }
+            if (item.type === 'ActionsBar') {
+                item.onPressArray = [this.props.onDeletePress]
+            }
 
-    //         if (item.type === 'DatePicker' && this.props.case[item.id] !== undefined) {
-    //             value = this.props.case[item.id]
-    //         } else if (item.type === 'DropDownSectioned') {
-    //             if (this.props.case && this.props.case.addresses && Array.isArray(this.props.case.addresses) && this.props.case.addresses[this.props.index] && this.props.case.addresses[this.props.index][item.id] && this.props.case.addresses[this.props.index][item.id] !== "") {
-    //                 for (let i = 0; i < this.props.locations.length; i++) {
-    //                     let myLocationName = this.getLocationNameById(this.props.locations[i], this.props.case.addresses[this.props.index][item.id])
-    //                     if (myLocationName !== null){
-    //                         value = myLocationName
-    //                         break
-    //                     }
-    //                 }
-    //             }
-    //         } else if (item.type === 'SwitchInput' && this.props.case[item.id] !== undefined) {
-    //             value = this.props.case[item.id]
-    //         } else {
-    //             value = this.computeValueForCasesSingleScreen(item, this.props.index);
-    //         }
-    //         if (this.props.selectedItemIndexForTextSwitchSelectorForAge !== null && this.props.selectedItemIndexForTextSwitchSelectorForAge !== undefined && item.objectType === 'Case' && item.dependsOn !== undefined && item.dependsOn !== null){
-    //             let itemIndexInConfigTextSwitchSelectorValues = config[item.dependsOn].map((e) => {return e.value}).indexOf(item.id)
-    //             if (itemIndexInConfigTextSwitchSelectorValues > -1) {
-    //                 if (itemIndexInConfigTextSwitchSelectorValues != this.props.selectedItemIndexForTextSwitchSelectorForAge) {
-    //                     return
-    //                 }
-    //             }
-    //         }
-    //     }
+            if (item.type === 'DatePicker' && this.props.case[item.id] !== undefined) {
+                value = this.props.case[item.id]
+            } else if (item.type === 'DropDownSectioned') {
+                if (this.props.case && this.props.case.addresses && Array.isArray(this.props.case.addresses) && this.props.case.addresses[this.props.index] && this.props.case.addresses[this.props.index][item.id] && this.props.case.addresses[this.props.index][item.id] !== "") {
+                    for (let i = 0; i < this.props.locations.length; i++) {
+                        let myLocationName = this.getLocationNameById(this.props.locations[i], this.props.case.addresses[this.props.index][item.id])
+                        if (myLocationName !== null){
+                            value = myLocationName
+                            break
+                        }
+                    }
+                }
+            } else if (item.type === 'SwitchInput' && this.props.case[item.id] !== undefined) {
+                value = this.props.case[item.id]
+            } else {
+                value = this.computeValueForCasesSingleScreen(item, this.props.index);
+            }
+            if (this.props.selectedItemIndexForTextSwitchSelectorForAge !== null && this.props.selectedItemIndexForTextSwitchSelectorForAge !== undefined && item.objectType === 'Case' && item.dependsOn !== undefined && item.dependsOn !== null){
+                let itemIndexInConfigTextSwitchSelectorValues = config[item.dependsOn].map((e) => {return e.value}).indexOf(item.id)
+                if (itemIndexInConfigTextSwitchSelectorValues > -1) {
+                    if (itemIndexInConfigTextSwitchSelectorValues != this.props.selectedItemIndexForTextSwitchSelectorForAge) {
+                        return
+                    }
+                }
+            }
+        }
 
-    //     if (this.props.screen === 'FollowUpSingle') {
-    //         if (item.type === 'DropdownInput') {
-    //             item.data = this.computeDataForFollowUpSingleScreenDropdownInput(item, this.props.index);
-    //         }
+        if (this.props.screen === 'FollowUpSingle') {
+            if (item.type === 'DropdownInput') {
+                item.data = this.computeDataForFollowUpSingleScreenDropdownInput(item, this.props.index);
+            }
             
-    //         if (item.type === 'DatePicker' && this.props.followUp[item.id] !== undefined) {
-    //             value = this.props.followUp[item.id]
-    //         } else if (item.type === 'SwitchInput' && this.props.followUp[item.id] !== undefined) {
-    //             value = this.props.followUp[item.id]
-    //         } else if (item.type === 'DropDownSectioned') {
-    //             if (this.props.followUp && this.props.followUp.address && this.props.followUp.address[item.id] && this.props.followUp.address[item.id] !== "") {
-    //                 for (let i = 0; i < this.props.locations.length; i++) {
-    //                     let myLocationName = this.getLocationNameById(this.props.locations[i], this.props.followUp.address[item.id])
-    //                     if (myLocationName !== null){
-    //                         value = myLocationName
-    //                         break
-    //                     }
-    //                 }
-    //             }
-    //         } else {
-    //             value = this.computeValueForFollowUpSingleScreen(item);
-    //         }
-    //     }
+            if (item.type === 'DatePicker' && this.props.followUp[item.id] !== undefined) {
+                value = this.props.followUp[item.id]
+            } else if (item.type === 'SwitchInput' && this.props.followUp[item.id] !== undefined) {
+                value = this.props.followUp[item.id]
+            } else if (item.type === 'DropDownSectioned') {
+                if (this.props.followUp && this.props.followUp.address && this.props.followUp.address[item.id] && this.props.followUp.address[item.id] !== "") {
+                    for (let i = 0; i < this.props.locations.length; i++) {
+                        let myLocationName = this.getLocationNameById(this.props.locations[i], this.props.followUp.address[item.id])
+                        if (myLocationName !== null){
+                            value = myLocationName
+                            break
+                        }
+                    }
+                }
+            } else {
+                value = this.computeValueForFollowUpSingleScreen(item);
+            }
+        }
 
-    //     if (this.props.screen === 'HelpSingleScreen') {
-    //         value = this.computeValueForHelpSingleScreen(item)
-    //     }
+        if (this.props.screen === 'HelpSingleScreen') {
+            value = this.computeValueForHelpSingleScreen(item)
+        }
 
-    //     let isEditModeForDropDownInput = addContactFromCasesScreen ? false : (this.props.screen === 'ExposureScreen' ? item.id === 'exposure' ? true : item.isEditMode : item.isEditMode)
+        let isEditModeForDropDownInput = addContactFromCasesScreen ? false : (this.props.screen === 'ExposureScreen' ? item.id === 'exposure' ? true : item.isEditMode : item.isEditMode)
 
-    //     if (item.type === 'DatePicker' && value === '') {
-    //         value = null
-    //     }
+        if (item.type === 'DatePicker' && value === '') {
+            value = null
+        }
 
-    //     let dateValidation = this.setDateValidations(item);
-    //     minimumDate = dateValidation.minimumDate;
-    //     maximumDate = dateValidation.maximumDate;
+        let dateValidation = this.setDateValidations(item);
+        minimumDate = dateValidation.minimumDate;
+        maximumDate = dateValidation.maximumDate;
 
-    //     switch(item.type) {
-    //         case 'Section':
-    //             return (
-    //                 <Section
-    //                     label={item.label}
-    //                     hasBorderBottom={item.hasBorderBottom}
-    //                     borderBottomColor={item.borderBottomColor}
-    //                     containerStyle={{height: calculateDimension(54, true, this.props.screenSize)}}
-    //                     translation={this.props.translation}
-    //                 />
-    //             );
-    //         case 'TextInput':
-    //             return (
-    //                 <TextInput
-    //                     id={item.id}
-    //                     label={item.label}
-    //                     index={this.props.index}
-    //                     value={value}
-    //                     isEditMode={item.isEditMode}
-    //                     isRequired={item.isRequired}
-    //                     onChange={this.props.onChangeText}
-    //                     multiline={item.multiline}
-    //                     style={{width: width, marginHorizontal: marginHorizontal}}
-    //                     objectType={item.objectType}
-    //                     keyboardType={item.keyboardType}
-    //                     translation={this.props.translation}
-    //                 />
-    //             );
-    //         case 'DropdownInput':
-    //             return (
-    //                 <DropdownInput
-    //                     id={item.id}
-    //                     index={this.props.index}
-    //                     label={item.label}
-    //                     labelValue={item.labelValue}
-    //                     value={value}
-    //                     data={item.data}
-    //                     isEditMode={isEditModeForDropDownInput}
-    //                     isRequired={item.isRequired}
-    //                     onChange={this.props.onChangeDropDown}
-    //                     style={{width: width, marginHorizontal: marginHorizontal}}
-    //                     objectType={item.objectType}
-    //                     translation={this.props.translation}
-    //                 />
-    //             );
-    //         case 'DropDown':
-    //             return (
-    //                 <DropDown
-    //                     key={item.id}
-    //                     id={item.id}
-    //                     label={translations.dropDownLabels.selectedAnswersLabel}
-    //                     labelValue={item.label}
-    //                     value={value}
-    //                     data={data}
-    //                     isEditMode={true}
-    //                     isRequired={item.required}
-    //                     onChange={this.props.onChangeMultipleSelection}
-    //                     style={{width: width, marginHorizontal: marginHorizontal}}
-    //                     dropDownStyle={{width: width, alignSelf: 'center'}}
-    //                     showDropdown={this.state.showDropdown}
-    //                     objectType={item.objectType}
-    //                 />
-    //             );
-    //         case 'DropDownSectioned':
-    //             return (
-    //                 <DropDownSectioned
-    //                     key={item.id}
-    //                     id={item.id}
-    //                     label={item.label}
-    //                     index={this.props.index}
-    //                     value={value}
-    //                     data={this.props.locations}
-    //                     isEditMode={item.isEditMode}
-    //                     isRequired={item.isRequired}
-    //                     sectionedSelectedItems={sectionedSelectedItems}
-    //                     onChange={this.props.onChangeSectionedDropDown}
-    //                     style={{width: width, marginHorizontal: marginHorizontal}}
-    //                     dropDownStyle={{width: width, alignSelf: 'center'}}
-    //                     objectType={item.objectType}
-    //                     single={item.single}
-    //                 />
-    //             );
-    //         case 'SwitchInput':
-    //             return(
-    //                 <SwitchInput
-    //                     id={item.id}
-    //                     label={item.label}
-    //                     index={this.props.index}
-    //                     value={value}
-    //                     showValue={true}
-    //                     isEditMode={item.isEditMode}
-    //                     isRequired={item.isRequired}
-    //                     onChange={this.props.onChangeSwitch}
-    //                     activeButtonColor={item.activeButtonColor}
-    //                     activeBackgroundColor={item.activeBackgroundColor}
-    //                     style={{justifyContent: 'space-between', width: width, marginHorizontal: marginHorizontal}}
-    //                     objectType={item.objectType}
-    //                     translation={this.props.translation}
-    //                 />
-    //             );
-    //         case 'DatePicker':
-    //             return (
-    //                 <DatePicker
-    //                     id={item.id}
-    //                     label={item.label}
-    //                     value={value}
-    //                     index={this.props.index}
-    //                     isEditMode={item.isEditMode}
-    //                     isRequired={item.isRequired}
-    //                     onChange={this.props.onChangeDate}
-    //                     minimumDate={minimumDate}
-    //                     maximumDate={maximumDate}
-    //                     style={{width: width, marginHorizontal: marginHorizontal}}
-    //                     objectType={item.objectType}
-    //                     translation={this.props.translation}
-    //                 />
-    //             );
-    //         case 'Selector':
-    //             return (
-    //                 <Selector
-    //                     id={item.id}
-    //                     key={item.id}
-    //                     data={item.data}
-    //                     selectItem={this.props.onSelectItem}
-    //                     style={{width: width, height: '100%', marginHorizontal: marginHorizontal}}
-    //                     objectType={item.objectType}
-    //                 />
-    //             );
-    //         case 'IntervalPicker':
-    //             return (
-    //                 <IntervalPicker
-    //                     id={item.id}
-    //                     label={item.label}
-    //                     value={item.value}
-    //                     min={item.min}
-    //                     max={item.max}
-    //                     style={{width, marginHorizontal}}
-    //                     onChange={this.props.onChangeInterval}
-    //                     objectType={item.objectType}
-    //                 />
-    //             );
-    //         case 'ActionsBar':
-    //             return (
-    //                 <ActionsBar
-    //                     id={item.id}
-    //                     key={item.id}
-    //                     addressIndex={this.props.index}
-    //                     textsArray={item.textsArray}
-    //                     textsStyleArray={item.textsStyleArray}
-    //                     onPressArray={item.onPressArray}
-    //                     containerTextStyle={{width, marginHorizontal, height: calculateDimension(46, true, this.props.screenSize)}}
-    //                     isEditMode = {this.props.isEditMode !== undefined && this.props.isEditMode !== null ? this.props.isEditMode : true}
-    //                     translation={this.props.translation}
-    //                 />
-    //             );
-    //         case 'TextSwitchSelector':
-    //             return (
-    //                 <TextSwitchSelector 
-    //                     selectedItem={this.props[item.selectedItemIndexForTextSwitchSelector]}
-    //                     selectedItemIndexForTextSwitchSelector={item.selectedItemIndexForTextSwitchSelector}
-    //                     onChange={this.props.onChangeTextSwitchSelector}
-    //                     values={item.values}
-    //                     isEditMode = {this.props.isEditMode}
-    //                     style={{width: width, marginHorizontal: marginHorizontal}}
-    //                     translation={this.props.translation}
-    //                 />
-    //             );
-    //         case 'TextInputWithDropDown':
-    //             return (
-    //                 <TextInputWithDropDown 
-    //                     id={item.id}
-    //                     label={item.label}
-    //                     index={this.props.index}
-    //                     value={value}
-    //                     isEditMode={item.isEditMode}
-    //                     isRequired={item.isRequired}
-    //                     multiline={item.multiline}
-    //                     dropDownData={item.dropDownData}
-    //                     onChange={this.props.onChangeextInputWithDropDown}
-    //                     style={{width: width, marginHorizontal: marginHorizontal}}
-    //                     objectType={item.objectType}
-    //                     keyboardType={item.keyboardType}
-    //                     onChangeDropDown={this.props.onChangeTextSwitchSelector}
-    //                     selectedDropDownItemIndex={this.props[item.selectedItemIndexForAgeUnitOfMeasureDropDown]}
-    //                     selectedItemIndexForAgeUnitOfMeasureDropDown ={item.selectedItemIndexForAgeUnitOfMeasureDropDown}
-    //                     translation={this.props.translation}
-    //                 />
-    //             )
-    //         default:
-    //             return (
-    //                 <View style={{backgroundColor: 'red'}}>
-    //                     <Text>{"TODO: item type: " + item.type + " is not implemented yet"}</Text>
-    //                 </View>
-    //             )
-    //     }
-    // };
+    };
+
+    computeValueForCasesSingleScreen = (item, index) => {
+        if (index || index >= 0) {
+            if (item.objectType === 'Address') {
+
+                if (item.id === 'lng') {
+                    return this.props.case && this.props.case.addresses && Array.isArray(this.props.case.addresses) &&
+                    this.props.case.addresses[index] && this.props.case.addresses[index].geoLocation &&
+                    this.props.case.addresses[index].geoLocation.coordinates &&
+                    Array.isArray(this.props.case.addresses[index].geoLocation.coordinates) ?
+                        this.getTranslation(this.props.case.addresses[index].geoLocation.coordinates[0]) : '';
+                } else {
+                    if (item.id === 'lat') {
+                        return this.props.case && this.props.case.addresses && Array.isArray(this.props.case.addresses) &&
+                        this.props.case.addresses[index] && this.props.case.addresses[index].geoLocation &&
+                        this.props.case.addresses[index].geoLocation.coordinates &&
+                        Array.isArray(this.props.case.addresses[index].geoLocation.coordinates) ?
+                            this.getTranslation(this.props.case.addresses[index].geoLocation.coordinates[1]) : '';
+                    } else {
+                        return this.props.case && this.props.case.addresses && Array.isArray(this.props.case.addresses) ?
+                            this.getTranslation(this.props.case.addresses[index][item.id]) : '';
+                    }
+                }
+            } else if (item.objectType === 'Documents') {
+                return this.props.case && this.props.case.documents && Array.isArray(this.props.case.documents) && this.props.case.documents.length > 0 && this.props.case.documents[index][item.id] !== undefined ?
+                    this.getTranslation(this.props.case.documents[index][item.id]) : '';
+            } else if (item.objectType === 'HospitalizationDates') {
+                return this.props.case && this.props.case.hospitalizationDates && Array.isArray(this.props.case.hospitalizationDates) && this.props.case.hospitalizationDates.length > 0 && this.props.case.hospitalizationDates[index][item.id] !== undefined ?
+                    this.getTranslation(this.props.case.hospitalizationDates[index][item.id]) : '';
+            } else if (item.objectType === 'IsolationDates') {
+                return this.props.case && this.props.case.isolationDates && Array.isArray(this.props.case.isolationDates) && this.props.case.isolationDates.length > 0 && this.props.case.isolationDates[index][item.id] !== undefined ?
+                    this.getTranslation(this.props.case.isolationDates[index][item.id]) : '';
+            }
+        }
+        return this.props.case && this.props.case[item.id] ? this.getTranslation(this.props.case[item.id]) : '';
+    };
 
     // Please write here all the methods that are not react native lifecycle methods
     

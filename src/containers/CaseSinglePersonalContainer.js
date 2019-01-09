@@ -205,6 +205,7 @@ class CaseSinglePersonalContainer extends PureComponent {
         if (item.type === 'DatePicker' && value === '') {
             value = null
         }
+        isEditModeForDropDownInput = this.props.isEditMode
 
         let dateValidation = this.setDateValidations(item);
         minimumDate = dateValidation.minimumDate;
