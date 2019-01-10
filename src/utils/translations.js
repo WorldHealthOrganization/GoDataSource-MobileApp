@@ -132,8 +132,19 @@ const caseSingleScreen = {
 
     hospitalisationStartDate: 'LNG_DATE_FIELD_LABEL_FROM',
     hospitalisationEndDate: 'LNG_DATE_FIELD_LABEL_TO',
+    // TODO add translations to API
+    hospitalisationCenterName: 'LNG_DATE_FIELD_LABEL_CENTER_NAME',
+    hospitalisationLocation: 'LNG_DATE_FIELD_LABEL_LOCATION',
+    hospitalisationComments: 'LNG_DATE_FIELD_LABEL_COMMENTS',
+
+
     isolationStartDate: 'LNG_DATE_FIELD_LABEL_FROM',
     isolationEndDate: 'LNG_DATE_FIELD_LABEL_TO',
+    // TODO add translations to API
+    isolationCenterName: 'LNG_DATE_FIELD_LABEL_CENTER_NAME',
+    isolationLocation: 'LNG_DATE_FIELD_LABEL_LOCATION',
+    isolationComments: 'LNG_DATE_FIELD_LABEL_COMMENTS',
+
 };
 
 const contactSingleScreen = {
