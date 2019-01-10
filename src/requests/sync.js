@@ -9,6 +9,7 @@ import {getSyncEncryptPassword} from './../utils/encryption';
 import {setSyncState} from './../actions/app';
 import translations from './../utils/translations';
 import {testApi} from './testApi';
+import uniq from 'lodash/uniq';
 
 export function getDatabaseSnapshotRequest(hubConfig, lastSyncDate, dispatch, callback) {
 
@@ -16,7 +17,7 @@ export function getDatabaseSnapshotRequest(hubConfig, lastSyncDate, dispatch, ca
     let hubConfiguration = JSON.parse(hubConfig.clientId);
 
     let arrayOfTokens = getAllLanguageTokens();
-    console.log("Array of Tokens: ", JSON.stringify(arrayOfTokens));
+    // console.log("Array of Tokens: ", JSON.stringify(arrayOfTokens));
 
     let filter = {};
 
@@ -30,7 +31,7 @@ export function getDatabaseSnapshotRequest(hubConfig, lastSyncDate, dispatch, ca
 
     let requestUrl = `${hubConfiguration.url}/sync/get-mobile-database-snapshot?autoEncrypt=${hubConfiguration.encryptedData}${lastSyncDate ? `&filter=${JSON.stringify(filter)}` : ''}&chunkSize=5000`;
 
-    console.log('Request URL: ', requestUrl);
+    // console.log('Request URL: ', requestUrl);
 
     let dirs = RNFetchBlob.fs.dirs.DocumentDir;
     let databaseLocation = `${dirs}/database.zip`;
@@ -45,7 +46,7 @@ export function getDatabaseSnapshotRequest(hubConfig, lastSyncDate, dispatch, ca
             callback(errorTestApi);
         }
         if (responseTestApi) {
-            console.log('Response TestApi: ', responseTestApi);
+            // console.log('Response TestApi: ', responseTestApi);
             RNFetchBlob.config({
                 timeout: (30 * 60 * 10 * 1000),
                 followRedirect: false,
@@ -58,7 +59,7 @@ export function getDatabaseSnapshotRequest(hubConfig, lastSyncDate, dispatch, ca
                         'Authorization': 'Basic ' + base64.encode(`${hubConfiguration.clientId}:${hubConfiguration.clientSecret}`)
                     },
                     JSON.stringify({
-                        languageTokens: arrayOfTokens
+                        languageTokens: lastSyncDate ? [] : arrayOfTokens
                     })
                 )
                 .progress({count: 500}, (received, total) => {
@@ -91,12 +92,12 @@ export function postDatabaseSnapshotRequest(internetCredentials, path, callback)
     let hubConfig = JSON.parse(internetCredentials.username);
     let requestUrl = `${hubConfig.url}/sync/import-database-snapshot`;
 
-    // console.log('Request URL:' + requestUrl);
+    console.log('Request URL:' + requestUrl);
 
     console.log('Send database to server');
 
     // Before starting a download, first test if the API responds
-    testApi(`${hubConfiguration.url}/system-settings/version`, (errorTestApi, responseTestApi) => {
+    testApi(`${hubConfig.url}/system-settings/version`, (errorTestApi, responseTestApi) => {
         if (errorTestApi) {
             console.log("*** testApi error: ", JSON.stringify(errorTestApi));
             callback(errorTestApi);
@@ -143,5 +144,5 @@ function getAllLanguageTokens () {
         }
     }
 
-    return arrayOfTokens;
+    return uniq(arrayOfTokens);
 }
