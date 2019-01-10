@@ -143,11 +143,11 @@ class CasesSortContainer extends Component {
             })
 
             item.data = configSortCiteriaFilter.map((e) => { return {label: getTranslation(e.value, this.props.translation), value: e.value }})
-            value = this.computeValueForCaseSortScreen(item, cardIndex);
+            value = this.computeValueForSortScreen(item, cardIndex);
         }
         if (item.type === 'DropdownInput' && item.id === 'sortOrder') {
             item.data = config.sortOrderDropDownItems.map((e) => { return {label: getTranslation(e.value, this.props.translation), value: e.value }})
-            value = this.computeValueForCaseSortScreen(item, cardIndex);
+            value = this.computeValueForSortScreen(item, cardIndex);
         }
         if (item.type === 'ActionsBar') {
             item.onPressArray = [this.props.onDeletePress]
@@ -169,7 +169,7 @@ class CasesSortContainer extends Component {
         )
     };
 
-     computeValueForCaseSortScreen = (item, index) => {
+    computeValueForSortScreen = (item, index) => {
         if (index !== null && index >= 0) {
             if (item.objectType === 'Sort') {
                 return this.props.filter && this.props.filter.sort && Array.isArray(this.props.filter.sort) && this.props.filter.sort.length > 0 && this.props.filter.sort[index][item.id] !== undefined ?
@@ -220,7 +220,6 @@ const style = StyleSheet.create({
 function mapStateToProps(state) {
     return {
         screenSize: state.app.screenSize,
-        cases: state.cases,
         translation: state.app.translation
     };
 }

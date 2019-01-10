@@ -240,7 +240,7 @@ class ExposureScreen extends Component {
         if (item.type === 'DatePicker' && value === '') {
             value = null
         }
-        let isEditModeForDropDownInput = addContactFromCasesScreen ? false : (this.props.screen === 'ExposureScreen' ? item.id === 'exposure' ? true : item.isEditMode : item.isEditMode)
+        let isEditModeForDropDownInput = addContactFromCasesScreen ? false : true
 
         let dateValidation = this.setDateValidations(item);
         minimumDate = dateValidation.minimumDate;
@@ -249,7 +249,7 @@ class ExposureScreen extends Component {
         return (
             <CardComponent
                 item={item}
-                isEditMode={this.props.isEditMode}
+                isEditMode={true}
                 exposure={this.state.exposure}
                 isEditModeForDropDownInput={isEditModeForDropDownInput}
                 value={value}

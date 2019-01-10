@@ -132,6 +132,7 @@ class CasesFiltersContainer extends PureComponent {
             <CardComponent
                 item={item}
                 isEditMode={true}
+                isEditModeForDropDownInput={true}
                 value={value}
                 filter={this.props.filter}
 

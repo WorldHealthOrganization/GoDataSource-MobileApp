@@ -38,7 +38,6 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
     // }
 
     componentDidMount() {
-        
         InteractionManager.runAfterInteractions(() => {
             this.setState({
                 interactionComplete: true,
@@ -87,14 +86,6 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
                                     height={buttonHeight}
                                     width={buttonWidth}
                                 />
-                                {/*<Button*/}
-                                {/*title={'Missing'}*/}
-                                {/*onPress={this.props.onPressMissing}*/}
-                                {/*color={'white'}*/}
-                                {/*titleColor={styles.buttonTextGray}*/}
-                                {/*height={buttonHeight}*/}
-                                {/*width={buttonWidth}*/}
-                                {/*/>*/}
                             </View>) : (null)
                     }
                     <KeyboardAwareScrollView
