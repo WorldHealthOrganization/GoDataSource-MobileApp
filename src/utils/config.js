@@ -669,7 +669,7 @@ const caseSingleScreen = {
             {
                 cardNumber: 2,
                 id: 'centerName',
-                label: null,
+                label: translations.caseSingleScreen.hospitalisationCenterName,
                 type: 'TextInput',
                 value: '',
                 isRequired: false,
@@ -679,7 +679,7 @@ const caseSingleScreen = {
             {
                 cardNumber: 2,
                 id: 'locationId',
-                label: null,
+                label: translations.caseSingleScreen.hospitalisationLocation,
                 labelValue: 'test',
                 type: 'DropDownSectioned',
                 value: '',
@@ -691,7 +691,7 @@ const caseSingleScreen = {
             {
                 cardNumber: 2,
                 id: 'comments',
-                label: null,
+                label: translations.caseSingleScreen.hospitalisationComments,
                 type: 'TextInput',
                 value: '',
                 isRequired: false,
@@ -736,7 +736,7 @@ const caseSingleScreen = {
             {
                 cardNumber: 3,
                 id: 'centerName',
-                label: null,
+                label: translations.caseSingleScreen.isolationCenterName,
                 type: 'TextInput',
                 value: '',
                 isRequired: false,
@@ -746,7 +746,7 @@ const caseSingleScreen = {
             {
                 cardNumber: 3,
                 id: 'locationId',
-                label: null,
+                label: translations.caseSingleScreen.isolationLocation,
                 labelValue: 'test',
                 type: 'DropDownSectioned',
                 value: '',
@@ -758,7 +758,7 @@ const caseSingleScreen = {
             {
                 cardNumber: 3,
                 id: 'comments',
-                label: null,
+                label: translations.caseSingleScreen.isolationComments,
                 type: 'TextInput',
                 value: '',
                 isRequired: false,
