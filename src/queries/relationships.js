@@ -44,9 +44,10 @@ export function getRelationshipsAndFollowUpsForContactRequest(outbreakId, keys, 
     let oneDay = 24 * 60 * 60 * 1000;
     let startDate = '';
     let endDate = '';
+    // new Date().getTimezoneOffset()
     if (filter && filter.date) {
         startDate = new Date(`${filter.date.getMonth() + 1}/${filter.date.getDate()}/${filter.date.getFullYear()}`).getTime();
-        endDate = moment(filter.date.getTime() + oneDay).add(-1, 'second')._d.getTime();
+        endDate = moment(filter.date.getTime() + (oneDay + (moment().isDST() ? filter.date.getTimezoneOffset() : (filter.date.getTimezoneOffset() - 60)) * 60 * 1000)).add(-1, 'second')._d.getTime();
     }
 
     let promiseArray = [];
