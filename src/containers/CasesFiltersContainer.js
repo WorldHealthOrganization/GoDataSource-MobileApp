@@ -108,7 +108,7 @@ class CasesFiltersContainer extends PureComponent {
 
     handleRenderItemByType = (item, cardIndex) => {
         let value = '';
-
+        let data = []
         if (item.type === 'Selector' && item.id === 'gender') {
             item.data = item.data.map((e) => {return {
                 value: getTranslation(e.value, this.props.translation), 
@@ -135,6 +135,7 @@ class CasesFiltersContainer extends PureComponent {
                 isEditModeForDropDownInput={true}
                 value={value}
                 filter={this.props.filter}
+                data={data}
 
                 onChangeSectionedDropDown={this.props.onChangeSectionedDropDown}
                 onChangeInterval={this.props.onChangeInterval}
@@ -154,7 +155,6 @@ class CasesFiltersContainer extends PureComponent {
         return [];
     };
 }
-
 
 // Create style outside the class, or for components that will be used by other components (buttons),
 // make a global style in the config directory
@@ -189,7 +189,8 @@ function mapStateToProps(state) {
     return {
         screenSize: state.app.screenSize,
         cases: state.cases,
-        translation: state.app.translation
+        translation: state.app.translation,
+        referenceData: state.referenceData,
     };
 }
 

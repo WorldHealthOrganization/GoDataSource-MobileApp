@@ -109,7 +109,7 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
         return (
             <View>
                 <Section
-                    label={this.getTranslation(item.categoryName)}
+                    label={getTranslation(item.categoryName, this.props.translation)}
                     containerStyle={{
                         marginVertical: 10
                     }}
@@ -171,21 +171,6 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
             }
         }
         return true;
-    };
-
-    getTranslation = (value) => {
-        if (value && value !== '') {
-            let valueToBeReturned = value;
-            if (value && typeof value === 'string' && value.includes('LNG')) {
-                valueToBeReturned = value && this.props.translation && Array.isArray(this.props.translation) && this.props.translation[this.props.translation.map((e) => {
-                    return e && e.token ? e.token : null
-                }).indexOf(value)] ? this.props.translation[this.props.translation.map((e) => {
-                    return e.token
-                }).indexOf(value)].translation : '';
-            }
-            return valueToBeReturned;
-        }
-        return '';
     };
 }
 

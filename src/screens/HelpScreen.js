@@ -56,11 +56,10 @@ class HelpScreen extends Component {
 
     // Please add here the react lifecycle methods that you need
     static getDerivedStateFromProps(props, state) {
-        console.log ('getDerivedStateFromProps');
         if (props.errors && props.errors.type && props.errors.message) {
             Alert.alert(props.errors.type, props.errors.message, [
                 {
-                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+                    text: getTranslation(translations.alertMessages.okButtonLabel, props.translation),
                     onPress: () => {
                         props.removeErrors();
                         state.loading = false;
@@ -258,7 +257,7 @@ class HelpScreen extends Component {
         return (<HelpListItem
             item={item}
             onPressViewHelp={this.handlePressViewHelp}
-            firstActionText={this.getTranslation(item.statusId)}
+            firstActionText={getTranslation(item.statusId, this.props.translation)}
         />)
     };
 
@@ -425,16 +424,6 @@ class HelpScreen extends Component {
 
 
     //Other
-    getTranslation = (value) => {
-        let valueToBeReturned = value;
-        if (value && typeof value === 'string' && value.includes('LNG')) {
-            valueToBeReturned = value && this.props.translation && Array.isArray(this.props.translation) && this.props.translation[this.props.translation.map((e) => {return e && e.token ? e.token : null}).indexOf(value)] ? this.props.translation[this.props.translation.map((e) => {
-                return e.token
-            }).indexOf(value)].translation : '';
-        }
-        return valueToBeReturned;
-    };
-
     showMenu = () => {
         this.refs.menuRef.show();
     };
