@@ -5,7 +5,7 @@
 // the material ui library, since it provides design and animations out of the box
 import React, {PureComponent} from 'react';
 import {View, Text, StyleSheet, Alert, ScrollView, TouchableWithoutFeedback, Keyboard} from 'react-native';
-import {calculateDimension, getTranslation} from './../utils/functions';
+import {calculateDimension, getTranslation, extractIdFromPouchId} from './../utils/functions';
 import config from './../utils/config';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -250,7 +250,7 @@ class CaseSingleInfectionContainer extends PureComponent {
         } else if (item.type === 'DropDownSectioned') {
             if (item.objectType === 'HospitalizationDates') {
                 for (let i = 0; i < this.props.locations.length; i++) {
-                    let myLocationName = this.getLocationNameById(this.props.locations[i], this.props.case.hospitalizationDates[this.props.index][item.id]);
+                    let myLocationName = this.getLocationNameById(this.props.locations[i], this.props.case.hospitalizationDates[cardIndex][item.id]);
                     if (myLocationName !== null){
                         value = myLocationName;
                         break
@@ -258,7 +258,7 @@ class CaseSingleInfectionContainer extends PureComponent {
                 }
             } else if (item.objectType === 'IsolationDates') {
                 for (let i = 0; i < this.props.locations.length; i++) {
-                    let myLocationName = this.getLocationNameById(this.props.locations[i], this.props.case.isolationDates[this.props.index][item.id])
+                    let myLocationName = this.getLocationNameById(this.props.locations[i], this.props.case.isolationDates[cardIndex][item.id])
                     if (myLocationName !== null){
                         value = myLocationName;
                         break
@@ -395,7 +395,24 @@ class CaseSingleInfectionContainer extends PureComponent {
         
         let dateValidation = {minimumDate, maximumDate}
         return dateValidation
-    }
+    };
+
+    getLocationNameById = (element, locationId) => {
+        if(extractIdFromPouchId(element._id, 'location') === locationId) {
+            return element.name;
+        } else {
+            if (element.children && element.children.length > 0) {
+                let i;
+                let result = null;
+
+                for(i=0; result === null && i < element.children.length; i++){
+                    result = this.getLocationNameById(element.children[i], locationId);
+                }
+                return result;
+            }
+        }
+        return null;
+    };
 
     computeDataForCasesSingleScreenDropdownInput = (item) => {
         if (item.id === 'riskLevel') {
@@ -520,6 +537,7 @@ function mapStateToProps(state) {
         role: state.role,
         translation: state.app.translation,
         referenceData: state.referenceData,
+        locations: state.locations,
     };
 }
 
