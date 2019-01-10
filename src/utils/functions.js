@@ -479,9 +479,10 @@ export async function processFile (path, type, totalNumberOfFiles, dispatch, isF
                                 }
                                 if (encryptedData) {
                                     let password = getSyncEncryptPassword(null, hubConfig);
-
+                                    let startTimeDecrypt = new Date().getTime();
                                     decrypt(password, encryptedData)
                                         .then((decryptedData) => {
+                                            console.log(`Time for decrypting file: ${type}: ${new Date().getTime() - startTimeDecrypt}`);
                                             encryptedData = null;
                                             // Decrypted data is a zip file that needs first to be written to disk
                                             RNFetchBlobFS.writeFile(`${path}`, decryptedData, 'base64')
