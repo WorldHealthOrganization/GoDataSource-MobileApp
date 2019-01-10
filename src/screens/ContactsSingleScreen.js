@@ -955,7 +955,7 @@ class ContactsSingleScreen extends Component {
                             this.setState(prevState => ({
                                 contact: Object.assign({}, prevState.contact, {relationships: relations})
                             }), () => {
-                                this.props.deleteExposureForContact(this.props.user.activeOutbreakId, this.props.contact.id, relation, this.props.user.token);
+                                this.props.deleteExposureForContact(this.props.user.activeOutbreakId, this.props.contact._id, relation, this.props.user.token);
                             })
                         }
                     }
