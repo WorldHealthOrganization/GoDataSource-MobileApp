@@ -421,6 +421,9 @@ class CaseSingleScreen extends Component {
                         onPressAddIsolationDates={this.onPressAddIsolationDates}
                         handleOnPressDeleteIsolationDates={this.handleOnPressDeleteIsolationDates}
                         checkIsolationOnsetDates={this.checkIsolationOnsetDates}
+                        onChangeSectionedDropDownHospitalization={this.onChangeSectionedDropDownHospitalization}
+                        onChangeSectionedDropDownIsolation={this.onChangeSectionedDropDownIsolation}
+                        checkDateOfOnsetOutcome={this.checkDateOfOnsetOutcome}
                     />
                 );
             case 'caseInvestigation':
@@ -806,7 +809,10 @@ class CaseSingleScreen extends Component {
 
         hospitalizationDates.push({
             startDate: null,
-            endDate: null
+            endDate: null,
+            centerName: null,
+            locationId: null,
+            comments: null
         });
 
         this.setState(prevState => ({
@@ -827,6 +833,16 @@ class CaseSingleScreen extends Component {
             console.log("After deleting the hospitalizationDates: ", this.state.case);
         })
     };
+    onChangeSectionedDropDownHospitalization = (selectedItems, index) => {
+        console.log ('handleOnChangeSectionedDropDown', selectedItems, index);
+        // Here selectedItems is always an array with just one value and should pe mapped to the locationId field from the address from index
+        let hospitalizationDates = _.cloneDeep(this.state.case.hospitalizationDates);
+        hospitalizationDates[index].locationId = extractIdFromPouchId(selectedItems['0'], 'location');
+        this.setState(prevState => ({
+            case: Object.assign({}, prevState.case, {hospitalizationDates}),
+            isModified: true
+        }))
+    };
 
 
     //isolationDates functions
@@ -835,7 +851,10 @@ class CaseSingleScreen extends Component {
 
         isolationDates.push({
             startDate: null,
-            endDate: null
+            endDate: null,
+            centerName: null,
+            locationId: null,
+            comments: null
         });
 
         this.setState(prevState => ({
@@ -855,6 +874,16 @@ class CaseSingleScreen extends Component {
         }), () => {
             console.log("After deleting the isolationDates: ", this.state.case);
         })
+    };
+    onChangeSectionedDropDownIsolation = (selectedItems, index) => {
+        console.log ('handleOnChangeSectionedDropDown', selectedItems, index);
+        // Here selectedItems is always an array with just one value and should pe mapped to the locationId field from the address from index
+        let isolationDates = _.cloneDeep(this.state.case.isolationDates);
+        isolationDates[index].locationId = extractIdFromPouchId(selectedItems['0'], 'location');
+        this.setState(prevState => ({
+            case: Object.assign({}, prevState.case, {isolationDates}),
+            isModified: true
+        }))
     };
 
 
@@ -993,7 +1022,12 @@ class CaseSingleScreen extends Component {
         }
         return true;
     };
-    
+    checkDateOfOnsetOutcome = () => {
+        if(this.state.case && this.state.case.dateOfOnset && this.state.case.dateOfOutcome && moment(this.state.case.dateOfOutcome).format('YYYY-MM-DD') < moment(this.state.case.dateOfOnset).format('YYYY-MM-DD')){
+            return false
+        }
+        return true;
+    };
     
     // onChangeStuff functions
     onChangeText = (value, id, objectTypeOrIndex, objectType) => {
@@ -1057,6 +1091,26 @@ class CaseSingleScreen extends Component {
                             case: Object.assign({}, prevState.case, {documents: documentsClone}),
                             isModified: true
                         }))
+                } else {
+                    if (objectType && objectType === 'HospitalizationDates') {
+                        let hospitalizationDatesClone = _.cloneDeep(this.state.case.hospitalizationDates);
+                        hospitalizationDatesClone[objectTypeOrIndex][id] = value && value.value ? value.value : value;
+                        // console.log ('hospitalizationDatesClone', hospitalizationDatesClone);
+                        this.setState(prevState => ({
+                            case: Object.assign({}, prevState.case, {hospitalizationDates: hospitalizationDatesClone}),
+                            isModified: true
+                        }))
+                    } else {
+                        if (objectType && objectType === 'IsolationDates') {
+                            let isolationDatesClone = _.cloneDeep(this.state.case.isolationDates);
+                            isolationDatesClone[objectTypeOrIndex][id] = value && value.value ? value.value : value;
+                            // console.log ('isolationDatesClone', isolationDatesClone);
+                            this.setState(prevState => ({
+                                case: Object.assign({}, prevState.case, {isolationDates: isolationDatesClone}),
+                                isModified: true
+                            }))
+                        }
+                    }
                 }
             }
         }

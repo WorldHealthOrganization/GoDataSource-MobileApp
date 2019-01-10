@@ -247,6 +247,24 @@ class CaseSingleInfectionContainer extends PureComponent {
 
         if (item.type === 'DatePicker' && this.props.case[item.id] !== undefined) {
             value = this.props.case[item.id]
+        } else if (item.type === 'DropDownSectioned') {
+            if (item.objectType === 'HospitalizationDates') {
+                for (let i = 0; i < this.props.locations.length; i++) {
+                    let myLocationName = this.getLocationNameById(this.props.locations[i], this.props.case.hospitalizationDates[this.props.index][item.id]);
+                    if (myLocationName !== null){
+                        value = myLocationName;
+                        break
+                    }
+                }
+            } else if (item.objectType === 'IsolationDates') {
+                for (let i = 0; i < this.props.locations.length; i++) {
+                    let myLocationName = this.getLocationNameById(this.props.locations[i], this.props.case.isolationDates[this.props.index][item.id])
+                    if (myLocationName !== null){
+                        value = myLocationName;
+                        break
+                    }
+                }
+            }
         } else if (item.type === 'SwitchInput' && this.props.case[item.id] !== undefined) {
             value = this.props.case[item.id]
         } else {
@@ -282,6 +300,11 @@ class CaseSingleInfectionContainer extends PureComponent {
                                 item.objectType !== null && item.objectType !== undefined && item.objectType === 'IsolationDates' ? 
                                 this.props.handleOnPressDeleteIsolationDates : 
                                 null}
+                onChangeSectionedDropDown={item.objectType !== null && item.objectType !== undefined && item.objectType === 'HospitalizationDates' ? 
+                                this.props.onChangeSectionedDropDownHospitalization : 
+                                item.objectType !== null && item.objectType !== undefined && item.objectType === 'IsolationDates' ? 
+                                this.props.onChangeSectionedDropDownIsolation : 
+                                null}         
             />
         )
     };
@@ -427,10 +450,19 @@ class CaseSingleInfectionContainer extends PureComponent {
 
     handleNextButton = () => {
         if (this.props.checkRequiredFieldsInfection()) {
-            if (this.props.checkIsolationOnsetDates()) {
-                this.props.handleMoveToNextScreenButton(true);
+            if (this.props.checkDateOfOnsetOutcome()) {
+                if (this.props.checkIsolationOnsetDates()) {
+                    this.props.handleMoveToNextScreenButton(true);
+                } else {
+                    Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.dateOfOnsetError, this.props.translation), [
+                        {
+                            text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+                            onPress: () => {console.log("OK pressed")}
+                        }
+                    ])
+                }
             } else {
-                Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.dateOfOnsetError, this.props.translation), [
+                Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.dateOfOutcomeError, this.props.translation), [
                     {
                         text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
                         onPress: () => {console.log("OK pressed")}
