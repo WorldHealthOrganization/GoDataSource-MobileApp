@@ -365,6 +365,7 @@ export function deleteExposureForContact(outbreakId, contactId, exposure, token)
 
                             }
                             if (responseGetRelationships) {
+                                console.log('ResponseGetRelationships: ', responseGetRelationships);
                                 responseGetContact.relationships = responseGetRelationships;
                                 responseGetContact = updateContactFollowUpFields(responseGetContact, getState().outbreak);
                                 dispatch(updateContact(outbreakId, contactId, responseGetContact, null, null, true));

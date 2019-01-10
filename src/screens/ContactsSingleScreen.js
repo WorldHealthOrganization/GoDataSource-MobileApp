@@ -949,12 +949,15 @@ class ContactsSingleScreen extends Component {
                     text: getTranslation(translations.alertMessages.yesButtonLabel, this.props.translation), 
                     onPress: () => {
                         let relations = _.cloneDeep(this.state.contact.relationships);
-                        if (relations && Array.isArray(relations) && relations.map((e) => {return e.id}).indexOf(relation.id) > -1) {
-                            relations.splice(relations.map((e) => {return e.id}).indexOf(relation.id), 1);
+                        console.log('Relations after cloneDeep: ', relations, relation);
+                        if (relations && Array.isArray(relations) && relations.map((e) => {return e._id}).indexOf(relation._id) > -1) {
+                            relations.splice(relations.map((e) => {return e._id}).indexOf(relation._id), 1);
+                            console.log('Relations after splice: ', relations);
 
                             this.setState(prevState => ({
                                 contact: Object.assign({}, prevState.contact, {relationships: relations})
                             }), () => {
+                                relation = updateRequiredFields(this.props.user.activeOutbreakId, this.props.user._id, Object.assign({}, relation), 'delete');
                                 this.props.deleteExposureForContact(this.props.user.activeOutbreakId, this.props.contact._id, relation, this.props.user.token);
                             })
                         }

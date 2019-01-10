@@ -377,7 +377,7 @@ export function updateExposureForContactRequest(outbreakId, contactId, exposure,
 export function deleteExposureForContactRequest(outbreakId, contactId, exposure, token, callback) {
     let database = getDatabase();
 
-    database.remove(exposure)
+    database.put(exposure)
         .then((result) => {
             console.log('Result deleteExposureForContactRequest: ', result);
             callback(null, result);
