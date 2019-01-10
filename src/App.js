@@ -16,6 +16,7 @@ import {appInitialized} from './actions/app';
 import { registerScreens } from './screens';
 import config from './utils/config';
 import Modal from 'react-native-root-modal';
+import {resetInternetCredentials} from 'react-native-keychain';
 
 console.disableYellowBox = true;
 
@@ -36,7 +37,7 @@ export default class App {
         ParseNativeModule.addListener('onParseInit', (item) => {
             console.log('~~~ TODO save installation Id onParseInit ~~~', item);
             AsyncStorage.setItem('installationId', item.installationId);
-        })
+        });
 
         ParseNativeModule.addListener('onPushReceived', (item) => {
             console.log('~~~ TODO WIPE onPushReceived ~~~', item)
@@ -68,10 +69,9 @@ export default class App {
                                                                     if (currentHubConfig && currentHubConfig !== undefined && currentHubConfig.url && currentHubConfig.url !== undefined && currentHubConfig.url.trim().length > 0 && installationId && installationId !== undefined) {
                                                                         // console.log ('configHubInfo', currentHubConfig)
                                                                         // console.log ('installationId', installationId)
-
                                                                         wipeCompleteRequest(currentHubConfig.url, installationId, currentHubConfig.clientId, currentHubConfig.clientSecret, (error, response) => {
                                                                             if (error) {
-                                                                                console.log ('wipeCompleteRequest error: ', error)
+                                                                                console.log('wipeCompleteRequest error: ', error)
                                                                             }
                                                                             if (response) {
                                                                                 this.startApp('config');
@@ -193,32 +193,102 @@ export default class App {
         }
     };
 
-    removeAllDatabases = (callback) => {
+    removeAllDatabases = async (callback) => {
         // Remove DocumentDirectory and LibraryDirectory
         // console.log('Path for debug purposes: ', RNFetchBlobFS.dirs.DocumentDir);
 
-        RNFetchBlobFS.unlink(RNFetchBlobFS.dirs.DocumentDir)
-            .then(() => {
-                console.log('Document Directory Delete Successful');
-                // If the platform is IOS, delete also the Library folder
-                if (Platform.OS === 'ios') {
-                    RNFetchBlobFS.unlink(RNFS.LibraryDirectoryPath)
-                        .then(() => {
-                            console.log('Library Directory Delete Successful');
-                            // If the platform is IOS, delete also the Library folder
-                            callback(null, 'success');
-                        })
-                        .catch((errorDeleteLibraryDirectory) => {
-                            console.log('Error delete library directory: ', errorDeleteLibraryDirectory);
-                            callback(errorDeleteLibraryDirectory)
-                        })
-                } else {
-                    callback(null, 'success');
+
+        // First clear the internet credentials
+        try {
+            let allDatabases = await AsyncStorage.getItem('databases');
+            if (allDatabases) {
+                allDatabases = JSON.parse(allDatabases);
+                allDatabases = allDatabases.map((e) => {return e.id});
+                for (let i=0; i<allDatabases.length; i++) {
+                    try {
+                        let responseRemoveInternetCredentials = await resetInternetCredentials(allDatabases[i]);
+                    } catch(removeInternetCredentialsError) {
+                        console.log('removeInternetCredentialsError: ', removeInternetCredentialsError);
+                        break;
+                    }
                 }
-            })
-            .catch((errorDeleteDocumentDirectory) => {
-                console.log('Error delete document directory: ', errorDeleteDocumentDirectory);
-                callback(errorDeleteDocumentDirectory);
-            })
+                // After removing the internet credentials delete everything from AsyncStorage
+                try {
+                    let clearAsyncStorage = await AsyncStorage.clear();
+                    // Proceed to removing the databases. For this take into consideration the differences between the two platforms
+
+                    try {
+                        let libraryFiles = await RNFetchBlobFS.ls(Platform.OS === 'ios' ? `${RNFS.LibraryDirectoryPath}/NoCloud` : `${RNFetchBlobFS.dirs.DocumentDir}`);
+                        if (libraryFiles && Array.isArray(libraryFiles) && libraryFiles.length > 0) {
+                            for (let i = 0; i < libraryFiles.length; i++) {
+                                try {
+                                    console.log('Trying to delete file: ', libraryFiles[i]);
+                                    let deletedFile = await RNFetchBlobFS.unlink(`${RNFetchBlobFS.dirs.DocumentDir}/${libraryFiles[i]}`)
+                                } catch (errorUnlinkDocumentDir) {
+                                    console.log('ErrorUnlinkDocumentDir: ', errorUnlinkDocumentDir);
+                                    return callback(errorUnlinkDocumentDir);
+                                }
+                            }
+                            callback(null, 'success');
+                        }
+                    } catch (errorLsLibraryDir) {
+                        console.log('ErrorLsDocumentDir: ', errorLsLibraryDir);
+                        return callback(errorLsLibraryDir);
+                    }
+                } catch (errorClearAsyncStorage) {
+                    console.log('ErrorClearAsyncStorage: ', errorClearAsyncStorage);
+                    // Proceed to removing the databases. For this take into consideration the differences between the two platforms
+                    try {
+                        let libraryFiles = await RNFetchBlobFS.ls(Platform.OS === 'ios' ? `${RNFS.LibraryDirectoryPath}/NoCloud` : `${RNFetchBlobFS.dirs.DocumentDir}`);
+                        if (libraryFiles && Array.isArray(libraryFiles) && libraryFiles.length > 0) {
+                            for (let i = 0; i < libraryFiles.length; i++) {
+                                try {
+                                    console.log('Trying to delete file: ', libraryFiles[i]);
+                                    let deletedFile = await RNFetchBlobFS.unlink(`${RNFetchBlobFS.dirs.DocumentDir}/${libraryFiles[i]}`)
+                                } catch (errorUnlinkDocumentDir) {
+                                    console.log('ErrorUnlinkDocumentDir: ', errorUnlinkDocumentDir);
+                                    return callback(errorUnlinkDocumentDir);
+                                }
+                            }
+                            callback(null, 'success');
+                        }
+                    } catch (errorLsLibraryDir) {
+                        console.log('ErrorLsDocumentDir: ', errorLsLibraryDir);
+                        return callback(errorLsLibraryDir);
+                    }
+                }
+            } else {
+                console.log('No hubs found');
+                callback('No hubs found');
+            }
+        } catch (getAllHubsError) {
+            console.log('Get All hubs error: ', getAllHubsError);
+            callback(getAllHubsError);
+        }
+
+
+        // RNFetchBlobFS.unlink(RNFetchBlobFS.dirs.DocumentDir)
+        //     .then(() => {
+        //         console.log('Document Directory Delete Successful');
+        //         // If the platform is IOS, delete also the Library folder
+        //         if (Platform.OS === 'ios') {
+        //             RNFetchBlobFS.unlink(RNFS.LibraryDirectoryPath)
+        //                 .then(() => {
+        //                     console.log('Library Directory Delete Successful');
+        //                     // If the platform is IOS, delete also the Library folder
+        //                     callback(null, 'success');
+        //                 })
+        //                 .catch((errorDeleteLibraryDirectory) => {
+        //                     console.log('Error delete library directory: ', errorDeleteLibraryDirectory);
+        //                     callback(errorDeleteLibraryDirectory)
+        //                 })
+        //         } else {
+        //             callback(null, 'success');
+        //         }
+        //     })
+        //     .catch((errorDeleteDocumentDirectory) => {
+        //         console.log('Error delete document directory: ', errorDeleteDocumentDirectory);
+        //         callback(errorDeleteDocumentDirectory);
+        //     })
     }
 }

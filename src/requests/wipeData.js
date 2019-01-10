@@ -7,11 +7,11 @@ export function wipeCompleteRequest(url, installationId, clientId, clientSecret,
     if (url && installationId) {
         let requestUrl = `${url}/devices/wipe-complete`
     
-        let operatingSystem = Platform.OS
-        let deviceManufacturer = DeviceInfo.getManufacturer()
-        let deviceModel = DeviceInfo.getModel()
-        let deviceName = DeviceInfo.getDeviceName()
-        let deviceDescription = ''
+        let operatingSystem = Platform.OS;
+        let deviceManufacturer = DeviceInfo.getManufacturer();
+        let deviceModel = DeviceInfo.getModel();
+        let deviceName = DeviceInfo.getDeviceName();
+        let deviceDescription = '';
     
         // console.log ('operatingSystem: ', operatingSystem)
         // console.log ('deviceManufacturer: ', deviceManufacturer)

@@ -4,9 +4,10 @@
 import url from './../utils/url';
 import RNFetchBlob from 'rn-fetch-blob';
 import base64 from 'base-64';
-import {Platform} from 'react-native';
+import {Platform, AsyncStorage} from 'react-native';
 import {getSyncEncryptPassword} from './../utils/encryption';
 import {setSyncState} from './../actions/app';
+import DeviceInfo from 'react-native-device-info';
 
 export function getDatabaseSnapshotRequest(hubConfig, lastSyncDate, dispatch, callback) {
 
@@ -21,47 +22,63 @@ export function getDatabaseSnapshotRequest(hubConfig, lastSyncDate, dispatch, ca
         }
     }
 
-    // let requestUrl = hubConfiguration.url + '/sync/database-snapshot' + (lastSyncDate ? ('?filter=' + JSON.stringify(filter)) : '');
+    // Get installationId first from the local storage
+    AsyncStorage.getItem('installationId')
+        .then((installationId) => {
+            let deviceInfo = JSON.stringify({
+                id: installationId,
+                os: Platform.OS,
+                manufacturer: DeviceInfo.getManufacturer(),
+                model: DeviceInfo.getModel(),
+                name: DeviceInfo.getDeviceName()
+            });
+            // let requestUrl = hubConfiguration.url + '/sync/database-snapshot' + (lastSyncDate ? ('?filter=' + JSON.stringify(filter)) : '');
 
-    let requestUrl = `${hubConfiguration.url}/sync/database-snapshot?autoEncrypt=${hubConfiguration.encryptedData}${lastSyncDate ? `&filter=${JSON.stringify(filter)}` : ''}`;
+            let requestUrl = `${hubConfiguration.url}/sync/database-snapshot?autoEncrypt=${hubConfiguration.encryptedData}${lastSyncDate ? `&filter=${JSON.stringify(filter)}` : ''}`;
 
-    console.log('Request URL: ', requestUrl);
+            console.log('Request URL: ', requestUrl);
 
-    let dirs = RNFetchBlob.fs.dirs.DocumentDir;
-    let databaseLocation = `${dirs}/database.zip`;
+            let dirs = RNFetchBlob.fs.dirs.DocumentDir;
+            let databaseLocation = `${dirs}/database.zip`;
 
-    console.log('Get database');
+            console.log('Get database');
 
-    RNFetchBlob.config({
-        timeout: (60 * 10 * 1000),
-        followRedirect: false,
-        fileCache: true,
-        path: `${dirs}/database.zip`
-    })
-        .fetch('GET', encodeURI(requestUrl), {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'Authorization': 'Basic ' + base64.encode(`${hubConfiguration.clientId}:${hubConfiguration.clientSecret}`)
-    })
-        .progress({count: 500}, (received, total) => {
-            dispatch(setSyncState(`Downloading database\nReceived ${received} bytes`));
-            console.log(received, total)
+            RNFetchBlob.config({
+                timeout: (60 * 10 * 1000),
+                followRedirect: false,
+                fileCache: true,
+                path: `${dirs}/database.zip`
+            })
+                .fetch('GET', encodeURI(requestUrl), {
+                    'device-info': deviceInfo,
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'Authorization': 'Basic ' + base64.encode(`${hubConfiguration.clientId}:${hubConfiguration.clientSecret}`)
+                })
+                .progress({count: 500}, (received, total) => {
+                    dispatch(setSyncState(`Downloading database\nReceived ${received} bytes`));
+                    console.log(received, total)
+                })
+                .then((res) => {
+                    let status = res.info().status;
+                    // After getting zip file from the server, unzip it and then proceed to the importing of the data to the SQLite database
+                    if(status === 200) {
+                        // After returning the database, return the path to it
+                        console.log("Got database");
+                        callback(null, databaseLocation)
+                    } else {
+                        callback(`Cannot connect to HUB, please check URL, Client ID and Client secret.\nStatus code: ${status}`);
+                    }
+                })
+                .catch((errorMessage, statusCode) => {
+                    // error handling
+                    console.log("*** getDatabaseSnapshotRequest error: ", JSON.stringify(errorMessage));
+                    callback(errorMessage.message);
+                });
         })
-        .then((res) => {
-            let status = res.info().status;
-            // After getting zip file from the server, unzip it and then proceed to the importing of the data to the SQLite database
-            if(status === 200) {
-                // After returning the database, return the path to it
-                console.log("Got database");
-                callback(null, databaseLocation)
-            } else {
-                callback(`Cannot connect to HUB, please check URL, Client ID and Client secret.\nStatus code: ${status}`);
-            }
-        })
-        .catch((errorMessage, statusCode) => {
-            // error handling
-            console.log("*** getDatabaseSnapshotRequest error: ", JSON.stringify(errorMessage));
-            callback(errorMessage.message);
+        .catch((errorGetInstallationId) => {
+            console.log('error while trying to get installationId: ', errorGetInstallationId);
+
         });
 }
 
@@ -72,30 +89,45 @@ export function postDatabaseSnapshotRequest(internetCredentials, path, callback)
 
     // console.log('Request URL:' + requestUrl);
 
-    console.log('Send database to server');
+    // Get installationId from the local storage first
+    AsyncStorage.getItem('installationId')
+        .then((installationId) => {
 
-    RNFetchBlob.config({timeout: (60 * 10 * 1000)})
-        .fetch('POST', requestUrl, {
-        'Content-Type': 'multipart/form-data',
-        'Accept': 'application/json',
-        'Authorization': 'Basic ' + base64.encode(`${hubConfig.clientId}:${hubConfig.clientSecret}`)
-    }, [
-        {name: 'snapshot', filename: 'snapshot', data: RNFetchBlob.wrap(path)},
-        {name: 'autoEncrypt', data: `${hubConfig.encryptedData}`}
-    ], '0', '6000000')
-        .then((res) => {
-            console.log('Finished sending the data to the server: ', res);
-            let status = res.info().status;
-            if(status === 200) {
-            //     console.log("Got database");
-                callback(null, 'Finished sending data to the server')
-            } else {
-                callback(res, 'Finished sending data to the server');
-            }
+            let deviceInfo = JSON.stringify({
+                id: installationId,
+                os: Platform.OS,
+                manufacturer: DeviceInfo.getManufacturer(),
+                model: DeviceInfo.getModel(),
+                name: DeviceInfo.getDeviceName()
+            });
+
+            RNFetchBlob.config({timeout: (60 * 10 * 1000)})
+                .fetch('POST', requestUrl, {
+                    'device-info': deviceInfo,
+                    'Content-Type': 'multipart/form-data',
+                    'Accept': 'application/json',
+                    'Authorization': 'Basic ' + base64.encode(`${hubConfig.clientId}:${hubConfig.clientSecret}`)
+                }, [
+                    {name: 'snapshot', filename: 'snapshot', data: RNFetchBlob.wrap(path)},
+                    {name: 'autoEncrypt', data: `${hubConfig.encryptedData}`}
+                ], '0', '6000000')
+                .then((res) => {
+                    console.log('Finished sending the data to the server: ', res);
+                    let status = res.info().status;
+                    if(status === 200) {
+                        //     console.log("Got database");
+                        callback(null, 'Finished sending data to the server')
+                    } else {
+                        callback(res, 'Finished sending data to the server');
+                    }
+                })
+                .catch((errorMessage, statusCode) => {
+                    // error handling
+                    console.log("*** postDatabaseSnapshotRequest error: ", JSON.stringify(errorMessage));
+                    callback(errorMessage);
+                });
         })
-        .catch((errorMessage, statusCode) => {
-            // error handling
-            console.log("*** postDatabaseSnapshotRequest error: ", JSON.stringify(errorMessage));
-            callback(errorMessage);
-        });
+        .catch((errorGetInstallationId) => {
+            console.log('Error while trying to get installationId from AsyncStorage: ', errorGetInstallationId);
+        })
 }

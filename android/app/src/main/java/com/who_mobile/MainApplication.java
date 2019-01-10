@@ -55,7 +55,7 @@ public class MainApplication extends NavigationApplication {
                  new RNSqlite2Package(),
                  new RNFSPackage(),
                  new ReactNativeDocumentPicker(),
-                 new ParseReceiverPackage()
+                 new ParseReceiverPackage(),
                  new RandomBytesPackage()
          );
      }
