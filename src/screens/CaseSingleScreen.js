@@ -424,6 +424,7 @@ class CaseSingleScreen extends Component {
                         checkIsolationOnsetDates={this.checkIsolationOnsetDates}
                         onChangeSectionedDropDownHospitalization={this.onChangeSectionedDropDownHospitalization}
                         onChangeSectionedDropDownIsolation={this.onChangeSectionedDropDownIsolation}
+                        checkDateOfOnsetOutcome={this.checkDateOfOnsetOutcome}
                     />
                 );
             case 'caseInvestigation':
@@ -1019,6 +1020,12 @@ class CaseSingleScreen extends Component {
                     }
                 }
             }
+        }
+        return true;
+    };
+    checkDateOfOnsetOutcome = () => {
+        if(this.state.case && this.state.case.dateOfOnset && this.state.case.dateOfOutcome && moment(this.state.case.dateOfOutcome).format('YYYY-MM-DD') < moment(this.state.case.dateOfOnset).format('YYYY-MM-DD')){
+            return false
         }
         return true;
     };
