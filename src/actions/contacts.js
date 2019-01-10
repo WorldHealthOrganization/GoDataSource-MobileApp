@@ -352,7 +352,7 @@ export function deleteExposureForContact(outbreakId, contactId, exposure, token)
                 dispatch(addError(errorTypes.ERROR_DELETE_EXPOSURE));
             }
             if (response) {
-                // console.log("Response from updateExposureForContact");
+                 // console.log("Response from updateExposureForContact");
 
                 // Get contact and its relationships and update the follow-up periods
                 getContactByIdRequest(outbreakId, contactId, null, (errorGetContact, responseGetContact) => {
@@ -360,11 +360,12 @@ export function deleteExposureForContact(outbreakId, contactId, exposure, token)
 
                     }
                     if (responseGetContact) {
-                        getRelationshipsForTypeRequest(outbreakId, null, [contactId], (errorGetRelationships, responseGetRelationships) => {
+                        getRelationshipsForTypeRequest(outbreakId, null, [extractIdFromPouchId(contactId, 'person')], (errorGetRelationships, responseGetRelationships) => {
                             if (errorGetRelationships) {
 
                             }
                             if (responseGetRelationships) {
+                                console.log('ResponseGetRelationships: ', responseGetRelationships);
                                 responseGetContact.relationships = responseGetRelationships;
                                 responseGetContact = updateContactFollowUpFields(responseGetContact, getState().outbreak);
                                 dispatch(updateContact(outbreakId, contactId, responseGetContact, null, null, true));
@@ -374,7 +375,7 @@ export function deleteExposureForContact(outbreakId, contactId, exposure, token)
                 })
 
 
-
+                
                 // dispatch(getContactById(outbreakId, contactId, token));
             }
         })

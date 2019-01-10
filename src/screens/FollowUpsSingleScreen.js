@@ -603,7 +603,7 @@ class FollowUpsSingleScreen extends Component {
             if (this.props.isNew) {
                 followUpClone = updateRequiredFields(this.props.user.activeOutbreakId, this.props.user._id, Object.assign({}, followUpClone), action = 'create', 'followUp.json');
                 console.log ('followUpClone create', JSON.stringify(followUpClone))
-                this.props.createFollowUp(this.props.outbreak.id, contactClone._id, followUpClone, contactClone, null, this.props.user.token)
+                this.props.createFollowUp(this.props.user.activeOutbreakId, contactClone._id, followUpClone, contactClone, null, this.props.user.token)
             } else {
                 if (this.state.deletePressed === false) {
                     followUpClone = updateRequiredFields(this.props.user.activeOutbreakId, this.props.user._id, Object.assign({}, followUpClone), action = 'update');
