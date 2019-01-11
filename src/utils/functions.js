@@ -479,9 +479,10 @@ export async function processFile (path, type, totalNumberOfFiles, dispatch, isF
                                 }
                                 if (encryptedData) {
                                     let password = getSyncEncryptPassword(null, hubConfig);
-
+                                    let startTimeDecrypt = new Date().getTime();
                                     decrypt(password, encryptedData)
                                         .then((decryptedData) => {
+                                            console.log(`Time for decrypting file: ${type}: ${new Date().getTime() - startTimeDecrypt}`);
                                             encryptedData = null;
                                             // Decrypted data is a zip file that needs first to be written to disk
                                             RNFetchBlobFS.writeFile(`${path}`, decryptedData, 'base64')
@@ -1205,7 +1206,6 @@ export function getTranslation (value, allTransactions) {
     if (allTransactions && Array.isArray(allTransactions) && allTransactions[0] && allTransactions[0].languageId) {
         key = `${key}-${allTransactions[0].languageId}`
     }
-    
     if (getTranslation.cache[key] !== undefined) {
         // console.log('~~~ return cache value ~~~', key)
         return getTranslation.cache[key]
@@ -1218,7 +1218,7 @@ export function getTranslation (value, allTransactions) {
         }
         valueToBeReturned = item ? item.translation : '';
     }
-    getTranslation.cache[key] = valueToBeReturned
+    getTranslation.cache[key] = valueToBeReturned;
     return valueToBeReturned;
 }
 

@@ -380,8 +380,10 @@ export function deleteExposureForContactRequest(outbreakId, contactId, exposure,
     database.put(exposure)
         .then((result) => {
             console.log('Result deleteExposureForContactRequest: ', result);
+            callback(null, result);
         })
         .catch((errorAddExposure) => {
             console.log("Error deleteExposureForContactRequest: ", errorAddExposure);
+            callback(errorAddExposure);
         })
 }

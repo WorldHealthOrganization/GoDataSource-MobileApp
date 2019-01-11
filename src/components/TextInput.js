@@ -139,7 +139,7 @@ class TextInput extends PureComponent {
             this.props.onChange(
                 state,
                 this.props.id,
-                this.props.objectType ? (this.props.objectType === 'Address' || this.props.objectType === 'LabResult' || this.props.objectType === 'Documents' ? this.props.index : this.props.objectType) : null,
+                this.props.objectType ? (this.props.objectType === 'Address' || this.props.objectType === 'LabResult' || this.props.objectType === 'Documents' || this.props.objectType === 'HospitalizationDates' || this.props.objectType === 'IsolationDates' ? this.props.index : this.props.objectType) : null,
                 this.props.objectType
             )
         }

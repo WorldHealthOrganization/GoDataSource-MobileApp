@@ -125,7 +125,7 @@ class CardComponent extends Component {
             if (this.props.case.hospitalizationDates && this.props.case.hospitalizationDates.length > 0 && nextProps.case.hospitalizationDates && nextProps.case.hospitalizationDates.length > 0 && this.props.case.hospitalizationDates.length === nextProps.case.hospitalizationDates.length) {
                 for (let i=0; i<this.props.case.hospitalizationDates.length; i++){
                     if (this.props.case.hospitalizationDates[i][nextProps.item[0].id] !== undefined && this.props.case.hospitalizationDates[i][nextProps.item[1].id] !== undefined) {
-                        if (this.props.case.hospitalizationDates[i][nextProps.item[0].id] !== nextProps.case.hospitalizationDates[i][nextProps.item[0].id] || this.props.case.hospitalizationDates[i][nextProps.item[1].id] !== nextProps.case.hospitalizationDates[i][nextProps.item[1].id]){
+                        if (this.props.case.hospitalizationDates[i][nextProps.item[0].id] !== nextProps.case.hospitalizationDates[i][nextProps.item[0].id] || this.props.case.hospitalizationDates[i][nextProps.item[1].id] !== nextProps.case.hospitalizationDates[i][nextProps.item[1].id] || this.props.case.hospitalizationDates[i][nextProps.item[2].id] !== nextProps.case.hospitalizationDates[i][nextProps.item[2].id] || this.props.case.hospitalizationDates[i][nextProps.item[3].id] !== nextProps.case.hospitalizationDates[i][nextProps.item[3].id] || this.props.case.hospitalizationDates[i][nextProps.item[4].id] !== nextProps.case.hospitalizationDates[i][nextProps.item[4].id]) {
                             return true
                         }
                     }
@@ -134,7 +134,7 @@ class CardComponent extends Component {
             if (this.props.case.isolationDates && this.props.case.isolationDates.length > 0 && nextProps.case.isolationDates && nextProps.case.isolationDates.length > 0 && this.props.case.isolationDates.length === nextProps.case.isolationDates.length) {
                 for (let i=0; i<this.props.case.isolationDates.length; i++){
                     if (this.props.case.isolationDates[i][nextProps.item[0].id] !== undefined && this.props.case.isolationDates[i][nextProps.item[1].id] !== undefined) {
-                        if (this.props.case.isolationDates[i][nextProps.item[0].id] !== nextProps.case.isolationDates[i][nextProps.item[0].id] || this.props.case.isolationDates[i][nextProps.item[1].id] !== nextProps.case.isolationDates[i][nextProps.item[1].id]){
+                        if (this.props.case.isolationDates[i][nextProps.item[0].id] !== nextProps.case.isolationDates[i][nextProps.item[0].id] || this.props.case.isolationDates[i][nextProps.item[1].id] !== nextProps.case.isolationDates[i][nextProps.item[1].id] || this.props.case.isolationDates[i][nextProps.item[2].id] !== nextProps.case.isolationDates[i][nextProps.item[2].id] || this.props.case.isolationDates[i][nextProps.item[3].id] !== nextProps.case.isolationDates[i][nextProps.item[3].id] || this.props.case.isolationDates[i][nextProps.item[4].id] !== nextProps.case.isolationDates[i][nextProps.item[4].id]) {
                             return true
                         }
                     }
@@ -375,12 +375,32 @@ class CardComponent extends Component {
             if (item.type === 'DatePicker' && this.props.case[item.id] !== undefined) {
                 value = this.props.case[item.id]
             } else if (item.type === 'DropDownSectioned') {
-                if (this.props.case && this.props.case.addresses && Array.isArray(this.props.case.addresses) && this.props.case.addresses[this.props.index] && this.props.case.addresses[this.props.index][item.id] && this.props.case.addresses[this.props.index][item.id] !== "") {
+                if (item.objectType === 'HospitalizationDates') {
                     for (let i = 0; i < this.props.locations.length; i++) {
-                        let myLocationName = this.getLocationNameById(this.props.locations[i], this.props.case.addresses[this.props.index][item.id])
+                        let myLocationName = this.getLocationNameById(this.props.locations[i], this.props.case.hospitalizationDates[this.props.index][item.id]);
                         if (myLocationName !== null){
-                            value = myLocationName
+                            value = myLocationName;
                             break
+                        }
+                    }
+                } else {
+                    if (item.objectType === 'IsolationDates') {
+                        for (let i = 0; i < this.props.locations.length; i++) {
+                            let myLocationName = this.getLocationNameById(this.props.locations[i], this.props.case.isolationDates[this.props.index][item.id])
+                            if (myLocationName !== null){
+                                value = myLocationName;
+                                break
+                            }
+                        }
+                    } else {
+                        if (this.props.case && this.props.case.addresses && Array.isArray(this.props.case.addresses) && this.props.case.addresses[this.props.index] && this.props.case.addresses[this.props.index][item.id] && this.props.case.addresses[this.props.index][item.id] !== "") {
+                            for (let i = 0; i < this.props.locations.length; i++) {
+                                let myLocationName = this.getLocationNameById(this.props.locations[i], this.props.case.addresses[this.props.index][item.id])
+                                if (myLocationName !== null){
+                                    value = myLocationName;
+                                    break
+                                }
+                            }
                         }
                     }
                 }
