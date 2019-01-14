@@ -232,7 +232,16 @@ class ExposureScreen extends Component {
         if (item.type === 'DropdownInput') {
             item.data = this.computeDataForExposure(item);
         }
-        value = this.computeExposureValue(item);
+
+        if (item.type === 'DropdownInput' && item.id === 'clusterId' && this.state.exposure.clusterId) {
+            let myCluster = this.props.clusters.filter((e) => {
+                return extractIdFromPouchId(e._id, 'cluster') === this.state.exposure.clusterId
+            })
+            value = myCluster[0].name
+        } else {
+            value = this.computeExposureValue(item);
+        }
+
         if (this.props.addContactFromCasesScreen && this.props.addContactFromCasesScreen !== undefined && item.id === 'exposure') {
             addContactFromCasesScreen = true
         }
@@ -298,9 +307,9 @@ class ExposureScreen extends Component {
                 data = data.concat(this.props.events.map((e) => {return {value: e.name, id: extractIdFromPouchId(e._id, 'person'), type: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_EVENT'}}));
             } else {
                 if (item.id === 'clusterId') {
-                    // return _.filter(this.props.referenceData, (o) => {
-                    //     return o.categoryId.includes("")
-                    // }).map((o) => {return {value: getTranslation(o.value, this.props.translation), id: o.value}})
+                    data = this.props.clusters.map((e) => {
+                        return {value: e.name, id: extractIdFromPouchId(e._id, 'cluster')}
+                    })
                 }
             }
         }
@@ -340,16 +349,16 @@ class ExposureScreen extends Component {
             Alert.alert("", 'You have unsaved data. Are you sure you want to leave this page and lose all changes?', [
                 {
                     text: 'Yes', onPress: () => {
-                    this.props.navigator.dismissModal();
-                }
+                        this.props.navigator.dismissModal();
+                    }
                 },
                 {
                     text: 'Cancel', onPress: () => {
-                    console.log("onPressCancelEdit No pressed - nothing changes")
-                }
+                        console.log("onPressCancelEdit No pressed - nothing changes")
+                    }
                 }
             ])
-        }else {
+        } else {
             this.props.navigator.dismissModal();
         }
     };
@@ -389,7 +398,7 @@ class ExposureScreen extends Component {
                 exposure: Object.assign({}, prevState.exposure, {persons: personsArray, source: source, target: target, active: true}),
                 isModified: true
             }), () => {
-                console.log('After changing state: ', this.state.exposure);
+                console.log('After changing state if: ', this.state.exposure);
             })
         } else {
             // let source = this.state.exposure.persons && Array.isArray(this.state.exposure.persons) && this.state.exposure.persons.length === 2 ? this.state.exposure.persons[0].source ? this.state.exposure.persons[0].id : this.state.exposure.persons[1].id : null;
@@ -398,7 +407,7 @@ class ExposureScreen extends Component {
                 exposure: Object.assign({}, prevState.exposure, {[id]: value.value}),
                 isModified: true
             }), () => {
-                console.log('After changing state: ', this.state.exposure);
+                console.log('After changing state else: ', this.state.exposure);
             })
         }
     };
@@ -581,6 +590,7 @@ function mapStateToProps(state) {
         referenceData: state.referenceData,
         cases: state.cases,
         events: state.events,
+        clusters: state.clusters,
     };
 }
 
