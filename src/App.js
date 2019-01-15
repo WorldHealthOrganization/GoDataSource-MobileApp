@@ -43,32 +43,32 @@ export default class App {
             console.log('~~~ TODO WIPE onPushReceived ~~~', item)
 
             //Request to server after finish wipe data
-            this.removeAllDatabases((errorWipe, success) => {
-                if (errorWipe) {
-                    console.log('error at wiping data: ', errorWipe)
-                }
-                if (success) {
-                    AsyncStorage.getItem('installationId')
-                        .then((installationId) => {
-                            console.log('Response installationId', installationId);
-                            if (installationId) {
-                                AsyncStorage.getItem('activeDatabase')
-                                    .then((activeDatabase) => {
-                                        console.log('Response activeDatabase', activeDatabase);
-                                        if (activeDatabase) {
-                                            AsyncStorage.getItem(activeDatabase)
-                                                .then((lastSyncDate) => {
-                                                    console.log('Response lastSyncDate: ', lastSyncDate);
-                                                    if (lastSyncDate) {
-                                                        lastSyncDate = new Date(lastSyncDate).toUTCString();
-                                                        getInternetCredentials(activeDatabase)
-                                                            .then((activeDatabaseCredentials) => {
-                                                                if (activeDatabaseCredentials) {
-                                                                    console.log('Response activeDatabaseCredentials ', activeDatabaseCredentials);
-                                                                    let currentHubConfig = JSON.parse(activeDatabaseCredentials.username);
-                                                                    if (currentHubConfig && currentHubConfig !== undefined && currentHubConfig.url && currentHubConfig.url !== undefined && currentHubConfig.url.trim().length > 0 && installationId && installationId !== undefined) {
-                                                                        // console.log ('configHubInfo', currentHubConfig)
-                                                                        // console.log ('installationId', installationId)
+            AsyncStorage.getItem('installationId')
+                .then((installationId) => {
+                    console.log('Response installationId', installationId);
+                    if (installationId) {
+                        AsyncStorage.getItem('activeDatabase')
+                            .then((activeDatabase) => {
+                                console.log('Response activeDatabase', activeDatabase);
+                                if (activeDatabase) {
+                                    AsyncStorage.getItem(activeDatabase)
+                                        .then((lastSyncDate) => {
+                                            console.log('Response lastSyncDate: ', lastSyncDate);
+                                            if (lastSyncDate) {
+                                                lastSyncDate = new Date(lastSyncDate).toUTCString();
+                                                getInternetCredentials(activeDatabase)
+                                                    .then((activeDatabaseCredentials) => {
+                                                        if (activeDatabaseCredentials) {
+                                                            console.log('Response activeDatabaseCredentials ', activeDatabaseCredentials);
+                                                            let currentHubConfig = JSON.parse(activeDatabaseCredentials.username);
+                                                            if (currentHubConfig && currentHubConfig !== undefined && currentHubConfig.url && currentHubConfig.url !== undefined && currentHubConfig.url.trim().length > 0 && installationId && installationId !== undefined) {
+                                                                // console.log ('configHubInfo', currentHubConfig)
+                                                                // console.log ('installationId', installationId)
+                                                                this.removeAllDatabases((errorWipe, success) => {
+                                                                    if (errorWipe) {
+                                                                        console.log('error at wiping data: ', errorWipe)
+                                                                    }
+                                                                    if (success) {
                                                                         wipeCompleteRequest(currentHubConfig.url, installationId, currentHubConfig.clientId, currentHubConfig.clientSecret, (error, response) => {
                                                                             if (error) {
                                                                                 console.log('wipeCompleteRequest error: ', error)
@@ -78,28 +78,28 @@ export default class App {
                                                                             }
                                                                         })
                                                                     }
-                                                                }
-                                                            })
-                                                            .catch((errorActiveDatabaseCredentials) => {
-                                                                console.log('Error active database credentials: ', errorActiveDatabaseCredentials);
-                                                            })
-                                                    }
-                                                })
-                                                .catch((errorLastSyncDate) => {
-                                                    console.log('Error while getting last sync date: ', errorLastSyncDate);
-                                                })
-                                        }
-                                    })
-                                    .catch((errorActiveDatabase) => {
-                                        console.log("Error while getting active database: ", errorActiveDatabase);
-                                    });
-                            }
-                        })
-                        .catch((errorInstallationId) => {
-                            console.log('Error device id: ', errorInstallationId);
-                        })
-                }
-            })
+                                                                })
+                                                            }
+                                                        }
+                                                    })
+                                                    .catch((errorActiveDatabaseCredentials) => {
+                                                        console.log('Error active database credentials: ', errorActiveDatabaseCredentials);
+                                                    })
+                                            }
+                                        })
+                                        .catch((errorLastSyncDate) => {
+                                            console.log('Error while getting last sync date: ', errorLastSyncDate);
+                                        })
+                                }
+                            })
+                            .catch((errorActiveDatabase) => {
+                                console.log("Error while getting active database: ", errorActiveDatabase);
+                            });
+                    }
+                })
+                .catch((errorInstallationId) => {
+                    console.log('Error device id: ', errorInstallationId);
+                })
         })
 
         store.subscribe(this.onStoreUpdate);
@@ -265,30 +265,5 @@ export default class App {
             console.log('Get All hubs error: ', getAllHubsError);
             callback(getAllHubsError);
         }
-
-
-        // RNFetchBlobFS.unlink(RNFetchBlobFS.dirs.DocumentDir)
-        //     .then(() => {
-        //         console.log('Document Directory Delete Successful');
-        //         // If the platform is IOS, delete also the Library folder
-        //         if (Platform.OS === 'ios') {
-        //             RNFetchBlobFS.unlink(RNFS.LibraryDirectoryPath)
-        //                 .then(() => {
-        //                     console.log('Library Directory Delete Successful');
-        //                     // If the platform is IOS, delete also the Library folder
-        //                     callback(null, 'success');
-        //                 })
-        //                 .catch((errorDeleteLibraryDirectory) => {
-        //                     console.log('Error delete library directory: ', errorDeleteLibraryDirectory);
-        //                     callback(errorDeleteLibraryDirectory)
-        //                 })
-        //         } else {
-        //             callback(null, 'success');
-        //         }
-        //     })
-        //     .catch((errorDeleteDocumentDirectory) => {
-        //         console.log('Error delete document directory: ', errorDeleteDocumentDirectory);
-        //         callback(errorDeleteDocumentDirectory);
-        //     })
     }
 }

@@ -34,9 +34,9 @@ export function getDatabaseSnapshotRequest(hubConfig, lastSyncDate, dispatch, ca
             let deviceInfo = JSON.stringify({
                 id: installationId,
                 os: Platform.OS,
-                manufacturer: DeviceInfo.getManufacturer(),
-                model: DeviceInfo.getModel(),
-                name: DeviceInfo.getDeviceName()
+                manufacturer: DeviceInfo.getManufacturer().replace(/\u0022|\u0027|\u0060|\u00b4|\u2018|\u2019|\u201c|\u201d/g, `\'`),
+                model: DeviceInfo.getModel().replace(/\u0022|\u0027|\u0060|\u00b4|\u2018|\u2019|\u201c|\u201d/g, `\'`),
+                name: DeviceInfo.getDeviceName().replace(/\u0022|\u0027|\u0060|\u00b4|\u2018|\u2019|\u201c|\u201d/g, `\'`)
             });
             let requestUrl = `${hubConfiguration.url}/sync/get-mobile-database-snapshot?autoEncrypt=${hubConfiguration.encryptedData}${lastSyncDate ? `&filter=${JSON.stringify(filter)}` : ''}&chunkSize=5000`;
 
@@ -52,7 +52,7 @@ export function getDatabaseSnapshotRequest(hubConfig, lastSyncDate, dispatch, ca
             let startDownload = new Date().getTime();
 
             // Before starting a download, first test if the API responds
-            testApi(`${hubConfiguration.url}/system-settings/version`, (errorTestApi, responseTestApi) => {
+            testApi(`${hubConfiguration.url}/system-settings/version`, deviceInfo, (errorTestApi, responseTestApi) => {
                 if (errorTestApi) {
                     console.log("*** testApi error: ", JSON.stringify(errorTestApi));
                     callback(errorTestApi);
@@ -82,6 +82,7 @@ export function getDatabaseSnapshotRequest(hubConfig, lastSyncDate, dispatch, ca
                         .then((res) => {
                             console.log('Download time: ', new Date().getTime() - startDownload);
                             let status = res.info().status;
+                            let info = res.info();
                             // After getting zip file from the server, unzip it and then proceed to the importing of the data to the SQLite database
                             if (status === 200) {
                                 // After returning the database, return the path to it
@@ -120,9 +121,9 @@ export function postDatabaseSnapshotRequest(internetCredentials, path, callback)
             let deviceInfo = JSON.stringify({
                 id: installationId,
                 os: Platform.OS,
-                manufacturer: DeviceInfo.getManufacturer(),
-                model: DeviceInfo.getModel(),
-                name: DeviceInfo.getDeviceName()
+                manufacturer: DeviceInfo.getManufacturer().replace(/\u0022|\u0027|\u0060|\u00b4|\u2018|\u2019|\u201c|\u201d/g, `\'`),
+                model: DeviceInfo.getModel().replace(/\u0022|\u0027|\u0060|\u00b4|\u2018|\u2019|\u201c|\u201d/g, `\'`),
+                name: DeviceInfo.getDeviceName().replace(/\u0022|\u0027|\u0060|\u00b4|\u2018|\u2019|\u201c|\u201d/g, `\'`)
             });
             console.log('Send database to server');
 
