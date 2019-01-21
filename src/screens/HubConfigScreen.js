@@ -290,7 +290,7 @@ class FirstConfigScreen extends Component {
                             <Section label={getTranslation(translations.hubConfigScreen.otherHubConfigurationsLabel, this.props.translation)}/>
                             <View style={{alignItems: 'center', marginVertical: 10}}>
                                 {
-                                    this.state.allDatabases.map((database) => {
+                                    this.state && this.state.allDatabases && Array.isArray(this.state.allDatabases) && this.state.allDatabases.map((database) => {
                                         return this.renderDatabase(database, width);
                                     })
                                 }
