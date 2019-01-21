@@ -61,7 +61,7 @@ class LoginScreen extends Component {
             state.hasAlert = true;
             Alert.alert(props.errors.type, props.errors.message, [
                 {
-                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props && this.props.translation ? this.props.translation : null),
+                    text: getTranslation(translations.alertMessages.okButtonLabel, props && props.translation ? props.translation : null),
                     onPress: () => {
                         state.hasAlert = false;
                         props.removeErrors();

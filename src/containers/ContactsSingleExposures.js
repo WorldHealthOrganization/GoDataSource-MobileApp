@@ -230,17 +230,7 @@ class ContactsSingleExposures extends Component {
             caseName = aux && aux.name ? aux.name : '';
         }
 
-        return {title: caseName, primaryText: moment(relation.contactDate).format("YYYY-MM-DD").toString(), secondaryText: this.getTranslation(relation.certaintyLevelId)};
-    };
-
-    getTranslation = (value) => {
-        let valueToBeReturned = value;
-        if (value && typeof value === 'string' && value.includes('LNG')) {
-            valueToBeReturned = value && this.props.translation && Array.isArray(this.props.translation) && this.props.translation[this.props.translation.map((e) => {return e && e.token ? e.token : null}).indexOf(value)] ? this.props.translation[this.props.translation.map((e) => {
-                return e.token
-            }).indexOf(value)].translation : '';
-        }
-        return valueToBeReturned;
+        return {title: caseName, primaryText: moment(relation.contactDate).format("YYYY-MM-DD").toString(), secondaryText: getTranslation(relation.certaintyLevelId, this.props.translation)};
     };
 
     onPressAddExposure = () => {
