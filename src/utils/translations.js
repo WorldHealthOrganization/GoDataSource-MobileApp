@@ -133,8 +133,19 @@ const caseSingleScreen = {
 
     hospitalisationStartDate: 'LNG_DATE_FIELD_LABEL_FROM',
     hospitalisationEndDate: 'LNG_DATE_FIELD_LABEL_TO',
+    // TODO add translations to API
+    hospitalisationCenterName: 'LNG_DATE_FIELD_LABEL_CENTER_NAME',
+    hospitalisationLocation: 'LNG_DATE_FIELD_LABEL_LOCATION',
+    hospitalisationComments: 'LNG_DATE_FIELD_LABEL_COMMENTS',
+
+
     isolationStartDate: 'LNG_DATE_FIELD_LABEL_FROM',
     isolationEndDate: 'LNG_DATE_FIELD_LABEL_TO',
+    // TODO add translations to API
+    isolationCenterName: 'LNG_DATE_FIELD_LABEL_CENTER_NAME',
+    isolationLocation: 'LNG_DATE_FIELD_LABEL_LOCATION',
+    isolationComments: 'LNG_DATE_FIELD_LABEL_COMMENTS',
+
 };
 
 const contactSingleScreen = {
@@ -265,6 +276,9 @@ const alertMessages = {
 
     placeOfResidenceError: 'LNG_DIALOG_ALERT_MESSAGE_PLEASE_ADD_THE_PLACE_OF_RESIDENCE_ADDRESS',
     dateOfOnsetError: 'LNG_DIALOG_ALERT_MESSAGE_DATE_OF_ISOLATION_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET',
+    // TODO update translations
+    dateOfOutcomeError: 'LNG_DIALOG_ALERT_MESSAGE_DATE_OF_OUTCOME_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET',
+    // End TODO
     monthsValueError: 'LNG_DIALOG_ALERT_MESSAGE_NUMBER_OF_MONTHS_MUST_BE_BETWEEN_MESSAGE',
     yearsValueError: 'LNG_DIALOG_ALERT_MESSAGE_NUMBER_OF_YEARS_MUST_BE_BETWEEN_MESSAGE',
     requiredFieldsMissingError: 'LNG_DIALOG_ALERT_MESSAGE_COMPLETE_ALL_MISSING_REQUIRED_FIELDS',

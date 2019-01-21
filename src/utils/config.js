@@ -679,6 +679,39 @@ const caseSingleScreen = {
             },
             {
                 cardNumber: 2,
+                id: 'centerName',
+                label: translations.caseSingleScreen.hospitalisationCenterName,
+                type: 'TextInput',
+                value: '',
+                isRequired: false,
+                isEditMode: false,
+                objectType: 'HospitalizationDates'
+            },
+            {
+                cardNumber: 2,
+                id: 'locationId',
+                label: translations.caseSingleScreen.hospitalisationLocation,
+                labelValue: 'test',
+                type: 'DropDownSectioned',
+                value: '',
+                isRequired: false,
+                isEditMode: true,
+                objectType: 'HospitalizationDates',
+                single: true
+            },
+            {
+                cardNumber: 2,
+                id: 'comments',
+                label: translations.caseSingleScreen.hospitalisationComments,
+                type: 'TextInput',
+                value: '',
+                isRequired: false,
+                isEditMode: false,
+                objectType: 'HospitalizationDates',
+                multiline: true
+            },
+            {
+                cardNumber: 2,
                 id: 'deleteButton',
                 type: 'ActionsBar',
                 labelValue: 'test',
@@ -710,6 +743,39 @@ const caseSingleScreen = {
                 isEditMode: true,
                 format: 'YYYY-MM-dd',
                 objectType: 'IsolationDates'
+            },
+            {
+                cardNumber: 3,
+                id: 'centerName',
+                label: translations.caseSingleScreen.isolationCenterName,
+                type: 'TextInput',
+                value: '',
+                isRequired: false,
+                isEditMode: false,
+                objectType: 'IsolationDates'
+            },
+            {
+                cardNumber: 3,
+                id: 'locationId',
+                label: translations.caseSingleScreen.isolationLocation,
+                labelValue: 'test',
+                type: 'DropDownSectioned',
+                value: '',
+                isRequired: false,
+                isEditMode: true,
+                objectType: 'IsolationDates',
+                single: true
+            },
+            {
+                cardNumber: 3,
+                id: 'comments',
+                label: translations.caseSingleScreen.isolationComments,
+                type: 'TextInput',
+                value: '',
+                isRequired: false,
+                isEditMode: false,
+                objectType: 'IsolationDates',
+                multiline: true
             },
             {
                 cardNumber: 3,

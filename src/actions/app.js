@@ -277,20 +277,29 @@ function processFilesForSync(error, response, hubConfiguration, isFirstTime, syn
                             let promiseResponses = [];
 
                             try {
+                                let startTimeForProcessingFiles = new Date().getTime();
                                 let files = await readDir(responseUnzipPath);
 
                                 if (files) {
                                     // First sort the files
                                     files = files.sort((a, b) => {
-                                        if (a.split('.')[0] <= b.split('.')[0] && parseInt(a.split('.')[1]) < parseInt(b.split('.')[1])) {
+                                        if (a.split('.')[0] < b.split('.')[0]) {
                                             return -1;
                                         }
-                                        if (a.split('.')[0] >= b.split('.')[0] && parseInt(a.split('.')[1]) > parseInt(b.split('.')[1])) {
+                                        if (a.split('.')[0] > b.split('.')[0]) {
                                             return 1;
                                         }
                                         return 0;
                                     });
-                                    console.log('Sorted files: ', files);
+                                    files = files.sort((a, b) => {
+                                        if (a.split('.')[0] === b.split('.')[0] && parseInt(a.split('.')[1]) < parseInt(b.split('.')[1])) {
+                                            return -1;
+                                        }
+                                        if (a.split('.')[0] === b.split('.')[0] && parseInt(a.split('.')[1]) > parseInt(b.split('.')[1])) {
+                                            return 1;
+                                        }
+                                        return 0;
+                                    });
                                     // For every file of the database dump, do sync
                                     for (let i = 0; i < files.length; i++) {
                                         if (files[i] !== 'auditLog.json' && files[i] !== 'icon.json' && files[i] !== 'icons') {
@@ -298,9 +307,11 @@ function processFilesForSync(error, response, hubConfiguration, isFirstTime, syn
                                             // Process every file synchronously
                                             try {
                                                 // console.log('Memory size of database: ', memorySizeOf(database));
+                                                let startTimeForProcessingOneFile = new Date().getTime();
                                                 let auxData = await processFile(RNFetchBlobFs.dirs.DocumentDir + '/who_databases/' + files[i], files[i], files.length, dispatch, isFirstTime, forceBulk, hubConfig.encryptedData, hubConfig);
                                                 if (auxData) {
                                                     console.log('auxData: ', auxData);
+                                                    console.log(`Time for processing file: ${files[i]}: ${new Date().getTime() - startTimeForProcessingOneFile}`);
                                                     promiseResponses.push(auxData);
                                                 } else {
                                                     console.log('There was an error at processing file: ', files[i]);
@@ -316,6 +327,7 @@ function processFilesForSync(error, response, hubConfiguration, isFirstTime, syn
                                     }
                                     // After processing all files, store hub config
                                     // After processing all the data store the last sync date
+                                    console.log('Processing time for all files: ', new Date().getTime() - startTimeForProcessingFiles)
                                     console.log("Now that the processing is over, proceed with storing last sync date:");
                                     // First clean up the files
                                     RNFetchBlobFs.unlink(`${RNFetchBlobFs.dirs.DocumentDir}/who_databases`)
