@@ -75,7 +75,7 @@ class DropDown extends PureComponent {
                     >
                         <ElevatedView elevation={3} style={[{backgroundColor: 'white'}]}>
                             <SelectMultiple
-                                items={this.props.data}
+                                items={this.props.data !== undefined && this.props.data !== null ? this.props.data : []}
                                 selectedItems={this.state.selectedItems}
                                 onSelectionsChange={this.handleOnselectionChange}
                             />

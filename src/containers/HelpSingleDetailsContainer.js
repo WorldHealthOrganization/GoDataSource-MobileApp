@@ -4,17 +4,16 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {PureComponent} from 'react';
-import {TextInput, View, Text, StyleSheet, FlatList, Alert, TouchableWithoutFeedback, Keyboard} from 'react-native';
+import {View, StyleSheet, ScrollView, TouchableWithoutFeedback, Keyboard} from 'react-native';
 import {calculateDimension, getTranslation} from './../utils/functions';
 import config from './../utils/config';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import styles from './../styles';
 import CardComponent from './../components/CardComponent';
-import Ripple from 'react-native-material-ripple';
-import Button from './../components/Button';
+import ElevatedView from 'react-native-elevated-view';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
-import translations from './../utils/translations'
+import _ from 'lodash';
 
 class HelpSingleDetailsContainer extends PureComponent {
 
@@ -55,21 +54,75 @@ class HelpSingleDetailsContainer extends PureComponent {
         let fields = item.fields.map((field) => {
             return Object.assign({},field, {isEditMode: this.props.isEditMode})
         });
+        return this.renderItemCardComponent(fields)
+    };
+
+    renderItemCardComponent = (fields, cardIndex = null) => {
+        return (
+            <ElevatedView elevation={3} style={[style.containerCardComponent, {
+                marginHorizontal: calculateDimension(16, false, this.props.screenSize),
+                width: calculateDimension(config.designScreenSize.width - 32, false, this.props.screenSize),
+                marginVertical: 4,
+                minHeight: calculateDimension(72, true, this.props.screenSize)
+            }, style.cardStyle]}>
+                <ScrollView scrollEnabled={false} style={{flex: 1}} contentContainerStyle={{flexGrow: 1}}>
+                    {
+                        fields && fields.map((item, index) => {
+                            return this.handleRenderItemCardComponent(item, index, cardIndex);
+                        })
+                    }
+                </ScrollView>
+            </ElevatedView>
+        );
+    }
+
+    handleRenderItemCardComponent = (item, index, cardIndex) => {
+        return (
+            <View style={[style.subcontainerCardComponent, {flex: 1}]} key={index}>
+                {
+                    this.handleRenderItemByType(item, cardIndex)
+                }
+            </View>
+        )
+    };
+
+    handleRenderItemByType = (item, cardIndex) => {
+        let value = '';
+
+        value = this.computeValueForHelpSingleScreen(item)
+
+        if (item.type === 'DatePicker' && value === '') {
+            value = null
+        }
+
         return (
             <CardComponent
-                item={fields}
+                item={item}
                 isEditMode={this.props.isEditMode}
-                screen={'HelpSingleScreen'}
+                isEditModeForDropDownInput={this.props.isEditMode}
                 helpItem={this.props.item}
-                style={style.cardStyle}
+                value={value}
+                index={cardIndex}
             />
         )
-    }
+    };
+
+    computeValueForHelpSingleScreen = (item) => {
+        return this.props.item && this.props.item[item.id] ? getTranslation(this.props.item[item.id], this.props.translation) : '';
+    };
 }
 
 // Create style outside the class, or for components that will be used by other components (buttons),
 // make a global style in the config directory
 const style = StyleSheet.create({
+    containerCardComponent: {
+        backgroundColor: 'white',
+        borderRadius: 2
+    },
+    subcontainerCardComponent: {
+        alignItems: 'center',
+        flex: 1
+    },
     container: {
         flex: 1,
         backgroundColor: styles.screenBackgroundGrey,

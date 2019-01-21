@@ -365,7 +365,6 @@ class CaseSingleScreen extends Component {
                         onPressEdit={this.onPressEdit}
                         onPressSaveEdit={this.onPressSaveEdit}
                         onPressCancelEdit={this.onPressCancelEdit}
-                        onPressSave={this.handleSavePress}
                         onChangeText={this.onChangeText}
                         onChangeDate={this.onChangeDate}
                         onChangeSwitch={this.onChangeSwitch}

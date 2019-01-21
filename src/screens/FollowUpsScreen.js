@@ -429,7 +429,7 @@ class FollowUpsScreen extends Component {
             onPressMissing={this.handleOnPressMissing}
             onPressExposure={this.handleOnPressExposure}
             onPressMap={this.handleOnPressMap}
-            firstActionText={this.getTranslation(item.statusId)}
+            firstActionText={getTranslation(item.statusId, this.props.translation)}
         />)
     };
 
@@ -781,16 +781,6 @@ class FollowUpsScreen extends Component {
         }
     };
 
-    getTranslation = (value) => {
-        let valueToBeReturned = value;
-        if (value && typeof value === 'string' && value.includes('LNG')) {
-            valueToBeReturned = value && this.props.translation && Array.isArray(this.props.translation) && this.props.translation[this.props.translation.map((e) => {return e && e.token ? e.token : null}).indexOf(value)] ? this.props.translation[this.props.translation.map((e) => {
-                return e.token
-            }).indexOf(value)].translation : '';
-        }
-        return valueToBeReturned;
-    };
-
     showMenu = () => {
         this.refs.menuRef.show();
     };
@@ -835,9 +825,9 @@ class FollowUpsScreen extends Component {
                 parsedData =  JSON.parse(QRCodeInfo.data)
             } catch(err) {
                 setTimeout(function(){
-                    Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props && this.props.translation ? this.props.translation : null), getTranslation(translations.alertMessages.errorOccuredMsg,  this.props && this.props.translation ? this.props.translation : null), [
+                    Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props && this.props.translation ? this.props.translation : null), getTranslation(translations.alertMessages.errorOccuredMsg, this.props && this.props.translation ? this.props.translation : null), [
                         {
-                            text: getTranslation(translations.alertMessages.okButtonLabel,  this.props && this.props.translation ? this.props.translation : null),
+                            text: getTranslation(translations.alertMessages.okButtonLabel, this.props && this.props.translation ? this.props.translation : null),
                             onPress: () => {console.log('Ok pressed')}
                         }
                     ])
