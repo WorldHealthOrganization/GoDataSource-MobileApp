@@ -88,10 +88,12 @@ class FollowUpsSingleScreen extends Component {
             Alert.alert("", 'You have unsaved data. Are you sure you want to leave this page and lose all changes?', [
                 {
                     text: 'Yes', onPress: () => {
-                    this.props.navigator.pop({
-                        animated: true,
-                        animationType: 'fade'
-                    })
+                    this.props.navigator.pop(
+                    //     {
+                    //     animated: true,
+                    //     animationType: 'fade'
+                    // }
+                    )
                 }
                 },
                 {
@@ -101,10 +103,12 @@ class FollowUpsSingleScreen extends Component {
                 }
             ])
         } else {
-            this.props.navigator.pop({
-                animated: true,
-                animationType: 'fade'
-            })
+            this.props.navigator.pop(
+            //     {
+            //     animated: true,
+            //     animationType: 'fade'
+            // }
+            )
         }
         return false;
     }
@@ -127,10 +131,12 @@ class FollowUpsSingleScreen extends Component {
                 if (props.startLoadingScreen !== undefined) {
                     props.startLoadingScreen()
                 }
-                props.navigator.pop({
+                props.navigator.pop(
+                    {
                     animated: true,
                     animationType: 'fade',
-                })
+                }
+                )
             }
         }
         return null;
@@ -340,10 +346,12 @@ class FollowUpsSingleScreen extends Component {
             Alert.alert("", 'You have unsaved data. Are you sure you want to leave this page and lose all changes?', [
                 {
                     text: 'Yes', onPress: () => {
-                    this.props.navigator.pop({
-                        animated: true,
-                        animationType: 'fade'
-                    })
+                    this.props.navigator.pop(
+                    //     {
+                    //     animated: true,
+                    //     animationType: 'fade'
+                    // }
+                    )
                 }
                 },
                 {
@@ -353,10 +361,12 @@ class FollowUpsSingleScreen extends Component {
                 }
             ])
         } else {
-            this.props.navigator.pop({
-                animated: true,
-                animationType: 'fade'
-            });
+            this.props.navigator.pop(
+            //     {
+            //     animated: true,
+            //     animationType: 'fade'
+            // }
+            );
         }
     };
 

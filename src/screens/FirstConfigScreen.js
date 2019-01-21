@@ -64,8 +64,17 @@ class FirstConfigScreen extends Component {
             >
                 {
                     this.props && this.props.allowBack ? (
-                        <Ripple style={{position: "absolute", top: 20, left: 20}} onPress={this.handleOnPressBack}>
+                        <Ripple style={{flexDirection: 'row', position: "absolute", top: 20, left: 20}} onPress={this.handleOnPressBack}>
                             <Icon name="arrow-back"/>
+                            <Text style={{fontFamily: 'Roboto-Medium', fontSize: 18, color: 'white'}}>Hub config</Text>
+                        </Ripple>
+                    ) : (null)
+                }
+                {
+                    this.props && this.props.activeDatabase ? (
+                        <Ripple style={{flexDirection: 'row', alignItems: 'center', position: "absolute", top: 20, right: 20}} onPress={this.handleOnPressForward}>
+                            <Text style={{fontFamily: 'Roboto-Medium', fontSize: 18, color: 'white'}}>Current Hub config</Text>
+                            <Icon name="arrow-forward"/>
                         </Ripple>
                     ) : (null)
                 }
@@ -91,7 +100,18 @@ class FirstConfigScreen extends Component {
 
     // Please write here all the methods that are not react native lifecycle methods
     handleOnPressBack = () => {
-        this.props.navigator.dismissModal();
+        this.props.navigator.pop();
+    };
+
+    handleOnPressForward = () => {
+        this.props.navigator.push({
+            screen: 'ManualConfigScreen',
+            passProps: {
+                allowBack: this.props.allowBack
+            }
+            // animationType: 'fade',
+            // animated: true
+        })
     };
 
     handlePressScanQR = () => {
@@ -116,16 +136,20 @@ class FirstConfigScreen extends Component {
         console.log("Here change screen");
         this.props.navigator.push({
             screen: 'ManualConfigScreen',
-            animated: true,
-            animationType: 'fade'
+            // animated: true,
+            // animationType: 'fade',
+            passProps: {
+                isNewHub: true,
+                allowBack: this.props.allowBack
+            }
         })
     };
 
     pushNewScreen = (QRCodeInfo) => {
         this.props.navigator.push({
             screen: 'ManualConfigScreen',
-            animated: true,
-            animationType: 'fade',
+            // animated: true,
+            // animationType: 'fade',
             passProps: {
                 QRCodeInfo: QRCodeInfo
             }
@@ -186,6 +210,7 @@ function mapStateToProps(state) {
     return {
         screenSize: state.app.screenSize,
         errors: state.errors,
+        activeDatabase: state.app.activeDatabase
     };
 }
 

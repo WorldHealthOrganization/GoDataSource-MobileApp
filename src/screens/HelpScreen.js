@@ -163,8 +163,8 @@ class HelpScreen extends Component {
 
         return (
             <ViewHOC style={style.container}
-                     showLoader={(this.props && this.props.syncState && (this.props.syncState !== 'Finished processing' && this.props.syncState !== 'Error')) || (this && this.state && this.state.loading)}
-                     loaderText={this.props && this.props.syncState ? this.props.syncState : getTranslation(translations.loadingScreenMessages.loadingMsg, this.props.translation)}>
+                     showLoader={(this.props && this.props.syncState && ((this.props.syncState.id === 'sync' && this.props.syncState.status !== 'Success') && this.props.syncState.status !== 'Error')) || (this && this.state && this.state.loading)}
+                     loaderText={this.props && this.props.syncState ? 'Loading' : getTranslation(translations.loadingScreenMessages.loadingMsg, this.props.translation)}>
                 {
                     this.state.displayModalFormat === true ? (
                         <NavBarCustom customTitle={
@@ -310,8 +310,8 @@ class HelpScreen extends Component {
         let itemClone = Object.assign({}, item);
         this.props.navigator.push({
             screen: 'HelpSingleScreen',
-            animated: true,
-            animationType: 'fade',
+            // animated: true,
+            // animationType: 'fade',
             passProps: {
                 isNew: false,
                 item: itemClone,

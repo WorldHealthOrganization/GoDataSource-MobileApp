@@ -154,10 +154,12 @@ class CaseSingleScreen extends Component {
             ])
         } else {
             if (state.savePressed || state.deletePressed) {
-                props.navigator.pop({
-                    animated: true,
-                    animationType: 'fade'
-                })
+                props.navigator.pop(
+                //     {
+                //     animated: true,
+                //     animationType: 'fade'
+                // }
+                )
             }
         }
         return null;
@@ -169,10 +171,12 @@ class CaseSingleScreen extends Component {
             Alert.alert("", 'You have unsaved data. Are you sure you want to leave this page and lose all changes?', [
                 {
                     text: 'Yes', onPress: () => {
-                    this.props.navigator.pop({
-                        animated: true,
-                        animationType: 'fade'
-                    })
+                    this.props.navigator.pop(
+                    //     {
+                    //     animated: true,
+                    //     animationType: 'fade'
+                    // }
+                    )
                 }
                 },
                 {
@@ -182,10 +186,12 @@ class CaseSingleScreen extends Component {
                 }
             ])
         } else {
-            this.props.navigator.pop({
-                animated: true,
-                animationType: 'fade'
-            })
+            this.props.navigator.pop(
+            //     {
+            //     animated: true,
+            //     animationType: 'fade'
+            // }
+            )
         }
         return false;
     }
@@ -576,10 +582,12 @@ class CaseSingleScreen extends Component {
             Alert.alert("", 'You have unsaved data. Are you sure you want to leave this page and lose all changes?', [
                 {
                     text: 'Yes', onPress: () => {
-                    this.props.navigator.pop({
-                        animated: true,
-                        animationType: 'fade'
-                    })
+                    this.props.navigator.pop(
+                    //     {
+                    //     animated: true,
+                    //     animationType: 'fade'
+                    // }
+                    )
                 }
                 },
                 {
@@ -589,10 +597,12 @@ class CaseSingleScreen extends Component {
                 }
             ])
         } else {
-            this.props.navigator.pop({
-                animated: true,
-                animationType: 'fade'
-            });
+            this.props.navigator.pop(
+            //     {
+            //     animated: true,
+            //     animationType: 'fade'
+            // }
+            );
         }
     };
 

@@ -157,8 +157,8 @@ class CasesScreen extends Component {
         let caseTitle = []; caseTitle[0] = getTranslation(translations.casesScreen.casesTitle, this.props.translation);
         return (
             <ViewHOC style={style.container}
-                     showLoader={(this.props && this.props.syncState && (this.props.syncState !== 'Finished processing' && this.props.syncState !== 'Error')) || (this && this.state && this.state.loading)}
-                     loaderText={this.props && this.props.syncState ? this.props.syncState : getTranslation(translations.loadingScreenMessages.loadingMsg, this.props.translation)}>
+                     showLoader={(this.props && this.props.syncState && ((this.props.syncState.id === 'sync' && this.props.syncState.status !== 'Success') && this.props.syncState.status !== 'Error')) || (this && this.state && this.state.loading)}
+                     loaderText={this.props && this.props.syncState ? 'Loading' : getTranslation(translations.loadingScreenMessages.loadingMsg, this.props.translation)}>
                 <NavBarCustom
                     title={null}
                     customTitle={
@@ -411,8 +411,8 @@ class CasesScreen extends Component {
         console.log("### handlePressCases: ", JSON.stringify(item));
         this.props.navigator.push({
             screen: 'CaseSingleScreen',
-            animated: true,
-            animationType: 'fade',
+            // animated: true,
+            // animationType: 'fade',
             passProps: {
                 case: item,
             }
@@ -424,8 +424,8 @@ class CasesScreen extends Component {
         console.log('*** handleOnPressAddContact: ', item, contact)
         this.props.navigator.push({
             screen: 'ContactsSingleScreen',
-            animated: true,
-            animationType: 'fade',
+            // animated: true,
+            // animationType: 'fade',
             passProps: {
                 isNew: true,
                 addContactFromCasesScreen: true,
@@ -465,8 +465,8 @@ class CasesScreen extends Component {
     handleOnPressAddCase = () => {
         this.props.navigator.push({
             screen: 'CaseSingleScreen',
-            animated: true,
-            animationType: 'fade',
+            // animated: true,
+            // animationType: 'fade',
             passProps: {
                 isNew: true,
             }
@@ -633,8 +633,8 @@ class CasesScreen extends Component {
                         if (itemType === 'case') {
                             this.props.navigator.push({
                                 screen: 'CaseSingleScreen',
-                                animated: true,
-                                animationType: 'fade',
+                                // animated: true,
+                                // animationType: 'fade',
                                 passProps: {
                                     case: response
                                 }
@@ -642,8 +642,8 @@ class CasesScreen extends Component {
                         } else if (itemType === 'contact') {
                             this.props.navigator.push({
                                 screen: 'ContactsSingleScreen',
-                                animated: true,
-                                animationType: 'fade',
+                                // animated: true,
+                                // animationType: 'fade',
                                 passProps: {
                                     contact: response
                                 }

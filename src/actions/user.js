@@ -152,7 +152,7 @@ export function getUserById(userId, token, refreshFollowUps) {
 
                 // Here is the local storage handling
                 if (refreshFollowUps) {
-                    dispatch(setSyncState('Loading'));
+                    dispatch(setSyncState({id: 'sync', status: 'test'}));
                 }
                 let promises = [];
                 // promises.push(getOutbreakById(response.activeOutbreakId, null, dispatch));
