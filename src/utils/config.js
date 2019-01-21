@@ -2037,6 +2037,17 @@ const userPermissions = {
     writeFollowUp: 'write_followup',
 };
 
+const manualSyncStages = [
+    {id: 'getData', name: 'Get local changes', status: '...'},
+    {id: 'createFile', name: 'Create files for sync', status: '...'},
+    {id: 'sendData', name: 'Send data to the hub', status: '...'},
+    {id: 'getDataFromServer', name: 'Get updated data', status: '...'},
+    {id: 'testApi', name: 'Test API', status: '...'},
+    {id: 'downloadDatabase', name: 'Download database', status: '...'},
+    {id: 'unzipFile', name: 'Unzip', status: '...'},
+    {id: 'sync', name: 'Sync', status: '...'}
+];
+
 export default {
     designScreenSize,
     sideMenuItems,
@@ -2068,4 +2079,5 @@ export default {
     userPermissions,
     helpSingleScreen,
     helpItemsSortCriteriaDropDownItems,
+    manualSyncStages
 }

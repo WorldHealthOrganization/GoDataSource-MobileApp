@@ -150,13 +150,18 @@ class FollowUpsScreen extends Component {
             //         props.saveGeneratedFollowUps(0);
             //     }
             // }
-            state.refreshing = false;
-            state.loading = false;
+            // console.log(`Before making it false: state.refreshing - ${state.refreshing},  state.loading - ${state.loading}`);
+            // setTimeout(() => {
+                state.refreshing = false;
+                state.loading = false;
+            // }, 200);
         }
+        console.log(`Before making it false: state.refreshing - ${state.refreshing},  state.loading - ${state.loading}`);
         return null;
     };
 
     componentDidMount() {
+        console.log('Component Did mount');
         BackHandler.addEventListener('hardwareBackPress', this.handleBackButtonClick);
         this.setState({
             loading: true,
@@ -221,7 +226,7 @@ class FollowUpsScreen extends Component {
             extrapolate: 'clamp',
         });
 
-        let filterNumbers = 0
+        let filterNumbers = 0;
         if (this.state.filterFromFilterScreen) {
             if (this.state.filterFromFilterScreen.gender && this.state.filterFromFilterScreen.gender !== null && this.state.filterFromFilterScreen.gender !== undefined) {
                 ++filterNumbers
@@ -236,10 +241,11 @@ class FollowUpsScreen extends Component {
         let filterText = filterNumbers === 0 ? `${getTranslation(translations.generalLabels.filterTitle, this.props.translation)}` : `${getTranslation(translations.generalLabels.filterTitle, this.props.translation)}(${filterNumbers})`
        
         let followUpTitle = []; followUpTitle[0] = getTranslation(translations.followUpsScreen.followUpsTitle, this.props.translation);
+        console.log(`Refreshing: ${this.state.refreshing}   Loading: ${this.state.loading}`);
         return (
             <ViewHOC style={style.container}
-                     showLoader={(this.props && this.props.syncState && (this.props.syncState !== 'Finished processing' && this.props.syncState !== 'Error')) || (this && this.state && this.state.loading)}
-                     loaderText={this.props && this.props.syncState ? this.props.syncState : getTranslation(translations.loadingScreenMessages.loadingMsg, this.props.translation)}>
+                     showLoader={(this.props && this.props.syncState && ((this.props.syncState.id === 'sync' && this.props.syncState.status !== 'Success') && this.props.syncState.status !== 'Error')) || (this && this.state && this.state.loading)}
+                     loaderText={this.props && this.props.syncState ? 'Loading' : getTranslation(translations.loadingScreenMessages.loadingMsg, this.props.translation)}>
                 <NavBarCustom
                     title={null}
                     customTitle={
@@ -410,6 +416,7 @@ class FollowUpsScreen extends Component {
     };
 
     startLoadingScreen = () => {
+        console.log('startLoadingScreen: ', this.state.loading);
         this.setState({
             loading: true
         })
@@ -499,8 +506,8 @@ class FollowUpsScreen extends Component {
         }
         this.props.navigator.push({
             screen: 'FollowUpsSingleScreen',
-            animated: true,
-            animationType: 'fade',
+            // animated: true,
+            // animationType: 'fade',
             passProps: {
                 isNew: false,
                 item: itemClone,
@@ -877,8 +884,8 @@ class FollowUpsScreen extends Component {
                         if (itemType === 'case') {
                             this.props.navigator.push({
                                 screen: 'CaseSingleScreen',
-                                animated: true,
-                                animationType: 'fade',
+                                // animated: true,
+                                // animationType: 'fade',
                                 passProps: {
                                     case: response
                                 }
@@ -886,8 +893,8 @@ class FollowUpsScreen extends Component {
                         } else if (itemType === 'contact') {
                             this.props.navigator.push({
                                 screen: 'ContactsSingleScreen',
-                                animated: true,
-                                animationType: 'fade',
+                                // animated: true,
+                                // animationType: 'fade',
                                 passProps: {
                                     contact: response
                                 }

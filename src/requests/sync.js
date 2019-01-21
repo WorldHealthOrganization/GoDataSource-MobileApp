@@ -40,13 +40,17 @@ export function getDatabaseSnapshotRequest(hubConfig, lastSyncDate, dispatch, ca
     let startDownload = new Date().getTime();
 
     // Before starting a download, first test if the API responds
+    dispatch(setSyncState({id: 'testApi', status: 'In progress'}));
     testApi(`${hubConfiguration.url}/system-settings/version`, (errorTestApi, responseTestApi) => {
         if (errorTestApi) {
             console.log("*** testApi error: ", JSON.stringify(errorTestApi));
-            callback(errorTestApi);
+            dispatch(setSyncState({id: 'testApi', status: `Error`, error: 'The hub is not available'}));
+            callback('The hub is not available');
         }
         if (responseTestApi) {
             // console.log('Response TestApi: ', responseTestApi);
+            dispatch(setSyncState({id: 'testApi', status: 'Success'}));
+            dispatch(setSyncState({id: 'downloadDatabase', status: 'In progress'}));
             RNFetchBlob.config({
                 timeout: (30 * 60 * 10 * 1000),
                 followRedirect: false,
@@ -63,7 +67,7 @@ export function getDatabaseSnapshotRequest(hubConfig, lastSyncDate, dispatch, ca
                     })
                 )
                 .progress({count: 500}, (received, total) => {
-                    dispatch(setSyncState(`Downloading database\nReceived ${received} bytes`));
+                    dispatch(setSyncState({id: 'downloadDatabase', name: `Downloading database\nReceived ${received} bytes`}));
                     console.log(received, total)
                 })
                 .then((res) => {
@@ -100,7 +104,7 @@ export function postDatabaseSnapshotRequest(internetCredentials, path, callback)
     testApi(`${hubConfig.url}/system-settings/version`, (errorTestApi, responseTestApi) => {
         if (errorTestApi) {
             console.log("*** testApi error: ", JSON.stringify(errorTestApi));
-            callback(errorTestApi);
+            callback('The hub is not available');
         }
         if (responseTestApi) {
             console.log('Response testApi: ', responseTestApi);
