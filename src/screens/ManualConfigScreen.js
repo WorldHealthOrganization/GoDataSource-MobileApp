@@ -179,6 +179,7 @@ class ManualConfigScreen extends Component {
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
+        console.log("Screen size: ", this.props.screenSize);
         return (
             <KeyboardAwareScrollView
                 style={[style.container, {paddingTop: Platform.OS === 'ios' ? this.props.screenSize.height === 812 ? 44 : 20 : 0}]}
@@ -186,26 +187,36 @@ class ManualConfigScreen extends Component {
                 keyboardShouldPersistTaps={'always'}
             >
 
-                <Ripple style={{flexDirection: 'row', alignItems: 'center', position: "absolute", top: 20, left: 20}} onPress={this.handleOnPressBack}>
-                    <Icon name="arrow-back"/>
-                    <Text style={{fontFamily: 'Roboto-Medium', fontSize: 18, color: 'white'}}>New hub</Text>
-                </Ripple>
+                <View style={{width: '100%', flexDirection: 'row', flex: 0.35}}>
+                    <Ripple
+                        style={{flexDirection: 'row', alignItems: 'center', position: "absolute", top: 20, left: 20}}
+                        onPress={this.handleOnPressBack}>
+                        <Icon name="arrow-back"/>
+                        <Text style={{fontFamily: 'Roboto-Medium', fontSize: 18, color: 'white'}}>New hub</Text>
+                    </Ripple>
 
-                {
-                    this.props && this.props.activeDatabase && !this.props.allowBack ? (
-                        <Ripple style={{flexDirection: 'row', alignItems: 'center', position: "absolute", top: 20, right: 20}} onPress={this.handleOnPressForward}>
-                            <Text style={{fontFamily: 'Roboto-Medium', fontSize: 18, color: 'white'}}>Login</Text>
-                            <Icon name="arrow-forward"/>
-                        </Ripple>
-                    ) : (null)
-                }
+                    {
+                        this.props && this.props.activeDatabase && !this.props.allowBack ? (
+                            <Ripple style={{
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                                position: "absolute",
+                                top: 20,
+                                right: 20
+                            }} onPress={this.handleOnPressForward}>
+                                <Text style={{fontFamily: 'Roboto-Medium', fontSize: 18, color: 'white'}}>Login</Text>
+                                <Icon name="arrow-forward"/>
+                            </Ripple>
+                        ) : (null)
+                    }
+                </View>
 
-                {
-                    Platform.OS === 'ios' && this.props.screenSize.height <= 600 ? (
-                        <View style={{flex: 0.35}} />
-                    ) : (null)
-                }
-                <View style={[style.welcomeTextContainer, {flex: Platform.OS === 'ios' && this.props.screenSize <= 600 ? 0.05 : 0.35}]}>
+                {/*{*/}
+                    {/*Platform.OS === 'ios' && this.props.screenSize.height <= 600 ? (*/}
+                        {/*<View style={{flex: 0.35}} />*/}
+                    {/*) : (null)*/}
+                {/*}*/}
+                <View style={[style.welcomeTextContainer, {flex: Platform.OS === 'ios' && this.props.screenSize.height <= 600 ? 0.05 : 0.35}]}>
                     <Text style={style.welcomeText}>
                         {getTranslation(translations.manualConfigScreen.title, null)}
                     </Text>
@@ -278,9 +289,13 @@ class ManualConfigScreen extends Component {
                     }
                     <Button upperCase={false} onPress={() => {this.checkFields('saveHubConfiguration')}} text={getTranslation(translations.manualConfigScreen.saveHubConfigButton, null)} style={styles.buttonLogin} />
                 </View>
-                <View style={style.logoContainer}>
-                    <Image source={{uri: 'logo_app'}} style={style.logoStyle} />
-                </View>
+                {
+                    Platform.OS === 'ios' && this.props && this.props.screenSize.height < 600 && this.props.activeDatabase ? (null) : (
+                        <View style={style.logoContainer}>
+                            <Image source={{uri: 'logo_app'}} style={style.logoStyle} />
+                        </View>
+                    )
+                }
                 {/*{*/}
                     {/*this.props && this.props.syncState && (this.props.syncState !== 'Finished processing' && this.props.syncState !== 'Error') ? (*/}
                         {/*<LoaderScreen message={this.props.syncState || ''} overlay={true} backgroundColor={'white'} />*/}
