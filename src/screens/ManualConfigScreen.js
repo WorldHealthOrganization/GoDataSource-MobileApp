@@ -85,7 +85,7 @@ class ManualConfigScreen extends Component {
                             }
                         }
 
-                        console.log('All URLs: ', allUrls);
+                        // console.log('All URLs: ', this.props.QRCodeInfo);
 
                         if (this.props && this.props.QRCodeInfo && this.props.QRCodeInfo.data) {
                             //TO DO map this.props.QRCodeInfo info to props
@@ -131,9 +131,29 @@ class ManualConfigScreen extends Component {
                         }
                     } else {
                         console.log('No database found');
+                        if (this.props && this.props.QRCodeInfo && this.props.QRCodeInfo.data) {
+                            //TO DO map this.props.QRCodeInfo info to props
+                            console.log('Here have the QRCodeInfo: ', JSON.parse(this.props.QRCodeInfo.data));
+                            let QRCodeData = JSON.parse(this.props.QRCodeInfo.data);
+                            this.setState({
+                                url: QRCodeData.url || '',
+                                clientId: QRCodeData.clientId || '',
+                                clientSecret: QRCodeData.clientSecret || ''
+                            })
+                        }
                     }
                 } catch (errorGetAllDatabases) {
                     console.log('Error get all databases: ', errorGetAllDatabases);
+                    if (this.props && this.props.QRCodeInfo && this.props.QRCodeInfo.data) {
+                        //TO DO map this.props.QRCodeInfo info to props
+                        console.log('Here have the QRCodeInfo: ', JSON.parse(this.props.QRCodeInfo.data));
+                        let QRCodeData = JSON.parse(this.props.QRCodeInfo.data);
+                        this.setState({
+                            url: QRCodeData.url || '',
+                            clientId: QRCodeData.clientId || '',
+                            clientSecret: QRCodeData.clientSecret || ''
+                        })
+                    }
                 }
     };
 

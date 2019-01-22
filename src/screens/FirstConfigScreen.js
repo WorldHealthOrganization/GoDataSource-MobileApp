@@ -146,14 +146,24 @@ class FirstConfigScreen extends Component {
     };
 
     pushNewScreen = (QRCodeInfo) => {
-        this.props.navigator.push({
-            screen: 'ManualConfigScreen',
-            // animated: true,
-            // animationType: 'fade',
-            passProps: {
-                QRCodeInfo: QRCodeInfo
-            }
-        })
+        console.log('PushNewScreen: ', QRCodeInfo);
+        if (QRCodeInfo) {
+            this.props.navigator.dismissAllModals();
+            this.props.navigator.push({
+                screen: 'ManualConfigScreen',
+                // animated: true,
+                // animationType: 'fade',
+                passProps: {
+                    QRCodeInfo: QRCodeInfo
+                }
+            })
+        } else {
+            Alert.alert('QR Code Error', 'The QR code scan failed to find a code. Please try again or add the credentials manually', [
+                {
+                    text: 'Ok', onPress: () => {console.log('Ok pressed')}
+                }
+            ])
+        }
     };
 }
 
