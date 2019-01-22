@@ -13,11 +13,12 @@ import {
     ACTION_TYPE_SAVE_HUB_CONFIGURATION,
     ACTION_TYPE_SET_SYNC_STATE,
     ACTION_TYPE_SAVE_GENERATED_FOLLOWUPS,
+    ACTION_TYPE_SAVE_ACTIVE_DATABASE,
     ACTION_TYPE_SET_LOGIN_STATE
 } from './../utils/enums';
 
 // Do not add unnecessary business logic in the reducer. Here should only be updated the store
-export default function app(state = { root: undefined, screenSize: {width: 375, height: 667}, filters: {}, translation: {}, helpCategory: {}, helpItem: {}, availableLanguages: [], hubConfiguration:{}, syncState: '', generatedFollowUps: '', loginState: '' }, action = {}) {
+export default function app(state = { root: undefined, screenSize: {width: 375, height: 667}, filters: {}, translation: {}, helpCategory: {}, helpItem: {}, availableLanguages: [], hubConfiguration:{}, syncState: '', generatedFollowUps: '', loginState: '', activeDatabase: '' }, action = {}) {
     let stateClone = null;
     switch (action.type) {
         case ACTION_TYPE_ROOT_CHANGE:
@@ -56,6 +57,11 @@ export default function app(state = { root: undefined, screenSize: {width: 375, 
             console.log('generatedFollowUps',action.generatedFollowUps);
             return Object.assign({}, state, {
                 generatedFollowUps: action.generatedFollowUps
+            });
+        case ACTION_TYPE_SAVE_ACTIVE_DATABASE:
+            console.log('activeDatabase',action.activeDatabase);
+            return Object.assign({}, state, {
+                activeDatabase: action.activeDatabase
             });
         case ACTION_TYPE_SET_LOGIN_STATE:
             return Object.assign({}, state, {

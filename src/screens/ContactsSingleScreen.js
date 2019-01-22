@@ -120,10 +120,12 @@ class ContactsSingleScreen extends Component {
             ])
         } else {
             if (state.savePressed || state.deletePressed) {
-                props.navigator.pop({
-                    animated: true,
-                    animationType: 'fade'
-                })
+                props.navigator.pop(
+                //     {
+                //     animated: true,
+                //     animationType: 'fade'
+                // }
+                )
             }
             // if (props.contacts && props.contact !== props.contacts[props.contacts.map((e) => {return e.id}).indexOf(props.contact.id)]) {
             //     props.contact = props.contacts[props.contacts.map((e) => {return e.id}).indexOf(props.contact.id)];
@@ -150,9 +152,9 @@ class ContactsSingleScreen extends Component {
 
             //permissions check
             let isEditMode = true
-            if (this.props.role.find((e) => e === config.userPermissions.writeContact) !== undefined) {
+            if (this.props.role && this.props.role.find((e) => e === config.userPermissions.writeContact) !== undefined) {
                 isEditMode = true
-            } else if (this.props.role.find((e) => e === config.userPermissions.writeContact) === undefined && this.props.role.find((e) => e === config.userPermissions.readContact) !== undefined){
+            } else if (this.props.role && this.props.role.find((e) => e === config.userPermissions.writeContact) === undefined && this.props.role.find((e) => e === config.userPermissions.readContact) !== undefined){
                 isEditMode = false
             }
             this.setState({
@@ -189,10 +191,12 @@ class ContactsSingleScreen extends Component {
             Alert.alert("", 'You have unsaved data. Are you sure you want to leave this page and lose all changes?', [
                 {
                     text: 'Yes', onPress: () => {
-                    this.props.navigator.pop({
-                        animated: true,
-                        animationType: 'fade'
-                    })
+                    this.props.navigator.pop(
+                    //     {
+                    //     animated: true,
+                    //     animationType: 'fade'
+                    // }
+                    )
                 }
                 },
                 {
@@ -202,10 +206,12 @@ class ContactsSingleScreen extends Component {
                 }
             ])
         } else {
-            this.props.navigator.pop({
-                animated: true,
-                animationType: 'fade'
-            })
+            this.props.navigator.pop(
+            //     {
+            //     animated: true,
+            //     animationType: 'fade'
+            // }
+            )
         }
         return false;
     };
@@ -246,7 +252,7 @@ class ContactsSingleScreen extends Component {
                                     </Ripple>
                                 </ElevatedView> 
                                 {
-                                    this.props.role.find((e) => e === config.userPermissions.writeContact) !== undefined ? (
+                                    this.props.role && this.props.role.find((e) => e === config.userPermissions.writeContact) !== undefined ? (
                                         <View>
                                             <Menu
                                                 ref="menuRef"
@@ -471,10 +477,12 @@ class ContactsSingleScreen extends Component {
             Alert.alert("", 'You have unsaved data. Are you sure you want to leave this page and lose all changes?', [
                 {
                     text: 'Yes', onPress: () => {
-                    this.props.navigator.pop({
-                        animated: true,
-                        animationType: 'fade'
-                    })
+                    this.props.navigator.pop(
+                    //     {
+                    //     animated: true,
+                    //     animationType: 'fade'
+                    // }
+                    )
                 }
                 },
                 {
@@ -484,10 +492,12 @@ class ContactsSingleScreen extends Component {
                 }
             ])
         } else {
-            this.props.navigator.pop({
-                animated: true,
-                animationType: 'fade'
-            });
+            this.props.navigator.pop(
+            //     {
+            //     animated: true,
+            //     animationType: 'fade'
+            // }
+            );
         }
     };
 
@@ -1234,8 +1244,8 @@ class ContactsSingleScreen extends Component {
         contactAddressesClone.splice(index, 1);
 
         let hasPlaceOfResidence = false
-        let caselaceOfResidence = caseAddressesClone.find((e) => {return e.typeId === config.userResidenceAddress.userPlaceOfResidence})
-        if (caselaceOfResidence !== undefined) {
+        let contactPlaceOfResidence = contactAddressesClone.find((e) => {return e.typeId === config.userResidenceAddress.userPlaceOfResidence})
+        if (contactPlaceOfResidence !== undefined) {
             hasPlaceOfResidence = true
         }
 

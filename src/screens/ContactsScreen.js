@@ -143,8 +143,8 @@ class ContactsScreen extends Component {
 
         return (
             <ViewHOC style={style.container}
-                     showLoader={(this.props && this.props.syncState && (this.props.syncState !== 'Finished processing' && this.props.syncState !== 'Error')) || (this && this.state && this.state.loading)}
-                     loaderText={this.props && this.props.syncState ? this.props.syncState : getTranslation(translations.loadingScreenMessages.loadingMsg, this.props.translation)}>
+                     showLoader={(this.props && this.props.syncState && ((this.props.syncState.id === 'sync' && this.props.syncState.status !== 'Success') && this.props.syncState.status !== 'Error')) || (this && this.state && this.state.loading)}
+                     loaderText={this.props && this.props.syncState ? 'Loading' : getTranslation(translations.loadingScreenMessages.loadingMsg, this.props.translation)}>
                 <NavBarCustom
                     title={null}
                     customTitle={
@@ -279,8 +279,8 @@ class ContactsScreen extends Component {
     handleOnPressAddContact = () => {
         this.props.navigator.push({
             screen: 'ContactsSingleScreen',
-            animated: true,
-            animationType: 'fade',
+            // animated: true,
+            // animationType: 'fade',
             passProps: {
                 isNew: true
             }
@@ -397,8 +397,8 @@ class ContactsScreen extends Component {
 
         this.props.navigator.push({
             screen: 'FollowUpsSingleScreen',
-            animated: true,
-            animationType: 'fade',
+            // animated: true,
+            // animationType: 'fade',
             passProps: {
                 item: {
                     date: new Date(),
@@ -418,8 +418,8 @@ class ContactsScreen extends Component {
         console.log("Handle on press edit contact: ", JSON.stringify(contact));
         this.props.navigator.push({
             screen: 'ContactsSingleScreen',
-            animated: true,
-            animationType: 'fade',
+            // animated: true,
+            // animationType: 'fade',
             passProps: {
                 contact: contact || followUp
             }
@@ -628,8 +628,8 @@ class ContactsScreen extends Component {
                         if (itemType === 'case') {
                             this.props.navigator.push({
                                 screen: 'CaseSingleScreen',
-                                animated: true,
-                                animationType: 'fade',
+                                // animated: true,
+                                // animationType: 'fade',
                                 passProps: {
                                     case: response
                                 }
@@ -637,8 +637,8 @@ class ContactsScreen extends Component {
                         } else if (itemType === 'contact') {
                             this.props.navigator.push({
                                 screen: 'ContactsSingleScreen',
-                                animated: true,
-                                animationType: 'fade',
+                                // animated: true,
+                                // animationType: 'fade',
                                 passProps: {
                                     contact: response
                                 }

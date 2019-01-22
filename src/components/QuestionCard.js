@@ -58,10 +58,10 @@ class QuestionCard extends Component {
                     <Text style={[style.questionText, {
                             marginLeft: calculateDimension(8, false, this.props.screenSize),
                             marginRight: calculateDimension(34, false, this.props.screenSize) }]} numberOfLines={2}>
-                        {this.getTranslation(this.props.item.text)}
+                        {getTranslation(this.props.item.text, this.props.translation)}
                         {
                             this.props.item && this.props.item.category ?
-                                ' - ' + this.getTranslation(this.props.item.category) : ''
+                                ' - ' + getTranslation(this.props.item.category, this.props.translation) : ''
 
                         }
                     </Text>
@@ -122,7 +122,7 @@ class QuestionCard extends Component {
             questionAnswers !== undefined &&
             item.answers.map((e) => {return e && e.value ? e.value : null}).indexOf(questionAnswers) > -1 &&
             item.answers[item.answers.map((e) => {return e.value ? e.value : null}).indexOf(questionAnswers)] ?
-                this.getTranslation(item.answers[item.answers.map((e) => {return e.value}).indexOf(questionAnswers)].label) : ' ';
+                getTranslation(item.answers[item.answers.map((e) => {return e.value}).indexOf(questionAnswers)].label, this.props.translation) : ' ';
         }
         else {
             if (item.answerType === 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_MULTIPLE_ANSWERS') {
@@ -132,7 +132,7 @@ class QuestionCard extends Component {
                         console.log('Inside filter: ', e);
                         return e && e.value && questionAnswers.indexOf(e.value) > -1;
                     }).map((e) => {
-                        return {label: this.getTranslation(e.label), value: e.value || null}
+                        return {label: getTranslation(e.label, this.props.translation), value: e.value || null}
                     }) : [];
             }
         }
@@ -199,7 +199,7 @@ class QuestionCard extends Component {
                         label={translations.questionCardLabels.dropDownInputLabel}
                         labelValue={item.text}
                         value={questionAnswers}
-                        data={item.answers.map((e) => {return {value: this.getTranslation(e.label), id: e.value}})}
+                        data={item.answers.map((e) => {return {value: getTranslation(e.label, this.props.translation), id: e.value}})}
                         isEditMode={this.props.isEditMode}
                         isRequired={item.required}
                         onChange={this.props.onChangeSingleSelection}
@@ -215,7 +215,7 @@ class QuestionCard extends Component {
                         label={translations.questionCardLabels.dropDownLabel}
                         labelValue={item.text}
                         value={questionAnswers}
-                        data={item.answers.map((e) => {return {label: this.getTranslation(e.label), value: e.value}})}
+                        data={item.answers.map((e) => {return {label: getTranslation(e.label, this.props.translation), value: e.value}})}
                         isEditMode={this.props.isEditMode}
                         isRequired={item.required}
                         onChange={this.props.onChangeMultipleSelection}
@@ -234,21 +234,6 @@ class QuestionCard extends Component {
                 )
         }
     };
-
-    getTranslation = (value) => {
-        if (value && value !== '') {
-            let valueToBeReturned = value;
-            if (value && typeof value === 'string' && value.includes('LNG')) {
-                valueToBeReturned = value && this.props.translation && Array.isArray(this.props.translation) && this.props.translation[this.props.translation.map((e) => {
-                    return e && e.token ? e.token : null
-                }).indexOf(value)] ? this.props.translation[this.props.translation.map((e) => {
-                    return e.token
-                }).indexOf(value)].translation : '';
-            }
-            return valueToBeReturned;
-        }
-        return '';
-    }
 }
 
 

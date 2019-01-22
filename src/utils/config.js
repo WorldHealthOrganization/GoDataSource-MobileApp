@@ -2050,7 +2050,18 @@ const userPermissions = {
 
 const caseFieldsForHardCodeCheck = {
     outcomeIdDeceasedValue: 'LNG_REFERENCE_DATA_CATEGORY_OUTCOME_DECEASED',
-}
+};
+
+const manualSyncStages = [
+    {id: 'getData', name: 'Get local changes', status: '...'},
+    {id: 'createFile', name: 'Create files for sync', status: '...'},
+    {id: 'sendData', name: 'Send data to the hub', status: '...'},
+    {id: 'getDataFromServer', name: 'Get updated data', status: '...'},
+    {id: 'testApi', name: 'Test API', status: '...'},
+    {id: 'downloadDatabase', name: 'Download database', status: '...'},
+    {id: 'unzipFile', name: 'Unzip', status: '...'},
+    {id: 'sync', name: 'Sync', status: '...'}
+];
 
 export default {
     designScreenSize,
@@ -2083,5 +2094,6 @@ export default {
     userPermissions,
     helpSingleScreen,
     helpItemsSortCriteriaDropDownItems,
-    caseFieldsForHardCodeCheck
+    caseFieldsForHardCodeCheck,
+    manualSyncStages
 }

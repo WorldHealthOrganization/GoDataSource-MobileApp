@@ -3,8 +3,8 @@
  */
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
-import React, {Component} from 'react';
-import {View, StyleSheet, InteractionManager, Alert, TouchableWithoutFeedback, Keyboard} from 'react-native';
+import React, {PureComponent} from 'react';
+import {View, StyleSheet, InteractionManager, Alert, TouchableWithoutFeedback, Keyboard, ScrollView} from 'react-native';
 import {calculateDimension, getTranslation} from './../utils/functions';
 import config from './../utils/config';
 import {connect} from "react-redux";
@@ -15,8 +15,10 @@ import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import CardComponent from './../components/CardComponent';
 import {LoaderScreen} from 'react-native-ui-lib';
 import translations from './../utils/translations'
+import ElevatedView from 'react-native-elevated-view';
+import _ from 'lodash';
 
-class ContactsSinglePersonal extends Component {
+class ContactsSinglePersonal extends PureComponent {
 
     // This will be a container, so put as less business logic here as possible
     constructor(props) {
@@ -27,11 +29,6 @@ class ContactsSinglePersonal extends Component {
     }
 
     // Please add here the react lifecycle methods that you need
-    // shouldComponentUpdate(nextProps, nextState) {
-    //     // console.log("NextPropsIndex ContactsSinglePersonal: ", nextProps.activeIndex, this.props.activeIndex);
-    //     return nextProps.activeIndex === 0;
-    // }
-
     componentWillMount() {
         InteractionManager.runAfterInteractions(() => {
             this.setState({
@@ -84,31 +81,137 @@ class ContactsSinglePersonal extends Component {
                 </View>
             </TouchableWithoutFeedback>
         );
-    }
+    };
 
     // Please write here all the methods that are not react native lifecycle methods
     handleRenderItem = (item) => {
         let fields = item.fields.map((field) => {
             return Object.assign({},field, {isEditMode: this.props.isEditMode})
         });
+        return this.renderItemCardComponent(fields)
+    };
+
+    renderItemCardComponent = (fields, cardIndex = null) => {
+        return (
+            <ElevatedView elevation={3} style={[style.containerCardComponent, {
+                marginHorizontal: calculateDimension(16, false, this.props.screenSize),
+                width: calculateDimension(config.designScreenSize.width - 32, false, this.props.screenSize),
+                marginVertical: 4,
+                minHeight: calculateDimension(72, true, this.props.screenSize)
+            }, style.cardStyle]}>
+                <ScrollView scrollEnabled={false} style={{flex: 1}} contentContainerStyle={{flexGrow: 1}}>
+                    {
+                        fields && fields.map((item, index) => {
+                            return this.handleRenderItemCardComponent(item, index, cardIndex);
+                        })
+                    }
+                </ScrollView>
+            </ElevatedView>
+        );
+    };
+
+    handleRenderItemCardComponent = (item, index, cardIndex) => {
+        return (
+            <View style={[style.subcontainerCardComponent, {flex: 1}]} key={index}>
+                {
+                    this.handleRenderItemByType(item, cardIndex)
+                }
+            </View>
+        )
+    };
+
+    handleRenderItemByType = (item, cardIndex) => {
+        let value = '';
+        let minimumDate = undefined;
+        let maximumDate = undefined;
+
+        if (item.type === 'DropdownInput') {
+            item.data = this.computeDataForContactsSingleScreenDropdownInput(item);
+        }
+
+        if (item.type === 'DatePicker' && item.objectType !== 'Address') {
+            value = this.props.contact[item.id]
+        } else if (item.type === 'SwitchInput' && this.props.contact[item.id] !== undefined) {
+            value = this.props.contact[item.id]
+        } else {
+            value = this.computeValueForContactsSingleScreen(item);
+        }
+
+        if (this.props.selectedItemIndexForTextSwitchSelectorForAge !== null && this.props.selectedItemIndexForTextSwitchSelectorForAge !== undefined && item.objectType === 'Contact' && item.dependsOn !== undefined && item.dependsOn !== null){
+            let itemIndexInConfigTextSwitchSelectorValues = config[item.dependsOn].map((e) => {return e.value}).indexOf(item.id)
+            if (itemIndexInConfigTextSwitchSelectorValues > -1) {
+                if (itemIndexInConfigTextSwitchSelectorValues != this.props.selectedItemIndexForTextSwitchSelectorForAge) {
+                    return
+                }
+            }
+        }
+      
+        if (item.type === 'DatePicker' && value === '') {
+            value = null
+        }
+
+        let dateValidation = this.setDateValidations(item);
+        minimumDate = dateValidation.minimumDate;
+        maximumDate = dateValidation.maximumDate;
+
         return (
             <CardComponent
-                item={fields}
-                contact={this.props.contact}
-                style={style.cardStyle}
-                screen={'ContactsSingleScreen'}
+                item={item}
                 isEditMode={this.props.isEditMode}
-                onChangeText={this.props.onChangeText}
-                onChangeDropDown={this.props.onChangeDropDown}
-                onChangeDate={this.props.onChangeDate}
-                onChangeSwitch={this.props.onChangeSwitch}
-                selectedItemIndexForTextSwitchSelectorForAge={this.props.selectedItemIndexForTextSwitchSelectorForAge}
-                onChangeTextSwitchSelector={this.props.onChangeTextSwitchSelector}
+                contact={this.props.contact}
+                isEditModeForDropDownInput={this.props.isEditMode}
                 selectedItemIndexForAgeUnitOfMeasureDropDown={this.props.selectedItemIndexForAgeUnitOfMeasureDropDown}
                 onChangeextInputWithDropDown={this.props.onChangeextInputWithDropDown}
+                value={value}
+                minimumDate={minimumDate}
+                maximumDate={maximumDate}
+                
+                onChangeText={this.props.onChangeText}
+                onChangeDate={this.props.onChangeDate}
+                onChangeSwitch={this.props.onChangeSwitch}
+                onChangeDropDown={this.props.onChangeDropDown}
+                onChangeTextSwitchSelector={this.props.onChangeTextSwitchSelector}
             />
         )
+    };
+
+    setDateValidations = (item) => {
+        let minimumDate = undefined;
+        let maximumDate = undefined;
+
+        if (item.type === 'DatePicker') {
+            if (this.props.screen === 'ContactsSingleScreen') {
+                if (item.id === 'dob' || item.id === 'dateOfReporting') {
+                    maximumDate = new Date()
+                }
+            }
+        }
+        
+        let dateValidation = {minimumDate, maximumDate}
+        return dateValidation
     }
+
+    computeValueForContactsSingleScreen = (item) => {
+        return this.props.contact && this.props.contact[item.id] ? getTranslation(this.props.contact[item.id], this.props.translation) : '';
+    };
+
+    computeDataForContactsSingleScreenDropdownInput = (item) => {
+        if (item.id === 'riskLevel') {
+            return _.filter(this.props.referenceData, (o) => {
+                return o.active === true && o.categoryId.includes("RISK_LEVEL")
+            }).map((o) => {return {value: getTranslation(o.value, this.props.translation), id: o.value}})
+        }
+        if (item.id === 'gender') {
+            return _.filter(this.props.referenceData, (o) => {
+                return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_GENDER'
+            }).map((o) => {return {value: getTranslation(o.value, this.props.translation), id: o.value}})
+        }
+        if (item.id === 'occupation') {
+            return _.filter(this.props.referenceData, (o) => {
+                return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_OCCUPATION'
+            }).map((o) => {return {value: getTranslation(o.value, this.props.translation), id: o.value}})
+        }
+    };
 
     handleNextButton = () => {
         if (this.props.isNew) {
@@ -143,13 +246,21 @@ class ContactsSinglePersonal extends Component {
         } else {
             this.props.handleMoveToNextScreenButton()
         }
-    }
+    };
 }
 
 
 // Create style outside the class, or for components that will be used by other components (buttons),
 // make a global style in the config directory
 const style = StyleSheet.create({
+    containerCardComponent: {
+        backgroundColor: 'white',
+        borderRadius: 2
+    },
+    subcontainerCardComponent: {
+        alignItems: 'center',
+        flex: 1
+    },
     viewContainer: {
         flex: 1,
         backgroundColor: styles.screenBackgroundGrey,
@@ -169,7 +280,6 @@ const style = StyleSheet.create({
     container: {
         flex: 1,
         marginBottom: 10
-        
     }
 });
 
@@ -178,8 +288,8 @@ function mapStateToProps(state) {
         screenSize: state.app.screenSize,
         contacts: state.contacts,
         cases: state.cases,
-        events: state.events,
-        translation: state.app.translation
+        translation: state.app.translation,
+        referenceData: state.referenceData,
     };
 }
 

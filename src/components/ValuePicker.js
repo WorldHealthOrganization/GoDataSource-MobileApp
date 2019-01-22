@@ -6,7 +6,7 @@ import {TextInput, View, Text, StyleSheet, Platform, Dimensions, TouchableOpacit
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import {ListItem, Icon, Button} from 'react-native-material-ui';
-import {calculateDimension} from './../utils/functions';
+import {calculateDimension, getTranslation} from './../utils/functions';
 import config from './../utils/config';
 import styles from './../styles';
 import {connect} from "react-redux";
@@ -46,7 +46,7 @@ class ValuePicker extends PureComponent {
                 >
                     <Dropdown
                         ref='dropdown'
-                        data={config.dropDownValues.map((e) => {return {label: e.value === 'All' ? e.value : this.getTranslation(e.value), value: e.value}})}
+                        data={config.dropDownValues.map((e) => {return {label: e.value === 'All' ? e.value : getTranslation(e.value, this.props.translation), value: e.value}})}
                         value={this.props.value}
                         renderAccessory={() => {
                             return null;
@@ -75,16 +75,6 @@ class ValuePicker extends PureComponent {
             this.props.onSelectValue({label: data[data.map((e) => {return e.value}).indexOf(value)].label, value: value});
         // })
     };
-
-    getTranslation = (value) => {
-        let valueToBeReturned = value;
-        if (value && typeof value === 'string' && value.includes('LNG')) {
-            valueToBeReturned = value && this.props.translation && Array.isArray(this.props.translation) && this.props.translation[this.props.translation.map((e) => {return e && e.token ? e.token : null}).indexOf(value)] ? this.props.translation[this.props.translation.map((e) => {
-                return e.token
-            }).indexOf(value)].translation : '';
-        }
-        return valueToBeReturned;
-    }
 }
 
 ValuePicker.defaultProps = {

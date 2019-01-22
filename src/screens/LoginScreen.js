@@ -61,7 +61,7 @@ class LoginScreen extends Component {
             state.hasAlert = true;
             Alert.alert(props.errors.type, props.errors.message, [
                 {
-                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props && this.props.translation ? this.props.translation : null),
+                    text: getTranslation(translations.alertMessages.okButtonLabel, props && props.translation ? props.translation : null),
                     onPress: () => {
                         state.hasAlert = false;
                         props.removeErrors();
@@ -80,7 +80,6 @@ class LoginScreen extends Component {
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
-        console.log('Render method of LoginScreen');
         return (
             <KeyboardAwareScrollView
                 style={[style.container, {paddingTop: Platform.OS === 'ios' ? this.props.screenSize.height === 812 ? 44 : 20 : 0}]}
@@ -92,8 +91,9 @@ class LoginScreen extends Component {
                         <LoaderScreen overlay={true} backgroundColor={'white'} message={this.props && this.props.loginState ? this.props.loginState : 'Loading'} />
                     ) : (null)
                 }
-                <Ripple style={{position: "absolute", top: 20, left: 20}} onPress={this.handleOnPressBack}>
+                <Ripple style={{flexDirection: 'row', alignItems: 'center', position: "absolute", top: 20, left: 20}} onPress={this.handleOnPressBack}>
                     <Icon name="arrow-back"/>
+                    <Text style={{fontFamily: 'Roboto-Medium', fontSize: 18, color: 'white'}}>Hub configuration</Text>
                 </Ripple>
                 <View style={[style.welcomeTextContainer]}>
                     <Text style={style.welcomeText}>
@@ -203,7 +203,10 @@ class LoginScreen extends Component {
     handleOnPressBack = () => {
         this.props.setSyncState(null);
         this.props.navigator.resetTo({
-            screen: 'FirstConfigScreen'
+            screen: this.props.activeDatabase ? 'ManualConfigScreen' : 'FirstConfigScreen',
+            passProps: {
+                allowBack: this.props.allowBack
+            }
         })
     }
 }
@@ -257,7 +260,8 @@ function mapStateToProps(state) {
         screenSize: state.app.screenSize,
         errors: state.errors,
         loginState: state.app.loginState,
-        translation: state.app.translation
+        translation: state.app.translation,
+        activeDatabase: state.app.activeDatabase
     };
 }
 

@@ -87,10 +87,12 @@ class Breadcrumb extends PureComponent {
                 if(this.props.onPress){
                     this.props.onPress();
                 }else {
-                    this.props.navigator.pop({
-                        animated: true,
-                        animationType: 'fade'
-                    })
+                    this.props.navigator.pop(
+                    //     {
+                    //     animated: true,
+                    //     animationType: 'fade'
+                    // }
+                    )
                 }
             }
         });

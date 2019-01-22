@@ -42,7 +42,7 @@ class CaseListItem extends Component {
         let genderString = '';
         let ageString = '';
         if (this.props.item && this.props.item.gender) {
-            genderString = this.getTranslation(this.props.item.gender);
+            genderString = getTranslation(this.props.item.gender, this.props.translation);
         }
 
         if(this.props.item && this.props.item.age){
@@ -160,16 +160,6 @@ class CaseListItem extends Component {
                 this.props.onPressMap(this.props.item, contact)
             }
         });
-    }
-
-    getTranslation = (value) => {
-        let valueToBeReturned = value;
-        if (value && typeof value === 'string' && value.includes('LNG')) {
-            valueToBeReturned = value && this.props.translation && Array.isArray(this.props.translation) && this.props.translation[this.props.translation.map((e) => {return e && e.token ? e.token : null}).indexOf(value)] ? this.props.translation[this.props.translation.map((e) => {
-                return e.token
-            }).indexOf(value)].translation : '';
-        }
-        return valueToBeReturned;
     }
 }
 

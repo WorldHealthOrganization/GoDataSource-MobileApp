@@ -19,6 +19,7 @@ import { logoutUser } from './../actions/user';
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import { removeErrors } from './../actions/errors';
+import { saveActiveDatabase } from './../actions/app';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import NavBarCustom from './../components/NavBarCustom';
 import config from './../utils/config';
@@ -380,9 +381,14 @@ class FirstConfigScreen extends Component {
         return (
             <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', width: width - 30}}>
                 <Text>{database.name}</Text>
-                <Ripple onPress={() => (this.onPressMakeHubActive(database))}>
-                    <Text>{getTranslation(translations.hubConfigScreen.makeActiveLabel, this.props.translation)}</Text>
-                </Ripple>
+                <Button
+                    color={styles.buttonGreen}
+                    height={calculateDimension(25, true, this.props.screenSize)}
+                    width={calculateDimension(110, false, this.props.screenSize)}
+                    title={'Make active'}
+                    titleColor={'white'}
+                    onPress={() => {this.onPressMakeHubActive(database)}}
+                />
             </View>
         )
     };
@@ -458,40 +464,53 @@ class FirstConfigScreen extends Component {
 
     handleOnPressAddHub = () => {
         this.props.navigator.push({
-            screen: 'FirstConfigScreen'
+            screen: 'FirstConfigScreen',
+            passProps: {
+                allowBack: true
+            }
         })
     };
 
     // database = {id, name}
     onPressMakeHubActive = (database) => {
-        // change active database and logout user
-        getInternetCredentials(database.id)
-            .then((internetCredentials) => {
-                let server = Platform.OS === 'ios' ? internetCredentials.server : internetCredentials.service;
-                createDatabase(server, internetCredentials.password, true)
-                    .then((newDatabase) => {
-                        AsyncStorage.setItem('activeDatabase', database.id)
-                            .then(() => {
-                                Alert.alert("", getTranslation(translations.hubConfigScreen.successMakingHubActiveMessage, this.props.translation), [
-                                    {
-                                        text: 'Ok', onPress: () => {this.props.logoutUser();}
-                                    }
-                                ]);
+        Alert.alert('', `Are you sure you want to change the hub to ${database.name}?`, [
+            {
+                text: 'No', onPress: () => {console.log('Cancel pressed')}
+            },
+            {
+                text: 'Yes', onPress: () => {
+                // change active database and logout user
+                getInternetCredentials(database.id)
+                    .then((internetCredentials) => {
+                        let server = Platform.OS === 'ios' ? internetCredentials.server : internetCredentials.service;
+                        createDatabase(server, internetCredentials.password, true)
+                            .then((newDatabase) => {
+                                AsyncStorage.setItem('activeDatabase', database.id)
+                                    .then(() => {
+                                        this.props.saveActiveDatabase(database.id);
+                                        Alert.alert("", getTranslation(translations.hubConfigScreen.successMakingHubActiveMessage, this.props.translation), [
+                                            {
+                                                text: 'Ok', onPress: () => {this.props.logoutUser();}
+                                            }
+                                        ]);
+                                    })
+                                    .catch((errorMakeActive) => {
+                                        console.log('Error make active database: ', errorMakeActive);
+                                        this.showAlert(getTranslation(translations.hubConfigScreen.setActiveDatabaseTitle, this.props.translation), getTranslation(translations.hubConfigScreen.setActiveDatabaseMessage, this.props.translation));
+                                    })
                             })
-                            .catch((errorMakeActive) => {
-                                console.log('Error make active database: ', errorMakeActive);
+                            .catch((errorNewDatabase) => {
+                                console.log('Error creating new Database: ', errorNewDatabase);
                                 this.showAlert(getTranslation(translations.hubConfigScreen.setActiveDatabaseTitle, this.props.translation), getTranslation(translations.hubConfigScreen.setActiveDatabaseMessage, this.props.translation));
                             })
                     })
-                    .catch((errorNewDatabase) => {
-                        console.log('Error creating new Database: ', errorNewDatabase);
+                    .catch((errorGettingInternetCredentials) => {
+                        console.log('Error getting internet credentials: ', errorGettingInternetCredentials)
                         this.showAlert(getTranslation(translations.hubConfigScreen.setActiveDatabaseTitle, this.props.translation), getTranslation(translations.hubConfigScreen.setActiveDatabaseMessage, this.props.translation));
                     })
-            })
-            .catch((errorGettingInternetCredentials) => {
-                console.log('Error getting internet credentials: ', errorGettingInternetCredentials)
-                this.showAlert(getTranslation(translations.hubConfigScreen.setActiveDatabaseTitle, this.props.translation), getTranslation(translations.hubConfigScreen.setActiveDatabaseMessage, this.props.translation));
-            })
+            }
+            }
+        ])
     };
 
     showAlert = (alertTitle, alertText) => {
@@ -564,7 +583,8 @@ function mapStateToProps(state) {
 function matchDispatchToProps(dispatch) {
     return bindActionCreators({
         logoutUser,
-        removeErrors
+        removeErrors,
+        saveActiveDatabase
     }, dispatch);
 }
 

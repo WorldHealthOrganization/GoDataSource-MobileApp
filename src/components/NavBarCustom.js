@@ -37,7 +37,7 @@ class NavBarCustom extends PureComponent {
             <View style={[this.props.style, style.container,
                 {
                     height: calculateDimension(this.props.children ? 81 : 40.5, true, this.props.screenSize),
-                    marginTop: Platform.OS === 'ios' ? this.props.screenSize.height === 812 ? 44 : 20 : 0,
+                    marginTop: Platform.OS === 'ios' ? this.props.screenSize.height >= 812 ? 44 : 20 : 0,
                     marginHorizontal: calculateDimension(16, false, this.props.screenSize)
                 },
                 Platform.OS === 'ios' && {zIndex: 99}

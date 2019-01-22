@@ -9,6 +9,7 @@ import {getUserRoles} from './../actions/role';
 import { getFollowUpsForOutbreakIdWithPromises } from './followUps';
 import { getContactsForOutbreakId, getContactsForOutbreakIdWithPromises } from './contacts';
 import { getCasesForOutbreakIdWithPromise, getCasesForOutbreakId } from './cases';
+import { getClusters } from './clusters';
 import { getEventsForOutbreakId } from './events';
 import { getOutbreakById } from './outbreak';
 import { addError } from './errors';
@@ -25,6 +26,7 @@ import {storeHelpCategory} from './helpCategory';
 import {storeHelpItem} from './helpItem';
 import {storeFollowUps} from './followUps';
 import {storeOutbreak} from './outbreak';
+import {storeClusters} from './clusters';
 import {setLoginState, storeData, getAvailableLanguages, setSyncState} from './app';
 import moment from 'moment';
 import _ from 'lodash';
@@ -69,6 +71,7 @@ export function loginUser(credentials) {
                         promises.push(getHelpCategory(null, dispatch));
                         promises.push(getHelpItem(null, dispatch));
                         promises.push(getEventsForOutbreakId(response.activeOutbreakId, null, dispatch));
+                        promises.push(getClusters(null, dispatch));
                         promises.push(getCasesForOutbreakIdWithPromise(response.activeOutbreakId, null, null, dispatch));
                         promises.push(getUserRoles(response.roleIds, dispatch));
 
@@ -134,6 +137,7 @@ export function cleanDataAfterLogout() {
             dispatch(storeOutbreak(null));
             dispatch(storeHelpCategory(null));
             dispatch(storeHelpItem(null));
+            dispatch(storeClusters(null));
         });
     }
 }
@@ -152,7 +156,7 @@ export function getUserById(userId, token, refreshFollowUps) {
 
                 // Here is the local storage handling
                 if (refreshFollowUps) {
-                    dispatch(setSyncState('Loading'));
+                    dispatch(setSyncState({id: 'sync', status: 'test'}));
                 }
                 let promises = [];
                 // promises.push(getOutbreakById(response.activeOutbreakId, null, dispatch));
@@ -174,7 +178,8 @@ export function getUserById(userId, token, refreshFollowUps) {
                         promises.push(getEventsForOutbreakId(response.activeOutbreakId, null, dispatch));
                         promises.push(getCasesForOutbreakIdWithPromise(response.activeOutbreakId, null, null, dispatch));
                         promises.push(getUserRoles(response.roleIds, dispatch));
-
+                        promises.push(getClusters(null, dispatch));
+                        
                         // Store the user to the redux store, and also store the userId to the AsyncStorage
                         dispatch(storeUser(response));
                         // dispatch(storeData("loggedUser", response._id, () => {}));
