@@ -10,6 +10,7 @@ import {setSyncState} from './../actions/app';
 import bcrypt from 'react-native-bcrypt';
 import uuid from 'react-native-uuid';
 import _ from 'lodash';
+import defaultTranslations from './defaultTranslations'
 import {getContactsForOutbreakId} from './../actions/contacts';
 import {getSyncEncryptPassword, encrypt, decrypt} from './../utils/encryption';
 import RNFS from 'react-native-fs';
@@ -1216,7 +1217,16 @@ export function getTranslation (value, allTransactions) {
         if (value && allTransactions && Array.isArray(allTransactions)) {
             item = allTransactions.find(e => {return e && e.token === value})
         }
-        valueToBeReturned = item ? item.translation : '';
+
+        // valueToBeReturned = item ? item.translation : '';
+
+        if (item !== null && item !== undefined && item.translation !== null && item.translation !== undefined) {
+            valueToBeReturned = item.translation
+        } else if (defaultTranslations[`${value}`] !== undefined && defaultTranslations[`${value}`] !== null){
+            valueToBeReturned = defaultTranslations[`${value}`]
+        } else {
+            valueToBeReturned = ''
+        }
     }
     getTranslation.cache[key] = valueToBeReturned;
     return valueToBeReturned;
