@@ -9,8 +9,9 @@ import {getTranslation, getTooltip} from './../utils/functions';
 import TooltipComponent from './TooltipComponent'
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
-var Switch = require('react-native-material-switch');
+// var Switch = require('react-native-material-switch');
 // import Switch from 'react-native-material-switch';
+import {Switch} from 'react-native-ui-lib';
 
 class SwitchInput extends PureComponent {
 
@@ -41,25 +42,8 @@ class SwitchInput extends PureComponent {
                     {getTranslation(this.props.label, this.props.translation)}
                 </Text>
                 <Switch
-                    active={this.props.value}
-                    switchWidth={32}
-                    switchHeight={12}
-                    buttonRadius={10}
-                    inactiveButtonColor={'rgb(250,250,250)'}
-                    inactiveBackgroundColor={'rgba(0,0,0,.3)'}
-                    activeButtonColor={this.props.activeButtonColor}
-                    activeBackgroundColor={this.props.activeBackgroundColor}
-                    style={{
-                        flex: 0,
-                    }}
-                    onChangeState={ (state) => this.props.onChange(
-                        state,
-                        this.props.id,
-                        this.props.objectType ? (this.props.objectType == 'Address' ? this.props.index : (
-                            this.props.objectType == 'LabResult' ? this.props.index : this.props.objectType
-                        )) : null,
-                    this.props.objectType)}
-                /> 
+                    value={this.props.value}
+                />
                 {
                     tooltip.hasTooltip === true ? (
                         <TooltipComponent

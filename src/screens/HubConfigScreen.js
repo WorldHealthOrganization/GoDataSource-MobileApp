@@ -68,7 +68,7 @@ let textFieldsStructure = [
         id: 'encryptedData',
         label: translations.manualConfigScreen.encryptDataLabel,
         type: 'SwitchInput',
-        value: '',
+        value: true,
         isRequired: false,
         isEditMode: true,
         activeButtonColor: 'green',
@@ -99,7 +99,7 @@ class FirstConfigScreen extends Component {
             url: '',
             clientId: '',
             clientSecret: '',
-            encryptedData: false,
+            encryptedData: true,
             allDatabases: [],
             lastSyncDate: null,
             isModified: false
