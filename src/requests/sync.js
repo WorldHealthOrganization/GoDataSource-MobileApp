@@ -52,13 +52,17 @@ export function getDatabaseSnapshotRequest(hubConfig, lastSyncDate, dispatch, ca
             let startDownload = new Date().getTime();
 
             // Before starting a download, first test if the API responds
+            dispatch(setSyncState({id: 'testApi', status: 'In progress'}));
             testApi(`${hubConfiguration.url}/system-settings/version`, deviceInfo, (errorTestApi, responseTestApi) => {
                 if (errorTestApi) {
                     console.log("*** testApi error: ", JSON.stringify(errorTestApi));
-                    callback(errorTestApi);
+                    dispatch(setSyncState({id: 'testApi', status: `Error`, error: 'The hub is not available'}));
+                    callback('The hub is not available');
                 }
                 if (responseTestApi) {
                     // console.log('Response TestApi: ', responseTestApi);
+                    dispatch(setSyncState({id: 'testApi', status: 'Success'}));
+                    dispatch(setSyncState({id: 'downloadDatabase', status: 'In progress'}));
                     RNFetchBlob.config({
                         timeout: (30 * 60 * 10 * 1000),
                         followRedirect: false,
@@ -66,7 +70,6 @@ export function getDatabaseSnapshotRequest(hubConfig, lastSyncDate, dispatch, ca
                         path: `${dirs}/database.zip`
                     })
                         .fetch('POST', encodeURI(requestUrl), {
-                                'device-info': deviceInfo,
                                 'Content-Type': 'application/json',
                                 'Accept': 'application/json',
                                 'Authorization': 'Basic ' + base64.encode(`${hubConfiguration.clientId}:${hubConfiguration.clientSecret}`)
@@ -76,15 +79,14 @@ export function getDatabaseSnapshotRequest(hubConfig, lastSyncDate, dispatch, ca
                             })
                         )
                         .progress({count: 500}, (received, total) => {
-                            dispatch(setSyncState(`Downloading database\nReceived ${received} bytes`));
+                            dispatch(setSyncState({id: 'downloadDatabase', name: `Downloading database\nReceived ${received} bytes`}));
                             console.log(received, total)
                         })
                         .then((res) => {
                             console.log('Download time: ', new Date().getTime() - startDownload);
                             let status = res.info().status;
-                            let info = res.info();
                             // After getting zip file from the server, unzip it and then proceed to the importing of the data to the SQLite database
-                            if (status === 200) {
+                            if(status === 200) {
                                 // After returning the database, return the path to it
                                 console.log("Got database");
                                 callback(null, databaseLocation)
@@ -102,7 +104,6 @@ export function getDatabaseSnapshotRequest(hubConfig, lastSyncDate, dispatch, ca
         })
         .catch((errorGetInstallationId) => {
             console.log('error while trying to get installationId: ', errorGetInstallationId);
-
         });
 }
 
@@ -112,6 +113,7 @@ export function postDatabaseSnapshotRequest(internetCredentials, path, callback)
     let requestUrl = `${hubConfig.url}/sync/import-database-snapshot`;
 
     console.log('Request URL:' + requestUrl);
+
 
 
     // Get installationId from the local storage first
@@ -126,12 +128,11 @@ export function postDatabaseSnapshotRequest(internetCredentials, path, callback)
                 name: DeviceInfo.getDeviceName().replace(/\u0022|\u0027|\u0060|\u00b4|\u2018|\u2019|\u201c|\u201d/g, `\'`)
             });
             console.log('Send database to server');
-
             // Before starting a download, first test if the API responds
             testApi(`${hubConfig.url}/system-settings/version`, (errorTestApi, responseTestApi) => {
                 if (errorTestApi) {
                     console.log("*** testApi error: ", JSON.stringify(errorTestApi));
-                    callback(errorTestApi);
+                    callback('The hub is not available');
                 }
                 if (responseTestApi) {
                     console.log('Response testApi: ', responseTestApi);
@@ -148,7 +149,7 @@ export function postDatabaseSnapshotRequest(internetCredentials, path, callback)
                         .then((res) => {
                             console.log('Finished sending the data to the server: ', res);
                             let status = res.info().status;
-                            if (status === 200) {
+                            if(status === 200) {
                                 //     console.log("Got database");
                                 callback(null, 'Finished sending data to the server')
                             } else {
@@ -162,11 +163,11 @@ export function postDatabaseSnapshotRequest(internetCredentials, path, callback)
                         });
                 }
             })
+
         })
         .catch((errorGetInstallationId) => {
             console.log('Error while trying to get installationId from AsyncStorage: ', errorGetInstallationId);
         })
-
 }
 
 function getAllLanguageTokens () {

@@ -27,4 +27,5 @@ export default {
     ERROR_REFERENCE_DATA: {type: "Reference data error", message: 'An error occurred while trying to get reference data'},
     ERROR_HELP: {type: "Help error", message: 'An error occurred while trying to get help'},
     ERROR_LOCATIONS: {type: "Location areas error", message: 'An error occurred while trying to get location areas'},
+    ERROR_CLUSTERS: {type: "Clusters error", message: 'An error occurred while trying to get clusters data'},
 }

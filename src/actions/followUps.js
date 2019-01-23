@@ -66,7 +66,7 @@ export function getFollowUpsForOutbreakId(outbreakId, filter, token) {
                     .then((responseGetContacts) => {
                         console.log ('getFollowUpsForOutbreakIdRequest getContactsForOutbreakIdWithPromises response')
                         dispatch(storeFollowUps(response));
-                        let mappedContact = []
+                        let mappedContact = [];
                         if (response.length > 0) {
                             mappedContact = mapContactsAndFollowUps(responseGetContacts, response);
                         }
@@ -103,12 +103,12 @@ export function getFollowUpsForOutbreakIdWithPromises(outbreakId, filter, token,
                 getContactsForOutbreakIdWithPromises(outbreakId, {keys: keys}, null, dispatch)
                     .then((responseGetContacts) => {
                         dispatch(storeFollowUps(response));
-                        getRelationshipsForTypeRequest(outbreakId, 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT', keys, (errorGetRelationships, resultGetRelationships) => {
+                        // getRelationshipsForTypeRequest(outbreakId, 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT', keys, (errorGetRelationships, resultGetRelationships) => {
                             let mappedContact = mapContactsAndFollowUps(responseGetContacts, response);
-                            mappedContact = mapContactsAndRelationships(mappedContact, resultGetRelationships);
+                            // mappedContact = mapContactsAndRelationships(mappedContact, resultGetRelationships);
                             dispatch(storeContacts(mappedContact));
                             resolve('Done followUps');
-                        })
+                        // })
                     })
                     .catch((errorGetContactsForFollowUps) => {
                         dispatch(addError(errorTypes.ERROR_CONTACT));

@@ -56,7 +56,6 @@ class HelpScreen extends Component {
 
     // Please add here the react lifecycle methods that you need
     static getDerivedStateFromProps(props, state) {
-        console.log ('getDerivedStateFromProps');
         if (props.errors && props.errors.type && props.errors.message) {
             Alert.alert(props.errors.type, props.errors.message, [
                 {
@@ -163,8 +162,8 @@ class HelpScreen extends Component {
 
         return (
             <ViewHOC style={style.container}
-                     showLoader={(this.props && this.props.syncState && (this.props.syncState !== 'Finished processing' && this.props.syncState !== 'Error')) || (this && this.state && this.state.loading)}
-                     loaderText={this.props && this.props.syncState ? this.props.syncState : getTranslation(translations.loadingScreenMessages.loadingMsg, this.props.translation)}>
+                     showLoader={(this.props && this.props.syncState && ((this.props.syncState.id === 'sync' && this.props.syncState.status !== 'Success') && this.props.syncState.status !== 'Error')) || (this && this.state && this.state.loading)}
+                     loaderText={this.props && this.props.syncState ? 'Loading' : getTranslation(translations.loadingScreenMessages.loadingMsg, this.props.translation)}>
                 {
                     this.state.displayModalFormat === true ? (
                         <NavBarCustom customTitle={
@@ -258,7 +257,7 @@ class HelpScreen extends Component {
         return (<HelpListItem
             item={item}
             onPressViewHelp={this.handlePressViewHelp}
-            firstActionText={this.getTranslation(item.statusId)}
+            firstActionText={getTranslation(item.statusId, this.props.translation)}
         />)
     };
 
@@ -310,8 +309,8 @@ class HelpScreen extends Component {
         let itemClone = Object.assign({}, item);
         this.props.navigator.push({
             screen: 'HelpSingleScreen',
-            animated: true,
-            animationType: 'fade',
+            // animated: true,
+            // animationType: 'fade',
             passProps: {
                 isNew: false,
                 item: itemClone,
@@ -425,16 +424,6 @@ class HelpScreen extends Component {
 
 
     //Other
-    getTranslation = (value) => {
-        let valueToBeReturned = value;
-        if (value && typeof value === 'string' && value.includes('LNG')) {
-            valueToBeReturned = value && this.props.translation && Array.isArray(this.props.translation) && this.props.translation[this.props.translation.map((e) => {return e && e.token ? e.token : null}).indexOf(value)] ? this.props.translation[this.props.translation.map((e) => {
-                return e.token
-            }).indexOf(value)].translation : '';
-        }
-        return valueToBeReturned;
-    };
-
     showMenu = () => {
         this.refs.menuRef.show();
     };

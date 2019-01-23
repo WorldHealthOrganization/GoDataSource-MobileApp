@@ -189,7 +189,7 @@ export function updateContact(outbreakId, contactId, contact, token, filter, con
                 dispatch(addError(errorTypes.ERROR_UPDATE_CONTACT));
             }
             if (response) {
-                console.log("*** updateContactRequest response: ", JSON.stringify(response));
+                // console.log("*** updateContactRequest response: ", JSON.stringify(response));
                 if (response.deleted === false) {
                     getRelationshipsAndFollowUpsForContactRequest(outbreakId, extractIdFromPouchId(response._id, 'person'), filter, (errorRelationshipsAndFollowUps, responseRelationshipsAndFollowUps) => {
                         if (errorRelationshipsAndFollowUps) {
@@ -197,7 +197,7 @@ export function updateContact(outbreakId, contactId, contact, token, filter, con
                             dispatch(addError(errorTypes.ERROR_CONTACT));
                         }
                         if (responseRelationshipsAndFollowUps) {
-                            console.log("*** getRelationshipsAndFollowUpsForContact response: ", JSON.stringify(responseRelationshipsAndFollowUps));
+                            // console.log("*** getRelationshipsAndFollowUpsForContact response: ", JSON.stringify(responseRelationshipsAndFollowUps));
                             let relationships = responseRelationshipsAndFollowUps.filter((e) => {if (e.persons) {return e}});
                             let followUps = responseRelationshipsAndFollowUps.filter((e) => {if (e.personId) {return e}});
 

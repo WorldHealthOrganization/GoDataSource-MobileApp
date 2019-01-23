@@ -15,6 +15,7 @@ import locations from './locations';
 import role from './role';
 import helpCategory from './helpCategory';
 import helpItem from './helpItem';
+import clusters from './clusters';
 
 const allReducers = combineReducers({
     app,
@@ -24,6 +25,7 @@ const allReducers = combineReducers({
     followUps,
     contacts,
     events,
+    clusters,
     helpCategory,
     helpItem,
     errors,

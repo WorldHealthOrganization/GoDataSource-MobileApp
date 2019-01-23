@@ -57,7 +57,7 @@ class FollowUpListItem extends PureComponent {
          
             let genderString = '';
             if (contact && contact.gender) {
-                genderString = this.getTranslation(contact.gender);
+                genderString = getTranslation(contact.gender, this.props.translation);
             }
 
             let secondaryTextGender = contact && genderString ? genderString.charAt(0) : ' ';
@@ -65,9 +65,9 @@ class FollowUpListItem extends PureComponent {
             if (contact && contact.age !== undefined && contact.age !== null) {
                 if (contact.age.years !== null && contact.age.years !== undefined && contact.age.months !== null && contact.age.months !== undefined) {
                     if (contact.age.years !== 0 && contact.age.months === 0) {
-                        secondaryTextAge = contact.age.years.toString() + this.getTranslation(config.localTranslationTokens.years).charAt(0).toLowerCase()
+                        secondaryTextAge = contact.age.years.toString() + getTranslation(config.localTranslationTokens.years, this.props.translation).charAt(0).toLowerCase()
                     } else if (contact.age.years === 0 && contact.age.months !== 0) {
-                        secondaryTextAge = contact.age.months.toString() + this.getTranslation(config.localTranslationTokens.months).charAt(0).toLowerCase()
+                        secondaryTextAge = contact.age.months.toString() + getTranslation(config.localTranslationTokens.months, this.props.translation).charAt(0).toLowerCase()
                     }
                 }
             }
@@ -207,16 +207,6 @@ class FollowUpListItem extends PureComponent {
                 this.props.onPressMap(this.props.item, contact)
             }
         })
-    }
-
-    getTranslation = (value) => {
-        let valueToBeReturned = value;
-        if (value && typeof value === 'string' && value.includes('LNG')) {
-            valueToBeReturned = value && this.props.translation && Array.isArray(this.props.translation) && this.props.translation[this.props.translation.map((e) => {return e && e.token ? e.token : null}).indexOf(value)] ? this.props.translation[this.props.translation.map((e) => {
-                return e.token
-            }).indexOf(value)].translation : '';
-        }
-        return valueToBeReturned;
     }
 }
 

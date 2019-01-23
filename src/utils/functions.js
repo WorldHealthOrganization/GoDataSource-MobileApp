@@ -121,8 +121,8 @@ export function navigation(event, navigator) {
                     setTimeout(function(){ 
                         navigator.push({
                             screen: addScreen,
-                            animated: true,
-                            animationType: 'fade',
+                            // animated: true,
+                            // animationType: 'fade',
                             passProps: {
                                 isNew: true,
                             }
@@ -132,7 +132,7 @@ export function navigation(event, navigator) {
 
                     navigator.resetTo({
                         screen: screenToSwitchTo,
-                        animated: true
+                        // animated: true
                     });
                 }
             }
@@ -507,7 +507,7 @@ export async function processFile (path, type, totalNumberOfFiles, dispatch, isF
                                                                                 numberOfFilesProcessedAux += 1;
                                                                                 data = null;
                                                                                 setNumberOfFilesProcessed(numberOfFilesProcessedAux);
-                                                                                dispatch(setSyncState(("Synced " + numberOfFilesProcessedAux + "/" + totalNumberOfFiles)));
+                                                                                dispatch(setSyncState(({id: 'sync', name: 'Syncing', status: numberOfFilesProcessedAux + "/" + totalNumberOfFiles})));
                                                                                 resolve('Finished inserting');
                                                                             })
                                                                             .catch((errorBulk) => {
@@ -530,7 +530,7 @@ export async function processFile (path, type, totalNumberOfFiles, dispatch, isF
                                                                                 data = null;
                                                                                 promises = null;
                                                                                 setNumberOfFilesProcessed(numberOfFilesProcessedAux);
-                                                                                dispatch(setSyncState(("Synced " + numberOfFilesProcessedAux + "/" + totalNumberOfFiles)));
+                                                                                dispatch(setSyncState(({id: 'sync', name: 'Syncing', status: numberOfFilesProcessedAux + "/" + totalNumberOfFiles})));
                                                                                 resolve('Finished syncing');
                                                                             })
                                                                             .catch((error) => {
@@ -580,7 +580,7 @@ export async function processFile (path, type, totalNumberOfFiles, dispatch, isF
                                                         numberOfFilesProcessedAux += 1;
                                                         data = null;
                                                         setNumberOfFilesProcessed(numberOfFilesProcessedAux);
-                                                        dispatch(setSyncState(("Synced " + numberOfFilesProcessedAux + "/" + totalNumberOfFiles)));
+                                                        dispatch(setSyncState(({id: 'sync', name: 'Syncing', status: numberOfFilesProcessedAux + "/" + totalNumberOfFiles})));
                                                         resolve('Finished inserting');
                                                     })
                                                     .catch((errorBulk) => {
@@ -603,7 +603,7 @@ export async function processFile (path, type, totalNumberOfFiles, dispatch, isF
                                                         numberOfFilesProcessedAux += 1;
                                                         data = null;
                                                         setNumberOfFilesProcessed(numberOfFilesProcessedAux);
-                                                        dispatch(setSyncState(("Synced " + numberOfFilesProcessedAux + "/" + totalNumberOfFiles)));
+                                                        dispatch(setSyncState(({id: 'sync', name: 'Syncing', status: numberOfFilesProcessedAux + "/" + totalNumberOfFiles})));
                                                         resolve('Finished syncing');
                                                     })
                                                     .catch((error) => {
