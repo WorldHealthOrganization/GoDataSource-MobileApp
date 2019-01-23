@@ -35,6 +35,7 @@ class SwitchInput extends PureComponent {
     };
 
     editInput = () => {
+        console.log('Render stuff: ', this.props.value);
         let tooltip = getTooltip(this.props.label, this.props.translation, this.props.tooltipsMessage, this.props.tooltipsMessage);
         return (
             <View style={[{flexDirection: 'row', marginVertical: 10}, this.props.style]}>
@@ -43,6 +44,19 @@ class SwitchInput extends PureComponent {
                 </Text>
                 <Switch
                     value={this.props.value}
+                    onColor={this.props.activeButtonColor}
+                    onTintColor={this.props.activeBackgroundColor}
+                    onValueChange={(state) => this.props.onChange(
+                        state,
+                        this.props.id,
+                        this.props.objectType ? (this.props.objectType == 'Address' ? this.props.index : (
+                            this.props.objectType == 'LabResult' ? this.props.index : this.props.objectType
+                        )) : null,
+                        this.props.objectType)}
+                    height={18}
+                    width={40}
+                    thumbSize={16}
+                    offColor={'gray'}
                 />
                 {
                     tooltip.hasTooltip === true ? (
