@@ -273,7 +273,8 @@ class ContactsSingleAddress extends PureComponent {
 
     handleNextButton = () => {
         if (this.props.isNew) {
-            if (this.props.checkRequiredFieldsAddresses()) {
+            let missingFields = this.props.checkRequiredFieldsAddresses();
+            if (missingFields && Array.isArray(missingFields) && missingFields.length === 0) {
                 if (this.props.hasPlaceOfResidence !== undefined && this.props.hasPlaceOfResidence === true){
                     this.props.handleMoveToNextScreenButton(true)
                 } else {
@@ -285,7 +286,7 @@ class ContactsSingleAddress extends PureComponent {
                     ])
                 }
             } else {
-                Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.alertMessages.addressRequiredFieldsMissing, this.props.translation), [
+                Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), `${getTranslation(translations.alertMessages.addressRequiredFieldsMissing, this.props.translation)}.\n${getTranslation(translations.alertMessages.missingFields, this.props.translation)}: ${missingFields}`, [
                     {
                         text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation), 
                         onPress: () => {console.log("OK pressed")}
