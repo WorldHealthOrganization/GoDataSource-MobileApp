@@ -283,7 +283,13 @@ class CaseSinglePersonalContainer extends PureComponent {
                     getTranslation(this.props.case.documents[index][item.id], this.props.translation) : '';
             }
         }
-        return this.props.case && this.props.case[item.id] ? getTranslation(this.props.case[item.id], this.props.translation) : '';
+        if (item.id === 'age') {
+            if (this.props.case && this.props.case[item.id] !== null && this.props.case[item.id] !== undefined) {
+             return this.props.case[item.id]
+            }
+        } else {
+            return this.props.case && this.props.case[item.id] ? getTranslation(this.props.case[item.id], this.props.translation) : '';
+        }
     };
 
     handleNextButton = () => {
