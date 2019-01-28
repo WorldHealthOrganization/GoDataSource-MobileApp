@@ -71,7 +71,7 @@ class FirstConfigScreen extends Component {
                     ) : (null)
                 }
                 {
-                    this.props && this.props.activeDatabase ? (
+                    this.props && this.props.activeDatabase && !this.props.skipEdit ? (
                         <Ripple style={{flexDirection: 'row', alignItems: 'center', position: "absolute", top: 20, right: 20}} onPress={this.handleOnPressForward}>
                             <Text style={{fontFamily: 'Roboto-Medium', fontSize: 18, color: 'white'}}>Current Hub config</Text>
                             <Icon name="arrow-forward"/>
@@ -119,7 +119,8 @@ class FirstConfigScreen extends Component {
             screen: 'QRScanScreen',
             animated: true,
             passProps: {
-                pushNewScreen: this.pushNewScreen
+                pushNewScreen: this.pushNewScreen,
+                allowBack: this.props.allowBack
             }
         })
     };
@@ -145,16 +146,19 @@ class FirstConfigScreen extends Component {
         })
     };
 
-    pushNewScreen = (QRCodeInfo) => {
+    pushNewScreen = (QRCodeInfo, allowBack, skipEdit) => {
         console.log('PushNewScreen: ', QRCodeInfo);
         if (QRCodeInfo) {
-            this.props.navigator.dismissAllModals();
+            // this.props.navigator.dismissAllModals();
             this.props.navigator.push({
                 screen: 'ManualConfigScreen',
-                // animated: true,
-                // animationType: 'fade',
+                animated: true,
+                animationType: 'fade',
                 passProps: {
-                    QRCodeInfo: QRCodeInfo
+                    QRCodeInfo: QRCodeInfo,
+                    allowBack: allowBack,
+                    isNewHub: true,
+                    skipEdit: skipEdit
                 }
             })
         } else {

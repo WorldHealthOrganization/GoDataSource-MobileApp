@@ -250,6 +250,8 @@ export default {
     'LNG_DIALOG_ALERT_MESSAGE_NUMBER_OF_MONTHS_MUST_BE_BETWEEN_MESSAGE': 'Number of months must be between 0 and 11',
     'LNG_DIALOG_ALERT_MESSAGE_NUMBER_OF_YEARS_MUST_BE_BETWEEN_MESSAGE': 'Number of years must be between 0 and 150',
     'LNG_DIALOG_ALERT_MESSAGE_COMPLETE_ALL_MISSING_REQUIRED_FIELDS': 'Some of the required fields are missing. Please make sure you have completed them',
+    'LNG_DIALOG_ALERT_MESSAGE_COMPLETE_ALL_MISSING_RELATIONSHIPS': 'You have not added any relationships. Please add at least one',
+    'LNG_DIALOG_ALERT_MESSAGE_COMPLETE_ALL_MISSING_FIELDS': 'Missing fields',
     'LNG_DIALOG_ALERT_MESSAGE_THERE_WAS_AN_ISSUE_GETTING_YOUR_LOCATION': 'There was an issue with getting your location',
     'LNG_DIALOG_ALERT_MESSAGE_MAKE_SURE_YOU_COMPLETE_ALL_FIELDS': 'Please make sure you have completed the fields',
     'LNG_DIALOG_ALERT_MESSAGE_ERROR_OCCURED_WHILE_GETTING_CONTACTS': 'An error occurred while getting contacts',

@@ -141,11 +141,12 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
 
     onPressSave = () => {
         // First check if all the required questions are filled
-        console.log("Check required questions: ", this.checkRequiredQuestions());
-        if (this.checkRequiredQuestions()) {
+        let checkRequiredFields = this.checkRequiredQuestions();
+        console.log("Check required questions: ", checkRequiredFields);
+        if (checkRequiredFields && Array.isArray(checkRequiredFields) && checkRequiredFields.length === 0) {
             this.props.onPressSave();
         } else {
-            Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.requiredFieldsMissingError, this.props.translation), [
+            Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), `${getTranslation(translations.alertMessages.requiredFieldsMissingError, this.props.translation)}.\n${getTranslation(translations.alertMessages.missingFields, this.props.translation)}: ${checkRequiredFields}`, [
                 {
                     text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation), 
                     onPress: () => {console.log("OK pressed")}
@@ -155,19 +156,22 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
     };
 
     checkRequiredQuestions = () => {
+        let requiredQuestions = [];
         // Loop through all categories' questions and if a required question is unanswered return false
         if (this.state.questions && Array.isArray(this.state.questions) && this.state.questions.length > 0) {
             for (let i = 0; i < this.state.questions.length; i++) {
                 if (this.state.questions[i].variable && this.props.item) {
                     if (this.state.questions[i].required === true) {
                         if (!this.props.item.questionnaireAnswers || !this.props.item.questionnaireAnswers[this.state.questions[i].variable]) {
-                            return false;
+                            requiredQuestions.push(getTranslation(this.state.questions[i].text, this.props.translation));
+                            // return false;
                         }
                     }
                 }
             }
         }
-        return true;
+        return requiredQuestions;
+        // return true;
     };
 }
 
