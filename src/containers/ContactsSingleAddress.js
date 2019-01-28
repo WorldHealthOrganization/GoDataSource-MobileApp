@@ -203,7 +203,6 @@ class ContactsSingleAddress extends PureComponent {
                 onChangeSectionedDropDown={this.props.onChangeSectionedDropDown}
                 onDeletePress={this.props.onDeletePress}
                 anotherPlaceOfResidenceWasChosen={this.props.anotherPlaceOfResidenceWasChosen}
-                anotherPlaceOfResidenceChanged={this.props.anotherPlaceOfResidenceChanged}
             />
         )
     };

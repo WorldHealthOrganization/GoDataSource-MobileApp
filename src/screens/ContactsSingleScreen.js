@@ -71,7 +71,22 @@ class ContactsSingleScreen extends Component {
                 },
                 dateOfReporting: new Date(),
                 isDateOfReportingApproximate: false,
-                relationships: [],
+                relationships: [
+                    {
+                        outbreakId: this.props.user.activeOutbreakId,
+                        contactDate: new Date(),
+                        contactDateEstimated: false,
+                        certaintyLevelId: '',
+                        exposureTypeId: '',
+                        exposureFrequencyId: '',
+                        exposureDurationId: '',
+                        socialRelationshipTypeId: '',
+                        socialRelationshipDetail: '',
+                        clusterId: '',
+                        comment: '',
+                        persons: []
+                    }
+                ],
                 addresses: [
                     {
                         typeId: config.userResidenceAddress.userPlaceOfResidence,
@@ -178,6 +193,29 @@ class ContactsSingleScreen extends Component {
                     }
                 }
             })
+        } else if (this.props.isNew === true) {
+            let personsArray = [] 
+            if (this.props.addContactFromCasesScreen !== null && this.props.addContactFromCasesScreen !== undefined && this.props.caseIdFromCasesScreen !== null && this.props.caseIdFromCasesScreen !== undefined) {
+                personsArray = [{
+                    id: extractIdFromPouchId(this.props.caseIdFromCasesScreen, 'person'),
+                    type: config.personTypes.cases,
+                    source: true,
+                    target: null
+                },{
+                    id: null,
+                    type: config.personTypes.contacts,
+                    source: null,
+                    target: true
+                }]
+
+                let relationshipsClone = _.cloneDeep(this.state.contact.relationships)
+                relationshipsClone[0].persons = personsArray
+                this.setState(prevState => ({
+                    contact: Object.assign({}, prevState.contact, {relationships: relationshipsClone})
+                }), () => {
+                    console.log('After changing state componentDidMount: ', this.state.contact);
+                })
+            }
         }
     };
 
@@ -430,7 +468,6 @@ class ContactsSingleScreen extends Component {
                         checkRequiredFieldsAddresses={this.checkRequiredFieldsAddresses}
                         isNew={this.props.isNew}
                         anotherPlaceOfResidenceWasChosen={this.state.anotherPlaceOfResidenceWasChosen}
-                        anotherPlaceOfResidenceChanged={this.anotherPlaceOfResidenceChanged}
                         hasPlaceOfResidence={this.state.hasPlaceOfResidence}
                         isEditMode={this.state.isEditMode}
                     />
@@ -443,13 +480,16 @@ class ContactsSingleScreen extends Component {
                         onPressEditExposure={this.handleOnPressEditExposure}
                         onPressDeleteExposure={this.handleOnPressDeleteExposure}
                         addContactFromCasesScreen={this.props.addContactFromCasesScreen}
-                        caseIdFromCasesScreen={this.props.caseIdFromCasesScreen}
                         navigator={this.props.navigator}
                         saveExposure={this.handleSaveExposure}
                         handleMoveToPrevieousScreenButton={this.handleMoveToPrevieousScreenButton}
                         isNew={this.props.isNew}
                         handleOnPressSave={this.handleOnPressSave}
                         isEditMode={this.state.isEditMode}
+                        onChangeText={this.handleOnChangeText}
+                        onChangeDropDown={this.handleOnChangeDropDown}
+                        onChangeDate={this.handleOnChangeDate}
+                        onChangeSwitch={this.handleOnChangeSwitch}
                     />
                 );
             case 'calendar':
@@ -562,12 +602,31 @@ class ContactsSingleScreen extends Component {
                         contact: Object.assign({}, prevState.contact, {[id]: value}),
                         isModified: true
                     }))
-            } else {
-                if (typeof objectType === 'phoneNumber' && objectType >= 0 || typeof objectType === 'number' && objectType >= 0) {
-                    // Change address drop down
-                    let addressesClone = _.cloneDeep(this.state.contact.addresses);
-                    // Check if the lat/lng have changed
-                    if (id === 'lng') {
+            } else if (objectType === 'Exposure' && this.props.isNew === true) {
+                let relationshipsClone = _.cloneDeep(this.state.contact.relationships);
+                relationshipsClone[0][id] = value && value.value ? value.value : value;
+                this.setState(prevState => ({
+                    contact: Object.assign({}, prevState.contact, {relationships: relationshipsClone}),
+                    isModified: true
+                }))
+            } else if (typeof objectType === 'phoneNumber' && objectType >= 0 || typeof objectType === 'number' && objectType >= 0) {
+                let addressesClone = _.cloneDeep(this.state.contact.addresses);
+                if (id === 'lng') {
+                    if (!addressesClone[objectType].geoLocation) {
+                        addressesClone[objectType].geoLocation = {};
+                        addressesClone[objectType].geoLocation.type = 'Point';
+                        if (!addressesClone[objectType].geoLocation.coordinates) {
+                            addressesClone[objectType].geoLocation.coordinates = [];
+                        }
+                    }
+                    if (!addressesClone[objectType].geoLocation.coordinates) {
+                            addressesClone[objectType].geoLocation.coordinates = [];
+                        }
+                    if (!addressesClone[objectType].geoLocation.type) {
+                            addressesClone[objectType].geoLocation.type = 'Point';
+                        }
+                    addressesClone[objectType].geoLocation.coordinates[0] = value && value.value ? value.value : parseFloat(value);
+                } else if (id === 'lat') {
                         if (!addressesClone[objectType].geoLocation) {
                             addressesClone[objectType].geoLocation = {};
                             addressesClone[objectType].geoLocation.type = 'Point';
@@ -581,33 +640,15 @@ class ContactsSingleScreen extends Component {
                         if (!addressesClone[objectType].geoLocation.type) {
                                 addressesClone[objectType].geoLocation.type = 'Point';
                             }
-                        addressesClone[objectType].geoLocation.coordinates[0] = value && value.value ? value.value : parseFloat(value);
-                    } else {
-                        if (id === 'lat') {
-                            if (!addressesClone[objectType].geoLocation) {
-                                addressesClone[objectType].geoLocation = {};
-                                addressesClone[objectType].geoLocation.type = 'Point';
-                                if (!addressesClone[objectType].geoLocation.coordinates) {
-                                    addressesClone[objectType].geoLocation.coordinates = [];
-                                }
-                            }
-                            if (!addressesClone[objectType].geoLocation.coordinates) {
-                                    addressesClone[objectType].geoLocation.coordinates = [];
-                                }
-                            if (!addressesClone[objectType].geoLocation.type) {
-                                    addressesClone[objectType].geoLocation.type = 'Point';
-                                }
-                            addressesClone[objectType].geoLocation.coordinates[1] = value && value.value ? value.value : parseFloat(value);
-                        } else {
-                            addressesClone[objectType][id] = value && value.value ? value.value : value;
-                        }
-                    }
-                    // console.log ('addressesClone', addressesClone);
-                    this.setState(prevState => ({
-                        contact: Object.assign({}, prevState.contact, {addresses: addressesClone}),
-                        isModified: true
-                    }))
+                        addressesClone[objectType].geoLocation.coordinates[1] = value && value.value ? value.value : parseFloat(value);
+                } else {
+                        addressesClone[objectType][id] = value && value.value ? value.value : value;
                 }
+
+                this.setState(prevState => ({
+                    contact: Object.assign({}, prevState.contact, {addresses: addressesClone}),
+                    isModified: true
+                }))
             }
         }
     };
@@ -691,19 +732,23 @@ class ContactsSingleScreen extends Component {
                             console.log("onChangeDate", id, " ", value, " ", this.state.contact);
                         }
                     )
-                } else {
-                    if (typeof objectType === 'phoneNumber' && objectType >= 0 || typeof objectType === 'number' && objectType >= 0) {
-                        // Change address date
-                        let addressesClone = _.cloneDeep(this.state.contact.addresses);
-                        addressesClone[objectType][id] = value && value.value ? value.value : value;
-                        console.log ('addressesClone', addressesClone)
-                        this.setState(prevState => ({
-                            contact: Object.assign({}, prevState.contact, {addresses: addressesClone}),
-                            isModified: true
-                        }), () => {
-                            console.log("handleOnChangeDate", id, " ", value, " ", this.state.contact);
-                        })
-                    }
+                } else if (objectType === 'Exposure' && this.props.isNew === true) {
+                    let relationshipsClone = _.cloneDeep(this.state.contact.relationships);
+                    relationshipsClone[0][id] = value && value.value ? value.value : value;
+                    this.setState(prevState => ({
+                        contact: Object.assign({}, prevState.contact, {relationships: relationshipsClone}),
+                        isModified: true
+                    }))
+                } else if (typeof objectType === 'phoneNumber' && objectType >= 0 || typeof objectType === 'number' && objectType >= 0) {
+                    let addressesClone = _.cloneDeep(this.state.contact.addresses);
+                    addressesClone[objectType][id] = value && value.value ? value.value : value;
+                    console.log ('addressesClone', addressesClone)
+                    this.setState(prevState => ({
+                        contact: Object.assign({}, prevState.contact, {addresses: addressesClone}),
+                        isModified: true
+                    }), () => {
+                        console.log("handleOnChangeDate", id, " ", value, " ", this.state.contact);
+                    })
                 }
             }
         }
@@ -782,13 +827,20 @@ class ContactsSingleScreen extends Component {
                             console.log("onChangeSwitch", id, " ", value, " ", this.state.contact);
                         }
                     )
+                } else if (objectType === 'Exposure' && this.props.isNew === true) {
+                    let relationshipsClone = _.cloneDeep(this.state.contact.relationships);
+                    relationshipsClone[0][id] = value && value.value ? value.value : value;
+                    this.setState(prevState => ({
+                        contact: Object.assign({}, prevState.contact, {relationships: relationshipsClone}),
+                        isModified: true
+                    }))
                 }
             }
         }
 
     };
 
-    handleOnChangeDropDown = (value, id, objectType) => {
+    handleOnChangeDropDown = (value, id, objectType, type) => {
         console.log("onChangeDropDown: ", value, id, objectType, this.state.contact);
         if (objectType === 'FollowUp' || id === 'address') {
             if (id === 'address') {
@@ -818,58 +870,57 @@ class ContactsSingleScreen extends Component {
                     }
                 )
             }
-
-        } else {
-            if (objectType === 'Contact') {
-                this.setState(
-                    (prevState) => ({
-                        contact: Object.assign({}, prevState.contact, {[id]: value && value.value ? value.value : value}),
-                        isModified: true
-                    }), () => {
-                        console.log("onChangeDropDown", id, " ", value, " ", this.state.contact);
-                    }
-                )
-            } else {
-                if (typeof objectType === 'number' && objectType >= 0) {
-                    // Change address drop down
-                    let addressesClone = _.cloneDeep(this.state.contact.addresses);
-
-                    let anotherPlaceOfResidenceWasChosen = false;
-                    if (value && value.value){
-                        if(value.value === config.userResidenceAddress.userPlaceOfResidence){
-                            addressesClone.forEach(element => {
-                                if (element[id] === value.value){
-                                    element[id] = config.userResidenceAddress.userOtherResidence
-                                    anotherPlaceOfResidenceWasChosen = true
-                                }
-                            });
-                        }
-                    }
-
-                    addressesClone[objectType][id] = value && value.value ? value.value : value;
-                    let hasPlaceOfResidence = false;
-                    let contactPlaceOfResidence = addressesClone.filter((e) => {return e.typeId === config.userResidenceAddress.userPlaceOfResidence});
-                    if (contactPlaceOfResidence && contactPlaceOfResidence.length > 0) {
-                        hasPlaceOfResidence = true
-                    }
-
-                    this.setState(prevState => ({
-                        contact: Object.assign({}, prevState.contact, {addresses: addressesClone}),
-                        isModified: true,
-                        anotherPlaceOfResidenceWasChosen,
-                        hasPlaceOfResidence
-                    }), () => {
-                        console.log("onChangeDropDown", id, " ", value, " ", this.state.contact);
-                    })
+        } else if (objectType === 'Contact') {
+            this.setState(
+                (prevState) => ({
+                    contact: Object.assign({}, prevState.contact, {[id]: value && value.value ? value.value : value}),
+                    isModified: true
+                }), () => {
+                    console.log("onChangeDropDown", id, " ", value, " ", this.state.contact);
                 }
-            }
-        }
-    };
+            )
+        } else if (type && type === 'Exposure' && this.props.isNew === true) {
+            let relationshipsClone = _.cloneDeep(this.state.contact.relationships);
+            relationshipsClone[0][id] = value && value.value ? value.value : value;
+            this.setState(prevState => ({
+                contact: Object.assign({}, prevState.contact, {relationships: relationshipsClone}),
+                isModified: true
+            }), () => {
+                console.log('After changing state handleOnChangeDropDown: ', this.state.contact);
+            })
+        } else if (typeof objectType === 'number' && objectType >= 0) {
+            if (type && type === 'Address') {
+                let addressesClone = _.cloneDeep(this.state.contact.addresses);
 
-    anotherPlaceOfResidenceChanged = () => {
-        this.setState({
-            anotherPlaceOfResidenceWasChosen: false
-        })
+                let anotherPlaceOfResidenceWasChosen = false;
+                if (value && value.value){
+                    if(value.value === config.userResidenceAddress.userPlaceOfResidence){
+                        addressesClone.forEach(element => {
+                            if (element[id] === value.value){
+                                element[id] = config.userResidenceAddress.userOtherResidence
+                                anotherPlaceOfResidenceWasChosen = true
+                            }
+                        });
+                    }
+                }
+
+                addressesClone[objectType][id] = value && value.value ? value.value : value;
+                let hasPlaceOfResidence = false;
+                let contactPlaceOfResidence = addressesClone.filter((e) => {return e.typeId === config.userResidenceAddress.userPlaceOfResidence});
+                if (contactPlaceOfResidence && contactPlaceOfResidence.length > 0) {
+                    hasPlaceOfResidence = true
+                }
+                
+                this.setState(prevState => ({
+                    contact: Object.assign({}, prevState.contact, {addresses: addressesClone}),
+                    isModified: true,
+                    anotherPlaceOfResidenceWasChosen,
+                    hasPlaceOfResidence
+                }), () => {
+                    console.log("onChangeDropDown", id, " ", value, " ", this.state.contact);
+                })
+            } 
+        } 
     };
 
     handleOnChangeSectionedDropDown = (selectedItems, index) => {
@@ -935,7 +986,6 @@ class ContactsSingleScreen extends Component {
                 contact: this.props.isNew ? null: this.props.contact,
                 type: 'Contact',
                 saveExposure: this.handleSaveExposure,
-                addContactFromCasesScreen: this.props.addContactFromCasesScreen,
                 caseIdFromCasesScreen: this.props.caseIdFromCasesScreen
             }
         })

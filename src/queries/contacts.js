@@ -236,7 +236,7 @@ export function getContactByIdRequest(outbreakId, contactId, token, callback) {
 
     database.get(contactId)
         .then((resultGetContactById) => {
-            console.log("Result getContactByIdRequest: ");
+            console.log("Result getContactByIdRequest: ", resultGetContactById);
             callback(null, resultGetContactById);
         })
         .catch((errorGetContactById) => {
