@@ -436,7 +436,7 @@ class FirstConfigScreen extends Component {
                                             this.showAlert(getTranslation(translations.hubConfigScreen.saveCurrentHubTitle, this.props.translation), getTranslation(translations.hubConfigScreen.saveCurrentHubMessage, this.props.translation));
                                         } else {
                                             this.setState({
-                                                allDatabases,
+                                                allDatabases: allDatabases.filter((e) => {return e.id !== server}),
                                                 isModified: false
                                             }, () => {
                                                 console.log('Finished updating current credentials');
@@ -466,7 +466,8 @@ class FirstConfigScreen extends Component {
         this.props.navigator.push({
             screen: 'FirstConfigScreen',
             passProps: {
-                allowBack: true
+                allowBack: true,
+                skipEdit: true
             }
         })
     };

@@ -474,7 +474,8 @@ class CaseSingleScreen extends Component {
     };
     //Save case
     handleOnPressSave = () => {
-        if (this.checkRequiredFields()) {
+        let missingFields = this.checkRequiredFields();
+        if (missingFields && Array.isArray(missingFields) && missingFields.length === 0) {
             if (this.checkAgeYearsRequirements()) {
                 if (this.checkAgeMonthsRequirements()) {
                     if (this.state.hasPlaceOfResidence === true){
@@ -574,7 +575,7 @@ class CaseSingleScreen extends Component {
                 ])
             }
         } else {
-            Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.requiredFieldsMissingError, this.props.translation), [
+            Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), `${getTranslation(translations.alertMessages.requiredFieldsMissingError, this.props.translation)}.\n${getTranslation(translations.alertMessages.missingFields, this.props.translation)}: ${missingFields}`, [
                 {
                     text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation), 
                     onPress: () => {this.hideMenu()}
@@ -916,10 +917,12 @@ class CaseSingleScreen extends Component {
     // Check required fields functions
     checkRequiredFieldsPersonalInfo = () => {
         //personal info
+        let requiredFields = [];
         for(let i=0; i<config.caseSingleScreen.personal.length; i++) {
             for (let j=0; j<config.caseSingleScreen.personal[i].fields.length; j++) {
                 if (config.caseSingleScreen.personal[i].fields[j].isRequired && !this.state.case[config.caseSingleScreen.personal[i].fields[j].id]) {
-                    return false;
+                    requiredFields.push(getTranslation(config.caseSingleScreen.personal[i].fields[j].label, this.props.translation));
+                    // return false;
                 }
             }
         }
@@ -929,33 +932,41 @@ class CaseSingleScreen extends Component {
             for (let i=0; i < this.state.case.documents.length; i++) {
                 for (let j=0; j<config.caseSingleScreen.document.fields.length; j++) {
                     if (config.caseSingleScreen.document.fields[j].isRequired && !this.state.case.documents[i][config.caseSingleScreen.document.fields[j].id]) {
-                        return false;
+                        requiredFields.push(getTranslation(config.caseSingleScreen.document.fields[j].label, this.props.translation));
+                        // return false;
                     }
                 }
             }
         }
-        return true
+        return requiredFields;
+        // return true;
     };
     checkRequiredFieldsAddresses = () => {
+        let requiredFields = [];
         if (this.state.case && this.state.case.addresses && Array.isArray(this.state.case.addresses) && this.state.case.addresses.length > 0) {
             for (let i=0; i < this.state.case.addresses.length; i++) {
                 for (let j=0; j<config.caseSingleScreen.address.fields.length; j++) {
                     if (config.caseSingleScreen.address.fields[j].isRequired && !this.state.case.addresses[i][config.caseSingleScreen.address.fields[j].id]) {
-                        return false;
+                        requiredFields.push(getTranslation(config.caseSingleScreen.address.fields[j].label, this.props.translation));
+                        // return false;
                     }
                 }
             }
         } else {
-            return false;
+            return requiredFields;
+            // return false;
         }
-        return true
+        return requiredFields;
+        // return true;
     };
     checkRequiredFieldsInfection = () => {
+        let requiredFields = [];
         //infection general info
         for(let i=0; i<config.caseSingleScreen.infection.length; i++) {
             for (let j=0; j<config.caseSingleScreen.infection[i].fields.length; j++) {
                 if (config.caseSingleScreen.infection[i].fields[j].isRequired && !this.state.case[config.caseSingleScreen.infection[i].fields[j].id]) {
-                    return false;
+                    requiredFields.push(getTranslation(config.caseSingleScreen.infection[i].fields[j].label, this.props.translation));
+                    // return false;
                 }
             }
         }
@@ -965,7 +976,8 @@ class CaseSingleScreen extends Component {
             for (let i=0; i < this.state.case.hospitalizationDates.length; i++) {
                 for (let j=0; j<config.caseSingleScreen.hospitalizationDate.fields.length; j++) {
                     if (config.caseSingleScreen.hospitalizationDate.fields[j].isRequired && !this.state.case.hospitalizationDates[i][config.caseSingleScreen.hospitalizationDate.fields[j].id]) {
-                        return false;
+                        requiredFields.push(getTranslation(config.caseSingleScreen.hospitalizationDate.fields[j].label, this.props.translation));
+                        // return false;
                     }
                 }
             }
@@ -976,14 +988,17 @@ class CaseSingleScreen extends Component {
             for (let i=0; i < this.state.case.isolationDates.length; i++) {
                 for (let j=0; j<config.caseSingleScreen.isolationDate.fields.length; j++) {
                     if (config.caseSingleScreen.isolationDate.fields[j].isRequired && !this.state.case.isolationDates[i][config.caseSingleScreen.isolationDate.fields[j].id]) {
-                        return false;
+                        requiredFields.push(getTranslation(config.caseSingleScreen.isolationDate.fields[j].label, this.props.translation));
+                        // return false;
                     }
                 }
             }
         }
-        return true
+        return requiredFields;
+        // return true
     };
     checkRequiredFieldsCaseInvestigationQuestionnaire = () => {
+        let requiredFields = [];
         for (let i = 0; i< this.props.caseInvestigationQuestions.length; i++) {
             let questionnaireAnswer = this.state.case.questionnaireAnswers[this.props.caseInvestigationQuestions[i].variable];
             if (this.props.caseInvestigationQuestions[i].required){
@@ -991,19 +1006,23 @@ class CaseSingleScreen extends Component {
                 if(Array.isArray(questionnaireAnswer)){
                     //if is empty
                     if(_.isEmpty(questionnaireAnswer))
-                        return false;
+                        requiredFields.push(getTranslation(this.props.caseInvestigationQuestions[i].text, this.props.translation));
+                        // return false;
                 }else{
                     //regular question missing answer
                     if(!questionnaireAnswer)
-                        return false;
+                        requiredFields.push(getTranslation(this.props.caseInvestigationQuestions[i].text, this.props.translation));
+                        // return false;
                 }
             }
         }
-
-        return true;
+        return requiredFields;
+        // return true;
     };
     checkRequiredFields = () => {
-        return this.checkRequiredFieldsPersonalInfo() && this.checkRequiredFieldsAddresses() && this.checkRequiredFieldsInfection() && this.checkRequiredFieldsCaseInvestigationQuestionnaire()
+        let requiredFields = [];
+        return requiredFields.concat(this.checkRequiredFieldsPersonalInfo(), this.checkRequiredFieldsAddresses(), this.checkRequiredFieldsInfection(), this.checkRequiredFieldsCaseInvestigationQuestionnaire());
+        // return this.checkRequiredFieldsPersonalInfo() && this.checkRequiredFieldsAddresses() && this.checkRequiredFieldsInfection() && this.checkRequiredFieldsCaseInvestigationQuestionnaire()
     };
     checkAgeYearsRequirements = () => {
         if (this.state.selectedItemIndexForAgeUnitOfMeasureDropDown === 0) {
@@ -1133,7 +1152,7 @@ class CaseSingleScreen extends Component {
         }
     };
     onChangeDate = (value, id, objectTypeOrIndex, objectType) => {
-        console.log("case onChangeDate: ", value, id, objectTypeOrIndex, objectType);
+        // console.log("case onChangeDate: ", value, id, objectTypeOrIndex, objectType);
         if (id === 'dob') {
             let today = new Date()
             let nrOFYears = this.calcDateDiff(value, today);
@@ -1157,7 +1176,7 @@ class CaseSingleScreen extends Component {
                     selectedItemIndexForAgeUnitOfMeasureDropDown,
                     isModified: true
                 }), () => {
-                    console.log("handleOnChangeDate dob", id, " ", value, " ", this.state.case);
+                    // console.log("handleOnChangeDate dob", id, " ", value, " ", this.state.case);
                 })
             }
         } else {
@@ -1167,7 +1186,7 @@ class CaseSingleScreen extends Component {
                     isModified: true
                 })
                 , () => {
-                    console.log("onChangeDate", id, " ", value, " ", this.state.case);
+                    // console.log("onChangeDate", id, " ", value, " ", this.state.case);
                 })
             } else {
                 if (typeof objectTypeOrIndex === 'phoneNumber' && objectTypeOrIndex >= 0 || typeof objectTypeOrIndex === 'number' && objectTypeOrIndex >= 0) {
@@ -1179,7 +1198,7 @@ class CaseSingleScreen extends Component {
                             case: Object.assign({}, prevState.case, {hospitalizationDates: hospitalizationDatesClone}),
                             isModified: true
                         }), () => {
-                            console.log("onChangeDate HospitalizationDates", id, " ", value, " ", this.state.case);
+                            // console.log("onChangeDate HospitalizationDates", id, " ", value, " ", this.state.case);
                         })
                     } else if (objectType && objectType === 'IsolationDates') {
                         let isolationDatesClone = _.cloneDeep(this.state.case.isolationDates);
@@ -1189,7 +1208,7 @@ class CaseSingleScreen extends Component {
                             case: Object.assign({}, prevState.case, {isolationDates: isolationDatesClone}),
                             isModified: true
                         }), () => {
-                            console.log("onChangeDate IsolationDates", id, " ", value, " ", this.state.case);
+                            // console.log("onChangeDate IsolationDates", id, " ", value, " ", this.state.case);
                         })
                     } else if (objectType && objectType === 'Address') {
                         let addressesClone = _.cloneDeep(this.state.case.addresses);
@@ -1199,7 +1218,7 @@ class CaseSingleScreen extends Component {
                             case: Object.assign({}, prevState.case, {addresses: addressesClone}),
                             isModified: true
                         }), () => {
-                            console.log("onChangeDate addressesClone", id, " ", value, " ", this.state.case);
+                            // console.log("onChangeDate addressesClone", id, " ", value, " ", this.state.case);
                         })
                     }
                 }
@@ -1214,7 +1233,7 @@ class CaseSingleScreen extends Component {
                             item: Object.assign({}, prevState.item, {[id]: value ? {lat: position.coords.latitude, lng: position.coords.longitude} : null }),
                             isModified: true
                         }), () => {
-                            console.log("onChangeSwitch", id, " ", value, " ", this.state.item);
+                            // console.log("onChangeSwitch", id, " ", value, " ", this.state.item);
                         }
                     )
                 },
@@ -1236,21 +1255,21 @@ class CaseSingleScreen extends Component {
                         case: Object.assign({}, prevState.case, {[id]: value}),
                         isModified: true
                     }), () => {
-                            console.log("onChangeSwitch", id, " ", value, " ", this.state.case);
+                            // console.log("onChangeSwitch", id, " ", value, " ", this.state.case);
                     }
                 )
             }
         }
     };
     onChangeDropDown = (value, id, objectTypeOrIndex, objectType) => {
-        console.log("case onChangeDropDown: ", value, id, objectTypeOrIndex, this.state.case);
+        // console.log("case onChangeDropDown: ", value, id, objectTypeOrIndex, this.state.case);
         if(objectTypeOrIndex === 'Case') {
             this.setState(
                 (prevState) => ({
                     case: Object.assign({}, prevState.case, {[id]: value && value.value ? value.value : value}),
                     isModified: true
                 }), () => {
-                    console.log("onChangeDropDown", id, " ", value, " ", this.state.case);
+                    // console.log("onChangeDropDown", id, " ", value, " ", this.state.case);
                 }
             )
         } else {
@@ -1284,7 +1303,7 @@ class CaseSingleScreen extends Component {
                         anotherPlaceOfResidenceWasChosen,
                         hasPlaceOfResidence
                     }), () => {
-                        console.log("onChangeDropDown", id, " ", value, " ", this.state.case);
+                        // console.log("onChangeDropDown", id, " ", value, " ", this.state.case);
                     })
                 } else if (objectType === 'Documents') {
                         let documentsClone = _.cloneDeep(this.state.case.documents);
@@ -1294,14 +1313,14 @@ class CaseSingleScreen extends Component {
                             case: Object.assign({}, prevState.case, {documents: documentsClone}),
                             isModified: true
                         }), () => {
-                            console.log("onChangeDropDown", id, " ", value, " ", this.state.case);
+                            // console.log("onChangeDropDown", id, " ", value, " ", this.state.case);
                         })
                 }
             }
         }
     };
     handleOnChangeTextInputWithDropDown = (value, id, objectType, stateValue) => {
-        console.log("handleOnChangeTextInputWithDropDown: ",value, id, objectType, stateValue, this.state.case);
+        // console.log("handleOnChangeTextInputWithDropDown: ",value, id, objectType, stateValue, this.state.case);
 
         if (stateValue !== undefined && stateValue !== null){
             if (id === 'age'){
@@ -1316,7 +1335,7 @@ class CaseSingleScreen extends Component {
                     case: Object.assign({}, prevState.case, {age: ageClone}, {dob: null}),
                     isModified: true
                 }), () => {
-                    console.log("handleOnChangeTextInputWithDropDown done", id, " ", value, " ", this.state.case);
+                    // console.log("handleOnChangeTextInputWithDropDown done", id, " ", value, " ", this.state.case);
                 })
             }
         }
@@ -1336,14 +1355,14 @@ class CaseSingleScreen extends Component {
                 case: Object.assign({}, prevState.case, {dob: null}, {age: ageClone}),
                 isModified: true
             }), () => {
-                console.log ('handleOnChangeTextSwitchSelector', stateValue, this.state[stateValue])
+                // console.log ('handleOnChangeTextSwitchSelector', stateValue, this.state[stateValue])
             })
         } else {
             this.setState({
                 [stateValue]: index,
                 isModified: true
             }, () => {
-                console.log ('handleOnChangeTextSwitchSelector', stateValue, this.state[stateValue])
+                // console.log ('handleOnChangeTextSwitchSelector', stateValue, this.state[stateValue])
             })
         }
     };
@@ -1413,7 +1432,7 @@ class CaseSingleScreen extends Component {
 
     //labData Questionnaire onChange... functions
     onChangeTextAnswer = (value, id) => {
-        console.log ('onChangeTextAnswer', value, id)
+        // console.log ('onChangeTextAnswer', value, id)
         let itemClone = _.cloneDeep(this.state.case);
         let questionnaireAnswers = itemClone && itemClone.questionnaireAnswers ? itemClone.questionnaireAnswers : null;
         if (!itemClone.questionnaireAnswers) {
@@ -1425,11 +1444,11 @@ class CaseSingleScreen extends Component {
             case: Object.assign({}, prevState.case, {questionnaireAnswers: questionnaireAnswers}),
             isModified: true
             }), () => {
-                console.log ('onChangeMultipleSelection after setState', this.state.case)
+                // console.log ('onChangeMultipleSelection after setState', this.state.case)
             })
     };
     onChangeSingleSelection = (value, id) => {
-        console.log ('onChangeSingleSelection', value, id)
+        // console.log ('onChangeSingleSelection', value, id)
         let itemClone = _.cloneDeep(this.state.case);
         let questionnaireAnswers = itemClone && itemClone.questionnaireAnswers ? itemClone.questionnaireAnswers : null;
         if (!itemClone.questionnaireAnswers) {
@@ -1441,11 +1460,11 @@ class CaseSingleScreen extends Component {
             case: Object.assign({}, prevState.case, {questionnaireAnswers: questionnaireAnswers}),
             isModified: true
             }), () => {
-                console.log ('onChangeMultipleSelection after setState', this.state.case)
+                // console.log ('onChangeMultipleSelection after setState', this.state.case)
             })
     };
     onChangeMultipleSelection = (selections, id) => {
-        console.log ('onChangeMultipleSelection', selections, id)
+        // console.log ('onChangeMultipleSelection', selections, id)
         let itemClone = _.cloneDeep(this.state.case);
         let questionnaireAnswers = itemClone && itemClone.questionnaireAnswers ? itemClone.questionnaireAnswers : null;
         if (!itemClone.questionnaireAnswers) {
@@ -1457,11 +1476,11 @@ class CaseSingleScreen extends Component {
             case: Object.assign({}, prevState.case, {questionnaireAnswers: questionnaireAnswers}),
             isModified: true
             }), () => {
-                console.log ('onChangeMultipleSelection after setState', this.state.case)
+                // console.log ('onChangeMultipleSelection after setState', this.state.case)
             })
     };
     onChangeDateAnswer = (value, id) => {
-        console.log ('onChangeDateAnswer', value, id)
+        // console.log ('onChangeDateAnswer', value, id)
         let itemClone = _.cloneDeep(this.state.case);
         let questionnaireAnswers = itemClone && itemClone.questionnaireAnswers ? itemClone.questionnaireAnswers : null;
         if (!itemClone.questionnaireAnswers) {
@@ -1473,7 +1492,7 @@ class CaseSingleScreen extends Component {
             case: Object.assign({}, prevState.case, {questionnaireAnswers: questionnaireAnswers}),
             isModified: true
         }), () => {
-            console.log ('onChangeDateAnswer after setState', this.state.case)
+            // console.log ('onChangeDateAnswer after setState', this.state.case)
         })
     };
 
