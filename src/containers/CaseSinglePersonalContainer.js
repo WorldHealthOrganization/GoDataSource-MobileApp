@@ -293,7 +293,8 @@ class CaseSinglePersonalContainer extends PureComponent {
     };
 
     handleNextButton = () => {
-        if (this.props.checkRequiredFieldsPersonalInfo()) {
+        let missingFields = this.props.checkRequiredFieldsPersonalInfo();
+        if (missingFields && Array.isArray(missingFields) && missingFields.length === 0) {
             if (this.props.checkAgeYearsRequirements()) {
                 if (this.props.checkAgeMonthsRequirements()){
                     this.props.handleMoveToNextScreenButton()
@@ -314,7 +315,7 @@ class CaseSinglePersonalContainer extends PureComponent {
                 ])
             }
         } else {
-            Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.requiredFieldsMissingError, this.props.translation), [
+            Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), `${getTranslation(translations.alertMessages.requiredFieldsMissingError, this.props.translation)}.\n${getTranslation(translations.alertMessages.missingFields, this.props.translation)}: ${missingFields}`, [
                 {
                     text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation), 
                     onPress: () => {console.log("OK pressed")}

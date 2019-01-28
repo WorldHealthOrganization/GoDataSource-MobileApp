@@ -307,7 +307,7 @@ class ManualConfigScreen extends Component {
                             <Button upperCase={false} onPress={() => {this.checkFields('editCurrentConfiguration')}} text={'Edit current configuration'} style={styles.buttonLogin} />
                         ) : (null)
                     }
-                    <Button upperCase={false} onPress={() => {this.checkFields('saveHubConfiguration')}} text={getTranslation(translations.manualConfigScreen.saveHubConfigButton, null)} style={styles.buttonLogin} />
+                    <Button upperCase={false} onPress={() => {this.checkFields('saveHubConfiguration', true)}} text={getTranslation(translations.manualConfigScreen.saveHubConfigButton, null)} style={styles.buttonLogin} />
                 </View>
                 {
                     Platform.OS === 'ios' && this.props && this.props.screenSize.height < 600 && this.props.activeDatabase ? (null) : (
@@ -373,7 +373,8 @@ class ManualConfigScreen extends Component {
             this.props.navigator.resetTo({
                 screen: 'FirstConfigScreen',
                 passProps: {
-                    allowBack: this.props.allowBack
+                    allowBack: this.props.allowBack,
+                    skipEdit: this.props.skipEdit
                 }
                 // animationType: 'fade',
                 // animated: true
@@ -385,7 +386,8 @@ class ManualConfigScreen extends Component {
         this.props.navigator.push({
             screen: 'LoginScreen',
             passProps: {
-                allowBack: this.props.allowBack
+                allowBack: this.props.allowBack,
+                skipEdit: this.props.skipEdit
             }
             // animationType: 'fade',
             // animated: true
@@ -396,7 +398,7 @@ class ManualConfigScreen extends Component {
         this[name] = ref;
     }
 
-    checkFields = (nextFunction) => {
+    checkFields = (nextFunction, validateUrl) => {
         if (!this.state.name || !this.state.url || !this.state.clientId || !this.state.clientSecret) {
             Alert.alert("Alert", "Please make sure you have completed all the fields before moving forward", [
                 {
@@ -404,7 +406,7 @@ class ManualConfigScreen extends Component {
                 }
             ])
         } else {
-            if (this.state.allUrls.indexOf(this.state.url) > -1) {
+            if (this.state.allUrls.indexOf(this.state.url) > -1 && validateUrl) {
                 Alert.alert('Alert', "The hub URL that you entered already exists. Are you sure you want to continue?", [
                     {
                         text: 'No', onPress: () => {console.log('No pressed')}

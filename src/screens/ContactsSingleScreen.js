@@ -1029,80 +1029,91 @@ class ContactsSingleScreen extends Component {
 
     handleOnPressSave = () => {
         // Check the required fields and then update the contact
-        if (this.checkRequiredFields()) {
-            if (this.checkAgeYearsRequirements()) {
-                if (this.checkAgeMonthsRequirements()) {
-                    if (this.state.hasPlaceOfResidence === true){
-                        this.setState({
-                            savePressed: true
-                        }, () => {
-                            this.hideMenu()
-                            let ageConfig = this.ageAndDobPrepareForSave()
-                            this.setState(prevState => ({
-                                contact: Object.assign({}, prevState.contact, {age: ageConfig.ageClone}, {dob: ageConfig.dobClone}),
-                            }), () => {
-                                console.log("ageAndDobPrepareForSave done", this.state.contact);
-                                if (this.props.isNew) {
-                                    let contactWithRequiredFields = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, this.state.contact), action = 'create', fileType = 'person.json', type = 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT')
-                                    this.setState(prevState => ({
-                                        contact: Object.assign({}, prevState.contact, contactWithRequiredFields)
-                                    }), () => {
-                                        let contactClone = _.cloneDeep(this.state.contact)
-                                        let contactMatchFilter = this.checkIfContactMatchFilter()
-                                        console.log('contactMatchFilter', contactMatchFilter)
-                                        this.props.addContact(this.props.user.activeOutbreakId, contactClone, null, this.props.user.token, contactMatchFilter);
-                                    })
-                                } else {
-                                    let contactWithRequiredFields = null;
-                                    if (this.state.deletePressed === true) {
-                                        contactWithRequiredFields = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, this.state.contact), action = 'delete')
+        if (this.checkRelationships()) {
+            let missingFields = this.checkRequiredFields();
+            if (missingFields && Array.isArray(missingFields) && missingFields.length === 0) {
+                if (this.checkAgeYearsRequirements()) {
+                    if (this.checkAgeMonthsRequirements()) {
+                        if (this.state.hasPlaceOfResidence === true){
+                            this.setState({
+                                savePressed: true
+                            }, () => {
+                                this.hideMenu()
+                                let ageConfig = this.ageAndDobPrepareForSave()
+                                this.setState(prevState => ({
+                                    contact: Object.assign({}, prevState.contact, {age: ageConfig.ageClone}, {dob: ageConfig.dobClone}),
+                                }), () => {
+                                    console.log("ageAndDobPrepareForSave done", this.state.contact);
+                                    if (this.props.isNew) {
+                                        let contactWithRequiredFields = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, this.state.contact), action = 'create', fileType = 'person.json', type = 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT')
+                                        this.setState(prevState => ({
+                                            contact: Object.assign({}, prevState.contact, contactWithRequiredFields)
+                                        }), () => {
+                                            let contactClone = _.cloneDeep(this.state.contact)
+                                            let contactMatchFilter = this.checkIfContactMatchFilter()
+                                            console.log('contactMatchFilter', contactMatchFilter)
+                                            this.props.addContact(this.props.user.activeOutbreakId, contactClone, null, this.props.user.token, contactMatchFilter);
+                                        })
                                     } else {
-                                        contactWithRequiredFields = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, this.state.contact), action = 'update')
+                                        let contactWithRequiredFields = null;
+                                        if (this.state.deletePressed === true) {
+                                            contactWithRequiredFields = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, this.state.contact), action = 'delete')
+                                        } else {
+                                            contactWithRequiredFields = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, this.state.contact), action = 'update')
+                                        }
+
+                                        this.setState(prevState => ({
+                                            contact: Object.assign({}, prevState.contact, contactWithRequiredFields)
+                                        }), () => {
+                                            let contactClone = _.cloneDeep(this.state.contact)
+                                            let contactMatchFilter = this.checkIfContactMatchFilter()
+                                            console.log('contactMatchFilter', contactMatchFilter)
+                                            this.props.updateContact(this.props.user.activeOutbreakId, contactClone._id, contactClone, this.props.user.token, null, contactMatchFilter);
+                                        })
                                     }
-                                    
-                                    this.setState(prevState => ({
-                                        contact: Object.assign({}, prevState.contact, contactWithRequiredFields)
-                                    }), () => {
-                                        let contactClone = _.cloneDeep(this.state.contact)
-                                        let contactMatchFilter = this.checkIfContactMatchFilter()
-                                        console.log('contactMatchFilter', contactMatchFilter)
-                                        this.props.updateContact(this.props.user.activeOutbreakId, contactClone._id, contactClone, this.props.user.token, null, contactMatchFilter);
-                                    })
+                                })
+                            });
+                        } else {
+                            Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.placeOfResidenceError, this.props.translation), [
+                                {
+                                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+                                    onPress: () => {this.hideMenu()}
                                 }
-                            })
-                        });
+                            ])
+                        }
                     } else {
-                        Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.placeOfResidenceError, this.props.translation), [
+                        Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.monthsValueError, this.props.translation), [
                             {
-                                text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),  
-                                onPress: () => {this.hideMenu()}
+                                text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+                                onPress: () => {console.log("OK pressed")}
                             }
                         ])
                     }
                 } else {
-                    Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.monthsValueError, this.props.translation), [
+                    Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.yearsValueError, this.props.translation), [
                         {
-                            text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation), 
+                            text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
                             onPress: () => {console.log("OK pressed")}
                         }
                     ])
                 }
             } else {
-            Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.yearsValueError, this.props.translation), [
-                {
-                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),  
-                    onPress: () => {console.log("OK pressed")}
-                }
-            ])
+                Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), `${getTranslation(translations.alertMessages.requiredFieldsMissingError, this.props.translation)}.\n${getTranslation(translations.alertMessages.missingFields, this.props.translation)}: ${missingFields}`, [
+                    {
+                        text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+                        onPress: () => {this.hideMenu()}
+                    }
+                ])
             }
         } else {
-            Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.requiredFieldsMissingError, this.props.translation), [
+            Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.relationshipsErrorLabel, this.props.translation), [
                 {
-                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation), 
+                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
                     onPress: () => {this.hideMenu()}
                 }
             ])
         }
+
     };
 
     ageAndDobPrepareForSave = () => {
@@ -1142,36 +1153,42 @@ class ContactsSingleScreen extends Component {
     };
 
     checkRequiredFieldsPersonalInfo = () => {
+        let personalInfo = [];
         for(let i=0; i<config.contactsSingleScreen.personal.length; i++) {
             for (let j=0; j<config.contactsSingleScreen.personal[i].fields.length; j++) {
                 if (config.contactsSingleScreen.personal[i].fields[j].isRequired && !this.state.contact[config.contactsSingleScreen.personal[i].fields[j].id]) {
-                    return false;
+                    personalInfo.push(getTranslation(config.contactsSingleScreen.personal[i].fields[j].label, this.props.translation));
+                    // return false;
                 }
             }
         }
-        return true
+        return personalInfo;
+        // return true;
     };
 
     checkRequiredFieldsAddresses = () => {
+        let addresses = [];
         if (this.state.contact && this.state.contact.addresses && Array.isArray(this.state.contact.addresses) && this.state.contact.addresses.length > 0) {
             for (let i=0; i < this.state.contact.addresses.length; i++) {
                 for (let j=0; j<config.contactsSingleScreen.address.fields.length; j++) {
                     if (config.contactsSingleScreen.address.fields[j].isRequired && !this.state.contact.addresses[i][config.contactsSingleScreen.address.fields[j].id]) {
-                        return false;
+                        addresses.push(getTranslation(config.contactsSingleScreen.address.fields[j].label, this.props.translation));
+                        // return false;
                     }
                 }
             }
         } else {
-            return false;
+            return addresses
+            // return false;
         }
-        return true
+        return addresses;
+        // return true;
     };
 
     checkRequiredFieldsRelationships = () => {
         if (!this.state.contact || !this.state.contact.relationships || !Array.isArray(this.state.contact.relationships) || this.state.contact.relationships.length < 1) {
             return false;
         }
-
         return true
     };
 
@@ -1198,7 +1215,18 @@ class ContactsSingleScreen extends Component {
     };
 
     checkRequiredFields = () => {
-        return this.checkRequiredFieldsPersonalInfo() && this.checkRequiredFieldsAddresses() && this.checkRequiredFieldsRelationships()
+        let requiredFields = [];
+        return requiredFields.concat(this.checkRequiredFieldsPersonalInfo(), this.checkRequiredFieldsAddresses());
+        // return this.checkRequiredFieldsPersonalInfo() && this.checkRequiredFieldsAddresses() && this.checkRequiredFieldsRelationships()
+    };
+
+    checkRelationships = () => {
+        if (this.state && this.state.contact) {
+            if (!this.state.contact.relationships || !Array.isArray(this.state.contact.relationships) || this.state.contact.relationships.length === 0) {
+                return false;
+            }
+        }
+        return true;
     };
 
     checkIfContactMatchFilter = () => {

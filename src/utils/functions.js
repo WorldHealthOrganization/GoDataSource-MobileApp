@@ -964,6 +964,8 @@ export async function createFilesWithName (fileName, data, password) {
 }
 
 export function createZipFileAtPath (source, target, callback) {
+    // First check if the source exists, so that we don't create an empty zip file
+    RNFetchBlobFS.exists()
     // We don't need to check for archives with the same name, since the zip function overwrites the previous archive
     zip(source, target)
         .then((path) => {

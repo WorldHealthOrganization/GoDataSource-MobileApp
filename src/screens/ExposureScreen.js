@@ -268,7 +268,8 @@ class ExposureScreen extends Component {
     };
 
     handleSaveExposure = () => {
-        if (this.checkFields()) {
+        let missingFields = this.checkFields();
+        if (missingFields && Array.isArray(missingFields) && missingFields.length === 0) {
             console.log("Here should save the exposure and dismiss the modal");
             this.setState({
                 savePressed: true,
@@ -302,7 +303,7 @@ class ExposureScreen extends Component {
                 }
             });
         } else {
-            Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.requiredFieldsMissingError, this.props.translation), [
+            Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), `${getTranslation(translations.alertMessages.requiredFieldsMissingError, this.props.translation)}.\n${getTranslation(translations.alertMessages.missingFields, this.props.translation)}: ${missingFields}`, [
                 {
                     text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
                     onPress: () => {console.log("Ok pressed")}
@@ -312,22 +313,26 @@ class ExposureScreen extends Component {
     };
 
     checkFields = () => {
-        let pass = true;
+        // let pass = true;
+        let requiredFields = [];
         for (let i=0; i<config.addExposureScreen.length; i++) {
             if (config.addExposureScreen[i].id === 'exposure') {
                 if (this.state.exposure.persons.length === 0) {
-                    pass = false;
+                    requiredFields.push('Person')
+                    // pass = false;
                 }
             } else {
                 if (config.addExposureScreen[i].isRequired) {
                     if (!this.state.exposure[config.addExposureScreen[i].id]) {
-                        pass = false;
+                        requiredFields.push(getTranslation(config.addExposureScreen[i].label, this.props.translation));
+                        // pass = false;
                     }
                 }
             }
         }
-        return pass;
-    };
+        return requiredFields;
+        // return pass;
+    }
 
     goToHelpScreen = () => {
         let pageAskingHelpFrom = null
