@@ -50,7 +50,7 @@ class NavigationDrawerListItem extends PureComponent {
                         }}
                     />
                 </View>
-                {this.props.addButton &&
+                {!!this.props.addButton &&
                     <View style={{
                         flex: 0.2,
                         justifyContent: 'center',
