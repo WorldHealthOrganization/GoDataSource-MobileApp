@@ -265,8 +265,12 @@ function processFilesForSync(error, response, hubConfiguration, isFirstTime, syn
         // hubConfiguration = {url: databaseName, clientId: JSON.stringify({name, url, clientId, clientSecret, encryptedData}), clientSecret: databasePass}
         let hubConfig = JSON.parse(hubConfiguration.clientId);
         if (error) {
-            dispatch(setSyncState({id: 'downloadDatabase', name: 'Download Database', status: 'Error', error: error}));
-            // dispatch(addError({type: 'Error downloading database', message: error}));
+            if (error === 'No data to export') {
+                dispatch(setSyncState({id: 'downloadDatabase', name: 'Download Database', status: error}));
+            } else {
+                dispatch(setSyncState({id: 'downloadDatabase', name: 'Download Database', status: 'Error', error: error}));
+                // dispatch(addError({type: 'Error downloading database', message: error}));
+            }
         }
         if (response) {
             dispatch(setSyncState({id: 'downloadDatabase', name: 'Download Database', status: 'Success'}));
@@ -913,7 +917,11 @@ export function sendDatabaseToServer () {
                                                         // arrayOfStatuses.push({text: 'Getting updated data from the server', status: JSON.stringify(error)});
                                                         // dispatch(setSyncState('Error'));
                                                         // dispatch(parseStatusesAndShowMessage(getState().user._id));
-                                                        dispatch(setSyncState({id: 'getDataFromServer', status: 'Error', error: JSON.stringify(error)}));
+                                                        if (error === 'No data to export') {
+                                                            dispatch(setSyncState({id: 'getDataFromServer', status: 'No data to export'}));
+                                                        } else {
+                                                            dispatch(setSyncState({id: 'getDataFromServer', status: 'Error', error: JSON.stringify(error)}));
+                                                        }
                                                     }
                                                     if (response) {
                                                         // statuses.gettingData.status = 'OK';

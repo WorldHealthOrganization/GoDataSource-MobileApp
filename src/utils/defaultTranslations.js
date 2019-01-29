@@ -120,6 +120,7 @@ export default {
 
     'LNG_DATE_FIELD_LABEL_FROM': 'From',
     'LNG_DATE_FIELD_LABEL_TO': 'To',
+    'LNG_DATE_FIELD_LABEL_HOSPITAL_NAME': 'Hospital Name',
     'LNG_DATE_FIELD_LABEL_CENTER_NAME': 'Center Name',
     'LNG_DATE_FIELD_LABEL_LOCATION': 'Location',
     'LNG_DATE_FIELD_LABEL_COMMENTS': 'Comments',

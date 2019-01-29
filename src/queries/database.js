@@ -247,6 +247,7 @@ export function updateFileInDatabase(file, type) {
     return new Promise((resolve, reject) => {
         if (database) {
             file._id = createIdForType(file, type);
+            type = `${type.split('.')[0]}.${type.split('.')[2]}`;
             database.upsert(file._id, (doc) => {
                 // If we have to insert the doc, then add the type property
                 if (!doc || (typeof doc === 'object' && Object.keys(doc).length === 0)) {
@@ -306,7 +307,7 @@ export function processBulkDocs(data, type) {
         if (database) {
             // New types: fileType.number.json
             let fileType = `${type.split('.')[0]}.${type.split('.')[2]}`;
-            database.bulkDocs(data.map((e) => {return Object.assign({}, e, {_id: createIdForType(e, fileType), fileType})}))
+            database.bulkDocs(data.map((e) => {return Object.assign({}, e, {_id: createIdForType(e, type), fileType})}))
                 .then(() => {
                     console.log('Bulk docs finished: ');
                     data = null;
@@ -326,17 +327,18 @@ export function processBulkDocs(data, type) {
 
 // Create new ID's in order to be used more easily for querying the Pouch database
 export function createIdForType(file, type) {
-    switch (type) {
+    let fileType = `${type.split('.')[0]}.${type.split('.')[2]}`;
+    switch (fileType) {
         case 'person.json':
-            return (type + '_' + file.type + '_' + file.outbreakId + '_' + file._id);
+            return (fileType + '_' + file.type + '_' + file.outbreakId + '_' + file._id);
         case 'languageToken.json':
-            return (type + '_' + file.languageId + '_' + file._id);
+            return (fileType + '_' + file.languageId + '_' + file._id);
         case 'followUp.json':
-            return (type + '_' + file.outbreakId + '_' + new Date(file.date).getTime() + '_' + file._id);
+            return (fileType + '_' + file.outbreakId + '_' + new Date(file.date).getTime() + '_' + file._id);
             // return (type + '_' + file.outbreakId + '_' + file._id);
         case 'relationship.json':
-            return (type + '_' + file.outbreakId + '_' + file._id);
+            return (fileType + '_' + file.outbreakId + '_' + file._id);
         default:
-            return (type + '_' + file._id);
+            return (fileType + '_' + file._id);
     }
 }
