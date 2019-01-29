@@ -8,6 +8,7 @@ import {View, StyleSheet, Dimensions, Animated, Alert, Platform, BackHandler} fr
 import {Icon} from 'react-native-material-ui';
 import styles from './../styles';
 import NavBarCustom from './../components/NavBarCustom';
+import ViewHOC from './../components/ViewHOC';
 import config from './../utils/config';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -106,11 +107,13 @@ class ContactsSingleScreen extends Component {
             } : Object.assign({}, this.props.contact),
             savePressed: false,
             deletePressed: false,
+            loading: false,
             isModified: false,
             isDateTimePickerVisible: false,
             canChangeScreen: false,
             anotherPlaceOfResidenceWasChosen: false,
             hasPlaceOfResidence: true,
+            updateExposure: false,
             isEditMode: true,
             selectedItemIndexForTextSwitchSelectorForAge: 0, // age/dob - switch tab
             selectedItemIndexForAgeUnitOfMeasureDropDown: this.props.isNew ? 0 : (this.props.contact.age && this.props.contact.age.years !== undefined && this.props.contact.age.years !== null && this.props.contact.age.years > 0) ? 0 : 1, //default age dropdown value
@@ -146,6 +149,19 @@ class ContactsSingleScreen extends Component {
             //     props.contact = props.contacts[props.contacts.map((e) => {return e.id}).indexOf(props.contact.id)];
             // }
         }
+
+        if ((props.isNew === false || props.isNew === undefined) && state.updateExposure === true){
+            let updatedContact = props.contacts[props.contacts.map((e) => {return e._id}).indexOf(state.contact._id)]
+            if (updatedContact !== undefined && updatedContact !== null) {
+                state.contact.relationships = updatedContact.relationships
+                state.updateExposure = false
+            }
+        }
+
+        if (state.loading === true) {
+            state.loading = false
+        }
+
         return null;
     };
 
@@ -259,8 +275,11 @@ class ContactsSingleScreen extends Component {
     // and can slow down the app
     render() {
         // console.log("### contact from render ContactSingleScreen: ", this.state.contact);
+       
         return (
-            <View style={style.container}>
+            <ViewHOC style={style.container}
+                showLoader={this && this.state && this.state.loading}
+                loaderText={this.props && this.props.syncState ? 'Loading' : getTranslation(translations.loadingScreenMessages.loadingMsg, this.props.translation)}>
                 <NavBarCustom
                     title={null}
                     customTitle={
@@ -340,7 +359,7 @@ class ContactsSingleScreen extends Component {
                     initialLayout={initialLayout}
                     swipeEnabled = { this.props.isNew ? false : true}
                 />
-            </View>
+            </ViewHOC>
         );
     };
 
@@ -541,27 +560,33 @@ class ContactsSingleScreen extends Component {
         }
     };
 
+
     handleSaveExposure = (exposure, isUpdate = false) => {
-        console.log ('exposure', JSON.stringify(exposure))
-        if (isUpdate === true){
-            let relationships = _.cloneDeep(this.state.contact.relationships);
-            if (relationships.map((e) => {return e._id}).indexOf(exposure._id) > -1){
-                relationships[relationships.map((e) => {return e._id}).indexOf(exposure._id)] = exposure;
-            }
-            this.setState(prevState => ({
-                contact: Object.assign({}, prevState.contact, {relationships})
-            }), () => {
-                console.log("After updating the exposure: ", this.state.contact);
-            })
-        } else {
-            let relationships = []
-            relationships.push(exposure);
-            this.setState(prevState => ({
-                contact: Object.assign({}, prevState.contact, {relationships})
-            }), () => {
-                console.log("After adding the exposure: ", this.state.contact);
-            })
-        }
+        this.setState({
+            loading: true,
+            updateExposure: true
+        }, () => {
+            console.log ('exposure', JSON.stringify(exposure))
+            // if (isUpdate === true){
+            //     let relationships = _.cloneDeep(this.state.contact.relationships);
+            //     if (relationships.map((e) => {return e._id}).indexOf(exposure._id) > -1){
+            //         relationships[relationships.map((e) => {return e._id}).indexOf(exposure._id)] = exposure;
+            //     }
+            //     this.setState(prevState => ({
+            //         contact: Object.assign({}, prevState.contact, {relationships})
+            //     }), () => {
+            //         console.log("After updating the exposure: ", this.state.contact);
+            //     })
+            // } else {
+            //     let relationships = []
+            //     relationships.push(exposure);
+            //     this.setState(prevState => ({
+            //         contact: Object.assign({}, prevState.contact, {relationships})
+            //     }), () => {
+            //         console.log("After adding the exposure: ", this.state.contact);
+            //     })
+            // }
+        })
     };
 
     handleOnChangeTextInputWithDropDown = (value, id, objectType, stateValue) => {
