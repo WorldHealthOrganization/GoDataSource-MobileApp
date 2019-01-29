@@ -1029,7 +1029,8 @@ class ContactsSingleScreen extends Component {
 
     handleOnPressSave = () => {
         // Check the required fields and then update the contact
-        if (this.checkRelationships()) {
+        let relationshipsMissingFields = this.checkFields();
+        if (relationshipsMissingFields && Array.isArray(relationshipsMissingFields) && relationshipsMissingFields.length === 0) {
             let missingFields = this.checkRequiredFields();
             if (missingFields && Array.isArray(missingFields) && missingFields.length === 0) {
                 if (this.checkAgeYearsRequirements()) {
@@ -1106,7 +1107,7 @@ class ContactsSingleScreen extends Component {
                 ])
             }
         } else {
-            Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.relationshipsErrorLabel, this.props.translation), [
+            Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), `${getTranslation(translations.alertMessages.requiredFieldsMissingError, this.props.translation)}.\n${getTranslation(translations.alertMessages.missingFields, this.props.translation)}: ${relationshipsMissingFields}`, [
                 {
                     text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
                     onPress: () => {this.hideMenu()}
@@ -1184,6 +1185,28 @@ class ContactsSingleScreen extends Component {
         return addresses;
         // return true;
     };
+
+    checkFields = () => {
+        // let pass = true;
+        let requiredFields = [];
+        for (let i=0; i<config.addExposureScreen.length; i++) {
+            if (config.addExposureScreen[i].id === 'exposure') {
+                if (this.state.contact.relationships[0].persons.length === 0) {
+                    requiredFields.push('Person')
+                    // pass = false;
+                }
+            } else {
+                if (config.addExposureScreen[i].isRequired) {
+                    if (!this.state.contact.relationships[0][config.addExposureScreen[i].id]) {
+                        requiredFields.push(getTranslation(config.addExposureScreen[i].label, this.props.translation));
+                        // pass = false;
+                    }
+                }
+            }
+        }
+        return requiredFields;
+        // return pass;
+    }
 
     checkRequiredFieldsRelationships = () => {
         if (!this.state.contact || !this.state.contact.relationships || !Array.isArray(this.state.contact.relationships) || this.state.contact.relationships.length < 1) {
