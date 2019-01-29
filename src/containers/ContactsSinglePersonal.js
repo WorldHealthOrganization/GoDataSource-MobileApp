@@ -180,10 +180,8 @@ class ContactsSinglePersonal extends PureComponent {
         let maximumDate = undefined;
 
         if (item.type === 'DatePicker') {
-            if (this.props.screen === 'ContactsSingleScreen') {
-                if (item.id === 'dob' || item.id === 'dateOfReporting') {
-                    maximumDate = new Date()
-                }
+            if (item.id === 'dob' || item.id === 'dateOfReporting') {
+                maximumDate = new Date()
             }
         }
         
@@ -192,7 +190,13 @@ class ContactsSinglePersonal extends PureComponent {
     }
 
     computeValueForContactsSingleScreen = (item) => {
-        return this.props.contact && this.props.contact[item.id] ? getTranslation(this.props.contact[item.id], this.props.translation) : '';
+        if (item.id === 'age') {
+            if (this.props.contact && this.props.contact[item.id] !== null && this.props.contact[item.id] !== undefined) {
+             return this.props.contact[item.id]
+            }
+        } else {
+            return this.props.contact && this.props.contact[item.id] ? getTranslation(this.props.contact[item.id], this.props.translation) : '';
+        }
     };
 
     computeDataForContactsSingleScreenDropdownInput = (item) => {

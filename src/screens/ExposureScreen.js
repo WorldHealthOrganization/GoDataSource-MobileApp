@@ -20,6 +20,7 @@ import {calculateDimension, extractIdFromPouchId, updateRequiredFields, getTrans
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import translations from './../utils/translations'
 import ElevatedView from 'react-native-elevated-view';
+import ExposureContainer from '../containers/ExposureContainer';
 
 class ExposureScreen extends Component {
 
@@ -52,27 +53,6 @@ class ExposureScreen extends Component {
     }
 
     // Please add here the react lifecycle methods that you need
-    componentDidMount() {
-        let personsArray = [] 
-        if (this.props.addContactFromCasesScreen !== null && this.props.addContactFromCasesScreen !== undefined && this.props.caseIdFromCasesScreen !== null && this.props.caseIdFromCasesScreen !== undefined) {
-            personsArray = [{
-                id: extractIdFromPouchId(this.props.caseIdFromCasesScreen, 'person'),
-                type: config.personTypes.cases,
-                source: true,
-                target: null
-            },{
-                id: null,
-                type: config.personTypes.contacts,
-                source: null,
-                target: true
-            }]
-            this.setState(prevState => ({
-                exposure: Object.assign({}, prevState.exposure, {persons: personsArray})
-            }), () => {
-                console.log('After changing state componentDidMount: ', this.state.exposure);
-            })
-        }
-    }
 
     static getDerivedStateFromProps(props, state) {
         // console.log("FollowUpsSingleScreen: ", state);
@@ -178,17 +158,17 @@ class ExposureScreen extends Component {
                                     }}/>
 
                         </View>
-                        <KeyboardAwareScrollView
-                        style={style.containerScrollView}
-                        contentContainerStyle={[style.contentContainerStyle, {paddingBottom: this.props.screenSize.height < 600 ? 70 : 20}]}
-                        keyboardShouldPersistTaps={'always'}
-                    >
-                        <View style={style.container}>
-                        {
-                            this.renderItemCardComponent(config.addExposureScreen)
-                        }
-                        </View>
-                    </KeyboardAwareScrollView>
+                        <ExposureContainer
+                            exposure={this.state.exposure}
+                            contact={null}
+                            fromExposureScreen={true}
+                            type={this.props.type}
+                            isEditMode={true}
+                            onChangeText={this.handleOnChangeText}
+                            onChangeDropDown={this.handleOnChangeDropDown}
+                            onChangeDate={this.handleOnChangeDate}
+                            onChangeSwitch={this.handleOnChangeSwitch}
+                        />
                     </View>
                 </View>
             </TouchableWithoutFeedback>
@@ -196,154 +176,6 @@ class ExposureScreen extends Component {
     }
 
     // Please write here all the methods that are not react native lifecycle methods
-    renderItemCardComponent = (fields, cardIndex = null) => {
-        return (
-            <ElevatedView elevation={3} style={[style.containerCardComponent, {
-                marginHorizontal: calculateDimension(16, false, this.props.screenSize),
-                width: calculateDimension(config.designScreenSize.width - 32, false, this.props.screenSize),
-                marginVertical: 4,
-                minHeight: calculateDimension(72, true, this.props.screenSize)
-            }, style.cardStyle]}>
-                <ScrollView scrollEnabled={false} style={{flex: 1}} contentContainerStyle={{flexGrow: 1}}>
-                    {
-                        fields && fields.map((item, index) => {
-                            return this.handleRenderItemCardComponent(item, index, cardIndex);
-                        })
-                    }
-                </ScrollView>
-            </ElevatedView>
-        );
-    }
-
-    handleRenderItemCardComponent = (item, index, cardIndex) => {
-        return (
-            <View style={[style.subcontainerCardComponent, {flex: 1}]} key={index}>
-                {
-                    this.handleRenderItemByType(item, cardIndex)
-                }
-            </View>
-        )
-    };
-
-    handleRenderItemByType = (item, cardIndex) => {
-        let addContactFromCasesScreen = false;
-        let value = '';
-     
-        if (item.type === 'DropdownInput') {
-            item.data = this.computeDataForExposure(item);
-        }
-
-        if (item.type === 'DropdownInput' && item.id === 'clusterId' && this.state.exposure.clusterId) {
-            let myCluster = this.props.clusters.filter((e) => {
-                return extractIdFromPouchId(e._id, 'cluster') === this.state.exposure.clusterId
-            })
-            value = myCluster[0].name
-        } else {
-            value = this.computeExposureValue(item);
-        }
-
-        if (this.props.addContactFromCasesScreen && this.props.addContactFromCasesScreen !== undefined && item.id === 'exposure') {
-            addContactFromCasesScreen = true
-        }
-
-        if (item.type === 'DatePicker' && value === '') {
-            value = null
-        }
-        let isEditModeForDropDownInput = addContactFromCasesScreen ? false : true
-
-        let dateValidation = this.setDateValidations(item);
-        minimumDate = dateValidation.minimumDate;
-        maximumDate = dateValidation.maximumDate;
-
-        return (
-            <CardComponent
-                item={item}
-                isEditMode={true}
-                exposure={this.state.exposure}
-                isEditModeForDropDownInput={isEditModeForDropDownInput}
-                value={value}
-                minimumDate={minimumDate}
-                maximumDate={maximumDate}
-                index={cardIndex}
-                
-                onChangeDropDown={this.handleOnChangeDropDown}
-                onChangeDate={this.handleOnChangeDate}
-                onChangeText={this.handleOnChangeText}
-                onChangeSwitch={this.handleOnChangeSwitch}
-            />
-        )
-    };
-
-    setDateValidations = (item) => {
-        let minimumDate = undefined;
-        let maximumDate = undefined;
-
-        if (item.type === 'DatePicker') {
-            if (item.id === 'contactDate') {
-                maximumDate = new Date()
-            }
-        }
-        
-        let dateValidation = {minimumDate, maximumDate}
-        return dateValidation
-    };
-
-    computeDataForExposure = (item) => {
-        let data = [];
-        if (item.categoryId) {
-            data = this.props.referenceData.filter((e) => {
-                return e.active === true && e.categoryId === item.categoryId
-            }).map((e) => {
-                return {value: getTranslation(e.value, this.props.translation), id: extractIdFromPouchId(e._id, 'referenceData')}
-            });
-        } else {
-            if (item.id === 'exposure') {
-                if (this.props.type !== 'Contact') {
-                    data = this.props.contacts.map((e) => {return {value: ((e.firstName ? e.firstName + ' ' : '') + (e.lastName ? e.lastName : '')), id: extractIdFromPouchId(e._id, 'person'), type: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT'}});
-                }
-                if (this.props.cases && this.props.cases.length > 0){
-                    data = this.props.cases.map((e) => {return {value: ((e.firstName ? e.firstName + ' ' : '') + (e.lastName ? e.lastName : '')), id: extractIdFromPouchId(e._id, 'person'), type: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE'}});
-                }
-                data = data.concat(this.props.events.map((e) => {return {value: e.name, id: extractIdFromPouchId(e._id, 'person'), type: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_EVENT'}}));
-            } else {
-                if (item.id === 'clusterId') {
-                    data = this.props.clusters.map((e) => {
-                        return {value: e.name, id: extractIdFromPouchId(e._id, 'cluster')}
-                    })
-                }
-            }
-        }
-        return data;
-    };
-
-    computeExposureValue = (item) => {
-        let value = '';
-
-        value = this.state.exposure[item.id];
-        if (item.id === 'exposure') {
-            if (this.state.exposure.persons && Array.isArray(this.state.exposure.persons) && this.state.exposure.persons.length > 0) {
-                let persons = this.state.exposure.persons.filter((e) => {return e.type !== (this.props.type === 'Contact' ? config.personTypes.contacts : config.personTypes.contacts)});
-                value = this.extractNameForExposure(persons[0]);
-            }
-        }
-        return getTranslation(value, this.props.translation);
-    };
-
-    extractNameForExposure = (person) => {
-        switch (person.type) {
-            case config.personTypes.cases:
-                return (this.props.cases && Array.isArray(this.props.cases) && this.props.cases.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id) > -1 && this.props.cases[this.props.cases.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id)].firstName ? (this.props.cases[this.props.cases.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id)].firstName + ' ') : '') +
-                    (this.props.cases && Array.isArray(this.props.cases) && this.props.cases.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id) > -1 && this.props.cases[this.props.cases.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id)].lastName ? (this.props.cases[this.props.cases.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id)].lastName) : '');
-            case config.personTypes.events:
-                return (this.props.events && Array.isArray(this.props.events) && this.props.events.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id) > -1 && this.props.events[this.props.events.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id)].name ? (this.props.events[this.props.events.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id)].name) : '');
-            case config.personTypes.contacts:
-                return (this.props.contacts && Array.isArray(this.props.contacts) && this.props.contacts.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id) > -1 && this.props.contacts[this.props.contacts.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id)].firstName ? (this.props.contacts[this.props.contacts.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id)].firstName + ' ') : '') +
-                    (this.props.contacts && Array.isArray(this.props.contacts) && this.props.contacts.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id) > -1 && this.props.contacts[this.props.contacts.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id)].lastName ? (this.props.contacts[this.props.contacts.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id)].lastName) : '');
-            default:
-                return ''
-        }
-    };
-
     handlePressNavbarButton = () => {
         if (this.state.isModified === true) {
             Alert.alert("", 'You have unsaved data. Are you sure you want to leave this page and lose all changes?', [
@@ -435,22 +267,6 @@ class ExposureScreen extends Component {
         }))
     };
 
-    handleAddAnotherExposure = () => {
-        if (this.checkFields()) {
-            console.log("Here should save current exposure and reset the fields in order to add another one");
-            if (this.props.type === 'Contact') {
-                this.props.addExposureForContact(this.props.user.activeOutbreakId, this.props.contact.id, this.state.exposure, this.props.user.token);
-            }
-        } else {
-            Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.requiredFieldsMissingError, this.props.translation), [
-                {
-                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
-                    onPress: () => {console.log("Ok pressed")}
-                }
-            ])
-        }
-    };
-
     handleSaveExposure = () => {
         let missingFields = this.checkFields();
         if (missingFields && Array.isArray(missingFields) && missingFields.length === 0) {
@@ -468,9 +284,9 @@ class ExposureScreen extends Component {
                                 this.props.navigator.dismissModal(this.props.saveExposure(this.state.exposure, true));
                             })
                         } else {
-                            let exposure = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.contact.updatedBy, record = Object.assign({}, this.state.exposure), action = 'update')
-                            this.props.navigator.dismissModal(this.props.saveExposure(this.state.exposure, true));
+                            let exposure = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id.split('_')[this.props.user._id.split('_').length - 1], record = Object.assign({}, this.state.exposure), action = 'update')
                             this.props.updateExposureForContact(this.props.user.activeOutbreakId, this.props.contact._id, exposure, this.props.user.token);
+                            this.props.navigator.dismissModal(this.props.saveExposure(this.state.exposure, true));
                         }
                     } else {
                         if (!this.props.contact) {
@@ -480,7 +296,7 @@ class ExposureScreen extends Component {
                               this.props.navigator.dismissModal(this.props.saveExposure(this.state.exposure));
                             })
                         } else {
-                            let exposure = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.contact.updatedBy, record = Object.assign({}, this.state.exposure), action = 'create', fileType = 'relationship.json')
+                            let exposure = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id.split('_')[this.props.user._id.split('_').length - 1], record = Object.assign({}, this.state.exposure), action = 'create', fileType = 'relationship.json')
                             this.props.addExposureForContact(this.props.user.activeOutbreakId, this.props.contact._id, exposure, this.props.user.token, Object.assign({}, this.props.contact));
                         }
                     }
@@ -534,7 +350,7 @@ class ExposureScreen extends Component {
                 pageAskingHelpFrom: pageAskingHelpFrom
             }
         });
-    }
+    };
 }
 
 // Create style outside the class, or for components that will be used by other components (buttons),

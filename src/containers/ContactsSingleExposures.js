@@ -22,6 +22,7 @@ import GeneralListItem from '../components/GeneralListItem';
 import Ripple from 'react-native-material-ripple';
 import moment from 'moment';
 import translations from './../utils/translations'
+import ExposureContainer from '../containers/ExposureContainer';
 
 const scrollAnim = new Animated.Value(0);
 const offsetAnim = new Animated.Value(0);
@@ -122,31 +123,49 @@ class ContactsSingleExposures extends Component {
                         }
                     </View>
                 </View>
-                <ScrollView contentContainerStyle={{flexGrow: 1}}>
-                    <AnimatedListView
-                        data={this.props.contact && this.props.contact.relationships && Array.isArray(this.props.contact.relationships) ? this.props.contact.relationships : []}
-                        renderItem={this.renderRelationship}
-                        keyExtractor={this.keyExtractor}
-                        ItemSeparatorComponent={this.renderSeparatorComponent}
-                        ListEmptyComponent={this.listEmptyComponent}
-                        style={[style.listViewStyle]}
-                        componentContainerStyle={style.componentContainerStyle}
-                        onScroll={this.handleScroll}
-                    />
-                    <View style={{height: 30}}/>
-                </ScrollView>
-
+                {
+                    !this.props.isNew ? (
+                        <ScrollView contentContainerStyle={{flexGrow: 1}}>
+                            <AnimatedListView
+                                data={this.props.contact && this.props.contact.relationships && Array.isArray(this.props.contact.relationships) ? this.props.contact.relationships : []}
+                                renderItem={this.renderRelationship}
+                                keyExtractor={this.keyExtractor}
+                                ItemSeparatorComponent={this.renderSeparatorComponent}
+                                ListEmptyComponent={this.listEmptyComponent}
+                                style={[style.listViewStyle]}
+                                componentContainerStyle={style.componentContainerStyle}
+                                onScroll={this.handleScroll}
+                            />
+                            <View style={{height: 30}}/>
+                        </ScrollView>
+                    ) : (
+                        <ExposureContainer
+                            exposure={this.props.contact.relationships[0]}
+                            addContactFromCasesScreen={this.props.addContactFromCasesScreen}
+                            fromExposureScreen={false}
+                            isEditMode={this.props.isEditMode}
+                            contact={this.props.contact}
+                            onChangeDropDown={this.props.onChangeDropDown}
+                            onChangeDate={this.props.onChangeDate}
+                            onChangeText={this.props.onChangeText}
+                            onChangeSwitch={this.props.onChangeSwitch}
+                        />
+                    )
+                }
             </ElevatedView>
             
         );
     }
 
     // Please write here all the methods that are not react native lifecycle methods
-    keyExtractor = (item, index) => item.id;
+
+    keyExtractor = (item, index) => {
+        return item.id;
+    };
 
     handleBackButton = () => {
         this.props.handleMoveToPrevieousScreenButton()
-    }
+    };
 
     renderRelationship = (relation) => {
 
@@ -241,8 +260,6 @@ class ContactsSingleExposures extends Component {
                 contact: null,
                 type: 'Contact',
                 saveExposure: this.props.saveExposure,
-                addContactFromCasesScreen: this.props.addContactFromCasesScreen,
-                caseIdFromCasesScreen: this.props.caseIdFromCasesScreen
             }
         })
     };

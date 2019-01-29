@@ -236,7 +236,7 @@ export function getContactByIdRequest(outbreakId, contactId, token, callback) {
 
     database.get(contactId)
         .then((resultGetContactById) => {
-            console.log("Result getContactByIdRequest: ");
+            console.log("Result getContactByIdRequest: ", resultGetContactById);
             callback(null, resultGetContactById);
         })
         .catch((errorGetContactById) => {
@@ -337,40 +337,22 @@ export function updateExposureForContactRequest(outbreakId, contactId, exposure,
     let database = getDatabase();
 
     console.log ('updateExposureForContactRequest', outbreakId, contactId, JSON.stringify(exposure))
-
-    database.get(exposure._id)
-        .then((resultGetExposure) => {
-            console.log ('Get exposure result: ', JSON.stringify(resultGetExposure))
-            database.remove(resultGetExposure)
-                .then((resultRemove) => {
-                    console.log ('Remove exposure result: ', JSON.stringify(resultRemove))
-                    delete exposure._rev;
-                    database.put(exposure)
-                        .then((responseUpdateExposure) => {
-                            console.log("Update exposure response: ", responseUpdateExposure);
-                            database.get(exposure._id)
-                                .then((resultGetUpdatedExposure) => {
-                                    console.log("Response getUpdatedExposure: ", JSON.stringify(resultGetUpdatedExposure));
-                                    callback(null, resultGetUpdatedExposure);
-                                })
-                                .catch((errorGetUpdatedExposure) => {
-                                    console.log("Error getUpdatedExposure: ", errorGetUpdatedExposure);
-                                    callback(errorGetUpdatedExposure);
-                                })
-                        })
-                        .catch((errorUpdateExposure) => {
-                            console.log('Update exposure error: ', errorUpdateExposure);
-                            callback(errorUpdateExposure);
-                        })
+    database.put(exposure)
+        .then((responseUpdateExposure) => {
+            console.log("Update exposure response: ", responseUpdateExposure);
+            database.get(exposure._id)
+                .then((resultGetUpdatedExposure) => {
+                    console.log("Response getUpdatedExposure: ", JSON.stringify(resultGetUpdatedExposure));
+                    callback(null, resultGetUpdatedExposure);
                 })
-                .catch((errorRemove) => {
-                    console.log('Remove exposure error: ', errorRemove);
-                    callback(errorRemove);
+                .catch((errorGetUpdatedExposure) => {
+                    console.log("Error getUpdatedExposure: ", errorGetUpdatedExposure);
+                    callback(errorGetUpdatedExposure);
                 })
         })
-        .catch((errorGetExposure) => {
-            console.log('Get exposure error:  ', errorGetExposure);
-            callback(errorGetExposure);
+        .catch((errorUpdateExposure) => {
+            console.log('Update exposure error: ', errorUpdateExposure);
+            callback(errorUpdateExposure);
         })
 }
 
