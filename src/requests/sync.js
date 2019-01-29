@@ -73,14 +73,17 @@ export function getDatabaseSnapshotRequest(hubConfig, lastSyncDate, dispatch, ca
                 .then((res) => {
                     console.log('Download time: ', new Date().getTime() - startDownload);
                     let status = res.info().status;
-                    let info = res.info();
                     // After getting zip file from the server, unzip it and then proceed to the importing of the data to the SQLite database
                     if(status === 200) {
                         // After returning the database, return the path to it
                         console.log("Got database");
                         callback(null, databaseLocation)
                     } else {
-                        callback(`Cannot connect to HUB, please check URL, Client ID and Client secret.\nStatus code: ${status}`);
+                        if (status === 422) {
+                            callback(`No data to export`);
+                        } else {
+                            callback(`Cannot connect to HUB, please check URL, Client ID and Client secret.\nStatus code: ${status}`);
+                        }
                     }
                 })
                 .catch((errorMessage, statusCode) => {

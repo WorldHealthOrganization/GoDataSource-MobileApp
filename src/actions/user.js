@@ -28,6 +28,7 @@ import {storeFollowUps} from './followUps';
 import {storeOutbreak} from './outbreak';
 import {storeClusters} from './clusters';
 import {setLoginState, storeData, getAvailableLanguages, setSyncState} from './app';
+import {storePermissions} from './role';
 import moment from 'moment';
 import _ from 'lodash';
 
@@ -138,6 +139,7 @@ export function cleanDataAfterLogout() {
             dispatch(storeHelpCategory(null));
             dispatch(storeHelpItem(null));
             dispatch(storeClusters(null));
+            dispatch(storePermissions(null));
         });
     }
 }

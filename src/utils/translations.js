@@ -133,7 +133,7 @@ const caseSingleScreen = {
     hospitalisationStartDate: 'LNG_DATE_FIELD_LABEL_FROM',
     hospitalisationEndDate: 'LNG_DATE_FIELD_LABEL_TO',
     // TODO add translations to API
-    hospitalisationCenterName: 'LNG_DATE_FIELD_LABEL_CENTER_NAME',
+    hospitalisationCenterName: 'LNG_DATE_FIELD_LABEL_HOSPITAL_NAME',
     hospitalisationLocation: 'LNG_DATE_FIELD_LABEL_LOCATION',
     hospitalisationComments: 'LNG_DATE_FIELD_LABEL_COMMENTS',
 
