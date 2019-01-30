@@ -853,8 +853,6 @@ export function sendDatabaseToServer () {
                             // To avoid performance issues, go through all the collections that can change and see if anything actually changed
 
                             // arrayOfStatuses.push({text: 'Getting local data', status: 'OK'});
-                            dispatch(setSyncState({id: 'getData', status: 'Success'}));
-                            dispatch(setSyncState({id: 'createFile', status: 'In progress'}));
                             let statusArray = [];
                             for (let i=0; i<config.changingMongoCollections.length; i++) {
                                 try {
@@ -880,63 +878,99 @@ export function sendDatabaseToServer () {
                             }
 
                             if (statusArray.length === config.changingMongoCollections.length) {
-                                // console.log('Result from processing all the files: timeForCreatingFiles: ', new Date().getTime() - startTimeForCreatingFiles);
-                                // let startTimeForCreateZip = new Date().getTime();
-                                createZipFileAtPath(`${RNFetchBlobFs.dirs.DocumentDir}/who_files`, `${RNFetchBlobFs.dirs.DocumentDir}/${activeDatabase.replace(/\/|\.|\:/g, '')}.zip`, (errorCreateZipFile, resultCreateZipFile) => {
-                                    if (errorCreateZipFile) {
-                                        console.log("An error occurred while zipping the files: ", errorCreateZipFile);
-                                        // arrayOfStatuses.push({text: 'Creating local files', status: JSON.stringify(errorCreateZipFile)});
-                                        // dispatch(parseStatusesAndShowMessage(getState().user._id));
-                                        dispatch(setSyncState({id: 'createFile', status: 'Error', error: JSON.stringify(errorCreateZipFile)}));
+                                // Check if the status array is full of "No data to send" statuses
+                                let skipZip = true;
+
+                                for (let i=0; i<statusArray.length; i++) {
+                                    if (statusArray[i] !== 'No data to send') {
+                                        skipZip = false;
                                     }
-                                    if (resultCreateZipFile) {
-                                        // After creating the zip file, it's time to send it to the server
-                                        // console.log("Response from create zip file: time For zip", new Date().getTime() - startTimeForCreateZip);
-                                        // statuses.createLocalFiles.status = 'OK';
-                                        dispatch(setSyncState({id: 'createFile', status: 'Success'}));
-                                        dispatch(setSyncState({id: 'sendData', status: 'In progress'}));
-                                        postDatabaseSnapshotRequest(internetCredentials, resultCreateZipFile, (errorSendData, resultSendData) => {
-                                            if (errorSendData && !resultSendData) {
-                                                console.log('An error occurred while sending data to server: ', errorSendData);
-                                                // dispatch(setSyncState('Error'));
-                                                // statuses.sendData.status = JSON.stringify(errorSendData);
-                                                // arrayOfStatuses.push({text: 'Sending data to the HUB', status: JSON.stringify(errorSendData)});
-                                                // dispatch(parseStatusesAndShowMessage(getState().user._id));
-                                                // dispatch(addError({type: 'Sync Error', message: JSON.stringify(errorSendData)}));
-                                                dispatch(setSyncState({id: 'sendData', status: 'Error', error: JSON.stringify(errorSendData)}));
+                                }
+
+                                if (skipZip) {
+                                    dispatch(setSyncState({id: 'getData', status: 'No data to send'}));
+                                    dispatch(setSyncState({id: 'createFile', status: 'Skip'}));
+                                    dispatch(setSyncState({id: 'sendData', status: 'Skip'}));
+                                    getDatabaseSnapshotRequest({url: internetCredentials.server ? internetCredentials.server : internetCredentials.service, clientId: internetCredentials.username, clientSecret: internetCredentials.password}, lastSyncDate, dispatch, (error, response) => {
+                                        if (error) {
+                                            // arrayOfStatuses.push({text: 'Getting updated data from the server', status: JSON.stringify(error)});
+                                            // dispatch(setSyncState('Error'));
+                                            // dispatch(parseStatusesAndShowMessage(getState().user._id));
+                                            if (error === 'No data to export') {
+                                                dispatch(setSyncState({id: 'getDataFromServer', status: 'No data to export'}));
+                                            } else {
+                                                dispatch(setSyncState({id: 'getDataFromServer', status: 'Error', error: JSON.stringify(error)}));
                                             }
-                                            if (resultSendData) {
-                                                console.log("Data was successfully sent to server: ", resultSendData, new Date().getTime() - operationStart);
-                                                // statuses.sendData.status = 'OK';
-                                                // arrayOfStatuses.push({text: 'Sending data to the HUB', status: errorSendData ? JSON.stringify(errorSendData) : 'OK'});
-                                                // dispatch(setSyncState('Getting updated data from the server'));
-                                                dispatch(setSyncState({id: 'sendData', status: errorSendData ? 'Error' : 'Success', error: errorSendData ? JSON.stringify(errorSendData) : null}));
-                                                dispatch(setSyncState({id: 'getDataFromServer', status: 'In progress'}));
-                                                getDatabaseSnapshotRequest({url: internetCredentials.server ? internetCredentials.server : internetCredentials.service, clientId: internetCredentials.username, clientSecret: internetCredentials.password}, lastSyncDate, dispatch, (error, response) => {
-                                                    if (error) {
-                                                        // arrayOfStatuses.push({text: 'Getting updated data from the server', status: JSON.stringify(error)});
-                                                        // dispatch(setSyncState('Error'));
-                                                        // dispatch(parseStatusesAndShowMessage(getState().user._id));
-                                                        if (error === 'No data to export') {
-                                                            dispatch(setSyncState({id: 'getDataFromServer', status: 'No data to export'}));
-                                                        } else {
-                                                            dispatch(setSyncState({id: 'getDataFromServer', status: 'Error', error: JSON.stringify(error)}));
+                                        }
+                                        if (response) {
+                                            // statuses.gettingData.status = 'OK';
+                                            // arrayOfStatuses.push({text: 'Getting updated data from the server', status: 'OK'});
+                                            dispatch(processFilesForSync(error, response, {
+                                                url: Platform.OS === 'ios' ? internetCredentials.server : internetCredentials.service,
+                                                clientId: internetCredentials.username,
+                                                clientSecret: internetCredentials.password
+                                            }, null, true, false));
+                                        }
+                                    })
+                                } else {
+                                    dispatch(setSyncState({id: 'getData', status: 'Success'}));
+                                    dispatch(setSyncState({id: 'createFile', status: 'In progress'}));
+                                    createZipFileAtPath(`${RNFetchBlobFs.dirs.DocumentDir}/who_files`, `${RNFetchBlobFs.dirs.DocumentDir}/${activeDatabase.replace(/\/|\.|\:/g, '')}.zip`, (errorCreateZipFile, resultCreateZipFile) => {
+                                        if (errorCreateZipFile) {
+                                            console.log("An error occurred while zipping the files: ", errorCreateZipFile);
+                                            // arrayOfStatuses.push({text: 'Creating local files', status: JSON.stringify(errorCreateZipFile)});
+                                            // dispatch(parseStatusesAndShowMessage(getState().user._id));
+                                            dispatch(setSyncState({id: 'createFile', status: 'Error', error: JSON.stringify(errorCreateZipFile)}));
+                                        }
+                                        if (resultCreateZipFile) {
+                                            // After creating the zip file, it's time to send it to the server
+                                            // console.log("Response from create zip file: time For zip", new Date().getTime() - startTimeForCreateZip);
+                                            // statuses.createLocalFiles.status = 'OK';
+                                            dispatch(setSyncState({id: 'createFile', status: 'Success'}));
+                                            dispatch(setSyncState({id: 'sendData', status: 'In progress'}));
+                                            postDatabaseSnapshotRequest(internetCredentials, resultCreateZipFile, (errorSendData, resultSendData) => {
+                                                if (errorSendData && !resultSendData) {
+                                                    console.log('An error occurred while sending data to server: ', errorSendData);
+                                                    // dispatch(setSyncState('Error'));
+                                                    // statuses.sendData.status = JSON.stringify(errorSendData);
+                                                    // arrayOfStatuses.push({text: 'Sending data to the HUB', status: JSON.stringify(errorSendData)});
+                                                    // dispatch(parseStatusesAndShowMessage(getState().user._id));
+                                                    // dispatch(addError({type: 'Sync Error', message: JSON.stringify(errorSendData)}));
+                                                    dispatch(setSyncState({id: 'sendData', status: 'Error', error: JSON.stringify(errorSendData)}));
+                                                }
+                                                if (resultSendData) {
+                                                    console.log("Data was successfully sent to server: ", resultSendData, new Date().getTime() - operationStart);
+                                                    // statuses.sendData.status = 'OK';
+                                                    // arrayOfStatuses.push({text: 'Sending data to the HUB', status: errorSendData ? JSON.stringify(errorSendData) : 'OK'});
+                                                    // dispatch(setSyncState('Getting updated data from the server'));
+                                                    dispatch(setSyncState({id: 'sendData', status: errorSendData ? 'Error' : 'Success', error: errorSendData ? JSON.stringify(errorSendData) : null}));
+                                                    dispatch(setSyncState({id: 'getDataFromServer', status: 'In progress'}));
+                                                    getDatabaseSnapshotRequest({url: internetCredentials.server ? internetCredentials.server : internetCredentials.service, clientId: internetCredentials.username, clientSecret: internetCredentials.password}, lastSyncDate, dispatch, (error, response) => {
+                                                        if (error) {
+                                                            // arrayOfStatuses.push({text: 'Getting updated data from the server', status: JSON.stringify(error)});
+                                                            // dispatch(setSyncState('Error'));
+                                                            // dispatch(parseStatusesAndShowMessage(getState().user._id));
+                                                            if (error === 'No data to export') {
+                                                                dispatch(setSyncState({id: 'getDataFromServer', status: 'No data to export'}));
+                                                            } else {
+                                                                dispatch(setSyncState({id: 'getDataFromServer', status: 'Error', error: JSON.stringify(error)}));
+                                                            }
                                                         }
-                                                    }
-                                                    if (response) {
-                                                        // statuses.gettingData.status = 'OK';
-                                                        // arrayOfStatuses.push({text: 'Getting updated data from the server', status: 'OK'});
-                                                        dispatch(processFilesForSync(error, response, {
-                                                            url: Platform.OS === 'ios' ? internetCredentials.server : internetCredentials.service,
-                                                            clientId: internetCredentials.username,
-                                                            clientSecret: internetCredentials.password
-                                                        }, null, !errorSendData, false));
-                                                    }
-                                                })
-                                            }
-                                        })
-                                    }
-                                })
+                                                        if (response) {
+                                                            // statuses.gettingData.status = 'OK';
+                                                            // arrayOfStatuses.push({text: 'Getting updated data from the server', status: 'OK'});
+                                                            dispatch(processFilesForSync(error, response, {
+                                                                url: Platform.OS === 'ios' ? internetCredentials.server : internetCredentials.service,
+                                                                clientId: internetCredentials.username,
+                                                                clientSecret: internetCredentials.password
+                                                            }, null, !errorSendData, false));
+                                                        }
+                                                    })
+                                                }
+                                            })
+                                        }
+                                    })
+                                }
                             }
 
 
