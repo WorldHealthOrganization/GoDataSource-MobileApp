@@ -25,6 +25,7 @@ import {getTranslation, generateId} from './../utils/functions';
 import translations from './../utils/translations';
 import SwitchInput from './../components/SwitchInput';
 import {getInternetCredentials, setInternetCredentials} from 'react-native-keychain';
+import {setSyncState} from './../actions/app';
 
 class ManualConfigScreen extends PureComponent {
 
@@ -529,6 +530,8 @@ class ManualConfigScreen extends PureComponent {
             showModal: false,
             showCloseModalButton: false
         }, () => {
+            console.log('New state: ', this.state.syncState);
+            this.props.setSyncState({id: 'sync', status: null});
             callback();
         })
     }
@@ -591,7 +594,8 @@ function matchDispatchToProps(dispatch) {
     return bindActionCreators({
         loginUser,
         removeErrors,
-        storeHubConfiguration
+        storeHubConfiguration,
+        setSyncState
     }, dispatch);
 }
 

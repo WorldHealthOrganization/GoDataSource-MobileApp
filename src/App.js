@@ -73,6 +73,7 @@ export default class App {
                                                                                 console.log('wipeCompleteRequest error: ', error)
                                                                             }
                                                                             if (response) {
+                                                                                store.dispatch(appActions.saveActiveDatabase(null));
                                                                                 store.dispatch(appActions.changeAppRoot('config'));
                                                                                 store.dispatch(appActions.storeUser(null));
                                                                                 store.dispatch(appActions.storeContacts(null));
@@ -84,7 +85,6 @@ export default class App {
                                                                                 store.dispatch(appActions.storeHelpItem(null));
                                                                                 store.dispatch(appActions.storeClusters(null));
                                                                                 store.dispatch(appActions.storePermissions(null));
-                                                                                store.dispatch(appActions.saveActiveDatabase(null));
                                                                             }
                                                                         })
                                                                     }
@@ -214,58 +214,63 @@ export default class App {
             if (allDatabases) {
                 allDatabases = JSON.parse(allDatabases);
                 allDatabases = allDatabases.map((e) => {return e.id});
-                for (let i=0; i<allDatabases.length; i++) {
-                    try {
-                        let responseRemoveInternetCredentials = await resetInternetCredentials(allDatabases[i]);
-                    } catch(removeInternetCredentialsError) {
-                        console.log('removeInternetCredentialsError: ', removeInternetCredentialsError);
-                        break;
-                    }
-                }
-                // After removing the internet credentials delete everything from AsyncStorage
                 try {
-                    let clearAsyncStorage = await AsyncStorage.clear();
-                    // Proceed to removing the databases. For this take into consideration the differences between the two platforms
+                    let deleteAllKeys = await AsyncStorage.multiRemove(allDatabases);
+                    for (let i=0; i<allDatabases.length; i++) {
+                        try {
+                            let responseRemoveInternetCredentials = await resetInternetCredentials(allDatabases[i]);
+                        } catch(removeInternetCredentialsError) {
+                            console.log('removeInternetCredentialsError: ', removeInternetCredentialsError);
+                            break;
+                        }
+                    }
+                    // After removing the internet credentials delete everything from AsyncStorage
+                    try {
+                        let clearAsyncStorage = await AsyncStorage.multiRemove(['loggedUser', 'databases', 'activeDatabase']);
+                        // Proceed to removing the databases. For this take into consideration the differences between the two platforms
 
-                    try {
-                        let libraryFiles = await RNFetchBlobFS.ls(Platform.OS === 'ios' ? `${RNFS.LibraryDirectoryPath}/NoCloud` : `${RNFetchBlobFS.dirs.DocumentDir}`);
-                        if (libraryFiles && Array.isArray(libraryFiles) && libraryFiles.length > 0) {
-                            for (let i = 0; i < libraryFiles.length; i++) {
-                                try {
-                                    console.log('Trying to delete file: ', libraryFiles[i]);
-                                    let deletedFile = await RNFetchBlobFS.unlink(`${RNFetchBlobFS.dirs.DocumentDir}/${libraryFiles[i]}`)
-                                } catch (errorUnlinkDocumentDir) {
-                                    console.log('ErrorUnlinkDocumentDir: ', errorUnlinkDocumentDir);
-                                    return callback(errorUnlinkDocumentDir);
+                        try {
+                            let libraryFiles = await RNFetchBlobFS.ls(Platform.OS === 'ios' ? `${RNFS.LibraryDirectoryPath}/NoCloud` : `${RNFetchBlobFS.dirs.DocumentDir}`);
+                            if (libraryFiles && Array.isArray(libraryFiles) && libraryFiles.length > 0) {
+                                for (let i = 0; i < libraryFiles.length; i++) {
+                                    try {
+                                        console.log('Trying to delete file: ', libraryFiles[i]);
+                                        let deletedFile = await RNFetchBlobFS.unlink(`${RNFetchBlobFS.dirs.DocumentDir}/${libraryFiles[i]}`)
+                                    } catch (errorUnlinkDocumentDir) {
+                                        console.log('ErrorUnlinkDocumentDir: ', errorUnlinkDocumentDir);
+                                        return callback(errorUnlinkDocumentDir);
+                                    }
                                 }
+                                callback(null, 'success');
                             }
-                            callback(null, 'success');
+                        } catch (errorLsLibraryDir) {
+                            console.log('ErrorLsDocumentDir: ', errorLsLibraryDir);
+                            return callback(errorLsLibraryDir);
                         }
-                    } catch (errorLsLibraryDir) {
-                        console.log('ErrorLsDocumentDir: ', errorLsLibraryDir);
-                        return callback(errorLsLibraryDir);
-                    }
-                } catch (errorClearAsyncStorage) {
-                    console.log('ErrorClearAsyncStorage: ', errorClearAsyncStorage);
-                    // Proceed to removing the databases. For this take into consideration the differences between the two platforms
-                    try {
-                        let libraryFiles = await RNFetchBlobFS.ls(Platform.OS === 'ios' ? `${RNFS.LibraryDirectoryPath}/NoCloud` : `${RNFetchBlobFS.dirs.DocumentDir}`);
-                        if (libraryFiles && Array.isArray(libraryFiles) && libraryFiles.length > 0) {
-                            for (let i = 0; i < libraryFiles.length; i++) {
-                                try {
-                                    console.log('Trying to delete file: ', libraryFiles[i]);
-                                    let deletedFile = await RNFetchBlobFS.unlink(`${RNFetchBlobFS.dirs.DocumentDir}/${libraryFiles[i]}`)
-                                } catch (errorUnlinkDocumentDir) {
-                                    console.log('ErrorUnlinkDocumentDir: ', errorUnlinkDocumentDir);
-                                    return callback(errorUnlinkDocumentDir);
+                    } catch (errorClearAsyncStorage) {
+                        console.log('ErrorClearAsyncStorage: ', errorClearAsyncStorage);
+                        // Proceed to removing the databases. For this take into consideration the differences between the two platforms
+                        try {
+                            let libraryFiles = await RNFetchBlobFS.ls(Platform.OS === 'ios' ? `${RNFS.LibraryDirectoryPath}/NoCloud` : `${RNFetchBlobFS.dirs.DocumentDir}`);
+                            if (libraryFiles && Array.isArray(libraryFiles) && libraryFiles.length > 0) {
+                                for (let i = 0; i < libraryFiles.length; i++) {
+                                    try {
+                                        console.log('Trying to delete file: ', libraryFiles[i]);
+                                        let deletedFile = await RNFetchBlobFS.unlink(`${RNFetchBlobFS.dirs.DocumentDir}/${libraryFiles[i]}`)
+                                    } catch (errorUnlinkDocumentDir) {
+                                        console.log('ErrorUnlinkDocumentDir: ', errorUnlinkDocumentDir);
+                                        return callback(errorUnlinkDocumentDir);
+                                    }
                                 }
+                                callback(null, 'success');
                             }
-                            callback(null, 'success');
+                        } catch (errorLsLibraryDir) {
+                            console.log('ErrorLsDocumentDir: ', errorLsLibraryDir);
+                            return callback(errorLsLibraryDir);
                         }
-                    } catch (errorLsLibraryDir) {
-                        console.log('ErrorLsDocumentDir: ', errorLsLibraryDir);
-                        return callback(errorLsLibraryDir);
                     }
+                } catch(deleteAllLastSyncDates) {
+                    console.log('Error while removing last sync dates: ', deleteAllLastSyncDates)
                 }
             } else {
                 console.log('No hubs found');
