@@ -6,12 +6,14 @@ import base64 from 'base-64';
 export function wipeCompleteRequest(url, installationId, clientId, clientSecret, callback) {
     if (url && installationId) {
         let requestUrl = `${url}/devices/wipe-complete`
-    
-        let operatingSystem = Platform.OS;
-        let deviceManufacturer = DeviceInfo.getManufacturer();
-        let deviceModel = DeviceInfo.getModel();
-        let deviceName = DeviceInfo.getDeviceName();
-        let deviceDescription = '';
+
+        let deviceInfoStringify = JSON.stringify({
+            id: installationId,
+            os: Platform.OS,
+            manufacturer: DeviceInfo.getManufacturer().replace(/\u0022|\u0027|\u0060|\u00b4|\u2018|\u2019|\u201c|\u201d/g, `\'`),
+            model: DeviceInfo.getModel().replace(/\u0022|\u0027|\u0060|\u00b4|\u2018|\u2019|\u201c|\u201d/g, `\'`),
+            name: DeviceInfo.getDeviceName().replace(/\u0022|\u0027|\u0060|\u00b4|\u2018|\u2019|\u201c|\u201d/g, `\'`)
+        });
     
         // console.log ('operatingSystem: ', operatingSystem)
         // console.log ('deviceManufacturer: ', deviceManufacturer)
@@ -21,7 +23,7 @@ export function wipeCompleteRequest(url, installationId, clientId, clientSecret,
         // console.log ('requestUrl: ', requestUrl)
         // console.log ('installationId: ', installationId)
 
-        let deviceInfoStringify = `{"id": "${installationId}", "os": "${operatingSystem}", "manufacturer": "${deviceManufacturer}", "model": "${deviceModel}", "name": "${deviceName}"}`
+        // let deviceInfoStringify = `{"id": "${installationId}", "os": "${operatingSystem}", "manufacturer": "${deviceManufacturer}", "model": "${deviceModel}", "name": "${deviceName}"}`
         // console.log('deviceInfoStringify: ', deviceInfoStringify)
 
         fetch( encodeURI(requestUrl), {

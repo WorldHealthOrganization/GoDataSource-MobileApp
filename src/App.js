@@ -8,8 +8,7 @@ import { Platform, DeviceEventEmitter, NativeEventEmitter, NativeModules, AsyncS
 import RNFetchBlobFS from 'rn-fetch-blob/fs';
 import RNFS from 'react-native-fs';
 import {getInternetCredentials} from 'react-native-keychain';
-import {wipeCompleteRequest} from './requests/wipeData'
-
+import {wipeCompleteRequest} from './requests/wipeData';
 import appReducers from './reducers';
 import appActions from './actions';
 import {appInitialized} from './actions/app';
@@ -74,7 +73,18 @@ export default class App {
                                                                                 console.log('wipeCompleteRequest error: ', error)
                                                                             }
                                                                             if (response) {
-                                                                                this.startApp('config');
+                                                                                store.dispatch(appActions.changeAppRoot('config'));
+                                                                                store.dispatch(appActions.storeUser(null));
+                                                                                store.dispatch(appActions.storeContacts(null));
+                                                                                store.dispatch(appActions.storeFollowUps(null));
+                                                                                store.dispatch(appActions.storeCases(null));
+                                                                                store.dispatch(appActions.storeEvents(null));
+                                                                                store.dispatch(appActions.storeOutbreak(null));
+                                                                                store.dispatch(appActions.storeHelpCategory(null));
+                                                                                store.dispatch(appActions.storeHelpItem(null));
+                                                                                store.dispatch(appActions.storeClusters(null));
+                                                                                store.dispatch(appActions.storePermissions(null));
+                                                                                store.dispatch(appActions.saveActiveDatabase(null));
                                                                             }
                                                                         })
                                                                     }
