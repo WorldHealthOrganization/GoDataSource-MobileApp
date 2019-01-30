@@ -74,17 +74,19 @@ class NavigationDrawer extends Component {
                     {
                         config.sideMenuItems.map((item, index) => {
                             let addButton = false;
-                            if (item.addButton && item.addButton === true){
-                                let findPermission = undefined
-                                if (item.key === 'followups') {
-                                    findPermission = this.props.role.find((e) => e === config.userPermissions.writeFollowUp )
-                                } else if (item.key === 'contacts') {
-                                    findPermission = this.props.role.find((e) => e === config.userPermissions.writeContact )
-                                } else if (item.key === 'cases') {
-                                    findPermission = this.props.role.find((e) => e === config.userPermissions.writeCase)
-                                }
-                                if (findPermission !== undefined) {
-                                    addButton = true
+                            if (this.props && this.props.role) {
+                                if (item.addButton && item.addButton === true) {
+                                    let findPermission = undefined;
+                                    if (item.key === 'followups') {
+                                        findPermission = this.props.role.find((e) => e === config.userPermissions.writeFollowUp)
+                                    } else if (item.key === 'contacts') {
+                                        findPermission = this.props.role.find((e) => e === config.userPermissions.writeContact)
+                                    } else if (item.key === 'cases') {
+                                        findPermission = this.props.role.find((e) => e === config.userPermissions.writeCase)
+                                    }
+                                    if (findPermission !== undefined) {
+                                        addButton = true
+                                    }
                                 }
                             }
 

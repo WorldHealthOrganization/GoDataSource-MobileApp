@@ -41,7 +41,7 @@ class ViewHOC extends Component {
 
                 let index = state.syncState.map((e) => {return e.id}).indexOf(props.syncState.id);
                 state.syncState[index] = itemToBeChanged;
-                if (itemToBeChanged.status === 'Error' || (index === state.syncState.length - 1 && itemToBeChanged.status === 'Success')) {
+                if (itemToBeChanged.status === 'Error' || (index === state.syncState.length - 1 && itemToBeChanged.status === 'Success') || itemToBeChanged.status === 'No data to export') {
                     state.showCloseModalButton = true;
                 }
             }

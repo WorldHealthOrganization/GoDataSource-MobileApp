@@ -1611,6 +1611,151 @@ const contactsSingleScreen = {
                 objectType: 'Address'
             }
         ]
+    },
+    relationship: {
+        fields: [
+            {
+                cardNumber: 1,
+                id: 'exposure',
+                label: translations.exposureScreen.chooseCaseOrEvent,
+                labelValue: 'test',
+                type: 'DropdownInput',
+                value: '',
+                isRequired: true,
+                isEditMode: true,
+                objectType: 'Exposure'
+            },
+            {
+                cardNumber: 1,
+                id: 'contactDate',
+                label: translations.exposureScreen.contactDate,
+                value: new Date(),
+                type: "DatePicker",
+                isRequired: true,
+                isEditMode: true,
+                format: 'MM/dd/YYYY',
+                objectType: 'Exposure'
+            },
+            {
+                cardNumber: 1,
+                id: 'contactDateEstimated',
+                label: translations.exposureScreen.contactDateEstimated,
+                type: 'SwitchInput',
+                value: false,
+                isRequired: false,
+                isEditMode: true,
+                activeButtonColor: styles.missedRedColor,
+                activeBackgroundColor: styles.missedRedColorWithOpacity,
+                objectType: 'Exposure'
+            },
+            {
+                cardNumber: 1,
+                id: 'certaintyLevelId',
+                categoryId: 'LNG_REFERENCE_DATA_CATEGORY_CERTAINTY_LEVEL',
+                label: translations.exposureScreen.certaintyLevelId,
+                labelValue: 'test',
+                type: 'DropdownInput',
+                value: '',
+                isRequired: true,
+                isEditMode: true,
+                activeButtonColor: 'red',
+                activeBackgroundColor: 'red',
+                objectType: 'Exposure'
+            },
+            {
+                cardNumber: 1,
+                id: 'exposureTypeId',
+                categoryId: 'LNG_REFERENCE_DATA_CATEGORY_EXPOSURE_TYPE',
+                label: translations.exposureScreen.exposureTypeId,
+                labelValue: 'test',
+                type: 'DropdownInput',
+                value: '',
+                isRequired: false,
+                isEditMode: true,
+                activeButtonColor: 'red',
+                activeBackgroundColor: 'red',
+                objectType: 'Exposure'
+            },
+            {
+                cardNumber: 1,
+                id: 'exposureFrequencyId',
+                categoryId: "LNG_REFERENCE_DATA_CATEGORY_EXPOSURE_FREQUENCY",
+                label: translations.exposureScreen.exposureFrequencyId,
+                labelValue: 'test',
+                type: 'DropdownInput',
+                value: '',
+                isRequired: false,
+                isEditMode: true,
+                activeButtonColor: 'red',
+                activeBackgroundColor: 'red',
+                objectType: 'Exposure'
+            },
+            {
+                cardNumber: 1,
+                id: 'exposureDurationId',
+                categoryId: 'LNG_REFERENCE_DATA_CATEGORY_EXPOSURE_DURATION',
+                label: translations.exposureScreen.exposureDurationId,
+                labelValue: 'test',
+                type: 'DropdownInput',
+                value: '',
+                isRequired: false,
+                isEditMode: true,
+                activeButtonColor: 'red',
+                activeBackgroundColor: 'red',
+                objectType: 'Exposure'
+            },
+            {
+                cardNumber: 1,
+                id: 'socialRelationshipTypeId',
+                categoryId: 'LNG_REFERENCE_DATA_CATEGORY_CONTEXT_OF_TRANSMISSION',
+                label: translations.exposureScreen.socialRelationshipTypeId,
+                labelValue: 'test',
+                type: 'DropdownInput',
+                value: '',
+                isRequired: false,
+                isEditMode: true,
+                activeButtonColor: 'red',
+                activeBackgroundColor: 'red',
+                objectType: 'Exposure'
+            },
+            {
+                cardNumber: 1,
+                id: 'socialRelationshipDetail',
+                label: translations.exposureScreen.socialRelationshipDetail,
+                labelValue: 'test',
+                type: 'TextInput',
+                value: '',
+                isRequired: false,
+                isEditMode: true,
+                multiline: true,
+                objectType: 'Exposure'
+            },
+            {
+                cardNumber: 1,
+                id: 'clusterId',
+                label: translations.exposureScreen.clusterId,
+                labelValue: 'test',
+                type: 'DropdownInput',
+                value: '',
+                isRequired: false,
+                isEditMode: true,
+                activeButtonColor: 'red',
+                activeBackgroundColor: 'red',
+                objectType: 'Exposure'
+            },
+            {
+                cardNumber: 1,
+                id: 'comment',
+                label: translations.exposureScreen.comment,
+                labelValue: 'test',
+                type: 'TextInput',
+                value: '',
+                isRequired: false,
+                isEditMode: true,
+                multiline: true,
+                objectType: 'Exposure'
+            }
+        ]
     }
 };
 
