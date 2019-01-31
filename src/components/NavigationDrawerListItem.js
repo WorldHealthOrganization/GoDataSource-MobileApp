@@ -50,33 +50,35 @@ class NavigationDrawerListItem extends PureComponent {
                         }}
                     />
                 </View>
-                {!!this.props.addButton &&
-                    <View style={{
-                        flex: 0.2,
-                        justifyContent: 'center',
-                        backgroundColor: this.props.isSelected ? styles.backgroundGreen : 'white',
-                        marginTop: this.props.isSelected ? 7.5 : 0,
-                        marginBottom: this.props.isSelected ? 7.5 : 0,
-                        marginRight: this.props.isSelected ? 7.5 : 0,
-                    }}>
-                        <ElevatedView
-                            elevation={3}
-                            style={{
-                                backgroundColor: styles.buttonGreen,
-                                width: calculateDimension(33, false, this.props.screenSize),
-                                height: calculateDimension(25, true, this.props.screenSize),
-                                borderRadius: 4
-                            }}
-                        >
-                            <Ripple style={{
-                                flex: 1,
+                {
+                    this.props && this.props.addButton ?
+                        (<View style={{
+                                flex: 0.2,
                                 justifyContent: 'center',
-                                alignItems: 'center'
-                            }} onPress={this.props.handleOnPressAdd}>
-                                <Icon name="add" color={'white'} size={15}/>
-                            </Ripple>
-                        </ElevatedView>
-                    </View>
+                                backgroundColor: this.props.isSelected ? styles.backgroundGreen : 'white',
+                                marginTop: this.props.isSelected ? 7.5 : 0,
+                                marginBottom: this.props.isSelected ? 7.5 : 0,
+                                marginRight: this.props.isSelected ? 7.5 : 0,
+                            }}>
+                                <ElevatedView
+                                    elevation={3}
+                                    style={{
+                                        backgroundColor: styles.buttonGreen,
+                                        width: calculateDimension(33, false, this.props.screenSize),
+                                        height: calculateDimension(25, true, this.props.screenSize),
+                                        borderRadius: 4
+                                    }}
+                                >
+                                    <Ripple style={{
+                                        flex: 1,
+                                        justifyContent: 'center',
+                                        alignItems: 'center'
+                                    }} onPress={this.props.handleOnPressAdd}>
+                                        <Icon name="add" color={'white'} size={15}/>
+                                    </Ripple>
+                                </ElevatedView>
+                            </View>
+                        ) : (<View/>)
                 }
             </View>
         );

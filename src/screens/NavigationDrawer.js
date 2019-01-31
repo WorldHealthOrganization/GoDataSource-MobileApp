@@ -49,8 +49,8 @@ class NavigationDrawer extends Component {
                             numberOfLines={2}
                             leftElement={<Icon name="account-circle" size={40} color={styles.buttonGreen}/>}
                             centerElement={{
-                                primaryText: (this.props.user && this.props.user.firstName ? (this.props.user.firstName + ' ') : '') + (this.props.user && this.props.user.lastName ? this.props.user.lastName : ''),
-                                secondaryText: this.props.user && this.props.user.email ? this.props.user.email : ''
+                                primaryText: (this.props.user && this.props.user.firstName ? (this.props.user.firstName + ' ') : ' ') + (this.props.user && this.props.user.lastName ? this.props.user.lastName : ' '),
+                                secondaryText: this.props.user && this.props.user.email ? this.props.user.email : ' '
                             }}
                             style={{
                                 // container: {height: '75%'},
