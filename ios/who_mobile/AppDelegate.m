@@ -18,8 +18,9 @@
 #import <UserNotifications/UserNotifications.h>
 #import <Parse.h>
 
-@interface AppDelegate () <UNUserNotificationCenterDelegate>
 
+@interface AppDelegate () <UNUserNotificationCenterDelegate>
+@property (nonatomic, strong) NSMutableArray *queuedNotifications;
 @end
 
 @implementation AppDelegate
@@ -32,6 +33,8 @@
 #else
   jsCodeLocation = [[NSBundle mainBundle] URLForResource:@"main" withExtension:@"jsbundle"];
 #endif
+  
+  self.queuedNotifications = [NSMutableArray array];
   
   self.window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
   self.window.backgroundColor = [UIColor whiteColor];
@@ -52,7 +55,7 @@
     configuration.server = @"http://whoapicd.clarisoft.com:1337/api";
   }];
   [Parse initializeWithConfiguration:config];
-  
+    
   return YES;
 }
 
@@ -64,11 +67,30 @@
 }
 
 - (void)userNotificationCenter:(UNUserNotificationCenter *)center willPresentNotification:(UNNotification *)notification withCompletionHandler:(void (^)(UNNotificationPresentationOptions))completionHandler {
-  [[APNSEventManager sharedInstance] dispatch:@"onPushReceived" body:notification.request.content.userInfo];
+  if (self.reactAppLoaded) {
+    [[APNSEventManager sharedInstance] dispatch:@"onPushReceived" body:notification.request.content.userInfo];
+  } else {
+    // queue notification to be send after react app is loaded
+    [self.queuedNotifications addObject:notification.request.content.userInfo];
+  }
 }
 
 - (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler {
-  [[APNSEventManager sharedInstance] dispatch:@"onPushReceived" body:userInfo];
+  if (self.reactAppLoaded) {
+    [[APNSEventManager sharedInstance] dispatch:@"onPushReceived" body:userInfo];
+  } else {
+    // queue notification to be send after react app is loaded
+    [self.queuedNotifications addObject:userInfo];
+  }
+}
+
+- (void)setReactAppLoaded:(BOOL)reactAppLoaded {
+  _reactAppLoaded = YES;
+  // fire queued notifications;
+  [self.queuedNotifications enumerateObjectsUsingBlock:^(NSDictionary *notification, NSUInteger idx, BOOL * _Nonnull stop) {
+    [[APNSEventManager sharedInstance] dispatch:@"onPushReceived" body:notification];
+  }];
+  [self.queuedNotifications removeAllObjects];
 }
 
 @end

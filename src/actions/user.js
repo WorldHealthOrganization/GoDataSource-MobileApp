@@ -144,7 +144,7 @@ export function cleanDataAfterLogout() {
     }
 }
 
-export function getUserById(userId, token, refreshFollowUps) {
+export function getUserById(userId, token, refreshFollowUps, nativeEventEmitter) {
     return async function(dispatch, getState) {
         console.log("getUserById userId: ", userId);
         getUserByIdRequest(userId, token, (error, response) => {
@@ -195,6 +195,7 @@ export function getUserById(userId, token, refreshFollowUps) {
                                     dispatch(setSyncState('Finished processing'));
                                 }
                                 dispatch(changeAppRoot('after-login'));
+                                dispatch(nativeEventEmitter.appLoaded());
                             })
                             .catch((error) => {
                                 console.log('Getting data from local db resulted in error: ', error);

@@ -10,6 +10,7 @@
 #import <React/RCTEventEmitter.h>
 #import "APNSEventManager.h"
 #import <Parse.h>
+#import "AppDelegate.h"
 
 @implementation APNSEventEmitter
 
@@ -29,6 +30,11 @@ RCT_EXPORT_MODULE();
 RCT_EXPORT_METHOD(initParse) {
   NSString *installationId = [PFInstallation currentInstallation].installationId;
   [[APNSEventManager sharedInstance] dispatch:@"onParseInit" body:@{ @"installationId" : installationId}];
+}
+
+RCT_EXPORT_METHOD(appLoaded) {
+  AppDelegate *appDelegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
+  appDelegate.reactAppLoaded = YES;
 }
 
 @end

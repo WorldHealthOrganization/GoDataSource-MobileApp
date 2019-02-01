@@ -110,10 +110,12 @@ export default class App {
                 .catch((errorInstallationId) => {
                     console.log('Error device id: ', errorInstallationId);
                 })
-        })
+        });
 
         store.subscribe(this.onStoreUpdate);
-        store.dispatch(appActions.appInitialized());
+        store.dispatch(appActions.appInitialized(Platform.OS === 'ios' ? NativeModules.APNSEventEmitter : DeviceEventEmitter));
+        // console.log('App loaded');
+        // NativeModules.APNSEventEmitter.appLoaded();
     };
 
     onStoreUpdate = () => {
