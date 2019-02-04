@@ -252,6 +252,9 @@ class ManualConfigScreen extends Component {
                         onChangeText={this.handleTextChange}
                         label={getTranslation(translations.manualConfigScreen.nameLabel, this.props.translation)}
                         autoCapitalize={'none'}
+                        tintColor={'#F5F5F5'}
+                        baseColor={'#DCDCDC'}
+                        textColor={'white'}
                     />
                     <TextField
                         ref={this.urlRef}
@@ -263,6 +266,9 @@ class ManualConfigScreen extends Component {
                         onChangeText={this.handleTextChange}
                         label={getTranslation(translations.manualConfigScreen.hubUrlLabel, null)}
                         autoCapitalize={'none'}
+                        tintColor={'#F5F5F5'}
+                        baseColor={'#DCDCDC'}
+                        textColor={'white'}
                     />
                     <TextField
                         ref={this.clientIDRef}
@@ -274,6 +280,9 @@ class ManualConfigScreen extends Component {
                         onChangeText={this.handleTextChange}
                         label={getTranslation(translations.manualConfigScreen.clientIdLabel, null)}
                         autoCapitalize={'none'}
+                        tintColor={'#F5F5F5'}
+                        baseColor={'#DCDCDC'}
+                        textColor={'white'}
                     />
                     <TextField
                         ref={this.clientSecretRef}
@@ -286,6 +295,9 @@ class ManualConfigScreen extends Component {
                         label={getTranslation(translations.manualConfigScreen.clientSecretPass, null)}
                         secureTextEntry={true}
                         autoCapitalize={'none'}
+                        tintColor={'#F5F5F5'}
+                        baseColor={'#DCDCDC'}
+                        textColor={'white'}
                     />
                     <SwitchInput
                         id="encryptedData"
