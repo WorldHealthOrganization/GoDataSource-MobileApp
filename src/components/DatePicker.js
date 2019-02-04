@@ -164,7 +164,7 @@ class DatePicker extends PureComponent {
         this.props.onChange(
             date, 
             this.props.id, 
-            this.props.objectType ? (this.props.objectType === 'Address' || this.props.objectType === 'LabResult' || this.props.objectType === 'HospitalizationDates' || this.props.objectType === 'IsolationDates' ? this.props.index : this.props.objectType) : null, 
+            this.props.objectType ? (this.props.objectType === 'Address' || this.props.objectType === 'LabResult' || this.props.objectType === 'DateRanges' ? this.props.index : this.props.objectType) : null,
             this.props.objectType
         );
         this.handleDateCancelled();

@@ -644,59 +644,71 @@ const caseSingleScreen = {
             ]
         }
     ],
-    hospitalizationDate: {
+    dateRanges: {
         fields: [
             {
                 cardNumber: 2,
+                id: 'type',
+                label: translations.caseSingleScreen.dateRangeType,
+                labelValue: 'test',
+                type: 'DropdownInput',
+                value: '',
+                isEditMode: true,
+                isRequired: true,
+                format: 'YYYY-MM-dd',
+                objectType: 'DateRanges'
+            },
+            {
+                cardNumber: 2,
                 id: 'startDate',
-                label: translations.caseSingleScreen.hospitalisationStartDate,
+                label: translations.caseSingleScreen.dateRangeStartDate,
                 type: 'DatePicker',
                 value: '',
                 isEditMode: true,
                 format: 'YYYY-MM-dd',
-                objectType: 'HospitalizationDates'
+                objectType: 'DateRanges'
             },
             {
                 cardNumber: 2,
                 id: 'endDate',
-                label: translations.caseSingleScreen.hospitalisationEndDate,
+                label: translations.caseSingleScreen.dateRangeEndDate,
                 type: 'DatePicker',
                 value: '',
                 isEditMode: true,
                 format: 'YYYY-MM-dd',
-                objectType: 'HospitalizationDates'
+                objectType: 'DateRanges'
             },
             {
                 cardNumber: 2,
                 id: 'centerName',
-                label: translations.caseSingleScreen.hospitalisationCenterName,
+                label: translations.caseSingleScreen.dateRangeCenterName,
                 type: 'TextInput',
                 value: '',
                 isRequired: false,
                 isEditMode: false,
-                objectType: 'HospitalizationDates'
+                objectType: 'DateRanges'
             },
             {
                 cardNumber: 2,
                 id: 'locationId',
-                label: translations.caseSingleScreen.hospitalisationLocation,
+                label: translations.caseSingleScreen.dateRangeLocation,
                 labelValue: 'test',
                 type: 'DropDownSectioned',
                 value: '',
                 isRequired: false,
                 isEditMode: true,
-                objectType: 'HospitalizationDates',
+                objectType: 'DateRanges',
                 single: true
             },
             {
                 cardNumber: 2,
                 id: 'comments',
-                label: translations.caseSingleScreen.hospitalisationComments,
+                label: translations.caseSingleScreen.dateRangeComments,
                 type: 'TextInput',
                 value: '',
                 isRequired: false,
                 isEditMode: false,
-                objectType: 'HospitalizationDates',
+                objectType: 'DateRanges',
                 multiline: true
             },
             {
@@ -707,77 +719,146 @@ const caseSingleScreen = {
                 textsArray: [translations.caseSingleScreen.deleteButton],
                 textsStyleArray: [{color: styles.missedRedColor}],
                 onPressArray: [],
-                objectType: 'HospitalizationDates'
+                objectType: 'DateRanges'
             }
         ]
     },
-    isolationDate: {
-        fields: [
-            {
-                cardNumber: 3,
-                id: 'startDate',
-                label: translations.caseSingleScreen.isolationStartDate,
-                type: 'DatePicker',
-                value: '',
-                isEditMode: true,
-                format: 'YYYY-MM-dd',
-                objectType: 'IsolationDates'
-            },
-            {
-                cardNumber: 3,
-                id: 'endDate',
-                label: translations.caseSingleScreen.isolationEndDate,
-                type: 'DatePicker',
-                value: '',
-                isEditMode: true,
-                format: 'YYYY-MM-dd',
-                objectType: 'IsolationDates'
-            },
-            {
-                cardNumber: 3,
-                id: 'centerName',
-                label: translations.caseSingleScreen.isolationCenterName,
-                type: 'TextInput',
-                value: '',
-                isRequired: false,
-                isEditMode: false,
-                objectType: 'IsolationDates'
-            },
-            {
-                cardNumber: 3,
-                id: 'locationId',
-                label: translations.caseSingleScreen.isolationLocation,
-                labelValue: 'test',
-                type: 'DropDownSectioned',
-                value: '',
-                isRequired: false,
-                isEditMode: true,
-                objectType: 'IsolationDates',
-                single: true
-            },
-            {
-                cardNumber: 3,
-                id: 'comments',
-                label: translations.caseSingleScreen.isolationComments,
-                type: 'TextInput',
-                value: '',
-                isRequired: false,
-                isEditMode: false,
-                objectType: 'IsolationDates',
-                multiline: true
-            },
-            {
-                cardNumber: 3,
-                id: 'deleteButton',
-                type: 'ActionsBar',
-                labelValue: 'test',
-                textsArray: [translations.caseSingleScreen.deleteButton],
-                textsStyleArray: [{color: styles.missedRedColor}],
-                onPressArray: [],
-                objectType: 'IsolationDates'
-            }
-        ]
-    },
+
+    // hospitalizationDate: {
+    //     fields: [
+    //         {
+    //             cardNumber: 2,
+    //             id: 'startDate',
+    //             label: translations.caseSingleScreen.hospitalisationStartDate,
+    //             type: 'DatePicker',
+    //             value: '',
+    //             isEditMode: true,
+    //             format: 'YYYY-MM-dd',
+    //             objectType: 'HospitalizationDates'
+    //         },
+    //         {
+    //             cardNumber: 2,
+    //             id: 'endDate',
+    //             label: translations.caseSingleScreen.hospitalisationEndDate,
+    //             type: 'DatePicker',
+    //             value: '',
+    //             isEditMode: true,
+    //             format: 'YYYY-MM-dd',
+    //             objectType: 'HospitalizationDates'
+    //         },
+    //         {
+    //             cardNumber: 2,
+    //             id: 'centerName',
+    //             label: translations.caseSingleScreen.hospitalisationCenterName,
+    //             type: 'TextInput',
+    //             value: '',
+    //             isRequired: false,
+    //             isEditMode: false,
+    //             objectType: 'HospitalizationDates'
+    //         },
+    //         {
+    //             cardNumber: 2,
+    //             id: 'locationId',
+    //             label: translations.caseSingleScreen.hospitalisationLocation,
+    //             labelValue: 'test',
+    //             type: 'DropDownSectioned',
+    //             value: '',
+    //             isRequired: false,
+    //             isEditMode: true,
+    //             objectType: 'HospitalizationDates',
+    //             single: true
+    //         },
+    //         {
+    //             cardNumber: 2,
+    //             id: 'comments',
+    //             label: translations.caseSingleScreen.hospitalisationComments,
+    //             type: 'TextInput',
+    //             value: '',
+    //             isRequired: false,
+    //             isEditMode: false,
+    //             objectType: 'HospitalizationDates',
+    //             multiline: true
+    //         },
+    //         {
+    //             cardNumber: 2,
+    //             id: 'deleteButton',
+    //             type: 'ActionsBar',
+    //             labelValue: 'test',
+    //             textsArray: [translations.caseSingleScreen.deleteButton],
+    //             textsStyleArray: [{color: styles.missedRedColor}],
+    //             onPressArray: [],
+    //             objectType: 'HospitalizationDates'
+    //         }
+    //     ]
+    // },
+    // isolationDate: {
+    //     fields: [
+    //         {
+    //             cardNumber: 3,
+    //             id: 'startDate',
+    //             label: translations.caseSingleScreen.isolationStartDate,
+    //             type: 'DatePicker',
+    //             value: '',
+    //             isEditMode: true,
+    //             format: 'YYYY-MM-dd',
+    //             objectType: 'IsolationDates'
+    //         },
+    //         {
+    //             cardNumber: 3,
+    //             id: 'endDate',
+    //             label: translations.caseSingleScreen.isolationEndDate,
+    //             type: 'DatePicker',
+    //             value: '',
+    //             isEditMode: true,
+    //             format: 'YYYY-MM-dd',
+    //             objectType: 'IsolationDates'
+    //         },
+    //         {
+    //             cardNumber: 3,
+    //             id: 'centerName',
+    //             label: translations.caseSingleScreen.isolationCenterName,
+    //             type: 'TextInput',
+    //             value: '',
+    //             isRequired: false,
+    //             isEditMode: false,
+    //             objectType: 'IsolationDates'
+    //         },
+    //         {
+    //             cardNumber: 3,
+    //             id: 'locationId',
+    //             label: translations.caseSingleScreen.isolationLocation,
+    //             labelValue: 'test',
+    //             type: 'DropDownSectioned',
+    //             value: '',
+    //             isRequired: false,
+    //             isEditMode: true,
+    //             objectType: 'IsolationDates',
+    //             single: true
+    //         },
+    //         {
+    //             cardNumber: 3,
+    //             id: 'comments',
+    //             label: translations.caseSingleScreen.isolationComments,
+    //             type: 'TextInput',
+    //             value: '',
+    //             isRequired: false,
+    //             isEditMode: false,
+    //             objectType: 'IsolationDates',
+    //             multiline: true
+    //         },
+    //         {
+    //             cardNumber: 3,
+    //             id: 'deleteButton',
+    //             type: 'ActionsBar',
+    //             labelValue: 'test',
+    //             textsArray: [translations.caseSingleScreen.deleteButton],
+    //             textsStyleArray: [{color: styles.missedRedColor}],
+    //             onPressArray: [],
+    //             objectType: 'IsolationDates'
+    //         }
+    //     ]
+    // },
+
 };
 
 const followUpsFilterScreen = {
@@ -2193,6 +2274,13 @@ const manualSyncStages = [
     {id: 'sync', name: 'Sync', status: '...'}
 ];
 
+const dateRangeTypes = {
+    hospitalization: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_DATE_TYPE_HOSPITALIZATION',
+    isolation: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_DATE_TYPE_ISOLATION',
+    incubation: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_DATE_TYPE_INCUBATION',
+    other: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_DATE_TYPE_OTHER'
+};
+
 export default {
     designScreenSize,
     sideMenuItems,
@@ -2224,5 +2312,6 @@ export default {
     userPermissions,
     helpSingleScreen,
     helpItemsSortCriteriaDropDownItems,
-    manualSyncStages
+    manualSyncStages,
+    dateRangeTypes
 }
