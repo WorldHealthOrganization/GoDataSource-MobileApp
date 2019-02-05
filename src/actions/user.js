@@ -195,7 +195,9 @@ export function getUserById(userId, token, refreshFollowUps, nativeEventEmitter)
                                     dispatch(setSyncState('Finished processing'));
                                 }
                                 dispatch(changeAppRoot('after-login'));
-                                dispatch(nativeEventEmitter.appLoaded());
+                                if (nativeEventEmitter) {
+                                    dispatch(nativeEventEmitter.appLoaded());
+                                }
                             })
                             .catch((error) => {
                                 console.log('Getting data from local db resulted in error: ', error);

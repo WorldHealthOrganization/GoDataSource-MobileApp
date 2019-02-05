@@ -31,7 +31,8 @@ export default class App {
         if (Platform.OS === 'ios') {
             ParseNativeModule = new NativeEventEmitter(NativeModules.APNSEventEmitter)
         } else {
-            ParseNativeModule = DeviceEventEmitter
+
+            ParseNativeModule = DeviceEventEmitter;
         }
         ParseNativeModule.addListener('onParseInit', (item) => {
             console.log('~~~ TODO save installation Id onParseInit ~~~', item);
@@ -113,7 +114,8 @@ export default class App {
         });
 
         store.subscribe(this.onStoreUpdate);
-        store.dispatch(appActions.appInitialized(Platform.OS === 'ios' ? NativeModules.APNSEventEmitter : DeviceEventEmitter));
+        console.log('Proceed to initialize the app');
+        store.dispatch(appActions.appInitialized(Platform.OS === 'ios' ? NativeModules.APNSEventEmitter : NativeModules.ParseReceiver));
         // console.log('App loaded');
         // NativeModules.APNSEventEmitter.appLoaded();
     };
