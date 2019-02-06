@@ -749,7 +749,7 @@ export function getDataFromDatabaseFromFile (database, fileType, lastSyncDate, p
                         })
                 } else {
                     database = null;
-                    resolve(`Done with ${fileType}`);
+                    resolve(`No data to send`);
                 }
             })
             .catch((error) => {
@@ -901,6 +901,7 @@ export async function createFilesWithName (fileName, data, password) {
     try {
         let exists = await RNFetchBlobFS.exists(RNFetchBlobFS.dirs.DocumentDir + '/who_files');
         if (exists) {
+            console.log(`Directory ${RNFetchBlobFS.dirs.DocumentDir + '/who_files'} exists`);
             let numberOfChunks = parseInt(data.length / 1000);
             let remainder = data.length % 1000;
             let arrayOfResponses = [];
@@ -925,6 +926,7 @@ export async function createFilesWithName (fileName, data, password) {
             }
         } else {
             // If the directory does not exists, then create it
+            console.log(`Directory ${RNFetchBlobFS.dirs.DocumentDir + '/who_files'} does not exist`);
             try {
                 let directory = await RNFetchBlobFS.mkdir(RNFetchBlobFS.dirs.DocumentDir + '/who_files');
                 // Do not check if directory exists, since the mkdir method does not return anything
@@ -965,17 +967,29 @@ export async function createFilesWithName (fileName, data, password) {
 
 export function createZipFileAtPath (source, target, callback) {
     // First check if the source exists, so that we don't create an empty zip file
-    RNFetchBlobFS.exists()
-    // We don't need to check for archives with the same name, since the zip function overwrites the previous archive
-    zip(source, target)
-        .then((path) => {
-            console.log('Zip file created at path: ', path);
-            callback(null, path);
+    console.log('Checking source: ', source);
+    RNFetchBlobFS.exists(source)
+        .then((exists) => {
+            if (exists) {
+                // We don't need to check for archives with the same name, since the zip function overwrites the previous archive
+                zip(source, target)
+                    .then((path) => {
+                        console.log('Zip file created at path: ', path);
+                        return callback(null, path);
+                    })
+                    .catch((errorCreateZip) => {
+                        console.log('Error while creating zip file: ', errorCreateZip);
+                        callback(errorCreateZip);
+                    })
+            } else {
+                console.log('File does not exist at path: ', source);
+                return callback('File does not exist');
+            }
         })
-        .catch((errorCreateZip) => {
-            console.log('Error while creating zip file: ', errorCreateZip);
-            callback(errorCreateZip);
-        })
+        .catch((errorFileExists) => {
+            console.log('Error while checking if file exists: ', errorFileExists);
+            return callback(errorFileExists);
+        });
 }
 
 // Method for extracting the mongo id from the pouch id
