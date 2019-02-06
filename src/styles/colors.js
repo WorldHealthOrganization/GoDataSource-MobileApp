@@ -20,6 +20,9 @@ const textFieldUnderline = 'rgb(176, 176, 176)';
 const colorLoginButtonText = 'rgb(39, 39, 39)';
 const colorUnselectedItem = 'rgb(237, 237, 237)';
 const colorUnselectedItemText = 'rgb(49, 49, 49)';
+const colorTint = '#f5f5f5';
+const colorBase = '#dcdcdc';
+const colorWhite = 'white';
 
 export default {
     screenBackgroundGrey,
@@ -40,5 +43,8 @@ export default {
     colorLoginButtonText,
     colorUnselectedItem,
     colorUnselectedItemText,
-    buttonBlack
+    buttonBlack,
+    colorTint,
+    colorBase,
+    colorWhite
 }
