@@ -1125,10 +1125,27 @@ export function updateRequiredFields(outbreakId, userId, record, action, fileTyp
             record.deleted = true;
             record.deletedAt = new Date().toISOString();
             // console.log ('updateRequiredFields delete record', JSON.stringify(record))
+
+            // WGD-1806 when removing cases/contacts and they have visualId, set it to null, and add a new document
+            if (fileType === 'person.json' && (type === config.personTypes.contacts || type === config.personTypes.cases) && record.visualId) {
+                if (!record.documents || !Array.isArray(record.documents)) {
+                    record.documents = [];
+                }
+                let documents = record.documents.slice();
+
+                documents.push({
+                    type: config.documentTypes.archivedId,
+                    number: record.visualId
+                });
+                record.documents = documents.slice();
+                record.visualId = null;
+            }
+
             return record;
 
         default:
             console.log ('updateRequiredFields default record', JSON.stringify(record));
+            return record;
     }
 }
 

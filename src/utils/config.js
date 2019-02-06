@@ -2193,6 +2193,10 @@ const manualSyncStages = [
     {id: 'sync', name: 'Sync', status: '...'}
 ];
 
+const documentTypes = {
+    archivedId: 'LNG_REFERENCE_DATA_CATEGORY_DOCUMENT_TYPE_ARCHIVED_ID'
+};
+
 export default {
     designScreenSize,
     sideMenuItems,
@@ -2224,5 +2228,6 @@ export default {
     userPermissions,
     helpSingleScreen,
     helpItemsSortCriteriaDropDownItems,
-    manualSyncStages
+    manualSyncStages,
+    documentTypes
 }
