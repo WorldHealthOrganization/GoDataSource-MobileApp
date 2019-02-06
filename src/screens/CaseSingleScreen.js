@@ -509,7 +509,7 @@ class CaseSingleScreen extends Component {
                                         savePressed: true
                                     }, () => {
                                         if (this.props.isNew) {
-                                            let caseWithRequiredFields = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, this.state.case), action = 'create', fileType = 'person.json', type = 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE')
+                                            let caseWithRequiredFields = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, this.state.case), action = 'create', fileType = 'person.json', type = 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE');
                                             this.setState(prevState => ({
                                                 case: Object.assign({}, prevState.case, caseWithRequiredFields)
                                             }), () => {
@@ -520,9 +520,9 @@ class CaseSingleScreen extends Component {
                                         } else {
                                             let caseWithRequiredFields = null
                                             if (this.state.deletePressed === true) {
-                                                caseWithRequiredFields = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, this.state.case), action = 'delete')
+                                                caseWithRequiredFields = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, this.state.case), action = 'delete', fileType = 'person.json', type = 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE')
                                             } else {
-                                                caseWithRequiredFields = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, this.state.case), action = 'update')
+                                                caseWithRequiredFields = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, this.state.case), action = 'update', fileType = 'person.json', type = 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE')
                                             }
                                             this.setState(prevState => ({
                                                 case: Object.assign({}, prevState.case, caseWithRequiredFields)

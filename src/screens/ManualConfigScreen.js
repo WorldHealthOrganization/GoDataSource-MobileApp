@@ -252,6 +252,9 @@ class ManualConfigScreen extends PureComponent {
                         onChangeText={this.handleTextChange}
                         label={getTranslation(translations.manualConfigScreen.nameLabel, this.props.translation)}
                         autoCapitalize={'none'}
+                        tintColor={styles.colorTint}
+                        baseColor={styles.colorBase}
+                        textColor={styles.colorWhite}
                     />
                     <TextField
                         ref={this.urlRef}
@@ -263,6 +266,9 @@ class ManualConfigScreen extends PureComponent {
                         onChangeText={this.handleTextChange}
                         label={getTranslation(translations.manualConfigScreen.hubUrlLabel, null)}
                         autoCapitalize={'none'}
+                        tintColor={styles.colorTint}
+                        baseColor={styles.colorBase}
+                        textColor={styles.colorWhite}
                     />
                     <TextField
                         ref={this.clientIDRef}
@@ -274,6 +280,9 @@ class ManualConfigScreen extends PureComponent {
                         onChangeText={this.handleTextChange}
                         label={getTranslation(translations.manualConfigScreen.clientIdLabel, null)}
                         autoCapitalize={'none'}
+                        tintColor={styles.colorTint}
+                        baseColor={styles.colorBase}
+                        textColor={styles.colorWhite}
                     />
                     <TextField
                         ref={this.clientSecretRef}
@@ -286,6 +295,9 @@ class ManualConfigScreen extends PureComponent {
                         label={getTranslation(translations.manualConfigScreen.clientSecretPass, null)}
                         secureTextEntry={true}
                         autoCapitalize={'none'}
+                        tintColor={styles.colorTint}
+                        baseColor={styles.colorBase}
+                        textColor={styles.colorWhite}
                     />
                     <SwitchInput
                         id="encryptedData"
