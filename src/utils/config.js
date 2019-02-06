@@ -2274,11 +2274,15 @@ const manualSyncStages = [
     {id: 'sync', name: 'Sync', status: '...'}
 ];
 
-const dateRangeTypes = {
+const dateRangeTypes ={
     hospitalization: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_DATE_TYPE_HOSPITALIZATION',
     isolation: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_DATE_TYPE_ISOLATION',
     incubation: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_DATE_TYPE_INCUBATION',
     other: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_DATE_TYPE_OTHER'
+};
+
+const documentTypes = {
+    archivedId: 'LNG_REFERENCE_DATA_CATEGORY_DOCUMENT_TYPE_ARCHIVED_ID'
 };
 
 export default {
@@ -2313,5 +2317,6 @@ export default {
     helpSingleScreen,
     helpItemsSortCriteriaDropDownItems,
     manualSyncStages,
-    dateRangeTypes
+    dateRangeTypes,
+    documentTypes
 }
