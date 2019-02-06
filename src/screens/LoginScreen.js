@@ -124,9 +124,9 @@ class LoginScreen extends Component {
                         onChangeText={this.handleTextChange}
                         label={getTranslation(translations.loginScreen.emailLabel, this.props && this.props.translation ? this.props.translation : null)}
                         autoCapitalize={'none'}
-                        tintColor={'#F5F5F5'}
-                        baseColor={'#DCDCDC'}
-                        textColor={'white'}
+                        tintColor={styles.colorTint}
+                        baseColor={styles.colorBase}
+                        textColor={styles.colorWhite}
                     />
                     <TextField
                         ref={this.passwordRef}
@@ -139,9 +139,9 @@ class LoginScreen extends Component {
                         label={getTranslation(translations.loginScreen.passwordLabel, this.props && this.props.translation ? this.props.translation : null)}
                         secureTextEntry={true}
                         autoCapitalize={'none'}
-                        tintColor={'#F5F5F5'}
-                        baseColor={'#DCDCDC'}
-                        textColor={'white'}
+                        tintColor={styles.colorTint}
+                        baseColor={styles.colorBase}
+                        textColor={styles.colorWhite}
                     />
                     <Button onPress={this.handleLogin} text={getTranslation(translations.loginScreen.loginButtonLabel, this.props && this.props.translation ? this.props.translation : null)} style={styles.buttonLogin} height={35} />
                 </View>
