@@ -31,6 +31,7 @@ import {setLoginState, storeData, getAvailableLanguages, setSyncState} from './a
 import {storePermissions} from './role';
 import moment from 'moment';
 import _ from 'lodash';
+import {middlewareFunction} from './app';
 
 // Add here only the actions, not also the requests that are executed.
 // For that purpose is the requests directory
@@ -195,8 +196,10 @@ export function getUserById(userId, token, refreshFollowUps, nativeEventEmitter)
                                     dispatch(setSyncState('Finished processing'));
                                 }
                                 dispatch(changeAppRoot('after-login'));
+                                console.log('NativeEventEmitter: ', typeof nativeEventEmitter, nativeEventEmitter);
+                                console.log("Typeof nativeEventEmitter: ", typeof nativeEventEmitter.appLoaded);
                                 if (nativeEventEmitter) {
-                                    dispatch(nativeEventEmitter.appLoaded());
+                                    dispatch(middlewareFunction(nativeEventEmitter));
                                 }
                             })
                             .catch((error) => {

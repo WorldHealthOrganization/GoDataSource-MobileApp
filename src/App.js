@@ -31,7 +31,6 @@ export default class App {
         if (Platform.OS === 'ios') {
             ParseNativeModule = new NativeEventEmitter(NativeModules.APNSEventEmitter)
         } else {
-
             ParseNativeModule = DeviceEventEmitter;
         }
         ParseNativeModule.addListener('onParseInit', (item) => {

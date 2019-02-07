@@ -137,7 +137,7 @@ export function postDatabaseSnapshotRequest(internetCredentials, path, callback)
             });
             console.log('Send database to server');
             // Before starting a download, first test if the API responds
-            testApi(`${hubConfig.url}/system-settings/version`, (errorTestApi, responseTestApi) => {
+            testApi(`${hubConfig.url}/system-settings/version`, deviceInfo, (errorTestApi, responseTestApi) => {
                 if (errorTestApi) {
                     console.log("*** testApi error: ", JSON.stringify(errorTestApi));
                     callback('The hub is not available');
