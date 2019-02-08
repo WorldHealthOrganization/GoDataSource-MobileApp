@@ -187,8 +187,11 @@ class CaseSingleInfectionContainer extends Component {
         let fields = config.caseSingleScreen.dateRanges.fields.map((field) => {
             return Object.assign({},field, {isEditMode: this.props.isEditMode})
         });
-        if (this.props && this.props.case && this.props.case.dateRanges && Array.isArray(this.props.case.dateRanges) && this.props.case.dateRanges[index] && this.props.case.dateRanges[index].type === config.dateRangeTypes.hospitalization) {
+        if (this.props && this.props.case && this.props.case.dateRanges && Array.isArray(this.props.case.dateRanges) && this.props.case.dateRanges[index] && this.props.case.dateRanges[index].typeId === config.dateRangeTypes.hospitalization) {
             fields[3].label = translations.caseSingleScreen.dateRangeHospitalName;
+        }
+        if (this.props && this.props.case && this.props.case.dateRanges && Array.isArray(this.props.case.dateRanges) && this.props.case.dateRanges[index] && (this.props.case.dateRanges[index].typeId !== config.dateRangeTypes.hospitalization && this.props.case.dateRanges[index].typeId !== config.dateRangeTypes.isolation)) {
+            fields.splice(3, 1);
         }
         return this.renderItemCardComponent(fields, index)
     };
@@ -419,7 +422,7 @@ class CaseSingleInfectionContainer extends Component {
     };
 
     computeDataForCasesSingleScreenDropdownInput = (item) => {
-        if (item.id === 'type' && item.objectType === 'DateRanges') {
+        if (item.id === 'typeId' && item.objectType === 'DateRanges') {
             return _.filter(this.props.referenceData, (o) => {
                 return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_PERSON_DATE_TYPE'
             }).map((o) => {return {value: getTranslation(o.value, this.props.translation), id: o.value}})

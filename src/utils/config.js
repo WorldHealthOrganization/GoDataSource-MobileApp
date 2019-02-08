@@ -648,7 +648,7 @@ const caseSingleScreen = {
         fields: [
             {
                 cardNumber: 2,
-                id: 'type',
+                id: 'typeId',
                 label: translations.caseSingleScreen.dateRangeType,
                 labelValue: 'test',
                 type: 'DropdownInput',

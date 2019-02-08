@@ -823,7 +823,7 @@ class CaseSingleScreen extends Component {
         }
 
         dateRanges.push({
-            type: null,
+            typeId: null,
             startDate: null,
             endDate: null,
             centerName: null,
