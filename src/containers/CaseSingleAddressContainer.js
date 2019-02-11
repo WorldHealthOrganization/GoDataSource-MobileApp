@@ -49,9 +49,7 @@ class CaseSingleAddressContainer extends PureComponent {
         }
 
         return (
-            <TouchableWithoutFeedback onPress={() => {
-                Keyboard.dismiss()
-            }} accessible={false}>
+            <View style={{flex: 1}}>
                 <View style={style.container}>
                     <View style={{flexDirection: 'row'}}>
                         {
@@ -152,7 +150,7 @@ class CaseSingleAddressContainer extends PureComponent {
                         }
                     </KeyboardAwareScrollView>
                 </View>
-            </TouchableWithoutFeedback>
+            </View>
         );
     }
 
