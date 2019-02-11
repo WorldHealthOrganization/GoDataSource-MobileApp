@@ -48,9 +48,7 @@ class ContactsSinglePersonal extends PureComponent {
         }
 
         return (
-            <TouchableWithoutFeedback onPress={() => {
-                Keyboard.dismiss()
-            }} accessible={false}>
+            <View style={{flex: 1}}>
                 <View style={style.viewContainer}>
                     <View style={{flexDirection: 'row'}}>
                         <Button
@@ -79,7 +77,7 @@ class ContactsSinglePersonal extends PureComponent {
                         </View>
                     </KeyboardAwareScrollView>
                 </View>
-            </TouchableWithoutFeedback>
+            </View>
         );
     };
 

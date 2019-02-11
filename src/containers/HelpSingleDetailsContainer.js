@@ -31,7 +31,7 @@ class HelpSingleDetailsContainer extends PureComponent {
     // and can slow down the app
     render() {
         return (
-            <TouchableWithoutFeedback onPress={() => {Keyboard.dismiss()}} accessible={false}>
+            <View style={{flex: 1}}>
                 <View style={style.container}>
                     <KeyboardAwareScrollView
                         style={style.containerScrollView}
@@ -45,7 +45,7 @@ class HelpSingleDetailsContainer extends PureComponent {
                         }
                     </KeyboardAwareScrollView>
                 </View>
-            </TouchableWithoutFeedback>
+            </View>
         );
     }
 

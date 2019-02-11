@@ -83,8 +83,8 @@ export default {
     'LNG_CASE_SINGLE_SCREEN_ADD_NEW_CASE_TITLE_LABEL': 'Add case',
     'LNG_CASE_SINGLE_SCREEN_DELETE_CASE_ACTION': 'Delete case',
 
-    'LNG_HOSPITALIZATION_ADD_NEW_HOSPITALIZATION_MESSAGE': 'Add hospitalization date range',
-    'LNG_HOSPITALIZATION_ADD_ANOTHER_HOSPITALIZATION_MESSAGE': 'Add another hospitalization date range',
+    'LNG_DATE_RANGE_ADD_NEW_DATE_MESSAGE': 'Add date range',
+    'LNG_DATE_RANGE_ADD_ANOTHER_DATE_MESSAGE': 'Add another date range',
     'LNG_ISOLATION_ADD_NEW_ISOLATION_MESSAGE': 'Add isolation date range',
     'LNG_ISOLATION_ADD_ANOTHER_ISOLATION_MESSAGE': 'Add another isolation date range',
     'LNG_DOCUMENT_ADD_NEW_DOCUMENT_MESSAGE': 'Add document',

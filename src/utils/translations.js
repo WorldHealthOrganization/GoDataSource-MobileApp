@@ -94,8 +94,13 @@ const caseSingleScreen = {
 
     oneAddressText: 'LNG_ADDRESS_ADD_NEW_ADDRESS_MESSAGE',
     moreAddressesText: 'LNG_ADDRESS_ADD_ANOTHER_ADDRESS_MESSAGE',
-    oneHospitalizationDateText: 'LNG_HOSPITALIZATION_ADD_NEW_HOSPITALIZATION_MESSAGE',
-    moreHospitalizationDatesText: 'LNG_HOSPITALIZATION_ADD_ANOTHER_HOSPITALIZATION_MESSAGE',
+
+    // TODO SEND to API
+    oneDateRangeText: 'LNG_DATE_RANGE_ADD_NEW_DATE_MESSAGE',
+    moreDateRangeText: 'LNG_DATE_RANGE_ADD_ANOTHER_DATE_MESSAGE',
+    // END
+
+
     oneIsolationDateText: 'LNG_ISOLATION_ADD_NEW_ISOLATION_MESSAGE',
     moreIsolationDatesText: 'LNG_ISOLATION_ADD_ANOTHER_ISOLATION_MESSAGE',
     oneDocumentText: 'LNG_DOCUMENT_ADD_NEW_DOCUMENT_MESSAGE',
@@ -129,6 +134,16 @@ const caseSingleScreen = {
     deceased: 'LNG_CASE_FIELD_LABEL_DECEASED',
     safeBurial: 'LNG_CASE_FIELD_LABEL_SAFETY_BURIAL',
     dateDeceased: 'LNG_CASE_FIELD_LABEL_DATE_OF_DECEASE',
+
+
+    dateRangeType: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_DATE_TYPE',
+    dateRangeStartDate: 'LNG_DATE_FIELD_LABEL_FROM',
+    dateRangeEndDate: 'LNG_DATE_FIELD_LABEL_TO',
+    dateRangeLocation: 'LNG_DATE_FIELD_LABEL_LOCATION',
+    dateRangeComments: 'LNG_DATE_FIELD_LABEL_COMMENTS',
+    dateRangeCenterName: 'LNG_DATE_FIELD_LABEL_CENTER_NAME',
+    dateRangeHospitalName: 'LNG_DATE_FIELD_LABEL_HOSPITAL_NAME',
+
 
     hospitalisationStartDate: 'LNG_DATE_FIELD_LABEL_FROM',
     hospitalisationEndDate: 'LNG_DATE_FIELD_LABEL_TO',

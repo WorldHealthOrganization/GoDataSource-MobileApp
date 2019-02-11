@@ -3,7 +3,7 @@
  */
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
-import React, {PureComponent} from 'react';
+import React, {Component} from 'react';
 import {View, Text, StyleSheet, Alert, ScrollView, TouchableWithoutFeedback, Keyboard} from 'react-native';
 import {calculateDimension, getTranslation, extractIdFromPouchId} from './../utils/functions';
 import config from './../utils/config';
@@ -18,7 +18,7 @@ import translations from './../utils/translations'
 import ElevatedView from 'react-native-elevated-view';
 import _ from 'lodash';
 
-class CaseSingleInfectionContainer extends PureComponent {
+class CaseSingleInfectionContainer extends Component {
 
     // This will be a container, so put as less business logic here as possible
     constructor(props) {
@@ -34,9 +34,7 @@ class CaseSingleInfectionContainer extends PureComponent {
     // and can slow down the app
     render() {
         return (
-            <TouchableWithoutFeedback onPress={() => {
-                Keyboard.dismiss()
-            }} accessible={false}>
+            <View style={{flex: 1}}>
                 <View style={style.container}>
                     <View style={{flexDirection: 'row'}}>
                         {
@@ -109,7 +107,7 @@ class CaseSingleInfectionContainer extends PureComponent {
                     <KeyboardAwareScrollView
                         style={style.containerScrollView}
                         contentContainerStyle={[style.contentContainerStyle, {paddingBottom: this.props.screenSize.height < 600 ? 70 : 20}]}
-                        keyboardShouldPersistTaps={'always'}
+                        keyboardShouldPersistTaps={'never'}
                     >
                         {
                             config.caseSingleScreen.infection.map((item, index) => {
@@ -118,8 +116,8 @@ class CaseSingleInfectionContainer extends PureComponent {
                         }
                         <View style={style.container}>
                             {
-                                this.props.case && this.props.case.hospitalizationDates && this.props.case.hospitalizationDates.map((item, index) => {
-                                    return this.handleRenderItemForHospitalizationDatesList(item, index)
+                                this.props.case && this.props.case.dateRanges && this.props.case.dateRanges.map((item, index) => {
+                                    return this.handleRenderItemForDateRangesList(item, index)
                                 })
                             }
                         </View>
@@ -131,42 +129,42 @@ class CaseSingleInfectionContainer extends PureComponent {
                                             height: 25,
                                             justifyContent: 'center'
                                         }}
-                                        onPress={this.props.onPressAddHospitalizationDate}
+                                        onPress={this.props.onPressAddDateRange}
                                     >
                                         <Text style={{fontFamily: 'Roboto-Medium', fontSize: 12, color: styles.buttonGreen}}>
-                                            {this.props.case.hospitalizationDates && this.props.case.hospitalizationDates.length === 0 ? getTranslation(translations.caseSingleScreen.oneHospitalizationDateText, this.props.translation) : getTranslation(translations.caseSingleScreen.moreHospitalizationDatesText, this.props.translation)}
+                                            {this.props.case.dateRanges && this.props.case.dateRanges.length === 0 ? getTranslation(translations.caseSingleScreen.oneDateRangeText, this.props.translation) : getTranslation(translations.caseSingleScreen.moreDateRangeText, this.props.translation)}
                                         </Text>
                                     </Ripple>
                                 </View>
                             ) : null
                         }
-                        <View style={style.container}>
-                            {
-                                this.props.case && this.props.case.isolationDates && this.props.case.isolationDates.map((item, index) => {
-                                    return this.handleRenderItemForIsolationDatesList(item, index)
-                                })
-                            }
-                        </View>
-                        {
-                            this.props.isEditMode ? (
-                                <View style={{alignSelf: 'flex-start', marginHorizontal: calculateDimension(16, false, this.props.screenSize), marginVertical: 20}}>
-                                    <Ripple
-                                        style={{
-                                            height: 25,
-                                            justifyContent: 'center'
-                                        }}
-                                        onPress={this.props.onPressAddIsolationDates}
-                                    >
-                                        <Text style={{fontFamily: 'Roboto-Medium', fontSize: 12, color: styles.buttonGreen}}>
-                                            {this.props.case.isolationDates && this.props.case.isolationDates.length === 0 ? getTranslation(translations.caseSingleScreen.oneIsolationDateText, this.props.translation) : getTranslation(translations.caseSingleScreen.moreIsolationDatesText, this.props.translation)}
-                                        </Text>
-                                    </Ripple>
-                                </View>
-                            ) : null
-                        }
+                        {/*<View style={style.container}>*/}
+                            {/*{*/}
+                                {/*this.props.case && this.props.case.isolationDates && this.props.case.isolationDates.map((item, index) => {*/}
+                                    {/*return this.handleRenderItemForIsolationDatesList(item, index)*/}
+                                {/*})*/}
+                            {/*}*/}
+                        {/*</View>*/}
+                        {/*{*/}
+                            {/*this.props.isEditMode ? (*/}
+                                {/*<View style={{alignSelf: 'flex-start', marginHorizontal: calculateDimension(16, false, this.props.screenSize), marginVertical: 20}}>*/}
+                                    {/*<Ripple*/}
+                                        {/*style={{*/}
+                                            {/*height: 25,*/}
+                                            {/*justifyContent: 'center'*/}
+                                        {/*}}*/}
+                                        {/*onPress={this.props.onPressAddIsolationDates}*/}
+                                    {/*>*/}
+                                        {/*<Text style={{fontFamily: 'Roboto-Medium', fontSize: 12, color: styles.buttonGreen}}>*/}
+                                            {/*{this.props.case.isolationDates && this.props.case.isolationDates.length === 0 ? getTranslation(translations.caseSingleScreen.oneIsolationDateText, this.props.translation) : getTranslation(translations.caseSingleScreen.moreIsolationDatesText, this.props.translation)}*/}
+                                        {/*</Text>*/}
+                                    {/*</Ripple>*/}
+                                {/*</View>*/}
+                            {/*) : null*/}
+                        {/*}*/}
                     </KeyboardAwareScrollView>
                 </View>
-            </TouchableWithoutFeedback>
+            </View>
         );
     }
 
@@ -185,10 +183,16 @@ class CaseSingleInfectionContainer extends PureComponent {
         return this.renderItemCardComponent(fields)
     };
 
-    handleRenderItemForHospitalizationDatesList = (item, index) => {
-        let fields = config.caseSingleScreen.hospitalizationDate.fields.map((field) => {
+    handleRenderItemForDateRangesList = (item, index) => {
+        let fields = config.caseSingleScreen.dateRanges.fields.map((field) => {
             return Object.assign({},field, {isEditMode: this.props.isEditMode})
         });
+        if (this.props && this.props.case && this.props.case.dateRanges && Array.isArray(this.props.case.dateRanges) && this.props.case.dateRanges[index] && this.props.case.dateRanges[index].typeId === config.dateRangeTypes.hospitalization) {
+            fields[3].label = translations.caseSingleScreen.dateRangeHospitalName;
+        }
+        if (this.props && this.props.case && this.props.case.dateRanges && Array.isArray(this.props.case.dateRanges) && this.props.case.dateRanges[index] && (this.props.case.dateRanges[index].typeId !== config.dateRangeTypes.hospitalization && this.props.case.dateRanges[index].typeId !== config.dateRangeTypes.isolation)) {
+            fields.splice(3, 1);
+        }
         return this.renderItemCardComponent(fields, index)
     };
 
@@ -231,40 +235,42 @@ class CaseSingleInfectionContainer extends PureComponent {
 
     handleRenderItemByType = (item, cardIndex) => {
         let value = '';
-        let isEditModeForDropDownInput = true
+        let isEditModeForDropDownInput = true;
         let minimumDate = undefined;
         let maximumDate = undefined;
 
         if (item.type === 'DropdownInput') {
             item.data = this.computeDataForCasesSingleScreenDropdownInput(item);
         } else if (item.type === 'ActionsBar') {
-            if (item.objectType !== null && item.objectType !== undefined && item.objectType === 'HospitalizationDates') { 
-                item.onPressArray = [this.props.handleOnPressDeleteHospitalizationDates]
-            } else if (item.objectType !== null && item.objectType !== undefined && item.objectType === 'IsolationDates') {
-                item.onPressArray = [this.props.handleOnPressDeleteIsolationDates]
+            if (item.objectType !== null && item.objectType !== undefined && item.objectType === 'DateRanges') {
+                item.onPressArray = [this.props.handleOnPressDeleteDateRange]
             }
+            // else if (item.objectType !== null && item.objectType !== undefined && item.objectType === 'IsolationDates') {
+            //     item.onPressArray = [this.props.handleOnPressDeleteIsolationDates]
+            // }
         }
 
         if (item.type === 'DatePicker' && this.props.case[item.id] !== undefined) {
             value = this.props.case[item.id]
         } else if (item.type === 'DropDownSectioned') {
-            if (item.objectType === 'HospitalizationDates') {
+            if (item.objectType === 'DateRanges') {
                 for (let i = 0; i < this.props.locations.length; i++) {
-                    let myLocationName = this.getLocationNameById(this.props.locations[i], this.props.case.hospitalizationDates[cardIndex][item.id]);
-                    if (myLocationName !== null){
-                        value = myLocationName;
-                        break
-                    }
-                }
-            } else if (item.objectType === 'IsolationDates') {
-                for (let i = 0; i < this.props.locations.length; i++) {
-                    let myLocationName = this.getLocationNameById(this.props.locations[i], this.props.case.isolationDates[cardIndex][item.id])
+                    let myLocationName = this.getLocationNameById(this.props.locations[i], this.props.case.dateRanges[cardIndex][item.id]);
                     if (myLocationName !== null){
                         value = myLocationName;
                         break
                     }
                 }
             }
+            // else if (item.objectType === 'IsolationDates') {
+            //     for (let i = 0; i < this.props.locations.length; i++) {
+            //         let myLocationName = this.getLocationNameById(this.props.locations[i], this.props.case.isolationDates[cardIndex][item.id])
+            //         if (myLocationName !== null){
+            //             value = myLocationName;
+            //             break
+            //         }
+            //     }
+            // }
         } else if (item.type === 'SwitchInput' && this.props.case[item.id] !== undefined) {
             value = this.props.case[item.id]
         } else {
@@ -295,13 +301,13 @@ class CaseSingleInfectionContainer extends PureComponent {
                 onChangeSwitch={this.props.onChangeSwitch}
                 onChangeDropDown={this.props.onChangeDropDown}
                 onChangeTextSwitchSelector={this.props.onChangeTextSwitchSelector}
-                onDeletePress={item.objectType !== null && item.objectType !== undefined && item.objectType === 'HospitalizationDates' ? 
-                                this.props.handleOnPressDeleteHospitalizationDates : 
+                onDeletePress={item.objectType !== null && item.objectType !== undefined && item.objectType === 'DateRanges' ?
+                                this.props.handleOnPressDeleteDateRange :
                                 item.objectType !== null && item.objectType !== undefined && item.objectType === 'IsolationDates' ? 
                                 this.props.handleOnPressDeleteIsolationDates : 
                                 null}
-                onChangeSectionedDropDown={item.objectType !== null && item.objectType !== undefined && item.objectType === 'HospitalizationDates' ? 
-                                this.props.onChangeSectionedDropDownHospitalization : 
+                onChangeSectionedDropDown={item.objectType !== null && item.objectType !== undefined && item.objectType === 'DateRanges' ?
+                                this.props.onChangeSectionedDropDownDateRange :
                                 item.objectType !== null && item.objectType !== undefined && item.objectType === 'IsolationDates' ? 
                                 this.props.onChangeSectionedDropDownIsolation : 
                                 null}         
@@ -342,10 +348,10 @@ class CaseSingleInfectionContainer extends PureComponent {
                     maximumDate = new Date()
                 }
             } else if (item.id === 'dateDeceased') {
-                maximumDate = new Date()
+                maximumDate = new Date();
                 let hasDateOfOnset = false   
-                let hasDateOfReporting = false
-                let hasDateOfInfection = false
+                let hasDateOfReporting = false;
+                let hasDateOfInfection = false;
 
                 if (this.props.case && this.props.case !== undefined && this.props.case.dateOfOnset && this.props.case.dateOfOnset !== undefined && this.props.case.dateOfOnset !== ''){
                     hasDateOfOnset = true
@@ -372,29 +378,30 @@ class CaseSingleInfectionContainer extends PureComponent {
                 } else if (hasDateOfOnset === true && hasDateOfReporting === true && hasDateOfInfection === true) {
                     minimumDate = _.max([this.props.case.dateOfOnset, this.props.case.dateOfReporting, this.props.case.dateOfInfection])
                 }
-            } else if (item.objectType === 'HospitalizationDates'){
-                if (this.props.case && this.props.case.hospitalizationDates && Array.isArray(this.props.case.hospitalizationDates) && this.props.case.hospitalizationDates.length > 0 && this.props.case.hospitalizationDates[cardIndex]) {
-                    if (this.props.case.hospitalizationDates[cardIndex].startDate !== null && item.id !== 'startDate') {
-                        minimumDate = this.props.case.hospitalizationDates[cardIndex].startDate
+            } else if (item.objectType === 'DateRanges'){
+                if (this.props.case && this.props.case.dateRanges && Array.isArray(this.props.case.dateRanges) && this.props.case.dateRanges.length > 0 && this.props.case.dateRanges[cardIndex]) {
+                    if (this.props.case.dateRanges[cardIndex].startDate !== null && item.id !== 'startDate') {
+                        minimumDate = this.props.case.dateRanges[cardIndex].startDate
                     }
-                    if (this.props.case.hospitalizationDates[cardIndex].endDate !== null && item.id !== 'endDate') {
-                        maximumDate = this.props.case.hospitalizationDates[cardIndex].endDate
-                    }
-                }
-            } else if (item.objectType === 'IsolationDates'){
-                if (this.props.case && this.props.case.isolationDates && Array.isArray(this.props.case.isolationDates) && this.props.case.isolationDates.length > 0 && this.props.case.isolationDates[cardIndex]) {
-                    if (this.props.case.isolationDates[cardIndex].startDate !== null && item.id !== 'startDate') {
-                        minimumDate = this.props.case.isolationDates[cardIndex].startDate
-                    }
-                    if (this.props.case.isolationDates[cardIndex].endDate !== null && item.id !== 'endDate') {
-                        maximumDate = this.props.case.isolationDates[cardIndex].endDate
+                    if (this.props.case.dateRanges[cardIndex].endDate !== null && item.id !== 'endDate') {
+                        maximumDate = this.props.case.dateRanges[cardIndex].endDate
                     }
                 }
             }
+            // else if (item.objectType === 'IsolationDates'){
+            //     if (this.props.case && this.props.case.isolationDates && Array.isArray(this.props.case.isolationDates) && this.props.case.isolationDates.length > 0 && this.props.case.isolationDates[cardIndex]) {
+            //         if (this.props.case.isolationDates[cardIndex].startDate !== null && item.id !== 'startDate') {
+            //             minimumDate = this.props.case.isolationDates[cardIndex].startDate
+            //         }
+            //         if (this.props.case.isolationDates[cardIndex].endDate !== null && item.id !== 'endDate') {
+            //             maximumDate = this.props.case.isolationDates[cardIndex].endDate
+            //         }
+            //     }
+            // }
         }
         
-        let dateValidation = {minimumDate, maximumDate}
-        return dateValidation
+        let dateValidation = {minimumDate, maximumDate};
+        return dateValidation;
     };
 
     getLocationNameById = (element, locationId) => {
@@ -415,6 +422,11 @@ class CaseSingleInfectionContainer extends PureComponent {
     };
 
     computeDataForCasesSingleScreenDropdownInput = (item) => {
+        if (item.id === 'typeId' && item.objectType === 'DateRanges') {
+            return _.filter(this.props.referenceData, (o) => {
+                return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_PERSON_DATE_TYPE'
+            }).map((o) => {return {value: getTranslation(o.value, this.props.translation), id: o.value}})
+        }
         if (item.id === 'riskLevel') {
             return _.filter(this.props.referenceData, (o) => {
                 return o.active === true && o.categoryId.includes("RISK_LEVEL")
@@ -454,12 +466,9 @@ class CaseSingleInfectionContainer extends PureComponent {
 
     computeValueForCasesSingleScreen = (item, index) => {
         if (index !== null || index >= 0) {
-            if (item.objectType === 'HospitalizationDates') {
-                return this.props.case && this.props.case.hospitalizationDates && Array.isArray(this.props.case.hospitalizationDates) && this.props.case.hospitalizationDates.length > 0 && this.props.case.hospitalizationDates[index][item.id] !== undefined ?
-                    getTranslation(this.props.case.hospitalizationDates[index][item.id], this.props.translation) : '';
-            } else if (item.objectType === 'IsolationDates') {
-                return this.props.case && this.props.case.isolationDates && Array.isArray(this.props.case.isolationDates) && this.props.case.isolationDates.length > 0 && this.props.case.isolationDates[index][item.id] !== undefined ?
-                    getTranslation(this.props.case.isolationDates[index][item.id], this.props.translation) : '';
+            if (item.objectType === 'DateRanges') {
+                return this.props.case && this.props.case.dateRanges && Array.isArray(this.props.case.dateRanges) && this.props.case.dateRanges.length > 0 && this.props.case.dateRanges[index][item.id] !== undefined ?
+                    getTranslation(this.props.case.dateRanges[index][item.id], this.props.translation) : '';
             }
         }
         return this.props.case && this.props.case[item.id] ? getTranslation(this.props.case[item.id], this.props.translation) : '';
