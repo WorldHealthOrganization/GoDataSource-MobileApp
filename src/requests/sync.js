@@ -120,7 +120,7 @@ export function postDatabaseSnapshotRequest(internetCredentials, path, callback)
                 }, [
                     {name: 'snapshot', filename: 'snapshot', data: RNFetchBlob.wrap(path)},
                     {name: 'autoEncrypt', data: `${hubConfig.encryptedData}`},
-                    {name: 'generatePersonVisualId', data: true}
+                    {name: 'generatePersonVisualId', data: `${true}`}
                 ], '0', '6000000')
                 .then((res) => {
                     console.log('Finished sending the data to the server: ', res);
