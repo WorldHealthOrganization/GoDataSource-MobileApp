@@ -440,6 +440,9 @@ const dropDownSectionedLabels = {
     chooseMoreLocations: 'LNG_FILTER_SCREEN_CHOOSE_LOCATIONS_MESSAGE',
     searchPlaceholderText: 'LNG_LOCATIONS_DROP_DOWN_SECTIONED_TITLE',
     noLocationsMessage: 'LNG_NO_LOCATIONS_AVAILABLE_MESSAGE',
+
+    noneSelected: 'LNG_DROP_DOWN_SECTIONED_NONE_SELECTED',
+    selected: 'LNG_DROP_DOWN_SECTIONED_SELECTED'
 };
 
 const hubConfigScreen = {

@@ -152,13 +152,13 @@ class CardComponent extends PureComponent {
                     <DatePicker
                         id={this.props.item.id}
                         label={this.props.item.label}
-                        value={this.props.value instanceof Date ? this.props.value : new Date(this.props.value)}
+                        value={this.props.value instanceof Date ? this.props.value : this.props.value ? new Date(this.props.value) : this.props.value}
                         index={this.props.index}
                         isEditMode={this.props.item.isEditMode}
                         isRequired={this.props.item.isRequired}
                         onChange={this.props.onChangeDate}
-                        minimumDate={this.props.minimumDate instanceof Date ? this.props.minimumDate : new Date(this.props.minimumDate)}
-                        maximumDate={this.props.maximumDate instanceof Date ? this.props.maximumDate : new Date(this.props.maximumDate)}
+                        minimumDate={this.props.minimumDate instanceof Date ? this.props.minimumDate : this.props.minimumDate ? new Date(this.props.minimumDate) : this.props.minimumDate}
+                        maximumDate={this.props.maximumDate instanceof Date ? this.props.maximumDate : this.props.maximumDate ? new Date(this.props.maximumDate) : this.props.maximumDate}
                         style={{width: width, marginHorizontal: marginHorizontal}}
                         objectType={this.props.item.objectType}
                         translation={this.props.translation}

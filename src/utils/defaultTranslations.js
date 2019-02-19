@@ -323,7 +323,9 @@ export default {
 
 
     //addressFieldLabels
-    'LNG_ADDRESS_FIELD_LABEL_NAME': 'Name',
+    // TODO change to API also
+    'LNG_ADDRESS_FIELD_LABEL_NAME': 'Type',
+    // End of todo
     'LNG_ADDRESS_FIELD_LABEL_DATE': 'Date',
     'LNG_ADDRESS_FIELD_LABEL_LOCATION': 'Area',
     'LNG_ADDRESS_FIELD_LABEL_ADDRESS_CITY': 'City',
@@ -421,4 +423,7 @@ export default {
     'LNG_HUB_CONFIGURATION_SCREEN_HUB_CREDENTIALS_SUCCESS_UPDATED': 'HUB credentials were successfully updated',
 
     'LNG_HUB_CONFIGURATION_SCREEN_SUCCES_SET_HUB_AS_ACTIVE_AND_YOU_WILL_BE_LOGGED_OUT_MESSAGE': 'The HUB was successfully made as active. You will be logged out and can log in with the credentials for the new HUB configuration',
+
+    'LNG_DROP_DOWN_SECTIONED_NONE_SELECTED': 'None Selected',
+    'LNG_DROP_DOWN_SECTIONED_SELECTED': 'Items'
 };
