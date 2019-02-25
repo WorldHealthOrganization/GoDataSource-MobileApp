@@ -1121,6 +1121,9 @@
 						DevelopmentTeam = HT9KH229F3;
 						ProvisioningStyle = Automatic;
 						SystemCapabilities = {
+							com.apple.BackgroundModes = {
+								enabled = 1;
+							};
 							com.apple.GameCenter.iOS = {
 								enabled = 0;
 							};

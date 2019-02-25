@@ -18,6 +18,8 @@
 #import <UserNotifications/UserNotifications.h>
 #import <Parse.h>
 
+#define SYSTEM_VERSION_GRATERTHAN_OR_EQUALTO(v) ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] != NSOrderedAscending)
+
 
 @interface AppDelegate () <UNUserNotificationCenterDelegate>
 @property (nonatomic, strong) NSMutableArray *queuedNotifications;
@@ -40,27 +42,53 @@
   self.window.backgroundColor = [UIColor whiteColor];
   [[RCCManager sharedInstance] initBridgeWithBundleURL:jsCodeLocation launchOptions:launchOptions];
   
-  [UNUserNotificationCenter currentNotificationCenter].delegate = self;
-  [[UNUserNotificationCenter currentNotificationCenter] requestAuthorizationWithOptions:UNAuthorizationOptionAlert | UNAuthorizationOptionBadge | UNAuthorizationOptionSound
-                                                                      completionHandler:^(BOOL granted, NSError * _Nullable error) {
-                                                                        if (granted) {
-                                                                          dispatch_async(dispatch_get_main_queue(), ^{
-                                                                            [application registerForRemoteNotifications];
-                                                                          });
-                                                                        }
-                                                                      }];
+  [self registerForRemoteNotifications:[UIApplication sharedApplication]];
   
   ParseClientConfiguration *config = [ParseClientConfiguration configurationWithBlock:^(id<ParseMutableClientConfiguration>  _Nonnull configuration) {
     configuration.applicationId = @"b61f5946-1af3-4e07-9986-9ffd1e36ae93";
     configuration.server = @"http://whoapicd.clarisoft.com:1337/api";
   }];
   [Parse initializeWithConfiguration:config];
-    
+  NSDictionary *notification = [launchOptions objectForKey:UIApplicationLaunchOptionsRemoteNotificationKey];
+  if (notification) {
+    [self application:application didReceiveRemoteNotification:notification];
+  }
+  
   return YES;
 }
 
-- (void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
+- (void)registerForRemoteNotifications:(UIApplication *)application {
+  if ([application respondsToSelector:@selector(registerUserNotificationSettings:)]) {
+    
+    // greather than ios 8
+    UIUserNotificationSettings *notificationSettings = [UIUserNotificationSettings settingsForTypes:(UIUserNotificationTypeSound |
+                                                                                                     UIUserNotificationTypeAlert |
+                                                                                                     UIUserNotificationTypeBadge)
+                                                                                         categories:nil];
+    [application registerUserNotificationSettings:notificationSettings];
+    
+  }
+  
+  if(SYSTEM_VERSION_GRATERTHAN_OR_EQUALTO(@"10.0")) {
+    UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
+    center.delegate = self;
+    if ([center respondsToSelector:@selector(requestAuthorizationWithOptions:completionHandler:)]) {
+      [center requestAuthorizationWithOptions:(UNAuthorizationOptionSound | UNAuthorizationOptionAlert | UNAuthorizationOptionBadge)
+                            completionHandler:^(BOOL granted, NSError * _Nullable error) {
+                              if (!error) {
+                                dispatch_async(dispatch_get_main_queue(), ^{
+                                  [[UIApplication sharedApplication] registerForRemoteNotifications];
+                                });
+                              } else {
+                                
+                              }
+                            }];
+    }
+  }
+}
 
+- (void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
+  
   [[PFInstallation currentInstallation] setDeviceTokenFromData:deviceToken];
   [[PFInstallation currentInstallation] saveEventually:^(BOOL succeeded, NSError * _Nullable error) {
   }];
@@ -76,12 +104,7 @@
 }
 
 - (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler {
-  if (self.reactAppLoaded) {
-    [[APNSEventManager sharedInstance] dispatch:@"onPushReceived" body:userInfo];
-  } else {
-    // queue notification to be send after react app is loaded
-    [self.queuedNotifications addObject:userInfo];
-  }
+  [self application:application didReceiveRemoteNotification:userInfo];
 }
 
 - (void)setReactAppLoaded:(BOOL)reactAppLoaded {
@@ -91,6 +114,41 @@
     [[APNSEventManager sharedInstance] dispatch:@"onPushReceived" body:notification];
   }];
   [self.queuedNotifications removeAllObjects];
+}
+
+- (void)userNotificationCenter:(UNUserNotificationCenter *)center didReceiveNotificationResponse:(UNNotificationResponse *)response withCompletionHandler:(void (^)(void))completionHandler {
+  
+  if (completionHandler) {
+    completionHandler();
+  }
+}
+
+- (void)application:(UIApplication *)application didRegisterUserNotificationSettings:(UIUserNotificationSettings *)notificationSettings {
+  //register to receive notifications
+  dispatch_async(dispatch_get_main_queue(), ^{
+    
+    if ([application respondsToSelector:@selector(registerUserNotificationSettings:)]) {
+      [application registerForRemoteNotifications];
+    }
+  });
+}
+
+- (void)application:(UIApplication *)application didFailToRegisterForRemoteNotificationsWithError:(NSError *)error {
+  if (error.code == 3010) {
+    
+  } else {
+    // show some alert or otherwise handle the failure to register.
+    
+  }
+}
+
+- (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo {
+  if (self.reactAppLoaded) {
+    [[APNSEventManager sharedInstance] dispatch:@"onPushReceived" body:userInfo];
+  } else {
+    // queue notification to be send after react app is loaded
+    [self.queuedNotifications addObject:userInfo];
+  }
 }
 
 @end
