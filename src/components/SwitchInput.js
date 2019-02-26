@@ -9,8 +9,9 @@ import {getTranslation, getTooltip} from './../utils/functions';
 import TooltipComponent from './TooltipComponent'
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
-var Switch = require('react-native-material-switch');
+// var Switch = require('react-native-material-switch');
 // import Switch from 'react-native-material-switch';
+import {Switch} from 'react-native-ui-lib';
 
 class SwitchInput extends PureComponent {
 
@@ -34,6 +35,7 @@ class SwitchInput extends PureComponent {
     };
 
     editInput = () => {
+        console.log('Render stuff: ', this.props.value);
         let tooltip = getTooltip(this.props.label, this.props.translation, this.props.tooltipsMessage, this.props.tooltipsMessage);
         return (
             <View style={[{flexDirection: 'row', marginVertical: 10}, this.props.style]}>
@@ -41,25 +43,21 @@ class SwitchInput extends PureComponent {
                     {getTranslation(this.props.label, this.props.translation)}
                 </Text>
                 <Switch
-                    active={this.props.value}
-                    switchWidth={32}
-                    switchHeight={12}
-                    buttonRadius={10}
-                    inactiveButtonColor={'rgb(250,250,250)'}
-                    inactiveBackgroundColor={'rgba(0,0,0,.3)'}
-                    activeButtonColor={this.props.activeButtonColor}
-                    activeBackgroundColor={this.props.activeBackgroundColor}
-                    style={{
-                        flex: 0,
-                    }}
-                    onChangeState={ (state) => this.props.onChange(
+                    value={this.props.value}
+                    onColor={this.props.activeButtonColor}
+                    onTintColor={this.props.activeBackgroundColor}
+                    onValueChange={(state) => this.props.onChange(
                         state,
                         this.props.id,
                         this.props.objectType ? (this.props.objectType == 'Address' ? this.props.index : (
                             this.props.objectType == 'LabResult' ? this.props.index : this.props.objectType
                         )) : null,
-                    this.props.objectType)}
-                /> 
+                        this.props.objectType)}
+                    height={18}
+                    width={40}
+                    thumbSize={16}
+                    offColor={'gray'}
+                />
                 {
                     tooltip.hasTooltip === true ? (
                         <TooltipComponent

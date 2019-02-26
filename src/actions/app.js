@@ -1151,7 +1151,7 @@ export function getData (key) {
     }
 }
 
-export function appInitialized() {
+export function appInitialized(nativeEventEmitter) {
     return async function (dispatch, getState) {
         // Get Screen Dimensions and store them to the redux store in order to use them throughout the app
         let width = Dimensions.get("window").width;
@@ -1179,31 +1179,61 @@ export function appInitialized() {
                                 try {
                                     let database = await createDatabase(server.replace(/\/|\.|\:/g, ''), databaseCredentials.password, false);
                                     if (database) {
-                                        dispatch(getUserById(loggedUser, null));
+                                        dispatch(getUserById(loggedUser, null, false, nativeEventEmitter));
                                     } else {
                                         console.log('Database does not exist');
                                         dispatch(changeAppRoot('config'));
+                                        console.log('NativeEventEmitter: ', typeof nativeEventEmitter, nativeEventEmitter);
+                                        console.log("Typeof nativeEventEmitter: ", typeof nativeEventEmitter.appLoaded);
+                                        if (nativeEventEmitter && typeof nativeEventEmitter.appLoaded === 'function') {
+                                            dispatch(middlewareFunction(nativeEventEmitter));
+                                        }
                                     }
                                 } catch (errorCreateDatabase) {
                                     console.log('errorCreateDatabase: ', errorCreateDatabase);
                                     dispatch(changeAppRoot('config'));
+                                    console.log('NativeEventEmitter: ', typeof nativeEventEmitter, nativeEventEmitter);
+                                    console.log("Typeof nativeEventEmitter: ", typeof nativeEventEmitter.appLoaded);
+                                    if (nativeEventEmitter) {
+                                        dispatch(middlewareFunction(nativeEventEmitter));
+                                    }
                                 }
 
                             } else {
                                 console.log("Don't have database credentials, but have active database and logged user. Proceed to config screen");
-                                dispatch(changeAppRoot('config'))
+                                dispatch(changeAppRoot('config'));
+                                console.log('NativeEventEmitter: ', typeof nativeEventEmitter, nativeEventEmitter);
+                                console.log("Typeof nativeEventEmitter: ", typeof nativeEventEmitter.appLoaded);
+                                if (nativeEventEmitter) {
+                                    dispatch(middlewareFunction(nativeEventEmitter));
+                                }
                             }
                         } catch (errorGetDatabaseCredentials) {
                             console.log("Don't have database credentials, but have active database and logged user and error. Proceed to config screen: ", errorGetDatabaseCredentials);
-                            dispatch(changeAppRoot('config'))
+                            dispatch(changeAppRoot('config'));
+                            console.log('NativeEventEmitter: ', typeof nativeEventEmitter, nativeEventEmitter);
+                            console.log("Typeof nativeEventEmitter: ", typeof nativeEventEmitter.appLoaded);
+                            if (nativeEventEmitter) {
+                                dispatch(middlewareFunction(nativeEventEmitter));
+                            }
                         }
                     } else {
                         console.log("Don't have an active database but we have a logged user. Proceed to config screen");
                         dispatch(changeAppRoot('config'));
+                        console.log('NativeEventEmitter: ', typeof nativeEventEmitter, nativeEventEmitter);
+                        console.log("Typeof nativeEventEmitter: ", typeof nativeEventEmitter.appLoaded);
+                        if (nativeEventEmitter) {
+                            dispatch(middlewareFunction(nativeEventEmitter));
+                        }
                     }
                 } catch (errorGetActiveDatabase) {
                     console.log("We have an error at getting the active database, but we have logged user. Proceed to config screen: ", errorGetActiveDatabase)
                     dispatch(changeAppRoot('config'));
+                    console.log('NativeEventEmitter: ', typeof nativeEventEmitter, nativeEventEmitter);
+                    console.log("Typeof nativeEventEmitter: ", typeof nativeEventEmitter.appLoaded);
+                    if (nativeEventEmitter) {
+                        dispatch(middlewareFunction(nativeEventEmitter));
+                    }
                 }
             } else {
                 console.log("Don't have a logged user. Time to check if there is an active database and if there is, move to the login screen");
@@ -1222,29 +1252,64 @@ export function appInitialized() {
                                     let database = await createDatabase(server.replace(/\/|\.|\:/g, ''), databaseCredentials.password, false);
                                     if (database) {
                                         dispatch(changeAppRoot('login'));
+                                        console.log('NativeEventEmitter: ', typeof nativeEventEmitter, nativeEventEmitter);
+                                        console.log("Typeof nativeEventEmitter: ", typeof nativeEventEmitter.appLoaded);
+                                        if (nativeEventEmitter) {
+                                            dispatch(middlewareFunction(nativeEventEmitter));
+                                        }
                                     } else {
                                         console.log('Database does not exist');
                                         dispatch(changeAppRoot('config'));
+                                        console.log('NativeEventEmitter: ', typeof nativeEventEmitter, nativeEventEmitter);
+                                        console.log("Typeof nativeEventEmitter: ", typeof nativeEventEmitter.appLoaded);
+                                        if (nativeEventEmitter) {
+                                            dispatch(middlewareFunction(nativeEventEmitter));
+                                        }
                                     }
                                 } catch (errorCreateDatabase) {
-                                    console.log('errorCreateDatabase: ', errorCreateDatabase)
+                                    console.log('errorCreateDatabase: ', errorCreateDatabase);
                                     dispatch(changeAppRoot('config'));
+                                    console.log('NativeEventEmitter: ', typeof nativeEventEmitter, nativeEventEmitter);
+                                    console.log("Typeof nativeEventEmitter: ", typeof nativeEventEmitter.appLoaded);
+                                    if (nativeEventEmitter) {
+                                        dispatch(middlewareFunction(nativeEventEmitter));
+                                    }
                                 }
                             } else {
                                 console.log("We don't have logged user, we have active database, but we don't have credentials. Proceed to config screen");
                                 dispatch(changeAppRoot('config'));
+                                console.log('NativeEventEmitter: ', typeof nativeEventEmitter, nativeEventEmitter);
+                                console.log("Typeof nativeEventEmitter: ", typeof nativeEventEmitter.appLoaded);
+                                if (nativeEventEmitter) {
+                                    dispatch(middlewareFunction(nativeEventEmitter));
+                                }
                             }
                         } catch (errorDatabaseCredentials) {
                             console.log("We don't have logged user, we have active database, but we have error when getting its credentials. Proceed to config screen", errorDatabaseCredentials);
                             dispatch(changeAppRoot('config'));
+                            console.log('NativeEventEmitter: ', typeof nativeEventEmitter, nativeEventEmitter);
+                            console.log("Typeof nativeEventEmitter: ", typeof nativeEventEmitter.appLoaded);
+                            if (nativeEventEmitter) {
+                                dispatch(middlewareFunction(nativeEventEmitter));
+                            }
                         }
                     } else {
                         console.log("We don't have an active database, and we don't have logged user. Proceed to config screen");
                         dispatch(changeAppRoot('config'));
+                        console.log('NativeEventEmitter: ', typeof nativeEventEmitter, nativeEventEmitter);
+                        console.log("Typeof nativeEventEmitter: ", typeof nativeEventEmitter.appLoaded);
+                        if (nativeEventEmitter) {
+                            dispatch(middlewareFunction(nativeEventEmitter));
+                        }
                     }
                 } catch (errorActiveDatabase) {
                     console.log("We don't have a logged user and we have an error at getting active database. Proceed to config screen ", errorActiveDatabase);
                     dispatch(changeAppRoot('config'));
+                    console.log('NativeEventEmitter: ', typeof nativeEventEmitter, nativeEventEmitter);
+                    console.log("Typeof nativeEventEmitter: ", typeof nativeEventEmitter.appLoaded);
+                    if (nativeEventEmitter) {
+                        dispatch(middlewareFunction(nativeEventEmitter));
+                    }
                 }
             }
         } catch (errorGetLoggedUser) {
@@ -1264,100 +1329,73 @@ export function appInitialized() {
                                 let database = await createDatabase(server.replace(/\/|\.|\:/g, ''), databaseCredentials.password, false);
                                 if (database) {
                                     dispatch(changeAppRoot('login'));
+                                    console.log('NativeEventEmitter: ', typeof nativeEventEmitter, nativeEventEmitter);
+                                    console.log("Typeof nativeEventEmitter: ", typeof nativeEventEmitter.appLoaded);
+                                    if (nativeEventEmitter) {
+                                        dispatch(middlewareFunction(nativeEventEmitter));
+                                    }
                                 } else {
                                     console.log('Database does not exist');
                                     dispatch(changeAppRoot('config'));
+                                    console.log('NativeEventEmitter: ', typeof nativeEventEmitter, nativeEventEmitter);
+                                    console.log("Typeof nativeEventEmitter: ", typeof nativeEventEmitter.appLoaded);
+                                    if (nativeEventEmitter) {
+                                        dispatch(middlewareFunction(nativeEventEmitter));
+                                    }
                                 }
                             } catch (errorCreateDatabase) {
-                                console.log('errorCreateDatabase: ', errorCreateDatabase)
+                                console.log('errorCreateDatabase: ', errorCreateDatabase);
                                 dispatch(changeAppRoot('config'));
+                                console.log('NativeEventEmitter: ', typeof nativeEventEmitter, nativeEventEmitter);
+                                console.log("Typeof nativeEventEmitter: ", typeof nativeEventEmitter.appLoaded);
+                                if (nativeEventEmitter) {
+                                    dispatch(middlewareFunction(nativeEventEmitter));
+                                }
                             }
                         } else {
                             console.log("We don't have logged user, we have active database, but we don't have credentials. Proceed to config screen");
                             dispatch(changeAppRoot('config'));
+                            console.log('NativeEventEmitter: ', typeof nativeEventEmitter, nativeEventEmitter);
+                            console.log("Typeof nativeEventEmitter: ", typeof nativeEventEmitter.appLoaded);
+                            if (nativeEventEmitter) {
+                                dispatch(middlewareFunction(nativeEventEmitter));
+                            }
                         }
                     } catch (errorDatabaseCredentials) {
                         console.log("We don't have logged user, we have active database, but we have error when getting its credentials. Proceed to config screen", errorDatabaseCredentials);
                         dispatch(changeAppRoot('config'));
+                        console.log('NativeEventEmitter: ', typeof nativeEventEmitter, nativeEventEmitter);
+                        console.log("Typeof nativeEventEmitter: ", typeof nativeEventEmitter.appLoaded);
+                        if (nativeEventEmitter) {
+                            dispatch(middlewareFunction(nativeEventEmitter));
+                        }
                     }
                 } else {
                     console.log("We don't have an active database, and we don't have logged user. Proceed to config screen");
                     dispatch(changeAppRoot('config'));
+                    console.log('NativeEventEmitter: ', typeof nativeEventEmitter, nativeEventEmitter);
+                    console.log("Typeof nativeEventEmitter: ", typeof nativeEventEmitter.appLoaded);
+                    if (nativeEventEmitter) {
+                        dispatch(middlewareFunction(nativeEventEmitter));
+                    }
                 }
             } catch (errorActiveDatabase) {
                 console.log("We don't have a logged user and we have an error at getting active database. Proceed to config screen ", errorActiveDatabase);
                 dispatch(changeAppRoot('config'));
+                console.log('NativeEventEmitter: ', typeof nativeEventEmitter, nativeEventEmitter);
+                console.log("Typeof nativeEventEmitter: ", typeof nativeEventEmitter.appLoaded);
+                if (nativeEventEmitter) {
+                    dispatch(middlewareFunction(nativeEventEmitter));
+                }
             }
         }
+    }
+}
 
-
-        // Here check if the user is already logged in and which database is he using
-
-
-        // getData('loggedUser', (error, loggedUser) => {
-        //     console.log('Logged user: ', loggedUser);
-        //     if (loggedUser) {
-        //         // If there is a logged user, then, get the database, and log the user
-        //         getData('activeDatabase', (error, activeDatabase) => {
-        //             console.log("Active database: ", activeDatabase);
-        //             let databaseCredentials = await getInternetCredentials(activeDatabase);
-        //             return null;
-        //             //, (errorCredentials, databaseCredentials) => {
-        //         //         console.log('Database credentials: ', databaseCredentials);
-        //         //         if (databaseCredentials) {
-        //         //             createDatabase(databaseCredentials.username, databaseCredentials.password, (database) => {
-        //         //                 // After creating the Pouch db, redirect the user to the login screen
-        //         //                 dispatch(getUserById(loggedUser, null));
-        //         //             })
-        //         //         } else {
-        //         //             dispatch(changeAppRoot('config'));
-        //         //         }
-        //         //     });
-        //         // })
-        //     } else {
-        //         // If there is not a logged user, check if there is an active database
-        //         getData('activeDatabase', (error, activeDatabase) => {
-        //             console.log("Active database: ", activeDatabase);
-        //             if (activeDatabase) {
-        //                 // If there is and active database, initialize it in PouchDb and redirect to the login screen
-        //                 getServerCredentials(activeDatabase, (error, databaseCredentials) => {
-        //                     console.log('Database credentials: ', databaseCredentials);
-        //                     createDatabase(databaseCredentials.username, databaseCredentials.password, (database) => {
-        //                         // After creating the Pouch db, redirect the user to the login screen
-        //                         dispatch(changeAppRoot('login'));
-        //                     })
-        //                 });
-        //             } else {
-        //                 // If there is no active database, go to the config screen
-        //                 dispatch(changeAppRoot('config'));
-        //             }
-        //         });
-        //     }
-        // });
-
-        // Get the translations from the api and save them to the redux store
-        // dispatch(getTranslations());
-        // dispatch(changeAppRoot('login'));
-
-        // dispatch(loginUser({
-        //     email: 'florin.popa@clarisoft.com',
-        //     password: 'Cl@r1soft'
-        // }));
-
-        // I don't think we need this in production since before the user logs in, the translations should be already saved
-        // TODO comment what's below and uncomment the code above
-        // getTranslations(dispatch)
-        //     .then(() => {
-        //         console.log('Saved?');
-        //         // dispatch(changeAppRoot('login'));
-        //         // Login to skip the first step. Only for develop mode
-        //         dispatch(loginUser({
-        //             email: 'florin.popa@clarisoft.com',
-        //             password: 'Cl@r1soft'
-        //         }))
-        //     })
-        //     .catch(() => {
-        //         console.log("Error?");
-        //     })
+export function middlewareFunction(nativeEventEmitter) {
+    return async function (dispatch) {
+        if (nativeEventEmitter && typeof nativeEventEmitter.appLoaded === 'function') {
+            dispatch(() => {nativeEventEmitter.appLoaded()});
+        }
     }
 }

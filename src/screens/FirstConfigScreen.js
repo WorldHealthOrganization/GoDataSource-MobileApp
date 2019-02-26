@@ -68,7 +68,7 @@ class FirstConfigScreen extends Component {
                             <Icon name="arrow-back"/>
                             <Text style={{fontFamily: 'Roboto-Medium', fontSize: 18, color: 'white'}}>Hub config</Text>
                         </Ripple>
-                    ) : (null)
+                    ) : (<View/>)
                 }
                 {
                     this.props && this.props.activeDatabase && !this.props.skipEdit ? (
@@ -76,7 +76,7 @@ class FirstConfigScreen extends Component {
                             <Text style={{fontFamily: 'Roboto-Medium', fontSize: 18, color: 'white'}}>Current Hub config</Text>
                             <Icon name="arrow-forward"/>
                         </Ripple>
-                    ) : (null)
+                    ) : (<View/>)
                 }
                 <View style={[style.welcomeTextContainer]}>
                     <Text style={style.welcomeText}>
