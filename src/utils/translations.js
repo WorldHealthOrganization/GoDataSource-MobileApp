@@ -278,6 +278,12 @@ const alertMessages = {
     invalidEmail: 'Invalid email address',
     emailValidationError: 'Please make sure you have entered a valid email address',
     noItemAlert: 'No person exists with this information',
+
+    // TODO add translation to backend
+    addMissingPerson: 'Would you like to add a new person for this id?',
+    wrongQR: 'The QR code has a bad format',
+    // End todo
+
     errorOccuredMsg: 'QR code is not valid',
 
     // cases

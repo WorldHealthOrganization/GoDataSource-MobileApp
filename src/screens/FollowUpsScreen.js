@@ -38,7 +38,8 @@ import { Popup } from 'react-native-map-link';
 import moment from 'moment';
 import translations from './../utils/translations'
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-import {getItemByIdRequest} from './../queries/cases'
+import {getItemByIdRequest} from './../queries/cases';
+import {pushNewEditScreen} from './../utils/screenTransitionFunctions';
 
 const scrollAnim = new Animated.Value(0);
 const offsetAnim = new Animated.Value(0);
@@ -807,112 +808,183 @@ class FollowUpsScreen extends Component {
             screen: 'QRScanScreen',
             animated: true,
             passProps: {
-                pushNewScreen: this.pushNewEditScreen
+                pushNewScreen: this.pushNewEditScreenLocal
             }
         })
     };
 
-    pushNewEditScreen = (QRCodeInfo) => {
-        console.log('pushNewEditScreen QRCodeInfo', QRCodeInfo);
+    pushNewEditScreenLocal = (QRCodeInfo) => {
+        console.log('pushNewEditScreen QRCodeInfo do with method from another side', QRCodeInfo);
 
-        let itemId = null;
-        let itemType = null;
-        let outbreakId = null;
-
-        if (QRCodeInfo && QRCodeInfo !== undefined && QRCodeInfo.data && QRCodeInfo.data !== undefined){
-            let parsedData = null;
-            try {
-                parsedData =  JSON.parse(QRCodeInfo.data)
-            } catch(err) {
-                setTimeout(function(){
-                    Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props && this.props.translation ? this.props.translation : null), getTranslation(translations.alertMessages.errorOccuredMsg, this.props && this.props.translation ? this.props.translation : null), [
-                        {
-                            text: getTranslation(translations.alertMessages.okButtonLabel, this.props && this.props.translation ? this.props.translation : null),
-                            onPress: () => {console.log('Ok pressed')}
-                        }
-                    ])
-                }, 1000);
-                return
-            }
-            if (parsedData && parsedData !== undefined){
-                console.log('parsedData', parsedData);
-
-                if (parsedData.targetResource && parsedData.targetResource !== undefined) {
-                    if (parsedData.targetResource === 'case' || parsedData.targetResource === 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE') {
-                        itemType = 'case';
-                        if (parsedData.resourceContext && parsedData.resourceContext !== undefined &&
-                            parsedData.resourceContext.outbreakId && parsedData.resourceContext.outbreakId !== undefined &&
-                            parsedData.resourceContext.caseId && parsedData.resourceContext.caseId !== undefined) {
-                            itemId = parsedData.resourceContext.caseId;
-                            outbreakId = parsedData.resourceContext.outbreakId
-                        }
-                    } else if (parsedData.targetResource === 'contact' || parsedData.targetResource === 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT') {
-                        itemType = 'contact';
-                        if (parsedData.resourceContext && parsedData.resourceContext !== undefined &&
-                            parsedData.resourceContext.outbreakId && parsedData.resourceContext.outbreakId !== undefined &&
-                            parsedData.resourceContext.contactId && parsedData.resourceContext.contactId !== undefined) {
-                            itemId = parsedData.resourceContext.contactId;
-                            outbreakId = parsedData.resourceContext.outbreakId;
-                        }
-                    }
-                }
-            }
-        }
-
-        console.log('pushNewEditScreen', itemId, itemType, outbreakId);
-        if (itemId && itemType && outbreakId && outbreakId === this.props.user.activeOutbreakId) {
-            let itemPouchId = null;
-            if (itemType === 'case') {
-                itemPouchId = `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE_${outbreakId}_${itemId}`
-            } else if (itemType === 'contact') {
-                itemPouchId = `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT_${outbreakId}_${itemId}`
-            }
-
-            if (itemPouchId) {
-                getItemByIdRequest(outbreakId, itemPouchId, itemType, (error, response) => {
+        this.setState({
+            loading: true
+        }, () => {
+            pushNewEditScreen(QRCodeInfo, this.props.navigator, this.props && this.props.user ? this.props.user : null, this.props && this.props.translation ? this.props.translation : null, (error, itemType, record) => {
+                this.setState({
+                    loading: false
+                }, () => {
                     if (error) {
-                        console.log("*** getItemByIdRequest error: ", error);
-                        Alert.alert(getTranslation(translations.alertMessages.alertLabel,  this.props && this.props.translation ? this.props.translation : null), getTranslation(translations.alertMessages.noItemAlert,  this.props && this.props.translation ? this.props.translation : null), [
-                            {
-                                text: getTranslation(translations.alertMessages.okButtonLabel,  this.props && this.props.translation ? this.props.translation : null),
-                                onPress: () => {console.log('Ok pressed')}
+                        if (error === translations.alertMessages.noItemAlert && itemType === 'case' && record) {
+                            Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props && this.props.translation ? this.props.translation : null), `${getTranslation(error, this.props && this.props.translation ? this.props.translation : null)}.\n${getTranslation(translations.alertMessages.addMissingPerson, this.props && this.props.translation ? this.props.translation : null)}`, [
+                                {
+                                    text: getTranslation(translations.alertMessages.cancelButtonLabel, this.props && this.props.translation ? this.props.translation : null),
+                                    onPress: () => {
+                                        console.log('Cancel pressed');
+                                    }
+                                },
+                                {
+                                    text: getTranslation(translations.alertMessages.yesButtonLabel, this.props && this.props.translation ? this.props.translation : null),
+                                    onPress: () => {
+                                        console.log('Yes pressed');
+                                        this.props.navigator.push({
+                                            screen: 'CaseSingleScreen',
+                                            animated: true,
+                                            animationType: 'fade',
+                                            passProps: {
+                                                case: Object.assign({}, record, {
+                                                    outbreakId: this.props.user.activeOutbreakId,
+                                                }, config.caseBlueprint),
+                                                forceNew: true
+                                            }
+                                        })
+                                    }
+                                },
+                            ])
+                        } else {
+                            Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props && this.props.translation ? this.props.translation : null), getTranslation(error, this.props && this.props.translation ? this.props.translation : null), [
+                                {
+                                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props && this.props.translation ? this.props.translation : null),
+                                    onPress: () => {
+                                        console.log('Ok pressed');
+                                    }
+                                }
+                            ])
+                        }
+                    } else {
+                        if (itemType && record) {
+                            if (itemType === 'case') {
+                                this.props.navigator.push({
+                                    screen: 'CaseSingleScreen',
+                                    animated: true,
+                                    animationType: 'fade',
+                                    passProps: {
+                                        case: record
+                                    }
+                                })
+                            } else if (itemType === 'contact') {
+                                this.props.navigator.push({
+                                    screen: 'ContactsSingleScreen',
+                                    animated: true,
+                                    animationType: 'fade',
+                                    passProps: {
+                                        contact: record
+                                    }
+                                })
                             }
-                        ])
-                    }
-                    if (response) {
-                        console.log("*** getItemByIdRequest response: ", response);
-                        if (itemType === 'case') {
-                            this.props.navigator.push({
-                                screen: 'CaseSingleScreen',
-                                // animated: true,
-                                // animationType: 'fade',
-                                passProps: {
-                                    case: response
-                                }
-                            })
-                        } else if (itemType === 'contact') {
-                            this.props.navigator.push({
-                                screen: 'ContactsSingleScreen',
-                                // animated: true,
-                                // animationType: 'fade',
-                                passProps: {
-                                    contact: response
-                                }
-                            })
                         }
                     }
-                })
-            }
-        } else {
-            setTimeout(function(){
-                Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props && this.props.translation ? this.props.translation : null), getTranslation(translations.alertMessages.noItemAlert,  this.props && this.props.translation ? this.props.translation : null), [
-                    {
-                        text: getTranslation(translations.alertMessages.okButtonLabel,  this.props && this.props.translation ? this.props.translation : null),
-                        onPress: () => {console.log('Ok pressed')}
-                    }
-                ])
-            }, 1000)
-        }
+                });
+            })
+        });
+
+    //     let itemId = null;
+    //     let itemType = null;
+    //     let outbreakId = null;
+    //
+    //     if (QRCodeInfo && QRCodeInfo !== undefined && QRCodeInfo.data && QRCodeInfo.data !== undefined){
+    //         let parsedData = null;
+    //         try {
+    //             parsedData =  JSON.parse(QRCodeInfo.data)
+    //         } catch(err) {
+    //             setTimeout(function(){
+    //                 Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props && this.props.translation ? this.props.translation : null), getTranslation(translations.alertMessages.errorOccuredMsg, this.props && this.props.translation ? this.props.translation : null), [
+    //                     {
+    //                         text: getTranslation(translations.alertMessages.okButtonLabel, this.props && this.props.translation ? this.props.translation : null),
+    //                         onPress: () => {console.log('Ok pressed')}
+    //                     }
+    //                 ])
+    //             }, 1000);
+    //             return
+    //         }
+    //         if (parsedData && parsedData !== undefined){
+    //             console.log('parsedData', parsedData);
+    //
+    //             if (parsedData.targetResource && parsedData.targetResource !== undefined) {
+    //                 if (parsedData.targetResource === 'case' || parsedData.targetResource === 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE') {
+    //                     itemType = 'case';
+    //                     if (parsedData.resourceContext && parsedData.resourceContext !== undefined &&
+    //                         parsedData.resourceContext.outbreakId && parsedData.resourceContext.outbreakId !== undefined &&
+    //                         parsedData.resourceContext.caseId && parsedData.resourceContext.caseId !== undefined) {
+    //                         itemId = parsedData.resourceContext.caseId;
+    //                         outbreakId = parsedData.resourceContext.outbreakId
+    //                     }
+    //                 } else if (parsedData.targetResource === 'contact' || parsedData.targetResource === 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT') {
+    //                     itemType = 'contact';
+    //                     if (parsedData.resourceContext && parsedData.resourceContext !== undefined &&
+    //                         parsedData.resourceContext.outbreakId && parsedData.resourceContext.outbreakId !== undefined &&
+    //                         parsedData.resourceContext.contactId && parsedData.resourceContext.contactId !== undefined) {
+    //                         itemId = parsedData.resourceContext.contactId;
+    //                         outbreakId = parsedData.resourceContext.outbreakId;
+    //                     }
+    //                 }
+    //             }
+    //         }
+    //     }
+    //
+    //     console.log('pushNewEditScreen', itemId, itemType, outbreakId);
+    //     if (itemId && itemType && outbreakId && outbreakId === this.props.user.activeOutbreakId) {
+    //         let itemPouchId = null;
+    //         if (itemType === 'case') {
+    //             itemPouchId = `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE_${outbreakId}_${itemId}`
+    //         } else if (itemType === 'contact') {
+    //             itemPouchId = `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT_${outbreakId}_${itemId}`
+    //         }
+    //
+    //         if (itemPouchId) {
+    //             getItemByIdRequest(outbreakId, itemPouchId, itemType, (error, response) => {
+    //                 if (error) {
+    //                     console.log("*** getItemByIdRequest error: ", error);
+    //                     Alert.alert(getTranslation(translations.alertMessages.alertLabel,  this.props && this.props.translation ? this.props.translation : null), getTranslation(translations.alertMessages.noItemAlert,  this.props && this.props.translation ? this.props.translation : null), [
+    //                         {
+    //                             text: getTranslation(translations.alertMessages.okButtonLabel,  this.props && this.props.translation ? this.props.translation : null),
+    //                             onPress: () => {console.log('Ok pressed')}
+    //                         }
+    //                     ])
+    //                 }
+    //                 if (response) {
+    //                     console.log("*** getItemByIdRequest response: ", response);
+    //                     if (itemType === 'case') {
+    //                         this.props.navigator.push({
+    //                             screen: 'CaseSingleScreen',
+    //                             animated: true,
+    //                             animationType: 'fade',
+    //                             passProps: {
+    //                                 case: response
+    //                             }
+    //                         })
+    //                     } else if (itemType === 'contact') {
+    //                         this.props.navigator.push({
+    //                             screen: 'ContactsSingleScreen',
+    //                             animated: true,
+    //                             animationType: 'fade',
+    //                             passProps: {
+    //                                 contact: response
+    //                             }
+    //                         })
+    //                     }
+    //                 }
+    //             })
+    //         }
+    //     } else {
+    //         setTimeout(function(){
+    //             Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props && this.props.translation ? this.props.translation : null), getTranslation(translations.alertMessages.noItemAlert,  this.props && this.props.translation ? this.props.translation : null), [
+    //                 {
+    //                     text: getTranslation(translations.alertMessages.okButtonLabel,  this.props && this.props.translation ? this.props.translation : null),
+    //                     onPress: () => {console.log('Ok pressed')}
+    //                 }
+    //             ])
+    //         }, 1000)
+    //     }
     };
 }
 
