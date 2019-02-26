@@ -4,7 +4,7 @@
 /**
  * Created by florinpopa on 14/06/2018.
  */
-import React, {Component} from 'react';
+import React, {PureComponent} from 'react';
 import {View, Text, StyleSheet, Platform, Image, Alert, Modal, ScrollView, AsyncStorage} from 'react-native';
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
@@ -25,8 +25,9 @@ import {getTranslation, generateId} from './../utils/functions';
 import translations from './../utils/translations';
 import SwitchInput from './../components/SwitchInput';
 import {getInternetCredentials, setInternetCredentials} from 'react-native-keychain';
+import {setSyncState} from './../actions/app';
 
-class ManualConfigScreen extends Component {
+class ManualConfigScreen extends PureComponent {
 
     static navigatorStyle = {
         navBarHidden: true,
@@ -199,7 +200,6 @@ class ManualConfigScreen extends Component {
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
-        console.log("Screen size: ", this.props.screenSize);
         return (
             <KeyboardAwareScrollView
                 style={[style.container, {paddingTop: Platform.OS === 'ios' ? this.props.screenSize.height === 812 ? 44 : 20 : 0}]}
@@ -542,6 +542,8 @@ class ManualConfigScreen extends Component {
             showModal: false,
             showCloseModalButton: false
         }, () => {
+            console.log('New state: ', this.state.syncState);
+            this.props.setSyncState({id: 'sync', status: null});
             callback();
         })
     }
@@ -604,7 +606,8 @@ function matchDispatchToProps(dispatch) {
     return bindActionCreators({
         loginUser,
         removeErrors,
-        storeHubConfiguration
+        storeHubConfiguration,
+        setSyncState
     }, dispatch);
 }
 
