@@ -174,9 +174,9 @@ class CaseSingleInfectionContainer extends Component {
             return Object.assign({},field, {isEditMode: this.props.isEditMode})
         });
 
-        if (this.props.case.deceased === false) {
+        if (this.props.case.outcomeId !== config.caseFieldsForHardCodeCheck.outcomeIdDeceasedValue) {
             fields = fields.filter((field) => {
-                return field.id !== 'dateDeceased' && field.id !== 'safeBurial'
+                return field.id !== 'safeBurial' && field.id !== 'dateOfBurial'
             });
         }
 
@@ -320,30 +320,11 @@ class CaseSingleInfectionContainer extends Component {
         let maximumDate = undefined;
 
         if (item.type === 'DatePicker') {
-            if (item.id === 'dateBecomeCase' || item.id === 'dateOfOutcome' ) {
+            if (item.id === 'dateBecomeCase' || item.id === 'dateOfOutcome' || item.id === 'dateOfBurial' || item.id === 'dateOfOnset') {
                 maximumDate = new Date()
-            } else if (item.id === 'dateOfOnset') {
-                if (this.props.case && this.props.case !== undefined && this.props.case.deceased !== null && this.props.case.deceased !== undefined && this.props.case.deceased === true && this.props.case.dateDeceased && this.props.case.dateDeceased !== undefined && this.props.case.dateDeceased !== ''){
-                    maximumDate = new Date(this.props.case.dateDeceased);
-                } else {
-                    maximumDate = new Date();
-                }
             } else if (item.id === 'dateOfInfection') {
-                let hasDeceasedDate = false;
-                let hasDateOfOnset = false;
-                if (this.props.case && this.props.case !== undefined && this.props.case.deceased !== null && this.props.case.deceased !== undefined && this.props.case.deceased === true && this.props.case.dateDeceased && this.props.case.dateDeceased !== undefined && this.props.case.dateDeceased !== ''){
-                    hasDeceasedDate = true
-                }
                 if (this.props.case && this.props.case !== undefined && this.props.case.dateOfOnset && this.props.case.dateOfOnset !== undefined && this.props.case.dateOfOnset !== ''){
-                    hasDateOfOnset = true
-                }
-
-                if (hasDeceasedDate === true && hasDateOfOnset === false) {
-                    maximumDate = new Date(this.props.case.dateDeceased);
-                } else if (hasDeceasedDate === false && hasDateOfOnset === true) {
                     maximumDate = new Date(this.props.case.dateOfOnset);
-                } else if (hasDeceasedDate === true && hasDateOfOnset === true) {
-                    maximumDate = _.min([this.props.case.dateOfOnset, this.props.case.dateDeceased])
                 } else {
                     maximumDate = new Date()
                 }

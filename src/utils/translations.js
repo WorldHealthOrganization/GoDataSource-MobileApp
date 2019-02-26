@@ -134,6 +134,7 @@ const caseSingleScreen = {
     deceased: 'LNG_CASE_FIELD_LABEL_DECEASED',
     safeBurial: 'LNG_CASE_FIELD_LABEL_SAFETY_BURIAL',
     dateDeceased: 'LNG_CASE_FIELD_LABEL_DATE_OF_DECEASE',
+    dateOfBurial: 'LNG_CASE_FIELD_LABEL_DATE_OF_BURIAL',
 
 
     dateRangeType: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_DATE_TYPE',

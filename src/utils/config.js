@@ -606,18 +606,18 @@ const caseSingleScreen = {
                     format: 'YYYY-MM-dd',
                     objectType: 'Case'
                 },
-                {
-                    cardNumber: 1,
-                    id: 'deceased',
-                    label: translations.caseSingleScreen.deceased,
-                    type: 'SwitchInput',
-                    value: false,
-                    isRequired: false,
-                    isEditMode: false,
-                    activeButtonColor: styles.missedRedColor,
-                    activeBackgroundColor: styles.missedRedColorWithOpacity,
-                    objectType: 'Case'
-                },
+                // {
+                //     cardNumber: 1,
+                //     id: 'deceased',
+                //     label: translations.caseSingleScreen.deceased,
+                //     type: 'SwitchInput',
+                //     value: false,
+                //     isRequired: false,
+                //     isEditMode: false,
+                //     activeButtonColor: styles.missedRedColor,
+                //     activeBackgroundColor: styles.missedRedColorWithOpacity,
+                //     objectType: 'Case'
+                // },
                 {
                     cardNumber: 1,
                     id: 'safeBurial',
@@ -632,8 +632,8 @@ const caseSingleScreen = {
                 },
                 {
                     cardNumber: 1,
-                    id: 'dateDeceased',
-                    label: translations.caseSingleScreen.dateDeceased,
+                    id: 'dateOfBurial',
+                    label: translations.caseSingleScreen.dateOfBurial,
                     value: '',
                     type: "DatePicker",
                     isRequired: false,
@@ -641,6 +641,17 @@ const caseSingleScreen = {
                     format: 'YYYY-MM-dd',
                     objectType: 'Case'
                 },
+                // {
+                //     cardNumber: 1,
+                //     id: 'dateDeceased',
+                //     label: translations.caseSingleScreen.dateDeceased,
+                //     value: '',
+                //     type: "DatePicker",
+                //     isRequired: false,
+                //     isEditMode: false,
+                //     format: 'YYYY-MM-dd',
+                //     objectType: 'Case'
+                // },
             ]
         }
     ],
@@ -2263,6 +2274,10 @@ const userPermissions = {
     writeFollowUp: 'write_followup',
 };
 
+const caseFieldsForHardCodeCheck = {
+    outcomeIdDeceasedValue: 'LNG_REFERENCE_DATA_CATEGORY_OUTCOME_DECEASED',
+};
+
 const manualSyncStages = [
     {id: 'getData', name: 'Get local changes', status: '...'},
     {id: 'createFile', name: 'Create files for sync', status: '...'},
@@ -2365,6 +2380,7 @@ export default {
     userPermissions,
     helpSingleScreen,
     helpItemsSortCriteriaDropDownItems,
+    caseFieldsForHardCodeCheck,
     manualSyncStages,
     dateRangeTypes,
     documentTypes,

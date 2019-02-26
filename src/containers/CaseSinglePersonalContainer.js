@@ -236,14 +236,8 @@ class CaseSinglePersonalContainer extends PureComponent {
         let maximumDate = undefined;
 
         if (item.type === 'DatePicker') {
-            if (item.id === 'dob') {
+            if (item.id === 'dob' || item.id === 'dateOfReporting') {
                 maximumDate = new Date()
-            } else if (item.id === 'dateOfReporting') {
-                if (this.props.case && this.props.case !== undefined && this.props.case.deceased !== null && this.props.case.deceased !== undefined && this.props.case.deceased === true && this.props.case.dateDeceased && this.props.case.dateDeceased !== undefined && this.props.case.dateDeceased !== ''){
-                    maximumDate = this.props.case.dateDeceased
-                } else {
-                    maximumDate = new Date()
-                }
             }
         }
         
