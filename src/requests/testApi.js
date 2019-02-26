@@ -2,10 +2,11 @@
  * Created by florinpopa on 07/01/2019.
  */
 
-export function testApi(testUrl, callback) {
+export function testApi(testUrl, deviceInfo, callback) {
     fetch(testUrl, {
         method: 'GET',
         headers: {
+            'device-info': deviceInfo,
             'Content-Type': 'application/json',
             'Accept': 'application/json'
         }
