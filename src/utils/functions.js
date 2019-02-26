@@ -1097,7 +1097,7 @@ export function updateRequiredFields(outbreakId, userId, record, action, fileTyp
     // console.log ('updateRequiredFields ', record, action)
     switch (action) {
         case 'create':
-            record._id = computeIdForFileType(fileType, outbreakId, record, type);
+            record._id = record._id ? record._id : computeIdForFileType(fileType, outbreakId, record, type);
             record.fileType = fileType;
             record.updatedAt = new Date().toISOString();
             record.updatedBy = extractIdFromPouchId(userId, 'user');
@@ -1240,7 +1240,6 @@ export function getTranslation (value, allTransactions) {
     if (allTransactions && Array.isArray(allTransactions) && allTransactions[0] && allTransactions[0].languageId) {
         key = `${key}-${allTransactions[0].languageId}`
     }
-
     if (getTranslation.cache[key] !== undefined) {
         // console.log('~~~ return cache value ~~~', key)
         return getTranslation.cache[key]
@@ -1262,7 +1261,7 @@ export function getTranslation (value, allTransactions) {
             valueToBeReturned = ''
         }
     }
-    getTranslation.cache[key] = valueToBeReturned
+    getTranslation.cache[key] = valueToBeReturned;
     return valueToBeReturned;
 }
 
