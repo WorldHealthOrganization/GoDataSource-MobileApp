@@ -32,6 +32,10 @@ class ValuePicker extends PureComponent {
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
+        // Do the mapping for the dropdown dynamically
+        let data = this.props.referenceData.filter((e) => {return e.active && !e.deleted && e.categoryId === 'LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE'}).map((e) => {return {value: e.value}});
+        data.unshift(config.dropDownValues[0]);
+
         return (
             <ElevatedView elevation={2}>
                 <ButtonWithIcons
@@ -46,7 +50,7 @@ class ValuePicker extends PureComponent {
                 >
                     <Dropdown
                         ref='dropdown'
-                        data={config.dropDownValues.map((e) => {return {label: e.value === 'All' ? e.value : getTranslation(e.value, this.props.translation), value: e.value}})}
+                        data={data.map((e) => {return {label: e.value === 'All' ? e.value : getTranslation(e.value, this.props.translation), value: e.value}})}
                         value={this.props.value}
                         renderAccessory={() => {
                             return null;
@@ -106,7 +110,8 @@ const style = StyleSheet.create({
 function mapStateToProps(state) {
     return {
         screenSize: state.app.screenSize,
-        translation: state.app.translation
+        translation: state.app.translation,
+        referenceData: state.referenceData
     };
 }
 

@@ -39,7 +39,8 @@ class DropDownSectioned extends Component {
 
     // Please write here all the methods that are not react native lifecycle methods
     editInput() {
-        let tooltip = getTooltip(this.props.label, this.props.translation)
+        let tooltip = getTooltip(this.props.label, this.props.translation);
+        console.log('Value from DropDownSectioned: ', this.props.value);
         return (
             <View style={[this.props.style, {flexDirection: 'row'}]}>
                 <View style = {{flex: 1}}>
@@ -55,7 +56,7 @@ class DropDownSectioned extends Component {
                         items={this.props.data}
                         uniqueKey='_id'
                         subKey='children'
-                        selectText= {this.props.value !== "" ? this.props.value : this.props.single === true ? getTranslation(translations.dropDownSectionedLabels.chooseOneLocation, this.props.translation) : getTranslation(translations.dropDownSectionedLabels.chooseMoreLocations, this.props.translation)}
+                        selectText= {this.props.value !== "" ? Array.isArray(this.props.value) && this.props.value.length > 1 ? getTranslation(translations.dropDownSectionedLabels.selected, this.props.translation) : Array.isArray(this.props.value) && this.props.value.length < 1 ? getTranslation(translations.dropDownSectionedLabels.noneSelected, this.props.translation) : this.props.value : this.props.single === true ? getTranslation(translations.dropDownSectionedLabels.chooseOneLocation, this.props.translation) : getTranslation(translations.dropDownSectionedLabels.chooseMoreLocations, this.props.translation)}
                         showDropDowns={true}
                         readOnlyHeadings={true}
                         onSelectedItemsChange={this.onSelectedItemsChange}
