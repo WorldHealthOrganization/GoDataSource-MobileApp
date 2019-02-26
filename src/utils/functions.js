@@ -749,7 +749,7 @@ export function getDataFromDatabaseFromFile (database, fileType, lastSyncDate, p
                         })
                 } else {
                     database = null;
-                    resolve(`Done with ${fileType}`);
+                    resolve(`No data to send`);
                 }
             })
             .catch((error) => {
@@ -901,6 +901,7 @@ export async function createFilesWithName (fileName, data, password) {
     try {
         let exists = await RNFetchBlobFS.exists(RNFetchBlobFS.dirs.DocumentDir + '/who_files');
         if (exists) {
+            console.log(`Directory ${RNFetchBlobFS.dirs.DocumentDir + '/who_files'} exists`);
             let numberOfChunks = parseInt(data.length / 1000);
             let remainder = data.length % 1000;
             let arrayOfResponses = [];
@@ -925,6 +926,7 @@ export async function createFilesWithName (fileName, data, password) {
             }
         } else {
             // If the directory does not exists, then create it
+            console.log(`Directory ${RNFetchBlobFS.dirs.DocumentDir + '/who_files'} does not exist`);
             try {
                 let directory = await RNFetchBlobFS.mkdir(RNFetchBlobFS.dirs.DocumentDir + '/who_files');
                 // Do not check if directory exists, since the mkdir method does not return anything
@@ -965,17 +967,29 @@ export async function createFilesWithName (fileName, data, password) {
 
 export function createZipFileAtPath (source, target, callback) {
     // First check if the source exists, so that we don't create an empty zip file
-    RNFetchBlobFS.exists()
-    // We don't need to check for archives with the same name, since the zip function overwrites the previous archive
-    zip(source, target)
-        .then((path) => {
-            console.log('Zip file created at path: ', path);
-            callback(null, path);
+    console.log('Checking source: ', source);
+    RNFetchBlobFS.exists(source)
+        .then((exists) => {
+            if (exists) {
+                // We don't need to check for archives with the same name, since the zip function overwrites the previous archive
+                zip(source, target)
+                    .then((path) => {
+                        console.log('Zip file created at path: ', path);
+                        return callback(null, path);
+                    })
+                    .catch((errorCreateZip) => {
+                        console.log('Error while creating zip file: ', errorCreateZip);
+                        callback(errorCreateZip);
+                    })
+            } else {
+                console.log('File does not exist at path: ', source);
+                return callback('File does not exist');
+            }
         })
-        .catch((errorCreateZip) => {
-            console.log('Error while creating zip file: ', errorCreateZip);
-            callback(errorCreateZip);
-        })
+        .catch((errorFileExists) => {
+            console.log('Error while checking if file exists: ', errorFileExists);
+            return callback(errorFileExists);
+        });
 }
 
 // Method for extracting the mongo id from the pouch id
@@ -1083,7 +1097,7 @@ export function updateRequiredFields(outbreakId, userId, record, action, fileTyp
     // console.log ('updateRequiredFields ', record, action)
     switch (action) {
         case 'create':
-            record._id = computeIdForFileType(fileType, outbreakId, record, type);
+            record._id = record._id ? record._id : computeIdForFileType(fileType, outbreakId, record, type);
             record.fileType = fileType;
             record.updatedAt = new Date().toISOString();
             record.updatedBy = extractIdFromPouchId(userId, 'user');
@@ -1111,10 +1125,27 @@ export function updateRequiredFields(outbreakId, userId, record, action, fileTyp
             record.deleted = true;
             record.deletedAt = new Date().toISOString();
             // console.log ('updateRequiredFields delete record', JSON.stringify(record))
+
+            // WGD-1806 when removing cases/contacts and they have visualId, set it to null, and add a new document
+            if (fileType === 'person.json' && (type === config.personTypes.contacts || type === config.personTypes.cases) && record.visualId) {
+                if (!record.documents || !Array.isArray(record.documents)) {
+                    record.documents = [];
+                }
+                let documents = record.documents.slice();
+
+                documents.push({
+                    type: config.documentTypes.archivedId,
+                    number: record.visualId
+                });
+                record.documents = documents.slice();
+                record.visualId = null;
+            }
+
             return record;
 
         default:
             console.log ('updateRequiredFields default record', JSON.stringify(record));
+            return record;
     }
 }
 
@@ -1209,7 +1240,6 @@ export function getTranslation (value, allTransactions) {
     if (allTransactions && Array.isArray(allTransactions) && allTransactions[0] && allTransactions[0].languageId) {
         key = `${key}-${allTransactions[0].languageId}`
     }
-
     if (getTranslation.cache[key] !== undefined) {
         // console.log('~~~ return cache value ~~~', key)
         return getTranslation.cache[key]
@@ -1231,7 +1261,7 @@ export function getTranslation (value, allTransactions) {
             valueToBeReturned = ''
         }
     }
-    getTranslation.cache[key] = valueToBeReturned
+    getTranslation.cache[key] = valueToBeReturned;
     return valueToBeReturned;
 }
 
@@ -1402,7 +1432,7 @@ export function localSortItems (itemsToSort, sortFilter) {
         let sortOrder = []
         for(let i = 0; i < sortFilter.length; i++) {
             if (sortFilter[i].sortCriteria && sortFilter[i].sortCriteria.trim().length > 0 && sortFilter[i].sortOrder && sortFilter[i].sortOrder.trim().length > 0){
-                sortCriteria.push(sortFilter[i].sortCriteria === 'LNG_CONTACT_FIELD_LABEL_FIRST_NAME' ? 'firstName' : 'lastNmae')
+                sortCriteria.push(sortFilter[i].sortCriteria === 'LNG_CONTACT_FIELD_LABEL_FIRST_NAME' ? 'firstName' : 'lastName')
                 sortOrder.push(sortFilter[i].sortOrder === 'LNG_SIDE_FILTERS_SORT_BY_ASC_PLACEHOLDER' ? false : true)
             }
         }

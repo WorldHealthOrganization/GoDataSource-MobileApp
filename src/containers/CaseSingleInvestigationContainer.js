@@ -34,9 +34,7 @@ class CaseSingleInvestigationContainer extends PureComponent {
         sortedQuestions = extractAllQuestions(sortedQuestions, this.props.item);
 
         return (
-            <TouchableWithoutFeedback onPress={() => {
-                Keyboard.dismiss()
-            }} accessible={false}>
+            <View style={{flex: 1}}>
                 <View style={style.container}>
                     <View style={{flexDirection: 'row'}}>
                     {
@@ -120,7 +118,7 @@ class CaseSingleInvestigationContainer extends PureComponent {
                         }
                     </KeyboardAwareScrollView>
                 </View>
-            </TouchableWithoutFeedback>
+            </View>
         );
     }
 

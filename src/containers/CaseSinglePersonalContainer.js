@@ -34,9 +34,7 @@ class CaseSinglePersonalContainer extends PureComponent {
     // and can slow down the app
     render() {
         return (
-            <TouchableWithoutFeedback onPress={() => {
-                Keyboard.dismiss()
-            }} accessible={false}>
+            <View style={{flex: 1}}>
                 <View style={style.container}>
                     <View style={{flexDirection: 'row'}}>
                         {
@@ -128,7 +126,7 @@ class CaseSinglePersonalContainer extends PureComponent {
                         }
                     </KeyboardAwareScrollView>
                 </View>
-            </TouchableWithoutFeedback>
+            </View>
         );
     }
 
@@ -277,7 +275,13 @@ class CaseSinglePersonalContainer extends PureComponent {
                     getTranslation(this.props.case.documents[index][item.id], this.props.translation) : '';
             }
         }
-        return this.props.case && this.props.case[item.id] ? getTranslation(this.props.case[item.id], this.props.translation) : '';
+        if (item.id === 'age') {
+            if (this.props.case && this.props.case[item.id] !== null && this.props.case[item.id] !== undefined) {
+             return this.props.case[item.id]
+            }
+        } else {
+            return this.props.case && this.props.case[item.id] ? getTranslation(this.props.case[item.id], this.props.translation) : '';
+        }
     };
 
     handleNextButton = () => {

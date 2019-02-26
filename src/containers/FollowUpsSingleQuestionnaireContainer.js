@@ -71,9 +71,7 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
         let viewWidth = calculateDimension(config.designScreenSize.width - 32, false, this.props.screenSize);
 
         return (
-            <TouchableWithoutFeedback onPress={() => {
-                Keyboard.dismiss()
-            }} accessible={false}>
+            <View style={{flex: 1}}>
                 <View style={style.mainContainer}>
                     {
                         this && this.props && this.props.isEditMode ? (
@@ -100,7 +98,7 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
                         }
                     </KeyboardAwareScrollView>
                 </View>
-            </TouchableWithoutFeedback>
+            </View>
         );
     }
 

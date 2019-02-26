@@ -31,6 +31,7 @@ import {setLoginState, storeData, getAvailableLanguages, setSyncState} from './a
 import {storePermissions} from './role';
 import moment from 'moment';
 import _ from 'lodash';
+import {middlewareFunction} from './app';
 
 // Add here only the actions, not also the requests that are executed.
 // For that purpose is the requests directory
@@ -144,7 +145,7 @@ export function cleanDataAfterLogout() {
     }
 }
 
-export function getUserById(userId, token, refreshFollowUps) {
+export function getUserById(userId, token, refreshFollowUps, nativeEventEmitter) {
     return async function(dispatch, getState) {
         console.log("getUserById userId: ", userId);
         getUserByIdRequest(userId, token, (error, response) => {
@@ -195,6 +196,11 @@ export function getUserById(userId, token, refreshFollowUps) {
                                     dispatch(setSyncState('Finished processing'));
                                 }
                                 dispatch(changeAppRoot('after-login'));
+                                console.log('NativeEventEmitter: ', typeof nativeEventEmitter, nativeEventEmitter);
+                                console.log("Typeof nativeEventEmitter: ", typeof nativeEventEmitter.appLoaded);
+                                if (nativeEventEmitter) {
+                                    dispatch(middlewareFunction(nativeEventEmitter));
+                                }
                             })
                             .catch((error) => {
                                 console.log('Getting data from local db resulted in error: ', error);

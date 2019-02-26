@@ -300,43 +300,29 @@ function updateContactFollowUpFields(contact, outbreak) {
 export function updateExposureForContact(outbreakId, contactId, exposure, token) {
     let contactIdForExposure = extractIdFromPouchId(contactId, 'person');
     return async function(dispatch, getState) {
-
-        getContactByIdRequest(outbreakId, contactId, null, (errorContact, responseContact) => {
-            if (errorContact) {
-                console.log("*** updateExposureForContact getContactByIdRequest error: ", error);
-                dispatch(addError(errorTypes.ERROR_ADD_EXPOSURE));
+        updateExposureForContactRequest(outbreakId, contactIdForExposure, exposure, token, (error, response) => {
+            if (error) {
+                console.log("*** updateExposureForContact error: ", error);
+                dispatch(addError(errorTypes.ERROR_UPDATE_EXPOSURE));
             }
-            if (responseContact) {
-                getRelationshipsForTypeRequest(outbreakId, null, [contactIdForExposure], (errorRelationships, resultRelationships) => {
-                    if (errorRelationships) {
-                        console.log("*** updateExposureForContact getRelationshipsForTypeRequest error: ", error);
-                        dispatch(addError(errorTypes.ERROR_ADD_EXPOSURE));
+            if (response) {
+                console.log("*** updateExposureForContact response: ", JSON.stringify(response));
+                getContactByIdRequest(outbreakId, contactId, null, (errorContact, responseContact) => {
+                    if (errorContact) {
+                        console.log("*** updateExposureForContact getContactByIdRequest error: ", error);
+                        dispatch(addError(errorTypes.ERROR_UPDATE_EXPOSURE));
                     }
-                    if (resultRelationships) {
-                        // Map the relationships inside the new contact
-                        responseContact.relationships = resultRelationships;
-                        responseContact.relationships.push(exposure);
-
-                        responseContact = updateContactFollowUpFields(responseContact, getState().outbreak);
-                        dispatch(updateContact(outbreakId, contactId, responseContact, null, null, true));
-                        // updateContactRequest(outbreakId, responseContact._id, responseContact, null, (errorUpdateContact, responseUpdateContact) => {
-                        //     if (errorUpdateContact) {
-                        //         console.log("*** updateExposureForContact updateContactRequest error: ", error);
-                        //         dispatch(addError(errorTypes.ERROR_ADD_EXPOSURE));
-                        //     }
-                        //     if (responseUpdateContact) {
-                        //         updateExposureForContactRequest(outbreakId, contactIdForExposure, exposure, token, (error, response) => {
-                        //             if (error) {
-                        //                 console.log("*** updateExposureForContact error: ", error);
-                        //                 dispatch(addError(errorTypes.ERROR_UPDATE_EXPOSURE));
-                        //             }
-                        //             if (response) {
-                        //                 console.log("*** updateExposureForContact response: ", JSON.stringify(response));
-                        //                 dispatch(getContactById(outbreakId, contactId, token));
-                        //             }
-                        //         })
-                        //     }
-                        // })
+                    if (responseContact) {
+                        getRelationshipsForTypeRequest(outbreakId, null, [contactIdForExposure], (errorRelationships, resultRelationships) => {
+                            if (errorRelationships) {
+                                console.log("*** updateExposureForContact getRelationshipsForTypeRequest error: ", error);
+                                dispatch(addError(errorTypes.ERROR_UPDATE_EXPOSURE));
+                            }
+                            if (resultRelationships) {
+                                responseContact.relationships = resultRelationships;
+                                dispatch(updateContact(outbreakId, contactId, responseContact, null, null, true));
+                            }
+                        })
                     }
                 })
             }

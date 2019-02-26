@@ -853,8 +853,6 @@ export function sendDatabaseToServer () {
                             // To avoid performance issues, go through all the collections that can change and see if anything actually changed
 
                             // arrayOfStatuses.push({text: 'Getting local data', status: 'OK'});
-                            dispatch(setSyncState({id: 'getData', status: 'Success'}));
-                            dispatch(setSyncState({id: 'createFile', status: 'In progress'}));
                             let statusArray = [];
                             for (let i=0; i<config.changingMongoCollections.length; i++) {
                                 try {
@@ -880,63 +878,99 @@ export function sendDatabaseToServer () {
                             }
 
                             if (statusArray.length === config.changingMongoCollections.length) {
-                                // console.log('Result from processing all the files: timeForCreatingFiles: ', new Date().getTime() - startTimeForCreatingFiles);
-                                // let startTimeForCreateZip = new Date().getTime();
-                                createZipFileAtPath(`${RNFetchBlobFs.dirs.DocumentDir}/who_files`, `${RNFetchBlobFs.dirs.DocumentDir}/${activeDatabase.replace(/\/|\.|\:/g, '')}.zip`, (errorCreateZipFile, resultCreateZipFile) => {
-                                    if (errorCreateZipFile) {
-                                        console.log("An error occurred while zipping the files: ", errorCreateZipFile);
-                                        // arrayOfStatuses.push({text: 'Creating local files', status: JSON.stringify(errorCreateZipFile)});
-                                        // dispatch(parseStatusesAndShowMessage(getState().user._id));
-                                        dispatch(setSyncState({id: 'createFile', status: 'Error', error: JSON.stringify(errorCreateZipFile)}));
+                                // Check if the status array is full of "No data to send" statuses
+                                let skipZip = true;
+
+                                for (let i=0; i<statusArray.length; i++) {
+                                    if (statusArray[i] !== 'No data to send') {
+                                        skipZip = false;
                                     }
-                                    if (resultCreateZipFile) {
-                                        // After creating the zip file, it's time to send it to the server
-                                        // console.log("Response from create zip file: time For zip", new Date().getTime() - startTimeForCreateZip);
-                                        // statuses.createLocalFiles.status = 'OK';
-                                        dispatch(setSyncState({id: 'createFile', status: 'Success'}));
-                                        dispatch(setSyncState({id: 'sendData', status: 'In progress'}));
-                                        postDatabaseSnapshotRequest(internetCredentials, resultCreateZipFile, (errorSendData, resultSendData) => {
-                                            if (errorSendData && !resultSendData) {
-                                                console.log('An error occurred while sending data to server: ', errorSendData);
-                                                // dispatch(setSyncState('Error'));
-                                                // statuses.sendData.status = JSON.stringify(errorSendData);
-                                                // arrayOfStatuses.push({text: 'Sending data to the HUB', status: JSON.stringify(errorSendData)});
-                                                // dispatch(parseStatusesAndShowMessage(getState().user._id));
-                                                // dispatch(addError({type: 'Sync Error', message: JSON.stringify(errorSendData)}));
-                                                dispatch(setSyncState({id: 'sendData', status: 'Error', error: JSON.stringify(errorSendData)}));
+                                }
+
+                                if (skipZip) {
+                                    dispatch(setSyncState({id: 'getData', status: 'No data to send'}));
+                                    dispatch(setSyncState({id: 'createFile', status: 'Skip'}));
+                                    dispatch(setSyncState({id: 'sendData', status: 'Skip'}));
+                                    getDatabaseSnapshotRequest({url: internetCredentials.server ? internetCredentials.server : internetCredentials.service, clientId: internetCredentials.username, clientSecret: internetCredentials.password}, lastSyncDate, dispatch, (error, response) => {
+                                        if (error) {
+                                            // arrayOfStatuses.push({text: 'Getting updated data from the server', status: JSON.stringify(error)});
+                                            // dispatch(setSyncState('Error'));
+                                            // dispatch(parseStatusesAndShowMessage(getState().user._id));
+                                            if (error === 'No data to export') {
+                                                dispatch(setSyncState({id: 'getDataFromServer', status: 'No data to export'}));
+                                            } else {
+                                                dispatch(setSyncState({id: 'getDataFromServer', status: 'Error', error: JSON.stringify(error)}));
                                             }
-                                            if (resultSendData) {
-                                                console.log("Data was successfully sent to server: ", resultSendData, new Date().getTime() - operationStart);
-                                                // statuses.sendData.status = 'OK';
-                                                // arrayOfStatuses.push({text: 'Sending data to the HUB', status: errorSendData ? JSON.stringify(errorSendData) : 'OK'});
-                                                // dispatch(setSyncState('Getting updated data from the server'));
-                                                dispatch(setSyncState({id: 'sendData', status: errorSendData ? 'Error' : 'Success', error: errorSendData ? JSON.stringify(errorSendData) : null}));
-                                                dispatch(setSyncState({id: 'getDataFromServer', status: 'In progress'}));
-                                                getDatabaseSnapshotRequest({url: internetCredentials.server ? internetCredentials.server : internetCredentials.service, clientId: internetCredentials.username, clientSecret: internetCredentials.password}, lastSyncDate, dispatch, (error, response) => {
-                                                    if (error) {
-                                                        // arrayOfStatuses.push({text: 'Getting updated data from the server', status: JSON.stringify(error)});
-                                                        // dispatch(setSyncState('Error'));
-                                                        // dispatch(parseStatusesAndShowMessage(getState().user._id));
-                                                        if (error === 'No data to export') {
-                                                            dispatch(setSyncState({id: 'getDataFromServer', status: 'No data to export'}));
-                                                        } else {
-                                                            dispatch(setSyncState({id: 'getDataFromServer', status: 'Error', error: JSON.stringify(error)}));
+                                        }
+                                        if (response) {
+                                            // statuses.gettingData.status = 'OK';
+                                            // arrayOfStatuses.push({text: 'Getting updated data from the server', status: 'OK'});
+                                            dispatch(processFilesForSync(error, response, {
+                                                url: Platform.OS === 'ios' ? internetCredentials.server : internetCredentials.service,
+                                                clientId: internetCredentials.username,
+                                                clientSecret: internetCredentials.password
+                                            }, null, true, false));
+                                        }
+                                    })
+                                } else {
+                                    dispatch(setSyncState({id: 'getData', status: 'Success'}));
+                                    dispatch(setSyncState({id: 'createFile', status: 'In progress'}));
+                                    createZipFileAtPath(`${RNFetchBlobFs.dirs.DocumentDir}/who_files`, `${RNFetchBlobFs.dirs.DocumentDir}/${activeDatabase.replace(/\/|\.|\:/g, '')}.zip`, (errorCreateZipFile, resultCreateZipFile) => {
+                                        if (errorCreateZipFile) {
+                                            console.log("An error occurred while zipping the files: ", errorCreateZipFile);
+                                            // arrayOfStatuses.push({text: 'Creating local files', status: JSON.stringify(errorCreateZipFile)});
+                                            // dispatch(parseStatusesAndShowMessage(getState().user._id));
+                                            dispatch(setSyncState({id: 'createFile', status: 'Error', error: JSON.stringify(errorCreateZipFile)}));
+                                        }
+                                        if (resultCreateZipFile) {
+                                            // After creating the zip file, it's time to send it to the server
+                                            // console.log("Response from create zip file: time For zip", new Date().getTime() - startTimeForCreateZip);
+                                            // statuses.createLocalFiles.status = 'OK';
+                                            dispatch(setSyncState({id: 'createFile', status: 'Success'}));
+                                            dispatch(setSyncState({id: 'sendData', status: 'In progress'}));
+                                            postDatabaseSnapshotRequest(internetCredentials, resultCreateZipFile, (errorSendData, resultSendData) => {
+                                                if (errorSendData && !resultSendData) {
+                                                    console.log('An error occurred while sending data to server: ', errorSendData);
+                                                    // dispatch(setSyncState('Error'));
+                                                    // statuses.sendData.status = JSON.stringify(errorSendData);
+                                                    // arrayOfStatuses.push({text: 'Sending data to the HUB', status: JSON.stringify(errorSendData)});
+                                                    // dispatch(parseStatusesAndShowMessage(getState().user._id));
+                                                    // dispatch(addError({type: 'Sync Error', message: JSON.stringify(errorSendData)}));
+                                                    dispatch(setSyncState({id: 'sendData', status: 'Error', error: JSON.stringify(errorSendData)}));
+                                                }
+                                                if (resultSendData) {
+                                                    console.log("Data was successfully sent to server: ", resultSendData, new Date().getTime() - operationStart);
+                                                    // statuses.sendData.status = 'OK';
+                                                    // arrayOfStatuses.push({text: 'Sending data to the HUB', status: errorSendData ? JSON.stringify(errorSendData) : 'OK'});
+                                                    // dispatch(setSyncState('Getting updated data from the server'));
+                                                    dispatch(setSyncState({id: 'sendData', status: errorSendData ? 'Error' : 'Success', error: errorSendData ? JSON.stringify(errorSendData) : null}));
+                                                    dispatch(setSyncState({id: 'getDataFromServer', status: 'In progress'}));
+                                                    getDatabaseSnapshotRequest({url: internetCredentials.server ? internetCredentials.server : internetCredentials.service, clientId: internetCredentials.username, clientSecret: internetCredentials.password}, lastSyncDate, dispatch, (error, response) => {
+                                                        if (error) {
+                                                            // arrayOfStatuses.push({text: 'Getting updated data from the server', status: JSON.stringify(error)});
+                                                            // dispatch(setSyncState('Error'));
+                                                            // dispatch(parseStatusesAndShowMessage(getState().user._id));
+                                                            if (error === 'No data to export') {
+                                                                dispatch(setSyncState({id: 'getDataFromServer', status: 'No data to export'}));
+                                                            } else {
+                                                                dispatch(setSyncState({id: 'getDataFromServer', status: 'Error', error: JSON.stringify(error)}));
+                                                            }
                                                         }
-                                                    }
-                                                    if (response) {
-                                                        // statuses.gettingData.status = 'OK';
-                                                        // arrayOfStatuses.push({text: 'Getting updated data from the server', status: 'OK'});
-                                                        dispatch(processFilesForSync(error, response, {
-                                                            url: Platform.OS === 'ios' ? internetCredentials.server : internetCredentials.service,
-                                                            clientId: internetCredentials.username,
-                                                            clientSecret: internetCredentials.password
-                                                        }, null, !errorSendData, false));
-                                                    }
-                                                })
-                                            }
-                                        })
-                                    }
-                                })
+                                                        if (response) {
+                                                            // statuses.gettingData.status = 'OK';
+                                                            // arrayOfStatuses.push({text: 'Getting updated data from the server', status: 'OK'});
+                                                            dispatch(processFilesForSync(error, response, {
+                                                                url: Platform.OS === 'ios' ? internetCredentials.server : internetCredentials.service,
+                                                                clientId: internetCredentials.username,
+                                                                clientSecret: internetCredentials.password
+                                                            }, null, !errorSendData, false));
+                                                        }
+                                                    })
+                                                }
+                                            })
+                                        }
+                                    })
+                                }
                             }
 
 
@@ -1117,7 +1151,7 @@ export function getData (key) {
     }
 }
 
-export function appInitialized() {
+export function appInitialized(nativeEventEmitter) {
     return async function (dispatch, getState) {
         // Get Screen Dimensions and store them to the redux store in order to use them throughout the app
         let width = Dimensions.get("window").width;
@@ -1145,31 +1179,61 @@ export function appInitialized() {
                                 try {
                                     let database = await createDatabase(server.replace(/\/|\.|\:/g, ''), databaseCredentials.password, false);
                                     if (database) {
-                                        dispatch(getUserById(loggedUser, null));
+                                        dispatch(getUserById(loggedUser, null, false, nativeEventEmitter));
                                     } else {
                                         console.log('Database does not exist');
                                         dispatch(changeAppRoot('config'));
+                                        console.log('NativeEventEmitter: ', typeof nativeEventEmitter, nativeEventEmitter);
+                                        console.log("Typeof nativeEventEmitter: ", typeof nativeEventEmitter.appLoaded);
+                                        if (nativeEventEmitter && typeof nativeEventEmitter.appLoaded === 'function') {
+                                            dispatch(middlewareFunction(nativeEventEmitter));
+                                        }
                                     }
                                 } catch (errorCreateDatabase) {
                                     console.log('errorCreateDatabase: ', errorCreateDatabase);
                                     dispatch(changeAppRoot('config'));
+                                    console.log('NativeEventEmitter: ', typeof nativeEventEmitter, nativeEventEmitter);
+                                    console.log("Typeof nativeEventEmitter: ", typeof nativeEventEmitter.appLoaded);
+                                    if (nativeEventEmitter) {
+                                        dispatch(middlewareFunction(nativeEventEmitter));
+                                    }
                                 }
 
                             } else {
                                 console.log("Don't have database credentials, but have active database and logged user. Proceed to config screen");
-                                dispatch(changeAppRoot('config'))
+                                dispatch(changeAppRoot('config'));
+                                console.log('NativeEventEmitter: ', typeof nativeEventEmitter, nativeEventEmitter);
+                                console.log("Typeof nativeEventEmitter: ", typeof nativeEventEmitter.appLoaded);
+                                if (nativeEventEmitter) {
+                                    dispatch(middlewareFunction(nativeEventEmitter));
+                                }
                             }
                         } catch (errorGetDatabaseCredentials) {
                             console.log("Don't have database credentials, but have active database and logged user and error. Proceed to config screen: ", errorGetDatabaseCredentials);
-                            dispatch(changeAppRoot('config'))
+                            dispatch(changeAppRoot('config'));
+                            console.log('NativeEventEmitter: ', typeof nativeEventEmitter, nativeEventEmitter);
+                            console.log("Typeof nativeEventEmitter: ", typeof nativeEventEmitter.appLoaded);
+                            if (nativeEventEmitter) {
+                                dispatch(middlewareFunction(nativeEventEmitter));
+                            }
                         }
                     } else {
                         console.log("Don't have an active database but we have a logged user. Proceed to config screen");
                         dispatch(changeAppRoot('config'));
+                        console.log('NativeEventEmitter: ', typeof nativeEventEmitter, nativeEventEmitter);
+                        console.log("Typeof nativeEventEmitter: ", typeof nativeEventEmitter.appLoaded);
+                        if (nativeEventEmitter) {
+                            dispatch(middlewareFunction(nativeEventEmitter));
+                        }
                     }
                 } catch (errorGetActiveDatabase) {
                     console.log("We have an error at getting the active database, but we have logged user. Proceed to config screen: ", errorGetActiveDatabase)
                     dispatch(changeAppRoot('config'));
+                    console.log('NativeEventEmitter: ', typeof nativeEventEmitter, nativeEventEmitter);
+                    console.log("Typeof nativeEventEmitter: ", typeof nativeEventEmitter.appLoaded);
+                    if (nativeEventEmitter) {
+                        dispatch(middlewareFunction(nativeEventEmitter));
+                    }
                 }
             } else {
                 console.log("Don't have a logged user. Time to check if there is an active database and if there is, move to the login screen");
@@ -1188,29 +1252,64 @@ export function appInitialized() {
                                     let database = await createDatabase(server.replace(/\/|\.|\:/g, ''), databaseCredentials.password, false);
                                     if (database) {
                                         dispatch(changeAppRoot('login'));
+                                        console.log('NativeEventEmitter: ', typeof nativeEventEmitter, nativeEventEmitter);
+                                        console.log("Typeof nativeEventEmitter: ", typeof nativeEventEmitter.appLoaded);
+                                        if (nativeEventEmitter) {
+                                            dispatch(middlewareFunction(nativeEventEmitter));
+                                        }
                                     } else {
                                         console.log('Database does not exist');
                                         dispatch(changeAppRoot('config'));
+                                        console.log('NativeEventEmitter: ', typeof nativeEventEmitter, nativeEventEmitter);
+                                        console.log("Typeof nativeEventEmitter: ", typeof nativeEventEmitter.appLoaded);
+                                        if (nativeEventEmitter) {
+                                            dispatch(middlewareFunction(nativeEventEmitter));
+                                        }
                                     }
                                 } catch (errorCreateDatabase) {
-                                    console.log('errorCreateDatabase: ', errorCreateDatabase)
+                                    console.log('errorCreateDatabase: ', errorCreateDatabase);
                                     dispatch(changeAppRoot('config'));
+                                    console.log('NativeEventEmitter: ', typeof nativeEventEmitter, nativeEventEmitter);
+                                    console.log("Typeof nativeEventEmitter: ", typeof nativeEventEmitter.appLoaded);
+                                    if (nativeEventEmitter) {
+                                        dispatch(middlewareFunction(nativeEventEmitter));
+                                    }
                                 }
                             } else {
                                 console.log("We don't have logged user, we have active database, but we don't have credentials. Proceed to config screen");
                                 dispatch(changeAppRoot('config'));
+                                console.log('NativeEventEmitter: ', typeof nativeEventEmitter, nativeEventEmitter);
+                                console.log("Typeof nativeEventEmitter: ", typeof nativeEventEmitter.appLoaded);
+                                if (nativeEventEmitter) {
+                                    dispatch(middlewareFunction(nativeEventEmitter));
+                                }
                             }
                         } catch (errorDatabaseCredentials) {
                             console.log("We don't have logged user, we have active database, but we have error when getting its credentials. Proceed to config screen", errorDatabaseCredentials);
                             dispatch(changeAppRoot('config'));
+                            console.log('NativeEventEmitter: ', typeof nativeEventEmitter, nativeEventEmitter);
+                            console.log("Typeof nativeEventEmitter: ", typeof nativeEventEmitter.appLoaded);
+                            if (nativeEventEmitter) {
+                                dispatch(middlewareFunction(nativeEventEmitter));
+                            }
                         }
                     } else {
                         console.log("We don't have an active database, and we don't have logged user. Proceed to config screen");
                         dispatch(changeAppRoot('config'));
+                        console.log('NativeEventEmitter: ', typeof nativeEventEmitter, nativeEventEmitter);
+                        console.log("Typeof nativeEventEmitter: ", typeof nativeEventEmitter.appLoaded);
+                        if (nativeEventEmitter) {
+                            dispatch(middlewareFunction(nativeEventEmitter));
+                        }
                     }
                 } catch (errorActiveDatabase) {
                     console.log("We don't have a logged user and we have an error at getting active database. Proceed to config screen ", errorActiveDatabase);
                     dispatch(changeAppRoot('config'));
+                    console.log('NativeEventEmitter: ', typeof nativeEventEmitter, nativeEventEmitter);
+                    console.log("Typeof nativeEventEmitter: ", typeof nativeEventEmitter.appLoaded);
+                    if (nativeEventEmitter) {
+                        dispatch(middlewareFunction(nativeEventEmitter));
+                    }
                 }
             }
         } catch (errorGetLoggedUser) {
@@ -1230,100 +1329,73 @@ export function appInitialized() {
                                 let database = await createDatabase(server.replace(/\/|\.|\:/g, ''), databaseCredentials.password, false);
                                 if (database) {
                                     dispatch(changeAppRoot('login'));
+                                    console.log('NativeEventEmitter: ', typeof nativeEventEmitter, nativeEventEmitter);
+                                    console.log("Typeof nativeEventEmitter: ", typeof nativeEventEmitter.appLoaded);
+                                    if (nativeEventEmitter) {
+                                        dispatch(middlewareFunction(nativeEventEmitter));
+                                    }
                                 } else {
                                     console.log('Database does not exist');
                                     dispatch(changeAppRoot('config'));
+                                    console.log('NativeEventEmitter: ', typeof nativeEventEmitter, nativeEventEmitter);
+                                    console.log("Typeof nativeEventEmitter: ", typeof nativeEventEmitter.appLoaded);
+                                    if (nativeEventEmitter) {
+                                        dispatch(middlewareFunction(nativeEventEmitter));
+                                    }
                                 }
                             } catch (errorCreateDatabase) {
-                                console.log('errorCreateDatabase: ', errorCreateDatabase)
+                                console.log('errorCreateDatabase: ', errorCreateDatabase);
                                 dispatch(changeAppRoot('config'));
+                                console.log('NativeEventEmitter: ', typeof nativeEventEmitter, nativeEventEmitter);
+                                console.log("Typeof nativeEventEmitter: ", typeof nativeEventEmitter.appLoaded);
+                                if (nativeEventEmitter) {
+                                    dispatch(middlewareFunction(nativeEventEmitter));
+                                }
                             }
                         } else {
                             console.log("We don't have logged user, we have active database, but we don't have credentials. Proceed to config screen");
                             dispatch(changeAppRoot('config'));
+                            console.log('NativeEventEmitter: ', typeof nativeEventEmitter, nativeEventEmitter);
+                            console.log("Typeof nativeEventEmitter: ", typeof nativeEventEmitter.appLoaded);
+                            if (nativeEventEmitter) {
+                                dispatch(middlewareFunction(nativeEventEmitter));
+                            }
                         }
                     } catch (errorDatabaseCredentials) {
                         console.log("We don't have logged user, we have active database, but we have error when getting its credentials. Proceed to config screen", errorDatabaseCredentials);
                         dispatch(changeAppRoot('config'));
+                        console.log('NativeEventEmitter: ', typeof nativeEventEmitter, nativeEventEmitter);
+                        console.log("Typeof nativeEventEmitter: ", typeof nativeEventEmitter.appLoaded);
+                        if (nativeEventEmitter) {
+                            dispatch(middlewareFunction(nativeEventEmitter));
+                        }
                     }
                 } else {
                     console.log("We don't have an active database, and we don't have logged user. Proceed to config screen");
                     dispatch(changeAppRoot('config'));
+                    console.log('NativeEventEmitter: ', typeof nativeEventEmitter, nativeEventEmitter);
+                    console.log("Typeof nativeEventEmitter: ", typeof nativeEventEmitter.appLoaded);
+                    if (nativeEventEmitter) {
+                        dispatch(middlewareFunction(nativeEventEmitter));
+                    }
                 }
             } catch (errorActiveDatabase) {
                 console.log("We don't have a logged user and we have an error at getting active database. Proceed to config screen ", errorActiveDatabase);
                 dispatch(changeAppRoot('config'));
+                console.log('NativeEventEmitter: ', typeof nativeEventEmitter, nativeEventEmitter);
+                console.log("Typeof nativeEventEmitter: ", typeof nativeEventEmitter.appLoaded);
+                if (nativeEventEmitter) {
+                    dispatch(middlewareFunction(nativeEventEmitter));
+                }
             }
         }
+    }
+}
 
-
-        // Here check if the user is already logged in and which database is he using
-
-
-        // getData('loggedUser', (error, loggedUser) => {
-        //     console.log('Logged user: ', loggedUser);
-        //     if (loggedUser) {
-        //         // If there is a logged user, then, get the database, and log the user
-        //         getData('activeDatabase', (error, activeDatabase) => {
-        //             console.log("Active database: ", activeDatabase);
-        //             let databaseCredentials = await getInternetCredentials(activeDatabase);
-        //             return null;
-        //             //, (errorCredentials, databaseCredentials) => {
-        //         //         console.log('Database credentials: ', databaseCredentials);
-        //         //         if (databaseCredentials) {
-        //         //             createDatabase(databaseCredentials.username, databaseCredentials.password, (database) => {
-        //         //                 // After creating the Pouch db, redirect the user to the login screen
-        //         //                 dispatch(getUserById(loggedUser, null));
-        //         //             })
-        //         //         } else {
-        //         //             dispatch(changeAppRoot('config'));
-        //         //         }
-        //         //     });
-        //         // })
-        //     } else {
-        //         // If there is not a logged user, check if there is an active database
-        //         getData('activeDatabase', (error, activeDatabase) => {
-        //             console.log("Active database: ", activeDatabase);
-        //             if (activeDatabase) {
-        //                 // If there is and active database, initialize it in PouchDb and redirect to the login screen
-        //                 getServerCredentials(activeDatabase, (error, databaseCredentials) => {
-        //                     console.log('Database credentials: ', databaseCredentials);
-        //                     createDatabase(databaseCredentials.username, databaseCredentials.password, (database) => {
-        //                         // After creating the Pouch db, redirect the user to the login screen
-        //                         dispatch(changeAppRoot('login'));
-        //                     })
-        //                 });
-        //             } else {
-        //                 // If there is no active database, go to the config screen
-        //                 dispatch(changeAppRoot('config'));
-        //             }
-        //         });
-        //     }
-        // });
-
-        // Get the translations from the api and save them to the redux store
-        // dispatch(getTranslations());
-        // dispatch(changeAppRoot('login'));
-
-        // dispatch(loginUser({
-        //     email: 'florin.popa@clarisoft.com',
-        //     password: 'Cl@r1soft'
-        // }));
-
-        // I don't think we need this in production since before the user logs in, the translations should be already saved
-        // TODO comment what's below and uncomment the code above
-        // getTranslations(dispatch)
-        //     .then(() => {
-        //         console.log('Saved?');
-        //         // dispatch(changeAppRoot('login'));
-        //         // Login to skip the first step. Only for develop mode
-        //         dispatch(loginUser({
-        //             email: 'florin.popa@clarisoft.com',
-        //             password: 'Cl@r1soft'
-        //         }))
-        //     })
-        //     .catch(() => {
-        //         console.log("Error?");
-        //     })
+export function middlewareFunction(nativeEventEmitter) {
+    return async function (dispatch) {
+        if (nativeEventEmitter && typeof nativeEventEmitter.appLoaded === 'function') {
+            dispatch(() => {nativeEventEmitter.appLoaded()});
+        }
     }
 }

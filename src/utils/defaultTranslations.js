@@ -83,8 +83,8 @@ export default {
     'LNG_CASE_SINGLE_SCREEN_ADD_NEW_CASE_TITLE_LABEL': 'Add case',
     'LNG_CASE_SINGLE_SCREEN_DELETE_CASE_ACTION': 'Delete case',
 
-    'LNG_HOSPITALIZATION_ADD_NEW_HOSPITALIZATION_MESSAGE': 'Add hospitalization date range',
-    'LNG_HOSPITALIZATION_ADD_ANOTHER_HOSPITALIZATION_MESSAGE': 'Add another hospitalization date range',
+    'LNG_DATE_RANGE_ADD_NEW_DATE_MESSAGE': 'Add date range',
+    'LNG_DATE_RANGE_ADD_ANOTHER_DATE_MESSAGE': 'Add another date range',
     'LNG_ISOLATION_ADD_NEW_ISOLATION_MESSAGE': 'Add isolation date range',
     'LNG_ISOLATION_ADD_ANOTHER_ISOLATION_MESSAGE': 'Add another isolation date range',
     'LNG_DOCUMENT_ADD_NEW_DOCUMENT_MESSAGE': 'Add document',
@@ -323,7 +323,9 @@ export default {
 
 
     //addressFieldLabels
-    'LNG_ADDRESS_FIELD_LABEL_NAME': 'Name',
+    // TODO change to API also
+    'LNG_ADDRESS_FIELD_LABEL_NAME': 'Type',
+    // End of todo
     'LNG_ADDRESS_FIELD_LABEL_DATE': 'Date',
     'LNG_ADDRESS_FIELD_LABEL_LOCATION': 'Area',
     'LNG_ADDRESS_FIELD_LABEL_ADDRESS_CITY': 'City',
@@ -421,4 +423,7 @@ export default {
     'LNG_HUB_CONFIGURATION_SCREEN_HUB_CREDENTIALS_SUCCESS_UPDATED': 'HUB credentials were successfully updated',
 
     'LNG_HUB_CONFIGURATION_SCREEN_SUCCES_SET_HUB_AS_ACTIVE_AND_YOU_WILL_BE_LOGGED_OUT_MESSAGE': 'The HUB was successfully made as active. You will be logged out and can log in with the credentials for the new HUB configuration',
+
+    'LNG_DROP_DOWN_SECTIONED_NONE_SELECTED': 'None Selected',
+    'LNG_DROP_DOWN_SECTIONED_SELECTED': 'Items'
 };

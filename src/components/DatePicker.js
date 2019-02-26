@@ -42,13 +42,14 @@ class DatePicker extends PureComponent {
 
     // Please write here all the methods that are not react native lifecycle methods
     editInput = () => {
+        console.log('This.props.value: ', this.props.value);
         let tooltip = getTooltip(this.props.label, this.props.translation)
         let customStyle = this.props.value !== undefined && this.props.value !== null ? styles.hasDateTooltipStyle : style.emptyDateTooltipStyle
         return (
             <View style={[{marginVertical: 10, flexDirection: 'row'},this.props.style]}>
                 <View style = {{flex: 1}}>
                     {
-                        this.props.value !== undefined && this.props.value !== null ? (
+                        this.props.value !== null && this.props.value !== undefined && this.props.date !== '' ? (
                             <View>
                                 <Text style={{
                                     fontFamily: 'Roboto',
@@ -69,7 +70,7 @@ class DatePicker extends PureComponent {
                                         color: 'rgb(60,60,60)',
                                         marginBottom: 7.5
                                     }}>
-                                        {this.props.value !== undefined && this.props.value !== null ? moment(this.props.value).format('MM/DD/YYYY') : ''}
+                                        {this.props.value !== null && this.props.value !== undefined && this.props.value !== '' ? moment(this.props.value).format('MM/DD/YYYY') : ''}
                                     </Text>
                                 </Ripple>
                             </View>
@@ -133,7 +134,7 @@ class DatePicker extends PureComponent {
                     textAlign: 'left',
                     color: 'rgb(60,60,60)',
                 }}>
-                    {this.props.value !== undefined && this.props.value !== null ? moment(this.props.value).format('MM/DD/YYYY') : ''}
+                    {this.props.value !== null && this.props.value !== undefined && this.props.value !== '' ? moment(this.props.value).format('MM/DD/YYYY') : ''}
                 </Text>
                 </View>
                 {
@@ -164,7 +165,7 @@ class DatePicker extends PureComponent {
         this.props.onChange(
             date, 
             this.props.id, 
-            this.props.objectType ? (this.props.objectType === 'Address' || this.props.objectType === 'LabResult' || this.props.objectType === 'HospitalizationDates' || this.props.objectType === 'IsolationDates' ? this.props.index : this.props.objectType) : null, 
+            this.props.objectType ? (this.props.objectType === 'Address' || this.props.objectType === 'LabResult' || this.props.objectType === 'DateRanges' ? this.props.index : this.props.objectType) : null,
             this.props.objectType
         );
         this.handleDateCancelled();
