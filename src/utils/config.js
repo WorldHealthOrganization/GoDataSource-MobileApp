@@ -2285,6 +2285,55 @@ const documentTypes = {
     archivedId: 'LNG_REFERENCE_DATA_CATEGORY_DOCUMENT_TYPE_ARCHIVED_ID'
 };
 
+const caseBlueprint = {
+    riskLevel: '',
+    dateOfReporting: null,
+    isDateOfReportingApproximate: false,
+    transferRefused: false,
+    riskReason: '',
+    firstName: '',
+    middleName: '',
+    lastName: '',
+    gender: '',
+    phoneNumber: '',
+    occupation: '',
+    outcomeId: '',
+    dob: null,
+    age: {
+        years: 0,
+        months: 0
+    },
+    classification: '',
+    dateBecomeCase: null,
+    dateOfInfection: null,
+    dateOfOutcome: null,
+    dateOfOnset: null,
+    isDateOfOnsetApproximate: false,
+    deceased: false,
+    dateDeceased: null,
+    addresses: [
+        {
+            typeId: userResidenceAddress.userPlaceOfResidence,
+            country: '',
+            city: '',
+            addressLine1: '',
+            addressLine2: '',
+            postalCode: '',
+            locationId: '',
+            geoLocation: {
+                coordinates: [0, 0],
+                type: 'Point'
+            },
+            date: new Date()
+        }
+    ],
+    documents: [],
+    dateRanges: [],
+    // hospitalizationDates: [],
+    // isolationDates: [],
+    questionnaireAnswers: {}
+};
+
 export default {
     designScreenSize,
     sideMenuItems,
@@ -2318,5 +2367,6 @@ export default {
     helpItemsSortCriteriaDropDownItems,
     manualSyncStages,
     dateRangeTypes,
-    documentTypes
+    documentTypes,
+    caseBlueprint
 }

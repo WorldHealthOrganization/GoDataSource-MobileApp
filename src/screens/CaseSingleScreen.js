@@ -102,7 +102,7 @@ class CaseSingleScreen extends Component {
                 // isolationDates: [],
                 questionnaireAnswers: {}
             } : Object.assign({}, this.props.case),
-            isEditMode: this.props.isNew ? true : false,
+            isEditMode: this.props.isNew ? true : this.props.forceNew ? true : false,
             isDateTimePickerVisible: false,
             isModified: false,
             canChangeScreen: false,
@@ -372,7 +372,7 @@ class CaseSingleScreen extends Component {
                         onChangeDropDown={this.onChangeDropDown}
                         handleMoveToNextScreenButton={this.handleMoveToNextScreenButton}
                         checkRequiredFieldsPersonalInfo={this.checkRequiredFieldsPersonalInfo}
-                        isNew={this.props.isNew}
+                        isNew={this.props.isNew ? true : this.props.forceNew ? true : false}
                         onPressAddDocument={this.onPressAddDocument}
                         onDeletePress={this.handleOnPressDeleteDocument}
                         onChangeTextSwitchSelector={this.handleOnChangeTextSwitchSelector}
@@ -401,7 +401,7 @@ class CaseSingleScreen extends Component {
                         handleMoveToNextScreenButton={this.handleMoveToNextScreenButton}
                         handleMoveToPrevieousScreenButton={this.handleMoveToPrevieousScreenButton}
                         checkRequiredFieldsAddresses={this.checkRequiredFieldsAddresses}
-                        isNew={this.props.isNew}
+                        isNew={this.props.isNew ? true : this.props.forceNew ? true : false}
                         anotherPlaceOfResidenceWasChosen={this.state.anotherPlaceOfResidenceWasChosen}
                         anotherPlaceOfResidenceChanged={this.anotherPlaceOfResidenceChanged}
                         hasPlaceOfResidence={this.state.hasPlaceOfResidence}
@@ -422,7 +422,7 @@ class CaseSingleScreen extends Component {
                         handleMoveToNextScreenButton={this.handleMoveToNextScreenButton}
                         handleMoveToPrevieousScreenButton={this.handleMoveToPrevieousScreenButton}
                         checkRequiredFieldsInfection={this.checkRequiredFieldsInfection}
-                        isNew={this.props.isNew}
+                        isNew={this.props.isNew ? true : this.props.forceNew ? true : false}
                         onPressAddDateRange={this.onPressAddDateRange}
                         handleOnPressDeleteDateRange={this.handleOnPressDeleteDateRange}
                         onPressAddIsolationDates={this.onPressAddIsolationDates}
@@ -446,7 +446,7 @@ class CaseSingleScreen extends Component {
                     onChangeMultipleSelection={this.onChangeMultipleSelection}
                     onChangeDateAnswer={this.onChangeDateAnswer}
                     handleMoveToPrevieousScreenButton={this.handleMoveToPrevieousScreenButton}
-                    isNew={this.props.isNew}
+                    isNew={this.props.isNew ? true : this.props.forceNew ? true : false}
                 />;
             default: return null;
         }
@@ -509,7 +509,7 @@ class CaseSingleScreen extends Component {
                                     this.setState({
                                         savePressed: true
                                     }, () => {
-                                        if (this.props.isNew) {
+                                        if (this.props.isNew || this.props.forceNew) {
                                             let caseWithRequiredFields = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, this.state.case), action = 'create', fileType = 'person.json', type = 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE');
                                             this.setState(prevState => ({
                                                 case: Object.assign({}, prevState.case, caseWithRequiredFields)

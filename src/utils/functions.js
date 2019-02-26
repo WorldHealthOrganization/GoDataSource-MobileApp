@@ -1097,7 +1097,7 @@ export function updateRequiredFields(outbreakId, userId, record, action, fileTyp
     // console.log ('updateRequiredFields ', record, action)
     switch (action) {
         case 'create':
-            record._id = computeIdForFileType(fileType, outbreakId, record, type);
+            record._id = record._id ? record._id : computeIdForFileType(fileType, outbreakId, record, type);
             record.fileType = fileType;
             record.updatedAt = new Date().toISOString();
             record.updatedBy = extractIdFromPouchId(userId, 'user');
