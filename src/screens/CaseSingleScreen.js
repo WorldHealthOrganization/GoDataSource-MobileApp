@@ -214,7 +214,7 @@ class CaseSingleScreen extends Component {
                                 onPress={this.handlePressBreadcrumb}
                             />
 
-                            <View style={{flexDirection: 'row', marginRight: calculateDimension(16, false, this.props.screenSize)}}>
+                            <View style={{flexDirection: 'row', marginLeft: calculateDimension(16, false, this.props.screenSize)}}>
                                 <ElevatedView
                                     elevation={3}
                                     style={{
@@ -232,24 +232,24 @@ class CaseSingleScreen extends Component {
                                         <Icon name="help" color={'white'} size={15}/>
                                     </Ripple>
                                 </ElevatedView> 
-                                <View>
-                                    <Menu
-                                        ref="menuRef"
-                                        button={
-                                            <Ripple onPress={this.showMenu} hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}>
-                                                <Icon name="more-vert"/>
-                                            </Ripple>
-                                        }
-                                    >
-                                        {
-                                            !this.props.isNew ? (
-                                                <MenuItem onPress={this.handleOnPressDeleteCase}>
-                                                    {getTranslation(translations.caseSingleScreen.deleteCaseLabel, this.props.translation)}
-                                                </MenuItem>
-                                            ) : null
-                                        }
-                                    </Menu>
-                                </View>
+                                {/*<View>*/}
+                                    {/*<Menu*/}
+                                        {/*ref="menuRef"*/}
+                                        {/*button={*/}
+                                            {/*<Ripple onPress={this.showMenu} hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}>*/}
+                                                {/*<Icon name="more-vert"/>*/}
+                                            {/*</Ripple>*/}
+                                        {/*}*/}
+                                    {/*>*/}
+                                        {/*{*/}
+                                            {/*!this.props.isNew ? (*/}
+                                                {/*<MenuItem onPress={this.handleOnPressDeleteCase}>*/}
+                                                    {/*{getTranslation(translations.caseSingleScreen.deleteCaseLabel, this.props.translation)}*/}
+                                                {/*</MenuItem>*/}
+                                            {/*) : null*/}
+                                        {/*}*/}
+                                    {/*</Menu>*/}
+                                {/*</View>*/}
                             </View>
                         </View>
                     }
@@ -453,26 +453,27 @@ class CaseSingleScreen extends Component {
     };
 
     //Delete case
-    handleOnPressDeleteCase = () => {
-        Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.alertMessages.caseDeleteConfirmation, this.props.translation), [
-            {
-                text: getTranslation(translations.alertMessages.yesButtonLabel, this.props.translation),
-                onPress: () => {
-                    this.setState ({
-                        deletePressed: true
-                    }, () => {
-                        this.handleOnPressSave();
-                    })
-                }
-            },
-            {
-                text: getTranslation(translations.alertMessages.cancelButtonLabel, this.props.translation),
-                onPress: () => {
-                    this.hideMenu();
-                }
-            }
-        ])
-    };
+    // handleOnPressDeleteCase = () => {
+    //     Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.alertMessages.caseDeleteConfirmation, this.props.translation), [
+    //         {
+    //             text: getTranslation(translations.alertMessages.yesButtonLabel, this.props.translation),
+    //             onPress: () => {
+    //                 this.setState ({
+    //                     deletePressed: true
+    //                 }, () => {
+    //                     this.handleOnPressSave();
+    //                 })
+    //             }
+    //         },
+    //         {
+    //             text: getTranslation(translations.alertMessages.cancelButtonLabel, this.props.translation),
+    //             onPress: () => {
+    //                 this.hideMenu();
+    //             }
+    //         }
+    //     ])
+    // };
+
     //Save case
     handleOnPressSave = () => {
         let missingFields = this.checkRequiredFields();

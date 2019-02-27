@@ -119,7 +119,7 @@ class CasesFiltersContainer extends PureComponent {
             item.value = this.props.filter.filter[item.id];
         }
         if (item.type === 'DropDownSectioned' && item.id === 'selectedLocations') {
-            sectionedSelectedItems = this.props.filter.filter[item.id].map ((e) => {
+            value = this.props.filter.filter[item.id].map ((e) => {
                 return 'location.json_' + e
             })
         }
