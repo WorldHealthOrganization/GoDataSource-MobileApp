@@ -41,6 +41,7 @@ class FollowUpsSortContainer extends Component {
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
+        // console.log('FollowUpsFilterContainer render Sort');
         return (
             <View style={[style.container]}>
                  <Button

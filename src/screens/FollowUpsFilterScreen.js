@@ -126,31 +126,44 @@ class FollowUpsFilterScreen extends Component {
         this.handleOnIndexChange(nextIndex)
     }
 
-    handleRenderScene = () => {
-        if (this.state.index === 0) {
-            return (
-                <FollowUpsFiltersContainer
-                    filter={this.state.filter}
-                    onSelectItem={this.handleOnSelectItem}
-                    onChangeSectionedDropDown={this.handleOnChangeSectionedDropDown}
-                    onChangeInterval={this.handleOnChangeInterval}
-                    onChangeMultipleSelection={this.handleOnChangeMultipleSelection}
-                    onPressApplyFilters={this.handleOnPressApplyFilters}
-                    handleMoveToNextScreenButton = {this.handleMoveToNextScreenButton}
-                />
-            );
-        } else {
-            return (
-                <FollowUpsSortContainer
-                    handleMoveToPrevieousScreenButton={this.handleMoveToPrevieousScreenButton}
-                    filter={this.state.filter}
-                    onPressApplyFilters={this.handleOnPressApplyFilters}
-                    onPressAddSortRule={this.onPressAddSortRule}
-                    onChangeDropDown={this.onChangeDropDown}
-                    onDeletePress={this.onDeleteSortRulePress}
-                    key={this.state.index}
-                />
-            );
+    handleRenderScene = ({route}) => {
+        switch (route.key) {
+            case 'filters':
+                return (
+                    <FollowUpsFiltersContainer
+                        filter={this.state.filter}
+                        onSelectItem={this.handleOnSelectItem}
+                        onChangeSectionedDropDown={this.handleOnChangeSectionedDropDown}
+                        onChangeInterval={this.handleOnChangeInterval}
+                        onChangeMultipleSelection={this.handleOnChangeMultipleSelection}
+                        onPressApplyFilters={this.handleOnPressApplyFilters}
+                        handleMoveToNextScreenButton = {this.handleMoveToNextScreenButton}
+                    />
+                );
+            case 'sort':
+                return (
+                    <FollowUpsSortContainer
+                        handleMoveToPrevieousScreenButton={this.handleMoveToPrevieousScreenButton}
+                        filter={this.state.filter}
+                        onPressApplyFilters={this.handleOnPressApplyFilters}
+                        onPressAddSortRule={this.onPressAddSortRule}
+                        onChangeDropDown={this.onChangeDropDown}
+                        onDeletePress={this.onDeleteSortRulePress}
+                        key={this.state.index}
+                    />
+                );
+            default:
+                return (
+                    <FollowUpsFiltersContainer
+                        filter={this.state.filter}
+                        onSelectItem={this.handleOnSelectItem}
+                        onChangeSectionedDropDown={this.handleOnChangeSectionedDropDown}
+                        onChangeInterval={this.handleOnChangeInterval}
+                        onChangeMultipleSelection={this.handleOnChangeMultipleSelection}
+                        onPressApplyFilters={this.handleOnPressApplyFilters}
+                        handleMoveToNextScreenButton = {this.handleMoveToNextScreenButton}
+                    />
+                )
         }
     };
 

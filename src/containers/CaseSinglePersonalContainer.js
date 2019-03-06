@@ -28,11 +28,18 @@ class CaseSinglePersonalContainer extends PureComponent {
     }
 
     // Please add here the react lifecycle methods that you need
+    shouldComponentUpdate(nextProps, nextState) {
+        if (nextProps.isEditMode !== this.props.isEditMode || nextProps.index === 0) {
+            return true;
+        }
+        return false;
+    }
 
     // The render method should have at least business logic as possible,
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
+        // console.log('CaseSingleContainer render Personal');
         return (
             <View style={{flex: 1}}>
                 <View style={style.container}>
@@ -220,7 +227,6 @@ class CaseSinglePersonalContainer extends PureComponent {
                 minimumDate={minimumDate}
                 maximumDate={maximumDate}
                 index={cardIndex}
-                
                 onChangeText={this.props.onChangeText}
                 onChangeDate={this.props.onChangeDate}
                 onChangeSwitch={this.props.onChangeSwitch}

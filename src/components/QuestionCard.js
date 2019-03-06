@@ -17,9 +17,11 @@ import ElevatedView from 'react-native-elevated-view';
 import DropdownInput from './DropdownInput';
 import TextInput from './TextInput';
 import DropDown from './DropDown';
-import _ from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
+import isEqual from 'lodash/isEqual';
 import DatePicker from './DatePicker';
-import translations from './../utils/translations'
+import translations from './../utils/translations';
+import QuestionCardTitle from './QuestionCardTitle';
 
 
 class QuestionCard extends Component {
@@ -30,6 +32,15 @@ class QuestionCard extends Component {
         this.state = {
             showDropdown: false
         };
+    }
+
+    shouldComponentUpdate(nextProps, nextState) {
+        // console.log("Next source, old source: ", nextProps.source.questionnaireAnswers[nextProps.item.variable], this.props.source.questionnaireAnswers[this.props.item.variable]);
+        if (nextProps.isEditMode !== this.props.isEditMode || !isEqual(nextProps.source.questionnaireAnswers[nextProps.item.variable], this.props.source.questionnaireAnswers[this.props.item.variable])) {
+            // console.log("Next source, old source: ", nextProps.item.variable, nextProps.source.questionnaireAnswers[nextProps.item.variable], this.props.source.questionnaireAnswers[this.props.item.variable]);
+            return true;
+        }
+        return false;
     }
 
     // Please add here the react lifecycle methods that you need
@@ -46,26 +57,17 @@ class QuestionCard extends Component {
             }]}
                 onPress={() => {this.setState({showDropdown: false})}}
             >
-                <View style={[style.containerQuestion,
-                    {
-                        height: calculateDimension(43, true, this.props.screenSize),
-                        paddingRight: calculateDimension(34, false, this.props.screenSize),
-                        paddingLeft: calculateDimension(14, false, this.props.screenSize)
-                    }]}>
-                    <View style={style.containerQuestionNumber}>
-                        <Text style={style.questionText}>{getTranslation(translations.generalLabels.questionInitial, this.props.translation).charAt(0).toUpperCase() + this.props.index}</Text>
-                    </View>
-                    <Text style={[style.questionText, {
-                            marginLeft: calculateDimension(8, false, this.props.screenSize),
-                            marginRight: calculateDimension(34, false, this.props.screenSize) }]} numberOfLines={2}>
-                        {getTranslation(this.props.item.text, this.props.translation)}
-                        {
-                            this.props.item && this.props.item.category ?
-                                ' - ' + getTranslation(this.props.item.category, this.props.translation) : ''
-
-                        }
-                    </Text>
-                </View>
+                <QuestionCardTitle
+                    height={calculateDimension(43, true, this.props.screenSize)}
+                    paddingRight={calculateDimension(34, true, this.props.screenSize)}
+                    paddingLeft={calculateDimension(14, true, this.props.screenSize)}
+                    marginLeft={calculateDimension(8, false, this.props.screenSize)}
+                    marginRight={calculateDimension(34, false, this.props.screenSize)}
+                    questionNumber={getTranslation(translations.generalLabels.questionInitial, this.props.translation).charAt(0).toUpperCase() + this.props.index}
+                    questionText={getTranslation(this.props.item.text, this.props.translation)}
+                    questionCategory={this.props.item && this.props.item.category ?
+                        ' - ' + getTranslation(this.props.item.category, this.props.translation) : ''}
+                />
                 <ScrollView scrollEnabled={false} keyboardShouldPersistTaps={'always'}>
                     {
                         this.handleRenderItem(this.props.item)
@@ -94,7 +96,7 @@ class QuestionCard extends Component {
 
         let width = calculateDimension(315, false, this.props.screenSize);
         let marginHorizontal = calculateDimension(14, false, this.props.screenSize);
-        let source = _.cloneDeep(this.props.source);
+        let source = cloneDeep(this.props.source);
         if (!source.questionnaireAnswers) {
             source.questionnaireAnswers = {};
         }

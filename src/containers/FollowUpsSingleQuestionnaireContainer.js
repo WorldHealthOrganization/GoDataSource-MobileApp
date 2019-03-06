@@ -45,6 +45,13 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
         })
     }
 
+    shouldComponentUpdate(nextProps, nextState) {
+        if (nextProps.activeIndex === 1) {
+            return true;
+        }
+        return false;
+    }
+
     static getDerivedStateFromProps(props, state) {
         // Get all additional questions recursively
         let sortedQuestions = sortBy(props.questions, ['order', 'variable']);
@@ -63,6 +70,7 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
                 <LoaderScreen overlay={true} backgroundColor={'white'}/>
             )
         }
+        // console.log('FollowUpsSingleContainer render Questionnaire');
 
         // console.log("### FollowUpsSingleQuestionnaire: ", this.props.questions);
         let buttonHeight = calculateDimension(25, true, this.props.screenSize);

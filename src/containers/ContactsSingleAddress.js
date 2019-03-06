@@ -39,6 +39,13 @@ class ContactsSingleAddress extends PureComponent {
         })
     }
 
+    shouldComponentUpdate(nextProps, nextState) {
+        if (nextProps.activeIndex === 1) {
+            return true;
+        }
+        return false;
+    }
+
     // The render method should have at least business logic as possible,
     // because this will be called whenever there is a new setState call
     // and can slow down the app
@@ -48,6 +55,8 @@ class ContactsSingleAddress extends PureComponent {
                 <LoaderScreen overlay={true} backgroundColor={'white'}/>
             )
         }
+
+        // console.log('ContactsSingleContainer render Address');
 
         return (
             <TouchableWithoutFeedback onPress={() => {

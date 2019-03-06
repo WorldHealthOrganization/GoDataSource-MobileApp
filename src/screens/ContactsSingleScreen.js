@@ -419,6 +419,8 @@ class ContactsSingleScreen extends Component {
                     backgroundColor: 'white'
                 }}
                 renderLabel={this.handleRenderLabel(props)}
+                scrollEnabled={true}
+                bounces={true}
             />
         )
     };
@@ -522,6 +524,7 @@ class ContactsSingleScreen extends Component {
                 return (
                     <ContactsSinglePersonal
                         contact={this.state.contact}
+                        activeIndex={this.state.index}
                         onChangeText={this.handleOnChangeText}
                         onChangeDropDown={this.handleOnChangeDropDown}
                         onChangeDate={this.handleOnChangeDate}
@@ -807,31 +810,72 @@ class ContactsSingleScreen extends Component {
         }
     };
 
-    handleOnChangeSwitch = (value, id, objectType) => {
+    handleOnChangeSwitch = (value, id, objectTypeOrIndex, objectType) => {
         // console.log("onChangeSwitch: ", value, id, this.state.item);
-        if (id === 'fillGeoLocation') {
-            navigator.geolocation.getCurrentPosition((position) => {
-                    this.setState(
-                        (prevState) => ({
-                            item: Object.assign({}, prevState.item, {[id]: value ? {lat: position.coords.latitude, lng: position.coords.longitude} : null }),
-                            isModified: true
-                        }), () => {
-                            console.log("onChangeSwitch", id, " ", value, " ", this.state.item);
+        if (id === 'geoLocationAccurate' && typeof objectTypeOrIndex === 'number' && objectTypeOrIndex >= 0 && objectType === 'Address') {
+            if (value) {
+                navigator.geolocation.getCurrentPosition((position) => {
+                        let addressesClone = _.cloneDeep(this.props.contact.addresses);
+                        console.log('addressesClone: ', addressesClone);
+                        if (!addressesClone[objectTypeOrIndex].geoLocation) {
+                            addressesClone[objectTypeOrIndex].geoLocation = {};
+                            addressesClone[objectTypeOrIndex].geoLocation.type = 'Point';
+                            addressesClone[objectTypeOrIndex].geoLocation.coordinates = [];
                         }
-                    )
-                },
-                (error) => {
-                    Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.alertMessages.getLocationError, this.props.translation), [
-                        {
-                            text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation), 
-                            onPress: () => {console.log("OK pressed")}
+                        if (!addressesClone[objectTypeOrIndex].geoLocation.type) {
+                            addressesClone[objectTypeOrIndex].geoLocation.type = 'Point';
                         }
-                    ])
-                },
-                {
-                    enableHighAccuracy: true, timeout: 20000, maximumAge: 1000
+                        if (!addressesClone[objectTypeOrIndex].geoLocation.coordinates) {
+                            addressesClone[objectTypeOrIndex].geoLocation.coordinates = [];
+                        }
+                        addressesClone[objectTypeOrIndex].geoLocation.coordinates = [value ? position.coords.longitude : 0, value ? position.coords.latitude : 0];
+                        addressesClone[objectTypeOrIndex].geoLocationAccurate = value;
+                        this.setState(
+                            (prevState) => ({
+                                contact: Object.assign({}, prevState.contact, {addresses: addressesClone}),
+                                isModified: true
+                            }), () => {
+                                console.log("onChangeSwitch", id, " ", value, " ", this.state.contact);
+                            }
+                        )
+                    },
+                    (error) => {
+                        Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(error, this.props.translation), [
+                            {
+                                text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+                                onPress: () => {console.log("OK pressed")}
+                            }
+                        ])
+                    },
+                    {
+                        enableHighAccuracy: true, timeout: 20000, maximumAge: 1000
+                    }
+                )
+            } else {
+                let addressesClone = _.cloneDeep(this.props.contact.addresses);
+                console.log('addressesClone: ', addressesClone);
+                if (!addressesClone[objectTypeOrIndex].geoLocation) {
+                    addressesClone[objectTypeOrIndex].geoLocation = {};
+                    addressesClone[objectTypeOrIndex].geoLocation.type = 'Point';
+                    addressesClone[objectTypeOrIndex].geoLocation.coordinates = [];
                 }
-            )
+                if (!addressesClone[objectTypeOrIndex].geoLocation.type) {
+                    addressesClone[objectTypeOrIndex].geoLocation.type = 'Point';
+                }
+                if (!addressesClone[objectTypeOrIndex].geoLocation.coordinates) {
+                    addressesClone[objectTypeOrIndex].geoLocation.coordinates = [];
+                }
+                addressesClone[objectTypeOrIndex].geoLocation.coordinates = [0, 0];
+                addressesClone[objectTypeOrIndex].geoLocationAccurate = value;
+                this.setState(
+                    (prevState) => ({
+                        contact: Object.assign({}, prevState.contact, {addresses: addressesClone}),
+                        isModified: true
+                    }), () => {
+                        console.log("onChangeSwitch", id, " ", value, " ", this.state.contact);
+                    }
+                )
+            }
         } else {
             if (objectType === 'FollowUp') {
                 this.setState(

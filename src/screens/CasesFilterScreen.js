@@ -129,31 +129,44 @@ class CasesFilterScreen extends Component {
         this.handleOnIndexChange(nextIndex)
     }
 
-    handleRenderScene = () => {
-        if (this.state.index === 0) {
-            return (
-                <CasesFiltersContainer
-                    filter={this.state.filter}
-                    handleMoveToNextScreenButton={this.handleMoveToNextScreenButton}
-                    onSelectItem={this.handleOnSelectItem}
-                    onChangeSectionedDropDown={this.handleOnChangeSectionedDropDown}
-                    onChangeInterval={this.handleOnChangeInterval}
-                    onChangeMultipleSelection={this.handleOnChangeMultipleSelection}
-                    onPressApplyFilters={this.handleOnPressApplyFilters}
-                />
-            )
-        } else {
-            return (
-                <CasesSortContainer
-                    handleMoveToPrevieousScreenButton={this.handleMoveToPrevieousScreenButton}
-                    onPressApplyFilters={this.handleOnPressApplyFilters}
-                    onPressAddSortRule={this.onPressAddSortRule}
-                    onChangeDropDown={this.onChangeDropDown}
-                    filter={this.state.filter}
-                    onDeletePress={this.onDeleteSortRulePress}
-                    key={this.state.index}
-                />
-            )
+    handleRenderScene = ({route}) => {
+        switch (route.key) {
+            case 'filters':
+                return (
+                    <CasesFiltersContainer
+                        filter={this.state.filter}
+                        handleMoveToNextScreenButton={this.handleMoveToNextScreenButton}
+                        onSelectItem={this.handleOnSelectItem}
+                        onChangeSectionedDropDown={this.handleOnChangeSectionedDropDown}
+                        onChangeInterval={this.handleOnChangeInterval}
+                        onChangeMultipleSelection={this.handleOnChangeMultipleSelection}
+                        onPressApplyFilters={this.handleOnPressApplyFilters}
+                    />
+                );
+            case 'sort':
+                return (
+                    <CasesSortContainer
+                        handleMoveToPrevieousScreenButton={this.handleMoveToPrevieousScreenButton}
+                        onPressApplyFilters={this.handleOnPressApplyFilters}
+                        onPressAddSortRule={this.onPressAddSortRule}
+                        onChangeDropDown={this.onChangeDropDown}
+                        filter={this.state.filter}
+                        onDeletePress={this.onDeleteSortRulePress}
+                        key={this.state.index}
+                    />
+                );
+            default:
+                return (
+                    <CasesFiltersContainer
+                        filter={this.state.filter}
+                        handleMoveToNextScreenButton={this.handleMoveToNextScreenButton}
+                        onSelectItem={this.handleOnSelectItem}
+                        onChangeSectionedDropDown={this.handleOnChangeSectionedDropDown}
+                        onChangeInterval={this.handleOnChangeInterval}
+                        onChangeMultipleSelection={this.handleOnChangeMultipleSelection}
+                        onPressApplyFilters={this.handleOnPressApplyFilters}
+                    />
+                )
         }
     };
 
@@ -209,7 +222,6 @@ class CasesFilterScreen extends Component {
         return (
             <TabBar
                 {...props}
-                scrollEnabled={false}
                 indicatorStyle={{
                     backgroundColor: styles.buttonGreen,
                     height: 2

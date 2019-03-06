@@ -27,12 +27,19 @@ class FollowUpsSingleGetInfoContainer extends PureComponent {
     }
 
     // Please add here the react lifecycle methods that you need
+    shouldComponentUpdate(nextProps, nextState) {
+        if (nextProps.activeIndex === 0) {
+            return true;
+        }
+        return false;
+    }
 
 
     // The render method should have at least business logic as possible,
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
+        // console.log('FollowUpsSingleContainer render Details');
         return (
             <View style={style.container}>
                 <Button

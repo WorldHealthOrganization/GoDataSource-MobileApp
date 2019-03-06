@@ -42,7 +42,7 @@ class DatePicker extends PureComponent {
 
     // Please write here all the methods that are not react native lifecycle methods
     editInput = () => {
-        console.log('This.props.value: ', this.props.value);
+        // console.log('This.props.value: ', this.props.value);
         let tooltip = getTooltip(this.props.label, this.props.translation)
         let customStyle = this.props.value !== undefined && this.props.value !== null ? styles.hasDateTooltipStyle : style.emptyDateTooltipStyle
         return (

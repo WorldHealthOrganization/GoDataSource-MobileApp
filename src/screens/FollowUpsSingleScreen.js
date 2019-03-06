@@ -246,6 +246,7 @@ class FollowUpsSingleScreen extends Component {
                         isEditMode={this.state.isEditMode}
                         item={this.state.item}
                         contact={this.state.contact}
+                        activeIndex={this.state.index}
                         onNext={this.handleNextPress}
                         onChangeText={this.onChangeText}
                         onChangeDate={this.onChangeDate}
@@ -260,6 +261,7 @@ class FollowUpsSingleScreen extends Component {
                         contact={this.state.contact}
                         isNew={this.props.isNew}
                         isEditMode={this.state.isEditMode}
+                        activeIndex={this.state.index}
                         onChangeTextAnswer={this.onChangeTextAnswer}
                         onChangeDateAnswer={this.onChangeDateAnswer}
                         onChangeSingleSelection={this.onChangeSingleSelection}
@@ -327,8 +329,8 @@ class FollowUpsSingleScreen extends Component {
             <Animated.Text style={{
                 fontFamily: 'Roboto-Medium',
                 fontSize: 12,
-                color: color,
                 flex: 1,
+                color: color,
                 alignSelf: 'center'
             }}>
                 {getTranslation(route.title, this.props.translation).toUpperCase()}
