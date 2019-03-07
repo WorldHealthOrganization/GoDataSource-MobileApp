@@ -314,7 +314,13 @@ const alertMessages = {
 
     // address
     addressOfResidenceError: 'LNG_DIALOG_ALERT_MESSAGE_PLEASE_ADD_THE_PLACE_OF_RESIDENCE_ADDRESS',
-    addressRequiredFieldsMissing: 'LNG_DIALOG_ALERT_MESSAGE_ADD_AT_LEAST_ONE_ADDRESS_WITH_ALL_REQUERED_FIELDS_COMPLETED'
+    addressRequiredFieldsMissing: 'LNG_DIALOG_ALERT_MESSAGE_ADD_AT_LEAST_ONE_ADDRESS_WITH_ALL_REQUERED_FIELDS_COMPLETED',
+
+    // TODO add translation to backend
+    // Delete alert messages
+    deleteDocument: 'LNG_DIALOG_ALERT_MESSAGE_ARE_YOU_SURE_YOU_WANT_TO_DELETE_THIS_DOCUMENT',
+    deleteAddress: 'LNG_DIALOG_ALERT_MESSAGE_ARE_YOU_SURE_YOU_WANT_TO_DELETE_THIS_ADDRESS',
+    deleteDateRange: 'LNG_DIALOG_ALERT_MESSAGE_ARE_YOU_SURE_YOU_WANT_TO_DELETE_THIS_DATE_RANGE',
 };
 
 const loadingScreenMessages = {
