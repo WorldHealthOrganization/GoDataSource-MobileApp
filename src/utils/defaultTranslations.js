@@ -287,6 +287,7 @@ export default {
     //take just first letter
     'LNG_COMMON_LABEL_QUESTION': 'Question',
 
+    'LNG_DROPDOWN_NONE_OPTION': 'None',
 
     //questionCardLabels
     'LNG_QUESTIONNAIRE_LABEL_WRITE_ANSWER': 'Write answer',
