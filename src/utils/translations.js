@@ -333,6 +333,7 @@ const generalButtons = {
 const generalLabels = {
     filterTitle: 'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER',
     applyFiltersButton: 'LNG_COMMON_BUTTON_APPLY_FILTERS',
+    resetFiltersButton: 'LNG_COMMON_BUTTON_RESET_FILTERS',
     yesAnswer: 'LNG_COMMON_LABEL_YES',
     noAnswer: 'LNG_COMMON_LABEL_NO',
     today: 'LNG_COMMON_LABEL_TODAY',

@@ -88,6 +88,7 @@ class HelpFilterScreen extends Component {
                     filter={this.state.filter}
                     onChangeMultipleSelection={this.handleOnChangeMultipleSelection}
                     onPressApplyFilters={this.handleOnPressApplyFilters}
+                    onPressResetFilters={this.handleResetFilters}
                 />
             );
         } else {
@@ -97,6 +98,7 @@ class HelpFilterScreen extends Component {
                     onPressApplyFilters={this.handleOnPressApplyFilters}
                     onPressAddSortRule={this.onPressAddSortRule}
                     onChangeDropDown={this.onChangeDropDown}
+                    onPressResetFilters={this.handleResetFilters}
                     onDeletePress={this.onDeleteSortRulePress}
                 />
             );
@@ -190,6 +192,10 @@ class HelpFilterScreen extends Component {
 
     // Please write here all the methods that are not react native lifecycle methods
     handlePressNavbarButton = () => {
+        this.props.navigator.dismissModal();
+    };
+
+    handleResetFilters = () => {
         this.props.removeFilterForScreen(this.props.screen);
         this.props.navigator.dismissModal(this.props.onApplyFilters(null));
     };
