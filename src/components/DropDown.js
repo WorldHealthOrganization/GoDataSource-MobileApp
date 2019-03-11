@@ -74,6 +74,13 @@ class DropDown extends PureComponent {
                         onBackdropPress={() => this.setState({ showDropdown: false })}
                     >
                         <ElevatedView elevation={3} style={[{backgroundColor: 'white'}]}>
+                            <Ripple 
+                                style={style.navbarContainer}
+                                onPress={() => this.setState({ showDropdown: false })} 
+                                hitSlop={{top: 20, bottom: 20, left: 20, right: 20}}
+                            >
+                                <Icon name="close"/>
+                            </Ripple>
                             <SelectMultiple
                                 items={this.props.data !== undefined && this.props.data !== null ? this.props.data : []}
                                 selectedItems={this.state.selectedItems}
@@ -157,6 +164,14 @@ const style = StyleSheet.create({
     },
     dropdownStyle: {
         marginHorizontal: 14
+    },
+    navbarContainer: {
+        paddingRight: 10, 
+        paddingTop: 10, 
+        paddingBottom: 0, 
+        margin: 0, 
+        flexDirection: 'row', 
+        justifyContent: 'flex-end'
     },
     labelStyle: {
         flex: 1,
