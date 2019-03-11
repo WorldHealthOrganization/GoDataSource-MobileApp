@@ -898,7 +898,7 @@ class ContactsSingleScreen extends Component {
         } else if (objectType === 'Contact') {
             this.setState(
                 (prevState) => ({
-                    contact: Object.assign({}, prevState.contact, {[id]: value && value.value ? value.value : value}),
+                    contact: Object.assign({}, prevState.contact, {[id]: value && value.value !== undefined  ? value.value : value}),
                     isModified: true
                 }), () => {
                     console.log("onChangeDropDown", id, " ", value, " ", this.state.contact);
@@ -906,7 +906,7 @@ class ContactsSingleScreen extends Component {
             )
         } else if (type && type === 'Exposure' && this.props.isNew === true) {
             let relationshipsClone = _.cloneDeep(this.state.contact.relationships);
-            relationshipsClone[0][id] = value && value.value ? value.value : value;
+            relationshipsClone[0][id] = value && value.value !== undefined  ? value.value : value;
             this.setState(prevState => ({
                 contact: Object.assign({}, prevState.contact, {relationships: relationshipsClone}),
                 isModified: true
@@ -918,7 +918,7 @@ class ContactsSingleScreen extends Component {
                 let addressesClone = _.cloneDeep(this.state.contact.addresses);
 
                 let anotherPlaceOfResidenceWasChosen = false;
-                if (value && value.value){
+                if (value && value.value !== undefined ){
                     if(value.value === config.userResidenceAddress.userPlaceOfResidence){
                         addressesClone.forEach(element => {
                             if (element[id] === value.value){
@@ -929,7 +929,7 @@ class ContactsSingleScreen extends Component {
                     }
                 }
 
-                addressesClone[objectType][id] = value && value.value ? value.value : value;
+                addressesClone[objectType][id] = value && value.value !== undefined  ? value.value : value;
                 let hasPlaceOfResidence = false;
                 let contactPlaceOfResidence = addressesClone.filter((e) => {return e.typeId === config.userResidenceAddress.userPlaceOfResidence});
                 if (contactPlaceOfResidence && contactPlaceOfResidence.length > 0) {

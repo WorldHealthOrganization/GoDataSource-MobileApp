@@ -97,23 +97,29 @@ class DropdownInput extends PureComponent {
     };
 
     handleOnChangeText = (state) => {
+        console.log("Label value branch: ", this.props.data, state);
+        
         if (this.props.labelValue) {
-            console.log("Label value branch: ", this.props.data, state);
             if (this.props && this.props.data && Array.isArray(this.props.data)) {
                 this.props.onChange(
                     {
-                    label: state, value: this.props.data[this.props.data.map((e) => {
-                        return e.value
-                    }).indexOf(state)].id
+                        label: state, 
+                        value: this.props.data[this.props.data.map((e) => { return e.value}).indexOf(state)].id
                     },
                     this.props.id,
-                    this.props.id === 'exposure' ? this.props.data[this.props.data.map((e) => {
-                        return e.value
-                    }).indexOf(state)].type : this.props.objectType ? (
-                            this.props.objectType === 'Address' || this.props.objectType === 'LabResult' || this.props.objectType === 'Documents' || this.props.objectType === 'Sort' || this.props.objectType === 'DateRanges' ? this.props.index : this.props.objectType
-                        ) : this.props.data[this.props.data.map((e) => {
-                                return e.value
-                            }).indexOf(state)].type || null,
+                    this.props.id === 'exposure' 
+                        ? this.props.data[this.props.data.map((e) => {return e.value}).indexOf(state)].type 
+                        : this.props.objectType 
+                            ?   (
+                                    this.props.objectType === 'Address' || 
+                                    this.props.objectType === 'LabResult' || 
+                                    this.props.objectType === 'Documents' || 
+                                    this.props.objectType === 'Sort' || 
+                                    this.props.objectType === 'DateRanges' 
+                                        ? this.props.index 
+                                        : this.props.objectType
+                                ) 
+                            : this.props.data[this.props.data.map((e) => {return e.value}).indexOf(state)].type || null,
                     this.props.objectType
                 )
             }
@@ -121,7 +127,15 @@ class DropdownInput extends PureComponent {
             this.props.onChange(
                 state,
                 this.props.id,
-                this.props.objectType ? (this.props.objectType === 'Address' || this.props.objectType === 'LabResult' || this.props.objectType === 'Documents' || this.props.objectType === 'Sort' || this.props.objectType === 'DateRanges' ? this.props.index : this.props.objectType) : null,
+                this.props.objectType 
+                    ? (this.props.objectType === 'Address' || 
+                        this.props.objectType === 'LabResult' || 
+                        this.props.objectType === 'Documents' || 
+                        this.props.objectType === 'Sort' || 
+                        this.props.objectType === 'DateRanges' 
+                            ? this.props.index 
+                            : this.props.objectType) 
+                    : null,
                 this.props.objectType
             )
         }

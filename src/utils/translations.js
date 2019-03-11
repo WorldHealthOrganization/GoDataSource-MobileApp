@@ -342,6 +342,8 @@ const generalLabels = {
     ageYearsInitials: 'LNG_AGE_FIELD_LABEL_YEARS',
     ageMonthsInitials: 'LNG_AGE_FIELD_LABEL_MONTHS',
     questionInitial: 'LNG_COMMON_LABEL_QUESTION',
+
+    noneLabel: 'LNG_DROPDOWN_NONE_OPTION'
 };
 
 const questionCardLabels = {

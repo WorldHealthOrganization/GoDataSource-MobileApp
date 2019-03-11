@@ -1252,7 +1252,7 @@ class CaseSingleScreen extends Component {
         if(objectTypeOrIndex === 'Case') {
             this.setState(
                 (prevState) => ({
-                    case: Object.assign({}, prevState.case, {[id]: value && value.value ? value.value : value}),
+                    case: Object.assign({}, prevState.case, {[id]: value && value.value !== undefined ? value.value : value}),
                     isModified: true
                 }), () => {
                     // console.log("onChangeDropDown", id, " ", value, " ", this.state.case);
@@ -1264,7 +1264,7 @@ class CaseSingleScreen extends Component {
                     let addressesClone = _.cloneDeep(this.state.case.addresses);
 
                     let anotherPlaceOfResidenceWasChosen = false
-                    if (value && value.value){
+                    if (value && value.value !== undefined ){
                        if(value.value === config.userResidenceAddress.userPlaceOfResidence){
                             addressesClone.forEach(element => {
                                 if (element[id] === value.value){
@@ -1275,7 +1275,7 @@ class CaseSingleScreen extends Component {
                        }
                     }
 
-                    addressesClone[objectTypeOrIndex][id] = value && value.value ? value.value : value;
+                    addressesClone[objectTypeOrIndex][id] = value && value.value !== undefined ? value.value : value;
                     let hasPlaceOfResidence = false
                     let casePlaceOfResidence = addressesClone.filter((e) => {return e.typeId === config.userResidenceAddress.userPlaceOfResidence})
                     if (casePlaceOfResidence && casePlaceOfResidence.length > 0) {
@@ -1293,7 +1293,7 @@ class CaseSingleScreen extends Component {
                     })
                 } else if (objectType === 'Documents') {
                         let documentsClone = _.cloneDeep(this.state.case.documents);
-                        documentsClone[objectTypeOrIndex][id] = value && value.value ? value.value : value;
+                        documentsClone[objectTypeOrIndex][id] = value && value.value !== undefined  ? value.value : value;
                         console.log ('documentsClone', documentsClone)
                         this.setState(prevState => ({
                             case: Object.assign({}, prevState.case, {documents: documentsClone}),
@@ -1303,7 +1303,7 @@ class CaseSingleScreen extends Component {
                         })
                 } else if (objectType === 'DateRanges') {
                     let dateRangesClone = _.cloneDeep(this.state.case.dateRanges);
-                    dateRangesClone[objectTypeOrIndex][id] = value && value.value ? value.value : value;
+                    dateRangesClone[objectTypeOrIndex][id] = value && value.value !== undefined  ? value.value : value;
                     console.log ('dateRangesClone', dateRangesClone);
                     this.setState(prevState => ({
                         case: Object.assign({}, prevState.case, {dateRanges: dateRangesClone}),
