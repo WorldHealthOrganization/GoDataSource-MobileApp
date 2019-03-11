@@ -76,12 +76,12 @@ class CasesFilterScreen extends Component {
                 filterClone.classification = props.activeFilters.classification;
             }
 
-            // if (props.activeFilters.sort && props.activeFilters.sort !== undefined && Array.isArray(props.activeFilters.sort) && props.activeFilters.sort.length > 0){
-            //     sortClone.sort = props.activeFilters.sort
-            // }
+            if (props.activeFilters.sort && props.activeFilters.sort !== undefined && Array.isArray(props.activeFilters.sort) && props.activeFilters.sort.length > 0){
+                sortClone = props.activeFilters.sort
+            }
         }
         state.filter.filter = filterClone
-        // state.filter.sort = sortClone
+        state.filter.sort = sortClone
         return null
     }
 
@@ -200,7 +200,7 @@ class CasesFilterScreen extends Component {
         if (typeof objectTypeOrIndex === 'number' && objectTypeOrIndex >= 0) {
             if (objectType === 'Sort') {
                 let sortClone = _.cloneDeep(this.state.filter.sort);
-                sortClone[objectTypeOrIndex][id] = value && value.value ? value.value : value;
+                sortClone[objectTypeOrIndex][id] = value && value.value !== undefined ? value.value : value;
                 console.log ('sortClone', sortClone)
                 this.setState(prevState => ({
                     filter: Object.assign({}, prevState.filter, {sort: sortClone}),

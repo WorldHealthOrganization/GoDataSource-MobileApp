@@ -264,6 +264,11 @@ export default {
     'LNG_DIALOG_ALERT_MESSAGE_PLEASE_ADD_THE_PLACE_OF_RESIDENCE_ADDRESS': 'Please add the place of residence address',
     'LNG_DIALOG_ALERT_MESSAGE_ADD_AT_LEAST_ONE_ADDRESS_WITH_ALL_REQUERED_FIELDS_COMPLETED': 'Please add at least one address with all the required fields completed',
 
+    // Delete
+    'LNG_DIALOG_ALERT_MESSAGE_ARE_YOU_SURE_YOU_WANT_TO_DELETE_THIS_DOCUMENT': 'Are you sure you want to delete this document?',
+    'LNG_DIALOG_ALERT_MESSAGE_ARE_YOU_SURE_YOU_WANT_TO_DELETE_THIS_ADDRESS': 'Are you sure you want to delete this address?',
+    'LNG_DIALOG_ALERT_MESSAGE_ARE_YOU_SURE_YOU_WANT_TO_DELETE_THIS_DATE_RANGE': 'Are you sure you want to delete this date range?',
+
 
     //loadingScreenMessages
     'LNG_LOADING_SCREEN_MESSAGE': 'Loading...',
@@ -288,6 +293,7 @@ export default {
     //take just first letter
     'LNG_COMMON_LABEL_QUESTION': 'Question',
 
+    'LNG_DROPDOWN_NONE_OPTION': 'None',
 
     //questionCardLabels
     'LNG_QUESTIONNAIRE_LABEL_WRITE_ANSWER': 'Write answer',
