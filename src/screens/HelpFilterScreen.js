@@ -45,13 +45,19 @@ class HelpFilterScreen extends Component {
     // Please add here the react lifecycle methods that you need
     static getDerivedStateFromProps(props, state) {
         let filterClone = Object.assign({}, state.filter.filter);
+        let sortClone = _.cloneDeep(state.filter.sort);
+
         if (props && props.activeFilters) {
             if (props.activeFilters.categories && Array.isArray(props.activeFilters.categories)){
                 filterClone.categories = props.activeFilters.categories;
             }
-            console.log("### Active filters: ", filterClone);
+
+            if (props.activeFilters.sort && props.activeFilters.sort !== undefined && Array.isArray(props.activeFilters.sort) && props.activeFilters.sort.length > 0){
+                sortClone = props.activeFilters.sort;
+            }
         }
         state.filter.filter = filterClone
+        state.filter.sort = sortClone
         return null
     };
 

@@ -1528,3 +1528,100 @@ export function getTooltip (label, translation, forceTooltip, tooltipsMessage) {
     
     return tooltip
 }
+
+export function createFilterCasesObject(filterFromFilterScreen, filter){
+    let allFilters = {}
+
+    //age
+    if (filterFromFilterScreen && filterFromFilterScreen.age) {
+        allFilters.age = filterFromFilterScreen.age
+    } else {
+        allFilters.age = null
+    }
+
+    //gender
+    if (filterFromFilterScreen && filterFromFilterScreen.gender && filterFromFilterScreen.gender !== null) {
+        allFilters.gender = filterFromFilterScreen.gender
+
+    } else {
+        allFilters.gender = null
+    }
+
+    //classification
+    if (filterFromFilterScreen && filterFromFilterScreen.classification) {
+        allFilters.classification = filterFromFilterScreen.classification;
+    } else {
+        allFilters.classification = null
+    }
+
+    //search text
+    if (filter && filter.searchText && filter.searchText.trim().length > 0) {
+        let splitedFilter= filter.searchText.split(" ")
+        splitedFilter = splitedFilter.filter((e) => {return e !== ""})
+        allFilters.searchText = new RegExp(splitedFilter.join("|"), "ig");
+    } else {
+        allFilters.searchText = null
+    }
+
+    //selected locations
+    if (filterFromFilterScreen && filterFromFilterScreen.selectedLocations && filterFromFilterScreen.selectedLocations.length > 0) {
+        allFilters.selectedLocations = filterFromFilterScreen.selectedLocations;
+    } else {
+        allFilters.selectedLocations = null
+    }
+
+    //sort rules
+    if (filterFromFilterScreen && filterFromFilterScreen.sort && filterFromFilterScreen.sort.length > 0) {
+        allFilters.sort = filterFromFilterScreen.sort;
+    } else {
+        allFilters.sort = null
+    }
+
+    if (!allFilters.age && !allFilters.gender && !allFilters.searchText && !allFilters.classification && !allFilters.selectedLocations && !allFilters.sort) {
+        allFilters = null
+    }
+
+    return allFilters;
+}
+
+export function createFilterContactsObject(filterFromFilterScreen, filter){
+    let allFilters = {}
+
+    if (filterFromFilterScreen && filterFromFilterScreen.age) {
+        allFilters.age = filterFromFilterScreen.age
+    } else {
+        allFilters.age = null
+    }
+
+    if (filterFromFilterScreen && filterFromFilterScreen.gender && filterFromFilterScreen.gender !== null) {
+        allFilters.gender = filterFromFilterScreen.gender
+    } else {
+        allFilters.gender = null
+    }
+
+    if (filter && filter.searchText && filter.searchText.trim().length > 0) {
+        let splitedFilter= filter.searchText.split(" ");
+        splitedFilter = splitedFilter.filter((e) => {return e !== ""});
+        allFilters.searchText = new RegExp(splitedFilter.join("|"), "ig");
+    } else {
+        allFilters.searchText = null
+    }
+
+    if (filterFromFilterScreen && filterFromFilterScreen.selectedLocations && filterFromFilterScreen.selectedLocations.length > 0) {
+        allFilters.selectedLocations = filterFromFilterScreen.selectedLocations;
+    } else {
+        allFilters.selectedLocations = null
+    }
+
+    if (filterFromFilterScreen && filterFromFilterScreen.sort && filterFromFilterScreen.sort.length > 0) {
+        allFilters.sort = filterFromFilterScreen.sort;
+    } else {
+        allFilters.sort = null
+    }
+    
+    if (!allFilters.age && !allFilters.gender && !allFilters.searchText && !allFilters.selectedLocations && !allFilters.sort) {
+        allFilters = null
+    }
+
+    return allFilters
+}
