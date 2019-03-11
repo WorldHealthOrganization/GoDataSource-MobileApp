@@ -107,7 +107,7 @@ class CaseSingleInfectionContainer extends Component {
                     <KeyboardAwareScrollView
                         style={style.containerScrollView}
                         contentContainerStyle={[style.contentContainerStyle, {paddingBottom: this.props.screenSize.height < 600 ? 70 : 20}]}
-                        keyboardShouldPersistTaps={'never'}
+                        keyboardShouldPersistTaps={'always'}
                         extraHeight={20 + 81 + 50 + 70}
                         innerRef={ref => {
                             this.scrollCasesSingleInfection = ref
