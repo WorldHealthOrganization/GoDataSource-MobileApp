@@ -73,12 +73,12 @@ class FollowUpsFilterScreen extends Component {
                 filterClone.selectedLocations = props.activeFilters.selectedLocations;
             }
            
-            // if (props.activeFilters.sort && props.activeFilters.sort !== undefined && Array.isArray(props.activeFilters.sort) && props.activeFilters.sort.length > 0){
-            //     sortClone = props.activeFilters.sort
-            // }
+            if (props.activeFilters.sort && props.activeFilters.sort !== undefined && Array.isArray(props.activeFilters.sort) && props.activeFilters.sort.length > 0){
+                sortClone = props.activeFilters.sort
+            }
         }
         state.filter.filter = filterClone
-        // state.filter.sort = sortClone
+        state.filter.sort = sortClone
         return null
     }
 
@@ -108,6 +108,10 @@ class FollowUpsFilterScreen extends Component {
 
     // Please write here all the methods that are not react native lifecycle methods
     handlePressNavbarButton = () => {
+        this.props.navigator.dismissModal();
+    };
+
+    handleResetFilters = () => {
         this.props.removeFilterForScreen(this.props.screen);
         this.props.navigator.dismissModal(this.props.onApplyFilters(null));
     };
@@ -136,6 +140,7 @@ class FollowUpsFilterScreen extends Component {
                     onChangeInterval={this.handleOnChangeInterval}
                     onChangeMultipleSelection={this.handleOnChangeMultipleSelection}
                     onPressApplyFilters={this.handleOnPressApplyFilters}
+                    onPressResetFilters={this.handleResetFilters}
                     handleMoveToNextScreenButton = {this.handleMoveToNextScreenButton}
                 />
             );
@@ -145,6 +150,7 @@ class FollowUpsFilterScreen extends Component {
                     handleMoveToPrevieousScreenButton={this.handleMoveToPrevieousScreenButton}
                     filter={this.state.filter}
                     onPressApplyFilters={this.handleOnPressApplyFilters}
+                    onPressResetFilters={this.handleResetFilters}
                     onPressAddSortRule={this.onPressAddSortRule}
                     onChangeDropDown={this.onChangeDropDown}
                     onDeletePress={this.onDeleteSortRulePress}
@@ -203,7 +209,7 @@ class FollowUpsFilterScreen extends Component {
         if (typeof objectTypeOrIndex === 'number' && objectTypeOrIndex >= 0) {
             if (objectType === 'Sort') {
                 let sortClone = _.cloneDeep(this.state.filter.sort);
-                sortClone[objectTypeOrIndex][id] = value && value.value ? value.value : value;
+                sortClone[objectTypeOrIndex][id] = value && value.value !== undefined ? value.value : value;
                 console.log ('sortClone', sortClone)
                 this.setState(prevState => ({
                     filter: Object.assign({}, prevState.filter, {sort: sortClone}),
