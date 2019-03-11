@@ -497,7 +497,7 @@ class FollowUpsSingleScreen extends Component {
             } else {
                 this.setState(
                     (prevState) => ({
-                        item: Object.assign({}, prevState.item, {[id]: value && value.value ? value.value : value}),
+                        item: Object.assign({}, prevState.item, {[id]: value && value.value !== undefined ? value.value : value}),
                         isModified: true
                     }), () => {
                         console.log("onChangeDropDown", id, " ", value, " ", this.state.item);
@@ -509,7 +509,7 @@ class FollowUpsSingleScreen extends Component {
             if (objectType === 'Contact') {
                 this.setState(
                     (prevState) => ({
-                        contact: Object.assign({}, prevState.contact, {[id]: value && value.value ? value.value : value}),
+                        contact: Object.assign({}, prevState.contact, {[id]: value && value.value !== undefined ? value.value : value}),
                         isModified: true
                     }), () => {
                         console.log("onChangeDropDown", id, " ", value, " ", this.state.contact);

@@ -37,9 +37,9 @@ class DropdownSearchable extends PureComponent {
             <SearchableDropdown
                 onTextChange={this.handleOnChangeText}
                 onItemSelect={this.handleOnChangeItem}
-                containerStyle={{padding: 5, minHeight: 150}}
+                containerStyle={{padding: 5, minHeight: 130}}
                 itemTextStyle={{color: '#222'}}
-                itemsContainerStyle={{maxHeight: 140}}
+                itemsContainerStyle={{maxHeight: 120}}
                 items={this.state.items}
                 defaultIndex={2}
                 placeholder={this.props.placeholder}

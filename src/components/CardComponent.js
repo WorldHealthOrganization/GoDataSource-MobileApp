@@ -8,7 +8,7 @@
 // the material ui library, since it provides design and animations out of the box
 import React, {Component, PureComponent} from 'react';
 import {View, Text, StyleSheet} from 'react-native';
-import {calculateDimension, handleExposedTo, getAddress, extractIdFromPouchId} from './../utils/functions';
+import {calculateDimension, handleExposedTo, getAddress, extractIdFromPouchId, getTranslation} from './../utils/functions';
 import config from './../utils/config';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -76,6 +76,21 @@ class CardComponent extends PureComponent {
                     />
                 );
             case 'DropdownInput':
+                const dataWithNoneOption = _.cloneDeep(this.props.item.data)
+                if (dataWithNoneOption !== undefined && dataWithNoneOption !== null && dataWithNoneOption.length > 0) {
+                    const dataFormatKeys = Object.keys(dataWithNoneOption[0])
+                    if (dataFormatKeys.length === 2) {
+                        const noneLabel = getTranslation(translations.generalLabels.noneLabel, this.props.translation)
+                        if (dataFormatKeys[0] === 'label' && dataFormatKeys[1] === 'value'){
+                            noneData = { label: noneLabel, value: null }
+                            dataWithNoneOption.unshift(noneData)
+                        } else if (dataFormatKeys[0] === 'value' && dataFormatKeys[1] === 'id'){
+                            noneData = { value: noneLabel, id: null }
+                            dataWithNoneOption.unshift(noneData)
+                        }
+                    }
+                }
+
                 return (
                     <DropdownInput
                         id={this.props.item.id}
@@ -83,7 +98,7 @@ class CardComponent extends PureComponent {
                         label={this.props.item.label}
                         labelValue={this.props.item.labelValue}
                         value={this.props.value}
-                        data={this.props.item.data}
+                        data={dataWithNoneOption}
                         isEditMode={this.props.isEditModeForDropDownInput}
                         isRequired={this.props.item.isRequired}
                         style={{width: width, marginHorizontal: marginHorizontal}}
