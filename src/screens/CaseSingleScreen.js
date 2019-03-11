@@ -913,10 +913,10 @@ class CaseSingleScreen extends Component {
 
     // show/hide Menu
     showMenu = () => {
-        // this.refs.menuRef.show();
+        this.refs.menuRef.show();
     };
     hideMenu = () => {
-        // this.refs.menuRef.hide();
+        this.refs.menuRef.hide();
     };
 
 
