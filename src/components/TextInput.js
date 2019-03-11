@@ -60,6 +60,7 @@ class TextInput extends PureComponent {
                         keyboardType={this.props.keyboardType ? this.props.keyboardType : 'default'}
                         onSubmitEditing={this.props.onSubmitEditing}
                         secureTextEntry={this.props.secureTextEntry}
+                        onFocus={this.props.onFocus}
                     />
                 </View>
                 {

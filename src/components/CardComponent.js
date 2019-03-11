@@ -73,6 +73,7 @@ class CardComponent extends PureComponent {
                         keyboardType={this.props.item.keyboardType}
                         translation={this.props.translation}
                         onChange={this.props.onChangeText}
+                        onFocus={this.props.onFocus}
                     />
                 );
             case 'DropdownInput':
