@@ -4,7 +4,15 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {PureComponent} from 'react';
-import {View, StyleSheet, InteractionManager, Alert, TouchableWithoutFeedback, Keyboard} from 'react-native';
+import {
+    View,
+    StyleSheet,
+    InteractionManager,
+    Alert,
+    TouchableWithoutFeedback,
+    Keyboard,
+    findNodeHandle
+} from 'react-native';
 import {calculateDimension, extractAllQuestions, mapQuestions, getTranslation} from './../utils/functions';
 import config from './../utils/config';
 import {connect} from "react-redux";
@@ -98,6 +106,10 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
                         style={style.container}
                         contentContainerStyle={[style.contentContainerStyle, {paddingBottom: this.props.screenSize.height < 600 ? 70 : 20}]}
                         keyboardShouldPersistTaps={'always'}
+                        extraHeight={20 + 81 + 50 + 70}
+                        innerRef={ref => {
+                            this.scrollFollowUpsSingleQuestionnaire = ref
+                        }}
                     >
                         {
                             this.state.questions.map((item, index) => {
@@ -141,6 +153,7 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
                 onChangeDateAnswer={this.props.onChangeDateAnswer}
                 onChangeSingleSelection={this.props.onChangeSingleSelection}
                 onChangeMultipleSelection={this.props.onChangeMultipleSelection}
+                onFocus={this.handleOnFocus}
             />
         )
     };
@@ -178,6 +191,15 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
         }
         return requiredQuestions;
         // return true;
+    };
+
+    handleOnFocus = (event) => {
+        this.scrollToInput(findNodeHandle(event.target))
+    };
+
+    scrollToInput (reactNode) {
+        // Add a 'scroll' ref to your ScrollView
+        this.scrollFollowUpsSingleQuestionnaire.props.scrollToFocusedInput(reactNode)
     };
 }
 

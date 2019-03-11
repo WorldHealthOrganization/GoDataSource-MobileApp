@@ -4,7 +4,7 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
-import {View, Text, StyleSheet, Alert, ScrollView, TouchableWithoutFeedback, Keyboard} from 'react-native';
+import {View, Text, StyleSheet, Alert, ScrollView, findNodeHandle} from 'react-native';
 import {calculateDimension, getTranslation, extractIdFromPouchId} from './../utils/functions';
 import config from './../utils/config';
 import {connect} from "react-redux";
@@ -113,7 +113,11 @@ class CaseSingleInfectionContainer extends Component {
                     <KeyboardAwareScrollView
                         style={style.containerScrollView}
                         contentContainerStyle={[style.contentContainerStyle, {paddingBottom: this.props.screenSize.height < 600 ? 70 : 20}]}
-                        keyboardShouldPersistTaps={'never'}
+                        keyboardShouldPersistTaps={'always'}
+                        extraHeight={20 + 81 + 50 + 70}
+                        innerRef={ref => {
+                            this.scrollCasesSingleInfection = ref
+                        }}
                     >
                         {
                             config.caseSingleScreen.infection.map((item, index) => {
@@ -316,7 +320,8 @@ class CaseSingleInfectionContainer extends Component {
                                 this.props.onChangeSectionedDropDownDateRange :
                                 item.objectType !== null && item.objectType !== undefined && item.objectType === 'IsolationDates' ? 
                                 this.props.onChangeSectionedDropDownIsolation : 
-                                null}         
+                                null}
+                onFocus={this.handleOnFocus}
             />
         )
     };
@@ -495,6 +500,15 @@ class CaseSingleInfectionContainer extends Component {
 
     handleBackButton = () => {
         this.props.handleMoveToPrevieousScreenButton()
+    };
+
+    handleOnFocus = (event) => {
+        this.scrollToInput(findNodeHandle(event.target))
+    };
+
+    scrollToInput (reactNode) {
+        // Add a 'scroll' ref to your ScrollView
+        this.scrollCasesSingleInfection.props.scrollToFocusedInput(reactNode)
     };
 }
 

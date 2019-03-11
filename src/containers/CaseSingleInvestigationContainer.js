@@ -4,7 +4,7 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {PureComponent} from 'react';
-import {TextInput, View, Text, StyleSheet, FlatList, TouchableWithoutFeedback, Keyboard} from 'react-native';
+import {View, StyleSheet, findNodeHandle} from 'react-native';
 import {calculateDimension, extractAllQuestions, mapQuestions, getTranslation} from '../utils/functions';
 import config from '../utils/config';
 import {connect} from "react-redux";
@@ -118,6 +118,10 @@ class CaseSingleInvestigationContainer extends PureComponent {
                         style={style.containerScrollView}
                         contentContainerStyle={[style.contentContainerStyle, {paddingBottom: this.props.screenSize.height < 600 ? 70 : 20}]}
                         keyboardShouldPersistTaps={'always'}
+                        extraHeight={20 + 81 + 50 + 70}
+                        innerRef={ref => {
+                            this.scrollCasesSingleInvestigation = ref
+                        }}
                     >
                         {
                             sortedQuestions.map((item, index) => {
@@ -161,13 +165,23 @@ class CaseSingleInvestigationContainer extends PureComponent {
                 onChangeSingleSelection={this.props.onChangeSingleSelection}
                 onChangeMultipleSelection={this.props.onChangeMultipleSelection}
                 onChangeDateAnswer={this.props.onChangeDateAnswer}
+                onFocus={this.handleOnFocus}
             />
         )
     }
 
     handleBackButton = () => {
         this.props.handleMoveToPrevieousScreenButton()
-    }
+    };
+
+    handleOnFocus = (event) => {
+        this.scrollToInput(findNodeHandle(event.target))
+    };
+
+    scrollToInput (reactNode) {
+        // Add a 'scroll' ref to your ScrollView
+        this.scrollCasesSingleInvestigation.props.scrollToFocusedInput(reactNode)
+    };
 }
 
 

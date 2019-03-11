@@ -942,7 +942,7 @@ class ContactsSingleScreen extends Component {
         } else if (objectType === 'Contact') {
             this.setState(
                 (prevState) => ({
-                    contact: Object.assign({}, prevState.contact, {[id]: value && value.value ? value.value : value}),
+                    contact: Object.assign({}, prevState.contact, {[id]: value && value.value !== undefined  ? value.value : value}),
                     isModified: true
                 }), () => {
                     console.log("onChangeDropDown", id, " ", value, " ", this.state.contact);
@@ -950,7 +950,7 @@ class ContactsSingleScreen extends Component {
             )
         } else if (type && type === 'Exposure' && this.props.isNew === true) {
             let relationshipsClone = _.cloneDeep(this.state.contact.relationships);
-            relationshipsClone[0][id] = value && value.value ? value.value : value;
+            relationshipsClone[0][id] = value && value.value !== undefined  ? value.value : value;
             this.setState(prevState => ({
                 contact: Object.assign({}, prevState.contact, {relationships: relationshipsClone}),
                 isModified: true
@@ -962,7 +962,7 @@ class ContactsSingleScreen extends Component {
                 let addressesClone = _.cloneDeep(this.state.contact.addresses);
 
                 let anotherPlaceOfResidenceWasChosen = false;
-                if (value && value.value){
+                if (value && value.value !== undefined ){
                     if(value.value === config.userResidenceAddress.userPlaceOfResidence){
                         addressesClone.forEach(element => {
                             if (element[id] === value.value){
@@ -973,7 +973,7 @@ class ContactsSingleScreen extends Component {
                     }
                 }
 
-                addressesClone[objectType][id] = value && value.value ? value.value : value;
+                addressesClone[objectType][id] = value && value.value !== undefined  ? value.value : value;
                 let hasPlaceOfResidence = false;
                 let contactPlaceOfResidence = addressesClone.filter((e) => {return e.typeId === config.userResidenceAddress.userPlaceOfResidence});
                 if (contactPlaceOfResidence && contactPlaceOfResidence.length > 0) {
@@ -1409,22 +1409,32 @@ class ContactsSingleScreen extends Component {
     };
 
     handleOnDeletePress = (index) => {
-        console.log("DeletePressed: ", index);
-        let contactAddressesClone = _.cloneDeep(this.state.contact.addresses);
-        contactAddressesClone.splice(index, 1);
+        // console.log("DeletePressed: ", index);
 
-        let hasPlaceOfResidence = false
-        let contactPlaceOfResidence = contactAddressesClone.find((e) => {return e.typeId === config.userResidenceAddress.userPlaceOfResidence})
-        if (contactPlaceOfResidence !== undefined) {
-            hasPlaceOfResidence = true
-        }
+        Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.alertMessages.deleteAddress, this.state.translation), [
+            {
+                text: getTranslation(translations.generalLabels.noAnswer, this.props.translation), onPress: () => {console.log('Cancel pressed')}
+            },
+            {
+                text: getTranslation(translations.generalLabels.yesAnswer, this.props.translation), onPress: () => {
+                    let contactAddressesClone = _.cloneDeep(this.state.contact.addresses);
+                    contactAddressesClone.splice(index, 1);
 
-        this.setState(prevState => ({
-            contact: Object.assign({}, prevState.contact, {addresses: contactAddressesClone}),
-            hasPlaceOfResidence
-        }), () => {
-            console.log("After deleting the address: ", this.state.contact);
-        })
+                    let hasPlaceOfResidence = false
+                    let contactPlaceOfResidence = contactAddressesClone.find((e) => {return e.typeId === config.userResidenceAddress.userPlaceOfResidence})
+                    if (contactPlaceOfResidence !== undefined) {
+                        hasPlaceOfResidence = true
+                    }
+
+                    this.setState(prevState => ({
+                        contact: Object.assign({}, prevState.contact, {addresses: contactAddressesClone}),
+                        hasPlaceOfResidence
+                    }), () => {
+                        console.log("After deleting the address: ", this.state.contact);
+                    })
+                }
+            }
+        ]);
     };
 
     handleOnPressAddAdrress = () => {

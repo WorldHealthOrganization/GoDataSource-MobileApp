@@ -44,6 +44,7 @@
     "react-native-elements": "1.0.0-beta5",
     "react-native-elevated-view": "0.0.6",
     "react-native-fs": "^2.11.18",
+    "react-native-keyboard-accessory": "^0.1.9",
     "react-native-keyboard-aware-scroll-view": "^0.8.0",
     "react-native-keychain": "^3.0.0",
     "react-native-level-fs": "^3.0.1",
