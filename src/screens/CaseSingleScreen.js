@@ -64,7 +64,6 @@ class CaseSingleScreen extends Component {
                 middleName: '',
                 lastName: '',
                 gender: '',
-                phoneNumber: '',
                 occupation: '',
                 outcomeId: '',
                 dob: null,
@@ -89,6 +88,7 @@ class CaseSingleScreen extends Component {
                         addressLine2: '',
                         postalCode: '',
                         locationId: '',
+                        phoneNumber: '',
                         geoLocation: {
                             coordinates: [0, 0],
                             type: 'Point'
@@ -913,10 +913,10 @@ class CaseSingleScreen extends Component {
 
     // show/hide Menu
     showMenu = () => {
-        this.refs.menuRef.show();
+        // this.refs.menuRef.show();
     };
     hideMenu = () => {
-        this.refs.menuRef.hide();
+        // this.refs.menuRef.hide();
     };
 
 
