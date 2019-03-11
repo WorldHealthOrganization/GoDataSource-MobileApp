@@ -266,7 +266,7 @@ class CaseSingleScreen extends Component {
                     onIndexChange={this.handleOnIndexChange}
                     renderScene={this.handleRenderScene}
                     renderTabBar={this.handleRenderTabBar}
-                    useNativeDriver
+                    useNativeDriver={true}
                     initialLayout={initialLayout}
                     swipeEnabled = { this.props.isNew ? false : true}
                 />
@@ -330,6 +330,8 @@ class CaseSingleScreen extends Component {
                     backgroundColor: 'white'
                 }}
                 renderLabel={this.handleRenderLabel(props)}
+                scrollEnabled={true}
+                bounces={true}
             />
         )
     };
@@ -361,12 +363,14 @@ class CaseSingleScreen extends Component {
 
     //Render scene
     handleRenderScene = ({route}) => {
+        console.log('Route: ', route);
         switch(route.key) {
             case 'personal':
                 return (
                     <CaseSinglePersonalContainer
                         case={this.state.case}
                         isEditMode={this.state.isEditMode}
+                        index={this.state.index}
                         onPressEdit={this.onPressEdit}
                         onPressSaveEdit={this.onPressSaveEdit}
                         onPressCancelEdit={this.onPressCancelEdit}
@@ -392,6 +396,7 @@ class CaseSingleScreen extends Component {
                     <CaseSingleAddressContainer
                         case={this.state.case}
                         isEditMode={this.state.isEditMode}
+                        index={this.state.index}
                         onPressEdit={this.onPressEdit}
                         onPressSaveEdit={this.onPressSaveEdit}
                         onPressCancelEdit={this.onPressCancelEdit}
@@ -416,6 +421,7 @@ class CaseSingleScreen extends Component {
                     <CaseSingleInfectionContainer
                         case={this.state.case}
                         isEditMode={this.state.isEditMode}
+                        index={this.state.index}
                         onPressEdit={this.onPressEdit}
                         onPressSaveEdit={this.onPressSaveEdit}
                         onPressCancelEdit={this.onPressCancelEdit}
@@ -441,6 +447,7 @@ class CaseSingleScreen extends Component {
                 return <CaseSingleInvestigationContainer
                     item={this.state.case}
                     isEditMode={this.state.isEditMode}
+                    index={this.state.index}
                     onPressEdit={this.onPressEdit}
                     onPressSave={this.handleOnPressSave}
                     onPressSaveEdit={this.onPressSaveEdit}
@@ -683,9 +690,6 @@ class CaseSingleScreen extends Component {
                 isEditMode: true,
                 isModified: false,
                 caseBeforeEdit: _.cloneDeep(this.state.case)
-        }, () => {
-            console.log("handleEditPress", this.state.isEditMode);
-            console.log("handleEditPress", this.state.caseBeforeEdit);
         })
     };
     onPressSaveEdit = () => {
@@ -944,10 +948,12 @@ class CaseSingleScreen extends Component {
 
     // show/hide Menu
     showMenu = () => {
-        this.refs.menuRef.show();
+        console.log('Show menu is not necessary');
+        // this.refs.menuRef.show();
     };
     hideMenu = () => {
-        this.refs.menuRef.hide();
+        console.log('Hide menu is not necessary');
+        // this.refs.menuRef.hide();
     };
 
 
@@ -1242,38 +1248,120 @@ class CaseSingleScreen extends Component {
             }
         }
     };
-    onChangeSwitch = (value, id, objectType) => {
-        if (id === 'fillGeoLocation') {
-            navigator.geolocation.getCurrentPosition((position) => {
-                    this.setState(
-                        (prevState) => ({
-                            item: Object.assign({}, prevState.item, {[id]: value ? {lat: position.coords.latitude, lng: position.coords.longitude} : null }),
-                            isModified: true
-                        }), () => {
-                            // console.log("onChangeSwitch", id, " ", value, " ", this.state.item);
-                        }
-                    )
-                },
-                (error) => {
-                    Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.alertMessages.caseGetLocationError, this.props.translation), [
-                        {
-                            text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation), 
-                            onPress: () => {console.log("OK pressed")}
-                        }
-                    ])
-                },
-                {
-                    enableHighAccuracy: true, timeout: 20000, maximumAge: 1000
+    onChangeSwitch = (value, id, objectTypeOrIndex, objectType) => {
+        if (id === 'geoLocationAccurate' && typeof objectTypeOrIndex === 'number' && objectTypeOrIndex >= 0 && objectType === 'Address') {
+            if (value) {
+                console.log('Start getting position');
+                let addressesClone = _.cloneDeep(this.props.case.addresses);
+                addressesClone[objectTypeOrIndex].geoLocationAccurate = value;
+                this.setState(
+                    (prevState) => ({
+                        case: Object.assign({}, prevState.case, {addresses: addressesClone}),
+                        isModified: true
+                    }), () => {
+                        navigator.geolocation.getCurrentPosition((position) => {
+                                console.log("Get position for cases: ", position);
+                                let addressesClone = _.cloneDeep(this.props.case.addresses);
+                                // console.log('addressesClone: ', addressesClone);
+                                if (!addressesClone[objectTypeOrIndex].geoLocation) {
+                                    addressesClone[objectTypeOrIndex].geoLocation = {};
+                                    addressesClone[objectTypeOrIndex].geoLocation.type = 'Point';
+                                    addressesClone[objectTypeOrIndex].geoLocation.coordinates = [];
+                                }
+                                if (!addressesClone[objectTypeOrIndex].geoLocation.type) {
+                                    addressesClone[objectTypeOrIndex].geoLocation.type = 'Point';
+                                }
+                                if (!addressesClone[objectTypeOrIndex].geoLocation.coordinates) {
+                                    addressesClone[objectTypeOrIndex].geoLocation.coordinates = [];
+                                }
+                                addressesClone[objectTypeOrIndex].geoLocation.coordinates = [value ? position.coords.longitude : 0, value ? position.coords.latitude : 0];
+                                addressesClone[objectTypeOrIndex].geoLocationAccurate = value;
+                                this.setState(
+                                    (prevState) => ({
+                                        case: Object.assign({}, prevState.case, {addresses: addressesClone}),
+                                        isModified: true
+                                    })
+                                    // , () => {
+                                    //     console.log("onChangeSwitch", id, " ", value, " ", this.state.case);
+                                    // }
+                                )
+                            },
+                            (error) => {
+                                console.log("Error while getting location: ", error);
+                                Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(error.message, this.props.translation), [
+                                    {
+                                        text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+                                        onPress: () => {
+                                            console.log("OK pressed");
+                                            let addressesClone = _.cloneDeep(this.props.case.addresses);
+                                            console.log('addressesClone: ', addressesClone);
+                                            if (!addressesClone[objectTypeOrIndex].geoLocation) {
+                                                addressesClone[objectTypeOrIndex].geoLocation = {};
+                                                addressesClone[objectTypeOrIndex].geoLocation.type = 'Point';
+                                                addressesClone[objectTypeOrIndex].geoLocation.coordinates = [];
+                                            }
+                                            if (!addressesClone[objectTypeOrIndex].geoLocation.type) {
+                                                addressesClone[objectTypeOrIndex].geoLocation.type = 'Point';
+                                            }
+                                            if (!addressesClone[objectTypeOrIndex].geoLocation.coordinates) {
+                                                addressesClone[objectTypeOrIndex].geoLocation.coordinates = [];
+                                            }
+                                            addressesClone[objectTypeOrIndex].geoLocation.coordinates = [0, 0];
+                                            addressesClone[objectTypeOrIndex].geoLocationAccurate = false;
+                                            this.setState(
+                                                (prevState) => ({
+                                                    case: Object.assign({}, prevState.case, {addresses: addressesClone}),
+                                                    isModified: true
+                                                })
+                                                // , () => {
+                                                //     console.log("onChangeSwitch", id, " ", value, " ", this.state.case);
+                                                // }
+                                            )
+                                        }
+                                    }
+                                ])
+                            },
+                            {
+                                enableHighAccuracy: true, timeout: 20000, maximumAge: 1000
+                            }
+                        )
+                    }
+                )
+            } else {
+                let addressesClone = _.cloneDeep(this.props.case.addresses);
+                // console.log('addressesClone: ', addressesClone);
+                if (!addressesClone[objectTypeOrIndex].geoLocation) {
+                    addressesClone[objectTypeOrIndex].geoLocation = {};
+                    addressesClone[objectTypeOrIndex].geoLocation.type = 'Point';
+                    addressesClone[objectTypeOrIndex].geoLocation.coordinates = [];
                 }
-            )
+                if (!addressesClone[objectTypeOrIndex].geoLocation.type) {
+                    addressesClone[objectTypeOrIndex].geoLocation.type = 'Point';
+                }
+                if (!addressesClone[objectTypeOrIndex].geoLocation.coordinates) {
+                    addressesClone[objectTypeOrIndex].geoLocation.coordinates = [];
+                }
+                addressesClone[objectTypeOrIndex].geoLocation.coordinates = [0, 0];
+                addressesClone[objectTypeOrIndex].geoLocationAccurate = value;
+                this.setState(
+                    (prevState) => ({
+                        case: Object.assign({}, prevState.case, {addresses: addressesClone}),
+                        isModified: true
+                    })
+                    // , () => {
+                    //     console.log("onChangeSwitch", id, " ", value, " ", this.state.case);
+                    // }
+                )
+            }
         } else {
-            if(objectType == 'Case') {
+            if(objectType === 'Case') {
                 this.setState( (prevState) => ({
                         case: Object.assign({}, prevState.case, {[id]: value}),
                         isModified: true
-                    }), () => {
+                    })
+                    // , () => {
                             // console.log("onChangeSwitch", id, " ", value, " ", this.state.case);
-                    }
+                    // }
                 )
             }
         }

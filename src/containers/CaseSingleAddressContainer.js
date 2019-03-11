@@ -48,6 +48,13 @@ class CaseSingleAddressContainer extends PureComponent {
         })
     }
 
+    shouldComponentUpdate(nextProps, nextState) {
+        if (nextProps.isEditMode !== this.props.isEditMode || nextProps.index === 1) {
+            return true;
+        }
+        return false;
+    }
+
     // The render method should have at least business logic as possible,
     // because this will be called whenever there is a new setState call
     // and can slow down the app
@@ -57,7 +64,7 @@ class CaseSingleAddressContainer extends PureComponent {
                 <LoaderScreen overlay={true} backgroundColor={'white'}/>
             )
         }
-
+        // console.log('CaseSingleContainer render Address');
         return (
             <View style={{flex: 1}}>
                 <View style={style.container}>
@@ -232,6 +239,12 @@ class CaseSingleAddressContainer extends PureComponent {
        
         if (item.type === 'DatePicker' && value === '') {
             value = null
+        }
+
+        if (item.type === 'SwitchInput' && item.id === 'geoLocationAccurate') {
+            if (this.props.case && this.props.case.addresses && Array.isArray(this.props.case.addresses) && this.props.case.addresses[cardIndex] && (this.props.case.addresses[cardIndex][item.id] === true || this.props.case.addresses[cardIndex][item.id] === false)) {
+                value = this.props.case.addresses[cardIndex][item.id];
+            }
         }
 
         let dateValidation = this.setDateValidations(item);
