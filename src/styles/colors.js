@@ -3,6 +3,7 @@
  */
 const screenBackgroundGrey = '#efefef';
 const buttonGreen = 'rgb(77, 176, 160)';
+const buttonWhite = 'rgb(255, 255, 255)';
 const buttonBlack = 'rgb(0,0,0)';
 const backgroundGreen = 'rgba(77, 176, 160, 0.15)';
 const navigationDrawerItemText = 'rgb(60, 60, 60)';
@@ -27,6 +28,7 @@ const colorWhite = 'white';
 export default {
     screenBackgroundGrey,
     buttonGreen,
+    buttonWhite,
     backgroundGreen,
     navigationDrawerItemText,
     navigationDrawerBackgroundColor,

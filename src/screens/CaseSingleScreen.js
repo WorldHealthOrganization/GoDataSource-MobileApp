@@ -754,15 +754,24 @@ class CaseSingleScreen extends Component {
         })
     };
     handleOnPressDeleteDocument = (index) => {
-        console.log("DeletePressed: ", index);
-        let caseDocumentsClone = _.cloneDeep(this.state.case.documents);
-        caseDocumentsClone.splice(index, 1);
-        this.setState(prevState => ({
-            case: Object.assign({}, prevState.case, {documents: caseDocumentsClone}),
-            isModified: true
-        }), () => {
-            console.log("After deleting the document: ", this.state.case);
-        })
+        // console.log("DeletePressed: ", index);
+        Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.alertMessages.deleteDocument, this.state.translation), [
+            {
+                text: getTranslation(translations.generalLabels.noAnswer, this.props.translation), onPress: () => {console.log('Cancel pressed')}
+            },
+            {
+                text: getTranslation(translations.generalLabels.yesAnswer, this.props.translation), onPress: () => {
+                    let caseDocumentsClone = _.cloneDeep(this.state.case.documents);
+                    caseDocumentsClone.splice(index, 1);
+                    this.setState(prevState => ({
+                        case: Object.assign({}, prevState.case, {documents: caseDocumentsClone}),
+                        isModified: true
+                    }), () => {
+                        console.log("After deleting the document: ", this.state.case);
+                    })
+                }
+            }
+        ]);
     };
 
 
@@ -795,23 +804,32 @@ class CaseSingleScreen extends Component {
         })
     };
     handleOnPressDeleteAddress = (index) => {
-        console.log("DeletePressed: ", index);
-        let caseAddressesClone = _.cloneDeep(this.state.case.addresses);
-        caseAddressesClone.splice(index, 1);
+        // console.log("DeletePressed: ", index);
+        Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.alertMessages.deleteAddress, this.state.translation), [
+            {
+                text: getTranslation(translations.generalLabels.noAnswer, this.props.translation), onPress: () => {console.log('Cancel pressed')}
+            },
+            {
+                text: getTranslation(translations.generalLabels.yesAnswer, this.props.translation), onPress: () => {
+                    let caseAddressesClone = _.cloneDeep(this.state.case.addresses);
+                    caseAddressesClone.splice(index, 1);
 
-        let hasPlaceOfResidence = false
-        let caselaceOfResidence = caseAddressesClone.find((e) => {return e.typeId === config.userResidenceAddress.userPlaceOfResidence})
-        if (caselaceOfResidence !== undefined) {
-            hasPlaceOfResidence = true
-        }
+                    let hasPlaceOfResidence = false;
+                    let caselaceOfResidence = caseAddressesClone.find((e) => {return e.typeId === config.userResidenceAddress.userPlaceOfResidence})
+                    if (caselaceOfResidence !== undefined) {
+                        hasPlaceOfResidence = true
+                    }
 
-        this.setState(prevState => ({
-            case: Object.assign({}, prevState.case, {addresses: caseAddressesClone}),
-            isModified: true,
-            hasPlaceOfResidence
-        }), () => {
-            console.log("After deleting the address: ", this.state.case);
-        })
+                    this.setState(prevState => ({
+                        case: Object.assign({}, prevState.case, {addresses: caseAddressesClone}),
+                        isModified: true,
+                        hasPlaceOfResidence
+                    }), () => {
+                        console.log("After deleting the address: ", this.state.case);
+                    })
+                }
+            }
+        ]);
     };
     handleOnChangeSectionedDropDownAddress = (selectedItems, index) => {
         // Here selectedItems is always an array with just one value and should pe mapped to the locationId field from the address from index
@@ -847,15 +865,24 @@ class CaseSingleScreen extends Component {
         })
     };
     handleOnPressDeleteDateRange = (index) => {
-        console.log("DeletePressed: ", index);
-        let caseDateRangesClone = _.cloneDeep(this.state.case.dateRanges);
-        caseDateRangesClone.splice(index, 1);
-        this.setState(prevState => ({
-            case: Object.assign({}, prevState.case, {dateRanges: caseDateRangesClone}),
-            isModified: true
-        }), () => {
-            console.log("After deleting the dateRange: ", this.state.case);
-        })
+        Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.alertMessages.deleteDateRange, this.state.translation), [
+            {
+                text: getTranslation(translations.generalLabels.noAnswer, this.props.translation), onPress: () => {console.log('Cancel pressed')}
+            },
+            {
+                text: getTranslation(translations.generalLabels.yesAnswer, this.props.translation), onPress: () => {
+                    console.log("DeletePressed: ", index);
+                    let caseDateRangesClone = _.cloneDeep(this.state.case.dateRanges);
+                    caseDateRangesClone.splice(index, 1);
+                    this.setState(prevState => ({
+                        case: Object.assign({}, prevState.case, {dateRanges: caseDateRangesClone}),
+                        isModified: true
+                    }), () => {
+                        console.log("After deleting the dateRange: ", this.state.case);
+                    })
+                }
+            }
+        ]);
     };
     onChangeSectionedDropDownDateRange = (selectedItems, index) => {
         console.log ('handleOnChangeSectionedDropDown', selectedItems, index);
@@ -1252,7 +1279,7 @@ class CaseSingleScreen extends Component {
         if(objectTypeOrIndex === 'Case') {
             this.setState(
                 (prevState) => ({
-                    case: Object.assign({}, prevState.case, {[id]: value && value.value ? value.value : value}),
+                    case: Object.assign({}, prevState.case, {[id]: value && value.value !== undefined ? value.value : value}),
                     isModified: true
                 }), () => {
                     // console.log("onChangeDropDown", id, " ", value, " ", this.state.case);
@@ -1264,7 +1291,7 @@ class CaseSingleScreen extends Component {
                     let addressesClone = _.cloneDeep(this.state.case.addresses);
 
                     let anotherPlaceOfResidenceWasChosen = false
-                    if (value && value.value){
+                    if (value && value.value !== undefined ){
                        if(value.value === config.userResidenceAddress.userPlaceOfResidence){
                             addressesClone.forEach(element => {
                                 if (element[id] === value.value){
@@ -1275,7 +1302,7 @@ class CaseSingleScreen extends Component {
                        }
                     }
 
-                    addressesClone[objectTypeOrIndex][id] = value && value.value ? value.value : value;
+                    addressesClone[objectTypeOrIndex][id] = value && value.value !== undefined ? value.value : value;
                     let hasPlaceOfResidence = false
                     let casePlaceOfResidence = addressesClone.filter((e) => {return e.typeId === config.userResidenceAddress.userPlaceOfResidence})
                     if (casePlaceOfResidence && casePlaceOfResidence.length > 0) {
@@ -1293,7 +1320,7 @@ class CaseSingleScreen extends Component {
                     })
                 } else if (objectType === 'Documents') {
                         let documentsClone = _.cloneDeep(this.state.case.documents);
-                        documentsClone[objectTypeOrIndex][id] = value && value.value ? value.value : value;
+                        documentsClone[objectTypeOrIndex][id] = value && value.value !== undefined  ? value.value : value;
                         console.log ('documentsClone', documentsClone)
                         this.setState(prevState => ({
                             case: Object.assign({}, prevState.case, {documents: documentsClone}),
@@ -1303,7 +1330,7 @@ class CaseSingleScreen extends Component {
                         })
                 } else if (objectType === 'DateRanges') {
                     let dateRangesClone = _.cloneDeep(this.state.case.dateRanges);
-                    dateRangesClone[objectTypeOrIndex][id] = value && value.value ? value.value : value;
+                    dateRangesClone[objectTypeOrIndex][id] = value && value.value !== undefined  ? value.value : value;
                     console.log ('dateRangesClone', dateRangesClone);
                     this.setState(prevState => ({
                         case: Object.assign({}, prevState.case, {dateRanges: dateRangesClone}),
