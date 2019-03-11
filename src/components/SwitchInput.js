@@ -44,8 +44,10 @@ class SwitchInput extends PureComponent {
                 </Text>
                 <Switch
                     value={this.props.value}
-                    onColor={this.props.activeButtonColor}
-                    onTintColor={this.props.activeBackgroundColor}
+                    // onColor={this.props.activeButtonColor}
+                    // onTintColor={this.props.activeBackgroundColor}
+                    onColor={'green'}
+                    onTintColor={'white'}
                     onValueChange={(state) => this.props.onChange(
                         state,
                         this.props.id,
