@@ -160,6 +160,7 @@ class QuestionCard extends Component {
                         style={{width: width, marginHorizontal: marginHorizontal}}
                         translation={this.props.translation}
                         screenSize={this.props.screenSize}
+                        onFocus={this.props.onFocus}
                     />
                 );
             case 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_NUMERIC':
@@ -177,6 +178,7 @@ class QuestionCard extends Component {
                         style={{width: width, marginHorizontal: marginHorizontal}}
                         translation={this.props.translation}
                         screenSize={this.props.screenSize}
+                        onFocus={this.props.onFocus}
                     />
                 );
             case 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_DATE_TIME':

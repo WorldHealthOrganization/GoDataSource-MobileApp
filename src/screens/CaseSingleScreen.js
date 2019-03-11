@@ -28,6 +28,7 @@ import {updateRequiredFields, extractIdFromPouchId, navigation, getTranslation, 
 import moment from 'moment';
 import translations from './../utils/translations'
 import ElevatedView from 'react-native-elevated-view';
+import ViewHOC from './../components/ViewHOC';
 
 const initialLayout = {
     height: 0,
@@ -202,7 +203,10 @@ class CaseSingleScreen extends Component {
     // and can slow down the app
     render() {
         return (
-            <View style={style.container}>
+            <ViewHOC style={style.container}
+                     showLoader={this && this.state && this.state.loading}
+                     loaderText={this.props && this.props.syncState ? 'Loading' : getTranslation(translations.loadingScreenMessages.loadingMsg, this.props.translation)}
+            >
                 <NavBarCustom
                     title={null}
                     customTitle={
@@ -266,7 +270,7 @@ class CaseSingleScreen extends Component {
                     initialLayout={initialLayout}
                     swipeEnabled = { this.props.isNew ? false : true}
                 />
-            </View>
+            </ViewHOC>
         );
     }
 
