@@ -25,10 +25,18 @@ class CaseSingleInvestigationContainer extends PureComponent {
         };
     }
 
+    shouldComponentUpdate(nextProps, nextState) {
+        if (nextProps.isEditMode !== this.props.isEditMode || nextProps.index === 3) {
+            return true;
+        }
+        return false;
+    }
+
     // The render method should have at least business logic as possible,
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
+        // console.log('CaseSingleContainer render Investigation');
          // Get all additional questions recursively
         let sortedQuestions = sortBy(this.props.questions, ['order', 'variable']);
         sortedQuestions = extractAllQuestions(sortedQuestions, this.props.item);
@@ -117,7 +125,7 @@ class CaseSingleInvestigationContainer extends PureComponent {
                     >
                         {
                             sortedQuestions.map((item, index) => {
-                                return this.handleRenderItem(item, index)
+                                return this.handleRenderItem(item, index, sortedQuestions.length)
                             })
                         }
                     </KeyboardAwareScrollView>
@@ -146,12 +154,13 @@ class CaseSingleInvestigationContainer extends PureComponent {
         )
     };
 
-    handleRenderItem = (item, index) => {
+    handleRenderItem = (item, index, totalNumberOfQuestions) => {
         return (
             <QuestionCard
                 item={item}
                 isEditMode={this.props.isEditMode}
                 index={index + 1}
+                totalNumberOfQuestions={totalNumberOfQuestions}
                 source={this.props.item}
                 onChangeTextAnswer={this.props.onChangeTextAnswer}
                 onChangeSingleSelection={this.props.onChangeSingleSelection}

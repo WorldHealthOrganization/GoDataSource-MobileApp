@@ -53,6 +53,13 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
         })
     }
 
+    shouldComponentUpdate(nextProps, nextState) {
+        if (nextProps.activeIndex === 1) {
+            return true;
+        }
+        return false;
+    }
+
     static getDerivedStateFromProps(props, state) {
         // Get all additional questions recursively
         let sortedQuestions = sortBy(props.questions, ['order', 'variable']);
@@ -71,6 +78,7 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
                 <LoaderScreen overlay={true} backgroundColor={'white'}/>
             )
         }
+        // console.log('FollowUpsSingleContainer render Questionnaire');
 
         // console.log("### FollowUpsSingleQuestionnaire: ", this.props.questions);
         let buttonHeight = calculateDimension(25, true, this.props.screenSize);
@@ -105,7 +113,7 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
                     >
                         {
                             this.state.questions.map((item, index) => {
-                                return this.handleRenderItem(item, index)
+                                return this.handleRenderItem(item, index, this.state.questions.length)
                             })
                         }
                     </KeyboardAwareScrollView>
@@ -134,11 +142,12 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
         )
     };
 
-    handleRenderItem = (item, index) => {
+    handleRenderItem = (item, index, totalNumberOfQuestions) => {
         return (
             <QuestionCard
                 item={item}
                 index={index + 1}
+                totalNumberOfQuestions={totalNumberOfQuestions}
                 source={this.props.item}
                 isEditMode={this.props.isEditMode}
                 onChangeTextAnswer={this.props.onChangeTextAnswer}

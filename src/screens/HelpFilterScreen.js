@@ -87,27 +87,35 @@ class HelpFilterScreen extends Component {
         this.setState({index});
     };
 
-    handleRenderScene = () => {
-        if (this.state.index === 0) {
-            return (
-                <HelpFilterContainer
-                    filter={this.state.filter}
-                    onChangeMultipleSelection={this.handleOnChangeMultipleSelection}
-                    onPressApplyFilters={this.handleOnPressApplyFilters}
-                    onPressResetFilters={this.handleResetFilters}
-                />
-            );
-        } else {
-            return (
-                <HelpSortContainer
-                    filter={this.state.filter}
-                    onPressApplyFilters={this.handleOnPressApplyFilters}
-                    onPressAddSortRule={this.onPressAddSortRule}
-                    onChangeDropDown={this.onChangeDropDown}
-                    onPressResetFilters={this.handleResetFilters}
-                    onDeletePress={this.onDeleteSortRulePress}
-                />
-            );
+
+    handleRenderScene = ({route}) => {
+        switch (route.key) {
+            case 'filters':
+                return (
+                    <HelpFilterContainer
+                        filter={this.state.filter}
+                        onChangeMultipleSelection={this.handleOnChangeMultipleSelection}
+                        onPressApplyFilters={this.handleOnPressApplyFilters}
+                    />
+                );
+            case 'sort':
+                return (
+                    <HelpSortContainer
+                        filter={this.state.filter}
+                        onPressApplyFilters={this.handleOnPressApplyFilters}
+                        onPressAddSortRule={this.onPressAddSortRule}
+                        onChangeDropDown={this.onChangeDropDown}
+                        onDeletePress={this.onDeleteSortRulePress}
+                    />
+                );
+            default:
+                return (
+                    <HelpFilterContainer
+                        filter={this.state.filter}
+                        onChangeMultipleSelection={this.handleOnChangeMultipleSelection}
+                        onPressApplyFilters={this.handleOnPressApplyFilters}
+                    />
+                )
         }
     };
 
