@@ -143,20 +143,22 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
     };
 
     handleRenderItem = (item, index, totalNumberOfQuestions) => {
-        return (
-            <QuestionCard
-                item={item}
-                index={index + 1}
-                totalNumberOfQuestions={totalNumberOfQuestions}
-                source={this.props.item}
-                isEditMode={this.props.isEditMode}
-                onChangeTextAnswer={this.props.onChangeTextAnswer}
-                onChangeDateAnswer={this.props.onChangeDateAnswer}
-                onChangeSingleSelection={this.props.onChangeSingleSelection}
-                onChangeMultipleSelection={this.props.onChangeMultipleSelection}
-                onFocus={this.handleOnFocus}
-            />
-        )
+        if (item.inactive === false ) {
+            return (
+                <QuestionCard
+                    item={item}
+                    index={index + 1}
+                    totalNumberOfQuestions={totalNumberOfQuestions}
+                    source={this.props.item}
+                    isEditMode={this.props.isEditMode}
+                    onChangeTextAnswer={this.props.onChangeTextAnswer}
+                    onChangeDateAnswer={this.props.onChangeDateAnswer}
+                    onChangeSingleSelection={this.props.onChangeSingleSelection}
+                    onChangeMultipleSelection={this.props.onChangeMultipleSelection}
+                    onFocus={this.handleOnFocus}
+                />
+            )
+        }
     };
 
     onPressSave = () => {

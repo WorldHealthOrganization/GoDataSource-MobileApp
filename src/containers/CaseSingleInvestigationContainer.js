@@ -155,20 +155,23 @@ class CaseSingleInvestigationContainer extends PureComponent {
     };
 
     handleRenderItem = (item, index, totalNumberOfQuestions) => {
-        return (
-            <QuestionCard
-                item={item}
-                isEditMode={this.props.isEditMode}
-                index={index + 1}
-                totalNumberOfQuestions={totalNumberOfQuestions}
-                source={this.props.item}
-                onChangeTextAnswer={this.props.onChangeTextAnswer}
-                onChangeSingleSelection={this.props.onChangeSingleSelection}
-                onChangeMultipleSelection={this.props.onChangeMultipleSelection}
-                onChangeDateAnswer={this.props.onChangeDateAnswer}
-                onFocus={this.handleOnFocus}
-            />
-        )
+        if (item.inactive === false) {
+
+            return (
+                <QuestionCard
+                    item={item}
+                    isEditMode={this.props.isEditMode}
+                    index={index + 1}
+                    totalNumberOfQuestions={totalNumberOfQuestions}
+                    source={this.props.item}
+                    onChangeTextAnswer={this.props.onChangeTextAnswer}
+                    onChangeSingleSelection={this.props.onChangeSingleSelection}
+                    onChangeMultipleSelection={this.props.onChangeMultipleSelection}
+                    onChangeDateAnswer={this.props.onChangeDateAnswer}
+                    onFocus={this.handleOnFocus}
+                />
+            )
+        }
     }
 
     handleBackButton = () => {

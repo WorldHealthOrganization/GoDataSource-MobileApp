@@ -144,11 +144,9 @@ class QuestionCard extends Component {
         }
 
         // console.log("### questionAnswers: ", questionAnswers, item);
-
         // if (item.type === 'DropdownInput' && item.isExposure) {
         //     item.data = this.props.cases.map((e) => {return {value: ((e.firstName ? e.firstName : '') + (e.lastName ? (" " + e.lastName) : ''))}})
         // }
-
         // console.log('Itemm: ', item);
 
         switch(item.answerType) {
@@ -257,6 +255,7 @@ class QuestionCard extends Component {
                     ) : null
                 )
         }
+      
     };
 }
 
