@@ -10,7 +10,7 @@ import NavBarCustom from './../components/NavBarCustom';
 import ElevatedView from 'react-native-elevated-view';
 import Ripple from 'react-native-material-ripple';
 import {Button, Icon} from 'react-native-material-ui';
-import {calculateDimension, getTranslation, navigation} from './../utils/functions';
+import {calculateDimension, getTranslation, navigation, createFilterContactsObject} from './../utils/functions';
 import FollowUpListItem from './../components/FollowUpListItem';
 import SearchFilterView from './../components/SearchFilterView';
 import {connect} from "react-redux";
@@ -46,6 +46,7 @@ class ContactsScreen extends Component {
             filterFromFilterScreen: this.props.filter && this.props.filter['ContactsFilterScreen'] ? this.props.filter['ContactsFilterScreen'] : null,
             loading: true,
 
+            sortData: false,
             isVisible: false,
             latitude: 0,
             longitude: 0,
@@ -76,6 +77,15 @@ class ContactsScreen extends Component {
     }
 
     static getDerivedStateFromProps(props, state) {
+        if (state.sortData === true){
+            state.sortData = false
+            state.loading = true
+            const allFilters = createFilterContactsObject(state.filterFromFilterScreen, state.filter)
+            props.getContactsForOutbreakId(props.user.activeOutbreakId, allFilters, null);
+        } else {
+            state.sortData = true
+        }
+
         state.loading = false;
         state.refreshing = false
         return null;
@@ -485,46 +495,11 @@ class ContactsScreen extends Component {
     };
 
     filterContacts = () => {
-        let allFilters = {}
-
-        if (this.state.filterFromFilterScreen && this.state.filterFromFilterScreen.age) {
-            allFilters.age = this.state.filterFromFilterScreen.age
-        } else {
-            allFilters.age = null
-        }
-
-        if (this.state.filterFromFilterScreen && this.state.filterFromFilterScreen.gender && this.state.filterFromFilterScreen.gender !== null) {
-            allFilters.gender = this.state.filterFromFilterScreen.gender
-        } else {
-            allFilters.gender = null
-        }
-
-        if (this.state.filter && this.state.filter.searchText && this.state.filter.searchText.trim().length > 0) {
-            let splitedFilter= this.state.filter.searchText.split(" ");
-            splitedFilter = splitedFilter.filter((e) => {return e !== ""});
-            allFilters.searchText = new RegExp(splitedFilter.join("|"), "ig");
-        } else {
-            allFilters.searchText = null
-        }
-
-        if (this.state.filterFromFilterScreen && this.state.filterFromFilterScreen.selectedLocations && this.state.filterFromFilterScreen.selectedLocations.length > 0) {
-            allFilters.selectedLocations = this.state.filterFromFilterScreen.selectedLocations;
-        } else {
-            allFilters.selectedLocations = null
-        }
-
-        if (this.state.filterFromFilterScreen && this.state.filterFromFilterScreen.sort && this.state.filterFromFilterScreen.sort.length > 0) {
-            allFilters.sort = this.state.filterFromFilterScreen.sort;
-        } else {
-            allFilters.sort = null
-        }
-        
-        if (!allFilters.age && !allFilters.gender && !allFilters.searchText && !allFilters.selectedLocations && !allFilters.sort) {
-            allFilters = null
-        }
+        const allFilters = createFilterContactsObject(this.state.filterFromFilterScreen, this.state.filter)
 
         this.setState({
-            loading: true
+            loading: true,
+            sortData: false
         }, () => {
             this.props.getContactsForOutbreakId(this.props.user.activeOutbreakId, allFilters, null);
         })
@@ -741,7 +716,8 @@ const style = StyleSheet.create({
     },
     containerContent: {
         flex: 1,
-        backgroundColor: 'rgba(217, 217, 217, 0.5)'
+        backgroundColor: styles.appBackground,
+        paddingBottom: 25
     },
     separatorComponentStyle: {
         height: 8

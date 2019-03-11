@@ -195,13 +195,29 @@ class QuestionCard extends Component {
                     />
                 );
             case 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_SINGLE_ANSWER':
+                const data = item.answers.map((e) => {return {value: getTranslation(e.label, this.props.translation), id: e.value}})
+                const dataWithNoneOption = _.cloneDeep(data)
+                if (dataWithNoneOption !== undefined && dataWithNoneOption !== null && dataWithNoneOption.length > 0) {
+                    const dataFormatKeys = Object.keys(dataWithNoneOption[0])
+                    if (dataFormatKeys.length === 2) {
+                        const noneLabel = getTranslation(translations.generalLabels.noneLabel, this.props.translation)
+                        if (dataFormatKeys[0] === 'label' && dataFormatKeys[1] === 'value'){
+                            noneData = { label: noneLabel, value: null }
+                            dataWithNoneOption.unshift(noneData)
+                        } else if (dataFormatKeys[0] === 'value' && dataFormatKeys[1] === 'id'){
+                            noneData = { value: noneLabel, id: null }
+                            dataWithNoneOption.unshift(noneData)
+                        }
+                    }
+                }
+
                 return (
                     <DropdownInput
                         id={item.variable}
                         label={translations.questionCardLabels.dropDownInputLabel}
                         labelValue={item.text}
                         value={questionAnswers}
-                        data={item.answers.map((e) => {return {value: getTranslation(e.label, this.props.translation), id: e.value}})}
+                        data={dataWithNoneOption}
                         isEditMode={this.props.isEditMode}
                         isRequired={item.required}
                         onChange={this.props.onChangeSingleSelection}
