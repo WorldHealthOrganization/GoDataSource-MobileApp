@@ -284,6 +284,7 @@ export default {
     //generalLabels
     'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER': 'Filter By',
     'LNG_COMMON_BUTTON_APPLY_FILTERS': 'Apply filters',
+    'LNG_COMMON_BUTTON_RESET_FILTERS': 'Reset',
     'LNG_COMMON_LABEL_YES': 'Yes',
     'LNG_COMMON_LABEL_NO': 'No',
     'LNG_COMMON_LABEL_TODAY': 'Today',
