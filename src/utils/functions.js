@@ -52,7 +52,11 @@ export function calculateDimension (designResourceDimension, isHeight, screenSiz
     }
 
     if (isHeight) {
-        return (designResourceDimension * scaledHeight) / designScreenDimension.height;
+        if (designScreenDimension.height / designScreenDimension.width > screenSize.height / screenSize.width) {
+            return (designResourceDimension * screenSize.height) / designScreenDimension.height;
+        } else {
+            return (designResourceDimension * scaledHeight) / designScreenDimension.height;
+        }
     }
 
     return (designResourceDimension * screenSize.width) / designScreenDimension.width;

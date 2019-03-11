@@ -51,12 +51,13 @@ class AddFollowUpScreen extends PureComponent{
     render () {
         let contentWidth = calculateDimension(297, false, this.props.screenSize);
         let marginHorizontal = calculateDimension(14, false, this.props.screenSize);
+        let height = calculateDimension(420, true, this.props.screenSize);
 
         return (
             <Dialog
                 visible={this.props.showAddFollowUpScreen}
                 width="90%"
-                height="75%"
+                height={height}
                 onDismiss={this.onCancelPressed}
             >
                 <ElevatedView
@@ -66,31 +67,34 @@ class AddFollowUpScreen extends PureComponent{
                         backgroundColor: 'white',
                         borderRadius: 4,
                         marginVertical: 10,
-                        justifyContent: 'space-around'
                     }}>
-                    <Section
-                        label={getTranslation(translations.addFollowUpScreen.addFollowUpLabel, this.props.translation)}
-                        hasBorderBottom={false}
-                        containerStyle={{width: '100%', flex: 0.15}}
-                        translation={this.props.translation}
-                    />
-                    <DropdownSearchable
-                        outbreakId={this.props && this.props.user && this.props.user.activeOutbreakId ? this.props.user.activeOutbreakId : null}
-                        onChange={this.onDropdownSearchableChanged}
-                        placeholder={getTranslation(translations.addFollowUpScreen.searchContactPlacehodler, this.props.translation)}
-                        translation={this.props.translation}
-                    />
-                    <DatePicker
-                        id='followUpDate'
-                        label={getTranslation(translations.addFollowUpScreen.followUpDateLabel, this.props.translation)}
-                        value={this.state.date}
-                        isEditMode={true}
-                        isRequired={false}
-                        onChange={this.onDateChanged}
-                        style={{width: contentWidth, marginHorizontal}}
-                        translation={this.props.translation}
-                    />
-                    <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-evenly'}}>
+                    <View style={{flex: 0.1}}>
+                        <Section
+                            label={getTranslation(translations.addFollowUpScreen.addFollowUpLabel, this.props.translation)}
+                            hasBorderBottom={false}
+                            containerStyle={{width: '100%', flex: 1}}
+                            translation={this.props.translation}
+                        />
+                    </View>
+                    <View style={{flex: 0.8, alignItems: 'center'}}>
+                        <DatePicker
+                            id='followUpDate'
+                            label={getTranslation(translations.addFollowUpScreen.followUpDateLabel, this.props.translation)}
+                            value={this.state.date}
+                            isEditMode={true}
+                            isRequired={false}
+                            onChange={this.onDateChanged}
+                            style={{width: contentWidth, marginHorizontal, flex: 0.33}}
+                            translation={this.props.translation}
+                        />
+                        <DropdownSearchable
+                            outbreakId={this.props && this.props.user && this.props.user.activeOutbreakId ? this.props.user.activeOutbreakId : null}
+                            onChange={this.onDropdownSearchableChanged}
+                            placeholder={getTranslation(translations.addFollowUpScreen.searchContactPlacehodler, this.props.translation)}
+                            translation={this.props.translation}
+                        />
+                    </View>
+                    <View style={{flex: 0.1, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-evenly'}}>
                         <Button
                             title={getTranslation(translations.generalButtons.cancelButtonLabel, this.props.translation)}
                             color="white"
@@ -137,32 +141,12 @@ class AddFollowUpScreen extends PureComponent{
     };
 
     onCancelPressed = () => {
-        if (this.state.isModified === true) {
-            Alert.alert("", 'You have unsaved data. Are you sure you want to leave this page and lose all changes?', [
-                {
-                    text: 'Yes', onPress: () => {
-                    this.setState({
-                        date: new Date(),
-                        isModified: false
-                    }, () => {
-                        this.props.onCancelPressed();
-                    });
-                }
-                },
-                {
-                    text: 'Cancel', onPress: () => {
-                    console.log("onPressCancelEdit No pressed - nothing changes")
-                }
-                }
-            ])
-        } else {
-            this.setState({
-                date: new Date(),
-                isModified: false
-            }, () => {
-                this.props.onCancelPressed();
-            });
-        }
+        this.setState({
+            date: new Date(),
+            isModified: false
+        }, () => {
+            this.props.onCancelPressed();
+        });
     };
 }
 

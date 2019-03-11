@@ -1365,22 +1365,32 @@ class ContactsSingleScreen extends Component {
     };
 
     handleOnDeletePress = (index) => {
-        console.log("DeletePressed: ", index);
-        let contactAddressesClone = _.cloneDeep(this.state.contact.addresses);
-        contactAddressesClone.splice(index, 1);
+        // console.log("DeletePressed: ", index);
 
-        let hasPlaceOfResidence = false
-        let contactPlaceOfResidence = contactAddressesClone.find((e) => {return e.typeId === config.userResidenceAddress.userPlaceOfResidence})
-        if (contactPlaceOfResidence !== undefined) {
-            hasPlaceOfResidence = true
-        }
+        Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.alertMessages.deleteAddress, this.state.translation), [
+            {
+                text: getTranslation(translations.generalLabels.noAnswer, this.props.translation), onPress: () => {console.log('Cancel pressed')}
+            },
+            {
+                text: getTranslation(translations.generalLabels.yesAnswer, this.props.translation), onPress: () => {
+                    let contactAddressesClone = _.cloneDeep(this.state.contact.addresses);
+                    contactAddressesClone.splice(index, 1);
 
-        this.setState(prevState => ({
-            contact: Object.assign({}, prevState.contact, {addresses: contactAddressesClone}),
-            hasPlaceOfResidence
-        }), () => {
-            console.log("After deleting the address: ", this.state.contact);
-        })
+                    let hasPlaceOfResidence = false
+                    let contactPlaceOfResidence = contactAddressesClone.find((e) => {return e.typeId === config.userResidenceAddress.userPlaceOfResidence})
+                    if (contactPlaceOfResidence !== undefined) {
+                        hasPlaceOfResidence = true
+                    }
+
+                    this.setState(prevState => ({
+                        contact: Object.assign({}, prevState.contact, {addresses: contactAddressesClone}),
+                        hasPlaceOfResidence
+                    }), () => {
+                        console.log("After deleting the address: ", this.state.contact);
+                    })
+                }
+            }
+        ]);
     };
 
     handleOnPressAddAdrress = () => {
