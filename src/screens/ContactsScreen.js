@@ -741,7 +741,8 @@ const style = StyleSheet.create({
     },
     containerContent: {
         flex: 1,
-        backgroundColor: 'rgba(217, 217, 217, 0.5)'
+        backgroundColor: styles.appBackground,
+        paddingBottom: 25
     },
     separatorComponentStyle: {
         height: 8
