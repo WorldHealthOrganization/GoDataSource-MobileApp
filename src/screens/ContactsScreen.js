@@ -26,6 +26,7 @@ import {getItemByIdRequest} from './../queries/cases'
 import Breadcrumb from './../components/Breadcrumb';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {pushNewEditScreen} from './../utils/screenTransitionFunctions';
+import RNExitApp from 'react-native-exit-app';
 
 const scrollAnim = new Animated.Value(0);
 const offsetAnim = new Animated.Value(0);
@@ -86,7 +87,7 @@ class ContactsScreen extends Component {
     }
 
     handleBackButtonClick() {
-        // this.props.navigator.goBack(null);
+        RNExitApp.exitApp();
         return true;
     }
 

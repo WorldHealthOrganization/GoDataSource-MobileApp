@@ -267,7 +267,7 @@ class ContactsSingleScreen extends Component {
             // }
             )
         }
-        return false;
+        return true;
     };
 
     // The render method should have at least business logic as possible,

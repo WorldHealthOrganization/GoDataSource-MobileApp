@@ -110,7 +110,7 @@ class FollowUpsSingleScreen extends Component {
             // }
             )
         }
-        return false;
+        return true;
     }
 
     // Please add here the react lifecycle methods that you need

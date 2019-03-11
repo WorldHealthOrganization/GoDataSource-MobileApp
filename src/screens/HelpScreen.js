@@ -18,6 +18,7 @@ import _ from 'lodash';
 import {calculateDimension, navigation, getTranslation, localSortHelpItem, filterItemsForEachPage} from './../utils/functions';
 import ViewHOC from './../components/ViewHOC';
 import translations from './../utils/translations'
+import RNExitApp from 'react-native-exit-app';
 
 const scrollAnim = new Animated.Value(0);
 const offsetAnim = new Animated.Value(0);
@@ -115,7 +116,8 @@ class HelpScreen extends Component {
     }
 
     handleBackButtonClick() {
-        return false;
+        RNExitApp.exitApp();
+        return true;
     }
 
     clampedScroll= Animated.diffClamp(
