@@ -113,7 +113,7 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
                     >
                         {
                             this.state.questions.map((item, index) => {
-                                return this.handleRenderItem(item, index)
+                                return this.handleRenderItem(item, index, this.state.questions.length)
                             })
                         }
                     </KeyboardAwareScrollView>
@@ -142,11 +142,12 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
         )
     };
 
-    handleRenderItem = (item, index) => {
+    handleRenderItem = (item, index, totalNumberOfQuestions) => {
         return (
             <QuestionCard
                 item={item}
                 index={index + 1}
+                totalNumberOfQuestions={totalNumberOfQuestions}
                 source={this.props.item}
                 isEditMode={this.props.isEditMode}
                 onChangeTextAnswer={this.props.onChangeTextAnswer}

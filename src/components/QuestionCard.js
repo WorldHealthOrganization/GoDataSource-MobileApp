@@ -36,7 +36,11 @@ class QuestionCard extends Component {
 
     shouldComponentUpdate(nextProps, nextState) {
         // console.log("Next source, old source: ", nextProps.source.questionnaireAnswers[nextProps.item.variable], this.props.source.questionnaireAnswers[this.props.item.variable]);
-        if (nextProps.isEditMode !== this.props.isEditMode || !isEqual(nextProps.source.questionnaireAnswers[nextProps.item.variable], this.props.source.questionnaireAnswers[this.props.item.variable])) {
+        if (nextProps.isEditMode !== this.props.isEditMode ||
+            (nextProps.source && nextProps.source.questionnaireAnswers && nextProps.source.questionnaireAnswers[nextProps.item.variable] &&
+                this.props.source && this.props.source.questionnaireAnswers && this.props.source.questionnaireAnswers[this.props.item.variable] &&
+                !isEqual(nextProps.source.questionnaireAnswers[nextProps.item.variable], this.props.source.questionnaireAnswers[this.props.item.variable])) ||
+            nextProps.totalNumberOfQuestions !== this.props.totalNumberOfQuestions) {
             // console.log("Next source, old source: ", nextProps.item.variable, nextProps.source.questionnaireAnswers[nextProps.item.variable], this.props.source.questionnaireAnswers[this.props.item.variable]);
             return true;
         }
@@ -48,7 +52,7 @@ class QuestionCard extends Component {
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
-        // console.log('Render stuff');
+        console.log('Render QuestionCard');
         return (
             <ElevatedView elevation={3} style={[this.props.style, style.container, {
                 marginHorizontal: calculateDimension(16, false, this.props.screenSize),
@@ -198,7 +202,7 @@ class QuestionCard extends Component {
                 );
             case 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_SINGLE_ANSWER':
                 const data = item.answers.map((e) => {return {value: getTranslation(e.label, this.props.translation), id: e.value}})
-                const dataWithNoneOption = _.cloneDeep(data)
+                const dataWithNoneOption = cloneDeep(data)
                 if (dataWithNoneOption !== undefined && dataWithNoneOption !== null && dataWithNoneOption.length > 0) {
                     const dataFormatKeys = Object.keys(dataWithNoneOption[0])
                     if (dataFormatKeys.length === 2) {

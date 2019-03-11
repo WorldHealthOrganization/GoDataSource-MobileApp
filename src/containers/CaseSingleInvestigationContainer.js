@@ -125,7 +125,7 @@ class CaseSingleInvestigationContainer extends PureComponent {
                     >
                         {
                             sortedQuestions.map((item, index) => {
-                                return this.handleRenderItem(item, index)
+                                return this.handleRenderItem(item, index, sortedQuestions.length)
                             })
                         }
                     </KeyboardAwareScrollView>
@@ -154,12 +154,13 @@ class CaseSingleInvestigationContainer extends PureComponent {
         )
     };
 
-    handleRenderItem = (item, index) => {
+    handleRenderItem = (item, index, totalNumberOfQuestions) => {
         return (
             <QuestionCard
                 item={item}
                 isEditMode={this.props.isEditMode}
                 index={index + 1}
+                totalNumberOfQuestions={totalNumberOfQuestions}
                 source={this.props.item}
                 onChangeTextAnswer={this.props.onChangeTextAnswer}
                 onChangeSingleSelection={this.props.onChangeSingleSelection}
