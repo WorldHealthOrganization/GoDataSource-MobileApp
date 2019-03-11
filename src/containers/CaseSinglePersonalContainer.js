@@ -4,7 +4,16 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {PureComponent} from 'react';
-import {View, Text, StyleSheet, Alert, ScrollView, TouchableWithoutFeedback, Keyboard} from 'react-native';
+import {
+    View,
+    Text,
+    StyleSheet,
+    Alert,
+    ScrollView,
+    TouchableWithoutFeedback,
+    Keyboard,
+    findNodeHandle
+} from 'react-native';
 import {calculateDimension, getTranslation} from './../utils/functions';
 import config from './../utils/config';
 import {connect} from "react-redux";
@@ -95,6 +104,10 @@ class CaseSinglePersonalContainer extends PureComponent {
                         style={style.containerScrollView}
                         contentContainerStyle={[style.contentContainerStyle, {paddingBottom: this.props.screenSize.height < 600 ? 70 : 20}]}
                         keyboardShouldPersistTaps={'always'}
+                        extraHeight={20 + 81 + 50 + 70}
+                        innerRef={ref => {
+                            this.scrollCasesSinglePersonal = ref
+                        }}
                     >
                         {
                             config.caseSingleScreen.personal.map((item) => {
@@ -227,6 +240,7 @@ class CaseSinglePersonalContainer extends PureComponent {
                 onChangeDropDown={this.props.onChangeDropDown}
                 onChangeTextSwitchSelector={this.props.onChangeTextSwitchSelector}
                 onDeletePress={this.props.onDeletePress}
+                onFocus={this.handleOnFocus}
             />
         )
     };
@@ -314,6 +328,15 @@ class CaseSinglePersonalContainer extends PureComponent {
                 }
             ])
         }
+    }
+
+    handleOnFocus = (event) => {
+        this.scrollToInput(findNodeHandle(event.target))
+    };
+
+    scrollToInput (reactNode) {
+        // Add a 'scroll' ref to your ScrollView
+        this.scrollCasesSinglePersonal.props.scrollToFocusedInput(reactNode)
     }
 }
 

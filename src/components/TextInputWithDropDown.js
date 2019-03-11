@@ -16,9 +16,23 @@ class TextInputWithDropDown extends Component {
     // This will be a dumb component, so it's best not to put any business logic in it
     constructor(props) {
         super(props);
+
+        this.state={
+            noneValueSelectedInDropdown: false
+        }
+
+        this.changeDropdown = this.changeDropdown.bind(this)
     }
 
     // Please add here the react lifecycle methods that you need
+    componentDidUpdate(prevProps){
+        if (this.props.isEditMode !== prevProps.isEditMode && prevProps.isEditMode === false){
+            this.setState({
+                noneValueSelectedInDropdown: false
+            })
+        }
+    }
+
     shouldComponentUpdate () {
         return true
     }
@@ -35,24 +49,34 @@ class TextInputWithDropDown extends Component {
     }
 
     editInput() {
-        let smth = this.props.value[config[this.props.dropDownData][this.props.selectedDropDownItemIndex].value];
-        if (smth !== undefined && smth !== null){
-            smth = smth.toString();
-        } else {
-            smth = ''
+        let tooltip = getTooltip(this.props.label, this.props.translation)
+
+        //  get Value
+        const value = this.props.value[config[this.props.dropDownData][this.props.selectedDropDownItemIndex].value];
+        let stringValue = ''
+        if (value !== undefined && value !== null){
+            stringValue = value.toString();
         }
 
+        //  get DropDown data
         let dropDownData = config[this.props.dropDownData].map((e) => {
             return {label: getTranslation(e.label, this.props.translation), value: e.value}
         })
-        let tooltip = getTooltip(this.props.label, this.props.translation)
+        dropDownData.unshift({ label: getTranslation(translations.generalLabels.noneLabel, this.props.translation), value: null})
+
+        //  get labels
+        const textLabel = getTranslation(config[this.props.dropDownData][this.props.selectedDropDownItemIndex].label, this.props.translation)
+        const dropdownLabel =  `${getTranslation(translations.ageUnitOfMeasureDropDown.yearsLabel, this.props.translation)} / ${getTranslation(translations.ageUnitOfMeasureDropDown.monthsLabel, this.props.translation)}`
+
         return (
             <View style={[{width: '100%'},this.props.style]}>
                 <View style={{flexDirection: 'row',  justifyContent: 'space-between'}}>
-                    <View style={{width: '45%'}}>
+                {
+                    this.state.noneValueSelectedInDropdown === false ? (
+                        <View style={{width: '45%'}}>
                         <TextField
-                            label={this.props.isRequired ? getTranslation(this.props.label, this.props.translation) + ' * ' : getTranslation(this.props.label, this.props.translation)}
-                            value={smth}
+                            label={this.props.isRequired ? textLabel + ' * ' : textLabel}
+                            value={stringValue}
                             onChangeText={(value) => this.handleOnChangeText(value)}
                             textColor='rgb(0,0,0)'
                             fontSize={15}
@@ -69,39 +93,46 @@ class TextInputWithDropDown extends Component {
                             onSubmitEditing={this.props.onSubmitEditing}
                         />
                     </View>
-                    <View style={{width: '45%'}}>
-                        <Dropdown
-                            label={getTranslation(config[this.props.dropDownData][this.props.selectedDropDownItemIndex].label, this.props.translation)}
-                            data={dropDownData}
-                            onChangeText={(value) => this.changeDropdown(value)}
-                            value={config[this.props.dropDownData][this.props.selectedDropDownItemIndex].value || ''}
-                            fontSize={15}
-                            labelFontSize={12.5}
-                            selectedItemColor={'rgb(255,60,56)'}
-                            dropdownPosition={1}
-                            dropdownMargins={{min: 4, max: 8}}
+                    ) : null
+                }
+                <View style={{width: this.state.noneValueSelectedInDropdown === true ? '100%' : '45%'}}>
+                    <Dropdown
+                        label={dropdownLabel}
+                        data={dropDownData}
+                        onChangeText={(value) => this.changeDropdown(value)}
+                        value={
+                            this.state.noneValueSelectedInDropdown === true 
+                                ? 'None'
+                                : config[this.props.dropDownData][this.props.selectedDropDownItemIndex].value || ''
+                        }
+                        fontSize={15}
+                        labelFontSize={12.5}
+                        selectedItemColor={'rgb(255,60,56)'}
+                        dropdownPosition={1}
+                        dropdownMargins={{min: 4, max: 8}}
+                    />
+                </View>
+                {
+                    tooltip.hasTooltip === true ? (
+                        <TooltipComponent
+                            tooltipMessage={tooltip.tooltipMessage}
                         />
-                    </View>
-                    {
-                        tooltip.hasTooltip === true ? (
-                            <TooltipComponent
-                                tooltipMessage={tooltip.tooltipMessage}
-                            />
-                        ) : null
-                    }
+                    ) : null
+                }
                 </View>
             </View>
         );
     }
 
     viewInput() {
-        let smth = this.props.value[config[this.props.dropDownData][this.props.selectedDropDownItemIndex].value];
-        if (smth !== undefined && smth !== null){
-            smth = smth.toString();
-        } else {
-            smth = ''
-        }
         let tooltip = getTooltip(this.props.label, this.props.translation)
+
+        const value = this.props.value[config[this.props.dropDownData][this.props.selectedDropDownItemIndex].value];
+        let stringValue = ''
+        if (value !== undefined && value !== null){
+            stringValue = value.toString();
+        }
+        
         return (
             <View style={[{width: '100%'},this.props.style]}>
                 <View style={{flexDirection: 'row',  justifyContent: 'space-between'}}>
@@ -122,7 +153,7 @@ class TextInputWithDropDown extends Component {
                             textAlign: 'left',
                             color: 'rgb(60,60,60)',
                         }}>
-                            {smth !== '' ? smth + ' ' + config[this.props.dropDownData][this.props.selectedDropDownItemIndex].value || '' : ''}
+                            {stringValue !== '' ? stringValue + ' ' + config[this.props.dropDownData][this.props.selectedDropDownItemIndex].value || '' : ''}
                         </Text>
                     </View>
                     {
@@ -137,10 +168,24 @@ class TextInputWithDropDown extends Component {
         );
     }
 
+    // Please write here all the methods that are not react native lifecycle methods
     changeDropdown(selectedValue) {
-        let selectedValueIndex = config[this.props.dropDownData].map((e) => {return e.value}).indexOf(selectedValue)
-        console.log ('TextInputWithDropDown changeDropdown', selectedValueIndex, this.props.selectedItemIndexForAgeUnitOfMeasureDropDown)
-        this.props.onChangeDropDown(selectedValueIndex, this.props.selectedItemIndexForAgeUnitOfMeasureDropDown)
+        if (selectedValue !== null){
+            this.setState({
+                noneValueSelectedInDropdown: false
+            }, () => {
+                let selectedValueIndex = config[this.props.dropDownData].map((e) => {return e.value}).indexOf(selectedValue)
+                console.log ('TextInputWithDropDown changeDropdown', selectedValueIndex, this.props.selectedItemIndexForAgeUnitOfMeasureDropDown)
+                this.props.onChangeDropDown(selectedValueIndex, this.props.selectedItemIndexForAgeUnitOfMeasureDropDown)
+            });
+        } else {
+            this.setState({
+                noneValueSelectedInDropdown: true
+            }, () => {
+                this.handleOnChangeText("")
+            })
+        }
+       
     }
 
     handleOnChangeText = (value) => {
@@ -151,8 +196,6 @@ class TextInputWithDropDown extends Component {
             this.props.selectedItemIndexForAgeUnitOfMeasureDropDown
         )
     }
-
-    // Please write here all the methods that are not react native lifecycle methods
 }
 
 // Create style outside the class, or for components that will be used by other components (buttons),

@@ -143,96 +143,113 @@ class QuestionCard extends Component {
         // }
         // console.log('Itemm: ', item);
 
-        if (item.inactive !== undefined && item.inactive !== null && item.inactive === false){
-            switch(item.answerType) {
-                case 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_FREE_TEXT':
-                    return (
-                        <TextInput
-                            id={item.variable}
-                            label={translations.questionCardLabels.textInputLabel}
-                            labelValue={item.text}
-                            value={questionAnswers}
-                            isEditMode={this.props.isEditMode}
-                            isRequired={item.required}
-                            onChange={this.props.onChangeTextAnswer}
-                            multiline={true}
-                            style={{width: width, marginHorizontal: marginHorizontal}}
-                            translation={this.props.translation}
-                            screenSize={this.props.screenSize}
-                        />
-                    );
-                case 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_NUMERIC':
-                    return (
-                        <TextInput
-                            id={item.variable}
-                            label={translations.questionCardLabels.textInputLabel}
-                            labelValue={item.text}
-                            value={questionAnswers}
-                            isEditMode={this.props.isEditMode}
-                            isRequired={item.required}
-                            onChange={this.props.onChangeTextAnswer}
-                            multiline={true}
-                            keyboardType={Platform.OS === 'ios' ? 'number-pad' : 'numeric'}
-                            style={{width: width, marginHorizontal: marginHorizontal}}
-                            translation={this.props.translation}
-                            screenSize={this.props.screenSize}
-                        />
-                    );
-                case 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_DATE_TIME':
-                    return (
-                        <DatePicker
-                            id={item.variable}
-                            label={translations.questionCardLabels.datePickerLabel}
-                            value={questionAnswers}
-                            isEditMode={this.props.isEditMode}
-                            isRequired={item.required}
-                            onChange={this.props.onChangeDateAnswer}
-                            style={{width: width, marginHorizontal: marginHorizontal}}
-                            translation={this.props.translation}
-                        />
-                    );
-                case 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_SINGLE_ANSWER':
-                    return (
-                        <DropdownInput
-                            id={item.variable}
-                            label={translations.questionCardLabels.dropDownInputLabel}
-                            labelValue={item.text}
-                            value={questionAnswers}
-                            data={item.answers.map((e) => {return {value: getTranslation(e.label, this.props.translation), id: e.value}})}
-                            isEditMode={this.props.isEditMode}
-                            isRequired={item.required}
-                            onChange={this.props.onChangeSingleSelection}
-                            style={{width: width, marginHorizontal: marginHorizontal}}
-                            translation={this.props.translation}
-                        />
-                    );
-                case 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_MULTIPLE_ANSWERS':
-                    return (
-                        <DropDown
-                            key={item.variable}
-                            id={item.variable}
-                            label={translations.questionCardLabels.dropDownLabel}
-                            labelValue={item.text}
-                            value={questionAnswers}
-                            data={item.answers.map((e) => {return {label: getTranslation(e.label, this.props.translation), value: e.value}})}
-                            isEditMode={this.props.isEditMode}
-                            isRequired={item.required}
-                            onChange={this.props.onChangeMultipleSelection}
-                            style={{width: width, marginHorizontal: marginHorizontal}}
-                            dropDownStyle={{width: width, alignSelf: 'center'}}
-                            showDropdown={this.state.showDropdown}
-                        />
-                    );
-                default:
-                    return(
-                        item.answerType !== undefined ? (
-                            <View>
-                                <Text>{"TODO: item type: " + item.answerType + " is not implemented yet"}</Text>
-                            </View>
-                        ) : null
-                    )
-            }
+        switch(item.answerType) {
+            case 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_FREE_TEXT':
+                return (
+                    <TextInput
+                        id={item.variable}
+                        label={translations.questionCardLabels.textInputLabel}
+                        labelValue={item.text}
+                        value={questionAnswers}
+                        isEditMode={this.props.isEditMode}
+                        isRequired={item.required}
+                        onChange={this.props.onChangeTextAnswer}
+                        multiline={true}
+                        style={{width: width, marginHorizontal: marginHorizontal}}
+                        translation={this.props.translation}
+                        screenSize={this.props.screenSize}
+                        onFocus={this.props.onFocus}
+                    />
+                );
+            case 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_NUMERIC':
+                return (
+                    <TextInput
+                        id={item.variable}
+                        label={translations.questionCardLabels.textInputLabel}
+                        labelValue={item.text}
+                        value={questionAnswers}
+                        isEditMode={this.props.isEditMode}
+                        isRequired={item.required}
+                        onChange={this.props.onChangeTextAnswer}
+                        multiline={true}
+                        keyboardType={Platform.OS === 'ios' ? 'number-pad' : 'numeric'}
+                        style={{width: width, marginHorizontal: marginHorizontal}}
+                        translation={this.props.translation}
+                        screenSize={this.props.screenSize}
+                        onFocus={this.props.onFocus}
+                    />
+                );
+            case 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_DATE_TIME':
+                return (
+                    <DatePicker
+                        id={item.variable}
+                        label={translations.questionCardLabels.datePickerLabel}
+                        value={questionAnswers}
+                        isEditMode={this.props.isEditMode}
+                        isRequired={item.required}
+                        onChange={this.props.onChangeDateAnswer}
+                        style={{width: width, marginHorizontal: marginHorizontal}}
+                        translation={this.props.translation}
+                    />
+                );
+            case 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_SINGLE_ANSWER':
+                const data = item.answers.map((e) => {return {value: getTranslation(e.label, this.props.translation), id: e.value}})
+                const dataWithNoneOption = _.cloneDeep(data)
+                if (dataWithNoneOption !== undefined && dataWithNoneOption !== null && dataWithNoneOption.length > 0) {
+                    const dataFormatKeys = Object.keys(dataWithNoneOption[0])
+                    if (dataFormatKeys.length === 2) {
+                        const noneLabel = getTranslation(translations.generalLabels.noneLabel, this.props.translation)
+                        if (dataFormatKeys[0] === 'label' && dataFormatKeys[1] === 'value'){
+                            noneData = { label: noneLabel, value: null }
+                            dataWithNoneOption.unshift(noneData)
+                        } else if (dataFormatKeys[0] === 'value' && dataFormatKeys[1] === 'id'){
+                            noneData = { value: noneLabel, id: null }
+                            dataWithNoneOption.unshift(noneData)
+                        }
+                    }
+                }
+
+                return (
+                    <DropdownInput
+                        id={item.variable}
+                        label={translations.questionCardLabels.dropDownInputLabel}
+                        labelValue={item.text}
+                        value={questionAnswers}
+                        data={dataWithNoneOption}
+                        isEditMode={this.props.isEditMode}
+                        isRequired={item.required}
+                        onChange={this.props.onChangeSingleSelection}
+                        style={{width: width, marginHorizontal: marginHorizontal}}
+                        translation={this.props.translation}
+                    />
+                );
+            case 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_MULTIPLE_ANSWERS':
+                return (
+                    <DropDown
+                        key={item.variable}
+                        id={item.variable}
+                        label={translations.questionCardLabels.dropDownLabel}
+                        labelValue={item.text}
+                        value={questionAnswers}
+                        data={item.answers.map((e) => {return {label: getTranslation(e.label, this.props.translation), value: e.value}})}
+                        isEditMode={this.props.isEditMode}
+                        isRequired={item.required}
+                        onChange={this.props.onChangeMultipleSelection}
+                        style={{width: width, marginHorizontal: marginHorizontal}}
+                        dropDownStyle={{width: width, alignSelf: 'center'}}
+                        showDropdown={this.state.showDropdown}
+                    />
+                );
+            default:
+                return(
+                    item.answerType !== undefined ? (
+                        <View>
+                            <Text>{"TODO: item type: " + item.answerType + " is not implemented yet"}</Text>
+                        </View>
+                    ) : null
+                )
         }
+      
     };
 }
 
