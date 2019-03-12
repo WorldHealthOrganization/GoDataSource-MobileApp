@@ -1306,7 +1306,7 @@ class CaseSingleScreen extends Component {
                                             if (!addressesClone[objectTypeOrIndex].geoLocation.coordinates) {
                                                 addressesClone[objectTypeOrIndex].geoLocation.coordinates = [];
                                             }
-                                            addressesClone[objectTypeOrIndex].geoLocation.coordinates = [0, 0];
+                                            addressesClone[objectTypeOrIndex].geoLocation.coordinates = [null, null];
                                             addressesClone[objectTypeOrIndex].geoLocationAccurate = false;
                                             this.setState(
                                                 (prevState) => ({
@@ -1341,7 +1341,7 @@ class CaseSingleScreen extends Component {
                 if (!addressesClone[objectTypeOrIndex].geoLocation.coordinates) {
                     addressesClone[objectTypeOrIndex].geoLocation.coordinates = [];
                 }
-                addressesClone[objectTypeOrIndex].geoLocation.coordinates = [0, 0];
+                addressesClone[objectTypeOrIndex].geoLocation.coordinates = [null, null];
                 addressesClone[objectTypeOrIndex].geoLocationAccurate = value;
                 this.setState(
                     (prevState) => ({
