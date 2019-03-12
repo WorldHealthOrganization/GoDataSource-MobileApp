@@ -40,7 +40,7 @@ class DropDownSectioned extends Component {
     // Please write here all the methods that are not react native lifecycle methods
     editInput() {
         let tooltip = getTooltip(this.props.label, this.props.translation);
-        console.log('Value from DropDownSectioned: ', this.props.value);
+        // console.log('Value from DropDownSectioned: ', this.props.value);
         return (
             <View style={[this.props.style, {flexDirection: 'row'}]}>
                 <View style = {{flex: 1}}>

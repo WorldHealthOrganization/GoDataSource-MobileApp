@@ -42,6 +42,13 @@ class ContactsSingleCalendar extends Component {
         })
     }
 
+    shouldComponentUpdate(nextProps, nextState) {
+        if (nextProps.activeIndex === 3) {
+            return true;
+        }
+        return false;
+    }
+
     // The render method should have at least business logic as possible,
     // because this will be called whenever there is a new setState call
     // and can slow down the app
@@ -51,6 +58,8 @@ class ContactsSingleCalendar extends Component {
                 <LoaderScreen overlay={true} backgroundColor={'white'}/>
             )
         }
+
+        // console.log('ContactsSingleContainer render Calendar');
 
         let followUps = this.computeFollowUps();
         // console.log("### ContactsSingleCalendar: ", followUps);

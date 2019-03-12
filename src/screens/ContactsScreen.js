@@ -416,7 +416,8 @@ class ContactsScreen extends Component {
                     date: new Date(),
                     outbreakId: this.props.user.activeOutbreakId,
                     lostToFollowUp: false,
-                    address: contactPlaceOfResidence[0] || null
+                    address: contactPlaceOfResidence[0] || null,
+                    statusId: config.followUpStatuses.notPerformed
                 },
                 contact: contact || item,
                 filter: this.state.filter,
