@@ -104,10 +104,14 @@ class ViewHOC extends Component {
                                     }
                                 </View>
                         </Modal>
-                    <KeyboardAccessoryNavigation
-                        nextHidden={true}
-                        previousHidden={true}
-                    />
+                    {
+                        Platform.OS === 'ios' ? (
+                            <KeyboardAccessoryNavigation
+                                nextHidden={true}
+                                previousHidden={true}
+                            />
+                        ) : (null)
+                    }
                 </View>
             )
     }
