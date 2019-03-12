@@ -191,10 +191,22 @@ class FollowUpsScreen extends Component {
     };
 
     handleBackButtonClick() {
-        RNExitApp.exitApp();
+        Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.alertMessages.androidBackButtonMsg, this.props.translation), [
+            {
+                text: getTranslation(translations.alertMessages.yesButtonLabel, this.props.translation), onPress: () => {
+                    RNExitApp.exitApp();
+                    return true;
+                }
+            },
+            {
+                text: getTranslation(translations.alertMessages.cancelButtonLabel, this.props.translation), onPress: () => {
+                    return true;
+                }
+            }
+        ])
         return true;
     };
-    
+
     clampedScroll= Animated.diffClamp(
         Animated.add(
             scrollAnim.interpolate({
