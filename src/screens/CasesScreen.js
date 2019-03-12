@@ -28,6 +28,7 @@ import translations from './../utils/translations'
 import {getItemByIdRequest} from './../queries/cases'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {pushNewEditScreen} from './../utils/screenTransitionFunctions';
+import RNExitApp from 'react-native-exit-app';
 
 let height = Dimensions.get('window').height;
 let width = Dimensions.get('window').width;
@@ -86,7 +87,19 @@ class CasesScreen extends Component {
     }
 
     handleBackButtonClick() {
-        // this.props.navigator.goBack(null);
+        Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.alertMessages.androidBackButtonMsg, this.props.translation), [
+            {
+                text: getTranslation(translations.alertMessages.yesButtonLabel, this.props.translation), onPress: () => {
+                    RNExitApp.exitApp();
+                    return true;
+                }
+            },
+            {
+                text: getTranslation(translations.alertMessages.cancelButtonLabel, this.props.translation), onPress: () => {
+                    return true;
+                }
+            }
+        ])
         return true;
     }
 

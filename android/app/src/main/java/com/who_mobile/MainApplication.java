@@ -14,6 +14,7 @@ import com.rnziparchive.RNZipArchivePackage;
 import com.RNFetchBlob.RNFetchBlobPackage;
 import com.reactnativenavigation.NavigationApplication;
 import com.facebook.react.ReactPackage;
+import com.github.wumke.RNExitApp.RNExitAppPackage;
 import com.learnium.RNDeviceInfo.RNDeviceInfo;
 import com.facebook.react.shell.MainReactPackage;
 import com.facebook.soloader.SoLoader;
@@ -54,6 +55,7 @@ public class MainApplication extends NavigationApplication {
                  new RNDeviceInfo(),
                  new RNSqlite2Package(),
                  new RNFSPackage(),
+                 new RNExitAppPackage(),
                  new ReactNativeDocumentPicker(),
                  new ParseReceiverPackage(),
                  new RandomBytesPackage()

@@ -40,6 +40,7 @@ import translations from './../utils/translations'
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import {getItemByIdRequest} from './../queries/cases';
 import {pushNewEditScreen} from './../utils/screenTransitionFunctions';
+import RNExitApp from 'react-native-exit-app';
 
 const scrollAnim = new Animated.Value(0);
 const offsetAnim = new Animated.Value(0);
@@ -190,10 +191,22 @@ class FollowUpsScreen extends Component {
     };
 
     handleBackButtonClick() {
-        // this.props.navigator.goBack(null);
+        Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.alertMessages.androidBackButtonMsg, this.props.translation), [
+            {
+                text: getTranslation(translations.alertMessages.yesButtonLabel, this.props.translation), onPress: () => {
+                    RNExitApp.exitApp();
+                    return true;
+                }
+            },
+            {
+                text: getTranslation(translations.alertMessages.cancelButtonLabel, this.props.translation), onPress: () => {
+                    return true;
+                }
+            }
+        ])
         return true;
     };
-    
+
     clampedScroll= Animated.diffClamp(
         Animated.add(
             scrollAnim.interpolate({

@@ -52,7 +52,8 @@ class HelpSingleScreen extends Component {
     }
     
     handleBackButtonClick() {
-        return false;
+        this.props.navigator.pop()
+        return true;
     };
 
     // Please add here the react lifecycle methods that you need
