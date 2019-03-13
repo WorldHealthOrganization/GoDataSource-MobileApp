@@ -1044,7 +1044,7 @@ class CaseSingleScreen extends Component {
         let requiredFields = [];
         for (let i = 0; i< this.props.caseInvestigationQuestions.length; i++) {
             let questionnaireAnswer = this.state.case.questionnaireAnswers[this.props.caseInvestigationQuestions[i].variable];
-            if (this.props.caseInvestigationQuestions[i].required){
+            if (this.props.caseInvestigationQuestions[i].required && this.props.caseInvestigationQuestions[i].inactive === false){
                 //multiple answer question
                 if(Array.isArray(questionnaireAnswer)){
                     //if is empty
