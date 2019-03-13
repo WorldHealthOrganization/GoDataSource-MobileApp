@@ -145,6 +145,7 @@ export function getCasesForOutbreakIdRequest (outbreakId, filter, token, callbac
                         $lte: `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE_${outbreakId}\uffff`,
                     },
                     deleted: false,
+                    classification: {$ne: 'LNG_REFERENCE_DATA_CATEGORY_CASE_CLASSIFICATION_NOT_A_CASE_DISCARDED'}
                 }
             })
                 .then((resultFind) => {
