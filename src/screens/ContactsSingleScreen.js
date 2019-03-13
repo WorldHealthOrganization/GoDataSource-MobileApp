@@ -828,7 +828,7 @@ class ContactsSingleScreen extends Component {
                         if (!addressesClone[objectTypeOrIndex].geoLocation.coordinates) {
                             addressesClone[objectTypeOrIndex].geoLocation.coordinates = [];
                         }
-                        addressesClone[objectTypeOrIndex].geoLocation.coordinates = [value ? position.coords.longitude : 0, value ? position.coords.latitude : 0];
+                        addressesClone[objectTypeOrIndex].geoLocation.coordinates = [value ? position.coords.longitude : null, value ? position.coords.latitude : null];
                         addressesClone[objectTypeOrIndex].geoLocationAccurate = value;
                         this.setState(
                             (prevState) => ({
@@ -865,7 +865,7 @@ class ContactsSingleScreen extends Component {
                 if (!addressesClone[objectTypeOrIndex].geoLocation.coordinates) {
                     addressesClone[objectTypeOrIndex].geoLocation.coordinates = [];
                 }
-                addressesClone[objectTypeOrIndex].geoLocation.coordinates = [0, 0];
+                addressesClone[objectTypeOrIndex].geoLocation.coordinates = [null, null];
                 addressesClone[objectTypeOrIndex].geoLocationAccurate = value;
                 this.setState(
                     (prevState) => ({
