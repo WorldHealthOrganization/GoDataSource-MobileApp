@@ -183,7 +183,7 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
         if (this.state.questions && Array.isArray(this.state.questions) && this.state.questions.length > 0) {
             for (let i = 0; i < this.state.questions.length; i++) {
                 if (this.state.questions[i].variable && this.props.item) {
-                    if (this.state.questions[i].required === true) {
+                    if (this.state.questions[i].required === true && this.state.questions[i].inactive === false) {
                         if (!this.props.item.questionnaireAnswers || !this.props.item.questionnaireAnswers[this.state.questions[i].variable]) {
                             requiredQuestions.push(getTranslation(this.state.questions[i].text, this.props.translation));
                             // return false;
