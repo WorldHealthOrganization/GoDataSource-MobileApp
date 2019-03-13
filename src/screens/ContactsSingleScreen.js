@@ -683,11 +683,11 @@ class ContactsSingleScreen extends Component {
 
     handleOnChangeTextSwitchSelector = (index, stateValue) => {
         if (stateValue === 'selectedItemIndexForAgeUnitOfMeasureDropDown') {
-            let ageClone = Object.assign({}, this.state.contact.age)
+            let ageClone = Object.assign({}, this.state.contact.age);
             if (!this.props.isNew) {
                 if (ageClone.years === 0 && ageClone.months !== 0) {
                     ageClone.years = ageClone.months
-                } else if (ageClone.monthsyears === 0 && ageClone.years !== 0){
+                } else if (ageClone.months === 0 && ageClone.years !== 0){
                     ageClone.months = ageClone.years
                 }
             }
