@@ -560,7 +560,7 @@ const caseSingleScreen = {
                     label: translations.caseSingleScreen.dateOfOnset,
                     value: '',
                     type: "DatePicker",
-                    isRequired: false,
+                    isRequired: true,
                     isEditMode: false,
                     format: 'YYYY-MM-dd',
                     objectType: 'Case'

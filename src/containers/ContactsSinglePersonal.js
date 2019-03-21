@@ -79,7 +79,7 @@ class ContactsSinglePersonal extends PureComponent {
                         extraHeight={20 + 81 + 50 + 70}
                         innerRef={ref => {
                             this.scrollContactsSinglePersonal = ref
-                        }}>
+                        }}
                     >
                         <View style={style.container}>
                             {
