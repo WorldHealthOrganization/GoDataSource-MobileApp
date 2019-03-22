@@ -193,14 +193,14 @@ class FollowUpsSingleGetInfoContainer extends PureComponent {
 
     computeDataForFollowUpSingleScreenDropdownInput = (item) => {
         if (item.id === 'statusId') {
-            return _.filter(this.props.referenceData, (o) => {
-                return o.active === true && o.categoryId.includes("LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE")
-            }).map((o) => {return {label: getTranslation(o.value, this.props.translation), value: o.value}})
+            return _.filter(this.props.referenceData, (o) => {return o.active === true && o.categoryId.includes("LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE")})
+                    .sort((a,b) => { return a.order - b.order; })
+                    .map((o) => {return {label: getTranslation(o.value, this.props.translation), value: o.value}})
         }
         if (item.id === 'typeId') {
-            return _.filter(this.props.referenceData, (o) => {
-                return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_ADDRESS_TYPE'
-            }).map((o) => {return {value: getTranslation(o.value, this.props.translation), id: o.value}})
+            return _.filter(this.props.referenceData, (o) => {return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_ADDRESS_TYPE'})
+                    .sort((a,b) => { return a.order - b.order; })
+                    .map((o) => {return {value: getTranslation(o.value, this.props.translation), id: o.value}})
         }
     };
 
@@ -216,63 +216,63 @@ class FollowUpsSingleGetInfoContainer extends PureComponent {
         }
 
         if (item.id === 'riskLevel') {
-            return _.filter(this.props.referenceData, (o) => {
-                return o.active === true && o.categoryId.includes("RISK_LEVEL")
-            }).map((o) => {return {value: getTranslation(o.value, this.props.translation), id: o.value}})
+            return _.filter(this.props.referenceData, (o) => {return o.active === true && o.categoryId.includes("RISK_LEVEL")})
+                    .sort((a,b) => { return a.order - b.order; })
+                    .map((o) => {return {value: getTranslation(o.value, this.props.translation), id: o.value}})
         }
 
         if (item.id === 'classification') {
-            return _.filter(this.props.referenceData, (o) => {
-                return o.active === true && o.categoryId.includes("CASE_CLASSIFICATION")
-            }).map((o) => {return {label: getTranslation(o.value, this.props.translation), value: o.value}})
+            return _.filter(this.props.referenceData, (o) => {return o.active === true && o.categoryId.includes("CASE_CLASSIFICATION")})
+                    .sort((a,b) => { return a.order - b.order; })
+                    .map((o) => {return {label: getTranslation(o.value, this.props.translation), value: o.value}})
         }
 
         if (item.id === 'gender') {
-            return _.filter(this.props.referenceData, (o) => {
-                return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_GENDER'
-            }).map((o) => {return {label: getTranslation(o.value, this.props.translation), value: o.value}})
+            return _.filter(this.props.referenceData, (o) => {return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_GENDER'})
+                    .sort((a,b) => { return a.order - b.order; })
+                    .map((o) => {return {label: getTranslation(o.value, this.props.translation), value: o.value}})
         }
 
         if (item.id === 'typeId') {
-            return _.filter(this.props.referenceData, (o) => {
-                return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_ADDRESS_TYPE'
-            }).map((o) => {return {label: getTranslation(o.value, this.props.translation), value: o.value}})
+            return _.filter(this.props.referenceData, (o) => {return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_ADDRESS_TYPE'})
+                    .sort((a,b) => { return a.order - b.order; })
+                    .map((o) => {return {label: getTranslation(o.value, this.props.translation), value: o.value}})
         }
 
         if (item.id === 'labName') {
-            return _.filter(this.props.referenceData, (o) => {
-                return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_LAB_NAME'
-            }).map((o) => {return {value: getTranslation(o.value, this.props.translation), id: o.value}})
+            return _.filter(this.props.referenceData, (o) => {return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_LAB_NAME'})
+                    .sort((a,b) => { return a.order - b.order; })
+                    .map((o) => {return {value: getTranslation(o.value, this.props.translation), id: o.value}})
         }
 
         if (item.id === 'sampleType') {
-            return _.filter(this.props.referenceData, (o) => {
-                return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_TYPE_OF_SAMPLE'
-            }).map((o) => {return {value: getTranslation(o.value, this.props.translation), id: o.value}})
+            return _.filter(this.props.referenceData, (o) => {return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_TYPE_OF_SAMPLE'})
+                    .sort((a,b) => { return a.order - b.order; })
+                    .map((o) => {return {value: getTranslation(o.value, this.props.translation), id: o.value}})
         }
 
         if (item.id === 'testType') {
-            return _.filter(this.props.referenceData, (o) => {
-                return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_TYPE_OF_LAB_TEST'
-            }).map((o) => {return {value: getTranslation(o.value, this.props.translation), id: o.value}})
+            return _.filter(this.props.referenceData, (o) => {return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_TYPE_OF_LAB_TEST'})
+                    .sort((a,b) => { return a.order - b.order; })
+                    .map((o) => {return {value: getTranslation(o.value, this.props.translation), id: o.value}})
         }
 
         if (item.id === 'result') {
-            return _.filter(this.props.referenceData, (o) => {
-                return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_LAB_TEST_RESULT'
-            }).map((o) => {return {value: getTranslation(o.value, this.props.translation), id: o.value}})
+            return _.filter(this.props.referenceData, (o) => {return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_LAB_TEST_RESULT'})
+                    .sort((a,b) => { return a.order - b.order; })
+                    .map((o) => {return {value: getTranslation(o.value, this.props.translation), id: o.value}})
         }
 
         if (item.id === 'status') {
-            return _.filter(this.props.referenceData, (o) => {
-                return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_LAB_TEST_RESULT_STATUS'
-            }).map((o) => {return {value: getTranslation(o.value, this.props.translation), id: o.value}})
+            return _.filter(this.props.referenceData, (o) => {return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_LAB_TEST_RESULT_STATUS'})
+                    .sort((a,b) => { return a.order - b.order; })
+                    .map((o) => {return {value: getTranslation(o.value, this.props.translation), id: o.value}})
         }
 
         if (item.id === 'categories') {
-            return _.filter(this.props.helpCategory, (o) => {
-                return o.deleted === false && o.fileType === 'helpCategory.json'
-            }).map((o) => {return {label: getTranslation(o.name, this.props.translation), value: o._id}})
+            return _.filter(this.props.helpCategory, (o) => {return o.deleted === false && o.fileType === 'helpCategory.json'})
+                    .sort((a,b) => { return a.order - b.order; })
+                    .map((o) => {return {label: getTranslation(o.name, this.props.translation), value: o._id}})
         }
 
         return [];
