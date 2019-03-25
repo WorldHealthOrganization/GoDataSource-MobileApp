@@ -1174,6 +1174,32 @@ export function mapLocations(locationList, parentLocationId) {
 
 //recursively functions for mapping questionCard questions (followUps and Cases)
 export function extractAllQuestions (questions, item) {
+    if (questions && Array.isArray(questions) && questions.length > 0) {
+        for (let i=0; i<questions.length; i++) {
+            if (questions[i] && questions[i].answerType && (questions[i].answerType === "LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_SINGLE_ANSWER" || questions[i].answerType === "LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_MULTIPLE_ANSWERS") && questions[i].answers && Array.isArray(questions[i].answers) && questions[i].answers.length > 0) {
+                for (let j = 0; j < questions[i].answers.length; j++) {
+                    // First check for single select since it has only a value
+                    if (questions[i].answerType === "LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_SINGLE_ANSWER" ) {
+                        if (item && item.questionnaireAnswers && item.questionnaireAnswers[questions[i].variable] === questions[i].answers[j].value && questions[i].answers[j].additionalQuestions) {
+                            questions[i].additionalQuestions = extractQuestionsRecursively(_.sortBy(questions[i].answers[j].additionalQuestions, ['order', 'variable']), item)
+                        }
+                    } else {
+                        // For the multiple select the answers are in an array of values
+                        if (questions[i].answerType === "LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_MULTIPLE_ANSWERS") {
+                            if (item && item.questionnaireAnswers && item.questionnaireAnswers[questions[i].variable] && Array.isArray(item.questionnaireAnswers[questions[i].variable]) && item.questionnaireAnswers[questions[i].variable].indexOf(questions[i].answers[j].value) > -1 && questions[i].answers[j].additionalQuestions) {
+                                questions[i].additionalQuestions = extractQuestionsRecursively(_.sortBy(questions[i].answers[j].additionalQuestions, ['order', 'variable']), item)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    console.log('~~~~ Mapped questions: ', questions);
+    return questions;
+};
+
+export function extractQuestionsRecursively (questions, item) {
     let returnedQuestions = [];
 
     if (questions && Array.isArray(questions) && questions.length > 0) {
@@ -1186,13 +1212,13 @@ export function extractAllQuestions (questions, item) {
                     // First check for single select since it has only a value
                     if (questions[i].answerType === "LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_SINGLE_ANSWER" ) {
                         if (item && item.questionnaireAnswers && item.questionnaireAnswers[questions[i].variable] === questions[i].answers[j].value && questions[i].answers[j].additionalQuestions) {
-                            returnedQuestions = returnedQuestions.concat(extractAllQuestions(_.sortBy(questions[i].answers[j].additionalQuestions, ['order', 'variable']), item))
+                            returnedQuestions = returnedQuestions.concat(extractQuestionsRecursively(_.sortBy(questions[i].answers[j].additionalQuestions, ['order', 'variable']), item))
                         }
                     } else {
                         // For the multiple select the answers are in an array of values
                         if (questions[i].answerType === "LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_MULTIPLE_ANSWERS") {
                             if (item && item.questionnaireAnswers && item.questionnaireAnswers[questions[i].variable] && Array.isArray(item.questionnaireAnswers[questions[i].variable]) && item.questionnaireAnswers[questions[i].variable].indexOf(questions[i].answers[j].value) > -1 && questions[i].answers[j].additionalQuestions) {
-                                returnedQuestions = returnedQuestions.concat(extractAllQuestions(_.sortBy(questions[i].answers[j].additionalQuestions, ['order', 'variable']), item))
+                                returnedQuestions = returnedQuestions.concat(extractQuestionsRecursively(_.sortBy(questions[i].answers[j].additionalQuestions, ['order', 'variable']), item))
                             }
                         }
                     }

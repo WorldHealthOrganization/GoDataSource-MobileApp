@@ -20,6 +20,7 @@ import DropDown from './DropDown';
 import _ from 'lodash';
 import DatePicker from './DatePicker';
 import translations from './../utils/translations'
+import Section from "./Section";
 
 
 class QuestionCard extends Component {
@@ -70,6 +71,18 @@ class QuestionCard extends Component {
                     {
                         this.handleRenderItem(this.props.item)
                     }
+                    {
+                        this.props.item.additionalQuestions ? (
+                            <View>
+                                <Text>Additional questions</Text>
+                                {
+                                    this.props.item.additionalQuestions.map((additionalQuestion) => {
+                                        return this.handleRenderAdditionalQuestions(additionalQuestion);
+                                    })
+                                }
+                            </View>
+                        ) : (null)
+                    }
                 </ScrollView>
             </ElevatedView>
         );
@@ -77,6 +90,7 @@ class QuestionCard extends Component {
 
     // Please write here all the methods that are not react native lifecycle methods
     handleRenderItem = (item) => {
+        // console.log('handleRenderItem: ', item);
         // item = item.item;
         return (
             <View style={[style.containerCardComponent, {
@@ -233,6 +247,18 @@ class QuestionCard extends Component {
                     ) : null
                 )
         }
+    };
+
+    handleRenderAdditionalQuestions = (additionalQuestion) => {
+        console.log('handleRenderAdditionalQuestions: ', additionalQuestion);
+        return (
+            <View>
+                <Section label={getTranslation(additionalQuestion.text, this.props.translation)} />
+                {
+                    this.handleRenderItemByType(additionalQuestion)
+                }
+            </View>
+        )
     };
 }
 
