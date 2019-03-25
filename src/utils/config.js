@@ -1224,9 +1224,18 @@ const helpSingleScreen = {
                 },
                 {
                     cardNumber: 1,
-                    id: 'content',
                     label: translations.helpScreen.helpDescriptionLabel,
-                    type: 'TextInput',
+                    type: 'Section',
+                    value: '',
+                    isRequired: false,
+                    isEditMode: false,
+                    multiline: true,
+                    objectType: 'Help'
+                },
+                {
+                    cardNumber: 1,
+                    id: 'content',
+                    type: 'WebView',
                     value: '',
                     isRequired: false,
                     isEditMode: false,

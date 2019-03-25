@@ -1,33 +1,25 @@
 import url from './../utils/url';
 import {handleResponse} from './../utils/functions';
 
-export function getHelpCategory(outbreakId, token, callback) {
-
-    let filter = {
-        include: {
-            relation: 'relationships'
-        }
-    };
-
-    let requestUrl = url.getOutbreaksUrl() + outbreakId + '/events?filter=' + JSON.stringify(filter);
-
+export function getHelpCategoriesRequest(requestUrl, authorization, filter, callback) {
+    requestUrl = `${requestUrl}${filter ? `?filter=${JSON.stringify(filter)}` : ``}`;
     fetch(requestUrl, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
             'Accept': 'application/json',
-            'Authorization': token,
+            'Authorization': authorization,
         }
     })
         .then((response) => {
             return handleResponse(response);
         })
         .then((response) => {
-            console.log('### getEventsForOutbreakIdRequest response: ', response);
+            console.log('### getHelpCategoriesRequest response: ', response);
             callback(null, response);
         })
         .catch((error) => {
-            console.log("*** getEventsForOutbreakIdRequest error: ", error);
+            console.log("*** getHelpCategoriesRequest error: ", JSON.stringify(error));
             callback(error);
         })
 }
