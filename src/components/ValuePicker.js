@@ -33,7 +33,9 @@ class ValuePicker extends PureComponent {
     // and can slow down the app
     render() {
         // Do the mapping for the dropdown dynamically
-        let data = this.props.referenceData.filter((e) => {return e.active && !e.deleted && e.categoryId === 'LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE'}).map((e) => {return {value: e.value}});
+        let data = this.props.referenceData.filter((e) => {return e.active && !e.deleted && e.categoryId === 'LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE'})
+                                        .sort((a,b) => { return a.order - b.order; })
+                                        .map((e) => {return {value: e.value}});
         data.unshift(config.dropDownValues[0]);
 
         return (
