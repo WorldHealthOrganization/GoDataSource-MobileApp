@@ -7,7 +7,7 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {Component, PureComponent} from 'react';
-import {View, Text, StyleSheet} from 'react-native';
+import {View, Text, StyleSheet, WebView} from 'react-native';
 import {calculateDimension, handleExposedTo, getAddress, extractIdFromPouchId, getTranslation} from './../utils/functions';
 import config from './../utils/config';
 import {connect} from "react-redux";
@@ -251,7 +251,17 @@ class CardComponent extends PureComponent {
                         translation={this.props.translation}
                         screenSize={this.props.screenSize}
                     />
-                )
+                );
+            case 'WebView':
+                return (
+                    <WebView
+                        style={{
+                            height: calculateDimension(300, true, this.props.screenSize),
+                            width: width
+                        }}
+                        source={{html: `<html><head></head><body>${this.props.value}</body></html>`}}
+                    />
+                );
             default:
                 return (
                     <View style={{backgroundColor: 'red'}}>
