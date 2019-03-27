@@ -69,6 +69,13 @@ class ContactsSingleExposures extends Component {
         {useNativeDriver: true}
     );
 
+    shouldComponentUpdate(nextProps, nextState) {
+        if (nextProps.activeIndex === 2) {
+            return true;
+        }
+        return false;
+    }
+
     // The render method should have at least business logic as possible,
     // because this will be called whenever there is a new setState call
     // and can slow down the app
@@ -80,16 +87,7 @@ class ContactsSingleExposures extends Component {
             )
         }
 
-        const navbarTranslate = this.clampedScroll.interpolate({
-            inputRange: [0, 30],
-            outputRange: [0, -30],
-            extrapolate: 'clamp',
-        });
-        const navbarOpacity = this.clampedScroll.interpolate({
-            inputRange: [0, 30],
-            outputRange: [1, 0],
-            extrapolate: 'clamp',
-        });
+        // console.log('ContactsSingleContainer render Exposures');
 
         return (
             <ElevatedView elevation={3} style={[style.container]}>

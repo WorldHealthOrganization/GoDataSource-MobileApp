@@ -314,7 +314,15 @@ const alertMessages = {
 
     // address
     addressOfResidenceError: 'LNG_DIALOG_ALERT_MESSAGE_PLEASE_ADD_THE_PLACE_OF_RESIDENCE_ADDRESS',
-    addressRequiredFieldsMissing: 'LNG_DIALOG_ALERT_MESSAGE_ADD_AT_LEAST_ONE_ADDRESS_WITH_ALL_REQUERED_FIELDS_COMPLETED'
+    addressRequiredFieldsMissing: 'LNG_DIALOG_ALERT_MESSAGE_ADD_AT_LEAST_ONE_ADDRESS_WITH_ALL_REQUERED_FIELDS_COMPLETED',
+
+    // TODO add translation to backend
+    // Delete alert messages
+    deleteDocument: 'LNG_DIALOG_ALERT_MESSAGE_ARE_YOU_SURE_YOU_WANT_TO_DELETE_THIS_DOCUMENT',
+    deleteAddress: 'LNG_DIALOG_ALERT_MESSAGE_ARE_YOU_SURE_YOU_WANT_TO_DELETE_THIS_ADDRESS',
+    deleteDateRange: 'LNG_DIALOG_ALERT_MESSAGE_ARE_YOU_SURE_YOU_WANT_TO_DELETE_THIS_DATE_RANGE',
+
+    androidBackButtonMsg: 'LNG_DIALOG_ALERT_MESSAGE_ARE_YOU_SURE_YOU_WANT_TO_EXIT_THE_APP'
 };
 
 const loadingScreenMessages = {
@@ -333,6 +341,7 @@ const generalButtons = {
 const generalLabels = {
     filterTitle: 'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER',
     applyFiltersButton: 'LNG_COMMON_BUTTON_APPLY_FILTERS',
+    resetFiltersButton: 'LNG_COMMON_BUTTON_RESET_FILTERS',
     yesAnswer: 'LNG_COMMON_LABEL_YES',
     noAnswer: 'LNG_COMMON_LABEL_NO',
     today: 'LNG_COMMON_LABEL_TODAY',
@@ -342,6 +351,8 @@ const generalLabels = {
     ageYearsInitials: 'LNG_AGE_FIELD_LABEL_YEARS',
     ageMonthsInitials: 'LNG_AGE_FIELD_LABEL_MONTHS',
     questionInitial: 'LNG_COMMON_LABEL_QUESTION',
+
+    noneLabel: 'LNG_DROPDOWN_NONE_OPTION'
 };
 
 const questionCardLabels = {
@@ -372,7 +383,7 @@ const manualConfigScreen = {
     hubUrlLabel: 'HUB URL',
     clientIdLabel: 'Client ID',
     clientSecretPass: 'Client secret',
-    saveHubConfigButton: 'Save HUB configuration',
+    saveHubConfigButton: 'Save and sync HUB',
     encryptDataLabel: 'Encrypted connection'
 };
 

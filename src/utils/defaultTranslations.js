@@ -264,6 +264,12 @@ export default {
     'LNG_DIALOG_ALERT_MESSAGE_PLEASE_ADD_THE_PLACE_OF_RESIDENCE_ADDRESS': 'Please add the place of residence address',
     'LNG_DIALOG_ALERT_MESSAGE_ADD_AT_LEAST_ONE_ADDRESS_WITH_ALL_REQUERED_FIELDS_COMPLETED': 'Please add at least one address with all the required fields completed',
 
+    // Delete
+    'LNG_DIALOG_ALERT_MESSAGE_ARE_YOU_SURE_YOU_WANT_TO_DELETE_THIS_DOCUMENT': 'Are you sure you want to delete this document?',
+    'LNG_DIALOG_ALERT_MESSAGE_ARE_YOU_SURE_YOU_WANT_TO_DELETE_THIS_ADDRESS': 'Are you sure you want to delete this address?',
+    'LNG_DIALOG_ALERT_MESSAGE_ARE_YOU_SURE_YOU_WANT_TO_DELETE_THIS_DATE_RANGE': 'Are you sure you want to delete this date range?',
+
+    'LNG_DIALOG_ALERT_MESSAGE_ARE_YOU_SURE_YOU_WANT_TO_EXIT_THE_APP': 'Are you sure you want to exit the application?',
 
     //loadingScreenMessages
     'LNG_LOADING_SCREEN_MESSAGE': 'Loading...',
@@ -279,6 +285,7 @@ export default {
     //generalLabels
     'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER': 'Filter By',
     'LNG_COMMON_BUTTON_APPLY_FILTERS': 'Apply filters',
+    'LNG_COMMON_BUTTON_RESET_FILTERS': 'Reset',
     'LNG_COMMON_LABEL_YES': 'Yes',
     'LNG_COMMON_LABEL_NO': 'No',
     'LNG_COMMON_LABEL_TODAY': 'Today',
@@ -287,6 +294,7 @@ export default {
     //take just first letter
     'LNG_COMMON_LABEL_QUESTION': 'Question',
 
+    'LNG_DROPDOWN_NONE_OPTION': 'None',
 
     //questionCardLabels
     'LNG_QUESTIONNAIRE_LABEL_WRITE_ANSWER': 'Write answer',

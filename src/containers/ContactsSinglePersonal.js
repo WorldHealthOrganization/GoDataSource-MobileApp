@@ -4,7 +4,7 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {PureComponent} from 'react';
-import {View, StyleSheet, InteractionManager, Alert, TouchableWithoutFeedback, Keyboard, ScrollView} from 'react-native';
+import {View, StyleSheet, InteractionManager, Alert, TouchableWithoutFeedback, Keyboard, ScrollView, findNodeHandle} from 'react-native';
 import {calculateDimension, getTranslation} from './../utils/functions';
 import config from './../utils/config';
 import {connect} from "react-redux";
@@ -37,6 +37,13 @@ class ContactsSinglePersonal extends PureComponent {
         })
     }
 
+    shouldComponentUpdate(nextProps, nextState) {
+        if (nextProps.activeIndex === 0) {
+            return true;
+        }
+        return false;
+    }
+
     // The render method should have at least business logic as possible,
     // because this will be called whenever there is a new setState call
     // and can slow down the app
@@ -46,6 +53,8 @@ class ContactsSinglePersonal extends PureComponent {
                 <LoaderScreen overlay={true} backgroundColor={'white'}/>
             )
         }
+
+        // console.log('ContactsSingleContainer render Personal');
 
         return (
             <View style={{flex: 1}}>
@@ -67,6 +76,10 @@ class ContactsSinglePersonal extends PureComponent {
                         style={style.containerScrollView}
                         contentContainerStyle={[style.contentContainerStyle, {paddingBottom: this.props.screenSize.height < 600 ? 70 : 20}]}
                         keyboardShouldPersistTaps={'always'}
+                        extraHeight={20 + 81 + 50 + 70}
+                        innerRef={ref => {
+                            this.scrollContactsSinglePersonal = ref
+                        }}>
                     >
                         <View style={style.container}>
                             {
@@ -169,6 +182,8 @@ class ContactsSinglePersonal extends PureComponent {
                 onChangeSwitch={this.props.onChangeSwitch}
                 onChangeDropDown={this.props.onChangeDropDown}
                 onChangeTextSwitchSelector={this.props.onChangeTextSwitchSelector}
+
+                onFocus={this.handleOnFocus}
             />
         )
     };
@@ -249,6 +264,15 @@ class ContactsSinglePersonal extends PureComponent {
         } else {
             this.props.handleMoveToNextScreenButton()
         }
+    };
+
+    handleOnFocus = (event) => {
+        this.scrollToInput(findNodeHandle(event.target))
+    };
+
+    scrollToInput (reactNode) {
+        // Add a 'scroll' ref to your ScrollView
+        this.scrollContactsSinglePersonal.props.scrollToFocusedInput(reactNode)
     };
 }
 

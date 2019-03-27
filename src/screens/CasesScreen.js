@@ -8,7 +8,7 @@ import {TextInput, View, Text, Alert, StyleSheet, Dimensions, Platform, FlatList
 import {Button, Icon} from 'react-native-material-ui';
 import styles from './../styles';
 import NavBarCustom from './../components/NavBarCustom';
-import {calculateDimension, navigation, getTranslation} from './../utils/functions';
+import {calculateDimension, navigation, getTranslation, createFilterCasesObject} from './../utils/functions';
 import config from './../utils/config';
 import Ripple from 'react-native-material-ripple';
 import {connect} from "react-redux";
@@ -28,6 +28,7 @@ import translations from './../utils/translations'
 import {getItemByIdRequest} from './../queries/cases'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {pushNewEditScreen} from './../utils/screenTransitionFunctions';
+import RNExitApp from 'react-native-exit-app';
 
 let height = Dimensions.get('window').height;
 let width = Dimensions.get('window').width;
@@ -51,6 +52,7 @@ class CasesScreen extends Component {
             refreshing: false,
             loading: true,
 
+            sortData: false,
             isVisible: false,
             latitude: 0,
             longitude: 0,
@@ -85,7 +87,19 @@ class CasesScreen extends Component {
     }
 
     handleBackButtonClick() {
-        // this.props.navigator.goBack(null);
+        Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.alertMessages.androidBackButtonMsg, this.props.translation), [
+            {
+                text: getTranslation(translations.alertMessages.yesButtonLabel, this.props.translation), onPress: () => {
+                    RNExitApp.exitApp();
+                    return true;
+                }
+            },
+            {
+                text: getTranslation(translations.alertMessages.cancelButtonLabel, this.props.translation), onPress: () => {
+                    return true;
+                }
+            }
+        ])
         return true;
     }
 
@@ -100,6 +114,15 @@ class CasesScreen extends Component {
                 }
                 }
             ])
+        }
+
+        if (state.sortData === true){
+            state.loading = true
+            state.sortData = false
+            const allFilters = createFilterCasesObject(state.filterFromFilterScreen, state.filter)
+            props.getCasesForOutbreakId(props.user.activeOutbreakId, allFilters, null);
+        } else {
+            state.sortData = true
         }
 
         state.loading = false;
@@ -482,59 +505,11 @@ class CasesScreen extends Component {
     };
 
     filterCases = () => {
-        let allFilters = {}
-
-        //age
-        if (this.state.filterFromFilterScreen && this.state.filterFromFilterScreen.age) {
-            allFilters.age = this.state.filterFromFilterScreen.age
-        } else {
-            allFilters.age = null
-        }
-
-        //gender
-        if (this.state.filterFromFilterScreen && this.state.filterFromFilterScreen.gender && this.state.filterFromFilterScreen.gender !== null) {
-            allFilters.gender = this.state.filterFromFilterScreen.gender
-
-        } else {
-            allFilters.gender = null
-        }
-
-        //classification
-        if (this.state.filterFromFilterScreen && this.state.filterFromFilterScreen.classification) {
-            allFilters.classification = this.state.filterFromFilterScreen.classification;
-        } else {
-            allFilters.classification = null
-        }
-
-        //search text
-        if (this.state.filter && this.state.filter.searchText && this.state.filter.searchText.trim().length > 0) {
-            let splitedFilter= this.state.filter.searchText.split(" ")
-            splitedFilter = splitedFilter.filter((e) => {return e !== ""})
-            allFilters.searchText = new RegExp(splitedFilter.join("|"), "ig");
-        } else {
-            allFilters.searchText = null
-        }
-
-        //selected locations
-        if (this.state.filterFromFilterScreen && this.state.filterFromFilterScreen.selectedLocations && this.state.filterFromFilterScreen.selectedLocations.length > 0) {
-            allFilters.selectedLocations = this.state.filterFromFilterScreen.selectedLocations;
-        } else {
-            allFilters.selectedLocations = null
-        }
-
-        //sort rules
-        if (this.state.filterFromFilterScreen && this.state.filterFromFilterScreen.sort && this.state.filterFromFilterScreen.sort.length > 0) {
-            allFilters.sort = this.state.filterFromFilterScreen.sort;
-        } else {
-            allFilters.sort = null
-        }
-
-        if (!allFilters.age && !allFilters.gender && !allFilters.searchText && !allFilters.classification && !allFilters.selectedLocations && !allFilters.sort) {
-            allFilters = null
-        }
+        const allFilters = createFilterCasesObject(this.state.filterFromFilterScreen, this.state.filter)
 
         this.setState({
-            loading: true
+            loading: true,
+            sortData: false
         }, () => {
             this.props.getCasesForOutbreakId(this.props.user.activeOutbreakId, allFilters, null);
         })
@@ -753,7 +728,8 @@ const style = StyleSheet.create({
     },
     containerContent: {
         flex: 1,
-        backgroundColor: 'rgba(217, 217, 217, 0.5)'
+        backgroundColor: styles.appBackground,
+        paddingBottom: 25
     },
     separatorComponentStyle: {
         height: 8

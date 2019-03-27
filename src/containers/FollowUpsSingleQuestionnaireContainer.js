@@ -4,7 +4,15 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {PureComponent} from 'react';
-import {View, StyleSheet, InteractionManager, Alert, TouchableWithoutFeedback, Keyboard} from 'react-native';
+import {
+    View,
+    StyleSheet,
+    InteractionManager,
+    Alert,
+    TouchableWithoutFeedback,
+    Keyboard,
+    findNodeHandle
+} from 'react-native';
 import {calculateDimension, extractAllQuestions, mapQuestions, getTranslation} from './../utils/functions';
 import config from './../utils/config';
 import {connect} from "react-redux";
@@ -45,6 +53,13 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
         })
     }
 
+    shouldComponentUpdate(nextProps, nextState) {
+        if (nextProps.activeIndex === 1) {
+            return true;
+        }
+        return false;
+    }
+
     static getDerivedStateFromProps(props, state) {
         // Get all additional questions recursively
         let sortedQuestions = sortBy(props.questions, ['order', 'variable']);
@@ -63,6 +78,7 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
                 <LoaderScreen overlay={true} backgroundColor={'white'}/>
             )
         }
+        // console.log('FollowUpsSingleContainer render Questionnaire');
 
         // console.log("### FollowUpsSingleQuestionnaire: ", this.props.questions);
         let buttonHeight = calculateDimension(25, true, this.props.screenSize);
@@ -90,10 +106,14 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
                         style={style.container}
                         contentContainerStyle={[style.contentContainerStyle, {paddingBottom: this.props.screenSize.height < 600 ? 70 : 20}]}
                         keyboardShouldPersistTaps={'always'}
+                        extraHeight={20 + 81 + 50 + 70}
+                        innerRef={ref => {
+                            this.scrollFollowUpsSingleQuestionnaire = ref
+                        }}
                     >
                         {
                             this.state.questions.map((item, index) => {
-                                return this.handleRenderItem(item, index)
+                                return this.handleRenderItem(item, index, this.state.questions.length)
                             })
                         }
                     </KeyboardAwareScrollView>
@@ -122,19 +142,23 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
         )
     };
 
-    handleRenderItem = (item, index) => {
-        return (
-            <QuestionCard
-                item={item}
-                index={index + 1}
-                source={this.props.item}
-                isEditMode={this.props.isEditMode}
-                onChangeTextAnswer={this.props.onChangeTextAnswer}
-                onChangeDateAnswer={this.props.onChangeDateAnswer}
-                onChangeSingleSelection={this.props.onChangeSingleSelection}
-                onChangeMultipleSelection={this.props.onChangeMultipleSelection}
-            />
-        )
+    handleRenderItem = (item, index, totalNumberOfQuestions) => {
+        if (item.inactive === false ) {
+            return (
+                <QuestionCard
+                    item={item}
+                    index={index + 1}
+                    totalNumberOfQuestions={totalNumberOfQuestions}
+                    source={this.props.item}
+                    isEditMode={this.props.isEditMode}
+                    onChangeTextAnswer={this.props.onChangeTextAnswer}
+                    onChangeDateAnswer={this.props.onChangeDateAnswer}
+                    onChangeSingleSelection={this.props.onChangeSingleSelection}
+                    onChangeMultipleSelection={this.props.onChangeMultipleSelection}
+                    onFocus={this.handleOnFocus}
+                />
+            )
+        }
     };
 
     onPressSave = () => {
@@ -159,7 +183,7 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
         if (this.state.questions && Array.isArray(this.state.questions) && this.state.questions.length > 0) {
             for (let i = 0; i < this.state.questions.length; i++) {
                 if (this.state.questions[i].variable && this.props.item) {
-                    if (this.state.questions[i].required === true) {
+                    if (this.state.questions[i].required === true && this.state.questions[i].inactive === false) {
                         if (!this.props.item.questionnaireAnswers || !this.props.item.questionnaireAnswers[this.state.questions[i].variable]) {
                             requiredQuestions.push(getTranslation(this.state.questions[i].text, this.props.translation));
                             // return false;
@@ -170,6 +194,15 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
         }
         return requiredQuestions;
         // return true;
+    };
+
+    handleOnFocus = (event) => {
+        this.scrollToInput(findNodeHandle(event.target))
+    };
+
+    scrollToInput (reactNode) {
+        // Add a 'scroll' ref to your ScrollView
+        this.scrollFollowUpsSingleQuestionnaire.props.scrollToFocusedInput(reactNode)
     };
 }
 

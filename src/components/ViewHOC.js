@@ -11,6 +11,7 @@ import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import {getUserById} from './../actions/user';
 import cloneDeep from 'lodash/cloneDeep';
+import {KeyboardAccessoryNavigation} from 'react-native-keyboard-accessory';
 
 class ViewHOC extends Component {
 
@@ -103,6 +104,14 @@ class ViewHOC extends Component {
                                     }
                                 </View>
                         </Modal>
+                    {
+                        Platform.OS === 'ios' ? (
+                            <KeyboardAccessoryNavigation
+                                nextHidden={true}
+                                previousHidden={true}
+                            />
+                        ) : (null)
+                    }
                 </View>
             )
     }

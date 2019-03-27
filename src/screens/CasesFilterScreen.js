@@ -76,12 +76,12 @@ class CasesFilterScreen extends Component {
                 filterClone.classification = props.activeFilters.classification;
             }
 
-            // if (props.activeFilters.sort && props.activeFilters.sort !== undefined && Array.isArray(props.activeFilters.sort) && props.activeFilters.sort.length > 0){
-            //     sortClone.sort = props.activeFilters.sort
-            // }
+            if (props.activeFilters.sort && props.activeFilters.sort !== undefined && Array.isArray(props.activeFilters.sort) && props.activeFilters.sort.length > 0){
+                sortClone = props.activeFilters.sort
+            }
         }
         state.filter.filter = filterClone
-        // state.filter.sort = sortClone
+        state.filter.sort = sortClone
         return null
     }
 
@@ -111,6 +111,10 @@ class CasesFilterScreen extends Component {
 
     // Please write here all the methods that are not react native lifecycle methods
     handlePressNavbarButton = () => {
+        this.props.navigator.dismissModal();
+    };
+
+    handleResetFilters = () => {
         this.props.removeFilterForScreen('CasesFilterScreen');
         this.props.navigator.dismissModal(this.props.onApplyFilters(config.defaultFilterForCases));
     };
@@ -120,40 +124,53 @@ class CasesFilterScreen extends Component {
     };
 
     handleMoveToNextScreenButton = () => {
-        let nextIndex = this.state.index + 1
+        let nextIndex = this.state.index + 1;
         this.handleOnIndexChange(nextIndex)
-    }
+    };
 
     handleMoveToPrevieousScreenButton = () => {
-        let nextIndex = this.state.index - 1
+        let nextIndex = this.state.index - 1;
         this.handleOnIndexChange(nextIndex)
-    }
+    };
 
-    handleRenderScene = () => {
-        if (this.state.index === 0) {
-            return (
-                <CasesFiltersContainer
-                    filter={this.state.filter}
-                    handleMoveToNextScreenButton={this.handleMoveToNextScreenButton}
-                    onSelectItem={this.handleOnSelectItem}
-                    onChangeSectionedDropDown={this.handleOnChangeSectionedDropDown}
-                    onChangeInterval={this.handleOnChangeInterval}
-                    onChangeMultipleSelection={this.handleOnChangeMultipleSelection}
-                    onPressApplyFilters={this.handleOnPressApplyFilters}
-                />
-            )
-        } else {
-            return (
-                <CasesSortContainer
-                    handleMoveToPrevieousScreenButton={this.handleMoveToPrevieousScreenButton}
-                    onPressApplyFilters={this.handleOnPressApplyFilters}
-                    onPressAddSortRule={this.onPressAddSortRule}
-                    onChangeDropDown={this.onChangeDropDown}
-                    filter={this.state.filter}
-                    onDeletePress={this.onDeleteSortRulePress}
-                    key={this.state.index}
-                />
-            )
+    handleRenderScene = ({route}) => {
+        switch (route.key) {
+            case 'filters':
+                return (
+                    <CasesFiltersContainer
+                        filter={this.state.filter}
+                        handleMoveToNextScreenButton={this.handleMoveToNextScreenButton}
+                        onSelectItem={this.handleOnSelectItem}
+                        onChangeSectionedDropDown={this.handleOnChangeSectionedDropDown}
+                        onChangeInterval={this.handleOnChangeInterval}
+                        onChangeMultipleSelection={this.handleOnChangeMultipleSelection}
+                        onPressApplyFilters={this.handleOnPressApplyFilters}
+                    />
+                );
+            case 'sort':
+                return (
+                    <CasesSortContainer
+                        handleMoveToPrevieousScreenButton={this.handleMoveToPrevieousScreenButton}
+                        onPressApplyFilters={this.handleOnPressApplyFilters}
+                        onPressAddSortRule={this.onPressAddSortRule}
+                        onChangeDropDown={this.onChangeDropDown}
+                        filter={this.state.filter}
+                        onDeletePress={this.onDeleteSortRulePress}
+                        key={this.state.index}
+                    />
+                );
+            default:
+                return (
+                    <CasesFiltersContainer
+                        filter={this.state.filter}
+                        handleMoveToNextScreenButton={this.handleMoveToNextScreenButton}
+                        onSelectItem={this.handleOnSelectItem}
+                        onChangeSectionedDropDown={this.handleOnChangeSectionedDropDown}
+                        onChangeInterval={this.handleOnChangeInterval}
+                        onChangeMultipleSelection={this.handleOnChangeMultipleSelection}
+                        onPressApplyFilters={this.handleOnPressApplyFilters}
+                    />
+                )
         }
     };
 
@@ -194,7 +211,7 @@ class CasesFilterScreen extends Component {
         if (typeof objectTypeOrIndex === 'number' && objectTypeOrIndex >= 0) {
             if (objectType === 'Sort') {
                 let sortClone = _.cloneDeep(this.state.filter.sort);
-                sortClone[objectTypeOrIndex][id] = value && value.value ? value.value : value;
+                sortClone[objectTypeOrIndex][id] = value && value.value !== undefined ? value.value : value;
                 console.log ('sortClone', sortClone)
                 this.setState(prevState => ({
                     filter: Object.assign({}, prevState.filter, {sort: sortClone}),
@@ -209,7 +226,6 @@ class CasesFilterScreen extends Component {
         return (
             <TabBar
                 {...props}
-                scrollEnabled={false}
                 indicatorStyle={{
                     backgroundColor: styles.buttonGreen,
                     height: 2

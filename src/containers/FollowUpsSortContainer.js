@@ -41,6 +41,7 @@ class FollowUpsSortContainer extends Component {
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
+        // console.log('FollowUpsFilterContainer render Sort');
         return (
             <View style={[style.container]}>
                  <Button
@@ -86,15 +87,29 @@ class FollowUpsSortContainer extends Component {
                     }
                 </KeyboardAwareScrollView>   
                 <View style={style.containerButtonApplyFilters}>
-                <Button
+                    <Button
                         title={getTranslation(translations.generalLabels.applyFiltersButton, this.props.translation)}
                         color={styles.buttonGreen}
                         onPress={this.props.onPressApplyFilters}
-                        width={calculateDimension(343, false, this.props.screenSize)}
+                        width={calculateDimension(247.5, false, this.props.screenSize)}
                         height={calculateDimension(32, true, this.props.screenSize)}
-                        style={{alignSelf: 'center'}}
+                        style={{                                            
+                            marginRight: calculateDimension(6.5, false, this.props.screenSize),
+                        }}
                         titleStyle={{fontFamily: 'Roboto-Medium', fontSize: 14}}
                         titleColor={'white'}
+                    />
+                    <Button
+                        title={getTranslation(translations.generalLabels.resetFiltersButton, this.props.translation)}
+                        color={styles.buttonWhite}
+                        onPress={this.props.onPressResetFilters}
+                        width={calculateDimension(80.5, false, this.props.screenSize)}
+                        height={calculateDimension(32, true, this.props.screenSize)}
+                        style={{                            
+                            marginLeft: calculateDimension(6.5, false, this.props.screenSize),
+                        }}
+                        titleStyle={{fontFamily: 'Roboto-Medium', fontSize: 14}}
+                        titleColor={'black'}
                     />
                 </View> 
             </View>
@@ -213,7 +228,8 @@ const style = StyleSheet.create({
     },
     containerButtonApplyFilters: {
         flex: 0,
-        justifyContent: 'flex-end',
+        flexDirection: 'row', 
+        justifyContent: 'space-between',
         marginBottom: 22,
         marginTop: 10
     }
