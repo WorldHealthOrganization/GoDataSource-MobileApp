@@ -38,8 +38,8 @@ class CaseSingleInvestigationContainer extends PureComponent {
     render() {
         // console.log('CaseSingleContainer render Investigation');
          // Get all additional questions recursively
-        let sortedQuestions = sortBy(this.props.questions, ['order', 'variable']);
-        sortedQuestions = extractAllQuestions(sortedQuestions, this.props.item);
+        let sortedQuestions = sortBy(this.props.questions.slice(), ['order', 'variable']);
+        sortedQuestions = extractAllQuestions(sortedQuestions, this.props.previousAnswers);
 
         return (
             <View style={{flex: 1}}>

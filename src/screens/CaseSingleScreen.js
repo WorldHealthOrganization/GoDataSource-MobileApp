@@ -12,7 +12,7 @@ import Menu, {MenuItem} from 'react-native-material-menu';
 import Ripple from 'react-native-material-ripple';
 import styles from './../styles';
 import config from './../utils/config';
-import _ from 'lodash';
+import _, {sortBy} from 'lodash';
 
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
@@ -29,6 +29,7 @@ import moment from 'moment';
 import translations from './../utils/translations'
 import ElevatedView from 'react-native-elevated-view';
 import ViewHOC from './../components/ViewHOC';
+import {extractAllQuestions} from "../utils/functions";
 
 const initialLayout = {
     height: 0,
@@ -112,15 +113,21 @@ class CaseSingleScreen extends Component {
             hasPlaceOfResidence: true,
             selectedItemIndexForTextSwitchSelectorForAge: 0, // age/dob - switch tab
             selectedItemIndexForAgeUnitOfMeasureDropDown: this.props.isNew ? 0 : (this.props.case.age && this.props.case.age.years !== undefined && this.props.case.age.years !== null && this.props.case.age.years > 0) ? 0 : 1, //default age dropdown value,
-            currentAnswers: []
+            currentAnswers: [],
+            previousAnswers: []
         };
         // Bind here methods, or at least don't declare methods in the render method
         this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this));
         this.handleBackButtonClick = this.handleBackButtonClick.bind(this);
     }
 
+
     componentDidMount() {
         BackHandler.addEventListener('hardwareBackPress', this.handleBackButtonClick);
+        let mappedAnswers = this.mapAnswers();
+        this.setState({
+            previousAnswers: mappedAnswers
+        })
     }
 
     componentWillUnmount() {
@@ -444,6 +451,8 @@ class CaseSingleScreen extends Component {
             case 'caseInvestigation':
                 return <CaseSingleInvestigationContainer
                     item={this.state.case}
+                    currentAnswers={this.state.currentAnswers}
+                    previousAnswers={this.state.previousAnswers}
                     isEditMode={this.state.isEditMode}
                     index={this.state.index}
                     onPressEdit={this.onPressEdit}
@@ -1632,7 +1641,79 @@ class CaseSingleScreen extends Component {
                 pageAskingHelpFrom: pageAskingHelpFrom
             }
         });
-    }
+    };
+
+
+    /**
+     * We want to add the answers to the
+     * */
+    mapAnswers = () => {
+        let mappedAnswers = {};
+        let sortedQuestions = sortBy(this.props.caseInvestigationQuestions.slice(), ['order', 'variable']);
+        if (this.state.case && this.state.case.questionnaireAnswers) {
+            for (let questionId in this.state.case.questionnaireAnswers) {
+                // First added the main questions
+                if (sortedQuestions.findIndex((e) => {return e.variable === questionId}) > -1) {
+                    mappedAnswers[questionId] = this.state.case.questionnaireAnswers[questionId];
+                }
+            }
+        }
+
+        // Look for the sub-questions
+        for (let i=0; i<sortedQuestions.length; i++) {
+            if (sortedQuestions[i].answerType === 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_SINGLE_ANSWER' || sortedQuestions[i].answerType === 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_MULTIPLE_ANSWERS') {
+                if (sortedQuestions[i].answers && Array.isArray(sortedQuestions[i].answers) && sortedQuestions[i].answers.length > 0) {
+                    sortedQuestions[i].additionalQuestions = [];
+                    for (let j = 0; j < sortedQuestions[i].answers.length; j++) {
+                        let result = this.extractQuestions(sortBy(sortedQuestions[i].answers[j].additionalQuestions, ['order', 'variable']));
+                        console.log('What is returned: ', result);
+                        sortedQuestions[i].additionalQuestions = sortedQuestions[i].additionalQuestions.concat(result);
+                        console.log('Added stuff to sortedQuestions: ', sortedQuestions[i]);
+                    }
+                }
+            }
+        }
+
+        if (mappedAnswers && Object.keys(mappedAnswers).length > 0) {
+            for (let questionId in this.state.case.questionnaireAnswers) {
+                for (let j = 0; j < sortedQuestions.length; j++) {
+                    if (!mappedAnswers[questionId]) {
+                        if (!mappedAnswers[sortedQuestions[j].variable].subAnswers) {
+                            mappedAnswers[sortedQuestions[j].variable].subAnswers = {};
+                        }
+                        mappedAnswers[sortedQuestions[j].variable].subAnswers[questionId] = this.state.case.questionnaireAnswers[questionId];
+                    }
+                }
+            }
+        }
+
+        console.log('Mapped answers here: ', mappedAnswers);
+
+        this.setState({
+            mappedQuestions: sortedQuestions
+        }, () => {
+            return mappedAnswers;
+        });
+    };
+
+    // Extract all sub questions of the sub-questions
+    extractQuestions = (questions) => {
+        let returnedQuestions = questions.slice();
+        if (questions && Array.isArray(questions) && questions.length > 0) {
+            for (let i=0; i<questions.length; i++) {
+                if (questions[i].answerType === 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_SINGLE_ANSWER' || questions[i].answerType === 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_MULTIPLE_ANSWERS') {
+                    if (questions[i].answers && Array.isArray(questions[i].answers) && questions[i].answers.length > 0) {
+                        for (let j = 0; j < questions[i].answers.length; j++) {
+                            returnedQuestions = returnedQuestions.concat(this.extractQuestions(sortBy(questions[i].answers[j].additionalQuestions, ['order', 'variable'])));
+                        }
+                    }
+                }
+            }
+        }
+
+        console.log('extract le questions:  ', returnedQuestions);
+        return returnedQuestions;
+    };
 }
 
 // Create style outside the class, or for components that will be used by other components (buttons),

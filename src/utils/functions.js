@@ -1180,6 +1180,9 @@ export function mapLocations(locationList, parentLocationId) {
 export function extractAllQuestions (questions, item) {
     if (questions && Array.isArray(questions) && questions.length > 0) {
         for (let i=0; i<questions.length; i++) {
+            if (questions[i].additionalQuestions) {
+                delete questions[i].additionalQuestions;
+            }
             if (questions[i] && questions[i].answerType && (questions[i].answerType === "LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_SINGLE_ANSWER" || questions[i].answerType === "LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_MULTIPLE_ANSWERS") && questions[i].answers && Array.isArray(questions[i].answers) && questions[i].answers.length > 0) {
                 for (let j = 0; j < questions[i].answers.length; j++) {
                     // First check for single select since it has only a value
@@ -1199,11 +1202,12 @@ export function extractAllQuestions (questions, item) {
             }
         }
     }
-    console.log('~~~~ Mapped questions: ', questions);
+    // console.log('~~~~ Mapped questions: ', questions);
     return questions;
 };
 
-export function extractQuestionsRecursively (questions, item) {
+// previousAnswer = {key}
+export function extractQuestionsRecursively (questions, previousAnswers) {
     let returnedQuestions = [];
 
     if (questions && Array.isArray(questions) && questions.length > 0) {

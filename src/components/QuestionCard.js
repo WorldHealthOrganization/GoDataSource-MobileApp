@@ -31,29 +31,35 @@ class QuestionCard extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            showDropdown: false
+            showDropdown: false,
+            answerDate: new Date()
         };
     }
 
-    shouldComponentUpdate(nextProps, nextState) {
-        // console.log("Next source, old source: ", nextProps.source.questionnaireAnswers[nextProps.item.variable], this.props.source.questionnaireAnswers[this.props.item.variable]);
-        if (nextProps.isEditMode !== this.props.isEditMode ||
-            (nextProps.source && nextProps.source.questionnaireAnswers && nextProps.source.questionnaireAnswers[nextProps.item.variable] &&
-                this.props.source && this.props.source.questionnaireAnswers && this.props.source.questionnaireAnswers[this.props.item.variable] &&
-                !isEqual(nextProps.source.questionnaireAnswers[nextProps.item.variable], this.props.source.questionnaireAnswers[this.props.item.variable])) ||
-            nextProps.totalNumberOfQuestions !== this.props.totalNumberOfQuestions) {
-            // console.log("Next source, old source: ", nextProps.item.variable, nextProps.source.questionnaireAnswers[nextProps.item.variable], this.props.source.questionnaireAnswers[this.props.item.variable]);
-            return true;
-        }
-        return false;
-    }
+    // shouldComponentUpdate(nextProps, nextState) {
+    //     // console.log("Next source, old source: ", nextProps.source.questionnaireAnswers[nextProps.item.variable], this.props.source.questionnaireAnswers[this.props.item.variable]);
+    //     if (nextProps.isEditMode !== this.props.isEditMode ||
+    //         (nextProps.source && nextProps.source.questionnaireAnswers && nextProps.source.questionnaireAnswers[nextProps.item.variable] &&
+    //             this.props.source && this.props.source.questionnaireAnswers && this.props.source.questionnaireAnswers[this.props.item.variable] &&
+    //             !isEqual(nextProps.source.questionnaireAnswers[nextProps.item.variable], this.props.source.questionnaireAnswers[this.props.item.variable])) ||
+    //         nextProps.totalNumberOfQuestions !== this.props.totalNumberOfQuestions) {
+    //         // console.log("Next source, old source: ", nextProps.item.variable, nextProps.source.questionnaireAnswers[nextProps.item.variable], this.props.source.questionnaireAnswers[this.props.item.variable]);
+    //         return true;
+    //     }
+    //     return false;
+    // }
 
     // Please add here the react lifecycle methods that you need
     // The render method should have at least business logic as possible,
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
-        console.log('Render QuestionCard');
+        console.log('Render QuestionCard: ', this.props.item);
+        let viewWidth = calculateDimension(315, false, this.props.screenSize);
+        let viewHeight = calculateDimension(30, true, this.props.screenSize);
+        let marginHorizontal = calculateDimension(14, false, this.props.screenSize);
+        let buttonHeight = calculateDimension(25, true, this.props.screenSize);
+        let buttonWidth = calculateDimension(120, false, this.props.screenSize);
         return (
             <ElevatedView elevation={3} style={[this.props.style, style.container, {
                 marginHorizontal: calculateDimension(16, false, this.props.screenSize),
@@ -75,17 +81,48 @@ class QuestionCard extends Component {
                 />
                 <ScrollView scrollEnabled={false} keyboardShouldPersistTaps={'always'}>
                     {
+                        this.props.item.multiAnswer ? (
+                            <DatePicker
+                                id={'answerDate'}
+                                label={'Answer Date'}
+                                value={this.state.answerDate}
+                                isEditMode={this.props.isEditMode}
+                                isRequired={true}
+                                style={{width: viewWidth, marginHorizontal: marginHorizontal}}
+                                onChange={this.onChangeAnswerDate}
+                            />
+                        ) : (null)
+                    }
+                    {
                         this.handleRenderItem(this.props.item)
                     }
                     {
                         this.props.item.additionalQuestions ? (
                             <View>
-                                <Text>Additional questions</Text>
+                                <Section label={'Additional Questions'}/>
                                 {
                                     this.props.item.additionalQuestions.map((additionalQuestion) => {
                                         return this.handleRenderAdditionalQuestions(additionalQuestion);
                                     })
                                 }
+                            </View>
+                        ) : (null)
+                    }
+                    {
+                        this.props.item.multiAnswer && this.props.isEditMode ? (
+                            <View
+                                style={{
+                                    flexDirection: 'row',
+                                    justifyContent: 'space-between',
+                                    alignItems: 'center',
+                                    width: viewWidth,
+                                    marginHorizontal,
+                                    height: viewHeight,
+                                    marginVertical: 5
+                                }}
+                            >
+                                <Button title={'Add Answer'} width={buttonWidth} height={buttonHeight} titleColor={'white'} color={styles.buttonGreen} />
+                                <Button title={'Prev Answer'} width={buttonWidth} height={buttonHeight} titleColor={'white'} color={styles.buttonGreen} />
                             </View>
                         ) : (null)
                     }
@@ -173,7 +210,7 @@ class QuestionCard extends Component {
                         value={questionAnswers}
                         isEditMode={this.props.isEditMode}
                         isRequired={item.required}
-                        onChange={this.props.onChangeTextAnswer}
+                        onChange={item.multiAnswer ? this.onChangeTextAnswer : this.props.onChangeTextAnswer}
                         multiline={true}
                         style={{width: width, marginHorizontal: marginHorizontal}}
                         translation={this.props.translation}
@@ -190,7 +227,7 @@ class QuestionCard extends Component {
                         value={questionAnswers}
                         isEditMode={this.props.isEditMode}
                         isRequired={item.required}
-                        onChange={this.props.onChangeTextAnswer}
+                        onChange={item.multiAnswer ? this.onChangeText : this.props.onChangeTextAnswer}
                         multiline={true}
                         keyboardType={Platform.OS === 'ios' ? 'number-pad' : 'numeric'}
                         style={{width: width, marginHorizontal: marginHorizontal}}
@@ -207,7 +244,7 @@ class QuestionCard extends Component {
                         value={questionAnswers}
                         isEditMode={this.props.isEditMode}
                         isRequired={item.required}
-                        onChange={this.props.onChangeDateAnswer}
+                        onChange={item.multiAnswer ? this.onChangeDateAnswer : this.props.onChangeDateAnswer}
                         style={{width: width, marginHorizontal: marginHorizontal}}
                         translation={this.props.translation}
                     />
@@ -238,7 +275,7 @@ class QuestionCard extends Component {
                         data={dataWithNoneOption}
                         isEditMode={this.props.isEditMode}
                         isRequired={item.required}
-                        onChange={this.props.onChangeSingleSelection}
+                        onChange={item.multiAnswer ? this.onChangeSingleSelection : this.props.onChangeSingleSelection}
                         style={{width: width, marginHorizontal: marginHorizontal}}
                         translation={this.props.translation}
                     />
@@ -254,7 +291,7 @@ class QuestionCard extends Component {
                         data={item.answers.map((e) => {return {label: getTranslation(e.label, this.props.translation), value: e.value}})}
                         isEditMode={this.props.isEditMode}
                         isRequired={item.required}
-                        onChange={this.props.onChangeMultipleSelection}
+                        onChange={item.multiAnswer ? this.onChangeMultipleSelection : this.props.onChangeMultipleSelection}
                         style={{width: width, marginHorizontal: marginHorizontal}}
                         dropDownStyle={{width: width, alignSelf: 'center'}}
                         showDropdown={this.state.showDropdown}
@@ -282,6 +319,30 @@ class QuestionCard extends Component {
                 }
             </View>
         )
+    };
+
+    onChangeAnswerDate = (date, id) => {
+        this.setState({
+            answerDate: date
+        }, () => {
+            console.log('AnswerDate: ', this.state.answerDate);
+        });
+    };
+
+    onChangeTextAnswer = () => {
+
+    };
+
+    onChangeDateAnswer = () => {
+
+    };
+
+    onChangeSingleSelection = () => {
+
+    };
+
+    onChangeMultipleSelection = () => {
+
     };
 }
 
