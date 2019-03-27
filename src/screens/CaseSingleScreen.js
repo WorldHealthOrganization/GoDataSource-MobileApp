@@ -65,7 +65,6 @@ class CaseSingleScreen extends Component {
                 middleName: '',
                 lastName: '',
                 gender: '',
-                phoneNumber: '',
                 occupation: '',
                 outcomeId: '',
                 dob: null,
@@ -90,6 +89,7 @@ class CaseSingleScreen extends Component {
                         addressLine2: '',
                         postalCode: '',
                         locationId: '',
+                        phoneNumber: '',
                         geoLocation: {
                             coordinates: [0, 0],
                             type: 'Point'
@@ -1269,7 +1269,7 @@ class CaseSingleScreen extends Component {
         if (id === 'geoLocationAccurate' && typeof objectTypeOrIndex === 'number' && objectTypeOrIndex >= 0 && objectType === 'Address') {
             if (value) {
                 console.log('Start getting position');
-                let addressesClone = _.cloneDeep(this.props.case.addresses);
+                let addressesClone = _.cloneDeep(this.state.case.addresses);
                 addressesClone[objectTypeOrIndex].geoLocationAccurate = value;
                 this.setState(
                     (prevState) => ({
@@ -1278,7 +1278,7 @@ class CaseSingleScreen extends Component {
                     }), () => {
                         navigator.geolocation.getCurrentPosition((position) => {
                                 console.log("Get position for cases: ", position);
-                                let addressesClone = _.cloneDeep(this.props.case.addresses);
+                                let addressesClone = _.cloneDeep(this.state.case.addresses);
                                 // console.log('addressesClone: ', addressesClone);
                                 if (!addressesClone[objectTypeOrIndex].geoLocation) {
                                     addressesClone[objectTypeOrIndex].geoLocation = {};
@@ -1310,7 +1310,7 @@ class CaseSingleScreen extends Component {
                                         text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
                                         onPress: () => {
                                             console.log("OK pressed");
-                                            let addressesClone = _.cloneDeep(this.props.case.addresses);
+                                            let addressesClone = _.cloneDeep(this.state.case.addresses);
                                             console.log('addressesClone: ', addressesClone);
                                             if (!addressesClone[objectTypeOrIndex].geoLocation) {
                                                 addressesClone[objectTypeOrIndex].geoLocation = {};
@@ -1339,13 +1339,13 @@ class CaseSingleScreen extends Component {
                                 ])
                             },
                             {
-                                enableHighAccuracy: true, timeout: 20000, maximumAge: 1000
+                                enableHighAccuracy: true, timeout: 5000
                             }
                         )
                     }
                 )
             } else {
-                let addressesClone = _.cloneDeep(this.props.case.addresses);
+                let addressesClone = _.cloneDeep(this.state.case.addresses);
                 // console.log('addressesClone: ', addressesClone);
                 if (!addressesClone[objectTypeOrIndex].geoLocation) {
                     addressesClone[objectTypeOrIndex].geoLocation = {};

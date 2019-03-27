@@ -177,11 +177,9 @@ class ExposureContainer extends PureComponent {
     computeDataForExposure = (item) => {
         let data = [];
         if (item.categoryId) {
-            data = this.props.referenceData.filter((e) => {
-                return e.active === true && e.categoryId === item.categoryId
-            }).map((e) => {
-                return {value: getTranslation(e.value, this.props.translation), id: extractIdFromPouchId(e._id, 'referenceData')}
-            });
+            data = this.props.referenceData.filter((e) => {return e.active === true && e.categoryId === item.categoryId})
+                                        .sort((a,b) => { return a.order - b.order; })
+                                        .map((e) => {return {value: getTranslation(e.value, this.props.translation), id: extractIdFromPouchId(e._id, 'referenceData')}});
         } else {
             if (item.id === 'exposure') {
                 if (this.props.type !== 'Contact') {

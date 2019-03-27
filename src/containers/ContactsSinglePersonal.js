@@ -79,7 +79,7 @@ class ContactsSinglePersonal extends PureComponent {
                         extraHeight={20 + 81 + 50 + 70}
                         innerRef={ref => {
                             this.scrollContactsSinglePersonal = ref
-                        }}>
+                        }}
                     >
                         <View style={style.container}>
                             {
@@ -214,19 +214,19 @@ class ContactsSinglePersonal extends PureComponent {
 
     computeDataForContactsSingleScreenDropdownInput = (item) => {
         if (item.id === 'riskLevel') {
-            return _.filter(this.props.referenceData, (o) => {
-                return o.active === true && o.categoryId.includes("RISK_LEVEL")
-            }).map((o) => {return {value: getTranslation(o.value, this.props.translation), id: o.value}})
+            return _.filter(this.props.referenceData, (o) => {return o.active === true && o.categoryId.includes("RISK_LEVEL")})
+                    .sort((a,b) => { return a.order - b.order; })
+                    .map((o) => {return {value: getTranslation(o.value, this.props.translation), id: o.value}})
         }
         if (item.id === 'gender') {
-            return _.filter(this.props.referenceData, (o) => {
-                return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_GENDER'
-            }).map((o) => {return {value: getTranslation(o.value, this.props.translation), id: o.value}})
+            return _.filter(this.props.referenceData, (o) => {return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_GENDER'})
+                    .sort((a,b) => { return a.order - b.order; })
+                    .map((o) => {return {value: getTranslation(o.value, this.props.translation), id: o.value}})
         }
         if (item.id === 'occupation') {
-            return _.filter(this.props.referenceData, (o) => {
-                return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_OCCUPATION'
-            }).map((o) => {return {value: getTranslation(o.value, this.props.translation), id: o.value}})
+            return _.filter(this.props.referenceData, (o) => {return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_OCCUPATION'})
+                    .sort((a,b) => { return a.order - b.order; })
+                    .map((o) => {return {value: getTranslation(o.value, this.props.translation), id: o.value}})
         }
     };
 

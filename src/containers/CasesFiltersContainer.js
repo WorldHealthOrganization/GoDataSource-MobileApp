@@ -161,9 +161,9 @@ class CasesFiltersContainer extends PureComponent {
 
     computeDataForDropdown = (item) => {
         if (item.id === 'classification') {
-            return _.filter(this.props.referenceData, (o) => {
-                return o.active === true && o.categoryId.includes("CASE_CLASSIFICATION")
-            }).map((o) => {return {label: getTranslation(o.value, this.props.translation), value: o.value}})
+            return _.filter(this.props.referenceData, (o) => {return o.active === true && o.categoryId.includes("CASE_CLASSIFICATION")})
+                    .sort((a,b) => { return a.order - b.order; })
+                    .map((o) => {return {label: getTranslation(o.value, this.props.translation), value: o.value}})
         }
 
         return [];
