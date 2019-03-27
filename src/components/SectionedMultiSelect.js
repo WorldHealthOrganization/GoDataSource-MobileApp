@@ -64,7 +64,7 @@ class SectionedMultiSelect extends PureComponent {
                         this.props.showUnderline ? (
                             <View style={{
                                 width: '100%',
-                                height: 1.5,
+                                height: 0.5,
                                 backgroundColor: this.props.underlineColor
                             }}/>
                         ) : (null)

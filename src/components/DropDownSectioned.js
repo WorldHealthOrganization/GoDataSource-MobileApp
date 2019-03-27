@@ -55,7 +55,7 @@ class DropDownSectioned extends Component {
                     <SectionedMultiSelect
                         items={this.props.data}
                         showUnderline={true}
-                        underlineColor={'red'}
+                        underlineColor={stylesGlobal.textFieldUnderline}
                         selectToggleIconComponent={(<Icon name="check" size={18} />)}
                         dropDownToggleIconDownComponent={(<Icon name="arrow-drop-down" size={18} />)}
                         dropDownToggleIconUpComponent={(<Icon name="arrow-drop-up" size={18} />)}
