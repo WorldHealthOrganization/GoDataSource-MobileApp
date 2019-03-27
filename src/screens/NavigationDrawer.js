@@ -118,6 +118,7 @@ class NavigationDrawer extends Component {
                             onChange={this.handleOnChangeLanguage}
                             style={{width: '90%'}}
                             translation={this.props.translation}
+                            screenSize={this.props.screenSize}
                         />
                     </View>
                     <NavigationDrawerListItem key={'help'} label={getTranslation(translations.navigationDrawer.helpLabel, this.props.translation)} name="help" onPress={() => this.handlePressOnListItem('help')} isSelected={'help' === this.state.selectedScreen}/>
