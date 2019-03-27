@@ -488,6 +488,20 @@ const caseSingleScreen = {
                 multiline: true,
                 objectType: 'Address'
             },
+            // Is the person next to you support
+            {
+                cardNumber: 1,
+                id: 'geoLocationAccurate',
+                label: 'Is the person next to you',
+                labelValue: 'test',
+                type: 'SwitchInput',
+                value: '',
+                isRequired: false,
+                isEditMode: true,
+                activeButtonColor: styles.missedRedColor,
+                activeBackgroundColor: styles.missedRedColorWithOpacity,
+                objectType: 'Address'
+            },
             // Add coordinates support
             {
                 cardNumber: 1,
@@ -1662,6 +1676,20 @@ const contactsSingleScreen = {
                 isRequired: false,
                 isEditMode: true,
                 multiline: true,
+                objectType: 'Address'
+            },
+            // Is the person next to you support
+            {
+                cardNumber: 1,
+                id: 'geoLocationAccurate',
+                label: 'Is the person next to you?',
+                labelValue: 'test',
+                type: 'SwitchInput',
+                value: '',
+                isRequired: false,
+                isEditMode: true,
+                activeButtonColor: styles.missedRedColor,
+                activeBackgroundColor: styles.missedRedColorWithOpacity,
                 objectType: 'Address'
             },
             // Add coordinates support

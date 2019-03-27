@@ -23,9 +23,10 @@ import {updateContact} from './../actions/contacts';
 import {removeErrors} from './../actions/errors';
 import DateTimePicker from 'react-native-modal-datetime-picker';
 import _ from 'lodash';
-import {calculateDimension, extractIdFromPouchId, computeIdForFileType, updateRequiredFields, getTranslation} from './../utils/functions';
+import {calculateDimension, extractIdFromPouchId, updateRequiredFields, getTranslation} from './../utils/functions';
 import translations from './../utils/translations'
 import ElevatedView from 'react-native-elevated-view';
+import ViewHOC from './../components/ViewHOC';
 
 
 class FollowUpsSingleScreen extends Component {
@@ -110,7 +111,7 @@ class FollowUpsSingleScreen extends Component {
             // }
             )
         }
-        return false;
+        return true;
     }
 
     // Please add here the react lifecycle methods that you need
@@ -147,7 +148,10 @@ class FollowUpsSingleScreen extends Component {
     // and can slow down the app
     render() {
         return (
-            <View style={style.container}>
+            <ViewHOC style={style.container}
+                     showLoader={this && this.state && this.state.loading}
+                     loaderText={this.props && this.props.syncState ? 'Loading' : getTranslation(translations.loadingScreenMessages.loadingMsg, this.props.translation)}
+            >
                 <NavBarCustom
                     title={null}
                     customTitle={
@@ -219,7 +223,7 @@ class FollowUpsSingleScreen extends Component {
                     renderTabBar={this.handleRenderTabBar}
                     useNativeDriver
                 />
-            </View>
+            </ViewHOC>
         );
     }
 
@@ -246,6 +250,7 @@ class FollowUpsSingleScreen extends Component {
                         isEditMode={this.state.isEditMode}
                         item={this.state.item}
                         contact={this.state.contact}
+                        activeIndex={this.state.index}
                         onNext={this.handleNextPress}
                         onChangeText={this.onChangeText}
                         onChangeDate={this.onChangeDate}
@@ -260,6 +265,7 @@ class FollowUpsSingleScreen extends Component {
                         contact={this.state.contact}
                         isNew={this.props.isNew}
                         isEditMode={this.state.isEditMode}
+                        activeIndex={this.state.index}
                         onChangeTextAnswer={this.onChangeTextAnswer}
                         onChangeDateAnswer={this.onChangeDateAnswer}
                         onChangeSingleSelection={this.onChangeSingleSelection}
@@ -327,8 +333,8 @@ class FollowUpsSingleScreen extends Component {
             <Animated.Text style={{
                 fontFamily: 'Roboto-Medium',
                 fontSize: 12,
-                color: color,
                 flex: 1,
+                color: color,
                 alignSelf: 'center'
             }}>
                 {getTranslation(route.title, this.props.translation).toUpperCase()}
@@ -497,7 +503,7 @@ class FollowUpsSingleScreen extends Component {
             } else {
                 this.setState(
                     (prevState) => ({
-                        item: Object.assign({}, prevState.item, {[id]: value && value.value ? value.value : value}),
+                        item: Object.assign({}, prevState.item, {[id]: value && value.value !== undefined ? value.value : value}),
                         isModified: true
                     }), () => {
                         console.log("onChangeDropDown", id, " ", value, " ", this.state.item);
@@ -509,7 +515,7 @@ class FollowUpsSingleScreen extends Component {
             if (objectType === 'Contact') {
                 this.setState(
                     (prevState) => ({
-                        contact: Object.assign({}, prevState.contact, {[id]: value && value.value ? value.value : value}),
+                        contact: Object.assign({}, prevState.contact, {[id]: value && value.value !== undefined ? value.value : value}),
                         isModified: true
                     }), () => {
                         console.log("onChangeDropDown", id, " ", value, " ", this.state.contact);

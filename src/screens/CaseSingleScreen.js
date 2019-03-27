@@ -28,6 +28,7 @@ import {updateRequiredFields, extractIdFromPouchId, navigation, getTranslation, 
 import moment from 'moment';
 import translations from './../utils/translations'
 import ElevatedView from 'react-native-elevated-view';
+import ViewHOC from './../components/ViewHOC';
 
 const initialLayout = {
     height: 0,
@@ -120,21 +121,6 @@ class CaseSingleScreen extends Component {
 
     componentDidMount() {
         BackHandler.addEventListener('hardwareBackPress', this.handleBackButtonClick);
-        if (!this.props.isNew) {
-            let ageClone = {years: 0, months: 0}
-            let updateAge = false;
-            if (this.props.case.age === null || this.props.case.age === undefined || this.props.case.age.years === undefined || this.props.case.age.years === null || this.props.case.age.months === undefined || this.props.case.age.months === null) {
-                updateAge = true
-            }
-
-            if (updateAge) {
-                this.setState(prevState => ({
-                    case: Object.assign({}, prevState.case, {age: ageClone}, {dob: this.props.case.dob !== undefined ? this.props.case.dob : null}),
-                }), () => {
-                    console.log ('old case with age as string update')
-                })
-            }
-        }
     }
 
     componentWillUnmount() {
@@ -144,6 +130,18 @@ class CaseSingleScreen extends Component {
     // Please add here the react lifecycle methods that you need
     static getDerivedStateFromProps(props, state) {
         // console.log("CaseSingleScreen: ", state, props);
+        if (!props.isNew) {
+            let ageClone = {years: 0, months: 0};
+            let updateAge = false;
+            if (props.case.age === null || props.case.age === undefined || props.case.age.years === undefined || props.case.age.years === null ||
+                props.case.age.months === undefined || props.case.age.months === null) {
+                updateAge = true
+            }
+
+            if (updateAge) {
+                state.case = Object.assign({}, state.case, {age: ageClone}, {dob: props.case.dob !== undefined ? props.case.dob : null});
+            }
+        }
         if (props.errors && props.errors.type && props.errors.message) {
             Alert.alert(props.errors.type, props.errors.message, [
                 {
@@ -195,7 +193,7 @@ class CaseSingleScreen extends Component {
             // }
             )
         }
-        return false;
+        return true;
     }
 
     // The render method should have at least business logic as possible,
@@ -203,7 +201,10 @@ class CaseSingleScreen extends Component {
     // and can slow down the app
     render() {
         return (
-            <View style={style.container}>
+            <ViewHOC style={style.container}
+                     showLoader={this && this.state && this.state.loading}
+                     loaderText={this.props && this.props.syncState ? 'Loading' : getTranslation(translations.loadingScreenMessages.loadingMsg, this.props.translation)}
+            >
                 <NavBarCustom
                     title={null}
                     customTitle={
@@ -263,11 +264,11 @@ class CaseSingleScreen extends Component {
                     onIndexChange={this.handleOnIndexChange}
                     renderScene={this.handleRenderScene}
                     renderTabBar={this.handleRenderTabBar}
-                    useNativeDriver
+                    useNativeDriver={true}
                     initialLayout={initialLayout}
                     swipeEnabled = { this.props.isNew ? false : true}
                 />
-            </View>
+            </ViewHOC>
         );
     }
 
@@ -327,6 +328,8 @@ class CaseSingleScreen extends Component {
                     backgroundColor: 'white'
                 }}
                 renderLabel={this.handleRenderLabel(props)}
+                scrollEnabled={true}
+                bounces={true}
             />
         )
     };
@@ -358,12 +361,14 @@ class CaseSingleScreen extends Component {
 
     //Render scene
     handleRenderScene = ({route}) => {
+        console.log('Route: ', route);
         switch(route.key) {
             case 'personal':
                 return (
                     <CaseSinglePersonalContainer
                         case={this.state.case}
                         isEditMode={this.state.isEditMode}
+                        index={this.state.index}
                         onPressEdit={this.onPressEdit}
                         onPressSaveEdit={this.onPressSaveEdit}
                         onPressCancelEdit={this.onPressCancelEdit}
@@ -389,6 +394,7 @@ class CaseSingleScreen extends Component {
                     <CaseSingleAddressContainer
                         case={this.state.case}
                         isEditMode={this.state.isEditMode}
+                        index={this.state.index}
                         onPressEdit={this.onPressEdit}
                         onPressSaveEdit={this.onPressSaveEdit}
                         onPressCancelEdit={this.onPressCancelEdit}
@@ -413,6 +419,7 @@ class CaseSingleScreen extends Component {
                     <CaseSingleInfectionContainer
                         case={this.state.case}
                         isEditMode={this.state.isEditMode}
+                        index={this.state.index}
                         onPressEdit={this.onPressEdit}
                         onPressSaveEdit={this.onPressSaveEdit}
                         onPressCancelEdit={this.onPressCancelEdit}
@@ -438,6 +445,7 @@ class CaseSingleScreen extends Component {
                 return <CaseSingleInvestigationContainer
                     item={this.state.case}
                     isEditMode={this.state.isEditMode}
+                    index={this.state.index}
                     onPressEdit={this.onPressEdit}
                     onPressSave={this.handleOnPressSave}
                     onPressSaveEdit={this.onPressSaveEdit}
@@ -680,9 +688,6 @@ class CaseSingleScreen extends Component {
                 isEditMode: true,
                 isModified: false,
                 caseBeforeEdit: _.cloneDeep(this.state.case)
-        }, () => {
-            console.log("handleEditPress", this.state.isEditMode);
-            console.log("handleEditPress", this.state.caseBeforeEdit);
         })
     };
     onPressSaveEdit = () => {
@@ -755,15 +760,24 @@ class CaseSingleScreen extends Component {
         })
     };
     handleOnPressDeleteDocument = (index) => {
-        console.log("DeletePressed: ", index);
-        let caseDocumentsClone = _.cloneDeep(this.state.case.documents);
-        caseDocumentsClone.splice(index, 1);
-        this.setState(prevState => ({
-            case: Object.assign({}, prevState.case, {documents: caseDocumentsClone}),
-            isModified: true
-        }), () => {
-            console.log("After deleting the document: ", this.state.case);
-        })
+        // console.log("DeletePressed: ", index);
+        Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.alertMessages.deleteDocument, this.state.translation), [
+            {
+                text: getTranslation(translations.generalLabels.noAnswer, this.props.translation), onPress: () => {console.log('Cancel pressed')}
+            },
+            {
+                text: getTranslation(translations.generalLabels.yesAnswer, this.props.translation), onPress: () => {
+                    let caseDocumentsClone = _.cloneDeep(this.state.case.documents);
+                    caseDocumentsClone.splice(index, 1);
+                    this.setState(prevState => ({
+                        case: Object.assign({}, prevState.case, {documents: caseDocumentsClone}),
+                        isModified: true
+                    }), () => {
+                        console.log("After deleting the document: ", this.state.case);
+                    })
+                }
+            }
+        ]);
     };
 
 
@@ -796,23 +810,32 @@ class CaseSingleScreen extends Component {
         })
     };
     handleOnPressDeleteAddress = (index) => {
-        console.log("DeletePressed: ", index);
-        let caseAddressesClone = _.cloneDeep(this.state.case.addresses);
-        caseAddressesClone.splice(index, 1);
+        // console.log("DeletePressed: ", index);
+        Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.alertMessages.deleteAddress, this.state.translation), [
+            {
+                text: getTranslation(translations.generalLabels.noAnswer, this.props.translation), onPress: () => {console.log('Cancel pressed')}
+            },
+            {
+                text: getTranslation(translations.generalLabels.yesAnswer, this.props.translation), onPress: () => {
+                    let caseAddressesClone = _.cloneDeep(this.state.case.addresses);
+                    caseAddressesClone.splice(index, 1);
 
-        let hasPlaceOfResidence = false
-        let caselaceOfResidence = caseAddressesClone.find((e) => {return e.typeId === config.userResidenceAddress.userPlaceOfResidence})
-        if (caselaceOfResidence !== undefined) {
-            hasPlaceOfResidence = true
-        }
+                    let hasPlaceOfResidence = false;
+                    let caselaceOfResidence = caseAddressesClone.find((e) => {return e.typeId === config.userResidenceAddress.userPlaceOfResidence})
+                    if (caselaceOfResidence !== undefined) {
+                        hasPlaceOfResidence = true
+                    }
 
-        this.setState(prevState => ({
-            case: Object.assign({}, prevState.case, {addresses: caseAddressesClone}),
-            isModified: true,
-            hasPlaceOfResidence
-        }), () => {
-            console.log("After deleting the address: ", this.state.case);
-        })
+                    this.setState(prevState => ({
+                        case: Object.assign({}, prevState.case, {addresses: caseAddressesClone}),
+                        isModified: true,
+                        hasPlaceOfResidence
+                    }), () => {
+                        console.log("After deleting the address: ", this.state.case);
+                    })
+                }
+            }
+        ]);
     };
     handleOnChangeSectionedDropDownAddress = (selectedItems, index) => {
         // Here selectedItems is always an array with just one value and should pe mapped to the locationId field from the address from index
@@ -848,15 +871,24 @@ class CaseSingleScreen extends Component {
         })
     };
     handleOnPressDeleteDateRange = (index) => {
-        console.log("DeletePressed: ", index);
-        let caseDateRangesClone = _.cloneDeep(this.state.case.dateRanges);
-        caseDateRangesClone.splice(index, 1);
-        this.setState(prevState => ({
-            case: Object.assign({}, prevState.case, {dateRanges: caseDateRangesClone}),
-            isModified: true
-        }), () => {
-            console.log("After deleting the dateRange: ", this.state.case);
-        })
+        Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.alertMessages.deleteDateRange, this.state.translation), [
+            {
+                text: getTranslation(translations.generalLabels.noAnswer, this.props.translation), onPress: () => {console.log('Cancel pressed')}
+            },
+            {
+                text: getTranslation(translations.generalLabels.yesAnswer, this.props.translation), onPress: () => {
+                    console.log("DeletePressed: ", index);
+                    let caseDateRangesClone = _.cloneDeep(this.state.case.dateRanges);
+                    caseDateRangesClone.splice(index, 1);
+                    this.setState(prevState => ({
+                        case: Object.assign({}, prevState.case, {dateRanges: caseDateRangesClone}),
+                        isModified: true
+                    }), () => {
+                        console.log("After deleting the dateRange: ", this.state.case);
+                    })
+                }
+            }
+        ]);
     };
     onChangeSectionedDropDownDateRange = (selectedItems, index) => {
         console.log ('handleOnChangeSectionedDropDown', selectedItems, index);
@@ -914,10 +946,12 @@ class CaseSingleScreen extends Component {
 
     // show/hide Menu
     showMenu = () => {
-        this.refs.menuRef.show();
+        console.log('Show menu is not necessary');
+        // this.refs.menuRef.show();
     };
     hideMenu = () => {
-        this.refs.menuRef.hide();
+        console.log('Hide menu is not necessary');
+        // this.refs.menuRef.hide();
     };
 
 
@@ -1008,7 +1042,7 @@ class CaseSingleScreen extends Component {
         let requiredFields = [];
         for (let i = 0; i< this.props.caseInvestigationQuestions.length; i++) {
             let questionnaireAnswer = this.state.case.questionnaireAnswers[this.props.caseInvestigationQuestions[i].variable];
-            if (this.props.caseInvestigationQuestions[i].required){
+            if (this.props.caseInvestigationQuestions[i].required && this.props.caseInvestigationQuestions[i].inactive === false){
                 //multiple answer question
                 if(Array.isArray(questionnaireAnswer)){
                     //if is empty
@@ -1212,38 +1246,120 @@ class CaseSingleScreen extends Component {
             }
         }
     };
-    onChangeSwitch = (value, id, objectType) => {
-        if (id === 'fillGeoLocation') {
-            navigator.geolocation.getCurrentPosition((position) => {
-                    this.setState(
-                        (prevState) => ({
-                            item: Object.assign({}, prevState.item, {[id]: value ? {lat: position.coords.latitude, lng: position.coords.longitude} : null }),
-                            isModified: true
-                        }), () => {
-                            // console.log("onChangeSwitch", id, " ", value, " ", this.state.item);
-                        }
-                    )
-                },
-                (error) => {
-                    Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.alertMessages.caseGetLocationError, this.props.translation), [
-                        {
-                            text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation), 
-                            onPress: () => {console.log("OK pressed")}
-                        }
-                    ])
-                },
-                {
-                    enableHighAccuracy: true, timeout: 20000, maximumAge: 1000
+    onChangeSwitch = (value, id, objectTypeOrIndex, objectType) => {
+        if (id === 'geoLocationAccurate' && typeof objectTypeOrIndex === 'number' && objectTypeOrIndex >= 0 && objectType === 'Address') {
+            if (value) {
+                console.log('Start getting position');
+                let addressesClone = _.cloneDeep(this.props.case.addresses);
+                addressesClone[objectTypeOrIndex].geoLocationAccurate = value;
+                this.setState(
+                    (prevState) => ({
+                        case: Object.assign({}, prevState.case, {addresses: addressesClone}),
+                        isModified: true
+                    }), () => {
+                        navigator.geolocation.getCurrentPosition((position) => {
+                                console.log("Get position for cases: ", position);
+                                let addressesClone = _.cloneDeep(this.props.case.addresses);
+                                // console.log('addressesClone: ', addressesClone);
+                                if (!addressesClone[objectTypeOrIndex].geoLocation) {
+                                    addressesClone[objectTypeOrIndex].geoLocation = {};
+                                    addressesClone[objectTypeOrIndex].geoLocation.type = 'Point';
+                                    addressesClone[objectTypeOrIndex].geoLocation.coordinates = [];
+                                }
+                                if (!addressesClone[objectTypeOrIndex].geoLocation.type) {
+                                    addressesClone[objectTypeOrIndex].geoLocation.type = 'Point';
+                                }
+                                if (!addressesClone[objectTypeOrIndex].geoLocation.coordinates) {
+                                    addressesClone[objectTypeOrIndex].geoLocation.coordinates = [];
+                                }
+                                addressesClone[objectTypeOrIndex].geoLocation.coordinates = [value ? position.coords.longitude : 0, value ? position.coords.latitude : 0];
+                                addressesClone[objectTypeOrIndex].geoLocationAccurate = value;
+                                this.setState(
+                                    (prevState) => ({
+                                        case: Object.assign({}, prevState.case, {addresses: addressesClone}),
+                                        isModified: true
+                                    })
+                                    // , () => {
+                                    //     console.log("onChangeSwitch", id, " ", value, " ", this.state.case);
+                                    // }
+                                )
+                            },
+                            (error) => {
+                                console.log("Error while getting location: ", error);
+                                Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(error.message, this.props.translation), [
+                                    {
+                                        text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+                                        onPress: () => {
+                                            console.log("OK pressed");
+                                            let addressesClone = _.cloneDeep(this.props.case.addresses);
+                                            console.log('addressesClone: ', addressesClone);
+                                            if (!addressesClone[objectTypeOrIndex].geoLocation) {
+                                                addressesClone[objectTypeOrIndex].geoLocation = {};
+                                                addressesClone[objectTypeOrIndex].geoLocation.type = 'Point';
+                                                addressesClone[objectTypeOrIndex].geoLocation.coordinates = [];
+                                            }
+                                            if (!addressesClone[objectTypeOrIndex].geoLocation.type) {
+                                                addressesClone[objectTypeOrIndex].geoLocation.type = 'Point';
+                                            }
+                                            if (!addressesClone[objectTypeOrIndex].geoLocation.coordinates) {
+                                                addressesClone[objectTypeOrIndex].geoLocation.coordinates = [];
+                                            }
+                                            addressesClone[objectTypeOrIndex].geoLocation.coordinates = [null, null];
+                                            addressesClone[objectTypeOrIndex].geoLocationAccurate = false;
+                                            this.setState(
+                                                (prevState) => ({
+                                                    case: Object.assign({}, prevState.case, {addresses: addressesClone}),
+                                                    isModified: true
+                                                })
+                                                // , () => {
+                                                //     console.log("onChangeSwitch", id, " ", value, " ", this.state.case);
+                                                // }
+                                            )
+                                        }
+                                    }
+                                ])
+                            },
+                            {
+                                enableHighAccuracy: true, timeout: 20000, maximumAge: 1000
+                            }
+                        )
+                    }
+                )
+            } else {
+                let addressesClone = _.cloneDeep(this.props.case.addresses);
+                // console.log('addressesClone: ', addressesClone);
+                if (!addressesClone[objectTypeOrIndex].geoLocation) {
+                    addressesClone[objectTypeOrIndex].geoLocation = {};
+                    addressesClone[objectTypeOrIndex].geoLocation.type = 'Point';
+                    addressesClone[objectTypeOrIndex].geoLocation.coordinates = [];
                 }
-            )
+                if (!addressesClone[objectTypeOrIndex].geoLocation.type) {
+                    addressesClone[objectTypeOrIndex].geoLocation.type = 'Point';
+                }
+                if (!addressesClone[objectTypeOrIndex].geoLocation.coordinates) {
+                    addressesClone[objectTypeOrIndex].geoLocation.coordinates = [];
+                }
+                addressesClone[objectTypeOrIndex].geoLocation.coordinates = [null, null];
+                addressesClone[objectTypeOrIndex].geoLocationAccurate = value;
+                this.setState(
+                    (prevState) => ({
+                        case: Object.assign({}, prevState.case, {addresses: addressesClone}),
+                        isModified: true
+                    })
+                    // , () => {
+                    //     console.log("onChangeSwitch", id, " ", value, " ", this.state.case);
+                    // }
+                )
+            }
         } else {
-            if(objectType == 'Case') {
+            if(objectType === 'Case') {
                 this.setState( (prevState) => ({
                         case: Object.assign({}, prevState.case, {[id]: value}),
                         isModified: true
-                    }), () => {
+                    })
+                    // , () => {
                             // console.log("onChangeSwitch", id, " ", value, " ", this.state.case);
-                    }
+                    // }
                 )
             }
         }
@@ -1253,7 +1369,7 @@ class CaseSingleScreen extends Component {
         if(objectTypeOrIndex === 'Case') {
             this.setState(
                 (prevState) => ({
-                    case: Object.assign({}, prevState.case, {[id]: value && value.value ? value.value : value}),
+                    case: Object.assign({}, prevState.case, {[id]: value && value.value !== undefined ? value.value : value}),
                     isModified: true
                 }), () => {
                     // console.log("onChangeDropDown", id, " ", value, " ", this.state.case);
@@ -1265,7 +1381,7 @@ class CaseSingleScreen extends Component {
                     let addressesClone = _.cloneDeep(this.state.case.addresses);
 
                     let anotherPlaceOfResidenceWasChosen = false
-                    if (value && value.value){
+                    if (value && value.value !== undefined ){
                        if(value.value === config.userResidenceAddress.userPlaceOfResidence){
                             addressesClone.forEach(element => {
                                 if (element[id] === value.value){
@@ -1276,7 +1392,7 @@ class CaseSingleScreen extends Component {
                        }
                     }
 
-                    addressesClone[objectTypeOrIndex][id] = value && value.value ? value.value : value;
+                    addressesClone[objectTypeOrIndex][id] = value && value.value !== undefined ? value.value : value;
                     let hasPlaceOfResidence = false
                     let casePlaceOfResidence = addressesClone.filter((e) => {return e.typeId === config.userResidenceAddress.userPlaceOfResidence})
                     if (casePlaceOfResidence && casePlaceOfResidence.length > 0) {
@@ -1294,7 +1410,7 @@ class CaseSingleScreen extends Component {
                     })
                 } else if (objectType === 'Documents') {
                         let documentsClone = _.cloneDeep(this.state.case.documents);
-                        documentsClone[objectTypeOrIndex][id] = value && value.value ? value.value : value;
+                        documentsClone[objectTypeOrIndex][id] = value && value.value !== undefined  ? value.value : value;
                         console.log ('documentsClone', documentsClone)
                         this.setState(prevState => ({
                             case: Object.assign({}, prevState.case, {documents: documentsClone}),
@@ -1304,7 +1420,7 @@ class CaseSingleScreen extends Component {
                         })
                 } else if (objectType === 'DateRanges') {
                     let dateRangesClone = _.cloneDeep(this.state.case.dateRanges);
-                    dateRangesClone[objectTypeOrIndex][id] = value && value.value ? value.value : value;
+                    dateRangesClone[objectTypeOrIndex][id] = value && value.value !== undefined  ? value.value : value;
                     console.log ('dateRangesClone', dateRangesClone);
                     this.setState(prevState => ({
                         case: Object.assign({}, prevState.case, {dateRanges: dateRangesClone}),
@@ -1343,7 +1459,7 @@ class CaseSingleScreen extends Component {
             if (!this.props.isNew) {
                 if (ageClone.years === 0 && ageClone.months !== 0) {
                     ageClone.years = ageClone.months
-                } else if (ageClone.monthsyears === 0 && ageClone.years !== 0){
+                } else if (ageClone.months === 0 && ageClone.years !== 0){
                     ageClone.months = ageClone.years
                 }
             }

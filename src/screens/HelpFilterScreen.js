@@ -45,13 +45,19 @@ class HelpFilterScreen extends Component {
     // Please add here the react lifecycle methods that you need
     static getDerivedStateFromProps(props, state) {
         let filterClone = Object.assign({}, state.filter.filter);
+        let sortClone = _.cloneDeep(state.filter.sort);
+
         if (props && props.activeFilters) {
             if (props.activeFilters.categories && Array.isArray(props.activeFilters.categories)){
                 filterClone.categories = props.activeFilters.categories;
             }
-            console.log("### Active filters: ", filterClone);
+
+            if (props.activeFilters.sort && props.activeFilters.sort !== undefined && Array.isArray(props.activeFilters.sort) && props.activeFilters.sort.length > 0){
+                sortClone = props.activeFilters.sort;
+            }
         }
         state.filter.filter = filterClone
+        state.filter.sort = sortClone
         return null
     };
 
@@ -81,25 +87,35 @@ class HelpFilterScreen extends Component {
         this.setState({index});
     };
 
-    handleRenderScene = () => {
-        if (this.state.index === 0) {
-            return (
-                <HelpFilterContainer
-                    filter={this.state.filter}
-                    onChangeMultipleSelection={this.handleOnChangeMultipleSelection}
-                    onPressApplyFilters={this.handleOnPressApplyFilters}
-                />
-            );
-        } else {
-            return (
-                <HelpSortContainer
-                    filter={this.state.filter}
-                    onPressApplyFilters={this.handleOnPressApplyFilters}
-                    onPressAddSortRule={this.onPressAddSortRule}
-                    onChangeDropDown={this.onChangeDropDown}
-                    onDeletePress={this.onDeleteSortRulePress}
-                />
-            );
+
+    handleRenderScene = ({route}) => {
+        switch (route.key) {
+            case 'filters':
+                return (
+                    <HelpFilterContainer
+                        filter={this.state.filter}
+                        onChangeMultipleSelection={this.handleOnChangeMultipleSelection}
+                        onPressApplyFilters={this.handleOnPressApplyFilters}
+                    />
+                );
+            case 'sort':
+                return (
+                    <HelpSortContainer
+                        filter={this.state.filter}
+                        onPressApplyFilters={this.handleOnPressApplyFilters}
+                        onPressAddSortRule={this.onPressAddSortRule}
+                        onChangeDropDown={this.onChangeDropDown}
+                        onDeletePress={this.onDeleteSortRulePress}
+                    />
+                );
+            default:
+                return (
+                    <HelpFilterContainer
+                        filter={this.state.filter}
+                        onChangeMultipleSelection={this.handleOnChangeMultipleSelection}
+                        onPressApplyFilters={this.handleOnPressApplyFilters}
+                    />
+                )
         }
     };
 
@@ -135,7 +151,7 @@ class HelpFilterScreen extends Component {
         if (typeof objectTypeOrIndex === 'number' && objectTypeOrIndex >= 0) {
             if (objectType === 'Sort') {
                 let sortClone = _.cloneDeep(this.state.filter.sort);
-                sortClone[objectTypeOrIndex][id] = value && value.value ? value.value : value;
+                sortClone[objectTypeOrIndex][id] = value && value.value !== undefined ? value.value : value;
                 console.log ('sortClone', sortClone)
                 this.setState(prevState => ({
                     filter: Object.assign({}, prevState.filter, {sort: sortClone}),
@@ -190,6 +206,10 @@ class HelpFilterScreen extends Component {
 
     // Please write here all the methods that are not react native lifecycle methods
     handlePressNavbarButton = () => {
+        this.props.navigator.dismissModal();
+    };
+
+    handleResetFilters = () => {
         this.props.removeFilterForScreen(this.props.screen);
         this.props.navigator.dismissModal(this.props.onApplyFilters(null));
     };

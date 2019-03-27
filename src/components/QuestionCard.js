@@ -17,10 +17,12 @@ import ElevatedView from 'react-native-elevated-view';
 import DropdownInput from './DropdownInput';
 import TextInput from './TextInput';
 import DropDown from './DropDown';
-import _ from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
+import isEqual from 'lodash/isEqual';
 import DatePicker from './DatePicker';
-import translations from './../utils/translations'
 import Section from "./Section";
+import translations from './../utils/translations';
+import QuestionCardTitle from './QuestionCardTitle';
 
 
 class QuestionCard extends Component {
@@ -33,12 +35,25 @@ class QuestionCard extends Component {
         };
     }
 
+    shouldComponentUpdate(nextProps, nextState) {
+        // console.log("Next source, old source: ", nextProps.source.questionnaireAnswers[nextProps.item.variable], this.props.source.questionnaireAnswers[this.props.item.variable]);
+        if (nextProps.isEditMode !== this.props.isEditMode ||
+            (nextProps.source && nextProps.source.questionnaireAnswers && nextProps.source.questionnaireAnswers[nextProps.item.variable] &&
+                this.props.source && this.props.source.questionnaireAnswers && this.props.source.questionnaireAnswers[this.props.item.variable] &&
+                !isEqual(nextProps.source.questionnaireAnswers[nextProps.item.variable], this.props.source.questionnaireAnswers[this.props.item.variable])) ||
+            nextProps.totalNumberOfQuestions !== this.props.totalNumberOfQuestions) {
+            // console.log("Next source, old source: ", nextProps.item.variable, nextProps.source.questionnaireAnswers[nextProps.item.variable], this.props.source.questionnaireAnswers[this.props.item.variable]);
+            return true;
+        }
+        return false;
+    }
+
     // Please add here the react lifecycle methods that you need
     // The render method should have at least business logic as possible,
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
-        // console.log('Render stuff');
+        console.log('Render QuestionCard');
         return (
             <ElevatedView elevation={3} style={[this.props.style, style.container, {
                 marginHorizontal: calculateDimension(16, false, this.props.screenSize),
@@ -47,26 +62,17 @@ class QuestionCard extends Component {
             }]}
                 onPress={() => {this.setState({showDropdown: false})}}
             >
-                <View style={[style.containerQuestion,
-                    {
-                        height: calculateDimension(43, true, this.props.screenSize),
-                        paddingRight: calculateDimension(34, false, this.props.screenSize),
-                        paddingLeft: calculateDimension(14, false, this.props.screenSize)
-                    }]}>
-                    <View style={style.containerQuestionNumber}>
-                        <Text style={style.questionText}>{getTranslation(translations.generalLabels.questionInitial, this.props.translation).charAt(0).toUpperCase() + this.props.index}</Text>
-                    </View>
-                    <Text style={[style.questionText, {
-                            marginLeft: calculateDimension(8, false, this.props.screenSize),
-                            marginRight: calculateDimension(34, false, this.props.screenSize) }]} numberOfLines={2}>
-                        {getTranslation(this.props.item.text, this.props.translation)}
-                        {
-                            this.props.item && this.props.item.category ?
-                                ' - ' + getTranslation(this.props.item.category, this.props.translation) : ''
-
-                        }
-                    </Text>
-                </View>
+                <QuestionCardTitle
+                    height={calculateDimension(43, true, this.props.screenSize)}
+                    paddingRight={calculateDimension(34, true, this.props.screenSize)}
+                    paddingLeft={calculateDimension(14, true, this.props.screenSize)}
+                    marginLeft={calculateDimension(8, false, this.props.screenSize)}
+                    marginRight={calculateDimension(34, false, this.props.screenSize)}
+                    questionNumber={getTranslation(translations.generalLabels.questionInitial, this.props.translation).charAt(0).toUpperCase() + this.props.index}
+                    questionText={getTranslation(this.props.item.text, this.props.translation)}
+                    questionCategory={this.props.item && this.props.item.category ?
+                        ' - ' + getTranslation(this.props.item.category, this.props.translation) : ''}
+                />
                 <ScrollView scrollEnabled={false} keyboardShouldPersistTaps={'always'}>
                     {
                         this.handleRenderItem(this.props.item)
@@ -108,7 +114,7 @@ class QuestionCard extends Component {
 
         let width = calculateDimension(315, false, this.props.screenSize);
         let marginHorizontal = calculateDimension(14, false, this.props.screenSize);
-        let source = _.cloneDeep(this.props.source);
+        let source = cloneDeep(this.props.source);
         if (!source.questionnaireAnswers) {
             source.questionnaireAnswers = {};
         }
@@ -152,11 +158,9 @@ class QuestionCard extends Component {
         }
 
         // console.log("### questionAnswers: ", questionAnswers, item);
-
         // if (item.type === 'DropdownInput' && item.isExposure) {
         //     item.data = this.props.cases.map((e) => {return {value: ((e.firstName ? e.firstName : '') + (e.lastName ? (" " + e.lastName) : ''))}})
         // }
-
         // console.log('Itemm: ', item);
 
         switch(item.answerType) {
@@ -174,6 +178,7 @@ class QuestionCard extends Component {
                         style={{width: width, marginHorizontal: marginHorizontal}}
                         translation={this.props.translation}
                         screenSize={this.props.screenSize}
+                        onFocus={this.props.onFocus}
                     />
                 );
             case 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_NUMERIC':
@@ -191,6 +196,7 @@ class QuestionCard extends Component {
                         style={{width: width, marginHorizontal: marginHorizontal}}
                         translation={this.props.translation}
                         screenSize={this.props.screenSize}
+                        onFocus={this.props.onFocus}
                     />
                 );
             case 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_DATE_TIME':
@@ -207,13 +213,29 @@ class QuestionCard extends Component {
                     />
                 );
             case 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_SINGLE_ANSWER':
+                const data = item.answers.map((e) => {return {value: getTranslation(e.label, this.props.translation), id: e.value}})
+                const dataWithNoneOption = cloneDeep(data)
+                if (dataWithNoneOption !== undefined && dataWithNoneOption !== null && dataWithNoneOption.length > 0) {
+                    const dataFormatKeys = Object.keys(dataWithNoneOption[0])
+                    if (dataFormatKeys.length === 2) {
+                        const noneLabel = getTranslation(translations.generalLabels.noneLabel, this.props.translation)
+                        if (dataFormatKeys[0] === 'label' && dataFormatKeys[1] === 'value'){
+                            noneData = { label: noneLabel, value: null }
+                            dataWithNoneOption.unshift(noneData)
+                        } else if (dataFormatKeys[0] === 'value' && dataFormatKeys[1] === 'id'){
+                            noneData = { value: noneLabel, id: null }
+                            dataWithNoneOption.unshift(noneData)
+                        }
+                    }
+                }
+
                 return (
                     <DropdownInput
                         id={item.variable}
                         label={translations.questionCardLabels.dropDownInputLabel}
                         labelValue={item.text}
                         value={questionAnswers}
-                        data={item.answers.map((e) => {return {value: getTranslation(e.label, this.props.translation), id: e.value}})}
+                        data={dataWithNoneOption}
                         isEditMode={this.props.isEditMode}
                         isRequired={item.required}
                         onChange={this.props.onChangeSingleSelection}
@@ -247,6 +269,7 @@ class QuestionCard extends Component {
                     ) : null
                 )
         }
+      
     };
 
     handleRenderAdditionalQuestions = (additionalQuestion) => {

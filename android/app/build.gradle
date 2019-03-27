@@ -141,6 +141,8 @@ android {
 }
 
 dependencies {
+    implementation project(':react-native-exit-app')
+    implementation project(':react-native-reanimated')
     implementation(project(':react-native-camera')) {
         // exclude group: "com.google.android.gms"
         exclude group: "com.android.support"

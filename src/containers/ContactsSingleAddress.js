@@ -4,7 +4,17 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {PureComponent} from 'react';
-import { View, Text, StyleSheet, InteractionManager, Alert, ScrollView, TouchableWithoutFeedback, Keyboard} from 'react-native';
+import {
+    View,
+    Text,
+    StyleSheet,
+    InteractionManager,
+    Alert,
+    ScrollView,
+    TouchableWithoutFeedback,
+    Keyboard,
+    findNodeHandle
+} from 'react-native';
 import {LoaderScreen} from 'react-native-ui-lib';
 import {calculateDimension, getTranslation, extractIdFromPouchId} from './../utils/functions';
 import config from './../utils/config';
@@ -39,6 +49,13 @@ class ContactsSingleAddress extends PureComponent {
         })
     }
 
+    shouldComponentUpdate(nextProps, nextState) {
+        if (nextProps.activeIndex === 1) {
+            return true;
+        }
+        return false;
+    }
+
     // The render method should have at least business logic as possible,
     // because this will be called whenever there is a new setState call
     // and can slow down the app
@@ -48,6 +65,8 @@ class ContactsSingleAddress extends PureComponent {
                 <LoaderScreen overlay={true} backgroundColor={'white'}/>
             )
         }
+
+        // console.log('ContactsSingleContainer render Address');
 
         return (
             <TouchableWithoutFeedback onPress={() => {
@@ -83,6 +102,10 @@ class ContactsSingleAddress extends PureComponent {
                         style={style.containerScrollView}
                         contentContainerStyle={[style.contentContainerStyle, {paddingBottom: this.props.screenSize.height < 600 ? 70 : 20}]}
                         keyboardShouldPersistTaps={'always'}
+                        extraHeight={20 + 81 + 50 + 70}
+                        innerRef={ref => {
+                            this.scrollContactsSingleAddress = ref
+                        }}
                     >
                         <View style={style.container}>
                             {
@@ -203,6 +226,7 @@ class ContactsSingleAddress extends PureComponent {
                 onChangeSectionedDropDown={this.props.onChangeSectionedDropDown}
                 onDeletePress={this.props.onDeletePress}
                 anotherPlaceOfResidenceWasChosen={this.props.anotherPlaceOfResidenceWasChosen}
+                onFocus={this.handleOnFocus}
             />
         )
     };
@@ -300,6 +324,15 @@ class ContactsSingleAddress extends PureComponent {
     handleBackButton = () => {
         this.props.handleMoveToPrevieousScreenButton()
     };
+
+    handleOnFocus = (event) => {
+        this.scrollToInput(findNodeHandle(event.target))
+    };
+
+    scrollToInput (reactNode) {
+        // Add a 'scroll' ref to your ScrollView
+        this.scrollContactsSingleAddress.props.scrollToFocusedInput(reactNode)
+    }
 }
 
 

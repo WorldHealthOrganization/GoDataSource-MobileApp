@@ -4,7 +4,7 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {PureComponent} from 'react';
-import {View, StyleSheet, ScrollView} from 'react-native';
+import {View, StyleSheet, ScrollView, findNodeHandle} from 'react-native';
 import {calculateDimension, getTranslation, handleExposedTo, getAddress, extractIdFromPouchId} from './../utils/functions';
 import config from './../utils/config';
 import {connect} from "react-redux";
@@ -27,12 +27,19 @@ class FollowUpsSingleGetInfoContainer extends PureComponent {
     }
 
     // Please add here the react lifecycle methods that you need
+    shouldComponentUpdate(nextProps, nextState) {
+        if (nextProps.activeIndex === 0) {
+            return true;
+        }
+        return false;
+    }
 
 
     // The render method should have at least business logic as possible,
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
+        // console.log('FollowUpsSingleContainer render Details');
         return (
             <View style={style.container}>
                 <Button
@@ -50,6 +57,10 @@ class FollowUpsSingleGetInfoContainer extends PureComponent {
                     style={style.containerScrollView}
                     contentContainerStyle={[style.contentContainerStyle, {paddingBottom: this.props.screenSize.height < 600 ? 70 : 20}]}
                     keyboardShouldPersistTaps={'always'}
+                    extraHeight={20 + 81 + 50 + 70}
+                    innerRef={ref => {
+                        this.scrollFollowUpsSingleGetInfo = ref
+                    }}
                 >
                     {
                         config.followUpsSingleScreen.generalInfo.map((item) => {
@@ -167,6 +178,7 @@ class FollowUpsSingleGetInfoContainer extends PureComponent {
                 onChangeSwitch={this.props.onChangeSwitch}
                 onChangeDropDown={this.props.onChangeDropDown}
                 onChangeTextSwitchSelector={this.props.onChangeTextSwitchSelector}
+                onFocus={this.handleOnFocus}
             />
         )
     };
@@ -322,6 +334,15 @@ class FollowUpsSingleGetInfoContainer extends PureComponent {
                 }
             }
         }
+    };
+
+    handleOnFocus = (event) => {
+        this.scrollToInput(findNodeHandle(event.target))
+    };
+
+    scrollToInput (reactNode) {
+        // Add a 'scroll' ref to your ScrollView
+        this.scrollFollowUpsSingleGetInfo.props.scrollToFocusedInput(reactNode)
     };
 }
 

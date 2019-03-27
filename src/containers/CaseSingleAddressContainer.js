@@ -4,7 +4,17 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {PureComponent} from 'react';
-import {View, Text, StyleSheet, InteractionManager, ScrollView, Alert, TouchableWithoutFeedback, Keyboard} from 'react-native';
+import {
+    View,
+    Text,
+    StyleSheet,
+    InteractionManager,
+    ScrollView,
+    Alert,
+    TouchableWithoutFeedback,
+    Keyboard,
+    findNodeHandle
+} from 'react-native';
 import {LoaderScreen} from 'react-native-ui-lib';
 import {calculateDimension, getTranslation, extractIdFromPouchId} from './../utils/functions';
 import config from './../utils/config';
@@ -38,6 +48,13 @@ class CaseSingleAddressContainer extends PureComponent {
         })
     }
 
+    shouldComponentUpdate(nextProps, nextState) {
+        if (nextProps.isEditMode !== this.props.isEditMode || nextProps.index === 1) {
+            return true;
+        }
+        return false;
+    }
+
     // The render method should have at least business logic as possible,
     // because this will be called whenever there is a new setState call
     // and can slow down the app
@@ -47,7 +64,7 @@ class CaseSingleAddressContainer extends PureComponent {
                 <LoaderScreen overlay={true} backgroundColor={'white'}/>
             )
         }
-
+        // console.log('CaseSingleContainer render Address');
         return (
             <View style={{flex: 1}}>
                 <View style={style.container}>
@@ -123,6 +140,10 @@ class CaseSingleAddressContainer extends PureComponent {
                         style={style.containerScrollView}
                         contentContainerStyle={[style.contentContainerStyle, {paddingBottom: this.props.screenSize.height < 600 ? 70 : 20}]}
                         keyboardShouldPersistTaps={'always'}
+                        extraHeight={20 + 81 + 50 + 70}
+                        innerRef={ref => {
+                            this.scrollCasesSingleAddress = ref
+                        }}
                     >
                          <View style={style.container}>
                             {
@@ -220,6 +241,12 @@ class CaseSingleAddressContainer extends PureComponent {
             value = null
         }
 
+        if (item.type === 'SwitchInput' && item.id === 'geoLocationAccurate') {
+            if (this.props.case && this.props.case.addresses && Array.isArray(this.props.case.addresses) && this.props.case.addresses[cardIndex] && (this.props.case.addresses[cardIndex][item.id] === true || this.props.case.addresses[cardIndex][item.id] === false)) {
+                value = this.props.case.addresses[cardIndex][item.id];
+            }
+        }
+
         let dateValidation = this.setDateValidations(item);
         minimumDate = dateValidation.minimumDate;
         maximumDate = dateValidation.maximumDate;
@@ -242,6 +269,7 @@ class CaseSingleAddressContainer extends PureComponent {
                 onChangeTextSwitchSelector={this.props.onChangeTextSwitchSelector}
                 onChangeSectionedDropDown={this.props.onChangeSectionedDropDown}
                 onDeletePress={this.props.onDeletePress}
+                onFocus={this.handleOnFocus}
             />
         )
     };
@@ -336,7 +364,16 @@ class CaseSingleAddressContainer extends PureComponent {
 
     handleBackButton = () => {
         this.props.handleMoveToPrevieousScreenButton()
-    }
+    };
+
+    handleOnFocus = (event) => {
+        this.scrollToInput(findNodeHandle(event.target))
+    };
+
+    scrollToInput (reactNode) {
+        // Add a 'scroll' ref to your ScrollView
+        this.scrollCasesSingleAddress.props.scrollToFocusedInput(reactNode)
+    };
 }
 
 
