@@ -65,7 +65,6 @@ class CaseSingleScreen extends Component {
                 middleName: '',
                 lastName: '',
                 gender: '',
-                phoneNumber: '',
                 occupation: '',
                 outcomeId: '',
                 dob: null,
@@ -90,6 +89,7 @@ class CaseSingleScreen extends Component {
                         addressLine2: '',
                         postalCode: '',
                         locationId: '',
+                        phoneNumber: '',
                         geoLocation: {
                             coordinates: [0, 0],
                             type: 'Point'

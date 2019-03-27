@@ -288,9 +288,9 @@ class ContactsSingleAddress extends PureComponent {
 
     computeDataForContactsSingleScreenDropdownInput = (item, index) => {
         if (item.id === 'typeId') {
-            return _.filter(this.props.referenceData, (o) => {
-                return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_ADDRESS_TYPE'
-            }).map((o) => {return {value: getTranslation(o.value, this.props.translation), id: o.value}})
+            return _.filter(this.props.referenceData, (o) => {return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_ADDRESS_TYPE'})
+                    .sort((a,b) => { return a.order - b.order; })
+                    .map((o) => {return {value: getTranslation(o.value, this.props.translation), id: o.value}})
         }
     };
 
