@@ -97,6 +97,7 @@ class ContactsSingleScreen extends Component {
                         addressLine2: '',
                         postalCode: '',
                         locationId: '',
+                        phoneNumber: '',
                         geoLocation: {
                             coordinates: [0, 0],
                             type: 'Point'

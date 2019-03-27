@@ -91,7 +91,6 @@ class CardComponent extends PureComponent {
                         }
                     }
                 }
-
                 return (
                     <DropdownInput
                         id={this.props.item.id}
@@ -106,6 +105,7 @@ class CardComponent extends PureComponent {
                         objectType={this.props.item.objectType}
                         translation={this.props.translation}
                         onChange={this.props.onChangeDropDown}
+                        screenSize={this.props.screenSize}
                     />
                 );
             case 'DropDown':
@@ -249,6 +249,7 @@ class CardComponent extends PureComponent {
                         selectedDropDownItemIndex={this.props[this.props.item.selectedItemIndexForAgeUnitOfMeasureDropDown]}
                         selectedItemIndexForAgeUnitOfMeasureDropDown ={this.props.item.selectedItemIndexForAgeUnitOfMeasureDropDown}
                         translation={this.props.translation}
+                        screenSize={this.props.screenSize}
                     />
                 );
             case 'WebView':

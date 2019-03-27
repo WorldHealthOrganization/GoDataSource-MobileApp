@@ -1625,3 +1625,23 @@ export function createFilterContactsObject(filterFromFilterScreen, filter){
 
     return allFilters
 }
+
+export function getDropDownInputDisplayParameters(screenSize, dropDownDataLength ){
+    let itemCount = 4
+    let dropdownPosition = 3
+
+    if (dropDownDataLength < 4){
+        itemCount = dropDownDataLength
+        dropdownPosition = dropDownDataLength - 1
+    } else {
+        if (screenSize.height !== undefined && screenSize.height < 667) { //iPhone 6
+            itemCount = 3
+            dropdownPosition = 2
+        }
+    }
+    
+    return {
+        itemCount: itemCount,
+        dropdownPosition: dropdownPosition
+    }
+}
