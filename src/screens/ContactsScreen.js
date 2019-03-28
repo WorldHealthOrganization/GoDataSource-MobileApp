@@ -324,9 +324,9 @@ class ContactsScreen extends Component {
 
     renderContact = (item) => {
         // console.log("### item: ", item);
-        let riskLevelReferenceData = this.props.referenceData.filter((o) => {
-            return o.categoryId.includes("RISK_LEVEL")
-        })
+        let riskLevelReferenceData = this.props.referenceData.filter((o) => {return o.categoryId.includes("RISK_LEVEL")})
+                                                        .sort((a,b) => { return a.order - b.order; })
+                                                        
         return (
             <FollowUpListItem
                 item={item.item}

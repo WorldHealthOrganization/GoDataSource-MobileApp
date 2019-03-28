@@ -5,7 +5,7 @@ import React, {PureComponent} from 'react';
 import {View, Text, StyleSheet} from 'react-native';
 import PropTypes from 'prop-types';
 import translations from './../utils/translations'
-import {getTranslation, getTooltip} from './../utils/functions';
+import {getTranslation, getTooltip, getDropDownInputDisplayParameters} from './../utils/functions';
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import { Dropdown } from 'react-native-material-dropdown';
@@ -35,6 +35,8 @@ class DropdownInput extends PureComponent {
     // Please write here all the methods that are not react native lifecycle methods
     editInput() {
         let tooltip = getTooltip(this.props.label, this.props.translation)
+        const dropDownParams = getDropDownInputDisplayParameters(this.props.screenSize, this.props.data.length)
+
         return (
             <View style={[{flexDirection: 'row'}, this.props.style]}>
                 <View style = {{flex: 1}}> 
@@ -46,8 +48,9 @@ class DropdownInput extends PureComponent {
                         labelFontSize={12.5}
                         selectedItemColor={'rgb(255,60,56)'}
                         onChangeText={this.handleOnChangeText}
-                        dropdownPosition={1}
                         dropdownMargins={{min: 4, max: 8}}
+                        dropdownPosition={dropDownParams.dropdownPosition}
+                        itemCount={dropDownParams.itemCount}
                     />
                 </View>
                 {

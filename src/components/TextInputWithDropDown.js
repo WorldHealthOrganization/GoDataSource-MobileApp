@@ -8,8 +8,9 @@ import PropTypes from 'prop-types';
 import { TextField } from 'react-native-material-textfield';
 import { Dropdown } from 'react-native-material-dropdown';
 import translations from './../utils/translations'
-import {getTranslation, getTooltip} from './../utils/functions';
+import {getTranslation, getTooltip, getDropDownInputDisplayParameters} from './../utils/functions';
 import TooltipComponent from './TooltipComponent'
+
 
 class TextInputWithDropDown extends Component {
 
@@ -68,6 +69,7 @@ class TextInputWithDropDown extends Component {
         const textLabel = getTranslation(config[this.props.dropDownData][this.props.selectedDropDownItemIndex].label, this.props.translation)
         const dropdownLabel =  `${getTranslation(translations.ageUnitOfMeasureDropDown.yearsLabel, this.props.translation)} / ${getTranslation(translations.ageUnitOfMeasureDropDown.monthsLabel, this.props.translation)}`
 
+        const dropDownParams = getDropDownInputDisplayParameters(this.props.screenSize, dropDownData.length)
         return (
             <View style={[{width: '100%'},this.props.style]}>
                 <View style={{flexDirection: 'row',  justifyContent: 'space-between'}}>
@@ -108,8 +110,9 @@ class TextInputWithDropDown extends Component {
                         fontSize={15}
                         labelFontSize={12.5}
                         selectedItemColor={'rgb(255,60,56)'}
-                        dropdownPosition={1}
                         dropdownMargins={{min: 4, max: 8}}
+                        dropdownPosition={dropDownParams.dropdownPosition}
+                        itemCount={dropDownParams.itemCount}
                     />
                 </View>
                 {

@@ -7,7 +7,7 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {Component, PureComponent} from 'react';
-import {View, Text, StyleSheet} from 'react-native';
+import {View, Text, StyleSheet, WebView} from 'react-native';
 import {calculateDimension, handleExposedTo, getAddress, extractIdFromPouchId, getTranslation} from './../utils/functions';
 import config from './../utils/config';
 import {connect} from "react-redux";
@@ -91,7 +91,6 @@ class CardComponent extends PureComponent {
                         }
                     }
                 }
-
                 return (
                     <DropdownInput
                         id={this.props.item.id}
@@ -106,6 +105,7 @@ class CardComponent extends PureComponent {
                         objectType={this.props.item.objectType}
                         translation={this.props.translation}
                         onChange={this.props.onChangeDropDown}
+                        screenSize={this.props.screenSize}
                     />
                 );
             case 'DropDown':
@@ -249,8 +249,19 @@ class CardComponent extends PureComponent {
                         selectedDropDownItemIndex={this.props[this.props.item.selectedItemIndexForAgeUnitOfMeasureDropDown]}
                         selectedItemIndexForAgeUnitOfMeasureDropDown ={this.props.item.selectedItemIndexForAgeUnitOfMeasureDropDown}
                         translation={this.props.translation}
+                        screenSize={this.props.screenSize}
                     />
-                )
+                );
+            case 'WebView':
+                return (
+                    <WebView
+                        style={{
+                            height: calculateDimension(300, true, this.props.screenSize),
+                            width: width
+                        }}
+                        source={{html: `<html><head></head><body>${this.props.value}</body></html>`}}
+                    />
+                );
             default:
                 return (
                     <View style={{backgroundColor: 'red'}}>
