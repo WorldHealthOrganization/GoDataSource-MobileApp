@@ -5,7 +5,8 @@
  * Created by florinpopa on 14/06/2018.
  */
 import React, {Component} from 'react';
-import {View, Text, StyleSheet, Platform, Image, Alert, AsyncStorage} from 'react-native';
+import {View, Text, StyleSheet, Platform, Image, Alert} from 'react-native';
+import AsyncStorage from '@react-native-community/async-storage';
 import ViewHOC from './../components/ViewHOC';
 import Section from './../components/Section';
 import ElevatedView from 'react-native-elevated-view';

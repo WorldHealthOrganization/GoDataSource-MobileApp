@@ -4,7 +4,8 @@
 import url from './../utils/url';
 import RNFetchBlob from 'rn-fetch-blob';
 import base64 from 'base-64';
-import {Platform, AsyncStorage} from 'react-native';
+import {Platform} from 'react-native';
+import AsyncStorage from '@react-native-community/async-storage';
 import {getSyncEncryptPassword} from './../utils/encryption';
 import {setSyncState} from './../actions/app';
 import DeviceInfo from 'react-native-device-info';

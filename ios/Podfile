@@ -2,10 +2,10 @@ source 'https://github.com/CocoaPods/Specs.git'
 target 'who_mobile' do
   pod 'SQLCipher'
   pod 'Parse'
+
   # Add new pods below this line
-
+  # pod 'react-native-async-storage', :path => '../node_modules/@react-native-community/async-storage'
   # pod 'react-native-document-picker', :path => '../node_modules/react-native-document-picker'
-
   # pod 'RNFS', :path => '../node_modules/react-native-fs'
 
 

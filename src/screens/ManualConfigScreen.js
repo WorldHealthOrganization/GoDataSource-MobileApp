@@ -5,7 +5,9 @@
  * Created by florinpopa on 14/06/2018.
  */
 import React, {PureComponent} from 'react';
-import {View, Text, StyleSheet, Platform, Image, Alert, Modal, ScrollView, AsyncStorage} from 'react-native';
+import {View, Text, StyleSheet, Platform, Image, Alert, Modal, ScrollView} from 'react-native';
+import AsyncStorage from '@react-native-community/async-storage';
+
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import {Button, Icon} from 'react-native-material-ui';

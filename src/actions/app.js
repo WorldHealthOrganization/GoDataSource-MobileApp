@@ -29,7 +29,7 @@ import RNFetchBlobFs from 'rn-fetch-blob/fs';
 import {processFile, getDataFromDatabaseFromFile} from './../utils/functions';
 import {createDatabase, getDatabase} from './../queries/database';
 import {setNumberOfFilesProcessed, createZipFileAtPath, extractIdFromPouchId} from './../utils/functions';
-import {AsyncStorage} from 'react-native';
+import AsyncStorage from '@react-native-community/async-storage';
 import {getUserById} from './user';
 import {uniq} from 'lodash';
 import {addError} from './errors';
@@ -350,7 +350,7 @@ function processFilesForSync(error, response, hubConfiguration, isFirstTime, syn
                                                 storeData('activeDatabase', hubConfiguration.url, (errorActiveDatabase) => {
                                                     if (!errorActiveDatabase) {
                                                         dispatch(saveActiveDatabase(hubConfiguration.url));
-                                                        storeData(hubConfiguration.url, new Date(), (errorStoreLastSync) => {
+                                                        storeData(hubConfiguration.url, new Date().toISOString(), (errorStoreLastSync) => {
                                                             if (!errorStoreLastSync) {
                                                                 // if all was successful, then store the database in async storage
                                                                 AsyncStorage.getItem('databases')
