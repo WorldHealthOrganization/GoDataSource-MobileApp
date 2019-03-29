@@ -100,6 +100,7 @@ class HelpFilterScreen extends Component {
                 return (
                     <HelpFilterContainer
                         filter={this.state.filter}
+                        onPressResetFilters={this.handleResetFilters}
                         onChangeMultipleSelection={this.handleOnChangeMultipleSelection}
                         onPressApplyFilters={this.handleOnPressApplyFilters}
                     />
@@ -108,6 +109,7 @@ class HelpFilterScreen extends Component {
                 return (
                     <HelpSortContainer
                         filter={this.state.filter}
+                        onPressResetFilters={this.handleResetFilters}
                         onPressApplyFilters={this.handleOnPressApplyFilters}
                         onPressAddSortRule={this.onPressAddSortRule}
                         onChangeDropDown={this.onChangeDropDown}
@@ -118,6 +120,7 @@ class HelpFilterScreen extends Component {
                 return (
                     <HelpFilterContainer
                         filter={this.state.filter}
+                        onPressResetFilters={this.handleResetFilters}
                         onChangeMultipleSelection={this.handleOnChangeMultipleSelection}
                         onPressApplyFilters={this.handleOnPressApplyFilters}
                     />

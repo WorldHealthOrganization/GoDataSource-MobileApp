@@ -139,6 +139,7 @@ class CasesFilterScreen extends Component {
                 return (
                     <CasesFiltersContainer
                         filter={this.state.filter}
+                        onPressResetFilters={this.handleResetFilters}
                         handleMoveToNextScreenButton={this.handleMoveToNextScreenButton}
                         onSelectItem={this.handleOnSelectItem}
                         onChangeSectionedDropDown={this.handleOnChangeSectionedDropDown}
@@ -152,6 +153,7 @@ class CasesFilterScreen extends Component {
                     <CasesSortContainer
                         handleMoveToPrevieousScreenButton={this.handleMoveToPrevieousScreenButton}
                         onPressApplyFilters={this.handleOnPressApplyFilters}
+                        onPressResetFilters={this.handleResetFilters}
                         onPressAddSortRule={this.onPressAddSortRule}
                         onChangeDropDown={this.onChangeDropDown}
                         filter={this.state.filter}
@@ -165,6 +167,7 @@ class CasesFilterScreen extends Component {
                         filter={this.state.filter}
                         handleMoveToNextScreenButton={this.handleMoveToNextScreenButton}
                         onSelectItem={this.handleOnSelectItem}
+                        onPressResetFilters={this.handleResetFilters}
                         onChangeSectionedDropDown={this.handleOnChangeSectionedDropDown}
                         onChangeInterval={this.handleOnChangeInterval}
                         onChangeMultipleSelection={this.handleOnChangeMultipleSelection}

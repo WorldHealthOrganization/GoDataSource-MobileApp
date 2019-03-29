@@ -124,18 +124,15 @@ class FollowUpsFilterScreen extends Component {
     };
 
     handleOnIndexChange = (index) => {
-        console.log('handleOnIndexChange ', index)
         this.setState({index});
     };
 
     handleMoveToNextScreenButton = () => {
-        console.log('handleMoveToNextScreenButton ')
         let nextIndex = this.state.index + 1;
         this.handleOnIndexChange(nextIndex)
     };
 
     handleMoveToPrevieousScreenButton = () => {
-        console.log('handleMoveToPrevieousScreenButton ')
         let nextIndex = this.state.index - 1;
         this.handleOnIndexChange(nextIndex)
     };
@@ -148,6 +145,7 @@ class FollowUpsFilterScreen extends Component {
                     <FollowUpsFiltersContainer
                         filter={this.state.filter}
                         onSelectItem={this.handleOnSelectItem}
+                        onPressResetFilters={this.handleResetFilters}
                         onChangeSectionedDropDown={this.handleOnChangeSectionedDropDown}
                         onChangeInterval={this.handleOnChangeInterval}
                         onChangeMultipleSelection={this.handleOnChangeMultipleSelection}
@@ -163,6 +161,7 @@ class FollowUpsFilterScreen extends Component {
                         onPressApplyFilters={this.handleOnPressApplyFilters}
                         onPressAddSortRule={this.onPressAddSortRule}
                         onChangeDropDown={this.onChangeDropDown}
+                        onPressResetFilters={this.handleResetFilters}
                         onDeletePress={this.onDeleteSortRulePress}
                         key={this.state.index}
                     />

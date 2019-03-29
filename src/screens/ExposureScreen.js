@@ -66,31 +66,10 @@ class ExposureScreen extends Component {
                     }
                 }
             ])
-        } else {
-            if (state.savePressed) {
-                props.navigator.dismissModal();
-            } else {
-                // If the save button was not pressed, then we should empty the exposure object in order to add another one
-                if (props.exposure) {
-                    state.exposure = props.exposure;
-                } else {
-                    state.exposure = {
-                        outbreakId: props.user.activeOutbreakId,
-                        contactDate: new Date(),
-                        contactDateEstimated: false,
-                        certaintyLevelId: '',
-                        exposureTypeId: '',
-                        exposureFrequencyId: '',
-                        exposureDurationId: '',
-                        socialRelationshipTypeId: '',
-                        socialRelationshipDetail: '',
-                        clusterId: '',
-                        comment: '',
-                        persons: []
-                    };
-                }
-            }
+        } else if (state.savePressed) {
+            props.navigator.dismissModal();
         }
+
         return null;
     }
 

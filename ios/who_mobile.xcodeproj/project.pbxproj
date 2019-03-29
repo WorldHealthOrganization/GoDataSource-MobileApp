@@ -25,6 +25,7 @@
 		146834051AC3E58100842450 /* libReact.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 146834041AC3E56700842450 /* libReact.a */; };
 		2B0143622176202700E5D306 /* libRNCamera.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2B01435B21761FF500E5D306 /* libRNCamera.a */; };
 		2B0143D32176251100E5D306 /* libReactNativePermissions.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2B0143CA217624CC00E5D306 /* libReactNativePermissions.a */; };
+		2B218239224E451900FAFAD2 /* libRNCWebView.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2B218238224E451900FAFAD2 /* libRNCWebView.a */; };
 		2B78099AD7F14576A5135193 /* Roboto-MediumItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = D3504A69925041D384B2A509 /* Roboto-MediumItalic.ttf */; };
 		2B7B45CD21C8ED410060111B /* libRNDeviceInfo.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2B7B45BE21C8ECA90060111B /* libRNDeviceInfo.a */; };
 		2BF9FB24224D0C47004C5F62 /* JavaScriptCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2BF9FAE2224D0C46004C5F62 /* JavaScriptCore.framework */; };
@@ -545,6 +546,7 @@
 		2716E648E46CFEBCDE573040 /* Pods-who_mobile.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-who_mobile.debug.xcconfig"; path = "Pods/Target Support Files/Pods-who_mobile/Pods-who_mobile.debug.xcconfig"; sourceTree = "<group>"; };
 		2B01432F21761FF500E5D306 /* RNCamera.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNCamera.xcodeproj; path = "../node_modules/react-native-camera/ios/RNCamera.xcodeproj"; sourceTree = "<group>"; };
 		2B01439F217624CB00E5D306 /* ReactNativePermissions.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = ReactNativePermissions.xcodeproj; path = "../node_modules/react-native-permissions/ios/ReactNativePermissions.xcodeproj"; sourceTree = "<group>"; };
+		2B218238224E451900FAFAD2 /* libRNCWebView.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libRNCWebView.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		2B7B458E21C8ECA90060111B /* RNDeviceInfo.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNDeviceInfo.xcodeproj; path = "../node_modules/react-native-device-info/ios/RNDeviceInfo.xcodeproj"; sourceTree = "<group>"; };
 		2BF9FAE2224D0C46004C5F62 /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		2BF9FB5B224D1566004C5F62 /* RNCAsyncStorage.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNCAsyncStorage.xcodeproj; path = "../node_modules/@react-native-community/async-storage/ios/RNCAsyncStorage.xcodeproj"; sourceTree = "<group>"; };
@@ -620,6 +622,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2B218239224E451900FAFAD2 /* libRNCWebView.a in Frameworks */,
 				2BF9FC86224D1D80004C5F62 /* libRNCAsyncStorage.a in Frameworks */,
 				2BF9FB24224D0C47004C5F62 /* JavaScriptCore.framework in Frameworks */,
 				F2331CF1222FE8A30082A203 /* libRNReanimated.a in Frameworks */,
@@ -853,6 +856,7 @@
 		2D16E6871FA4F8E400B85C8A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				2B218238224E451900FAFAD2 /* libRNCWebView.a */,
 				2BF9FBB6224D1628004C5F62 /* react-native-async-storage.podspec */,
 				2BF9FB5B224D1566004C5F62 /* RNCAsyncStorage.xcodeproj */,
 				2BF9FAE2224D0C46004C5F62 /* JavaScriptCore.framework */,
