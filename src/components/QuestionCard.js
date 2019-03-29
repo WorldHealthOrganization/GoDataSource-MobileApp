@@ -227,6 +227,7 @@ class QuestionCard extends Component {
                         onChange={this.props.onChangeSingleSelection}
                         style={{width: width, marginHorizontal: marginHorizontal}}
                         translation={this.props.translation}
+                        screenSize={this.props.screenSize}
                     />
                 );
             case 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_MULTIPLE_ANSWERS':

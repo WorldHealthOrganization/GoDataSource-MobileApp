@@ -205,6 +205,19 @@ const followUpsSingleScreen = {
                 multiline: true,
                 objectType: 'Address'
             },
+            {
+                cardNumber: 2,
+                id: 'phoneNumber',
+                label: translations.contactSingleScreen.phoneNumber,
+                labelValue: 'test',
+                type: 'TextInput',
+                value: '',
+                isRequired: false,
+                isEditMode: false,
+                multiline: false,
+                keyboardType: Platform.OS === 'ios' ? 'number-pad' : 'numeric',
+                objectType: 'Address'
+            },
         ]
     },
 };
@@ -254,17 +267,6 @@ const caseSingleScreen = {
                     isEditMode: false,
                     activeButtonColor: 'red',
                     activeBackgroundColor: 'red',
-                    objectType: 'Case'
-                },
-                {
-                    cardNumber: 1,
-                    id: 'phoneNumber',
-                    label: translations.caseSingleScreen.phoneNumber,
-                    type: 'TextInput',
-                    value: '',
-                    isRequired: false,
-                    isEditMode: false,
-                    keyboardType: Platform.OS === 'ios' ? 'number-pad' : 'numeric',
                     objectType: 'Case'
                 },
                 {
@@ -488,6 +490,17 @@ const caseSingleScreen = {
                 multiline: true,
                 objectType: 'Address'
             },
+            {
+                cardNumber: 1,
+                id: 'phoneNumber',
+                label: translations.caseSingleScreen.phoneNumber,
+                type: 'TextInput',
+                value: '',
+                isRequired: false,
+                isEditMode: true,
+                keyboardType: Platform.OS === 'ios' ? 'number-pad' : 'numeric',
+                objectType: 'Address'
+            },
             // Is the person next to you support
             {
                 cardNumber: 1,
@@ -560,7 +573,7 @@ const caseSingleScreen = {
                     label: translations.caseSingleScreen.dateOfOnset,
                     value: '',
                     type: "DatePicker",
-                    isRequired: false,
+                    isRequired: true,
                     isEditMode: false,
                     format: 'YYYY-MM-dd',
                     objectType: 'Case'
@@ -1224,9 +1237,18 @@ const helpSingleScreen = {
                 },
                 {
                     cardNumber: 1,
-                    id: 'content',
                     label: translations.helpScreen.helpDescriptionLabel,
-                    type: 'TextInput',
+                    type: 'Section',
+                    value: '',
+                    isRequired: false,
+                    isEditMode: false,
+                    multiline: true,
+                    objectType: 'Help'
+                },
+                {
+                    cardNumber: 1,
+                    id: 'content',
+                    type: 'WebView',
                     value: '',
                     isRequired: false,
                     isEditMode: false,
@@ -1489,19 +1511,6 @@ const contactsSingleScreen = {
                 },
                 {
                     cardNumber: 1,
-                    id: 'phoneNumber',
-                    label: translations.contactSingleScreen.phoneNumber,
-                    labelValue: 'test',
-                    type: 'TextInput',
-                    value: '',
-                    isRequired: false,
-                    isEditMode: true,
-                    multiline: false,
-                    keyboardType: Platform.OS === 'ios' ? 'number-pad' : 'numeric',
-                    objectType: 'Contact'
-                },
-                {
-                    cardNumber: 1,
                     id: 'occupation',
                     label: translations.contactSingleScreen.occupation,
                     labelValue: 'test',
@@ -1676,6 +1685,19 @@ const contactsSingleScreen = {
                 isRequired: false,
                 isEditMode: true,
                 multiline: true,
+                objectType: 'Address'
+            },
+            {
+                cardNumber: 1,
+                id: 'phoneNumber',
+                label: translations.contactSingleScreen.phoneNumber,
+                labelValue: 'test',
+                type: 'TextInput',
+                value: '',
+                isRequired: false,
+                isEditMode: true,
+                multiline: false,
+                keyboardType: Platform.OS === 'ios' ? 'number-pad' : 'numeric',
                 objectType: 'Address'
             },
             // Is the person next to you support

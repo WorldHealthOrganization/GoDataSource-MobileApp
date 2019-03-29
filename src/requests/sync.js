@@ -12,6 +12,8 @@ import DeviceInfo from 'react-native-device-info';
 import translations from './../utils/translations';
 import {testApi} from './testApi';
 import uniq from 'lodash/uniq';
+import {getHelpItemsRequest} from './helpItem';
+import {getHelpCategoriesRequest} from './helpCategory';
 
 export function getDatabaseSnapshotRequest(hubConfig, lastSyncDate, dispatch, callback) {
 
@@ -64,50 +66,56 @@ export function getDatabaseSnapshotRequest(hubConfig, lastSyncDate, dispatch, ca
                     // console.log('Response TestApi: ', responseTestApi);
                     dispatch(setSyncState({id: 'testApi', status: 'Success'}));
                     dispatch(setSyncState({id: 'downloadDatabase', status: 'In progress'}));
-                    RNFetchBlob.config({
-                        timeout: (30 * 60 * 10 * 1000),
-                        followRedirect: false,
-                        fileCache: true,
-                        path: `${dirs}/database.zip`
-                    })
-                        .fetch('POST', encodeURI(requestUrl), {
-                                'device-info': deviceInfo,
-                                'Content-Type': 'application/json',
-                                'Accept': 'application/json',
-                                'Authorization': 'Basic ' + base64.encode(`${hubConfiguration.clientId}:${hubConfiguration.clientSecret}`)
-                            },
-                            JSON.stringify({
-                                languageTokens: lastSyncDate ? [] : arrayOfTokens
+
+                    // Here call the method computeHelpItemsAndCategories
+
+                    computeHelpItemsAndCategories(hubConfiguration, lastSyncDate)
+                        .then((helpTranslations) => {
+                            RNFetchBlob.config({
+                                timeout: (30 * 60 * 10 * 1000),
+                                followRedirect: false,
+                                fileCache: true,
+                                path: `${dirs}/database.zip`
                             })
-                        )
-                        .progress({count: 500}, (received, total) => {
-                            dispatch(setSyncState({
-                                id: 'downloadDatabase',
-                                name: `Downloading database\nReceived ${received} bytes`
-                            }));
-                            console.log(received, total)
+                                .fetch('POST', encodeURI(requestUrl), {
+                                        'device-info': deviceInfo,
+                                        'Content-Type': 'application/json',
+                                        'Accept': 'application/json',
+                                        'Authorization': 'Basic ' + base64.encode(`${hubConfiguration.clientId}:${hubConfiguration.clientSecret}`)
+                                    },
+                                    JSON.stringify({
+                                        languageTokens: lastSyncDate ? helpTranslations : arrayOfTokens.concat(helpTranslations)
+                                    })
+                                )
+                                .progress({count: 500}, (received, total) => {
+                                    dispatch(setSyncState({
+                                        id: 'downloadDatabase',
+                                        name: `Downloading database\nReceived ${received} bytes`
+                                    }));
+                                    console.log(received, total)
+                                })
+                                .then((res) => {
+                                    console.log('Download time: ', new Date().getTime() - startDownload);
+                                    let status = res.info().status;
+                                    // After getting zip file from the server, unzip it and then proceed to the importing of the data to the SQLite database
+                                    if (status === 200) {
+                                        // After returning the database, return the path to it
+                                        console.log("Got database");
+                                        callback(null, databaseLocation)
+                                    } else {
+                                        if (status === 422) {
+                                            callback(`No data to export`);
+                                        } else {
+                                            callback(`Cannot connect to HUB, please check URL, Client ID and Client secret.\nStatus code: ${status}`);
+                                        }
+                                    }
+                                })
+                                .catch((errorMessage, statusCode) => {
+                                    // error handling
+                                    console.log("*** getDatabaseSnapshotRequest error: ", JSON.stringify(errorMessage));
+                                    callback(errorMessage.message);
+                                });
                         })
-                        .then((res) => {
-                            console.log('Download time: ', new Date().getTime() - startDownload);
-                            let status = res.info().status;
-                            // After getting zip file from the server, unzip it and then proceed to the importing of the data to the SQLite database
-                            if (status === 200) {
-                                // After returning the database, return the path to it
-                                console.log("Got database");
-                                callback(null, databaseLocation)
-                            } else {
-                                if (status === 422) {
-                                    callback(`No data to export`);
-                                } else {
-                                    callback(`Cannot connect to HUB, please check URL, Client ID and Client secret.\nStatus code: ${status}`);
-                                }
-                            }
-                        })
-                        .catch((errorMessage, statusCode) => {
-                            // error handling
-                            console.log("*** getDatabaseSnapshotRequest error: ", JSON.stringify(errorMessage));
-                            callback(errorMessage.message);
-                        });
                 }
             })
         })
@@ -190,4 +198,65 @@ function getAllLanguageTokens () {
     }
 
     return uniq(arrayOfTokens);
+}
+
+// This code will be changed to better suit our needs, but it will be a good start
+// The method is supposed to return all the needed translations to be requested in the sync
+async function computeHelpItemsAndCategories(hubConfiguration, lastSyncDate) {
+    return new Promise((resolve, reject) => {
+        let translations = [];
+        // First get the help items. For now get them all, but in the future
+        // will need to add more filtering criteria to get only the needed translations
+        let generalRequestUrl = hubConfiguration.url;
+        let authorization = `Basic ${base64.encode(`${hubConfiguration.clientId}:${hubConfiguration.clientSecret}`)}`;
+        let filterItems = {
+            updatedAt: {
+                gt: lastSyncDate
+            }
+        };
+        getHelpItemsRequest(`${generalRequestUrl}/help-items`, authorization, filterItems, (errorGetItems, resultItems) => {
+            if (errorGetItems) {
+                console.log('Error while getting items: ', errorGetItems);
+                resolve(translations);
+            }
+            if (resultItems) {
+                // For all the result items we need only the fields that have translations on API, mainly title and content
+                for (let i=0; i<resultItems.length; i++) {
+                    if (resultItems[i].title) {
+                        translations.push(resultItems[i].title);
+                    }
+                    if (resultItems[i].content) {
+                        translations.push(resultItems[i].content);
+                    }
+                    if (resultItems[i].comment) {
+                        translations.push(resultItems[i].comment);
+                    }
+                }
+
+                // After getting the needed items for translations, move to get categories
+                let filterCategories = {
+                    updatedAt: {
+                        gt: lastSyncDate
+                    }
+                };
+                getHelpCategoriesRequest(`${generalRequestUrl}/help-categories`, authorization, filterCategories, (errorGetCategories, resultCategories) => {
+                    if (errorGetCategories) {
+                        console.log('Error while getting categories: ', errorGetCategories);
+                        resolve(translations);
+                    }
+                    if (resultCategories) {
+                        for (let i=0; i<resultCategories.length; i++) {
+                            if (resultCategories[i].name) {
+                                translations.push(resultCategories[i].name);
+                            }
+                            if (resultCategories[i].description) {
+                                translations.push(resultCategories[i].description);
+                            }
+                        }
+                        resolve(translations);
+                    }
+                })
+            }
+        })
+    })
 }

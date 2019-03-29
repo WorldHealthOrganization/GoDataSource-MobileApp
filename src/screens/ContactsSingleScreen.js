@@ -97,6 +97,7 @@ class ContactsSingleScreen extends Component {
                         addressLine2: '',
                         postalCode: '',
                         locationId: '',
+                        phoneNumber: '',
                         geoLocation: {
                             coordinates: [0, 0],
                             type: 'Point'
@@ -815,7 +816,7 @@ class ContactsSingleScreen extends Component {
         if (id === 'geoLocationAccurate' && typeof objectTypeOrIndex === 'number' && objectTypeOrIndex >= 0 && objectType === 'Address') {
             if (value) {
                 navigator.geolocation.getCurrentPosition((position) => {
-                        let addressesClone = _.cloneDeep(this.props.contact.addresses);
+                        let addressesClone = _.cloneDeep(this.state.contact.addresses);
                         console.log('addressesClone: ', addressesClone);
                         if (!addressesClone[objectTypeOrIndex].geoLocation) {
                             addressesClone[objectTypeOrIndex].geoLocation = {};
@@ -848,11 +849,11 @@ class ContactsSingleScreen extends Component {
                         ])
                     },
                     {
-                        enableHighAccuracy: true, timeout: 20000, maximumAge: 1000
+                        enableHighAccuracy: true, timeout: 5000
                     }
                 )
             } else {
-                let addressesClone = _.cloneDeep(this.props.contact.addresses);
+                let addressesClone = _.cloneDeep(this.state.contact.addresses);
                 console.log('addressesClone: ', addressesClone);
                 if (!addressesClone[objectTypeOrIndex].geoLocation) {
                     addressesClone[objectTypeOrIndex].geoLocation = {};
@@ -993,14 +994,35 @@ class ContactsSingleScreen extends Component {
     };
 
     handleOnChangeSectionedDropDown = (selectedItems, index) => {
-        console.log ('handleOnChangeSectionedDropDown', selectedItems, index)
+        console.log ('handleOnChangeSectionedDropDown', selectedItems, index);
         // Here selectedItems is always an array with just one value and should pe mapped to the locationId field from the address from index
         let addresses = _.cloneDeep(this.state.contact.addresses);
-        addresses[index].locationId = extractIdFromPouchId(selectedItems['0'], 'location');
-        this.setState(prevState => ({
-            contact: Object.assign({}, prevState.contact, {addresses}),
-            isModified: true
-        }))
+        addresses[index].locationId = extractIdFromPouchId(selectedItems['0']._id, 'location');
+        if (selectedItems['0'].geoLocation && selectedItems['0'].geoLocation.coordinates && Array.isArray(selectedItems['0'].geoLocation.coordinates)) {
+            setTimeout(() => {
+                Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.alertMessages.replaceCurrentCoordinates, this.props.translation), [
+                    {
+                        text: getTranslation(translations.alertMessages.cancelButtonLabel, this.props.translation), onPress: () => {console.log('Cancel pressed')}
+                    },
+                    {
+                        text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation), onPress: () => {
+                            addresses[index].geoLocation = selectedItems['0'].geoLocation;
+                            console.log('Addresses biatch: ', addresses);
+                            this.setState(prevState => ({
+                                contact: Object.assign({}, prevState.contact, {addresses}),
+                                isModified: true
+                            }))
+                        }
+                    }
+                ])
+            }, 200);
+        } else {
+            console.log('Addresses biatch: ', addresses);
+            this.setState(prevState => ({
+                contact: Object.assign({}, prevState.contact, {addresses}),
+                isModified: true
+            }))
+        }
     };
 
     onChangeTextAnswer = (value, id) => {

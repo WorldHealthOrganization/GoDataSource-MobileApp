@@ -11,7 +11,7 @@ import Ripple from 'react-native-material-ripple';
 import stylesGlobal from './../styles';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
-import SectionedMultiSelect from 'react-native-sectioned-multi-select';
+import SectionedMultiSelect from './SectionedMultiSelect';
 import translations from './../utils/translations'
 import {getTranslation, getTooltip} from './../utils/functions';
 import TooltipComponent from './TooltipComponent'
@@ -40,7 +40,7 @@ class DropDownSectioned extends Component {
     // Please write here all the methods that are not react native lifecycle methods
     editInput() {
         let tooltip = getTooltip(this.props.label, this.props.translation);
-        // console.log('Value from DropDownSectioned: ', this.props.value);
+        console.log('Value from DropDownSectioned: ', this.props.value);
         return (
             <View style={[this.props.style, {flexDirection: 'row'}]}>
                 <View style = {{flex: 1}}>
@@ -48,47 +48,62 @@ class DropDownSectioned extends Component {
                         fontFamily: 'Roboto',
                         fontSize: 12.5,
                         textAlign: 'left',
-                        color: 'rgba(0,0,0,0.38)',
+                        color: 'rgba(0,0,0,0.38)'
                     }}>
                         {this.props.isRequired ? getTranslation(this.props.label, this.props.translation) + ' * ' : getTranslation(this.props.label, this.props.translation)}
                     </Text>
                     <SectionedMultiSelect
                         items={this.props.data}
-                        uniqueKey='_id'
-                        subKey='children'
-                        selectText= {this.props.value !== "" ? Array.isArray(this.props.value) && this.props.value.length > 1 ? getTranslation(translations.dropDownSectionedLabels.selected, this.props.translation) : Array.isArray(this.props.value) && this.props.value.length < 1 ? getTranslation(translations.dropDownSectionedLabels.noneSelected, this.props.translation) : this.props.value : this.props.single === true ? getTranslation(translations.dropDownSectionedLabels.chooseOneLocation, this.props.translation) : getTranslation(translations.dropDownSectionedLabels.chooseMoreLocations, this.props.translation)}
-                        showDropDowns={true}
-                        readOnlyHeadings={true}
-                        onSelectedItemsChange={this.onSelectedItemsChange}
-                        selectedItems={this.props.single === true ? ((this.props.sectionedSelectedItems !== null && this.props.sectionedSelectedItems !== undefined) ? this.props.sectionedSelectedItems : []) : this.state.selectedItems}
-                        showCancelButton={true}
-                        selectChildren={false}
-                        showChips={false}
-                        modalAnimationType="slide"
-                        searchPlaceholderText={getTranslation(translations.dropDownSectionedLabels.searchPlaceholderText, this.props.translation)}
-                        selectToggleIconComponent={(<Icon name="arrow-drop-down"/>)}
-                        dropDownToggleIconDownComponent={(<Icon name="arrow-drop-down"/>)}
-                        dropDownToggleIconUpComponent={(<Icon name="arrow-drop-up"/>)}
-                        confirmFontFamily={'Roboto-Medium'}
-                        searchTextFontFamily={'Roboo-Regular'}
-                        itemFontFamily={'Roboto-Medium'}
-                        subItemFontFamily={'Roboto-Regular'}
-                        onCancel={this.onCancelHandler}
-                        onConfirm={this.onConfirmHandler}
-                        styles={{
-                            button: {backgroundColor: stylesGlobal.buttonGreen},
-                            cancelButton: {backgroundColor: stylesGlobal.missedRedColor},
-                            selectToggle: {borderBottomColor: stylesGlobal.textFieldUnderline, borderBottomWidth: 1}
-                        }}
+                        showUnderline={true}
+                        underlineColor={stylesGlobal.textFieldUnderline}
+                        selectToggleIconComponent={(<Icon name="check" size={18} />)}
+                        dropDownToggleIconDownComponent={(<Icon name="arrow-drop-down" size={18} />)}
+                        dropDownToggleIconUpComponent={(<Icon name="arrow-drop-up" size={18} />)}
+                        uniqueKey={'id'}
+                        subKey={'children'}
                         single={this.props.single}
-                        noItemsComponent={(
-                            <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-                                <Text style={{fontFamily: 'Roboto-Medium', fontSize: 15}}>
-                                    {getTranslation(translations.dropDownSectionedLabels.noLocationsMessage, this.props.translation)}
-                                </Text>
-                            </View>
-                        )}
+                        selectedItems={this.props.value}
+                        onSelectedItemsChange={this.onSelectedItemsChange}
+                        selectText={this.props.value !== "" ? Array.isArray(this.props.value) && this.props.value.length > 1 ? getTranslation(translations.dropDownSectionedLabels.selected, this.props.translation) : Array.isArray(this.props.value) && this.props.value.length < 1 ? getTranslation(translations.dropDownSectionedLabels.noneSelected, this.props.translation) : this.props.value : this.props.single === true ? getTranslation(translations.dropDownSectionedLabels.chooseOneLocation, this.props.translation) : getTranslation(translations.dropDownSectionedLabels.chooseMoreLocations, this.props.translation)}
+                        searchPlaceholderText={getTranslation(translations.dropDownSectionedLabels.searchPlaceholderText, this.props.translation)}
                     />
+                    {/*<SectionedMultiSelect*/}
+                        {/*items={this.props.data}*/}
+                        {/*uniqueKey='_id'*/}
+                        {/*subKey='children'*/}
+                        {/*selectText= {this.props.value !== "" ? Array.isArray(this.props.value) && this.props.value.length > 1 ? getTranslation(translations.dropDownSectionedLabels.selected, this.props.translation) : Array.isArray(this.props.value) && this.props.value.length < 1 ? getTranslation(translations.dropDownSectionedLabels.noneSelected, this.props.translation) : this.props.value : this.props.single === true ? getTranslation(translations.dropDownSectionedLabels.chooseOneLocation, this.props.translation) : getTranslation(translations.dropDownSectionedLabels.chooseMoreLocations, this.props.translation)}*/}
+                        {/*showDropDowns={true}*/}
+                        {/*readOnlyHeadings={true}*/}
+                        {/*onSelectedItemsChange={this.onSelectedItemsChange}*/}
+                        {/*selectedItems={this.props.single === true ? ((this.props.sectionedSelectedItems !== null && this.props.sectionedSelectedItems !== undefined) ? this.props.sectionedSelectedItems : []) : this.state.selectedItems}*/}
+                        {/*showCancelButton={true}*/}
+                        {/*selectChildren={true}*/}
+                        {/*showChips={false}*/}
+                        {/*modalAnimationType="slide"*/}
+                        {/*searchPlaceholderText={getTranslation(translations.dropDownSectionedLabels.searchPlaceholderText, this.props.translation)}*/}
+                        {/*selectToggleIconComponent={(<Icon name="arrow-drop-down"/>)}*/}
+                        {/*dropDownToggleIconDownComponent={(<Icon name="arrow-drop-down"/>)}*/}
+                        {/*dropDownToggleIconUpComponent={(<Icon name="arrow-drop-up"/>)}*/}
+                        {/*confirmFontFamily={'Roboto-Medium'}*/}
+                        {/*searchTextFontFamily={'Roboo-Regular'}*/}
+                        {/*itemFontFamily={'Roboto-Medium'}*/}
+                        {/*subItemFontFamily={'Roboto-Regular'}*/}
+                        {/*onCancel={this.onCancelHandler}*/}
+                        {/*onConfirm={this.onConfirmHandler}*/}
+                        {/*styles={{*/}
+                            {/*button: {backgroundColor: stylesGlobal.buttonGreen},*/}
+                            {/*cancelButton: {backgroundColor: stylesGlobal.missedRedColor},*/}
+                            {/*selectToggle: {borderBottomColor: stylesGlobal.textFieldUnderline, borderBottomWidth: 1}*/}
+                        {/*}}*/}
+                        {/*single={this.props.single}*/}
+                        {/*noItemsComponent={(*/}
+                            {/*<View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>*/}
+                                {/*<Text style={{fontFamily: 'Roboto-Medium', fontSize: 15}}>*/}
+                                    {/*{getTranslation(translations.dropDownSectionedLabels.noLocationsMessage, this.props.translation)}*/}
+                                {/*</Text>*/}
+                            {/*</View>*/}
+                        {/*)}*/}
+                    {/*/>*/}
                 </View>
                 {
                     tooltip.hasTooltip === true ? (
@@ -157,16 +172,11 @@ class DropDownSectioned extends Component {
         if (this.props.single === false) {
             this.props.onChange(this.state.selectedItems, this.props.index);
         }
-    }
+    };
 
     onSelectedItemsChange = (selectedItems) => {
-        if (this.props.single === true) {
-            this.props.onChange(selectedItems, this.props.index);
-        } else {
-            this.setState({
-                selectedItems
-            })
-        }
+        console.log('DropDownSectioned onSelectItemsChange: ', selectedItems);
+        this.props.onChange(selectedItems, this.props.index);
     };
 }
 

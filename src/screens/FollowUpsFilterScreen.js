@@ -267,7 +267,7 @@ class FollowUpsFilterScreen extends Component {
 
     handleOnChangeSectionedDropDown = (selectedItems) => {
         let selectedItemsWithExtractedId = selectedItems.map ((e) => {
-            return extractIdFromPouchId (e, 'location')
+            return extractIdFromPouchId (e._id, 'location')
         })
 
         this.setState(prevState => ({
