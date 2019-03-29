@@ -14,7 +14,7 @@ import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import {getContactsForOutbreakId} from './../actions/contacts';
 import {addFilterForScreen, removeFilterForScreen} from './../actions/app';
-import {TabBar, TabView} from 'react-native-tab-view';
+import {TabBar, TabView, PagerScroll} from 'react-native-tab-view';
 import FollowUpsFiltersContainer from './../containers/FollowUpsFiltersContainer';
 import FollowUpsSortContainer from './../containers/FollowUpsSortContainer';
 import translations from './../utils/translations';
@@ -98,6 +98,7 @@ class FollowUpsFilterScreen extends Component {
                 <TabView
                     swipeEnabled = {false}
                     navigationState={this.state}
+                    renderPager={this.handleRenderPager}
                     renderScene={this.handleRenderScene}
                     renderTabBar={this.handleRenderTabBar}
                     onIndexChange={this.handleOnIndexChange}
@@ -105,6 +106,12 @@ class FollowUpsFilterScreen extends Component {
             </View>
         );
     }
+
+
+    handleRenderPager = (props) => {
+        return (Platform.OS === 'ios') ? <PagerScroll {...props} swipeEnabled={false} animationEnabled={false} /> :
+            <PagerScroll {...props} swipeEnabled={false} animationEnabled={false} />
+    };
 
     // Please write here all the methods that are not react native lifecycle methods
     handlePressNavbarButton = () => {
@@ -117,15 +124,18 @@ class FollowUpsFilterScreen extends Component {
     };
 
     handleOnIndexChange = (index) => {
+        console.log('handleOnIndexChange ', index)
         this.setState({index});
     };
 
     handleMoveToNextScreenButton = () => {
+        console.log('handleMoveToNextScreenButton ')
         let nextIndex = this.state.index + 1;
         this.handleOnIndexChange(nextIndex)
     };
 
     handleMoveToPrevieousScreenButton = () => {
+        console.log('handleMoveToPrevieousScreenButton ')
         let nextIndex = this.state.index - 1;
         this.handleOnIndexChange(nextIndex)
     };

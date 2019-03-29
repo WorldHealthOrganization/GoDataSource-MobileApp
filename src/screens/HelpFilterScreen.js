@@ -14,7 +14,7 @@ import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import {getContactsForOutbreakId} from './../actions/contacts';
 import {addFilterForScreen, removeFilterForScreen} from './../actions/app';
-import {TabBar, TabView} from 'react-native-tab-view';
+import {TabBar, TabView, PagerScroll} from 'react-native-tab-view';
 import HelpFilterContainer from './../containers/HelpFilterContainer';
 import HelpSortContainer from './../containers/HelpSortContainer';
 import FollowUpsSortContainer from './../containers/FollowUpsSortContainer';
@@ -77,11 +77,17 @@ class HelpFilterScreen extends Component {
                     navigationState={this.state}
                     renderScene={this.handleRenderScene}
                     renderTabBar={this.handleRenderTabBar}
+                    renderPager={this.handleRenderPager}
                     onIndexChange={this.handleOnIndexChange}
                 />
             </View>
         );
     }
+
+    handleRenderPager = (props) => {
+        return (Platform.OS === 'ios') ? <PagerScroll {...props} swipeEnabled={false} animationEnabled={false} /> :
+            <PagerScroll {...props} swipeEnabled={false} animationEnabled={false} />
+    };
 
     handleOnIndexChange = (index) => {
         this.setState({index});

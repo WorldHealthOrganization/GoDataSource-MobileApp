@@ -12,7 +12,7 @@ import config from './../utils/config';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import {getFollowUpsForOutbreakId, getMissedFollowUpsForOutbreakId} from './../actions/followUps';
-import {TabBar, TabView, SceneMap} from 'react-native-tab-view';
+import {TabBar, TabView, PagerScroll} from 'react-native-tab-view';
 import FollowUpsSingleGetInfoContainer from './../containers/FollowUpsSingleGetInfoContainer';
 import FollowUpsSingleQuestionnaireContainer from './../containers/FollowUpsSingleQuestionnaireContainer';
 import Breadcrumb from './../components/Breadcrumb';
@@ -220,12 +220,18 @@ class FollowUpsSingleScreen extends Component {
                     navigationState={this.state}
                     onIndexChange={this.handleOnIndexChange}
                     renderScene={this.handleRenderScene}
+                    renderPager={this.handleRenderPager}
                     renderTabBar={this.handleRenderTabBar}
                     useNativeDriver
                 />
             </ViewHOC>
         );
     }
+
+    handleRenderPager = (props) => {
+        return (Platform.OS === 'ios') ? <PagerScroll {...props} swipeEnabled={false} animationEnabled={false} /> :
+            <PagerScroll {...props} swipeEnabled={false} animationEnabled={false} />
+    };
 
     // Please write here all the methods that are not react native lifecycle methods
     handlePressNavbarButton = () => {

@@ -2,8 +2,8 @@
  * Created by mobileclarisoft on 23/07/2018.
  */
 import React, {Component} from 'react';
-import {View, Alert, Text, StyleSheet, Animated, ScrollView, Dimensions, BackHandler} from 'react-native';
-import {TabBar, TabView, SceneMap} from 'react-native-tab-view';
+import {View, Alert, Text, StyleSheet, Animated, Platform, Dimensions, BackHandler} from 'react-native';
+import {TabBar, TabView, PagerScroll} from 'react-native-tab-view';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import NavBarCustom from './../components/NavBarCustom';
@@ -263,6 +263,7 @@ class CaseSingleScreen extends Component {
                     onIndexChange={this.handleOnIndexChange}
                     renderScene={this.handleRenderScene}
                     renderTabBar={this.handleRenderTabBar}
+                    renderPager={this.handleRenderPager}
                     useNativeDriver={true}
                     initialLayout={initialLayout}
                     swipeEnabled = { this.props.isNew ? false : true}
@@ -270,6 +271,11 @@ class CaseSingleScreen extends Component {
             </ViewHOC>
         );
     }
+
+    handleRenderPager = (props) => {
+        return (Platform.OS === 'ios') ? <PagerScroll {...props} swipeEnabled={false} animationEnabled={false} /> :
+            <PagerScroll {...props} swipeEnabled={false} animationEnabled={false} />
+    };
 
     // Please write here all the methods that are not react native lifecycle methods
     handlePressNavbarButton = () => {

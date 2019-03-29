@@ -7,8 +7,9 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {Component, PureComponent} from 'react';
-import {View, Text, StyleSheet, WebView} from 'react-native';
+import {View, Text, StyleSheet} from 'react-native';
 import {calculateDimension, handleExposedTo, getAddress, extractIdFromPouchId, getTranslation} from './../utils/functions';
+import { WebView } from "react-native-webview";
 import config from './../utils/config';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";

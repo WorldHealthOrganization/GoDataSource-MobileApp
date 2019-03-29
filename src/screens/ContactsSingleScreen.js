@@ -355,13 +355,18 @@ class ContactsSingleScreen extends Component {
                     onIndexChange={this.handleOnIndexChange}
                     renderScene={this.renderScene}
                     renderTabBar={this.handleRenderTabBar}
-                    // renderPager={this.handleRenderPager}
+                    renderPager={this.handleRenderPager}
                     useNativeDriver
                     initialLayout={initialLayout}
                     swipeEnabled = { this.props.isNew ? false : true}
                 />
             </ViewHOC>
         );
+    };
+
+    handleRenderPager = (props) => {
+        return (Platform.OS === 'ios') ? <PagerScroll {...props} swipeEnabled={false} animationEnabled={false} /> :
+            <PagerScroll {...props} swipeEnabled={false} animationEnabled={false} />
     };
 
     // Please write here all the methods that are not react native lifecycle methods
