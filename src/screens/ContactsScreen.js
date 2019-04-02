@@ -30,6 +30,7 @@ import RNExitApp from 'react-native-exit-app';
 
 const scrollAnim = new Animated.Value(0);
 const offsetAnim = new Animated.Value(0);
+let callGetDerivedStateFromProps = true;
 
 class ContactsScreen extends Component {
     static navigatorStyle = {
@@ -64,6 +65,7 @@ class ContactsScreen extends Component {
     // Please add here the react lifecycle methods that you need
     componentDidMount() {
         BackHandler.addEventListener('hardwareBackPress', this.handleBackButtonClick);
+        callGetDerivedStateFromProps = false;
         this.setState({
             loading: true
         }, () => {
@@ -78,17 +80,27 @@ class ContactsScreen extends Component {
     }
 
     static getDerivedStateFromProps(props, state) {
-        if (state.sortData === true){
-            state.sortData = false
-            state.loading = true
-            const allFilters = createFilterContactsObject(state.filterFromFilterScreen, state.filter)
-            props.getContactsForOutbreakId(props.user.activeOutbreakId, allFilters, null);
-        } else {
-            state.sortData = true
-        }
+        if (callGetDerivedStateFromProps === true){
+            console.log('getDerivedStateFromProps - ContactsScreen')
 
-        state.loading = false;
-        state.refreshing = false
+            if (state.sortData === true){
+                state.sortData = false
+                state.loading = true
+                const allFilters = createFilterContactsObject(state.filterFromFilterScreen, state.filter)
+                props.getContactsForOutbreakId(props.user.activeOutbreakId, allFilters, null);
+
+                callGetDerivedStateFromProps = false;
+                console.log('sort done', allFilters);
+
+            } else {
+                state.sortData = true
+            }
+    
+            state.loading = false;
+            state.refreshing = false;
+        } else {
+            callGetDerivedStateFromProps = true;
+        }
         return null;
     }
 
@@ -278,9 +290,15 @@ class ContactsScreen extends Component {
                         this.state.error === null ? (
                             <Popup
                                 isVisible={this.state.isVisible}
-                                onCancelPressed={() => this.setState({ isVisible: false })}
-                                onAppPressed={() => this.setState({ isVisible: false })}
-                                onBackButtonPressed={() => this.setState({ isVisible: false })}
+                                onCancelPressed={() => {
+                                    callGetDerivedStateFromProps = false;
+                                    this.setState({ isVisible: false })}}
+                                onAppPressed={() => {
+                                    callGetDerivedStateFromProps = false;
+                                    this.setState({ isVisible: false })}}
+                                onBackButtonPressed={() => {
+                                    callGetDerivedStateFromProps = false;
+                                    this.setState({ isVisible: false })}}
                                 options={{
                                     latitude: this.state.latitude,
                                     longitude: this.state.longitude,
@@ -313,6 +331,7 @@ class ContactsScreen extends Component {
 
       //Refresh list of cases
     handleOnRefresh = () => {
+        callGetDerivedStateFromProps = false;
         this.setState({
             refreshing: true
         }, () => {
@@ -356,6 +375,7 @@ class ContactsScreen extends Component {
 
     handleOnChangeText = (text) => {
         console.log("### handleOnChangeText: ", text);
+        callGetDerivedStateFromProps = false;
         this.setState(prevState => ({
             filter: Object.assign({}, prevState.filter, {searchText: text})
         }), console.log('### filter after changed text: ', this.state.filter))
@@ -394,6 +414,7 @@ class ContactsScreen extends Component {
     };
 
     handleOnApplyFilters = (filter) => {
+        callGetDerivedStateFromProps = false;
         this.setState({
             filterFromFilterScreen: filter
         }, () => {
@@ -484,17 +505,19 @@ class ContactsScreen extends Component {
             let contactPlaceOfResidenceLongitude = contactPlaceOfResidence[0] && contactPlaceOfResidence[0].geoLocation && contactPlaceOfResidence[0].geoLocation.coordinates && Array.isArray(contactPlaceOfResidence[0].geoLocation.coordinates) && contactPlaceOfResidence[0].geoLocation.coordinates.length === 2 && contactPlaceOfResidence[0].geoLocation.coordinates[0] !== undefined && contactPlaceOfResidence[0].geoLocation.coordinates[0] !== null ? contactPlaceOfResidence[0].geoLocation.coordinates[0] : 0
             navigator.geolocation.getCurrentPosition(
                 (position) => {
+                    callGetDerivedStateFromProps = false;
                     this.setState({
                         latitude: contactPlaceOfResidenceLatitude,
                         longitude: contactPlaceOfResidenceLongitude,
                         sourceLatitude: position.coords.latitude,
                         sourceLongitude: position.coords.longitude,
                         isVisible: true,
-                        error: null,
+                        error: null
                     });
                 },
                 (error) => {
-                    this.setState({error: error.message})
+                    callGetDerivedStateFromProps = false;
+                    this.setState({ error: error.message })
                 },
             );
         }
@@ -511,6 +534,7 @@ class ContactsScreen extends Component {
     filterContacts = () => {
         const allFilters = createFilterContactsObject(this.state.filterFromFilterScreen, this.state.filter)
 
+        callGetDerivedStateFromProps = false;
         this.setState({
             loading: true,
             sortData: false
@@ -548,11 +572,12 @@ class ContactsScreen extends Component {
 
     pushNewEditScreenLocal = (QRCodeInfo) => {
         console.log('pushNewEditScreen QRCodeInfo do with method from another side', QRCodeInfo);
-
+        callGetDerivedStateFromProps = false;
         this.setState({
             loading: true
         }, () => {
             pushNewEditScreen(QRCodeInfo, this.props.navigator, this.props && this.props.user ? this.props.user : null, this.props && this.props.translation ? this.props.translation : null, (error, itemType, record) => {
+                callGetDerivedStateFromProps = false;
                 this.setState({
                     loading: false
                 }, () => {

@@ -20,6 +20,8 @@ import FollowUpsSortContainer from './../containers/FollowUpsSortContainer';
 import translations from './../utils/translations';
 import _ from 'lodash';
 
+let callGetDerivedStateFromProps = true;
+
 class FollowUpsFilterScreen extends Component {
 
     static navigatorStyle = {
@@ -49,36 +51,40 @@ class FollowUpsFilterScreen extends Component {
 
     // Please add here the react lifecycle methods that you need
     static getDerivedStateFromProps(props, state) {
-        console.log ('getDerivedStateFromProps', props.activeFilters)
-        let filterClone = _.cloneDeep(state.filter.filter);
-        let sortClone = _.cloneDeep(state.filter.sort);
+        if (callGetDerivedStateFromProps === true){
+            console.log ('getDerivedStateFromProps - FollowUpsFilter')
+            let filterClone = _.cloneDeep(state.filter.filter);
+            let sortClone = _.cloneDeep(state.filter.sort);
 
-        if (props && props.activeFilters) {
-            if (props.activeFilters.gender) {
-                if (props.activeFilters.gender === config.localTranslationTokens.male && filterClone.gender.Male === false) {
-                    filterClone.gender.Male = true
-                    filterClone.gender.Female = false
-                } else if (props.activeFilters.gender === config.localTranslationTokens.female && filterClone.gender.Female === false) {
-                    filterClone.gender.Female = true
-                    filterClone.gender.Male = false
+            if (props && props.activeFilters) {
+                if (props.activeFilters.gender) {
+                    if (props.activeFilters.gender === config.localTranslationTokens.male && filterClone.gender.Male === false) {
+                        filterClone.gender.Male = true
+                        filterClone.gender.Female = false
+                    } else if (props.activeFilters.gender === config.localTranslationTokens.female && filterClone.gender.Female === false) {
+                        filterClone.gender.Female = true
+                        filterClone.gender.Male = false
+                    }
+                }
+
+                if (props.activeFilters.age && Array.isArray(props.activeFilters.age) && props.activeFilters.age.length === 2) {
+                    filterClone.age[0] = props.activeFilters.age[0];
+                    filterClone.age[1] = props.activeFilters.age[1];
+                }
+
+                if (props.activeFilters.selectedLocations && Array.isArray(props.activeFilters.selectedLocations) && props.activeFilters.selectedLocations.length > 0){
+                    filterClone.selectedLocations = props.activeFilters.selectedLocations;
+                }
+            
+                if (props.activeFilters.sort && props.activeFilters.sort !== undefined && Array.isArray(props.activeFilters.sort) && props.activeFilters.sort.length > 0){
+                    sortClone = props.activeFilters.sort
                 }
             }
-
-            if (props.activeFilters.age && Array.isArray(props.activeFilters.age) && props.activeFilters.age.length === 2) {
-                filterClone.age[0] = props.activeFilters.age[0];
-                filterClone.age[1] = props.activeFilters.age[1];
-            }
-
-            if (props.activeFilters.selectedLocations && Array.isArray(props.activeFilters.selectedLocations) && props.activeFilters.selectedLocations.length > 0){
-                filterClone.selectedLocations = props.activeFilters.selectedLocations;
-            }
-           
-            if (props.activeFilters.sort && props.activeFilters.sort !== undefined && Array.isArray(props.activeFilters.sort) && props.activeFilters.sort.length > 0){
-                sortClone = props.activeFilters.sort
-            }
+            state.filter.filter = filterClone
+            state.filter.sort = sortClone
+        } else {
+            callGetDerivedStateFromProps = true;
         }
-        state.filter.filter = filterClone
-        state.filter.sort = sortClone
         return null
     }
 
@@ -124,6 +130,7 @@ class FollowUpsFilterScreen extends Component {
     };
 
     handleOnIndexChange = (index) => {
+        callGetDerivedStateFromProps = false;
         this.setState({index});
     };
 
@@ -207,6 +214,7 @@ class FollowUpsFilterScreen extends Component {
             sortCriteria: '',
             sortOrder: '',
         });
+        callGetDerivedStateFromProps = false;
         this.setState(prevState => ({
             filter: Object.assign({}, prevState.filter, {sort}),
         }), () => {
@@ -218,6 +226,7 @@ class FollowUpsFilterScreen extends Component {
         console.log("onDeleteSortRulePress: ", index);
         let filterSortClone = _.cloneDeep(this.state.filter.sort);
         filterSortClone.splice(index, 1);
+        callGetDerivedStateFromProps = false;
         this.setState(prevState => ({
             filter: Object.assign({}, prevState.filter, {sort: filterSortClone}),
         }), () => {
@@ -232,6 +241,7 @@ class FollowUpsFilterScreen extends Component {
                 let sortClone = _.cloneDeep(this.state.filter.sort);
                 sortClone[objectTypeOrIndex][id] = value && value.value !== undefined ? value.value : value;
                 console.log ('sortClone', sortClone)
+                callGetDerivedStateFromProps = false;
                 this.setState(prevState => ({
                     filter: Object.assign({}, prevState.filter, {sort: sortClone}),
                 }), () => {
@@ -269,6 +279,7 @@ class FollowUpsFilterScreen extends Component {
         console.log("### handleOnSelectItem: ", item, index, id);
         let filter = Object.assign({}, this.state.filter.filter);
         filter[id][item.value] = !filter[id][item.value];
+        callGetDerivedStateFromProps = false;
         this.setState(prevState => ({
             filter: Object.assign({}, prevState.filter, Object.assign({}, prevState.filter.filter, {[id]: filter[id]}))
         }))
@@ -278,7 +289,7 @@ class FollowUpsFilterScreen extends Component {
         let selectedItemsWithExtractedId = selectedItems.map ((e) => {
             return extractIdFromPouchId (e._id, 'location')
         })
-
+        callGetDerivedStateFromProps = false;
         this.setState(prevState => ({
             filter: Object.assign({}, prevState.filter, {filter: Object.assign({}, prevState.filter.filter, {selectedLocations: selectedItemsWithExtractedId})})
         }), () => {
@@ -287,12 +298,14 @@ class FollowUpsFilterScreen extends Component {
     };
 
     handleOnChangeInterval = (values, id) => {
+        callGetDerivedStateFromProps = false;
         this.setState(prevState => ({
             filter: Object.assign({}, prevState.filter, {filter: Object.assign({}, prevState.filter.filter, {[id]: values})})
         }));
     }
 
     handleOnChangeMultipleSelection = (selections, id) => {
+        callGetDerivedStateFromProps = false;
         this.setState(prevState => ({
             filter: Object.assign({}, prevState.filter, {filter: Object.assign({}, prevState.filter.filter, {[id]: selections})})
         }), () => {
