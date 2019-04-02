@@ -913,7 +913,7 @@ class CaseSingleScreen extends Component {
         console.log ('handleOnChangeSectionedDropDown', selectedItems, index);
         // Here selectedItems is always an array with just one value and should pe mapped to the locationId field from the address from index
         let dateRanges = _.cloneDeep(this.state.case.dateRanges);
-        dateRanges[index].locationId = extractIdFromPouchId(selectedItems['0'], 'location');
+        dateRanges[index].locationId = extractIdFromPouchId(selectedItems['0']._id, 'location');
         this.setState(prevState => ({
             case: Object.assign({}, prevState.case, {dateRanges}),
             isModified: true
@@ -955,7 +955,7 @@ class CaseSingleScreen extends Component {
         console.log ('handleOnChangeSectionedDropDown', selectedItems, index);
         // Here selectedItems is always an array with just one value and should pe mapped to the locationId field from the address from index
         let isolationDates = _.cloneDeep(this.state.case.isolationDates);
-        isolationDates[index].locationId = extractIdFromPouchId(selectedItems['0'], 'location');
+        isolationDates[index].locationId = extractIdFromPouchId(selectedItems['0']._id, 'location');
         this.setState(prevState => ({
             case: Object.assign({}, prevState.case, {isolationDates}),
             isModified: true
