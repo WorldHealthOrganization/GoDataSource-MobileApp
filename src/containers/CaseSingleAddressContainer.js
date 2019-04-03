@@ -270,6 +270,7 @@ class CaseSingleAddressContainer extends PureComponent {
                 onChangeSectionedDropDown={this.props.onChangeSectionedDropDown}
                 onDeletePress={this.props.onDeletePress}
                 onFocus={this.handleOnFocus}
+                onBlur={this.handleOnBlur}
             />
         )
     };
@@ -369,6 +370,11 @@ class CaseSingleAddressContainer extends PureComponent {
     handleOnFocus = (event) => {
         this.scrollToInput(findNodeHandle(event.target))
     };
+
+    handleOnBlur = (event) =>{
+        this.scrollCasesSingleAddress.props.scrollToPosition(0, 0)
+        this.scrollToInput(findNodeHandle(event.target))
+    }
 
     scrollToInput (reactNode) {
         // Add a 'scroll' ref to your ScrollView

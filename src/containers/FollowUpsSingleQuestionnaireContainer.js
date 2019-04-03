@@ -156,6 +156,7 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
                     onChangeSingleSelection={this.props.onChangeSingleSelection}
                     onChangeMultipleSelection={this.props.onChangeMultipleSelection}
                     onFocus={this.handleOnFocus}
+                    onBlur={this.handleOnBlur}
                 />
             )
         }
@@ -199,6 +200,11 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
     handleOnFocus = (event) => {
         this.scrollToInput(findNodeHandle(event.target))
     };
+
+    handleOnBlur = (event) =>{
+        this.scrollFollowUpsSingleQuestionnaire.props.scrollToPosition(0, 0)
+        this.scrollToInput(findNodeHandle(event.target))
+    }
 
     scrollToInput (reactNode) {
         // Add a 'scroll' ref to your ScrollView

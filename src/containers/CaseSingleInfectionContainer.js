@@ -322,6 +322,7 @@ class CaseSingleInfectionContainer extends Component {
                                 this.props.onChangeSectionedDropDownIsolation : 
                                 null}
                 onFocus={this.handleOnFocus}
+                onBlur={this.handleOnBlur}
             />
         )
     };
@@ -505,6 +506,11 @@ class CaseSingleInfectionContainer extends Component {
     handleOnFocus = (event) => {
         this.scrollToInput(findNodeHandle(event.target))
     };
+
+    handleOnBlur = (event) =>{
+        this.scrollCasesSingleInfection.props.scrollToPosition(0, 0)
+        this.scrollToInput(findNodeHandle(event.target))
+    }
 
     scrollToInput (reactNode) {
         // Add a 'scroll' ref to your ScrollView

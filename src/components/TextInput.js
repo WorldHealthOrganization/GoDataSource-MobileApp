@@ -61,6 +61,7 @@ class TextInput extends PureComponent {
                         onSubmitEditing={this.props.onSubmitEditing}
                         secureTextEntry={this.props.secureTextEntry}
                         onFocus={this.props.onFocus}
+                        onBlur={this.props.onBlur}
                     />
                 </View>
                 {

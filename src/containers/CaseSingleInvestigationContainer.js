@@ -169,6 +169,7 @@ class CaseSingleInvestigationContainer extends PureComponent {
                     onChangeMultipleSelection={this.props.onChangeMultipleSelection}
                     onChangeDateAnswer={this.props.onChangeDateAnswer}
                     onFocus={this.handleOnFocus}
+                    onBlur={this.handleOnBlur}
                 />
             )
         }
@@ -181,6 +182,11 @@ class CaseSingleInvestigationContainer extends PureComponent {
     handleOnFocus = (event) => {
         this.scrollToInput(findNodeHandle(event.target))
     };
+
+    handleOnBlur = (event) =>{
+        this.scrollCasesSingleInvestigation.props.scrollToPosition(0, 0)
+        this.scrollToInput(findNodeHandle(event.target))
+    }
 
     scrollToInput (reactNode) {
         // Add a 'scroll' ref to your ScrollView

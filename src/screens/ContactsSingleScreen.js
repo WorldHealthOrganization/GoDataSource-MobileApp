@@ -74,7 +74,7 @@ class ContactsSingleScreen extends Component {
                 isDateOfReportingApproximate: false,
                 relationships: [
                     {
-                        outbreakId: this.props.user.activeOutbreakId,
+                        outbreakId: this.props.user.activeOutbreakId ? this.props.user.activeOutbreakId : '',
                         contactDate: new Date(),
                         contactDateEstimated: false,
                         certaintyLevelId: '',
@@ -192,24 +192,26 @@ class ContactsSingleScreen extends Component {
             this.setState({
                 isEditMode
             })
-
-            getFollowUpsForContactRequest(this.props.user.activeOutbreakId, [extractIdFromPouchId(this.state.contact._id, 'person')], this.state.contact.followUp, (errorFollowUp, responseFollowUp) => {
-                if (errorFollowUp) {
-                    console.log ('getFollowUpsForContactRequest error: ', errorFollowUp)
-                }
-                if (responseFollowUp) {
-                    // console.log ('getFollowUpsForContactRequest response: ', JSON.stringify(responseFollowUp))
-                    if (responseFollowUp.length > 0) {
-                        let myContact = Object.assign({}, this.state.contact)
-                        myContact.followUps = responseFollowUp
-                        this.setState({
-                            contact: myContact
-                        }, () => {
-                            console.log("After adding the followUps: ");
-                        })
+            
+            if (this.props.user !== null) {
+                getFollowUpsForContactRequest(this.props.user.activeOutbreakId, [extractIdFromPouchId(this.state.contact._id, 'person')], this.state.contact.followUp, (errorFollowUp, responseFollowUp) => {
+                    if (errorFollowUp) {
+                        console.log ('getFollowUpsForContactRequest error: ', errorFollowUp)
                     }
-                }
-            })
+                    if (responseFollowUp) {
+                        // console.log ('getFollowUpsForContactRequest response: ', JSON.stringify(responseFollowUp))
+                        if (responseFollowUp.length > 0) {
+                            let myContact = Object.assign({}, this.state.contact)
+                            myContact.followUps = responseFollowUp
+                            this.setState({
+                                contact: myContact
+                            }, () => {
+                                console.log("After adding the followUps: ");
+                            })
+                        }
+                    }
+                })
+            }
         } else if (this.props.isNew === true) {
             let personsArray = [] 
             if (this.props.addContactFromCasesScreen !== null && this.props.addContactFromCasesScreen !== undefined && this.props.caseIdFromCasesScreen !== null && this.props.caseIdFromCasesScreen !== undefined) {

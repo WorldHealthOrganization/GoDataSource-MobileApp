@@ -4,7 +4,7 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {PureComponent} from 'react';
-import { View, Text, StyleSheet, InteractionManager, Alert, ScrollView, TouchableWithoutFeedback, Keyboard} from 'react-native';
+import { View, Text, StyleSheet, InteractionManager, Alert, findNodeHandle, ScrollView, TouchableWithoutFeedback, Keyboard} from 'react-native';
 import {LoaderScreen} from 'react-native-ui-lib';
 import {calculateDimension, getTranslation, extractIdFromPouchId} from './../utils/functions';
 import config from './../utils/config';
@@ -47,6 +47,10 @@ class ExposureContainer extends PureComponent {
                 style={style.containerScrollView}
                 contentContainerStyle={[style.contentContainerStyle, {paddingBottom: this.props.screenSize.height < 600 ? 70 : 20}]}
                 keyboardShouldPersistTaps={'always'}
+                extraHeight={20 + 81 + 70}
+                innerRef={ref => {
+                    this.scrollExposure = ref
+                }}
             >
                 <View style={style.container}>
                     {
@@ -60,6 +64,20 @@ class ExposureContainer extends PureComponent {
             </KeyboardAwareScrollView>
         );
     }
+
+    handleOnFocus = (event) => {
+        this.scrollToInput(findNodeHandle(event.target))
+    };
+
+    handleOnBlur = (event) =>{
+        this.scrollExposure.props.scrollToPosition(0, 0)
+        this.scrollToInput(findNodeHandle(event.target))
+    }
+
+    scrollToInput (reactNode) {
+        this.scrollExposure.props.scrollToFocusedInput(reactNode)
+
+    };
 
     // Please write here all the methods that are not react native lifecycle methods
     handleRenderItem = (item, index) => {
@@ -143,6 +161,8 @@ class ExposureContainer extends PureComponent {
                 onChangeDate={this.props.onChangeDate}
                 onChangeText={this.props.onChangeText}
                 onChangeSwitch={this.props.onChangeSwitch}
+                onFocus={this.handleOnFocus}
+                onBlur={this.handleOnBlur}
             />
         )
     };

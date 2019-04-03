@@ -227,6 +227,7 @@ class ContactsSingleAddress extends PureComponent {
                 onDeletePress={this.props.onDeletePress}
                 anotherPlaceOfResidenceWasChosen={this.props.anotherPlaceOfResidenceWasChosen}
                 onFocus={this.handleOnFocus}
+                onBlur={this.handleOnBlur}
             />
         )
     };
@@ -328,6 +329,11 @@ class ContactsSingleAddress extends PureComponent {
     handleOnFocus = (event) => {
         this.scrollToInput(findNodeHandle(event.target))
     };
+
+    handleOnBlur = (event) =>{
+        this.scrollContactsSingleAddress.props.scrollToPosition(0, 0)
+        this.scrollToInput(findNodeHandle(event.target))
+    }
 
     scrollToInput (reactNode) {
         // Add a 'scroll' ref to your ScrollView
