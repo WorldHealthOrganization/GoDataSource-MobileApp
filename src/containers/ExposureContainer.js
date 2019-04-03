@@ -70,7 +70,7 @@ class ExposureContainer extends PureComponent {
     };
 
     handleOnBlur = (event) =>{
-        this.scrollExposure.props.scrollToPosition(0, 0)
+        this.scrollExposure.props.scrollToPosition(0, 0, false)
         this.scrollToInput(findNodeHandle(event.target))
     }
 

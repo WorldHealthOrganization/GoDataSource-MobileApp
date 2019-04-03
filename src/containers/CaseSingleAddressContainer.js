@@ -372,7 +372,7 @@ class CaseSingleAddressContainer extends PureComponent {
     };
 
     handleOnBlur = (event) =>{
-        this.scrollCasesSingleAddress.props.scrollToPosition(0, 0)
+        this.scrollCasesSingleAddress.props.scrollToPosition(0, 0, false)
         this.scrollToInput(findNodeHandle(event.target))
     }
 

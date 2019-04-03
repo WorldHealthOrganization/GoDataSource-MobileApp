@@ -202,7 +202,7 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
     };
 
     handleOnBlur = (event) =>{
-        this.scrollFollowUpsSingleQuestionnaire.props.scrollToPosition(0, 0)
+        this.scrollFollowUpsSingleQuestionnaire.props.scrollToPosition(0, 0, false)
         this.scrollToInput(findNodeHandle(event.target))
     }
 

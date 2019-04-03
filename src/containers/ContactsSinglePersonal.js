@@ -272,7 +272,7 @@ class ContactsSinglePersonal extends PureComponent {
     };
 
     handleOnBlur = (event) =>{
-        this.scrollContactsSinglePersonal.props.scrollToPosition(0, 0)
+        this.scrollContactsSinglePersonal.props.scrollToPosition(0, 0, false)
         this.scrollToInput(findNodeHandle(event.target))
     }
 

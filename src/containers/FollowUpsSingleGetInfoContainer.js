@@ -342,7 +342,7 @@ class FollowUpsSingleGetInfoContainer extends PureComponent {
     };
 
     handleOnBlur = (event) =>{
-        this.scrollFollowUpsSingleGetInfo.props.scrollToPosition(0, 0)
+        this.scrollFollowUpsSingleGetInfo.props.scrollToPosition(0, 0, false)
         this.scrollToInput(findNodeHandle(event.target))
     }
 

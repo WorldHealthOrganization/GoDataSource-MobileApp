@@ -508,7 +508,7 @@ class CaseSingleInfectionContainer extends Component {
     };
 
     handleOnBlur = (event) =>{
-        this.scrollCasesSingleInfection.props.scrollToPosition(0, 0)
+        this.scrollCasesSingleInfection.props.scrollToPosition(0, 0, false)
         this.scrollToInput(findNodeHandle(event.target))
     }
 

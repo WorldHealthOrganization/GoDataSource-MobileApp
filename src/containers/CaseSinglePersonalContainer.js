@@ -342,7 +342,7 @@ class CaseSinglePersonalContainer extends PureComponent {
     };
 
     handleOnBlur = (event) =>{
-        this.scrollCasesSinglePersonal.props.scrollToPosition(0, 0)
+        this.scrollCasesSinglePersonal.props.scrollToPosition(0, 0, false)
         this.scrollToInput(findNodeHandle(event.target))
     }
 

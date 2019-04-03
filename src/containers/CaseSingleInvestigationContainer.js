@@ -184,7 +184,7 @@ class CaseSingleInvestigationContainer extends PureComponent {
     };
 
     handleOnBlur = (event) =>{
-        this.scrollCasesSingleInvestigation.props.scrollToPosition(0, 0)
+        this.scrollCasesSingleInvestigation.props.scrollToPosition(0, 0, false)
         this.scrollToInput(findNodeHandle(event.target))
     }
 
