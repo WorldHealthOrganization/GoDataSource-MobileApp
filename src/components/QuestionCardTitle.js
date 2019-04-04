@@ -2,11 +2,8 @@
  * Created by florinpopa on 04/03/2019.
  */
 import React, {PureComponent} from 'react';
-import {View, Text, StyleSheet, PixelRatio} from 'react-native';
-import PropTypes from 'prop-types';
+import {View, Text, StyleSheet} from 'react-native';
 import styles from './../styles';
-import translations from './../utils/translations'
-import {getTranslation} from './../utils/functions';
 
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
@@ -61,17 +58,5 @@ const style = StyleSheet.create({
         color: 'black'
     }
 });
-
-// QuestionCardTitle.propTypes = {
-//     label: PropTypes.string.isRequired,
-//     hasBorderBottom: PropTypes.boolean,
-//     borderBottomColor: PropTypes.string
-// };
-//
-// QuestionCardTitle.defaultProps = {
-//     label: 'Test',
-//     hasBorderBottom: false,
-//     borderBottomColor: styles.navigationDrawerSeparatorGrey
-// };
 
 export default QuestionCardTitle;

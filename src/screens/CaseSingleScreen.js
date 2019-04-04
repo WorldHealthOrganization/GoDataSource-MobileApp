@@ -12,7 +12,7 @@ import Menu, {MenuItem} from 'react-native-material-menu';
 import Ripple from 'react-native-material-ripple';
 import styles from './../styles';
 import config from './../utils/config';
-import _ from 'lodash';
+import _, {sortBy} from 'lodash';
 
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
@@ -24,11 +24,13 @@ import CaseSingleInvestigationContainer from '../containers/CaseSingleInvestigat
 import {Icon} from 'react-native-material-ui';
 import {removeErrors} from './../actions/errors';
 import {addCase, updateCase} from './../actions/cases';
-import {updateRequiredFields, extractIdFromPouchId, navigation, getTranslation, calculateDimension} from './../utils/functions';
+import {updateRequiredFields, extractIdFromPouchId, navigation, getTranslation, calculateDimension, mapAnswers, reMapAnswers, checkRequiredQuestions, extractAllQuestions} from './../utils/functions';
 import moment from 'moment';
 import translations from './../utils/translations'
 import ElevatedView from 'react-native-elevated-view';
 import ViewHOC from './../components/ViewHOC';
+import AddSingleAnswerModalScreen from "./AddSingleAnswerModalScreen";
+import cloneDeep from "lodash/cloneDeep";
 
 const initialLayout = {
     height: 0,
@@ -111,15 +113,30 @@ class CaseSingleScreen extends Component {
             anotherPlaceOfResidenceWasChosen: false,
             hasPlaceOfResidence: true,
             selectedItemIndexForTextSwitchSelectorForAge: 0, // age/dob - switch tab
-            selectedItemIndexForAgeUnitOfMeasureDropDown: this.props.isNew ? 0 : (this.props.case.age && this.props.case.age.years !== undefined && this.props.case.age.years !== null && this.props.case.age.years > 0) ? 0 : 1, //default age dropdown value
+            selectedItemIndexForAgeUnitOfMeasureDropDown: this.props.isNew ? 0 : (this.props.case.age && this.props.case.age.years !== undefined && this.props.case.age.years !== null && this.props.case.age.years > 0) ? 0 : 1, //default age dropdown value,
+            currentAnswers: {},
+            previousAnswers: [],
+            mappedQuestions: [],
+
+            // used for adding new multi-frequency answers
+            showAddSingleAnswerModalScreen: false,
+            newItem: null
         };
         // Bind here methods, or at least don't declare methods in the render method
         this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this));
         this.handleBackButtonClick = this.handleBackButtonClick.bind(this);
     }
 
+
     componentDidMount() {
         BackHandler.addEventListener('hardwareBackPress', this.handleBackButtonClick);
+        let mappedAnswers = mapAnswers(this.props.caseInvestigationQuestions, this.state.case.questionnaireAnswers);
+        this.setState({
+            previousAnswers: mappedAnswers.mappedAnswers,
+            mappedQuestions: mappedAnswers.mappedQuestions
+        }, () => {
+            console.log('Previous Answers: ', this.state.previousAnswers);
+        })
     }
 
     componentWillUnmount() {
@@ -266,6 +283,14 @@ class CaseSingleScreen extends Component {
                     useNativeDriver={true}
                     initialLayout={initialLayout}
                     swipeEnabled = { this.props.isNew ? false : true}
+                />
+                <AddSingleAnswerModalScreen
+                    showAddSingleAnswerModalScreen={this.state.showAddSingleAnswerModalScreen}
+                    item={this.state.newItem}
+                    currentAnswers={this.state.currentAnswers}
+                    onCancelPressed={this.onCancelPressed}
+                    saveCurrentAnswer={this.saveCurrentAnswer}
+                    updateCurrentAnswers={this.updateCurrentAnswers}
                 />
             </ViewHOC>
         );
@@ -443,6 +468,8 @@ class CaseSingleScreen extends Component {
             case 'caseInvestigation':
                 return <CaseSingleInvestigationContainer
                     item={this.state.case}
+                    currentAnswers={this.state.currentAnswers}
+                    previousAnswers={this.state.previousAnswers}
                     isEditMode={this.state.isEditMode}
                     index={this.state.index}
                     onPressEdit={this.onPressEdit}
@@ -455,6 +482,9 @@ class CaseSingleScreen extends Component {
                     onChangeDateAnswer={this.onChangeDateAnswer}
                     handleMoveToPrevieousScreenButton={this.handleMoveToPrevieousScreenButton}
                     isNew={this.props.isNew ? true : this.props.forceNew ? true : false}
+                    onClickAddNewMultiFrequencyAnswer={this.onClickAddNewMultiFrequencyAnswer}
+                    onClickShowPreviousAnswers={this.onClickShowPreviousAnswers}
+                    onChangeAnswerDate={this.onChangeAnswerDate}
                 />;
             default: return null;
         }
@@ -493,12 +523,15 @@ class CaseSingleScreen extends Component {
                             console.log("handleSavePress case", JSON.stringify(this.state.case));
                             this.hideMenu();
                             let ageConfig = this.ageAndDobPrepareForSave();
-                            let caseClone = _.cloneDeep(this.state.case)
-                            caseClone.age = ageConfig.ageClone
-                            caseClone.dob = ageConfig.dobClone
+                            let caseClone = _.cloneDeep(this.state.case);
+                            // Remap the previous answers
+                            let questionnaireAnswers = reMapAnswers(_.cloneDeep(this.state.previousAnswers));
+                            caseClone.age = ageConfig.ageClone;
+                            caseClone.dob = ageConfig.dobClone;
+                            caseClone.questionnaireAnswers = questionnaireAnswers;
                             if (caseClone.outcomeId !== config.caseFieldsForHardCodeCheck.outcomeIdDeceasedValue) {
-                                caseClone.safeBurial = false
-                                caseClone.dateOfBurial = null
+                                caseClone.safeBurial = false;
+                                caseClone.dateOfBurial = null;
                             }
                             this.setState(prevState => ({
                                 case: Object.assign({}, prevState.case, caseClone),
@@ -1058,25 +1091,12 @@ class CaseSingleScreen extends Component {
         // return true
     };
     checkRequiredFieldsCaseInvestigationQuestionnaire = () => {
-        let requiredFields = [];
-        for (let i = 0; i< this.props.caseInvestigationQuestions.length; i++) {
-            let questionnaireAnswer = this.state.case.questionnaireAnswers[this.props.caseInvestigationQuestions[i].variable];
-            if (this.props.caseInvestigationQuestions[i].required && this.props.caseInvestigationQuestions[i].inactive === false){
-                //multiple answer question
-                if(Array.isArray(questionnaireAnswer)){
-                    //if is empty
-                    if(_.isEmpty(questionnaireAnswer))
-                        requiredFields.push(getTranslation(this.props.caseInvestigationQuestions[i].text, this.props.translation));
-                        // return false;
-                }else{
-                    //regular question missing answer
-                    if(!questionnaireAnswer)
-                        requiredFields.push(getTranslation(this.props.caseInvestigationQuestions[i].text, this.props.translation));
-                        // return false;
-                }
-            }
-        }
-        return requiredFields;
+        let sortedQuestions = sortBy(cloneDeep(this.props.caseInvestigationQuestions), ['order', 'variable']);
+        sortedQuestions = extractAllQuestions(sortedQuestions, this.state.previousAnswers);
+
+        let unAnsweredQuestions = checkRequiredQuestions(sortedQuestions, this.state.previousAnswers);
+
+        return unAnsweredQuestions;
         // return true;
     };
     checkRequiredFields = () => {
@@ -1563,75 +1583,174 @@ class CaseSingleScreen extends Component {
     };
 
     //labData Questionnaire onChange... functions
-    onChangeTextAnswer = (value, id) => {
+    onChangeTextAnswer = (value, id, parentId) => {
         // console.log ('onChangeTextAnswer', value, id)
-        let itemClone = _.cloneDeep(this.state.case);
-        let questionnaireAnswers = itemClone && itemClone.questionnaireAnswers ? itemClone.questionnaireAnswers : null;
-        if (!itemClone.questionnaireAnswers) {
-            itemClone.questionnaireAnswers = {};
-            questionnaireAnswers = itemClone.questionnaireAnswers;
+        // let itemClone = _.cloneDeep(this.state.case);
+        let questionnaireAnswers = _.cloneDeep(this.state.previousAnswers);
+
+        if (parentId) {
+            if (!questionnaireAnswers[parentId]) {
+                questionnaireAnswers[parentId] = [];
+            }
+            if (questionnaireAnswers[parentId] && Array.isArray(questionnaireAnswers[parentId]) && questionnaireAnswers[parentId].length > 0 && questionnaireAnswers[parentId][0]) {
+                if (typeof questionnaireAnswers[parentId][0].subAnswers === "object" && Object.keys(questionnaireAnswers[parentId][0].subAnswers).length === 0) {
+                    questionnaireAnswers[parentId][0].subAnswers = {};
+                }
+                if (!questionnaireAnswers[parentId][0].subAnswers[id]) {
+                    questionnaireAnswers[parentId][0].subAnswers[id] = [];
+                }
+                // if (!questionnaireAnswers[parentId][0].subAnswers[id][0]) {
+                    questionnaireAnswers[parentId][0].subAnswers[id][0] = value;
+                // } else {
+                //     questionnaireAnswers[parentId][0].subAnswers[id].push(value);
+                // }
+            }
+        } else {
+            if (!questionnaireAnswers[id]) {
+                questionnaireAnswers[id] = [];
+            }
+            questionnaireAnswers[id][0] = value;
         }
-        questionnaireAnswers[id] = value;
+
+        // questionnaireAnswers[id] = value;
         this.setState(prevState => ({
-            case: Object.assign({}, prevState.case, {questionnaireAnswers: questionnaireAnswers}),
+            previousAnswers: questionnaireAnswers,
             isModified: true
             }), () => {
-                // console.log ('onChangeMultipleSelection after setState', this.state.case)
+                console.log ('onChangeMultipleSelection after setState', this.state.previousAnswers)
             })
     };
-    onChangeSingleSelection = (value, id) => {
+    onChangeSingleSelection = (value, id, parentId) => {
         // console.log ('onChangeSingleSelection', value, id)
-        let itemClone = _.cloneDeep(this.state.case);
-        let questionnaireAnswers = itemClone && itemClone.questionnaireAnswers ? itemClone.questionnaireAnswers : null;
-        if (!itemClone.questionnaireAnswers) {
-            itemClone.questionnaireAnswers = {};
-            questionnaireAnswers = itemClone.questionnaireAnswers;
+        let questionnaireAnswers = _.cloneDeep(this.state.previousAnswers);
+
+        if (parentId) {
+            if (!questionnaireAnswers[parentId]) {
+                questionnaireAnswers[parentId] = [];
+            }
+            if (questionnaireAnswers[parentId] && Array.isArray(questionnaireAnswers[parentId]) && questionnaireAnswers[parentId].length > 0 && questionnaireAnswers[parentId][0]) {
+                if (typeof questionnaireAnswers[parentId][0].subAnswers === "object" && Object.keys(questionnaireAnswers[parentId][0].subAnswers).length === 0) {
+                    questionnaireAnswers[parentId][0].subAnswers = {};
+                }
+                if (!questionnaireAnswers[parentId][0].subAnswers[id]) {
+                    questionnaireAnswers[parentId][0].subAnswers[id] = [];
+                }
+                // if (!questionnaireAnswers[parentId][0].subAnswers[id][0]) {
+                    questionnaireAnswers[parentId][0].subAnswers[id][0] = value;
+                // } else {
+                //     questionnaireAnswers[parentId][0].subAnswers[id].push(value);
+                // }
+            }
+        } else {
+            if (!questionnaireAnswers[id]) {
+                questionnaireAnswers[id] = [];
+            }
+            questionnaireAnswers[id][0] = value;
         }
-        questionnaireAnswers[id] = value.value;
+        // questionnaireAnswers[id] = value.value;
         this.setState(prevState => ({
-            case: Object.assign({}, prevState.case, {questionnaireAnswers: questionnaireAnswers}),
+            previousAnswers: questionnaireAnswers,
             isModified: true
             }), () => {
-                // console.log ('onChangeMultipleSelection after setState', this.state.case)
+                console.log ('onChangeMultipleSelection after setState', this.state.previousAnswers)
             })
     };
-    onChangeMultipleSelection = (selections, id) => {
+    onChangeMultipleSelection = (value, id, parentId) => {
         // console.log ('onChangeMultipleSelection', selections, id)
-        let itemClone = _.cloneDeep(this.state.case);
-        let questionnaireAnswers = itemClone && itemClone.questionnaireAnswers ? itemClone.questionnaireAnswers : null;
-        if (!itemClone.questionnaireAnswers) {
-            itemClone.questionnaireAnswers = {};
-            questionnaireAnswers = itemClone.questionnaireAnswers;
+        let questionnaireAnswers = _.cloneDeep(this.state.previousAnswers);
+
+        if (parentId) {
+            if (!questionnaireAnswers[parentId]) {
+                questionnaireAnswers[parentId] = [];
+            }
+            if (questionnaireAnswers[parentId] && Array.isArray(questionnaireAnswers[parentId]) && questionnaireAnswers[parentId].length > 0 && questionnaireAnswers[parentId][0]) {
+                if (typeof questionnaireAnswers[parentId][0].subAnswers === "object" && Object.keys(questionnaireAnswers[parentId][0].subAnswers).length === 0) {
+                    questionnaireAnswers[parentId][0].subAnswers = {};
+                }
+                if (!questionnaireAnswers[parentId][0].subAnswers[id]) {
+                    questionnaireAnswers[parentId][0].subAnswers[id] = [];
+                }
+                // if (!questionnaireAnswers[parentId][0].subAnswers[id][0]) {
+                    questionnaireAnswers[parentId][0].subAnswers[id][0] = value;
+                // } else {
+                //     questionnaireAnswers[parentId][0].subAnswers[id].push(value);
+                // }
+            }
+        } else {
+            if (!questionnaireAnswers[id]) {
+                questionnaireAnswers[id] = [];
+            }
+            questionnaireAnswers[id][0] = value;
         }
-        questionnaireAnswers[id] = selections.map((e) => {return e.value});
+        // questionnaireAnswers[id] = selections.map((e) => {return e.value});
         this.setState(prevState => ({
-            case: Object.assign({}, prevState.case, {questionnaireAnswers: questionnaireAnswers}),
+            previousAnswers: questionnaireAnswers,
             isModified: true
             }), () => {
-                // console.log ('onChangeMultipleSelection after setState', this.state.case)
+                console.log ('onChangeMultipleSelection after setState', this.state.previousAnswers)
             })
     };
-    onChangeDateAnswer = (value, id) => {
+    onChangeDateAnswer = (value, id, parentId) => {
         // console.log ('onChangeDateAnswer', value, id)
-        let itemClone = _.cloneDeep(this.state.case);
-        let questionnaireAnswers = itemClone && itemClone.questionnaireAnswers ? itemClone.questionnaireAnswers : null;
-        if (!itemClone.questionnaireAnswers) {
-            itemClone.questionnaireAnswers = {};
-            questionnaireAnswers = itemClone.questionnaireAnswers;
+        let questionnaireAnswers = _.cloneDeep(this.state.previousAnswers);
+
+        if (parentId) {
+            if (!questionnaireAnswers[parentId]) {
+                questionnaireAnswers[parentId] = [];
+            }
+            if (questionnaireAnswers[parentId] && Array.isArray(questionnaireAnswers[parentId]) && questionnaireAnswers[parentId].length > 0 && questionnaireAnswers[parentId][0]) {
+                if (typeof questionnaireAnswers[parentId][0].subAnswers === "object" && Object.keys(questionnaireAnswers[parentId][0].subAnswers).length === 0) {
+                    questionnaireAnswers[parentId][0].subAnswers = {};
+                }
+                if (!questionnaireAnswers[parentId][0].subAnswers[id]) {
+                    questionnaireAnswers[parentId][0].subAnswers[id] = [];
+                }
+                // if (!questionnaireAnswers[parentId][0].subAnswers[id][0]) {
+                    questionnaireAnswers[parentId][0].subAnswers[id][0] = value;
+                // } else {
+                //     questionnaireAnswers[parentId][0].subAnswers[id].push(value);
+                // }
+            }
+        } else {
+            if (!questionnaireAnswers[id]) {
+                questionnaireAnswers[id] = [];
+            }
+            questionnaireAnswers[id][0] = value;
         }
-        questionnaireAnswers[id] = value;
+        // questionnaireAnswers[id] = value;
         this.setState(prevState => ({
-            case: Object.assign({}, prevState.case, {questionnaireAnswers: questionnaireAnswers}),
+            previousAnswers: questionnaireAnswers,
             isModified: true
         }), () => {
-            // console.log ('onChangeDateAnswer after setState', this.state.case)
+            console.log ('onChangeDateAnswer after setState', this.state.previousAnswers)
+        })
+    };
+    onChangeAnswerDate = (value, questionId) => {
+        let questionnaireAnswers = _.cloneDeep(this.state.previousAnswers);
+        if (questionnaireAnswers && questionnaireAnswers[questionId] && Array.isArray(questionnaireAnswers[questionId]) && questionnaireAnswers[questionId].length) {
+            if (questionnaireAnswers[questionId][0] && questionnaireAnswers[questionId][0].date) {
+                questionnaireAnswers[questionId][0].date = value;
+                if (questionnaireAnswers[questionId][0].subAnswers && typeof questionnaireAnswers[questionId][0].subAnswers === "object" && Object.keys(questionnaireAnswers[questionId][0].subAnswers).length > 0) {
+                    for (let subQuestionId in questionnaireAnswers[questionId][0].subAnswers) {
+                        questionnaireAnswers[questionId][0].subAnswers[subQuestionId].map((e) => {
+                            return {value: e.value, date: value};
+                        })
+                    }
+                }
+            }
+        }
+
+        this.setState({
+            previousAnswers: questionnaireAnswers,
+            isModified: true
+        }, () => {
+            console.log ('onChangeAnswerDate after setState', this.state.previousAnswers);
         })
     };
 
     onNavigatorEvent = (event) => {
         navigation(event, this.props.navigator);
     };
-
     goToHelpScreen = () => {
         let pageAskingHelpFrom = null
         if (this.props.isNew !== null && this.props.isNew !== undefined && this.props.isNew === true ){
@@ -1651,7 +1770,76 @@ class CaseSingleScreen extends Component {
                 pageAskingHelpFrom: pageAskingHelpFrom
             }
         });
-    }
+    };
+
+    // used for adding multi-frequency answers
+    onClickAddNewMultiFrequencyAnswer = (item) => {
+        this.setState({
+            newItem: item
+        }, () => {
+            this.setState({
+                showAddSingleAnswerModalScreen: !this.state.showAddSingleAnswerModalScreen
+            })
+        })
+    };
+
+    onClickShowPreviousAnswers = (previousAnswer) => {
+        console.log("Previous answers button clicked: ", this.state.previousAnswers[previousAnswer.variable]);
+        this.props.navigator.showModal({
+            screen: 'PreviousAnswersScreen',
+            animated: true,
+            passProps: {
+                item: previousAnswer,
+                previousAnswers: this.state.previousAnswers[previousAnswer.variable],
+                previousAnswerVariable: previousAnswer.variable
+            }
+        })
+    };
+
+    onCancelPressed = () => {
+        this.setState({
+            newItem: null,
+            currentAnswers: {},
+            showAddSingleAnswerModalScreen: !this.state.showAddSingleAnswerModalScreen
+        })
+    };
+
+    saveCurrentAnswer = () => {
+        let previousAnswersClone = _.cloneDeep(this.state.previousAnswers);
+        let currentAnswersClone = _.cloneDeep(this.state.currentAnswers);
+        if (!previousAnswersClone) {
+            previousAnswersClone = {};
+        }
+        if (!previousAnswersClone[Object.keys(currentAnswersClone)[0]]) {
+            previousAnswersClone[Object.keys(currentAnswersClone)[0]] = [];
+        }
+        // currentAnswersClone[Object.keys(currentAnswersClone)[0]][0].date = currentAnswersClone[Object.keys(currentAnswersClone)[0]][0].date.toISOString();
+        previousAnswersClone[Object.keys(currentAnswersClone)[0]].push(currentAnswersClone[Object.keys(currentAnswersClone)[0]][0]);
+        previousAnswersClone[Object.keys(currentAnswersClone)[0]].sort((a, b) => {
+            if (new Date(a.date) > new Date(b.date)) {
+                return -1;
+            }
+            if (new Date(a.date) < new Date(b.date)) {
+                return 1;
+            }
+            return 0;
+        });
+        this.setState({
+            previousAnswers: previousAnswersClone,
+            newItem: null,
+            currentAnswers: {},
+            showAddSingleAnswerModalScreen: !this.state.showAddSingleAnswerModalScreen
+        })
+    };
+
+    updateCurrentAnswers = (currentAnswers) => {
+        this.setState({
+            currentAnswers: currentAnswers,
+            isModified: true
+        }, () => {
+            console.log('CurrentAnswers: ', this.state.currentAnswers);
+        })
+    };
 }
 
 // Create style outside the class, or for components that will be used by other components (buttons),

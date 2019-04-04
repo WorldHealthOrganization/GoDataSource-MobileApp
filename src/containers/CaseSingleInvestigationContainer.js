@@ -3,7 +3,7 @@
  */
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
-import React, {PureComponent} from 'react';
+import React, {Component} from 'react';
 import {View, StyleSheet, findNodeHandle} from 'react-native';
 import {calculateDimension, extractAllQuestions, mapQuestions, getTranslation} from '../utils/functions';
 import config from '../utils/config';
@@ -13,24 +13,48 @@ import styles from '../styles';
 import QuestionCard from '../components/QuestionCard';
 import Button from '../components/Button';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
-import {sortBy} from 'lodash';
+import sortBy from 'lodash/sortBy';
+import cloneDeep from 'lodash/cloneDeep';
 import translations from './../utils/translations'
 
-class CaseSingleInvestigationContainer extends PureComponent {
+class CaseSingleInvestigationContainer extends Component {
 
     // This will be a container, so put as less business logic here as possible
     constructor(props) {
         super(props);
         this.state = {
+            previousAnswers: this.props.previousAnswers
         };
     }
 
-    shouldComponentUpdate(nextProps, nextState) {
-        if (nextProps.isEditMode !== this.props.isEditMode || nextProps.index === 3) {
-            return true;
+    static getDerivedStateFromProps(props, state) {
+        if (props.previousAnswers) {
+            state.previousAnswers = props.previousAnswers;
         }
-        return false;
+        // Sort the answers by date
+        if (state.previousAnswers && Object.keys(state.previousAnswers).length > 0) {
+            for (let questionId in state.previousAnswers) {
+                if (Array.isArray(state.previousAnswers[questionId]) && state.previousAnswers[questionId].length > 1) {
+                    state.previousAnswers[questionId] = state.previousAnswers[questionId].sort((a, b) => {
+                        if (new Date(a.date) > new Date(b.date)) {
+                            return -1;
+                        }
+                        if (new Date(a.date) < new Date(b.date)) {
+                            return 1;
+                        }
+                        return 0;
+                    })
+                }
+            }
+        }
     }
+
+    // shouldComponentUpdate(nextProps, nextState) {
+    //     if (nextProps.isEditMode !== this.props.isEditMode || nextProps.index === 3) {
+    //         return true;
+    //     }
+    //     return false;
+    // }
 
     // The render method should have at least business logic as possible,
     // because this will be called whenever there is a new setState call
@@ -38,8 +62,8 @@ class CaseSingleInvestigationContainer extends PureComponent {
     render() {
         // console.log('CaseSingleContainer render Investigation');
          // Get all additional questions recursively
-        let sortedQuestions = sortBy(this.props.questions, ['order', 'variable']);
-        sortedQuestions = extractAllQuestions(sortedQuestions, this.props.item);
+        let sortedQuestions = sortBy(cloneDeep(this.props.questions), ['order', 'variable']);
+        sortedQuestions = extractAllQuestions(sortedQuestions, this.state.previousAnswers);
 
         return (
             <View style={{flex: 1}}>
@@ -156,20 +180,22 @@ class CaseSingleInvestigationContainer extends PureComponent {
 
     handleRenderItem = (item, index, totalNumberOfQuestions) => {
         if (item.inactive === false) {
-
             return (
                 <QuestionCard
                     item={item}
                     isEditMode={this.props.isEditMode}
                     index={index + 1}
                     totalNumberOfQuestions={totalNumberOfQuestions}
-                    source={this.props.item}
+                    source={this.state.previousAnswers}
                     onChangeTextAnswer={this.props.onChangeTextAnswer}
                     onChangeSingleSelection={this.props.onChangeSingleSelection}
                     onChangeMultipleSelection={this.props.onChangeMultipleSelection}
                     onChangeDateAnswer={this.props.onChangeDateAnswer}
                     onFocus={this.handleOnFocus}
+                    onClickAddNewMultiFrequencyAnswer={this.props.onClickAddNewMultiFrequencyAnswer}
+                    onClickShowPreviousAnswers={this.props.onClickShowPreviousAnswers}
                     onBlur={this.handleOnBlur}
+                    onChangeAnswerDate={this.props.onChangeAnswerDate}
                 />
             )
         }

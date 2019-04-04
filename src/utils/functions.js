@@ -9,7 +9,7 @@ import {updateFileInDatabase, processBulkDocs} from './../queries/database';
 import {setSyncState} from './../actions/app';
 import bcrypt from 'react-native-bcrypt';
 import uuid from 'react-native-uuid';
-import _ from 'lodash';
+import _, {sortBy} from 'lodash';
 import defaultTranslations from './defaultTranslations'
 import {getContactsForOutbreakId} from './../actions/contacts';
 import {getSyncEncryptPassword, encrypt, decrypt} from './../utils/encryption';
@@ -1177,7 +1177,38 @@ export function mapLocations(locationList, parentLocationId) {
 }
 
 //recursively functions for mapping questionCard questions (followUps and Cases)
+// item = {questionId1: [{date1, value1, subAnswers1}, {date2, value2}], questionId2: [{date: null, value1}]}
 export function extractAllQuestions (questions, item) {
+    if (questions && Array.isArray(questions) && questions.length > 0) {
+        for (let i=0; i<questions.length; i++) {
+            if (questions[i].additionalQuestions) {
+                delete questions[i].additionalQuestions;
+            }
+            if (questions[i] && questions[i].answerType && (questions[i].answerType === "LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_SINGLE_ANSWER" || questions[i].answerType === "LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_MULTIPLE_ANSWERS") && questions[i].answers && Array.isArray(questions[i].answers) && questions[i].answers.length > 0) {
+                for (let j = 0; j < questions[i].answers.length; j++) {
+                    // First check for single select since it has only a value
+                    if (questions[i].answerType === "LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_SINGLE_ANSWER" ) {
+                        if (item && typeof item === 'object' && Object.keys(item).length > 0 && item[questions[i].variable] && Array.isArray(item[questions[i].variable]) && item[questions[i].variable].length > 0 && typeof item[questions[i].variable][0] === "object" && Object.keys(item[questions[i].variable][0]).length > 0 && item[questions[i].variable][0].value && item[questions[i].variable][0].value === questions[i].answers[j].value && questions[i].answers[j].additionalQuestions) {
+                            questions[i].additionalQuestions = extractQuestionsRecursively(_.sortBy(questions[i].answers[j].additionalQuestions, ['order', 'variable']), item[questions[i].variable][0].subAnswers);
+                        }
+                    } else {
+                        // For the multiple select the answers are in an array of values
+                        if (questions[i].answerType === "LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_MULTIPLE_ANSWERS") {
+                            if (item && typeof item === 'object' && Object.keys(item).length > 0 && item[questions[i].variable] && Array.isArray(item[questions[i].variable]) && item[questions[i].variable].length > 0 && typeof item[questions[i].variable][0] === "object" && Object.keys(item[questions[i].variable][0]).length > 0 && item[questions[i].variable][0].value && Array.isArray(item[questions[i].variable][0].value) && item[questions[i].variable][0].value.length > 0 && item[questions[i].variable][0].value.indexOf(questions[i].answers[j].value) > -1 && questions[i].answers[j].additionalQuestions) {
+                                questions[i].additionalQuestions = questions[i].additionalQuestions ? questions[i].additionalQuestions.concat(extractQuestionsRecursively(_.sortBy(questions[i].answers[j].additionalQuestions, ['order', 'variable']), item[questions[i].variable][0].subAnswers)) : extractQuestionsRecursively(_.sortBy(questions[i].answers[j].additionalQuestions, ['order', 'variable']), item[questions[i].variable][0].subAnswers);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    console.log('~~~~ Mapped questions: ', questions);
+    return questions;
+};
+
+// previousAnswer = {key}
+export function extractQuestionsRecursively (questions, item) {
     let returnedQuestions = [];
 
     if (questions && Array.isArray(questions) && questions.length > 0) {
@@ -1189,14 +1220,14 @@ export function extractAllQuestions (questions, item) {
                 for (let j = 0; j < questions[i].answers.length; j++) {
                     // First check for single select since it has only a value
                     if (questions[i].answerType === "LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_SINGLE_ANSWER" ) {
-                        if (item && item.questionnaireAnswers && item.questionnaireAnswers[questions[i].variable] === questions[i].answers[j].value && questions[i].answers[j].additionalQuestions) {
-                            returnedQuestions = returnedQuestions.concat(extractAllQuestions(_.sortBy(questions[i].answers[j].additionalQuestions, ['order', 'variable']), item))
+                        if (item && typeof item === 'object' && Object.keys(item).length > 0 && item[questions[i].variable] && Array.isArray(item[questions[i].variable]) && item[questions[i].variable].length > 0 && typeof item[questions[i].variable][0] === "object" && Object.keys(item[questions[i].variable][0]).length > 0 && item[questions[i].variable][0].value && item[questions[i].variable][0].value === questions[i].answers[j].value && questions[i].answers[j].additionalQuestions) {
+                            returnedQuestions = returnedQuestions.concat(extractQuestionsRecursively(_.sortBy(questions[i].answers[j].additionalQuestions, ['order', 'variable']), item))
                         }
                     } else {
                         // For the multiple select the answers are in an array of values
                         if (questions[i].answerType === "LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_MULTIPLE_ANSWERS") {
-                            if (item && item.questionnaireAnswers && item.questionnaireAnswers[questions[i].variable] && Array.isArray(item.questionnaireAnswers[questions[i].variable]) && item.questionnaireAnswers[questions[i].variable].indexOf(questions[i].answers[j].value) > -1 && questions[i].answers[j].additionalQuestions) {
-                                returnedQuestions = returnedQuestions.concat(extractAllQuestions(_.sortBy(questions[i].answers[j].additionalQuestions, ['order', 'variable']), item))
+                            if (item && typeof item === 'object' && Object.keys(item).length > 0 && item[questions[i].variable] && Array.isArray(item[questions[i].variable]) && item[questions[i].variable].length > 0 && typeof item[questions[i].variable][0] === "object" && Object.keys(item[questions[i].variable][0]).length > 0 && item[questions[i].variable][0].value && Array.isArray(item[questions[i].variable][0].value) && item[questions[i].variable][0].value.length > 0 && item[questions[i].variable][0].value.indexOf(questions[i].answers[j].value) > -1 && questions[i].answers[j].additionalQuestions) {
+                                returnedQuestions = returnedQuestions.concat(extractQuestionsRecursively(_.sortBy(questions[i].answers[j].additionalQuestions, ['order', 'variable']), item))
                             }
                         }
                     }
@@ -1236,11 +1267,162 @@ export function mapQuestions (questions) {
     return mappedQuestions;
 };
 
+export function mapAnswers(questions, answers) {
+    let mappedAnswers = {};
+    let sortedQuestions = sortBy(questions, ['order', 'variable']);
+    let questionnaireAnswers = null;
+    if (answers) {
+        questionnaireAnswers = _.cloneDeep(answers);
+    }
+
+    if (questionnaireAnswers) {
+        for (let questionId in questionnaireAnswers) {
+            // First added the main questions
+            if (sortedQuestions.findIndex((e) => {return e.variable === questionId}) > -1) {
+                mappedAnswers[questionId] = _.cloneDeep(questionnaireAnswers[questionId]);
+            }
+        }
+    }
+
+    // Look for the sub-questions
+    for (let i=0; i<sortedQuestions.length; i++) {
+        if (sortedQuestions[i].answerType === 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_SINGLE_ANSWER' || sortedQuestions[i].answerType === 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_MULTIPLE_ANSWERS') {
+            if (sortedQuestions[i].answers && Array.isArray(sortedQuestions[i].answers) && sortedQuestions[i].answers.length > 0) {
+                sortedQuestions[i].additionalQuestions = [];
+                for (let j = 0; j < sortedQuestions[i].answers.length; j++) {
+                    let result = extractQuestions(sortBy(sortedQuestions[i].answers[j].additionalQuestions, ['order', 'variable']));
+                    sortedQuestions[i].additionalQuestions = sortedQuestions[i].additionalQuestions.concat(result);
+                }
+            }
+        }
+    }
+
+    if (questionnaireAnswers && mappedAnswers && Object.keys(mappedAnswers).length > 0) {
+        for (let questionId in questionnaireAnswers) {
+            for (let j=0; j<sortedQuestions.length; j++) {
+                if (!mappedAnswers[questionId] && sortedQuestions[j].additionalQuestions && Array.isArray(sortedQuestions[j].additionalQuestions) && sortedQuestions[j].additionalQuestions.findIndex((e) => {return e.variable === questionId}) > -1) {
+                    for (let i=0; i<questionnaireAnswers[questionId].length; i++) {
+                        let indexForStuff = mappedAnswers[sortedQuestions[j].variable].findIndex((e) => {return e.date === questionnaireAnswers[questionId][i].date});
+                        if (indexForStuff > -1) {
+                            if (mappedAnswers[sortedQuestions[j].variable][indexForStuff] && !mappedAnswers[sortedQuestions[j].variable][indexForStuff].subAnswers) {
+                                const a = Object.assign({}, mappedAnswers[sortedQuestions[j].variable][indexForStuff], {subAnswers: {}});
+                                mappedAnswers[sortedQuestions[j].variable][indexForStuff] = a;
+                            }
+                            mappedAnswers[sortedQuestions[j].variable][indexForStuff].subAnswers[questionId] = [questionnaireAnswers[questionId][i]];
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    console.log('Mapped answers here: ', mappedAnswers);
+
+    // this.setState({
+    //     mappedQuestions: sortedQuestions
+    // }, () => {
+    return {mappedQuestions: sortedQuestions, mappedAnswers: mappedAnswers};
+    // });
+};
+
+// Extract all sub questions of the sub-questions
+function extractQuestions(questions) {
+    let returnedQuestions = questions.slice();
+    if (questions && Array.isArray(questions) && questions.length > 0) {
+        for (let i=0; i<questions.length; i++) {
+            if (questions[i].answerType === 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_SINGLE_ANSWER' || questions[i].answerType === 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_MULTIPLE_ANSWERS') {
+                if (questions[i].answers && Array.isArray(questions[i].answers) && questions[i].answers.length > 0) {
+                    for (let j = 0; j < questions[i].answers.length; j++) {
+                        returnedQuestions = returnedQuestions.concat(extractQuestions(sortBy(questions[i].answers[j].additionalQuestions, ['order', 'variable'])));
+                    }
+                }
+            }
+        }
+    }
+
+    console.log('extract le questions:  ', returnedQuestions);
+    return returnedQuestions;
+};
+
+export function reMapAnswers(answers) {
+    let returnedAnswers = {};
+    if (answers && typeof answers === 'object') {
+        for (let questionId in answers) {
+            if (answers[questionId] && Array.isArray(answers[questionId]) && answers[questionId].length > 0) {
+                for (let i = 0; i < answers[questionId].length; i++) {
+                    if (answers[questionId][i].subAnswers) {
+                        for (let subQuestionId in answers[questionId][i].subAnswers) {
+                            if (!returnedAnswers[subQuestionId]) {
+                                returnedAnswers[subQuestionId] = [];
+                            }
+                            returnedAnswers[subQuestionId].push(answers[questionId][i].subAnswers[subQuestionId][0]);
+
+                        }
+                        delete answers[questionId][i].subAnswers;
+                        if (!returnedAnswers[questionId]) {
+                            returnedAnswers[questionId] = [];
+                        }
+                        returnedAnswers[questionId].push(answers[questionId][i]);
+                    } else {
+                        if (!returnedAnswers[questionId]) {
+                            returnedAnswers[questionId] = [];
+                        }
+                        returnedAnswers[questionId].push(answers[questionId][i]);
+                    }
+                }
+            }
+        }
+    }
+
+    // Sort each returnedAnswer by date descending
+    for(let questionId in returnedAnswers) {
+        returnedAnswers[questionId].sort((a, b) => {
+            if (a.date > b.date) {
+                return -1;
+            }
+            if (a.date < b.date) {
+                return 1;
+            }
+            return 0;
+        });
+        returnedAnswers[questionId] = returnedAnswers[questionId].map((e) => {
+            return {date: e.date ? new Date(e.date).toISOString() : e.date, value: e.value};
+        });
+    }
+
+
+
+    return returnedAnswers;
+};
+
+export function checkRequiredQuestions(questions, previousAnswers) {
+    let requiredQuestions = [];
+    for (let i = 0; i < questions.length; i++) {
+        if (questions[i].required && questions[i].inactive === false) {
+            if (!previousAnswers || !previousAnswers[questions[i].variable] || !Array.isArray(previousAnswers[questions[i].variable]) || previousAnswers[questions[i].variable].findIndex((e) => {
+                return !e.value || e.value === ''
+            }) > -1) {
+                requiredQuestions.push(questions[i].text);
+            }
+        }
+        if (questions[i].additionalQuestions && Array.isArray(questions[i].additionalQuestions) && questions[i].additionalQuestions.length > 0) {
+            for (let j = 0; j < questions[i].additionalQuestions.length; j++) {
+                if (questions[i].additionalQuestions[j].required && previousAnswers[questions[i].variable].findIndex((e) => {
+                    return !e.subAnswers || e.subAnswers[questions[i].additionalQuestions[j].variable][0].value === null || e.subAnswers[questions[i].additionalQuestions[j].variable][0].value === ""
+                }) > -1) {
+                    requiredQuestions.push(questions[i].additionalQuestions[j].text);
+                }
+            }
+        }
+    }
+    return requiredQuestions;
+};
+
 export function getTranslation (value, allTransactions) {
     if (!getTranslation.cache) {
         getTranslation.cache = {}
     }
-    let key = `${value}`
+    let key = `${value}`;
     if (allTransactions && Array.isArray(allTransactions) && allTransactions[0] && allTransactions[0].languageId) {
         key = `${key}-${allTransactions[0].languageId}`
     }

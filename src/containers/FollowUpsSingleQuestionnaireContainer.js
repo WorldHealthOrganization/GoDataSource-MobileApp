@@ -13,7 +13,7 @@ import {
     Keyboard,
     findNodeHandle
 } from 'react-native';
-import {calculateDimension, extractAllQuestions, mapQuestions, getTranslation} from './../utils/functions';
+import {calculateDimension, extractAllQuestions, getTranslation, checkRequiredQuestions} from './../utils/functions';
 import config from './../utils/config';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -25,6 +25,7 @@ import {LoaderScreen} from 'react-native-ui-lib';
 import Section from './../components/Section';
 import {sortBy} from 'lodash';
 import translations from './../utils/translations'
+import cloneDeep from "lodash/cloneDeep";
 
 class FollowUpsSingleQuestionnaireContainer extends PureComponent {
 
@@ -33,7 +34,8 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
         super(props);
         this.state = {
             interactionComplete: false,
-            questions: []
+            questions: [],
+            previousAnswers: this.props.previousAnswers
         };
     }
 
@@ -53,20 +55,42 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
         })
     }
 
-    shouldComponentUpdate(nextProps, nextState) {
-        if (nextProps.activeIndex === 1) {
-            return true;
-        }
-        return false;
-    }
+    // shouldComponentUpdate(nextProps, nextState) {
+    //     if (nextProps.activeIndex === 1) {
+    //         return true;
+    //     }
+    //     return false;
+    // }
 
     static getDerivedStateFromProps(props, state) {
         // Get all additional questions recursively
-        let sortedQuestions = sortBy(props.questions, ['order', 'variable']);
-        sortedQuestions = extractAllQuestions(sortedQuestions, props.item);
-        state.questions = sortedQuestions;
+        // let sortedQuestions = sortBy(props.questions, ['order', 'variable']);
+        // sortedQuestions = extractAllQuestions(sortedQuestions, props.item);
+        // state.questions = sortedQuestions;
+        //
+        // return null;
+        if (props.previousAnswers) {
+            state.previousAnswers = props.previousAnswers;
+        }
+        // Sort the answers by date
+        if (state.previousAnswers && Object.keys(state.previousAnswers).length > 0) {
+            for (let questionId in state.previousAnswers) {
+                if (Array.isArray(state.previousAnswers[questionId]) && state.previousAnswers[questionId].length > 1) {
+                    state.previousAnswers[questionId] = state.previousAnswers[questionId].sort((a, b) => {
+                        if (new Date(a.date) > new Date(b.date)) {
+                            return -1;
+                        }
+                        if (new Date(a.date) < new Date(b.date)) {
+                            return 1;
+                        }
+                        return 0;
+                    })
+                }
+            }
+        }
 
-        return null;
+        let sortedQuestions = sortBy(cloneDeep(props.questions), ['order', 'variable']);
+        state.questions = extractAllQuestions(sortedQuestions, state.previousAnswers);
     }
 
     // The render method should have at least business logic as possible,
@@ -112,8 +136,8 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
                         }}
                     >
                         {
-                            this.state.questions.map((item, index) => {
-                                return this.handleRenderItem(item, index, this.state.questions.length)
+                            this.state && this.state.questions && Array.isArray(this.state.questions) && this.state.questions.length > 0 && this.state.questions.map((item, index) => {
+                                return this.handleRenderItem(item, index, this.state.questions.length);
                             })
                         }
                     </KeyboardAwareScrollView>
@@ -123,25 +147,6 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
     }
 
     // Please write here all the methods that are not react native lifecycle methods
-    handleRenderSectionedList = (item, index) => {
-        return (
-            <View>
-                <Section
-                    label={getTranslation(item.categoryName, this.props.translation)}
-                    containerStyle={{
-                        marginVertical: 10
-                    }}
-                    translation={this.props.translation}
-                />
-                {
-                    item.questions.map((item, index) => {
-                        return this.handleRenderItem(item, index)
-                    })
-                }
-            </View>
-        )
-    };
-
     handleRenderItem = (item, index, totalNumberOfQuestions) => {
         if (item.inactive === false ) {
             return (
@@ -149,14 +154,17 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
                     item={item}
                     index={index + 1}
                     totalNumberOfQuestions={totalNumberOfQuestions}
-                    source={this.props.item}
+                    source={this.props.previousAnswers}
                     isEditMode={this.props.isEditMode}
                     onChangeTextAnswer={this.props.onChangeTextAnswer}
                     onChangeDateAnswer={this.props.onChangeDateAnswer}
                     onChangeSingleSelection={this.props.onChangeSingleSelection}
                     onChangeMultipleSelection={this.props.onChangeMultipleSelection}
                     onFocus={this.handleOnFocus}
+                    onClickAddNewMultiFrequencyAnswer={this.props.onClickAddNewMultiFrequencyAnswer}
+                    onClickShowPreviousAnswers={this.props.onClickShowPreviousAnswers}
                     onBlur={this.handleOnBlur}
+                    onChangeAnswerDate={this.props.onChangeAnswerDate}
                 />
             )
         }
@@ -164,7 +172,8 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
 
     onPressSave = () => {
         // First check if all the required questions are filled
-        let checkRequiredFields = this.checkRequiredQuestions();
+        let checkRequiredFields = checkRequiredQuestions(this.state.questions, this.props.previousAnswers);
+        checkRequiredFields = checkRequiredFields.map((e) => {return getTranslation(e, this.props.translation)});
         console.log("Check required questions: ", checkRequiredFields);
         if (checkRequiredFields && Array.isArray(checkRequiredFields) && checkRequiredFields.length === 0) {
             this.props.onPressSave();
@@ -178,25 +187,6 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
         }
     };
 
-    checkRequiredQuestions = () => {
-        let requiredQuestions = [];
-        // Loop through all categories' questions and if a required question is unanswered return false
-        if (this.state.questions && Array.isArray(this.state.questions) && this.state.questions.length > 0) {
-            for (let i = 0; i < this.state.questions.length; i++) {
-                if (this.state.questions[i].variable && this.props.item) {
-                    if (this.state.questions[i].required === true && this.state.questions[i].inactive === false) {
-                        if (!this.props.item.questionnaireAnswers || !this.props.item.questionnaireAnswers[this.state.questions[i].variable]) {
-                            requiredQuestions.push(getTranslation(this.state.questions[i].text, this.props.translation));
-                            // return false;
-                        }
-                    }
-                }
-            }
-        }
-        return requiredQuestions;
-        // return true;
-    };
-
     handleOnFocus = (event) => {
         this.scrollToInput(findNodeHandle(event.target))
     };
@@ -204,7 +194,7 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
     handleOnBlur = (event) =>{
         this.scrollFollowUpsSingleQuestionnaire.props.scrollToPosition(0, 0, false)
         this.scrollToInput(findNodeHandle(event.target))
-    }
+    };
 
     scrollToInput (reactNode) {
         // Add a 'scroll' ref to your ScrollView
