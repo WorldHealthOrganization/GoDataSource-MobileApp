@@ -194,6 +194,7 @@ class CaseSingleInvestigationContainer extends Component {
                     onFocus={this.handleOnFocus}
                     onClickAddNewMultiFrequencyAnswer={this.props.onClickAddNewMultiFrequencyAnswer}
                     onClickShowPreviousAnswers={this.props.onClickShowPreviousAnswers}
+                    onBlur={this.handleOnBlur}
                 />
             )
         }
@@ -206,6 +207,11 @@ class CaseSingleInvestigationContainer extends Component {
     handleOnFocus = (event) => {
         this.scrollToInput(findNodeHandle(event.target))
     };
+
+    handleOnBlur = (event) =>{
+        this.scrollCasesSingleInvestigation.props.scrollToPosition(0, 0, false)
+        this.scrollToInput(findNodeHandle(event.target))
+    }
 
     scrollToInput (reactNode) {
         // Add a 'scroll' ref to your ScrollView
