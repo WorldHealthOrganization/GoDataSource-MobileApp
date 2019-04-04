@@ -164,6 +164,7 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
                     onClickAddNewMultiFrequencyAnswer={this.props.onClickAddNewMultiFrequencyAnswer}
                     onClickShowPreviousAnswers={this.props.onClickShowPreviousAnswers}
                     onBlur={this.handleOnBlur}
+                    onChangeAnswerDate={this.props.onChangeAnswerDate}
                 />
             )
         }
@@ -186,29 +187,6 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
         }
     };
 
-    // checkRequiredQuestions = (questions, previousAnswers) => {
-    //     let requiredQuestions = [];
-    //     for (let i = 0; i < questions.length; i++) {
-    //         if (questions[i].required && questions[i].inactive === false) {
-    //             if (!previousAnswers || !previousAnswers[questions[i].variable] || !Array.isArray(previousAnswers[questions[i].variable]) || previousAnswers[questions[i].variable].findIndex((e) => {
-    //                 return !e.value || e.value === ''
-    //             }) > -1) {
-    //                 requiredQuestions.push(questions[i].text);
-    //             }
-    //         }
-    //         if (questions[i].additionalQuestions && Array.isArray(questions[i].additionalQuestions) && questions[i].additionalQuestions.length > 0) {
-    //             for (let j = 0; j < questions[i].additionalQuestions.length; j++) {
-    //                 if (questions[i].additionalQuestions[j].required && previousAnswers[questions[i].variable].findIndex((e) => {
-    //                     return e.subAnswers && e.subAnswers[questions[i].additionalQuestions[j].variable][0].value !== null && e.subAnswers[questions[i].additionalQuestions[j].variable][0].value !== ""
-    //                 }) === -1) {
-    //                     requiredQuestions.push(questions[i].additionalQuestions[j].text);
-    //                 }
-    //             }
-    //         }
-    //     }
-    //     return requiredQuestions;
-    // };
-
     handleOnFocus = (event) => {
         this.scrollToInput(findNodeHandle(event.target))
     };
@@ -216,7 +194,7 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
     handleOnBlur = (event) =>{
         this.scrollFollowUpsSingleQuestionnaire.props.scrollToPosition(0, 0, false)
         this.scrollToInput(findNodeHandle(event.target))
-    }
+    };
 
     scrollToInput (reactNode) {
         // Add a 'scroll' ref to your ScrollView

@@ -40,10 +40,10 @@ class QuestionCardContent extends PureComponent {
                             id={'answerDate'}
                             label={'Answer Date'}
                             value={this.state.answerDate}
-                            isEditMode={this.props.isEditMode}
+                            isEditMode={this.props.isEditMode && this.props.editableQuestionDate}
                             isRequired={true}
                             style={{width: this.props.viewWidth, marginHorizontal: this.props.viewMarginHorizontal}}
-                            onChange={this.onChangeAnswerDate}
+                            onChange={(value, id) => {this.onChangeAnswerDate(value, this.props.item.variable)}}
                         />
                     ) : (null)
                 }
@@ -365,7 +365,7 @@ class QuestionCardContent extends PureComponent {
         this.setState({
             answerDate: date
         }, () => {
-            console.log('AnswerDate: ', this.state.answerDate);
+            this.props.onChangeAnswerDate(date, id)
         });
     };
 }

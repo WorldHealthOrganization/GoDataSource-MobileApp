@@ -195,6 +195,7 @@ class CaseSingleInvestigationContainer extends Component {
                     onClickAddNewMultiFrequencyAnswer={this.props.onClickAddNewMultiFrequencyAnswer}
                     onClickShowPreviousAnswers={this.props.onClickShowPreviousAnswers}
                     onBlur={this.handleOnBlur}
+                    onChangeAnswerDate={this.props.onChangeAnswerDate}
                 />
             )
         }

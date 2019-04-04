@@ -304,6 +304,7 @@ class FollowUpsSingleScreen extends Component {
                         onPressMissing={this.handleOnPressMissing}
                         onClickAddNewMultiFrequencyAnswer={this.onClickAddNewMultiFrequencyAnswer}
                         onClickShowPreviousAnswers={this.onClickShowPreviousAnswers}
+                        onChangeAnswerDate={this.onChangeAnswerDate}
                     />
                 );
             default:
@@ -584,10 +585,10 @@ class FollowUpsSingleScreen extends Component {
         }
 
         // questionnaireAnswers[id] = value;
-        this.setState(prevState => ({
+        this.setState({
             previousAnswers: questionnaireAnswers,
             isModified: true
-        }), () => {
+        }, () => {
             console.log ('onChangeMultipleSelection after setState', this.state.previousAnswers)
         })
     };
@@ -694,6 +695,28 @@ class FollowUpsSingleScreen extends Component {
             isModified: true
         }), () => {
             console.log ('onChangeMultipleSelection after setState', this.state.previousAnswers)
+        })
+    };
+    onChangeAnswerDate = (value, questionId) => {
+        let questionnaireAnswers = _.cloneDeep(this.state.previousAnswers);
+        if (questionnaireAnswers && questionnaireAnswers[questionId] && Array.isArray(questionnaireAnswers[questionId]) && questionnaireAnswers[questionId].length) {
+            if (questionnaireAnswers[questionId][0] && questionnaireAnswers[questionId][0].date) {
+                questionnaireAnswers[questionId][0].date = value;
+                if (questionnaireAnswers[questionId][0].subAnswers && typeof questionnaireAnswers[questionId][0].subAnswers === "object" && Object.keys(questionnaireAnswers[questionId][0].subAnswers).length > 0) {
+                    for (let subQuestionId in questionnaireAnswers[questionId][0].subAnswers) {
+                        questionnaireAnswers[questionId][0].subAnswers[subQuestionId].map((e) => {
+                            return {value: e.value, date: value};
+                        })
+                    }
+                }
+            }
+        }
+
+        this.setState({
+            previousAnswers: questionnaireAnswers,
+            isModified: true
+        }, () => {
+            console.log ('onChangeAnswerDate after setState', this.state.previousAnswers);
         })
     };
 

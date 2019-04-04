@@ -99,6 +99,8 @@ class AddSingleAnswerModalScreen extends Component{
                                         onChangeDateAnswer={this.onChangeDateAnswer}
                                         onFocus={this.handleOnFocus}
                                         hideButtons={true}
+                                        onChangeAnswerDate={this.onChangeAnswerDate}
+                                        editableQuestionDate={true}
                                     />
                                 ) : (null)
                             }
@@ -233,6 +235,24 @@ class AddSingleAnswerModalScreen extends Component{
             questionnaireAnswers[id][0] = value;
         }
         console.log('onChangeDateAnswer after setState', questionnaireAnswers);
+        this.props.updateCurrentAnswers(questionnaireAnswers);
+    };
+
+    onChangeAnswerDate = (value, questionId) => {
+        let questionnaireAnswers = _.cloneDeep(this.props.currentAnswers);
+        if (questionnaireAnswers && questionnaireAnswers[questionId] && Array.isArray(questionnaireAnswers[questionId]) && questionnaireAnswers[questionId].length) {
+            if (questionnaireAnswers[questionId][0] && questionnaireAnswers[questionId][0].date) {
+                questionnaireAnswers[questionId][0].date = value;
+                if (questionnaireAnswers[questionId][0].subAnswers && typeof questionnaireAnswers[questionId][0].subAnswers === "object" && Object.keys(questionnaireAnswers[questionId][0].subAnswers).length > 0) {
+                    for (let subQuestionId in questionnaireAnswers[questionId][0].subAnswers) {
+                        questionnaireAnswers[questionId][0].subAnswers[subQuestionId].map((e) => {
+                            return {value: e.value, date: value};
+                        })
+                    }
+                }
+            }
+        }
+
         this.props.updateCurrentAnswers(questionnaireAnswers);
     };
 

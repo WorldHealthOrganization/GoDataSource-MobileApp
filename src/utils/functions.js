@@ -1408,8 +1408,8 @@ export function checkRequiredQuestions(questions, previousAnswers) {
         if (questions[i].additionalQuestions && Array.isArray(questions[i].additionalQuestions) && questions[i].additionalQuestions.length > 0) {
             for (let j = 0; j < questions[i].additionalQuestions.length; j++) {
                 if (questions[i].additionalQuestions[j].required && previousAnswers[questions[i].variable].findIndex((e) => {
-                    return e.subAnswers && e.subAnswers[questions[i].additionalQuestions[j].variable][0].value !== null && e.subAnswers[questions[i].additionalQuestions[j].variable][0].value !== ""
-                }) === -1) {
+                    return !e.subAnswers || e.subAnswers[questions[i].additionalQuestions[j].variable][0].value === null || e.subAnswers[questions[i].additionalQuestions[j].variable][0].value === ""
+                }) > -1) {
                     requiredQuestions.push(questions[i].additionalQuestions[j].text);
                 }
             }

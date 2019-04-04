@@ -484,6 +484,7 @@ class CaseSingleScreen extends Component {
                     isNew={this.props.isNew ? true : this.props.forceNew ? true : false}
                     onClickAddNewMultiFrequencyAnswer={this.onClickAddNewMultiFrequencyAnswer}
                     onClickShowPreviousAnswers={this.onClickShowPreviousAnswers}
+                    onChangeAnswerDate={this.onChangeAnswerDate}
                 />;
             default: return null;
         }
@@ -1722,6 +1723,28 @@ class CaseSingleScreen extends Component {
             isModified: true
         }), () => {
             console.log ('onChangeDateAnswer after setState', this.state.previousAnswers)
+        })
+    };
+    onChangeAnswerDate = (value, questionId) => {
+        let questionnaireAnswers = _.cloneDeep(this.state.previousAnswers);
+        if (questionnaireAnswers && questionnaireAnswers[questionId] && Array.isArray(questionnaireAnswers[questionId]) && questionnaireAnswers[questionId].length) {
+            if (questionnaireAnswers[questionId][0] && questionnaireAnswers[questionId][0].date) {
+                questionnaireAnswers[questionId][0].date = value;
+                if (questionnaireAnswers[questionId][0].subAnswers && typeof questionnaireAnswers[questionId][0].subAnswers === "object" && Object.keys(questionnaireAnswers[questionId][0].subAnswers).length > 0) {
+                    for (let subQuestionId in questionnaireAnswers[questionId][0].subAnswers) {
+                        questionnaireAnswers[questionId][0].subAnswers[subQuestionId].map((e) => {
+                            return {value: e.value, date: value};
+                        })
+                    }
+                }
+            }
+        }
+
+        this.setState({
+            previousAnswers: questionnaireAnswers,
+            isModified: true
+        }, () => {
+            console.log ('onChangeAnswerDate after setState', this.state.previousAnswers);
         })
     };
 
