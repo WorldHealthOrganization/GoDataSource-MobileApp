@@ -33,7 +33,11 @@ class DropDown extends PureComponent {
     }
 
     // Please add here the react lifecycle methods that you need
-
+    static getDerivedStateFromProps(props, state) {
+        if (props.value) {
+            state.selectedItems = props.value;
+        }
+    }
 
     // The render method should have at least business logic as possible,
     // because this will be called whenever there is a new setState call

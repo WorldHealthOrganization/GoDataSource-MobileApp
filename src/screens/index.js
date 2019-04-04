@@ -10,6 +10,7 @@ import ManualConfigScreen from './ManualConfigScreen';
 import NavigationDrawer from './NavigationDrawer';
 import FollowUpsScreen from './FollowUpsScreen';
 import AddFollowUpScreen from './AddFollowUpScreen';
+import AddSingleAnswerModalScreen from './AddSingleAnswerModalScreen';
 import GenerateFollowUpScreen from './GenerateFollowUpScreen';
 import FollowUpsFilterScreen from './FollowUpsFilterScreen';
 import FollowUpsSingleScreen from './FollowUpsSingleScreen';
@@ -25,6 +26,7 @@ import HelpSingleScreen from './HelpSingleScreen';
 import HelpFilterScreen from './HelpFilterScreen';
 import QRScanScreen from './QRScanScreen';
 import HubConfigScreen from './HubConfigScreen';
+import PreviousAnswersScreen from './PreviousAnswersScreen';
 
 const screens = [
     {screen: 'LoginScreen', component: LoginScreen},
@@ -33,6 +35,7 @@ const screens = [
     {screen: 'NavigationDrawer', component: NavigationDrawer},
     {screen: 'FollowUpsScreen', component: FollowUpsScreen},
     {screen: 'AddFollowUpScreen', component: AddFollowUpScreen},
+    {screen: 'AddSingleAnswerModalScreen', component: AddSingleAnswerModalScreen},
     {screen: 'GenerateFollowUpScreen', component: GenerateFollowUpScreen},
     {screen: 'FollowUpsFilterScreen', component: FollowUpsFilterScreen},
     {screen: 'FollowUpsSingleScreen', component: FollowUpsSingleScreen},
@@ -47,7 +50,8 @@ const screens = [
     {screen: 'HelpSingleScreen', component: HelpSingleScreen},
     {screen: 'HelpFilterScreen', component: HelpFilterScreen},
     {screen: 'QRScanScreen', component: QRScanScreen},
-    {screen: 'HubConfigScreen', component: HubConfigScreen}
+    {screen: 'HubConfigScreen', component: HubConfigScreen},
+    {screen: 'PreviousAnswersScreen', component: PreviousAnswersScreen}
 ];
 
 export function registerScreens(store, Provider) {
