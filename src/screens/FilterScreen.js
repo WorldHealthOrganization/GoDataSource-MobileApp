@@ -1,17 +1,18 @@
 import React, { Component } from 'react';
 import { View, Text, StyleSheet, Animated, Platform } from 'react-native';
+import { connect } from "react-redux";
+import { bindActionCreators } from "redux";
+import { TabBar, TabView, PagerScroll } from 'react-native-tab-view';
+import _ from 'lodash';
+
 import styles from './../styles';
 import NavBarCustom from './../components/NavBarCustom';
 import { extractIdFromPouchId, getTranslation } from './../utils/functions';
 import config from './../utils/config';
-import { connect } from "react-redux";
-import { bindActionCreators } from "redux";
 import { addFilterForScreen, removeFilterForScreen } from './../actions/app';
-import { TabBar, TabView, PagerScroll } from 'react-native-tab-view';
 import FiltersContainer from './../containers/FiltersContainer';
 import SortContainer from './../containers/SortContainer';
 import translations from './../utils/translations';
-import _ from 'lodash';
 
 class FilterScreen extends Component {
     static navigatorStyle = {

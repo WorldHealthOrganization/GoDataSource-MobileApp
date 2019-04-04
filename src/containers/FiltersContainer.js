@@ -1,16 +1,17 @@
 import React, { PureComponent } from 'react';
 import { View, StyleSheet, ScrollView } from 'react-native';
-import { calculateDimension, getTranslation, extractIdFromPouchId } from './../utils/functions';
-import config from './../utils/config';
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import ElevatedView from 'react-native-elevated-view';
+import _ from 'lodash';
+
+import { calculateDimension, getTranslation, extractIdFromPouchId } from './../utils/functions';
+import config from './../utils/config';
 import Button from './../components/Button';
 import styles from './../styles';
 import CardComponent from './../components/CardComponent';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import translations from './../utils/translations'
-import ElevatedView from 'react-native-elevated-view';
-import _ from 'lodash';
 
 class FiltersContainer extends PureComponent {
     constructor(props) {

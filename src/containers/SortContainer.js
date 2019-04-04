@@ -1,17 +1,18 @@
 import React, { Component } from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
-import { calculateDimension, getTranslation } from '../utils/functions';
-import config from '../utils/config';
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
-import Button from '../components/Button';
-import styles from '../styles';
 import Ripple from 'react-native-material-ripple';
 import ElevatedView from 'react-native-elevated-view';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import _ from 'lodash';
+
+import { calculateDimension, getTranslation } from '../utils/functions';
+import config from '../utils/config';
+import Button from '../components/Button';
+import styles from '../styles';
 import CardComponent from '../components/CardComponent';
 import translations from '../utils/translations'
-import _ from 'lodash';
 
 class SortContainer extends Component {
     constructor(props) {
