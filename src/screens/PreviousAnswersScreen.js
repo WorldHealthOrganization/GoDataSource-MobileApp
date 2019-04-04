@@ -6,11 +6,8 @@ import styles from './../styles';
 import NavBarCustom from './../components/NavBarCustom';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
-import {removeErrors} from './../actions/errors';
-import {addFilterForScreen, removeFilterForScreen} from './../actions/app';
 import _, {sortBy} from 'lodash';
 import {calculateDimension, getTranslation} from './../utils/functions';
-import ViewHOC from './../components/ViewHOC';
 import translations from './../utils/translations';
 import ElevatedView from 'react-native-elevated-view';
 import config from './../utils/config';
@@ -42,7 +39,7 @@ class PreviousAnswersScreen extends Component {
     render() {
         console.log('Render PreviousAnswersScreen: ', this.props.previousAnswers);
         return (
-            <View style={{flex: 1}}>
+            <View style={{flex: 1, backgroundColor: 'white'}}>
                 <NavBarCustom customTitle={
                     <View
                         style={{
@@ -136,7 +133,7 @@ class PreviousAnswersScreen extends Component {
 const style = StyleSheet.create({
     mapContainer: {
         flex: 1,
-        backgroundColor: 'rgba(217, 217, 217, 0.5)'
+        backgroundColor: styles.screenBackgroundGrey
     },
     containerContent: {
         justifyContent: 'center',
