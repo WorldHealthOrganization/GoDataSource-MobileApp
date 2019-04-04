@@ -419,7 +419,7 @@ class HelpScreen extends Component {
 
     handlePressFilter = () => {
         this.props.navigator.showModal({
-            screen: 'HelpFilterScreen',
+            screen: 'FilterScreen',
             animated: true,
             passProps: {
                 activeFilters: this.state.filterFromFilterScreen || null,

@@ -383,7 +383,7 @@ class ContactsScreen extends Component {
 
     handlePressFilter = () => {
         this.props.navigator.showModal({
-            screen: 'FollowUpsFilterScreen',
+            screen: 'FilterScreen',
             animated: true,
             passProps: {
                 activeFilters: this.state.filterFromFilterScreen || null,

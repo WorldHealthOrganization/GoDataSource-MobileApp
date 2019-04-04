@@ -353,11 +353,12 @@ class CasesScreen extends Component {
     //Open filter screen for cases
     handlePressFilter = () => {
         this.props.navigator.showModal({
-            screen: 'CasesFilterScreen',
+            screen: 'FilterScreen',
             animated: true,
             passProps: {
                 activeFilters: this.state.filterFromFilterScreen || null,
-                onApplyFilters: this.handleOnApplyFilters
+                onApplyFilters: this.handleOnApplyFilters,
+                screen: 'CasesFilterScreen'
             }
         })
     };

@@ -599,7 +599,7 @@ class FollowUpsScreen extends Component {
 
     handlePressFilter = () => {
         this.props.navigator.showModal({
-            screen: 'FollowUpsFilterScreen',
+            screen: 'FilterScreen',
             animated: true,
             passProps: {
                 activeFilters: this.state.filterFromFilterScreen || null,
@@ -617,19 +617,9 @@ class FollowUpsScreen extends Component {
     };
 
     handleOnPressAddFollowUp = () => {
-        // let FilterClone = {
-        //     date: new Date(),
-        //     searchText: ''
-        // }
         this.setState({
             showAddFollowUpScreen: !this.state.showAddFollowUpScreen,
-            // filterFromFilterScreen: null,
-            // filter: FilterClone
         })
-        // , () => {
-        //     this.props.removeFilterForScreen('FollowUpsFilterScreen');
-        //     this.filterContacts();
-        // })
     };
 
     handleOnCancelPressed = () => {
