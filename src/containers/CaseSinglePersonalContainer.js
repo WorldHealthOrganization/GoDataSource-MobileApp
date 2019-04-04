@@ -247,6 +247,7 @@ class CaseSinglePersonalContainer extends PureComponent {
                 onChangeTextSwitchSelector={this.props.onChangeTextSwitchSelector}
                 onDeletePress={this.props.onDeletePress}
                 onFocus={this.handleOnFocus}
+                onBlur={this.handleOnBlur}
             />
         )
     };
@@ -339,6 +340,11 @@ class CaseSinglePersonalContainer extends PureComponent {
     handleOnFocus = (event) => {
         this.scrollToInput(findNodeHandle(event.target))
     };
+
+    handleOnBlur = (event) =>{
+        this.scrollCasesSinglePersonal.props.scrollToPosition(0, 0, false)
+        this.scrollToInput(findNodeHandle(event.target))
+    }
 
     scrollToInput (reactNode) {
         // Add a 'scroll' ref to your ScrollView
