@@ -269,9 +269,12 @@ export default {
     'LNG_DIALOG_ALERT_MESSAGE_ARE_YOU_SURE_YOU_WANT_TO_DELETE_THIS_ADDRESS': 'Are you sure you want to delete this address?',
     'LNG_DIALOG_ALERT_MESSAGE_ARE_YOU_SURE_YOU_WANT_TO_DELETE_THIS_DATE_RANGE': 'Are you sure you want to delete this date range?',
 
+    'LNG_DIALOG_ALERT_MESSAGE_ARE_YOU_SURE_YOU_WANT_TO_DELETE_THIS_ANSWER': 'Are you sure you want to delete this answer?',
+
     'LNG_DIALOG_ALERT_MESSAGE_ARE_YOU_SURE_YOU_WANT_TO_EXIT_THE_APP': 'Are you sure you want to exit the application?',
 
     'LNG_DIALOG_ALERT_MESSAGE_DO_YOU_WANT_TO_REPLACE_CURRENT_COORDINATES_WITH_LOCATION_VALUES': "Do you want to replace current coordinates with location's values?",
+    'LNG_DIALOG_ALERT_MESSAGE_ADD_PERSON': 'Would you like to add a new person for this id?',
 
     //loadingScreenMessages
     'LNG_LOADING_SCREEN_MESSAGE': 'Loading...',
@@ -435,5 +438,16 @@ export default {
     'LNG_HUB_CONFIGURATION_SCREEN_SUCCES_SET_HUB_AS_ACTIVE_AND_YOU_WILL_BE_LOGGED_OUT_MESSAGE': 'The HUB was successfully made as active. You will be logged out and can log in with the credentials for the new HUB configuration',
 
     'LNG_DROP_DOWN_SECTIONED_NONE_SELECTED': 'None Selected',
-    'LNG_DROP_DOWN_SECTIONED_SELECTED': 'Items'
+    'LNG_DROP_DOWN_SECTIONED_SELECTED': 'Items',
+
+
+    // TODO add to backend
+    // Add single answer modal screen
+    'LNG_ADD_SINGLE_ANSWER_MODAL_SCREEN_ADD_NEW_ANSWER': 'Add new answer',
+
+    // Previous answers screen
+    'LNG_PREVIOUS_ANSWERS_SCREEN_PREVIOUS_ANSWERS_TITLE': 'Previous Answers',
+    'LNG_PREVIOUS_ANSWERS_SCREEN_NO_PREVIOUS_ANSWERS_TO_SHOW': 'No previous answers to show',
+    'LNG_QUESTIONNAIRE_LABEL_ADD_ANSWER': 'Add Answer',
+    'LNG_QUESTIONNAIRE_LABEL_PREVIOUS_ANSWERS': 'Prev Answers'
 };

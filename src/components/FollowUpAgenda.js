@@ -2,19 +2,16 @@
  * Created by florinpopa on 23/08/2018.
  */
 import React, {PureComponent} from 'react';
-import {TextInput, View, Text, StyleSheet, Platform, Dimensions, TouchableOpacity, Animated, FlatList} from 'react-native';
+import {View, StyleSheet} from 'react-native';
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
-import {ListItem, Icon, Button} from 'react-native-material-ui';
-import {calculateDimension} from './../utils/functions';
-import config from './../utils/config';
-import Ripple from 'react-native-material-ripple';
-import IconMaterial from 'react-native-vector-icons/MaterialCommunityIcons';
 import styles from './../styles';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import {Agenda} from 'react-native-calendars';
 import FollowUpsSingleQuestionnarireContainer from './../containers/FollowUpsSingleQuestionnaireContainer';
+import {mapAnswers} from "../utils/functions";
+import get from 'lodash/get';
 
 class FollowUpAgenda extends PureComponent {
 
@@ -26,7 +23,6 @@ class FollowUpAgenda extends PureComponent {
     }
 
     // Please add here the react lifecycle methods that you need
-
 
     // The render method should have at least business logic as possible,
     // because this will be called whenever there is a new setState call
@@ -50,10 +46,15 @@ class FollowUpAgenda extends PureComponent {
 
     // Please write here all the methods that are not react native lifecycle methods
     renderItem = (item, firstItemInDay) => {
-        console.log("RenderItem from FollowUpAgenda: ", item);
+        // console.log("RenderItem from FollowUpAgenda: ", item);
+        let mappedAnswers = {};
+        if (get(this.props, 'outbreak.contactFollowUpTemplate', 'failOubreakQuestions') !== 'failOubreakQuestions' && get(item, 'text.questionnaireAnswers', 'failQuestionnaire') !==  'failQuestionnaire') {
+            mappedAnswers = mapAnswers(this.props.outbreak.contactFollowUpTemplate, item.text.questionnaireAnswers);
+        }
         return(
             <FollowUpsSingleQuestionnarireContainer
-                item={item.text}
+                item={get(item, 'text', {})}
+                previousAnswers={get(mappedAnswers, 'mappedAnswers', {})}
                 contact={this.props.contact}
                 isEditMode={false}
             />
@@ -75,7 +76,8 @@ const style = StyleSheet.create({
 
 function mapStateToProps(state) {
     return {
-        screenSize: state.app.screenSize
+        screenSize: state.app.screenSize,
+        outbreak: state.outbreak
     };
 }
 

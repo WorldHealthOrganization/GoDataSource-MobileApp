@@ -4,7 +4,7 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {PureComponent} from 'react';
-import {View, Text, StyleSheet, Platform, ScrollView} from 'react-native';
+import {View, StyleSheet} from 'react-native';
 import {calculateDimension, getTranslation} from './../utils/functions';
 import config from './../utils/config';
 import {connect} from "react-redux";
@@ -12,12 +12,6 @@ import {bindActionCreators} from "redux";
 import Button from './Button';
 import styles from './../styles';
 import ElevatedView from 'react-native-elevated-view';
-import DropdownInput from './DropdownInput';
-import TextInput from './TextInput';
-import DropDown from './DropDown';
-import cloneDeep from 'lodash/cloneDeep';
-import DatePicker from './DatePicker';
-import Section from "./Section";
 import translations from './../utils/translations';
 import QuestionCardTitle from './QuestionCardTitle';
 import QuestionCardContent from './QuestionCardContent';
@@ -57,7 +51,7 @@ class QuestionCard extends PureComponent {
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
-        console.log('Render QuestionCard: ', this.props.item, this.props.source);
+        // console.log('Render QuestionCard: ', this.props.item, this.props.source);
         let viewWidth = calculateDimension(315, false, this.props.screenSize);
         let viewHeight = calculateDimension(30, true, this.props.screenSize);
         let marginHorizontal = calculateDimension(14, false, this.props.screenSize);
@@ -110,8 +104,22 @@ class QuestionCard extends PureComponent {
                             marginVertical: 5
                         }}
                     >
-                        <Button title={'Add Answer'} width={buttonWidth} height={buttonHeight} titleColor={'white'} color={styles.buttonGreen} onPress={() => {this.props.onClickAddNewMultiFrequencyAnswer(this.props.item)}} />
-                        <Button title={'Prev Answer'} width={buttonWidth} height={buttonHeight} titleColor={'white'} color={styles.buttonGreen} onPress={() => {this.props.onClickShowPreviousAnswers(this.props.item)}} />
+                        <Button
+                            title={getTranslation(translations.questionCardLabels.addAnswer, this.props.translation)}
+                            width={buttonWidth}
+                            height={buttonHeight}
+                            titleColor={'white'}
+                            color={styles.buttonGreen}
+                            onPress={() => {this.props.onClickAddNewMultiFrequencyAnswer(this.props.item)}}
+                        />
+                        <Button
+                            title={getTranslation(translations.questionCardLabels.previousAnswers, this.props.translation)}
+                            width={buttonWidth}
+                            height={buttonHeight}
+                            titleColor={'white'}
+                            color={styles.buttonGreen}
+                            onPress={() => {this.props.onClickShowPreviousAnswers(this.props.item)}}
+                        />
                     </View>
                 </QuestionCardContent>
             </ElevatedView>
@@ -119,7 +127,6 @@ class QuestionCard extends PureComponent {
     }
 
     // Please write here all the methods that are not react native lifecycle methods
-
     onClickAddNewMultiFrequencyAnswer = (item) => {
         this.props.onClickAddNewMultiFrequencyAnswer(item);
     }
@@ -161,9 +168,6 @@ const style = StyleSheet.create({
 function mapStateToProps(state) {
     return {
         screenSize: state.app.screenSize,
-        contacts: state.contacts,
-        cases: state.cases,
-        events: state.events,
         translation: state.app.translation
     };
 }

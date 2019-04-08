@@ -95,11 +95,8 @@ const caseSingleScreen = {
     oneAddressText: 'LNG_ADDRESS_ADD_NEW_ADDRESS_MESSAGE',
     moreAddressesText: 'LNG_ADDRESS_ADD_ANOTHER_ADDRESS_MESSAGE',
 
-    // TODO SEND to API
     oneDateRangeText: 'LNG_DATE_RANGE_ADD_NEW_DATE_MESSAGE',
     moreDateRangeText: 'LNG_DATE_RANGE_ADD_ANOTHER_DATE_MESSAGE',
-    // END
-
 
     oneIsolationDateText: 'LNG_ISOLATION_ADD_NEW_ISOLATION_MESSAGE',
     moreIsolationDatesText: 'LNG_ISOLATION_ADD_ANOTHER_ISOLATION_MESSAGE',
@@ -148,7 +145,6 @@ const caseSingleScreen = {
 
     hospitalisationStartDate: 'LNG_DATE_FIELD_LABEL_FROM',
     hospitalisationEndDate: 'LNG_DATE_FIELD_LABEL_TO',
-    // TODO add translations to API
     hospitalisationCenterName: 'LNG_DATE_FIELD_LABEL_HOSPITAL_NAME',
     hospitalisationLocation: 'LNG_DATE_FIELD_LABEL_LOCATION',
     hospitalisationComments: 'LNG_DATE_FIELD_LABEL_COMMENTS',
@@ -156,7 +152,6 @@ const caseSingleScreen = {
 
     isolationStartDate: 'LNG_DATE_FIELD_LABEL_FROM',
     isolationEndDate: 'LNG_DATE_FIELD_LABEL_TO',
-    // TODO add translations to API
     isolationCenterName: 'LNG_DATE_FIELD_LABEL_CENTER_NAME',
     isolationLocation: 'LNG_DATE_FIELD_LABEL_LOCATION',
     isolationComments: 'LNG_DATE_FIELD_LABEL_COMMENTS',
@@ -280,10 +275,8 @@ const alertMessages = {
     emailValidationError: 'Please make sure you have entered a valid email address',
     noItemAlert: 'No person exists with this information',
 
-    // TODO add translation to backend
-    addMissingPerson: 'Would you like to add a new person for this id?',
+    addMissingPerson: 'LNG_DIALOG_ALERT_MESSAGE_ADD_PERSON',
     wrongQR: 'The QR code has a bad format',
-    // End todo
 
     errorOccuredMsg: 'QR code is not valid',
 
@@ -322,6 +315,8 @@ const alertMessages = {
     deleteAddress: 'LNG_DIALOG_ALERT_MESSAGE_ARE_YOU_SURE_YOU_WANT_TO_DELETE_THIS_ADDRESS',
     deleteDateRange: 'LNG_DIALOG_ALERT_MESSAGE_ARE_YOU_SURE_YOU_WANT_TO_DELETE_THIS_DATE_RANGE',
 
+    // TODO add translation to backend
+    deletePreviousAnswer: 'LNG_DIALOG_ALERT_MESSAGE_ARE_YOU_SURE_YOU_WANT_TO_DELETE_THIS_ANSWER',
 
     // TODO add translation to backend
     replaceCurrentCoordinates: 'LNG_DIALOG_ALERT_MESSAGE_DO_YOU_WANT_TO_REPLACE_CURRENT_COORDINATES_WITH_LOCATION_VALUES',
@@ -364,6 +359,8 @@ const questionCardLabels = {
     datePickerLabel: 'LNG_QUESTIONNAIRE_LABEL_SELECT_DATE',
     dropDownInputLabel: 'LNG_QUESTIONNAIRE_LABEL_SELECT_ANSWER',
     dropDownLabel: 'LNG_QUESTIONNAIRE_LABEL_SELECT_ANSWERS',
+    addAnswer: 'LNG_QUESTIONNAIRE_LABEL_ADD_ANSWER',
+    previousAnswers: 'LNG_QUESTIONNAIRE_LABEL_PREVIOUS_ANSWERS'
 };
 
 const inAppNotificationScreen = {
@@ -507,6 +504,16 @@ const hubConfigScreen = {
     successMakingHubActiveMessage:      'LNG_HUB_CONFIGURATION_SCREEN_SUCCES_SET_HUB_AS_ACTIVE_AND_YOU_WILL_BE_LOGGED_OUT_MESSAGE'
 };
 
+const addSingleAnswerModalScreen = {
+    addNewAnswer: 'LNG_ADD_SINGLE_ANSWER_MODAL_SCREEN_ADD_NEW_ANSWER',
+
+};
+
+const previousAnswersScreen = {
+    previousAnswersTitle: 'LNG_PREVIOUS_ANSWERS_SCREEN_PREVIOUS_ANSWERS_TITLE',
+    noPreviousAnswersToShowMessage: 'LNG_PREVIOUS_ANSWERS_SCREEN_NO_PREVIOUS_ANSWERS_TO_SHOW'
+};
+
 export default {
     navigationDrawer,
     addFollowUpScreen,
@@ -544,5 +551,7 @@ export default {
     missedFollowUpListItemLabels,
     questionCardLabels,
     hubConfigScreen,
-    sortTab
+    sortTab,
+    addSingleAnswerModalScreen,
+    previousAnswersScreen
 };
