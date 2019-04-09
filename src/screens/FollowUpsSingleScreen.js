@@ -178,7 +178,7 @@ class FollowUpsSingleScreen extends Component {
                         <View
                             style={[style.breadcrumbContainer]}>
                             <Breadcrumb
-                                entities={[getTranslation(translations.followUpsSingleScreen.title, this.props.translation), ((this.props.contact && this.props.contact.firstName ? (this.props.contact.firstName + " ") : '') + (this.props.contact && this.props.contact.lastName ? this.props.contact.lastName : ''))]}
+                                entities={[getTranslation(translations.followUpsSingleScreen.title, this.props.translation), ((this.state.contact && this.state.contact.firstName ? (this.state.contact.firstName + " ") : '') + (this.state.contact && this.state.contact.lastName ? this.state.contact.lastName : ''))]}
                                 navigator={this.props.navigator}
                                 onPress={this.handlePressBreadcrumb}
                             />
@@ -220,6 +220,10 @@ class FollowUpsSingleScreen extends Component {
                                                 <MenuItem onPress={this.handleOnPressDelete}>
                                                     {getTranslation(translations.followUpsSingleScreen.deleteButton, this.props.translation)}
                                                 </MenuItem>
+                                                <MenuItem onPress={this.handleEditContact}>
+                                                    {getTranslation(translations.followUpsSingleScreen.editContactButton, this.props.translation)}
+                                                </MenuItem>
+                                              
                                                 <DateTimePicker
                                                     isVisible={this.state.isDateTimePickerVisible}
                                                     onConfirm={this._handleDatePicked}
@@ -385,12 +389,12 @@ class FollowUpsSingleScreen extends Component {
             Alert.alert("", 'You have unsaved data. Are you sure you want to leave this page and lose all changes?', [
                 {
                     text: 'Yes', onPress: () => {
-                    this.props.navigator.pop(
-                    //     {
-                    //     animated: true,
-                    //     animationType: 'fade'
-                    // }
-                    )
+                        this.props.navigator.pop(
+                            //     {
+                            //     animated: true,
+                            //     animationType: 'fade'
+                            // }
+                            )
                 }
                 },
                 {
@@ -793,6 +797,40 @@ class FollowUpsSingleScreen extends Component {
         console.log("### show date time picker: ");
         this._showDateTimePicker();
     };
+
+    handleEditContact = () => {
+        console.log('handleEditContact: ', JSON.stringify(this.state.contact))
+        this.hideMenu();
+
+        this.props.navigator.push({
+            screen: 'ContactsSingleScreen',
+            passProps: {
+                contact: this.state.contact,
+                handleUpdateContactFromFollowUp: this.handleUpdateContactFromFollowUp
+            }
+        })
+    }
+    
+    handleUpdateContactFromFollowUp = (updatedContact) => {
+        const {item} = this.state;
+        const itemCpy = _.cloneDeep(item);
+
+        if (updatedContact && updatedContact.addresses && Array.isArray(updatedContact.addresses) && updatedContact.addresses.length > 0) {
+            let contactPlaceOfResidence = updatedContact.addresses.filter((e) => {
+                return e.typeId === config.userResidenceAddress.userPlaceOfResidence
+            });
+            itemCpy.address = contactPlaceOfResidence[0];
+        }
+
+        this.setState({
+            item: itemCpy,
+            contact: updatedContact,
+        })
+
+        if (this.props.mimeComponentDidMount !== undefined ) {
+            this.props.mimeComponentDidMount()
+        }
+    }
 
     handleOnPressDelete = () => {
         // console.log("### handleOnPressDelete");

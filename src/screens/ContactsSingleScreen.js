@@ -139,16 +139,12 @@ class ContactsSingleScreen extends Component {
             ])
         } else {
             if (state.savePressed || state.deletePressed) {
-                props.navigator.pop(
-                //     {
-                //     animated: true,
-                //     animationType: 'fade'
-                // }
-                )
+                if (props.handleUpdateContactFromFollowUp !== undefined && props.handleUpdateContactFromFollowUp !== null){
+                    const { contact } = state
+                    props.handleUpdateContactFromFollowUp(contact)
+                }
+                props.navigator.pop()
             }
-            // if (props.contacts && props.contact !== props.contacts[props.contacts.map((e) => {return e.id}).indexOf(props.contact.id)]) {
-            //     props.contact = props.contacts[props.contacts.map((e) => {return e.id}).indexOf(props.contact.id)];
-            // }
         }
 
         if ((props.isNew === false || props.isNew === undefined) && state.updateExposure === true){
@@ -1207,7 +1203,7 @@ class ContactsSingleScreen extends Component {
                 }
             ])
         }
-
+        
     };
 
     ageAndDobPrepareForSave = () => {
