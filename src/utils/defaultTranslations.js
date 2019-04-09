@@ -289,8 +289,8 @@ export default {
 
     //generalLabels
     'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER': 'Filter By',
-    'LNG_COMMON_BUTTON_APPLY_FILTERS': 'Apply filters',
-    'LNG_COMMON_BUTTON_RESET_FILTERS': 'Reset',
+    'LNG_COMMON_BUTTON_LABEL_APPLY_FILTERS': 'Apply filters',
+    'LNG_COMMON_BUTTON_LABEL_RESET_FILTERS': 'Reset',
     'LNG_COMMON_LABEL_YES': 'Yes',
     'LNG_COMMON_LABEL_NO': 'No',
     'LNG_COMMON_LABEL_TODAY': 'Today',
@@ -336,9 +336,7 @@ export default {
 
 
     //addressFieldLabels
-    // TODO change to API also
-    'LNG_ADDRESS_FIELD_LABEL_NAME': 'Type',
-    // End of todo
+    'LNG_ADDRESS_FIELD_LABEL_MOBILE_NAME': 'Type',
     'LNG_ADDRESS_FIELD_LABEL_DATE': 'Date',
     'LNG_ADDRESS_FIELD_LABEL_LOCATION': 'Area',
     'LNG_ADDRESS_FIELD_LABEL_ADDRESS_CITY': 'City',
@@ -441,7 +439,6 @@ export default {
     'LNG_DROP_DOWN_SECTIONED_SELECTED': 'Items',
 
 
-    // TODO add to backend
     // Add single answer modal screen
     'LNG_ADD_SINGLE_ANSWER_MODAL_SCREEN_ADD_NEW_ANSWER': 'Add new answer',
 
@@ -449,5 +446,8 @@ export default {
     'LNG_PREVIOUS_ANSWERS_SCREEN_PREVIOUS_ANSWERS_TITLE': 'Previous Answers',
     'LNG_PREVIOUS_ANSWERS_SCREEN_NO_PREVIOUS_ANSWERS_TO_SHOW': 'No previous answers to show',
     'LNG_QUESTIONNAIRE_LABEL_ADD_ANSWER': 'Add Answer',
-    'LNG_QUESTIONNAIRE_LABEL_PREVIOUS_ANSWERS': 'Prev Answers'
+    'LNG_QUESTIONNAIRE_LABEL_PREVIOUS_ANSWERS': 'Prev Answers',
+
+    // TODO add to backend
+    'LNG_FOLLOW_UP_AGENDA_NO_FOLLOW_UPS_FOR_DATE': 'No follow-ups to show for this day'
 };

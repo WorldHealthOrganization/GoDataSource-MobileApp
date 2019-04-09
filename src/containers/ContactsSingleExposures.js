@@ -105,7 +105,7 @@ class ContactsSingleExposures extends Component {
                                 marginHorizontal: calculateDimension(16, false, this.props.screenSize),
                         }}/>
                         {
-                            this.props.isEditMode === true ? (
+                            this.props.isEditMode === true ? this.props.isNew ? (
                                 <Button
                                     title={getTranslation(translations.generalButtons.saveButtonLabel, this.props.translation)}
                                     onPress={this.props.handleOnPressSave}
@@ -117,6 +117,18 @@ class ContactsSingleExposures extends Component {
                                         marginVertical: calculateDimension(12.5, true, this.props.screenSize),
                                         marginHorizontal: calculateDimension(16, false, this.props.screenSize),
                                 }}/> 
+                            ) : (
+                                <Button
+                                    title={getTranslation(translations.generalButtons.nextButtonLabel, this.props.translation)}
+                                    onPress={this.props.handleMoveToNextScreenButton}
+                                    color={styles.buttonGreen}
+                                    titleColor={'white'}
+                                    height={calculateDimension(25, true, this.props.screenSize)}
+                                    width={calculateDimension(130, false, this.props.screenSize)}
+                                    style={{
+                                        marginVertical: calculateDimension(12.5, true, this.props.screenSize),
+                                        marginHorizontal: calculateDimension(16, false, this.props.screenSize),
+                                    }}/>
                             ) : null
                         }
                     </View>

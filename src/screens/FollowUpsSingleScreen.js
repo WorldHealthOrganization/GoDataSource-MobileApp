@@ -214,9 +214,9 @@ class FollowUpsSingleScreen extends Component {
                                                 <MenuItem onPress={this.handleOnPressMissing}>
                                                     {getTranslation(translations.followUpsSingleScreen.missingButton, this.props.translation)}
                                                 </MenuItem>
-                                                <MenuItem onPress={this.handleOnPressDeceased}>
-                                                    {getTranslation(translations.followUpsSingleScreen.deceasedButton, this.props.translation)}
-                                                </MenuItem>
+                                                {/*<MenuItem onPress={this.handleOnPressDeceased}>*/}
+                                                    {/*{getTranslation(translations.followUpsSingleScreen.deceasedButton, this.props.translation)}*/}
+                                                {/*</MenuItem>*/}
                                                 <MenuItem onPress={this.handleOnPressDelete}>
                                                     {getTranslation(translations.followUpsSingleScreen.deleteButton, this.props.translation)}
                                                 </MenuItem>

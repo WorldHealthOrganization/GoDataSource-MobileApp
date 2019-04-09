@@ -1359,7 +1359,7 @@ class CaseSingleScreen extends Component {
                                 ])
                             },
                             {
-                                enableHighAccuracy: true, timeout: 5000
+                                timeout: 5000
                             }
                         )
                     }
