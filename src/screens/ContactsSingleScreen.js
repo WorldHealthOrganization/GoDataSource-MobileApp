@@ -388,7 +388,7 @@ class ContactsSingleScreen extends Component {
     };
 
     handleMoveToNextScreenButton = () => {
-        let nextIndex = this.state.index + 1
+        let nextIndex = this.state.index + 1;
 
         this.setState({
             canChangeScreen: true,
@@ -511,6 +511,7 @@ class ContactsSingleScreen extends Component {
                         onChangeDropDown={this.handleOnChangeDropDown}
                         onChangeDate={this.handleOnChangeDate}
                         onChangeSwitch={this.handleOnChangeSwitch}
+                        handleMoveToNextScreenButton={this.handleMoveToNextScreenButton}
                     />
                 );
             case 'calendar':
@@ -518,6 +519,8 @@ class ContactsSingleScreen extends Component {
                     <ContactsSingleCalendar
                         contact={this.state.contact}
                         activeIndex={this.state.index}
+                        handleOnPressSave={this.handleOnPressSave}
+                        handleMoveToPrevieousScreenButton={this.handleMoveToPrevieousScreenButton}
                     />
                 );
             default:
@@ -847,7 +850,7 @@ class ContactsSingleScreen extends Component {
                         ])
                     },
                     {
-                        enableHighAccuracy: true, timeout: 5000
+                        timeout: 5000
                     }
                 )
             } else {

@@ -214,9 +214,9 @@ class FollowUpsSingleScreen extends Component {
                                                 <MenuItem onPress={this.handleOnPressMissing}>
                                                     {getTranslation(translations.followUpsSingleScreen.missingButton, this.props.translation)}
                                                 </MenuItem>
-                                                <MenuItem onPress={this.handleOnPressDeceased}>
-                                                    {getTranslation(translations.followUpsSingleScreen.deceasedButton, this.props.translation)}
-                                                </MenuItem>
+                                                {/*<MenuItem onPress={this.handleOnPressDeceased}>*/}
+                                                    {/*{getTranslation(translations.followUpsSingleScreen.deceasedButton, this.props.translation)}*/}
+                                                {/*</MenuItem>*/}
                                                 <MenuItem onPress={this.handleOnPressDelete}>
                                                     {getTranslation(translations.followUpsSingleScreen.deleteButton, this.props.translation)}
                                                 </MenuItem>
@@ -592,9 +592,11 @@ class FollowUpsSingleScreen extends Component {
         this.setState({
             previousAnswers: questionnaireAnswers,
             isModified: true
-        }, () => {
-            console.log ('onChangeMultipleSelection after setState', this.state.previousAnswers)
-        })
+        }
+        // , () => {
+        //     console.log ('onChangeMultipleSelection after setState', this.state.previousAnswers)
+        // }
+        )
     };
     onChangeDateAnswer = (value, id, parentId) => {
         // console.log ('onChangeDateAnswer', value, id)
@@ -627,9 +629,11 @@ class FollowUpsSingleScreen extends Component {
         this.setState(prevState => ({
             previousAnswers: questionnaireAnswers,
             isModified: true
-        }), () => {
-            console.log ('onChangeDateAnswer after setState', this.state.previousAnswers)
         })
+        //     , () => {
+        //     console.log ('onChangeDateAnswer after setState', this.state.previousAnswers)
+        // }
+        )
     };
     onChangeSingleSelection = (value, id, parentId) => {
         // console.log ('onChangeSingleSelection', value, id)
@@ -662,9 +666,11 @@ class FollowUpsSingleScreen extends Component {
         this.setState(prevState => ({
             previousAnswers: questionnaireAnswers,
             isModified: true
-        }), () => {
-            console.log ('onChangeMultipleSelection after setState', this.state.previousAnswers)
         })
+        //     , () => {
+        //     console.log ('onChangeMultipleSelection after setState', this.state.previousAnswers)
+        // }
+        )
     };
     onChangeMultipleSelection = (value, id, parentId) => {
         // console.log ('onChangeMultipleSelection', selections, id)
@@ -697,9 +703,11 @@ class FollowUpsSingleScreen extends Component {
         this.setState(prevState => ({
             previousAnswers: questionnaireAnswers,
             isModified: true
-        }), () => {
-            console.log ('onChangeMultipleSelection after setState', this.state.previousAnswers)
         })
+        //     , () => {
+        //     console.log ('onChangeMultipleSelection after setState', this.state.previousAnswers)
+        // }
+        )
     };
     onChangeAnswerDate = (value, questionId) => {
         let questionnaireAnswers = _.cloneDeep(this.state.previousAnswers);
@@ -719,9 +727,11 @@ class FollowUpsSingleScreen extends Component {
         this.setState({
             previousAnswers: questionnaireAnswers,
             isModified: true
-        }, () => {
-            console.log ('onChangeAnswerDate after setState', this.state.previousAnswers);
-        })
+        }
+        // , () => {
+        //     console.log ('onChangeAnswerDate after setState', this.state.previousAnswers);
+        // }
+        )
     };
 
     handleOnPressSave = () => {
@@ -917,15 +927,27 @@ class FollowUpsSingleScreen extends Component {
     };
 
     onClickShowPreviousAnswers = (previousAnswer) => {
-        console.log("Previous answers button clicked: ", this.state.previousAnswers[previousAnswer.variable]);
+        // console.log("Previous answers button clicked: ", this.state.previousAnswers[previousAnswer.variable]);
         this.props.navigator.showModal({
             screen: 'PreviousAnswersScreen',
             animated: true,
             passProps: {
                 item: previousAnswer,
                 previousAnswers: this.state.previousAnswers[previousAnswer.variable],
-                previousAnswerVariable: previousAnswer.variable
+                previousAnswerVariable: previousAnswer.variable,
+                savePreviousAnswers: this.savePreviousAnswers
             }
+        })
+    };
+    savePreviousAnswers = (previousAnswers, previousAnswersId) => {
+        // console.log(previousAnswers, previousAnswersId);
+        // let questionnaireAnswers = _.cloneDeep(this.state.previousAnswers);
+        this.setState(prevState => ({
+            previousAnswers: Object.assign({}, prevState.previousAnswers, {[previousAnswersId]: previousAnswers}),
+            isModified: true
+        }), () => {
+            // console.log('Updated previousAnswers: ', this.state.previousAnswers);
+            this.props.navigator.dismissAllModals();
         })
     };
 
@@ -961,7 +983,8 @@ class FollowUpsSingleScreen extends Component {
             previousAnswers: previousAnswersClone,
             newItem: null,
             currentAnswers: {},
-            showAddSingleAnswerModalScreen: !this.state.showAddSingleAnswerModalScreen
+            showAddSingleAnswerModalScreen: !this.state.showAddSingleAnswerModalScreen,
+            isModified: true
         })
     };
 
@@ -969,9 +992,11 @@ class FollowUpsSingleScreen extends Component {
         this.setState({
             currentAnswers: currentAnswers,
             isModified: true
-        }, () => {
-            console.log('CurrentAnswers: ', this.state.currentAnswers);
-        })
+        }
+        // , () => {
+        //     console.log('CurrentAnswers: ', this.state.currentAnswers);
+        // }
+        )
     };
 }
 

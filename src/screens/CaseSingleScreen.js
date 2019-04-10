@@ -1395,7 +1395,7 @@ class CaseSingleScreen extends Component {
                                 ])
                             },
                             {
-                                enableHighAccuracy: true, timeout: 5000
+                                timeout: 5000
                             }
                         )
                     }
@@ -1652,9 +1652,11 @@ class CaseSingleScreen extends Component {
         this.setState(prevState => ({
             previousAnswers: questionnaireAnswers,
             isModified: true
-            }), () => {
-                console.log ('onChangeMultipleSelection after setState', this.state.previousAnswers)
             })
+            // , () => {
+            //     console.log ('onChangeMultipleSelection after setState', this.state.previousAnswers)
+            // }
+            )
     };
     onChangeSingleSelection = (value, id, parentId) => {
         // console.log ('onChangeSingleSelection', value, id)
@@ -1687,9 +1689,11 @@ class CaseSingleScreen extends Component {
         this.setState(prevState => ({
             previousAnswers: questionnaireAnswers,
             isModified: true
-            }), () => {
-                console.log ('onChangeMultipleSelection after setState', this.state.previousAnswers)
             })
+            // , () => {
+            //     console.log ('onChangeMultipleSelection after setState', this.state.previousAnswers)
+            // }
+            )
     };
     onChangeMultipleSelection = (value, id, parentId) => {
         // console.log ('onChangeMultipleSelection', selections, id)
@@ -1722,9 +1726,11 @@ class CaseSingleScreen extends Component {
         this.setState(prevState => ({
             previousAnswers: questionnaireAnswers,
             isModified: true
-            }), () => {
-                console.log ('onChangeMultipleSelection after setState', this.state.previousAnswers)
             })
+            // , () => {
+            //     console.log ('onChangeMultipleSelection after setState', this.state.previousAnswers)
+            // }
+            )
     };
     onChangeDateAnswer = (value, id, parentId) => {
         // console.log ('onChangeDateAnswer', value, id)
@@ -1757,9 +1763,11 @@ class CaseSingleScreen extends Component {
         this.setState(prevState => ({
             previousAnswers: questionnaireAnswers,
             isModified: true
-        }), () => {
-            console.log ('onChangeDateAnswer after setState', this.state.previousAnswers)
         })
+        //     , () => {
+        //     console.log ('onChangeDateAnswer after setState', this.state.previousAnswers)
+        // }
+        )
     };
     onChangeAnswerDate = (value, questionId) => {
         let questionnaireAnswers = _.cloneDeep(this.state.previousAnswers);
@@ -1779,9 +1787,11 @@ class CaseSingleScreen extends Component {
         this.setState({
             previousAnswers: questionnaireAnswers,
             isModified: true
-        }, () => {
-            console.log ('onChangeAnswerDate after setState', this.state.previousAnswers);
-        })
+        }
+        // , () => {
+        //     console.log ('onChangeAnswerDate after setState', this.state.previousAnswers);
+        // }
+        )
     };
 
     onNavigatorEvent = (event) => {
@@ -1820,15 +1830,27 @@ class CaseSingleScreen extends Component {
     };
 
     onClickShowPreviousAnswers = (previousAnswer) => {
-        console.log("Previous answers button clicked: ", this.state.previousAnswers[previousAnswer.variable]);
+        // console.log("Previous answers button clicked: ", this.state.previousAnswers[previousAnswer.variable]);
         this.props.navigator.showModal({
             screen: 'PreviousAnswersScreen',
             animated: true,
             passProps: {
                 item: previousAnswer,
                 previousAnswers: this.state.previousAnswers[previousAnswer.variable],
-                previousAnswerVariable: previousAnswer.variable
+                previousAnswerVariable: previousAnswer.variable,
+                savePreviousAnswers: this.savePreviousAnswers
             }
+        })
+    };
+    savePreviousAnswers = (previousAnswers, previousAnswersId) => {
+        // console.log(previousAnswers, previousAnswersId);
+        // let questionnaireAnswers = _.cloneDeep(this.state.previousAnswers);
+        this.setState(prevState => ({
+            previousAnswers: Object.assign({}, prevState.previousAnswers, {[previousAnswersId]: previousAnswers}),
+            isModified: true
+        }), () => {
+            // console.log('Updated previousAnswers: ', this.state.previousAnswers);
+            this.props.navigator.dismissAllModals();
         })
     };
 
@@ -1862,6 +1884,7 @@ class CaseSingleScreen extends Component {
         });
         this.setState({
             previousAnswers: previousAnswersClone,
+            isModified: true,
             newItem: null,
             currentAnswers: {},
             showAddSingleAnswerModalScreen: !this.state.showAddSingleAnswerModalScreen
@@ -1872,9 +1895,11 @@ class CaseSingleScreen extends Component {
         this.setState({
             currentAnswers: currentAnswers,
             isModified: true
-        }, () => {
-            console.log('CurrentAnswers: ', this.state.currentAnswers);
-        })
+        }
+        // , () => {
+        //     console.log('CurrentAnswers: ', this.state.currentAnswers);
+        // }
+        )
     };
 }
 

@@ -9,7 +9,9 @@ import {updateFileInDatabase, processBulkDocs} from './../queries/database';
 import {setSyncState} from './../actions/app';
 import bcrypt from 'react-native-bcrypt';
 import uuid from 'react-native-uuid';
-import _, {sortBy} from 'lodash';
+import get from 'lodash/get';
+import sortBy from 'lodash/sortBy';
+import cloneDeep from 'lodash/cloneDeep';
 import defaultTranslations from './defaultTranslations'
 import {getContactsForOutbreakId} from './../actions/contacts';
 import {getSyncEncryptPassword, encrypt, decrypt} from './../utils/encryption';
@@ -1189,13 +1191,13 @@ export function extractAllQuestions (questions, item) {
                     // First check for single select since it has only a value
                     if (questions[i].answerType === "LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_SINGLE_ANSWER" ) {
                         if (item && typeof item === 'object' && Object.keys(item).length > 0 && item[questions[i].variable] && Array.isArray(item[questions[i].variable]) && item[questions[i].variable].length > 0 && typeof item[questions[i].variable][0] === "object" && Object.keys(item[questions[i].variable][0]).length > 0 && item[questions[i].variable][0].value && item[questions[i].variable][0].value === questions[i].answers[j].value && questions[i].answers[j].additionalQuestions) {
-                            questions[i].additionalQuestions = extractQuestionsRecursively(_.sortBy(questions[i].answers[j].additionalQuestions, ['order', 'variable']), item[questions[i].variable][0].subAnswers);
+                            questions[i].additionalQuestions = extractQuestionsRecursively(sortBy(questions[i].answers[j].additionalQuestions, ['order', 'variable']), item[questions[i].variable][0].subAnswers);
                         }
                     } else {
                         // For the multiple select the answers are in an array of values
                         if (questions[i].answerType === "LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_MULTIPLE_ANSWERS") {
                             if (item && typeof item === 'object' && Object.keys(item).length > 0 && item[questions[i].variable] && Array.isArray(item[questions[i].variable]) && item[questions[i].variable].length > 0 && typeof item[questions[i].variable][0] === "object" && Object.keys(item[questions[i].variable][0]).length > 0 && item[questions[i].variable][0].value && Array.isArray(item[questions[i].variable][0].value) && item[questions[i].variable][0].value.length > 0 && item[questions[i].variable][0].value.indexOf(questions[i].answers[j].value) > -1 && questions[i].answers[j].additionalQuestions) {
-                                questions[i].additionalQuestions = questions[i].additionalQuestions ? questions[i].additionalQuestions.concat(extractQuestionsRecursively(_.sortBy(questions[i].answers[j].additionalQuestions, ['order', 'variable']), item[questions[i].variable][0].subAnswers)) : extractQuestionsRecursively(_.sortBy(questions[i].answers[j].additionalQuestions, ['order', 'variable']), item[questions[i].variable][0].subAnswers);
+                                questions[i].additionalQuestions = questions[i].additionalQuestions ? questions[i].additionalQuestions.concat(extractQuestionsRecursively(sortBy(questions[i].answers[j].additionalQuestions, ['order', 'variable']), item[questions[i].variable][0].subAnswers)) : extractQuestionsRecursively(sortBy(questions[i].answers[j].additionalQuestions, ['order', 'variable']), item[questions[i].variable][0].subAnswers);
                             }
                         }
                     }
@@ -1203,7 +1205,7 @@ export function extractAllQuestions (questions, item) {
             }
         }
     }
-    console.log('~~~~ Mapped questions: ', questions);
+    // console.log('~~~~ Mapped questions: ', questions);
     return questions;
 };
 
@@ -1221,13 +1223,13 @@ export function extractQuestionsRecursively (questions, item) {
                     // First check for single select since it has only a value
                     if (questions[i].answerType === "LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_SINGLE_ANSWER" ) {
                         if (item && typeof item === 'object' && Object.keys(item).length > 0 && item[questions[i].variable] && Array.isArray(item[questions[i].variable]) && item[questions[i].variable].length > 0 && typeof item[questions[i].variable][0] === "object" && Object.keys(item[questions[i].variable][0]).length > 0 && item[questions[i].variable][0].value && item[questions[i].variable][0].value === questions[i].answers[j].value && questions[i].answers[j].additionalQuestions) {
-                            returnedQuestions = returnedQuestions.concat(extractQuestionsRecursively(_.sortBy(questions[i].answers[j].additionalQuestions, ['order', 'variable']), item))
+                            returnedQuestions = returnedQuestions.concat(extractQuestionsRecursively(sortBy(questions[i].answers[j].additionalQuestions, ['order', 'variable']), item))
                         }
                     } else {
                         // For the multiple select the answers are in an array of values
                         if (questions[i].answerType === "LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_MULTIPLE_ANSWERS") {
                             if (item && typeof item === 'object' && Object.keys(item).length > 0 && item[questions[i].variable] && Array.isArray(item[questions[i].variable]) && item[questions[i].variable].length > 0 && typeof item[questions[i].variable][0] === "object" && Object.keys(item[questions[i].variable][0]).length > 0 && item[questions[i].variable][0].value && Array.isArray(item[questions[i].variable][0].value) && item[questions[i].variable][0].value.length > 0 && item[questions[i].variable][0].value.indexOf(questions[i].answers[j].value) > -1 && questions[i].answers[j].additionalQuestions) {
-                                returnedQuestions = returnedQuestions.concat(extractQuestionsRecursively(_.sortBy(questions[i].answers[j].additionalQuestions, ['order', 'variable']), item))
+                                returnedQuestions = returnedQuestions.concat(extractQuestionsRecursively(sortBy(questions[i].answers[j].additionalQuestions, ['order', 'variable']), item))
                             }
                         }
                     }
@@ -1272,14 +1274,14 @@ export function mapAnswers(questions, answers) {
     let sortedQuestions = sortBy(questions, ['order', 'variable']);
     let questionnaireAnswers = null;
     if (answers) {
-        questionnaireAnswers = _.cloneDeep(answers);
+        questionnaireAnswers = cloneDeep(answers);
     }
 
     if (questionnaireAnswers) {
         for (let questionId in questionnaireAnswers) {
             // First added the main questions
             if (sortedQuestions.findIndex((e) => {return e.variable === questionId}) > -1) {
-                mappedAnswers[questionId] = _.cloneDeep(questionnaireAnswers[questionId]);
+                mappedAnswers[questionId] = cloneDeep(questionnaireAnswers[questionId]);
             }
         }
     }
@@ -1340,13 +1342,13 @@ function extractQuestions(questions) {
         }
     }
 
-    console.log('extract le questions:  ', returnedQuestions);
+    // console.log('extract le questions:  ', returnedQuestions);
     return returnedQuestions;
 };
 
 export function reMapAnswers(answers) {
     let returnedAnswers = {};
-    if (answers && typeof answers === 'object') {
+        if (answers && typeof answers === 'object') {
         for (let questionId in answers) {
             if (answers[questionId] && Array.isArray(answers[questionId]) && answers[questionId].length > 0) {
                 for (let i = 0; i < answers[questionId].length; i++) {
@@ -1390,8 +1392,6 @@ export function reMapAnswers(answers) {
         });
     }
 
-
-
     return returnedAnswers;
 };
 
@@ -1407,7 +1407,8 @@ export function checkRequiredQuestions(questions, previousAnswers) {
         }
         if (questions[i].additionalQuestions && Array.isArray(questions[i].additionalQuestions) && questions[i].additionalQuestions.length > 0) {
             for (let j = 0; j < questions[i].additionalQuestions.length; j++) {
-                if (questions[i].additionalQuestions[j].required && previousAnswers[questions[i].variable].findIndex((e) => {
+                if (questions[i].additionalQuestions[j].required && previousAnswers[questions[i].variable].filter((e) => {return get(e, `subAnswers[${questions[i].additionalQuestions[j].variable}]`, 'failTest') !== 'failTest'}).findIndex((e) => {
+                    // console.log('checkRequiredQuestions test: ', get(e, `subAnswers[${questions[i].additionalQuestions[j].variable}][0].value`, 'fail'), e);
                     return !e.subAnswers || e.subAnswers[questions[i].additionalQuestions[j].variable][0].value === null || e.subAnswers[questions[i].additionalQuestions[j].variable][0].value === ""
                 }) > -1) {
                     requiredQuestions.push(questions[i].additionalQuestions[j].text);

@@ -12,8 +12,12 @@ import translations from './../utils/translations';
 import ElevatedView from 'react-native-elevated-view';
 import config from './../utils/config';
 import QuestionCardContent from './../components/QuestionCardContent';
+import ActionsBar from './../components/ActionsBar';
 import cloneDeep from "lodash/cloneDeep";
+import get from 'lodash/get';
+import set from 'lodash/set';
 import {extractAllQuestions} from "../utils/functions";
+import Button from './../components/Button';
 
 class PreviousAnswersScreen extends Component {
 
@@ -24,20 +28,17 @@ class PreviousAnswersScreen extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            previousAnswers: this.props.previousAnswers
         };
     }
 
     // Please add here the react lifecycle methods that you need
-    static getDerivedStateFromProps(props, state) {
-        return null;
-    }
-
 
     // The render method should have at least business logic as possible,
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
-        console.log('Render PreviousAnswersScreen: ', this.props.previousAnswers);
+        // console.log('Render PreviousAnswersScreen: ', this.state.previousAnswers);
         return (
             <View style={{flex: 1, backgroundColor: 'white'}}>
                 <NavBarCustom customTitle={
@@ -51,7 +52,7 @@ class PreviousAnswersScreen extends Component {
                         }}
                     >
                         <Text style={[style.title, {marginLeft: 30}]}>
-                            {'Previous Answers'}
+                            {getTranslation(translations.previousAnswersScreen.previousAnswersTitle, this.props.translation)}
                         </Text>
                     </View>
                 }
@@ -60,9 +61,23 @@ class PreviousAnswersScreen extends Component {
                               iconName="close"
                               handlePressNavbarButton={this.handlePressNavbarButton}
                 />
+                <View style={{backgroundColor: styles.screenBackgroundGrey, justifyContent: 'center', alignItems: 'center'}}>
+                    <Button
+                        title={getTranslation(translations.generalButtons.saveButtonLabel, this.props.translation)}
+                        onPress={this.savePreviousAnswers}
+                        color={styles.buttonGreen}
+                        titleColor={'white'}
+                        height={calculateDimension(25, true, this.props.screenSize)}
+                        width={calculateDimension(130, false, this.props.screenSize)}
+                        style={{
+                            marginVertical: calculateDimension(12.5, true, this.props.screenSize),
+                            marginHorizontal: calculateDimension(16, false, this.props.screenSize),
+                        }}/>
+
+                </View>
                 <ScrollView style={style.mapContainer} contentContainerStyle={style.containerContent}>
                     {
-                        this.props && this.props.previousAnswers && Array.isArray(this.props.previousAnswers) && this.props.previousAnswers.length > 0 && this.props.previousAnswers.map((previousAnswer, index) => {
+                        this.state && this.state.previousAnswers && Array.isArray(this.state.previousAnswers) && this.state.previousAnswers.length > 0 && this.state.previousAnswers.map((previousAnswer, index) => {
                             return this.renderListOfPreviousAnswers(previousAnswer, index);
                         })
                     }
@@ -76,16 +91,16 @@ class PreviousAnswersScreen extends Component {
        this.props.navigator.dismissModal();
     };
 
+    // List render methods
     listEmptyComponent = () => {
         return (
             <View style={[style.mapContainer, {height: calculateDimension((667 - 152), true, this.props.screenSize)}]}>
                 <Text style={style.emptyComponentTextView}>
-                    {getTranslation(translations.helpScreen.noHelpItemsToShowMessage, this.props.translation)}
+                    {getTranslation(translations.previousAnswersScreen.noPreviousAnswersToShowMessage, this.props.translation)}
                 </Text>
             </View>
         )
     };
-
     renderListOfPreviousAnswers = (previousAnswer, index) => {
         console.log('renderListOfPreviousAnswers: ', previousAnswer, index);
         let width = calculateDimension(config.designScreenSize.width - 32, false, this.props.screenSize);
@@ -96,7 +111,7 @@ class PreviousAnswersScreen extends Component {
         let buttonWidth = calculateDimension(120, false, this.props.screenSize);
 
         let source = {};
-        source[this.props.previousAnswerVariable] = [this.props.previousAnswers[index]];
+        source[this.props.previousAnswerVariable] = [this.state .previousAnswers[index]];
         let sortedQuestions = sortBy(cloneDeep([this.props.item]), ['order', 'variable']);
         sortedQuestions = extractAllQuestions(sortedQuestions, source);
         return (
@@ -107,6 +122,7 @@ class PreviousAnswersScreen extends Component {
                     backgroundColor: 'white'
                 }}
                 elevation={5}
+                key={index}
             >
                 <QuestionCardContent
                     item={sortedQuestions[0]}
@@ -117,14 +133,171 @@ class PreviousAnswersScreen extends Component {
                     buttonWidth={buttonWidth}
                     buttonHeight={buttonHeight}
                     onClickAddNewMultiFrequencyAnswer={() => {}}
-                    onChangeTextAnswer={() => {}}
-                    onChangeDateAnswer={() => {}}
-                    onChangeSingleSelection={() => {}}
-                    onChangeMultipleSelection={() => {}}
-                    isEditMode={false}
+                    onChangeTextAnswer={(value, id, parentId) => {
+                        this.onChangeTextAnswer(value, id, parentId, index)
+                    }}
+                    onChangeDateAnswer={(value, id, parentId) => {
+                        this.onChangeDateAnswer(value, id, parentId, index)
+                    }}
+                    onChangeSingleSelection={(value, id, parentId) => {
+                        this.onChangeSingleSelection(value, id, parentId, index)
+                    }}
+                    onChangeMultipleSelection={(value, id, parentId) => {
+                        this.onChangeMultipleSelection(value, id, parentId, index)
+                    }}
+                    isEditMode={true}
+                    editableQuestionDate={true}
+                    onChangeAnswerDate={(value, questionId) => {
+                        this.onChangeAnswerDate(value, questionId, index)
+                    }}
+                />
+                <ActionsBar
+                    textsArray={[getTranslation(translations.caseSingleScreen.deleteButton, this.props.translation)]}
+                    textsStyleArray={[{fontFamily: 'Roboto-Regular', fontSize: 14, color: 'red', marginHorizontal}]}
+                    onPressArray={[() => {this.handleDeletePrevAnswer(index)}]}
+                    containerStyle={[{height: 54}]}
+                    isEditMode={true}
+                    translation={this.props.translation}
                 />
             </ElevatedView>
         )
+    };
+
+    // On change answers
+    onChangeTextAnswer = (value, id, parentId, index) => {
+        // console.log ('onChangeTextAnswer', value, id, parentId, index);
+        let questionnaireAnswers = _.cloneDeep(this.state.previousAnswers);
+
+        if (parentId) {
+            set(questionnaireAnswers, `[${index}].subAnswers[${id}][0]`, value);
+        } else {
+            set(questionnaireAnswers, `[${index}]`, value);
+        }
+
+        this.setState({
+            previousAnswers: questionnaireAnswers,
+            isModified: true
+        }
+        // , () => {
+        //     console.log ('onChangeMultipleSelection after setState', this.state.previousAnswers)
+        // }
+        )
+    };
+    onChangeSingleSelection = (value, id, parentId, index) => {
+        // console.log ('onChangeSingleSelection', value, id, parentId, index);
+        let questionnaireAnswers = _.cloneDeep(this.state.previousAnswers);
+
+        if (parentId) {
+            set(questionnaireAnswers, `[${index}].subAnswers[${id}][0]`, value);
+        } else {
+            set(questionnaireAnswers, `[${index}]`, value);
+        }
+
+        this.setState({
+            previousAnswers: questionnaireAnswers,
+            isModified: true
+        }
+        // , () => {
+        //     console.log ('onChangeMultipleSelection after setState', this.state.previousAnswers)
+        // }
+        )
+    };
+    onChangeMultipleSelection = (value, id, parentId, index) => {
+        // console.log ('onChangeMultipleSelection', value, id, parentId, index);
+        let questionnaireAnswers = _.cloneDeep(this.state.previousAnswers);
+
+        if (parentId) {
+            set(questionnaireAnswers, `[${index}].subAnswers[${id}][0]`, value);
+        } else {
+            set(questionnaireAnswers, `[${index}]`, value);
+        }
+
+        this.setState({
+            previousAnswers: questionnaireAnswers,
+            isModified: true
+        }
+        // , () => {
+        //     console.log ('onChangeMultipleSelection after setState', this.state.previousAnswers)
+        // }
+        )
+    };
+    onChangeDateAnswer = (value, id, parentId, index) => {
+        // console.log ('onChangeDateAnswer', value, id, parentId, index);
+        let questionnaireAnswers = _.cloneDeep(this.state.previousAnswers);
+
+        if (parentId) {
+            set(questionnaireAnswers, `[${index}].subAnswers[${id}][0]`, value);
+        } else {
+            set(questionnaireAnswers, `[${index}]`, value);
+        }
+
+        this.setState({
+            previousAnswers: questionnaireAnswers,
+            isModified: true
+        }
+        // , () => {
+        //     console.log ('onChangeDateAnswer after setState', this.state.previousAnswers)
+        // }
+        )
+    };
+    onChangeAnswerDate = (value, questionId, index) => {
+        let questionnaireAnswers = _.cloneDeep(this.state.previousAnswers);
+
+        set(questionnaireAnswers, `[${index}].date`, value);
+
+        if (get(questionnaireAnswers, `[${index}].subAnswers`, null) !== null && get(questionnaireAnswers, `[${index}].subAnswers`, null) !== {}) {
+            for (let subQuestionId in get(questionnaireAnswers, `[${index}].subAnswers`, null)) {
+                set(questionnaireAnswers, `[${index}].subAnswers[${subQuestionId}].date`, value);
+            }
+        }
+
+        // if (questionnaireAnswers && questionnaireAnswers[questionId] && Array.isArray(questionnaireAnswers[questionId]) && questionnaireAnswers[questionId].length) {
+        //     if (questionnaireAnswers[questionId][0] && questionnaireAnswers[questionId][index].date) {
+        //         questionnaireAnswers[questionId][0].date = value;
+        //         if (questionnaireAnswers[questionId][0].subAnswers && typeof questionnaireAnswers[questionId][index].subAnswers === "object" && Object.keys(questionnaireAnswers[questionId][index].subAnswers).length > 0) {
+        //             for (let subQuestionId in questionnaireAnswers[questionId][index].subAnswers) {
+        //                 questionnaireAnswers[questionId][index].subAnswers[subQuestionId].map((e) => {
+        //                     return {value: e.value, date: value};
+        //                 })
+        //             }
+        //         }
+        //     }
+        // }
+
+        this.setState({
+            previousAnswers: questionnaireAnswers,
+            isModified: true
+        }
+        // , () => {
+        //     console.log ('onChangeAnswerDate after setState', this.state.previousAnswers);
+        // }
+        )
+    };
+
+    savePreviousAnswers = () => {
+        this.props.savePreviousAnswers(this.state.previousAnswers, this.props.previousAnswerVariable);
+    };
+
+    handleDeletePrevAnswer = (index) => {
+        Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.alertMessages.deletePreviousAnswer, this.state.translation), [
+            {
+                text: getTranslation(translations.generalLabels.noAnswer, this.props.translation), onPress: () => {console.log('Cancel pressed')}
+            },
+            {
+                text: getTranslation(translations.generalLabels.yesAnswer, this.props.translation), onPress: () => {
+                    this.deletePreviousAnswer(index);
+                }
+            }
+        ]);
+    };
+    deletePreviousAnswer = (index) => {
+        let questionnaireAnswers = cloneDeep(this.state.previousAnswers);
+
+        questionnaireAnswers.splice(index, 1);
+
+        this.setState({
+            previousAnswers: questionnaireAnswers
+        })
     };
 }
 
