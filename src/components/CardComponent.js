@@ -222,7 +222,8 @@ class CardComponent extends PureComponent {
             case 'TextSwitchSelector':
                 return (
                     <TextSwitchSelector 
-                        selectedItem={this.props[this.props.item.selectedItemIndexForTextSwitchSelector]}
+                        selectedItem={this.props.selectedItemIndexForTextSwitchSelectorForAge}
+                        // selectedItem={this.props[this.props.item.selectedItemIndexForTextSwitchSelector]}
                         selectedItemIndexForTextSwitchSelector={this.props.item.selectedItemIndexForTextSwitchSelector}
                         onChange={this.props.onChangeTextSwitchSelector}
                         values={this.props.item.values}
