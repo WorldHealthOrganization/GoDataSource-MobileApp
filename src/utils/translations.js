@@ -280,6 +280,7 @@ const alertMessages = {
     wrongQR: 'The QR code has a bad format',
 
     errorOccuredMsg: 'QR code is not valid',
+    checkForDuplicatesRequestError: 'LNG_ALERT_MESSAGE_CHECK_FOR_DUPLICATES_REQUST_FAIL',
 
     // cases
     caseDeleteConfirmation: 'LNG_DIALOG_ALERT_MESSAGE_ARE_YOU_SURE_YOU_WANT_TO_DELETE_THIS_CASE',

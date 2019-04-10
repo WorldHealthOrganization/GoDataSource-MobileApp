@@ -1136,6 +1136,13 @@ class ContactsSingleScreen extends Component {
                                         console.log('getContactsNameForDuplicateCheckRequest error: ', error);
                                         this.setState({
                                             loading: false
+                                        }, () => {
+                                            Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.checkForDuplicatesRequestError, this.props.translation), [
+                                                {
+                                                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+                                                    onPress: () => {this.hideMenu()}
+                                                }
+                                            ])
                                         })
                                     } 
                                     if (response){
@@ -1180,60 +1187,66 @@ class ContactsSingleScreen extends Component {
                                                 })
                                             });
                                         } else {
-                                            this.setState({ loading: false })
-                                            Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.contactDuplicateNameError, this.props.translation), [
-                                                {
-                                                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
-                                                    onPress: () => {this.hideMenu()}
-                                                }
-                                            ])
+                                            this.setState({ loading: false }, () => {
+                                                Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.contactDuplicateNameError, this.props.translation), [
+                                                    {
+                                                        text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+                                                        onPress: () => {this.hideMenu()}
+                                                    }
+                                                ])
+                                            })
                                         }
                                     }
                                 });
                             } else {
-                                this.setState({ loading: false })
-                                Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.placeOfResidenceError, this.props.translation), [
-                                    {
-                                        text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
-                                        onPress: () => {this.hideMenu()}
-                                    }
-                                ])
+                                this.setState({ loading: false }, () => {
+                                    Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.placeOfResidenceError, this.props.translation), [
+                                        {
+                                            text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+                                            onPress: () => {this.hideMenu()}
+                                        }
+                                    ])
+                                })
                             }
                         } else {
-                            this.setState({ loading: false })
-                            Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.monthsValueError, this.props.translation), [
+                            this.setState({ loading: false }, () => {
+                                Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.monthsValueError, this.props.translation), [
+                                    {
+                                        text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+                                        onPress: () => {console.log("OK pressed")}
+                                    }
+                                ])
+                            })
+                        }
+                    } else {
+                        this.setState({ loading: false }, () => {
+                            Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.yearsValueError, this.props.translation), [
                                 {
                                     text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
                                     onPress: () => {console.log("OK pressed")}
                                 }
                             ])
-                        }
-                    } else {
-                        this.setState({ loading: false })
-                        Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.yearsValueError, this.props.translation), [
-                            {
-                                text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
-                                onPress: () => {console.log("OK pressed")}
-                            }
-                        ])
+                        })
                     }
                 } else {
-                    this.setState({ loading: false })
-                    Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), `${getTranslation(translations.alertMessages.requiredFieldsMissingError, this.props.translation)}.\n${getTranslation(translations.alertMessages.missingFields, this.props.translation)}: ${missingFields}`, [
+                    this.setState({ loading: false }, () => {
+                        Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), `${getTranslation(translations.alertMessages.requiredFieldsMissingError, this.props.translation)}.\n${getTranslation(translations.alertMessages.missingFields, this.props.translation)}: ${missingFields}`, [
+                            {
+                                text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+                                onPress: () => {this.hideMenu()}
+                            }
+                        ])
+                    })
+                }
+            } else {
+                this.setState({ loading: false }, () => {
+                    Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), `${getTranslation(translations.alertMessages.requiredFieldsMissingError, this.props.translation)}.\n${getTranslation(translations.alertMessages.missingFields, this.props.translation)}: ${relationshipsMissingFields}`, [
                         {
                             text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
                             onPress: () => {this.hideMenu()}
                         }
                     ])
-                }
-            } else {
-                this.setState({ loading: false });
-                Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), `${getTranslation(translations.alertMessages.requiredFieldsMissingError, this.props.translation)}.\n${getTranslation(translations.alertMessages.missingFields, this.props.translation)}: ${relationshipsMissingFields}`, [
-                    {
-                        text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
-                        onPress: () => {this.hideMenu()}
-                    }
-                ])
+                })
             }
         })
     };

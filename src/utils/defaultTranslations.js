@@ -238,6 +238,7 @@ export default {
     'Please make sure you have entered a valid email address': 'Please make sure you have entered a valid email address',
     'No person exists with this information': 'No person exists with this information',
     'QR code is not valid': 'QR code is not valid',
+    'LNG_ALERT_MESSAGE_CHECK_FOR_DUPLICATES_REQUST_FAIL': 'Something went wrong with the database request',
 
     // cases
     'LNG_DIALOG_ALERT_MESSAGE_ARE_YOU_SURE_YOU_WANT_TO_DELETE_THIS_CASE': 'Are you sure you want to delete this case?',
