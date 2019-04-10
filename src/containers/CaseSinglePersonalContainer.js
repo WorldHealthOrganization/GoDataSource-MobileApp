@@ -3,7 +3,7 @@
  */
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
-import React, {PureComponent} from 'react';
+import React, {Component} from 'react';
 import {
     View,
     Text,
@@ -27,7 +27,7 @@ import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import translations from './../utils/translations'
 import _ from 'lodash';
 
-class CaseSinglePersonalContainer extends PureComponent {
+class CaseSinglePersonalContainer extends Component {
 
     // This will be a container, so put as less business logic here as possible
     constructor(props) {
@@ -215,7 +215,7 @@ class CaseSinglePersonalContainer extends PureComponent {
         if (this.props.selectedItemIndexForTextSwitchSelectorForAge !== null && this.props.selectedItemIndexForTextSwitchSelectorForAge !== undefined && item.objectType === 'Case' && item.dependsOn !== undefined && item.dependsOn !== null){
             let itemIndexInConfigTextSwitchSelectorValues = config[item.dependsOn].map((e) => {return e.value}).indexOf(item.id)
             if (itemIndexInConfigTextSwitchSelectorValues > -1) {
-                if (itemIndexInConfigTextSwitchSelectorValues != this.props.selectedItemIndexForTextSwitchSelectorForAge) {
+                if (itemIndexInConfigTextSwitchSelectorValues !== this.props.selectedItemIndexForTextSwitchSelectorForAge) {
                     return
                 }
             }
@@ -237,6 +237,7 @@ class CaseSinglePersonalContainer extends PureComponent {
                 selectedItemIndexForAgeUnitOfMeasureDropDown={this.props.selectedItemIndexForAgeUnitOfMeasureDropDown}
                 onChangeextInputWithDropDown={this.props.onChangeextInputWithDropDown}
                 value={value}
+                selectedItemIndexForTextSwitchSelectorForAge={this.props.selectedItemIndexForTextSwitchSelectorForAge}
                 minimumDate={minimumDate}
                 maximumDate={maximumDate}
                 index={cardIndex}
