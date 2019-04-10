@@ -167,7 +167,7 @@ class ContactsSingleScreen extends Component {
         if (!this.props.isNew) {
             let ageClone = {years: 0, months: 0}
             let updateAge = false;
-            if (this.props.contact.age === null || this.props.contact.age === undefined || this.props.contact.age.years === undefined || this.props.contact.age.years === null || this.props.contact.age.months === undefined || this.props.contact.age.months === null) {
+            if (this.props.contact.age === null || this.props.contact.age === undefined || (this.props.contact.age.years === undefined && this.props.contact.age.months === undefined)) {
                 updateAge = true
             }
             if (updateAge) {
