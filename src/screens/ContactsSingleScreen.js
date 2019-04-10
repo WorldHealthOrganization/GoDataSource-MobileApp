@@ -19,6 +19,7 @@ import ContactsSingleCalendar from './../containers/ContactsSingleCalendar';
 import ContactsSingleExposures from './../containers/ContactsSingleExposures';
 import ContactsSinglePersonal from './../containers/ContactsSinglePersonal';
 import ExposureScreen from './../screens/ExposureScreen';
+import {getContactsNameForDuplicateCheckRequest, checkForNameDuplicatesRequest} from './../queries/contacts'
 import Breadcrumb from './../components/Breadcrumb';
 import Menu, {MenuItem} from 'react-native-material-menu';
 import Ripple from 'react-native-material-ripple';
@@ -564,7 +565,6 @@ class ContactsSingleScreen extends Component {
             );
         }
     };
-
 
     handleSaveExposure = (exposure, isUpdate = false) => {
         this.setState({
@@ -1120,93 +1120,135 @@ class ContactsSingleScreen extends Component {
     };
 
     handleOnPressSave = () => {
-        // Check the required fields and then update the contact
-        let relationshipsMissingFields = this.checkFields();
-        if (relationshipsMissingFields && Array.isArray(relationshipsMissingFields) && relationshipsMissingFields.length === 0) {
-            let missingFields = this.checkRequiredFields();
-            if (missingFields && Array.isArray(missingFields) && missingFields.length === 0) {
-                if (this.checkAgeYearsRequirements()) {
-                    if (this.checkAgeMonthsRequirements()) {
-                        if (this.state.hasPlaceOfResidence === true){
-                            this.setState({
-                                savePressed: true
-                            }, () => {
-                                this.hideMenu()
-                                let ageConfig = this.ageAndDobPrepareForSave()
-                                this.setState(prevState => ({
-                                    contact: Object.assign({}, prevState.contact, {age: ageConfig.ageClone}, {dob: ageConfig.dobClone}),
-                                }), () => {
-                                    console.log("ageAndDobPrepareForSave done", this.state.contact);
-                                    if (this.props.isNew) {
-                                        let contactWithRequiredFields = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, this.state.contact), action = 'create', fileType = 'person.json', type = 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT')
-                                        this.setState(prevState => ({
-                                            contact: Object.assign({}, prevState.contact, contactWithRequiredFields)
-                                        }), () => {
-                                            let contactClone = _.cloneDeep(this.state.contact)
-                                            let contactMatchFilter = this.checkIfContactMatchFilter()
-                                            console.log('contactMatchFilter', contactMatchFilter)
-                                            this.props.addContact(this.props.user.activeOutbreakId, contactClone, null, this.props.user.token, contactMatchFilter);
+        this.setState({
+            loading: true
+        }, () => {
+            let relationshipsMissingFields = this.checkFields();
+            if (relationshipsMissingFields && Array.isArray(relationshipsMissingFields) && relationshipsMissingFields.length === 0) {
+                let missingFields = this.checkRequiredFields();
+                if (missingFields && Array.isArray(missingFields) && missingFields.length === 0) {
+                    if (this.checkAgeYearsRequirements()) {
+                        if (this.checkAgeMonthsRequirements()) {
+                            if (this.state.hasPlaceOfResidence === true){
+                                const {contact} = this.state
+                                checkForNameDuplicatesRequest( this.props.isNew ? null : contact._id, contact.firstName, contact.lastName, this.props.user.activeOutbreakId, (error, response) => {
+                                    if (error){
+                                        console.log('getContactsNameForDuplicateCheckRequest error: ', error);
+                                        this.setState({
+                                            loading: false
+                                        }, () => {
+                                            Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.checkForDuplicatesRequestError, this.props.translation), [
+                                                {
+                                                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+                                                    onPress: () => {this.hideMenu()}
+                                                }
+                                            ])
                                         })
-                                    } else {
-                                        let contactWithRequiredFields = null;
-                                        if (this.state.deletePressed === true) {
-                                            contactWithRequiredFields = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, this.state.contact), action = 'delete', fileType = 'person.json', type = 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT')
+                                    } 
+                                    if (response){
+                                        console.log('getContactsNameForDuplicateCheckRequest response: ', response);
+                                        if (response.length === 0){
+                                            this.setState({
+                                                savePressed: true
+                                            }, () => {
+                                                this.hideMenu()
+                                                let ageConfig = this.ageAndDobPrepareForSave()
+                                                this.setState(prevState => ({
+                                                    contact: Object.assign({}, prevState.contact, {age: ageConfig.ageClone}, {dob: ageConfig.dobClone}),
+                                                }), () => {
+                                                    console.log("ageAndDobPrepareForSave done", this.state.contact);
+                                                    if (this.props.isNew) {
+                                                        let contactWithRequiredFields = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, this.state.contact), action = 'create', fileType = 'person.json', type = 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT')
+                                                        this.setState(prevState => ({
+                                                            contact: Object.assign({}, prevState.contact, contactWithRequiredFields),
+                                                        }), () => {
+                                                            let contactClone = _.cloneDeep(this.state.contact)
+                                                            let contactMatchFilter = this.checkIfContactMatchFilter()
+                                                            console.log('contactMatchFilter', contactMatchFilter)
+                                                            this.props.addContact(this.props.user.activeOutbreakId, contactClone, null, this.props.user.token, contactMatchFilter);
+                                                        })
+                                                    } else {
+                                                        let contactWithRequiredFields = null;
+                                                        if (this.state.deletePressed === true) {
+                                                            contactWithRequiredFields = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, this.state.contact), action = 'delete', fileType = 'person.json', type = 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT')
+                                                        } else {
+                                                            contactWithRequiredFields = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, this.state.contact), action = 'update', fileType = 'person.json', type = 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT')
+                                                        }
+                
+                                                        this.setState(prevState => ({
+                                                            contact: Object.assign({}, prevState.contact, contactWithRequiredFields),
+                                                        }), () => {
+                                                            let contactClone = _.cloneDeep(this.state.contact)
+                                                            let contactMatchFilter = this.checkIfContactMatchFilter()
+                                                            console.log('contactMatchFilter', contactMatchFilter)
+                                                            this.props.updateContact(this.props.user.activeOutbreakId, contactClone._id, contactClone, this.props.user.token, null, contactMatchFilter);
+                                                        })
+                                                    }
+                                                })
+                                            });
                                         } else {
-                                            contactWithRequiredFields = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, this.state.contact), action = 'update', fileType = 'person.json', type = 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT')
+                                            this.setState({ loading: false }, () => {
+                                                Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.contactDuplicateNameError, this.props.translation), [
+                                                    {
+                                                        text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+                                                        onPress: () => {this.hideMenu()}
+                                                    }
+                                                ])
+                                            })
                                         }
-
-                                        this.setState(prevState => ({
-                                            contact: Object.assign({}, prevState.contact, contactWithRequiredFields)
-                                        }), () => {
-                                            let contactClone = _.cloneDeep(this.state.contact)
-                                            let contactMatchFilter = this.checkIfContactMatchFilter()
-                                            console.log('contactMatchFilter', contactMatchFilter)
-                                            this.props.updateContact(this.props.user.activeOutbreakId, contactClone._id, contactClone, this.props.user.token, null, contactMatchFilter);
-                                        })
                                     }
+                                });
+                            } else {
+                                this.setState({ loading: false }, () => {
+                                    Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.placeOfResidenceError, this.props.translation), [
+                                        {
+                                            text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+                                            onPress: () => {this.hideMenu()}
+                                        }
+                                    ])
                                 })
-                            });
+                            }
                         } else {
-                            Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.placeOfResidenceError, this.props.translation), [
-                                {
-                                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
-                                    onPress: () => {this.hideMenu()}
-                                }
-                            ])
+                            this.setState({ loading: false }, () => {
+                                Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.monthsValueError, this.props.translation), [
+                                    {
+                                        text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+                                        onPress: () => {console.log("OK pressed")}
+                                    }
+                                ])
+                            })
                         }
                     } else {
-                        Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.monthsValueError, this.props.translation), [
-                            {
-                                text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
-                                onPress: () => {console.log("OK pressed")}
-                            }
-                        ])
+                        this.setState({ loading: false }, () => {
+                            Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.yearsValueError, this.props.translation), [
+                                {
+                                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+                                    onPress: () => {console.log("OK pressed")}
+                                }
+                            ])
+                        })
                     }
                 } else {
-                    Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.yearsValueError, this.props.translation), [
-                        {
-                            text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
-                            onPress: () => {console.log("OK pressed")}
-                        }
-                    ])
+                    this.setState({ loading: false }, () => {
+                        Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), `${getTranslation(translations.alertMessages.requiredFieldsMissingError, this.props.translation)}.\n${getTranslation(translations.alertMessages.missingFields, this.props.translation)}: ${missingFields}`, [
+                            {
+                                text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+                                onPress: () => {this.hideMenu()}
+                            }
+                        ])
+                    })
                 }
             } else {
-                Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), `${getTranslation(translations.alertMessages.requiredFieldsMissingError, this.props.translation)}.\n${getTranslation(translations.alertMessages.missingFields, this.props.translation)}: ${missingFields}`, [
-                    {
-                        text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
-                        onPress: () => {this.hideMenu()}
-                    }
-                ])
+                this.setState({ loading: false }, () => {
+                    Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), `${getTranslation(translations.alertMessages.requiredFieldsMissingError, this.props.translation)}.\n${getTranslation(translations.alertMessages.missingFields, this.props.translation)}: ${relationshipsMissingFields}`, [
+                        {
+                            text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+                            onPress: () => {this.hideMenu()}
+                        }
+                    ])
+                })
             }
-        } else {
-            Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), `${getTranslation(translations.alertMessages.requiredFieldsMissingError, this.props.translation)}.\n${getTranslation(translations.alertMessages.missingFields, this.props.translation)}: ${relationshipsMissingFields}`, [
-                {
-                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
-                    onPress: () => {this.hideMenu()}
-                }
-            ])
-        }
-        
+        })
     };
 
     ageAndDobPrepareForSave = () => {

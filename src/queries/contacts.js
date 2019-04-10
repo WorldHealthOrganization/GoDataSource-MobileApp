@@ -182,6 +182,31 @@ export function getContactsForOutbreakIdRequest (outbreakId, filter, token, call
     }
 }
 
+export function checkForNameDuplicatesRequest (id, firstName, lastName, outbreakId, callback){
+    let database = getDatabase();
+    let start = new Date().getTime();
+
+    database.find({
+        selector: {
+            _id: {
+                $gt: `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT_${outbreakId}_`,
+                $lt: `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT_${outbreakId}_\uffff`,
+                $ne: id
+            },
+            deleted: false,
+            firstName: firstName,
+            lastName: lastName
+        },
+    }).then((resultsContactsName) => {
+        console.log('Result get duplicates name time: ', new Date().getTime() - start);
+        console.log('Result get duplicates name: ', resultsContactsName);
+        callback(null, resultsContactsName.docs)
+    }).catch((errorContactsName) => {
+        console.log('Error when get duplicates name: ', errorContactsName);
+        callback(errorContactsName);
+    })
+}
+
 export function getContactsForFollowUpPeriodRequest (outbreakId, followUpDate, callback) {
     // Filter has followUpDate
     let database = getDatabase();

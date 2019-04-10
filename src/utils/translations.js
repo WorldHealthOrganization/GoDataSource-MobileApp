@@ -280,6 +280,7 @@ const alertMessages = {
     wrongQR: 'The QR code has a bad format',
 
     errorOccuredMsg: 'QR code is not valid',
+    checkForDuplicatesRequestError: 'LNG_ALERT_MESSAGE_CHECK_FOR_DUPLICATES_REQUST_FAIL',
 
     // cases
     caseDeleteConfirmation: 'LNG_DIALOG_ALERT_MESSAGE_ARE_YOU_SURE_YOU_WANT_TO_DELETE_THIS_CASE',
@@ -290,6 +291,8 @@ const alertMessages = {
     contactDeleteExposureConfirmation: 'LNG_DIALOG_ALERT_MESSAGE_ARE_YOU_SURE_YOU_WANT_TO_DELETE_THIS_EXPOSURE',
 
     placeOfResidenceError: 'LNG_DIALOG_ALERT_MESSAGE_PLEASE_ADD_THE_PLACE_OF_RESIDENCE_ADDRESS',
+    contactDuplicateNameError: 'LNG_DIALOG_ALERT_MESSAGE_CONTACT_WITH_DUPLICATE_NAME',
+    caseDuplicateNameError: 'LNG_DIALOG_ALERT_MESSAGE_CASE_WITH_DUPLICATE_NAME',
     dateOfOnsetError: 'LNG_DIALOG_ALERT_MESSAGE_DATE_OF_ISOLATION_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET',
     dateOfOutcomeError: 'LNG_DIALOG_ALERT_MESSAGE_DATE_OF_OUTCOME_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET',
     monthsValueError: 'LNG_DIALOG_ALERT_MESSAGE_NUMBER_OF_MONTHS_MUST_BE_BETWEEN_MESSAGE',

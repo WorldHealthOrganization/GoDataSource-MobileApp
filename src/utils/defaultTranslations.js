@@ -238,6 +238,7 @@ export default {
     'Please make sure you have entered a valid email address': 'Please make sure you have entered a valid email address',
     'No person exists with this information': 'No person exists with this information',
     'QR code is not valid': 'QR code is not valid',
+    'LNG_ALERT_MESSAGE_CHECK_FOR_DUPLICATES_REQUST_FAIL': 'Something went wrong with the database request',
 
     // cases
     'LNG_DIALOG_ALERT_MESSAGE_ARE_YOU_SURE_YOU_WANT_TO_DELETE_THIS_CASE': 'Are you sure you want to delete this case?',
@@ -263,6 +264,8 @@ export default {
 
     // address
     'LNG_DIALOG_ALERT_MESSAGE_PLEASE_ADD_THE_PLACE_OF_RESIDENCE_ADDRESS': 'Please add the place of residence address',
+    'LNG_DIALOG_ALERT_MESSAGE_CONTACT_WITH_DUPLICATE_NAME': 'A contact with this first and last name already exists',
+    'LNG_DIALOG_ALERT_MESSAGE_CASE_WITH_DUPLICATE_NAME': 'A case with this first and last name already exists',
     'LNG_DIALOG_ALERT_MESSAGE_ADD_AT_LEAST_ONE_ADDRESS_WITH_ALL_REQUERED_FIELDS_COMPLETED': 'Please add at least one address with all the required fields completed',
 
     // Delete
