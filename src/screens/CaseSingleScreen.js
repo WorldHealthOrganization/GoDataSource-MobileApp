@@ -139,6 +139,22 @@ class CaseSingleScreen extends Component {
         }, () => {
             console.log('Previous Answers: ', this.state.previousAnswers);
         })
+
+        if (!this.props.isNew) {
+            let ageClone = {years: 0, months: 0}
+            let updateAge = false;
+            if (this.props.case.age === null || this.props.case.age === undefined || (this.props.case.age.years === undefined && this.props.case.age.months === undefined)) {
+                updateAge = true
+            }
+            if (updateAge) {
+                this.setState(prevState => ({
+                    case: Object.assign({}, prevState.case, {age: ageClone}, {dob: this.props.case.dob !== undefined ? this.props.case.dob : null}),
+                }), () => {
+                    console.log ('old case with age as string update')
+                })
+            }
+        }
+
     }
 
     componentWillUnmount() {
@@ -147,19 +163,6 @@ class CaseSingleScreen extends Component {
 
     // Please add here the react lifecycle methods that you need
     static getDerivedStateFromProps(props, state) {
-        // console.log("CaseSingleScreen: ", state, props);
-        if (!props.isNew) {
-            let ageClone = {years: 0, months: 0};
-            let updateAge = false;
-            if (props.case.age === null || props.case.age === undefined || props.case.age.years === undefined || props.case.age.years === null ||
-                props.case.age.months === undefined || props.case.age.months === null) {
-                updateAge = true
-            }
-
-            if (updateAge) {
-                state.case = Object.assign({}, state.case, {age: ageClone}, {dob: props.case.dob !== undefined ? props.case.dob : null});
-            }
-        }
         if (props.errors && props.errors.type && props.errors.message) {
             Alert.alert(props.errors.type, props.errors.message, [
                 {
@@ -172,12 +175,7 @@ class CaseSingleScreen extends Component {
             ])
         } else {
             if (state.savePressed || state.deletePressed) {
-                props.navigator.pop(
-                //     {
-                //     animated: true,
-                //     animationType: 'fade'
-                // }
-                )
+                props.navigator.pop()
             }
         }
 
@@ -754,9 +752,9 @@ class CaseSingleScreen extends Component {
     //View case actions edit/saveEdit/cancelEdit
     onPressEdit = () => {
         this.setState({
-                isEditMode: true,
-                isModified: false,
-                caseBeforeEdit: _.cloneDeep(this.state.case)
+            isEditMode: true,
+            isModified: false,
+            caseBeforeEdit: _.cloneDeep(this.state.case)
         })
     };
     onPressSaveEdit = () => {
@@ -771,7 +769,8 @@ class CaseSingleScreen extends Component {
             })
         } else {
             this.setState({
-                isEditMode: false
+                isEditMode: false,
+                selectedItemIndexForTextSwitchSelectorForAge: this.state.case.dob !== null ? 1 : 0,
             }, () => {
                 console.log("onPressSaveEdit without changes");
             })

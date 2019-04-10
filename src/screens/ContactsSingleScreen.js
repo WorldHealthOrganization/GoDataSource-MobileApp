@@ -140,16 +140,12 @@ class ContactsSingleScreen extends Component {
             ])
         } else {
             if (state.savePressed || state.deletePressed) {
-                props.navigator.pop(
-                //     {
-                //     animated: true,
-                //     animationType: 'fade'
-                // }
-                )
+                if (props.handleUpdateContactFromFollowUp !== undefined && props.handleUpdateContactFromFollowUp !== null){
+                    const { contact } = state
+                    props.handleUpdateContactFromFollowUp(contact)
+                }
+                props.navigator.pop()
             }
-            // if (props.contacts && props.contact !== props.contacts[props.contacts.map((e) => {return e.id}).indexOf(props.contact.id)]) {
-            //     props.contact = props.contacts[props.contacts.map((e) => {return e.id}).indexOf(props.contact.id)];
-            // }
         }
 
         if ((props.isNew === false || props.isNew === undefined) && state.updateExposure === true){
@@ -172,7 +168,7 @@ class ContactsSingleScreen extends Component {
         if (!this.props.isNew) {
             let ageClone = {years: 0, months: 0}
             let updateAge = false;
-            if (this.props.contact.age === null || this.props.contact.age === undefined || this.props.contact.age.years === undefined || this.props.contact.age.years === null || this.props.contact.age.months === undefined || this.props.contact.age.months === null) {
+            if (this.props.contact.age === null || this.props.contact.age === undefined || (this.props.contact.age.years === undefined && this.props.contact.age.months === undefined)) {
                 updateAge = true
             }
             if (updateAge) {
@@ -1228,7 +1224,7 @@ class ContactsSingleScreen extends Component {
                     ])
                 }
             } else {
-                this.setState({ loading: false })
+                this.setState({ loading: false });
                 Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), `${getTranslation(translations.alertMessages.requiredFieldsMissingError, this.props.translation)}.\n${getTranslation(translations.alertMessages.missingFields, this.props.translation)}: ${relationshipsMissingFields}`, [
                     {
                         text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
