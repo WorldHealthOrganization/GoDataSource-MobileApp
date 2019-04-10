@@ -69,7 +69,7 @@ class AddSingleAnswerModalScreen extends Component{
                     }}>
                     <View style={{flex: 0.1}}>
                         <Section
-                            label={'Add new answer'}
+                            label={getTranslation(translations.addSingleAnswerModalScreen.addNewAnswer, this.props.translation)}
                             hasBorderBottom={false}
                             containerStyle={{width: '100%', flex: 1}}
                             translation={this.props.translation}
@@ -156,7 +156,7 @@ class AddSingleAnswerModalScreen extends Component{
             }
             questionnaireAnswers[id][0] = value;
         }
-        console.log('onChangeMultipleSelection after setState', questionnaireAnswers);
+        // console.log('onChangeMultipleSelection after setState', questionnaireAnswers);
         this.props.updateCurrentAnswers(questionnaireAnswers);
     };
 
@@ -182,7 +182,7 @@ class AddSingleAnswerModalScreen extends Component{
             }
             questionnaireAnswers[id][0] = value;
         }
-        console.log('onChangeMultipleSelection after setState', questionnaireAnswers);
+        // console.log('onChangeMultipleSelection after setState', questionnaireAnswers);
         this.props.updateCurrentAnswers(questionnaireAnswers);
     };
 
@@ -208,7 +208,7 @@ class AddSingleAnswerModalScreen extends Component{
             }
             questionnaireAnswers[id][0] = value;
         }
-        console.log('onChangeMultipleSelection after setState', questionnaireAnswers);
+        // console.log('onChangeMultipleSelection after setState', questionnaireAnswers);
         this.props.updateCurrentAnswers(questionnaireAnswers);
     };
 
@@ -234,7 +234,7 @@ class AddSingleAnswerModalScreen extends Component{
             }
             questionnaireAnswers[id][0] = value;
         }
-        console.log('onChangeDateAnswer after setState', questionnaireAnswers);
+        // console.log('onChangeDateAnswer after setState', questionnaireAnswers);
         this.props.updateCurrentAnswers(questionnaireAnswers);
     };
 
