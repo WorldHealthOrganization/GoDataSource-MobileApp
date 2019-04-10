@@ -165,16 +165,9 @@ class FollowUpsScreen extends Component {
     componentDidMount() {
         console.log('Component Did mount');
         BackHandler.addEventListener('hardwareBackPress', this.handleBackButtonClick);
-        this.setState({
-            loading: true,
-            generating: false,
-        }, () => {
-            if (this.props.user && this.props.user.activeOutbreakId) {
-                this.props.getFollowUpsForOutbreakId(this.props.user.activeOutbreakId, this.state.filter, null);
-            }
-        })
+        this.mimeComponentDidMount()
     };
-
+   
     shouldComponentUpdate(nextProps, nextState) {
         if (!nextProps.user) {
             return false;
@@ -206,6 +199,17 @@ class FollowUpsScreen extends Component {
         ])
         return true;
     };
+
+    mimeComponentDidMount = () => {
+        this.setState({
+            loading: true,
+            generating: false,
+        }, () => {
+            if (this.props.user && this.props.user.activeOutbreakId) {
+                this.props.getFollowUpsForOutbreakId(this.props.user.activeOutbreakId, this.state.filter, null);
+            }
+        })
+    }
 
     clampedScroll= Animated.diffClamp(
         Animated.add(
@@ -527,7 +531,9 @@ class FollowUpsScreen extends Component {
                 item: itemClone,
                 contact: contact,
                 filter: this.state.filter,
-                startLoadingScreen: this.startLoadingScreen
+                startLoadingScreen: this.startLoadingScreen,
+                mimeComponentDidMount: this.mimeComponentDidMount
+                
             }
         })
     };
