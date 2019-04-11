@@ -27,6 +27,7 @@
 		2B0143D32176251100E5D306 /* libReactNativePermissions.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2B0143CA217624CC00E5D306 /* libReactNativePermissions.a */; };
 		2B78099AD7F14576A5135193 /* Roboto-MediumItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = D3504A69925041D384B2A509 /* Roboto-MediumItalic.ttf */; };
 		2B7B45CD21C8ED410060111B /* libRNDeviceInfo.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2B7B45BE21C8ECA90060111B /* libRNDeviceInfo.a */; };
+		2B82EC15225F383F00CB9336 /* libReactNativeKeyboardManager.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2B82EC00225F383200CB9336 /* libReactNativeKeyboardManager.a */; };
 		2C4A81880B4540139C4281E7 /* Roboto-Italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A1350BA1254743D0BFE1DC9C /* Roboto-Italic.ttf */; };
 		2D02E4BC1E0B4A80006451C7 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.m */; };
 		2D02E4BD1E0B4A84006451C7 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
@@ -182,6 +183,13 @@
 			proxyType = 2;
 			remoteGlobalIDString = E72EC1401F7ABB5A0001BC90;
 			remoteInfo = "RNDeviceInfo-tvOS";
+		};
+		2B82EBFF225F383200CB9336 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 2B82EBD6225F383100CB9336 /* ReactNativeKeyboardManager.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = A51183591EFAC02F0077C68F;
+			remoteInfo = ReactNativeKeyboardManager;
 		};
 		2D02E4911E0B4A5D006451C7 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -530,6 +538,7 @@
 		2B01432F21761FF500E5D306 /* RNCamera.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNCamera.xcodeproj; path = "../node_modules/react-native-camera/ios/RNCamera.xcodeproj"; sourceTree = "<group>"; };
 		2B01439F217624CB00E5D306 /* ReactNativePermissions.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = ReactNativePermissions.xcodeproj; path = "../node_modules/react-native-permissions/ios/ReactNativePermissions.xcodeproj"; sourceTree = "<group>"; };
 		2B7B458E21C8ECA90060111B /* RNDeviceInfo.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNDeviceInfo.xcodeproj; path = "../node_modules/react-native-device-info/ios/RNDeviceInfo.xcodeproj"; sourceTree = "<group>"; };
+		2B82EBD6225F383100CB9336 /* ReactNativeKeyboardManager.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = ReactNativeKeyboardManager.xcodeproj; path = "../node_modules/react-native-keyboard-manager/ios/ReactNativeKeyboardManager.xcodeproj"; sourceTree = "<group>"; };
 		2D02E47B1E0B4A5D006451C7 /* who_mobile-tvOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "who_mobile-tvOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2D02E4901E0B4A5D006451C7 /* who_mobile-tvOSTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "who_mobile-tvOSTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2D16E6891FA4F8E400B85C8A /* libReact.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libReact.a; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -600,6 +609,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2B82EC15225F383F00CB9336 /* libReactNativeKeyboardManager.a in Frameworks */,
 				F2331CF1222FE8A30082A203 /* libRNReanimated.a in Frameworks */,
 				F265C95A21AD721E0055A97C /* libRNRandomBytes.a in Frameworks */,
 				F2315FB3219601360088153C /* libRNDocumentPicker.a in Frameworks */,
@@ -812,6 +822,14 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		2B82EBD7225F383100CB9336 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				2B82EC00225F383200CB9336 /* libReactNativeKeyboardManager.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		2D16E6871FA4F8E400B85C8A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -876,6 +894,7 @@
 		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
+				2B82EBD6225F383100CB9336 /* ReactNativeKeyboardManager.xcodeproj */,
 				F2331CB4222FE89C0082A203 /* RNReanimated.xcodeproj */,
 				2B7B458E21C8ECA90060111B /* RNDeviceInfo.xcodeproj */,
 				F265C91E21AD720A0055A97C /* RNRandomBytes.xcodeproj */,
@@ -1254,6 +1273,10 @@
 					ProjectRef = 146833FF1AC3E56700842450 /* React.xcodeproj */;
 				},
 				{
+					ProductGroup = 2B82EBD7225F383100CB9336 /* Products */;
+					ProjectRef = 2B82EBD6225F383100CB9336 /* ReactNativeKeyboardManager.xcodeproj */;
+				},
+				{
 					ProductGroup = F2A532C720D7F95F006F1EF1 /* Products */;
 					ProjectRef = F2A532C620D7F95F006F1EF1 /* ReactNativeNavigation.xcodeproj */;
 				},
@@ -1414,6 +1437,13 @@
 			fileType = archive.ar;
 			path = "libRNDeviceInfo-tvOS.a";
 			remoteRef = 2B7B45BF21C8ECA90060111B /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		2B82EC00225F383200CB9336 /* libReactNativeKeyboardManager.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libReactNativeKeyboardManager.a;
+			remoteRef = 2B82EBFF225F383200CB9336 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		2D16E6721FA4F8DC00B85C8A /* libRCTBlob-tvOS.a */ = {

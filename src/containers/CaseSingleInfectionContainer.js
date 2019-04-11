@@ -3,17 +3,17 @@
  */
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
-import React, {Component} from 'react';
-import {View, Text, StyleSheet, Alert, ScrollView, findNodeHandle} from 'react-native';
-import {calculateDimension, getTranslation, extractIdFromPouchId} from './../utils/functions';
+import React, { Component } from 'react';
+import { View, Text, StyleSheet, Alert, ScrollView, findNodeHandle } from 'react-native';
+import { calculateDimension, getTranslation, extractIdFromPouchId } from './../utils/functions';
 import config from './../utils/config';
-import {connect} from "react-redux";
-import {bindActionCreators} from "redux";
+import { connect } from "react-redux";
+import { bindActionCreators } from "redux";
 import styles from './../styles';
 import Ripple from 'react-native-material-ripple';
 import CardComponent from './../components/CardComponent';
 import Button from './../components/Button';
-import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import translations from './../utils/translations'
 import ElevatedView from 'react-native-elevated-view';
 import _ from 'lodash';
@@ -40,12 +40,12 @@ class CaseSingleInfectionContainer extends Component {
     render() {
         // console.log('CaseSingleContainer render Infection');
         return (
-            <View style={{flex: 1}}>
+            <View style={{ flex: 1 }}>
                 <View style={style.container}>
-                    <View style={{flexDirection: 'row'}}>
+                    <View style={{ flexDirection: 'row' }}>
                         {
                             this.props.isNew ? (
-                                <View style={{flexDirection: 'row'}}>
+                                <View style={{ flexDirection: 'row' }}>
                                     <Button
                                         title={getTranslation(translations.generalButtons.backButtonLabel, this.props.translation)}
                                         onPress={this.handleBackButton}
@@ -56,7 +56,7 @@ class CaseSingleInfectionContainer extends Component {
                                         style={{
                                             marginVertical: calculateDimension(12.5, true, this.props.screenSize),
                                             marginHorizontal: calculateDimension(16, false, this.props.screenSize),
-                                        }}/>
+                                        }} />
                                     <Button
                                         title={getTranslation(translations.generalButtons.nextButtonLabel, this.props.translation)}
                                         onPress={this.handleNextButton}
@@ -67,50 +67,50 @@ class CaseSingleInfectionContainer extends Component {
                                         style={{
                                             marginVertical: calculateDimension(12.5, true, this.props.screenSize),
                                             marginHorizontal: calculateDimension(16, false, this.props.screenSize),
-                                        }}/>
+                                        }} />
                                 </View>) : (
                                     this.props.isEditMode ? (
-                                    <View style={{flexDirection: 'row'}}>
-                                        <Button
-                                            title={getTranslation(translations.generalButtons.saveButtonLabel, this.props.translation)}
-                                            onPress={this.props.onPressSaveEdit}
-                                            color={styles.buttonGreen}
-                                            titleColor={'white'}
-                                            height={calculateDimension(25, true, this.props.screenSize)}
-                                            width={calculateDimension(166, false, this.props.screenSize)}
-                                            style={{
-                                                marginVertical: calculateDimension(12.5, true, this.props.screenSize),
-                                                marginRight: 10,
-                                        }}/>
-                                        <Button
-                                            title={getTranslation(translations.generalButtons.cancelButtonLabel, this.props.translation)}
-                                            onPress={this.props.onPressCancelEdit}
-                                            color={styles.buttonGreen}
-                                            titleColor={'white'}
-                                            height={calculateDimension(25, true, this.props.screenSize)}
-                                            width={calculateDimension(166, false, this.props.screenSize)}
-                                            style={{
-                                                marginVertical: calculateDimension(12.5, true, this.props.screenSize),
-                                                marginRight: 10,
-                                        }}/>
-                                    </View>) : (
-                                    this.props.role.find((e) => e === config.userPermissions.writeCase) !== undefined ? (
-                                        <Button
-                                            title={getTranslation(translations.generalButtons.editButtonLabel, this.props.translation)}
-                                            onPress={this.props.onPressEdit}
-                                            color={styles.buttonGreen}
-                                            titleColor={'white'}
-                                            height={calculateDimension(25, true, this.props.screenSize)}
-                                            width={calculateDimension(166, false, this.props.screenSize)}
-                                            style={{
-                                                marginVertical: calculateDimension(12.5, true, this.props.screenSize),
-                                                marginRight: 10,
-                                            }}/>
-                                        ) : null
-                                    ))
+                                        <View style={{ flexDirection: 'row' }}>
+                                            <Button
+                                                title={getTranslation(translations.generalButtons.saveButtonLabel, this.props.translation)}
+                                                onPress={this.props.onPressSaveEdit}
+                                                color={styles.buttonGreen}
+                                                titleColor={'white'}
+                                                height={calculateDimension(25, true, this.props.screenSize)}
+                                                width={calculateDimension(166, false, this.props.screenSize)}
+                                                style={{
+                                                    marginVertical: calculateDimension(12.5, true, this.props.screenSize),
+                                                    marginRight: 10,
+                                                }} />
+                                            <Button
+                                                title={getTranslation(translations.generalButtons.cancelButtonLabel, this.props.translation)}
+                                                onPress={this.props.onPressCancelEdit}
+                                                color={styles.buttonGreen}
+                                                titleColor={'white'}
+                                                height={calculateDimension(25, true, this.props.screenSize)}
+                                                width={calculateDimension(166, false, this.props.screenSize)}
+                                                style={{
+                                                    marginVertical: calculateDimension(12.5, true, this.props.screenSize),
+                                                    marginRight: 10,
+                                                }} />
+                                        </View>) : (
+                                            this.props.role.find((e) => e === config.userPermissions.writeCase) !== undefined ? (
+                                                <Button
+                                                    title={getTranslation(translations.generalButtons.editButtonLabel, this.props.translation)}
+                                                    onPress={this.props.onPressEdit}
+                                                    color={styles.buttonGreen}
+                                                    titleColor={'white'}
+                                                    height={calculateDimension(25, true, this.props.screenSize)}
+                                                    width={calculateDimension(166, false, this.props.screenSize)}
+                                                    style={{
+                                                        marginVertical: calculateDimension(12.5, true, this.props.screenSize),
+                                                        marginRight: 10,
+                                                    }} />
+                                            ) : null
+                                        ))
                         }
                     </View>
-                    <KeyboardAwareScrollView
+                    {/* <KeyboardAwareScrollView
                         style={style.containerScrollView}
                         contentContainerStyle={[style.contentContainerStyle, {paddingBottom: this.props.screenSize.height < 600 ? 70 : 20}]}
                         keyboardShouldPersistTaps={'always'}
@@ -118,6 +118,10 @@ class CaseSingleInfectionContainer extends Component {
                         innerRef={ref => {
                             this.scrollCasesSingleInfection = ref
                         }}
+                    > */}
+                    <ScrollView
+                        style={style.containerScrollView}
+                        contentContainerStyle={[style.contentContainerStyle, { paddingBottom: this.props.screenSize.height < 600 ? 70 : 20 }]}
                     >
                         {
                             config.caseSingleScreen.infection.map((item, index) => {
@@ -133,7 +137,7 @@ class CaseSingleInfectionContainer extends Component {
                         </View>
                         {
                             this.props.isEditMode ? (
-                                <View style={{alignSelf: 'flex-start', marginHorizontal: calculateDimension(16, false, this.props.screenSize), marginVertical: 20}}>
+                                <View style={{ alignSelf: 'flex-start', marginHorizontal: calculateDimension(16, false, this.props.screenSize), marginVertical: 20 }}>
                                     <Ripple
                                         style={{
                                             height: 25,
@@ -141,7 +145,7 @@ class CaseSingleInfectionContainer extends Component {
                                         }}
                                         onPress={this.props.onPressAddDateRange}
                                     >
-                                        <Text style={{fontFamily: 'Roboto-Medium', fontSize: 12, color: styles.buttonGreen}}>
+                                        <Text style={{ fontFamily: 'Roboto-Medium', fontSize: 12, color: styles.buttonGreen }}>
                                             {this.props.case.dateRanges && this.props.case.dateRanges.length === 0 ? getTranslation(translations.caseSingleScreen.oneDateRangeText, this.props.translation) : getTranslation(translations.caseSingleScreen.moreDateRangeText, this.props.translation)}
                                         </Text>
                                     </Ripple>
@@ -149,30 +153,31 @@ class CaseSingleInfectionContainer extends Component {
                             ) : null
                         }
                         {/*<View style={style.container}>*/}
-                            {/*{*/}
-                                {/*this.props.case && this.props.case.isolationDates && this.props.case.isolationDates.map((item, index) => {*/}
-                                    {/*return this.handleRenderItemForIsolationDatesList(item, index)*/}
-                                {/*})*/}
-                            {/*}*/}
+                        {/*{*/}
+                        {/*this.props.case && this.props.case.isolationDates && this.props.case.isolationDates.map((item, index) => {*/}
+                        {/*return this.handleRenderItemForIsolationDatesList(item, index)*/}
+                        {/*})*/}
+                        {/*}*/}
                         {/*</View>*/}
                         {/*{*/}
-                            {/*this.props.isEditMode ? (*/}
-                                {/*<View style={{alignSelf: 'flex-start', marginHorizontal: calculateDimension(16, false, this.props.screenSize), marginVertical: 20}}>*/}
-                                    {/*<Ripple*/}
-                                        {/*style={{*/}
-                                            {/*height: 25,*/}
-                                            {/*justifyContent: 'center'*/}
-                                        {/*}}*/}
-                                        {/*onPress={this.props.onPressAddIsolationDates}*/}
-                                    {/*>*/}
-                                        {/*<Text style={{fontFamily: 'Roboto-Medium', fontSize: 12, color: styles.buttonGreen}}>*/}
-                                            {/*{this.props.case.isolationDates && this.props.case.isolationDates.length === 0 ? getTranslation(translations.caseSingleScreen.oneIsolationDateText, this.props.translation) : getTranslation(translations.caseSingleScreen.moreIsolationDatesText, this.props.translation)}*/}
-                                        {/*</Text>*/}
-                                    {/*</Ripple>*/}
-                                {/*</View>*/}
-                            {/*) : null*/}
+                        {/*this.props.isEditMode ? (*/}
+                        {/*<View style={{alignSelf: 'flex-start', marginHorizontal: calculateDimension(16, false, this.props.screenSize), marginVertical: 20}}>*/}
+                        {/*<Ripple*/}
+                        {/*style={{*/}
+                        {/*height: 25,*/}
+                        {/*justifyContent: 'center'*/}
+                        {/*}}*/}
+                        {/*onPress={this.props.onPressAddIsolationDates}*/}
+                        {/*>*/}
+                        {/*<Text style={{fontFamily: 'Roboto-Medium', fontSize: 12, color: styles.buttonGreen}}>*/}
+                        {/*{this.props.case.isolationDates && this.props.case.isolationDates.length === 0 ? getTranslation(translations.caseSingleScreen.oneIsolationDateText, this.props.translation) : getTranslation(translations.caseSingleScreen.moreIsolationDatesText, this.props.translation)}*/}
+                        {/*</Text>*/}
+                        {/*</Ripple>*/}
+                        {/*</View>*/}
+                        {/*) : null*/}
                         {/*}*/}
-                    </KeyboardAwareScrollView>
+                    </ScrollView>
+                    {/* </KeyboardAwareScrollView> */}
                 </View>
             </View>
         );
@@ -180,8 +185,8 @@ class CaseSingleInfectionContainer extends Component {
 
     // Please write here all the methods that are not react native lifecycle methods
     handleRenderItem = (item) => {
-        let fields = item.fields.map( (field) => {
-            return Object.assign({},field, {isEditMode: this.props.isEditMode})
+        let fields = item.fields.map((field) => {
+            return Object.assign({}, field, { isEditMode: this.props.isEditMode })
         });
 
         if (this.props.case.outcomeId !== config.caseFieldsForHardCodeCheck.outcomeIdDeceasedValue) {
@@ -195,7 +200,7 @@ class CaseSingleInfectionContainer extends Component {
 
     handleRenderItemForDateRangesList = (item, index) => {
         let fields = config.caseSingleScreen.dateRanges.fields.map((field) => {
-            return Object.assign({},field, {isEditMode: this.props.isEditMode})
+            return Object.assign({}, field, { isEditMode: this.props.isEditMode })
         });
         if (this.props && this.props.case && this.props.case.dateRanges && Array.isArray(this.props.case.dateRanges) && this.props.case.dateRanges[index] && this.props.case.dateRanges[index].typeId === config.dateRangeTypes.hospitalization) {
             fields[3].label = translations.caseSingleScreen.dateRangeHospitalName;
@@ -208,7 +213,7 @@ class CaseSingleInfectionContainer extends Component {
 
     handleRenderItemForIsolationDatesList = (item, index) => {
         let fields = config.caseSingleScreen.isolationDate.fields.map((field) => {
-            return Object.assign({},field, {isEditMode: this.props.isEditMode})
+            return Object.assign({}, field, { isEditMode: this.props.isEditMode })
         });
 
         return this.renderItemCardComponent(fields, index)
@@ -222,7 +227,7 @@ class CaseSingleInfectionContainer extends Component {
                 marginVertical: 4,
                 minHeight: calculateDimension(72, true, this.props.screenSize)
             }, style.cardStyle]}>
-                <ScrollView scrollEnabled={false} style={{flex: 1}} contentContainerStyle={{flexGrow: 1}}>
+                <ScrollView scrollEnabled={false} style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }}>
                     {
                         fields && fields.map((item, index) => {
                             return this.handleRenderItemCardComponent(item, index, cardIndex);
@@ -235,7 +240,7 @@ class CaseSingleInfectionContainer extends Component {
 
     handleRenderItemCardComponent = (item, index, cardIndex) => {
         return (
-            <View style={[style.subcontainerCardComponent, {flex: 1}]} key={index}>
+            <View style={[style.subcontainerCardComponent, { flex: 1 }]} key={index}>
                 {
                     this.handleRenderItemByType(item, cardIndex)
                 }
@@ -266,7 +271,7 @@ class CaseSingleInfectionContainer extends Component {
             if (item.objectType === 'DateRanges') {
                 for (let i = 0; i < this.props.locations.length; i++) {
                     let myLocationName = this.getLocationNameById(this.props.locations[i], this.props.case.dateRanges[cardIndex][item.id]);
-                    if (myLocationName !== null){
+                    if (myLocationName !== null) {
                         value = myLocationName;
                         break
                     }
@@ -286,7 +291,7 @@ class CaseSingleInfectionContainer extends Component {
         } else {
             value = this.computeValueForCasesSingleScreen(item, cardIndex);
         }
-        
+
         if (item.type === 'DatePicker' && value === '') {
             value = null
         }
@@ -305,22 +310,22 @@ class CaseSingleInfectionContainer extends Component {
                 minimumDate={minimumDate}
                 maximumDate={maximumDate}
                 index={cardIndex}
-                
+
                 onChangeText={this.props.onChangeText}
                 onChangeDate={this.props.onChangeDate}
                 onChangeSwitch={this.props.onChangeSwitch}
                 onChangeDropDown={this.props.onChangeDropDown}
                 onChangeTextSwitchSelector={this.props.onChangeTextSwitchSelector}
                 onDeletePress={item.objectType !== null && item.objectType !== undefined && item.objectType === 'DateRanges' ?
-                                this.props.handleOnPressDeleteDateRange :
-                                item.objectType !== null && item.objectType !== undefined && item.objectType === 'IsolationDates' ? 
-                                this.props.handleOnPressDeleteIsolationDates : 
-                                null}
+                    this.props.handleOnPressDeleteDateRange :
+                    item.objectType !== null && item.objectType !== undefined && item.objectType === 'IsolationDates' ?
+                        this.props.handleOnPressDeleteIsolationDates :
+                        null}
                 onChangeSectionedDropDown={item.objectType !== null && item.objectType !== undefined && item.objectType === 'DateRanges' ?
-                                this.props.onChangeSectionedDropDownDateRange :
-                                item.objectType !== null && item.objectType !== undefined && item.objectType === 'IsolationDates' ? 
-                                this.props.onChangeSectionedDropDownIsolation : 
-                                null}
+                    this.props.onChangeSectionedDropDownDateRange :
+                    item.objectType !== null && item.objectType !== undefined && item.objectType === 'IsolationDates' ?
+                        this.props.onChangeSectionedDropDownIsolation :
+                        null}
                 onFocus={this.handleOnFocus}
                 onBlur={this.handleOnBlur}
             />
@@ -335,24 +340,24 @@ class CaseSingleInfectionContainer extends Component {
             if (item.id === 'dateBecomeCase' || item.id === 'dateOfOutcome' || item.id === 'dateOfBurial' || item.id === 'dateOfOnset') {
                 maximumDate = new Date()
             } else if (item.id === 'dateOfInfection') {
-                if (this.props.case && this.props.case !== undefined && this.props.case.dateOfOnset && this.props.case.dateOfOnset !== undefined && this.props.case.dateOfOnset !== ''){
+                if (this.props.case && this.props.case !== undefined && this.props.case.dateOfOnset && this.props.case.dateOfOnset !== undefined && this.props.case.dateOfOnset !== '') {
                     maximumDate = new Date(this.props.case.dateOfOnset);
                 } else {
                     maximumDate = new Date()
                 }
             } else if (item.id === 'dateDeceased') {
                 maximumDate = new Date();
-                let hasDateOfOnset = false   
+                let hasDateOfOnset = false
                 let hasDateOfReporting = false;
                 let hasDateOfInfection = false;
 
-                if (this.props.case && this.props.case !== undefined && this.props.case.dateOfOnset && this.props.case.dateOfOnset !== undefined && this.props.case.dateOfOnset !== ''){
+                if (this.props.case && this.props.case !== undefined && this.props.case.dateOfOnset && this.props.case.dateOfOnset !== undefined && this.props.case.dateOfOnset !== '') {
                     hasDateOfOnset = true
                 }
-                if (this.props.case && this.props.case !== undefined && this.props.case.dateOfReporting && this.props.case.dateOfReporting !== undefined && this.props.case.dateOfReporting !== ''){
+                if (this.props.case && this.props.case !== undefined && this.props.case.dateOfReporting && this.props.case.dateOfReporting !== undefined && this.props.case.dateOfReporting !== '') {
                     hasDateOfReporting = true
                 }
-                if (this.props.case && this.props.case !== undefined && this.props.case.dateOfInfection && this.props.case.dateOfInfection !== undefined && this.props.case.dateOfInfection !== ''){
+                if (this.props.case && this.props.case !== undefined && this.props.case.dateOfInfection && this.props.case.dateOfInfection !== undefined && this.props.case.dateOfInfection !== '') {
                     hasDateOfInfection = true
                 }
 
@@ -371,7 +376,7 @@ class CaseSingleInfectionContainer extends Component {
                 } else if (hasDateOfOnset === true && hasDateOfReporting === true && hasDateOfInfection === true) {
                     minimumDate = _.max([this.props.case.dateOfOnset, this.props.case.dateOfReporting, this.props.case.dateOfInfection])
                 }
-            } else if (item.objectType === 'DateRanges'){
+            } else if (item.objectType === 'DateRanges') {
                 if (this.props.case && this.props.case.dateRanges && Array.isArray(this.props.case.dateRanges) && this.props.case.dateRanges.length > 0 && this.props.case.dateRanges[cardIndex]) {
                     if (this.props.case.dateRanges[cardIndex].startDate !== null && item.id !== 'startDate') {
                         minimumDate = this.props.case.dateRanges[cardIndex].startDate
@@ -392,20 +397,20 @@ class CaseSingleInfectionContainer extends Component {
             //     }
             // }
         }
-        
-        let dateValidation = {minimumDate, maximumDate};
+
+        let dateValidation = { minimumDate, maximumDate };
         return dateValidation;
     };
 
     getLocationNameById = (element, locationId) => {
-        if(extractIdFromPouchId(element._id, 'location') === locationId) {
+        if (extractIdFromPouchId(element._id, 'location') === locationId) {
             return element.name;
         } else {
             if (element.children && element.children.length > 0) {
                 let i;
                 let result = null;
 
-                for(i=0; result === null && i < element.children.length; i++){
+                for (i = 0; result === null && i < element.children.length; i++) {
                     result = this.getLocationNameById(element.children[i], locationId);
                 }
                 return result;
@@ -416,44 +421,44 @@ class CaseSingleInfectionContainer extends Component {
 
     computeDataForCasesSingleScreenDropdownInput = (item) => {
         if (item.id === 'typeId' && item.objectType === 'DateRanges') {
-            return _.filter(this.props.referenceData, (o) => {return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_PERSON_DATE_TYPE'})
-                    .sort((a,b) => { return a.order - b.order; })
-                    .map((o) => {return {value: getTranslation(o.value, this.props.translation), id: o.value}})
+            return _.filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_PERSON_DATE_TYPE' })
+                .sort((a, b) => { return a.order - b.order; })
+                .map((o) => { return { value: getTranslation(o.value, this.props.translation), id: o.value } })
         }
         if (item.id === 'riskLevel') {
-            return _.filter(this.props.referenceData, (o) => {return o.active === true && o.categoryId.includes("RISK_LEVEL")})
-                    .sort((a,b) => { return a.order - b.order; })
-                    .map((o) => {return {value: getTranslation(o.value, this.props.translation), id: o.value}})
+            return _.filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId.includes("RISK_LEVEL") })
+                .sort((a, b) => { return a.order - b.order; })
+                .map((o) => { return { value: getTranslation(o.value, this.props.translation), id: o.value } })
         }
         if (item.id === 'gender') {
-            return _.filter(this.props.referenceData, (o) => {return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_GENDER'})
-                    .sort((a,b) => { return a.order - b.order; })
-                    .map((o) => {return {label: getTranslation(o.value, this.props.translation), value: o.value}})
+            return _.filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_GENDER' })
+                .sort((a, b) => { return a.order - b.order; })
+                .map((o) => { return { label: getTranslation(o.value, this.props.translation), value: o.value } })
         }
         if (item.id === 'typeId') {
-            return _.filter(this.props.referenceData, (o) => {return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_ADDRESS_TYPE'})
-                    .sort((a,b) => { return a.order - b.order; })
-                    .map((o) => {return {value: getTranslation(o.value, this.props.translation), id: o.value}})
+            return _.filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_ADDRESS_TYPE' })
+                .sort((a, b) => { return a.order - b.order; })
+                .map((o) => { return { value: getTranslation(o.value, this.props.translation), id: o.value } })
         }
         if (item.id === 'classification') {
-            return _.filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_CASE_CLASSIFICATION'})
-                    .sort((a,b) => { return a.order - b.order; })
-                    .map((o) => {return {label: getTranslation(o.value, this.props.translation), value: o.value}})
+            return _.filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_CASE_CLASSIFICATION' })
+                .sort((a, b) => { return a.order - b.order; })
+                .map((o) => { return { label: getTranslation(o.value, this.props.translation), value: o.value } })
         }
         if (item.id === 'outcomeId') {
-            return _.filter(this.props.referenceData, (o) => {return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_OUTCOME'})
-                    .sort((a,b) => { return a.order - b.order; })
-                    .map((o) => {return {label: getTranslation(o.value, this.props.translation), value: o.value}})
+            return _.filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_OUTCOME' })
+                .sort((a, b) => { return a.order - b.order; })
+                .map((o) => { return { label: getTranslation(o.value, this.props.translation), value: o.value } })
         }
         if (item.id === 'type') {
-            return _.filter(this.props.referenceData, (o) => {return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_DOCUMENT_TYPE'})
-                    .sort((a,b) => { return a.order - b.order; })
-                    .map((o) => {return {label: getTranslation(o.value, this.props.translation), value: o.value}})
+            return _.filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_DOCUMENT_TYPE' })
+                .sort((a, b) => { return a.order - b.order; })
+                .map((o) => { return { label: getTranslation(o.value, this.props.translation), value: o.value } })
         }
         if (item.id === 'occupation') {
-            return _.filter(this.props.referenceData, (o) => {return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_OCCUPATION'})
-                    .sort((a,b) => { return a.order - b.order; })
-                    .map((o) => {return {value: getTranslation(o.value, this.props.translation), id: o.value}})
+            return _.filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_OCCUPATION' })
+                .sort((a, b) => { return a.order - b.order; })
+                .map((o) => { return { value: getTranslation(o.value, this.props.translation), id: o.value } })
         }
     };
 
@@ -477,7 +482,7 @@ class CaseSingleInfectionContainer extends Component {
                     Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.dateOfOnsetError, this.props.translation), [
                         {
                             text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
-                            onPress: () => {console.log("OK pressed")}
+                            onPress: () => { console.log("OK pressed") }
                         }
                     ])
                 }
@@ -485,15 +490,15 @@ class CaseSingleInfectionContainer extends Component {
                 Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.dateOfOutcomeError, this.props.translation), [
                     {
                         text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
-                        onPress: () => {console.log("OK pressed")}
+                        onPress: () => { console.log("OK pressed") }
                     }
                 ])
             }
         } else {
             Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), `${getTranslation(translations.alertMessages.requiredFieldsMissingError, this.props.translation)}.\n${getTranslation(translations.alertMessages.missingFields, this.props.translation)}: ${missingFields}`, [
                 {
-                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation), 
-                    onPress: () => {console.log("OK pressed")}
+                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+                    onPress: () => { console.log("OK pressed") }
                 }
             ])
         }
@@ -504,17 +509,17 @@ class CaseSingleInfectionContainer extends Component {
     };
 
     handleOnFocus = (event) => {
-        this.scrollToInput(findNodeHandle(event.target))
+        // this.scrollToInput(findNodeHandle(event.target))
     };
 
-    handleOnBlur = (event) =>{
-        this.scrollCasesSingleInfection.props.scrollToPosition(0, 0, false)
-        this.scrollToInput(findNodeHandle(event.target))
+    handleOnBlur = (event) => {
+        // this.scrollCasesSingleInfection.props.scrollToPosition(0, 0, false)
+        // this.scrollToInput(findNodeHandle(event.target))
     }
 
-    scrollToInput (reactNode) {
+    scrollToInput(reactNode) {
         // Add a 'scroll' ref to your ScrollView
-        this.scrollCasesSingleInfection.props.scrollToFocusedInput(reactNode)
+        // this.scrollCasesSingleInfection.props.scrollToFocusedInput(reactNode)
     };
 }
 

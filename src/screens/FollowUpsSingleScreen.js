@@ -67,7 +67,7 @@ class FollowUpsSingleScreen extends Component {
         let isEditMode = true;
 
         if (this.props.isNew === false) {
-            if (this.props.role.find((e) => e === config.userPermissions.writeFollowUp) !== undefined) {
+            if (this.props.role && this.props.role.find((e) => e === config.userPermissions.writeFollowUp) !== undefined) {
                 let today = new Date()
                 let itemDate = new Date(this.props.item.date)
         
@@ -78,7 +78,7 @@ class FollowUpsSingleScreen extends Component {
                     console.log('follow-ups date < today => needitabil')
                     isEditMode = false
                 }
-            } else if (this.props.role.find((e) => e === config.userPermissions.writeFollowUp) === undefined && this.props.role.find((e) => e === config.userPermissions.readFollowUp) !== undefined){
+            } else if (this.props.role && this.props.role.find((e) => e === config.userPermissions.writeFollowUp) === undefined && this.props.role.find((e) => e === config.userPermissions.readFollowUp) !== undefined){
                 isEditMode = false
             }
         }
@@ -201,7 +201,7 @@ class FollowUpsSingleScreen extends Component {
                                     </Ripple>
                                 </ElevatedView> 
                                 {
-                                    this.props.role.find((e) => e === config.userPermissions.writeFollowUp) !== undefined ? (
+                                    this.props.role && this.props.role.find((e) => e === config.userPermissions.writeFollowUp) !== undefined ? (
                                         <View>
                                             <Menu
                                                 ref="menuRef"
