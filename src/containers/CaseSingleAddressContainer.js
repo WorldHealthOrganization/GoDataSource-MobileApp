@@ -138,7 +138,7 @@ class CaseSingleAddressContainer extends PureComponent {
                     </View>
                     {/* <KeyboardAwareScrollView
                         style={style.containerScrollView}
-                        contentContainerStyle={[style.contentContainerStyle, {paddingBottom: this.props.screenSize.height < 600 ? 70 : 20}]}
+                        contentContainerStyle={[style.contentContainerStyle, { paddingBottom: this.props.screenSize.height < 600 ? 70 : 20 }]}
                         keyboardShouldPersistTaps={'always'}
                         extraHeight={20 + 81 + 50 + 70}
                         innerRef={ref => {
@@ -350,7 +350,7 @@ class CaseSingleAddressContainer extends PureComponent {
     handleNextButton = () => {
         let missingFields = this.props.checkRequiredFieldsAddresses();
         if (missingFields && Array.isArray(missingFields) && missingFields.length === 0) {
-            if (this.props.hasPlaceOfResidence) {
+            if (this.props.case.addresses.length === 0 || (this.props.case.addresses.length > 0 && this.props.hasPlaceOfResidence)) {
                 this.props.handleMoveToNextScreenButton(true)
             } else {
                 Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.alertMessages.addressOfResidenceError, this.props.translation), [
@@ -381,7 +381,7 @@ class CaseSingleAddressContainer extends PureComponent {
     handleOnBlur = (event) => {
         // this.scrollCasesSingleAddress.props.scrollToPosition(0, 0, false)
         // this.scrollToInput(findNodeHandle(event.target))
-    }
+    };
 
     scrollToInput(reactNode) {
         // Add a 'scroll' ref to your ScrollView
