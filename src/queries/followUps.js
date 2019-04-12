@@ -7,7 +7,7 @@ import {generateId} from './../utils/functions';
 import moment from 'moment';
 
 // Credentials: {email, encryptedPassword}
-export function getFollowUpsForOutbreakIdRequest (outbreakId, filter, token, callback) {
+export function getFollowUpsForOutbreakIdRequest (outbreakId, filter, userTeams, token, callback) {
     let database = getDatabase();
 
     // Possible filters here are date and type, but we're not going to focus on type(to do, missed) since that can be mapped on the component
@@ -51,7 +51,13 @@ export function getFollowUpsForOutbreakIdRequest (outbreakId, filter, token, cal
     })
         .then((resultFind) => {
             console.log('Result for find time for followUps: ', new Date().getTime() - start);
-            callback(null, resultFind.docs)
+            let followUpList = resultFind.docs
+            if (userTeams !== null && userTeams !== undefined && Array.isArray(userTeams) && userTeams.length > 0) {
+                followUpList = followUpList.filter((e) => {
+                    return userTeams.indexOf(e.teamId) >= 0 || e.teamId === undefined || e.teamId === null
+                })
+            }
+            callback(null, followUpList)
         })
         .catch((errorFind) => {
             console.log('Error find for followUps: ', errorFind);
@@ -181,7 +187,7 @@ export function addFollowUpsBulkRequest (followUps, callback) {
         })
 }
 
-export function getFollowUpsForContactRequest (outbreakId, keys, contactFollowUp, callback) {
+export function getFollowUpsForContactRequest (outbreakId, keys, contactFollowUp, userTeams, callback) {
     let database = getDatabase();
 
     console.log("getCasesForOutbreakIdRequest: ", outbreakId, keys);
@@ -205,7 +211,11 @@ export function getFollowUpsForContactRequest (outbreakId, keys, contactFollowUp
     })
         .then((result) => {
             console.log('getFollowUpsForContactRequest request: ');
-            callback(null, result.docs)
+            let followUpList = result.docs
+            if (userTeams !== null && userTeams !== undefined && Array.isArray(userTeams) && userTeams.length > 0) {
+                followUpList = followUpList.filter((e) => userTeams.indexOf(e.teamId) >= 0 || e.teamId === undefined || e.teamId === null)
+            }
+            callback(null, followUpList)
         })
         .catch((error) => {
             console.log('getFollowUpsForContactRequest error: ', error);
