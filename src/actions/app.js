@@ -844,7 +844,6 @@ export function sendDatabaseToServer () {
                     if (lastSyncDate !== null) {
                         console.log('lastSyncDate: ', lastSyncDate);
                         // If we also have the lastSyncDate, we should move on to create the files to be synced
-                        let database = getDatabase();
 
                         let internetCredentials = await getInternetCredentials(activeDatabase);
                         if (internetCredentials) {
@@ -858,6 +857,7 @@ export function sendDatabaseToServer () {
                                 try {
                                     let credentials = JSON.parse(internetCredentials.username);
                                     let password = credentials.encryptedData ? getSyncEncryptPassword(null, credentials) : null;
+                                    let database = await getDatabase(config.changingMongoCollections[i]);
                                     let status = await getDataFromDatabaseFromFile(database, config.changingMongoCollections[i], lastSyncDate, password);
                                     // if (status) {
                                         statusArray.push(status);

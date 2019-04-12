@@ -722,19 +722,22 @@ function extractFromDatabase(database, fileType, lastSyncDate, startKey) {
 
 export function getDataFromDatabaseFromFile (database, fileType, lastSyncDate, password) {
     return new Promise((resolve, reject) => {
+        fileType = `${fileType}.json`;
+        let start = new Date().getTime();
         database.find({
             selector: {
-                _id: {
-                    $gte: `${fileType}_`,
-                    $lte: `${fileType}_\uffff`
-                },
-                fileType: {$eq: fileType},
+                // _id: {
+                //     $gte: `${fileType}_`,
+                //     $lte: `${fileType}_\uffff`
+                // },
+                // fileType: {$eq: fileType},
                 updatedAt: {$gte: lastSyncDate}
             }
         })
             .then((response) => {
                 // Now that we have some files, we should recreate the mongo collections
                 // If there are more than 1000 collections split in chunks of 1000 records
+                console.log('GetDataFromDatabaseFromFile query time: ', new Date().getTime() - start);
                 let responseArray = response.docs.map((e) => {
                     delete e._rev;
                     e._id = extractIdFromPouchId(e._id, fileType);
