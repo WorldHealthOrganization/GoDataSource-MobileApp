@@ -922,22 +922,24 @@ class CaseSingleScreen extends Component {
         let addresses = _.cloneDeep(this.state.case.addresses);
         addresses[index].locationId = extractIdFromPouchId(selectedItems['0']._id, 'location');
         if (selectedItems['0'].geoLocation && selectedItems['0'].geoLocation.coordinates && Array.isArray(selectedItems['0'].geoLocation.coordinates)) {
-            setTimeout(() => {
-                Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.alertMessages.replaceCurrentCoordinates, this.props.translation), [
-                    {
-                        text: getTranslation(translations.alertMessages.cancelButtonLabel, this.props.translation), onPress: () => {console.log('Cancel pressed')}
-                    },
-                    {
-                        text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation), onPress: () => {
-                            addresses[index].geoLocation = selectedItems['0'].geoLocation;
-                            console.log('Addresses biatch: ', addresses);
-                            this.setState(prevState => ({
-                                case: Object.assign({}, prevState.case, {addresses})
-                            }))
+            if (selectedItems['0'].geoLocation.coordinates[0] !== 0 || selectedItems['0'].geoLocation.coordinates[1] !== 0){
+                setTimeout(() => {
+                    Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.alertMessages.replaceCurrentCoordinates, this.props.translation), [
+                        {
+                            text: getTranslation(translations.alertMessages.cancelButtonLabel, this.props.translation), onPress: () => {console.log('Cancel pressed')}
+                        },
+                        {
+                            text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation), onPress: () => {
+                                addresses[index].geoLocation = selectedItems['0'].geoLocation;
+                                console.log('Addresses biatch: ', addresses);
+                                this.setState(prevState => ({
+                                    case: Object.assign({}, prevState.case, {addresses})
+                                }))
+                            }
                         }
-                    }
-                ])
-            }, 200);
+                    ])
+                }, 200);
+            }
         } else {
             console.log('Addresses biatch: ', addresses);
             this.setState(prevState => ({
