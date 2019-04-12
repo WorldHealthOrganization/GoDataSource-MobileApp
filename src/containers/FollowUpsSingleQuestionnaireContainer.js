@@ -3,7 +3,7 @@
  */
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
-import React, {PureComponent} from 'react';
+import React, { PureComponent } from 'react';
 import {
     View,
     StyleSheet,
@@ -11,19 +11,20 @@ import {
     Alert,
     TouchableWithoutFeedback,
     Keyboard,
-    findNodeHandle
+    findNodeHandle,
+    ScrollView
 } from 'react-native';
-import {calculateDimension, extractAllQuestions, getTranslation, checkRequiredQuestions} from './../utils/functions';
+import { calculateDimension, extractAllQuestions, getTranslation, checkRequiredQuestions } from './../utils/functions';
 import config from './../utils/config';
-import {connect} from "react-redux";
-import {bindActionCreators} from "redux";
+import { connect } from "react-redux";
+import { bindActionCreators } from "redux";
 import styles from './../styles';
 import QuestionCard from './../components/QuestionCard';
-import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import Button from './../components/Button';
-import {LoaderScreen} from 'react-native-ui-lib';
+import { LoaderScreen } from 'react-native-ui-lib';
 import Section from './../components/Section';
-import {sortBy} from 'lodash';
+import { sortBy } from 'lodash';
 import translations from './../utils/translations'
 import cloneDeep from "lodash/cloneDeep";
 
@@ -97,9 +98,9 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
-        if(!this.state.interactionComplete) {
+        if (!this.state.interactionComplete) {
             return (
-                <LoaderScreen overlay={true} backgroundColor={'white'}/>
+                <LoaderScreen overlay={true} backgroundColor={'white'} />
             )
         }
         // console.log('FollowUpsSingleContainer render Questionnaire');
@@ -111,11 +112,11 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
         let viewWidth = calculateDimension(config.designScreenSize.width - 32, false, this.props.screenSize);
 
         return (
-            <View style={{flex: 1}}>
+            <View style={{ flex: 1 }}>
                 <View style={style.mainContainer}>
                     {
                         this && this.props && this.props.isEditMode ? (
-                            <View style={[style.containerButtons, {marginVertical: marginVertical, width: viewWidth}]}>
+                            <View style={[style.containerButtons, { marginVertical: marginVertical, width: viewWidth }]}>
                                 <Button
                                     title={getTranslation(translations.generalButtons.saveButtonLabel, this.props.translation)}
                                     onPress={this.onPressSave}
@@ -126,7 +127,7 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
                                 />
                             </View>) : (null)
                     }
-                    <KeyboardAwareScrollView
+                    {/* <KeyboardAwareScrollView
                         style={style.container}
                         contentContainerStyle={[style.contentContainerStyle, {paddingBottom: this.props.screenSize.height < 600 ? 70 : 20}]}
                         keyboardShouldPersistTaps={'always'}
@@ -134,13 +135,18 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
                         innerRef={ref => {
                             this.scrollFollowUpsSingleQuestionnaire = ref
                         }}
+                    > */}
+                    <ScrollView
+                        style={style.containerScrollView}
+                        contentContainerStyle={[style.contentContainerStyle, { paddingBottom: this.props.screenSize.height < 600 ? 70 : 20 }]}
                     >
                         {
                             this.state && this.state.questions && Array.isArray(this.state.questions) && this.state.questions.length > 0 && this.state.questions.map((item, index) => {
                                 return this.handleRenderItem(item, index, this.state.questions.length);
                             })
                         }
-                    </KeyboardAwareScrollView>
+                    </ScrollView>
+                    {/* </KeyboardAwareScrollView> */}
                 </View>
             </View>
         );
@@ -148,7 +154,7 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
 
     // Please write here all the methods that are not react native lifecycle methods
     handleRenderItem = (item, index, totalNumberOfQuestions) => {
-        if (item.inactive === false ) {
+        if (item.inactive === false) {
             return (
                 <QuestionCard
                     item={item}
@@ -173,32 +179,32 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
     onPressSave = () => {
         // First check if all the required questions are filled
         let checkRequiredFields = checkRequiredQuestions(this.state.questions, this.props.previousAnswers);
-        checkRequiredFields = checkRequiredFields.map((e) => {return getTranslation(e, this.props.translation)});
+        checkRequiredFields = checkRequiredFields.map((e) => { return getTranslation(e, this.props.translation) });
         console.log("Check required questions: ", checkRequiredFields);
         if (checkRequiredFields && Array.isArray(checkRequiredFields) && checkRequiredFields.length === 0) {
             this.props.onPressSave();
         } else {
             Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), `${getTranslation(translations.alertMessages.requiredFieldsMissingError, this.props.translation)}.\n${getTranslation(translations.alertMessages.missingFields, this.props.translation)}: ${checkRequiredFields}`, [
                 {
-                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation), 
-                    onPress: () => {console.log("OK pressed")}
+                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+                    onPress: () => { console.log("OK pressed") }
                 }
             ])
         }
     };
 
     handleOnFocus = (event) => {
-        this.scrollToInput(findNodeHandle(event.target))
+        // this.scrollToInput(findNodeHandle(event.target))
     };
 
-    handleOnBlur = (event) =>{
-        this.scrollFollowUpsSingleQuestionnaire.props.scrollToPosition(0, 0, false)
-        this.scrollToInput(findNodeHandle(event.target))
+    handleOnBlur = (event) => {
+        // this.scrollFollowUpsSingleQuestionnaire.props.scrollToPosition(0, 0, false)
+        // this.scrollToInput(findNodeHandle(event.target))
     };
 
-    scrollToInput (reactNode) {
+    scrollToInput(reactNode) {
         // Add a 'scroll' ref to your ScrollView
-        this.scrollFollowUpsSingleQuestionnaire.props.scrollToFocusedInput(reactNode)
+        // this.scrollFollowUpsSingleQuestionnaire.props.scrollToFocusedInput(reactNode)
     };
 }
 

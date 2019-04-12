@@ -92,6 +92,8 @@ class QuestionCard extends PureComponent {
                     isEditMode={this.props.isEditMode}
                     onChangeAnswerDate={this.props.onChangeAnswerDate}
                     editableQuestionDate={this.props.editableQuestionDate}
+                    onFocus={this.props.onFocus}
+                    onBlur={this.props.onBlur}
                 >
                     <View
                         style={{

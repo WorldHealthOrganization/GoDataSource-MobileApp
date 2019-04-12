@@ -136,7 +136,7 @@ class CaseSingleAddressContainer extends PureComponent {
                                         ))
                         }
                     </View>
-                    <KeyboardAwareScrollView
+                    {/* <KeyboardAwareScrollView
                         style={style.containerScrollView}
                         contentContainerStyle={[style.contentContainerStyle, { paddingBottom: this.props.screenSize.height < 600 ? 70 : 20 }]}
                         keyboardShouldPersistTaps={'always'}
@@ -144,6 +144,10 @@ class CaseSingleAddressContainer extends PureComponent {
                         innerRef={ref => {
                             this.scrollCasesSingleAddress = ref
                         }}
+                    > */}
+                    <ScrollView
+                        style={style.containerScrollView}
+                        contentContainerStyle={[style.contentContainerStyle, { paddingBottom: this.props.screenSize.height < 600 ? 70 : 20 }]}
                     >
                         <View style={style.container}>
                             {
@@ -154,7 +158,9 @@ class CaseSingleAddressContainer extends PureComponent {
                         </View>
                         {
                             this.props.isEditMode ? (
-                                <View style={{ alignSelf: 'flex-start', marginHorizontal: calculateDimension(16, false, this.props.screenSize), marginVertical: 20 }}>
+                                <View style={{ alignSelf: 'flex-start', 
+                                    marginHorizontal: calculateDimension(16, false, this.props.screenSize), 
+                                    marginVertical: 20 }}>
                                     <Ripple
                                         style={{
                                             height: 25,
@@ -169,9 +175,10 @@ class CaseSingleAddressContainer extends PureComponent {
                                 </View>
                             ) : null
                         }
-                    </KeyboardAwareScrollView>
+                    </ScrollView>
+                    {/* </KeyboardAwareScrollView> */}
                 </View>
-            </View>
+            </View >
         );
     }
 
@@ -368,17 +375,17 @@ class CaseSingleAddressContainer extends PureComponent {
     };
 
     handleOnFocus = (event) => {
-        this.scrollToInput(findNodeHandle(event.target))
+        // this.scrollToInput(findNodeHandle(event.target))
     };
 
     handleOnBlur = (event) => {
-        this.scrollCasesSingleAddress.props.scrollToPosition(0, 0, false)
-        this.scrollToInput(findNodeHandle(event.target))
-    }
+        // this.scrollCasesSingleAddress.props.scrollToPosition(0, 0, false)
+        // this.scrollToInput(findNodeHandle(event.target))
+    };
 
     scrollToInput(reactNode) {
         // Add a 'scroll' ref to your ScrollView
-        this.scrollCasesSingleAddress.props.scrollToFocusedInput(reactNode)
+        // this.scrollCasesSingleAddress.props.scrollToFocusedInput(reactNode)
     };
 }
 

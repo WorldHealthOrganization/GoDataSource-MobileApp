@@ -98,7 +98,7 @@ class ContactsSingleAddress extends PureComponent {
                             }} />
                     </View>
 
-                    <KeyboardAwareScrollView
+                    {/* <KeyboardAwareScrollView
                         style={style.containerScrollView}
                         contentContainerStyle={[style.contentContainerStyle, { paddingBottom: this.props.screenSize.height < 600 ? 70 : 20 }]}
                         keyboardShouldPersistTaps={'always'}
@@ -106,34 +106,39 @@ class ContactsSingleAddress extends PureComponent {
                         innerRef={ref => {
                             this.scrollContactsSingleAddress = ref
                         }}
+                    > */}
+                    <ScrollView
+                        style={style.containerScrollView}
+                        contentContainerStyle={[style.contentContainerStyle, { paddingBottom: this.props.screenSize.height < 600 ? 70 : 20 }]}
                     >
-                        <View style={style.container}>
-                            {
-                                this.props.contact && this.props.contact.addresses && this.props.contact.addresses.map((item, index) => {
-                                    return this.handleRenderItem(item, index)
-                                })
-                            }
-                        </View>
+                    <View style={style.container}>
                         {
-                            this.props.isEditMode !== null && this.props.isEditMode !== undefined && this.props.isEditMode === true ? (
-                                <View style={{ alignSelf: 'flex-start', marginHorizontal: calculateDimension(16, false, this.props.screenSize), marginVertical: 20 }}>
-                                    <Ripple
-                                        style={{
-                                            height: 25,
-                                            justifyContent: 'center'
-                                        }}
-                                        onPress={this.props.onPressAddAdrress}
-                                    >
-                                        <Text style={{ fontFamily: 'Roboto-Medium', fontSize: 12, color: styles.buttonGreen }}>
-                                            {this.props.contact.addresses && this.props.contact.addresses.length === 0 ? getTranslation(translations.contactSingleScreen.oneAddressText, this.props.translation) : getTranslation(translations.contactSingleScreen.moreAddressesText, this.props.translation)}
-                                        </Text>
-                                    </Ripple>
-                                </View>
-                            ) : null
+                            this.props.contact && this.props.contact.addresses && this.props.contact.addresses.map((item, index) => {
+                                return this.handleRenderItem(item, index)
+                            })
                         }
-                    </KeyboardAwareScrollView>
+                    </View>
+                    {
+                        this.props.isEditMode !== null && this.props.isEditMode !== undefined && this.props.isEditMode === true ? (
+                            <View style={{ alignSelf: 'flex-start', marginHorizontal: calculateDimension(16, false, this.props.screenSize), marginVertical: 20 }}>
+                                <Ripple
+                                    style={{
+                                        height: 25,
+                                        justifyContent: 'center'
+                                    }}
+                                    onPress={this.props.onPressAddAdrress}
+                                >
+                                    <Text style={{ fontFamily: 'Roboto-Medium', fontSize: 12, color: styles.buttonGreen }}>
+                                        {this.props.contact.addresses && this.props.contact.addresses.length === 0 ? getTranslation(translations.contactSingleScreen.oneAddressText, this.props.translation) : getTranslation(translations.contactSingleScreen.moreAddressesText, this.props.translation)}
+                                    </Text>
+                                </Ripple>
+                            </View>
+                        ) : null
+                    }
+                    </ScrollView>
+                    {/* </KeyboardAwareScrollView> */}
                 </View>
-            </TouchableWithoutFeedback>
+            </TouchableWithoutFeedback >
         );
     }
 
@@ -299,6 +304,7 @@ class ContactsSingleAddress extends PureComponent {
         if (this.props.isNew) {
             let missingFields = this.props.checkRequiredFieldsAddresses();
             if (missingFields && Array.isArray(missingFields) && missingFields.length === 0) {
+
                 if (this.props.contact.addresses.length === 0 || (this.props.contact.addresses.length > 0 && this.props.hasPlaceOfResidence === true)) {
                     this.props.handleMoveToNextScreenButton(true)
                 } else {
@@ -327,17 +333,17 @@ class ContactsSingleAddress extends PureComponent {
     };
 
     handleOnFocus = (event) => {
-        this.scrollToInput(findNodeHandle(event.target))
+        // this.scrollToInput(findNodeHandle(event.target))
     };
 
     handleOnBlur = (event) => {
-        this.scrollContactsSingleAddress.props.scrollToPosition(0, 0, false)
-        this.scrollToInput(findNodeHandle(event.target))
+        // this.scrollContactsSingleAddress.props.scrollToPosition(0, 0, false)
+        // this.scrollToInput(findNodeHandle(event.target))
     }
 
     scrollToInput(reactNode) {
         // Add a 'scroll' ref to your ScrollView
-        this.scrollContactsSingleAddress.props.scrollToFocusedInput(reactNode)
+        // this.scrollContactsSingleAddress.props.scrollToFocusedInput(reactNode)
     }
 }
 
