@@ -6,40 +6,40 @@
  */
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
-import React, {Component} from 'react';
-import {View, Text, StyleSheet, Alert, Animated, NativeModules, BackHandler} from 'react-native';
-import {Button, Icon} from 'react-native-material-ui';
+import React, { Component } from 'react';
+import { View, Text, StyleSheet, Alert, Animated, NativeModules, BackHandler } from 'react-native';
+import { Button, Icon } from 'react-native-material-ui';
 import styles from './../styles';
 import NavBarCustom from './../components/NavBarCustom';
 import CalendarPicker from './../components/CalendarPicker';
 import config from './../utils/config';
 import Ripple from 'react-native-material-ripple';
-import {connect} from "react-redux";
-import {bindActionCreators} from "redux";
+import { connect } from "react-redux";
+import { bindActionCreators } from "redux";
 import SearchFilterView from './../components/SearchFilterView';
 import FollowUpListItem from './../components/FollowUpListItem';
 import MissedFollowUpListItem from './../components/MissedFollowUpListItem';
 import AnimatedListView from './../components/AnimatedListView';
 import Breadcrumb from './../components/Breadcrumb';
-import Menu, {MenuItem} from 'react-native-material-menu';
+import Menu, { MenuItem } from 'react-native-material-menu';
 import ValuePicker from './../components/ValuePicker';
-import {getFollowUpsForOutbreakId, getMissedFollowUpsForOutbreakId, updateFollowUpAndContact, addFollowUp, generateFollowUp} from './../actions/followUps';
-import {getContactsForOutbreakId} from './../actions/contacts';
-import {removeErrors} from './../actions/errors';
-import {addFilterForScreen, removeFilterForScreen, saveGeneratedFollowUps} from './../actions/app';
+import { getFollowUpsForOutbreakId, getMissedFollowUpsForOutbreakId, updateFollowUpAndContact, addFollowUp, generateFollowUp } from './../actions/followUps';
+import { getContactsForOutbreakId } from './../actions/contacts';
+import { removeErrors } from './../actions/errors';
+import { addFilterForScreen, removeFilterForScreen, saveGeneratedFollowUps } from './../actions/app';
 import ElevatedView from 'react-native-elevated-view';
 import _ from 'lodash';
 import AddFollowUpScreen from './AddFollowUpScreen';
 import GenerateFollowUpScreen from './GenerateFollowUpScreen';
-import {LoaderScreen, Colors} from 'react-native-ui-lib';
-import {calculateDimension, navigation, extractIdFromPouchId, generateId, updateRequiredFields, getTranslation, localSortContactsForFollowUps, objSort} from './../utils/functions';
+import { LoaderScreen, Colors } from 'react-native-ui-lib';
+import { calculateDimension, navigation, extractIdFromPouchId, generateId, updateRequiredFields, getTranslation, localSortContactsForFollowUps, objSort } from './../utils/functions';
 import ViewHOC from './../components/ViewHOC';
 import { Popup } from 'react-native-map-link';
 import moment from 'moment';
 import translations from './../utils/translations'
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-import {getItemByIdRequest} from './../queries/cases';
-import {pushNewEditScreen} from './../utils/screenTransitionFunctions';
+import { getItemByIdRequest } from './../queries/cases';
+import { pushNewEditScreen } from './../utils/screenTransitionFunctions';
 import RNExitApp from 'react-native-exit-app';
 
 const scrollAnim = new Animated.Value(0);
@@ -94,7 +94,7 @@ class FollowUpsScreen extends Component {
         if (props.errors && props.errors.type && props.errors.message) {
             Alert.alert(props.errors.type, props.errors.message, [
                 {
-                    text: getTranslation(translations.alertMessages.okButtonLabel, props.translation), 
+                    text: getTranslation(translations.alertMessages.okButtonLabel, props.translation),
                     onPress: () => {
                         props.removeErrors();
                         state.loading = false;
@@ -114,7 +114,7 @@ class FollowUpsScreen extends Component {
                 contactsCopy = objSort(contactsCopy, ['lastName', false])
             }
 
-            for (let i=0; i < contactsCopy.length; i++) {
+            for (let i = 0; i < contactsCopy.length; i++) {
                 if (contactsCopy[i].followUps) {
                     fUps = fUps.concat(contactsCopy[i].followUps);
                 }
@@ -124,7 +124,7 @@ class FollowUpsScreen extends Component {
             // Now filter the followUps by type (All/To do/Missed)
             // let oneDay = 24 * 60 * 60 * 1000;
             if (state.filter && state.filter.performed && state.filter.performed.value && state.filter.performed.value !== 'All') {
-                fUps = fUps.filter((e) => {return e.statusId === state.filter.performed.value});
+                fUps = fUps.filter((e) => { return e.statusId === state.filter.performed.value });
             }
 
             if (props.followUps && props.followUps.length > 0) {
@@ -154,8 +154,8 @@ class FollowUpsScreen extends Component {
             // }
             // console.log(`Before making it false: state.refreshing - ${state.refreshing},  state.loading - ${state.loading}`);
             // setTimeout(() => {
-                state.refreshing = false;
-                state.loading = false;
+            state.refreshing = false;
+            state.loading = false;
             // }, 200);
         }
         console.log(`Before making it false: state.refreshing - ${state.refreshing},  state.loading - ${state.loading}`);
@@ -167,7 +167,7 @@ class FollowUpsScreen extends Component {
         BackHandler.addEventListener('hardwareBackPress', this.handleBackButtonClick);
         this.mimeComponentDidMount()
     };
-   
+
     shouldComponentUpdate(nextProps, nextState) {
         if (!nextProps.user) {
             return false;
@@ -178,7 +178,7 @@ class FollowUpsScreen extends Component {
 
         return true;
     };
-    
+
     componentWillUnmount() {
         BackHandler.removeEventListener('hardwareBackPress', this.handleBackButtonClick);
     };
@@ -211,7 +211,7 @@ class FollowUpsScreen extends Component {
         })
     }
 
-    clampedScroll= Animated.diffClamp(
+    clampedScroll = Animated.diffClamp(
         Animated.add(
             scrollAnim.interpolate({
                 inputRange: [0, 1],
@@ -225,8 +225,8 @@ class FollowUpsScreen extends Component {
     );
 
     handleScroll = Animated.event(
-        [{nativeEvent: {contentOffset: {y: scrollAnim}}}],
-        {useNativeDriver: true}
+        [{ nativeEvent: { contentOffset: { y: scrollAnim } } }],
+        { useNativeDriver: true }
     );
 
     // The render method should have at least business logic as possible,
@@ -257,17 +257,17 @@ class FollowUpsScreen extends Component {
             }
         }
         let filterText = filterNumbers === 0 ? `${getTranslation(translations.generalLabels.filterTitle, this.props.translation)}` : `${getTranslation(translations.generalLabels.filterTitle, this.props.translation)}(${filterNumbers})`
-       
+
         let followUpTitle = []; followUpTitle[0] = getTranslation(translations.followUpsScreen.followUpsTitle, this.props.translation);
         console.log(`Refreshing: ${this.state.refreshing}   Loading: ${this.state.loading}`);
         return (
             <ViewHOC style={style.container}
-                     showLoader={(this.props && this.props.syncState && ((this.props.syncState.id === 'sync' && this.props.syncState.status !== null && this.props.syncState.status !== 'Success') && this.props.syncState.status !== 'Error')) || (this && this.state && this.state.loading)}
-                     loaderText={this.props && this.props.syncState ? 'Loading' : getTranslation(translations.loadingScreenMessages.loadingMsg, this.props.translation)}>
+                showLoader={(this.props && this.props.syncState && ((this.props.syncState.id === 'sync' && this.props.syncState.status !== null && this.props.syncState.status !== 'Success') && this.props.syncState.status !== 'Error')) || (this && this.state && this.state.loading)}
+                loaderText={this.props && this.props.syncState ? 'Loading' : getTranslation(translations.loadingScreenMessages.loadingMsg, this.props.translation)}>
                 <NavBarCustom
                     title={null}
                     customTitle={
-                        <View style={{flex: 1, flexDirection: 'row'}}>
+                        <View style={{ flex: 1, flexDirection: 'row' }}>
                             <View
                                 style={[style.breadcrumbContainer]}>
                                 <Breadcrumb
@@ -276,17 +276,17 @@ class FollowUpsScreen extends Component {
                                     navigator={this.props.navigator}
                                 />
                             </View>
-                            <View style={{flex: 0.15, marginRight: 10}}>
+                            <View style={{ flex: 0.15, marginRight: 10 }}>
                                 <Ripple style={{
                                     flex: 1,
                                     justifyContent: 'center',
                                     alignItems: 'center'
                                 }} onPress={this.handleOnPressQRCode}>
-                                    <MaterialCommunityIcons name="qrcode-scan" color={'black'} size={20}/>
+                                    <MaterialCommunityIcons name="qrcode-scan" color={'black'} size={20} />
                                 </Ripple>
                             </View>
 
-                            <View style={{flex: 0.135 /*, marginRight: 10*/}}>
+                            <View style={{ flex: 0.135 /*, marginRight: 10*/ }}>
                                 <ElevatedView
                                     elevation={3}
                                     style={{
@@ -301,7 +301,7 @@ class FollowUpsScreen extends Component {
                                         justifyContent: 'center',
                                         alignItems: 'center'
                                     }} onPress={this.goToHelpScreen}>
-                                        <Icon name="help" color={'white'} size={15}/>
+                                        <Icon name="help" color={'white'} size={15} />
                                     </Ripple>
                                 </ElevatedView>
                             </View>
@@ -340,12 +340,12 @@ class FollowUpsScreen extends Component {
                                     justifyContent: 'center',
                                     alignItems: 'center'
                                 }} onPress={this.handleOnPressAddFollowUp}>
-                                    <Icon name="add" color={'white'} size={15}/>
+                                    <Icon name="add" color={'white'} size={15} />
                                 </Ripple>
-                            </ElevatedView> 
+                            </ElevatedView>
                         ) : null
                     }
-                    </NavBarCustom>
+                </NavBarCustom>
                 <View style={style.containerContent}>
                     <AnimatedListView
                         stickyHeaderIndices={[0]}
@@ -440,7 +440,7 @@ class FollowUpsScreen extends Component {
         })
     };
 
-    renderFollowUp = ({item}) => {
+    renderFollowUp = ({ item }) => {
         return (<FollowUpListItem
             item={item}
             onPressFollowUp={this.handlePressFollowUp}
@@ -482,7 +482,7 @@ class FollowUpsScreen extends Component {
 
     listEmptyComponent = () => {
         return (
-            <View style={[style.emptyComponent, {height: calculateDimension((667 - 152), true, this.props.screenSize)}]}>
+            <View style={[style.emptyComponent, { height: calculateDimension((667 - 152), true, this.props.screenSize) }]}>
                 <Text style={style.emptyComponentTextView}>
                     {getTranslation(translations.followUpsScreen.noFollowupsMessage, this.props.translation)}
                 </Text>
@@ -492,23 +492,23 @@ class FollowUpsScreen extends Component {
 
     onSelectValue = (value) => {
         this.setState(prevState => ({
-            filter: Object.assign({}, prevState.filter, {performed: value})
+            filter: Object.assign({}, prevState.filter, { performed: value })
         }), () => {
             console.log("### filter from onSelectValue: ", this.state.filter);
             if (value === 'All') {
-                this.removeFromFilter({type: 'performed'});
+                this.removeFromFilter({ type: 'performed' });
             } else {
-                this.appendToFilter({type: 'performed', value});
+                this.appendToFilter({ type: 'performed', value });
             }
         });
     };
 
     handleDayPress = (day) => {
         this.setState(prevState => ({
-            filter: Object.assign({}, prevState.filter, {date: day})
+            filter: Object.assign({}, prevState.filter, { date: day })
         }), () => {
             console.log("### filter from handleDayPress: ", this.state.filter);
-            this.appendToFilter({type: 'date', value: day});
+            this.appendToFilter({ type: 'date', value: day });
         });
     };
 
@@ -521,6 +521,8 @@ class FollowUpsScreen extends Component {
                 return e.typeId === config.userResidenceAddress.userPlaceOfResidence
             });
             itemClone.address = contactPlaceOfResidence[0];
+        } else {
+            itemClone.address = null
         }
         this.props.navigator.push({
             screen: 'FollowUpsSingleScreen',
@@ -533,7 +535,7 @@ class FollowUpsScreen extends Component {
                 filter: this.state.filter,
                 startLoadingScreen: this.startLoadingScreen,
                 mimeComponentDidMount: this.mimeComponentDidMount
-                
+
             }
         })
     };
@@ -597,7 +599,7 @@ class FollowUpsScreen extends Component {
                     });
                 },
                 (error) => {
-                    this.setState({error: error.message})
+                    this.setState({ error: error.message })
                 },
             );
         }
@@ -618,7 +620,7 @@ class FollowUpsScreen extends Component {
     handleOnChangeText = (text) => {
         console.log("### handleOnChangeText: ", text);
         this.setState(prevState => ({
-            filter: Object.assign({}, prevState.filter, {searchText: text})
+            filter: Object.assign({}, prevState.filter, { searchText: text })
         }), console.log('### filter after changed text: ', this.state.filter))
     };
 
@@ -673,18 +675,18 @@ class FollowUpsScreen extends Component {
         this.setState({
             showGenerateFollowUpScreen: !this.state.showGenerateFollowUpScreen,
         }, () => {
-           this.handleGenerateFollowUps(date);
-        } );
+            this.handleGenerateFollowUps(date);
+        });
     };
 
     handleModalGenerateFollowUps = () => {
         this.hideMenu();
-        setTimeout(function(){
+        setTimeout(function () {
             this.setState({
                 showGenerateFollowUpScreen: !this.state.showGenerateFollowUpScreen,
             }, () => {
                 console.log("showGenerateFollowUpScreen", this.state.showGenerateFollowUpScreen);
-            } );
+            });
         }.bind(this), 2000);
     };
 
@@ -711,7 +713,7 @@ class FollowUpsScreen extends Component {
     };
 
     setFilter = (filter) => {
-        this.setState({filter}, () => {
+        this.setState({ filter }, () => {
             this.applyFilters();
         });
     };
@@ -730,7 +732,7 @@ class FollowUpsScreen extends Component {
     };
 
     handleOnApplyFilters = (filter) => {
-        console.log ('foolowUpsScreen handleOnApplyFilters', filter)
+        console.log('foolowUpsScreen handleOnApplyFilters', filter)
         this.setState({
             filterFromFilterScreen: filter
         }, () => {
@@ -748,7 +750,7 @@ class FollowUpsScreen extends Component {
     filterContacts = () => {
         let contactsCopy = _.cloneDeep(this.props.contacts);
         contactsCopy = localSortContactsForFollowUps(contactsCopy, this.props.filter, this.state.filter, this.state.filterFromFilterScreen)
-        
+
         // After filtering the contacts, it's time to get their respective follow-ups to show
         this.getFollowUpsFromContacts(contactsCopy);
     };
@@ -757,7 +759,7 @@ class FollowUpsScreen extends Component {
         let followUpsToBeShown = [];
 
         if (contacts && Array.isArray(contacts) && contacts.length > 0) {
-            for (let i=0; i<contacts.length; i++) {
+            for (let i = 0; i < contacts.length; i++) {
                 followUpsToBeShown = followUpsToBeShown.concat(contacts[i].followUps);
             }
         }
@@ -787,7 +789,7 @@ class FollowUpsScreen extends Component {
                 }
             }
 
-            this.setState({followUps});
+            this.setState({ followUps });
         }
     };
 
@@ -896,104 +898,104 @@ class FollowUpsScreen extends Component {
             })
         });
 
-    //     let itemId = null;
-    //     let itemType = null;
-    //     let outbreakId = null;
-    //
-    //     if (QRCodeInfo && QRCodeInfo !== undefined && QRCodeInfo.data && QRCodeInfo.data !== undefined){
-    //         let parsedData = null;
-    //         try {
-    //             parsedData =  JSON.parse(QRCodeInfo.data)
-    //         } catch(err) {
-    //             setTimeout(function(){
-    //                 Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props && this.props.translation ? this.props.translation : null), getTranslation(translations.alertMessages.errorOccuredMsg, this.props && this.props.translation ? this.props.translation : null), [
-    //                     {
-    //                         text: getTranslation(translations.alertMessages.okButtonLabel, this.props && this.props.translation ? this.props.translation : null),
-    //                         onPress: () => {console.log('Ok pressed')}
-    //                     }
-    //                 ])
-    //             }, 1000);
-    //             return
-    //         }
-    //         if (parsedData && parsedData !== undefined){
-    //             console.log('parsedData', parsedData);
-    //
-    //             if (parsedData.targetResource && parsedData.targetResource !== undefined) {
-    //                 if (parsedData.targetResource === 'case' || parsedData.targetResource === 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE') {
-    //                     itemType = 'case';
-    //                     if (parsedData.resourceContext && parsedData.resourceContext !== undefined &&
-    //                         parsedData.resourceContext.outbreakId && parsedData.resourceContext.outbreakId !== undefined &&
-    //                         parsedData.resourceContext.caseId && parsedData.resourceContext.caseId !== undefined) {
-    //                         itemId = parsedData.resourceContext.caseId;
-    //                         outbreakId = parsedData.resourceContext.outbreakId
-    //                     }
-    //                 } else if (parsedData.targetResource === 'contact' || parsedData.targetResource === 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT') {
-    //                     itemType = 'contact';
-    //                     if (parsedData.resourceContext && parsedData.resourceContext !== undefined &&
-    //                         parsedData.resourceContext.outbreakId && parsedData.resourceContext.outbreakId !== undefined &&
-    //                         parsedData.resourceContext.contactId && parsedData.resourceContext.contactId !== undefined) {
-    //                         itemId = parsedData.resourceContext.contactId;
-    //                         outbreakId = parsedData.resourceContext.outbreakId;
-    //                     }
-    //                 }
-    //             }
-    //         }
-    //     }
-    //
-    //     console.log('pushNewEditScreen', itemId, itemType, outbreakId);
-    //     if (itemId && itemType && outbreakId && outbreakId === this.props.user.activeOutbreakId) {
-    //         let itemPouchId = null;
-    //         if (itemType === 'case') {
-    //             itemPouchId = `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE_${outbreakId}_${itemId}`
-    //         } else if (itemType === 'contact') {
-    //             itemPouchId = `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT_${outbreakId}_${itemId}`
-    //         }
-    //
-    //         if (itemPouchId) {
-    //             getItemByIdRequest(outbreakId, itemPouchId, itemType, (error, response) => {
-    //                 if (error) {
-    //                     console.log("*** getItemByIdRequest error: ", error);
-    //                     Alert.alert(getTranslation(translations.alertMessages.alertLabel,  this.props && this.props.translation ? this.props.translation : null), getTranslation(translations.alertMessages.noItemAlert,  this.props && this.props.translation ? this.props.translation : null), [
-    //                         {
-    //                             text: getTranslation(translations.alertMessages.okButtonLabel,  this.props && this.props.translation ? this.props.translation : null),
-    //                             onPress: () => {console.log('Ok pressed')}
-    //                         }
-    //                     ])
-    //                 }
-    //                 if (response) {
-    //                     console.log("*** getItemByIdRequest response: ", response);
-    //                     if (itemType === 'case') {
-    //                         this.props.navigator.push({
-    //                             screen: 'CaseSingleScreen',
-    //                             animated: true,
-    //                             animationType: 'fade',
-    //                             passProps: {
-    //                                 case: response
-    //                             }
-    //                         })
-    //                     } else if (itemType === 'contact') {
-    //                         this.props.navigator.push({
-    //                             screen: 'ContactsSingleScreen',
-    //                             animated: true,
-    //                             animationType: 'fade',
-    //                             passProps: {
-    //                                 contact: response
-    //                             }
-    //                         })
-    //                     }
-    //                 }
-    //             })
-    //         }
-    //     } else {
-    //         setTimeout(function(){
-    //             Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props && this.props.translation ? this.props.translation : null), getTranslation(translations.alertMessages.noItemAlert,  this.props && this.props.translation ? this.props.translation : null), [
-    //                 {
-    //                     text: getTranslation(translations.alertMessages.okButtonLabel,  this.props && this.props.translation ? this.props.translation : null),
-    //                     onPress: () => {console.log('Ok pressed')}
-    //                 }
-    //             ])
-    //         }, 1000)
-    //     }
+        //     let itemId = null;
+        //     let itemType = null;
+        //     let outbreakId = null;
+        //
+        //     if (QRCodeInfo && QRCodeInfo !== undefined && QRCodeInfo.data && QRCodeInfo.data !== undefined){
+        //         let parsedData = null;
+        //         try {
+        //             parsedData =  JSON.parse(QRCodeInfo.data)
+        //         } catch(err) {
+        //             setTimeout(function(){
+        //                 Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props && this.props.translation ? this.props.translation : null), getTranslation(translations.alertMessages.errorOccuredMsg, this.props && this.props.translation ? this.props.translation : null), [
+        //                     {
+        //                         text: getTranslation(translations.alertMessages.okButtonLabel, this.props && this.props.translation ? this.props.translation : null),
+        //                         onPress: () => {console.log('Ok pressed')}
+        //                     }
+        //                 ])
+        //             }, 1000);
+        //             return
+        //         }
+        //         if (parsedData && parsedData !== undefined){
+        //             console.log('parsedData', parsedData);
+        //
+        //             if (parsedData.targetResource && parsedData.targetResource !== undefined) {
+        //                 if (parsedData.targetResource === 'case' || parsedData.targetResource === 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE') {
+        //                     itemType = 'case';
+        //                     if (parsedData.resourceContext && parsedData.resourceContext !== undefined &&
+        //                         parsedData.resourceContext.outbreakId && parsedData.resourceContext.outbreakId !== undefined &&
+        //                         parsedData.resourceContext.caseId && parsedData.resourceContext.caseId !== undefined) {
+        //                         itemId = parsedData.resourceContext.caseId;
+        //                         outbreakId = parsedData.resourceContext.outbreakId
+        //                     }
+        //                 } else if (parsedData.targetResource === 'contact' || parsedData.targetResource === 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT') {
+        //                     itemType = 'contact';
+        //                     if (parsedData.resourceContext && parsedData.resourceContext !== undefined &&
+        //                         parsedData.resourceContext.outbreakId && parsedData.resourceContext.outbreakId !== undefined &&
+        //                         parsedData.resourceContext.contactId && parsedData.resourceContext.contactId !== undefined) {
+        //                         itemId = parsedData.resourceContext.contactId;
+        //                         outbreakId = parsedData.resourceContext.outbreakId;
+        //                     }
+        //                 }
+        //             }
+        //         }
+        //     }
+        //
+        //     console.log('pushNewEditScreen', itemId, itemType, outbreakId);
+        //     if (itemId && itemType && outbreakId && outbreakId === this.props.user.activeOutbreakId) {
+        //         let itemPouchId = null;
+        //         if (itemType === 'case') {
+        //             itemPouchId = `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE_${outbreakId}_${itemId}`
+        //         } else if (itemType === 'contact') {
+        //             itemPouchId = `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT_${outbreakId}_${itemId}`
+        //         }
+        //
+        //         if (itemPouchId) {
+        //             getItemByIdRequest(outbreakId, itemPouchId, itemType, (error, response) => {
+        //                 if (error) {
+        //                     console.log("*** getItemByIdRequest error: ", error);
+        //                     Alert.alert(getTranslation(translations.alertMessages.alertLabel,  this.props && this.props.translation ? this.props.translation : null), getTranslation(translations.alertMessages.noItemAlert,  this.props && this.props.translation ? this.props.translation : null), [
+        //                         {
+        //                             text: getTranslation(translations.alertMessages.okButtonLabel,  this.props && this.props.translation ? this.props.translation : null),
+        //                             onPress: () => {console.log('Ok pressed')}
+        //                         }
+        //                     ])
+        //                 }
+        //                 if (response) {
+        //                     console.log("*** getItemByIdRequest response: ", response);
+        //                     if (itemType === 'case') {
+        //                         this.props.navigator.push({
+        //                             screen: 'CaseSingleScreen',
+        //                             animated: true,
+        //                             animationType: 'fade',
+        //                             passProps: {
+        //                                 case: response
+        //                             }
+        //                         })
+        //                     } else if (itemType === 'contact') {
+        //                         this.props.navigator.push({
+        //                             screen: 'ContactsSingleScreen',
+        //                             animated: true,
+        //                             animationType: 'fade',
+        //                             passProps: {
+        //                                 contact: response
+        //                             }
+        //                         })
+        //                     }
+        //                 }
+        //             })
+        //         }
+        //     } else {
+        //         setTimeout(function(){
+        //             Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props && this.props.translation ? this.props.translation : null), getTranslation(translations.alertMessages.noItemAlert,  this.props && this.props.translation ? this.props.translation : null), [
+        //                 {
+        //                     text: getTranslation(translations.alertMessages.okButtonLabel,  this.props && this.props.translation ? this.props.translation : null),
+        //                     onPress: () => {console.log('Ok pressed')}
+        //                 }
+        //             ])
+        //         }, 1000)
+        //     }
     };
 }
 

@@ -209,6 +209,7 @@ class QuestionCardContent extends PureComponent {
                         translation={this.props.translation}
                         screenSize={this.props.screenSize}
                         onFocus={this.props.onFocus}
+                        onBlur={this.props.onBlur}
                     />
                 );
             case 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_NUMERIC':
@@ -235,6 +236,7 @@ class QuestionCardContent extends PureComponent {
                         translation={this.props.translation}
                         screenSize={this.props.screenSize}
                         onFocus={this.props.onFocus}
+                        onBlur={this.props.onBlur}
                     />
                 );
             case 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_DATE_TIME':
