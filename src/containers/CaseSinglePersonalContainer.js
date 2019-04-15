@@ -3,7 +3,7 @@
  */
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import {
     View,
     Text,
@@ -14,16 +14,16 @@ import {
     Keyboard,
     findNodeHandle
 } from 'react-native';
-import {calculateDimension, getTranslation} from './../utils/functions';
+import { calculateDimension, getTranslation } from './../utils/functions';
 import config from './../utils/config';
-import {connect} from "react-redux";
-import {bindActionCreators} from "redux";
+import { connect } from "react-redux";
+import { bindActionCreators } from "redux";
 import styles from './../styles';
 import CardComponent from './../components/CardComponent';
 import Ripple from 'react-native-material-ripple';
 import Button from './../components/Button';
 import ElevatedView from 'react-native-elevated-view';
-import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import translations from './../utils/translations'
 import _ from 'lodash';
 
@@ -50,9 +50,9 @@ class CaseSinglePersonalContainer extends Component {
     render() {
         // console.log('CaseSingleContainer render Personal');
         return (
-            <View style={{flex: 1}}>
+            <View style={{ flex: 1 }}>
                 <View style={style.container}>
-                    <View style={{flexDirection: 'row'}}>
+                    <View style={{ flexDirection: 'row' }}>
                         {
                             this.props.isNew ? (
                                 <Button
@@ -65,36 +65,12 @@ class CaseSinglePersonalContainer extends Component {
                                     style={{
                                         marginVertical: calculateDimension(12.5, true, this.props.screenSize),
                                         marginRight: 10,
-                                    }}/>) : (
-                                this.props.isEditMode ? (
-                                    <View style={{flexDirection: 'row'}}>
-                                        <Button
-                                            title={getTranslation(translations.generalButtons.saveButtonLabel, this.props.translation)}
-                                            onPress={this.props.onPressSaveEdit}
-                                            color={styles.buttonGreen}
-                                            titleColor={'white'}
-                                            height={calculateDimension(25, true, this.props.screenSize)}
-                                            width={calculateDimension(166, false, this.props.screenSize)}
-                                            style={{
-                                                marginVertical: calculateDimension(12.5, true, this.props.screenSize),
-                                                marginRight: 10,
-                                        }}/>
-                                        <Button
-                                            title={getTranslation(translations.generalButtons.cancelButtonLabel, this.props.translation)}
-                                            onPress={this.props.onPressCancelEdit}
-                                            color={styles.buttonGreen}
-                                            titleColor={'white'}
-                                            height={calculateDimension(25, true, this.props.screenSize)}
-                                            width={calculateDimension(166, false, this.props.screenSize)}
-                                            style={{
-                                                marginVertical: calculateDimension(12.5, true, this.props.screenSize),
-                                                marginRight: 10,
-                                        }}/>
-                                    </View>) : (
-                                        this.props.role.find((e) => e === config.userPermissions.writeCase) !== undefined ? (
+                                    }} />) : (
+                                    this.props.isEditMode ? (
+                                        <View style={{ flexDirection: 'row' }}>
                                             <Button
-                                                title={getTranslation(translations.generalButtons.editButtonLabel, this.props.translation)}
-                                                onPress={this.props.onPressEdit}
+                                                title={getTranslation(translations.generalButtons.saveButtonLabel, this.props.translation)}
+                                                onPress={this.props.onPressSaveEdit}
                                                 color={styles.buttonGreen}
                                                 titleColor={'white'}
                                                 height={calculateDimension(25, true, this.props.screenSize)}
@@ -102,12 +78,36 @@ class CaseSinglePersonalContainer extends Component {
                                                 style={{
                                                     marginVertical: calculateDimension(12.5, true, this.props.screenSize),
                                                     marginRight: 10,
-                                            }}/>
-                                        ) : null
-                                    ))
+                                                }} />
+                                            <Button
+                                                title={getTranslation(translations.generalButtons.cancelButtonLabel, this.props.translation)}
+                                                onPress={this.props.onPressCancelEdit}
+                                                color={styles.buttonGreen}
+                                                titleColor={'white'}
+                                                height={calculateDimension(25, true, this.props.screenSize)}
+                                                width={calculateDimension(166, false, this.props.screenSize)}
+                                                style={{
+                                                    marginVertical: calculateDimension(12.5, true, this.props.screenSize),
+                                                    marginRight: 10,
+                                                }} />
+                                        </View>) : (
+                                            this.props.role.find((e) => e === config.userPermissions.writeCase) !== undefined ? (
+                                                <Button
+                                                    title={getTranslation(translations.generalButtons.editButtonLabel, this.props.translation)}
+                                                    onPress={this.props.onPressEdit}
+                                                    color={styles.buttonGreen}
+                                                    titleColor={'white'}
+                                                    height={calculateDimension(25, true, this.props.screenSize)}
+                                                    width={calculateDimension(166, false, this.props.screenSize)}
+                                                    style={{
+                                                        marginVertical: calculateDimension(12.5, true, this.props.screenSize),
+                                                        marginRight: 10,
+                                                    }} />
+                                            ) : null
+                                        ))
                         }
                     </View>
-                    <KeyboardAwareScrollView
+                    {/* <KeyboardAwareScrollView
                         style={style.containerScrollView}
                         contentContainerStyle={[style.contentContainerStyle, {paddingBottom: this.props.screenSize.height < 600 ? 70 : 20}]}
                         keyboardShouldPersistTaps={'always'}
@@ -115,13 +115,17 @@ class CaseSinglePersonalContainer extends Component {
                         innerRef={ref => {
                             this.scrollCasesSinglePersonal = ref
                         }}
+                    > */}
+                    <ScrollView
+                        style={style.containerScrollView}
+                        contentContainerStyle={[style.contentContainerStyle, { paddingBottom: this.props.screenSize.height < 600 ? 70 : 20 }]}
                     >
                         {
                             config.caseSingleScreen.personal.map((item) => {
                                 return this.handleRenderItem(item)
                             })
                         }
-                         <View style={style.container}>
+                        <View style={style.container}>
                             {
                                 this.props.case && this.props.case.documents && this.props.case.documents.map((item, index) => {
                                     return this.handleRenderItemForDocumentsList(item, index)
@@ -130,7 +134,7 @@ class CaseSinglePersonalContainer extends Component {
                         </View>
                         {
                             this.props.isEditMode ? (
-                                <View style={{alignSelf: 'flex-start', marginHorizontal: calculateDimension(16, false, this.props.screenSize), marginVertical: 20}}>
+                                <View style={{ alignSelf: 'flex-start', marginHorizontal: calculateDimension(16, false, this.props.screenSize), marginVertical: 20 }}>
                                     <Ripple
                                         style={{
                                             height: 25,
@@ -138,29 +142,30 @@ class CaseSinglePersonalContainer extends Component {
                                         }}
                                         onPress={this.props.onPressAddDocument}
                                     >
-                                        <Text style={{fontFamily: 'Roboto-Medium', fontSize: 12, color: styles.buttonGreen}}>
+                                        <Text style={{ fontFamily: 'Roboto-Medium', fontSize: 12, color: styles.buttonGreen }}>
                                             {this.props.case.documents && this.props.case.documents.length === 0 ? getTranslation(translations.caseSingleScreen.oneDocumentText, this.props.translation) : getTranslation(translations.caseSingleScreen.moreDocumentsText, this.props.translation)}
                                         </Text>
                                     </Ripple>
                                 </View>) : null
                         }
-                    </KeyboardAwareScrollView>
+                    </ScrollView>
+                    {/* </KeyboardAwareScrollView> */}
                 </View>
-            </View>
+            </View >
         );
     }
 
     // Please write here all the methods that are not react native lifecycle methods
     handleRenderItem = (item) => {
         let fields = item.fields.map((field) => {
-            return Object.assign({},field, {isEditMode: this.props.isEditMode})
+            return Object.assign({}, field, { isEditMode: this.props.isEditMode })
         });
         return this.renderItemCardComponent(fields)
     }
 
     handleRenderItemForDocumentsList = (item, index) => {
         let fields = config.caseSingleScreen.document.fields.map((field) => {
-            return Object.assign({},field, {isEditMode: this.props.isEditMode})
+            return Object.assign({}, field, { isEditMode: this.props.isEditMode })
         });
         return this.renderItemCardComponent(fields, index)
     }
@@ -173,7 +178,7 @@ class CaseSinglePersonalContainer extends Component {
                 marginVertical: 4,
                 minHeight: calculateDimension(72, true, this.props.screenSize)
             }, style.cardStyle]}>
-                <ScrollView scrollEnabled={false} style={{flex: 1}} contentContainerStyle={{flexGrow: 1}}>
+                <ScrollView scrollEnabled={false} style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }}>
                     {
                         fields && fields.map((item, index) => {
                             return this.handleRenderItemCardComponent(item, index, cardIndex);
@@ -186,7 +191,7 @@ class CaseSinglePersonalContainer extends Component {
 
     handleRenderItemCardComponent = (item, index, cardIndex) => {
         return (
-            <View style={[style.subcontainerCardComponent, {flex: 1}]} key={index}>
+            <View style={[style.subcontainerCardComponent, { flex: 1 }]} key={index}>
                 {
                     this.handleRenderItemByType(item, cardIndex)
                 }
@@ -211,9 +216,9 @@ class CaseSinglePersonalContainer extends Component {
         } else {
             value = this.computeValueForCasesSingleScreen(item, cardIndex);
         }
-        
-        if (this.props.selectedItemIndexForTextSwitchSelectorForAge !== null && this.props.selectedItemIndexForTextSwitchSelectorForAge !== undefined && item.objectType === 'Case' && item.dependsOn !== undefined && item.dependsOn !== null){
-            let itemIndexInConfigTextSwitchSelectorValues = config[item.dependsOn].map((e) => {return e.value}).indexOf(item.id)
+
+        if (this.props.selectedItemIndexForTextSwitchSelectorForAge !== null && this.props.selectedItemIndexForTextSwitchSelectorForAge !== undefined && item.objectType === 'Case' && item.dependsOn !== undefined && item.dependsOn !== null) {
+            let itemIndexInConfigTextSwitchSelectorValues = config[item.dependsOn].map((e) => { return e.value }).indexOf(item.id)
             if (itemIndexInConfigTextSwitchSelectorValues > -1) {
                 if (itemIndexInConfigTextSwitchSelectorValues !== this.props.selectedItemIndexForTextSwitchSelectorForAge) {
                     return
@@ -262,31 +267,31 @@ class CaseSinglePersonalContainer extends Component {
                 maximumDate = new Date()
             }
         }
-        
-        let dateValidation = {minimumDate, maximumDate}
+
+        let dateValidation = { minimumDate, maximumDate }
         return dateValidation
     }
 
     computeDataForCasesSingleScreenDropdownInput = (item) => {
         if (item.id === 'riskLevel') {
-            return _.filter(this.props.referenceData, (o) => {return o.active === true && o.categoryId.includes("RISK_LEVEL")})
-                    .sort((a,b) => { return a.order - b.order; })
-                    .map((o) => {return {value: getTranslation(o.value, this.props.translation), id: o.value}})
+            return _.filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId.includes("RISK_LEVEL") })
+                .sort((a, b) => { return a.order - b.order; })
+                .map((o) => { return { value: getTranslation(o.value, this.props.translation), id: o.value } })
         }
         if (item.id === 'gender') {
-            return _.filter(this.props.referenceData, (o) => {return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_GENDER'})
-                    .sort((a,b) => { return a.order - b.order; })
-                    .map((o) => {return {label: getTranslation(o.value, this.props.translation), value: o.value}})
+            return _.filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_GENDER' })
+                .sort((a, b) => { return a.order - b.order; })
+                .map((o) => { return { label: getTranslation(o.value, this.props.translation), value: o.value } })
         }
         if (item.id === 'occupation') {
-            return _.filter(this.props.referenceData, (o) => {return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_OCCUPATION'})
-                    .sort((a,b) => { return a.order - b.order; })
-                    .map((o) => {return {value: getTranslation(o.value, this.props.translation), id: o.value}})
+            return _.filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_OCCUPATION' })
+                .sort((a, b) => { return a.order - b.order; })
+                .map((o) => { return { value: getTranslation(o.value, this.props.translation), id: o.value } })
         }
         if (item.id === 'type') {
-            return _.filter(this.props.referenceData, (o) => {return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_DOCUMENT_TYPE'})
-                    .sort((a,b) => { return a.order - b.order; })
-                    .map((o) => {return {label: getTranslation(o.value, this.props.translation), value: o.value}})
+            return _.filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_DOCUMENT_TYPE' })
+                .sort((a, b) => { return a.order - b.order; })
+                .map((o) => { return { label: getTranslation(o.value, this.props.translation), value: o.value } })
         }
     };
 
@@ -299,7 +304,7 @@ class CaseSinglePersonalContainer extends Component {
         }
         if (item.id === 'age') {
             if (this.props.case && this.props.case[item.id] !== null && this.props.case[item.id] !== undefined) {
-             return this.props.case[item.id]
+                return this.props.case[item.id]
             }
         } else {
             return this.props.case && this.props.case[item.id] ? getTranslation(this.props.case[item.id], this.props.translation) : '';
@@ -310,46 +315,46 @@ class CaseSinglePersonalContainer extends Component {
         let missingFields = this.props.checkRequiredFieldsPersonalInfo();
         if (missingFields && Array.isArray(missingFields) && missingFields.length === 0) {
             if (this.props.checkAgeYearsRequirements()) {
-                if (this.props.checkAgeMonthsRequirements()){
+                if (this.props.checkAgeMonthsRequirements()) {
                     this.props.handleMoveToNextScreenButton()
                 } else {
                     Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.monthsValueError, this.props.translation), [
                         {
-                            text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation), 
-                            onPress: () => {console.log("OK pressed")}
+                            text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+                            onPress: () => { console.log("OK pressed") }
                         }
                     ])
                 }
             } else {
                 Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.yearsValueError, this.props.translation), [
                     {
-                        text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation), 
-                        onPress: () => {console.log("OK pressed")}
+                        text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+                        onPress: () => { console.log("OK pressed") }
                     }
                 ])
             }
         } else {
             Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), `${getTranslation(translations.alertMessages.requiredFieldsMissingError, this.props.translation)}.\n${getTranslation(translations.alertMessages.missingFields, this.props.translation)}: ${missingFields}`, [
                 {
-                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation), 
-                    onPress: () => {console.log("OK pressed")}
+                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+                    onPress: () => { console.log("OK pressed") }
                 }
             ])
         }
     }
 
     handleOnFocus = (event) => {
-        this.scrollToInput(findNodeHandle(event.target))
+        // this.scrollToInput(findNodeHandle(event.target))
     };
 
-    handleOnBlur = (event) =>{
-        this.scrollCasesSinglePersonal.props.scrollToPosition(0, 0, false)
-        this.scrollToInput(findNodeHandle(event.target))
+    handleOnBlur = (event) => {
+        // this.scrollCasesSinglePersonal.props.scrollToPosition(0, 0, false)
+        // this.scrollToInput(findNodeHandle(event.target))
     }
 
-    scrollToInput (reactNode) {
+    scrollToInput(reactNode) {
         // Add a 'scroll' ref to your ScrollView
-        this.scrollCasesSinglePersonal.props.scrollToFocusedInput(reactNode)
+        // this.scrollCasesSinglePersonal.props.scrollToFocusedInput(reactNode)
     }
 }
 
