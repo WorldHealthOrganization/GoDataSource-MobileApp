@@ -10,10 +10,9 @@ import styles from './../styles';
 import NavBarCustom from './../components/NavBarCustom';
 import ViewHOC from './../components/ViewHOC';
 import config from './../utils/config';
-import { connect } from "react-redux";
-import { bindActionCreators } from "redux";
-import { getFollowUpsForOutbreakId, getMissedFollowUpsForOutbreakId } from './../actions/followUps';
-import { TabBar, TabView, PagerScroll, PagerAndroid, SceneMap } from 'react-native-tab-view';
+import {connect} from "react-redux";
+import {bindActionCreators} from "redux";
+import {TabBar, TabView, PagerScroll, PagerAndroid, SceneMap} from 'react-native-tab-view';
 import ContactsSingleAddress from './../containers/ContactsSingleAddress';
 import ContactsSingleCalendar from './../containers/ContactsSingleCalendar';
 import ContactsSingleExposures from './../containers/ContactsSingleExposures';
@@ -23,9 +22,9 @@ import { getContactsNameForDuplicateCheckRequest, checkForNameDuplicatesRequest 
 import Breadcrumb from './../components/Breadcrumb';
 import Menu, { MenuItem } from 'react-native-material-menu';
 import Ripple from 'react-native-material-ripple';
-import { addFollowUp, updateFollowUpAndContact, deleteFollowUp } from './../actions/followUps';
-import { updateContact, deleteExposureForContact, addContact } from './../actions/contacts';
-import { removeErrors } from './../actions/errors';
+import {updateFollowUpAndContact, deleteFollowUp} from './../actions/followUps';
+import {updateContact, deleteExposureForContact, addContact} from './../actions/contacts';
+import {removeErrors} from './../actions/errors';
 import DateTimePicker from 'react-native-modal-datetime-picker';
 import _ from 'lodash';
 import { calculateDimension, extractIdFromPouchId, updateRequiredFields, navigation, getTranslation } from './../utils/functions';
@@ -191,7 +190,7 @@ class ContactsSingleScreen extends Component {
             })
 
             if (this.props.user !== null) {
-                getFollowUpsForContactRequest(this.props.user.activeOutbreakId, [extractIdFromPouchId(this.state.contact._id, 'person')], this.state.contact.followUp, (errorFollowUp, responseFollowUp) => {
+                getFollowUpsForContactRequest(this.props.user.activeOutbreakId, [extractIdFromPouchId(this.state.contact._id, 'person')], this.state.contact.followUp, this.props.teams, (errorFollowUp, responseFollowUp) => {
                     if (errorFollowUp) {
                         console.log('getFollowUpsForContactRequest error: ', errorFollowUp)
                     }
@@ -1001,23 +1000,25 @@ class ContactsSingleScreen extends Component {
         let addresses = _.cloneDeep(this.state.contact.addresses);
         addresses[index].locationId = extractIdFromPouchId(selectedItems['0']._id, 'location');
         if (selectedItems['0'].geoLocation && selectedItems['0'].geoLocation.coordinates && Array.isArray(selectedItems['0'].geoLocation.coordinates)) {
-            setTimeout(() => {
-                Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.alertMessages.replaceCurrentCoordinates, this.props.translation), [
-                    {
-                        text: getTranslation(translations.alertMessages.cancelButtonLabel, this.props.translation), onPress: () => { console.log('Cancel pressed') }
-                    },
-                    {
-                        text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation), onPress: () => {
-                            addresses[index].geoLocation = selectedItems['0'].geoLocation;
-                            console.log('Addresses biatch: ', addresses);
-                            this.setState(prevState => ({
-                                contact: Object.assign({}, prevState.contact, { addresses }),
-                                isModified: true
-                            }))
+            if (selectedItems['0'].geoLocation.coordinates[0] !== 0 || selectedItems['0'].geoLocation.coordinates[1] !== 0){
+                setTimeout(() => {
+                    Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.alertMessages.replaceCurrentCoordinates, this.props.translation), [
+                        {
+                            text: getTranslation(translations.alertMessages.cancelButtonLabel, this.props.translation), onPress: () => { console.log('Cancel pressed') }
+                        },
+                        {
+                            text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation), onPress: () => {
+                                addresses[index].geoLocation = selectedItems['0'].geoLocation;
+                                console.log('Addresses biatch: ', addresses);
+                                this.setState(prevState => ({
+                                    contact: Object.assign({}, prevState.contact, { addresses }),
+                                    isModified: true
+                                }))
+                            }
                         }
-                    }
-                ])
-            }, 200);
+                    ])
+                }, 200);
+            }
         } else {
             console.log('Addresses biatch: ', addresses);
             this.setState(prevState => ({
@@ -1573,6 +1574,7 @@ const style = StyleSheet.create({
 
 function mapStateToProps(state) {
     return {
+        teams: state.teams,
         user: state.user,
         role: state.role,
         screenSize: state.app.screenSize,
@@ -1587,9 +1589,6 @@ function mapStateToProps(state) {
 
 function matchDispatchProps(dispatch) {
     return bindActionCreators({
-        getFollowUpsForOutbreakId,
-        getMissedFollowUpsForOutbreakId,
-        addFollowUp,
         updateFollowUpAndContact,
         deleteFollowUp,
         updateContact,

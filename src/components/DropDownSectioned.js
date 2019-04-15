@@ -59,7 +59,7 @@ class DropDownSectioned extends Component {
                         selectToggleIconComponent={(<Icon name="check" size={18} />)}
                         dropDownToggleIconDownComponent={(<Icon name="arrow-drop-down" size={18} />)}
                         dropDownToggleIconUpComponent={(<Icon name="arrow-drop-up" size={18} />)}
-                        uniqueKey={'id'}
+                        uniqueKey={'_id'}
                         subKey={'children'}
                         single={this.props.single}
                         selectedItems={this.props.value}
