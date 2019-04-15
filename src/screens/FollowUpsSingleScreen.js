@@ -9,10 +9,9 @@ import { Icon } from 'react-native-material-ui';
 import styles from './../styles';
 import NavBarCustom from './../components/NavBarCustom';
 import config from './../utils/config';
-import { connect } from "react-redux";
-import { bindActionCreators } from "redux";
-import { getFollowUpsForOutbreakId, getMissedFollowUpsForOutbreakId } from './../actions/followUps';
-import { TabBar, TabView, SceneMap } from 'react-native-tab-view';
+import {connect} from "react-redux";
+import {bindActionCreators} from "redux";
+import {TabBar, TabView, SceneMap} from 'react-native-tab-view';
 import FollowUpsSingleGetInfoContainer from './../containers/FollowUpsSingleGetInfoContainer';
 import FollowUpsSingleQuestionnaireContainer from './../containers/FollowUpsSingleQuestionnaireContainer';
 import Breadcrumb from './../components/Breadcrumb';
@@ -1032,8 +1031,6 @@ function mapStateToProps(state) {
 
 function matchDispatchProps(dispatch) {
     return bindActionCreators({
-        getFollowUpsForOutbreakId,
-        getMissedFollowUpsForOutbreakId,
         createFollowUp,
         updateFollowUpAndContact,
         deleteFollowUp,

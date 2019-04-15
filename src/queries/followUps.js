@@ -8,7 +8,7 @@ import moment from 'moment';
 import config from './../utils/config';
 
 // Credentials: {email, encryptedPassword}
-export function getFollowUpsForOutbreakIdRequest (outbreakId, filter, token, callback) {
+export function getFollowUpsForOutbreakIdRequest (outbreakId, filter, userTeams, token, callback) {
     getDatabase(config.mongoCollections.followUp)
         .then((database) => {
             // Possible filters here are date and type, but we're not going to focus on type(to do, missed) since that can be mapped on the component
@@ -23,7 +23,7 @@ export function getFollowUpsForOutbreakIdRequest (outbreakId, filter, token, cal
                 endDate = moment(filter.date.getTime() + (oneDay + (moment().isDST() ? filter.date.getTimezoneOffset() : (filter.date.getTimezoneOffset() - 60)) * 60 * 1000)).add(-1, 'second')._d.getTime();
             }
 
-            let start =  new Date().getTime();
+            let start = new Date().getTime();
 
             database.find({
                 selector: {
@@ -33,12 +33,19 @@ export function getFollowUpsForOutbreakIdRequest (outbreakId, filter, token, cal
                     },
                     fileType: 'followUp.json',
                     deleted: false,
-                    outbreakId: outbreakId
+                    outbreakId: outbreakId,
+                    teamId: {$in: userTeams}
                 }
             })
                 .then((resultFind) => {
                     console.log('Result for find time for followUps: ', new Date().getTime() - start);
-                    callback(null, resultFind.docs)
+                    let followUpList = resultFind.docs;
+                    // if (userTeams !== null && userTeams !== undefined && Array.isArray(userTeams) && userTeams.length > 0) {
+                    //     followUpList = followUpList.filter((e) => {
+                    //         return userTeams.indexOf(e.teamId) >= 0 || e.teamId === undefined || e.teamId === null
+                    //     })
+                    // }
+                    callback(null, followUpList)
                 })
                 .catch((errorFind) => {
                     console.log('Error find for followUps: ', errorFind);
@@ -193,6 +200,7 @@ export function addFollowUpsBulkRequest (followUps, callback) {
         });
 }
 
+<<<<<<< HEAD
 export function getFollowUpsForContactRequest (outbreakId, keys, contactFollowUp, callback) {
     getDatabase(config.mongoCollections.followUp)
         .then((database) => {
@@ -223,6 +231,41 @@ export function getFollowUpsForContactRequest (outbreakId, keys, contactFollowUp
                     console.log('getFollowUpsForContactRequest error: ', error);
                     callback(error)
                 })
+=======
+export function getFollowUpsForContactRequest (outbreakId, keys, contactFollowUp, userTeams, callback) {
+    let database = getDatabase();
+
+    console.log("getCasesForOutbreakIdRequest: ", outbreakId, keys);
+    let startDate = null
+    let endDate = null
+    if (contactFollowUp) {
+        startDate = contactFollowUp.startDate
+        endDate = contactFollowUp.endDate
+    }
+
+    database.find({
+        selector: {
+            _id: {
+                $gte: `followUp.json_${outbreakId}_`,
+                $lte: `followUp.json_${outbreakId}_\uffff`
+            },
+            outbreakId: outbreakId,
+            deleted: false,
+            personId: {$in: keys}
+        }
+    })
+        .then((result) => {
+            console.log('getFollowUpsForContactRequest request: ');
+            let followUpList = result.docs
+            if (userTeams !== null && userTeams !== undefined && Array.isArray(userTeams) && userTeams.length > 0) {
+                followUpList = followUpList.filter((e) => userTeams.indexOf(e.teamId) >= 0 || e.teamId === undefined || e.teamId === null)
+            }
+            callback(null, followUpList)
+        })
+        .catch((error) => {
+            console.log('getFollowUpsForContactRequest error: ', error);
+            callback(error)
+>>>>>>> master
         })
         .catch((errorGetDatabase) => {
             console.log('Error while getting database: ', errorGetDatabase);

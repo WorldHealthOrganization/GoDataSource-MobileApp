@@ -21,6 +21,7 @@ export default {
     ERROR_DELETE_EXPOSURE: {type: "Exposure delete error", message: 'An error occurred while trying to delete exposure'},
     ERROR_CASES: {type: "Cases error", message: 'An error occurred while trying to get cases data'},
     ERROR_USER_ROLES: {type: "User roles error", message: 'An error occurred while trying to get user roles data'},
+    ERROR_USER_TEAMS: {type: "User teams error", message: 'An error occurred while trying to get user teams data'},
     ERROR_ADD_CASE: {type: "Case add error", message: 'An error occurred while trying to add the case'},
     ERROR_UPDATE_CASE: {type: "Case update error", message: 'An error occurred while trying to update the case'},
     ERROR_EVENTS: {type: "Events error", message: 'An error occurred while trying to get events data'},

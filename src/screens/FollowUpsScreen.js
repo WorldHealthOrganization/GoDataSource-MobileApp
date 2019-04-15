@@ -206,7 +206,7 @@ class FollowUpsScreen extends Component {
             generating: false,
         }, () => {
             if (this.props.user && this.props.user.activeOutbreakId) {
-                this.props.getFollowUpsForOutbreakId(this.props.user.activeOutbreakId, this.state.filter, null);
+                this.props.getFollowUpsForOutbreakId(this.props.user.activeOutbreakId, this.state.filter, this.props.teams, null);
             }
         })
     }
@@ -471,7 +471,7 @@ class FollowUpsScreen extends Component {
         this.setState({
             refreshing: true
         }, () => {
-            this.props.getFollowUpsForOutbreakId(this.props.user.activeOutbreakId, this.state.filter, null);
+            this.props.getFollowUpsForOutbreakId(this.props.user.activeOutbreakId, this.state.filter, this.props.teams, null);
         });
     };
 
@@ -657,7 +657,7 @@ class FollowUpsScreen extends Component {
         this.setState({
             showAddFollowUpScreen: !this.state.showAddFollowUpScreen
         }, () => {
-            this.props.addFollowUp(this.props.user.activeOutbreakId, contact.id, followUp, this.state.filter, this.props.user.token);
+            this.props.addFollowUp(this.props.user.activeOutbreakId, contact.id, followUp, this.state.filter, this.props.teams, this.props.user.token);
         });
     };
 
@@ -723,7 +723,7 @@ class FollowUpsScreen extends Component {
         this.setState({
             loading: true
         }, () => {
-            this.props.getFollowUpsForOutbreakId(this.props.user.activeOutbreakId, this.state.filter, null);
+            this.props.getFollowUpsForOutbreakId(this.props.user.activeOutbreakId, this.state.filter, this.props.teams, null);
         })
     };
 
@@ -1050,6 +1050,7 @@ const style = StyleSheet.create({
 function mapStateToProps(state) {
     return {
         user: state.user,
+        teams: state.teams,
         screenSize: state.app.screenSize,
         filter: state.app.filters,
         syncState: state.app.syncState,

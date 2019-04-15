@@ -105,6 +105,9 @@ export function updateUserRequest (user, callback) {
 export function getRolesForUserRequest (roleIds, callback) {
     getDatabase(config.mongoCollections.role)
         .then((database) => {
+            let roleIdsMapped = roleIds.map((e) => {
+                return 'role.json_' + e
+            });
             database.find({
                 selector: {
                     _id: {
@@ -128,7 +131,30 @@ export function getRolesForUserRequest (roleIds, callback) {
             callback(errorGetDatabase);
         });
 
-    let roleIdsMapped = roleIds.map((e) => {
-        return 'role.json_' + e
-    })
+}
+
+export function getTeamsForUserRequest(callback) {
+    getDatabase(config.mongoCollections.team)
+        .then((database) => {
+            database.find({
+                selector: {
+                    _id: {
+                        $gte: `team.json_`,
+                        $lte: `team.json_\uffff`,
+                    },
+                }
+            })
+                .then((result) => {
+                    console.log('Result in finding teams');
+                    callback(null, result.docs)
+                })
+                .catch((error) => {
+                    console.log('Error in finding teams: ', error);
+                    callback(error)
+                })
+        })
+        .catch((errorGetDatabase) => {
+            console.log('Error while getting database: ', errorGetDatabase);
+            callback(errorGetDatabase);
+        });
 }
