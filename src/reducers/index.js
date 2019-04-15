@@ -16,6 +16,7 @@ import role from './role';
 import helpCategory from './helpCategory';
 import helpItem from './helpItem';
 import clusters from './clusters';
+import teams from './teams';
 
 const allReducers = combineReducers({
     app,
@@ -23,6 +24,7 @@ const allReducers = combineReducers({
     outbreak,
     cases,
     followUps,
+    teams,
     contacts,
     events,
     clusters,

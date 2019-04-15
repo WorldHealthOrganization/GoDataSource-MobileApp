@@ -27,9 +27,7 @@ import {
 } from './../queries/contacts'
 import { addError } from './errors';
 import errorTypes from './../utils/errorTypes';
-import {storeFollowUps} from  './../actions/followUps';
 import {getRelationshipsForTypeRequest, getRelationshipsAndFollowUpsForContactRequest} from './../queries/relationships';
-import {getFollowUpsForContactRequest} from './../queries/followUps';
 import {extractIdFromPouchId, mapContactsAndRelationships, updateRequiredFields, mapContactsAndFollowUps} from './../utils/functions';
 import moment from 'moment';
 import config from './../utils/config';

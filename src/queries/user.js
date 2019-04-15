@@ -136,3 +136,23 @@ export function getRolesForUserRequest (roleIds, callback) {
             callback(error)
         })
 }
+
+export function getTeamsForUserRequest(callback) {
+    let database = getDatabase();
+    database.find({
+        selector: {
+            _id: {
+                $gte: `team.json_`,
+                $lte: `team.json_\uffff`,
+            },
+        }
+    })
+        .then((result) => {
+            console.log('Result in finding teams');
+            callback(null, result.docs)
+        })
+        .catch((error) => {
+            console.log('Error in finding teams: ', error);
+            callback(error)
+        })
+}

@@ -4,26 +4,17 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
-import {View, StyleSheet, Platform, Animated, Alert, BackHandler} from 'react-native';
-import {Icon} from 'react-native-material-ui';
-import styles from './../styles';
+import {View, StyleSheet, Alert, BackHandler} from 'react-native';
 import NavBarCustom from './../components/NavBarCustom';
-import config from './../utils/config';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
-import {getFollowUpsForOutbreakId, getMissedFollowUpsForOutbreakId} from './../actions/followUps';
-import {TabBar, TabView, SceneMap} from 'react-native-tab-view';
 import HelpSingleDetailsContainer from './../containers/HelpSingleDetailsContainer';
-import FollowUpsSingleQuestionnaireContainer from './../containers/FollowUpsSingleQuestionnaireContainer';
 import Breadcrumb from './../components/Breadcrumb';
-import Menu, {MenuItem} from 'react-native-material-menu';
-import Ripple from 'react-native-material-ripple';
 import {createFollowUp, updateFollowUpAndContact, deleteFollowUp} from './../actions/followUps';
 import {updateContact} from './../actions/contacts';
 import {removeErrors} from './../actions/errors';
-import DateTimePicker from 'react-native-modal-datetime-picker';
 import _ from 'lodash';
-import {calculateDimension, extractIdFromPouchId, computeIdForFileType, updateRequiredFields, getTranslation} from './../utils/functions';
+import {getTranslation} from './../utils/functions';
 import translations from './../utils/translations'
 
 
@@ -143,8 +134,6 @@ function mapStateToProps(state) {
 
 function matchDispatchProps(dispatch) {
     return bindActionCreators({
-        getFollowUpsForOutbreakId,
-        getMissedFollowUpsForOutbreakId,
         createFollowUp,
         updateFollowUpAndContact,
         deleteFollowUp,
