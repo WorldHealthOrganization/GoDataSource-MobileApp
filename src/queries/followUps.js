@@ -9,6 +9,7 @@ import config from './../utils/config';
 
 // Credentials: {email, encryptedPassword}
 export function getFollowUpsForOutbreakIdRequest (outbreakId, filter, userTeams, token, callback) {
+    let start = new Date().getTime();
     getDatabase(config.mongoCollections.followUp)
         .then((database) => {
             // Possible filters here are date and type, but we're not going to focus on type(to do, missed) since that can be mapped on the component
@@ -23,29 +24,35 @@ export function getFollowUpsForOutbreakIdRequest (outbreakId, filter, userTeams,
                 endDate = moment(filter.date.getTime() + (oneDay + (moment().isDST() ? filter.date.getTimezoneOffset() : (filter.date.getTimezoneOffset() - 60)) * 60 * 1000)).add(-1, 'second')._d.getTime();
             }
 
-            let start = new Date().getTime();
-
             database.find({
                 selector: {
                     _id: {
                         $gte: `followUp.json_${outbreakId}_${startDate}_`,
                         $lte: `followUp.json_${outbreakId}_${endDate}_\uffff`
                     },
-                    fileType: 'followUp.json',
                     deleted: false,
-                    outbreakId: outbreakId,
-                    teamId: {$in: userTeams}
+                    $or: [
+                        {
+                            teamId: {$in: userTeams}
+                        },
+                        {
+                            teamId: {$eq: null}
+                        },
+                        {
+                            teamId: {$eq: undefined}
+                        }
+                    ]
                 }
             })
                 .then((resultFind) => {
-                    console.log('Result for find time for followUps: ', new Date().getTime() - start);
-                    let followUpList = resultFind.docs;
+                    // let followUpList = resultFind.docs;
                     // if (userTeams !== null && userTeams !== undefined && Array.isArray(userTeams) && userTeams.length > 0) {
                     //     followUpList = followUpList.filter((e) => {
                     //         return userTeams.indexOf(e.teamId) >= 0 || e.teamId === undefined || e.teamId === null
                     //     })
                     // }
-                    callback(null, followUpList)
+                    console.log('Result for find time for followUps: ', new Date().getTime() - start);
+                    callback(null, resultFind.docs)
                 })
                 .catch((errorFind) => {
                     console.log('Error find for followUps: ', errorFind);
@@ -200,16 +207,16 @@ export function addFollowUpsBulkRequest (followUps, callback) {
         });
 }
 
-<<<<<<< HEAD
-export function getFollowUpsForContactRequest (outbreakId, keys, contactFollowUp, callback) {
+export function getFollowUpsForContactRequest (outbreakId, keys, contactFollowUp, userTeams, callback) {
+    let start = new Date().getTime();
     getDatabase(config.mongoCollections.followUp)
         .then((database) => {
             console.log("getCasesForOutbreakIdRequest: ", outbreakId, keys);
-            let startDate = null
-            let endDate = null
+            let startDate = null;
+            let endDate = null;
             if (contactFollowUp) {
-                startDate = contactFollowUp.startDate
-                endDate = contactFollowUp.endDate
+                startDate = contactFollowUp.startDate;
+                endDate = contactFollowUp.endDate;
             }
 
             database.find({
@@ -220,52 +227,32 @@ export function getFollowUpsForContactRequest (outbreakId, keys, contactFollowUp
                     },
                     outbreakId: outbreakId,
                     deleted: false,
-                    personId: {$in: keys}
+                    personId: {$in: keys},
+                    $or: [
+                        {
+                            teamId: {$in: userTeams}
+                        },
+                        {
+                            teamId: {$eq: null}
+                        },
+                        {
+                            teamId: {$eq: undefined}
+                        }
+                    ]
                 }
             })
                 .then((result) => {
-                    console.log('getFollowUpsForContactRequest request: ');
-                    callback(null, result.docs)
+                    let followUpList = result.docs;
+                    // if (userTeams !== null && userTeams !== undefined && Array.isArray(userTeams) && userTeams.length > 0) {
+                    //     followUpList = followUpList.filter((e) => userTeams.indexOf(e.teamId) >= 0 || e.teamId === undefined || e.teamId === null)
+                    // }
+                    console.log('getFollowUpsForContactRequest request time: ', new Date().getTime() - start);
+                    callback(null, followUpList)
                 })
                 .catch((error) => {
                     console.log('getFollowUpsForContactRequest error: ', error);
                     callback(error)
                 })
-=======
-export function getFollowUpsForContactRequest (outbreakId, keys, contactFollowUp, userTeams, callback) {
-    let database = getDatabase();
-
-    console.log("getCasesForOutbreakIdRequest: ", outbreakId, keys);
-    let startDate = null
-    let endDate = null
-    if (contactFollowUp) {
-        startDate = contactFollowUp.startDate
-        endDate = contactFollowUp.endDate
-    }
-
-    database.find({
-        selector: {
-            _id: {
-                $gte: `followUp.json_${outbreakId}_`,
-                $lte: `followUp.json_${outbreakId}_\uffff`
-            },
-            outbreakId: outbreakId,
-            deleted: false,
-            personId: {$in: keys}
-        }
-    })
-        .then((result) => {
-            console.log('getFollowUpsForContactRequest request: ');
-            let followUpList = result.docs
-            if (userTeams !== null && userTeams !== undefined && Array.isArray(userTeams) && userTeams.length > 0) {
-                followUpList = followUpList.filter((e) => userTeams.indexOf(e.teamId) >= 0 || e.teamId === undefined || e.teamId === null)
-            }
-            callback(null, followUpList)
-        })
-        .catch((error) => {
-            console.log('getFollowUpsForContactRequest error: ', error);
-            callback(error)
->>>>>>> master
         })
         .catch((errorGetDatabase) => {
             console.log('Error while getting database: ', errorGetDatabase);
