@@ -4,27 +4,27 @@
 /**
  * Created by florinpopa on 05/07/2018.
  */
-import React, {Component} from 'react';
-import {View, StyleSheet, findNodeHandle, Alert} from 'react-native';
+import React, { Component } from 'react';
+import { View, StyleSheet, findNodeHandle, Alert, ScrollView } from 'react-native';
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import Button from './../components/Button';
 import styles from './../styles';
-import {connect} from "react-redux";
-import {bindActionCreators} from "redux";
+import { connect } from "react-redux";
+import { bindActionCreators } from "redux";
 import ElevatedView from 'react-native-elevated-view';
-import {calculateDimension, getTranslation} from './../utils/functions';
+import { calculateDimension, getTranslation } from './../utils/functions';
 import config from './../utils/config';
 import Section from './../components/Section';
-import {Dialog} from 'react-native-ui-lib';
+import { Dialog } from 'react-native-ui-lib';
 import translations from './../utils/translations';
 import QuestionCard from './../components/QuestionCard';
-import _, {sortBy} from "lodash";
-import {extractAllQuestions} from './../utils/functions';
-import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
-import {checkRequiredQuestions} from './../utils/functions';
+import _, { sortBy } from "lodash";
+import { extractAllQuestions } from './../utils/functions';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import { checkRequiredQuestions } from './../utils/functions';
 
-class AddSingleAnswerModalScreen extends Component{
+class AddSingleAnswerModalScreen extends Component {
 
     constructor(props) {
         super(props);
@@ -34,7 +34,7 @@ class AddSingleAnswerModalScreen extends Component{
         };
     }
 
-    static getDerivedStateFromProps (props, state) {
+    static getDerivedStateFromProps(props, state) {
         if (props.item) {
             if (typeof props.currentAnswers === 'object' && Object.keys(props.currentAnswers).length === 0) {
                 props.currentAnswers[props.item.variable] = [{
@@ -48,12 +48,13 @@ class AddSingleAnswerModalScreen extends Component{
         }
     }
 
-    render () {
+    render() {
         let contentWidth = calculateDimension(350, false, this.props.screenSize);
         let marginHorizontal = calculateDimension(14, false, this.props.screenSize);
         let height = calculateDimension(450, true, this.props.screenSize);
+
         return (
-            <Dialog
+            < Dialog
                 visible={this.props.showAddSingleAnswerModalScreen}
                 width={contentWidth}
                 height={height}
@@ -67,24 +68,28 @@ class AddSingleAnswerModalScreen extends Component{
                         borderRadius: 4,
                         marginVertical: 10,
                     }}>
-                    <View style={{flex: 0.1}}>
+                    <View style={{ flex: 0.1 }}>
                         <Section
                             label={getTranslation(translations.addSingleAnswerModalScreen.addNewAnswer, this.props.translation)}
                             hasBorderBottom={false}
-                            containerStyle={{width: '100%', flex: 1}}
+                            containerStyle={{ width: '100%', flex: 1 }}
                             translation={this.props.translation}
                         />
                     </View>
-                    <KeyboardAwareScrollView
+                    {/* <KeyboardAwareScrollView
                         style={style.containerScrollView}
-                        contentContainerStyle={[style.contentContainerStyle, {paddingBottom: this.props.screenSize.height < 600 ? 70 : 20}]}
+                        contentContainerStyle={[style.contentContainerStyle, { paddingBottom: this.props.screenSize.height < 600 ? 70 : 20 }]}
                         keyboardShouldPersistTaps={'always'}
                         extraHeight={20 + 81 + 50 + 70}
                         innerRef={ref => {
                             this.scrollAddSingleAnswerModal = ref
                         }}
+                    > */}
+                    <ScrollView
+                        style={style.containerScrollView}
+                        contentContainerStyle={[style.contentContainerStyle, { paddingBottom: this.props.screenSize.height < 600 ? 70 : 20 }]}
                     >
-                        <View style={{flex: 0.8, alignItems: 'center', justifyContent: 'center'}}>
+                        <View style={{ flex: 0.8, alignItems: 'center', justifyContent: 'center' }}>
                             {
                                 this.state.item && this.props.currentAnswers ? (
                                     <QuestionCard
@@ -105,7 +110,8 @@ class AddSingleAnswerModalScreen extends Component{
                                 ) : (null)
                             }
                         </View>
-                    </KeyboardAwareScrollView>
+                    </ScrollView>
+                    {/* </KeyboardAwareScrollView> */}
                     <View style={{
                         flex: 0.1,
                         flexDirection: 'row',
@@ -130,7 +136,7 @@ class AddSingleAnswerModalScreen extends Component{
                         />
                     </View>
                 </ElevatedView>
-            </Dialog>
+            </Dialog >
         );
     }
 
@@ -246,7 +252,7 @@ class AddSingleAnswerModalScreen extends Component{
                 if (questionnaireAnswers[questionId][0].subAnswers && typeof questionnaireAnswers[questionId][0].subAnswers === "object" && Object.keys(questionnaireAnswers[questionId][0].subAnswers).length > 0) {
                     for (let subQuestionId in questionnaireAnswers[questionId][0].subAnswers) {
                         questionnaireAnswers[questionId][0].subAnswers[subQuestionId].map((e) => {
-                            return {value: e.value, date: value};
+                            return { value: e.value, date: value };
                         })
                     }
                 }
@@ -260,12 +266,12 @@ class AddSingleAnswerModalScreen extends Component{
         // First Check for required questions
         console.log('onSavePressed AddSingleAnswerModalScreen: ', this.props.item, this.props.currentAnswers);
         let checkRequiredFields = checkRequiredQuestions([this.props.item], this.props.currentAnswers);
-        checkRequiredFields = checkRequiredFields.map((e) => {return getTranslation(e, this.props.translation)});
+        checkRequiredFields = checkRequiredFields.map((e) => { return getTranslation(e, this.props.translation) });
         if (checkRequiredFields && Array.isArray(checkRequiredFields) && checkRequiredFields.length > 0) {
             Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), `${getTranslation(translations.alertMessages.requiredFieldsMissingError, this.props.translation)}.\n${getTranslation(translations.alertMessages.missingFields, this.props.translation)}: ${checkRequiredFields}`, [
                 {
                     text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
-                    onPress: () => {console.log("OK pressed")}
+                    onPress: () => { console.log("OK pressed") }
                 }
             ])
         } else {
@@ -278,12 +284,12 @@ class AddSingleAnswerModalScreen extends Component{
     };
 
     handleOnFocus = (event) => {
-        this.scrollToInput(findNodeHandle(event.target))
+        // this.scrollToInput(findNodeHandle(event.target))
     };
 
-    scrollToInput (reactNode) {
+    scrollToInput(reactNode) {
         // Add a 'scroll' ref to your ScrollView
-        this.scrollAddSingleAnswerModal.props.scrollToFocusedInput(reactNode)
+        // this.scrollAddSingleAnswerModal.props.scrollToFocusedInput(reactNode)
     };
 }
 

@@ -3,16 +3,16 @@
  */
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
-import React, {PureComponent} from 'react';
-import {View, StyleSheet, ScrollView, findNodeHandle} from 'react-native';
-import {calculateDimension, getTranslation, handleExposedTo, getAddress, extractIdFromPouchId} from './../utils/functions';
+import React, { PureComponent } from 'react';
+import { View, StyleSheet, ScrollView, findNodeHandle } from 'react-native';
+import { calculateDimension, getTranslation, handleExposedTo, getAddress, extractIdFromPouchId } from './../utils/functions';
 import config from './../utils/config';
-import {connect} from "react-redux";
-import {bindActionCreators} from "redux";
+import { connect } from "react-redux";
+import { bindActionCreators } from "redux";
 import styles from './../styles';
 import CardComponent from './../components/CardComponent';
 import Button from './../components/Button';
-import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import translations from './../utils/translations'
 import ElevatedView from 'react-native-elevated-view';
 import _ from 'lodash';
@@ -53,14 +53,18 @@ class FollowUpsSingleGetInfoContainer extends PureComponent {
                         marginVertical: calculateDimension(12.5, true, this.props.screenSize)
                     }}
                 />
-                <KeyboardAwareScrollView
+                {/* <KeyboardAwareScrollView
                     style={style.containerScrollView}
-                    contentContainerStyle={[style.contentContainerStyle, {paddingBottom: this.props.screenSize.height < 600 ? 70 : 20}]}
+                    contentContainerStyle={[style.contentContainerStyle, { paddingBottom: this.props.screenSize.height < 600 ? 70 : 20 }]}
                     keyboardShouldPersistTaps={'always'}
                     extraHeight={20 + 81 + 50 + 70}
                     innerRef={ref => {
                         this.scrollFollowUpsSingleGetInfo = ref
                     }}
+                > */}
+                <ScrollView
+                    style={style.containerScrollView}
+                    contentContainerStyle={[style.contentContainerStyle, { paddingBottom: this.props.screenSize.height < 600 ? 70 : 20 }]}
                 >
                     {
                         config.followUpsSingleScreen.generalInfo.map((item) => {
@@ -74,7 +78,8 @@ class FollowUpsSingleGetInfoContainer extends PureComponent {
                             ) : null
                         }
                     </View>
-                </KeyboardAwareScrollView>
+                </ScrollView>
+                {/* </KeyboardAwareScrollView> */}
             </View>
         );
     };
@@ -83,9 +88,9 @@ class FollowUpsSingleGetInfoContainer extends PureComponent {
     handleRenderItem = (item) => {
         let fields = item.fields.map((field) => {
             if (this.props.isNew === false && field.id === 'date') {
-                return Object.assign({},field, {isEditMode: false})
+                return Object.assign({}, field, { isEditMode: false })
             } else {
-                return Object.assign({},field, {isEditMode: this.props.isEditMode})
+                return Object.assign({}, field, { isEditMode: this.props.isEditMode })
             }
         });
 
@@ -105,7 +110,7 @@ class FollowUpsSingleGetInfoContainer extends PureComponent {
                 marginVertical: 4,
                 minHeight: calculateDimension(72, true, this.props.screenSize)
             }, style.cardStyle]}>
-                <ScrollView scrollEnabled={false} style={{flex: 1}} contentContainerStyle={{flexGrow: 1}}>
+                <ScrollView scrollEnabled={false} style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }}>
                     {
                         fields && fields.map((item, index) => {
                             return this.handleRenderItemCardComponent(item, index, cardIndex);
@@ -118,7 +123,7 @@ class FollowUpsSingleGetInfoContainer extends PureComponent {
 
     handleRenderItemCardComponent = (item, index, cardIndex) => {
         return (
-            <View style={[style.subcontainerCardComponent, {flex: 1}]} key={index}>
+            <View style={[style.subcontainerCardComponent, { flex: 1 }]} key={index}>
                 {
                     this.handleRenderItemByType(item, cardIndex)
                 }
@@ -141,18 +146,20 @@ class FollowUpsSingleGetInfoContainer extends PureComponent {
         if (item.type === 'DropdownInput') {
             item.data = this.computeDataForFollowUpSingleScreenDropdownInput(item);
         }
-        
+
         if (item.type === 'DatePicker' && this.props.item && this.props.item !== undefined && this.props.item[item.id] !== undefined) {
             value = this.props.item[item.id]
         } else if (item.type === 'SwitchInput' && this.props.item && this.props.item !== undefined && this.props.item[item.id] !== undefined) {
             value = this.props.item[item.id]
         } else if (item.type === 'DropDownSectioned') {
             if (this.props.item && this.props.item.address && this.props.item.address[item.id] && this.props.item.address[item.id] !== "") {
-                for (let i = 0; i < this.props.locations.length; i++) {
-                    let myLocationName = this.getLocationNameById(this.props.locations[i], this.props.item.address[item.id])
-                    if (myLocationName !== null){
-                        value = myLocationName
-                        break
+                if (this.props.locations) {
+                    for (let i = 0; i < this.props.locations.length; i++) {
+                        let myLocationName = this.getLocationNameById(this.props.locations[i], this.props.item.address[item.id])
+                        if (myLocationName !== null) {
+                            value = myLocationName
+                            break
+                        }
                     }
                 }
             }
@@ -194,100 +201,100 @@ class FollowUpsSingleGetInfoContainer extends PureComponent {
 
     computeDataForFollowUpSingleScreenDropdownInput = (item) => {
         if (item.id === 'statusId') {
-            return _.filter(this.props.referenceData, (o) => {return o.active === true && o.categoryId.includes("LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE")})
-                    .sort((a,b) => { return a.order - b.order; })
-                    .map((o) => {return {label: getTranslation(o.value, this.props.translation), value: o.value}})
+            return _.filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId.includes("LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE") })
+                .sort((a, b) => { return a.order - b.order; })
+                .map((o) => { return { label: getTranslation(o.value, this.props.translation), value: o.value } })
         }
         if (item.id === 'typeId') {
-            return _.filter(this.props.referenceData, (o) => {return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_ADDRESS_TYPE'})
-                    .sort((a,b) => { return a.order - b.order; })
-                    .map((o) => {return {value: getTranslation(o.value, this.props.translation), id: o.value}})
+            return _.filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_ADDRESS_TYPE' })
+                .sort((a, b) => { return a.order - b.order; })
+                .map((o) => { return { value: getTranslation(o.value, this.props.translation), id: o.value } })
         }
     };
 
     computeDataForDropdown = (item, contact) => {
         if (item.id === 'exposedTo') {
-            if (this.props.cases && this.props.cases.length > 0){
-                return this.props.cases.map((e) => {return {value: ((e.firstName ? e.firstName : '') + (e.lastName ? (" " + e.lastName) : ''))}});
+            if (this.props.cases && this.props.cases.length > 0) {
+                return this.props.cases.map((e) => { return { value: ((e.firstName ? e.firstName : '') + (e.lastName ? (" " + e.lastName) : '')) } });
             }
         }
 
         if (item.id === 'address') {
-            return contact.addresses.map((e) => {return Object.assign({}, e, {value: getAddress(e, true)})});
+            return contact.addresses.map((e) => { return Object.assign({}, e, { value: getAddress(e, true) }) });
         }
 
         if (item.id === 'riskLevel') {
-            return _.filter(this.props.referenceData, (o) => {return o.active === true && o.categoryId.includes("RISK_LEVEL")})
-                    .sort((a,b) => { return a.order - b.order; })
-                    .map((o) => {return {value: getTranslation(o.value, this.props.translation), id: o.value}})
+            return _.filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId.includes("RISK_LEVEL") })
+                .sort((a, b) => { return a.order - b.order; })
+                .map((o) => { return { value: getTranslation(o.value, this.props.translation), id: o.value } })
         }
 
         if (item.id === 'classification') {
-            return _.filter(this.props.referenceData, (o) => {return o.active === true && o.categoryId.includes("CASE_CLASSIFICATION")})
-                    .sort((a,b) => { return a.order - b.order; })
-                    .map((o) => {return {label: getTranslation(o.value, this.props.translation), value: o.value}})
+            return _.filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId.includes("CASE_CLASSIFICATION") })
+                .sort((a, b) => { return a.order - b.order; })
+                .map((o) => { return { label: getTranslation(o.value, this.props.translation), value: o.value } })
         }
 
         if (item.id === 'gender') {
-            return _.filter(this.props.referenceData, (o) => {return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_GENDER'})
-                    .sort((a,b) => { return a.order - b.order; })
-                    .map((o) => {return {label: getTranslation(o.value, this.props.translation), value: o.value}})
+            return _.filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_GENDER' })
+                .sort((a, b) => { return a.order - b.order; })
+                .map((o) => { return { label: getTranslation(o.value, this.props.translation), value: o.value } })
         }
 
         if (item.id === 'typeId') {
-            return _.filter(this.props.referenceData, (o) => {return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_ADDRESS_TYPE'})
-                    .sort((a,b) => { return a.order - b.order; })
-                    .map((o) => {return {label: getTranslation(o.value, this.props.translation), value: o.value}})
+            return _.filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_ADDRESS_TYPE' })
+                .sort((a, b) => { return a.order - b.order; })
+                .map((o) => { return { label: getTranslation(o.value, this.props.translation), value: o.value } })
         }
 
         if (item.id === 'labName') {
-            return _.filter(this.props.referenceData, (o) => {return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_LAB_NAME'})
-                    .sort((a,b) => { return a.order - b.order; })
-                    .map((o) => {return {value: getTranslation(o.value, this.props.translation), id: o.value}})
+            return _.filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_LAB_NAME' })
+                .sort((a, b) => { return a.order - b.order; })
+                .map((o) => { return { value: getTranslation(o.value, this.props.translation), id: o.value } })
         }
 
         if (item.id === 'sampleType') {
-            return _.filter(this.props.referenceData, (o) => {return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_TYPE_OF_SAMPLE'})
-                    .sort((a,b) => { return a.order - b.order; })
-                    .map((o) => {return {value: getTranslation(o.value, this.props.translation), id: o.value}})
+            return _.filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_TYPE_OF_SAMPLE' })
+                .sort((a, b) => { return a.order - b.order; })
+                .map((o) => { return { value: getTranslation(o.value, this.props.translation), id: o.value } })
         }
 
         if (item.id === 'testType') {
-            return _.filter(this.props.referenceData, (o) => {return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_TYPE_OF_LAB_TEST'})
-                    .sort((a,b) => { return a.order - b.order; })
-                    .map((o) => {return {value: getTranslation(o.value, this.props.translation), id: o.value}})
+            return _.filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_TYPE_OF_LAB_TEST' })
+                .sort((a, b) => { return a.order - b.order; })
+                .map((o) => { return { value: getTranslation(o.value, this.props.translation), id: o.value } })
         }
 
         if (item.id === 'result') {
-            return _.filter(this.props.referenceData, (o) => {return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_LAB_TEST_RESULT'})
-                    .sort((a,b) => { return a.order - b.order; })
-                    .map((o) => {return {value: getTranslation(o.value, this.props.translation), id: o.value}})
+            return _.filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_LAB_TEST_RESULT' })
+                .sort((a, b) => { return a.order - b.order; })
+                .map((o) => { return { value: getTranslation(o.value, this.props.translation), id: o.value } })
         }
 
         if (item.id === 'status') {
-            return _.filter(this.props.referenceData, (o) => {return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_LAB_TEST_RESULT_STATUS'})
-                    .sort((a,b) => { return a.order - b.order; })
-                    .map((o) => {return {value: getTranslation(o.value, this.props.translation), id: o.value}})
+            return _.filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_LAB_TEST_RESULT_STATUS' })
+                .sort((a, b) => { return a.order - b.order; })
+                .map((o) => { return { value: getTranslation(o.value, this.props.translation), id: o.value } })
         }
 
         if (item.id === 'categories') {
-            return _.filter(this.props.helpCategory, (o) => {return o.deleted === false && o.fileType === 'helpCategory.json'})
-                    .sort((a,b) => { return a.order - b.order; })
-                    .map((o) => {return {label: getTranslation(o.name, this.props.translation), value: o._id}})
+            return _.filter(this.props.helpCategory, (o) => { return o.deleted === false && o.fileType === 'helpCategory.json' })
+                .sort((a, b) => { return a.order - b.order; })
+                .map((o) => { return { label: getTranslation(o.name, this.props.translation), value: o._id } })
         }
 
         return [];
     };
 
     getLocationNameById = (element, locationId) => {
-        if(extractIdFromPouchId(element._id, 'location') === locationId) {
+        if (extractIdFromPouchId(element._id, 'location') === locationId) {
             return element.name;
         } else {
             if (element.children && element.children.length > 0) {
                 let i;
                 let result = null;
 
-                for(i=0; result === null && i < element.children.length; i++){
+                for (i = 0; result === null && i < element.children.length; i++) {
                     result = this.getLocationNameById(element.children[i], locationId);
                 }
                 return result;
@@ -324,13 +331,13 @@ class FollowUpsSingleGetInfoContainer extends PureComponent {
                     return contact[id];
                 }
             } else {
-                if(cases[id]){
+                if (cases[id]) {
                     if (typeof cases[id] === 'string' && cases[id].includes('LNG_')) {
                         return getTranslation(cases[id], this.props.translation);
                     } else {
                         return cases[id];
                     }
-                }else {
+                } else {
                     return '';
                 }
             }
@@ -338,17 +345,17 @@ class FollowUpsSingleGetInfoContainer extends PureComponent {
     };
 
     handleOnFocus = (event) => {
-        this.scrollToInput(findNodeHandle(event.target))
+        // this.scrollToInput(findNodeHandle(event.target))
     };
 
-    handleOnBlur = (event) =>{
-        this.scrollFollowUpsSingleGetInfo.props.scrollToPosition(0, 0, false)
-        this.scrollToInput(findNodeHandle(event.target))
+    handleOnBlur = (event) => {
+        // this.scrollFollowUpsSingleGetInfo.props.scrollToPosition(0, 0, false)
+        // this.scrollToInput(findNodeHandle(event.target))
     }
 
-    scrollToInput (reactNode) {
+    scrollToInput(reactNode) {
         // Add a 'scroll' ref to your ScrollView
-        this.scrollFollowUpsSingleGetInfo.props.scrollToFocusedInput(reactNode)
+        // this.scrollFollowUpsSingleGetInfo.props.scrollToFocusedInput(reactNode)
     };
 }
 

@@ -1,22 +1,24 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
-import React, {Component} from 'react';
-import {View, Text, StyleSheet, Alert, ScrollView} from 'react-native';
+import React, { Component } from 'react';
+import { View, Text, StyleSheet, Alert, ScrollView, findNodeHandle } from 'react-native';
 import styles from './../styles';
 import NavBarCustom from './../components/NavBarCustom';
-import {connect} from "react-redux";
-import {bindActionCreators} from "redux";
-import _, {sortBy} from 'lodash';
-import {calculateDimension, getTranslation} from './../utils/functions';
+import { connect } from "react-redux";
+import { bindActionCreators } from "redux";
+import _, { sortBy } from 'lodash';
+import { calculateDimension, getTranslation } from './../utils/functions';
 import translations from './../utils/translations';
 import ElevatedView from 'react-native-elevated-view';
 import config from './../utils/config';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import QuestionCardContent from './../components/QuestionCardContent';
 import ActionsBar from './../components/ActionsBar';
 import cloneDeep from "lodash/cloneDeep";
 import get from 'lodash/get';
 import set from 'lodash/set';
-import {extractAllQuestions} from "../utils/functions";
+import ViewHOC from './../components/ViewHOC';
+import { extractAllQuestions } from "../utils/functions";
 import Button from './../components/Button';
 
 class PreviousAnswersScreen extends Component {
@@ -38,9 +40,11 @@ class PreviousAnswersScreen extends Component {
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
-        // console.log('Render PreviousAnswersScreen: ', this.state.previousAnswers);
         return (
-            <View style={{flex: 1, backgroundColor: 'white'}}>
+            <ViewHOC style={{ flex: 1, backgroundColor: 'white' }}
+                showLoader={false}
+                loaderText={"test"}
+            >
                 <NavBarCustom customTitle={
                     <View
                         style={{
@@ -51,17 +55,17 @@ class PreviousAnswersScreen extends Component {
                             height: '100%'
                         }}
                     >
-                        <Text style={[style.title, {marginLeft: 30}]}>
+                        <Text style={[style.title, { marginLeft: 30 }]}>
                             {getTranslation(translations.previousAnswersScreen.previousAnswersTitle, this.props.translation)}
                         </Text>
                     </View>
                 }
-                              title={null}
-                              navigator={this.props.navigator}
-                              iconName="close"
-                              handlePressNavbarButton={this.handlePressNavbarButton}
+                    title={null}
+                    navigator={this.props.navigator}
+                    iconName="close"
+                    handlePressNavbarButton={this.handlePressNavbarButton}
                 />
-                <View style={{backgroundColor: styles.screenBackgroundGrey, justifyContent: 'center', alignItems: 'center'}}>
+                <View style={{ backgroundColor: styles.screenBackgroundGrey, justifyContent: 'center', alignItems: 'center' }}>
                     <Button
                         title={getTranslation(translations.generalButtons.saveButtonLabel, this.props.translation)}
                         onPress={this.savePreviousAnswers}
@@ -72,9 +76,19 @@ class PreviousAnswersScreen extends Component {
                         style={{
                             marginVertical: calculateDimension(12.5, true, this.props.screenSize),
                             marginHorizontal: calculateDimension(16, false, this.props.screenSize),
-                        }}/>
+                        }} />
 
                 </View>
+                {/* <KeyboardAwareScrollView
+                    style={style.containerScrollView}
+                    contentContainerStyle={[style.contentContainerStyle, { paddingBottom: this.props.screenSize.height < 600 ? 70 : 20 }]}
+                    keyboardShouldPersistTaps={'always'}
+                    // extraHeight={20 + 81 + 70}
+                    extraHeight={0}
+                    innerRef={ref => {
+                        this.scrollPrevAnswer = ref
+                    }}
+                > */}
                 <ScrollView style={style.mapContainer} contentContainerStyle={style.containerContent}>
                     {
                         this.state && this.state.previousAnswers && Array.isArray(this.state.previousAnswers) && this.state.previousAnswers.length > 0 && this.state.previousAnswers.map((previousAnswer, index) => {
@@ -82,19 +96,33 @@ class PreviousAnswersScreen extends Component {
                         })
                     }
                 </ScrollView>
-            </View>
+                {/* </KeyboardAwareScrollView> */}
+            </ViewHOC>
         );
     }
 
+    handleOnFocus = (event) => {
+        // this.scrollToInput(findNodeHandle(event.target))
+    };
+
+    handleOnBlur = (event) => {
+        // this.scrollPrevAnswer.props.scrollToPosition(0, 0, false)
+        // this.scrollToInput(findNodeHandle(event.target))
+    }
+
+    scrollToInput(reactNode) {
+        // this.scrollPrevAnswer.props.scrollToFocusedInput(reactNode)
+    };
+
     // Please write here all the methods that are not react native lifecycle methods
     handlePressNavbarButton = () => {
-       this.props.navigator.dismissModal();
+        this.props.navigator.dismissModal();
     };
 
     // List render methods
     listEmptyComponent = () => {
         return (
-            <View style={[style.mapContainer, {height: calculateDimension((667 - 152), true, this.props.screenSize)}]}>
+            <View style={[style.mapContainer, { height: calculateDimension((667 - 152), true, this.props.screenSize) }]}>
                 <Text style={style.emptyComponentTextView}>
                     {getTranslation(translations.previousAnswersScreen.noPreviousAnswersToShowMessage, this.props.translation)}
                 </Text>
@@ -111,7 +139,7 @@ class PreviousAnswersScreen extends Component {
         let buttonWidth = calculateDimension(120, false, this.props.screenSize);
 
         let source = {};
-        source[this.props.previousAnswerVariable] = [this.state .previousAnswers[index]];
+        source[this.props.previousAnswerVariable] = [this.state.previousAnswers[index]];
         let sortedQuestions = sortBy(cloneDeep([this.props.item]), ['order', 'variable']);
         sortedQuestions = extractAllQuestions(sortedQuestions, source);
         return (
@@ -126,13 +154,15 @@ class PreviousAnswersScreen extends Component {
             >
                 <QuestionCardContent
                     item={sortedQuestions[0]}
+                    onFocus={this.handleOnFocus}
+                    onBlur={this.handleOnBlur}
                     source={source}
                     viewWidth={viewWidth}
                     viewMarginHorizontal={marginHorizontal}
                     hideButtons={true}
                     buttonWidth={buttonWidth}
                     buttonHeight={buttonHeight}
-                    onClickAddNewMultiFrequencyAnswer={() => {}}
+                    onClickAddNewMultiFrequencyAnswer={() => { }}
                     onChangeTextAnswer={(value, id, parentId) => {
                         this.onChangeTextAnswer(value, id, parentId, index)
                     }}
@@ -153,9 +183,9 @@ class PreviousAnswersScreen extends Component {
                 />
                 <ActionsBar
                     textsArray={[getTranslation(translations.caseSingleScreen.deleteButton, this.props.translation)]}
-                    textsStyleArray={[{fontFamily: 'Roboto-Regular', fontSize: 14, color: 'red', marginHorizontal}]}
-                    onPressArray={[() => {this.handleDeletePrevAnswer(index)}]}
-                    containerStyle={[{height: 54}]}
+                    textsStyleArray={[{ fontFamily: 'Roboto-Regular', fontSize: 14, color: 'red', marginHorizontal }]}
+                    onPressArray={[() => { this.handleDeletePrevAnswer(index) }]}
+                    containerStyle={[{ height: 54 }]}
                     isEditMode={true}
                     translation={this.props.translation}
                 />
@@ -178,9 +208,9 @@ class PreviousAnswersScreen extends Component {
             previousAnswers: questionnaireAnswers,
             isModified: true
         }
-        // , () => {
-        //     console.log ('onChangeMultipleSelection after setState', this.state.previousAnswers)
-        // }
+            // , () => {
+            //     console.log ('onChangeMultipleSelection after setState', this.state.previousAnswers)
+            // }
         )
     };
     onChangeSingleSelection = (value, id, parentId, index) => {
@@ -197,9 +227,9 @@ class PreviousAnswersScreen extends Component {
             previousAnswers: questionnaireAnswers,
             isModified: true
         }
-        // , () => {
-        //     console.log ('onChangeMultipleSelection after setState', this.state.previousAnswers)
-        // }
+            // , () => {
+            //     console.log ('onChangeMultipleSelection after setState', this.state.previousAnswers)
+            // }
         )
     };
     onChangeMultipleSelection = (value, id, parentId, index) => {
@@ -216,9 +246,9 @@ class PreviousAnswersScreen extends Component {
             previousAnswers: questionnaireAnswers,
             isModified: true
         }
-        // , () => {
-        //     console.log ('onChangeMultipleSelection after setState', this.state.previousAnswers)
-        // }
+            // , () => {
+            //     console.log ('onChangeMultipleSelection after setState', this.state.previousAnswers)
+            // }
         )
     };
     onChangeDateAnswer = (value, id, parentId, index) => {
@@ -235,9 +265,9 @@ class PreviousAnswersScreen extends Component {
             previousAnswers: questionnaireAnswers,
             isModified: true
         }
-        // , () => {
-        //     console.log ('onChangeDateAnswer after setState', this.state.previousAnswers)
-        // }
+            // , () => {
+            //     console.log ('onChangeDateAnswer after setState', this.state.previousAnswers)
+            // }
         )
     };
     onChangeAnswerDate = (value, questionId, index) => {
@@ -268,9 +298,9 @@ class PreviousAnswersScreen extends Component {
             previousAnswers: questionnaireAnswers,
             isModified: true
         }
-        // , () => {
-        //     console.log ('onChangeAnswerDate after setState', this.state.previousAnswers);
-        // }
+            // , () => {
+            //     console.log ('onChangeAnswerDate after setState', this.state.previousAnswers);
+            // }
         )
     };
 
@@ -281,7 +311,7 @@ class PreviousAnswersScreen extends Component {
     handleDeletePrevAnswer = (index) => {
         Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.alertMessages.deletePreviousAnswer, this.state.translation), [
             {
-                text: getTranslation(translations.generalLabels.noAnswer, this.props.translation), onPress: () => {console.log('Cancel pressed')}
+                text: getTranslation(translations.generalLabels.noAnswer, this.props.translation), onPress: () => { console.log('Cancel pressed') }
             },
             {
                 text: getTranslation(translations.generalLabels.yesAnswer, this.props.translation), onPress: () => {
@@ -314,6 +344,13 @@ const style = StyleSheet.create({
     },
     separatorComponentStyle: {
         height: 8
+    },
+    containerScrollView: {
+        flex: 1,
+        backgroundColor: styles.screenBackgroundGrey
+    },
+    contentContainerStyle: {
+        alignItems: 'center'
     },
     listViewStyle: {
 
