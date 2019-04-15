@@ -28,7 +28,7 @@ import {unzipFile, readDir} from './../utils/functions';
 import RNFetchBlobFs from 'rn-fetch-blob/fs';
 import {processFile, getDataFromDatabaseFromFile} from './../utils/functions';
 import {createDatabase, getDatabase} from './../queries/database';
-import {setNumberOfFilesProcessed, createZipFileAtPath, extractIdFromPouchId} from './../utils/functions';
+import {setNumberOfFilesProcessed, createZipFileAtPath, extractIdFromPouchId, removeAllDatabases} from './../utils/functions';
 import {AsyncStorage} from 'react-native';
 import {getUserById} from './user';
 import {uniq} from 'lodash';
@@ -1167,14 +1167,14 @@ export function appInitialized(nativeEventEmitter) {
             if (loggedUser !== null) {
                 try {
                     let activeDatabase = await AsyncStorage.getItem('activeDatabase');
-                    console.log('Active database: ', activeDatabase);
+                    // console.log('Active database: ', activeDatabase);
                     if (activeDatabase !== null) {
                         dispatch(saveActiveDatabase(activeDatabase));
                         try {
                             let databaseCredentials = await getInternetCredentials(activeDatabase);
 
                             if (databaseCredentials) {
-                                console.log('Database credentials: ', databaseCredentials);
+                                // console.log('Database credentials: ', databaseCredentials);
                                 let server = Platform.OS === 'ios' ? databaseCredentials.server : databaseCredentials.service;
                                 try {
                                     let database = await createDatabase(server.replace(/\/|\.|\:/g, ''), databaseCredentials.password, false);
@@ -1239,13 +1239,13 @@ export function appInitialized(nativeEventEmitter) {
                 console.log("Don't have a logged user. Time to check if there is an active database and if there is, move to the login screen");
                 try {
                     let activeDatabase = await AsyncStorage.getItem('activeDatabase');
-                    console.log('Active database: ', activeDatabase);
+                    // console.log('Active database: ', activeDatabase);
                     if (activeDatabase !== null) {
                         dispatch(saveActiveDatabase(activeDatabase));
                         // If there is an active database get its credentials and proceeed to the login screen
                         try {
                             let databaseCredentials = await getInternetCredentials(activeDatabase);
-                            console.log('Database credentials: ', databaseCredentials);
+                            // console.log('Database credentials: ', databaseCredentials);
                             if (databaseCredentials) {
                                 let server = Platform.OS === 'ios' ? databaseCredentials.server : databaseCredentials.service;
                                 try {
@@ -1316,13 +1316,13 @@ export function appInitialized(nativeEventEmitter) {
             console.log("We have an error at getting logged user. We try to see if there is an active database: ");
             try {
                 let activeDatabase = await AsyncStorage.getItem('activeDatabase');
-                console.log('Active database: ', activeDatabase);
+                // console.log('Active database: ', activeDatabase);
                 if (activeDatabase !== null) {
                     dispatch(saveActiveDatabase(activeDatabase));
                     // If there is an active database get its credentials and proceeed to the login screen
                     try {
                         let databaseCredentials = await getInternetCredentials(activeDatabase);
-                        console.log('Database credentials: ', databaseCredentials);
+                        // console.log('Database credentials: ', databaseCredentials);
                         if (databaseCredentials) {
                             let server = Platform.OS === 'ios' ? databaseCredentials.server : databaseCredentials.service;
                             try {

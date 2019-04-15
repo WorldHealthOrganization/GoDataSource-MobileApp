@@ -17,6 +17,8 @@ import {getContactsForOutbreakId} from './../actions/contacts';
 import {getSyncEncryptPassword, encrypt, decrypt} from './../utils/encryption';
 import RNFS from 'react-native-fs';
 import {Buffer} from 'buffer';
+import {AsyncStorage, Platform} from "react-native";
+import {resetInternetCredentials} from "react-native-keychain";
 
 
 // This method is used for handling server responses. Please add here any custom error handling
@@ -1029,6 +1031,86 @@ export function computeIdForFileType (fileType, outbreakId, file, type) {
 
 export function generateId () {
     return uuid.v4();
+}
+
+
+export async function removeAllDatabases(callback) {
+    // Remove DocumentDirectory and LibraryDirectory
+    // console.log('Path for debug purposes: ', RNFetchBlobFS.dirs.DocumentDir);
+
+
+    // First clear the internet credentials
+    try {
+        let allDatabases = await AsyncStorage.getItem('databases');
+        if (allDatabases) {
+            allDatabases = JSON.parse(allDatabases);
+            allDatabases = allDatabases.map((e) => {return e.id});
+            try {
+                let deleteAllKeys = await AsyncStorage.multiRemove(allDatabases);
+                for (let i=0; i<allDatabases.length; i++) {
+                    try {
+                        let responseRemoveInternetCredentials = await resetInternetCredentials(allDatabases[i]);
+                    } catch(removeInternetCredentialsError) {
+                        console.log('removeInternetCredentialsError: ', removeInternetCredentialsError);
+                        break;
+                    }
+                }
+                // After removing the internet credentials delete everything from AsyncStorage
+                try {
+                    let clearAsyncStorage = await AsyncStorage.multiRemove(['loggedUser', 'databases', 'activeDatabase']);
+                    // Proceed to removing the databases. For this take into consideration the differences between the two platforms
+
+                    try {
+                        let libraryFiles = await RNFetchBlobFS.ls(Platform.OS === 'ios' ? `${RNFS.LibraryDirectoryPath}/NoCloud` : `${RNFetchBlobFS.dirs.DocumentDir}`);
+                        if (libraryFiles && Array.isArray(libraryFiles) && libraryFiles.length > 0) {
+                            for (let i = 0; i < libraryFiles.length; i++) {
+                                try {
+                                    console.log('Trying to delete file: ', libraryFiles[i]);
+                                    let deletedFile = await RNFetchBlobFS.unlink(`${RNFetchBlobFS.dirs.DocumentDir}/${libraryFiles[i]}`)
+                                } catch (errorUnlinkDocumentDir) {
+                                    console.log('ErrorUnlinkDocumentDir: ', errorUnlinkDocumentDir);
+                                    return callback(errorUnlinkDocumentDir);
+                                }
+                            }
+                            callback(null, 'success');
+                        }
+                    } catch (errorLsLibraryDir) {
+                        console.log('ErrorLsDocumentDir: ', errorLsLibraryDir);
+                        return callback(errorLsLibraryDir);
+                    }
+                } catch (errorClearAsyncStorage) {
+                    console.log('ErrorClearAsyncStorage: ', errorClearAsyncStorage);
+                    // Proceed to removing the databases. For this take into consideration the differences between the two platforms
+                    try {
+                        let libraryFiles = await RNFetchBlobFS.ls(Platform.OS === 'ios' ? `${RNFS.LibraryDirectoryPath}/NoCloud` : `${RNFetchBlobFS.dirs.DocumentDir}`);
+                        if (libraryFiles && Array.isArray(libraryFiles) && libraryFiles.length > 0) {
+                            for (let i = 0; i < libraryFiles.length; i++) {
+                                try {
+                                    console.log('Trying to delete file: ', libraryFiles[i]);
+                                    let deletedFile = await RNFetchBlobFS.unlink(`${RNFetchBlobFS.dirs.DocumentDir}/${libraryFiles[i]}`)
+                                } catch (errorUnlinkDocumentDir) {
+                                    console.log('ErrorUnlinkDocumentDir: ', errorUnlinkDocumentDir);
+                                    return callback(errorUnlinkDocumentDir);
+                                }
+                            }
+                            callback(null, 'success');
+                        }
+                    } catch (errorLsLibraryDir) {
+                        console.log('ErrorLsDocumentDir: ', errorLsLibraryDir);
+                        return callback(errorLsLibraryDir);
+                    }
+                }
+            } catch(deleteAllLastSyncDates) {
+                console.log('Error while removing last sync dates: ', deleteAllLastSyncDates)
+            }
+        } else {
+            console.log('No hubs found');
+            callback('No hubs found');
+        }
+    } catch (getAllHubsError) {
+        console.log('Get All hubs error: ', getAllHubsError);
+        callback(getAllHubsError);
+    }
 }
 
 export function mapContactsAndRelationships(contacts, relationships) {
