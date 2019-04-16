@@ -28,7 +28,7 @@ import {unzipFile, readDir} from './../utils/functions';
 import RNFetchBlobFs from 'rn-fetch-blob/fs';
 import {processFile, getDataFromDatabaseFromFile} from './../utils/functions';
 import {createDatabase, getDatabase} from './../queries/database';
-import {setNumberOfFilesProcessed, createZipFileAtPath, extractIdFromPouchId, removeAllDatabases} from './../utils/functions';
+import {setNumberOfFilesProcessed, createZipFileAtPath, extractIdFromPouchId} from './../utils/functions';
 import {AsyncStorage} from 'react-native';
 import {getUserById} from './user';
 import {uniq} from 'lodash';
