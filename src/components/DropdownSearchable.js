@@ -13,7 +13,8 @@ import SearchableDropdown from './SearchableDropdown';
 import Ripple from 'react-native-material-ripple';
 import {getContactsForOutbreakIdRequest} from './../queries/contacts';
 import {extractIdFromPouchId, createName, getTranslation} from './../utils/functions';
-import translations from './../utils/translations'
+import translations from './../utils/translations';
+import cloneDeep from 'lodash/cloneDeep';
 
 class DropdownSearchable extends PureComponent {
 
@@ -92,8 +93,18 @@ class DropdownSearchable extends PureComponent {
     handleOnSubmitEditing = () => {
         // here should make a query on contact for getting searched results
         // outbreakId should be passed by props
-        console.log('handleOnSubmitEditing: ', this.state.searchText)
-        getContactsForOutbreakIdRequest(this.props.outbreakId, {searchText: this.state.searchText}, null, (error, response) => {
+        // console.log('handleOnSubmitEditing: ', this.state.searchText);
+        let searchText = cloneDeep(this.state.searchText);
+
+        if (searchText && searchText.trim().length > 0) {
+            let splitedFilter= searchText.split(" ");
+            splitedFilter = splitedFilter.filter((e) => {return e !== ""});
+            searchText = new RegExp(splitedFilter.join("|"), "ig");
+        } else {
+            searchText = null
+        }
+
+        getContactsForOutbreakIdRequest(this.props.outbreakId, {searchText: searchText}, null, (error, response) => {
             if (error) {
                 Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.alertMessages.dropDownSearchableContactsError, this.props.translation), [
                     {

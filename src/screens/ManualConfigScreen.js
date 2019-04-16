@@ -25,7 +25,7 @@ import {getTranslation, generateId} from './../utils/functions';
 import translations from './../utils/translations';
 import SwitchInput from './../components/SwitchInput';
 import {getInternetCredentials, setInternetCredentials} from 'react-native-keychain';
-import {setSyncState} from './../actions/app';
+import {setSyncState, changeAppRoot} from './../actions/app';
 
 class ManualConfigScreen extends PureComponent {
 
@@ -518,11 +518,7 @@ class ManualConfigScreen extends PureComponent {
     closeModal = () => {
         if (this.state.syncState[this.state.syncState.length - 1].status === 'Success') {
             this.resetModalProps(() => {
-                this.props.navigator.push({
-                screen: 'LoginScreen',
-                // animationType: 'fade',
-                // animated: true
-            })
+                this.props.changeAppRoot('login');
             })
         } else {
             this.resetModalProps(() => {
@@ -607,7 +603,8 @@ function matchDispatchToProps(dispatch) {
         loginUser,
         removeErrors,
         storeHubConfiguration,
-        setSyncState
+        setSyncState,
+        changeAppRoot
     }, dispatch);
 }
 

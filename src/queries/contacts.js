@@ -29,13 +29,13 @@ export function getContactsForOutbreakIdRequest (outbreakId, filter, token, call
                     console.log('getContactsForOutbreakIdRequest else, if');
                     console.log ('myFilter', filter);
 
-                    let myFilterAge = null
+                    let myFilterAge = null;
                     if (filter.age) {
-                        myFilterAge = Object.assign([], filter.age)
-                        let maxAge = filter.age[1]
-                        let minAge = filter.age[0]
+                        myFilterAge = Object.assign([], filter.age);
+                        let maxAge = filter.age[1];
+                        let minAge = filter.age[0];
                         while (maxAge - 1 > minAge) {
-                            myFilterAge.push(minAge + 1)
+                            myFilterAge.push(minAge + 1);
                             minAge = minAge + 1
                         }
                     }

@@ -78,17 +78,17 @@ class ContactsScreen extends Component {
     }
 
     static getDerivedStateFromProps(props, state) {
-        if (state.sortData === true){
-            state.sortData = false
-            state.loading = true
-            const allFilters = createFilterContactsObject(state.filterFromFilterScreen, state.filter)
+        if (state.sortData === true && props.user && props.user.activeOutbreakId){
+            state.sortData = false;
+            state.loading = true;
+            const allFilters = createFilterContactsObject(state.filterFromFilterScreen, state.filter);
             props.getContactsForOutbreakId(props.user.activeOutbreakId, allFilters, null);
         } else {
             state.sortData = true
         }
 
         state.loading = false;
-        state.refreshing = false
+        state.refreshing = false;
         return null;
     }
 
