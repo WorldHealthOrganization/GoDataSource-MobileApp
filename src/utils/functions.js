@@ -13,12 +13,9 @@ import get from 'lodash/get';
 import sortBy from 'lodash/sortBy';
 import cloneDeep from 'lodash/cloneDeep';
 import defaultTranslations from './defaultTranslations'
-import {getContactsForOutbreakId} from './../actions/contacts';
 import {getSyncEncryptPassword, encrypt, decrypt} from './../utils/encryption';
 import RNFS from 'react-native-fs';
 import {Buffer} from 'buffer';
-import {AsyncStorage, Platform} from "react-native";
-import {resetInternetCredentials} from "react-native-keychain";
 
 
 // This method is used for handling server responses. Please add here any custom error handling
