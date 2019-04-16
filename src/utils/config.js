@@ -2399,6 +2399,8 @@ const caseBlueprint = {
     questionnaireAnswers: {}
 };
 
+const statusPendingWipe = 'LNG_DEVICE_WIPE_STATUS_PENDING';
+
 export default {
     designScreenSize,
     sideMenuItems,
@@ -2434,5 +2436,6 @@ export default {
     manualSyncStages,
     dateRangeTypes,
     documentTypes,
-    caseBlueprint
+    caseBlueprint,
+    statusPendingWipe
 }

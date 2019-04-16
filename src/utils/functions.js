@@ -13,7 +13,6 @@ import get from 'lodash/get';
 import sortBy from 'lodash/sortBy';
 import cloneDeep from 'lodash/cloneDeep';
 import defaultTranslations from './defaultTranslations'
-import {getContactsForOutbreakId} from './../actions/contacts';
 import {getSyncEncryptPassword, encrypt, decrypt} from './../utils/encryption';
 import RNFS from 'react-native-fs';
 import {Buffer} from 'buffer';
