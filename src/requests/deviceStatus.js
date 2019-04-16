@@ -1,4 +1,5 @@
 import base64 from 'base-64';
+import {handleResponse} from './../utils/functions';
 
 export function checkDeviceStatus(url, installationId, clientId, clientSecret, callback) {
     if (url && installationId) {
@@ -12,6 +13,9 @@ export function checkDeviceStatus(url, installationId, clientId, clientSecret, c
                 'Content-Type': 'application/json',
             },
         })
+            .then((response) => {
+                return handleResponse(response);
+            })
             .then((response) => {
                 console.log("*** checkDeviceStatus response: ", response);
                 callback(null, response.status);

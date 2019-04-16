@@ -227,7 +227,7 @@ export default class App {
                                         return callback();
                                     }
                                     if (deviceStatus) {
-                                        if (deviceStatus === 'LNG_DEVICE_WIPE_STATUS_PENDING_WIPE') {
+                                        if (deviceStatus === config.statusPendingWipe) {
                                             this.removeAllDatabases((errorWipe, success) => {
                                                 if (errorWipe) {
                                                     return callback()
