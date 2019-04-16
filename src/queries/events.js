@@ -7,7 +7,7 @@ import config from './../utils/config';
 // Credentials: {email, encryptedPassword}
 export function getEventsForOutbreakIdRequest (outbreakId, token, callback) {
     let start =  new Date().getTime();
-    getDatabase(config.mongoCollections.cluster)
+    getDatabase(config.mongoCollections.person)
         .then((database) => {
             database.find({
                 selector: {

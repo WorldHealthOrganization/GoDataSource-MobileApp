@@ -312,7 +312,7 @@ export function addContactRequest(outbreakId, contact, token, callback) {
 }
 
 export function addExposureForContactRequest(outbreakId, contactId, exposure, token, callback) {
-    getDatabase(config.mongoCollections.person)
+    getDatabase(config.mongoCollections.relationship)
         .then((database) => {
             if (exposure.persons[0].id === null && contactId !== null) {
                 exposure.persons[0].id = contactId;
@@ -342,7 +342,7 @@ export function addExposureForContactRequest(outbreakId, contactId, exposure, to
 }
 
 export function updateExposureForContactRequest(outbreakId, contactId, exposure, token, callback) {
-    getDatabase(config.mongoCollections.person)
+    getDatabase(config.mongoCollections.relationship)
         .then((database) => {
             // console.log ('updateExposureForContactRequest', outbreakId, contactId, JSON.stringify(exposure))
             database.put(exposure)
@@ -370,7 +370,7 @@ export function updateExposureForContactRequest(outbreakId, contactId, exposure,
 }
 
 export function deleteExposureForContactRequest(outbreakId, contactId, exposure, token, callback) {
-    getDatabase(config.mongoCollections.person)
+    getDatabase(config.mongoCollections.relationship)
         .then((database) => {
             database.put(exposure)
                 .then((result) => {
