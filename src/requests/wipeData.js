@@ -1,4 +1,3 @@
-
 import {Platform} from 'react-native';
 import DeviceInfo from 'react-native-device-info';
 import base64 from 'base-64';
