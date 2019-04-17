@@ -550,7 +550,7 @@ class ManualConfigScreen extends PureComponent {
         }, () => {
             console.log('New state: ', this.state.syncState);
             this.props.setSyncState({id: 'sync', status: null});
-            setTimeout(() => {callback()}, 400);
+            callback();
         })
     }
 }
