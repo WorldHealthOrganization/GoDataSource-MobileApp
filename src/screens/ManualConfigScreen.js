@@ -386,7 +386,8 @@ class ManualConfigScreen extends PureComponent {
                 screen: 'FirstConfigScreen',
                 passProps: {
                     allowBack: this.props.allowBack,
-                    skipEdit: this.props.skipEdit
+                    skipEdit: this.props.skipEdit,
+                    isMultipleHub: this.props.isMultipleHub
                 }
                 // animationType: 'fade',
                 // animated: true
@@ -399,7 +400,8 @@ class ManualConfigScreen extends PureComponent {
             screen: 'LoginScreen',
             passProps: {
                 allowBack: this.props.allowBack,
-                skipEdit: this.props.skipEdit
+                skipEdit: this.props.skipEdit,
+                isMultipleHub: this.props.isMultipleHub
             }
             // animationType: 'fade',
             // animated: true
@@ -518,7 +520,15 @@ class ManualConfigScreen extends PureComponent {
     closeModal = () => {
         if (this.state.syncState[this.state.syncState.length - 1].status === 'Success') {
             this.resetModalProps(() => {
-                this.props.changeAppRoot('login');
+                if (this.props.isMultipleHub) {
+                    this.props.changeAppRoot('login');
+                } else {
+                    this.props.navigator.push({
+                        screen: 'LoginScreen',
+                        animated: true,
+                        animationType: 'fade'
+                    })
+                }
             })
         } else {
             this.resetModalProps(() => {
@@ -540,7 +550,7 @@ class ManualConfigScreen extends PureComponent {
         }, () => {
             console.log('New state: ', this.state.syncState);
             this.props.setSyncState({id: 'sync', status: null});
-            callback();
+            setTimeout(() => {callback()}, 400);
         })
     }
 }

@@ -467,7 +467,8 @@ class FirstConfigScreen extends Component {
             screen: 'FirstConfigScreen',
             passProps: {
                 allowBack: true,
-                skipEdit: true
+                skipEdit: true,
+                isMultipleHub: true
             }
         })
     };

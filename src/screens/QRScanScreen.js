@@ -67,7 +67,7 @@ class QRScanScreen extends Component {
     onSuccess(e) {
         //  TO DO get data from e...
         console.log('Here we have some values for e: ', e);
-        this.props.pushNewScreen(e, this.props.allowBack, this.props.skipEdit);
+        this.props.pushNewScreen(e, this.props.allowBack, this.props.skipEdit, this.props.isMultipleHub);
         this.props.navigator.dismissModal();
     }
 }
