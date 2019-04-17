@@ -10,9 +10,9 @@ import styles from './../styles';
 import NavBarCustom from './../components/NavBarCustom';
 import ViewHOC from './../components/ViewHOC';
 import config from './../utils/config';
-import {connect} from "react-redux";
-import {bindActionCreators} from "redux";
-import {TabBar, TabView, PagerScroll, PagerAndroid, SceneMap} from 'react-native-tab-view';
+import { connect } from "react-redux";
+import { bindActionCreators } from "redux";
+import { TabBar, TabView, PagerScroll, PagerAndroid, SceneMap } from 'react-native-tab-view';
 import ContactsSingleAddress from './../containers/ContactsSingleAddress';
 import ContactsSingleCalendar from './../containers/ContactsSingleCalendar';
 import ContactsSingleExposures from './../containers/ContactsSingleExposures';
@@ -22,9 +22,9 @@ import { getContactsNameForDuplicateCheckRequest, checkForNameDuplicatesRequest 
 import Breadcrumb from './../components/Breadcrumb';
 import Menu, { MenuItem } from 'react-native-material-menu';
 import Ripple from 'react-native-material-ripple';
-import {updateFollowUpAndContact, deleteFollowUp} from './../actions/followUps';
-import {updateContact, deleteExposureForContact, addContact} from './../actions/contacts';
-import {removeErrors} from './../actions/errors';
+import { updateFollowUpAndContact, deleteFollowUp } from './../actions/followUps';
+import { updateContact, deleteExposureForContact, addContact } from './../actions/contacts';
+import { removeErrors } from './../actions/errors';
 import DateTimePicker from 'react-native-modal-datetime-picker';
 import _ from 'lodash';
 import { calculateDimension, extractIdFromPouchId, updateRequiredFields, navigation, getTranslation } from './../utils/functions';
@@ -1000,7 +1000,7 @@ class ContactsSingleScreen extends Component {
         let addresses = _.cloneDeep(this.state.contact.addresses);
         addresses[index].locationId = extractIdFromPouchId(selectedItems['0']._id, 'location');
         if (selectedItems['0'].geoLocation && selectedItems['0'].geoLocation.coordinates && Array.isArray(selectedItems['0'].geoLocation.coordinates)) {
-            if (selectedItems['0'].geoLocation.coordinates[0] !== 0 || selectedItems['0'].geoLocation.coordinates[1] !== 0){
+            if (selectedItems['0'].geoLocation.coordinates[0] !== 0 || selectedItems['0'].geoLocation.coordinates[1] !== 0) {
                 setTimeout(() => {
                     Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.alertMessages.replaceCurrentCoordinates, this.props.translation), [
                         {
@@ -1131,7 +1131,8 @@ class ContactsSingleScreen extends Component {
                 if (missingFields && Array.isArray(missingFields) && missingFields.length === 0) {
                     if (this.checkAgeYearsRequirements()) {
                         if (this.checkAgeMonthsRequirements()) {
-                            if (this.state.contact.addresses.length === 0 || (this.state.contact.addresses.length > 0 && this.state.hasPlaceOfResidence === true)) {
+                            if (this.state.contact.addresses === undefined || this.state.contact.addresses === null || this.state.contact.addresses.length === 0 || 
+                                (this.state.contact.addresses.length > 0 && this.state.hasPlaceOfResidence === true)) {
                                 const { contact } = this.state
                                 checkForNameDuplicatesRequest(this.props.isNew ? null : contact._id, contact.firstName, contact.lastName, this.props.user.activeOutbreakId, (error, response) => {
                                     if (error) {
@@ -1150,53 +1151,24 @@ class ContactsSingleScreen extends Component {
                                     if (response) {
                                         console.log('getContactsNameForDuplicateCheckRequest response: ', response);
                                         if (response.length === 0) {
-                                            this.setState({
-                                                savePressed: true
-                                            }, () => {
-                                                this.hideMenu()
-                                                let ageConfig = this.ageAndDobPrepareForSave()
-                                                this.setState(prevState => ({
-                                                    contact: Object.assign({}, prevState.contact, { age: ageConfig.ageClone }, { dob: ageConfig.dobClone }),
-                                                }), () => {
-                                                    console.log("ageAndDobPrepareForSave done", this.state.contact);
-                                                    if (this.props.isNew) {
-                                                        let contactWithRequiredFields = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, this.state.contact), action = 'create', fileType = 'person.json', type = 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT')
-                                                        this.setState(prevState => ({
-                                                            contact: Object.assign({}, prevState.contact, contactWithRequiredFields),
-                                                        }), () => {
-                                                            let contactClone = _.cloneDeep(this.state.contact)
-                                                            let contactMatchFilter = this.checkIfContactMatchFilter()
-                                                            console.log('contactMatchFilter', contactMatchFilter)
-                                                            this.props.addContact(this.props.user.activeOutbreakId, contactClone, null, this.props.user.token, contactMatchFilter);
-                                                        })
-                                                    } else {
-                                                        let contactWithRequiredFields = null;
-                                                        if (this.state.deletePressed === true) {
-                                                            contactWithRequiredFields = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, this.state.contact), action = 'delete', fileType = 'person.json', type = 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT')
-                                                        } else {
-                                                            contactWithRequiredFields = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, this.state.contact), action = 'update', fileType = 'person.json', type = 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT')
-                                                        }
-
-                                                        this.setState(prevState => ({
-                                                            contact: Object.assign({}, prevState.contact, contactWithRequiredFields),
-                                                        }), () => {
-                                                            let contactClone = _.cloneDeep(this.state.contact)
-                                                            let contactMatchFilter = this.checkIfContactMatchFilter()
-                                                            console.log('contactMatchFilter', contactMatchFilter)
-                                                            this.props.updateContact(this.props.user.activeOutbreakId, contactClone._id, contactClone, this.props.user.token, null, contactMatchFilter);
-                                                        })
-                                                    }
-                                                })
-                                            });
+                                            this.saveContactAction()
                                         } else {
-                                            this.setState({ loading: false }, () => {
-                                                Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.contactDuplicateNameError, this.props.translation), [
-                                                    {
-                                                        text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
-                                                        onPress: () => { this.hideMenu() }
+                                            Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.contactDuplicateNameError, this.props.translation), [
+                                                {
+                                                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+                                                    onPress: () => {
+                                                        this.setState({
+                                                            loading: false
+                                                        }, () => {
+                                                            this.hideMenu()
+                                                        })
                                                     }
-                                                ])
-                                            })
+                                                },
+                                                {
+                                                    text: getTranslation(translations.alertMessages.saveAnywayLabel, this.props.translation),
+                                                    onPress: () => { this.saveContactAction() }
+                                                }
+                                            ])
                                         }
                                     }
                                 });
@@ -1252,6 +1224,47 @@ class ContactsSingleScreen extends Component {
             }
         })
     };
+
+    saveContactAction = () => {
+        this.setState({
+            savePressed: true
+        }, () => {
+            this.hideMenu()
+            let ageConfig = this.ageAndDobPrepareForSave()
+            this.setState(prevState => ({
+                contact: Object.assign({}, prevState.contact, { age: ageConfig.ageClone }, { dob: ageConfig.dobClone }),
+            }), () => {
+                console.log("ageAndDobPrepareForSave done", this.state.contact);
+                if (this.props.isNew) {
+                    let contactWithRequiredFields = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, this.state.contact), action = 'create', fileType = 'person.json', type = 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT')
+                    this.setState(prevState => ({
+                        contact: Object.assign({}, prevState.contact, contactWithRequiredFields),
+                    }), () => {
+                        let contactClone = _.cloneDeep(this.state.contact)
+                        let contactMatchFilter = this.checkIfContactMatchFilter()
+                        console.log('contactMatchFilter', contactMatchFilter)
+                        this.props.addContact(this.props.user.activeOutbreakId, contactClone, null, this.props.user.token, contactMatchFilter);
+                    })
+                } else {
+                    let contactWithRequiredFields = null;
+                    if (this.state.deletePressed === true) {
+                        contactWithRequiredFields = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, this.state.contact), action = 'delete', fileType = 'person.json', type = 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT')
+                    } else {
+                        contactWithRequiredFields = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, this.state.contact), action = 'update', fileType = 'person.json', type = 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT')
+                    }
+
+                    this.setState(prevState => ({
+                        contact: Object.assign({}, prevState.contact, contactWithRequiredFields),
+                    }), () => {
+                        let contactClone = _.cloneDeep(this.state.contact)
+                        let contactMatchFilter = this.checkIfContactMatchFilter()
+                        console.log('contactMatchFilter', contactMatchFilter)
+                        this.props.updateContact(this.props.user.activeOutbreakId, contactClone._id, contactClone, this.props.user.token, null, contactMatchFilter);
+                    })
+                }
+            })
+        });
+    }
 
     ageAndDobPrepareForSave = () => {
         let dobClone = null
