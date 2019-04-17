@@ -1,17 +1,24 @@
 /**
  * Created by florinpopa on 23/08/2018.
  */
-import React, {PureComponent} from 'react';
-import {View, Text, StyleSheet} from 'react-native';
+import React, { PureComponent } from 'react';
+import { View, Text, StyleSheet } from 'react-native';
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import styles from './../styles';
-import {connect} from "react-redux";
-import {bindActionCreators} from "redux";
-import {Agenda} from 'react-native-calendars';
+import moment from 'moment';
+import { connect } from "react-redux";
+import { bindActionCreators } from "redux";
+import cloneDeep from "lodash/cloneDeep";
+import Ripple from 'react-native-material-ripple';
+import { Icon } from 'react-native-material-ui';
+import { Agenda } from 'react-native-calendars';
 import FollowUpsSingleQuestionnarireContainer from './../containers/FollowUpsSingleQuestionnaireContainer';
-import {mapAnswers, calculateDimension, getTranslation} from "../utils/functions";
+import Collapsible from 'react-native-collapsible';
+import { mapAnswers, calculateDimension, getTranslation } from "../utils/functions";
 import get from 'lodash/get';
+import ElevatedView from 'react-native-elevated-view';
+import Button from './Button';
 import translation from './../utils/translations';
 
 class FollowUpAgenda extends PureComponent {
@@ -20,6 +27,7 @@ class FollowUpAgenda extends PureComponent {
     constructor(props) {
         super(props);
         this.state = {
+            collapsed: {}
         };
     }
 
@@ -29,13 +37,14 @@ class FollowUpAgenda extends PureComponent {
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
-        // console.log('### FollowUpAgenda followUps: ', this.props.followUps);
+        const newFollowUps = cloneDeep(this.props.followUps)
+
         return (
             <Agenda
-                items={this.props.followUps}
+                items={newFollowUps}
                 renderItem={this.renderItem}
-                renderEmptyDate={() => {return (<View />);}}
-                rowHasChanged={(r1, r2) => {return r1.text !== r2.text}}
+                renderEmptyDate={() => { return (<View />); }}
+                rowHasChanged={(r1, r2) => { return r1.text !== r2.text }}
                 renderDay={this.renderDay}
                 theme={{
                     agendaKnobColor: 'rgba(0, 0, 0, 0.1)',
@@ -47,34 +56,84 @@ class FollowUpAgenda extends PureComponent {
 
     // Please write here all the methods that are not react native lifecycle methods
     renderItem = (item, firstItemInDay) => {
-        // console.log("RenderItem from FollowUpAgenda: ", item);
         let mappedAnswers = {};
-        if (get(this.props, 'outbreak.contactFollowUpTemplate', 'failOubreakQuestions') !== 'failOubreakQuestions' && get(item, 'text.questionnaireAnswers', 'failQuestionnaire') !==  'failQuestionnaire') {
+        if (get(this.props, 'outbreak.contactFollowUpTemplate', 'failOubreakQuestions') !== 'failOubreakQuestions' && get(item, 'text.questionnaireAnswers', 'failQuestionnaire') !== 'failQuestionnaire') {
             mappedAnswers = mapAnswers(this.props.outbreak.contactFollowUpTemplate, item.text.questionnaireAnswers);
         }
+
+        let followUpDate = '';
         let date = '';
-        if (firstItemInDay) {
-            date = this.extractDate(get(item, 'text.date', ''));
-        }
-        let marginHorizontal = calculateDimension(16, false, this.props.screenSize);
-        return(
+        let dateFormat = '';
+        followUpDate = get(item, 'text.date', '')
+        dateFormat = moment(followUpDate).format('YYYY-MM-DD')
+        date = this.extractDate(followUpDate)
+
+        const screenSize = get(this.props, 'screenSize')
+
+        return (
             <View>
                 {
                     firstItemInDay ? (
-                        <View style={{marginHorizontal}}>
-                            <Text style={{fontFamily: 'Roboto-Medium', fontSize: 16}}>{date}</Text>
+                        <View style={{
+                            marginHorizontal: calculateDimension(16, false, screenSize),
+                            marginVertical: calculateDimension(5, true, screenSize),
+                            flexDirection: 'row',
+                            justifyContent: 'space-between'
+                        }}>
+                            <Text style={{ fontFamily: 'Roboto-Medium', fontSize: 16 }}>{date}</Text>
+                            <ElevatedView
+                                elevation={3}
+                                style={{
+                                    backgroundColor: styles.buttonGreen,
+                                    width: calculateDimension(33, false, screenSize),
+                                    height: calculateDimension(25, true, screenSize),
+                                    borderRadius: 4
+                                }}
+                            >
+                                <Ripple style={{
+                                    flex: 1,
+                                    justifyContent: 'center',
+                                    alignItems: 'center'
+                                }} onPress={() => this.ChangeCollpased(dateFormat)}>
+                                    {
+                                        this.state.collapsed[dateFormat] === true || this.state.collapsed[dateFormat] === undefined
+                                            ? <Icon name="add" color={'white'} size={15} />
+                                            : <Icon name="remove" color={'white'} size={15} />
+                                    }
+                                </Ripple>
+                            </ElevatedView>
                         </View>
                     ) : (null)
                 }
-                <FollowUpsSingleQuestionnarireContainer
-                item={get(item, 'text', {})}
-                previousAnswers={get(mappedAnswers, 'mappedAnswers', {})}
-                contact={this.props.contact}
-                isEditMode={false}
-                />
+                {
+                    this.state.collapsed[dateFormat] === false ? (
+                        <Collapsible collapsed={this.state.collapsed[dateFormat]}>
+                            <FollowUpsSingleQuestionnarireContainer
+                                item={get(item, 'text', {})}
+                                previousAnswers={get(mappedAnswers, 'mappedAnswers', {})}
+                                contact={this.props.contact}
+                                isEditMode={false}
+                            />
+                        </Collapsible>) : null
+                }
+
             </View>
         )
     };
+
+    ChangeCollpased = (dateFormat) => {
+        const { collapsed } = this.state
+        const collapsedCpy = cloneDeep(collapsed)
+
+        if (collapsedCpy[dateFormat] !== undefined) {
+            collapsedCpy[dateFormat] = !collapsedCpy[dateFormat]
+        } else {
+            collapsedCpy[dateFormat] = false;
+        }
+        this.setState({
+            collapsed: collapsedCpy
+        })
+    }
 
     renderDay = (day, item) => {
         return (
@@ -90,19 +149,12 @@ class FollowUpAgenda extends PureComponent {
     renderEmptyData = () => {
         let marginHorizontal = calculateDimension(16, false, this.props.screenSize);
         return (
-            <View style={{marginHorizontal}}>
-                <Text style={{fontFamily: 'Roboto-Medium', fontSize: 16}}>{getTranslation(translation.followUpAgenda.noFollUpsForDate, this.props.translation)}</Text>
+            <View style={{ marginHorizontal }}>
+                <Text style={{ fontFamily: 'Roboto-Medium', fontSize: 16 }}>{getTranslation(translation.followUpAgenda.noFollUpsForDate, this.props.translation)}</Text>
             </View>
         )
     }
 }
-
-// FollowUpAgenda.defaultProps = {
-//     data: [],
-//     renderItem: () => {return (<View  />)},
-//     keyExtractor: () => {return null},
-//     renderSeparatorComponent: () => {return (<View />)}
-// };
 
 // Create style outside the class, or for components that will be used by other components (buttons),
 // make a global style in the config directory

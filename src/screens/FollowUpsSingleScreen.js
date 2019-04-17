@@ -9,10 +9,10 @@ import { Icon } from 'react-native-material-ui';
 import styles from './../styles';
 import NavBarCustom from './../components/NavBarCustom';
 import config from './../utils/config';
-import {connect} from "react-redux";
-import {bindActionCreators} from "redux";
-import {TabBar, TabView, SceneMap} from 'react-native-tab-view';
-import FollowUpsSingleGetInfoContainer from './../containers/FollowUpsSingleGetInfoContainer';
+import { connect } from "react-redux";
+import { bindActionCreators } from "redux";
+import { TabBar, TabView, SceneMap } from 'react-native-tab-view';
+import FollowUpsSingleContainer from './../containers/FollowUpsSingleContainer';
 import FollowUpsSingleQuestionnaireContainer from './../containers/FollowUpsSingleQuestionnaireContainer';
 import Breadcrumb from './../components/Breadcrumb';
 import Menu, { MenuItem } from 'react-native-material-menu';
@@ -77,7 +77,7 @@ class FollowUpsSingleScreen extends Component {
                     console.log('follow-ups date < today => needitabil')
                     isEditMode = false
                 }
-            } else if (this.props.role && this.props.role.find((e) => e === config.userPermissions.writeFollowUp) === undefined && this.props.role.find((e) => e === config.userPermissions.readFollowUp) !== undefined){
+            } else if (this.props.role && this.props.role.find((e) => e === config.userPermissions.writeFollowUp) === undefined && this.props.role.find((e) => e === config.userPermissions.readFollowUp) !== undefined) {
 
                 isEditMode = false
             }
@@ -277,7 +277,7 @@ class FollowUpsSingleScreen extends Component {
         switch (route.key) {
             case 'genInfo':
                 return (
-                    <FollowUpsSingleGetInfoContainer
+                    <FollowUpsSingleContainer
                         isNew={this.props.isNew}
                         isEditMode={this.state.isEditMode}
                         item={this.state.item}
@@ -313,7 +313,7 @@ class FollowUpsSingleScreen extends Component {
                 );
             default:
                 return (
-                    <FollowUpsSingleGetInfoContainer
+                    <FollowUpsSingleContainer
                         item={this.state.item}
                         isEditMode={this.state.isEditMode}
                         contact={this.state.contact}
