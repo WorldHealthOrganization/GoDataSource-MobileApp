@@ -231,6 +231,7 @@ export default {
     'LNG_DIALOG_ALERT_TITLE_LABEL': 'Alert',
     'LNG_DIALOG_VALIDATION_ERROR_TITLE_LABEL': 'Validation error',
     'LNG_DIALOG_WARNING_TITLE_LABEL': 'Warning',
+    'LNG_DIALOG_SAVE_ANYWAY_LABEL': 'Save anyway',
 
     //not used with translation
     'Invalid credentials': 'Invalid credentials',
@@ -283,7 +284,7 @@ export default {
     //loadingScreenMessages
     'LNG_LOADING_SCREEN_MESSAGE': 'Loading...',
 
-    
+
     //generalButtons
     'LNG_COMMON_BUTTON_NEXT': 'Next',
     'LNG_COMMON_BUTTON_BACK': 'Back',
