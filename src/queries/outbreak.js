@@ -2,23 +2,15 @@
  * Created by florinpopa on 13/09/2018.
  */
 import {getDatabase} from './database';
+import config from './../utils/config';
 
 // Credentials: {email, encryptedPassword}
 export function getOutbreakByIdRequest (outbreakId, token, callback) {
-    let database = getDatabase();
+    getDatabase(config.mongoCollections.outbreak)
+        .then((database) => {
+            let start =  new Date().getTime();
+            // For searching by ID it is recommended to use the PouchDB allDocs method with the ID as a key, since primary indexes are much faster than secondary ones
 
-    console.log('GetOutbreakByIdRequest: ', outbreakId);
-
-    let start =  new Date().getTime();
-    // For searching by ID it is recommended to use the PouchDB allDocs method with the ID as a key, since primary indexes are much faster than secondary ones
-
-    // database.allDocs({
-    //     startkey: 'outbreak.json_',
-    //     endkey: 'outbreak.json_\uffff',
-    //     include_docs: true
-    // })
-    //     .then((allOutbreaks) => {
-    //         console.log('All outbreaks: ', allOutbreaks.rows.map((e) => {return e.doc}));
             database.get('outbreak.json_' + outbreakId)
                 .then((result) => {
                     console.log("Result from getting outbreak: ", new Date().getTime() - start);
@@ -28,8 +20,9 @@ export function getOutbreakByIdRequest (outbreakId, token, callback) {
                     console.log("Error from getting outbreak: ", errorGetOutbreak);
                     callback(errorGetOutbreak);
                 })
-        // })
-        // .catch((errorAllOutbreaks) => {
-        //     console.log('Error all outbreaks: ', errorAllOutbreaks);
-        // })
+        })
+        .catch((errorGetDatabase) => {
+            console.log('Error while getting database: ', errorGetDatabase);
+            callback(errorGetDatabase);
+        });
 }
