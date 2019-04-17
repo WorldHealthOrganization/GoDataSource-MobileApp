@@ -2,43 +2,34 @@
  * Created by florinpopa on 18/09/2018.
  */
 import {getDatabase} from './database';
+import config from './../utils/config';
 
 // Credentials: {email, encryptedPassword}
 export function getReferenceDataRequest (token, callback) {
-    let database = getDatabase();
+    getDatabase(config.mongoCollections.referenceData)
+        .then((database) => {
+            let start =  new Date().getTime();
 
-    console.log("getReferenceDataRequest: ");
-
-    let start =  new Date().getTime();
-    // database.allDocs({
-    //     startkey: `referenceData.json_`,
-    //     endkey: `referenceData.json_\uffff`,
-    //     include_docs: true
-    // })
-    //     .then((result) => {
-    //         console.log("result with the new index for reference data: ", new Date().getTime() - start);
-    //         callback(null, result.rows.map((e) => {return e.doc}));
-    //     })
-    //     .catch((errorQuery) => {
-    //         console.log("Error with the new index for reference data: ", errorQuery);
-    //         callback(errorQuery);
-    //     })
-
-    database.find({
-        selector: {
-            _id: {
-                $gte: `referenceData.json_`,
-                $lte: `referenceData.json_\uffff`,
-            },
-            deleted: false
-        }
-    })
-        .then((resultFind) => {
-            console.log('Result for find time for reference data: ', new Date().getTime() - start);
-            callback(null, resultFind.docs)
+            database.find({
+                selector: {
+                    _id: {
+                        $gte: `referenceData.json_`,
+                        $lte: `referenceData.json_\uffff`,
+                    },
+                    deleted: false
+                }
+            })
+                .then((resultFind) => {
+                    console.log('Result for find time for reference data: ', new Date().getTime() - start);
+                    callback(null, resultFind.docs)
+                })
+                .catch((errorFind) => {
+                    console.log('Error find for reference data: ', errorFind);
+                    callback(errorFind);
+                })
         })
-        .catch((errorFind) => {
-            console.log('Error find for reference data: ', errorFind);
-            callback(errorFind);
-        })
+        .catch((errorGetDatabase) => {
+            console.log('Error while getting database: ', errorGetDatabase);
+            callback(errorGetDatabase);
+        });
 }
