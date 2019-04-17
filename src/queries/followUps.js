@@ -30,29 +30,18 @@ export function getFollowUpsForOutbreakIdRequest (outbreakId, filter, userTeams,
                         $gte: `followUp.json_${outbreakId}_${startDate}_`,
                         $lte: `followUp.json_${outbreakId}_${endDate}_\uffff`
                     },
-                    deleted: false,
-                    $or: [
-                        {
-                            teamId: {$in: userTeams}
-                        },
-                        {
-                            teamId: {$eq: null}
-                        },
-                        {
-                            teamId: {$eq: undefined}
-                        }
-                    ]
+                    deleted: false
                 }
             })
                 .then((resultFind) => {
-                    // let followUpList = resultFind.docs;
-                    // if (userTeams !== null && userTeams !== undefined && Array.isArray(userTeams) && userTeams.length > 0) {
-                    //     followUpList = followUpList.filter((e) => {
-                    //         return userTeams.indexOf(e.teamId) >= 0 || e.teamId === undefined || e.teamId === null
-                    //     })
-                    // }
+                    let followUpList = resultFind.docs;
+                    if (userTeams !== null && userTeams !== undefined && Array.isArray(userTeams) && userTeams.length > 0) {
+                        followUpList = followUpList.filter((e) => {
+                            return userTeams.indexOf(e.teamId) >= 0 || e.teamId === undefined || e.teamId === null
+                        })
+                    }
                     console.log('Result for find time for followUps: ', new Date().getTime() - start);
-                    callback(null, resultFind.docs)
+                    callback(null, followUpList);
                 })
                 .catch((errorFind) => {
                     console.log('Error find for followUps: ', errorFind);
@@ -227,25 +216,14 @@ export function getFollowUpsForContactRequest (outbreakId, keys, contactFollowUp
                     },
                     outbreakId: outbreakId,
                     deleted: false,
-                    personId: {$in: keys},
-                    $or: [
-                        {
-                            teamId: {$in: userTeams}
-                        },
-                        {
-                            teamId: {$eq: null}
-                        },
-                        {
-                            teamId: {$eq: undefined}
-                        }
-                    ]
+                    personId: {$in: keys}
                 }
             })
                 .then((result) => {
                     let followUpList = result.docs;
-                    // if (userTeams !== null && userTeams !== undefined && Array.isArray(userTeams) && userTeams.length > 0) {
-                    //     followUpList = followUpList.filter((e) => userTeams.indexOf(e.teamId) >= 0 || e.teamId === undefined || e.teamId === null)
-                    // }
+                    if (userTeams !== null && userTeams !== undefined && Array.isArray(userTeams) && userTeams.length > 0) {
+                        followUpList = followUpList.filter((e) => userTeams.indexOf(e.teamId) >= 0 || e.teamId === undefined || e.teamId === null)
+                    }
                     console.log('getFollowUpsForContactRequest request time: ', new Date().getTime() - start);
                     callback(null, followUpList)
                 })
