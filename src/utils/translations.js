@@ -269,6 +269,7 @@ const alertMessages = {
     alertLabel: 'LNG_DIALOG_ALERT_TITLE_LABEL',
     validationErrorLabel: 'LNG_DIALOG_VALIDATION_ERROR_TITLE_LABEL',
     warningLabel: 'LNG_DIALOG_WARNING_TITLE_LABEL',
+    saveAnywayLabel: 'LNG_DIALOG_SAVE_ANYWAY_LABEL',
 
     //not used with translation
     invalidCredentials: 'Invalid credentials',

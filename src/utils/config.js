@@ -1908,29 +1908,29 @@ const personTypes = {
 };
 
 const mongoCollections = {
-    cluster: 'cluster.json',
-    followUp: 'followUp.json',
-    labResult: 'labResult.json',
-    language: 'language.json',
-    languageToken: 'languageToken.json',
-    location: 'location.json',
-    outbreak: 'outbreak.json',
-    person: 'person.json',
-    referenceData: 'referenceData.json',
-    relationship: 'relationship.json',
-    role: 'role.json',
-    team: 'team.json',
-    helpCategory: 'helpCategory.json',
-    helpItem: 'helpItem.json',
-    user: 'user.json'
+    cluster: 'cluster',
+    followUp: 'followUp',
+    labResult: 'labResult',
+    language: 'language',
+    languageToken: 'languageToken',
+    location: 'location',
+    outbreak: 'outbreak',
+    person: 'person',
+    referenceData: 'referenceData',
+    relationship: 'relationship',
+    role: 'role',
+    team: 'team',
+    helpCategory: 'helpCategory',
+    helpItem: 'helpItem',
+    user: 'user'
 };
 
 const changingMongoCollections = [
-    'followUp.json',
-    'labResult.json',
-    'person.json',
-    'relationship.json',
-    'user.json'
+    'followUp',
+    'labResult',
+    'person',
+    'relationship',
+    'user'
 ];
 
 const RNDBConfig = {
@@ -2399,6 +2399,8 @@ const caseBlueprint = {
     questionnaireAnswers: {}
 };
 
+const statusPendingWipe = 'LNG_DEVICE_WIPE_STATUS_PENDING';
+
 export default {
     designScreenSize,
     sideMenuItems,
@@ -2434,5 +2436,6 @@ export default {
     manualSyncStages,
     dateRangeTypes,
     documentTypes,
-    caseBlueprint
+    caseBlueprint,
+    statusPendingWipe
 }

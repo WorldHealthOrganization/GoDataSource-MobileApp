@@ -526,7 +526,8 @@ class CaseSingleScreen extends Component {
             if (missingFields && Array.isArray(missingFields) && missingFields.length === 0) {
                 if (this.checkAgeYearsRequirements()) {
                     if (this.checkAgeMonthsRequirements()) {
-                        if (this.state.case.addresses.length === 0 || (this.state.case.addresses.length > 0 && this.state.hasPlaceOfResidence === true)) {
+                        if ( this.state.case.addresses === undefined || this.state.case.addresses === null || this.state.case.addresses.length === 0 || 
+                            (this.state.case.addresses.length > 0 && this.state.hasPlaceOfResidence === true)) {
                             if (this.checkIsolationOnsetDates()) {
                                 checkForNameDuplicatesRequest(this.props.isNew ? null : this.state.case._id, this.state.case.firstName, this.state.case.lastName, this.props.user.activeOutbreakId, (error, response) => {
                                     if (error) {
@@ -545,77 +546,22 @@ class CaseSingleScreen extends Component {
                                     if (response) {
                                         console.log('getCasessNameForDuplicateCheckRequest response: ', response);
                                         if (response.length === 0) {
-                                            console.log("handleSavePress case", JSON.stringify(this.state.case));
-                                            this.hideMenu();
-                                            let ageConfig = this.ageAndDobPrepareForSave();
-                                            let caseClone = _.cloneDeep(this.state.case);
-                                            // Remap the previous answers
-                                            let questionnaireAnswers = reMapAnswers(_.cloneDeep(this.state.previousAnswers));
-                                            caseClone.age = ageConfig.ageClone;
-                                            caseClone.dob = ageConfig.dobClone;
-                                            caseClone.questionnaireAnswers = questionnaireAnswers;
-                                            if (caseClone.outcomeId !== config.caseFieldsForHardCodeCheck.outcomeIdDeceasedValue) {
-                                                caseClone.safeBurial = false;
-                                                caseClone.dateOfBurial = null;
-                                            }
-                                            this.setState(prevState => ({
-                                                case: Object.assign({}, prevState.case, caseClone),
-                                            }), () => {
-                                                if (this.state.saveFromEditPressed === true) {
-                                                    //update case and remain on view screen
-                                                    this.setState({
-                                                        saveFromEditPressed: false,
-                                                        isEditMode: false,
-                                                        isModified: false,
-                                                        caseBeforeEdit: {}
-                                                    }, () => {
-                                                        let caseWithRequiredFields = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, this.state.case), action = 'update')
-                                                        this.setState(prevState => ({
-                                                            case: Object.assign({}, prevState.case, caseWithRequiredFields)
-                                                        }), () => {
-                                                            let caseMatchFitler = this.checkIfCaseMatchFilter()
-                                                            console.log('caseMatchFitler', caseMatchFitler)
-                                                            this.props.updateCase(this.props.user.activeOutbreakId, this.state.case._id, this.state.case, this.props.user.token, caseMatchFitler);
-                                                        })
-                                                    });
-                                                } else {
-                                                    //global save pressed
-                                                    this.setState({
-                                                        savePressed: true
-                                                    }, () => {
-                                                        if (this.props.isNew || this.props.forceNew) {
-                                                            let caseWithRequiredFields = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, this.state.case), action = 'create', fileType = 'person.json', type = 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE');
-                                                            this.setState(prevState => ({
-                                                                case: Object.assign({}, prevState.case, caseWithRequiredFields)
-                                                            }), () => {
-                                                                let caseMatchFitler = this.checkIfCaseMatchFilter()
-                                                                console.log('caseMatchFitler', caseMatchFitler)
-                                                                this.props.addCase(this.props.user.activeOutbreakId, this.state.case, this.props.user.token, caseMatchFitler);
-                                                            })
-                                                        } else {
-                                                            let caseWithRequiredFields = null
-                                                            if (this.state.deletePressed === true) {
-                                                                caseWithRequiredFields = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, this.state.case), action = 'delete', fileType = 'person.json', type = 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE')
-                                                            } else {
-                                                                caseWithRequiredFields = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, this.state.case), action = 'update', fileType = 'person.json', type = 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE')
-                                                            }
-                                                            this.setState(prevState => ({
-                                                                case: Object.assign({}, prevState.case, caseWithRequiredFields)
-                                                            }), () => {
-                                                                let caseMatchFitler = this.checkIfCaseMatchFilter()
-                                                                console.log('caseMatchFitler', caseMatchFitler)
-                                                                this.props.updateCase(this.props.user.activeOutbreakId, this.state.case._id, this.state.case, this.props.user.token, caseMatchFitler);
-                                                            })
-                                                        }
-                                                    });
-                                                }
-                                            })
+                                            this.saveCaseAction()
                                         } else {
-                                            this.setState({ loading: false })
                                             Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.caseDuplicateNameError, this.props.translation), [
                                                 {
                                                     text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
-                                                    onPress: () => { this.hideMenu() }
+                                                    onPress: () => {
+                                                        this.setState({
+                                                            loading: false
+                                                        }, () => {
+                                                            this.hideMenu()
+                                                        })
+                                                    }
+                                                },
+                                                {
+                                                    text: getTranslation(translations.alertMessages.saveAnywayLabel, this.props.translation),
+                                                    onPress: () => { this.saveCaseAction() }
                                                 }
                                             ])
                                         }
@@ -673,6 +619,73 @@ class CaseSingleScreen extends Component {
             }
         })
     };
+    saveCaseAction = () => {
+        console.log("handleSavePress case", JSON.stringify(this.state.case));
+        this.hideMenu();
+        let ageConfig = this.ageAndDobPrepareForSave();
+        let caseClone = _.cloneDeep(this.state.case);
+        // Remap the previous answers
+        let questionnaireAnswers = reMapAnswers(_.cloneDeep(this.state.previousAnswers));
+        caseClone.age = ageConfig.ageClone;
+        caseClone.dob = ageConfig.dobClone;
+        caseClone.questionnaireAnswers = questionnaireAnswers;
+        if (caseClone.outcomeId !== config.caseFieldsForHardCodeCheck.outcomeIdDeceasedValue) {
+            caseClone.safeBurial = false;
+            caseClone.dateOfBurial = null;
+        }
+        this.setState(prevState => ({
+            case: Object.assign({}, prevState.case, caseClone),
+        }), () => {
+            if (this.state.saveFromEditPressed === true) {
+                //update case and remain on view screen
+                this.setState({
+                    saveFromEditPressed: false,
+                    isEditMode: false,
+                    isModified: false,
+                    caseBeforeEdit: {}
+                }, () => {
+                    let caseWithRequiredFields = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, this.state.case), action = 'update')
+                    this.setState(prevState => ({
+                        case: Object.assign({}, prevState.case, caseWithRequiredFields)
+                    }), () => {
+                        let caseMatchFitler = this.checkIfCaseMatchFilter()
+                        console.log('caseMatchFitler', caseMatchFitler)
+                        this.props.updateCase(this.props.user.activeOutbreakId, this.state.case._id, this.state.case, this.props.user.token, caseMatchFitler);
+                    })
+                });
+            } else {
+                //global save pressed
+                this.setState({
+                    savePressed: true
+                }, () => {
+                    if (this.props.isNew || this.props.forceNew) {
+                        let caseWithRequiredFields = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, this.state.case), action = 'create', fileType = 'person.json', type = 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE');
+                        this.setState(prevState => ({
+                            case: Object.assign({}, prevState.case, caseWithRequiredFields)
+                        }), () => {
+                            let caseMatchFitler = this.checkIfCaseMatchFilter()
+                            console.log('caseMatchFitler', caseMatchFitler)
+                            this.props.addCase(this.props.user.activeOutbreakId, this.state.case, this.props.user.token, caseMatchFitler);
+                        })
+                    } else {
+                        let caseWithRequiredFields = null
+                        if (this.state.deletePressed === true) {
+                            caseWithRequiredFields = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, this.state.case), action = 'delete', fileType = 'person.json', type = 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE')
+                        } else {
+                            caseWithRequiredFields = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, this.state.case), action = 'update', fileType = 'person.json', type = 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE')
+                        }
+                        this.setState(prevState => ({
+                            case: Object.assign({}, prevState.case, caseWithRequiredFields)
+                        }), () => {
+                            let caseMatchFitler = this.checkIfCaseMatchFilter()
+                            console.log('caseMatchFitler', caseMatchFitler)
+                            this.props.updateCase(this.props.user.activeOutbreakId, this.state.case._id, this.state.case, this.props.user.token, caseMatchFitler);
+                        })
+                    }
+                });
+            }
+        })
+    }
     //Breadcrumb click
     handlePressBreadcrumb = () => {
         if (this.state.isModified === true) {
@@ -781,10 +794,59 @@ class CaseSingleScreen extends Component {
             })
         } else {
             this.setState({
-                isEditMode: false,
-                selectedItemIndexForTextSwitchSelectorForAge: this.state.case.dob !== null ? 1 : 0,
+                loading: true
             }, () => {
-                console.log("onPressSaveEdit without changes");
+                checkForNameDuplicatesRequest(this.props.isNew ? null : this.state.case._id, this.state.case.firstName, this.state.case.lastName, this.props.user.activeOutbreakId, (error, response) => {
+                    if (error) {
+                        console.log('getCasessNameForDuplicateCheckRequest error: ', error);
+                        this.setState({
+                            loading: false
+                        }, () => {
+                            Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.checkForDuplicatesRequestError, this.props.translation), [
+                                {
+                                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+                                    onPress: () => {
+                                        this.hideMenu()
+                                    }
+                                }
+                            ])
+                        })
+                    }
+                    if (response) {
+                        console.log('getCasessNameForDuplicateCheckRequest response: ', response);
+                        if (response.length === 0) {
+                            this.setState({
+                                isEditMode: false,
+                                selectedItemIndexForTextSwitchSelectorForAge: this.state.case.dob !== null ? 1 : 0,
+                            }, () => {
+                                console.log("onPressSaveEdit without changes");
+                                this.setState({ loading: false })
+                            })
+                        } else {
+                            Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.caseDuplicateNameError, this.props.translation), [
+                                {
+                                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+                                    onPress: () => {
+                                        this.setState({ loading: false })
+                                        this.hideMenu()
+                                    }
+                                },
+                                {
+                                    text: getTranslation(translations.alertMessages.saveAnywayLabel, this.props.translation),
+                                    onPress: () => {
+                                        this.setState({
+                                            isEditMode: false,
+                                            selectedItemIndexForTextSwitchSelectorForAge: this.state.case.dob !== null ? 1 : 0,
+                                        }, () => {
+                                            console.log("onPressSaveEdit without changes");
+                                            this.setState({ loading: false })
+                                        })
+                                    }
+                                }
+                            ])
+                        }
+                    }
+                });
             })
         }
     };
@@ -922,18 +984,18 @@ class CaseSingleScreen extends Component {
         let addresses = _.cloneDeep(this.state.case.addresses);
         addresses[index].locationId = extractIdFromPouchId(selectedItems['0']._id, 'location');
         if (selectedItems['0'].geoLocation && selectedItems['0'].geoLocation.coordinates && Array.isArray(selectedItems['0'].geoLocation.coordinates)) {
-            if (selectedItems['0'].geoLocation.coordinates[0] !== 0 || selectedItems['0'].geoLocation.coordinates[1] !== 0){
+            if (selectedItems['0'].geoLocation.coordinates[0] !== 0 || selectedItems['0'].geoLocation.coordinates[1] !== 0) {
                 setTimeout(() => {
                     Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.alertMessages.replaceCurrentCoordinates, this.props.translation), [
                         {
-                            text: getTranslation(translations.alertMessages.cancelButtonLabel, this.props.translation), onPress: () => {console.log('Cancel pressed')}
+                            text: getTranslation(translations.alertMessages.cancelButtonLabel, this.props.translation), onPress: () => { console.log('Cancel pressed') }
                         },
                         {
                             text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation), onPress: () => {
                                 addresses[index].geoLocation = selectedItems['0'].geoLocation;
                                 console.log('Addresses biatch: ', addresses);
                                 this.setState(prevState => ({
-                                    case: Object.assign({}, prevState.case, {addresses})
+                                    case: Object.assign({}, prevState.case, { addresses })
                                 }))
                             }
                         }

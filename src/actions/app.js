@@ -844,7 +844,6 @@ export function sendDatabaseToServer () {
                     if (lastSyncDate !== null) {
                         console.log('lastSyncDate: ', lastSyncDate);
                         // If we also have the lastSyncDate, we should move on to create the files to be synced
-                        let database = getDatabase();
 
                         let internetCredentials = await getInternetCredentials(activeDatabase);
                         if (internetCredentials) {
@@ -858,6 +857,7 @@ export function sendDatabaseToServer () {
                                 try {
                                     let credentials = JSON.parse(internetCredentials.username);
                                     let password = credentials.encryptedData ? getSyncEncryptPassword(null, credentials) : null;
+                                    let database = await getDatabase(config.changingMongoCollections[i]);
                                     let status = await getDataFromDatabaseFromFile(database, config.changingMongoCollections[i], lastSyncDate, password);
                                     // if (status) {
                                         statusArray.push(status);
@@ -1167,14 +1167,14 @@ export function appInitialized(nativeEventEmitter) {
             if (loggedUser !== null) {
                 try {
                     let activeDatabase = await AsyncStorage.getItem('activeDatabase');
-                    console.log('Active database: ', activeDatabase);
+                    // console.log('Active database: ', activeDatabase);
                     if (activeDatabase !== null) {
                         dispatch(saveActiveDatabase(activeDatabase));
                         try {
                             let databaseCredentials = await getInternetCredentials(activeDatabase);
 
                             if (databaseCredentials) {
-                                console.log('Database credentials: ', databaseCredentials);
+                                // console.log('Database credentials: ', databaseCredentials);
                                 let server = Platform.OS === 'ios' ? databaseCredentials.server : databaseCredentials.service;
                                 try {
                                     let database = await createDatabase(server.replace(/\/|\.|\:/g, ''), databaseCredentials.password, false);
@@ -1239,13 +1239,13 @@ export function appInitialized(nativeEventEmitter) {
                 console.log("Don't have a logged user. Time to check if there is an active database and if there is, move to the login screen");
                 try {
                     let activeDatabase = await AsyncStorage.getItem('activeDatabase');
-                    console.log('Active database: ', activeDatabase);
+                    // console.log('Active database: ', activeDatabase);
                     if (activeDatabase !== null) {
                         dispatch(saveActiveDatabase(activeDatabase));
                         // If there is an active database get its credentials and proceeed to the login screen
                         try {
                             let databaseCredentials = await getInternetCredentials(activeDatabase);
-                            console.log('Database credentials: ', databaseCredentials);
+                            // console.log('Database credentials: ', databaseCredentials);
                             if (databaseCredentials) {
                                 let server = Platform.OS === 'ios' ? databaseCredentials.server : databaseCredentials.service;
                                 try {
@@ -1316,13 +1316,13 @@ export function appInitialized(nativeEventEmitter) {
             console.log("We have an error at getting logged user. We try to see if there is an active database: ");
             try {
                 let activeDatabase = await AsyncStorage.getItem('activeDatabase');
-                console.log('Active database: ', activeDatabase);
+                // console.log('Active database: ', activeDatabase);
                 if (activeDatabase !== null) {
                     dispatch(saveActiveDatabase(activeDatabase));
                     // If there is an active database get its credentials and proceeed to the login screen
                     try {
                         let databaseCredentials = await getInternetCredentials(activeDatabase);
-                        console.log('Database credentials: ', databaseCredentials);
+                        // console.log('Database credentials: ', databaseCredentials);
                         if (databaseCredentials) {
                             let server = Platform.OS === 'ios' ? databaseCredentials.server : databaseCredentials.service;
                             try {

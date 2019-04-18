@@ -107,7 +107,8 @@ class FirstConfigScreen extends Component {
         this.props.navigator.push({
             screen: 'ManualConfigScreen',
             passProps: {
-                allowBack: this.props.allowBack
+                allowBack: this.props.allowBack,
+                isMultipleHub: this.props.isMultipleHub
             }
             // animationType: 'fade',
             // animated: true
@@ -120,7 +121,8 @@ class FirstConfigScreen extends Component {
             animated: true,
             passProps: {
                 pushNewScreen: this.pushNewScreen,
-                allowBack: this.props.allowBack
+                allowBack: this.props.allowBack,
+                isMultipleHub: this.props.isMultipleHub
             }
         })
     };
@@ -141,12 +143,13 @@ class FirstConfigScreen extends Component {
             // animationType: 'fade',
             passProps: {
                 isNewHub: true,
-                allowBack: this.props.allowBack
+                allowBack: this.props.allowBack,
+                isMultipleHub: this.props.isMultipleHub
             }
         })
     };
 
-    pushNewScreen = (QRCodeInfo, allowBack, skipEdit) => {
+    pushNewScreen = (QRCodeInfo, allowBack, skipEdit, isMultipleHub) => {
         console.log('PushNewScreen: ', QRCodeInfo);
         if (QRCodeInfo) {
             // this.props.navigator.dismissAllModals();
@@ -158,7 +161,8 @@ class FirstConfigScreen extends Component {
                     QRCodeInfo: QRCodeInfo,
                     allowBack: allowBack,
                     isNewHub: true,
-                    skipEdit: skipEdit
+                    skipEdit: skipEdit,
+                    isMultipleHub: isMultipleHub
                 }
             })
         } else {
