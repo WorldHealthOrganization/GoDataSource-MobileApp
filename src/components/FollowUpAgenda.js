@@ -6,7 +6,6 @@ import { View, Text, StyleSheet } from 'react-native';
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import styles from './../styles';
-import moment from 'moment';
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import cloneDeep from "lodash/cloneDeep";
@@ -14,11 +13,12 @@ import Ripple from 'react-native-material-ripple';
 import { Icon } from 'react-native-material-ui';
 import { Agenda } from 'react-native-calendars';
 import FollowUpsSingleQuestionnarireContainer from './../containers/FollowUpsSingleQuestionnaireContainer';
+import FollowUpsSingleGetInfoContainer from './../containers/FollowUpsSingleGetInfoContainer'
+import FollowUpsSingleAddressContainer from './../containers/FollowUpsSingleAddressContainer'
 import Collapsible from 'react-native-collapsible';
 import { mapAnswers, calculateDimension, getTranslation } from "../utils/functions";
 import get from 'lodash/get';
 import ElevatedView from 'react-native-elevated-view';
-import Button from './Button';
 import translation from './../utils/translations';
 
 class FollowUpAgenda extends PureComponent {
@@ -61,14 +61,16 @@ class FollowUpAgenda extends PureComponent {
             mappedAnswers = mapAnswers(this.props.outbreak.contactFollowUpTemplate, item.text.questionnaireAnswers);
         }
 
-        let followUpDate = '';
         let date = '';
-        let dateFormat = '';
-        followUpDate = get(item, 'text.date', '')
-        dateFormat = moment(followUpDate).format('YYYY-MM-DD')
-        date = this.extractDate(followUpDate)
+        if (firstItemInDay) {
+            date = this.extractDate(get(item, 'text.date', ''))
+        }
 
         const screenSize = get(this.props, 'screenSize')
+        const itemId = get(item, 'text._id', undefined)
+        const itemIdQuestionnaire = `${itemId}_questionnaire`
+        const itemIdStatus = `${itemId}_status`
+        const itemIdAddress = `${itemId}_address`
 
         return (
             <View>
@@ -77,58 +79,72 @@ class FollowUpAgenda extends PureComponent {
                         <View style={{
                             marginHorizontal: calculateDimension(16, false, screenSize),
                             marginVertical: calculateDimension(5, true, screenSize),
-                            flexDirection: 'row',
-                            justifyContent: 'space-between'
                         }}>
                             <Text style={{ fontFamily: 'Roboto-Medium', fontSize: 16 }}>{date}</Text>
-                            <ElevatedView
-                                elevation={3}
-                                style={{
-                                    backgroundColor: styles.buttonGreen,
-                                    width: calculateDimension(33, false, screenSize),
-                                    height: calculateDimension(25, true, screenSize),
-                                    borderRadius: 4
-                                }}
-                            >
-                                <Ripple style={{
-                                    flex: 1,
-                                    justifyContent: 'center',
-                                    alignItems: 'center'
-                                }} onPress={() => this.ChangeCollpased(dateFormat)}>
-                                    {
-                                        this.state.collapsed[dateFormat] === true || this.state.collapsed[dateFormat] === undefined
-                                            ? <Icon name="add" color={'white'} size={15} />
-                                            : <Icon name="remove" color={'white'} size={15} />
-                                    }
-                                </Ripple>
-                            </ElevatedView>
                         </View>
                     ) : (null)
                 }
                 {
-                    this.state.collapsed[dateFormat] === false ? (
-                        <Collapsible collapsed={this.state.collapsed[dateFormat]}>
-                            <FollowUpsSingleQuestionnarireContainer
-                                item={get(item, 'text', {})}
-                                previousAnswers={get(mappedAnswers, 'mappedAnswers', {})}
-                                contact={this.props.contact}
-                                isEditMode={false}
-                            />
-                        </Collapsible>) : null
+                    ToggleFollowUpDetails(getTranslation(translation.followUpAgenda.followUp, this.props.translation), screenSize, itemId, this.ChangeCollpased, this.state.collapsed, 25)
                 }
-
-            </View>
+                {
+                    this.state.collapsed[itemId] === false ? (
+                        <Collapsible collapsed={this.state.collapsed[itemId]}>
+                            {
+                                ToggleFollowUpDetails(getTranslation(translation.followUpAgenda.followUpStatus, this.props.translation), screenSize, itemIdStatus, this.ChangeCollpased, this.state.collapsed, 30)
+                            }
+                            {
+                                this.state.collapsed[itemIdStatus] === false ? (
+                                    <Collapsible collapsed={this.state.collapsed[itemIdStatus]}>
+                                        <FollowUpsSingleGetInfoContainer
+                                            isNew={false}
+                                            isEditMode={false}
+                                            item={get(item, 'text', {})}
+                                            contact={this.props.contact}
+                                        />
+                                    </Collapsible>) : null
+                            }
+                            {
+                                ToggleFollowUpDetails(getTranslation(translation.followUpAgenda.followUpQuestionnaire, this.props.translation), screenSize, itemIdQuestionnaire, this.ChangeCollpased, this.state.collapsed, 30)
+                            }
+                            {
+                                this.state.collapsed[itemIdQuestionnaire] === false ? (
+                                    <Collapsible collapsed={this.state.collapsed[itemIdQuestionnaire]}>
+                                        <FollowUpsSingleQuestionnarireContainer
+                                            item={get(item, 'text', {})}
+                                            previousAnswers={get(mappedAnswers, 'mappedAnswers', {})}
+                                            contact={this.props.contact}
+                                            isEditMode={false}
+                                        />
+                                    </Collapsible>) : null
+                            }
+                            {
+                                ToggleFollowUpDetails(getTranslation(translation.followUpAgenda.followUpAddress, this.props.translation), screenSize, itemIdAddress, this.ChangeCollpased, this.state.collapsed, 30)
+                            }
+                            {
+                                this.state.collapsed[itemIdAddress] === false ? (
+                                    <Collapsible collapsed={this.state.collapsed[itemIdAddress]}>
+                                        <FollowUpsSingleAddressContainer
+                                            item={get(item, 'text', {})}
+                                            contact={this.props.contact}
+                                        />
+                                    </Collapsible>) : null
+                            }
+                        </Collapsible>)
+                        : null
+                }
+            </View >
         )
     };
 
-    ChangeCollpased = (dateFormat) => {
+    ChangeCollpased = (id) => {
         const { collapsed } = this.state
         const collapsedCpy = cloneDeep(collapsed)
 
-        if (collapsedCpy[dateFormat] !== undefined) {
-            collapsedCpy[dateFormat] = !collapsedCpy[dateFormat]
+        if (collapsedCpy[id] !== undefined) {
+            collapsedCpy[id] = !collapsedCpy[id]
         } else {
-            collapsedCpy[dateFormat] = false;
+            collapsedCpy[id] = false;
         }
         this.setState({
             collapsed: collapsedCpy
@@ -154,6 +170,31 @@ class FollowUpAgenda extends PureComponent {
             </View>
         )
     }
+}
+
+const ToggleFollowUpDetails = (text, screenSize, itemId, ChangeCollpased, collapsed, marginHorizontal) => {
+    return (
+        <View style={{
+            marginHorizontal: calculateDimension(marginHorizontal, false, screenSize),
+            marginVertical: calculateDimension(3, true, screenSize),
+            flexDirection: 'row',
+            justifyContent: 'space-between'
+        }}>
+            <Text style={{ fontFamily: 'Roboto-Medium', fontSize: 16 }}>{text}</Text>
+
+            <Ripple style={{
+                justifyContent: 'flex-end',
+                width: calculateDimension(33, false, screenSize),
+                height: calculateDimension(25, true, screenSize),
+            }} onPress={() => ChangeCollpased(itemId)}>
+                {
+                    collapsed[itemId] === true || collapsed[itemId] === undefined
+                        ? <Icon name="arrow-drop-down" color={'black'} size={23} />
+                        : <Icon name="arrow-drop-up" color={'black'} size={23} />
+                }
+            </Ripple>
+        </View>
+    )
 }
 
 // Create style outside the class, or for components that will be used by other components (buttons),

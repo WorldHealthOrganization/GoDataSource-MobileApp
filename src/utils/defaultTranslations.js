@@ -216,6 +216,11 @@ export default {
     'Last follow-up': 'Last follow-up',
     'Next follow-up': 'Next follow-up',
 
+    // followUpAgenda
+    'LNG_FOLLOW_UP_AGENDA_FOLLOW_UP': 'Follow-up',
+    'LNG_FOLLOW_UP_AGENDA_FOLLOW_UP_STATUS': 'Status',
+    'LNG_FOLLOW_UP_AGENDA_FOLLOW_UP_QUESTIONNAIRE': 'Questionnaire',
+    'LNG_FOLLOW_UP_AGENDA_FOLLOW_UP_ADDRESS': 'Address',
 
     //followUpsScreenStatusFilterValues
     'LNG_FOLLOW_UPS_DROP_DOWN_FILTER_STATUS_LABEL_ALL': 'All',
@@ -283,7 +288,7 @@ export default {
     //loadingScreenMessages
     'LNG_LOADING_SCREEN_MESSAGE': 'Loading...',
 
-    
+
     //generalButtons
     'LNG_COMMON_BUTTON_NEXT': 'Next',
     'LNG_COMMON_BUTTON_BACK': 'Back',
