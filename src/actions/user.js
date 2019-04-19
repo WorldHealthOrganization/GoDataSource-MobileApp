@@ -1,35 +1,26 @@
 /**
  * Created by florinpopa on 03/07/2018.
  */
-import {ACTION_TYPE_STORE_USER} from './../utils/enums';
+import { ACTION_TYPE_STORE_USER } from './../utils/enums';
 import { changeAppRoot, getTranslations } from './app';
-import {loginUserRequest, getUserByIdRequest, updateUserRequest} from './../queries/user';
-import {getUserRoles} from './../actions/role';
-import {getUserTeams} from './../actions/teams'
-import { getFollowUpsForOutbreakIdWithPromises } from './followUps';
-import { getCasesForOutbreakIdWithPromise } from './cases';
-import { getClusters } from './clusters';
-import { getEventsForOutbreakId } from './events';
-import { getOutbreakById } from './outbreak';
+import { loginUserRequest, getUserByIdRequest, updateUserRequest } from './../queries/user';
+import { getUserRoles, storePermissions } from './role';
+import { getUserTeams, storeUserTeams } from './teams'
+import { getFollowUpsForOutbreakIdWithPromises, storeFollowUps } from './followUps';
+import { getCasesForOutbreakIdWithPromise, storeCases } from './cases';
+import { getClusters, storeClusters } from './clusters';
+import { getEventsForOutbreakId, storeEvents } from './events';
+import { getExposuresForOutbreakIdWithPromise, storeExposures } from './exposure';
+import { getOutbreakById, storeOutbreak } from './outbreak';
 import { addError } from './errors';
-import {getReferenceData} from './referenceData';
-import {getHelpCategory} from './helpCategory';
-import {getHelpItem} from './helpItem';
+import { getReferenceData } from './referenceData';
+import { getHelpCategory, storeHelpCategory } from './helpCategory';
+import { getHelpItem, storeHelpItem } from './helpItem';
 import errorTypes from './../utils/errorTypes';
-import {storeContacts} from './contacts';
-import {storeCases} from './cases';
-import {storeEvents} from './events';
-import {storeHelpCategory} from './helpCategory';
-import {storeHelpItem} from './helpItem';
-import {storeFollowUps} from './followUps';
-import {storeOutbreak} from './outbreak';
-import {storeUserTeams} from './teams';
-import {storeClusters} from './clusters';
-import {setLoginState, storeData, getAvailableLanguages, setSyncState} from './app';
-import {storePermissions} from './role';
+import { storeContacts, getContactsForOutbreakIdWithPromises } from './contacts';
+import { setLoginState, storeData, getAvailableLanguages, setSyncState, middlewareFunction } from './app';
 import moment from 'moment';
 import _ from 'lodash';
-import {middlewareFunction} from './app';
 
 // Add here only the actions, not also the requests that are executed.
 // For that purpose is the requests directory
@@ -49,15 +40,15 @@ export function loginUser(credentials) {
                 console.log("*** An error occurred while logging the user");
                 dispatch(setLoginState('Error'));
                 if (error === 'There is no active Outbreak configured for your user. You have to configure an active Outbreak for your user from the web portal and resync the data with the hub') {
-                    dispatch(addError({type: 'Login error', message: error}));
+                    dispatch(addError({ type: 'Login error', message: error }));
                 } else {
                     dispatch(addError(errorTypes.ERROR_LOGIN));
                 }
             }
             if (response) {
                 // if (response.id) {
-                    // Don't need to get user by id since the user is returned from the local database, so, instead, we store it to the redux store
-                    // dispatch(getUserById(response.userId, response.id));
+                // Don't need to get user by id since the user is returned from the local database, so, instead, we store it to the redux store
+                // dispatch(getUserById(response.userId, response.id));
 
                 // Here is the local storage handling
                 let promises = [];
@@ -65,6 +56,7 @@ export function loginUser(credentials) {
                     .then((responseOutbreak) => {
                         // promises.push(getContactsForOutbreakIdWithPromises(response.activeOutbreakId, null, null, dispatch));
                         // promises.push(getFollowUpsForOutbreakIdWithPromises(response.activeOutbreakId, null, null, null, dispatch));
+                        // promises.push(getCasesForOutbreakIdWithPromise(response.activeOutbreakId, null, null, dispatch));
                         promises.push(getTranslations(response.languageId, dispatch));
                         promises.push(getAvailableLanguages(dispatch));
                         promises.push(getReferenceData(null, dispatch));
@@ -72,7 +64,7 @@ export function loginUser(credentials) {
                         promises.push(getHelpItem(null, dispatch));
                         promises.push(getEventsForOutbreakId(response.activeOutbreakId, null, dispatch));
                         promises.push(getClusters(null, dispatch));
-                        promises.push(getCasesForOutbreakIdWithPromise(response.activeOutbreakId, null, null, dispatch));
+                        promises.push(getExposuresForOutbreakIdWithPromise(response.activeOutbreakId, null, false, null, dispatch));
                         promises.push(getUserRoles(response.roleIds, dispatch));
                         promises.push(getUserTeams(response._id, dispatch));
 
@@ -98,7 +90,7 @@ export function loginUser(credentials) {
                             });
                     })
                     .catch((errorOutbreak) => {
-                        console.log('Getting data from local db resulted in error: ', error);
+                        console.log('Getting data from local db resulted in error: ', errorOutbreak);
                         dispatch(setLoginState('Error'))
                     })
 
@@ -132,20 +124,21 @@ export function cleanDataAfterLogout() {
             dispatch(storeUser(null));
             dispatch(storeContacts(null));
             dispatch(storeFollowUps(null));
-            dispatch(storeCases(null));
+            dispatch(storeExposures(null));
             dispatch(storeEvents(null));
             dispatch(storeOutbreak(null));
             dispatch(storeHelpCategory(null));
             dispatch(storeHelpItem(null));
             dispatch(storeClusters(null));
             dispatch(storePermissions(null));
+            dispatch(storeCases(null));
             dispatch(storeUserTeams(null));
         });
     }
 }
 
 export function getUserById(userId, token, refreshFollowUps, nativeEventEmitter) {
-    return async function(dispatch, getState) {
+    return async function (dispatch, getState) {
         console.log("getUserById userId: ", userId);
         getUserByIdRequest(userId, token, (error, response) => {
             if (error) {
@@ -158,7 +151,7 @@ export function getUserById(userId, token, refreshFollowUps, nativeEventEmitter)
 
                 // Here is the local storage handling
                 if (refreshFollowUps) {
-                    dispatch(setSyncState({id: 'sync', status: 'test'}));
+                    dispatch(setSyncState({ id: 'sync', status: 'test' }));
                 }
 
                 // promises.push(getOutbreakById(response.activeOutbreakId, null, dispatch));
@@ -169,12 +162,12 @@ export function getUserById(userId, token, refreshFollowUps, nativeEventEmitter)
                                 SyncRequestsWithPromises(refreshFollowUps, response, responseUserTeams, dispatch, getState(), nativeEventEmitter)
                             })
                             .catch((errorTeams) => {
-                                console.log('Getting data from local db resulted in error: ', error);
+                                console.log('Getting data from local db resulted in error: ', errorTeams);
                                 SyncRequestsWithPromises(refreshFollowUps, response, null, dispatch, getState(), nativeEventEmitter)
                             })
                     })
                     .catch((errorOutbreak) => {
-                        console.log('Getting data from local db resulted in error: ', error);
+                        console.log('Getting data from local db resulted in error: ', errorOutbreak);
                         dispatch(setLoginState('Error'))
                     })
             }
@@ -200,7 +193,7 @@ function SyncRequestsWithPromises(refreshFollowUps, response, responseUserTeams,
     promises.push(getHelpCategory(null, dispatch));
     promises.push(getHelpItem(null, dispatch));
     promises.push(getEventsForOutbreakId(response.activeOutbreakId, null, dispatch));
-    promises.push(getCasesForOutbreakIdWithPromise(response.activeOutbreakId, null, null, dispatch));
+    promises.push(getExposuresForOutbreakIdWithPromise(response.activeOutbreakId, null, false, null, dispatch));
     promises.push(getUserRoles(response.roleIds, dispatch));
     promises.push(getClusters(null, dispatch));
 

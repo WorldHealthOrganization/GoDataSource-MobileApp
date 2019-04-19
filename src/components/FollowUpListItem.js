@@ -90,8 +90,8 @@ class FollowUpListItem extends PureComponent {
             }
 
             let relationshipText = '';
-            if (this.props && this.props.cases && this.props.events && contact && contact.relationships && Array.isArray(contact.relationships) && contact.relationships.length > 0) {
-                relationshipText = handleExposedTo(contact, true, this.props.cases, this.props.events);
+            if (this.props && this.props.exposure && this.props.events && contact && contact.relationships && Array.isArray(contact.relationships) && contact.relationships.length > 0) {
+                relationshipText = handleExposedTo(contact, true, this.props.exposure, this.props.events);
             }
 
         // }
@@ -266,7 +266,7 @@ function mapStateToProps(state) {
         screenSize: state.app.screenSize,
         translation: state.app.translation,
         contacts: state.contacts,
-        cases: state.cases,
+        exposure: state.exposure,
         events: state.events,
         role: state.role
     };
