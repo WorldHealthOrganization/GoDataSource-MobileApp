@@ -49,12 +49,12 @@ class CaseSingleInvestigationContainer extends Component {
         }
     }
 
-    // shouldComponentUpdate(nextProps, nextState) {
-    //     if (nextProps.isEditMode !== this.props.isEditMode || nextProps.index === 3) {
-    //         return true;
-    //     }
-    //     return false;
-    // }
+    shouldComponentUpdate(nextProps, nextState) {
+        if (nextProps.isEditMode !== this.props.isEditMode || nextProps.index === 3) {
+            return true;
+        }
+        return false;
+    }
 
     // The render method should have at least business logic as possible,
     // because this will be called whenever there is a new setState call
