@@ -316,7 +316,17 @@ const caseSingleScreen = {
                     selectedItemIndexForAgeUnitOfMeasureDropDown: 'selectedItemIndexForAgeUnitOfMeasureDropDown', //name of state parameter that will contain the selected index from values
                     objectType: 'Case',
                     keyboardType: Platform.OS === 'ios' ? 'number-pad' : 'numeric'
-                }
+                },
+                {
+                    cardNumber: 1,
+                    id: 'visualId',
+                    label: translations.caseSingleScreen.caseId,
+                    type: 'TextInput',
+                    value: '',
+                    isRequired: false,
+                    isEditMode: false,
+                    objectType: 'Case'
+                },
             ]
         },
         {
@@ -1580,6 +1590,18 @@ const contactsSingleScreen = {
                     isEditMode: true,
                     activeButtonColor: 'green',
                     activeBackgroundColor: 'green',
+                    objectType: 'Contact'
+                },
+                {
+                    cardNumber: 1,
+                    id: 'visualId',
+                    label: translations.contactSingleScreen.contactId,
+                    labelValue: 'test',
+                    type: 'TextInput',
+                    value: '',
+                    isRequired: false,
+                    isEditMode: false,
+                    multiline: false,
                     objectType: 'Contact'
                 },
             ]

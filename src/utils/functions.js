@@ -1306,13 +1306,15 @@ export function mapAnswers(questions, answers) {
             for (let j=0; j<sortedQuestions.length; j++) {
                 if (!mappedAnswers[questionId] && sortedQuestions[j].additionalQuestions && Array.isArray(sortedQuestions[j].additionalQuestions) && sortedQuestions[j].additionalQuestions.findIndex((e) => {return e.variable === questionId}) > -1) {
                     for (let i=0; i<questionnaireAnswers[questionId].length; i++) {
-                        let indexForStuff = mappedAnswers[sortedQuestions[j].variable].findIndex((e) => {return e.date === questionnaireAnswers[questionId][i].date});
-                        if (indexForStuff > -1) {
-                            if (mappedAnswers[sortedQuestions[j].variable][indexForStuff] && !mappedAnswers[sortedQuestions[j].variable][indexForStuff].subAnswers) {
-                                const a = Object.assign({}, mappedAnswers[sortedQuestions[j].variable][indexForStuff], {subAnswers: {}});
-                                mappedAnswers[sortedQuestions[j].variable][indexForStuff] = a;
+                        if (get(mappedAnswers, `sortedQuestions[${j}].variable`) && Array.isArray(get(mappedAnswers, `sortedQuestions[${j}].variable`)) && get(mappedAnswers, `sortedQuestions[${j}].variable`).length > 0) {
+                            let indexForStuff = mappedAnswers[sortedQuestions[j].variable].findIndex((e) => {return e.date === questionnaireAnswers[questionId][i].date});
+                            if (indexForStuff > -1) {
+                                if (mappedAnswers[sortedQuestions[j].variable][indexForStuff] && !mappedAnswers[sortedQuestions[j].variable][indexForStuff].subAnswers) {
+                                    const a = Object.assign({}, mappedAnswers[sortedQuestions[j].variable][indexForStuff], {subAnswers: {}});
+                                    mappedAnswers[sortedQuestions[j].variable][indexForStuff] = a;
+                                }
+                                mappedAnswers[sortedQuestions[j].variable][indexForStuff].subAnswers[questionId] = [questionnaireAnswers[questionId][i]];
                             }
-                            mappedAnswers[sortedQuestions[j].variable][indexForStuff].subAnswers[questionId] = [questionnaireAnswers[questionId][i]];
                         }
                     }
                 }

@@ -21,7 +21,7 @@
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>1.0.47</string>
+	<string>1.0.49</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSAppTransportSecurity</key>
@@ -44,9 +44,11 @@
 	<key>NSCalendarsUsageDescription</key>
 	<string>Some description</string>
 	<key>NSCameraUsageDescription</key>
-	<string>Your message to user when the camera is accessed for the first time</string>
+	<string>Camera is needed in order to scan QR code</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>Your location is needed to retrieve contact/cases' coordinates</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string></string>
+	<string>Your location is needed to retrieve contacts/cases' coordinates</string>
 	<key>NSMotionUsageDescription</key>
 	<string>Some description</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
@@ -80,6 +82,10 @@
 		<string>Octicons.ttf</string>
 		<string>SimpleLineIcons.ttf</string>
 		<string>Zocial.ttf</string>
+		<string>AntDesign.ttf</string>
+		<string>FontAwesome5_Brands.ttf</string>
+		<string>FontAwesome5_Regular.ttf</string>
+		<string>FontAwesome5_Solid.ttf</string>
 	</array>
 	<key>UIBackgroundModes</key>
 	<array>
