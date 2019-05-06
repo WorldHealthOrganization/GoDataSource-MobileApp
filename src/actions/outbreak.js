@@ -7,7 +7,7 @@ import {getOutbreakByIdRequest} from './../queries/outbreak';
 import { addError } from './errors';
 import errorTypes from './../utils/errorTypes';
 import {getLocationsByOutbreakIdRequest} from './../queries/locations'
-import {mapLocations} from './../utils/functions'
+import {mapLocations, extractIdFromPouchId} from './../utils/functions'
 
 // Add here only the actions, not also the requests that are executed. For that purpose is the requests directory
 export function storeOutbreak(outbreak) {
@@ -44,6 +44,9 @@ export function getOutbreakById(outbreakId, token, dispatch) {
                         console.log('*** getLocationsByOutbreakId response: ');
                         if (responseLocations.length > 0) {
                             let treeLocationList = mapLocations(responseLocations.filter((e) => {return e.active === true}), null);
+                            if (response && response.locationIds && Array.isArray(response.locationIds) && response.locationIds.length > 0) {
+                                treeLocationList = extractLocations(treeLocationList.slice(1), response.locationIds);
+                            }
                             dispatch(storeLocations(treeLocationList));
                         } else {
                             dispatch(storeLocations(responseLocations));
@@ -56,4 +59,25 @@ export function getOutbreakById(outbreakId, token, dispatch) {
         })
     })
     // }
+}
+
+
+function extractLocations (locationTree, locationIds) {
+    let newLocationTree = [];
+
+    for (let i=0; i<locationTree.length; i++) {
+        let index = locationIds.indexOf(extractIdFromPouchId(locationTree[i]._id, 'location'));
+        if(index > -1) {
+            newLocationTree.push(locationTree[i]);
+        } else {
+            if (locationTree[i].children && Array.isArray(locationTree[i].children) && locationTree[i].children.length > 0) {
+                let auxLocations = extractLocations(locationTree[i].children, locationIds);
+                if (auxLocations && Array.isArray(auxLocations) && auxLocations.length > 0) {
+                    newLocationTree = newLocationTree.concat(auxLocations);
+                }
+            }
+        }
+    }
+
+    return newLocationTree;
 }
