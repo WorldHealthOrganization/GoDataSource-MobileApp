@@ -49,8 +49,10 @@ class CaseListItem extends Component {
         if (item && item.age !== undefined && item.age !== null) {
             if (item.age.years !== undefined || item.age.months !== undefined) {
                 if (item.age.years !== 0 && item.age.years !== null) {
+                    // console.log('Here will be an error years: ', item.age);
                     secondaryTextAge = item.age.years.toString() + getTranslation(config.localTranslationTokens.years, translation).charAt(0).toLowerCase()
-                } else if (item.age.months !== 0 && item.age.months !== null) {
+                } else if (item.age.months !== undefined && item.age.months !== 0 && item.age.months !== null) {
+                    // console.log('Here will be an error months: ', item.age);
                     secondaryTextAge = item.age.months.toString() + getTranslation(config.localTranslationTokens.months, translation).charAt(0).toLowerCase()
                 }
             }
