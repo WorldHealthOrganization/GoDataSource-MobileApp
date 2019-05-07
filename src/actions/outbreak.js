@@ -45,7 +45,7 @@ export function getOutbreakById(outbreakId, token, dispatch) {
                         if (responseLocations.length > 0) {
                             let treeLocationList = mapLocations(responseLocations.filter((e) => {return e.active === true}), null);
                             if (response && response.locationIds && Array.isArray(response.locationIds) && response.locationIds.length > 0) {
-                                treeLocationList = extractLocations(treeLocationList.slice(1), response.locationIds);
+                                treeLocationList = extractLocations(treeLocationList, response.locationIds);
                             }
                             dispatch(storeLocations(treeLocationList));
                         } else {
