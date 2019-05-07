@@ -117,6 +117,9 @@ const caseSingleScreen = {
     transferRefused: 'LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED',
     riskReason: 'LNG_CASE_FIELD_LABEL_RISK_REASON',
 
+    // TODO add to backend
+    caseId: 'LNG_CASE_FIELD_LABEL_CASE_ID',
+
     documentType: 'LNG_CASE_FIELD_LABEL_DOCUMENT_TYPE',
     documentNumber: 'LNG_CASE_FIELD_LABEL_DOCUMENT_NUMBER',
     deleteButton: 'LNG_COMMON_BUTTON_DELETE',
@@ -184,7 +187,10 @@ const contactSingleScreen = {
     dateOfReporting: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING',
     isDateOfReportingApproximate: 'LNG_CONTACT_FIELD_LABEL_IS_DATE_OF_REPORTING_APPROXIMATE',
     riskLevel: 'LNG_CONTACT_FIELD_LABEL_RISK_LEVEL',
-    riskReason: 'LNG_CONTACT_FIELD_LABEL_RISK_REASON'
+    riskReason: 'LNG_CONTACT_FIELD_LABEL_RISK_REASON',
+
+    // TODO add to backend
+    contactId: 'LNG_CONTACT_FIELD_LABEL_CONTACT_ID'
 };
 
 const exposureScreen = {
