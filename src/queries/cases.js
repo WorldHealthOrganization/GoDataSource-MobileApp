@@ -267,14 +267,14 @@ export function updateCaseRequest (outbreakId, caseId, myCase, token, callback) 
         });
 }
 
-export function getItemByIdRequest (outbreakId, itemId, itemType, callback) {
+export function getItemByIdRequest (outbreakId, itemId, itemType, userTeams, callback) {
     getDatabase(config.mongoCollections.person)
         .then((database) => {
             database.get(itemId)
                 .then((result) => {
                     console.log('getItemByIdRequest result', result);
                     if (itemType === 'contact') {
-                        getRelationshipsAndFollowUpsForContactRequest(outbreakId, extractIdFromPouchId(itemId, 'person'), null, (errorRelationshipsAndFollowUps, responseRelationshipsAndFollowUps) => {
+                        getRelationshipsAndFollowUpsForContactRequest(outbreakId, extractIdFromPouchId(itemId, 'person'), null, userTeams, (errorRelationshipsAndFollowUps, responseRelationshipsAndFollowUps) => {
                             if (errorRelationshipsAndFollowUps) {
                                 console.log("*** getItemByIdRequest getRelationshipsAndFollowUpsForContact error: ", JSON.stringify(errorRelationshipsAndFollowUps));
                                 callback(errorRelationshipsAndFollowUps);

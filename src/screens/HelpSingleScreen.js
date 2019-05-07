@@ -10,8 +10,6 @@ import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import HelpSingleDetailsContainer from './../containers/HelpSingleDetailsContainer';
 import Breadcrumb from './../components/Breadcrumb';
-import {createFollowUp, updateFollowUpAndContact, deleteFollowUp} from './../actions/followUps';
-import {updateContact} from './../actions/contacts';
 import {removeErrors} from './../actions/errors';
 import _ from 'lodash';
 import {getTranslation} from './../utils/functions';
@@ -121,23 +119,13 @@ const style = StyleSheet.create({
 
 function mapStateToProps(state) {
     return {
-        user: state.user,
-        screenSize: state.app.screenSize,
-        followUps: state.followUps,
-        outbreak: state.outbreak,
         errors: state.errors,
-        contacts: state.contacts,
         translation: state.app.translation,
-        role: state.role
     };
 }
 
 function matchDispatchProps(dispatch) {
     return bindActionCreators({
-        createFollowUp,
-        updateFollowUpAndContact,
-        deleteFollowUp,
-        updateContact,
         removeErrors
     }, dispatch);
 }
