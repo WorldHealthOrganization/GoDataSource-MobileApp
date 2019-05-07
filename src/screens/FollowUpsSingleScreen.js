@@ -18,7 +18,6 @@ import Breadcrumb from './../components/Breadcrumb';
 import Menu, { MenuItem } from 'react-native-material-menu';
 import Ripple from 'react-native-material-ripple';
 import { createFollowUp, updateFollowUpAndContact, deleteFollowUp } from './../actions/followUps';
-import { updateContact } from './../actions/contacts';
 import { removeErrors } from './../actions/errors';
 import DateTimePicker from 'react-native-modal-datetime-picker';
 import _ from 'lodash';
@@ -773,7 +772,7 @@ class FollowUpsSingleScreen extends Component {
             if (this.props.isNew) {
                 followUpClone = updateRequiredFields(this.props.user.activeOutbreakId, this.props.user._id, Object.assign({}, followUpClone), action = 'create', 'followUp.json');
                 console.log('followUpClone create', JSON.stringify(followUpClone))
-                this.props.createFollowUp(this.props.user.activeOutbreakId, contactClone._id, followUpClone, contactClone, null, this.props.user.token)
+                this.props.createFollowUp(this.props.user.activeOutbreakId, contactClone._id, followUpClone, contactClone, null, this.props.user.token, this.props.teams)
             } else {
                 if (this.state.deletePressed === false) {
                     followUpClone = updateRequiredFields(this.props.user.activeOutbreakId, this.props.user._id, Object.assign({}, followUpClone), action = 'update');
@@ -782,7 +781,7 @@ class FollowUpsSingleScreen extends Component {
                     followUpClone = updateRequiredFields(this.props.user.activeOutbreakId, this.props.user._id, Object.assign({}, followUpClone), action = 'delete');
                     console.log('followUpClone delete', JSON.stringify(followUpClone))
                 }
-                this.props.updateFollowUpAndContact(this.props.user.activeOutbreakId, contactClone._id, followUpClone._id, followUpClone, contactClone, this.props.user.token, this.props.filter);
+                this.props.updateFollowUpAndContact(this.props.user.activeOutbreakId, contactClone._id, followUpClone._id, followUpClone, contactClone, this.props.user.token, this.props.filter, this.props.teams);
             }
         });
     };
@@ -1018,6 +1017,7 @@ const style = StyleSheet.create({
 
 function mapStateToProps(state) {
     return {
+        teams: state.teams,
         user: state.user,
         screenSize: state.app.screenSize,
         followUps: state.followUps,
@@ -1034,7 +1034,6 @@ function matchDispatchProps(dispatch) {
         createFollowUp,
         updateFollowUpAndContact,
         deleteFollowUp,
-        updateContact,
         removeErrors
     }, dispatch);
 }

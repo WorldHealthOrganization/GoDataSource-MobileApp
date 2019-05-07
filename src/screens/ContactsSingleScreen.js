@@ -1112,7 +1112,7 @@ class ContactsSingleScreen extends Component {
                                 contact: Object.assign({}, prevState.contact, { relationships: relations })
                             }), () => {
                                 relation = updateRequiredFields(this.props.user.activeOutbreakId, this.props.user._id, Object.assign({}, relation), 'delete');
-                                this.props.deleteExposureForContact(this.props.user.activeOutbreakId, this.props.contact._id, relation, this.props.user.token);
+                                this.props.deleteExposureForContact(this.props.user.activeOutbreakId, this.props.contact._id, relation, this.props.user.token, this.props.teams);
                             })
                         }
                     }
@@ -1259,7 +1259,7 @@ class ContactsSingleScreen extends Component {
                         let contactClone = _.cloneDeep(this.state.contact)
                         let contactMatchFilter = this.checkIfContactMatchFilter()
                         console.log('contactMatchFilter', contactMatchFilter)
-                        this.props.updateContact(this.props.user.activeOutbreakId, contactClone._id, contactClone, this.props.user.token, null, contactMatchFilter);
+                        this.props.updateContact(this.props.user.activeOutbreakId, contactClone._id, contactClone, this.props.user.token, null, contactMatchFilter, this.props.teams);
                     })
                 }
             })

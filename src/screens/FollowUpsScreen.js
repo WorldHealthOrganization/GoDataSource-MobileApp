@@ -23,7 +23,7 @@ import AnimatedListView from './../components/AnimatedListView';
 import Breadcrumb from './../components/Breadcrumb';
 import Menu, { MenuItem } from 'react-native-material-menu';
 import ValuePicker from './../components/ValuePicker';
-import { getFollowUpsForOutbreakId, getMissedFollowUpsForOutbreakId, updateFollowUpAndContact, addFollowUp, generateFollowUp } from './../actions/followUps';
+import { getFollowUpsForOutbreakId, getMissedFollowUpsForOutbreakId, addFollowUp, generateFollowUp } from './../actions/followUps';
 import { getContactsForOutbreakId } from './../actions/contacts';
 import { removeErrors } from './../actions/errors';
 import { addFilterForScreen, removeFilterForScreen, saveGeneratedFollowUps } from './../actions/app';
@@ -121,9 +121,9 @@ class FollowUpsScreen extends Component {
             }
 
             state.followUps = fUps;
-            // Now filter the followUps by type (All/To do/Missed)
-            // let oneDay = 24 * 60 * 60 * 1000;
-            if (state.filter && state.filter.performed && state.filter.performed.value && state.filter.performed.value !== 'All') {
+
+            
+            if (state.filter && state.filter.performed && state.filter.performed.value && state.filter.performed.value !== 'LNG_FOLLOW_UPS_DROP_DOWN_FILTER_STATUS_LABEL_ALL') {
                 fUps = fUps.filter((e) => { return e.statusId === state.filter.performed.value });
             }
 
@@ -495,7 +495,7 @@ class FollowUpsScreen extends Component {
             filter: Object.assign({}, prevState.filter, { performed: value })
         }), () => {
             console.log("### filter from onSelectValue: ", this.state.filter);
-            if (value === 'All') {
+            if (value && ((value.label && value.label === 'All') || (value.value && value.value === 'LNG_FOLLOW_UPS_DROP_DOWN_FILTER_STATUS_LABEL_ALL'))) {
                 this.removeFromFilter({ type: 'performed' });
             } else {
                 this.appendToFilter({ type: 'performed', value });
@@ -757,6 +757,7 @@ class FollowUpsScreen extends Component {
 
     getFollowUpsFromContacts = (contacts) => {
         let followUpsToBeShown = [];
+        const { filter } = this.state
 
         if (contacts && Array.isArray(contacts) && contacts.length > 0) {
             for (let i = 0; i < contacts.length; i++) {
@@ -764,33 +765,13 @@ class FollowUpsScreen extends Component {
             }
         }
 
+        if (filter && filter.performed && filter.performed.value && filter.performed.value !== 'LNG_FOLLOW_UPS_DROP_DOWN_FILTER_STATUS_LABEL_ALL') {
+            followUpsToBeShown = followUpsToBeShown.filter((e) => { return e.statusId === filter.performed.value });
+        }
+
         this.setState({
             followUps: followUpsToBeShown
         })
-    };
-
-    filterFollowUps = () => {
-        let followUps = [];
-        let oneDay = 24 * 60 * 60 * 1000;
-        if (this.state.followUps !== 'All') {
-            if (this.state.filter.performed === 'Missed') {
-                followUps = Object.assign({}, this.state.followUps);
-
-                followUps = followUps.filter((e) => {
-                    return (!e.performed && (new Date(e.date).getTime() - oneDay) < new Date().getTime()) || (e.performed && e.lostToFollowUp)
-                })
-            } else {
-                if (this.state.filter.performed === 'To do') {
-                    followUps = Object.assign({}, this.state.followUps);
-
-                    followUps = followUps.filter((e) => {
-                        return !e.performed && !e.lostToFollowUp
-                    })
-                }
-            }
-
-            this.setState({ followUps });
-        }
     };
 
     showMenu = () => {
@@ -1072,7 +1053,6 @@ function matchDispatchProps(dispatch) {
         removeErrors,
         addFilterForScreen,
         getContactsForOutbreakId,
-        updateFollowUpAndContact,
         addFollowUp,
         saveGeneratedFollowUps,
         removeFilterForScreen,
