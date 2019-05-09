@@ -73,11 +73,18 @@ export function checkIfSameDay(date1, date2) {
     return date1.getDate() === date2.getDate() && date1.getMonth() === date2.getMonth() && date1.getFullYear() === date2.getFullYear();
 }
 
-export function getAddress(address, returnString) {
+export function getAddress(address, returnString, locationsList) {
     let addressArray = [];
+    let locationName = null;
+    if (locationsList && Array.isArray(locationsList) && locationsList.length > 0) {
+        locationName = locationsList.find((e) => {return address.locationId === extractIdFromPouchId(e._id, 'location')});
+        if (locationName && locationName.name) {
+            locationName = locationName.name;
+        }
+    }
 
     if (address) {
-        addressArray = [address.addressLine1, address.addressLine2, address.city, address.country, address.postalCode];
+        addressArray = [address.addressLine1, address.addressLine2, address.city, address.country, address.postalCode, locationName];
         addressArray = addressArray.filter((e) => {return e});
     }
 

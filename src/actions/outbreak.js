@@ -1,7 +1,7 @@
 /**
  * Created by florinpopa on 19/07/2018.
  */
-import {ACTION_TYPE_STORE_OUTBREAK, ACTION_TYPE_STORE_LOCATIONS} from './../utils/enums';
+import {ACTION_TYPE_STORE_OUTBREAK, ACTION_TYPE_STORE_LOCATIONS, ACTION_TYPE_STORE_LOCATIONS_LIST} from './../utils/enums';
 // import {getOutbreakByIdRequest} from './../requests/outbreak';
 import {getOutbreakByIdRequest} from './../queries/outbreak';
 import { addError } from './errors';
@@ -24,6 +24,13 @@ export function storeLocations(locations) {
     }
 }
 
+export function storeLocationsList(locationsList) {
+    return {
+        type: ACTION_TYPE_STORE_LOCATIONS_LIST,
+        locationsList
+    }
+}
+
 export function getOutbreakById(outbreakId, token, dispatch) {
     // return async function(dispatch, getState) {
     return new Promise((resolve, reject) => {
@@ -42,6 +49,7 @@ export function getOutbreakById(outbreakId, token, dispatch) {
                     }
                     if (responseLocations) {
                         console.log('*** getLocationsByOutbreakId response: ');
+                        dispatch(storeLocationsList(responseLocations));
                         if (responseLocations.length > 0) {
                             let treeLocationList = mapLocations(responseLocations.filter((e) => {return e.active === true}), null);
                             if (response && response.locationIds && Array.isArray(response.locationIds) && response.locationIds.length > 0) {

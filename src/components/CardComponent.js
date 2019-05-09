@@ -290,7 +290,7 @@ const style = StyleSheet.create({
 function mapStateToProps(state) {
     return {
         screenSize: state.app.screenSize,
-        locations: state.locations,
+        locations: state.locations.locations,
         translation: state.app.translation,
     };
 }

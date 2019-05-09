@@ -425,7 +425,7 @@ function mapStateToProps(state) {
         role: state.role,
         translation: state.app.translation,
         referenceData: state.referenceData,
-        locations: state.locations,
+        locations: state.locations.locations,
     };
 
 }

@@ -1,5 +1,5 @@
 import React, {PureComponent} from 'react';
-import {View, Text, Modal, StyleSheet, TextInput, FlatList} from 'react-native';
+import {View, Text, Modal, StyleSheet, TextInput, FlatList, Platform} from 'react-native';
 import {Icon} from 'react-native-material-ui';
 import config from './../utils/config';
 import Ripple from 'react-native-material-ripple';
@@ -50,7 +50,7 @@ class SectionedMultiSelect extends PureComponent {
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
-        // console.log("SectionedMultiSelect: ", this.props.items);
+        console.log("SectionedMultiSelect screenSize: ", this.props.screenSize);
         return (
             <View>
                 {/*Component container*/}
