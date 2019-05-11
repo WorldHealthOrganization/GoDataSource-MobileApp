@@ -167,23 +167,20 @@ export function handleExposedTo(contact, returnString, cases, events) {
     for (let i=0; i<relationships.length; i++) {
         // Get only the persons that the contact has been exposed to
         // Since on the local storage we keep the ids as the actual id concatenated with other strings, we must parse this
-        let contactId = contact._id.split('_');
-        contactId = contactId[contactId.length - 1];
+        let contactId = extractIdFromPouchId(contact._id, 'person');
         let persons = relationships[i].persons.filter((e) => {return e.id !== contactId});
         // console.log('PErsons: ', persons);
         for (let j=0; j<persons.length; j++) {
             if ((persons[j].type === 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE' || persons[j].type === 'case') && cases && Array.isArray(cases)) {
-                let auxCase = cases[cases.map((e) => {return e._id.split('_')[e._id.split('_').length - 1]}).indexOf(persons[j].id)];
+                let auxCase = cases.find((e) => {return extractIdFromPouchId(e._id, 'person') === persons[j].id});
                 if (auxCase) {
-                    relationshipArray.push((auxCase.firstName || '') + " " + (auxCase.lastName || ''));
+                    relationshipArray.push({fullName: (auxCase.firstName || '') + " " + (auxCase.lastName || ''), id: auxCase._id, visualId: auxCase.visualId});
                 }
             } else {
                 if (events && Array.isArray(events)) {
-                    let auxEvent = events[events.map((e) => {
-                        return e._id.split('_')[e._id.split('_').length - 1]
-                    }).indexOf(persons[j].id)];
+                    let auxEvent = events.find((e) => {return extractIdFromPouchId(e._id, 'person') === persons[j].id});
                     if (auxEvent && auxEvent.name) {
-                        relationshipArray.push(auxEvent.name);
+                        relationshipArray.push({fullName: auxEvent.name, id: auxEvent._id, visualId: auxEvent.visualId});
                     }
                 }
             }

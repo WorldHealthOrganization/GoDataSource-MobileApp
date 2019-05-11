@@ -18,6 +18,7 @@ import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import SearchFilterView from './../components/SearchFilterView';
 import FollowUpListItem from './../components/FollowUpListItem';
+import PersonListItem from './../components/PersonListItem';
 import MissedFollowUpListItem from './../components/MissedFollowUpListItem';
 import AnimatedListView from './../components/AnimatedListView';
 import Breadcrumb from './../components/Breadcrumb';
@@ -73,7 +74,9 @@ class FollowUpsScreen extends Component {
             sourceLongitude: 0,
             error: null,
             generating: false,
-            calendarPickerOpen: false
+            calendarPickerOpen: false,
+
+            followUpsColors: {}
         };
         // Bind here methods, or at least don't declare methods in the render method
         this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this));
@@ -201,9 +204,15 @@ class FollowUpsScreen extends Component {
     };
 
     mimeComponentDidMount = () => {
+        let followUpsColors = {};
+        let refData = this.props.referenceData.filter((e) => {return e.categoryId === "LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE"})
+        for (let i=0; i<refData.length; i++) {
+            followUpsColors[refData[i].value] = refData[i].colorCode || styles.buttonGreen
+        }
         this.setState({
             loading: true,
             generating: false,
+            followUpsColors
         }, () => {
             if (this.props.user && this.props.user.activeOutbreakId) {
                 this.props.getFollowUpsForOutbreakId(this.props.user.activeOutbreakId, this.state.filter, this.props.teams, null);
@@ -441,14 +450,39 @@ class FollowUpsScreen extends Component {
     };
 
     renderFollowUp = ({ item }) => {
-        return (<FollowUpListItem
-            item={item}
-            onPressFollowUp={this.handlePressFollowUp}
-            onPressMissing={this.handleOnPressMissing}
-            onPressExposure={this.handleOnPressExposure}
-            onPressMap={this.handleOnPressMap}
-            firstActionText={getTranslation(item.statusId, this.props.translation)}
-        />)
+        let margins = calculateDimension(16, false, this.props.screenSize);
+        return(
+            <PersonListItem
+                type={'FollowUp'}
+                itemToRender={item}
+                onPressMapIconProp={this.handleOnPressMap}
+                onPressNameProp={this.handleOnPressNameProp}
+                onPressExposureProp={this.handleOnPressExposureProp}
+                textsArray={[
+                    getTranslation(item.statusId, this.props.translation),
+                    getTranslation(translations.followUpsScreen.addExposureFollowUpLabel, this.props.translation)
+                ]}
+                textsStyleArray={[[styles.buttonTextActionsBar, {color: this.state.followUpsColors[item.statusId], marginLeft: margins}], [styles.buttonTextActionsBar, {marginRight: margins}]]}
+                onPressTextsArray={[
+                    () => {
+                        // console.log('Test performance renderFollowUpQuestion');
+                        this.handlePressFollowUp(item, this.props.contacts.find((e) => {return extractIdFromPouchId(e._id, 'person') === item.personId}))
+                    },
+                    () => {
+                        // console.log('Test performance renderFollowUpQuestion');
+                        this.handleOnPressExposure(item, this.props.contacts.find((e) => {return extractIdFromPouchId(e._id, 'person') === item.personId}))
+                    }]}
+            />
+        )
+
+        // return (<FollowUpListItem
+        //     item={item}
+        //     onPressFollowUp={this.handlePressFollowUp}
+        //     onPressMissing={this.handleOnPressMissing}
+        //     onPressExposure={this.handleOnPressExposure}
+        //     onPressMap={this.handleOnPressMap}
+        //     firstActionText={getTranslation(item.statusId, this.props.translation)}
+        // />)
     };
 
     getItemLayout = (data, index) => ({
@@ -576,8 +610,7 @@ class FollowUpsScreen extends Component {
         })
     };
 
-    handleOnPressMap = (followUp, contact) => {
-        console.log("Handle on press map followUp: ", JSON.stringify(followUp));
+    handleOnPressMap = (contact) => {
         console.log("Handle on press map contact: ", JSON.stringify(contact));
 
         if (contact && contact.addresses && Array.isArray(contact.addresses) && contact.addresses.length > 0) {
@@ -611,6 +644,29 @@ class FollowUpsScreen extends Component {
                 }
             );
         }
+    };
+
+    handleOnPressNameProp = (type, personId) => {
+        this.props.navigator.push({
+            screen: 'ContactsSingleScreen',
+            animated: true,
+            passProps: {
+                contact: this.props.contacts.find((e) => {return e._id === personId}),
+                previousScreen: translations.followUpsSingleScreen.title
+            }
+        })
+    };
+
+    handleOnPressExposureProp = (exposureId) => {
+        if (exposureId.includes('person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE_'))
+        this.props.navigator.push({
+            screen: 'CaseSingleScreen',
+            animated: true,
+            passProps: {
+                case: this.props.cases.find((e) => {return e._id === exposureId}),
+                previousScreen: translations.followUpsSingleScreen.title
+            }
+        })
     };
 
     handlePressFilter = () => {
@@ -1050,7 +1106,9 @@ function mapStateToProps(state) {
         translation: state.app.translation,
         helpCategory: state.helpCategory,
         helpItem: state.helpItem,
-        role: state.role
+        role: state.role,
+        cases: state.cases,
+        referenceData: state.referenceData
     };
 }
 

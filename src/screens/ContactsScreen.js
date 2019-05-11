@@ -12,6 +12,7 @@ import Ripple from 'react-native-material-ripple';
 import {Button, Icon} from 'react-native-material-ui';
 import {calculateDimension, getTranslation, navigation, createFilterContactsObject} from './../utils/functions';
 import FollowUpListItem from './../components/FollowUpListItem';
+import PersonListItem from './../components/PersonListItem';
 import SearchFilterView from './../components/SearchFilterView';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -27,6 +28,7 @@ import Breadcrumb from './../components/Breadcrumb';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {pushNewEditScreen} from './../utils/screenTransitionFunctions';
 import RNExitApp from 'react-native-exit-app';
+import {extractIdFromPouchId} from "../utils/functions";
 
 const scrollAnim = new Animated.Value(0);
 const offsetAnim = new Animated.Value(0);
@@ -54,7 +56,8 @@ class ContactsScreen extends Component {
             sourceLatitude: 0,
             sourceLongitude: 0,
             error: null,
-            refreshing: false
+            refreshing: false,
+            riskColors: {}
         };
         // Bind here methods, or at least don't declare methods in the render method
         this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this));
@@ -64,8 +67,14 @@ class ContactsScreen extends Component {
     // Please add here the react lifecycle methods that you need
     componentDidMount() {
         BackHandler.addEventListener('hardwareBackPress', this.handleBackButtonClick);
+        let riskColors = {};
+        let refData = this.props.referenceData.filter((e) => {return e.categoryId.includes("RISK_LEVEL")});
+        for (let i=0; i<refData.length; i++) {
+            riskColors[refData[i].value] = refData[i].colorCode || 'black'
+        }
         this.setState({
-            loading: true
+            loading: true,
+            riskColors: riskColors
         }, () => {
             if (this.props && this.props.user && this.props.user.activeOutbreakId) {
                 if (this.props.filter && (this.props.filter['ContactsFilterScreen'] || this.props.filter['FollowUpsScreen'])) {
@@ -322,23 +331,53 @@ class ContactsScreen extends Component {
 
     keyExtractor = (item, index) => item._id;
 
-    renderContact = (item) => {
-        // console.log("### item: ", item);
-        let riskLevelReferenceData = this.props.referenceData.filter((o) => {return o.categoryId.includes("RISK_LEVEL")})
-                                                        .sort((a,b) => { return a.order - b.order; })
-                                                        
-        return (
-            <FollowUpListItem
-                item={item.item}
-                riskLevelReferenceData={riskLevelReferenceData}
-                isContact={true}
-                firstActionText={getTranslation(translations.contactsScreen.addFollowupsButton, this.props.translation).toUpperCase()}
-                secondActionText={getTranslation(translations.contactsScreen.editButton, this.props.translation).toUpperCase()}
-                onPressFollowUp={this.handlePressFollowUp}
-                onPressMissing={this.handleOnPressMissing}
-                onPressExposure={this.handleOnPressExposure}
-                onPressMap={this.handleOnPressMap}
+    renderContact = ({item}) => {
+        let margins = calculateDimension(16, false, this.props.screenSize);
+        return(
+            <PersonListItem
+                type={'Contact'}
+                titleColor={item && item.riskLevel ? this.state.riskColors[item.riskLevel] : 'black'}
+                itemToRender={item}
+                onPressMapIconProp={this.handleOnPressMap}
+                onPressNameProp={this.handleOnPressNameProp}
+                onPressExposureProp={this.handleOnPressExposureProp}
+                textsArray={[
+                    getTranslation(translations.contactsScreen.addFollowupsButton, this.props.translation),
+                    getTranslation(translations.contactsScreen.editButton, this.props.translation),
+                    getTranslation(translations.followUpsScreen.addExposureFollowUpLabel, this.props.translation)
+                ]}
+                textsStyleArray={[
+                    [styles.buttonTextActionsBar, {fontSize: 14, marginLeft: margins}],
+                    [styles.buttonTextActionsBar, {fontSize: 14}],
+                    [styles.buttonTextActionsBar, {fontSize: 14, marginRight: margins}]]
+                }
+                onPressTextsArray={[
+                    () => {
+                        console.log('Test performance renderFollowUpQuestion');
+                        this.handlePressFollowUp(item)
+                    },
+                    () => {
+                        console.log('Test performance renderFollowUpQuestion');
+                        this.handleOnPressMissing(item)
+                    },
+                    () => {
+                        console.log('Test performance renderFollowUpQuestion');
+                        this.handleOnPressExposure(item)
+                    }]}
             />
+                                                        
+        // return (
+        //     <FollowUpListItem
+        //         item={item.item}
+        //         riskLevelReferenceData={riskLevelReferenceData}
+        //         isContact={true}
+        //         firstActionText={getTranslation(translations.contactsScreen.addFollowupsButton, this.props.translation).toUpperCase()}
+        //         secondActionText={getTranslation(translations.contactsScreen.editButton, this.props.translation).toUpperCase()}
+        //         onPressFollowUp={this.handlePressFollowUp}
+        //         onPressMissing={this.handleOnPressMissing}
+        //         onPressExposure={this.handleOnPressExposure}
+        //         onPressMap={this.handleOnPressMap}
+        //     />
         )
     };
 
@@ -463,9 +502,32 @@ class ContactsScreen extends Component {
         })
     };
 
+    handleOnPressNameProp = (type, personId) => {
+        this.props.navigator.push({
+            screen: 'ContactsSingleScreen',
+            animated: true,
+            passProps: {
+                contact: this.props.contacts.find((e) => {return e._id === personId}),
+                previousScreen: translations.contactSingleScreen.title
+            }
+        })
+    };
+
+    handleOnPressExposureProp = (exposureId) => {
+        if (exposureId.includes('person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE_'))
+            this.props.navigator.push({
+                screen: 'CaseSingleScreen',
+                animated: true,
+                passProps: {
+                    case: this.props.cases.find((e) => {return e._id === exposureId}),
+                    previousScreen: translations.contactSingleScreen.title
+                }
+            })
+    };
+
     handleOnPressMap = (followUp, contact) => {
-        console.log("Handle on press map followUp: ", JSON.stringify(followUp));
-        console.log("Handle on press map contact: ", JSON.stringify(contact));
+        // console.log("Handle on press map followUp: ", JSON.stringify(followUp));
+        // console.log("Handle on press map contact: ", JSON.stringify(contact));
 
         let contactPlaceOfResidence = null
         if (contact && contact.addresses && Array.isArray(contact.addresses) && contact.addresses.length > 0) {
@@ -772,6 +834,7 @@ function mapStateToProps(state) {
         role: state.role,
         referenceData: state.referenceData,
         translation: state.app.translation,
+        cases: state.cases
     };
 }
 
