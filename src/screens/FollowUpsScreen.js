@@ -108,59 +108,47 @@ class FollowUpsScreen extends Component {
 
         // console.log('props.contacts', JSON.stringify(props.contacts))
         if (props.contacts) {
-            let fUps = [];
 
-            let contactsCopy = _.cloneDeep(props.contacts);
-            if (state.filter || state.filterFromFilterScreen) {
-                contactsCopy = localSortContactsForFollowUps(contactsCopy, props.filter, state.filter, state.filterFromFilterScreen)
-            } else {
-                contactsCopy = objSort(contactsCopy, ['lastName', false])
-            }
+            const contactsHasFollowUps = props.contacts.some(e => {
+                return e.followUps !== undefined && e.followUps !== null && e.followUps.length > 0
+            })
 
-            for (let i = 0; i < contactsCopy.length; i++) {
-                if (contactsCopy[i].followUps) {
-                    fUps = fUps.concat(contactsCopy[i].followUps);
+            if (contactsHasFollowUps) {
+                let fUps = [];
+
+                let contactsCopy = _.cloneDeep(props.contacts);
+                if (state.filter || state.filterFromFilterScreen) {
+                    contactsCopy = localSortContactsForFollowUps(contactsCopy, props.filter, state.filter, state.filterFromFilterScreen)
+                } else {
+                    contactsCopy = objSort(contactsCopy, ['lastName', false])
                 }
-            }
 
-            state.followUps = fUps;
+                for (let i = 0; i < contactsCopy.length; i++) {
+                    if (contactsCopy[i].followUps) {
+                        fUps = fUps.concat(contactsCopy[i].followUps);
+                    }
+                }
 
-            
-            if (state.filter && state.filter.performed && state.filter.performed.value && state.filter.performed.value !== 'LNG_FOLLOW_UPS_DROP_DOWN_FILTER_STATUS_LABEL_ALL') {
-                fUps = fUps.filter((e) => { return e.statusId === state.filter.performed.value });
-            }
-
-            if (props.followUps && props.followUps.length > 0) {
                 state.followUps = fUps;
-            }
-            else {
-                state.followUps = []
-            }
+                if (state.filter && state.filter.performed && state.filter.performed.value && state.filter.performed.value !== 'LNG_FOLLOW_UPS_DROP_DOWN_FILTER_STATUS_LABEL_ALL') {
+                    fUps = fUps.filter((e) => { return e.statusId === state.filter.performed.value });
+                }
 
-            //if we're generating follow-ups
-            // if(state.generating) {
-            //     if(props.generatedFollowUps){
-            //         let number = parseInt(props.generatedFollowUps);
-            //         props.navigator.showInAppNotification({
-            //             screen: "InAppNotificationScreen",
-            //             passProps: {
-            //                 number: number,
-            //                 translation: props.translation
-            //             },
-            //             autoDismissTimerSec: 1
-            //         });
-            //         //reset generating status
-            //         state.generating = false;
-            //         //reset number of generated followups
-            //         props.saveGeneratedFollowUps(0);
-            //     }
-            // }
-            // console.log(`Before making it false: state.refreshing - ${state.refreshing},  state.loading - ${state.loading}`);
-            // setTimeout(() => {
-            state.refreshing = false;
-            state.loading = false;
-            // }, 200);
+                if (props.followUps && props.followUps.length > 0) {
+                    state.followUps = fUps;
+                }
+                else {
+                    state.followUps = []
+                }
+
+                state.refreshing = false;
+                state.loading = false;
+            } else {
+                state.refreshing = false;
+                state.loading = false;
+            }
         }
+
         console.log(`Before making it false: state.refreshing - ${state.refreshing},  state.loading - ${state.loading}`);
         return null;
     };
