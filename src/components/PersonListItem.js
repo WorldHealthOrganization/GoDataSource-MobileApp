@@ -79,7 +79,6 @@ FirstComponent = ({type, firstComponentRenderData, titleColor, onPressMapIcon, o
                 </View>
                 <Text style={[style.secondaryText, {
                     flex: 1,
-                    color: firstComponentRenderData.primaryColor,
                     marginHorizontal: 7
                 }]}>{'\u2022 ' + getTranslation(translations.addressFieldLabels.address, translation) + ": " + firstComponentRenderData.addressString}</Text>
             </View>

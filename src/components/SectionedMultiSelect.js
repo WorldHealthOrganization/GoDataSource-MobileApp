@@ -241,11 +241,13 @@ class SectionedMultiSelect extends PureComponent {
         })
     };
 
-    handleOnPressExpand = (itemId) => {
+    handleOnPressExpand = (itemId, onlyExpand) => {
         let expandedItemsClone = this.state.reRenderProps.expandedItems.slice();
         let elementIndex = expandedItemsClone.findIndex((e) => {return e === itemId});
         if (elementIndex > -1) {
-            expandedItemsClone.splice(elementIndex, 1);
+            if (!onlyExpand) {
+                expandedItemsClone.splice(elementIndex, 1);
+            }
         } else {
             expandedItemsClone.push(itemId);
         }
@@ -253,7 +255,7 @@ class SectionedMultiSelect extends PureComponent {
         this.setState(prevState => ({
             reRenderProps: Object.assign({}, prevState.reRenderProps, {expandedItems: expandedItemsClone})
         }), () => {
-            console.log('Selected Items biatch: ', this.state.reRenderProps.expandedItems);
+            console.log('Expanded Items: ', this.state.reRenderProps.expandedItems);
         })
     };
 
@@ -279,14 +281,14 @@ class SectionedMultiSelect extends PureComponent {
 
             if (items[i].name.toUpperCase().includes(text.toUpperCase())) {
                 if (keepData && Array.isArray(keepData) && keepData.length > 0) {
-                    filteredData.push(Object.assign({}, items[i], {children: keepData}))
+                    filteredData.push(Object.assign({}, items[i], {children: keepData}));
                 } else {
                     delete items[i][this.props.subKey];
                     filteredData.push(items[i]);
                 }
             } else {
                 if (keepData && Array.isArray(keepData) && keepData.length > 0) {
-                    filteredData.push(Object.assign({}, items[i], {children: keepData}))
+                    filteredData.push(Object.assign({}, items[i], {children: keepData}));
                 }
             }
         }
