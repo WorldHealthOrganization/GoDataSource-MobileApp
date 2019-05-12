@@ -12,6 +12,7 @@ import TooltipComponent from './TooltipComponent';
 import ElevatedView from 'react-native-elevated-view';
 import Button from './Button';
 import SectionedMultiSelectListItem from './SectionedMultiSelectListItem';
+import cloneDeep from 'lodash/cloneDeep';
 
 class SectionedMultiSelect extends PureComponent {
 
@@ -260,15 +261,24 @@ class SectionedMultiSelect extends PureComponent {
     };
 
     handleOnChangeTextSearch = (text) => {
-        this.setState({
-            searchText: text
-        }, () => {
-            console.log('Here do the filtering');
-            let filteredData = this.filterData(this.props.items.slice(), text);
+        if (text !== '' && text !== null && text !== undefined) {
             this.setState({
-                allItems: filteredData
+                searchText: text
+            }, () => {
+                console.log('Here do the filtering');
+                let filteredData = this.filterData(cloneDeep(this.props.items), text);
+                let expandedItems = this.filterDataToExpand(cloneDeep(this.props.items), text);
+                this.setState(prevState => ({
+                    allItems: filteredData,
+                    reRenderProps: Object.assign({}, prevState.reRenderProps, {expandedItems: expandedItems})
+                }))
             })
-        })
+        } else {
+            this.setState(prevState => ({
+                allItems: cloneDeep(this.props.items),
+                reRenderProps: Object.assign({}, prevState.reRenderProps, {expandedItems: []})
+            }))
+        }
     };
 
     filterData = (items, text) => {
@@ -289,6 +299,23 @@ class SectionedMultiSelect extends PureComponent {
             } else {
                 if (keepData && Array.isArray(keepData) && keepData.length > 0) {
                     filteredData.push(Object.assign({}, items[i], {children: keepData}));
+                }
+            }
+        }
+
+        return filteredData;
+    };
+
+    filterDataToExpand = (items, text) => {
+        let filteredData = [];
+        for (let i=0; i<items.length; i++) {
+            if (items[i][this.props.subKey]) {
+                filteredData = filteredData.concat(this.filterDataToExpand(items[i][this.props.subKey], text));
+            }
+
+            if (!items[i].name.toUpperCase().includes(text.toUpperCase())) {
+                if (items[i][this.props.subKey]) {
+                    filteredData.push( items[i][this.props.uniqueKey]);
                 }
             }
         }
