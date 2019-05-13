@@ -20,7 +20,7 @@ export function getCasesForOutbreakIdRequest (outbreakId, filter, token, callbac
 
                 Promise.all(promiseArray)
                     .then((resultGetAll) => {
-                        console.log("Result from get queries: ", new Date().getTime() - start, resultGetAll.length);
+                        console.log("Result from get queries: ", new Date().getTime() - start);
                         callback(null, resultGetAll.filter((e) => {return e && e._id !== null}));
                     })
                     .catch((errorGetAll) => {
@@ -30,7 +30,7 @@ export function getCasesForOutbreakIdRequest (outbreakId, filter, token, callbac
             } else {
                 if (filter) {
                     console.log('getCasesForOutbreakIdRequest else, if');
-                    console.log ('myFilter', filter);
+                    // console.log ('myFilter', filter);
 
                     let classificationOrFilter = null
                     if(filter.classification){
@@ -76,7 +76,7 @@ export function getCasesForOutbreakIdRequest (outbreakId, filter, token, callbac
                         },
                     })
                         .then((resultFilterCases) => {
-                            console.log('Result when filtering cases: ', new Date().getTime() - start, resultFilterCases.docs);
+                            console.log('Result when filtering cases: ', new Date().getTime() - start);
                             //local filter for age because it can't be done in mango (can't use and in or filter
                             let resultFilterCasesDocs = resultFilterCases.docs
                             if (filter.age) {
@@ -184,7 +184,7 @@ export function checkForNameDuplicatesRequest (id, firstName, lastName, outbreak
                 },
             }).then((resultsCaseName) => {
                 console.log('Result get duplicates name time: ', new Date().getTime() - start);
-                console.log('Result get duplicates name: ', resultsCaseName);
+                // console.log('Result get duplicates name: ', resultsCaseName);
                 callback(null, resultsCaseName.docs)
             }).catch((errorCaseName) => {
                 console.log('Error when get duplicates name: ', errorCaseName);
@@ -199,13 +199,13 @@ export function checkForNameDuplicatesRequest (id, firstName, lastName, outbreak
 export function addCaseRequest (outbreakId, myCase, token, callback) {
     getDatabase(config.mongoCollections.person)
         .then((database) => {
-            console.log('addCaseRequest: ', outbreakId, myCase);
+            // console.log('addCaseRequest: ', outbreakId, myCase);
             database.put(myCase)
                 .then((responseAddCase) => {
                     console.log('responseAddCase', responseAddCase)
                     database.get(responseAddCase.id)
                         .then((responseGetAddedCase) => {
-                            console.log('responseGetAddedCase', responseGetAddedCase)
+                            // console.log('responseGetAddedCase', responseGetAddedCase)
                             callback(null, responseGetAddedCase);
                         })
                         .catch((errorGetAddedCase) => {
@@ -226,20 +226,20 @@ export function addCaseRequest (outbreakId, myCase, token, callback) {
 export function updateCaseRequest (outbreakId, caseId, myCase, token, callback) {
     getDatabase(config.mongoCollections.person)
         .then((database) => {
-            console.log('updateCaseRequest: ', outbreakId, caseId, myCase);
+            // console.log('updateCaseRequest: ', outbreakId, caseId, myCase);
             database.get(myCase._id)
                 .then((resultGetCase) => {
-                    console.log ('Get case result: ', JSON.stringify(resultGetCase))
+                    // console.log ('Get case result: ', JSON.stringify(resultGetCase))
                     database.remove(resultGetCase)
                         .then((resultRemove) => {
-                            console.log ('Remove case result: ', JSON.stringify(resultRemove))
+                            // console.log ('Remove case result: ', JSON.stringify(resultRemove))
                             delete myCase._rev;
                             database.put(myCase)
                                 .then((responseUpdateCase) => {
-                                    console.log("Update case response: ", responseUpdateCase);
+                                    // console.log("Update case response: ", responseUpdateCase);
                                     database.get(myCase._id)
                                         .then((resultGetUpdatedCase) => {
-                                            console.log("Response resultGetUpdatedCase: ", JSON.stringify(resultGetUpdatedCase));
+                                            // console.log("Response resultGetUpdatedCase: ", JSON.stringify(resultGetUpdatedCase));
                                             callback(null, resultGetUpdatedCase);
                                         })
                                         .catch((errorGetUpdatedCase) => {
@@ -272,7 +272,7 @@ export function getItemByIdRequest (outbreakId, itemId, itemType, userTeams, cal
         .then((database) => {
             database.get(itemId)
                 .then((result) => {
-                    console.log('getItemByIdRequest result', result);
+                    // console.log('getItemByIdRequest result', result);
                     if (itemType === 'contact') {
                         getRelationshipsAndFollowUpsForContactRequest(outbreakId, extractIdFromPouchId(itemId, 'person'), null, userTeams, (errorRelationshipsAndFollowUps, responseRelationshipsAndFollowUps) => {
                             if (errorRelationshipsAndFollowUps) {
@@ -280,7 +280,7 @@ export function getItemByIdRequest (outbreakId, itemId, itemType, userTeams, cal
                                 callback(errorRelationshipsAndFollowUps);
                             }
                             if (responseRelationshipsAndFollowUps) {
-                                console.log("*** getItemByIdRequest getRelationshipsAndFollowUpsForContact response: ", JSON.stringify(responseRelationshipsAndFollowUps));
+                                // console.log("*** getItemByIdRequest getRelationshipsAndFollowUpsForContact response: ", JSON.stringify(responseRelationshipsAndFollowUps));
                                 let relationships = responseRelationshipsAndFollowUps.filter((e) => {if (e.persons) {return e}});
                                 let followUps = responseRelationshipsAndFollowUps.filter((e) => {if (e.personId) {return e}});
 

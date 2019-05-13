@@ -21,7 +21,7 @@ export function getUserTeams(userPouchId, dispatch) {
                 reject(error);
             }
             if (response) {
-                console.log ('getUserTeams response', response);
+                // console.log ('getUserTeams response', response);
                 const userId = userPouchId.split('_')[1];
 
                 const userTeams = [];

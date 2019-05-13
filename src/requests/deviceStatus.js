@@ -17,7 +17,7 @@ export function checkDeviceStatus(url, installationId, clientId, clientSecret, c
                 return handleResponse(response);
             })
             .then((response) => {
-                console.log("*** checkDeviceStatus response: ", response);
+                // console.log("*** checkDeviceStatus response: ", response);
                 callback(null, response.status);
             })
             .catch((error) => {

@@ -305,9 +305,9 @@ class FollowUpsSingleGetInfoContainer extends PureComponent {
 
 
     computeValueForId = (type, id, followUp, contact, cases = []) => {
-        if (type === 'DropdownInput' && id === 'exposedTo') {
-            return handleExposedTo(contact, true, this.props.cases);
-        }
+        // if (type === 'DropdownInput' && id === 'exposedTo') {
+        //     return handleExposedTo(contact, true, this.props.cases);
+        // }
 
         if (type === 'DropdownInput' && id === 'address' && followUp.address) {
             return getAddress(followUp.address, true)
@@ -394,7 +394,7 @@ function mapStateToProps(state) {
         screenSize: state.app.screenSize,
         translation: state.app.translation,
         referenceData: state.referenceData,
-        locations: state.locations,
+        locations: state.locations.locations,
     };
 }
 

@@ -315,7 +315,7 @@ const caseSingleScreen = {
                     dropDownData: 'ageUnitOfMeasureDropDown', //drop down with values
                     selectedItemIndexForAgeUnitOfMeasureDropDown: 'selectedItemIndexForAgeUnitOfMeasureDropDown', //name of state parameter that will contain the selected index from values
                     objectType: 'Case',
-                    keyboardType: Platform.OS === 'ios' ? 'number-pad' : 'numeric'
+                    keyboardType: 'numeric'
                 },
                 {
                     cardNumber: 1,
@@ -1565,7 +1565,7 @@ const contactsSingleScreen = {
                     dropDownData: 'ageUnitOfMeasureDropDown', //drop down with values
                     selectedItemIndexForAgeUnitOfMeasureDropDown: 'selectedItemIndexForAgeUnitOfMeasureDropDown', //name of state parameter that will contain the selected index from values
                     objectType: 'Contact',
-                    keyboardType: Platform.OS === 'ios' ? 'number-pad' : 'numeric'
+                    keyboardType: 'numeric'
                 },
                 {
                     cardNumber: 3,

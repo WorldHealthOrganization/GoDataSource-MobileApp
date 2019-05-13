@@ -14,7 +14,7 @@ export function getClustersdRequest (token, callback) {
                 }
             })
                 .then((resultFind) => {
-                    console.log('Result for find clusters: ', resultFind);
+                    // console.log('Result for find clusters: ', resultFind);
                     callback(null, resultFind.docs);
                 })
                 .catch((errorFind) => {
