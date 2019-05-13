@@ -172,7 +172,7 @@ SecondComponent = ({data, translation, screenSize, onPressExposureProp}) => (
         {
             data && data.followUpDay ? (
                 <View>
-                    <Text style={[style.secondaryText, {marginVertical: 5, marginHorizontal: 7}]} numberOfLines={1}>{'Day of follow-up: ' + data.followUpDay}</Text>
+                    <Text style={[style.secondaryText, {marginVertical: 5, marginHorizontal: 7}]} numberOfLines={1}>{getTranslation(translations.personListItem.dayOfFollowUp, translation) + data.followUpDay}</Text>
                 </View>
             ) : (null)
         }

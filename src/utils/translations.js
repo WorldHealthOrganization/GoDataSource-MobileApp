@@ -526,6 +526,11 @@ const followUpAgenda = {
     noFollUpsForDate: 'LNG_FOLLOW_UP_AGENDA_NO_FOLLOW_UPS_FOR_DATE'
 };
 
+// TODO add to backend:
+const personListItem = {
+    dayOfFollowUp: 'LNG_PERSON_LIST_ITEM_DAY_OF_FOLLOW_UP'
+};
+
 export default {
     navigationDrawer,
     addFollowUpScreen,
@@ -566,5 +571,6 @@ export default {
     sortTab,
     addSingleAnswerModalScreen,
     previousAnswersScreen,
-    followUpAgenda
+    followUpAgenda,
+    personListItem
 };
