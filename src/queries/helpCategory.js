@@ -17,7 +17,7 @@ export function getHelpCategoryRequest (token, callback) {
                 }
             })
                 .then((result) => {
-                    console.log("result getHelpRequest: ", result);
+                    // console.log("result getHelpRequest: ", result);
                     callback(null, result.docs);
                 })
                 .catch((errorQuery) => {

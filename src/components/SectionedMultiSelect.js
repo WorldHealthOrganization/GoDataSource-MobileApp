@@ -116,7 +116,8 @@ class SectionedMultiSelect extends PureComponent {
                                         marginRight: 13
                                     }}
                                     value={this.state.searchText}
-                                    onChangeText={this.handleOnChangeTextSearch}
+                                    onChangeText={this.handleOnChangeText}
+                                    onSubmitEditing={this.handleOnChangeTextSearch}
                                     placeholder={this.props.searchPlaceholderText}
                                 />
                             </View>
@@ -260,17 +261,24 @@ class SectionedMultiSelect extends PureComponent {
         })
     };
 
-    handleOnChangeTextSearch = (text) => {
+    handleOnChangeText = (text) => {
+        this.setState({
+            searchText: text
+        })
+    };
+
+    handleOnChangeTextSearch = () => {
+        let text = this.state.searchText;
         if (text !== '' && text !== null && text !== undefined) {
             this.setState({
                 searchText: text
             }, () => {
                 console.log('Here do the filtering');
                 let filteredData = this.filterData(cloneDeep(this.props.items), text);
-                let expandedItems = this.filterDataToExpand(cloneDeep(this.props.items), text);
+                // let expandedItems = this.filterDataToExpand(cloneDeep(this.props.items), text);
                 this.setState(prevState => ({
-                    allItems: filteredData,
-                    reRenderProps: Object.assign({}, prevState.reRenderProps, {expandedItems: expandedItems})
+                    allItems: filteredData.filteredData,
+                    reRenderProps: Object.assign({}, prevState.reRenderProps, {expandedItems: filteredData.expandedItems})
                 }))
             })
         } else {
@@ -282,28 +290,38 @@ class SectionedMultiSelect extends PureComponent {
     };
 
     filterData = (items, text) => {
+        let dataToReturn = {
+            filteredData: [],
+            expandedItems: []
+        };
         let filteredData = [];
         for (let i=0; i<items.length; i++) {
             let keepData = null;
             if (items[i][this.props.subKey]) {
-                keepData = this.filterData(items[i][this.props.subKey], text);
+                let aux = this.filterData(items[i][this.props.subKey], text);
+                keepData = aux.filteredData;
+                dataToReturn.expandedItems = dataToReturn.expandedItems.concat(aux.expandedItems);
             }
 
             if (items[i].name.toUpperCase().includes(text.toUpperCase())) {
                 if (keepData && Array.isArray(keepData) && keepData.length > 0) {
-                    filteredData.push(Object.assign({}, items[i], {children: keepData}));
+                    dataToReturn.filteredData.push(Object.assign({}, items[i], {children: keepData}));
+                    if (items[i][this.props.subKey]) {
+                        dataToReturn.expandedItems.push( items[i][this.props.uniqueKey]);
+                    }
                 } else {
                     delete items[i][this.props.subKey];
-                    filteredData.push(items[i]);
+                    dataToReturn.filteredData.push(items[i]);
                 }
             } else {
                 if (keepData && Array.isArray(keepData) && keepData.length > 0) {
-                    filteredData.push(Object.assign({}, items[i], {children: keepData}));
+                    dataToReturn.filteredData.push(Object.assign({}, items[i], {children: keepData}));
+                    dataToReturn.expandedItems.push( items[i][this.props.uniqueKey]);
                 }
             }
         }
 
-        return filteredData;
+        return dataToReturn;
     };
 
     filterDataToExpand = (items, text) => {

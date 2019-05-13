@@ -315,7 +315,7 @@ const caseSingleScreen = {
                     dropDownData: 'ageUnitOfMeasureDropDown', //drop down with values
                     selectedItemIndexForAgeUnitOfMeasureDropDown: 'selectedItemIndexForAgeUnitOfMeasureDropDown', //name of state parameter that will contain the selected index from values
                     objectType: 'Case',
-                    keyboardType: 'number-pad'
+                    keyboardType: 'numeric'
                 },
                 {
                     cardNumber: 1,

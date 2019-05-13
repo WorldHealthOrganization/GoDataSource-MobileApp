@@ -41,7 +41,7 @@ export function getOutbreakById(outbreakId, token, dispatch) {
                 reject(error);
             }
             if (response) {
-                console.log ('*** getOutbreakById response: ', response);
+                // console.log ('*** getOutbreakById response: ', response);
                 getLocationsByOutbreakIdRequest(response, (error, responseLocations) => {
                     if (error) {
                         console.log('*** getLocationsByOutbreakId error: ', error);

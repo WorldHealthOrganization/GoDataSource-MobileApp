@@ -1590,10 +1590,18 @@ class CaseSingleScreen extends Component {
 
         if (stateValue !== undefined && stateValue !== null) {
             if (id === 'age') {
-                let ageClone = { years: 0, months: 0 }
+                let ageClone = { years: 0, months: 0 };
 
-                if (!isNaN(Number(value)) && !value.includes(".") && !value.includes("-") && !value.includes(",") && !value.includes(" ")) {
-                    ageClone.years = Number(value)
+                // Do replacing for value
+                // Replace first and last chars if it is ,
+                value = value.replace(/^,|,$/g, '');
+                // Replace the first , with .
+                value = value.replace(/,/, '.');
+                // Replace all the remaining , with empty string
+                value = value.replace(/,/g, '');
+
+                if (!isNaN(Number(value)) && !value.includes("-") && !value.includes(" ")) {
+                    ageClone.years = Number(value);
                     ageClone.months = Number(value)
                 }
 

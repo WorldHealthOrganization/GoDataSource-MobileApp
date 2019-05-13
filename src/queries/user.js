@@ -60,7 +60,7 @@ export function getUserByIdRequest (userId, token, callback) {
         .then((database) => {
             database.get(userId)
                 .then((result) => {
-                    console.log("GetUserByIdRequestQuery result: ", new Date().getTime() - start, result);
+                    // console.log("GetUserByIdRequestQuery result: ", new Date().getTime() - start, result);
                     callback(null, result)
                 })
                 .catch((errorGetUserById) => {

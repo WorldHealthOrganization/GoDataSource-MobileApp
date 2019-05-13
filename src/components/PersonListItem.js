@@ -73,13 +73,18 @@ FirstComponent = ({type, firstComponentRenderData, titleColor, onPressMapIcon, o
                 </Ripple>
                 <View style={{flexDirection: 'row'}}>
                     <Text
-                        style={[style.secondaryText, {marginHorizontal: 7}]}>{'\u2022 ' + firstComponentRenderData.gender + firstComponentRenderData.age}</Text>
+                        style={[style.secondaryText, {marginHorizontal: 7, display: !firstComponentRenderData.gender && !firstComponentRenderData.age ? 'none' : 'flex'}]}
+                        numberOfLines={1}
+                    >{'\u2022 ' + firstComponentRenderData.gender + ' ' + firstComponentRenderData.age}</Text>
                     <Text
-                        style={[style.secondaryText, {marginHorizontal: 7}]}>{'\u2022 ' + ' ID: ' + firstComponentRenderData.visualId}</Text>
+                        style={[style.secondaryText, {marginHorizontal: 7, display: firstComponentRenderData.visualId ? 'flex' : 'none'}]}
+                        numberOfLines={1}
+                    >{'\u2022 ' + ' ID: ' + firstComponentRenderData.visualId}</Text>
                 </View>
                 <Text style={[style.secondaryText, {
                     flex: 1,
-                    marginHorizontal: 7
+                    marginHorizontal: 7,
+                    display: firstComponentRenderData.addressString ? 'flex' : 'none'
                 }]}>{'\u2022 ' + getTranslation(translations.addressFieldLabels.address, translation) + ": " + firstComponentRenderData.addressString}</Text>
             </View>
             <Ripple style={{width: 35, height: 35}} onPress={onPressMapIcon}>
@@ -167,14 +172,14 @@ SecondComponent = ({data, translation, screenSize, onPressExposureProp}) => (
         {
             data && data.followUpDay ? (
                 <View>
-                    <Text>{'Day of follow-up: ' + data.followUpDay}</Text>
+                    <Text style={[style.secondaryText, {marginVertical: 5, marginHorizontal: 7}]} numberOfLines={1}>{'Day of follow-up: ' + data.followUpDay}</Text>
                 </View>
             ) : (null)
         }
         {
             data && data.exposures && Array.isArray(data.exposures) && data.exposures.length > 0 ? (
                 <View>
-                    <Text style={style.exposedToTextStyle}>Exposed to:</Text>
+                    <Text style={style.exposedToTextStyle}>{getTranslation(translations.followUpsScreen.exposedToMessage, translation) + ":"}</Text>
                     {
                         data.exposures.map((exposure, index) => {
                             return renderExposures(exposure, onPressExposureProp);
@@ -206,7 +211,7 @@ prepareSecondComponentData = (type, itemToRender, translation, cases, events, co
 renderExposures = (exposure, onPressExposureProp) => {
     return(
         <Ripple onPress={() => onPressExposureProp(exposure.id)}>
-            <Text style={[style.secondaryText, {marginVertical: 5, marginHorizontal: 7}]}>{`\u2022 ${exposure.fullName} (${exposure.visualId})`}</Text>
+            <Text style={[style.secondaryText, {marginVertical: 5, marginHorizontal: 7}]} numberOfLines={1}>{`\u2022 ${exposure.fullName} ${exposure.visualId ? `(${exposure.visualId})` : ''}`}</Text>
         </Ripple>
     )
 };

@@ -7,7 +7,7 @@ import config from './../utils/config';
 export function getAvailableLanguagesRequest (callback) {
     let start =  new Date().getTime();
 
-    getDatabase(config.mongoCollections.languageToken)
+    getDatabase(config.mongoCollections.language)
         .then((database) => {
             database.find({
                 selector: {
@@ -19,7 +19,7 @@ export function getAvailableLanguagesRequest (callback) {
                 }
             })
                 .then((resultFind) => {
-                    console.log('Result for find time for available languages: ', new Date().getTime() - start, resultFind.docs);
+                    console.log('Result for find time for available languages: ', new Date().getTime() - start);
                     callback(null, resultFind.docs)
                 })
                 .catch((errorFind) => {
