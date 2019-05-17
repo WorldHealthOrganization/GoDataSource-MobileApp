@@ -24,7 +24,7 @@ export function getHelpCategory(token, dispatch) {
                 reject(error);
             }
             if (response) {
-                console.log('response help category: ',response);
+                // console.log('response help category: ',response);
                 dispatch(storeHelpCategory(response));
                 resolve('Done help category');
             }

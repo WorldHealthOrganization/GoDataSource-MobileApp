@@ -17,6 +17,7 @@ import { registerScreens } from './screens';
 import config from './utils/config';
 import Modal from 'react-native-root-modal';
 import {resetInternetCredentials} from 'react-native-keychain';
+import {checkDeviceStatus} from "./requests/deviceStatus";
 
 console.disableYellowBox = true;
 
@@ -115,7 +116,9 @@ export default class App {
 
         store.subscribe(this.onStoreUpdate);
         console.log('Proceed to initialize the app');
-        store.dispatch(appActions.appInitialized(Platform.OS === 'ios' ? NativeModules.APNSEventEmitter : NativeModules.ParseReceiver));
+        this.checkDevice(() => {
+            store.dispatch(appActions.appInitialized(Platform.OS === 'ios' ? NativeModules.APNSEventEmitter : NativeModules.ParseReceiver));
+        })
         // console.log('App loaded');
         // NativeModules.APNSEventEmitter.appLoaded();
     };
@@ -204,6 +207,60 @@ export default class App {
                         orientation: 'portrait'
                     }
                 });
+        }
+    };
+
+
+    // Checks device status if exists, and if the status is pending wipe, removes everything
+    checkDevice = async (callback) => {
+        try {
+            let installationId = await AsyncStorage.getItem('installationId');
+            if (installationId) {
+                try {
+                    let activeDatabase = await AsyncStorage.getItem('activeDatabase');
+                    if (activeDatabase) {
+                        try {
+                            let databaseCredentials = await getInternetCredentials(activeDatabase);
+                            if (databaseCredentials) {
+                                let serverData = JSON.parse(databaseCredentials.username);
+                                checkDeviceStatus(serverData.url, installationId, serverData.clientId, serverData.clientSecret, (errorDeviceStatus, deviceStatus) => {
+                                    if (errorDeviceStatus) {
+                                        return callback();
+                                    }
+                                    if (deviceStatus) {
+                                        if (deviceStatus === config.statusPendingWipe) {
+                                            this.removeAllDatabases((errorWipe, success) => {
+                                                if (errorWipe) {
+                                                    return callback()
+                                                } else {
+                                                    wipeCompleteRequest(serverData.url, installationId, serverData.clientId, serverData.clientSecret, (errorCompletedWipe, successCompletedWipe) => {
+                                                        return callback();
+                                                    })
+                                                }
+                                            })
+                                        } else {
+                                            return callback();
+                                        }
+                                    }
+                                })
+                            } else {
+                                return callback();
+                            }
+                        } catch(errorGetDatabaseCredentials) {
+                            return callback();
+                        }
+                    } else {
+                        return callback();
+                    }
+                } catch (errorGetActiveDatabase) {
+                    return callback();
+                }
+            } else {
+                return callback();
+            }
+        } catch (errorGetInstallationId) {
+            console.log('checkDevice ErrorGetInstallationId: ', errorGetInstallationId);
+            return callback();
         }
     };
 

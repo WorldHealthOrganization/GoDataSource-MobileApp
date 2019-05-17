@@ -21,7 +21,7 @@ export function getUserRoles(userRoleIds, dispatch) {
                 reject(error);
             }
             if (response) {
-                console.log ('getUserRoles response', response)
+                // console.log ('getUserRoles response', response)
                 let permissions = []
                 let perm = response.map((e) => {
                     return e.permissionIds.map((k) => {

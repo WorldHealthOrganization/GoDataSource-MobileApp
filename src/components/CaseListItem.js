@@ -19,6 +19,7 @@ import styles from './../styles';
 import Ripple from 'react-native-material-ripple';
 import ElevatedView from 'react-native-elevated-view';
 import translations from './../utils/translations'
+import {getAddress} from './../utils/functions';
 
 class CaseListItem extends Component {
 
@@ -36,41 +37,45 @@ class CaseListItem extends Component {
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
-        // Get caseItem info from the cases
-        // console.log('item:', this.props.item);
-        let primaryText = this.props.item && ((this.props.item.firstName ? this.props.item.firstName : ' ') + (this.props.item.lastName ? (' ' + this.props.item.lastName) : ' '));
+        const { item, translation, screenSize, role } = this.props;
+        let primaryText = item && ((item.firstName ? item.firstName : ' ') + (item.lastName ? (' ' + item.lastName) : ' '));
         let genderString = '';
-        let ageString = '';
-        if (this.props.item && this.props.item.gender) {
-            genderString = getTranslation(this.props.item.gender, this.props.translation);
+        if (item && item.gender) {
+            genderString = getTranslation(item.gender, translation);
         }
+        let secondaryTextGender = item && genderString ? genderString.charAt(0) : '';
 
-        if(this.props.item && this.props.item.age){
-            ageString = this.props.item.age.years ? this.props.item.age.years + getTranslation(translations.generalLabels.ageYearsInitials, this.props.translation).charAt(0).toLowerCase() + ' ' : (this.props.item.age.months ? this.props.item.age.months + getTranslation(translations.generalLabels.ageMonthsInitials, this.props.translation).charAt(0).toLowerCase() + ' ' : '');
-        }
 
-        let secondaryText = this.props.item && ((genderString.charAt(0) + (ageString && genderString.charAt(0) ? ', ': '') + ageString))
-
-        let addressText = ' ';
-        let addressArray = []
-
-        if (this.props && this.props.item && this.props.item.addresses && this.props.item.addresses.length > 0) {
-            let casePlaceOfResidence = this.props.item.addresses.filter((e) => {return e.typeId === config.userResidenceAddress.userPlaceOfResidence})
-            if (casePlaceOfResidence && casePlaceOfResidence[0]) {
-                addressArray = [casePlaceOfResidence[0].addressLine1, casePlaceOfResidence[0].addressLine2, casePlaceOfResidence[0].city, casePlaceOfResidence[0].country, casePlaceOfResidence[0].postalCode];
-                addressArray = addressArray.filter((e) => {return e});
+        let secondaryTextAge = '';
+        if (item && item.age !== undefined && item.age !== null) {
+            if (item.age.years !== undefined || item.age.months !== undefined) {
+                if (item.age.years !== 0 && item.age.years !== null) {
+                    // console.log('Here will be an error years: ', item.age);
+                    secondaryTextAge = item.age.years.toString() + getTranslation(config.localTranslationTokens.years, translation).charAt(0).toLowerCase()
+                } else if (item.age.months !== undefined && item.age.months !== 0 && item.age.months !== null) {
+                    // console.log('Here will be an error months: ', item.age);
+                    secondaryTextAge = item.age.months.toString() + getTranslation(config.localTranslationTokens.months, translation).charAt(0).toLowerCase()
+                }
             }
         }
-        addressText = addressArray.join(', ');
+        let secondaryText = secondaryTextGender + ((secondaryTextGender.trim().length > 0 && secondaryTextAge.trim().length > 0 ) ? ', ' : '') + secondaryTextAge;
+
+        let addressText = ' ';
+        if (item && item.addresses && item.addresses.length > 0) {
+            let casePlaceOfResidence = item.addresses.find((e) => {return e.typeId === config.userResidenceAddress.userPlaceOfResidence});
+            if (casePlaceOfResidence) {
+                addressText = getAddress(casePlaceOfResidence, true, this.props.locations);
+            }
+        }
 
         return (
             <ElevatedView elevation={3} style={[style.container, {
-                marginHorizontal: calculateDimension(16, false, this.props.screenSize),
-                height: calculateDimension(178, true, this.props.screenSize)
+                marginHorizontal: calculateDimension(16, false, screenSize),
+                height: calculateDimension(178, true, screenSize)
             }]}>
                 <View style={[style.firstSectionContainer, {
-                    height: calculateDimension(53, true, this.props.screenSize),
-                    paddingBottom: calculateDimension(18, true, this.props.screenSize)
+                    height: calculateDimension(53, true, screenSize),
+                    paddingBottom: calculateDimension(18, true, screenSize)
                 }]}>
                     <ListItem
                         numberOfLines={1}
@@ -87,17 +92,17 @@ class CaseListItem extends Component {
                             </Ripple>
                         }
                         style={{
-                            container: {marginRight: calculateDimension(13, false, this.props.screenSize)},
+                            container: {marginRight: calculateDimension(13, false, screenSize)},
                             rightElementContainer: {justifyContent: 'center', alignItems: 'center'}
                         }}
                     />
                 </View>
                 <View style={styles.lineStyle}/>
                 <View
-                    style={[style.secondSectionContainer, {height: calculateDimension(78.5, true, this.props.screenSize)}]}>
+                    style={[style.secondSectionContainer, {height: calculateDimension(78.5, true, screenSize)}]}>
                     <Text
                         style={[style.addressStyle, {
-                            marginHorizontal: calculateDimension(14, false, this.props.screenSize),
+                            marginHorizontal: calculateDimension(14, false, screenSize),
                             marginVertical: 7.5
                         }]}
                         numberOfLines={2}
@@ -105,21 +110,21 @@ class CaseListItem extends Component {
                 </View>
                 <View style={styles.lineStyle}/>
                 <View
-                    style={[style.thirdSectionContainer, {marginHorizontal: calculateDimension(14, false, this.props.screenSize)}]}>
+                    style={[style.thirdSectionContainer, {marginHorizontal: calculateDimension(14, false, screenSize)}]}>
                     {
-                        this.props.role.find((e) => e === config.userPermissions.readCase) !== undefined ? (
+                        role.find((e) => e === config.userPermissions.readCase) !== undefined ? (
                             <Ripple style={[style.rippleStyle]} onPress={this.onPressCase}>
                                 <Text style={[style.rippleTextStyle]}>
-                                    {getTranslation(translations.casesScreen.viewButtonLabel, this.props.translation).toUpperCase()}
+                                    {getTranslation(translations.casesScreen.viewButtonLabel, translation).toUpperCase()}
                                 </Text>
                             </Ripple>
                         ) : null
                     }
                     {
-                        this.props.role.find((e) => e === config.userPermissions.writeContact) !== undefined ? (
+                        role.find((e) => e === config.userPermissions.writeContact) !== undefined ? (
                             <Ripple style={[style.rippleStyle]}  onPress={this.onPressAddContact}>
                                 <Text style={[style.rippleTextStyle]}>
-                                    {getTranslation(translations.casesScreen.addContactButtonLabel, this.props.translation).toUpperCase()}
+                                    {getTranslation(translations.casesScreen.addContactButtonLabel, translation).toUpperCase()}
                                 </Text>
                             </Ripple>
                         ) : null
@@ -221,7 +226,8 @@ function mapStateToProps(state) {
         cases: state.cases,
         role: state.role,
         contacts: state.contacts,
-        events: state.events
+        events: state.events,
+        locations: state.locations.locationsList
     };
 }
 

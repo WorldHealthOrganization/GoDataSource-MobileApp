@@ -3,118 +3,142 @@
  */
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
-import React, {PureComponent} from 'react';
-import {View, StyleSheet, findNodeHandle} from 'react-native';
-import {calculateDimension, extractAllQuestions, mapQuestions, getTranslation} from '../utils/functions';
+import React, { Component } from 'react';
+import { View, StyleSheet, findNodeHandle, ScrollView } from 'react-native';
+import { calculateDimension, extractAllQuestions, mapQuestions, getTranslation } from '../utils/functions';
 import config from '../utils/config';
-import {connect} from "react-redux";
-import {bindActionCreators} from "redux";
+import { connect } from "react-redux";
+import { bindActionCreators } from "redux";
 import styles from '../styles';
 import QuestionCard from '../components/QuestionCard';
 import Button from '../components/Button';
-import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
-import {sortBy} from 'lodash';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import sortBy from 'lodash/sortBy';
+import cloneDeep from 'lodash/cloneDeep';
 import translations from './../utils/translations'
 
-class CaseSingleInvestigationContainer extends PureComponent {
+class CaseSingleInvestigationContainer extends Component {
 
     // This will be a container, so put as less business logic here as possible
     constructor(props) {
         super(props);
         this.state = {
+            previousAnswers: this.props.previousAnswers
         };
     }
 
-    shouldComponentUpdate(nextProps, nextState) {
-        if (nextProps.isEditMode !== this.props.isEditMode || nextProps.index === 3) {
-            return true;
+    static getDerivedStateFromProps(props, state) {
+        if (props.previousAnswers) {
+            state.previousAnswers = props.previousAnswers;
         }
-        return false;
+        // Sort the answers by date
+        if (state.previousAnswers && Object.keys(state.previousAnswers).length > 0) {
+            for (let questionId in state.previousAnswers) {
+                if (Array.isArray(state.previousAnswers[questionId]) && state.previousAnswers[questionId].length > 1) {
+                    state.previousAnswers[questionId] = state.previousAnswers[questionId].sort((a, b) => {
+                        if (new Date(a.date) > new Date(b.date)) {
+                            return -1;
+                        }
+                        if (new Date(a.date) < new Date(b.date)) {
+                            return 1;
+                        }
+                        return 0;
+                    })
+                }
+            }
+        }
     }
+
+    // shouldComponentUpdate(nextProps, nextState) {
+    //     if (nextProps.isEditMode !== this.props.isEditMode || nextProps.index === 3) {
+    //         return true;
+    //     }
+    //     return false;
+    // }
 
     // The render method should have at least business logic as possible,
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
         // console.log('CaseSingleContainer render Investigation');
-         // Get all additional questions recursively
-        let sortedQuestions = sortBy(this.props.questions, ['order', 'variable']);
-        sortedQuestions = extractAllQuestions(sortedQuestions, this.props.item);
+        // Get all additional questions recursively
+        let sortedQuestions = sortBy(cloneDeep(this.props.questions), ['order', 'variable']);
+        sortedQuestions = extractAllQuestions(sortedQuestions, this.state.previousAnswers);
 
         return (
-            <View style={{flex: 1}}>
+            <View style={{ flex: 1 }}>
                 <View style={style.container}>
-                    <View style={{flexDirection: 'row'}}>
-                    {
-                        this.props.isNew ? (
-                            <View style={{flexDirection: 'row', width: '90%', alignItems: 'center'}}>
-                                <Button
-                                title={getTranslation(translations.generalButtons.backButtonLabel, this.props.translation)}
-                                onPress={this.handleBackButton}
-                                color={styles.buttonGreen}
-                                titleColor={'white'}
-                                height={calculateDimension(25, true, this.props.screenSize)}
-                                width={calculateDimension(130, false, this.props.screenSize)}
-                                style={{
-                                    marginVertical: calculateDimension(12.5, true, this.props.screenSize),
-                                    marginHorizontal: calculateDimension(16, false, this.props.screenSize),
-                                }}/>
-                                <Button
-                                    title={getTranslation(translations.generalButtons.saveButtonLabel, this.props.translation)}
-                                    onPress={this.props.onPressSave}
-                                    color={styles.buttonGreen}
-                                    titleColor={'white'}
-                                    height={calculateDimension(25, true, this.props.screenSize)}
-                                    width={calculateDimension(130, false, this.props.screenSize)}
-                                    style={{
-                                        marginVertical: calculateDimension(12.5, true, this.props.screenSize),
-                                        marginHorizontal: calculateDimension(16, false, this.props.screenSize),
-                                    }}/>
-                            </View>
-                            )
-                            : (
-                            this.props.isEditMode ? (
-                                <View style={{flexDirection: 'row'}}>
+                    <View style={{ flexDirection: 'row' }}>
+                        {
+                            this.props.isNew ? (
+                                <View style={{ flexDirection: 'row', width: '90%', alignItems: 'center' }}>
+                                    <Button
+                                        title={getTranslation(translations.generalButtons.backButtonLabel, this.props.translation)}
+                                        onPress={this.handleBackButton}
+                                        color={styles.buttonGreen}
+                                        titleColor={'white'}
+                                        height={calculateDimension(25, true, this.props.screenSize)}
+                                        width={calculateDimension(130, false, this.props.screenSize)}
+                                        style={{
+                                            marginVertical: calculateDimension(12.5, true, this.props.screenSize),
+                                            marginHorizontal: calculateDimension(16, false, this.props.screenSize),
+                                        }} />
                                     <Button
                                         title={getTranslation(translations.generalButtons.saveButtonLabel, this.props.translation)}
-                                        onPress={this.props.onPressSaveEdit}
+                                        onPress={this.props.onPressSave}
                                         color={styles.buttonGreen}
                                         titleColor={'white'}
                                         height={calculateDimension(25, true, this.props.screenSize)}
-                                        width={calculateDimension(166, false, this.props.screenSize)}
+                                        width={calculateDimension(130, false, this.props.screenSize)}
                                         style={{
                                             marginVertical: calculateDimension(12.5, true, this.props.screenSize),
-                                            marginRight: 10,
-                                    }}/>
-                                    <Button
-                                        title={getTranslation(translations.generalButtons.cancelButtonLabel, this.props.translation)}
-                                        onPress={this.props.onPressCancelEdit}
-                                        color={styles.buttonGreen}
-                                        titleColor={'white'}
-                                        height={calculateDimension(25, true, this.props.screenSize)}
-                                        width={calculateDimension(166, false, this.props.screenSize)}
-                                        style={{
-                                            marginVertical: calculateDimension(12.5, true, this.props.screenSize),
-                                            marginRight: 10,
-                                    }}/>
-                                </View>) : (
-                                    this.props.role.find((e) => e === config.userPermissions.writeCase) !== undefined ? (
-                                        <Button
-                                            title={getTranslation(translations.generalButtons.editButtonLabel, this.props.translation)}
-                                            onPress={this.props.onPressEdit}
-                                            color={styles.buttonGreen}
-                                            titleColor={'white'}
-                                            height={calculateDimension(25, true, this.props.screenSize)}
-                                            width={calculateDimension(166, false, this.props.screenSize)}
-                                            style={{
-                                                marginVertical: calculateDimension(12.5, true, this.props.screenSize),
-                                                marginRight: 10,
-                                            }}/>
-                                    ) : null
-                                ))
-                    }
+                                            marginHorizontal: calculateDimension(16, false, this.props.screenSize),
+                                        }} />
+                                </View>
+                            )
+                                : (
+                                    this.props.isEditMode ? (
+                                        <View style={{ flexDirection: 'row' }}>
+                                            <Button
+                                                title={getTranslation(translations.generalButtons.saveButtonLabel, this.props.translation)}
+                                                onPress={this.props.onPressSaveEdit}
+                                                color={styles.buttonGreen}
+                                                titleColor={'white'}
+                                                height={calculateDimension(25, true, this.props.screenSize)}
+                                                width={calculateDimension(166, false, this.props.screenSize)}
+                                                style={{
+                                                    marginVertical: calculateDimension(12.5, true, this.props.screenSize),
+                                                    marginRight: 10,
+                                                }} />
+                                            <Button
+                                                title={getTranslation(translations.generalButtons.cancelButtonLabel, this.props.translation)}
+                                                onPress={this.props.onPressCancelEdit}
+                                                color={styles.buttonGreen}
+                                                titleColor={'white'}
+                                                height={calculateDimension(25, true, this.props.screenSize)}
+                                                width={calculateDimension(166, false, this.props.screenSize)}
+                                                style={{
+                                                    marginVertical: calculateDimension(12.5, true, this.props.screenSize),
+                                                    marginRight: 10,
+                                                }} />
+                                        </View>) : (
+                                            this.props.role.find((e) => e === config.userPermissions.writeCase) !== undefined ? (
+                                                <Button
+                                                    title={getTranslation(translations.generalButtons.editButtonLabel, this.props.translation)}
+                                                    onPress={this.props.onPressEdit}
+                                                    color={styles.buttonGreen}
+                                                    titleColor={'white'}
+                                                    height={calculateDimension(25, true, this.props.screenSize)}
+                                                    width={calculateDimension(166, false, this.props.screenSize)}
+                                                    style={{
+                                                        marginVertical: calculateDimension(12.5, true, this.props.screenSize),
+                                                        marginRight: 10,
+                                                    }} />
+                                            ) : null
+                                        ))
+                        }
                     </View>
-                    <KeyboardAwareScrollView
+                    {/* <KeyboardAwareScrollView
                         style={style.containerScrollView}
                         contentContainerStyle={[style.contentContainerStyle, {paddingBottom: this.props.screenSize.height < 600 ? 70 : 20}]}
                         keyboardShouldPersistTaps={'always'}
@@ -122,15 +146,20 @@ class CaseSingleInvestigationContainer extends PureComponent {
                         innerRef={ref => {
                             this.scrollCasesSingleInvestigation = ref
                         }}
+                    > */}
+                    <ScrollView
+                        style={style.containerScrollView}
+                        contentContainerStyle={[style.contentContainerStyle, { paddingBottom: this.props.screenSize.height < 600 ? 70 : 20 }]}
                     >
                         {
                             sortedQuestions.map((item, index) => {
                                 return this.handleRenderItem(item, index, sortedQuestions.length)
                             })
                         }
-                    </KeyboardAwareScrollView>
+                    </ScrollView>
+                    {/* </KeyboardAwareScrollView> */}
                 </View>
-            </View>
+            </View >
         );
     }
 
@@ -156,19 +185,22 @@ class CaseSingleInvestigationContainer extends PureComponent {
 
     handleRenderItem = (item, index, totalNumberOfQuestions) => {
         if (item.inactive === false) {
-
             return (
                 <QuestionCard
                     item={item}
                     isEditMode={this.props.isEditMode}
                     index={index + 1}
                     totalNumberOfQuestions={totalNumberOfQuestions}
-                    source={this.props.item}
+                    source={this.state.previousAnswers}
                     onChangeTextAnswer={this.props.onChangeTextAnswer}
                     onChangeSingleSelection={this.props.onChangeSingleSelection}
                     onChangeMultipleSelection={this.props.onChangeMultipleSelection}
                     onChangeDateAnswer={this.props.onChangeDateAnswer}
                     onFocus={this.handleOnFocus}
+                    onClickAddNewMultiFrequencyAnswer={this.props.onClickAddNewMultiFrequencyAnswer}
+                    onClickShowPreviousAnswers={this.props.onClickShowPreviousAnswers}
+                    onBlur={this.handleOnBlur}
+                    onChangeAnswerDate={this.props.onChangeAnswerDate}
                 />
             )
         }
@@ -179,12 +211,17 @@ class CaseSingleInvestigationContainer extends PureComponent {
     };
 
     handleOnFocus = (event) => {
-        this.scrollToInput(findNodeHandle(event.target))
+        // this.scrollToInput(findNodeHandle(event.target))
     };
 
-    scrollToInput (reactNode) {
+    handleOnBlur = (event) => {
+        // this.scrollCasesSingleInvestigation.props.scrollToPosition(0, 0, false)
+        // this.scrollToInput(findNodeHandle(event.target))
+    }
+
+    scrollToInput(reactNode) {
         // Add a 'scroll' ref to your ScrollView
-        this.scrollCasesSingleInvestigation.props.scrollToFocusedInput(reactNode)
+        // this.scrollCasesSingleInvestigation.props.scrollToFocusedInput(reactNode)
     };
 }
 

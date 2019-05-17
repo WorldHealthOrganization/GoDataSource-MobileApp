@@ -7,9 +7,8 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {Component, PureComponent} from 'react';
-import {View, Text, StyleSheet} from 'react-native';
-import {calculateDimension, handleExposedTo, getAddress, extractIdFromPouchId, getTranslation} from './../utils/functions';
-import { WebView } from "react-native-webview";
+import {View, Text, StyleSheet, WebView} from 'react-native';
+import {calculateDimension, getTranslation} from './../utils/functions';
 import config from './../utils/config';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -75,6 +74,7 @@ class CardComponent extends PureComponent {
                         translation={this.props.translation}
                         onChange={this.props.onChangeText}
                         onFocus={this.props.onFocus}
+                        onBlur={this.props.onBlur}
                     />
                 );
             case 'DropdownInput':
@@ -222,7 +222,8 @@ class CardComponent extends PureComponent {
             case 'TextSwitchSelector':
                 return (
                     <TextSwitchSelector 
-                        selectedItem={this.props[this.props.item.selectedItemIndexForTextSwitchSelector]}
+                        selectedItem={this.props.selectedItemIndexForTextSwitchSelectorForAge}
+                        // selectedItem={this.props[this.props.item.selectedItemIndexForTextSwitchSelector]}
                         selectedItemIndexForTextSwitchSelector={this.props.item.selectedItemIndexForTextSwitchSelector}
                         onChange={this.props.onChangeTextSwitchSelector}
                         values={this.props.item.values}
@@ -289,7 +290,7 @@ const style = StyleSheet.create({
 function mapStateToProps(state) {
     return {
         screenSize: state.app.screenSize,
-        locations: state.locations,
+        locations: state.locations.locations,
         translation: state.app.translation,
     };
 }

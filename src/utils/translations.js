@@ -19,7 +19,7 @@ const addFollowUpScreen = {
 const casesFilter = {
     casesFilterTitle: 'LNG_CASE_FILTER_SCREEN_TITLE',
     filterTitle: 'LNG_FILTER_SCREEN_FILTER_TAB',
-    sortTitle:'LNG_FILTER_SCREEN_SORT_TAB',
+    sortTitle: 'LNG_FILTER_SCREEN_SORT_TAB',
 
     gender: 'LNG_FILTER_SCREEN_GENDER_LABEL',
     ageRange: 'LNG_FILTER_SCREEN_AGE_RANGE_LABEL',
@@ -34,7 +34,7 @@ const followUpFilter = {
     contactFilterTitle: 'LNG_CONTACTS_FILTER_SCREEN_TITLE',
 
     filterTitle: 'LNG_FILTER_SCREEN_FILTER_TAB',
-    sortTitle:'LNG_FILTER_SCREEN_SORT_TAB',
+    sortTitle: 'LNG_FILTER_SCREEN_SORT_TAB',
 
     gender: 'LNG_FILTER_SCREEN_GENDER_LABEL',
     ageRange: 'LNG_FILTER_SCREEN_AGE_RANGE_LABEL',
@@ -44,7 +44,7 @@ const followUpFilter = {
 
 const helpFilter = {
     filterTitle: 'LNG_SIDE_FILTERS_TITLE',
-    sortTitle:'LNG_SIDE_FILTERS_SECTION_SORT_TITLE',
+    sortTitle: 'LNG_SIDE_FILTERS_SECTION_SORT_TITLE',
     helpFilterTitle: 'LNG_HELP_ITEMS_FILTER_SCREEN_TITLE',
     category: 'LNG_HELP_ITEMS_FILTER_CATEGORY_LABEL',
     chooseCategoryLabel: 'LNG_HELP_ITEMS_FILTER_CATEGORY_MESSAGE_LABEL',
@@ -95,11 +95,8 @@ const caseSingleScreen = {
     oneAddressText: 'LNG_ADDRESS_ADD_NEW_ADDRESS_MESSAGE',
     moreAddressesText: 'LNG_ADDRESS_ADD_ANOTHER_ADDRESS_MESSAGE',
 
-    // TODO SEND to API
     oneDateRangeText: 'LNG_DATE_RANGE_ADD_NEW_DATE_MESSAGE',
     moreDateRangeText: 'LNG_DATE_RANGE_ADD_ANOTHER_DATE_MESSAGE',
-    // END
-
 
     oneIsolationDateText: 'LNG_ISOLATION_ADD_NEW_ISOLATION_MESSAGE',
     moreIsolationDatesText: 'LNG_ISOLATION_ADD_ANOTHER_ISOLATION_MESSAGE',
@@ -119,6 +116,9 @@ const caseSingleScreen = {
     isDateOfReportingApproximate: 'LNG_CASE_FIELD_LABEL_IS_DATE_OF_REPORTING_APPROXIMATE',
     transferRefused: 'LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED',
     riskReason: 'LNG_CASE_FIELD_LABEL_RISK_REASON',
+
+    // TODO add to backend
+    caseId: 'LNG_CASE_FIELD_LABEL_CASE_ID',
 
     documentType: 'LNG_CASE_FIELD_LABEL_DOCUMENT_TYPE',
     documentNumber: 'LNG_CASE_FIELD_LABEL_DOCUMENT_NUMBER',
@@ -148,7 +148,6 @@ const caseSingleScreen = {
 
     hospitalisationStartDate: 'LNG_DATE_FIELD_LABEL_FROM',
     hospitalisationEndDate: 'LNG_DATE_FIELD_LABEL_TO',
-    // TODO add translations to API
     hospitalisationCenterName: 'LNG_DATE_FIELD_LABEL_HOSPITAL_NAME',
     hospitalisationLocation: 'LNG_DATE_FIELD_LABEL_LOCATION',
     hospitalisationComments: 'LNG_DATE_FIELD_LABEL_COMMENTS',
@@ -156,7 +155,6 @@ const caseSingleScreen = {
 
     isolationStartDate: 'LNG_DATE_FIELD_LABEL_FROM',
     isolationEndDate: 'LNG_DATE_FIELD_LABEL_TO',
-    // TODO add translations to API
     isolationCenterName: 'LNG_DATE_FIELD_LABEL_CENTER_NAME',
     isolationLocation: 'LNG_DATE_FIELD_LABEL_LOCATION',
     isolationComments: 'LNG_DATE_FIELD_LABEL_COMMENTS',
@@ -189,7 +187,10 @@ const contactSingleScreen = {
     dateOfReporting: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING',
     isDateOfReportingApproximate: 'LNG_CONTACT_FIELD_LABEL_IS_DATE_OF_REPORTING_APPROXIMATE',
     riskLevel: 'LNG_CONTACT_FIELD_LABEL_RISK_LEVEL',
-    riskReason: 'LNG_CONTACT_FIELD_LABEL_RISK_REASON'
+    riskReason: 'LNG_CONTACT_FIELD_LABEL_RISK_REASON',
+
+    // TODO add to backend
+    contactId: 'LNG_CONTACT_FIELD_LABEL_CONTACT_ID'
 };
 
 const exposureScreen = {
@@ -215,10 +216,11 @@ const followUpsSingleScreen = {
     questionnaireTitle: 'LNG_FOLLOW_UPS_SINGLE_SCREEN_QUESTIONNAIRE_TAB',
 
     missingButton: 'LNG_FOLLOW_UPS_SINGLE_SCREEN_ACTION_MISSING',
-    deceasedButton: 'LNG_FOLLOW_UPS_SINGLE_SCREEN_ACTION_DELETE',
-    deleteButton: 'LNG_FOLLOW_UPS_SINGLE_SCREEN_ACTION_DECEASE',
+    deceasedButton: 'LNG_FOLLOW_UPS_SINGLE_SCREEN_ACTION_DECEASE',
+    deleteButton: 'LNG_FOLLOW_UPS_SINGLE_SCREEN_ACTION_DELETE',
+    editContactButton: 'LNG_FOLLOW_UPS_SINGLE_SCREEN_ACTION_EDIT_CONTACT',
 
-    deleteFollowUpAlertError : 'LNG_DIALOG_ALERT_MESSAGE_ARE_YOU_SURE_YOU_WANT_TO_DELETE_THIS_FOLLOW_UP',
+    deleteFollowUpAlertError: 'LNG_DIALOG_ALERT_MESSAGE_ARE_YOU_SURE_YOU_WANT_TO_DELETE_THIS_FOLLOW_UP',
 
     date: 'LNG_FOLLOW_UP_FIELD_LABEL_DATE',
     status: 'LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID',
@@ -273,6 +275,7 @@ const alertMessages = {
     alertLabel: 'LNG_DIALOG_ALERT_TITLE_LABEL',
     validationErrorLabel: 'LNG_DIALOG_VALIDATION_ERROR_TITLE_LABEL',
     warningLabel: 'LNG_DIALOG_WARNING_TITLE_LABEL',
+    saveAnywayLabel: 'LNG_DIALOG_SAVE_ANYWAY_LABEL',
 
     //not used with translation
     invalidCredentials: 'Invalid credentials',
@@ -280,12 +283,11 @@ const alertMessages = {
     emailValidationError: 'Please make sure you have entered a valid email address',
     noItemAlert: 'No person exists with this information',
 
-    // TODO add translation to backend
-    addMissingPerson: 'Would you like to add a new person for this id?',
+    addMissingPerson: 'LNG_DIALOG_ALERT_MESSAGE_ADD_PERSON',
     wrongQR: 'The QR code has a bad format',
-    // End todo
 
     errorOccuredMsg: 'QR code is not valid',
+    checkForDuplicatesRequestError: 'LNG_ALERT_MESSAGE_CHECK_FOR_DUPLICATES_REQUST_FAIL',
 
     // cases
     caseDeleteConfirmation: 'LNG_DIALOG_ALERT_MESSAGE_ARE_YOU_SURE_YOU_WANT_TO_DELETE_THIS_CASE',
@@ -296,15 +298,15 @@ const alertMessages = {
     contactDeleteExposureConfirmation: 'LNG_DIALOG_ALERT_MESSAGE_ARE_YOU_SURE_YOU_WANT_TO_DELETE_THIS_EXPOSURE',
 
     placeOfResidenceError: 'LNG_DIALOG_ALERT_MESSAGE_PLEASE_ADD_THE_PLACE_OF_RESIDENCE_ADDRESS',
+    contactDuplicateNameError: 'LNG_DIALOG_ALERT_MESSAGE_CONTACT_WITH_DUPLICATE_NAME',
+    caseDuplicateNameError: 'LNG_DIALOG_ALERT_MESSAGE_CASE_WITH_DUPLICATE_NAME',
     dateOfOnsetError: 'LNG_DIALOG_ALERT_MESSAGE_DATE_OF_ISOLATION_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET',
     dateOfOutcomeError: 'LNG_DIALOG_ALERT_MESSAGE_DATE_OF_OUTCOME_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET',
     monthsValueError: 'LNG_DIALOG_ALERT_MESSAGE_NUMBER_OF_MONTHS_MUST_BE_BETWEEN_MESSAGE',
     yearsValueError: 'LNG_DIALOG_ALERT_MESSAGE_NUMBER_OF_YEARS_MUST_BE_BETWEEN_MESSAGE',
     requiredFieldsMissingError: 'LNG_DIALOG_ALERT_MESSAGE_COMPLETE_ALL_MISSING_REQUIRED_FIELDS',
-    // TODO add translation to backend
     relationshipsErrorLabel: 'LNG_DIALOG_ALERT_MESSAGE_COMPLETE_ALL_MISSING_RELATIONSHIPS',
     missingFields: 'LNG_DIALOG_ALERT_MESSAGE_COMPLETE_ALL_MISSING_FIELDS',
-    // END TODO
     getLocationError: 'LNG_DIALOG_ALERT_MESSAGE_THERE_WAS_AN_ISSUE_GETTING_YOUR_LOCATION',
     credentialsValidationError: 'LNG_DIALOG_ALERT_MESSAGE_MAKE_SURE_YOU_COMPLETE_ALL_FIELDS',
     dropDownSearchableContactsError: 'LNG_DIALOG_ALERT_MESSAGE_ERROR_OCCURED_WHILE_GETTING_CONTACTS',
@@ -322,8 +324,8 @@ const alertMessages = {
     deleteAddress: 'LNG_DIALOG_ALERT_MESSAGE_ARE_YOU_SURE_YOU_WANT_TO_DELETE_THIS_ADDRESS',
     deleteDateRange: 'LNG_DIALOG_ALERT_MESSAGE_ARE_YOU_SURE_YOU_WANT_TO_DELETE_THIS_DATE_RANGE',
 
+    deletePreviousAnswer: 'LNG_DIALOG_ALERT_MESSAGE_ARE_YOU_SURE_YOU_WANT_TO_DELETE_THIS_ANSWER',
 
-    // TODO add translation to backend
     replaceCurrentCoordinates: 'LNG_DIALOG_ALERT_MESSAGE_DO_YOU_WANT_TO_REPLACE_CURRENT_COORDINATES_WITH_LOCATION_VALUES',
 
     androidBackButtonMsg: 'LNG_DIALOG_ALERT_MESSAGE_ARE_YOU_SURE_YOU_WANT_TO_EXIT_THE_APP'
@@ -344,8 +346,8 @@ const generalButtons = {
 
 const generalLabels = {
     filterTitle: 'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER',
-    applyFiltersButton: 'LNG_COMMON_BUTTON_APPLY_FILTERS',
-    resetFiltersButton: 'LNG_COMMON_BUTTON_RESET_FILTERS',
+    applyFiltersButton: 'LNG_COMMON_BUTTON_LABEL_APPLY_FILTERS',
+    resetFiltersButton: 'LNG_COMMON_BUTTON_LABEL_RESET_FILTERS',
     yesAnswer: 'LNG_COMMON_LABEL_YES',
     noAnswer: 'LNG_COMMON_LABEL_NO',
     today: 'LNG_COMMON_LABEL_TODAY',
@@ -364,6 +366,8 @@ const questionCardLabels = {
     datePickerLabel: 'LNG_QUESTIONNAIRE_LABEL_SELECT_DATE',
     dropDownInputLabel: 'LNG_QUESTIONNAIRE_LABEL_SELECT_ANSWER',
     dropDownLabel: 'LNG_QUESTIONNAIRE_LABEL_SELECT_ANSWERS',
+    addAnswer: 'LNG_QUESTIONNAIRE_LABEL_ADD_ANSWER',
+    previousAnswers: 'LNG_QUESTIONNAIRE_LABEL_PREVIOUS_ANSWERS'
 };
 
 const inAppNotificationScreen = {
@@ -399,7 +403,7 @@ const loginScreen = {
 };
 
 const addressFieldLabels = {
-    name: 'LNG_ADDRESS_FIELD_LABEL_NAME',
+    name: 'LNG_ADDRESS_FIELD_LABEL_MOBILE_NAME',
     date: 'LNG_ADDRESS_FIELD_LABEL_DATE',
     area: 'LNG_ADDRESS_FIELD_LABEL_LOCATION',
     city: 'LNG_ADDRESS_FIELD_LABEL_ADDRESS_CITY',
@@ -468,43 +472,63 @@ const dropDownSectionedLabels = {
 };
 
 const hubConfigScreen = {
-    label:                              'LNG_HUB_CONFIGURATION_SCREEN_TITLE',
-    currentHubConfigurationLabel:       'LNG_HUB_CONFIGURATION_SCREEN_CURRENT_HUB_CONFIG',
-    hubNameLabel:                       'LNG_HUB_CONFIGURATION_SCREEN_CURRENT_CONFIG_NAME',
-    hubUrlLabel:                        'LNG_HUB_CONFIGURATION_SCREEN_CURRENT_CONFIG_URL',
-    hubClientIdLabel:                   'LNG_HUB_CONFIGURATION_SCREEN_CURRENT_CONFIG_CLIENT_ID',
-    hubClientSecretLabel:               'LNG_HUB_CONFIGURATION_SCREEN_CURRENT_CONFIG_CLIENT_SECRET',
-    lastSyncDate:                       'LNG_HUB_CONFIGURATION_SCREEN_LAST_SYNC_DATE',
-    scanQRButtonLabel:                  'LNG_HUB_CONFIGURATION_SCREEN_SCAN_QR_CODE_BUTTON',
-    saveCurrentHubButtonLabel:          'LNG_COMMON_BUTTON_SAVE',
-    connectAnotherComputerLabel:        'LNG_HUB_CONFIGURATION_SCREEN_WANT_TO_CONNECT_TO_DIFFERENT_COMPUTER_LABEL',
-    addHubButtonLabel:                  'LNG_HUB_CONFIGURATION_SCREEN_ADD_HUB_BUTTON',
-    otherHubConfigurationsLabel:        'LNG_HUB_CONFIGURATION_SCREEN_OTHER_HUB_CONFIGURATIONS_LABEL',
-    makeActiveLabel:                    'LNG_HUB_CONFIGURATION_SCREEN_MAKE_ACTIVE_ACTION',
+    label: 'LNG_HUB_CONFIGURATION_SCREEN_TITLE',
+    currentHubConfigurationLabel: 'LNG_HUB_CONFIGURATION_SCREEN_CURRENT_HUB_CONFIG',
+    hubNameLabel: 'LNG_HUB_CONFIGURATION_SCREEN_CURRENT_CONFIG_NAME',
+    hubUrlLabel: 'LNG_HUB_CONFIGURATION_SCREEN_CURRENT_CONFIG_URL',
+    hubClientIdLabel: 'LNG_HUB_CONFIGURATION_SCREEN_CURRENT_CONFIG_CLIENT_ID',
+    hubClientSecretLabel: 'LNG_HUB_CONFIGURATION_SCREEN_CURRENT_CONFIG_CLIENT_SECRET',
+    lastSyncDate: 'LNG_HUB_CONFIGURATION_SCREEN_LAST_SYNC_DATE',
+    scanQRButtonLabel: 'LNG_HUB_CONFIGURATION_SCREEN_SCAN_QR_CODE_BUTTON',
+    saveCurrentHubButtonLabel: 'LNG_COMMON_BUTTON_SAVE',
+    connectAnotherComputerLabel: 'LNG_HUB_CONFIGURATION_SCREEN_WANT_TO_CONNECT_TO_DIFFERENT_COMPUTER_LABEL',
+    addHubButtonLabel: 'LNG_HUB_CONFIGURATION_SCREEN_ADD_HUB_BUTTON',
+    otherHubConfigurationsLabel: 'LNG_HUB_CONFIGURATION_SCREEN_OTHER_HUB_CONFIGURATIONS_LABEL',
+    makeActiveLabel: 'LNG_HUB_CONFIGURATION_SCREEN_MAKE_ACTIVE_ACTION',
 
     // Errors
-    setActiveDatabaseTitle:             'LNG_HUB_CONFIGURATION_SCREEN_ERROR_SET_ACTIVE_HUB',
-    setActiveDatabaseMessage:           'LNG_HUB_CONFIGURATION_SCREEN_ERROR_OCCURED_WHILE_SETTING_ACTIVE_HUB',
+    setActiveDatabaseTitle: 'LNG_HUB_CONFIGURATION_SCREEN_ERROR_SET_ACTIVE_HUB',
+    setActiveDatabaseMessage: 'LNG_HUB_CONFIGURATION_SCREEN_ERROR_OCCURED_WHILE_SETTING_ACTIVE_HUB',
 
-    saveCurrentHubTitle:                'LNG_HUB_CONFIGURATION_SCREEN_ERROR_SAVE_CURRENT_HUB',
-    saveCurrentHubMessage:              'LNG_HUB_CONFIGURATION_SCREEN_ERROR_WHILE_SAVING_THE_UPDATE_HUB_INFO',
+    saveCurrentHubTitle: 'LNG_HUB_CONFIGURATION_SCREEN_ERROR_SAVE_CURRENT_HUB',
+    saveCurrentHubMessage: 'LNG_HUB_CONFIGURATION_SCREEN_ERROR_WHILE_SAVING_THE_UPDATE_HUB_INFO',
 
-    getOtherHubsTitle:                  'LNG_HUB_CONFIGURATION_SCREEN_ERROR_GET_HUBS',
-    getOtherHubsMessage:                'LNG_HUB_CONFIGURATION_SCREEN_ERROR_WHILE_GETTING_THE_OTHER_HUBS_CONFIG',
+    getOtherHubsTitle: 'LNG_HUB_CONFIGURATION_SCREEN_ERROR_GET_HUBS',
+    getOtherHubsMessage: 'LNG_HUB_CONFIGURATION_SCREEN_ERROR_WHILE_GETTING_THE_OTHER_HUBS_CONFIG',
 
-    getCurrentHubTitle:                 'LNG_HUB_CONFIGURATION_SCREEN_ERROR_GET_CURRENT_HUB',
-    getCurrentHubMessage:               'LNG_HUB_CONFIGURATION_SCREEN_ERROR_WHILE_GETTING_CURRENT_HUB_CONFIG',
+    getCurrentHubTitle: 'LNG_HUB_CONFIGURATION_SCREEN_ERROR_GET_CURRENT_HUB',
+    getCurrentHubMessage: 'LNG_HUB_CONFIGURATION_SCREEN_ERROR_WHILE_GETTING_CURRENT_HUB_CONFIG',
 
-    getCurrentHubLastSyncDateTitle:     'LNG_HUB_CONFIGURATION_SCREEN_ERROR_GET_LAST_SYNC_DATE',
-    getCurrentHubLastSyncDateMessage:   `LNG_HUB_CONFIGURATION_SCREEN_ERROR_WHILE_GETTING_CURRENT_HUBS_LAST_SYNC_DATE`,
+    getCurrentHubLastSyncDateTitle: 'LNG_HUB_CONFIGURATION_SCREEN_ERROR_GET_LAST_SYNC_DATE',
+    getCurrentHubLastSyncDateMessage: `LNG_HUB_CONFIGURATION_SCREEN_ERROR_WHILE_GETTING_CURRENT_HUBS_LAST_SYNC_DATE`,
 
-    exitWithoutSavingMessage:           'LNG_HUB_CONFIGURATION_SCREEN_ERROR_YOU_HAVE_UNSAVED_DATA_SURE_LEAVE_PAGE',
+    exitWithoutSavingMessage: 'LNG_HUB_CONFIGURATION_SCREEN_ERROR_YOU_HAVE_UNSAVED_DATA_SURE_LEAVE_PAGE',
 
     // Success saving database
     // successUpdatingCurrentHubTitle:     'LNG_HUB_CONFIGURATION_SCREEN_SUCCESS_UPDATING_HUB',
-    successUpdatingCurrentHubMessage:   'LNG_HUB_CONFIGURATION_SCREEN_HUB_CREDENTIALS_SUCCESS_UPDATED',
+    successUpdatingCurrentHubMessage: 'LNG_HUB_CONFIGURATION_SCREEN_HUB_CREDENTIALS_SUCCESS_UPDATED',
 
-    successMakingHubActiveMessage:      'LNG_HUB_CONFIGURATION_SCREEN_SUCCES_SET_HUB_AS_ACTIVE_AND_YOU_WILL_BE_LOGGED_OUT_MESSAGE'
+    successMakingHubActiveMessage: 'LNG_HUB_CONFIGURATION_SCREEN_SUCCES_SET_HUB_AS_ACTIVE_AND_YOU_WILL_BE_LOGGED_OUT_MESSAGE'
+};
+
+const addSingleAnswerModalScreen = {
+    addNewAnswer: 'LNG_ADD_SINGLE_ANSWER_MODAL_SCREEN_ADD_NEW_ANSWER',
+
+};
+
+const previousAnswersScreen = {
+    previousAnswersTitle: 'LNG_PREVIOUS_ANSWERS_SCREEN_PREVIOUS_ANSWERS_TITLE',
+    noPreviousAnswersToShowMessage: 'LNG_PREVIOUS_ANSWERS_SCREEN_NO_PREVIOUS_ANSWERS_TO_SHOW'
+};
+
+// TODO add to backend
+const followUpAgenda = {
+    noFollUpsForDate: 'LNG_FOLLOW_UP_AGENDA_NO_FOLLOW_UPS_FOR_DATE'
+};
+
+// TODO add to backend:
+const personListItem = {
+    dayOfFollowUp: 'LNG_PERSON_LIST_ITEM_DAY_OF_FOLLOW_UP'
 };
 
 export default {
@@ -544,5 +568,9 @@ export default {
     missedFollowUpListItemLabels,
     questionCardLabels,
     hubConfigScreen,
-    sortTab
+    sortTab,
+    addSingleAnswerModalScreen,
+    previousAnswersScreen,
+    followUpAgenda,
+    personListItem
 };

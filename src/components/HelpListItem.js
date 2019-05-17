@@ -6,7 +6,7 @@
 import React, {PureComponent} from 'react';
 import {TextInput, View, Text, StyleSheet, Platform, Dimensions, Image, InteractionManager} from 'react-native';
 import {ListItem, Icon} from 'react-native-material-ui';
-import {calculateDimension, handleExposedTo, getAddress, extractIdFromPouchId, getTranslation} from './../utils/functions';
+import {calculateDimension, getTranslation} from './../utils/functions';
 import config from './../utils/config';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";

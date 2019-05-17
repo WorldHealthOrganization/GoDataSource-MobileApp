@@ -60,18 +60,18 @@ class FollowUpListItem extends PureComponent {
                 genderString = getTranslation(contact.gender, this.props.translation);
             }
 
-            let secondaryTextGender = contact && genderString ? genderString.charAt(0) : ' ';
+            let secondaryTextGender = contact && genderString ? genderString.charAt(0) : '';
             let secondaryTextAge = '';
             if (contact && contact.age !== undefined && contact.age !== null) {
-                if (contact.age.years !== null && contact.age.years !== undefined && contact.age.months !== null && contact.age.months !== undefined) {
-                    if (contact.age.years !== 0 && contact.age.months === 0) {
+                if (contact.age.years !== undefined || contact.age.months !== undefined) {
+                    if (contact.age.years !== 0 && contact.age.years !== null) {
                         secondaryTextAge = contact.age.years.toString() + getTranslation(config.localTranslationTokens.years, this.props.translation).charAt(0).toLowerCase()
-                    } else if (contact.age.years === 0 && contact.age.months !== 0) {
+                    } else if (contact.age.months !== 0 && contact.age.months !== null) {
                         secondaryTextAge = contact.age.months.toString() + getTranslation(config.localTranslationTokens.months, this.props.translation).charAt(0).toLowerCase()
                     }
                 }
             }
-            let secondaryText = secondaryTextGender + (secondaryTextAge && secondaryTextGender ? ', ' : '') + secondaryTextAge;
+            let secondaryText = secondaryTextGender + ((secondaryTextGender.trim().length > 0 && secondaryTextAge.trim().length > 0 ) ? ', ' : '') + secondaryTextAge;
 
             let addressText = '';
             let followUpContact = this.props && this.props.contacts && Array.isArray(this.props.contacts) && this.props.contacts.length > 0 ? 
@@ -80,13 +80,13 @@ class FollowUpListItem extends PureComponent {
             if (followUpContact && followUpContact.addresses && Array.isArray(followUpContact.addresses) && followUpContact.addresses.length > 0) {
                 let contactPlaceOfResidence = followUpContact.addresses.filter((e) => {return e.typeId === config.userResidenceAddress.userPlaceOfResidence})
                 if (contactPlaceOfResidence && contactPlaceOfResidence[0]) {
-                    addressText = getAddress(contactPlaceOfResidence[0], true);
+                    addressText = getAddress(contactPlaceOfResidence[0], true, this.props.locations);
                 }
             }
            
             if (this.props.isContact && contact && contact.addresses && Array.isArray(contact.addresses) && contact.addresses.length > 0) {
                 let contactPlaceOfResidence = contact.addresses.filter((e) => {return e.typeId === config.userResidenceAddress.userPlaceOfResidence});
-                addressText = getAddress(contactPlaceOfResidence[0], true);
+                addressText = getAddress(contactPlaceOfResidence[0], true, this.props.locations);
             }
 
             let relationshipText = '';
@@ -268,7 +268,8 @@ function mapStateToProps(state) {
         contacts: state.contacts,
         cases: state.cases,
         events: state.events,
-        role: state.role
+        role: state.role,
+        locations: state.locations.locationsList
     };
 }
 

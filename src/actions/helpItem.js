@@ -24,7 +24,7 @@ export function getHelpItem(token, dispatch) {
                 reject(error);
             }
             if (response) {
-                console.log('response help item: ',response);
+                // console.log('response help item: ',response);
                 dispatch(storeHelpItem(response));
                 resolve('Done help item');
             }

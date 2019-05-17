@@ -211,7 +211,8 @@ class LoginScreen extends Component {
         this.props.navigator.resetTo({
             screen: this.props.activeDatabase ? 'ManualConfigScreen' : 'FirstConfigScreen',
             passProps: {
-                allowBack: this.props.allowBack
+                allowBack: this.props.allowBack,
+                isMultipleHub: this.props.isMultipleHub
             }
         })
     }

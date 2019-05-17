@@ -3,17 +3,17 @@
  */
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
-import React, {PureComponent} from 'react';
-import { View, Text, StyleSheet, InteractionManager, Alert, ScrollView, TouchableWithoutFeedback, Keyboard} from 'react-native';
-import {LoaderScreen} from 'react-native-ui-lib';
-import {calculateDimension, getTranslation, extractIdFromPouchId} from './../utils/functions';
+import React, { PureComponent } from 'react';
+import { View, Text, StyleSheet, InteractionManager, Alert, findNodeHandle, ScrollView, TouchableWithoutFeedback, Keyboard } from 'react-native';
+import { LoaderScreen } from 'react-native-ui-lib';
+import { calculateDimension, getTranslation, extractIdFromPouchId } from './../utils/functions';
 import config from './../utils/config';
-import {connect} from "react-redux";
-import {bindActionCreators} from "redux";
+import { connect } from "react-redux";
+import { bindActionCreators } from "redux";
 import Button from './../components/Button';
 import styles from './../styles';
 import Ripple from 'react-native-material-ripple';
-import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import CardComponent from './../components/CardComponent';
 import translations from './../utils/translations'
 import ElevatedView from 'react-native-elevated-view';
@@ -43,28 +43,51 @@ class ExposureContainer extends PureComponent {
     // and can slow down the app
     render() {
         return (
-            <KeyboardAwareScrollView
+            // <KeyboardAwareScrollView
+            //     style={style.containerScrollView}
+            //     contentContainerStyle={[style.contentContainerStyle, {paddingBottom: this.props.screenSize.height < 600 ? 70 : 20}]}
+            //     keyboardShouldPersistTaps={'always'}
+            //     extraHeight={20 + 81 + 70}
+            //     innerRef={ref => {
+            //         this.scrollExposure = ref
+            //     }}
+            // >
+            <ScrollView
                 style={style.containerScrollView}
-                contentContainerStyle={[style.contentContainerStyle, {paddingBottom: this.props.screenSize.height < 600 ? 70 : 20}]}
-                keyboardShouldPersistTaps={'always'}
+                contentContainerStyle={[style.contentContainerStyle, { paddingBottom: this.props.screenSize.height < 600 ? 70 : 20 }]}
             >
                 <View style={style.container}>
                     {
                         this.props.fromExposureScreen === true ? (
                             this.renderItemCardComponent(config.addExposureScreen)
                         ) : (
-                            this.handleRenderItem(null, 0)
-                        )
+                                this.handleRenderItem(null, 0)
+                            )
                     }
                 </View>
-            </KeyboardAwareScrollView>
+            </ScrollView>
+            // </KeyboardAwareScrollView>
         );
     }
+
+    handleOnFocus = (event) => {
+        // this.scrollToInput(findNodeHandle(event.target))
+    };
+
+    handleOnBlur = (event) => {
+        // this.scrollExposure.props.scrollToPosition(0, 0, false)
+        // this.scrollToInput(findNodeHandle(event.target))
+    }
+
+    scrollToInput(reactNode) {
+        // this.scrollExposure.props.scrollToFocusedInput(reactNode)
+
+    };
 
     // Please write here all the methods that are not react native lifecycle methods
     handleRenderItem = (item, index) => {
         let fields = config.contactsSingleScreen.relationship.fields.map((field) => {
-            return Object.assign({},field, {isEditMode: this.props.isEditMode !== undefined && this.props.isEditMode !== null ? this.props.isEditMode : true})
+            return Object.assign({}, field, { isEditMode: this.props.isEditMode !== undefined && this.props.isEditMode !== null ? this.props.isEditMode : true })
         });
         return this.renderItemCardComponent(fields, index)
     };
@@ -77,7 +100,7 @@ class ExposureContainer extends PureComponent {
                 marginVertical: 4,
                 minHeight: calculateDimension(72, true, this.props.screenSize)
             }, style.cardStyle]}>
-                <ScrollView scrollEnabled={false} style={{flex: 1}} contentContainerStyle={{flexGrow: 1}}>
+                <ScrollView scrollEnabled={false} style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }}>
                     {
                         fields && fields.map((item, index) => {
                             return this.handleRenderItemCardComponent(item, index, cardIndex);
@@ -90,7 +113,7 @@ class ExposureContainer extends PureComponent {
 
     handleRenderItemCardComponent = (item, index, cardIndex) => {
         return (
-            <View style={[style.subcontainerCardComponent, {flex: 1}]} key={index}>
+            <View style={[style.subcontainerCardComponent, { flex: 1 }]} key={index}>
                 {
                     this.handleRenderItemByType(item, cardIndex)
                 }
@@ -101,7 +124,7 @@ class ExposureContainer extends PureComponent {
     handleRenderItemByType = (item, cardIndex) => {
         let addContactFromCasesScreen = false;
         let value = '';
-     
+
         if (item.type === 'DropdownInput') {
             item.data = this.computeDataForExposure(item);
         }
@@ -138,11 +161,13 @@ class ExposureContainer extends PureComponent {
                 minimumDate={minimumDate}
                 maximumDate={maximumDate}
                 index={cardIndex}
-                
+
                 onChangeDropDown={this.props.onChangeDropDown}
                 onChangeDate={this.props.onChangeDate}
                 onChangeText={this.props.onChangeText}
                 onChangeSwitch={this.props.onChangeSwitch}
+                onFocus={this.handleOnFocus}
+                onBlur={this.handleOnBlur}
             />
         )
     };
@@ -153,7 +178,7 @@ class ExposureContainer extends PureComponent {
         value = this.props.exposure[item.id];
         if (item.id === 'exposure') {
             if (this.props.exposure.persons && Array.isArray(this.props.exposure.persons) && this.props.exposure.persons.length > 0) {
-                let persons = this.props.exposure.persons.filter((e) => {return e.type !== (this.props.type === 'Contact' ? config.personTypes.contacts : config.personTypes.contacts)});
+                let persons = this.props.exposure.persons.filter((e) => { return e.type !== (this.props.type === 'Contact' ? config.personTypes.contacts : config.personTypes.contacts) });
                 value = this.extractNameForExposure(persons[0]);
             }
         }
@@ -169,30 +194,30 @@ class ExposureContainer extends PureComponent {
                 maximumDate = new Date()
             }
         }
-        
-        let dateValidation = {minimumDate, maximumDate}
+
+        let dateValidation = { minimumDate, maximumDate }
         return dateValidation
     };
 
     computeDataForExposure = (item) => {
         let data = [];
         if (item.categoryId) {
-            data = this.props.referenceData.filter((e) => {return e.active === true && e.categoryId === item.categoryId})
-                                        .sort((a,b) => { return a.order - b.order; })
-                                        .map((e) => {return {value: getTranslation(e.value, this.props.translation), id: extractIdFromPouchId(e._id, 'referenceData')}});
+            data = this.props.referenceData.filter((e) => { return e.active === true && e.categoryId === item.categoryId })
+                .sort((a, b) => { return a.order - b.order; })
+                .map((e) => { return { value: getTranslation(e.value, this.props.translation), id: extractIdFromPouchId(e._id, 'referenceData') } });
         } else {
             if (item.id === 'exposure') {
                 if (this.props.type !== 'Contact') {
-                    data = this.props.contacts.map((e) => {return {value: ((e.firstName ? e.firstName + ' ' : '') + (e.lastName ? e.lastName : '')), id: extractIdFromPouchId(e._id, 'person'), type: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT'}});
+                    data = this.props.contacts.map((e) => { return { value: ((e.firstName ? e.firstName + ' ' : '') + (e.lastName ? e.lastName : '')), id: extractIdFromPouchId(e._id, 'person'), type: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT' } });
                 }
-                if (this.props.cases && this.props.cases.length > 0){
-                    data = this.props.cases.map((e) => {return {value: ((e.firstName ? e.firstName + ' ' : '') + (e.lastName ? e.lastName : '')), id: extractIdFromPouchId(e._id, 'person'), type: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE'}});
+                if (this.props.cases && this.props.cases.length > 0) {
+                    data = this.props.cases.map((e) => { return { value: ((e.firstName ? e.firstName + ' ' : '') + (e.lastName ? e.lastName : '')), id: extractIdFromPouchId(e._id, 'person'), type: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE' } });
                 }
-                data = data.concat(this.props.events.map((e) => {return {value: e.name, id: extractIdFromPouchId(e._id, 'person'), type: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_EVENT'}}));
+                data = data.concat(this.props.events.map((e) => { return { value: e.name, id: extractIdFromPouchId(e._id, 'person'), type: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_EVENT' } }));
             } else {
                 if (item.id === 'clusterId') {
                     data = this.props.clusters.map((e) => {
-                        return {value: e.name, id: extractIdFromPouchId(e._id, 'cluster')}
+                        return { value: e.name, id: extractIdFromPouchId(e._id, 'cluster') }
                     })
                 }
             }
@@ -203,13 +228,13 @@ class ExposureContainer extends PureComponent {
     extractNameForExposure = (person) => {
         switch (person.type) {
             case config.personTypes.cases:
-                return (this.props.cases && Array.isArray(this.props.cases) && this.props.cases.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id) > -1 && this.props.cases[this.props.cases.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id)].firstName ? (this.props.cases[this.props.cases.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id)].firstName + ' ') : '') +
-                    (this.props.cases && Array.isArray(this.props.cases) && this.props.cases.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id) > -1 && this.props.cases[this.props.cases.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id)].lastName ? (this.props.cases[this.props.cases.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id)].lastName) : '');
+                return (this.props.cases && Array.isArray(this.props.cases) && this.props.cases.map((e) => { return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id) > -1 && this.props.cases[this.props.cases.map((e) => { return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id)].firstName ? (this.props.cases[this.props.cases.map((e) => { return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id)].firstName + ' ') : '') +
+                    (this.props.cases && Array.isArray(this.props.cases) && this.props.cases.map((e) => { return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id) > -1 && this.props.cases[this.props.cases.map((e) => { return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id)].lastName ? (this.props.cases[this.props.cases.map((e) => { return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id)].lastName) : '');
             case config.personTypes.events:
-                return (this.props.events && Array.isArray(this.props.events) && this.props.events.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id) > -1 && this.props.events[this.props.events.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id)].name ? (this.props.events[this.props.events.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id)].name) : '');
+                return (this.props.events && Array.isArray(this.props.events) && this.props.events.map((e) => { return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id) > -1 && this.props.events[this.props.events.map((e) => { return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id)].name ? (this.props.events[this.props.events.map((e) => { return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id)].name) : '');
             case config.personTypes.contacts:
-                return (this.props.contacts && Array.isArray(this.props.contacts) && this.props.contacts.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id) > -1 && this.props.contacts[this.props.contacts.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id)].firstName ? (this.props.contacts[this.props.contacts.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id)].firstName + ' ') : '') +
-                    (this.props.contacts && Array.isArray(this.props.contacts) && this.props.contacts.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id) > -1 && this.props.contacts[this.props.contacts.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id)].lastName ? (this.props.contacts[this.props.contacts.map((e) => {return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id)].lastName) : '');
+                return (this.props.contacts && Array.isArray(this.props.contacts) && this.props.contacts.map((e) => { return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id) > -1 && this.props.contacts[this.props.contacts.map((e) => { return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id)].firstName ? (this.props.contacts[this.props.contacts.map((e) => { return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id)].firstName + ' ') : '') +
+                    (this.props.contacts && Array.isArray(this.props.contacts) && this.props.contacts.map((e) => { return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id) > -1 && this.props.contacts[this.props.contacts.map((e) => { return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id)].lastName ? (this.props.contacts[this.props.contacts.map((e) => { return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id)].lastName) : '');
             default:
                 return ''
         }
@@ -257,7 +282,7 @@ function mapStateToProps(state) {
         cases: state.cases,
         translation: state.app.translation,
         referenceData: state.referenceData,
-        locations: state.locations,
+        locations: state.locations.locations,
         events: state.events,
         clusters: state.clusters,
     };

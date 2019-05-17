@@ -3,7 +3,7 @@
  */
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
-import React, {PureComponent} from 'react';
+import React, { PureComponent } from 'react';
 import {
     View,
     Text,
@@ -15,15 +15,15 @@ import {
     Keyboard,
     findNodeHandle
 } from 'react-native';
-import {LoaderScreen} from 'react-native-ui-lib';
-import {calculateDimension, getTranslation, extractIdFromPouchId} from './../utils/functions';
+import { LoaderScreen } from 'react-native-ui-lib';
+import { calculateDimension, getTranslation, extractIdFromPouchId } from './../utils/functions';
 import config from './../utils/config';
-import {connect} from "react-redux";
-import {bindActionCreators} from "redux";
+import { connect } from "react-redux";
+import { bindActionCreators } from "redux";
 import Button from './../components/Button';
 import styles from './../styles';
 import Ripple from 'react-native-material-ripple';
-import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import CardComponent from './../components/CardComponent';
 import translations from './../utils/translations'
 import ElevatedView from 'react-native-elevated-view';
@@ -60,9 +60,9 @@ class ContactsSingleAddress extends PureComponent {
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
-        if(!this.state.interactionComplete) {
+        if (!this.state.interactionComplete) {
             return (
-                <LoaderScreen overlay={true} backgroundColor={'white'}/>
+                <LoaderScreen overlay={true} backgroundColor={'white'} />
             )
         }
 
@@ -73,7 +73,7 @@ class ContactsSingleAddress extends PureComponent {
                 Keyboard.dismiss()
             }} accessible={false}>
                 <View style={style.viewContainer}>
-                    <View style={{flexDirection: 'row'}}>
+                    <View style={{ flexDirection: 'row' }}>
                         <Button
                             title={getTranslation(translations.generalButtons.backButtonLabel, this.props.translation)}
                             onPress={this.handleBackButton}
@@ -84,7 +84,7 @@ class ContactsSingleAddress extends PureComponent {
                             style={{
                                 marginVertical: calculateDimension(12.5, true, this.props.screenSize),
                                 marginHorizontal: calculateDimension(16, false, this.props.screenSize),
-                            }}/>
+                            }} />
                         <Button
                             title={getTranslation(translations.generalButtons.nextButtonLabel, this.props.translation)}
                             onPress={this.handleNextButton}
@@ -95,52 +95,57 @@ class ContactsSingleAddress extends PureComponent {
                             style={{
                                 marginVertical: calculateDimension(12.5, true, this.props.screenSize),
                                 marginHorizontal: calculateDimension(16, false, this.props.screenSize),
-                            }}/>
+                            }} />
                     </View>
 
-                    <KeyboardAwareScrollView
+                    {/* <KeyboardAwareScrollView
                         style={style.containerScrollView}
-                        contentContainerStyle={[style.contentContainerStyle, {paddingBottom: this.props.screenSize.height < 600 ? 70 : 20}]}
+                        contentContainerStyle={[style.contentContainerStyle, { paddingBottom: this.props.screenSize.height < 600 ? 70 : 20 }]}
                         keyboardShouldPersistTaps={'always'}
                         extraHeight={20 + 81 + 50 + 70}
                         innerRef={ref => {
                             this.scrollContactsSingleAddress = ref
                         }}
+                    > */}
+                    <ScrollView
+                        style={style.containerScrollView}
+                        contentContainerStyle={[style.contentContainerStyle, { paddingBottom: this.props.screenSize.height < 600 ? 70 : 20 }]}
                     >
-                        <View style={style.container}>
-                            {
-                                this.props.contact && this.props.contact.addresses && this.props.contact.addresses.map((item, index) => {
-                                    return this.handleRenderItem(item, index)
-                                })
-                            }
-                        </View>
+                    <View style={style.container}>
                         {
-                            this.props.isEditMode !== null && this.props.isEditMode !== undefined && this.props.isEditMode === true ? (
-                                <View style={{alignSelf: 'flex-start', marginHorizontal: calculateDimension(16, false, this.props.screenSize), marginVertical: 20}}>
-                                    <Ripple
-                                        style={{
-                                            height: 25,
-                                            justifyContent: 'center'
-                                        }}
-                                        onPress={this.props.onPressAddAdrress}
-                                    >
-                                        <Text style={{fontFamily: 'Roboto-Medium', fontSize: 12, color: styles.buttonGreen}}>
-                                            {this.props.contact.addresses && this.props.contact.addresses.length === 0 ? getTranslation(translations.contactSingleScreen.oneAddressText, this.props.translation) : getTranslation(translations.contactSingleScreen.moreAddressesText, this.props.translation)}
-                                        </Text>
-                                    </Ripple>
-                                </View>
-                            ) : null
+                            this.props.contact && this.props.contact.addresses && this.props.contact.addresses.map((item, index) => {
+                                return this.handleRenderItem(item, index)
+                            })
                         }
-                    </KeyboardAwareScrollView>
+                    </View>
+                    {
+                        this.props.isEditMode !== null && this.props.isEditMode !== undefined && this.props.isEditMode === true ? (
+                            <View style={{ alignSelf: 'flex-start', marginHorizontal: calculateDimension(16, false, this.props.screenSize), marginVertical: 20 }}>
+                                <Ripple
+                                    style={{
+                                        height: 25,
+                                        justifyContent: 'center'
+                                    }}
+                                    onPress={this.props.onPressAddAdrress}
+                                >
+                                    <Text style={{ fontFamily: 'Roboto-Medium', fontSize: 12, color: styles.buttonGreen }}>
+                                        {this.props.contact.addresses && this.props.contact.addresses.length === 0 ? getTranslation(translations.contactSingleScreen.oneAddressText, this.props.translation) : getTranslation(translations.contactSingleScreen.moreAddressesText, this.props.translation)}
+                                    </Text>
+                                </Ripple>
+                            </View>
+                        ) : null
+                    }
+                    </ScrollView>
+                    {/* </KeyboardAwareScrollView> */}
                 </View>
-            </TouchableWithoutFeedback>
+            </TouchableWithoutFeedback >
         );
     }
 
     // Please write here all the methods that are not react native lifecycle methods
     handleRenderItem = (item, index) => {
         let fields = config.contactsSingleScreen.address.fields.map((field) => {
-            return Object.assign({},field, {isEditMode: this.props.isEditMode})
+            return Object.assign({}, field, { isEditMode: this.props.isEditMode })
         });
         return this.renderItemCardComponent(fields, index)
     };
@@ -153,7 +158,7 @@ class ContactsSingleAddress extends PureComponent {
                 marginVertical: 4,
                 minHeight: calculateDimension(72, true, this.props.screenSize)
             }, style.cardStyle]}>
-                <ScrollView scrollEnabled={false} style={{flex: 1}} contentContainerStyle={{flexGrow: 1}}>
+                <ScrollView scrollEnabled={false} style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }}>
                     {
                         fields && fields.map((item, index) => {
                             return this.handleRenderItemCardComponent(item, index, cardIndex);
@@ -166,7 +171,7 @@ class ContactsSingleAddress extends PureComponent {
 
     handleRenderItemCardComponent = (item, index, cardIndex) => {
         return (
-            <View style={[style.subcontainerCardComponent, {flex: 1}]} key={index}>
+            <View style={[style.subcontainerCardComponent, { flex: 1 }]} key={index}>
                 {
                     this.handleRenderItemByType(item, cardIndex)
                 }
@@ -189,7 +194,7 @@ class ContactsSingleAddress extends PureComponent {
             if (this.props.contact && this.props.contact.addresses && Array.isArray(this.props.contact.addresses) && this.props.contact.addresses[cardIndex] && this.props.contact.addresses[cardIndex][item.id] && this.props.contact.addresses[cardIndex][item.id] !== "") {
                 for (let location of this.props.locations) {
                     let myLocationName = this.getLocationNameById(location, this.props.contact.addresses[cardIndex][item.id])
-                    if (myLocationName !== null){
+                    if (myLocationName !== null) {
                         value = myLocationName
                         break
                     }
@@ -198,7 +203,7 @@ class ContactsSingleAddress extends PureComponent {
         } else {
             value = this.computeValueForContactsSingleScreen(item, cardIndex);
         }
-       
+
         if (item.type === 'DatePicker' && value === '') {
             value = null
         }
@@ -227,19 +232,20 @@ class ContactsSingleAddress extends PureComponent {
                 onDeletePress={this.props.onDeletePress}
                 anotherPlaceOfResidenceWasChosen={this.props.anotherPlaceOfResidenceWasChosen}
                 onFocus={this.handleOnFocus}
+                onBlur={this.handleOnBlur}
             />
         )
     };
 
     getLocationNameById = (element, locationId) => {
-        if(extractIdFromPouchId(element._id, 'location') === locationId) {
+        if (extractIdFromPouchId(element._id, 'location') === locationId) {
             return element.name;
         } else {
             if (element.children && element.children.length > 0) {
                 let i;
                 let result = null;
 
-                for(i=0; result === null && i < element.children.length; i++){
+                for (i = 0; result === null && i < element.children.length; i++) {
                     result = this.getLocationNameById(element.children[i], locationId);
                 }
                 return result;
@@ -281,16 +287,16 @@ class ContactsSingleAddress extends PureComponent {
                 maximumDate = new Date()
             }
         }
-        
-        let dateValidation = {minimumDate, maximumDate}
+
+        let dateValidation = { minimumDate, maximumDate }
         return dateValidation
     };
 
     computeDataForContactsSingleScreenDropdownInput = (item, index) => {
         if (item.id === 'typeId') {
-            return _.filter(this.props.referenceData, (o) => {return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_ADDRESS_TYPE'})
-                    .sort((a,b) => { return a.order - b.order; })
-                    .map((o) => {return {value: getTranslation(o.value, this.props.translation), id: o.value}})
+            return _.filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_ADDRESS_TYPE' })
+                .sort((a, b) => { return a.order - b.order; })
+                .map((o) => { return { value: getTranslation(o.value, this.props.translation), id: o.value } })
         }
     };
 
@@ -298,21 +304,22 @@ class ContactsSingleAddress extends PureComponent {
         if (this.props.isNew) {
             let missingFields = this.props.checkRequiredFieldsAddresses();
             if (missingFields && Array.isArray(missingFields) && missingFields.length === 0) {
-                if (this.props.hasPlaceOfResidence !== undefined && this.props.hasPlaceOfResidence === true){
+
+                if (this.props.contact.addresses.length === 0 || (this.props.contact.addresses.length > 0 && this.props.hasPlaceOfResidence === true)) {
                     this.props.handleMoveToNextScreenButton(true)
                 } else {
                     Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.alertMessages.addressOfResidenceError, this.props.translation), [
                         {
-                            text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation), 
-                            onPress: () => {console.log("OK pressed")}
+                            text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+                            onPress: () => { console.log("OK pressed") }
                         }
                     ])
                 }
             } else {
                 Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), `${getTranslation(translations.alertMessages.addressRequiredFieldsMissing, this.props.translation)}.\n${getTranslation(translations.alertMessages.missingFields, this.props.translation)}: ${missingFields}`, [
                     {
-                        text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation), 
-                        onPress: () => {console.log("OK pressed")}
+                        text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+                        onPress: () => { console.log("OK pressed") }
                     }
                 ])
             }
@@ -326,12 +333,17 @@ class ContactsSingleAddress extends PureComponent {
     };
 
     handleOnFocus = (event) => {
-        this.scrollToInput(findNodeHandle(event.target))
+        // this.scrollToInput(findNodeHandle(event.target))
     };
 
-    scrollToInput (reactNode) {
+    handleOnBlur = (event) => {
+        // this.scrollContactsSingleAddress.props.scrollToPosition(0, 0, false)
+        // this.scrollToInput(findNodeHandle(event.target))
+    }
+
+    scrollToInput(reactNode) {
         // Add a 'scroll' ref to your ScrollView
-        this.scrollContactsSingleAddress.props.scrollToFocusedInput(reactNode)
+        // this.scrollContactsSingleAddress.props.scrollToFocusedInput(reactNode)
     }
 }
 
@@ -376,7 +388,7 @@ function mapStateToProps(state) {
         cases: state.cases,
         translation: state.app.translation,
         referenceData: state.referenceData,
-        locations: state.locations,
+        locations: state.locations.locations,
     };
 }
 

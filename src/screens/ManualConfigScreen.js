@@ -27,7 +27,7 @@ import {getTranslation, generateId} from './../utils/functions';
 import translations from './../utils/translations';
 import SwitchInput from './../components/SwitchInput';
 import {getInternetCredentials, setInternetCredentials} from 'react-native-keychain';
-import {setSyncState} from './../actions/app';
+import {setSyncState, changeAppRoot} from './../actions/app';
 
 class ManualConfigScreen extends PureComponent {
 
@@ -388,7 +388,8 @@ class ManualConfigScreen extends PureComponent {
                 screen: 'FirstConfigScreen',
                 passProps: {
                     allowBack: this.props.allowBack,
-                    skipEdit: this.props.skipEdit
+                    skipEdit: this.props.skipEdit,
+                    isMultipleHub: this.props.isMultipleHub
                 }
                 // animationType: 'fade',
                 // animated: true
@@ -401,7 +402,8 @@ class ManualConfigScreen extends PureComponent {
             screen: 'LoginScreen',
             passProps: {
                 allowBack: this.props.allowBack,
-                skipEdit: this.props.skipEdit
+                skipEdit: this.props.skipEdit,
+                isMultipleHub: this.props.isMultipleHub
             }
             // animationType: 'fade',
             // animated: true
@@ -520,11 +522,15 @@ class ManualConfigScreen extends PureComponent {
     closeModal = () => {
         if (this.state.syncState[this.state.syncState.length - 1].status === 'Success') {
             this.resetModalProps(() => {
-                this.props.navigator.push({
-                screen: 'LoginScreen',
-                // animationType: 'fade',
-                // animated: true
-            })
+                if (this.props.isMultipleHub) {
+                    this.props.changeAppRoot('login');
+                } else {
+                    this.props.navigator.push({
+                        screen: 'LoginScreen',
+                        animated: true,
+                        animationType: 'fade'
+                    })
+                }
             })
         } else {
             this.resetModalProps(() => {
@@ -609,7 +615,8 @@ function matchDispatchToProps(dispatch) {
         loginUser,
         removeErrors,
         storeHubConfiguration,
-        setSyncState
+        setSyncState,
+        changeAppRoot
     }, dispatch);
 }
 

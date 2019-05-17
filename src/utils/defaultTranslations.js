@@ -103,6 +103,7 @@ export default {
     'LNG_CASE_FIELD_LABEL_IS_DATE_OF_REPORTING_APPROXIMATE': 'Date of reporting approximate',
     'LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED': 'Refused transfer to treatment unit',
     'LNG_CASE_FIELD_LABEL_RISK_REASON': 'Risk reason',
+    'LNG_CASE_FIELD_LABEL_CASE_ID': 'Case ID',
 
     'LNG_CASE_FIELD_LABEL_DOCUMENT_TYPE': 'Document Type',
     'LNG_CASE_FIELD_LABEL_DOCUMENT_NUMBER': 'Document number',
@@ -149,6 +150,7 @@ export default {
     'LNG_CONTACT_FIELD_LABEL_IS_DATE_OF_REPORTING_APPROXIMATE': 'Date of reporting approximate',
     'LNG_CONTACT_FIELD_LABEL_RISK_LEVEL': 'Risk level',
     'LNG_CONTACT_FIELD_LABEL_RISK_REASON': 'Reason',
+    'LNG_CONTACT_FIELD_LABEL_CONTACT_ID': 'Contact ID',
 
 
     //exposureScreen
@@ -176,6 +178,7 @@ export default {
     'LNG_FOLLOW_UPS_SINGLE_SCREEN_ACTION_MISSING': 'Missing',
     'LNG_FOLLOW_UPS_SINGLE_SCREEN_ACTION_DELETE': 'Deleted',
     'LNG_FOLLOW_UPS_SINGLE_SCREEN_ACTION_DECEASE': 'Deceased',
+    'LNG_FOLLOW_UPS_SINGLE_SCREEN_ACTION_EDIT_CONTACT': 'Edit contact',
 
     'LNG_DIALOG_ALERT_MESSAGE_ARE_YOU_SURE_YOU_WANT_TO_DELETE_THIS_FOLLOW_UP': 'Are you sure you want to delete this follow-up?',
 
@@ -230,6 +233,7 @@ export default {
     'LNG_DIALOG_ALERT_TITLE_LABEL': 'Alert',
     'LNG_DIALOG_VALIDATION_ERROR_TITLE_LABEL': 'Validation error',
     'LNG_DIALOG_WARNING_TITLE_LABEL': 'Warning',
+    'LNG_DIALOG_SAVE_ANYWAY_LABEL': 'Save anyway',
 
     //not used with translation
     'Invalid credentials': 'Invalid credentials',
@@ -237,6 +241,7 @@ export default {
     'Please make sure you have entered a valid email address': 'Please make sure you have entered a valid email address',
     'No person exists with this information': 'No person exists with this information',
     'QR code is not valid': 'QR code is not valid',
+    'LNG_ALERT_MESSAGE_CHECK_FOR_DUPLICATES_REQUST_FAIL': 'Something went wrong with the database request',
 
     // cases
     'LNG_DIALOG_ALERT_MESSAGE_ARE_YOU_SURE_YOU_WANT_TO_DELETE_THIS_CASE': 'Are you sure you want to delete this case?',
@@ -262,6 +267,8 @@ export default {
 
     // address
     'LNG_DIALOG_ALERT_MESSAGE_PLEASE_ADD_THE_PLACE_OF_RESIDENCE_ADDRESS': 'Please add the place of residence address',
+    'LNG_DIALOG_ALERT_MESSAGE_CONTACT_WITH_DUPLICATE_NAME': 'A contact with this first and last name already exists',
+    'LNG_DIALOG_ALERT_MESSAGE_CASE_WITH_DUPLICATE_NAME': 'A case with this first and last name already exists',
     'LNG_DIALOG_ALERT_MESSAGE_ADD_AT_LEAST_ONE_ADDRESS_WITH_ALL_REQUERED_FIELDS_COMPLETED': 'Please add at least one address with all the required fields completed',
 
     // Delete
@@ -269,14 +276,17 @@ export default {
     'LNG_DIALOG_ALERT_MESSAGE_ARE_YOU_SURE_YOU_WANT_TO_DELETE_THIS_ADDRESS': 'Are you sure you want to delete this address?',
     'LNG_DIALOG_ALERT_MESSAGE_ARE_YOU_SURE_YOU_WANT_TO_DELETE_THIS_DATE_RANGE': 'Are you sure you want to delete this date range?',
 
+    'LNG_DIALOG_ALERT_MESSAGE_ARE_YOU_SURE_YOU_WANT_TO_DELETE_THIS_ANSWER': 'Are you sure you want to delete this answer?',
+
     'LNG_DIALOG_ALERT_MESSAGE_ARE_YOU_SURE_YOU_WANT_TO_EXIT_THE_APP': 'Are you sure you want to exit the application?',
 
     'LNG_DIALOG_ALERT_MESSAGE_DO_YOU_WANT_TO_REPLACE_CURRENT_COORDINATES_WITH_LOCATION_VALUES': "Do you want to replace current coordinates with location's values?",
+    'LNG_DIALOG_ALERT_MESSAGE_ADD_PERSON': 'Would you like to add a new person for this id?',
 
     //loadingScreenMessages
     'LNG_LOADING_SCREEN_MESSAGE': 'Loading...',
 
-    
+
     //generalButtons
     'LNG_COMMON_BUTTON_NEXT': 'Next',
     'LNG_COMMON_BUTTON_BACK': 'Back',
@@ -286,8 +296,8 @@ export default {
 
     //generalLabels
     'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER': 'Filter By',
-    'LNG_COMMON_BUTTON_APPLY_FILTERS': 'Apply filters',
-    'LNG_COMMON_BUTTON_RESET_FILTERS': 'Reset',
+    'LNG_COMMON_BUTTON_LABEL_APPLY_FILTERS': 'Apply filters',
+    'LNG_COMMON_BUTTON_LABEL_RESET_FILTERS': 'Reset',
     'LNG_COMMON_LABEL_YES': 'Yes',
     'LNG_COMMON_LABEL_NO': 'No',
     'LNG_COMMON_LABEL_TODAY': 'Today',
@@ -333,9 +343,7 @@ export default {
 
 
     //addressFieldLabels
-    // TODO change to API also
-    'LNG_ADDRESS_FIELD_LABEL_NAME': 'Type',
-    // End of todo
+    'LNG_ADDRESS_FIELD_LABEL_MOBILE_NAME': 'Type',
     'LNG_ADDRESS_FIELD_LABEL_DATE': 'Date',
     'LNG_ADDRESS_FIELD_LABEL_LOCATION': 'Area',
     'LNG_ADDRESS_FIELD_LABEL_ADDRESS_CITY': 'City',
@@ -435,5 +443,21 @@ export default {
     'LNG_HUB_CONFIGURATION_SCREEN_SUCCES_SET_HUB_AS_ACTIVE_AND_YOU_WILL_BE_LOGGED_OUT_MESSAGE': 'The HUB was successfully made as active. You will be logged out and can log in with the credentials for the new HUB configuration',
 
     'LNG_DROP_DOWN_SECTIONED_NONE_SELECTED': 'None Selected',
-    'LNG_DROP_DOWN_SECTIONED_SELECTED': 'Items'
+    'LNG_DROP_DOWN_SECTIONED_SELECTED': 'Items',
+
+
+    // Add single answer modal screen
+    'LNG_ADD_SINGLE_ANSWER_MODAL_SCREEN_ADD_NEW_ANSWER': 'Add new answer',
+
+    // Previous answers screen
+    'LNG_PREVIOUS_ANSWERS_SCREEN_PREVIOUS_ANSWERS_TITLE': 'Previous Answers',
+    'LNG_PREVIOUS_ANSWERS_SCREEN_NO_PREVIOUS_ANSWERS_TO_SHOW': 'No previous answers to show',
+    'LNG_QUESTIONNAIRE_LABEL_ADD_ANSWER': 'Add Answer',
+    'LNG_QUESTIONNAIRE_LABEL_PREVIOUS_ANSWERS': 'Prev Answers',
+
+    // TODO add to backend
+    'LNG_FOLLOW_UP_AGENDA_NO_FOLLOW_UPS_FOR_DATE': 'No follow-ups to show for this day',
+
+    // TODO add to backend
+    'LNG_PERSON_LIST_ITEM_DAY_OF_FOLLOW_UP': 'Day of follow-up: '
 };

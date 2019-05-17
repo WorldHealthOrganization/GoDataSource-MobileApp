@@ -2,14 +2,6 @@
  * Created by florinpopa on 19/07/2018.
  */
 import {ACTION_TYPE_GET_FOLLOWUPS, ACTION_TYPE_STORE_FOLLOWUPS, ACTION_TYPE_UPDATE_FOLLOWUP, ACTION_TYPE_DELETE_FOLLOWUP} from './../utils/enums';
-import {
-    // getFollowUpsForOutbreakIdRequest,
-    getMissedFollowUpsForOutbreakIdRequest,
-    // updateFollowUpRequest,
-    // addFollowUpRequest,
-    deleteFollowUpRequest,
-    generateFollowUpRequest
-} from './../requests/followUps';
 import {updateContact, updateContactAction, getContactsForOutbreakIdWithPromises} from './contacts';
 import { addError } from './errors';
 import errorTypes from './../utils/errorTypes';
@@ -45,13 +37,13 @@ export function updateFollowUpAction(followUp) {
     }
 }
 
-export function getFollowUpsForOutbreakId(outbreakId, filter, token) {
+export function getFollowUpsForOutbreakId(outbreakId, filter, userTeams, token) {
     return async function (dispatch, getState) {
         if (!filter) {
             filter = {};
             filter.date = new Date();
         }
-        getFollowUpsForOutbreakIdRequest(outbreakId, filter, token, (error, response) => {
+        getFollowUpsForOutbreakIdRequest(outbreakId, filter, userTeams, token, (error, response) => {
             if (error) {
                 console.log("*** getFollowUpsForOutbreakId error: ", error);
                 dispatch(addError(errorTypes.ERROR_FOLLOWUPS));
@@ -81,7 +73,7 @@ export function getFollowUpsForOutbreakId(outbreakId, filter, token) {
     }
 }
 
-export function getFollowUpsForOutbreakIdWithPromises(outbreakId, filter, token, dispatch) {
+export function getFollowUpsForOutbreakIdWithPromises(outbreakId, filter, userTeams, token, dispatch) {
     // return async function (dispatch, getState) {
     return new Promise((resolve, reject) => {
         if (!filter) {
@@ -89,7 +81,7 @@ export function getFollowUpsForOutbreakIdWithPromises(outbreakId, filter, token,
             filter.date = new Date();
         }
         console.log("getFollowUpsForOutbreakId Filter: ", filter);
-        getFollowUpsForOutbreakIdRequest(outbreakId, filter, token, (error, response) => {
+        getFollowUpsForOutbreakIdRequest(outbreakId, filter, userTeams, token, (error, response) => {
             if (error) {
                 console.log("*** getFollowUpsForOutbreakId error: ", error);
                 dispatch(addError(errorTypes.ERROR_FOLLOWUPS));
@@ -137,7 +129,7 @@ export function getMissedFollowUpsForOutbreakId(outbreakId, filter, token) {
     }
 }
 
-export function updateFollowUpAndContact(outbreakId, contactId, followUpId, followUp, contact, token, filter) {
+export function updateFollowUpAndContact(outbreakId, contactId, followUpId, followUp, contact, token, filter, userTeams) {
     let contactIdForFollowUp = null;
     if (contactId) {
         contactIdForFollowUp = extractIdFromPouchId(contactId, 'person')
@@ -152,7 +144,7 @@ export function updateFollowUpAndContact(outbreakId, contactId, followUpId, foll
                 console.log("*** updateFollowUp response: ", JSON.stringify(response));
                 dispatch(updateFollowUpAction(response));
                 if (contact && contactId) {
-                    dispatch(updateContact(outbreakId, contactId, contact, token, filter, true));
+                    dispatch(updateContact(outbreakId, contactId, contact, token, filter, true, userTeams));
                 } else if (contact){
                     console.log ('updateContactAction');
                     dispatch(updateContactAction(contact));
@@ -162,7 +154,7 @@ export function updateFollowUpAndContact(outbreakId, contactId, followUpId, foll
     }
 }
 
-export function addFollowUp(outbreakId, contactId, followUp, activeFilters, token) {
+export function addFollowUp(outbreakId, contactId, followUp, activeFilters, userTeams, token) {
     return async function(dispatch, getState) {
         addFollowUpRequest(outbreakId, contactId, followUp, token, (error, response) => {
             if (error) {
@@ -170,13 +162,13 @@ export function addFollowUp(outbreakId, contactId, followUp, activeFilters, toke
                 dispatch(addError(errorTypes.ERROR_ADD_FOLLOWUP));
             }
             if (response) {
-                dispatch(getFollowUpsForOutbreakId(outbreakId, activeFilters, token));
+                dispatch(getFollowUpsForOutbreakId(outbreakId, activeFilters, userTeams, token));
             }
         })
     }
 }
 
-export function createFollowUp(outbreakId, contactId, followUp, contact, activeFilters, token) {
+export function createFollowUp(outbreakId, contactId, followUp, contact, activeFilters, token, userTeams) {
     let contactIdForFollowUp = extractIdFromPouchId(contactId, 'person')
     return async function(dispatch, getState) {
         addFollowUpRequest(outbreakId, contactIdForFollowUp, followUp, token, (error, response) => {
@@ -186,7 +178,7 @@ export function createFollowUp(outbreakId, contactId, followUp, contact, activeF
             }
             if (response) {
                 dispatch(updateFollowUpAction(response));
-                dispatch(updateContact(outbreakId, contactId, contact, token, activeFilters, true));
+                dispatch(updateContact(outbreakId, contactId, contact, token, activeFilters, true, userTeams));
             }
         })
     }

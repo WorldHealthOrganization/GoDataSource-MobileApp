@@ -3,12 +3,11 @@
  */
 import {ACTION_TYPE_STORE_USER} from './../utils/enums';
 import { changeAppRoot, getTranslations } from './app';
-// import { getUserByIdRequest} from './../requests/user';
-import {loginUserRequest, getUserByIdRequest, updateUserRequest, getRolesForUserRequest} from './../queries/user';
+import {loginUserRequest, getUserByIdRequest, updateUserRequest} from './../queries/user';
 import {getUserRoles} from './../actions/role';
+import {getUserTeams} from './../actions/teams'
 import { getFollowUpsForOutbreakIdWithPromises } from './followUps';
-import { getContactsForOutbreakId, getContactsForOutbreakIdWithPromises } from './contacts';
-import { getCasesForOutbreakIdWithPromise, getCasesForOutbreakId } from './cases';
+import { getCasesForOutbreakIdWithPromise } from './cases';
 import { getClusters } from './clusters';
 import { getEventsForOutbreakId } from './events';
 import { getOutbreakById } from './outbreak';
@@ -16,9 +15,7 @@ import { addError } from './errors';
 import {getReferenceData} from './referenceData';
 import {getHelpCategory} from './helpCategory';
 import {getHelpItem} from './helpItem';
-import {getLocations} from './locations';
 import errorTypes from './../utils/errorTypes';
-import config from './../utils/config';
 import {storeContacts} from './contacts';
 import {storeCases} from './cases';
 import {storeEvents} from './events';
@@ -26,6 +23,7 @@ import {storeHelpCategory} from './helpCategory';
 import {storeHelpItem} from './helpItem';
 import {storeFollowUps} from './followUps';
 import {storeOutbreak} from './outbreak';
+import {storeUserTeams} from './teams';
 import {storeClusters} from './clusters';
 import {setLoginState, storeData, getAvailableLanguages, setSyncState} from './app';
 import {storePermissions} from './role';
@@ -66,7 +64,7 @@ export function loginUser(credentials) {
                 getOutbreakById(response.activeOutbreakId, null, dispatch)
                     .then((responseOutbreak) => {
                         // promises.push(getContactsForOutbreakIdWithPromises(response.activeOutbreakId, null, null, dispatch));
-                        promises.push(getFollowUpsForOutbreakIdWithPromises(response.activeOutbreakId, null, null, dispatch));
+                        // promises.push(getFollowUpsForOutbreakIdWithPromises(response.activeOutbreakId, null, null, null, dispatch));
                         promises.push(getTranslations(response.languageId, dispatch));
                         promises.push(getAvailableLanguages(dispatch));
                         promises.push(getReferenceData(null, dispatch));
@@ -76,7 +74,7 @@ export function loginUser(credentials) {
                         promises.push(getClusters(null, dispatch));
                         promises.push(getCasesForOutbreakIdWithPromise(response.activeOutbreakId, null, null, dispatch));
                         promises.push(getUserRoles(response.roleIds, dispatch));
-
+                        promises.push(getUserTeams(response._id, dispatch));
 
 
                         Promise.all(promises)
@@ -141,6 +139,7 @@ export function cleanDataAfterLogout() {
             dispatch(storeHelpItem(null));
             dispatch(storeClusters(null));
             dispatch(storePermissions(null));
+            dispatch(storeUserTeams(null));
         });
     }
 }
@@ -161,53 +160,17 @@ export function getUserById(userId, token, refreshFollowUps, nativeEventEmitter)
                 if (refreshFollowUps) {
                     dispatch(setSyncState({id: 'sync', status: 'test'}));
                 }
-                let promises = [];
+
                 // promises.push(getOutbreakById(response.activeOutbreakId, null, dispatch));
                 getOutbreakById(response.activeOutbreakId, null, dispatch)
                     .then((responseOutbreak) => {
-                        promises.push(getAvailableLanguages(dispatch));
-                        // promises.push(getContactsForOutbreakIdWithPromises(response.activeOutbreakId, null, null, dispatch));
-                        if (refreshFollowUps) {
-                            let now = new Date();
-                            promises.push(getFollowUpsForOutbreakIdWithPromises(response.activeOutbreakId, getState().app.filters['FollowUpsScreen'] || {
-                                    date: new Date(new Date((now.getUTCMonth() + 1) + '/' + now.getUTCDate() + '/' + now.getUTCFullYear()).getTime() - ((moment().isDST() ? now.getTimezoneOffset() : now.getTimezoneOffset() - 60) * 60 * 1000)),
-                                    searchText: ''
-                                }, null, dispatch));
-                        }
-                        promises.push(getTranslations(response && response.languageId ? response.languageId : 'english_us', dispatch));
-                        promises.push(getReferenceData(null, dispatch));
-                        promises.push(getHelpCategory(null, dispatch));
-                        promises.push(getHelpItem(null, dispatch));
-                        promises.push(getEventsForOutbreakId(response.activeOutbreakId, null, dispatch));
-                        promises.push(getCasesForOutbreakIdWithPromise(response.activeOutbreakId, null, null, dispatch));
-                        promises.push(getUserRoles(response.roleIds, dispatch));
-                        promises.push(getClusters(null, dispatch));
-                        
-                        // Store the user to the redux store, and also store the userId to the AsyncStorage
-                        dispatch(storeUser(response));
-                        // dispatch(storeData("loggedUser", response._id, () => {}));
-
-
-                        Promise.all(promises)
-                            .then((result) => {
-                                console.log("Finished getting data from local db: ", result);
-                                dispatch(setLoginState('Finished logging'));
-                                if (refreshFollowUps) {
-                                    dispatch(setSyncState('Finished processing'));
-                                }
-                                dispatch(changeAppRoot('after-login'));
-                                console.log('NativeEventEmitter: ', typeof nativeEventEmitter, nativeEventEmitter);
-                                console.log("Typeof nativeEventEmitter: ", typeof nativeEventEmitter.appLoaded);
-                                if (nativeEventEmitter) {
-                                    dispatch(middlewareFunction(nativeEventEmitter));
-                                }
+                        getUserTeams(response._id, dispatch)
+                            .then((responseUserTeams) => {
+                                SyncRequestsWithPromises(refreshFollowUps, response, responseUserTeams, dispatch, getState(), nativeEventEmitter)
                             })
-                            .catch((error) => {
+                            .catch((errorTeams) => {
                                 console.log('Getting data from local db resulted in error: ', error);
-                                if (refreshFollowUps) {
-                                    dispatch(setSyncState('Finished processing'));
-                                }
-                                dispatch(setLoginState('Finished logging'));
+                                SyncRequestsWithPromises(refreshFollowUps, response, null, dispatch, getState(), nativeEventEmitter)
                             })
                     })
                     .catch((errorOutbreak) => {
@@ -218,6 +181,55 @@ export function getUserById(userId, token, refreshFollowUps, nativeEventEmitter)
 
         })
     }
+}
+
+function SyncRequestsWithPromises(refreshFollowUps, response, responseUserTeams, dispatch, state, nativeEventEmitter) {
+    let promises = [];
+
+    promises.push(getAvailableLanguages(dispatch));
+    if (refreshFollowUps) {
+        let now = new Date();
+        promises.push(getFollowUpsForOutbreakIdWithPromises(response.activeOutbreakId, state.app.filters['FollowUpsScreen'] || {
+            date: new Date(new Date((now.getUTCMonth() + 1) + '/' + now.getUTCDate() + '/' + now.getUTCFullYear()).getTime() - ((moment().isDST() ? now.getTimezoneOffset() : now.getTimezoneOffset() - 60) * 60 * 1000)),
+            searchText: ''
+        }, responseUserTeams, null, dispatch));
+    }
+    // promises.push(getContactsForOutbreakIdWithPromises(response.activeOutbreakId, null, null, dispatch));
+    promises.push(getTranslations(response && response.languageId ? response.languageId : 'english_us', dispatch));
+    promises.push(getReferenceData(null, dispatch));
+    promises.push(getHelpCategory(null, dispatch));
+    promises.push(getHelpItem(null, dispatch));
+    promises.push(getEventsForOutbreakId(response.activeOutbreakId, null, dispatch));
+    promises.push(getCasesForOutbreakIdWithPromise(response.activeOutbreakId, null, null, dispatch));
+    promises.push(getUserRoles(response.roleIds, dispatch));
+    promises.push(getClusters(null, dispatch));
+
+    // Store the user to the redux store, and also store the userId to the AsyncStorage
+    dispatch(storeUser(response));
+    // dispatch(storeData("loggedUser", response._id, () => {}));
+
+
+    Promise.all(promises)
+        .then((result) => {
+            console.log("Finished getting data from local db: ", result);
+            dispatch(setLoginState('Finished logging'));
+            if (refreshFollowUps) {
+                dispatch(setSyncState('Finished processing'));
+            }
+            dispatch(changeAppRoot('after-login'));
+            console.log('NativeEventEmitter: ', typeof nativeEventEmitter, nativeEventEmitter);
+            console.log("Typeof nativeEventEmitter: ", typeof nativeEventEmitter.appLoaded);
+            if (nativeEventEmitter) {
+                dispatch(middlewareFunction(nativeEventEmitter));
+            }
+        })
+        .catch((error) => {
+            console.log('Getting data from local db resulted in error: ', error);
+            if (refreshFollowUps) {
+                dispatch(setSyncState('Finished processing'));
+            }
+            dispatch(setLoginState('Finished logging'));
+        })
 }
 
 export function updateUser(user) {

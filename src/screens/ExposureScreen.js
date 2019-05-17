@@ -8,6 +8,7 @@ import {View, Text, StyleSheet, ScrollView, Alert, Keyboard, TouchableWithoutFee
 import Button from './../components/Button';
 import {Icon} from 'react-native-material-ui';
 import styles from './../styles';
+import ViewHOC from './../components/ViewHOC';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import {addExposureForContact, updateExposureForContact} from './../actions/contacts';
@@ -43,7 +44,8 @@ class ExposureScreen extends Component {
                 socialRelationshipDetail: '',
                 clusterId: '',
                 comment: '',
-                persons: []
+                persons: [],
+                loading: false
             },
             savePressed: false,
             isModified: false,
@@ -80,77 +82,82 @@ class ExposureScreen extends Component {
         console.log('Render from ExposureScreen: ', this.state.exposure, this.props.exposure);
 
         return (
-            <TouchableWithoutFeedback onPress={() => {
-                Keyboard.dismiss()
-            }} accessible={false}>
-                <View style={style.container}>
-                    <NavBarCustom style = {style.navbarContainer}
-                        customTitle={
-                            <View
-                                style={{
-                                    flex: 1,
-                                    flexDirection: 'row',
-                                    alignItems: 'center',
-                                    justifyContent: 'space-between',
-                                    height: '100%'
-                                }}
-                            >
-                                <Text style={[style.title, {marginLeft: 30}]}>
-                                    {this.props.exposure ? getTranslation(translations.exposureScreen.editExposureLabel, this.props.translation) : getTranslation(translations.exposureScreen.addExposureLabel, this.props.translation)}
-                                </Text>
-                                <ElevatedView
-                                    elevation={3}
+            <ViewHOC style={style.viewHocContainer}
+                showLoader={this && this.state && this.state.loading}
+                loaderText={this.props && this.props.syncState ? 'Loading' : getTranslation(translations.loadingScreenMessages.loadingMsg, this.props.translation)}>
+            
+                <TouchableWithoutFeedback onPress={() => {
+                    Keyboard.dismiss()
+                }} accessible={false}>
+                    <View style={style.container}>
+                        <NavBarCustom style = {style.navbarContainer}
+                            customTitle={
+                                <View
                                     style={{
-                                        backgroundColor: styles.buttonGreen,
-                                        width: calculateDimension(33, false, this.props.screenSize),
-                                        height: calculateDimension(25, true, this.props.screenSize),
-                                        borderRadius: 4
+                                        flex: 1,
+                                        flexDirection: 'row',
+                                        alignItems: 'center',
+                                        justifyContent: 'space-between',
+                                        height: '100%'
                                     }}
                                 >
-                                    <Ripple style={{
-                                        flex: 1,
-                                        justifyContent: 'center',
-                                        alignItems: 'center'
-                                    }} onPress={this.goToHelpScreen}>
-                                        <Icon name="help" color={'white'} size={15}/>
-                                    </Ripple>
-                                </ElevatedView> 
-                            </View>
-                        }
-                        title={null}
-                        navigator={this.props.navigator}
-                        iconName="close"
-                        handlePressNavbarButton={this.handlePressNavbarButton}
-                    />
-                    <View style={style.containContainer}>
-                        <View style={{flexDirection: 'row'}}>
-                                <Button
-                                    title={getTranslation(translations.generalButtons.saveButtonLabel, this.props.translation)}
-                                    onPress={this.handleSaveExposure}
-                                    color={styles.buttonGreen}
-                                    titleColor={'white'}
-                                    height={calculateDimension(25, true, this.props.screenSize)}
-                                    width={calculateDimension(130, false, this.props.screenSize)}
-                                    style={{
-                                        marginVertical: calculateDimension(12.5, true, this.props.screenSize),
-                                        marginHorizontal: calculateDimension(16, false, this.props.screenSize),
-                                    }}/>
-
-                        </View>
-                        <ExposureContainer
-                            exposure={this.state.exposure}
-                            contact={null}
-                            fromExposureScreen={true}
-                            type={this.props.type}
-                            isEditMode={true}
-                            onChangeText={this.handleOnChangeText}
-                            onChangeDropDown={this.handleOnChangeDropDown}
-                            onChangeDate={this.handleOnChangeDate}
-                            onChangeSwitch={this.handleOnChangeSwitch}
+                                    <Text style={[style.title, {marginLeft: 30}]}>
+                                        {this.props.exposure ? getTranslation(translations.exposureScreen.editExposureLabel, this.props.translation) : getTranslation(translations.exposureScreen.addExposureLabel, this.props.translation)}
+                                    </Text>
+                                    <ElevatedView
+                                        elevation={3}
+                                        style={{
+                                            backgroundColor: styles.buttonGreen,
+                                            width: calculateDimension(33, false, this.props.screenSize),
+                                            height: calculateDimension(25, true, this.props.screenSize),
+                                            borderRadius: 4
+                                        }}
+                                    >
+                                        <Ripple style={{
+                                            flex: 1,
+                                            justifyContent: 'center',
+                                            alignItems: 'center'
+                                        }} onPress={this.goToHelpScreen}>
+                                            <Icon name="help" color={'white'} size={15}/>
+                                        </Ripple>
+                                    </ElevatedView> 
+                                </View>
+                            }
+                            title={null}
+                            navigator={this.props.navigator}
+                            iconName="close"
+                            handlePressNavbarButton={this.handlePressNavbarButton}
                         />
+                        <View style={style.containContainer}>
+                            <View style={{flexDirection: 'row'}}>
+                                    <Button
+                                        title={getTranslation(translations.generalButtons.saveButtonLabel, this.props.translation)}
+                                        onPress={this.handleSaveExposure}
+                                        color={styles.buttonGreen}
+                                        titleColor={'white'}
+                                        height={calculateDimension(25, true, this.props.screenSize)}
+                                        width={calculateDimension(130, false, this.props.screenSize)}
+                                        style={{
+                                            marginVertical: calculateDimension(12.5, true, this.props.screenSize),
+                                            marginHorizontal: calculateDimension(16, false, this.props.screenSize),
+                                        }}/>
+
+                            </View>
+                            <ExposureContainer
+                                exposure={this.state.exposure}
+                                contact={null}
+                                fromExposureScreen={true}
+                                type={this.props.type}
+                                isEditMode={true}
+                                onChangeText={this.handleOnChangeText}
+                                onChangeDropDown={this.handleOnChangeDropDown}
+                                onChangeDate={this.handleOnChangeDate}
+                                onChangeSwitch={this.handleOnChangeSwitch}
+                            />
+                        </View>
                     </View>
-                </View>
-            </TouchableWithoutFeedback>
+                </TouchableWithoutFeedback>
+            </ViewHOC>
         )
     }
 
@@ -264,7 +271,7 @@ class ExposureScreen extends Component {
                             })
                         } else {
                             let exposure = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id.split('_')[this.props.user._id.split('_').length - 1], record = Object.assign({}, this.state.exposure), action = 'update')
-                            this.props.updateExposureForContact(this.props.user.activeOutbreakId, this.props.contact._id, exposure, this.props.user.token);
+                            this.props.updateExposureForContact(this.props.user.activeOutbreakId, this.props.contact._id, exposure, this.props.user.token, this.props.teams);
                             this.props.navigator.dismissModal(this.props.saveExposure(this.state.exposure, true));
                         }
                     } else {
@@ -377,11 +384,16 @@ const style = StyleSheet.create({
     title: {
         fontSize: 17,
         fontFamily: 'Roboto-Medium',
+    },
+    viewHocContainer: {
+        flex: 1,
+        backgroundColor: 'white',
     }
 });
 
 function mapStateToProps(state) {
     return {
+        teams: state.teams,
         user: state.user,
         screenSize: state.app.screenSize,
         errors: state.errors,

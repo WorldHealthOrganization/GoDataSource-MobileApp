@@ -12,6 +12,7 @@ import DeviceInfo from 'react-native-device-info';
 import translations from './../utils/translations';
 import {testApi} from './testApi';
 import uniq from 'lodash/uniq';
+import get from 'lodash/get';
 import {getHelpItemsRequest} from './helpItem';
 import {getHelpCategoriesRequest} from './helpCategory';
 
@@ -205,8 +206,6 @@ function getAllLanguageTokens () {
 async function computeHelpItemsAndCategories(hubConfiguration, lastSyncDate) {
     return new Promise((resolve, reject) => {
         let translations = [];
-        // First get the help items. For now get them all, but in the future
-        // will need to add more filtering criteria to get only the needed translations
         let generalRequestUrl = hubConfiguration.url;
         let authorization = `Basic ${base64.encode(`${hubConfiguration.clientId}:${hubConfiguration.clientSecret}`)}`;
         let filterItems = {
@@ -221,41 +220,18 @@ async function computeHelpItemsAndCategories(hubConfiguration, lastSyncDate) {
             }
             if (resultItems) {
                 // For all the result items we need only the fields that have translations on API, mainly title and content
-                for (let i=0; i<resultItems.length; i++) {
-                    if (resultItems[i].title) {
-                        translations.push(resultItems[i].title);
-                    }
-                    if (resultItems[i].content) {
-                        translations.push(resultItems[i].content);
-                    }
-                    if (resultItems[i].comment) {
-                        translations.push(resultItems[i].comment);
-                    }
+                for (let i = 0; i < resultItems.length; i++) {
+                    translations.push(get(resultItems, `[${i}].title`, 'fail'));
+                    translations.push(get(resultItems, `[${i}].content`, 'fail'));
+                    translations.push(get(resultItems, `[${i}].comment`, 'fail'));
+                    translations.push(get(resultItems, `[${i}].category.name`, 'fail'));
+                    translations.push(get(resultItems, `[${i}].category.description`, 'fail'));
                 }
-
-                // After getting the needed items for translations, move to get categories
-                let filterCategories = {
-                    updatedAt: {
-                        gt: lastSyncDate
-                    }
-                };
-                getHelpCategoriesRequest(`${generalRequestUrl}/help-categories`, authorization, filterCategories, (errorGetCategories, resultCategories) => {
-                    if (errorGetCategories) {
-                        console.log('Error while getting categories: ', errorGetCategories);
-                        resolve(translations);
-                    }
-                    if (resultCategories) {
-                        for (let i=0; i<resultCategories.length; i++) {
-                            if (resultCategories[i].name) {
-                                translations.push(resultCategories[i].name);
-                            }
-                            if (resultCategories[i].description) {
-                                translations.push(resultCategories[i].description);
-                            }
-                        }
-                        resolve(translations);
-                    }
-                })
+                translations = translations.filter((e) => {
+                    return e !== 'fail' && e.includes('LNG_')
+                });
+                translations = uniq(translations);
+                resolve(translations);
             }
         })
     })

@@ -3,7 +3,7 @@
  */
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
-import React, {PureComponent} from 'react';
+import React, { PureComponent } from 'react';
 import {
     View,
     Text,
@@ -15,16 +15,16 @@ import {
     Keyboard,
     findNodeHandle
 } from 'react-native';
-import {LoaderScreen} from 'react-native-ui-lib';
-import {calculateDimension, getTranslation, extractIdFromPouchId} from './../utils/functions';
+import { LoaderScreen } from 'react-native-ui-lib';
+import { calculateDimension, getTranslation, extractIdFromPouchId } from './../utils/functions';
 import config from './../utils/config';
-import {connect} from "react-redux";
-import {bindActionCreators} from "redux";
+import { connect } from "react-redux";
+import { bindActionCreators } from "redux";
 import styles from './../styles';
 import CardComponent from './../components/CardComponent';
 import Button from './../components/Button';
 import Ripple from 'react-native-material-ripple';
-import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import translations from './../utils/translations'
 import ElevatedView from 'react-native-elevated-view';
 import _ from 'lodash';
@@ -59,19 +59,19 @@ class CaseSingleAddressContainer extends PureComponent {
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
-        if(!this.state.interactionComplete) {
+        if (!this.state.interactionComplete) {
             return (
-                <LoaderScreen overlay={true} backgroundColor={'white'}/>
+                <LoaderScreen overlay={true} backgroundColor={'white'} />
             )
         }
         // console.log('CaseSingleContainer render Address');
         return (
-            <View style={{flex: 1}}>
+            <View style={{ flex: 1 }}>
                 <View style={style.container}>
-                    <View style={{flexDirection: 'row'}}>
+                    <View style={{ flexDirection: 'row' }}>
                         {
                             this.props.isNew ? (
-                                <View style={{flexDirection: 'row'}}>
+                                <View style={{ flexDirection: 'row' }}>
                                     <Button
                                         title={getTranslation(translations.generalButtons.backButtonLabel, this.props.translation)}
                                         onPress={this.handleBackButton}
@@ -82,7 +82,7 @@ class CaseSingleAddressContainer extends PureComponent {
                                         style={{
                                             marginVertical: calculateDimension(12.5, true, this.props.screenSize),
                                             marginHorizontal: calculateDimension(16, false, this.props.screenSize),
-                                        }}/>
+                                        }} />
                                     <Button
                                         title={getTranslation(translations.generalButtons.nextButtonLabel, this.props.translation)}
                                         onPress={this.handleNextButton}
@@ -93,37 +93,13 @@ class CaseSingleAddressContainer extends PureComponent {
                                         style={{
                                             marginVertical: calculateDimension(12.5, true, this.props.screenSize),
                                             marginHorizontal: calculateDimension(16, false, this.props.screenSize),
-                                        }}/>
+                                        }} />
                                 </View>) : (
-                                this.props.isEditMode ? (
-                                    <View style={{flexDirection: 'row'}}>
-                                        <Button
-                                            title={getTranslation(translations.generalButtons.saveButtonLabel, this.props.translation)}
-                                            onPress={this.props.onPressSaveEdit}
-                                            color={styles.buttonGreen}
-                                            titleColor={'white'}
-                                            height={calculateDimension(25, true, this.props.screenSize)}
-                                            width={calculateDimension(166, false, this.props.screenSize)}
-                                            style={{
-                                                marginVertical: calculateDimension(12.5, true, this.props.screenSize),
-                                                marginRight: 10,
-                                        }}/>
-                                        <Button
-                                            title={getTranslation(translations.generalButtons.cancelButtonLabel, this.props.translation)}
-                                            onPress={this.props.onPressCancelEdit}
-                                            color={styles.buttonGreen}
-                                            titleColor={'white'}
-                                            height={calculateDimension(25, true, this.props.screenSize)}
-                                            width={calculateDimension(166, false, this.props.screenSize)}
-                                            style={{
-                                                marginVertical: calculateDimension(12.5, true, this.props.screenSize),
-                                                marginRight: 10,
-                                        }}/>
-                                    </View>) : (
-                                        this.props.role.find((e) => e === config.userPermissions.writeCase) !== undefined ? (
+                                    this.props.isEditMode ? (
+                                        <View style={{ flexDirection: 'row' }}>
                                             <Button
-                                                title={getTranslation(translations.generalButtons.editButtonLabel, this.props.translation)}
-                                                onPress={this.props.onPressEdit}
+                                                title={getTranslation(translations.generalButtons.saveButtonLabel, this.props.translation)}
+                                                onPress={this.props.onPressSaveEdit}
                                                 color={styles.buttonGreen}
                                                 titleColor={'white'}
                                                 height={calculateDimension(25, true, this.props.screenSize)}
@@ -131,21 +107,49 @@ class CaseSingleAddressContainer extends PureComponent {
                                                 style={{
                                                     marginVertical: calculateDimension(12.5, true, this.props.screenSize),
                                                     marginRight: 10,
-                                                }}/>
-                                        ) : null
-                                    ))
+                                                }} />
+                                            <Button
+                                                title={getTranslation(translations.generalButtons.cancelButtonLabel, this.props.translation)}
+                                                onPress={this.props.onPressCancelEdit}
+                                                color={styles.buttonGreen}
+                                                titleColor={'white'}
+                                                height={calculateDimension(25, true, this.props.screenSize)}
+                                                width={calculateDimension(166, false, this.props.screenSize)}
+                                                style={{
+                                                    marginVertical: calculateDimension(12.5, true, this.props.screenSize),
+                                                    marginRight: 10,
+                                                }} />
+                                        </View>) : (
+                                            this.props.role.find((e) => e === config.userPermissions.writeCase) !== undefined ? (
+                                                <Button
+                                                    title={getTranslation(translations.generalButtons.editButtonLabel, this.props.translation)}
+                                                    onPress={this.props.onPressEdit}
+                                                    color={styles.buttonGreen}
+                                                    titleColor={'white'}
+                                                    height={calculateDimension(25, true, this.props.screenSize)}
+                                                    width={calculateDimension(166, false, this.props.screenSize)}
+                                                    style={{
+                                                        marginVertical: calculateDimension(12.5, true, this.props.screenSize),
+                                                        marginRight: 10,
+                                                    }} />
+                                            ) : null
+                                        ))
                         }
                     </View>
-                    <KeyboardAwareScrollView
+                    {/* <KeyboardAwareScrollView
                         style={style.containerScrollView}
-                        contentContainerStyle={[style.contentContainerStyle, {paddingBottom: this.props.screenSize.height < 600 ? 70 : 20}]}
+                        contentContainerStyle={[style.contentContainerStyle, { paddingBottom: this.props.screenSize.height < 600 ? 70 : 20 }]}
                         keyboardShouldPersistTaps={'always'}
                         extraHeight={20 + 81 + 50 + 70}
                         innerRef={ref => {
                             this.scrollCasesSingleAddress = ref
                         }}
+                    > */}
+                    <ScrollView
+                        style={style.containerScrollView}
+                        contentContainerStyle={[style.contentContainerStyle, { paddingBottom: this.props.screenSize.height < 600 ? 70 : 20 }]}
                     >
-                         <View style={style.container}>
+                        <View style={style.container}>
                             {
                                 this.props.case && this.props.case.addresses && this.props.case.addresses.map((item, index) => {
                                     return this.handleRenderItem(item, index)
@@ -154,7 +158,9 @@ class CaseSingleAddressContainer extends PureComponent {
                         </View>
                         {
                             this.props.isEditMode ? (
-                                <View style={{alignSelf: 'flex-start', marginHorizontal: calculateDimension(16, false, this.props.screenSize), marginVertical: 20}}>
+                                <View style={{ alignSelf: 'flex-start', 
+                                    marginHorizontal: calculateDimension(16, false, this.props.screenSize), 
+                                    marginVertical: 20 }}>
                                     <Ripple
                                         style={{
                                             height: 25,
@@ -162,23 +168,24 @@ class CaseSingleAddressContainer extends PureComponent {
                                         }}
                                         onPress={this.props.onPressAddAddress}
                                     >
-                                        <Text style={{fontFamily: 'Roboto-Medium', fontSize: 12, color: styles.buttonGreen}}>
+                                        <Text style={{ fontFamily: 'Roboto-Medium', fontSize: 12, color: styles.buttonGreen }}>
                                             {this.props.case.addresses && this.props.case.addresses.length === 0 ? getTranslation(translations.caseSingleScreen.oneAddressText, this.props.translation) : getTranslation(translations.caseSingleScreen.moreAddressesText, this.props.translation)}
                                         </Text>
                                     </Ripple>
                                 </View>
                             ) : null
                         }
-                    </KeyboardAwareScrollView>
+                    </ScrollView>
+                    {/* </KeyboardAwareScrollView> */}
                 </View>
-            </View>
+            </View >
         );
     }
 
     // Please write here all the methods that are not react native lifecycle methods
     handleRenderItem = (item, index) => {
         let fields = config.caseSingleScreen.address.fields.map((field) => {
-            return Object.assign({},field, {isEditMode: this.props.isEditMode})
+            return Object.assign({}, field, { isEditMode: this.props.isEditMode })
         });
         return this.renderItemCardComponent(fields, index)
     }
@@ -191,7 +198,7 @@ class CaseSingleAddressContainer extends PureComponent {
                 marginVertical: 4,
                 minHeight: calculateDimension(72, true, this.props.screenSize)
             }, style.cardStyle]}>
-                <ScrollView scrollEnabled={false} style={{flex: 1}} contentContainerStyle={{flexGrow: 1}}>
+                <ScrollView scrollEnabled={false} style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }}>
                     {
                         fields && fields.map((item, index) => {
                             return this.handleRenderItemCardComponent(item, index, cardIndex);
@@ -204,7 +211,7 @@ class CaseSingleAddressContainer extends PureComponent {
 
     handleRenderItemCardComponent = (item, index, cardIndex) => {
         return (
-            <View style={[style.subcontainerCardComponent, {flex: 1}]} key={index}>
+            <View style={[style.subcontainerCardComponent, { flex: 1 }]} key={index}>
                 {
                     this.handleRenderItemByType(item, cardIndex)
                 }
@@ -227,7 +234,7 @@ class CaseSingleAddressContainer extends PureComponent {
             if (this.props.case && this.props.case.addresses && Array.isArray(this.props.case.addresses) && this.props.case.addresses[cardIndex] && this.props.case.addresses[cardIndex][item.id] && this.props.case.addresses[cardIndex][item.id] !== "") {
                 for (let i = 0; i < this.props.locations.length; i++) {
                     let myLocationName = this.getLocationNameById(this.props.locations[i], this.props.case.addresses[cardIndex][item.id])
-                    if (myLocationName !== null){
+                    if (myLocationName !== null) {
                         value = myLocationName
                         break
                     }
@@ -236,7 +243,7 @@ class CaseSingleAddressContainer extends PureComponent {
         } else {
             value = this.computeValueForCasesSingleScreen(item, cardIndex);
         }
-       
+
         if (item.type === 'DatePicker' && value === '') {
             value = null
         }
@@ -270,19 +277,20 @@ class CaseSingleAddressContainer extends PureComponent {
                 onChangeSectionedDropDown={this.props.onChangeSectionedDropDown}
                 onDeletePress={this.props.onDeletePress}
                 onFocus={this.handleOnFocus}
+                onBlur={this.handleOnBlur}
             />
         )
     };
 
     getLocationNameById = (element, locationId) => {
-        if(extractIdFromPouchId(element._id, 'location') === locationId) {
+        if (extractIdFromPouchId(element._id, 'location') === locationId) {
             return element.name;
         } else {
             if (element.children && element.children.length > 0) {
                 let i;
                 let result = null;
 
-                for(i=0; result === null && i < element.children.length; i++){
+                for (i = 0; result === null && i < element.children.length; i++) {
                     result = this.getLocationNameById(element.children[i], locationId);
                 }
                 return result;
@@ -300,16 +308,16 @@ class CaseSingleAddressContainer extends PureComponent {
                 maximumDate = new Date()
             }
         }
-        
-        let dateValidation = {minimumDate, maximumDate}
+
+        let dateValidation = { minimumDate, maximumDate }
         return dateValidation
     };
 
     computeDataForCasesSingleScreenDropdownInput = (item) => {
         if (item.id === 'typeId') {
-            return _.filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_ADDRESS_TYPE'})
-                    .sort((a,b) => { return a.order - b.order; })
-                    .map((o) => {return {value: getTranslation(o.value, this.props.translation), id: o.value}})
+            return _.filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_ADDRESS_TYPE' })
+                .sort((a, b) => { return a.order - b.order; })
+                .map((o) => { return { value: getTranslation(o.value, this.props.translation), id: o.value } })
         }
     };
 
@@ -318,16 +326,16 @@ class CaseSingleAddressContainer extends PureComponent {
             if (item.objectType === 'Address') {
                 if (item.id === 'lng') {
                     return this.props.case && this.props.case.addresses && Array.isArray(this.props.case.addresses) &&
-                    this.props.case.addresses[index] && this.props.case.addresses[index].geoLocation &&
-                    this.props.case.addresses[index].geoLocation.coordinates &&
-                    Array.isArray(this.props.case.addresses[index].geoLocation.coordinates) ?
+                        this.props.case.addresses[index] && this.props.case.addresses[index].geoLocation &&
+                        this.props.case.addresses[index].geoLocation.coordinates &&
+                        Array.isArray(this.props.case.addresses[index].geoLocation.coordinates) ?
                         getTranslation(this.props.case.addresses[index].geoLocation.coordinates[0], this.props.translation) : '';
                 } else {
                     if (item.id === 'lat') {
                         return this.props.case && this.props.case.addresses && Array.isArray(this.props.case.addresses) &&
-                        this.props.case.addresses[index] && this.props.case.addresses[index].geoLocation &&
-                        this.props.case.addresses[index].geoLocation.coordinates &&
-                        Array.isArray(this.props.case.addresses[index].geoLocation.coordinates) ?
+                            this.props.case.addresses[index] && this.props.case.addresses[index].geoLocation &&
+                            this.props.case.addresses[index].geoLocation.coordinates &&
+                            Array.isArray(this.props.case.addresses[index].geoLocation.coordinates) ?
                             getTranslation(this.props.case.addresses[index].geoLocation.coordinates[1], this.props.translation) : '';
                     } else {
                         return this.props.case && this.props.case.addresses && Array.isArray(this.props.case.addresses) && this.props.case.addresses[index][item.id] ?
@@ -342,21 +350,21 @@ class CaseSingleAddressContainer extends PureComponent {
     handleNextButton = () => {
         let missingFields = this.props.checkRequiredFieldsAddresses();
         if (missingFields && Array.isArray(missingFields) && missingFields.length === 0) {
-            if (this.props.hasPlaceOfResidence) {
+            if (this.props.case.addresses.length === 0 || (this.props.case.addresses.length > 0 && this.props.hasPlaceOfResidence)) {
                 this.props.handleMoveToNextScreenButton(true)
             } else {
                 Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.alertMessages.addressOfResidenceError, this.props.translation), [
                     {
-                        text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation), 
-                        onPress: () => {console.log("OK pressed")}
+                        text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+                        onPress: () => { console.log("OK pressed") }
                     }
                 ])
             }
         } else {
             Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), `${getTranslation(translations.alertMessages.addressRequiredFieldsMissing, this.props.translation)}.\n${getTranslation(translations.alertMessages.missingFields, this.props.translation)}: ${missingFields}`, [
                 {
-                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation), 
-                    onPress: () => {console.log("OK pressed")}
+                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+                    onPress: () => { console.log("OK pressed") }
                 }
             ])
         }
@@ -367,12 +375,17 @@ class CaseSingleAddressContainer extends PureComponent {
     };
 
     handleOnFocus = (event) => {
-        this.scrollToInput(findNodeHandle(event.target))
+        // this.scrollToInput(findNodeHandle(event.target))
     };
 
-    scrollToInput (reactNode) {
+    handleOnBlur = (event) => {
+        // this.scrollCasesSingleAddress.props.scrollToPosition(0, 0, false)
+        // this.scrollToInput(findNodeHandle(event.target))
+    };
+
+    scrollToInput(reactNode) {
         // Add a 'scroll' ref to your ScrollView
-        this.scrollCasesSingleAddress.props.scrollToFocusedInput(reactNode)
+        // this.scrollCasesSingleAddress.props.scrollToFocusedInput(reactNode)
     };
 }
 
@@ -412,7 +425,7 @@ function mapStateToProps(state) {
         role: state.role,
         translation: state.app.translation,
         referenceData: state.referenceData,
-        locations: state.locations,
+        locations: state.locations.locations,
     };
 
 }
