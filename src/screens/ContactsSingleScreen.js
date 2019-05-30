@@ -1601,7 +1601,6 @@ function mapStateToProps(state) {
         role: state.role,
         screenSize: state.app.screenSize,
         followUps: state.followUps,
-        outbreak: state.outbreak,
         errors: state.errors,
         contacts: state.contacts,
         filter: state.app.filters,

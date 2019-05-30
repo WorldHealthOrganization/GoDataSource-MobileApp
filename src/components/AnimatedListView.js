@@ -1,7 +1,7 @@
 /**
  * Created by florinpopa on 23/07/2018.
  */
-import React, {PureComponent} from 'react';
+import React, {Component} from 'react';
 import {TextInput, View, Text, StyleSheet, Platform, Dimensions, TouchableOpacity, Animated, FlatList} from 'react-native';
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
@@ -13,7 +13,8 @@ import IconMaterial from 'react-native-vector-icons/MaterialCommunityIcons';
 import styles from './../styles';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
-import translations from './../utils/translations'
+import translations from './../utils/translations';
+import isEqual from 'lodash/isEqual';
 
 const AnimatedFlatList = Animated.createAnimatedComponent(FlatList);
 
@@ -23,7 +24,7 @@ const VIEWABILITY_CONFIG = {
     waitForInteraction: true
 };
 
-class AnimatedListView extends PureComponent {
+class AnimatedListView extends Component {
 
     // This will be a dumb component, so it's best not to put any business logic in it
     constructor(props) {
@@ -41,6 +42,12 @@ class AnimatedListView extends PureComponent {
 
     // Please add here the react lifecycle methods that you need
 
+    shouldComponentUpdate(nextProps, nextState) {
+        if (!isEqual(nextProps.data, this.props.data)) {
+            return true;
+        }
+        return false;
+    }
 
     // The render method should have at least business logic as possible,
     // because this will be called whenever there is a new setState call
@@ -50,6 +57,7 @@ class AnimatedListView extends PureComponent {
             <AnimatedFlatList
                 ref={this.animatedFlatList}
                 data={Array.isArray(this.props.data) ? this.props.data : []}
+                extraData={this.props.extraData}
                 renderItem={this.props.renderItem}
                 keyExtractor={this.props.keyExtractor}
                 ItemSeparatorComponent={this.props.ItemSeparatorComponent}

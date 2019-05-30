@@ -7,9 +7,9 @@ import config from './../utils/config';
 
 // Credentials: {email, encryptedPassword}
 export function getRelationshipsForTypeRequest(outbreakId, searchType, keys, callback) {
+    let start = new Date().getTime();
     getDatabase(config.mongoCollections.relationship)
         .then((database) => {
-            let start = new Date().getTime();
             if (!keys || keys.length === 0) {
                 callback(null, []);
             }
@@ -42,6 +42,8 @@ export function getRelationshipsForTypeRequest(outbreakId, searchType, keys, cal
 }
 
 export function getRelationshipsAndFollowUpsForContactRequest(outbreakId, keys, filter, userTeams, callback) {
+
+    let start = new Date().getTime();
 
     let oneDay = 24 * 60 * 60 * 1000;
     let startDate = '';
@@ -95,6 +97,7 @@ export function getRelationshipsAndFollowUpsForContactRequest(outbreakId, keys, 
                         .then((results) => {
                             let aux = [];
                             Array.from(results, (x) => { x.map((e) => { aux.push(e) }) });
+                            console.log('Result for find time for getRelationshipsAndFollowUpsForContactsRequest: ', new Date().getTime() - start);
                             callback(null, aux);
                         })
                         .catch((errorGetData) => {

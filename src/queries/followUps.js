@@ -75,7 +75,7 @@ export function getFollowUpsForContactIds (outbreakId, date, contactIds, callbac
                 }
             })
                 .then((resultGetFollowUps) => {
-                    console.log('getFollowUpsForContactIds result: ', new Date().getTime() - start);
+                    console.log('Result for find time for getFollowUpsForContactIds result: ', new Date().getTime() - start);
                     callback(null, resultGetFollowUps.docs);
                 })
                 .catch((errorGetFollowUps) => {
@@ -224,7 +224,7 @@ export function getFollowUpsForContactRequest (outbreakId, keys, contactFollowUp
                     if (userTeams !== null && userTeams !== undefined && Array.isArray(userTeams) && userTeams.length > 0) {
                         followUpList = followUpList.filter((e) => userTeams.indexOf(e.teamId) >= 0 || e.teamId === undefined || e.teamId === null)
                     }
-                    console.log('getFollowUpsForContactRequest request time: ', new Date().getTime() - start);
+                    console.log('Result for find time for getFollowUpsForContactRequest request time: ', new Date().getTime() - start);
                     callback(null, followUpList)
                 })
                 .catch((error) => {

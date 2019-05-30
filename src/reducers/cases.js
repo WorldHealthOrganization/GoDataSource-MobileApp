@@ -1,7 +1,7 @@
 /**
  * Created by florinpopa on 19/07/2018.
  */
-import _ from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
 import {ACTION_TYPE_STORE_CASES, 
     ACTION_TYPE_ADD_CASE,
     ACTION_TYPE_UPDATE_CASE,
@@ -9,27 +9,29 @@ import {ACTION_TYPE_STORE_CASES,
 
 // Do not add unnecessary business logic in the reducer. Here should only be updated the store
 export default function (state=null, action) {
-    var stateClone = _.cloneDeep(state);
+    let stateClone = null;
     switch (action.type) {
         case ACTION_TYPE_STORE_CASES:
             if (!action.payload) {
                 return null;
             }
-            if (state) {
-                state = null
-            }
-            return Object.assign([], state, action.payload);
+            // if (state) {
+            //     state = null
+            // }
+            return Object.assign([], action.payload);
         case ACTION_TYPE_ADD_CASE:
             if (!action.payload) {
                 return null;
             }
+            stateClone = cloneDeep(state);
             stateClone.push(action.payload);
             return Object.assign([], stateClone);
         case ACTION_TYPE_UPDATE_CASE:
             if (!action.payload) {
                 return null;
             }
-            let itemToUpdateIndex = stateClone.map((e) => {return e._id}).indexOf(action.payload._id)
+            stateClone = cloneDeep(state);
+            let itemToUpdateIndex = stateClone.findIndex((e) => {return e._id === action.payload._id});
             if (itemToUpdateIndex > -1){
                 if (action.payload.deleted === false) {
                     stateClone[itemToUpdateIndex] = action.payload;
@@ -42,7 +44,8 @@ export default function (state=null, action) {
             if (!action.payload) {
                 return null;
             }
-            let itemToRemoveIndex = stateClone.map((e) => {return e._id}).indexOf(action.payload._id)
+            stateClone = cloneDeep(state);
+            let itemToRemoveIndex = stateClone.findIndex((e) => {return e._id === action.payload._id});
             if (itemToRemoveIndex > -1){
                 stateClone.splice(itemToRemoveIndex, 1)
             }

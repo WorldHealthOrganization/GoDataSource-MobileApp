@@ -12,6 +12,7 @@ import uuid from 'react-native-uuid';
 import get from 'lodash/get';
 import sortBy from 'lodash/sortBy';
 import cloneDeep from 'lodash/cloneDeep';
+import groupBy from 'lodash/groupBy';
 import defaultTranslations from './defaultTranslations'
 import {getSyncEncryptPassword, encrypt, decrypt} from './../utils/encryption';
 import RNFS from 'react-native-fs';
@@ -671,12 +672,23 @@ export async function processFile (path, type, totalNumberOfFiles, dispatch, isF
 }
 
 export function comparePasswords (password, encryptedPassword, callback) {
-    bcrypt.compare(password, encryptedPassword, (errorCompare, isMatch) => {
-        if (errorCompare) {
-            return callback(errorCompare)
-        }
-        callback(null, isMatch)
-    })
+    let start = new Date().getTime();
+    try {
+        let isMatch = bcrypt.compareSync(password, encryptedPassword);
+        console.log('Result for find time for compare bcrypt: ', new Date().getTime() - start);
+        callback(null, isMatch);
+    } catch (errorCompare) {
+        return callback(errorCompare)
+    }
+
+
+    // bcrypt.compare(password, encryptedPassword, (errorCompare, isMatch) => {
+    //     console.log('Result for find time for compare bcrypt: ', new Date().getTime() - start);
+    //     if (errorCompare) {
+    //         return callback(errorCompare)
+    //     }
+    //     callback(null, isMatch)
+    // })
 }
 
 function extractFromDatabase(database, fileType, lastSyncDate, startKey) {
@@ -1169,19 +1181,50 @@ export function createName(type, firstName, lastName) {
     }
 }
 
-export function mapLocations(locationList, parentLocationId) {
-    let output = []
-    for (let obj of locationList) {
-        if(obj.parentLocationId === parentLocationId) {
-            let children = mapLocations(locationList, extractIdFromPouchId(obj._id, 'location'))
+// Map locations algorithm
+// 1. sort locations by geographicalLevelId desc
+// 2. filter locations that don't have geographicalLevelId
+// 3. for each level starting from the second to last, add them to the children
+// the new array will be the array that will be searched next
+export function mapLocations(locationList) {
+    // start with the roots
+    let start = new Date().getTime();
+    let sortedArrays = groupBy(locationList, 'geographicalLevelId');
+    // delete undefined geographicalLevelId
+    delete sortedArrays['undefined'];
+    // Get sorted keys
+    let allKeys = Object.keys(sortedArrays).map((e) => {return e.split('_')[e.split('_').length - 1]}).sort((a, b) => {return b-a});
 
-            if (children.length) {
-                obj.children = children
+    let currentTree = sortedArrays[`LNG_REFERENCE_DATA_CATEGORY_LOCATION_GEOGRAPHICAL_LEVEL_ADMIN_LEVEL_${allKeys[0]}`];
+    // console.log("Map locations: initialized tree: ", new Date().getTime() - start);
+    for (let levelIndex=1; levelIndex<allKeys.length; levelIndex++) {
+        currentTree = groupBy(currentTree, 'parentLocationId');
+        let currentLevelTree = [];
+        for (let elementIndex=0; elementIndex<sortedArrays[`LNG_REFERENCE_DATA_CATEGORY_LOCATION_GEOGRAPHICAL_LEVEL_ADMIN_LEVEL_${allKeys[levelIndex]}`].length; elementIndex ++) {
+            let currentElement = sortedArrays[`LNG_REFERENCE_DATA_CATEGORY_LOCATION_GEOGRAPHICAL_LEVEL_ADMIN_LEVEL_${allKeys[levelIndex]}`][elementIndex];
+            let children = currentTree[extractIdFromPouchId(currentElement._id, 'location')] || null;
+            if (children) {
+                currentElement.children = children;
             }
-            output.push(obj)
+            currentLevelTree.push(currentElement);
         }
+        // console.log('Map locations: created level ', allKeys[levelIndex], new Date().getTime() - start);
+        currentTree = currentLevelTree.slice();
     }
-    return output
+    // console.log('Map locations: ', new Date().getTime() - start, currentTree);
+
+
+    // for (let i=0; i<locationList.length; i++) {
+    //     if(locationList[i].parentLocationId === parentLocationId) {
+    //         let children = mapLocations(locationList, extractIdFromPouchId(locationList[i]._id, 'location'))
+    //
+    //         if (children.length) {
+    //             locationList[i].children = children
+    //         }
+    //         output.push(locationList[i])
+    //     }
+    // }
+    return currentTree;
 }
 
 //recursively functions for mapping questionCard questions (followUps and Cases)

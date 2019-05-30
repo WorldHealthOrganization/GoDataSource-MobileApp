@@ -21,6 +21,7 @@ import {extractIdFromPouchId, mapContactsAndRelationships, mapContactsAndFollowU
 import {getContactsForFollowUpPeriodRequest} from './../queries/contacts';
 import {difference} from 'lodash';
 import {setSyncState, saveGeneratedFollowUps} from './app';
+import {batchActions} from 'redux-batched-actions';
 
 // Add here only the actions, not also the requests that are executed. For that purpose is the requests directory
 export function storeFollowUps(followUps) {
@@ -57,12 +58,16 @@ export function getFollowUpsForOutbreakId(outbreakId, filter, userTeams, token) 
                 getContactsForOutbreakIdWithPromises(outbreakId, {keys: keys}, null, dispatch)
                     .then((responseGetContacts) => {
                         console.log ('getFollowUpsForOutbreakIdRequest getContactsForOutbreakIdWithPromises response')
-                        dispatch(storeFollowUps(response));
+                        // dispatch(storeFollowUps(response));
                         let mappedContact = [];
                         if (response.length > 0) {
                             mappedContact = mapContactsAndFollowUps(responseGetContacts, response);
                         }
-                        dispatch(storeContacts(mappedContact));
+                        // dispatch(storeContacts(mappedContact));
+                        dispatch(batchActions([
+                            storeFollowUps(response),
+                            storeContacts(mappedContact)
+                        ]))
                     })
                     .catch((errorGetContactsForFollowUps) => {
                         console.log ('getFollowUpsForOutbreakIdRequest getContactsForOutbreakIdWithPromises error', JSON.stringify(errorGetContactsForFollowUps))

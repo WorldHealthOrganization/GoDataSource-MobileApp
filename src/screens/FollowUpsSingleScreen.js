@@ -82,8 +82,8 @@ class FollowUpsSingleScreen extends Component {
             }
         }
 
-        if (this.props.outbreak && this.props.outbreak.contactFollowUpTemplate) {
-            let mappedAnswers = mapAnswers(this.props.outbreak.contactFollowUpTemplate, this.state.item.questionnaireAnswers);
+        if (this.props.contactFollowUpTemplate) {
+            let mappedAnswers = mapAnswers(this.props.contactFollowUpTemplate, this.state.item.questionnaireAnswers);
             this.setState({
                 previousAnswers: mappedAnswers.mappedAnswers,
                 mappedQuestions: mappedAnswers.mappedQuestions,
@@ -1021,7 +1021,7 @@ function mapStateToProps(state) {
         user: state.user,
         screenSize: state.app.screenSize,
         followUps: state.followUps,
-        outbreak: state.outbreak,
+        contactFollowUpTemplate: state.outbreak.contactFollowUpTemplate,
         errors: state.errors,
         contacts: state.contacts,
         translation: state.app.translation,

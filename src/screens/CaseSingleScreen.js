@@ -2014,7 +2014,7 @@ function mapStateToProps(state) {
     return {
         user: state.user,
         screenSize: state.app.screenSize,
-        outbreak: state.outbreak,
+        // outbreak: state.outbreak,
         errors: state.errors,
         filter: state.app.filters,
         cases: state.cases,

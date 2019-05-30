@@ -20,7 +20,7 @@ export function getCasesForOutbreakIdRequest (outbreakId, filter, token, callbac
 
                 Promise.all(promiseArray)
                     .then((resultGetAll) => {
-                        console.log("Result from get queries: ", new Date().getTime() - start);
+                        console.log("Result for find time for get queries: ", new Date().getTime() - start);
                         callback(null, resultGetAll.filter((e) => {return e && e._id !== null}));
                     })
                     .catch((errorGetAll) => {
@@ -150,7 +150,7 @@ export function getCasesForOutbreakIdRequest (outbreakId, filter, token, callbac
                         }
                     })
                         .then((resultFind) => {
-                            console.log('Result for find cases time: ', new Date().getTime() - start);
+                            console.log('Result for find time for cases time: ', new Date().getTime() - start);
                             callback(null, objSort(resultFind.docs, ['lastName', false]));
                         })
                         .catch((errorFind) => {
@@ -183,7 +183,7 @@ export function checkForNameDuplicatesRequest (id, firstName, lastName, outbreak
                     lastName: lastName
                 },
             }).then((resultsCaseName) => {
-                console.log('Result get duplicates name time: ', new Date().getTime() - start);
+                console.log('Result for find time for get duplicates name time: ', new Date().getTime() - start);
                 // console.log('Result get duplicates name: ', resultsCaseName);
                 callback(null, resultsCaseName.docs)
             }).catch((errorCaseName) => {

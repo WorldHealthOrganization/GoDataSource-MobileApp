@@ -21,7 +21,19 @@
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>1.0.51</string>
+	<string>1.0.52</string>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>comgooglemaps</string>
+		<string>citymapper</string>
+		<string>uber</string>
+		<string>lyft</string>
+		<string>transit</string>
+		<string>waze</string>
+		<string>yandexnavi</string>
+		<string>moovit</string>
+		<string>yandexmaps</string>
+	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSAppTransportSecurity</key>
@@ -39,18 +51,6 @@
 	</dict>
 	<key>NSAppleMusicUsageDescription</key>
 	<string>Some description</string>
-  <key>LSApplicationQueriesSchemes</key>
-  <array>
-    <string>comgooglemaps</string>
-    <string>citymapper</string>
-    <string>uber</string>
-    <string>lyft</string>
-    <string>transit</string>
-    <string>waze</string>
-    <string>yandexnavi</string>
-    <string>moovit</string>
-    <string>yandexmaps</string>
-  </array>
 	<key>NSBluetoothPeripheralUsageDescription</key>
 	<string>Some description</string>
 	<key>NSCalendarsUsageDescription</key>
@@ -58,9 +58,9 @@
 	<key>NSCameraUsageDescription</key>
 	<string>Camera is needed in order to scan QR code</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>Your location is needed to retrieve contact/cases&apos; coordinates</string>
+	<string>Your location is needed to retrieve contact/cases' coordinates</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Your location is needed to retrieve contacts/cases&apos; coordinates</string>
+	<string>Your location is needed to retrieve contacts/cases' coordinates</string>
 	<key>NSMotionUsageDescription</key>
 	<string>Some description</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>

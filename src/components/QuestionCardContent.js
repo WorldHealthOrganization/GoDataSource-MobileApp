@@ -251,9 +251,9 @@ class QuestionCardContent extends PureComponent {
                             let valueToSend = {
                                 date: this.state.answerDate, value: date
                             };
-                            if (source[item.variable][0].subAnswers) {
-                                valueToSend.subAnswers = source[item.variable][0].subAnswers
-                            }
+                            // if (source[item.variable][0].subAnswers) {
+                            //     valueToSend.subAnswers = source[item.variable][0].subAnswers
+                            // }
                             this.props.onChangeDateAnswer(valueToSend, id, parentId);
                         }}
                         style={{width: width, marginHorizontal: marginHorizontal}}

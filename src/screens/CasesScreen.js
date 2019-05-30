@@ -312,7 +312,7 @@ class CasesScreen extends Component {
                                     sourceLongitude: this.state.sourceLongitude,
                                     dialogTitle: getTranslation(translations.alertMessages.mapsPopupMessage, this.props.translation),
                                     cancelText: getTranslation(translations.alertMessages.cancelButtonLabel, this.props.translation),
-                                    appsWhiteList: ['google-maps', 'apple-maps', 'waze', 'citymapper', 'uber', 'lyft', 'transit', 'yandex', 'moovit', 'yandex-maps']
+                                    appsWhiteList: ['google-maps', 'apple-maps', 'waze', 'citymapper', 'uber', 'lyft', 'transit', 'yandex', 'moovit']
                                     //other possibilities: citymapper, uber, lyft, transit, yandex, moovit
                                 }}
                             />
@@ -399,6 +399,7 @@ class CasesScreen extends Component {
 
     //Render a case tile
     renderCase = ({item}) => {
+        // console.log('Render Case: ', item.firstName);
         let margins = calculateDimension(16, false, this.props.screenSize);
         return (
             <PersonListItem
@@ -414,11 +415,11 @@ class CasesScreen extends Component {
                 textsStyleArray={[[styles.buttonTextActionsBar, {marginLeft: margins}], [styles.buttonTextActionsBar, {marginRight: margins}]]}
                 onPressTextsArray={[
                     () => {
-                        // console.log('Test performance renderFollowUpQuestion');
+                        console.log('Test performance renderFollowUpQuestion');
                         this.handleOnPressCase(item);
                     },
                     () => {
-                        // console.log('Test performance renderFollowUpQuestion');
+                        console.log('Test performance renderFollowUpQuestion');
                         this.handleOnPressAddContact(item, null);
                     }]}
             />

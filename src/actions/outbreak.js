@@ -37,32 +37,46 @@ export function getOutbreakById(outbreakId, token, dispatch) {
         getOutbreakByIdRequest(outbreakId, null, (error, response) => {
             if (error) {
                 console.log('*** getOutbreakById error: ', error);
-                dispatch(addError(errorTypes.ERROR_OUTBREAK));
-                reject(error);
+                // dispatch(addError(errorTypes.ERROR_OUTBREAK));
+                // reject(error);
+                reject(errorTypes.ERROR_OUTBREAK);
             }
             if (response) {
                 // console.log ('*** getOutbreakById response: ', response);
-                getLocationsByOutbreakIdRequest(response, (error, responseLocations) => {
-                    if (error) {
-                        console.log('*** getLocationsByOutbreakId error: ', error);
-                        dispatch(addError(errorTypes.ERROR_LOCATIONS));
-                    }
-                    if (responseLocations) {
-                        console.log('*** getLocationsByOutbreakId response: ');
-                        dispatch(storeLocationsList(responseLocations));
-                        if (responseLocations.length > 0) {
-                            let treeLocationList = mapLocations(responseLocations.filter((e) => {return e.active === true}), null);
-                            if (response && response.locationIds && Array.isArray(response.locationIds) && response.locationIds.length > 0) {
-                                treeLocationList = extractLocations(treeLocationList, response.locationIds);
-                            }
-                            dispatch(storeLocations(treeLocationList));
-                        } else {
-                            dispatch(storeLocations(responseLocations));
-                        }
-                    }
-                });
-                dispatch(storeOutbreak(response));
-                resolve('Done outbreak');
+                let start = new Date().getTime();
+                resolve(response);
+
+
+                // getLocationsByOutbreakIdRequest(response, (error, responseLocations) => {
+                //     if (error) {
+                //         console.log('*** getLocationsByOutbreakId error: ', error);
+                //         // dispatch(addError(errorTypes.ERROR_LOCATIONS));
+                //         reject(errorTypes.ERROR_LOCATIONS);
+                //     }
+                //     if (responseLocations) {
+                //         console.log('*** getLocationsByOutbreakId response: ');
+                //         // dispatch(storeLocationsList(responseLocations));
+                //         let treeLocationList = [];
+                //         if (responseLocations.length > 0) {
+                //             treeLocationList = mapLocations(responseLocations.filter((e) => {return e.active === true}));
+                //             console.log('Map locations: ', new Date().getTime() - start);
+                //             if (response && response.locationIds && Array.isArray(response.locationIds) && response.locationIds.length > 0) {
+                //                 treeLocationList = extractLocations(treeLocationList, response.locationIds);
+                //             }
+                //             console.log('Map locations: ', new Date().getTime() - start);
+                //             // dispatch(storeLocations(treeLocationList));
+                //         } else {
+                //             // dispatch(storeLocations(responseLocations));
+                //         }
+                //         // dispatch(storeOutbreak(response));
+                //         // resolve('Done outbreak');
+                //         resolve({outbreak: response, locationsList: responseLocations, treeLocationsList: treeLocationList});
+                //     }
+                // });
+
+
+                // dispatch(storeOutbreak(response));
+                // resolve('Done outbreak');
             }
         })
     })

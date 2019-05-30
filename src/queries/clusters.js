@@ -2,6 +2,7 @@ import {getDatabase} from './database';
 import config from './../utils/config';
 
 export function getClustersdRequest (token, callback) {
+    let start = new Date().getTime();
     getDatabase(config.mongoCollections.cluster)
         .then((database) => {
             database.find({
@@ -14,7 +15,7 @@ export function getClustersdRequest (token, callback) {
                 }
             })
                 .then((resultFind) => {
-                    // console.log('Result for find clusters: ', resultFind);
+                    console.log('Result for find time for clusters: ', new Date().getTime() - start);
                     callback(null, resultFind.docs);
                 })
                 .catch((errorFind) => {

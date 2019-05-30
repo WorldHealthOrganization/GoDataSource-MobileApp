@@ -297,7 +297,7 @@ class ContactsScreen extends Component {
                                     sourceLongitude: this.state.sourceLongitude,
                                     dialogTitle: getTranslation(translations.alertMessages.mapsPopupMessage, this.props.translation),
                                     cancelText: getTranslation(translations.alertMessages.cancelButtonLabel, this.props.translation),
-                                    appsWhiteList: ['google-maps', 'apple-maps', 'waze', 'citymapper', 'uber', 'lyft', 'transit', 'yandex', 'moovit', 'yandex-maps']
+                                    appsWhiteList: ['google-maps', 'apple-maps', 'waze', 'citymapper', 'uber', 'lyft', 'transit', 'yandex', 'moovit']
                                     //other possibilities: citymapper, uber, lyft, transit, yandex, moovit
                                 }}
                             />
