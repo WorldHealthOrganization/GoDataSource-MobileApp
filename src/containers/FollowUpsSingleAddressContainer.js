@@ -5,7 +5,7 @@
 // the material ui library, since it provides design and animations out of the box
 import React, { PureComponent } from 'react';
 import { View, StyleSheet, ScrollView } from 'react-native';
-import { calculateDimension, getTranslation, handleExposedTo, getAddress, extractIdFromPouchId } from '../utils/functions';
+import { calculateDimension, getTranslation, extractIdFromPouchId } from '../utils/functions';
 import config from '../utils/config';
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
@@ -14,7 +14,7 @@ import CardComponent from '../components/CardComponent';
 import ElevatedView from 'react-native-elevated-view';
 import _ from 'lodash';
 
-class FollowUpsSingleGetInfoContainer extends PureComponent {
+class FollowUpsSingleAddressContainer extends PureComponent {
 
     // This will be a container, so put as less business logic here as possible
     constructor(props) {
@@ -29,24 +29,20 @@ class FollowUpsSingleGetInfoContainer extends PureComponent {
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
-        // console.log('FollowUpsSingleContainer render Details');
         return (
-            config.followUpsSingleScreen.generalInfo.map((item) => {
-                return this.handleRenderItem(item)
-            })
+            <View style={style.container}>
+                {
+                    this.props.item && this.props.item.address ? (
+                        this.handleRenderItemForAddress()
+                    ) : null
+                }
+            </View>
         );
     };
 
     // Please write here all the methods that are not react native lifecycle methods
-    handleRenderItem = (item) => {
-        let fields = item.fields.map((field) => {
-            if (this.props.isNew === false && field.id === 'date') {
-                return Object.assign({}, field, { isEditMode: false })
-            } else {
-                return Object.assign({}, field, { isEditMode: this.props.isEditMode })
-            }
-        });
-
+    handleRenderItemForAddress = () => {
+        let fields = config.followUpsSingleScreen.address.fields
         return this.renderItemCardComponent(fields)
     };
 
@@ -86,10 +82,18 @@ class FollowUpsSingleGetInfoContainer extends PureComponent {
             item.data = this.computeDataForFollowUpSingleScreenDropdownInput(item);
         }
 
-        if (item.type === 'DatePicker' && this.props.item && this.props.item !== undefined && this.props.item[item.id] !== undefined) {
-            value = this.props.item[item.id]
-        } else if (item.type === 'SwitchInput' && this.props.item && this.props.item !== undefined && this.props.item[item.id] !== undefined) {
-            value = this.props.item[item.id]
+        if (item.type === 'DropDownSectioned') {
+            if (this.props.item && this.props.item.address && this.props.item.address[item.id] && this.props.item.address[item.id] !== "") {
+                if (this.props.locations) {
+                    for (let i = 0; i < this.props.locations.length; i++) {
+                        let myLocationName = this.getLocationNameById(this.props.locations[i], this.props.item.address[item.id])
+                        if (myLocationName !== null) {
+                            value = myLocationName
+                            break
+                        }
+                    }
+                }
+            }
         } else {
             value = this.computeValueForFollowUpSingleScreen(item);
         }
@@ -97,22 +101,15 @@ class FollowUpsSingleGetInfoContainer extends PureComponent {
         if (item.type === 'DatePicker' && value === '') {
             value = null
         }
-
         return (
             <CardComponent
                 item={item}
-                isEditMode={this.props.isEditMode}
-                isEditModeForDropDownInput={this.props.isEditMode}
+                isEditMode={false}
+                isEditModeForDropDownInput={false}
                 value={value}
                 index={cardIndex}
                 followUp={this.props.item}
                 contact={this.props.contact}
-
-                onChangeText={this.props.onChangeText}
-                onChangeDate={this.props.onChangeDate}
-                onChangeSwitch={this.props.onChangeSwitch}
-                onChangeDropDown={this.props.onChangeDropDown}
-                onChangeTextSwitchSelector={this.props.onChangeTextSwitchSelector}
             />
         )
     };
@@ -126,11 +123,28 @@ class FollowUpsSingleGetInfoContainer extends PureComponent {
     };
 
     computeDataForFollowUpSingleScreenDropdownInput = (item) => {
-        if (item.id === 'statusId') {
-            return _.filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId.includes("LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE") })
+        if (item.id === 'typeId') {
+            return _.filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_ADDRESS_TYPE' })
                 .sort((a, b) => { return a.order - b.order; })
-                .map((o) => { return { label: getTranslation(o.value, this.props.translation), value: o.value } })
+                .map((o) => { return { value: getTranslation(o.value, this.props.translation), id: o.value } })
         }
+    };
+
+    getLocationNameById = (element, locationId) => {
+        if (extractIdFromPouchId(element._id, 'location') === locationId) {
+            return element.name;
+        } else {
+            if (element.children && element.children.length > 0) {
+                let i;
+                let result = null;
+
+                for (i = 0; result === null && i < element.children.length; i++) {
+                    result = this.getLocationNameById(element.children[i], locationId);
+                }
+                return result;
+            }
+        }
+        return null;
     };
 }
 
@@ -165,6 +179,7 @@ function mapStateToProps(state) {
         screenSize: state.app.screenSize,
         translation: state.app.translation,
         referenceData: state.referenceData,
+        locations: state.locations,
     };
 }
 
@@ -173,4 +188,4 @@ function matchDispatchProps(dispatch) {
     }, dispatch);
 }
 
-export default connect(mapStateToProps, matchDispatchProps)(FollowUpsSingleGetInfoContainer);
+export default connect(mapStateToProps, matchDispatchProps)(FollowUpsSingleAddressContainer);

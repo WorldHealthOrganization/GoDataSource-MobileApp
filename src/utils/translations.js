@@ -523,6 +523,10 @@ const previousAnswersScreen = {
 
 // TODO add to backend
 const followUpAgenda = {
+    followUp: 'LNG_FOLLOW_UP_AGENDA_FOLLOW_UP',
+    followUpStatus: 'LNG_FOLLOW_UP_AGENDA_FOLLOW_UP_STATUS',
+    followUpQuestionnaire: 'LNG_FOLLOW_UP_AGENDA_FOLLOW_UP_QUESTIONNAIRE',
+    followUpAddress: 'LNG_FOLLOW_UP_AGENDA_FOLLOW_UP_ADDRESS',
     noFollUpsForDate: 'LNG_FOLLOW_UP_AGENDA_NO_FOLLOW_UPS_FOR_DATE'
 };
 
