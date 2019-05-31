@@ -103,6 +103,7 @@ export default {
     'LNG_CASE_FIELD_LABEL_IS_DATE_OF_REPORTING_APPROXIMATE': 'Date of reporting approximate',
     'LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED': 'Refused transfer to treatment unit',
     'LNG_CASE_FIELD_LABEL_RISK_REASON': 'Risk reason',
+    'LNG_CASE_FIELD_LABEL_CASE_ID': 'Case ID',
 
     'LNG_CASE_FIELD_LABEL_DOCUMENT_TYPE': 'Document Type',
     'LNG_CASE_FIELD_LABEL_DOCUMENT_NUMBER': 'Document number',
@@ -149,6 +150,7 @@ export default {
     'LNG_CONTACT_FIELD_LABEL_IS_DATE_OF_REPORTING_APPROXIMATE': 'Date of reporting approximate',
     'LNG_CONTACT_FIELD_LABEL_RISK_LEVEL': 'Risk level',
     'LNG_CONTACT_FIELD_LABEL_RISK_REASON': 'Reason',
+    'LNG_CONTACT_FIELD_LABEL_CONTACT_ID': 'Contact ID',
 
 
     //exposureScreen
@@ -459,5 +461,8 @@ export default {
     'LNG_QUESTIONNAIRE_LABEL_PREVIOUS_ANSWERS': 'Prev Answers',
 
     // TODO add to backend
-    'LNG_FOLLOW_UP_AGENDA_NO_FOLLOW_UPS_FOR_DATE': 'No follow-ups to show for this day'
+    'LNG_FOLLOW_UP_AGENDA_NO_FOLLOW_UPS_FOR_DATE': 'No follow-ups to show for this day',
+
+    // TODO add to backend
+    'LNG_PERSON_LIST_ITEM_DAY_OF_FOLLOW_UP': 'Day of follow-up: '
 };

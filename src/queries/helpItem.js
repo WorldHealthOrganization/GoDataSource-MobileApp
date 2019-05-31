@@ -5,6 +5,7 @@ import {getDatabase} from './database';
 import config from './../utils/config';
 
 export function getHelpItemRequest (token, callback) {
+    let start = new Date().getTime();
     getDatabase(config.mongoCollections.helpItem)
         .then((database) => {
             database.find({
@@ -17,7 +18,7 @@ export function getHelpItemRequest (token, callback) {
                 }
             })
                 .then((result) => {
-                    console.log("result getHelpRequest: ", result);
+                    console.log("Result for find time for getHelpRequest: ", new Date().getTime() - start);
                     callback(null, result.docs);
                 })
                 .catch((errorQuery) => {

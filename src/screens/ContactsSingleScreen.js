@@ -285,7 +285,7 @@ class ContactsSingleScreen extends Component {
                         <View
                             style={[style.breadcrumbContainer]}>
                             <Breadcrumb
-                                entities={[getTranslation(translations.contactSingleScreen.title, this.props.translation), this.props.isNew ? getTranslation(translations.contactSingleScreen.addContactTitle, this.props.translation) : ((this.props.contact && this.props.contact.firstName ? (this.props.contact.firstName + " ") : '') + (this.props.contact && this.props.contact.lastName ? this.props.contact.lastName : ''))]}
+                                entities={[getTranslation(this.props && this.props.previousScreen ? this.props.previousScreen : translations.contactSingleScreen.title, this.props.translation), this.props.isNew ? getTranslation(translations.contactSingleScreen.addContactTitle, this.props.translation) : ((this.props.contact && this.props.contact.firstName ? (this.props.contact.firstName + " ") : '') + (this.props.contact && this.props.contact.lastName ? this.props.contact.lastName : ''))]}
                                 navigator={this.props.navigator}
                                 onPress={this.handlePressBreadcrumb}
                             />
@@ -598,11 +598,19 @@ class ContactsSingleScreen extends Component {
 
         if (stateValue !== undefined && stateValue !== null) {
             if (id === 'age') {
-                let ageClone = { years: 0, months: 0 }
+                let ageClone = { years: 0, months: 0 };
 
-                if (!isNaN(Number(value)) && !value.includes(".") && !value.includes("-") && !value.includes(",") && !value.includes(" ")) {
-                    ageClone.years = Number(value)
-                    ageClone.months = Number(value)
+                // Do replacing for value
+                // Replace first and last chars if it is ,
+                value = value.replace(/^,|,$/g, '');
+                // Replace the first , with .
+                value = value.replace(/,/, '.');
+                // Replace all the remaining , with empty string
+                value = value.replace(/,/g, '');
+
+                if (!isNaN(Number(value)) && !value.includes("-") && !value.includes(" ")) {
+                    ageClone.years = Number(value);
+                    ageClone.months = Number(value);
                 }
 
                 this.setState(prevState => ({
@@ -841,7 +849,7 @@ class ContactsSingleScreen extends Component {
                     )
                 },
                     (error) => {
-                        Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(error, this.props.translation), [
+                        Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(error.message, this.props.translation), [
                             {
                                 text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
                                 onPress: () => { console.log("OK pressed") }
@@ -997,34 +1005,35 @@ class ContactsSingleScreen extends Component {
     handleOnChangeSectionedDropDown = (selectedItems, index) => {
         console.log('handleOnChangeSectionedDropDown', selectedItems, index);
         // Here selectedItems is always an array with just one value and should pe mapped to the locationId field from the address from index
-        let addresses = _.cloneDeep(this.state.contact.addresses);
-        addresses[index].locationId = extractIdFromPouchId(selectedItems['0']._id, 'location');
-        if (selectedItems['0'].geoLocation && selectedItems['0'].geoLocation.coordinates && Array.isArray(selectedItems['0'].geoLocation.coordinates)) {
-            if (selectedItems['0'].geoLocation.coordinates[0] !== 0 || selectedItems['0'].geoLocation.coordinates[1] !== 0) {
-                setTimeout(() => {
-                    Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.alertMessages.replaceCurrentCoordinates, this.props.translation), [
-                        {
-                            text: getTranslation(translations.alertMessages.cancelButtonLabel, this.props.translation), onPress: () => { console.log('Cancel pressed') }
-                        },
-                        {
-                            text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation), onPress: () => {
-                                addresses[index].geoLocation = selectedItems['0'].geoLocation;
-                                console.log('Addresses biatch: ', addresses);
-                                this.setState(prevState => ({
-                                    contact: Object.assign({}, prevState.contact, { addresses }),
-                                    isModified: true
-                                }))
+        if (selectedItems && Array.isArray(selectedItems) && selectedItems.length > 0) {
+            let addresses = _.cloneDeep(this.state.contact.addresses);
+            addresses[index].locationId = extractIdFromPouchId(selectedItems['0']._id, 'location');
+            if (selectedItems['0'].geoLocation && selectedItems['0'].geoLocation.coordinates && Array.isArray(selectedItems['0'].geoLocation.coordinates)) {
+                if (selectedItems['0'].geoLocation.coordinates[0] !== 0 || selectedItems['0'].geoLocation.coordinates[1] !== 0) {
+                    setTimeout(() => {
+                        Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.alertMessages.replaceCurrentCoordinates, this.props.translation), [
+                            {
+                                text: getTranslation(translations.alertMessages.cancelButtonLabel, this.props.translation), onPress: () => { console.log('Cancel pressed') }
+                            },
+                            {
+                                text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation), onPress: () => {
+                                    addresses[index].geoLocation = selectedItems['0'].geoLocation;
+                                    console.log('Addresses biatch: ', addresses);
+                                    this.setState(prevState => ({
+                                        contact: Object.assign({}, prevState.contact, { addresses }),
+                                        isModified: true
+                                    }))
+                                }
                             }
-                        }
-                    ])
-                }, 200);
+                        ])
+                    }, 200);
+                }
+            } else {
+                this.setState(prevState => ({
+                    contact: Object.assign({}, prevState.contact, { addresses }),
+                    isModified: true
+                }))
             }
-        } else {
-            console.log('Addresses biatch: ', addresses);
-            this.setState(prevState => ({
-                contact: Object.assign({}, prevState.contact, { addresses }),
-                isModified: true
-            }))
         }
     };
 
@@ -1112,7 +1121,7 @@ class ContactsSingleScreen extends Component {
                                 contact: Object.assign({}, prevState.contact, { relationships: relations })
                             }), () => {
                                 relation = updateRequiredFields(this.props.user.activeOutbreakId, this.props.user._id, Object.assign({}, relation), 'delete');
-                                this.props.deleteExposureForContact(this.props.user.activeOutbreakId, this.props.contact._id, relation, this.props.user.token);
+                                this.props.deleteExposureForContact(this.props.user.activeOutbreakId, this.props.contact._id, relation, this.props.user.token, this.props.teams);
                             })
                         }
                     }
@@ -1259,7 +1268,7 @@ class ContactsSingleScreen extends Component {
                         let contactClone = _.cloneDeep(this.state.contact)
                         let contactMatchFilter = this.checkIfContactMatchFilter()
                         console.log('contactMatchFilter', contactMatchFilter)
-                        this.props.updateContact(this.props.user.activeOutbreakId, contactClone._id, contactClone, this.props.user.token, null, contactMatchFilter);
+                        this.props.updateContact(this.props.user.activeOutbreakId, contactClone._id, contactClone, this.props.user.token, null, contactMatchFilter, this.props.teams);
                     })
                 }
             })
@@ -1592,7 +1601,6 @@ function mapStateToProps(state) {
         role: state.role,
         screenSize: state.app.screenSize,
         followUps: state.followUps,
-        outbreak: state.outbreak,
         errors: state.errors,
         contacts: state.contacts,
         filter: state.app.filters,

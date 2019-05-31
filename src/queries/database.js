@@ -181,6 +181,8 @@ export function getDatabase(collectionName) {
             pathToDatabase = `${RNFS.LibraryDirectoryPath}/NoCloud/${databaseName}`;
         }
 
+        console.log('Path to database: ', pathToDatabase);
+
         RNFetchBlobFS.exists(pathToDatabase)
             .then((exists) => {
                 console.log('Database exists? ', exists);
@@ -322,6 +324,12 @@ export function processBulkDocs(data, type) {
                 if (database) {
                     // New types: fileType.number.json
                     let fileType = `${type.split('.')[0]}.${type.split('.')[2]}`;
+                    // if (type.includes('location')) {
+                    //     data = data.splice(0, 1000);
+                    // }
+                    // if (type.includes('languageToken')) {
+                    //     data = data.filter((e) => {return e.languageId === 'english_en'})
+                    // }
                     database.bulkDocs(data.map((e) => {
                         return Object.assign({}, e, {_id: createIdForType(e, type), fileType})
                     }))

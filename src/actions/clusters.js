@@ -22,12 +22,13 @@ export function getClusters(token, dispatch) {
         getClustersdRequest(token, (error, response) => {
             if (error) {
                 console.log("*** getClustersdRequest error: ", error);
-                dispatch(addError(errorTypes.ERROR_CLUSTERS));
-                reject(error);
+                // dispatch(addError(errorTypes.ERROR_CLUSTERS));
+                reject(errorTypes.ERROR_CLUSTERS);
             }
             if (response) {
-                dispatch(storeClusters(response));
-                resolve('Done clusters');
+                // dispatch(storeClusters(response));
+                // resolve('Done clusters');
+                resolve({clusters: response});
             }
         })
     })

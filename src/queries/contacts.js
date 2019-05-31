@@ -17,7 +17,7 @@ export function getContactsForOutbreakIdRequest (outbreakId, filter, token, call
                 let start =  new Date().getTime();
                 Promise.all(promiseArray)
                     .then((resultGetAll) => {
-                        console.log("Result from get queries: ", new Date().getTime() - start, resultGetAll.length);
+                        console.log("Result for find time for get queries: ", new Date().getTime() - start);
                         callback(null, resultGetAll.filter((e) => {return e && e._id !== null}));
                     })
                     .catch((errorGetAll) => {
@@ -27,7 +27,7 @@ export function getContactsForOutbreakIdRequest (outbreakId, filter, token, call
             } else {
                 if (filter) {
                     console.log('getContactsForOutbreakIdRequest else, if');
-                    console.log ('myFilter', filter);
+                    // console.log ('myFilter', filter);
 
                     let myFilterAge = null;
                     if (filter.age) {
@@ -60,7 +60,7 @@ export function getContactsForOutbreakIdRequest (outbreakId, filter, token, call
                         },
                     })
                         .then((resultFilterContacts) => {
-                            console.log('Result when filtering contacts: ', new Date().getTime() - start, resultFilterContacts);
+                            console.log('Result for find time for filtering contacts: ', new Date().getTime() - start);
 
                             let resultFilterContactsDocs = resultFilterContacts.docs
                             if (resultFilterContactsDocs && resultFilterContactsDocs !== undefined) {
@@ -153,8 +153,8 @@ export function checkForNameDuplicatesRequest (id, firstName, lastName, outbreak
                     lastName: lastName
                 },
             }).then((resultsContactsName) => {
-                console.log('Result get duplicates name time: ', new Date().getTime() - start);
-                console.log('Result get duplicates name: ', resultsContactsName);
+                console.log('Result for find time for get duplicates name time: ', new Date().getTime() - start);
+                // console.log('Result get duplicates name: ', resultsContactsName);
                 callback(null, resultsContactsName.docs)
             }).catch((errorContactsName) => {
                 console.log('Error when get duplicates name: ', errorContactsName);
@@ -203,7 +203,7 @@ export function getContactsForFollowUpPeriodRequest (outbreakId, followUpDate, c
 
 function getFromDb(database, id) {
     return new Promise((resolve, reject) => {
-        console.log('Get record with id: ', id);
+        // console.log('Get record with id: ', id);
         database.get(id)
             .then((result) => {
                 console.log('Found result. Return stuff');
@@ -226,7 +226,7 @@ export function getContactByIdRequest(outbreakId, contactId, token, callback) {
         .then((database) => {
             database.get(contactId)
                 .then((resultGetContactById) => {
-                    console.log("Result getContactByIdRequest: ", resultGetContactById);
+                    // console.log("Result getContactByIdRequest: ", resultGetContactById);
                     callback(null, resultGetContactById);
                 })
                 .catch((errorGetContactById) => {
@@ -326,7 +326,7 @@ export function addExposureForContactRequest(outbreakId, contactId, exposure, to
             // exposure.outbreakId = outbreakId
             database.put(exposure)
                 .then((result) => {
-                    console.log('Result addExposureForContactRequest: ', JSON.stringify(result));
+                    // console.log('Result addExposureForContactRequest: ', JSON.stringify(result));
                     callback(null, result)
                 })
                 .catch((errorAddExposure) => {
@@ -347,10 +347,10 @@ export function updateExposureForContactRequest(outbreakId, contactId, exposure,
             // console.log ('updateExposureForContactRequest', outbreakId, contactId, JSON.stringify(exposure))
             database.put(exposure)
                 .then((responseUpdateExposure) => {
-                    console.log("Update exposure response: ", responseUpdateExposure);
+                    // console.log("Update exposure response: ", responseUpdateExposure);
                     database.get(exposure._id)
                         .then((resultGetUpdatedExposure) => {
-                            console.log("Response getUpdatedExposure: ", JSON.stringify(resultGetUpdatedExposure));
+                            // console.log("Response getUpdatedExposure: ", JSON.stringify(resultGetUpdatedExposure));
                             callback(null, resultGetUpdatedExposure);
                         })
                         .catch((errorGetUpdatedExposure) => {
@@ -374,7 +374,7 @@ export function deleteExposureForContactRequest(outbreakId, contactId, exposure,
         .then((database) => {
             database.put(exposure)
                 .then((result) => {
-                    console.log('Result deleteExposureForContactRequest: ', result);
+                    // console.log('Result deleteExposureForContactRequest: ', result);
                     callback(null, result);
                 })
                 .catch((errorAddExposure) => {

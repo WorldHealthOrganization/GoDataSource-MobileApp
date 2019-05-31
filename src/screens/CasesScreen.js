@@ -29,6 +29,8 @@ import {getItemByIdRequest} from './../queries/cases'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {pushNewEditScreen} from './../utils/screenTransitionFunctions';
 import RNExitApp from 'react-native-exit-app';
+import PersonListItem from "../components/PersonListItem";
+import {extractIdFromPouchId} from "../utils/functions";
 
 let height = Dimensions.get('window').height;
 let width = Dimensions.get('window').width;
@@ -59,6 +61,8 @@ class CasesScreen extends Component {
             sourceLatitude: 0,
             sourceLongitude: 0,
             error: null,
+
+            riskColors: {}
         };
 
         // Bind here methods, or at least don't declare methods in the render method
@@ -69,8 +73,14 @@ class CasesScreen extends Component {
     // Please add here the react lifecycle methods that you need
     componentDidMount() {
         BackHandler.addEventListener('hardwareBackPress', this.handleBackButtonClick);
+        let riskColors = {};
+        let refData = this.props.referenceData.filter((e) => {return e.categoryId.includes("RISK_LEVEL")});
+        for (let i=0; i<refData.length; i++) {
+            riskColors[refData[i].value] = refData[i].colorCode || 'black'
+        }
         this.setState({
-            loading: true
+            loading: true,
+            riskColors: riskColors
         }, () => {
             if (this.props.filter && (this.props.filter['CasesScreen'] || this.props.filter['CasesFilterScreen'])) {
                 this.filterCases();
@@ -302,7 +312,7 @@ class CasesScreen extends Component {
                                     sourceLongitude: this.state.sourceLongitude,
                                     dialogTitle: getTranslation(translations.alertMessages.mapsPopupMessage, this.props.translation),
                                     cancelText: getTranslation(translations.alertMessages.cancelButtonLabel, this.props.translation),
-                                    appsWhiteList: ['google-maps', 'apple-maps', 'waze']
+                                    appsWhiteList: ['google-maps', 'apple-maps', 'waze', 'citymapper', 'uber', 'lyft', 'transit', 'yandex', 'moovit']
                                     //other possibilities: citymapper, uber, lyft, transit, yandex, moovit
                                 }}
                             />
@@ -389,14 +399,39 @@ class CasesScreen extends Component {
 
     //Render a case tile
     renderCase = ({item}) => {
+        // console.log('Render Case: ', item.firstName);
+        let margins = calculateDimension(16, false, this.props.screenSize);
         return (
-            <CaseListItem 
-                item={item} 
-                onPressCase={this.handleOnPressCase}             
-                onPressMap={this.handleOnPressMap}
-                onPressAddContact={this.handleOnPressAddContact} 
+            <PersonListItem
+                type={'Case'}
+                titleColor={item && item.riskLevel ? this.state.riskColors[item.riskLevel] : 'black'}
+                itemToRender={item}
+                onPressMapIconProp={this.handleOnPressMap}
+                onPressNameProp={this.handleOnPressNameProp}
+                textsArray={[
+                    getTranslation(translations.casesScreen.viewButtonLabel, this.props.translation),
+                    getTranslation(translations.casesScreen.addContactButtonLabel, this.props.translation)
+                ]}
+                textsStyleArray={[[styles.buttonTextActionsBar, {marginLeft: margins}], [styles.buttonTextActionsBar, {marginRight: margins}]]}
+                onPressTextsArray={[
+                    () => {
+                        console.log('Test performance renderFollowUpQuestion');
+                        this.handleOnPressCase(item);
+                    },
+                    () => {
+                        console.log('Test performance renderFollowUpQuestion');
+                        this.handleOnPressAddContact(item, null);
+                    }]}
             />
         )
+        // return (
+        //     <CaseListItem
+        //         item={item}
+        //         onPressCase={this.handleOnPressCase}
+        //         onPressMap={this.handleOnPressMap}
+        //         onPressAddContact={this.handleOnPressAddContact}
+        //     />
+        // )
     };
 
     //Key extractor for case list
@@ -461,8 +496,7 @@ class CasesScreen extends Component {
         })
     };
 
-    handleOnPressMap = (myCase, contact) => {
-        console.log('handleOnPressMap', myCase. contact)
+    handleOnPressMap = (myCase) => {
         if (myCase && myCase.addresses && Array.isArray(myCase.addresses) && myCase.addresses.length > 0) {
             let casePlaceOfResidence = myCase.addresses.filter((e) => {
                 return e.typeId === config.userResidenceAddress.userPlaceOfResidence
@@ -482,11 +516,29 @@ class CasesScreen extends Component {
                     });
                 },
                 (error) => {
-                    this.setState({error: error.message})
+                    Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(error.message, this.props.translation), [
+                        {
+                            text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+                            onPress: () => { console.log("OK pressed") }
+                        }
+                    ])
                 },
+                {
+                    timeout: 5000
+                }
             );
         }
-    }
+    };
+
+    handleOnPressNameProp = (type, personId) => {
+        this.props.navigator.push({
+            screen: 'CaseSingleScreen',
+            animated: true,
+            passProps: {
+                case: this.props.cases.find((e) => {return e._id === personId})
+            }
+        })
+    };
 
     //Create new case in CaseSingleScreen
     handleOnPressAddCase = () => {
@@ -751,7 +803,8 @@ function mapStateToProps(state) {
         screenSize: state.app.screenSize,
         syncState: state.app.syncState,
         errors: state.errors,
-        translation: state.app.translation
+        translation: state.app.translation,
+        referenceData: state.referenceData
     };
 }
 

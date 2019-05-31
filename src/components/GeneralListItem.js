@@ -15,13 +15,15 @@ import ElevatedView from 'react-native-elevated-view';
 import ActionsBar from './ActionsBar';
 import translations from './../utils/translations'
 import {getTranslation} from './../utils/functions';
+import {connect} from "react-redux";
+import {bindActionCreators} from "redux";
 
 GeneralListItem = ({title, primaryText, secondaryText, firstComponent, secondComponent, thirdComponent, hasActionsBar, textsArray, textsStyleArray, onPressArray, actionsBarContainerStyle, containerStyle, translation}) => (
     <ElevatedView
         elevation={3}
-        style={[{borderRadius: 2, height: '100%', backgroundColor: 'white'}, containerStyle]}
+        style={[{borderRadius: 2, backgroundColor: 'white'}, containerStyle]}
     >
-        <View containerStyle={{flex: 1, height: '100%'}}>
+        <View containerStyle={containerStyle}>
                 {
                     firstComponent ? (
                         firstComponent
@@ -34,20 +36,20 @@ GeneralListItem = ({title, primaryText, secondaryText, firstComponent, secondCom
                 {
                     secondComponent ? (
                         secondComponent
-                    ) : (
+                    ) : primaryText ? (
                         <Text style={style.primaryText}>
                             {getTranslation(primaryText, translation)}
                         </Text>
-                    )
+                    ) : (null)
                 }
                 {
                     thirdComponent ? (
                         thirdComponent
-                    ) : (
+                    ) : secondaryText ? (
                         <Text style={style.primaryText}>
                             {getTranslation(secondaryText, translation)}
                         </Text>
-                    )
+                    ) : (null)
                 }
                 {
                     hasActionsBar ? (<ActionsBar
@@ -97,4 +99,4 @@ const style = StyleSheet.create({
 //     borderBottomColor: styles.navigationDrawerSeparatorGrey
 // };
 
-export default GeneralListItem;
+export default (GeneralListItem);

@@ -292,7 +292,7 @@ class ExposureScreen extends Component {
                             })
                         } else {
                             let exposure = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id.split('_')[this.props.user._id.split('_').length - 1], record = Object.assign({}, this.state.exposure), action = 'update')
-                            this.props.updateExposureForContact(this.props.user.activeOutbreakId, this.props.contact._id, exposure, this.props.user.token);
+                            this.props.updateExposureForContact(this.props.user.activeOutbreakId, this.props.contact._id, exposure, this.props.user.token, this.props.teams);
                             this.props.navigator.dismissModal(this.props.saveExposure(this.state.exposure, true));
                         }
                     } else {
@@ -414,6 +414,7 @@ const style = StyleSheet.create({
 
 function mapStateToProps(state) {
     return {
+        teams: state.teams,
         user: state.user,
         screenSize: state.app.screenSize,
         errors: state.errors,

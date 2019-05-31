@@ -8,7 +8,7 @@
 // the material ui library, since it provides design and animations out of the box
 import React, {Component, PureComponent} from 'react';
 import {View, Text, StyleSheet, WebView} from 'react-native';
-import {calculateDimension, handleExposedTo, getAddress, extractIdFromPouchId, getTranslation} from './../utils/functions';
+import {calculateDimension, getTranslation} from './../utils/functions';
 import config from './../utils/config';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -290,7 +290,7 @@ const style = StyleSheet.create({
 function mapStateToProps(state) {
     return {
         screenSize: state.app.screenSize,
-        locations: state.locations,
+        locations: state.locations.locations,
         translation: state.app.translation,
     };
 }

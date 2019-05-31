@@ -102,7 +102,7 @@ class ContactsSinglePersonal extends PureComponent {
     // Please write here all the methods that are not react native lifecycle methods
     handleRenderItem = (item) => {
         let fields = item.fields.map((field) => {
-            return Object.assign({}, field, { isEditMode: this.props.isEditMode })
+            return Object.assign({}, field, { isEditMode: field.id === 'visualId' ? false : this.props.isEditMode })
         });
         return this.renderItemCardComponent(fields)
     };

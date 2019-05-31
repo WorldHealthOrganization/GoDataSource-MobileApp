@@ -22,14 +22,15 @@ export function loginUserRequest (credentials, callback) {
                 }
             })
                 .then((resultFind) => {
-                    console.log("Result From find user: ", new Date().getTime() - start, resultFind);
+                    console.log("Result for find time for find user: ", new Date().getTime() - start);
+
                     comparePasswords(credentials.password, resultFind.docs[0].password, (error, isMatch) => {
                         if (error) {
                             console.log("Error at comparing passwords: ", error);
                             callback(error)
                         }
                         if (isMatch) {
-                            console.log("Passwords match: ");
+                            console.log("Result for find time for: Passwords match: ", new Date().getTime() - start);
                             // Return user
                             // If passwords match, check also if the user has an active outbreak id
                             if (resultFind.docs[0].activeOutbreakId) {
@@ -60,7 +61,7 @@ export function getUserByIdRequest (userId, token, callback) {
         .then((database) => {
             database.get(userId)
                 .then((result) => {
-                    console.log("GetUserByIdRequestQuery result: ", new Date().getTime() - start, result);
+                    // console.log("GetUserByIdRequestQuery result: ", new Date().getTime() - start, result);
                     callback(null, result)
                 })
                 .catch((errorGetUserById) => {

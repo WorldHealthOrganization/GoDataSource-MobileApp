@@ -20,13 +20,15 @@ export function getHelpCategory(token, dispatch) {
         getHelpCategoryRequest (null, (error, response) => {
             if (error) {
                 console.log("*** getHelpCategoryRequest error: ", error);
-                dispatch(addError(errorTypes.ERROR_HELP));
-                reject(error);
+                // dispatch(addError(errorTypes.ERROR_HELP));
+                // reject(error);
+                reject(errorTypes.ERROR_HELP);
             }
             if (response) {
-                console.log('response help category: ',response);
-                dispatch(storeHelpCategory(response));
-                resolve('Done help category');
+                // console.log('response help category: ',response);
+                // dispatch(storeHelpCategory(response));
+                // resolve('Done help category');
+                resolve({helpCategory: response})
             }
         })
     })

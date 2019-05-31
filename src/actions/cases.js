@@ -50,12 +50,13 @@ export function getCasesForOutbreakIdWithPromise(outbreakId, filter, token, disp
         getCasesForOutbreakIdRequest(outbreakId, filter, token, (error, response) => {
             if (error) {
                 console.log("*** getCasesForOutbreakId error: ", error);
-                dispatch(addError(errorTypes.ERROR_CASES));
-                reject(error);
+                // dispatch(addError(errorTypes.ERROR_CASES));
+                reject(errorTypes.ERROR_CASES);
             }
             if (response) {
-                dispatch(storeCases(response));
-                resolve('Done cases');
+                // dispatch(storeCases(response));
+                // resolve('Done cases');
+                resolve({cases: response});
             }
         })
     })

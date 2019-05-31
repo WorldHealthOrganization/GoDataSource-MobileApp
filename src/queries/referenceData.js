@@ -6,10 +6,9 @@ import config from './../utils/config';
 
 // Credentials: {email, encryptedPassword}
 export function getReferenceDataRequest (token, callback) {
+    let start =  new Date().getTime();
     getDatabase(config.mongoCollections.referenceData)
         .then((database) => {
-            let start =  new Date().getTime();
-
             database.find({
                 selector: {
                     _id: {

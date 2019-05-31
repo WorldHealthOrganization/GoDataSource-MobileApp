@@ -13,7 +13,7 @@ export function getOutbreakByIdRequest (outbreakId, token, callback) {
 
             database.get('outbreak.json_' + outbreakId)
                 .then((result) => {
-                    console.log("Result from getting outbreak: ", new Date().getTime() - start);
+                    console.log("Result for find time for getting outbreak: ", new Date().getTime() - start);
                     callback(null, result);
                 })
                 .catch((errorGetOutbreak) => {
