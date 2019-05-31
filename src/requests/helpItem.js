@@ -15,7 +15,7 @@ export function getHelpItemsRequest(requestUrl, authorization, filter, callback)
             return handleResponse(response);
         })
         .then((response) => {
-            console.log('### getHelpItemsRequest response: ', response);
+            console.log('### getHelpItemsRequest response: ');
             callback(null, response);
         })
         .catch((error) => {

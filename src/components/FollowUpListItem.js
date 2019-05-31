@@ -80,13 +80,13 @@ class FollowUpListItem extends PureComponent {
             if (followUpContact && followUpContact.addresses && Array.isArray(followUpContact.addresses) && followUpContact.addresses.length > 0) {
                 let contactPlaceOfResidence = followUpContact.addresses.filter((e) => {return e.typeId === config.userResidenceAddress.userPlaceOfResidence})
                 if (contactPlaceOfResidence && contactPlaceOfResidence[0]) {
-                    addressText = getAddress(contactPlaceOfResidence[0], true);
+                    addressText = getAddress(contactPlaceOfResidence[0], true, this.props.locations);
                 }
             }
            
             if (this.props.isContact && contact && contact.addresses && Array.isArray(contact.addresses) && contact.addresses.length > 0) {
                 let contactPlaceOfResidence = contact.addresses.filter((e) => {return e.typeId === config.userResidenceAddress.userPlaceOfResidence});
-                addressText = getAddress(contactPlaceOfResidence[0], true);
+                addressText = getAddress(contactPlaceOfResidence[0], true, this.props.locations);
             }
 
             let relationshipText = '';
@@ -268,7 +268,8 @@ function mapStateToProps(state) {
         contacts: state.contacts,
         exposure: state.exposure,
         events: state.events,
-        role: state.role
+        role: state.role,
+        locations: state.locations.locationsList
     };
 }
 

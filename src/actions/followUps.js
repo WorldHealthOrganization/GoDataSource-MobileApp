@@ -21,6 +21,7 @@ import {extractIdFromPouchId, mapContactsAndRelationships, mapContactsAndFollowU
 import {getContactsForFollowUpPeriodRequest} from './../queries/contacts';
 import {difference} from 'lodash';
 import {setSyncState, saveGeneratedFollowUps} from './app';
+import {batchActions} from 'redux-batched-actions';
 
 // Add here only the actions, not also the requests that are executed. For that purpose is the requests directory
 export function storeFollowUps(followUps) {
@@ -57,12 +58,16 @@ export function getFollowUpsForOutbreakId(outbreakId, filter, userTeams, token) 
                 getContactsForOutbreakIdWithPromises(outbreakId, {keys: keys}, null, dispatch)
                     .then((responseGetContacts) => {
                         console.log ('getFollowUpsForOutbreakIdRequest getContactsForOutbreakIdWithPromises response')
-                        dispatch(storeFollowUps(response));
+                        // dispatch(storeFollowUps(response));
                         let mappedContact = [];
                         if (response.length > 0) {
                             mappedContact = mapContactsAndFollowUps(responseGetContacts, response);
                         }
-                        dispatch(storeContacts(mappedContact));
+                        // dispatch(storeContacts(mappedContact));
+                        dispatch(batchActions([
+                            storeFollowUps(response),
+                            storeContacts(mappedContact)
+                        ]))
                     })
                     .catch((errorGetContactsForFollowUps) => {
                         console.log ('getFollowUpsForOutbreakIdRequest getContactsForOutbreakIdWithPromises error', JSON.stringify(errorGetContactsForFollowUps))
@@ -129,7 +134,7 @@ export function getMissedFollowUpsForOutbreakId(outbreakId, filter, token) {
     }
 }
 
-export function updateFollowUpAndContact(outbreakId, contactId, followUpId, followUp, contact, token, filter) {
+export function updateFollowUpAndContact(outbreakId, contactId, followUpId, followUp, contact, token, filter, userTeams) {
     let contactIdForFollowUp = null;
     if (contactId) {
         contactIdForFollowUp = extractIdFromPouchId(contactId, 'person')
@@ -144,7 +149,7 @@ export function updateFollowUpAndContact(outbreakId, contactId, followUpId, foll
                 console.log("*** updateFollowUp response: ", JSON.stringify(response));
                 dispatch(updateFollowUpAction(response));
                 if (contact && contactId) {
-                    dispatch(updateContact(outbreakId, contactId, contact, token, filter, true));
+                    dispatch(updateContact(outbreakId, contactId, contact, token, filter, true, userTeams));
                 } else if (contact){
                     console.log ('updateContactAction');
                     dispatch(updateContactAction(contact));
@@ -168,7 +173,7 @@ export function addFollowUp(outbreakId, contactId, followUp, activeFilters, user
     }
 }
 
-export function createFollowUp(outbreakId, contactId, followUp, contact, activeFilters, token) {
+export function createFollowUp(outbreakId, contactId, followUp, contact, activeFilters, token, userTeams) {
     let contactIdForFollowUp = extractIdFromPouchId(contactId, 'person')
     return async function(dispatch, getState) {
         addFollowUpRequest(outbreakId, contactIdForFollowUp, followUp, token, (error, response) => {
@@ -178,7 +183,7 @@ export function createFollowUp(outbreakId, contactId, followUp, contact, activeF
             }
             if (response) {
                 dispatch(updateFollowUpAction(response));
-                dispatch(updateContact(outbreakId, contactId, contact, token, activeFilters, true));
+                dispatch(updateContact(outbreakId, contactId, contact, token, activeFilters, true, userTeams));
             }
         })
     }

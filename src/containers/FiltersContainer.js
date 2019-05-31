@@ -233,7 +233,7 @@ function mapStateToProps(state) {
     return {
         screenSize: state.app.screenSize,
         translation: state.app.translation,
-        locations: state.locations,
+        locations: state.locations.locations,
         helpCategory: state.helpCategory,
         referenceData: state.referenceData,
     };

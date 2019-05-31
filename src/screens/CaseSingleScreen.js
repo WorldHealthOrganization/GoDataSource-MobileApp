@@ -232,7 +232,7 @@ class CaseSingleScreen extends Component {
                         <View
                             style={[style.breadcrumbContainer]}>
                             <Breadcrumb
-                                entities={[getTranslation(translations.caseSingleScreen.title, this.props.translation), this.props.isNew ? getTranslation(translations.caseSingleScreen.addCaseTitle, this.props.translation) : ((this.props.case && this.props.case.firstName ? (this.props.case.firstName + " ") : '') + (this.props.case && this.props.case.lastName ? this.props.case.lastName : ''))]}
+                                entities={[getTranslation(this.props && this.props.previousScreen ? this.props.previousScreen : translations.caseSingleScreen.title, this.props.translation), this.props.isNew ? getTranslation(translations.caseSingleScreen.addCaseTitle, this.props.translation) : ((this.props.case && this.props.case.firstName ? (this.props.case.firstName + " ") : '') + (this.props.case && this.props.case.lastName ? this.props.case.lastName : ''))]}
                                 navigator={this.props.navigator}
                                 onPress={this.handlePressBreadcrumb}
                             />
@@ -981,32 +981,34 @@ class CaseSingleScreen extends Component {
     };
     handleOnChangeSectionedDropDownAddress = (selectedItems, index) => {
         // Here selectedItems is always an array with just one value and should pe mapped to the locationId field from the address from index
-        let addresses = _.cloneDeep(this.state.case.addresses);
-        addresses[index].locationId = extractIdFromPouchId(selectedItems['0']._id, 'location');
-        if (selectedItems['0'].geoLocation && selectedItems['0'].geoLocation.coordinates && Array.isArray(selectedItems['0'].geoLocation.coordinates)) {
-            if (selectedItems['0'].geoLocation.coordinates[0] !== 0 || selectedItems['0'].geoLocation.coordinates[1] !== 0) {
-                setTimeout(() => {
-                    Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.alertMessages.replaceCurrentCoordinates, this.props.translation), [
-                        {
-                            text: getTranslation(translations.alertMessages.cancelButtonLabel, this.props.translation), onPress: () => { console.log('Cancel pressed') }
-                        },
-                        {
-                            text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation), onPress: () => {
-                                addresses[index].geoLocation = selectedItems['0'].geoLocation;
-                                console.log('Addresses biatch: ', addresses);
-                                this.setState(prevState => ({
-                                    case: Object.assign({}, prevState.case, { addresses })
-                                }))
+        if (selectedItems && Array.isArray(selectedItems) && selectedItems.length > 0) {
+            let addresses = _.cloneDeep(this.state.case.addresses);
+            addresses[index].locationId = extractIdFromPouchId(selectedItems['0']._id, 'location');
+            if (selectedItems['0'].geoLocation && selectedItems['0'].geoLocation.coordinates && Array.isArray(selectedItems['0'].geoLocation.coordinates)) {
+                if (selectedItems['0'].geoLocation.coordinates[0] !== 0 || selectedItems['0'].geoLocation.coordinates[1] !== 0) {
+                    setTimeout(() => {
+                        Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.alertMessages.replaceCurrentCoordinates, this.props.translation), [
+                            {
+                                text: getTranslation(translations.alertMessages.cancelButtonLabel, this.props.translation), onPress: () => { console.log('Cancel pressed') }
+                            },
+                            {
+                                text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation), onPress: () => {
+                                    addresses[index].geoLocation = selectedItems['0'].geoLocation;
+                                    console.log('Addresses biatch: ', addresses);
+                                    this.setState(prevState => ({
+                                        case: Object.assign({}, prevState.case, { addresses })
+                                    }))
+                                }
                             }
-                        }
-                    ])
-                }, 200);
+                        ])
+                    }, 200);
+                }
+            } else {
+                console.log('Addresses biatch: ', addresses);
+                this.setState(prevState => ({
+                    case: Object.assign({}, prevState.case, { addresses })
+                }))
             }
-        } else {
-            console.log('Addresses biatch: ', addresses);
-            this.setState(prevState => ({
-                case: Object.assign({}, prevState.case, { addresses })
-            }))
         }
     };
 
@@ -1588,10 +1590,18 @@ class CaseSingleScreen extends Component {
 
         if (stateValue !== undefined && stateValue !== null) {
             if (id === 'age') {
-                let ageClone = { years: 0, months: 0 }
+                let ageClone = { years: 0, months: 0 };
 
-                if (!isNaN(Number(value)) && !value.includes(".") && !value.includes("-") && !value.includes(",") && !value.includes(" ")) {
-                    ageClone.years = Number(value)
+                // Do replacing for value
+                // Replace first and last chars if it is ,
+                value = value.replace(/^,|,$/g, '');
+                // Replace the first , with .
+                value = value.replace(/,/, '.');
+                // Replace all the remaining , with empty string
+                value = value.replace(/,/g, '');
+
+                if (!isNaN(Number(value)) && !value.includes("-") && !value.includes(" ")) {
+                    ageClone.years = Number(value);
                     ageClone.months = Number(value)
                 }
 
@@ -2004,7 +2014,7 @@ function mapStateToProps(state) {
     return {
         user: state.user,
         screenSize: state.app.screenSize,
-        outbreak: state.outbreak,
+        // outbreak: state.outbreak,
         errors: state.errors,
         filter: state.app.filters,
         cases: state.cases,

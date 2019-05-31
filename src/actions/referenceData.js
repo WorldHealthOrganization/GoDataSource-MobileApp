@@ -22,12 +22,13 @@ export function getReferenceData(token, dispatch) {
         getReferenceDataRequest (null, (error, response) => {
             if (error) {
                 console.log("*** getReferenceDataRequest error: ", error);
-                dispatch(addError(errorTypes.ERROR_REFERENCE_DATA));
-                reject(error);
+                // dispatch(addError(errorTypes.ERROR_REFERENCE_DATA));
+                reject(errorTypes.ERROR_REFERENCE_DATA);
             }
             if (response) {
-                dispatch(storeReferenceData(response));
-                resolve('Done referenceData');
+                // dispatch(storeReferenceData(response));
+                // resolve('Done reference data');
+                resolve({referenceData: response});
             }
         })
     })

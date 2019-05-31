@@ -9,16 +9,15 @@ import { Icon } from 'react-native-material-ui';
 import styles from './../styles';
 import NavBarCustom from './../components/NavBarCustom';
 import config from './../utils/config';
-import {connect} from "react-redux";
-import {bindActionCreators} from "redux";
-import {TabBar, TabView, SceneMap} from 'react-native-tab-view';
-import FollowUpsSingleGetInfoContainer from './../containers/FollowUpsSingleGetInfoContainer';
+import { connect } from "react-redux";
+import { bindActionCreators } from "redux";
+import { TabBar, TabView, SceneMap } from 'react-native-tab-view';
+import FollowUpsSingleContainer from './../containers/FollowUpsSingleContainer';
 import FollowUpsSingleQuestionnaireContainer from './../containers/FollowUpsSingleQuestionnaireContainer';
 import Breadcrumb from './../components/Breadcrumb';
 import Menu, { MenuItem } from 'react-native-material-menu';
 import Ripple from 'react-native-material-ripple';
 import { createFollowUp, updateFollowUpAndContact, deleteFollowUp } from './../actions/followUps';
-import { updateContact } from './../actions/contacts';
 import { removeErrors } from './../actions/errors';
 import DateTimePicker from 'react-native-modal-datetime-picker';
 import _ from 'lodash';
@@ -77,14 +76,14 @@ class FollowUpsSingleScreen extends Component {
                     console.log('follow-ups date < today => needitabil')
                     isEditMode = false
                 }
-            } else if (this.props.role && this.props.role.find((e) => e === config.userPermissions.writeFollowUp) === undefined && this.props.role.find((e) => e === config.userPermissions.readFollowUp) !== undefined){
+            } else if (this.props.role && this.props.role.find((e) => e === config.userPermissions.writeFollowUp) === undefined && this.props.role.find((e) => e === config.userPermissions.readFollowUp) !== undefined) {
 
                 isEditMode = false
             }
         }
 
-        if (this.props.outbreak && this.props.outbreak.contactFollowUpTemplate) {
-            let mappedAnswers = mapAnswers(this.props.outbreak.contactFollowUpTemplate, this.state.item.questionnaireAnswers);
+        if (this.props.contactFollowUpTemplate) {
+            let mappedAnswers = mapAnswers(this.props.contactFollowUpTemplate, this.state.item.questionnaireAnswers);
             this.setState({
                 previousAnswers: mappedAnswers.mappedAnswers,
                 mappedQuestions: mappedAnswers.mappedQuestions,
@@ -178,7 +177,7 @@ class FollowUpsSingleScreen extends Component {
                         <View
                             style={[style.breadcrumbContainer]}>
                             <Breadcrumb
-                                entities={[getTranslation(translations.followUpsSingleScreen.title, this.props.translation), ((this.state.contact && this.state.contact.firstName ? (this.state.contact.firstName + " ") : '') + (this.state.contact && this.state.contact.lastName ? this.state.contact.lastName : ''))]}
+                                entities={[getTranslation(this.props && this.props.previousScreen ? this.props.previousScreen : translations.followUpsSingleScreen.title, this.props.translation), ((this.state.contact && this.state.contact.firstName ? (this.state.contact.firstName + " ") : '') + (this.state.contact && this.state.contact.lastName ? this.state.contact.lastName : ''))]}
                                 navigator={this.props.navigator}
                                 onPress={this.handlePressBreadcrumb}
                             />
@@ -277,7 +276,7 @@ class FollowUpsSingleScreen extends Component {
         switch (route.key) {
             case 'genInfo':
                 return (
-                    <FollowUpsSingleGetInfoContainer
+                    <FollowUpsSingleContainer
                         isNew={this.props.isNew}
                         isEditMode={this.state.isEditMode}
                         item={this.state.item}
@@ -313,7 +312,7 @@ class FollowUpsSingleScreen extends Component {
                 );
             default:
                 return (
-                    <FollowUpsSingleGetInfoContainer
+                    <FollowUpsSingleContainer
                         item={this.state.item}
                         isEditMode={this.state.isEditMode}
                         contact={this.state.contact}
@@ -773,7 +772,7 @@ class FollowUpsSingleScreen extends Component {
             if (this.props.isNew) {
                 followUpClone = updateRequiredFields(this.props.user.activeOutbreakId, this.props.user._id, Object.assign({}, followUpClone), action = 'create', 'followUp.json');
                 console.log('followUpClone create', JSON.stringify(followUpClone))
-                this.props.createFollowUp(this.props.user.activeOutbreakId, contactClone._id, followUpClone, contactClone, null, this.props.user.token)
+                this.props.createFollowUp(this.props.user.activeOutbreakId, contactClone._id, followUpClone, contactClone, null, this.props.user.token, this.props.teams)
             } else {
                 if (this.state.deletePressed === false) {
                     followUpClone = updateRequiredFields(this.props.user.activeOutbreakId, this.props.user._id, Object.assign({}, followUpClone), action = 'update');
@@ -782,7 +781,7 @@ class FollowUpsSingleScreen extends Component {
                     followUpClone = updateRequiredFields(this.props.user.activeOutbreakId, this.props.user._id, Object.assign({}, followUpClone), action = 'delete');
                     console.log('followUpClone delete', JSON.stringify(followUpClone))
                 }
-                this.props.updateFollowUpAndContact(this.props.user.activeOutbreakId, contactClone._id, followUpClone._id, followUpClone, contactClone, this.props.user.token, this.props.filter);
+                this.props.updateFollowUpAndContact(this.props.user.activeOutbreakId, contactClone._id, followUpClone._id, followUpClone, contactClone, this.props.user.token, this.props.filter, this.props.teams);
             }
         });
     };
@@ -1018,10 +1017,11 @@ const style = StyleSheet.create({
 
 function mapStateToProps(state) {
     return {
+        teams: state.teams,
         user: state.user,
         screenSize: state.app.screenSize,
         followUps: state.followUps,
-        outbreak: state.outbreak,
+        contactFollowUpTemplate: state.outbreak.contactFollowUpTemplate,
         errors: state.errors,
         contacts: state.contacts,
         translation: state.app.translation,
@@ -1034,7 +1034,6 @@ function matchDispatchProps(dispatch) {
         createFollowUp,
         updateFollowUpAndContact,
         deleteFollowUp,
-        updateContact,
         removeErrors
     }, dispatch);
 }

@@ -117,6 +117,9 @@ const caseSingleScreen = {
     transferRefused: 'LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED',
     riskReason: 'LNG_CASE_FIELD_LABEL_RISK_REASON',
 
+    // TODO add to backend
+    caseId: 'LNG_CASE_FIELD_LABEL_CASE_ID',
+
     documentType: 'LNG_CASE_FIELD_LABEL_DOCUMENT_TYPE',
     documentNumber: 'LNG_CASE_FIELD_LABEL_DOCUMENT_NUMBER',
     deleteButton: 'LNG_COMMON_BUTTON_DELETE',
@@ -184,7 +187,10 @@ const contactSingleScreen = {
     dateOfReporting: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING',
     isDateOfReportingApproximate: 'LNG_CONTACT_FIELD_LABEL_IS_DATE_OF_REPORTING_APPROXIMATE',
     riskLevel: 'LNG_CONTACT_FIELD_LABEL_RISK_LEVEL',
-    riskReason: 'LNG_CONTACT_FIELD_LABEL_RISK_REASON'
+    riskReason: 'LNG_CONTACT_FIELD_LABEL_RISK_REASON',
+
+    // TODO add to backend
+    contactId: 'LNG_CONTACT_FIELD_LABEL_CONTACT_ID'
 };
 
 const exposureScreen = {
@@ -517,7 +523,16 @@ const previousAnswersScreen = {
 
 // TODO add to backend
 const followUpAgenda = {
+    followUp: 'LNG_FOLLOW_UP_AGENDA_FOLLOW_UP',
+    followUpStatus: 'LNG_FOLLOW_UP_AGENDA_FOLLOW_UP_STATUS',
+    followUpQuestionnaire: 'LNG_FOLLOW_UP_AGENDA_FOLLOW_UP_QUESTIONNAIRE',
+    followUpAddress: 'LNG_FOLLOW_UP_AGENDA_FOLLOW_UP_ADDRESS',
     noFollUpsForDate: 'LNG_FOLLOW_UP_AGENDA_NO_FOLLOW_UPS_FOR_DATE'
+};
+
+// TODO add to backend:
+const personListItem = {
+    dayOfFollowUp: 'LNG_PERSON_LIST_ITEM_DAY_OF_FOLLOW_UP'
 };
 
 export default {
@@ -560,5 +575,6 @@ export default {
     sortTab,
     addSingleAnswerModalScreen,
     previousAnswersScreen,
-    followUpAgenda
+    followUpAgenda,
+    personListItem
 };

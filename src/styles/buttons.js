@@ -2,6 +2,7 @@
  * Created by florinpopa on 04/07/2018.
  */
 import colors from './colors';
+import styles from "./index";
 
 const buttonGreen = {
     container: {
@@ -35,8 +36,15 @@ const buttonLogin = {
     }
 };
 
+const buttonTextActionsBar = {
+    fontFamily: 'Roboto-Medium',
+    fontSize: 16,
+    color: colors.buttonGreen
+};
+
 export default {
     buttonGreen,
     buttonRed,
-    buttonLogin
+    buttonLogin,
+    buttonTextActionsBar
 }

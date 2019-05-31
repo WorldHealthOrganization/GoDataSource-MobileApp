@@ -19,6 +19,7 @@ import styles from './../styles';
 import Ripple from 'react-native-material-ripple';
 import ElevatedView from 'react-native-elevated-view';
 import translations from './../utils/translations'
+import {getAddress} from './../utils/functions';
 
 class CaseListItem extends Component {
 
@@ -49,8 +50,10 @@ class CaseListItem extends Component {
         if (item && item.age !== undefined && item.age !== null) {
             if (item.age.years !== undefined || item.age.months !== undefined) {
                 if (item.age.years !== 0 && item.age.years !== null) {
+                    // console.log('Here will be an error years: ', item.age);
                     secondaryTextAge = item.age.years.toString() + getTranslation(config.localTranslationTokens.years, translation).charAt(0).toLowerCase()
-                } else if (item.age.months !== 0 && item.age.months !== null) {
+                } else if (item.age.months !== undefined && item.age.months !== 0 && item.age.months !== null) {
+                    // console.log('Here will be an error months: ', item.age);
                     secondaryTextAge = item.age.months.toString() + getTranslation(config.localTranslationTokens.months, translation).charAt(0).toLowerCase()
                 }
             }
@@ -58,15 +61,12 @@ class CaseListItem extends Component {
         let secondaryText = secondaryTextGender + ((secondaryTextGender.trim().length > 0 && secondaryTextAge.trim().length > 0 ) ? ', ' : '') + secondaryTextAge;
 
         let addressText = ' ';
-        let addressArray = []
         if (item && item.addresses && item.addresses.length > 0) {
-            let casePlaceOfResidence = item.addresses.filter((e) => {return e.typeId === config.userResidenceAddress.userPlaceOfResidence})
-            if (casePlaceOfResidence && casePlaceOfResidence[0]) {
-                addressArray = [casePlaceOfResidence[0].addressLine1, casePlaceOfResidence[0].addressLine2, casePlaceOfResidence[0].city, casePlaceOfResidence[0].country, casePlaceOfResidence[0].postalCode];
-                addressArray = addressArray.filter((e) => {return e});
+            let casePlaceOfResidence = item.addresses.find((e) => {return e.typeId === config.userResidenceAddress.userPlaceOfResidence});
+            if (casePlaceOfResidence) {
+                addressText = getAddress(casePlaceOfResidence, true, this.props.locations);
             }
         }
-        addressText = addressArray.join(', ');
 
         return (
             <ElevatedView elevation={3} style={[style.container, {
@@ -226,7 +226,8 @@ function mapStateToProps(state) {
         cases: state.cases,
         role: state.role,
         contacts: state.contacts,
-        events: state.events
+        events: state.events,
+        locations: state.locations.locationsList
     };
 }
 

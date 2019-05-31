@@ -36,6 +36,7 @@ import {addError} from './errors';
 // import {addError} from './errors';
 // import RNDB from 'react-native-nosql-to-sqlite';
 import {getSyncEncryptPassword} from './../utils/encryption';
+import errorTypes from "../utils/errorTypes";
 
 let arrayOfStatuses = [];
 
@@ -136,12 +137,13 @@ export function getTranslations(language, dispatch) {
         getTranslationRequest(language, (error, response) => {
             if (error) {
                 console.log("*** getTranslations error: ", error);
-                reject(error);
+                reject(errorTypes.ERROR_OUTBREAK);
             }
             if (response) {
                 console.log("### here should have the translations: ");
-                dispatch(saveTranslation(response));
-                resolve('Done translation');
+                // dispatch(saveTranslation(response));
+                // resolve('Done translations');
+                resolve({translations: response});
             }
         })
     })
@@ -205,12 +207,13 @@ export function getAvailableLanguages(dispatch) {
         getAvailableLanguagesRequest((error, response) => {
             if (error) {
                 console.log("*** getAvailableLanguages error: ", error);
-                reject(error);
+                reject(errorTypes.ERROR_OUTBREAK);
             }
             if (response) {
-                console.log("### here should have available languages: ", response.map((e) => {return {id: extractIdFromPouchId(e._id, 'language'), name: e.name}}));
-                dispatch(saveAvailableLanguages(response.map((e) => {return {value: e._id.substr('language.json_'.length), label: e.name}})));
-                resolve('Done languages');
+                // console.log("### here should have available languages: ", response.map((e) => {return {id: extractIdFromPouchId(e._id, 'language'), name: e.name}}));
+                // dispatch(saveAvailableLanguages(response.map((e) => {return {value: e._id.substr('language.json_'.length), label: e.name}})));
+                // resolve('Done available languages');
+                resolve({availableLanguages: response.map((e) => {return {value: e._id.substr('language.json_'.length), label: e.name}})});
             }
         })
     })
@@ -1163,7 +1166,7 @@ export function appInitialized(nativeEventEmitter) {
 
         try {
             let loggedUser = await AsyncStorage.getItem('loggedUser');
-            console.log('Logged user: ', loggedUser);
+            // console.log('Logged user: ', loggedUser);
             if (loggedUser !== null) {
                 try {
                     let activeDatabase = await AsyncStorage.getItem('activeDatabase');
