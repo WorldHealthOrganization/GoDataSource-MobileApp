@@ -20,6 +20,7 @@ import { mapAnswers, calculateDimension, getTranslation } from "../utils/functio
 import get from 'lodash/get';
 import ElevatedView from 'react-native-elevated-view';
 import translation from './../utils/translations';
+import FollowUpAgendaItem from './FollowUpAgendaItem';
 
 class FollowUpAgenda extends PureComponent {
 
@@ -37,7 +38,7 @@ class FollowUpAgenda extends PureComponent {
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
-        const newFollowUps = cloneDeep(this.props.followUps)
+        const newFollowUps = cloneDeep(this.props.followUps);
 
         return (
             <Agenda
@@ -56,84 +57,13 @@ class FollowUpAgenda extends PureComponent {
 
     // Please write here all the methods that are not react native lifecycle methods
     renderItem = (item, firstItemInDay) => {
-        let mappedAnswers = {};
-        if (get(this.props, 'outbreak.contactFollowUpTemplate', 'failOubreakQuestions') !== 'failOubreakQuestions' && get(item, 'text.questionnaireAnswers', 'failQuestionnaire') !== 'failQuestionnaire') {
-            mappedAnswers = mapAnswers(this.props.outbreak.contactFollowUpTemplate, item.text.questionnaireAnswers);
-        }
-
-        let date = '';
-        if (firstItemInDay) {
-            date = this.extractDate(get(item, 'text.date', ''))
-        }
-
-        const screenSize = get(this.props, 'screenSize')
-        const itemId = get(item, 'text._id', undefined)
-        const itemIdQuestionnaire = `${itemId}_questionnaire`
-        const itemIdStatus = `${itemId}_status`
-        const itemIdAddress = `${itemId}_address`
-
         return (
-            <View>
-                {
-                    firstItemInDay ? (
-                        <View style={{
-                            marginHorizontal: calculateDimension(16, false, screenSize),
-                            marginVertical: calculateDimension(5, true, screenSize),
-                        }}>
-                            <Text style={{ fontFamily: 'Roboto-Medium', fontSize: 16 }}>{date}</Text>
-                        </View>
-                    ) : (null)
-                }
-                {
-                    ToggleFollowUpDetails(getTranslation(translation.followUpAgenda.followUp, this.props.translation), screenSize, itemId, this.ChangeCollpased, this.state.collapsed, 25)
-                }
-                {
-                    this.state.collapsed[itemId] === false ? (
-                        <Collapsible collapsed={this.state.collapsed[itemId]}>
-                            {
-                                ToggleFollowUpDetails(getTranslation(translation.followUpAgenda.followUpStatus, this.props.translation), screenSize, itemIdStatus, this.ChangeCollpased, this.state.collapsed, 30)
-                            }
-                            {
-                                this.state.collapsed[itemIdStatus] === false ? (
-                                    <Collapsible collapsed={this.state.collapsed[itemIdStatus]}>
-                                        <FollowUpsSingleGetInfoContainer
-                                            isNew={false}
-                                            isEditMode={false}
-                                            item={get(item, 'text', {})}
-                                            contact={this.props.contact}
-                                        />
-                                    </Collapsible>) : null
-                            }
-                            {
-                                ToggleFollowUpDetails(getTranslation(translation.followUpAgenda.followUpQuestionnaire, this.props.translation), screenSize, itemIdQuestionnaire, this.ChangeCollpased, this.state.collapsed, 30)
-                            }
-                            {
-                                this.state.collapsed[itemIdQuestionnaire] === false ? (
-                                    <Collapsible collapsed={this.state.collapsed[itemIdQuestionnaire]}>
-                                        <FollowUpsSingleQuestionnarireContainer
-                                            item={get(item, 'text', {})}
-                                            previousAnswers={get(mappedAnswers, 'mappedAnswers', {})}
-                                            contact={this.props.contact}
-                                            isEditMode={false}
-                                        />
-                                    </Collapsible>) : null
-                            }
-                            {
-                                ToggleFollowUpDetails(getTranslation(translation.followUpAgenda.followUpAddress, this.props.translation), screenSize, itemIdAddress, this.ChangeCollpased, this.state.collapsed, 30)
-                            }
-                            {
-                                this.state.collapsed[itemIdAddress] === false ? (
-                                    <Collapsible collapsed={this.state.collapsed[itemIdAddress]}>
-                                        <FollowUpsSingleAddressContainer
-                                            item={get(item, 'text', {})}
-                                            contact={this.props.contact}
-                                        />
-                                    </Collapsible>) : null
-                            }
-                        </Collapsible>)
-                        : null
-                }
-            </View >
+            <FollowUpAgendaItem
+                firstItemInDay={firstItemInDay}
+                item={item}
+                collapsed={this.state.collapsed}
+                ChangeCollpased={this.ChangeCollpased}
+            />
         )
     };
 
@@ -157,11 +87,6 @@ class FollowUpAgenda extends PureComponent {
         )
     };
 
-    extractDate = (date) => {
-        date = new Date(date);
-        return `${date.getDate() < 9 ? '0' + date.getDate() : date.getDate()}/${date.getUTCMonth() < 9 ? '0' + (date.getUTCMonth() + 1) : (date.getUTCMonth() + 1)}/${date.getUTCFullYear()}`;
-    };
-
     renderEmptyData = () => {
         let marginHorizontal = calculateDimension(16, false, this.props.screenSize);
         return (
@@ -170,31 +95,6 @@ class FollowUpAgenda extends PureComponent {
             </View>
         )
     }
-}
-
-const ToggleFollowUpDetails = (text, screenSize, itemId, ChangeCollpased, collapsed, marginHorizontal) => {
-    return (
-        <View style={{
-            marginHorizontal: calculateDimension(marginHorizontal, false, screenSize),
-            marginVertical: calculateDimension(3, true, screenSize),
-            flexDirection: 'row',
-            justifyContent: 'space-between'
-        }}>
-            <Text style={{ fontFamily: 'Roboto-Medium', fontSize: 16 }}>{text}</Text>
-
-            <Ripple style={{
-                justifyContent: 'flex-end',
-                width: calculateDimension(33, false, screenSize),
-                height: calculateDimension(25, true, screenSize),
-            }} onPress={() => ChangeCollpased(itemId)}>
-                {
-                    collapsed[itemId] === true || collapsed[itemId] === undefined
-                        ? <Icon name="arrow-drop-down" color={'black'} size={23} />
-                        : <Icon name="arrow-drop-up" color={'black'} size={23} />
-                }
-            </Ripple>
-        </View>
-    )
 }
 
 // Create style outside the class, or for components that will be used by other components (buttons),
