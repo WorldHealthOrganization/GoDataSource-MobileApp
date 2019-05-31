@@ -28,6 +28,7 @@ import {storeUserTeams} from './teams';
 import {storeClusters} from './clusters';
 import {setLoginState, storeData, getAvailableLanguages, setSyncState} from './app';
 import {storePermissions} from './role';
+import {storeExposures} from './exposure';
 import {getLocations} from './locations';
 import moment from 'moment';
 import get from 'lodash/get';
@@ -371,7 +372,7 @@ export function computeCommonData(storeUserBool, user) {
                             storeClusters(get(actionsObject,  'clusters', null)),
                             storePermissions(get(actionsObject,  'userRoles', null)),
                             storeUserTeams(get(actionsObject,  'userTeams', null)),
-                            storeCases(get(actionsObject,  'cases', null)),
+                            storeExposures(get(actionsObject,  'cases', null)),
                             storeEvents(get(actionsObject,  'events', null)),
                             storeHelpCategory(get(actionsObject,  'helpCategory', null)),
                             storeHelpItem(get(actionsObject,  'helpItem', null)),
