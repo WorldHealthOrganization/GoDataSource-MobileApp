@@ -23,9 +23,6 @@ class FollowUpAgendaItem extends PureComponent {
     constructor(props) {
         super(props);
         this.state = {
-            collapsed: {
-
-            }
         };
     }
 
@@ -120,20 +117,6 @@ class FollowUpAgendaItem extends PureComponent {
     extractDate = (date) => {
         date = new Date(date);
         return `${date.getDate() < 9 ? '0' + date.getDate() : date.getDate()}/${date.getUTCMonth() < 9 ? '0' + (date.getUTCMonth() + 1) : (date.getUTCMonth() + 1)}/${date.getUTCFullYear()}`;
-    };
-
-    ChangeCollpased = (id) => {
-        const { collapsed } = this.state;
-        const collapsedCpy = cloneDeep(collapsed);
-
-        if (collapsedCpy[id] !== undefined) {
-            collapsedCpy[id] = !collapsedCpy[id]
-        } else {
-            collapsedCpy[id] = false;
-        }
-        this.setState({
-            collapsed: collapsedCpy
-        })
     };
 }
 
