@@ -196,6 +196,7 @@ export function cleanDataAfterLogout() {
                 storeContacts(null),
                 storeFollowUps(null),
                 storeCases(null),
+                storeExposures(null),
                 storeEvents(null),
                 storeOutbreak(null),
                 storeHelpCategory(null),
