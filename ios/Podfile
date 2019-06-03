@@ -3,6 +3,8 @@ target 'who_mobile' do
   pod 'SQLCipher'
   pod 'Parse'
   # Add new pods below this line
+  pod 'SentryReactNative', :path => '../node_modules/react-native-sentry'
+
 
   # pod 'react-native-document-picker', :path => '../node_modules/react-native-document-picker'
 
