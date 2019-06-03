@@ -28,6 +28,7 @@ import {storeUserTeams} from './teams';
 import {storeClusters} from './clusters';
 import {setLoginState, storeData, getAvailableLanguages, setSyncState} from './app';
 import {storePermissions} from './role';
+import {storeExposures} from './exposure';
 import {getLocations} from './locations';
 import moment from 'moment';
 import get from 'lodash/get';
@@ -158,7 +159,7 @@ export function newLoginUser(credentials) {
                         //     });
                     })
                     .catch((errorOutbreak) => {
-                        console.log('Getting data from local db resulted in error: ', error);
+                        console.log('Getting data from local db resulted in error: ', errorOutbreak);
                         dispatch(setLoginState('Error'))
                     })
 
@@ -195,6 +196,7 @@ export function cleanDataAfterLogout() {
                 storeContacts(null),
                 storeFollowUps(null),
                 storeCases(null),
+                storeExposures(null),
                 storeEvents(null),
                 storeOutbreak(null),
                 storeHelpCategory(null),
@@ -219,7 +221,7 @@ export function cleanDataAfterLogout() {
 }
 
 export function getUserById(userId, token, refreshFollowUps, nativeEventEmitter) {
-    return async function(dispatch, getState) {
+    return async function (dispatch, getState) {
         console.log("getUserById userId: ", userId);
         getUserByIdRequest(userId, token, (error, response) => {
             if (error) {
@@ -232,7 +234,7 @@ export function getUserById(userId, token, refreshFollowUps, nativeEventEmitter)
 
                 // Here is the local storage handling
                 if (refreshFollowUps) {
-                    dispatch(setSyncState({id: 'sync', status: 'test'}));
+                    dispatch(setSyncState({ id: 'sync', status: 'test' }));
                 }
 
                 dispatch(computeCommonData(false, response));
@@ -371,7 +373,7 @@ export function computeCommonData(storeUserBool, user) {
                             storeClusters(get(actionsObject,  'clusters', null)),
                             storePermissions(get(actionsObject,  'userRoles', null)),
                             storeUserTeams(get(actionsObject,  'userTeams', null)),
-                            storeCases(get(actionsObject,  'cases', null)),
+                            storeExposures(get(actionsObject,  'cases', null)),
                             storeEvents(get(actionsObject,  'events', null)),
                             storeHelpCategory(get(actionsObject,  'helpCategory', null)),
                             storeHelpItem(get(actionsObject,  'helpItem', null)),

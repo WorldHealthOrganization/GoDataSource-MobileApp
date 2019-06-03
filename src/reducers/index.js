@@ -17,6 +17,7 @@ import helpCategory from './helpCategory';
 import helpItem from './helpItem';
 import clusters from './clusters';
 import teams from './teams';
+import exposure from './exposure';
 
 const allReducers = combineReducers({
     app,
@@ -33,7 +34,8 @@ const allReducers = combineReducers({
     errors,
     referenceData,
     locations,
-    role
+    role,
+    exposure
 });
 
 export default allReducers;
