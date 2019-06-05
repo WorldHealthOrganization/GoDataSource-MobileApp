@@ -237,7 +237,7 @@ export function getUserById(userId, token, refreshFollowUps, nativeEventEmitter)
                     dispatch(setSyncState({ id: 'sync', status: 'test' }));
                 }
 
-                dispatch(computeCommonData(false, response));
+                dispatch(computeCommonData(false, response, refreshFollowUps, getState().app.filters));
 
                 // promises.push(getOutbreakById(response.activeOutbreakId, null, dispatch));
 
@@ -334,7 +334,7 @@ async function SyncRequestsWithPromises(refreshFollowUps, response, responseUser
     //     })
 }
 
-export function computeCommonData(storeUserBool, user) {
+export function computeCommonData(storeUserBool, user, refreshFollowUps, filters) {
     return async function (dispatch) {
         try {
             let outbreakAndLocationInfo = await getOutbreakById(user.activeOutbreakId, null, null);
@@ -343,17 +343,25 @@ export function computeCommonData(storeUserBool, user) {
 
                 // promises.push(getContactsForOutbreakIdWithPromises(response.activeOutbreakId, null, null, dispatch));
                 // promises.push(getFollowUpsForOutbreakIdWithPromises(response.activeOutbreakId, null, null, null, dispatch));
+                let userTeams = await getUserTeams(user._id, null);
                 promises.push(getTranslations(user.languageId, null));
                 promises.push(getLocations(outbreakAndLocationInfo.locationIds || null, null));
                 promises.push(getAvailableLanguages(dispatch));
                 promises.push(getReferenceData(null, dispatch));
                 promises.push(getHelpCategory(null, dispatch));
                 promises.push(getHelpItem(null, dispatch));
-                promises.push(getEventsForOutbreakId(user.activeOutbreakId, null, dispatch));
-                promises.push(getClusters(null, dispatch));
-                promises.push(getCasesForOutbreakIdWithPromise(user.activeOutbreakId, null, null, dispatch));
-                promises.push(getUserRoles(user.roleIds, dispatch));
-                promises.push(getUserTeams(user._id, dispatch));
+                if (refreshFollowUps) {
+                    let now = new Date();
+                    promises.push(getFollowUpsForOutbreakIdWithPromises(user.activeOutbreakId, filters['FollowUpsScreen'] || {
+                        date: new Date(new Date((now.getUTCMonth() + 1) + '/' + now.getUTCDate() + '/' + now.getUTCFullYear()).getTime() - ((moment().isDST() ? now.getTimezoneOffset() : now.getTimezoneOffset() - 60) * 60 * 1000)),
+                        searchText: ''
+                    }, userTeams, null, dispatch));
+                }
+                promises.push(getEventsForOutbreakId(user.activeOutbreakId, null, null));
+                promises.push(getClusters(null, null));
+                promises.push(getCasesForOutbreakIdWithPromise(user.activeOutbreakId, null, null, null));
+                promises.push(getUserRoles(user.roleIds, null));
+                // promises.push(getUserTeams(user._id, null));
 
                 Promise.all(promises)
                     .then((dataArray) => {
@@ -372,7 +380,7 @@ export function computeCommonData(storeUserBool, user) {
                             saveTranslation(get(actionsObject,  'translations', null)),
                             storeClusters(get(actionsObject,  'clusters', null)),
                             storePermissions(get(actionsObject,  'userRoles', null)),
-                            storeUserTeams(get(actionsObject,  'userTeams', null)),
+                            storeUserTeams(userTeams),
                             storeExposures(get(actionsObject,  'cases', null)),
                             storeEvents(get(actionsObject,  'events', null)),
                             storeHelpCategory(get(actionsObject,  'helpCategory', null)),
@@ -380,6 +388,12 @@ export function computeCommonData(storeUserBool, user) {
                             setLoginState('Finished logging'),
                             changeAppRoot('after-login')
                         ];
+
+                        if(refreshFollowUps) {
+                            arrayOfActions.push(setSyncState({id: 'tests', status:'Success'}));
+                            arrayOfActions.push(storeFollowUps(get(actionsObject, 'followUps.followUps', null)));
+                            arrayOfActions.push(storeContacts(get(actionsObject, 'followUps.contacts', null)));
+                        }
 
                         if (storeUserBool) {
                             storeData('loggedUser', user._id, (error, success) => {

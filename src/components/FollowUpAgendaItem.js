@@ -34,7 +34,7 @@ class FollowUpAgendaItem extends PureComponent {
     render() {
         // console.log("SectionedMultiSelect: ", this.props.items);
         let mappedAnswers = {};
-        if (get(this.props, 'outbreak.contactFollowUpTemplate', 'failOubreakQuestions') !== 'failOubreakQuestions' && get(this.props, 'item.text.questionnaireAnswers', 'failQuestionnaire') !== 'failQuestionnaire') {
+        if (get(this.props, 'outbreakContactFollowUpTemplate', 'failOubreakQuestions') !== 'failOubreakQuestions' && get(this.props, 'item.text.questionnaireAnswers', 'failQuestionnaire') !== 'failQuestionnaire') {
             mappedAnswers = mapAnswers(this.props.outbreakContactFollowUpTemplate, this.props.item.text.questionnaireAnswers);
         }
 
