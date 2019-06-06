@@ -66,7 +66,7 @@ export function pushNewEditScreen(QRCodeInfo, navigator, user, translation, call
         }
 
         if (itemPouchId) {
-            getItemByIdRequest(outbreakId, itemPouchId, itemType, (error, response) => {
+            getItemByIdRequest(outbreakId, itemPouchId, itemType, null, (error, response) => {
                 if (error) {
                     console.log("*** getItemByIdRequest error: ", error);
                     return callback(translations.alertMessages.noItemAlert, itemType, {_id: itemPouchId});
