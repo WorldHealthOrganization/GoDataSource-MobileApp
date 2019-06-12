@@ -2,6 +2,8 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>Your location is needed to retrieve contact/cases&apos; coordinates</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
@@ -58,9 +60,9 @@
 	<key>NSCameraUsageDescription</key>
 	<string>Camera is needed in order to scan QR code</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>Your location is needed to retrieve contact/cases' coordinates</string>
+	<string>Your location is needed to retrieve contact/cases&apos; coordinates</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Your location is needed to retrieve contacts/cases' coordinates</string>
+	<string>Your location is needed to retrieve contacts/cases&apos; coordinates</string>
 	<key>NSMotionUsageDescription</key>
 	<string>Some description</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
