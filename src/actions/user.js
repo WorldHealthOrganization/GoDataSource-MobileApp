@@ -344,10 +344,12 @@ export function computeCommonData(storeUserBool, user, refreshFollowUps, filters
                 // promises.push(getContactsForOutbreakIdWithPromises(response.activeOutbreakId, null, null, dispatch));
                 // promises.push(getFollowUpsForOutbreakIdWithPromises(response.activeOutbreakId, null, null, null, dispatch));
                 let userTeams = await getUserTeams(user._id, null);
-                promises.push(getTranslations(user.languageId, null));
-                promises.push(getLocations(outbreakAndLocationInfo.locationIds || null, null));
+                promises.push(getUserRoles(user.roleIds, null));
+                promises.push(getClusters(null, null));
                 promises.push(getAvailableLanguages(dispatch));
                 promises.push(getReferenceData(null, dispatch));
+                promises.push(getTranslations(user.languageId, null));
+                promises.push(getLocations(outbreakAndLocationInfo.locationIds || null, null));
                 promises.push(getHelpCategory(null, dispatch));
                 promises.push(getHelpItem(null, dispatch));
                 if (refreshFollowUps) {
@@ -358,9 +360,7 @@ export function computeCommonData(storeUserBool, user, refreshFollowUps, filters
                     }, userTeams, null, dispatch));
                 }
                 promises.push(getEventsForOutbreakId(user.activeOutbreakId, null, null));
-                promises.push(getClusters(null, null));
                 promises.push(getCasesForOutbreakIdWithPromise(user.activeOutbreakId, null, null, null));
-                promises.push(getUserRoles(user.roleIds, null));
                 // promises.push(getUserTeams(user._id, null));
 
                 Promise.all(promises)

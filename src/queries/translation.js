@@ -3,8 +3,19 @@
  */
 import {getDatabase} from './database';
 import config from './../utils/config';
+import {rawSQLQuery} from './sqlHelper';
 
 export function getAvailableLanguagesRequest (callback) {
+
+    // rawSQLQuery(config.mongoCollections.language, `${config.rawSQLQueryString}`, [])
+    //     .then((result) => {
+    //         callback(null, result);
+    //     })
+    //     .catch((error) => {
+    //         console.log('Error get translations: ', error);
+    //         callback(error)
+    //     })
+
     let start =  new Date().getTime();
 
     getDatabase(config.mongoCollections.language)
@@ -35,6 +46,15 @@ export function getAvailableLanguagesRequest (callback) {
 
 export function getTranslationRequest (languageId, callback) {
     let start =  new Date().getTime();
+
+    // rawSQLQuery(config.mongoCollections.languageToken, `${config.rawSQLQueryString}${config.rawSQLQueryWhereString}`, [`${config.mongoCollections.languageToken}.json_${languageId}_%`])
+    //     .then((result) => {
+    //         callback(null, result);
+    //     })
+    //     .catch((error) => {
+    //         console.log('Error get translations: ', error);
+    //         callback(error)
+    //     })
 
     getDatabase(config.mongoCollections.languageToken)
         .then((database) => {

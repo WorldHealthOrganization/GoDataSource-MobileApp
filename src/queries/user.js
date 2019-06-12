@@ -135,6 +135,7 @@ export function getRolesForUserRequest (roleIds, callback) {
 }
 
 export function getTeamsForUserRequest(callback) {
+    let start = new Date().getTime();
     getDatabase(config.mongoCollections.team)
         .then((database) => {
             database.find({
@@ -146,7 +147,7 @@ export function getTeamsForUserRequest(callback) {
                 }
             })
                 .then((result) => {
-                    console.log('Result in finding teams');
+                    console.log('Result for find time userTeams: ', new Date().getTime() - start);
                     callback(null, result.docs)
                 })
                 .catch((error) => {

@@ -79,7 +79,7 @@
 		E567B4CD62EC4DE6B39954D5 /* Ionicons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A64F56DA9922496E8F14D97B /* Ionicons.ttf */; };
 		E9CB62B08ACF4C2E98651372 /* Roboto-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A028CDE013104AAA955FC253 /* Roboto-Regular.ttf */; };
 		ED66F31E746248B331274E90 /* libPods-who_mobile.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0ECADE128F14DBEA491FB6A9 /* libPods-who_mobile.a */; };
-		F21A837F22A564A500F9B4AC /* libRNSentry.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F21A837822A5647E00F9B4AC /* libRNSentry.a */; };
+		F208B62A22AFCFD300B84216 /* libRNSentry.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F208B62322AFCFBD00B84216 /* libRNSentry.a */; };
 		F2315FB3219601360088153C /* libRNDocumentPicker.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F2315FAA219601240088153C /* libRNDocumentPicker.a */; };
 		F2316EAF229D328F002B7854 /* libRNReanimated.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F2316EAE229D3281002B7854 /* libRNReanimated.a */; };
 		F250AA102136B7EB002386CF /* libRNFetchBlob.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F250AA0F2136B7E3002386CF /* libRNFetchBlob.a */; };
@@ -412,16 +412,16 @@
 			remoteGlobalIDString = 358F4ED71D1E81A9004DF814;
 			remoteInfo = RCTBlob;
 		};
-		F21A837722A5647E00F9B4AC /* PBXContainerItemProxy */ = {
+		F208B62222AFCFBD00B84216 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = F21A833B22A5647E00F9B4AC /* RNSentry.xcodeproj */;
+			containerPortal = F208B5E622AFCFBD00B84216 /* RNSentry.xcodeproj */;
 			proxyType = 2;
 			remoteGlobalIDString = 134814201AA4EA6300B7C361;
 			remoteInfo = RNSentry;
 		};
-		F21A837922A5647E00F9B4AC /* PBXContainerItemProxy */ = {
+		F208B62422AFCFBD00B84216 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = F21A833B22A5647E00F9B4AC /* RNSentry.xcodeproj */;
+			containerPortal = F208B5E622AFCFBD00B84216 /* RNSentry.xcodeproj */;
 			proxyType = 2;
 			remoteGlobalIDString = 274692C321B4414400BF91A8;
 			remoteInfo = "RNSentry-tvOS";
@@ -605,7 +605,7 @@
 		D76C7890181046A1AA3452BD /* Octicons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Octicons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Octicons.ttf"; sourceTree = "<group>"; };
 		E9DC39632BDD44A9915133B7 /* RNKeychain.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNKeychain.xcodeproj; path = "../node_modules/react-native-keychain/RNKeychain.xcodeproj"; sourceTree = "<group>"; };
 		EC98F5D4250748DC812CB9B3 /* EvilIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = EvilIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/EvilIcons.ttf"; sourceTree = "<group>"; };
-		F21A833B22A5647E00F9B4AC /* RNSentry.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNSentry.xcodeproj; path = "../node_modules/react-native-sentry/ios/RNSentry.xcodeproj"; sourceTree = "<group>"; };
+		F208B5E622AFCFBD00B84216 /* RNSentry.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNSentry.xcodeproj; path = "../node_modules/react-native-sentry/ios/RNSentry.xcodeproj"; sourceTree = "<group>"; };
 		F2315F7B219601240088153C /* RNDocumentPicker.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNDocumentPicker.xcodeproj; path = "../node_modules/react-native-document-picker/ios/RNDocumentPicker.xcodeproj"; sourceTree = "<group>"; };
 		F2315FB4219601E20088153C /* who_mobile.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = who_mobile.entitlements; path = who_mobile/who_mobile.entitlements; sourceTree = "<group>"; };
 		F2316EA9229D3281002B7854 /* RNReanimated.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNReanimated.xcodeproj; path = "../node_modules/react-native-reanimated/ios/RNReanimated.xcodeproj"; sourceTree = "<group>"; };
@@ -632,7 +632,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F21A837F22A564A500F9B4AC /* libRNSentry.a in Frameworks */,
+				F208B62A22AFCFD300B84216 /* libRNSentry.a in Frameworks */,
 				F2316EAF229D328F002B7854 /* libRNReanimated.a in Frameworks */,
 				2B82EC15225F383F00CB9336 /* libReactNativeKeyboardManager.a in Frameworks */,
 				F265C95A21AD721E0055A97C /* libRNRandomBytes.a in Frameworks */,
@@ -921,7 +921,7 @@
 		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
-				F21A833B22A5647E00F9B4AC /* RNSentry.xcodeproj */,
+				F208B5E622AFCFBD00B84216 /* RNSentry.xcodeproj */,
 				F2316EA9229D3281002B7854 /* RNReanimated.xcodeproj */,
 				F2320F6A22708CA100754AEB /* RNVectorIcons.xcodeproj */,
 				2B82EBD6225F383100CB9336 /* ReactNativeKeyboardManager.xcodeproj */,
@@ -1018,11 +1018,11 @@
 			name = Pods;
 			sourceTree = "<group>";
 		};
-		F21A833C22A5647E00F9B4AC /* Products */ = {
+		F208B5E722AFCFBD00B84216 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				F21A837822A5647E00F9B4AC /* libRNSentry.a */,
-				F21A837A22A5647E00F9B4AC /* libRNSentry-tvOS.a */,
+				F208B62322AFCFBD00B84216 /* libRNSentry.a */,
+				F208B62522AFCFBD00B84216 /* libRNSentry-tvOS.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1363,8 +1363,8 @@
 					ProjectRef = F2316EA9229D3281002B7854 /* RNReanimated.xcodeproj */;
 				},
 				{
-					ProductGroup = F21A833C22A5647E00F9B4AC /* Products */;
-					ProjectRef = F21A833B22A5647E00F9B4AC /* RNSentry.xcodeproj */;
+					ProductGroup = F208B5E722AFCFBD00B84216 /* Products */;
+					ProjectRef = F208B5E622AFCFBD00B84216 /* RNSentry.xcodeproj */;
 				},
 				{
 					ProductGroup = F26A79BA2175E3BD00E445C2 /* Products */;
@@ -1698,18 +1698,18 @@
 			remoteRef = ADBDB9261DFEBF0700ED6528 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		F21A837822A5647E00F9B4AC /* libRNSentry.a */ = {
+		F208B62322AFCFBD00B84216 /* libRNSentry.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
 			path = libRNSentry.a;
-			remoteRef = F21A837722A5647E00F9B4AC /* PBXContainerItemProxy */;
+			remoteRef = F208B62222AFCFBD00B84216 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		F21A837A22A5647E00F9B4AC /* libRNSentry-tvOS.a */ = {
+		F208B62522AFCFBD00B84216 /* libRNSentry-tvOS.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
 			path = "libRNSentry-tvOS.a";
-			remoteRef = F21A837922A5647E00F9B4AC /* PBXContainerItemProxy */;
+			remoteRef = F208B62422AFCFBD00B84216 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		F2315FAA219601240088153C /* libRNDocumentPicker.a */ = {
@@ -1897,11 +1897,11 @@
 			);
 			inputPaths = (
 				"${SRCROOT}/Pods/Target Support Files/Pods-who_mobile/Pods-who_mobile-resources.sh",
-				"${PODS_ROOT}/Parse/Parse/Resources/en.lproj",
+				"${PODS_CONFIGURATION_BUILD_DIR}/Parse/Parse.bundle",
 			);
 			name = "[CP] Copy Pods Resources";
 			outputPaths = (
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/en.lproj",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Parse.bundle",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -2115,7 +2115,7 @@
 					"$(SRCROOT)/../node_modules/react-native-sqlcipher-2/ios",
 				);
 				INFOPLIST_FILE = who_mobile/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -2153,7 +2153,7 @@
 					"$(SRCROOT)/../node_modules/react-native-sqlcipher-2/ios",
 				);
 				INFOPLIST_FILE = who_mobile/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				OTHER_LDFLAGS = (
 					"$(inherited)",

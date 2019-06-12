@@ -1,11 +1,13 @@
 PODS:
-  - Bolts/Tasks (1.8.4)
-  - Parse (1.15.3):
-    - Bolts/Tasks (~> 1.8)
-  - SQLCipher (3.4.1):
-    - SQLCipher/standard (= 3.4.1)
-  - SQLCipher/common (3.4.1)
-  - SQLCipher/standard (3.4.1):
+  - Bolts/Tasks (1.9.0)
+  - Parse (1.17.2):
+    - Parse/Core (= 1.17.2)
+  - Parse/Core (1.17.2):
+    - Bolts/Tasks (~> 1.9)
+  - SQLCipher (4.2.0):
+    - SQLCipher/standard (= 4.2.0)
+  - SQLCipher/common (4.2.0)
+  - SQLCipher/standard (4.2.0):
     - SQLCipher/common
 
 DEPENDENCIES:
@@ -19,10 +21,10 @@ SPEC REPOS:
     - SQLCipher
 
 SPEC CHECKSUMS:
-  Bolts: 8a7995239dbe724f9cba2248b766d48b7ebdd322
-  Parse: cdc0f1f975ee8be0409e66f21b05df4ae067047c
-  SQLCipher: 43d12c0eb9c57fb438749618fc3ce0065509a559
+  Bolts: ac6567323eac61e203f6a9763667d0f711be34c8
+  Parse: 3b31a3dd1777b07ee7f0caee32fafbff544483a5
+  SQLCipher: 0187a2180ac288ea686b670b7141da62cd013b16
 
-PODFILE CHECKSUM: e796b489623c7a4a27c67ec0cc14e11f68c930b0
+PODFILE CHECKSUM: 853e66a567f3864b1f0f6312ebfdebc3b1055644
 
 COCOAPODS: 1.5.3
