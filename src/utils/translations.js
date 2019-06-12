@@ -390,6 +390,7 @@ const manualConfigScreen = {
     nameLabel: 'HUB Name',
     hubUrlLabel: 'HUB URL',
     clientIdLabel: 'Client ID',
+    userEmailLabel: 'User Email',
     clientSecretPass: 'Client secret',
     saveHubConfigButton: 'Save and sync HUB',
     encryptDataLabel: 'Encrypted connection'
