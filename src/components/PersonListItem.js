@@ -57,7 +57,7 @@ class PersonListItem extends Component {
         let secondComponentData = this.prepareSecondComponentData(this.props.type, this.props.itemToRender);
 
 
-        console.log('Render PersonListItem main component');
+        // console.log('Render PersonListItem main component');
 
         return (
             <GeneralListItem

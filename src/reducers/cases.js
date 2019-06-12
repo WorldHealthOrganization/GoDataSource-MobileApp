@@ -8,7 +8,7 @@ import {ACTION_TYPE_STORE_CASES,
     ACTION_TYPE_REMOVE_CASE} from './../utils/enums';
 
 // Do not add unnecessary business logic in the reducer. Here should only be updated the store
-export default function (state=null, action) {
+export default function (state=[], action) {
     let stateClone = null;
     switch (action.type) {
         case ACTION_TYPE_STORE_CASES:
@@ -23,14 +23,14 @@ export default function (state=null, action) {
             if (!action.payload) {
                 return null;
             }
-            stateClone = cloneDeep(state);
+            stateClone = state.slice();
             stateClone.push(action.payload);
             return Object.assign([], stateClone);
         case ACTION_TYPE_UPDATE_CASE:
             if (!action.payload) {
                 return null;
             }
-            stateClone = cloneDeep(state);
+            stateClone = state.slice();
             let itemToUpdateIndex = stateClone.findIndex((e) => {return e._id === action.payload._id});
             if (itemToUpdateIndex > -1){
                 if (action.payload.deleted === false) {
@@ -44,7 +44,7 @@ export default function (state=null, action) {
             if (!action.payload) {
                 return null;
             }
-            stateClone = cloneDeep(state);
+            stateClone = state.slice();
             let itemToRemoveIndex = stateClone.findIndex((e) => {return e._id === action.payload._id});
             if (itemToRemoveIndex > -1){
                 stateClone.splice(itemToRemoveIndex, 1)

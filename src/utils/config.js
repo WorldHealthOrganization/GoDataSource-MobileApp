@@ -2423,6 +2423,10 @@ const caseBlueprint = {
 
 const statusPendingWipe = 'LNG_DEVICE_WIPE_STATUS_PENDING';
 
+const rawSQLQueryString = 'SELECT json, doc_id as _id from `by-sequence`';
+
+const rawSQLQueryWhereString = ' WHERE doc_id LIKE ?';
+
 export default {
     designScreenSize,
     sideMenuItems,
@@ -2459,5 +2463,7 @@ export default {
     dateRangeTypes,
     documentTypes,
     caseBlueprint,
-    statusPendingWipe
+    statusPendingWipe,
+    rawSQLQueryString,
+    rawSQLQueryWhereString
 }

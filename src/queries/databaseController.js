@@ -12,6 +12,14 @@ class DatabaseController {
         this.databaseName = databaseName;
         this.databasePassword = databasePassword;
     }
+
+    getDatabaseName () {
+        return this.databaseName;
+    }
+
+    getDatabasePassword () {
+        return this.databasePassword;
+    }
 }
 
 export default DatabaseController;

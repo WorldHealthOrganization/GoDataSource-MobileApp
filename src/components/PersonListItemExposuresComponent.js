@@ -31,7 +31,7 @@ class PersonListItemNameAndAddressComponent extends PureComponent {
     }
 
     render() {
-        console.log(`Render PersonListItem subComponent 2`);
+        // console.log(`Render PersonListItem subComponent 2`);
         let {data, translation, screenSize} = this.props;
         return (
             <View style={{

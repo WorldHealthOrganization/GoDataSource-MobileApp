@@ -1,7 +1,17 @@
 import {getDatabase} from './database';
 import config from './../utils/config';
+import {rawSQLQuery} from "./sqlHelper";
 
 export function getClustersdRequest (token, callback) {
+
+    // rawSQLQuery(config.mongoCollections.cluster, `${config.rawSQLQueryString}`, [])
+    //     .then((result) => {
+    //         callback(null, result);
+    //     })
+    //     .catch((error) => {
+    //         callback(error)
+    //     })
+
     let start = new Date().getTime();
     getDatabase(config.mongoCollections.cluster)
         .then((database) => {

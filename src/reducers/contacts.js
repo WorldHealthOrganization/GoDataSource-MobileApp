@@ -9,26 +9,28 @@ import {ACTION_TYPE_STORE_CONTACTS,
 
 // Do not add unnecessary business logic in the reducer. Here should only be updated the store
 export default function (state=null, action) {
-    var stateClone = _.cloneDeep(state);
+    var stateClone = null;
     switch (action.type) {
         case ACTION_TYPE_STORE_CONTACTS:
             if (!action.payload) {
                 return null;
             }
-            if (state) {
-                state = null
-            }
-            return Object.assign([], state, action.payload);
+            // if (state) {
+            //     state = null
+            // }
+            return Object.assign([], action.payload);
         case ACTION_TYPE_ADD_CONTACT:
             if (!action.payload) {
                 return null;
             }
+            stateClone = state.slice();
             stateClone.push(action.payload);
             return Object.assign([], stateClone);
         case ACTION_TYPE_UPDATE_CONTACT:
             if (!action.payload) {
                 return null;
             }
+            stateClone = state.slice();
             let itemToUpdateIndex = stateClone.map((e) => {return e._id}).indexOf(action.payload._id)
             if (itemToUpdateIndex > -1){
                 if (action.payload.deleted === false) {
@@ -42,6 +44,7 @@ export default function (state=null, action) {
             if (!action.payload) {
                 return null;
             }
+            stateClone = state.slice();
             let itemToRemoveIndex = stateClone.map((e) => {return e._id}).indexOf(action.payload._id)
             if (itemToRemoveIndex > -1){
                 stateClone.splice(itemToRemoveIndex, 1)

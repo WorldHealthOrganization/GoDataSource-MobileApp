@@ -26,7 +26,7 @@ class PersonListItemNameAndAddressComponent extends PureComponent {
     }
 
     render() {
-        console.log(`Render PersonListItem subComponent 1 ${this.props.firstComponentRenderData.fullName}`);
+        // console.log(`Render PersonListItem subComponent 1 ${this.props.firstComponentRenderData.fullName}`);
         let {firstComponentRenderData, translation, titleColor} = this.props;
         return (
             <View>

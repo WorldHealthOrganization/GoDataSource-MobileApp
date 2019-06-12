@@ -42,12 +42,12 @@ class AnimatedListView extends Component {
 
     // Please add here the react lifecycle methods that you need
 
-    shouldComponentUpdate(nextProps, nextState) {
-        if (!isEqual(nextProps.data, this.props.data)) {
-            return true;
-        }
-        return false;
-    }
+    // shouldComponentUpdate(nextProps, nextState) {
+    //     if (!isEqual(nextProps.data, this.props.data)) {
+    //         return true;
+    //     }
+    //     return false;
+    // }
 
     // The render method should have at least business logic as possible,
     // because this will be called whenever there is a new setState call

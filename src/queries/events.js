@@ -3,9 +3,20 @@
  */
 import {getDatabase} from './database';
 import config from './../utils/config';
+import {rawSQLQuery} from "./sqlHelper";
 
 // Credentials: {email, encryptedPassword}
 export function getEventsForOutbreakIdRequest (outbreakId, token, callback) {
+
+
+    // rawSQLQuery(config.mongoCollections.person, `${config.rawSQLQueryString}${config.rawSQLQueryWhereString}`, [`${config.mongoCollections.person}_${config.personTypes.events}_${outbreakId}`])
+    //     .then((result) => {
+    //         callback(null, result);
+    //     })
+    //     .catch((error) => {
+    //         callback(error)
+    //     })
+
     let start =  new Date().getTime();
     getDatabase(config.mongoCollections.person)
         .then((database) => {
