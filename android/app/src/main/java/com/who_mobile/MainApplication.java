@@ -20,6 +20,7 @@ import com.facebook.react.shell.MainReactPackage;
 import com.facebook.soloader.SoLoader;
 import com.bitgo.randombytes.RandomBytesPackage;
 import io.sentry.RNSentryPackage;
+import com.reactlibrary.RNBcryptPackage;
 
 import java.util.Arrays;
 import java.util.List;
@@ -60,7 +61,8 @@ public class MainApplication extends NavigationApplication {
                  new ReactNativeDocumentPicker(),
                  new ParseReceiverPackage(),
                  new RandomBytesPackage(),
-                 new RNSentryPackage()
+                 new RNSentryPackage(),
+                 new RNBcryptPackage()
          );
      }
 

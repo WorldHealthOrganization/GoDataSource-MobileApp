@@ -142,6 +142,7 @@ android {
 }
 
 dependencies {
+    compile project(':react-native-bcrypt')
     compile project(':react-native-sentry')
     implementation project(':react-native-sentry')
     implementation project(':react-native-vector-icons')
