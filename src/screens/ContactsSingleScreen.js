@@ -482,6 +482,7 @@ class ContactsSingleScreen extends Component {
                         onChangeSwitch={this.handleOnChangeSwitch}
                         onChangeSectionedDropDown={this.handleOnChangeSectionedDropDown}
                         onDeletePress={this.handleOnDeletePress}
+                        onPressCopyAddress={this.handleOnPressCopyAddress}
                         onPressAddAdrress={this.handleOnPressAddAdrress}
                         handleMoveToNextScreenButton={this.handleMoveToNextScreenButton}
                         handleMoveToPrevieousScreenButton={this.handleMoveToPrevieousScreenButton}
@@ -1500,7 +1501,7 @@ class ContactsSingleScreen extends Component {
     handleOnDeletePress = (index) => {
         // console.log("DeletePressed: ", index);
 
-        Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.alertMessages.deleteAddress, this.state.translation), [
+        Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.alertMessages.deleteAddress, this.props.translation), [
             {
                 text: getTranslation(translations.generalLabels.noAnswer, this.props.translation), onPress: () => { console.log('Cancel pressed') }
             },
@@ -1524,6 +1525,25 @@ class ContactsSingleScreen extends Component {
                 }
             }
         ]);
+    };
+
+    handleOnPressCopyAddress = (index) => {
+        Alert.alert(
+            getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.alertMessages.copyAddress, this.props.translation), [
+                {
+                    text: getTranslation(translations.generalLabels.noAnswer, this.props.translation), onPress: () => { console.log('Cancel pressed') }
+                },
+                {
+                    text: getTranslation(translations.generalLabels.yesAnswer, this.props.translation), onPress: () => {
+                        let contactsCopy = _.cloneDeep(this.state.contact);
+                        _.set(contactsCopy, `addresses[${index}]`, this.props.caseAddress);
+                        this.setState({
+                            contact: contactsCopy
+                        })
+                    }
+                }
+            ]
+        );
     };
 
     handleOnPressAddAdrress = () => {
