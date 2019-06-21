@@ -65,6 +65,14 @@ let textFieldsStructure = [
         secureTextEntry: true
     },
     {
+        id: 'userEmail',
+        label: 'User email',
+        type: 'TextInput',
+        value: '',
+        isRequired: false,
+        isEditMode: true
+    },
+    {
         id: 'encryptedData',
         label: translations.manualConfigScreen.encryptDataLabel,
         type: 'SwitchInput',
@@ -99,6 +107,7 @@ class FirstConfigScreen extends Component {
             url: '',
             clientId: '',
             clientSecret: '',
+            userEmail: '',
             encryptedData: true,
             allDatabases: [],
             lastSyncDate: null,
@@ -129,6 +138,7 @@ class FirstConfigScreen extends Component {
                                     url: currentHubConfig.url,
                                     clientId: currentHubConfig.clientId,
                                     clientSecret: currentHubConfig.clientSecret,
+                                    userEmail: currentHubConfig.userEmail,
                                     encryptedData: currentHubConfig.encryptedData,
                                     lastSyncDate: lastSyncDate
                                 }, () => {

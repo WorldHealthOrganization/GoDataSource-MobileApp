@@ -127,16 +127,16 @@ class CasesScreen extends Component {
         }
 
         if (state.sortData === true){
-            state.loading = true
-            state.sortData = false
-            const allFilters = createFilterCasesObject(state.filterFromFilterScreen, state.filter)
+            state.loading = true;
+            state.sortData = false;
+            const allFilters = createFilterCasesObject(state.filterFromFilterScreen, state.filter);
             props.getCasesForOutbreakId(props.user.activeOutbreakId, allFilters, null);
         } else {
             state.sortData = true
         }
 
         state.loading = false;
-        state.refreshing = false
+        state.refreshing = false;
         return null;
     }
 

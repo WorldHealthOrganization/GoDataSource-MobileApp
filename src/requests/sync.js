@@ -97,7 +97,7 @@ export function getDatabaseSnapshotRequest(hubConfig, lastSyncDate, dispatch, ca
                                 .then((res) => {
                                     console.log('Download time: ', new Date().getTime() - startDownload);
                                     let status = res.info().status;
-                                    // After getting zip file from the server, unzip it and then proceed to the importing of the data to the SQLite database
+
                                     if (status === 200) {
                                         // After returning the database, return the path to it
                                         console.log("Got database");
@@ -106,7 +106,15 @@ export function getDatabaseSnapshotRequest(hubConfig, lastSyncDate, dispatch, ca
                                         if (status === 422) {
                                             callback(`No data to export`);
                                         } else {
-                                            callback(`Cannot connect to HUB, please check URL, Client ID and Client secret.\nStatus code: ${status}`);
+                                            res.json()
+                                                .then((parsedError) => {
+                                                    console.log('Jsons: ', parsedError);
+                                                    // After getting zip file from the server, unzip it and then proceed to the importing of the data to the SQLite database
+                                                    callback(get(parsedError, 'error.message', 'Unknown error'));
+                                                })
+                                                .catch((errorParseError) => {
+                                                    callback(`Cannot connect to HUB, please check URL, Client ID and Client secret.\nStatus code: ${status}`);
+                                                })
                                         }
                                     }
                                 })
