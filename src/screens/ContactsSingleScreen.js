@@ -117,7 +117,7 @@ class ContactsSingleScreen extends Component {
             updateExposure: false,
             isEditMode: true,
             selectedItemIndexForTextSwitchSelectorForAge: 0, // age/dob - switch tab
-            selectedItemIndexForAgeUnitOfMeasureDropDown: this.props.isNew ? 0 : (this.props.contact.age && this.props.contact.age.years !== undefined && this.props.contact.age.years !== null && this.props.contact.age.years > 0) ? 0 : 1, //default age dropdown value
+            selectedItemIndexForAgeUnitOfMeasureDropDown: this.props.isNew ? 0 : (this.props.contact && this.props.contact.age && this.props.contact.age.years !== undefined && this.props.contact.age.years !== null && this.props.contact.age.years > 0) ? 0 : 1, //default age dropdown value
         };
         // Bind here methods, or at least don't declare methods in the render method
         this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this));
@@ -165,9 +165,9 @@ class ContactsSingleScreen extends Component {
     componentDidMount() {
         BackHandler.addEventListener('hardwareBackPress', this.handleBackButtonClick);
         if (!this.props.isNew) {
-            let ageClone = { years: 0, months: 0 }
+            let ageClone = { years: 0, months: 0 };
             let updateAge = false;
-            if (this.props.contact.age === null || this.props.contact.age === undefined || (this.props.contact.age.years === undefined && this.props.contact.age.months === undefined)) {
+            if (!this.props.contact || this.props.contact.age === null || this.props.contact.age === undefined || (this.props.contact.age.years === undefined && this.props.contact.age.months === undefined)) {
                 updateAge = true
             }
             if (updateAge) {
