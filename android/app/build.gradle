@@ -142,7 +142,6 @@ android {
 }
 
 dependencies {
-    compile project(':react-native-sentry')
     implementation project(':react-native-sentry')
     implementation project(':react-native-vector-icons')
     implementation project(':react-native-exit-app')
