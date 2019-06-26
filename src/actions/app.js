@@ -13,7 +13,9 @@ import {
     ACTION_TYPE_SET_SYNC_STATE,
     ACTION_TYPE_SAVE_GENERATED_FOLLOWUPS,
     ACTION_TYPE_SET_LOGIN_STATE,
-    ACTION_TYPE_SAVE_ACTIVE_DATABASE
+    ACTION_TYPE_SAVE_ACTIVE_DATABASE,
+    ACTION_TYPE_SET_LOADER_STATE,
+    ACTION_TYPE_SAVE_HELP_ITEM
 } from './../utils/enums';
 import url from '../utils/url';
 import config from './../utils/config';
@@ -114,6 +116,13 @@ export function setLoginState(loginState) {
     return {
         type: ACTION_TYPE_SET_LOGIN_STATE,
         loginState: loginState
+    }
+}
+
+export function setLoaderState(loaderState) {
+    return {
+        type: ACTION_TYPE_SET_LOADER_STATE,
+        loaderState: loaderState
     }
 }
 

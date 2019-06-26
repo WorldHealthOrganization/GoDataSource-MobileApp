@@ -47,7 +47,7 @@ class ContactsScreen extends Component {
                 searchText: ''
             },
             filterFromFilterScreen: this.props.filter && this.props.filter['ContactsFilterScreen'] ? this.props.filter['ContactsFilterScreen'] : null,
-            loading: true,
+            loading: false,
 
             sortData: false,
             isVisible: false,
@@ -72,33 +72,41 @@ class ContactsScreen extends Component {
         for (let i=0; i<refData.length; i++) {
             riskColors[refData[i].value] = refData[i].colorCode || 'black'
         }
-        this.setState({
-            loading: true,
-            riskColors: riskColors
-        }, () => {
-            if (this.props && this.props.user && this.props.user.activeOutbreakId) {
-                if (this.props.filter && (this.props.filter['ContactsFilterScreen'] || this.props.filter['FollowUpsScreen'])) {
+        // this.setState({
+        //     loading: true,
+        //     riskColors: riskColors
+        // }, () => {
+        //     if (this.props && this.props.user && this.props.user.activeOutbreakId) {
+        //         if (this.props.filter && (this.props.filter['ContactsFilterScreen'] || this.props.filter['FollowUpsScreen'])) {
                     this.filterContacts();
-                } else {
-                    this.props.getContactsForOutbreakId(this.props.user.activeOutbreakId, null, null);
-                }
-            }
-        })
+        //         } else {
+        //             this.props.getContactsForOutbreakId(this.props.user.activeOutbreakId, null, null);
+        //         }
+        //     }
+        // })
     }
 
-    static getDerivedStateFromProps(props, state) {
-        if (state.sortData === true && props.user && props.user.activeOutbreakId){
-            state.sortData = false;
-            state.loading = true;
-            const allFilters = createFilterContactsObject(state.filterFromFilterScreen, state.filter);
-            props.getContactsForOutbreakId(props.user.activeOutbreakId, allFilters, null);
-        } else {
-            state.sortData = true
-        }
+    // static getDerivedStateFromProps(props, state) {
+    //     if (state.sortData === true && props.user && props.user.activeOutbreakId){
+    //         state.sortData = false;
+    //         state.loading = true;
+    //         const allFilters = createFilterContactsObject(state.filterFromFilterScreen, state.filter);
+    //         props.getContactsForOutbreakId(props.user.activeOutbreakId, allFilters, null);
+    //     } else {
+    //         state.sortData = true
+    //     }
+    //
+    //     state.loading = false;
+    //     state.refreshing = false;
+    //     return null;
+    // }
 
-        state.loading = false;
-        state.refreshing = false;
-        return null;
+    componentDidUpdate(prevProps) {
+        if (!this.props.loaderState && this.state.refreshing) {
+            this.setState({
+                refreshing: false
+            })
+        }
     }
 
     componentWillUnmount() {
@@ -176,7 +184,7 @@ class ContactsScreen extends Component {
 
         return (
             <ViewHOC style={style.container}
-                     showLoader={(this.props && this.props.syncState && ((this.props.syncState.id === 'sync' && this.props.syncState.status !== null && this.props.syncState.status !== 'Success') && this.props.syncState.status !== 'Error')) || (this && this.state && this.state.loading)}
+                     showLoader={(this.props && this.props.loaderState) || (this.state && this.state.loading)}
                      loaderText={this.props && this.props.syncState ? 'Loading' : getTranslation(translations.loadingScreenMessages.loadingMsg, this.props.translation)}>
                 <NavBarCustom
                     title={null}
@@ -276,8 +284,8 @@ class ContactsScreen extends Component {
                         style={[style.listViewStyle]}
                         componentContainerStyle={style.componentContainerStyle}
                         onScroll={this.handleScroll}
-                        // getItemLayout={this.getItemLayout}
-                        refreshing={this.state.refreshing}
+                        getItemLayout={this.getItemLayout}
+                        refreshing={this.state.refreshing && this.props.loaderState}
                         onRefresh={this.handleOnRefresh}
                     />
                 </View>
@@ -381,11 +389,11 @@ class ContactsScreen extends Component {
         )
     };
 
-    // getItemLayout = (data, index) => ({
-    //     length: calculateDimension(178, true, this.props.screenSize),
-    //     offset: calculateDimension(178, true, this.props.screenSize) * index,
-    //     index
-    // });
+    getItemLayout = (data, index) => ({
+        length: calculateDimension(178, true, this.props.screenSize),
+        offset: calculateDimension(178, true, this.props.screenSize) * index,
+        index
+    });
 
     renderSeparatorComponent = () => {
         return (
@@ -579,14 +587,17 @@ class ContactsScreen extends Component {
     };
 
     filterContacts = () => {
-        const allFilters = createFilterContactsObject(this.state.filterFromFilterScreen, this.state.filter)
+        let allFilters = null;
+        if (this.props.filter && (this.props.filter['ContactsFilterScreen'] || this.props.filter['FollowUpsScreen'])) {
+            allFilters = createFilterContactsObject(this.state.filterFromFilterScreen, this.state.filter)
+        }
 
-        this.setState({
-            loading: true,
-            sortData: false
-        }, () => {
+        // this.setState({
+        //     loading: true,
+        //     sortData: false
+        // }, () => {
             this.props.getContactsForOutbreakId(this.props.user.activeOutbreakId, allFilters, null);
-        })
+        // })
     };
 
     onNavigatorEvent = (event) => {
@@ -825,16 +836,17 @@ const style = StyleSheet.create({
 
 function mapStateToProps(state) {
     return {
-        user: state.user,
-        screenSize: state.app.screenSize,
-        syncState: state.app.syncState,
-        filter: state.app.filters,
-        contacts: state.contacts,
-        errors: state.errors,
-        role: state.role,
-        referenceData: state.referenceData,
-        translation: state.app.translation,
-        cases: state.cases
+        user:           state.user,
+        screenSize:     state.app.screenSize,
+        syncState:      state.app.syncState,
+        filter:         state.app.filters,
+        translation:    state.app.translation,
+        loaderState:    state.app.loaderState,
+        contacts:       state.contacts,
+        errors:         state.errors,
+        role:           state.role,
+        referenceData:  state.referenceData,
+        cases:          state.cases
     };
 }
 

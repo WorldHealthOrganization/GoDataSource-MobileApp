@@ -12,7 +12,9 @@ import {deleteCaseRequest} from './../requests/cases';
 import {getCasesForOutbreakIdRequest, addCaseRequest, updateCaseRequest} from './../queries/cases';
 import { addError } from './errors';
 import errorTypes from './../utils/errorTypes';
-import config from './../utils/config';
+// import config from './../utils/config';
+import {batchActions} from 'redux-batched-actions';
+import {setLoaderState} from "./app";
 
 
 // Add here only the actions, not also the requests that are executed. For that purpose is the requests directory
@@ -69,11 +71,19 @@ export function getCasesForOutbreakId(outbreakId, filter, token) {
         getCasesForOutbreakIdRequest(outbreakId, filter, token, (error, response) => {
             if (error) {
                 console.log("*** getCasesForOutbreakId error: ", error);
-                dispatch(addError(errorTypes.ERROR_CASES));
+                dispatch(batchActions([
+                    addError(errorTypes.ERROR_CASES),
+                    setLoaderState(false)
+                ]))
+                // dispatch(addError(errorTypes.ERROR_CASES));
                 // reject(error);
             }
             if (response) {
-                dispatch(storeCases(response));
+                dispatch(batchActions([
+                    storeCases(response),
+                    setLoaderState(false)
+                ]))
+                // dispatch(storeCases(response));
                 // resolve('Done cases');
             }
         })

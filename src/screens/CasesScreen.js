@@ -52,7 +52,7 @@ class CasesScreen extends Component {
             filterFromFilterScreen: this.props.filter && this.props.filter['CasesFilterScreen'] ? this.props.filter['CasesFilterScreen'] : null,
             cases: [],
             refreshing: false,
-            loading: true,
+            loading: false,
 
             sortData: false,
             isVisible: false,
@@ -78,18 +78,18 @@ class CasesScreen extends Component {
         for (let i=0; i<refData.length; i++) {
             riskColors[refData[i].value] = refData[i].colorCode || 'black'
         }
-        this.setState({
-            loading: true,
-            riskColors: riskColors
-        }, () => {
-            if (this.props.filter && (this.props.filter['CasesScreen'] || this.props.filter['CasesFilterScreen'])) {
+        // this.setState({
+        //     loading: true,
+        //     riskColors: riskColors
+        // }, () => {
+        //     if (this.props.filter && (this.props.filter['CasesScreen'] || this.props.filter['CasesFilterScreen'])) {
                 this.filterCases();
-            } else {
-                if (this.props.user && this.props.user.activeOutbreakId) {
-                    this.props.getCasesForOutbreakId(this.props.user.activeOutbreakId, null, null);
-                }
-            }
-        })
+        //     } else {
+        //         if (this.props.user && this.props.user.activeOutbreakId) {
+        //             this.props.getCasesForOutbreakId(this.props.user.activeOutbreakId, null, null);
+        //         }
+        //     }
+        // })
     }
 
     componentWillUnmount() {
@@ -113,31 +113,39 @@ class CasesScreen extends Component {
         return true;
     }
 
-    static getDerivedStateFromProps(props, state) {
-        if (props.errors && props.errors.type && props.errors.message) {
-            Alert.alert(props.errors.type, props.errors.message, [
-                {
-                    text: getTranslation(translations.alertMessages.okButtonLabel, props.translation), 
-                    onPress: () => {
-                    props.removeErrors();
-                    state.loading = false;
-                }
-                }
-            ])
-        }
+    // static getDerivedStateFromProps(props, state) {
+    //     //     if (props.errors && props.errors.type && props.errors.message) {
+    //     //         Alert.alert(props.errors.type, props.errors.message, [
+    //     //             {
+    //     //                 text: getTranslation(translations.alertMessages.okButtonLabel, props.translation),
+    //     //                 onPress: () => {
+    //     //                 props.removeErrors();
+    //     //                 state.loading = false;
+    //     //             }
+    //     //             }
+    //     //         ])
+    //     //     }
+    //     //
+    //     //     if (state.sortData === true){
+    //     //         state.loading = true;
+    //     //         state.sortData = false;
+    //     //         const allFilters = createFilterCasesObject(state.filterFromFilterScreen, state.filter);
+    //     //         props.getCasesForOutbreakId(props.user.activeOutbreakId, allFilters, null);
+    //     //     } else {
+    //     //         state.sortData = true
+    //     //     }
+    //     //
+    //     //     state.loading = false;
+    //     //     state.refreshing = false;
+    //     //     return null;
+    //     // }
 
-        if (state.sortData === true){
-            state.loading = true;
-            state.sortData = false;
-            const allFilters = createFilterCasesObject(state.filterFromFilterScreen, state.filter);
-            props.getCasesForOutbreakId(props.user.activeOutbreakId, allFilters, null);
-        } else {
-            state.sortData = true
+    componentDidUpdate(prevProps) {
+        if (!this.props.loaderState && this.state.refreshing) {
+            this.setState({
+                refreshing: false
+            })
         }
-
-        state.loading = false;
-        state.refreshing = false;
-        return null;
     }
 
     clampedScroll = Animated.diffClamp(
@@ -162,6 +170,17 @@ class CasesScreen extends Component {
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
+        if (this.props.errors && this.props.errors.type && this.props.errors.message) {
+            Alert.alert(this.props.errors.type, this.props.errors.message, [
+                {
+                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+                    onPress: () => {
+                        this.props.removeErrors();
+                        // state.loading = false;
+                    }
+                }
+            ])
+        }
         const navbarTranslate = this.clampedScroll.interpolate({
             inputRange: [0, 30],
             outputRange: [0, -30],
@@ -193,7 +212,7 @@ class CasesScreen extends Component {
         let caseTitle = []; caseTitle[0] = getTranslation(translations.casesScreen.casesTitle, this.props.translation);
         return (
             <ViewHOC style={style.container}
-                     showLoader={(this.props && this.props.syncState && ((this.props.syncState.id === 'sync' && this.props.syncState.status !== null && this.props.syncState.status !== 'Success') && this.props.syncState.status !== 'Error')) || (this && this.state && this.state.loading)}
+                     showLoader={(this.props && this.props.loaderState) || (this.state && this.state.loading)}
                      loaderText={this.props && this.props.syncState ? 'Loading' : getTranslation(translations.loadingScreenMessages.loadingMsg, this.props.translation)}>
                 <NavBarCustom
                     title={null}
@@ -292,7 +311,7 @@ class CasesScreen extends Component {
                         style={[style.listViewStyle]}
                         componentContainerStyle={style.componentContainerStyle}
                         onScroll={this.handleScroll}
-                        refreshing={this.state.refreshing}
+                        refreshing={this.state.refreshing && this.props.loaderState}
                         onRefresh={this.handleOnRefresh}
                     />
                 </View>
@@ -558,14 +577,17 @@ class CasesScreen extends Component {
     };
 
     filterCases = () => {
-        const allFilters = createFilterCasesObject(this.state.filterFromFilterScreen, this.state.filter)
+        let allFilters = null;
+        if (this.props.filter && (this.props.filter['CasesScreen'] || this.props.filter['CasesFilterScreen'])) {
+            allFilters = createFilterCasesObject(this.state.filterFromFilterScreen, this.state.filter);
+        }
 
-        this.setState({
-            loading: true,
-            sortData: false
-        }, () => {
+        // this.setState({
+        //     loading: true,
+        //     sortData: false
+        // }, () => {
             this.props.getCasesForOutbreakId(this.props.user.activeOutbreakId, allFilters, null);
-        })
+        // })
     };
 
     goToHelpScreen = () => {
@@ -796,15 +818,16 @@ const style = StyleSheet.create({
 
 function mapStateToProps(state) {
     return {
-        user: state.user,
-        role: state.role,
-        cases: state.cases,
-        filter: state.app.filters,
-        screenSize: state.app.screenSize,
-        syncState: state.app.syncState,
-        errors: state.errors,
-        translation: state.app.translation,
-        referenceData: state.referenceData
+        user:           state.user,
+        filter:         state.app.filters,
+        screenSize:     state.app.screenSize,
+        syncState:      state.app.syncState,
+        translation:    state.app.translation,
+        loaderState:    state.app.loaderState,
+        role:           state.role,
+        cases:          state.cases,
+        errors:         state.errors,
+        referenceData:  state.referenceData
     };
 }
 
