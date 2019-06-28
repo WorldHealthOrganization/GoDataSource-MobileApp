@@ -41,20 +41,22 @@ export function handleResponse(response) {
 
 // RN-fetch-blob does not manage status codes, so, this
 export function handleResponseFromRNFetchBlob(response) {
-    let status = response.info().status;
+    return new Promise ((resolve, reject) => {
+        let status = response.info().status;
 
-    if (status === 200) {
-        return response;
-    } else {
-        // Manage errors
-        response.json()
-            .then((parsedError) => {
-                throw new Error(get(parsedError, 'error.message', 'Unknown Error'));
-            })
-            .catch((errorParseError) => {
-                throw new Error('Unknown Error');
-            })
-    }
+        if (status === 200) {
+            resolve(response);
+        } else {
+            // Manage errors
+            response.json()
+                .then((parsedError) => {
+                    reject({message: get(parsedError, 'error.message', 'Unknown Error')});
+                })
+                .catch((errorParseError) => {
+                    reject({message: 'Unknown Error'});
+                })
+        }
+    })
 };
 
 // This method is used for calculating dimensions for components.
