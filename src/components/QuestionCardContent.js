@@ -231,7 +231,7 @@ class QuestionCardContent extends PureComponent {
                             this.props.onChangeTextAnswer(valueToSend, id, parentId);
                         }}
                         multiline={true}
-                        keyboardType={Platform.OS === 'ios' ? 'number-pad' : 'numeric'}
+                        keyboardType={'numeric'}
                         style={{width: width, marginHorizontal: marginHorizontal}}
                         translation={this.props.translation}
                         screenSize={this.props.screenSize}
