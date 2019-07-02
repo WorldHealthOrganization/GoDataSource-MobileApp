@@ -187,7 +187,12 @@ class ContactsSingleAddress extends PureComponent {
         if (item.type === 'DropdownInput') {
             item.data = this.computeDataForContactsSingleScreenDropdownInput(item, cardIndex);
         } else if (item.type === 'ActionsBar') {
-            item.onPressArray = [this.props.onDeletePress]
+            item.onPressArray = [this.props.onDeletePress];
+            if (this.props.isNew) {
+                item.textsArray = [item.textsArray[0], translations.addressFieldLabels.copyAddress];
+                item.textsStyleArray = [item.textsStyleArray[0], {color: styles.buttonGreen}];
+                item.onPressArray = [item.onPressArray[0], this.props.onPressCopyAddress];
+            }
         }
 
         if (item.type === 'DropDownSectioned') {

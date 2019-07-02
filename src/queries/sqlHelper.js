@@ -1,6 +1,9 @@
 import SQLite, {encodeName} from 'react-native-sqlcipher-2';
 import {database} from './database';
 import get from 'lodash/get';
+import groupBy from 'lodash/groupBy';
+
+// import SQLiteQueryBuilder from 'simple-sql-query-builder';
 
 export function rawSQLQuery (collectionName, query, params) {
     return new Promise((resolve, reject) => {
@@ -41,5 +44,38 @@ export function rawSQLQuery (collectionName, query, params) {
             console.log('Error while opening Database: ', errorOpenDatabase);
             return reject(errorOpenDatabase);
         }
+    })
+}
+
+// Given 2 queries, 2 join conditions and an optional filter cond for the result, performs joins. Can work as nested
+export function innerJoin (leftQuery, rightQuery, leftJoinCond, rightJoinCond, additionalFilter) {
+    return new Promise((resolve, reject) => {
+        Promise.all([
+            leftQuery,
+            rightQuery
+        ])
+            .then((results) => {
+                let result = [];
+                let left = get(results, '[0]');
+                let right = groupBy(get(results, '[1]'), rightJoinCond);
+
+                for (let i=0; i<left.length; i++) {
+                    if (right(left[i][leftJoinCond])) {
+                        result.push({left: left[i], right: right[left[i][leftJoinCond][0]]})
+                    }
+                }
+
+                resolve(result);
+            })
+            .catch((errorQueries) => {
+                reject(errorQueries)
+            })
+    })
+}
+
+// Given a query, this method returns all the related models in a one to many relationship by performing multiple gets
+export function populate (query, relatedDatabase, idFormula) {
+    return new Promise((resolve, reject) => {
+
     })
 }
