@@ -66,7 +66,7 @@ export function getUserByIdRequest (userId, token, callback) {
                 })
                 .catch((errorGetUserById) => {
                     console.log('GetUserByIdRequestQuery error: ', errorGetUserById);
-                    callback(error);
+                    callback(errorGetUserById);
                 })
         })
         .catch((errorGetDatabase) => {

@@ -328,7 +328,11 @@ const alertMessages = {
 
     replaceCurrentCoordinates: 'LNG_DIALOG_ALERT_MESSAGE_DO_YOU_WANT_TO_REPLACE_CURRENT_COORDINATES_WITH_LOCATION_VALUES',
 
-    androidBackButtonMsg: 'LNG_DIALOG_ALERT_MESSAGE_ARE_YOU_SURE_YOU_WANT_TO_EXIT_THE_APP'
+    androidBackButtonMsg: 'LNG_DIALOG_ALERT_MESSAGE_ARE_YOU_SURE_YOU_WANT_TO_EXIT_THE_APP',
+
+
+    // TODO add translation to backend
+    copyAddress: 'LNG_DIALOG_ALERT_MESSAGE_ARE_YOU_SURE_YOU_WANT_TO_COPY_THE_ADDRESS_FROM_THE_PARENT_ENTITY'
 };
 
 const loadingScreenMessages = {
@@ -413,6 +417,7 @@ const addressFieldLabels = {
     longitude: 'LNG_ADDRESS_FIELD_LABEL_LONGITUDE',
     latitude: 'LNG_ADDRESS_FIELD_LABEL_LATITUDE',
     deleteButton: 'LNG_COMMON_BUTTON_DELETE',
+    copyAddress: 'LNG_ADDRESS_FIELD_LABEL_COPY_ADDRESS'
 };
 
 const personTypes = {

@@ -510,9 +510,18 @@ class CasesScreen extends Component {
             passProps: {
                 isNew: true,
                 addContactFromCasesScreen: true,
-                caseIdFromCasesScreen: item._id
+                caseIdFromCasesScreen: item._id,
+                caseAddress: this.extractCurrentAddress(item)
             }
         })
+    };
+
+    extractCurrentAddress = (item) => {
+        let itemToReturn = null;
+        if (item && item.addresses && Array.isArray(item.addresses) && item.addresses.length > 0) {
+            itemToReturn = item.addresses.find((e) => {return e.typeId === config.userResidenceAddress.userPlaceOfResidence})
+        }
+        return itemToReturn;
     };
 
     handleOnPressMap = (myCase) => {

@@ -3,6 +3,9 @@ target 'who_mobile' do
   pod 'SQLCipher'
   pod 'Parse'
   # Add new pods below this line
+  pod 'React', :path => '../node_modules/react-native'
+  pod 'yoga', :path => '../node_modules/react-native/ReactCommon/yoga'
+  pod 'RNBcrypt', path: '../node_modules/react-native-bcrypt'
   #pod 'SentryReactNative', :path => '../node_modules/react-native-sentry'
 
 
@@ -10,5 +13,12 @@ target 'who_mobile' do
 
   # pod 'RNFS', :path => '../node_modules/react-native-fs'
 
+  post_install do |installer|
+    installer.pods_project.targets.each do |target|
+      if target.name == "React"
+        target.remove_from_project
+      end
+    end
+  end
 
 end
