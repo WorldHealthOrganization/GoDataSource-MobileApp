@@ -52,7 +52,7 @@ class PersonListItemNameAndAddressComponent extends PureComponent {
                             <Text style={style.exposedToTextStyle}>{getTranslation(translations.followUpsScreen.exposedToMessage, translation) + ":"}</Text>
                             {
                                 data.exposures.map((exposure, index) => {
-                                    return this.renderExposures(exposure);
+                                    return this.renderExposures(exposure, index);
                                 })
                             }
                         </View>
@@ -63,9 +63,9 @@ class PersonListItemNameAndAddressComponent extends PureComponent {
     }
 
 
-    renderExposures = (exposure) => {
+    renderExposures = (exposure, index) => {
         return(
-            <Ripple onPress={() => this.props.onPressExposureProp(exposure.id)}>
+            <Ripple key={index} onPress={() => this.props.onPressExposureProp(exposure.id)}>
                 <Text style={[style.secondaryText, {marginVertical: 5, marginHorizontal: 7}]} numberOfLines={1}>{`\u2022 ${exposure.fullName} ${exposure.visualId ? `(${exposure.visualId})` : ''}`}</Text>
             </Ripple>
         )

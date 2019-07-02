@@ -442,6 +442,7 @@ class FollowUpsScreen extends Component {
         let margins = calculateDimension(16, false, this.props.screenSize);
         return(
             <PersonListItem
+                key={item._id}
                 type={'FollowUp'}
                 itemToRender={item}
                 onPressMapIconProp={this.handleOnPressMap}
@@ -480,9 +481,7 @@ class FollowUpsScreen extends Component {
         index
     });
 
-    keyExtractor = (item, index) => {
-        item._id;
-    };
+    keyExtractor = (item, index) => item._id;
 
     renderSeparatorComponent = () => {
         return (

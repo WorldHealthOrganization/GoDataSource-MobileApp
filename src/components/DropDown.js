@@ -37,6 +37,7 @@ class DropDown extends PureComponent {
         if (props.value) {
             state.selectedItems = props.value;
         }
+        return null;
     }
 
     // The render method should have at least business logic as possible,

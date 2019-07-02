@@ -43,8 +43,8 @@ class FiltersContainer extends PureComponent {
                     keyboardShouldPersistTaps={'always'}
                 >
                     {
-                        configFilterScreen.filter.map((item) => {
-                            return this.handleRenderItem(item);
+                        configFilterScreen.filter.map((item, index) => {
+                            return this.handleRenderItem(item, index);
                         })
                     }
                 </KeyboardAwareScrollView>
@@ -78,8 +78,8 @@ class FiltersContainer extends PureComponent {
         );
     };
 
-    handleRenderItem = (item) => {
-        return this.renderItemCardComponent(item.fields)
+    handleRenderItem = (item, index) => {
+        return this.renderItemCardComponent(item.fields, index)
     };
 
     renderItemCardComponent = (fields, cardIndex = null) => {
@@ -87,7 +87,7 @@ class FiltersContainer extends PureComponent {
         const { designScreenSize } = config;
 
         return (
-            <ElevatedView elevation={3} style={[style.containerCardComponent, {
+            <ElevatedView key={cardIndex} elevation={3} style={[style.containerCardComponent, {
                 marginHorizontal: calculateDimension(16, false, screenSize),
                 width: calculateDimension(designScreenSize.width - 32, false, screenSize),
                 marginVertical: 4,

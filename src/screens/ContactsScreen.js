@@ -343,6 +343,7 @@ class ContactsScreen extends Component {
         let margins = calculateDimension(16, false, this.props.screenSize);
         return(
             <PersonListItem
+                key={item._id}
                 type={'Contact'}
                 titleColor={item && item.riskLevel ? this.state.riskColors[item.riskLevel] : 'black'}
                 itemToRender={item}

@@ -110,6 +110,9 @@ class FollowUpsSingleAddressContainer extends PureComponent {
                 index={cardIndex}
                 followUp={this.props.item}
                 contact={this.props.contact}
+                onChangeDropDown={() => {}}
+                onChangeDate={() => {}}
+                onChangeText={() => {}}
             />
         )
     };

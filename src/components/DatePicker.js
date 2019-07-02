@@ -198,7 +198,7 @@ const styles = StyleSheet.create({
 DatePicker.propTypes = {
     id: PropTypes.string.isRequired,
     label: PropTypes.string.isRequired,
-    value: PropTypes.string.isRequired,
+    value: PropTypes.oneOfType([PropTypes.instanceOf(Date), PropTypes.string]).isRequired,
     isEditMode: PropTypes.bool.isRequired,
     isRequired: PropTypes.bool.isRequired,
     onChange: PropTypes.func.isRequired,

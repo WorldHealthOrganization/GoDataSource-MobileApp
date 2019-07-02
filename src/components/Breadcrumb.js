@@ -25,7 +25,7 @@ const Crumb = ({isCrumbActive, index, text, numberOfEntities, crumbPress, transl
                 {getTranslation(text, translation)}
             </Text>
             {
-                index !== (numberOfEntities - 1) ? (<Icon name="chevron-right" size={16} color={isCrumbActive && 'black'} style={style.chevronStyle} />) : (null)
+                index !== (numberOfEntities - 1) ? (<Icon name="chevron-right" size={16} color={isCrumbActive ? 'black' : 'gray'} style={[style.chevronStyle]} />) : (null)
             }
         </Ripple>
     )
