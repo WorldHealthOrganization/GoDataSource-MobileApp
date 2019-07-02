@@ -144,6 +144,7 @@ class FollowUpsScreen extends Component {
                 state.refreshing = false;
                 state.loading = false;
             } else {
+                state.followUps = [];
                 state.refreshing = false;
                 state.loading = false;
             }
