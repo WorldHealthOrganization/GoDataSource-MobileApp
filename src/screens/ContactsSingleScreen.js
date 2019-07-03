@@ -823,69 +823,89 @@ class ContactsSingleScreen extends Component {
     handleOnChangeSwitch = (value, id, objectTypeOrIndex, objectType) => {
         // console.log("onChangeSwitch: ", value, id, this.state.item);
         if (id === 'geoLocationAccurate' && typeof objectTypeOrIndex === 'number' && objectTypeOrIndex >= 0 && objectType === 'Address') {
-            if (value) {
-                navigator.geolocation.getCurrentPosition((position) => {
-                    let addressesClone = _.cloneDeep(this.state.contact.addresses);
-                    console.log('addressesClone: ', addressesClone);
-                    if (!addressesClone[objectTypeOrIndex].geoLocation) {
-                        addressesClone[objectTypeOrIndex].geoLocation = {};
-                        addressesClone[objectTypeOrIndex].geoLocation.type = 'Point';
-                        addressesClone[objectTypeOrIndex].geoLocation.coordinates = [];
-                    }
-                    if (!addressesClone[objectTypeOrIndex].geoLocation.type) {
-                        addressesClone[objectTypeOrIndex].geoLocation.type = 'Point';
-                    }
-                    if (!addressesClone[objectTypeOrIndex].geoLocation.coordinates) {
-                        addressesClone[objectTypeOrIndex].geoLocation.coordinates = [];
-                    }
-                    addressesClone[objectTypeOrIndex].geoLocation.coordinates = [value ? position.coords.longitude : null, value ? position.coords.latitude : null];
-                    addressesClone[objectTypeOrIndex].geoLocationAccurate = value;
-                    this.setState(
-                        (prevState) => ({
-                            contact: Object.assign({}, prevState.contact, { addresses: addressesClone }),
-                            isModified: true
-                        }), () => {
-                            console.log("onChangeSwitch", id, " ", value, " ", this.state.contact);
-                        }
-                    )
-                },
-                    (error) => {
-                        Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(error.message, this.props.translation), [
-                            {
-                                text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
-                                onPress: () => { console.log("OK pressed") }
+            Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.alertMessages.replaceCurrentCoordinates, this.props.translation), [
+                {
+                    text: getTranslation(translations.generalLabels.noAnswer, this.props.translation), onPress: () => {
+                        let addressesClone = _.cloneDeep(this.state.contact.addresses);
+                        addressesClone[objectTypeOrIndex].geoLocationAccurate = value;
+                        this.setState(
+                            (prevState) => ({
+                                contact: Object.assign({}, prevState.contact, { addresses: addressesClone }),
+                                isModified: true
+                            }), () => {
+                                console.log("onChangeSwitch", id, " ", value, " ", this.state.contact);
                             }
-                        ])
-                    },
-                    {
-                        timeout: 5000
+                        )
                     }
-                )
-            } else {
-                let addressesClone = _.cloneDeep(this.state.contact.addresses);
-                console.log('addressesClone: ', addressesClone);
-                if (!addressesClone[objectTypeOrIndex].geoLocation) {
-                    addressesClone[objectTypeOrIndex].geoLocation = {};
-                    addressesClone[objectTypeOrIndex].geoLocation.type = 'Point';
-                    addressesClone[objectTypeOrIndex].geoLocation.coordinates = [];
-                }
-                if (!addressesClone[objectTypeOrIndex].geoLocation.type) {
-                    addressesClone[objectTypeOrIndex].geoLocation.type = 'Point';
-                }
-                if (!addressesClone[objectTypeOrIndex].geoLocation.coordinates) {
-                    addressesClone[objectTypeOrIndex].geoLocation.coordinates = [];
-                }
-                addressesClone[objectTypeOrIndex].geoLocation.coordinates = [null, null];
-                addressesClone[objectTypeOrIndex].geoLocationAccurate = value;
-                this.setState(
-                    (prevState) => ({
-                        contact: Object.assign({}, prevState.contact, { addresses: addressesClone }),
-                        isModified: true
-                    }), () => {
-                        console.log("onChangeSwitch", id, " ", value, " ", this.state.contact);
+                },
+                {
+                    text: getTranslation(translations.generalLabels.yesAnswer, this.props.translation), onPress: () => {
+                        if (value) {
+                            navigator.geolocation.getCurrentPosition((position) => {
+                                    let addressesClone = _.cloneDeep(this.state.contact.addresses);
+                                    console.log('addressesClone: ', addressesClone);
+                                    if (!addressesClone[objectTypeOrIndex].geoLocation) {
+                                        addressesClone[objectTypeOrIndex].geoLocation = {};
+                                        addressesClone[objectTypeOrIndex].geoLocation.type = 'Point';
+                                        addressesClone[objectTypeOrIndex].geoLocation.coordinates = [];
+                                    }
+                                    if (!addressesClone[objectTypeOrIndex].geoLocation.type) {
+                                        addressesClone[objectTypeOrIndex].geoLocation.type = 'Point';
+                                    }
+                                    if (!addressesClone[objectTypeOrIndex].geoLocation.coordinates) {
+                                        addressesClone[objectTypeOrIndex].geoLocation.coordinates = [];
+                                    }
+                                    addressesClone[objectTypeOrIndex].geoLocation.coordinates = [value ? position.coords.longitude : null, value ? position.coords.latitude : null];
+                                    addressesClone[objectTypeOrIndex].geoLocationAccurate = value;
+                                    this.setState(
+                                        (prevState) => ({
+                                            contact: Object.assign({}, prevState.contact, { addresses: addressesClone }),
+                                            isModified: true
+                                        }), () => {
+                                            console.log("onChangeSwitch", id, " ", value, " ", this.state.contact);
+                                        }
+                                    )
+                                },
+                                (error) => {
+                                    Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(error.message, this.props.translation), [
+                                        {
+                                            text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+                                            onPress: () => { console.log("OK pressed") }
+                                        }
+                                    ])
+                                },
+                                {
+                                    timeout: 5000
+                                }
+                            )
+                        } else {
+                            let addressesClone = _.cloneDeep(this.state.contact.addresses);
+                            console.log('addressesClone: ', addressesClone);
+                            if (!addressesClone[objectTypeOrIndex].geoLocation) {
+                                addressesClone[objectTypeOrIndex].geoLocation = {};
+                                addressesClone[objectTypeOrIndex].geoLocation.type = 'Point';
+                                addressesClone[objectTypeOrIndex].geoLocation.coordinates = [];
+                            }
+                            if (!addressesClone[objectTypeOrIndex].geoLocation.type) {
+                                addressesClone[objectTypeOrIndex].geoLocation.type = 'Point';
+                            }
+                            if (!addressesClone[objectTypeOrIndex].geoLocation.coordinates) {
+                                addressesClone[objectTypeOrIndex].geoLocation.coordinates = [];
+                            }
+                            addressesClone[objectTypeOrIndex].geoLocation.coordinates = [null, null];
+                            addressesClone[objectTypeOrIndex].geoLocationAccurate = value;
+                            this.setState(
+                                (prevState) => ({
+                                    contact: Object.assign({}, prevState.contact, { addresses: addressesClone }),
+                                    isModified: true
+                                }), () => {
+                                    console.log("onChangeSwitch", id, " ", value, " ", this.state.contact);
+                                }
+                            )
+                        }
                     }
-                )
-            }
+                }
+            ])
         } else {
             if (objectType === 'FollowUp') {
                 this.setState(
