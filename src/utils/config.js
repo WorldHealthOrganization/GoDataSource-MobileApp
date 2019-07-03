@@ -3,7 +3,7 @@
  */
 import styles from './../styles';
 import {Platform} from 'react-native';
-import translations from './translations'
+import translations from './translations';
 
 const baseUrls = [
     {value: 'gva11sucombee.who.int:3000'},
@@ -515,7 +515,7 @@ const caseSingleScreen = {
             {
                 cardNumber: 1,
                 id: 'geoLocationAccurate',
-                label: 'Is the person next to you',
+                label: translations.addressFieldLabels.isThePersonNextToYou,
                 labelValue: 'test',
                 type: 'SwitchInput',
                 value: '',
@@ -1726,7 +1726,7 @@ const contactsSingleScreen = {
             {
                 cardNumber: 1,
                 id: 'geoLocationAccurate',
-                label: 'Is the person next to you?',
+                label: translations.addressFieldLabels.isThePersonNextToYou,
                 labelValue: 'test',
                 type: 'SwitchInput',
                 value: '',
