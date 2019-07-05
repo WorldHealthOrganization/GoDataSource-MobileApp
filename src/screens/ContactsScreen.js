@@ -351,20 +351,20 @@ class ContactsScreen extends Component {
                 onPressNameProp={this.handleOnPressNameProp}
                 onPressExposureProp={this.handleOnPressExposureProp}
                 textsArray={[
-                    getTranslation(translations.contactsScreen.addFollowupsButton, this.props.translation),
+                    // getTranslation(translations.contactsScreen.addFollowupsButton, this.props.translation),
                     getTranslation(translations.contactsScreen.editButton, this.props.translation),
                     getTranslation(translations.followUpsScreen.addExposureFollowUpLabel, this.props.translation)
                 ]}
                 textsStyleArray={[
                     [styles.buttonTextActionsBar, {fontSize: 14, marginLeft: margins}],
-                    [styles.buttonTextActionsBar, {fontSize: 14}],
+                    // [styles.buttonTextActionsBar, {fontSize: 14}],
                     [styles.buttonTextActionsBar, {fontSize: 14, marginRight: margins}]]
                 }
                 onPressTextsArray={[
-                    () => {
-                        console.log('Test performance renderFollowUpQuestion');
-                        this.handlePressFollowUp(item)
-                    },
+                    // () => {
+                    //     console.log('Test performance renderFollowUpQuestion');
+                    //     this.handlePressFollowUp(item)
+                    // },
                     () => {
                         console.log('Test performance renderFollowUpQuestion');
                         this.handleOnPressMissing(item)
@@ -460,9 +460,9 @@ class ContactsScreen extends Component {
     };
 
     handlePressFollowUp = (item, contact) => {
-        let contactPlaceOfResidence = [];
+        let contactPlaceOfResidence = null;
         if (item && item.addresses && Array.isArray(item.addresses) && item.addresses.length > 0) {
-            contactPlaceOfResidence = item.addresses.filter((e) => {
+            contactPlaceOfResidence = item.addresses.find((e) => {
                 return e.typeId === config.userResidenceAddress.userPlaceOfResidence
             })
         }
@@ -476,7 +476,7 @@ class ContactsScreen extends Component {
                     date: new Date(),
                     outbreakId: this.props.user.activeOutbreakId,
                     lostToFollowUp: false,
-                    address: contactPlaceOfResidence[0] || null,
+                    address: contactPlaceOfResidence,
                     statusId: config.followUpStatuses.notPerformed
                 },
                 contact: contact || item,

@@ -832,9 +832,10 @@ class ContactsSingleScreen extends Component {
                             (prevState) => ({
                                 contact: Object.assign({}, prevState.contact, { addresses: addressesClone }),
                                 isModified: true
-                            }), () => {
-                                console.log("onChangeSwitch", id, " ", value, " ", this.state.contact);
-                            }
+                            })
+                            // , () => {
+                            //     console.log("onChangeSwitch", id, " ", value, " ", this.state.contact);
+                            // }
                         )
                     }
                 },
@@ -861,9 +862,10 @@ class ContactsSingleScreen extends Component {
                                         (prevState) => ({
                                             contact: Object.assign({}, prevState.contact, { addresses: addressesClone }),
                                             isModified: true
-                                        }), () => {
-                                            console.log("onChangeSwitch", id, " ", value, " ", this.state.contact);
-                                        }
+                                        })
+                                        // , () => {
+                                        //     console.log("onChangeSwitch", id, " ", value, " ", this.state.contact);
+                                        // }
                                     )
                                 },
                                 (error) => {

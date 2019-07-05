@@ -117,18 +117,18 @@ const followUpsSingleScreen = {
                     isEditMode: true,
                     objectType: 'FollowUp'
                 },
-                {
-                    cardNumber: 1,
-                    id: 'targeted',
-                    label: translations.followUpsSingleScreen.targeted,
-                    type: 'SwitchInput',
-                    value: false,
-                    isRequired: false,
-                    isEditMode: true,
-                    activeButtonColor: 'green',
-                    activeBackgroundColor: 'green',
-                    objectType: 'FollowUp'
-                },
+                // {
+                //     cardNumber: 1,
+                //     id: 'targeted',
+                //     label: translations.followUpsSingleScreen.targeted,
+                //     type: 'SwitchInput',
+                //     value: false,
+                //     isRequired: false,
+                //     isEditMode: true,
+                //     activeButtonColor: 'green',
+                //     activeBackgroundColor: 'green',
+                //     objectType: 'FollowUp'
+                // },
             ]
         }
     ],

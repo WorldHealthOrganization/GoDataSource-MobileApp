@@ -2,7 +2,7 @@
  * Created by florinpopa on 14/06/2018.
  */
 import { Navigation } from 'react-native-navigation';
-import { COLOR, ThemeContext, getTheme } from 'react-native-material-ui';
+import constants from './../utils/constants';
 
 import LoginScreen from './LoginScreen';
 import FirstConfigScreen from './FirstConfigScreen';
@@ -27,27 +27,27 @@ import HubConfigScreen from './HubConfigScreen';
 import PreviousAnswersScreen from './PreviousAnswersScreen';
 
 const screens = [
-    {screen: 'LoginScreen', component: LoginScreen},
-    {screen: 'FirstConfigScreen', component: FirstConfigScreen},
-    {screen: 'ManualConfigScreen', component: ManualConfigScreen},
-    {screen: 'NavigationDrawer', component: NavigationDrawer},
-    {screen: 'FollowUpsScreen', component: FollowUpsScreen},
-    {screen: 'AddFollowUpScreen', component: AddFollowUpScreen},
-    {screen: 'AddSingleAnswerModalScreen', component: AddSingleAnswerModalScreen},
-    {screen: 'GenerateFollowUpScreen', component: GenerateFollowUpScreen},
-    {screen: 'FilterScreen', component: FilterScreen},
-    {screen: 'FollowUpsSingleScreen', component: FollowUpsSingleScreen},
-    {screen: 'CasesScreen', component: CasesScreen},
-    {screen: 'CaseSingleScreen', component: CaseSingleScreen},
-    {screen: 'ContactsScreen', component: ContactsScreen},
-    {screen: 'ContactsSingleScreen', component: ContactsSingleScreen},
-    {screen: 'InAppNotificationScreen', component: InAppNotificationScreen},
-    {screen: 'ExposureScreen', component: ExposureScreen},
-    {screen: 'HelpScreen', component: HelpScreen},
-    {screen: 'HelpSingleScreen', component: HelpSingleScreen},
-    {screen: 'QRScanScreen', component: QRScanScreen},
-    {screen: 'HubConfigScreen', component: HubConfigScreen},
-    {screen: 'PreviousAnswersScreen', component: PreviousAnswersScreen}
+    {screen: constants.appScreens.loginScreen, component: LoginScreen},
+    {screen: constants.appScreens.firstConfigScreen, component: FirstConfigScreen},
+    {screen: constants.appScreens.manualConfigScreen, component: ManualConfigScreen},
+    {screen: constants.appScreens.navigationDrawer, component: NavigationDrawer},
+    {screen: constants.appScreens.followUpScreen, component: FollowUpsScreen},
+    {screen: constants.appScreens.addFollowUpScreen, component: AddFollowUpScreen},
+    {screen: constants.appScreens.addSingleAnswerModalScreen, component: AddSingleAnswerModalScreen},
+    {screen: constants.appScreens.generateFollowUpsScreen, component: GenerateFollowUpScreen},
+    {screen: constants.appScreens.filterScreen, component: FilterScreen},
+    {screen: constants.appScreens.followUpSingleScreen, component: FollowUpsSingleScreen},
+    {screen: constants.appScreens.casesScreen, component: CasesScreen},
+    {screen: constants.appScreens.caseSingleScreen, component: CaseSingleScreen},
+    {screen: constants.appScreens.contactsScreen, component: ContactsScreen},
+    {screen: constants.appScreens.contactSingleScreen, component: ContactsSingleScreen},
+    {screen: constants.appScreens.inAppNotificationScreen, component: InAppNotificationScreen},
+    {screen: constants.appScreens.exposureScreen, component: ExposureScreen},
+    {screen: constants.appScreens.helpScreen, component: HelpScreen},
+    {screen: constants.appScreens.helpSingleScreen, component: HelpSingleScreen},
+    {screen: constants.appScreens.qrScanScreen, component: QRScanScreen},
+    {screen: constants.appScreens.hubConfigScreen, component: HubConfigScreen},
+    {screen: constants.appScreens.previousAnswersScreen, component: PreviousAnswersScreen}
 ];
 
 export function registerScreens(store, Provider) {
