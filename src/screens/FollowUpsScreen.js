@@ -17,22 +17,18 @@ import Ripple from 'react-native-material-ripple';
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import SearchFilterView from './../components/SearchFilterView';
-import FollowUpListItem from './../components/FollowUpListItem';
 import PersonListItem from './../components/PersonListItem';
-import MissedFollowUpListItem from './../components/MissedFollowUpListItem';
 import AnimatedListView from './../components/AnimatedListView';
 import Breadcrumb from './../components/Breadcrumb';
-import Menu, { MenuItem } from 'react-native-material-menu';
 import ValuePicker from './../components/ValuePicker';
 import { getFollowUpsForOutbreakId, getMissedFollowUpsForOutbreakId, addFollowUp, generateFollowUp } from './../actions/followUps';
 import { getContactsForOutbreakId } from './../actions/contacts';
 import { removeErrors } from './../actions/errors';
-import { addFilterForScreen, removeFilterForScreen, saveGeneratedFollowUps } from './../actions/app';
+import { addFilterForScreen, removeFilterForScreen, saveGeneratedFollowUps, setLoaderState } from './../actions/app';
 import ElevatedView from 'react-native-elevated-view';
 import _ from 'lodash';
 import AddFollowUpScreen from './AddFollowUpScreen';
 import GenerateFollowUpScreen from './GenerateFollowUpScreen';
-import { LoaderScreen, Colors } from 'react-native-ui-lib';
 import { calculateDimension, navigation, extractIdFromPouchId, generateId, updateRequiredFields, getTranslation, localSortContactsForFollowUps, objSort } from './../utils/functions';
 import ViewHOC from './../components/ViewHOC';
 import { Popup } from 'react-native-map-link';
@@ -42,6 +38,8 @@ import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityI
 import { getItemByIdRequest } from './../queries/cases';
 import { pushNewEditScreen } from './../utils/screenTransitionFunctions';
 import RNExitApp from 'react-native-exit-app';
+import {createSelector} from 'reselect';
+import {mapFollowUps} from './../selectors/followUpsScreen';
 
 const scrollAnim = new Animated.Value(0);
 const offsetAnim = new Animated.Value(0);
@@ -197,15 +195,16 @@ class FollowUpsScreen extends Component {
         for (let i=0; i<refData.length; i++) {
             followUpsColors[refData[i].value] = refData[i].colorCode || styles.buttonGreen
         }
-        this.setState({
-            loading: true,
-            generating: false,
-            followUpsColors
-        }, () => {
-            if (this.props.user && this.props.user.activeOutbreakId) {
-                this.props.getFollowUpsForOutbreakId(this.props.user.activeOutbreakId, this.state.filter, this.props.teams, null);
-            }
-        })
+        // this.setState({
+        //     loading: true,
+        //     generating: false,
+        //     followUpsColors
+        // }, () => {
+        if (this.props.user && this.props.user.activeOutbreakId) {
+            // this.props.setLoaderState(true);
+            this.props.getFollowUpsForOutbreakId(this.props.user.activeOutbreakId, this.state.filter, this.props.teams, null);
+        }
+        // })
     }
 
     clampedScroll = Animated.diffClamp(
@@ -257,10 +256,12 @@ class FollowUpsScreen extends Component {
 
         let followUpTitle = []; followUpTitle[0] = getTranslation(translations.followUpsScreen.followUpsTitle, this.props.translation);
         console.log(`Refreshing: ${this.state.refreshing}   Loading: ${this.state.loading}`);
+
+        // Here call the method for filter/sorting
+        let sortedAndFilteredFollowUps = this.filterFollowUps(this.props);
+
         return (
-            <ViewHOC style={style.container}
-                showLoader={(this.props && this.props.syncState && ((this.props.syncState.id === 'sync' && this.props.syncState.status !== null && this.props.syncState.status !== 'Success') && this.props.syncState.status !== 'Error')) || (this && this.state && this.state.loading)}
-                loaderText={this.props && this.props.syncState ? 'Loading' : getTranslation(translations.loadingScreenMessages.loadingMsg, this.props.translation)}>
+            <ViewHOC style={style.container}>
                 <NavBarCustom
                     title={null}
                     customTitle={
@@ -322,7 +323,7 @@ class FollowUpsScreen extends Component {
                         value={this.state.filter.performed && this.state.filter.performed.label ? this.state.filter.performed.label : config.dropDownValues[0].value}
                     />
                     {
-                        this.props.role.find((e) => e === config.userPermissions.writeFollowUp) !== undefined ? (
+                        this.props && this.props.role && Array.isArray(this.props.role) && this.props.role.length > 0 && this.props.role.find((e) => e === config.userPermissions.writeFollowUp) !== undefined ? (
                             <ElevatedView
                                 elevation={3}
                                 style={{
@@ -346,7 +347,7 @@ class FollowUpsScreen extends Component {
                 <View style={style.containerContent}>
                     <AnimatedListView
                         stickyHeaderIndices={[0]}
-                        data={this.state.followUps || []}
+                        data={this.props.mappedFollowUps || []}
                         renderItem={this.renderFollowUp}
                         keyExtractor={this.keyExtractor}
                         ListHeaderComponent={
@@ -446,9 +447,10 @@ class FollowUpsScreen extends Component {
                 onPressMapIconProp={this.handleOnPressMap}
                 onPressNameProp={this.handleOnPressNameProp}
                 onPressExposureProp={this.handleOnPressExposureProp}
+                screenSize={this.props.screenSize}
                 textsArray={[
-                    getTranslation(item.statusId, this.props.translation),
-                    getTranslation(translations.followUpsScreen.addExposureFollowUpLabel, this.props.translation)
+                    item.additionalData.thirdComponentData.followUpStatus,
+                    item.additionalData.thirdComponentData.addExposureLabel
                 ]}
                 textsStyleArray={[[styles.buttonTextActionsBar, {color: this.state.followUpsColors[item.statusId], marginLeft: margins}], [styles.buttonTextActionsBar, {marginRight: margins}]]}
                 onPressTextsArray={[
@@ -496,6 +498,17 @@ class FollowUpsScreen extends Component {
             this.props.getFollowUpsForOutbreakId(this.props.user.activeOutbreakId, this.state.filter, this.props.teams, null);
         });
     };
+
+    selectFollowUps = (props) => {
+        return props.mappedFollowUps;
+    };
+
+    filterFollowUps = createSelector(
+        [this.selectFollowUps],
+        (followUps) => {
+
+        }
+    );
 
     calculateTopForDropdown = () => {
         let dim = calculateDimension(98, true, this.props.screenSize);
@@ -599,7 +612,7 @@ class FollowUpsScreen extends Component {
     };
 
     handleOnPressMap = (contact) => {
-        console.log("Handle on press map contact: ", JSON.stringify(contact));
+        contact = this.props.contacts.find((e) => {return extractIdFromPouchId(e._id, 'person') === contact});
 
         if (contact && contact.addresses && Array.isArray(contact.addresses) && contact.addresses.length > 0) {
             let contactPlaceOfResidence = contact.addresses.filter((e) => {
@@ -1080,7 +1093,8 @@ const style = StyleSheet.create({
     }
 });
 
-function mapStateToProps(state) {
+mapStateToProps = (state, ownProps) => {
+    const mappedFollowUps = mapFollowUps(state);
     return {
         user: state.user,
         teams: state.teams,
@@ -1096,7 +1110,9 @@ function mapStateToProps(state) {
         helpItem: state.helpItem,
         role: state.role,
         cases: state.cases,
-        referenceData: state.referenceData
+        referenceData: state.referenceData,
+        mappedFollowUps: mappedFollowUps,
+        showLoader: state.app.loaderState
     };
 }
 
@@ -1110,7 +1126,8 @@ function matchDispatchProps(dispatch) {
         addFollowUp,
         saveGeneratedFollowUps,
         removeFilterForScreen,
-        generateFollowUp
+        generateFollowUp,
+        setLoaderState
     }, dispatch);
 }
 

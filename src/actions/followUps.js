@@ -2,7 +2,7 @@
  * Created by florinpopa on 19/07/2018.
  */
 import {ACTION_TYPE_GET_FOLLOWUPS, ACTION_TYPE_STORE_FOLLOWUPS, ACTION_TYPE_UPDATE_FOLLOWUP, ACTION_TYPE_DELETE_FOLLOWUP} from './../utils/enums';
-import {updateContact, updateContactAction, getContactsForOutbreakIdWithPromises} from './contacts';
+import {updateContact, updateContactAction, getContactsForOutbreakIdWithPromises, getContactsForOutbreakPromise} from './contacts';
 import { addError } from './errors';
 import errorTypes from './../utils/errorTypes';
 import config from './../utils/config';
@@ -35,6 +35,79 @@ export function updateFollowUpAction(followUp) {
         type: ACTION_TYPE_UPDATE_FOLLOWUP,
         payload: followUp
     }
+}
+
+// Replace method for getting the list of follow-ups. it has to support searching by case/contacts name and visualId, and location
+export function getFollowUpsForOutbreak(outbreakId, filter, userTeams) {
+    return async function (dispatch) {
+        // Filter props for follow-ups: date
+        // Filter props for contacts: firstName, lastName, locationId, visualId, age, gender
+        // Filter props for cases/events: firstName/lastName, visualId
+        let {followUpsFilter, contactsFilter, casesFilter} = computeFilters(filter);
+        // Get follow-ups filtered by date and user Teams
+        try {
+            let followUpsList = await getFollowUpsForOutbreakIdRequest(outbreakId, filter, userTeams);
+            if (followUpsList && Array.isArray(followUpsList) && followUpsList.length > 0) {
+                let mappedFollowUpsByContactIds = _.groupBy(followUpsList, 'personId');
+                try {
+                    let contactsWithRelationships = await getContactsForOutbreakPromise(outbreakId, filter);
+                    if (contactsWithRelationships) {
+
+                    }
+                } catch (errorGetContactsWithRelationships) {
+                    console.log('Error while getting contacts for followUps: ', errorGetContactsWithRelationships);
+                    dispatch(addError(errorTypes.ERROR_FOLLOWUPS));
+                }
+            } else {
+                dispatch(storeFollowUps([]));
+            }
+        } catch(errorGetFollowUpsList) {
+            console.log('Error while getting followUpsList: ', errorGetFollowUpsList);
+            dispatch(addError(errorTypes.ERROR_FOLLOWUPS));
+        }
+    }
+}
+
+function computeFilters(filter) {
+    let returnedFilter = {
+        followUpsFilter: {},
+        contactsFilter: {},
+        casesFilter: {}
+    };
+
+    // FollowUps filter
+    if (!filter) {
+        returnedFilter.followUpsFilter.date = new Date();
+    }
+    if (filter && filter.statusId) {
+        returnedFilter.followUpsFilter.statusId = filter.statusId;
+    }
+
+    // Common cases/contacts
+
+    if (filter && filter.date) {
+        returnedFilter.followUpsFilter.date = filter.date;
+    }
+
+    if (filter && filter.searchText) {
+        returnedFilter.contactsFilter.searchText = filter.searchText;
+        returnedFilter.casesFilter.searchText = filter.searchText;
+    }
+
+
+
+    if (filter && filter.age) {
+        returnedFilter.contactsFilter.age = filter.age;
+    }
+
+    if (filter && filter.locationId) {
+        returnedFilter.contactsFilter.locationId = filter.locationId;
+    }
+
+    if (filter && filter.gender) {
+        returnedFilter.contactsFilter.gender = filter.gender;
+    }
+
 }
 
 export function getFollowUpsForOutbreakId(outbreakId, filter, userTeams, token) {

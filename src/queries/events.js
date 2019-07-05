@@ -7,6 +7,7 @@ import config from './../utils/config';
 // Credentials: {email, encryptedPassword}
 export function getEventsForOutbreakIdRequest (outbreakId, token, callback) {
     let start =  new Date().getTime();
+    console.log('Result for find start time for getEvents: ', new Date());
     getDatabase(config.mongoCollections.person)
         .then((database) => {
             database.find({

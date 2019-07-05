@@ -62,6 +62,32 @@ export function removeContactAction(contact) {
     }
 }
 
+export function getContactsForOutbreakPromise(outbreakId, filter) {
+    return new Promise((resolve, reject) => {
+        getContactsForOutbreakIdRequest(outbreakId, filter, null, (error, response) => {
+            if (error) {
+                console.log("*** getContactsForOutbreakId error: ", error);
+                // dispatch(addError(errorTypes.ERROR_CONTACT));
+                reject(error);
+            }
+            if (response) {
+                // dispatch(storeContacts(response));
+                getRelationshipsForTypeRequest(outbreakId, 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT', response.map((e) => {return extractIdFromPouchId(e._id, 'person')}), (errorRelationships, responseRelationships) => {
+                    if (errorRelationships) {
+                        // dispatch(addError(errorTypes.ERROR_CONTACT));
+                        reject(errorRelationships);
+                    }
+
+                    if (responseRelationships) {
+                        let mappedContacts = mapContactsAndRelationships(response, responseRelationships);
+                        resolve(mappedContacts);
+                    }
+                });
+            }
+        })
+    })
+}
+
 export function getContactsForOutbreakIdWithPromises(outbreakId, filter, token, dispatch) {
     // return async function (dispatch, getState) {
     return new Promise((resolve, reject) => {

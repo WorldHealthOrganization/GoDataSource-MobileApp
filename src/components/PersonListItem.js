@@ -22,9 +22,9 @@ import Ripple from 'react-native-material-ripple';
 import {extractIdFromPouchId, getAddress, handleExposedTo} from "../utils/functions";
 import config from "../utils/config";
 
-PersonListItem = ({type, itemToRender, titleColor, screenSize, translations, cases, events, contacts, locations, onPressMapIconProp, onPressNameProp, onPressExposureProp, textsArray, textsStyleArray, onPressTextsArray}) => {
-    let firstComponentData = prepareFirstComponentData(type, itemToRender, translations, cases, contacts, locations);
-    let secondComponentData = prepareSecondComponentData(type, itemToRender, translations, cases, events, contacts)
+PersonListItem = ({type, itemToRender, titleColor, screenSize, onPressMapIconProp, onPressNameProp, onPressExposureProp, textsArray, textsStyleArray, onPressTextsArray}) => {
+    // let firstComponentData = prepareFirstComponentData(type, itemToRender, translations, cases, contacts, locations);
+    // let secondComponentData = prepareSecondComponentData(type, itemToRender, translations, cases, events, contacts)
     return (
         <GeneralListItem
             containerStyle={{
@@ -34,17 +34,15 @@ PersonListItem = ({type, itemToRender, titleColor, screenSize, translations, cas
                 <FirstComponent
                     type={type}
                     titleColor={titleColor}
-                    firstComponentRenderData={firstComponentData}
-                    onPressMapIcon={() => {onPressMapIcon(type, onPressMapIconProp, itemToRender, contacts)}}
+                    firstComponentRenderData={itemToRender.additionalData.firstComponentData}
+                    onPressMapIcon={() => {onPressMapIcon(type, onPressMapIconProp, itemToRender)}}
                     onPressNameProp={onPressNameProp}
                     screenSize={screenSize}
-                    translation={translations}
                 />
             }
             secondComponent={type !== 'Case' ? (
                 <SecondComponent
-                    data={secondComponentData}
-                    translation={translations}
+                    data={itemToRender.additionalData.secondComponentData}
                     screenSize={screenSize}
                     onPressExposureProp={onPressExposureProp}
                 />) : (null)
@@ -58,7 +56,7 @@ PersonListItem = ({type, itemToRender, titleColor, screenSize, translations, cas
 };
 
 
-FirstComponent = ({type, firstComponentRenderData, titleColor, onPressMapIcon, onPressNameProp, screenSize, translation}) => (
+FirstComponent = ({type, firstComponentRenderData, titleColor, onPressMapIcon, onPressNameProp, screenSize}) => (
     <View>
         <View style={{
             flexDirection: 'row',
@@ -85,7 +83,7 @@ FirstComponent = ({type, firstComponentRenderData, titleColor, onPressMapIcon, o
                     flex: 1,
                     marginHorizontal: 7,
                     display: firstComponentRenderData.addressString ? 'flex' : 'none'
-                }]}>{'\u2022 ' + getTranslation(translations.addressFieldLabels.address, translation) + ": " + firstComponentRenderData.addressString}</Text>
+                }]}>{'\u2022 ' + firstComponentRenderData.addressString}</Text>
             </View>
             <Ripple style={{width: 35, height: 35}} onPress={onPressMapIcon}>
                 <Image source={{uri: 'map_icon'}} style={{width: 35, height: 35}}/>
@@ -147,9 +145,9 @@ prepareFirstComponentData = (type, itemToRender, translation, cases, contacts, l
     return returnValues;
 };
 
-onPressMapIcon = (type, onPressMapIcon, itemToRender, contacts) => {
+onPressMapIcon = (type, onPressMapIcon, itemToRender) => {
     InteractionManager.runAfterInteractions(() => {
-        let person = type === 'Contact' || type === 'Case' ? itemToRender : contacts && Array.isArray(contacts) && contacts.length > 0 ?  contacts.find((e) => {return extractIdFromPouchId(e._id, 'person') === itemToRender.personId}) : null;
+        let person = type === 'Contact' || type === 'Case' ? itemToRender : itemToRender.personId;
 
         if (onPressMapIcon !== undefined) {
             onPressMapIcon(person)
@@ -163,7 +161,7 @@ handleOnPressName = (type, onPressNameProp, personId) => {
     })
 };
 
-SecondComponent = ({data, translation, screenSize, onPressExposureProp}) => (
+SecondComponent = ({data, screenSize, onPressExposureProp}) => (
     <View style={{
         marginHorizontal: calculateDimension(16, false, screenSize),
         justifyContent: 'space-between',
@@ -172,16 +170,16 @@ SecondComponent = ({data, translation, screenSize, onPressExposureProp}) => (
         {
             data && data.followUpDay ? (
                 <View>
-                    <Text style={[style.secondaryText, {marginVertical: 5, marginHorizontal: 7}]} numberOfLines={1}>{getTranslation(translations.personListItem.dayOfFollowUp, translation) + data.followUpDay}</Text>
+                    <Text style={[style.secondaryText, {marginVertical: 5, marginHorizontal: 7}]} numberOfLines={1}>{data.followUpDayLabel + ': ' + data.followUpDay}</Text>
                 </View>
             ) : (null)
         }
         {
-            data && data.exposures && Array.isArray(data.exposures) && data.exposures.length > 0 ? (
+            data && data.exposedTo && Array.isArray(data.exposedTo) && data.exposedTo.length > 0 ? (
                 <View>
-                    <Text style={style.exposedToTextStyle}>{getTranslation(translations.followUpsScreen.exposedToMessage, translation) + ":"}</Text>
+                    <Text style={style.exposedToTextStyle}>{data.exposedToMessage + ":"}</Text>
                     {
-                        data.exposures.map((exposure, index) => {
+                        data.exposedTo.map((exposure, index) => {
                             return renderExposures(exposure, onPressExposureProp);
                         })
                     }
@@ -290,4 +288,4 @@ function mapStateToProps(state) {
     };
 }
 
-export default connect(mapStateToProps)(PersonListItem);
+export default PersonListItem;

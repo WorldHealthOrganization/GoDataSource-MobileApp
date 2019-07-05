@@ -17,7 +17,7 @@ export function getContactsForOutbreakIdRequest (outbreakId, filter, token, call
                 let start =  new Date().getTime();
                 Promise.all(promiseArray)
                     .then((resultGetAll) => {
-                        // console.log("Result from get queries: ", new Date().getTime() - start, resultGetAll.length);
+                        console.log("Result for find get queries: ", new Date().getTime() - start, resultGetAll.length);
                         callback(null, resultGetAll.filter((e) => {return e && e._id !== null}));
                     })
                     .catch((errorGetAll) => {

@@ -5,9 +5,8 @@
  * Created by florinpopa on 14/06/2018.
  */
 import React, {PureComponent} from 'react';
-import {View, Text, StyleSheet, Platform, Image, Alert, Modal, ScrollView} from 'react-native';
+import {View, Text, StyleSheet, Platform, Image, Alert} from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
-
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import {Button, Icon} from 'react-native-material-ui';
@@ -18,16 +17,15 @@ import { bindActionCreators } from 'redux';
 import { loginUser } from './../actions/user';
 import { removeErrors } from './../actions/errors';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
-import config from './../utils/config';
 import url from './../utils/url';
 import {storeHubConfiguration} from './../actions/app';
-import {LoaderScreen} from 'react-native-ui-lib';
 import Ripple from 'react-native-material-ripple';
 import {getTranslation, generateId} from './../utils/functions';
 import translations from './../utils/translations';
 import SwitchInput from './../components/SwitchInput';
 import {getInternetCredentials, setInternetCredentials} from 'react-native-keychain';
 import {setSyncState, changeAppRoot} from './../actions/app';
+import ModalSyncStatus from './../components/ModalSyncStatus';
 
 class ManualConfigScreen extends PureComponent {
 
@@ -160,48 +158,59 @@ class ManualConfigScreen extends PureComponent {
                 }
     };
 
-    static getDerivedStateFromProps(props, state) {
-        if (props.errors && props.errors.type && props.errors.message && !state.hasAlert) {
-            state.hasAlert = true;
-            Alert.alert(props.errors.type, props.errors.message, [
-                {
-                    text: getTranslation(translations.alertMessages.okButtonLabel, props.translation),
-                    onPress: () => {
-                        state.hasAlert = false;
-                        props.removeErrors();
-                    }
-                }
-            ])
-        }
-        if (props.syncState) {
-            // props.navigator.push({
-            //     screen: 'LoginScreen',
-            //     animationType: 'fade',
-            //     animated: true
-            // })
-            if (props.syncState.id === 'testApi' && props.syncState.status === 'In progress') {
-                state.showModal = true;
-            }
-            let itemToBeChanged = state.syncState.find((e) => {return e.id === props.syncState.id});
-            if (itemToBeChanged) {
-                itemToBeChanged.name = props.syncState.name ? props.syncState.name : itemToBeChanged.name;
-                itemToBeChanged.error = props.syncState.error || null;
-                itemToBeChanged.status = props.syncState.status || '...';
-
-                let index = state.syncState.map((e) => {return e.id}).indexOf(props.syncState.id);
-                state.syncState[index] = itemToBeChanged;
-                if (itemToBeChanged.status === 'Error' || (index === state.syncState.length - 1 && itemToBeChanged.status === 'Success')) {
-                    state.showCloseModalButton = true;
-                }
-            }
-        }
-        return null;
-    }
+    // static getDerivedStateFromProps(props, state) {
+    //     // if (props.errors && props.errors.type && props.errors.message && !state.hasAlert) {
+    //     //     state.hasAlert = true;
+    //     //     Alert.alert(props.errors.type, props.errors.message, [
+    //     //         {
+    //     //             text: getTranslation(translations.alertMessages.okButtonLabel, props.translation),
+    //     //             onPress: () => {
+    //     //                 state.hasAlert = false;
+    //     //                 props.removeErrors();
+    //     //             }
+    //     //         }
+    //     //     ])
+    //     // }
+    //     if (props.syncState) {
+    //         // props.navigator.push({
+    //         //     screen: 'LoginScreen',
+    //         //     animationType: 'fade',
+    //         //     animated: true
+    //         // })
+    //         if (props.syncState.id === 'testApi' && props.syncState.status === 'In progress') {
+    //             state.showModal = true;
+    //         }
+    //         let itemToBeChanged = state.syncState.find((e) => {return e.id === props.syncState.id});
+    //         if (itemToBeChanged) {
+    //             itemToBeChanged.name = props.syncState.name ? props.syncState.name : itemToBeChanged.name;
+    //             itemToBeChanged.error = props.syncState.error || null;
+    //             itemToBeChanged.status = props.syncState.status || '...';
+    //
+    //             let index = state.syncState.map((e) => {return e.id}).indexOf(props.syncState.id);
+    //             state.syncState[index] = itemToBeChanged;
+    //             if (itemToBeChanged.status === 'Error' || (index === state.syncState.length - 1 && itemToBeChanged.status === 'Success')) {
+    //                 state.showCloseModalButton = true;
+    //             }
+    //         }
+    //     }
+    //     return null;
+    // }
 
     // The render method should have at least business logic as possible,
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
+        if (this.props.syncState === 'Finished' && this.props.showModal === false && this.props.showCloseModalButton === false) {
+            if (this.props.isMultipleHub) {
+                this.props.changeAppRoot('login');
+            } else {
+                this.props.navigator.push({
+                    screen: 'LoginScreen',
+                    animated: true,
+                    animationType: 'fade'
+                })
+            }
+        }
         return (
             <KeyboardAwareScrollView
                 style={[style.container, {paddingTop: Platform.OS === 'ios' ? this.props.screenSize.height === 812 ? 44 : 20 : 0}]}
@@ -232,12 +241,6 @@ class ManualConfigScreen extends PureComponent {
                         ) : (null)
                     }
                 </View>
-
-                {/*{*/}
-                    {/*Platform.OS === 'ios' && this.props.screenSize.height <= 600 ? (*/}
-                        {/*<View style={{flex: 0.35}} />*/}
-                    {/*) : (null)*/}
-                {/*}*/}
                 <View style={[style.welcomeTextContainer, {flex: Platform.OS === 'ios' && this.props.screenSize.height <= 600 ? 0.05 : 0.35}]}>
                     <Text style={style.welcomeText}>
                         {getTranslation(translations.manualConfigScreen.title, null)}
@@ -330,51 +333,15 @@ class ManualConfigScreen extends PureComponent {
                         </View>
                     )
                 }
-                {/*{*/}
-                    {/*this.props && this.props.syncState && (this.props.syncState !== 'Finished processing' && this.props.syncState !== 'Error') ? (*/}
-                        {/*<LoaderScreen message={this.props.syncState || ''} overlay={true} backgroundColor={'white'} />*/}
-                    {/*) : (*/}
-                        {/*null*/}
-                    {/*)*/}
-                {/*}*/}
-                <Modal
-                    animationType={'slide'}
-                    transparent={false}
-                    visible={this.state.showModal}
-                >
-                    <View style={{flex: 1, backgroundColor: '#55b5a6', alignItems: 'center'}}>
-                        <Text style={{marginTop: 60, fontFamily: 'Roboto-Bold', fontSize: 20, color: 'white'}}>Sync status</Text>
-                        <ScrollView style={{width: '100%'}} contentContainerStyle={{flexGrow: 1, justifyContent: 'center', alignItems: 'center'}}>
-                            {
-                                this.state.syncState.map((item, index) => {
-                                    return (
-                                        <View style={{
-                                            width: '85%',
-                                            justifyContent: 'space-between',
-                                            marginVertical: 8
-                                        }}>
-                                            <View style={{
-                                                flexDirection: 'row',
-                                                justifyContent: 'space-between'
-                                            }}>
-                                                <Text style={{fontFamily: 'Roboto-Medium', fontSize: 16, color: 'white'}}>{item.name}</Text>
-                                                <Text style={{fontFamily: 'Roboto-Medium', fontSize: 16, color: 'white'}}>{item.status}</Text>
-                                            </View>
-                                            <Text style={{fontFamily: 'Roboto-Medium', fontSize: 16, color: 'white'}}>{item.error}</Text>
-                                        </View>
-                                    )
-                                })
-                            }
-                        </ScrollView>
-                        {
-                            this.state.showCloseModalButton ? (
-                                <View style={{marginBottom: Platform.OS === 'ios' ? this.props.screenSize.height > 812 ? 60 : 20 : 40}}>
-                                    <Button upperCase={false} onPress={this.closeModal} text={'Close'} style={styles.buttonLogin} />
-                                </View>
-                            ) : (null)
-                        }
-                    </View>
-                </Modal>
+
+                <ModalSyncStatus
+                    showModal={this.props.showModal}
+                    syncState={this.props.syncState}
+                    showCloseModalButton={this.props.showCloseModalButton}
+                    screenSize={this.props.screenSize}
+                    closeModal={this.closeModal}
+                />
+
             </KeyboardAwareScrollView>
         );
     }
@@ -520,41 +487,43 @@ class ManualConfigScreen extends PureComponent {
     };
 
     closeModal = () => {
-        if (this.state.syncState[this.state.syncState.length - 1].status === 'Success') {
-            this.resetModalProps(() => {
-                if (this.props.isMultipleHub) {
-                    this.props.changeAppRoot('login');
-                } else {
-                    this.props.navigator.push({
-                        screen: 'LoginScreen',
-                        animated: true,
-                        animationType: 'fade'
-                    })
-                }
-            })
+        if (this.props.syncState[this.props.syncState.length - 1].status === 'Success') {
+            // this.resetModalProps(() => {
+            //     if (this.props.isMultipleHub) {
+            //         this.props.changeAppRoot('login');
+            //     } else {
+            //         this.props.navigator.push({
+            //             screen: 'LoginScreen',
+            //             animated: true,
+            //             animationType: 'fade'
+            //         })
+            //     }
+            // })
+            this.props.setSyncState('Finished')
         } else {
-            this.resetModalProps(() => {
-                console.log('reset props')
-            })
+            // this.resetModalProps(() => {
+            //     console.log('reset props')
+            // })
+            this.props.setSyncState('Reset');
         }
     };
 
-    resetModalProps = (callback) => {
-        this.setState({
-            syncState: [
-                {id: 'testApi', name: 'Test API', status: '...'},
-                {id: 'downloadDatabase', name: 'Download database', status: '...'},
-                {id: 'unzipFile', name: 'Unzip', status: '...'},
-                {id: 'sync', name: 'Sync', status: '...'}
-            ],
-            showModal: false,
-            showCloseModalButton: false
-        }, () => {
-            console.log('New state: ', this.state.syncState);
-            this.props.setSyncState({id: 'sync', status: null});
-            callback();
-        })
-    }
+    // resetModalProps = (callback) => {
+    //     this.setState({
+    //         syncState: [
+    //             {id: 'testApi', name: 'Test API', status: '...'},
+    //             {id: 'downloadDatabase', name: 'Download database', status: '...'},
+    //             {id: 'unzipFile', name: 'Unzip', status: '...'},
+    //             {id: 'sync', name: 'Sync', status: '...'}
+    //         ],
+    //         showModal: false,
+    //         showCloseModalButton: false
+    //     }, () => {
+    //         console.log('New state: ', this.state.syncState);
+    //         this.props.setSyncState({id: 'sync', status: null});
+    //         callback();
+    //     })
+    // }
 }
 
 // Create style outside the class, or for components that will be used by other components (buttons),
@@ -602,13 +571,68 @@ const style = StyleSheet.create({
 });
 
 function mapStateToProps(state) {
+    const aux = handleChangingSyncState(state.app.syncState);
+    const {showModal, showCloseModalButton} = aux;
+
+    let syncState = aux.syncState;
+    if (Array.isArray(aux.syncState)) {
+        syncState = Object.assign([], aux.syncState);
+    } else {
+        syncState = aux.syncState;
+    }
+
     return {
         screenSize: state.app.screenSize,
-        errors: state.errors,
-        syncState: state.app.syncState,
+        // errors: state.errors,
+        syncState: syncState,
+        showModal: showModal,
+        showCloseModalButton: showCloseModalButton,
         activeDatabase: state.app.activeDatabase
     };
 }
+
+let syncStateGlobal = [
+        {id: 'testApi', name: 'Test API', status: '...'},
+        {id: 'downloadDatabase', name: 'Download database', status: '...'},
+        {id: 'unzipFile', name: 'Unzip', status: '...'},
+        {id: 'sync', name: 'Sync', status: '...'}
+        ];
+
+handleChangingSyncState = (syncState) => {
+    let returnedValue = {
+        showModal: !!(syncState && syncState.id && (syncState.status || syncState.name)),
+        syncState: syncStateGlobal,
+        showCloseModalButton: false
+    };
+
+    if (!syncState || syncState === 'Finished' || syncState === 'Reset') {
+        returnedValue = {
+            showModal: false,
+            syncState: syncState === 'Finished' ? syncState : [
+                {id: 'testApi', name: 'Test API', status: '...'},
+                {id: 'downloadDatabase', name: 'Download database', status: '...'},
+                {id: 'unzipFile', name: 'Unzip', status: '...'},
+                {id: 'sync', name: 'Sync', status: '...'}
+            ],
+            showCloseModalButton: false
+        }
+    } else {
+        let itemToBeChanged = returnedValue.syncState.find((e) => {return e.id === syncState.id});
+        if (itemToBeChanged) {
+            itemToBeChanged.name = syncState.name ? syncState.name : itemToBeChanged.name;
+            itemToBeChanged.error = syncState.error || null;
+            itemToBeChanged.status = syncState.status || '...';
+
+            let index = syncStateGlobal.findIndex((e) => e.id === syncState.id);
+            syncStateGlobal[index] = itemToBeChanged;
+            if (itemToBeChanged.status === 'Error' || (index === syncStateGlobal.length - 1 && itemToBeChanged.status === 'Success')) {
+                returnedValue.showCloseModalButton = true;
+            }
+        }
+    }
+
+    return returnedValue;
+};
 
 function matchDispatchToProps(dispatch) {
     return bindActionCreators({

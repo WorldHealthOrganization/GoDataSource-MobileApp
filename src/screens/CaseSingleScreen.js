@@ -2,7 +2,7 @@
  * Created by mobileclarisoft on 23/07/2018.
  */
 import React, { Component } from 'react';
-import { View, Alert, Text, StyleSheet, Animated, ScrollView, Dimensions, BackHandler } from 'react-native';
+import { View, Alert, Text, StyleSheet, Animated, Platform, Dimensions, BackHandler } from 'react-native';
 import { TabBar, TabView, PagerScroll } from 'react-native-tab-view';
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";

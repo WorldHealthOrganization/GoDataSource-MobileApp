@@ -15,7 +15,7 @@ export function getHelpCategoriesRequest(requestUrl, authorization, filter, call
             return handleResponse(response);
         })
         .then((response) => {
-            console.log('### getHelpCategoriesRequest response: ', response);
+            console.log('### getHelpCategoriesRequest response: ');
             callback(null, response);
         })
         .catch((error) => {

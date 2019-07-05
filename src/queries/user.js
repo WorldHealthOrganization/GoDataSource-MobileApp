@@ -103,6 +103,8 @@ export function updateUserRequest (user, callback) {
 }
 
 export function getRolesForUserRequest (roleIds, callback) {
+    let start = new Date().getTime();
+    console.log('Result for find start time for getUserRoles: ', new Date());
     getDatabase(config.mongoCollections.role)
         .then((database) => {
             let roleIdsMapped = roleIds.map((e) => {
@@ -118,7 +120,7 @@ export function getRolesForUserRequest (roleIds, callback) {
                 }
             })
                 .then((result) => {
-                    console.log('Result in finding roles');
+                    console.log('Result for find user roles: ', new Date().getTime() - start);
                     callback(null, result.docs)
                 })
                 .catch((error) => {
@@ -134,6 +136,7 @@ export function getRolesForUserRequest (roleIds, callback) {
 }
 
 export function getTeamsForUserRequest(callback) {
+    let start = new Date().getTime();
     getDatabase(config.mongoCollections.team)
         .then((database) => {
             database.find({
@@ -145,7 +148,7 @@ export function getTeamsForUserRequest(callback) {
                 }
             })
                 .then((result) => {
-                    console.log('Result in finding teams');
+                    console.log('Result for find user teams: ', new Date().getTime() - start);
                     callback(null, result.docs)
                 })
                 .catch((error) => {

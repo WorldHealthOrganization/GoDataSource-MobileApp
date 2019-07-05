@@ -2,6 +2,7 @@ import {getDatabase} from './database';
 import config from './../utils/config'
 
 export function getLocationsByOutbreakIdRequest (outbreakResponse, callback) {
+    let start = new Date().getTime();
     getDatabase(config.mongoCollections.location)
         .then((database) => {
             database.find({
@@ -14,7 +15,7 @@ export function getLocationsByOutbreakIdRequest (outbreakResponse, callback) {
                 }
             })
                 .then((result) => {
-                    console.log("result getLocationsByOutbreakIdRequest: ");
+                    console.log('Result for find locations: ', new Date().getTime() - start);
                     callback(null, result.docs);
                 })
                 .catch((errorQuery) => {

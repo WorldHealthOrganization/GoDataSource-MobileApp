@@ -51,7 +51,9 @@ export function getOutbreakById(outbreakId, token, dispatch) {
                         console.log('*** getLocationsByOutbreakId response: ');
                         dispatch(storeLocationsList(responseLocations));
                         if (responseLocations.length > 0) {
-                            let treeLocationList = mapLocations(responseLocations.filter((e) => {return e.active === true}), null);
+                            let start = new Date().getTime();
+                            let treeLocationList =  mapLocations(responseLocations.filter((e) => {return e.active === true}));
+                            console.log('Map locations: ', new Date().getTime() - start);
                             if (response && response.locationIds && Array.isArray(response.locationIds) && response.locationIds.length > 0) {
                                 treeLocationList = extractLocations(treeLocationList, response.locationIds);
                             }
@@ -59,10 +61,11 @@ export function getOutbreakById(outbreakId, token, dispatch) {
                         } else {
                             dispatch(storeLocations(responseLocations));
                         }
+
+                        dispatch(storeOutbreak(response));
+                        resolve('Done outbreak');
                     }
                 });
-                dispatch(storeOutbreak(response));
-                resolve('Done outbreak');
             }
         })
     })

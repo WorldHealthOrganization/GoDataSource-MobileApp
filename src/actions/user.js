@@ -68,16 +68,16 @@ export function loginUser(credentials) {
                         promises.push(getTranslations(response.languageId, dispatch));
                         promises.push(getAvailableLanguages(dispatch));
                         promises.push(getReferenceData(null, dispatch));
-                        promises.push(getHelpCategory(null, dispatch));
-                        promises.push(getHelpItem(null, dispatch));
+                        // promises.push(getHelpCategory(null, dispatch));
+                        // promises.push(getHelpItem(null, dispatch));
                         promises.push(getEventsForOutbreakId(response.activeOutbreakId, null, dispatch));
                         promises.push(getClusters(null, dispatch));
                         promises.push(getCasesForOutbreakIdWithPromise(response.activeOutbreakId, null, null, dispatch));
                         promises.push(getUserRoles(response.roleIds, dispatch));
                         promises.push(getUserTeams(response._id, dispatch));
 
-
-                        Promise.all(promises)
+                        let start = new Date().getTime();
+                        executeTasksSync(promises)
                             .then((result) => {
                                 console.log("Finished getting data from local db: ", result);
                                 storeData('loggedUser', response._id, (error, success) => {
@@ -86,6 +86,7 @@ export function loginUser(credentials) {
                                         dispatch(setLoginState('Error'));
                                     }
                                     if (success) {
+                                        console.log('Result for find all the data: ', new Date().getTime() - start);
                                         dispatch(storeUser(response));
                                         dispatch(setLoginState('Finished logging'));
                                         dispatch(changeAppRoot('after-login'));
@@ -118,6 +119,36 @@ export function loginUser(credentials) {
             }
         })
     }
+}
+
+async function executeTasksSync (tasks) {
+    console.log('Here check you are in executeTaskSync: ', tasks);
+    let tasksResponses = [];
+    if (tasks && Array.isArray(tasks) && tasks.length > 0) {
+        console.log('Here check first validation');
+        for (let i=0; i<tasks.length; i++) {
+            console.log('Here check tasks: ', tasks[i]);
+            try {
+                let aux = await tasks[i];
+                console.log('Here check aux: ', aux);
+                if (aux) {
+                    tasksResponses.push(aux);
+                }
+            } catch (errorExecuteTask) {
+                console.log('Error while trying to execute task: ', errorExecuteTask);
+            }
+        }
+
+        console.log('Here check you have finished stuff: ', tasksResponses);
+
+        if (tasksResponses.length === tasks.length) {
+            return Promise.resolve('success');
+        } else {
+            return Promise.reject('failure');
+        }
+    } else {
+        return Promise.reject('failure')
+    };
 }
 
 export function logoutUser() {
@@ -162,8 +193,10 @@ export function getUserById(userId, token, refreshFollowUps, nativeEventEmitter)
                 }
 
                 // promises.push(getOutbreakById(response.activeOutbreakId, null, dispatch));
+                console.log('Result for find start getOutbreakById: ', new Date());
                 getOutbreakById(response.activeOutbreakId, null, dispatch)
                     .then((responseOutbreak) => {
+                        console.log('Result for find start getUserTeams: ', new Date());
                         getUserTeams(response._id, dispatch)
                             .then((responseUserTeams) => {
                                 SyncRequestsWithPromises(refreshFollowUps, response, responseUserTeams, dispatch, getState(), nativeEventEmitter)
@@ -194,11 +227,44 @@ function SyncRequestsWithPromises(refreshFollowUps, response, responseUserTeams,
             searchText: ''
         }, responseUserTeams, null, dispatch));
     }
+
+    // getReferenceData(null, dispatch).then(() => {
+    //     getEventsForOutbreakId(response.activeOutbreakId, null, dispatch).then(() => {
+    //         getCasesForOutbreakIdWithPromise(response.activeOutbreakId, null, null, dispatch).then(() => {
+    //             getUserRoles(response.roleIds, dispatch).then(() => {
+    //                 getTranslations(response && response.languageId ? response.languageId : 'english_us', dispatch).then(() => {
+    //                     getClusters(null, dispatch).then(() => {
+    //                         dispatch(changeAppRoot('after-login'));
+    //                         dispatch(storeUser(response));
+    //                         let start = new Date().getTime();
+    //                         console.log('Result for find all begin: ', new Date(start));
+    //                         console.log('Result for find all end: ', new Date().getTime() - start, new Date());
+    //                         console.log("Finished getting data from local db: ", result);
+    //                         dispatch(setLoginState('Finished logging'));
+    //                         if (refreshFollowUps) {
+    //                             dispatch(setSyncState('Finished processing'));
+    //                         }
+    //                         // dispatch(changeAppRoot('after-login'));
+    //                         // if (response && response.languageId !== 'english_us') {
+    //                         //     dispatch(getTranslations(response && response.languageId ? response.languageId : 'english_us', dispatch))
+    //                         // }
+    //                         console.log('NativeEventEmitter: ', typeof nativeEventEmitter, nativeEventEmitter);
+    //                         console.log("Typeof nativeEventEmitter: ", typeof nativeEventEmitter.appLoaded);
+    //                         if (nativeEventEmitter) {
+    //                             dispatch(middlewareFunction(nativeEventEmitter));
+    //                         }
+    //                     })
+    //                 })
+    //             })
+    //         })
+    //     });
+    // });
+
     // promises.push(getContactsForOutbreakIdWithPromises(response.activeOutbreakId, null, null, dispatch));
     promises.push(getTranslations(response && response.languageId ? response.languageId : 'english_us', dispatch));
     promises.push(getReferenceData(null, dispatch));
-    promises.push(getHelpCategory(null, dispatch));
-    promises.push(getHelpItem(null, dispatch));
+    // promises.push(getHelpCategory(null, dispatch));
+    // promises.push(getHelpItem(null, dispatch));
     promises.push(getEventsForOutbreakId(response.activeOutbreakId, null, dispatch));
     promises.push(getCasesForOutbreakIdWithPromise(response.activeOutbreakId, null, null, dispatch));
     promises.push(getUserRoles(response.roleIds, dispatch));
@@ -209,14 +275,21 @@ function SyncRequestsWithPromises(refreshFollowUps, response, responseUserTeams,
     // dispatch(storeData("loggedUser", response._id, () => {}));
 
 
-    Promise.all(promises)
+    console.log('Here Check if you have promises: ', p1romises);
+    let start = new Date().getTime();
+    console.log('Result for find all begin: ', new Date(start));
+    executeTasksSync(promises)
         .then((result) => {
+            console.log('Result for find all end: ', new Date().getTime() - start, new Date());
             console.log("Finished getting data from local db: ", result);
             dispatch(setLoginState('Finished logging'));
             if (refreshFollowUps) {
                 dispatch(setSyncState('Finished processing'));
             }
             dispatch(changeAppRoot('after-login'));
+            // if (response && response.languageId !== 'english_us') {
+            //     dispatch(getTranslations(response && response.languageId ? response.languageId : 'english_us', dispatch))
+            // }
             console.log('NativeEventEmitter: ', typeof nativeEventEmitter, nativeEventEmitter);
             console.log("Typeof nativeEventEmitter: ", typeof nativeEventEmitter.appLoaded);
             if (nativeEventEmitter) {

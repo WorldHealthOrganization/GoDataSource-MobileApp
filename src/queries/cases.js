@@ -10,6 +10,7 @@ import config from './../utils/config';
 // Credentials: {email, encryptedPassword}
 export function getCasesForOutbreakIdRequest (outbreakId, filter, token, callback) {
     let start =  new Date().getTime();
+    console.log('Result for find start time for getCases: ', new Date());
     getDatabase(config.mongoCollections.person)
         .then ((database) => {
             console.log("getCasesForOutbreakIdRequest: ", outbreakId);

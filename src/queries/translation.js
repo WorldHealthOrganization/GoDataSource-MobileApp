@@ -6,7 +6,7 @@ import config from './../utils/config';
 
 export function getAvailableLanguagesRequest (callback) {
     let start =  new Date().getTime();
-
+    console.log('Result for find start time for getAvailableLanguages: ', new Date());
     getDatabase(config.mongoCollections.language)
         .then((database) => {
             database.find({
@@ -35,21 +35,22 @@ export function getAvailableLanguagesRequest (callback) {
 
 export function getTranslationRequest (languageId, callback) {
     let start =  new Date().getTime();
-
+    console.log('Result for find start time for getTranslations: ', new Date());
     getDatabase(config.mongoCollections.languageToken)
         .then((database) => {
-            database.find({
-                selector: {
-                    _id: {
-                        $gte: `languageToken.json_${languageId}`,
-                        $lte: `languageToken.json_${languageId}\uffff`,
-                    },
-                    deleted: false
-                }
+            database.allDocs({
+                // selector: {
+                //     _id: {
+                //         $gte: `languageToken.json_${languageId}`,
+                //         $lte: `languageToken.json_${languageId}\uffff`,
+                //     },
+                //     deleted: false
+                    include_docs: true
+                // }
             })
                 .then((resultFind) => {
-                    console.log('Result for find time for translations: ', new Date().getTime() - start);
-                    callback(null, resultFind.docs)
+                    console.log('Result for find time for translations: ', new Date().getTime() - start, resultFind.rows.length);
+                    callback(null, resultFind.rows.map((e) => {return e.doc}))
                 })
                 .catch((errorFind) => {
                     console.log('Error find for translations: ', errorFind);
