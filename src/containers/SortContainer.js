@@ -123,7 +123,7 @@ class SortContainer extends Component {
         const { screenSize } = this.props;
         const { designScreenSize } = config;
         return (
-            <ElevatedView elevation={3} style={[style.containerCardComponent, {
+            <ElevatedView key={cardIndex} elevation={3} style={[style.containerCardComponent, {
                 marginHorizontal: calculateDimension(16, false, screenSize),
                 width: calculateDimension(designScreenSize.width - 32, false, screenSize),
                 marginVertical: 4,

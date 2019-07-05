@@ -24,6 +24,7 @@ ActionsBar = ({textsArray, addressIndex, textsStyleArray, onPressArray, hasBorde
                     textsArray.map((text, index) => {
                         return (
                             <Ripple
+                                key={index}
                                 style={style.rippleStyle}
                                 onPress={onPressArray && onPressArray[index] ? () => {onPressArray[index](addressIndex)} : () => {console.log("Default ")}}
                             >
@@ -74,7 +75,7 @@ ActionsBar.propTypes = {
     textsArray: PropTypes.array.isRequired,
     textsStyleArray: PropTypes.array,
     onPressArray: PropTypes.array,
-    hasBorder: PropTypes.boolean,
+    hasBorder: PropTypes.bool,
     borderColor: PropTypes.string,
     containerStyle: PropTypes.object
 };

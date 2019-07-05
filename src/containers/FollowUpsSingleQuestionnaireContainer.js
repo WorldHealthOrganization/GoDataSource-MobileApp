@@ -92,6 +92,8 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
 
         let sortedQuestions = sortBy(cloneDeep(props.questions), ['order', 'variable']);
         state.questions = extractAllQuestions(sortedQuestions, state.previousAnswers);
+
+        return null;
     }
 
     // The render method should have at least business logic as possible,
@@ -157,6 +159,7 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
         if (item.inactive === false) {
             return (
                 <QuestionCard
+                    key={index}
                     item={item}
                     index={index + 1}
                     totalNumberOfQuestions={totalNumberOfQuestions}

@@ -46,7 +46,7 @@ const style = StyleSheet.create({
 
 Section.propTypes = {
     label: PropTypes.string.isRequired,
-    hasBorderBottom: PropTypes.boolean,
+    hasBorderBottom: PropTypes.bool,
     borderBottomColor: PropTypes.string
 };
 

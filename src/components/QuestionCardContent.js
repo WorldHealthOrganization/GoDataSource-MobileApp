@@ -11,6 +11,7 @@ import DropDown from './DropDown';
 import Section from './Section';
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
+import get from 'lodash/get';
 
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
@@ -28,6 +29,7 @@ class QuestionCardContent extends PureComponent {
         if (props.source && props.source[props.item.variable] && Array.isArray(props.source[props.item.variable]) && props.source[props.item.variable][0] && props.source[props.item.variable][0].date) {
             state.answerDate = props.source[props.item.variable][0].date;
         }
+        return null;
     }
 
     render() {
@@ -40,7 +42,7 @@ class QuestionCardContent extends PureComponent {
                             id={'answerDate'}
                             label={'Answer Date'}
                             value={this.state.answerDate}
-                            isEditMode={this.props.isEditMode && this.props.editableQuestionDate}
+                            isEditMode={!!(this.props.isEditMode && this.props.editableQuestionDate)}
                             isRequired={true}
                             style={{width: this.props.viewWidth, marginHorizontal: this.props.viewMarginHorizontal}}
                             onChange={(value, id) => {this.onChangeAnswerDate(value, this.props.item.variable)}}
@@ -154,9 +156,9 @@ class QuestionCardContent extends PureComponent {
             Object.keys(source[parentId][0].subAnswers).length > 0 && source[parentId][0].subAnswers[item.variable] &&
             Array.isArray(source[parentId][0].subAnswers[item.variable]) && source[parentId][0].subAnswers[item.variable].length > 0 &&
             source[parentId][0].subAnswers[item.variable][0] && source[parentId][0].subAnswers[item.variable][0].value ?
-            source[parentId][0].subAnswers[item.variable][0].value : null :
+            source[parentId][0].subAnswers[item.variable][0].value : '' :
             source[item.variable] && Array.isArray(source[item.variable]) && source[item.variable].length > 0 &&
-            source[item.variable][0] && source[item.variable][0].value ? source[item.variable][0].value : null;
+            source[item.variable][0] && source[item.variable][0].value ? source[item.variable][0].value : '';
 
         if (item.answerType === 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_SINGLE_ANSWER') {
             // console.log('QuestionCard: ', item);
@@ -231,7 +233,7 @@ class QuestionCardContent extends PureComponent {
                             this.props.onChangeTextAnswer(valueToSend, id, parentId);
                         }}
                         multiline={true}
-                        keyboardType={Platform.OS === 'ios' ? 'number-pad' : 'numeric'}
+                        keyboardType={'numeric'}
                         style={{width: width, marginHorizontal: marginHorizontal}}
                         translation={this.props.translation}
                         screenSize={this.props.screenSize}
@@ -245,7 +247,7 @@ class QuestionCardContent extends PureComponent {
                         id={item.variable}
                         label={translations.questionCardLabels.datePickerLabel}
                         value={questionAnswers}
-                        isEditMode={this.props.isEditMode}
+                        isEditMode={get(this.props, 'isEditMode', true)}
                         isRequired={item.required}
                         onChange={(date, id) => {
                             let valueToSend = {

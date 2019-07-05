@@ -8,15 +8,6 @@ import {
     ACTION_TYPE_REMOVE_CONTACT
 } from './../utils/enums';
 import {
-    // getContactsForOutbreakIdRequest,
-    // getContactByIdRequest,
-    // updateContactRequest,
-    // addContactRequest,
-    // addExposureForContactRequest,
-    // updateExposureForContactRequest,
-    // deleteExposureForContactRequest
-} from './../requests/contacts';
-import {
     getContactsForOutbreakIdRequest,
     getContactByIdRequest,
     updateContactRequest,
@@ -32,6 +23,8 @@ import {extractIdFromPouchId, mapContactsAndRelationships, updateRequiredFields,
 import moment from 'moment';
 import config from './../utils/config';
 import {max} from 'lodash';
+import {setLoaderState} from "./app";
+import {batchActions} from 'redux-batched-actions';
 
 // Add here only the actions, not also the requests that are executed. For that purpose is the requests directory
 export function storeContacts(followUps) {
@@ -93,22 +86,35 @@ export function getContactsForOutbreakIdWithPromises(outbreakId, filter, token, 
 export function getContactsForOutbreakId(outbreakId, filter, token) {
     return async function (dispatch, getState) {
         // return new Promise((resolve, reject) => {
+        dispatch(setLoaderState(true));
         getContactsForOutbreakIdRequest(outbreakId, filter, null, (error, response) => {
             if (error) {
                 console.log("*** getContactsForOutbreakId error: ", error);
-                dispatch(addError(errorTypes.ERROR_CONTACT));
+                dispatch(batchActions([
+                    addError(errorTypes.ERROR_CONTACT),
+                    setLoaderState(false)
+                ]))
+                // dispatch(addError(errorTypes.ERROR_CONTACT));
                 // reject(error);
             }
             if (response) {
                 getRelationshipsForTypeRequest(outbreakId, 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT', response.map((e) => {return extractIdFromPouchId(e._id, 'person')}), (errorRelationships, responseRelationships) => {
                     if (errorRelationships) {
-                        console.log ('getContactsForOutbreakId getRelationshipsForTypeRequest error: ', errorRelationships)
-                        dispatch(addError(errorTypes.ERROR_CONTACT));
+                        console.log ('getContactsForOutbreakId getRelationshipsForTypeRequest error: ', errorRelationships);
+                        dispatch(batchActions([
+                            addError(errorTypes.ERROR_CONTACT),
+                            setLoaderState(false)
+                        ]))
+                        // dispatch(addError(errorTypes.ERROR_CONTACT));
                     }
                     if (responseRelationships) {
-                        console.log ('getContactsForOutbreakId getRelationshipsForTypeRequest response: ')
+                        console.log ('getContactsForOutbreakId getRelationshipsForTypeRequest response: ');
                         let mappedContacts = mapContactsAndRelationships(response, responseRelationships);
-                        dispatch(storeContacts(mappedContacts));
+                        dispatch(batchActions([
+                            storeContacts(mappedContacts),
+                            setLoaderState(false)
+                        ]))
+                        // dispatch(storeContacts(mappedContacts));
                     }
                 })
             }

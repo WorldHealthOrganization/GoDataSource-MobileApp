@@ -44,6 +44,7 @@ class QuestionCard extends PureComponent {
         if (props.source && props.source[props.item.variable] && Array.isArray(props.source[props.item.variable]) && props.source[props.item.variable][0] && props.source[props.item.variable][0].date) {
             state.answerDate = props.source[props.item.variable][0].date;
         }
+        return null;
     }
 
     // Please add here the react lifecycle methods that you need

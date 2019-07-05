@@ -394,6 +394,7 @@ const manualConfigScreen = {
     nameLabel: 'HUB Name',
     hubUrlLabel: 'HUB URL',
     clientIdLabel: 'Client ID',
+    userEmailLabel: 'User Email',
     clientSecretPass: 'Client secret',
     saveHubConfigButton: 'Save and sync HUB',
     encryptDataLabel: 'Encrypted connection'
@@ -416,7 +417,9 @@ const addressFieldLabels = {
     longitude: 'LNG_ADDRESS_FIELD_LABEL_LONGITUDE',
     latitude: 'LNG_ADDRESS_FIELD_LABEL_LATITUDE',
     deleteButton: 'LNG_COMMON_BUTTON_DELETE',
-    copyAddress: 'LNG_ADDRESS_FIELD_LABEL_COPY_ADDRESS'
+    copyAddress: 'LNG_ADDRESS_FIELD_LABEL_COPY_ADDRESS',
+    // TODO add to backend
+    isThePersonNextToYou: 'LNG_ADDRESS_FIELD_LABEL_IS_THE_PERSON_NEXT_TO_YOU'
 };
 
 const personTypes = {

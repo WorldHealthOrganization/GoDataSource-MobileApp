@@ -83,21 +83,24 @@ class ViewHOC extends Component {
                     ) : (null)
                 }
                 <Modal
+                    key={'modal'}
                     animationType={'slide'}
                     transparent={false}
                     visible={this.state.showModal}
                 >
                     <View style={{ flex: 1, backgroundColor: '#55b5a6', alignItems: 'center' }}>
-                        <Text style={{ marginTop: 60, fontFamily: 'Roboto-Bold', fontSize: 20, color: 'white' }}>Sync status</Text>
-                        <ScrollView style={{ width: '100%' }} contentContainerStyle={{ flexGrow: 1, justifyContent: 'center', alignItems: 'center' }}>
+                        <Text key={'modalText'} style={{ marginTop: 60, fontFamily: 'Roboto-Bold', fontSize: 20, color: 'white' }}>Sync status</Text>
+                        <ScrollView key={'modalScrollView'} style={{ width: '100%' }} contentContainerStyle={{ flexGrow: 1, justifyContent: 'center', alignItems: 'center' }}>
                             {
                                 this.state.syncState.map((item, index) => {
                                     return (
-                                        <View style={{
-                                            width: '85%',
-                                            justifyContent: 'space-between',
-                                            marginVertical: 8
-                                        }}>
+                                        <View
+                                            key={index}
+                                            style={{
+                                                width: '85%',
+                                                justifyContent: 'space-between',
+                                                marginVertical: 8
+                                            }}>
                                             <View style={{
                                                 flexDirection: 'row',
                                                 justifyContent: 'space-between'

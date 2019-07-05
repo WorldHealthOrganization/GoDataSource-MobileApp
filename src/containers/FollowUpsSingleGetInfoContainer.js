@@ -31,14 +31,14 @@ class FollowUpsSingleGetInfoContainer extends PureComponent {
     render() {
         // console.log('FollowUpsSingleContainer render Details');
         return (
-            config.followUpsSingleScreen.generalInfo.map((item) => {
-                return this.handleRenderItem(item)
+            config.followUpsSingleScreen.generalInfo.map((item, index) => {
+                return this.handleRenderItem(item, index)
             })
         );
     };
 
     // Please write here all the methods that are not react native lifecycle methods
-    handleRenderItem = (item) => {
+    handleRenderItem = (item, index) => {
         let fields = item.fields.map((field) => {
             if (this.props.isNew === false && field.id === 'date') {
                 return Object.assign({}, field, { isEditMode: false })
@@ -47,12 +47,12 @@ class FollowUpsSingleGetInfoContainer extends PureComponent {
             }
         });
 
-        return this.renderItemCardComponent(fields)
+        return this.renderItemCardComponent(fields, index)
     };
 
     renderItemCardComponent = (fields, cardIndex = null) => {
         return (
-            <ElevatedView elevation={3} style={[style.containerCardComponent, {
+            <ElevatedView key={cardIndex} elevation={3} style={[style.containerCardComponent, {
                 marginHorizontal: calculateDimension(16, false, this.props.screenSize),
                 width: calculateDimension(config.designScreenSize.width - 32, false, this.props.screenSize),
                 marginVertical: 4,
@@ -73,7 +73,7 @@ class FollowUpsSingleGetInfoContainer extends PureComponent {
         return (
             <View style={[style.subcontainerCardComponent, { flex: 1 }]} key={index}>
                 {
-                    this.handleRenderItemByType(item, cardIndex)
+                    this.handleRenderItemByType(item, index)
                 }
             </View>
         )
@@ -100,6 +100,7 @@ class FollowUpsSingleGetInfoContainer extends PureComponent {
 
         return (
             <CardComponent
+                key={cardIndex}
                 item={item}
                 isEditMode={this.props.isEditMode}
                 isEditModeForDropDownInput={this.props.isEditMode}

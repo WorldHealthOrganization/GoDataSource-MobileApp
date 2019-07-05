@@ -40,6 +40,7 @@ class ManualConfigScreen extends PureComponent {
             url: '',
             clientId: '',
             clientSecret: '',
+            userEmail: '',
             encryptedData: true,
             hasAlert: false,
             syncState: [
@@ -57,6 +58,7 @@ class ManualConfigScreen extends PureComponent {
         this.urlRef = this.updateRef.bind(this, 'url');
         this.clientIDRef = this.updateRef.bind(this, 'clientId');
         this.clientSecretRef = this.updateRef.bind(this, 'clientSecret');
+        this.userEmailRef = this.updateRef.bind(this, 'userEmail');
     }
 
     // Please add here the react lifecycle methods that you need
@@ -109,6 +111,7 @@ class ManualConfigScreen extends PureComponent {
                                             url: activeDatabaseCredentials.url,
                                             clientId: activeDatabaseCredentials.clientId,
                                             clientSecret: activeDatabaseCredentials.clientSecret,
+                                            userEmail: activeDatabaseCredentials.userEmail,
                                             encryptedData: activeDatabaseCredentials.encryptedData,
                                             allUrls: allUrls
                                         })
@@ -299,6 +302,20 @@ class ManualConfigScreen extends PureComponent {
                         baseColor={styles.colorBase}
                         textColor={styles.colorWhite}
                     />
+                    <TextField
+                        ref={this.userEmailRef}
+                        value={this.state.userEmail}
+                        autoCorrect={false}
+                        lineWidth={1}
+                        enablesReturnKeyAutomatically={true}
+                        containerStyle={style.textInput}
+                        onChangeText={this.handleTextChange}
+                        label={getTranslation(translations.manualConfigScreen.userEmailLabel, null)}
+                        autoCapitalize={'none'}
+                        tintColor={styles.colorTint}
+                        baseColor={styles.colorBase}
+                        textColor={styles.colorWhite}
+                    />
                     <SwitchInput
                         id="encryptedData"
                         label={'Encrypted connection'}
@@ -413,7 +430,7 @@ class ManualConfigScreen extends PureComponent {
     }
 
     checkFields = (nextFunction, validateUrl) => {
-        if (!this.state.name || !this.state.url || !this.state.clientId || !this.state.clientSecret) {
+        if (!this.state.name || !this.state.url || !this.state.clientId || !this.state.clientSecret || !this.state.userEmail) {
             Alert.alert("Alert", "Please make sure you have completed all the fields before moving forward", [
                 {
                     text: 'Ok', onPress: () => {console.log('Ok pressed')}
@@ -432,7 +449,18 @@ class ManualConfigScreen extends PureComponent {
                     }
                 ])
             } else {
-                this.continueTo(nextFunction);
+                // Test if correct email
+                let re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+                if (!re.test(this.state.userEmail)) {
+                    Alert.alert(getTranslation(translations.alertMessages.invalidEmail, this.props && this.props.translation ? this.props.translation : null), getTranslation(translations.alertMessages.emailValidationError, this.props && this.props.translation ? this.props.translation : null), [
+                        {
+                            text: getTranslation(translations.alertMessages.okButtonLabel, this.props && this.props.translation ? this.props.translation : null),
+                            onPress: () => {console.log('Ok pressed')}
+                        }
+                    ])
+                } else {
+                    this.continueTo(nextFunction);
+                }
             }
         }
     };
@@ -466,6 +494,7 @@ class ManualConfigScreen extends PureComponent {
                     url: this.state.url,
                     clientId: this.state.clientId,
                     clientSecret: this.state.clientSecret,
+                    userEmail: this.state.userEmail,
                     encryptedData: this.state.encryptedData
                 };
                 this.props.storeHubConfiguration({
@@ -491,6 +520,7 @@ class ManualConfigScreen extends PureComponent {
             url: this.state.url,
             clientId: this.state.clientId,
             clientSecret: this.state.clientSecret,
+            userEmail: this.state.userEmail,
             encryptedData: this.state.encryptedData
         };
         this.props.storeHubConfiguration({
@@ -501,7 +531,7 @@ class ManualConfigScreen extends PureComponent {
     };
 
     handleTextChange = (text) => {
-        ['name', 'url', 'clientId', 'clientSecret'].map((name) => ({ name, ref: this[name] }))
+        ['name', 'url', 'clientId', 'clientSecret', 'userEmail'].map((name) => ({ name, ref: this[name] }))
             .forEach(({ name, ref }) => {
                 if (ref.isFocused()) {
                     this.setState({ [name]: text });

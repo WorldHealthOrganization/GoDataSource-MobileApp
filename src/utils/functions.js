@@ -40,6 +40,26 @@ export function handleResponse(response) {
     });
 };
 
+// RN-fetch-blob does not manage status codes, so, this
+export function handleResponseFromRNFetchBlob(response) {
+    return new Promise ((resolve, reject) => {
+        let status = response.info().status;
+
+        if (status === 200) {
+            resolve(response);
+        } else {
+            // Manage errors
+            response.json()
+                .then((parsedError) => {
+                    reject({message: get(parsedError, 'error.message', 'Unknown Error')});
+                })
+                .catch((errorParseError) => {
+                    reject({message: 'Unknown Error'});
+                })
+        }
+    })
+};
+
 // This method is used for calculating dimensions for components.
 // Because the design is made only for one screen, this means that for other screen resolutions, the views will not be scaled
 // To use the method

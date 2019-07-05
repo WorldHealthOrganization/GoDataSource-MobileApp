@@ -73,17 +73,20 @@ export default class SearchableDropDown extends Component{
         return (
             <View keyboardShouldpersist='always' style={{...this.props.containerStyle}}>
                 <TextInput
+                    id={'SearchableDropDownId'}
                     ref={(e) => this.input = e}
                     onChange={this.searchedItems}
-                    isEditMode={'true'}
+                    isEditMode={true}
                     value={this.state.searchText}
                     label={this.props.placeholder}
                     onSubmitEditing={this.props.onSubmitEditing}
                     style={{width: '90%'}}
                     translation={this.props.translation}
+                    isRequired={false}
                 />
                 <ListView
                     style={{...this.props.itemsContainerStyle}}
+                    enableEmptySections={true}
                     keyboardShouldPersistTaps="always"
                     dataSource={ds.cloneWithRows(this.props.items)}
                     renderRow={this.renderItems}/>

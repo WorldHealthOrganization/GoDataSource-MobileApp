@@ -62,7 +62,7 @@ Button.propTypes = {
     titleColor: PropTypes.string.isRequired,
     onPress: PropTypes.func.isRequired,
     height: PropTypes.number.isRequired,
-    width: PropTypes.number.isRequired,
+    width: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
     style: PropTypes.object,
 };
 

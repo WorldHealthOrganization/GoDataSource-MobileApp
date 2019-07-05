@@ -36,8 +36,8 @@ class PersonListItemNameAndAddressComponent extends PureComponent {
                     justifyContent: 'space-between',
                     marginVertical: 5
                 }}>
-                    <View style={{flex: 1}}>
-                        <Ripple onPress={() => this.props.onPressName(firstComponentRenderData.type, firstComponentRenderData.id)}>
+                    <View key={'firstView'} style={{flex: 1}}>
+                        <Ripple key={'firstChildOfFirstView'} onPress={() => this.props.onPressName(firstComponentRenderData.type, firstComponentRenderData.id)}>
                             <Text style={[style.primaryText, {marginVertical: 5, flex: 3, color: titleColor || 'black'}]}
                                   numberOfLines={1}>{firstComponentRenderData.fullName}</Text>
                         </Ripple>
@@ -57,13 +57,13 @@ class PersonListItemNameAndAddressComponent extends PureComponent {
                             display: firstComponentRenderData.addressString ? 'flex' : 'none'
                         }]}>{'\u2022 ' + getTranslation(translations.addressFieldLabels.address, translation) + ": " + firstComponentRenderData.addressString}</Text>
                     </View>
-                    <Ripple style={{width: 35, height: 35}} onPress={this.props.onPressMapIcon}>
+                    <Ripple key={'secondView'} style={{width: 35, height: 35}} onPress={this.props.onPressMapIcon}>
                         <Image source={{uri: 'map_icon'}} style={{width: 35, height: 35}}/>
                     </Ripple>
                 </View>
                 {
                     this.props.type !== 'Case' ? (
-                        <View style={styles.lineStyle} />
+                        <View key={'thirdView'} style={styles.lineStyle} />
                     ) : (null)
                 }
             </View>

@@ -10,6 +10,7 @@ import {getTranslation, getTooltip, getDropDownInputDisplayParameters} from './.
 // the material ui library, since it provides design and animations out of the box
 import { Dropdown } from 'react-native-material-dropdown';
 import TooltipComponent from './TooltipComponent'
+import get from 'lodash/get';
 
 class DropdownInput extends PureComponent {
 
@@ -34,8 +35,8 @@ class DropdownInput extends PureComponent {
 
     // Please write here all the methods that are not react native lifecycle methods
     editInput() {
-        let tooltip = getTooltip(this.props.label, this.props.translation)
-        const dropDownParams = getDropDownInputDisplayParameters(this.props.screenSize, this.props.data.length)
+        let tooltip = getTooltip(this.props.label, this.props.translation);
+        const dropDownParams = getDropDownInputDisplayParameters(this.props.screenSize, get(this.props, 'data.length', 3));
 
         return (
             <View style={[{flexDirection: 'row'}, this.props.style]}>
