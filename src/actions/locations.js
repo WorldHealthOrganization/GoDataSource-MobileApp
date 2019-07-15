@@ -8,6 +8,7 @@ import { addError } from './errors';
 import errorTypes from './../utils/errorTypes';
 import {getLocationsByOutbreakIdRequest} from './../queries/locations'
 import {mapLocations} from './../utils/functions'
+import {extractIdFromPouchId} from "../utils/functions";
 
 // Add here only the actions, not also the requests that are executed. For that purpose is the requests directory
 export function storeOutbreak(outbreak) {
@@ -24,36 +25,57 @@ export function storeLocations(locations) {
     }
 }
 
-export function getOutbreakById(outbreakId, token, dispatch) {
+export function getLocations(locationIds) {
     // return async function(dispatch, getState) {
+    let start = new Date().getTime();
     return new Promise((resolve, reject) => {
-        getOutbreakByIdRequest(outbreakId, null, (error, response) => {
+                        // console.log ('*** getOutbreakById response: ', response);
+        getLocationsByOutbreakIdRequest(null, (error, responseLocations) => {
             if (error) {
-                console.log('*** getOutbreakById error: ', error);
-                dispatch(addError(errorTypes.ERROR_OUTBREAK));
-                reject(error);
+                console.log('*** getLocationsByOutbreakId error: ', error);
+                // dispatch(addError(errorTypes.ERROR_LOCATIONS));
+                reject(errorTypes.ERROR_LOCATIONS);
             }
-            if (response) {
-                // console.log ('*** getOutbreakById response: ', response);
-                getLocationsByOutbreakIdRequest(response, (error, responseLocations) => {
-                    if (error) {
-                        console.log('*** getLocationsByOutbreakId error: ', error);
-                        dispatch(addError(errorTypes.ERROR_LOCATIONS));
+            if (responseLocations) {
+                console.log('*** getLocationsByOutbreakId response: ');
+                // dispatch(storeLocationsList(responseLocations));
+                let treeLocationList = [];
+                if (responseLocations.length > 0) {
+                    treeLocationList = mapLocations(responseLocations.filter((e) => {return e.active === true}));
+                    console.log('Map locations: ', new Date().getTime() - start);
+                    if (locationIds && Array.isArray(locationIds) && locationIds.length > 0) {
+                        treeLocationList = extractLocations(treeLocationList, locationIds);
                     }
-                    if (responseLocations) {
-                        console.log('*** getLocationsByOutbreakId response: ', response);
-                        if (responseLocations.length > 0) {
-                            let treeLocationList = mapLocations(responseLocations.filter((e) => {return e.active === true}));
-                            dispatch(storeLocations(treeLocationList));
-                        } else {
-                            dispatch(storeLocations(responseLocations));
-                        }
-                    }
-                });
-                dispatch(storeOutbreak(response));
-                resolve('Done outbreak');
+                    console.log('Map locations: ', new Date().getTime() - start);
+                    // dispatch(storeLocations(treeLocationList));
+                } else {
+                    // dispatch(storeLocations(responseLocations));
+                }
+                // dispatch(storeOutbreak(response));
+                // resolve('Done outbreak');
+                resolve({locations: {locationsList: responseLocations, treeLocationsList: treeLocationList}});
             }
-        })
+        });
     })
     // }
+}
+
+function extractLocations (locationTree, locationIds) {
+    let newLocationTree = [];
+
+    for (let i=0; i<locationTree.length; i++) {
+        let index = locationIds.indexOf(extractIdFromPouchId(locationTree[i]._id, 'location'));
+        if(index > -1) {
+            newLocationTree.push(locationTree[i]);
+        } else {
+            if (locationTree[i].children && Array.isArray(locationTree[i].children) && locationTree[i].children.length > 0) {
+                let auxLocations = extractLocations(locationTree[i].children, locationIds);
+                if (auxLocations && Array.isArray(auxLocations) && auxLocations.length > 0) {
+                    newLocationTree = newLocationTree.concat(auxLocations);
+                }
+            }
+        }
+    }
+
+    return newLocationTree;
 }

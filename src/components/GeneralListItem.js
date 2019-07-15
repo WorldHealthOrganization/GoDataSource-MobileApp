@@ -56,7 +56,7 @@ GeneralListItem = ({title, primaryText, secondaryText, firstComponent, secondCom
                             textsArray={textsArray}
                             textsStyleArray={textsStyleArray}
                             onPressArray={onPressArray}
-                            containerStyle={[{height: 54}]}
+                            containerStyle={{height: 54}}
                             isEditMode={true}
                             translation={translation}
                         />) : (null)

@@ -14,6 +14,7 @@ import {bindActionCreators} from "redux";
 import {getFollowUpsForOutbreakId, getMissedFollowUpsForOutbreakId} from './../actions/followUps';
 import {TabBar, TabView, PagerScroll} from 'react-native-tab-view';
 import FollowUpsSingleGetInfoContainer from './../containers/FollowUpsSingleGetInfoContainer';
+import FollowUpsSingleContainer from './../containers/FollowUpsSingleContainer';
 import FollowUpsSingleQuestionnaireContainer from './../containers/FollowUpsSingleQuestionnaireContainer';
 import Breadcrumb from './../components/Breadcrumb';
 import Menu, { MenuItem } from 'react-native-material-menu';
@@ -77,14 +78,14 @@ class FollowUpsSingleScreen extends Component {
                     console.log('follow-ups date < today => needitabil')
                     isEditMode = false
                 }
-            } else if (this.props.role && this.props.role.find((e) => e === config.userPermissions.writeFollowUp) === undefined && this.props.role.find((e) => e === config.userPermissions.readFollowUp) !== undefined){
+            } else if (this.props.role && this.props.role.find((e) => e === config.userPermissions.writeFollowUp) === undefined && this.props.role.find((e) => e === config.userPermissions.readFollowUp) !== undefined) {
 
                 isEditMode = false
             }
         }
 
-        if (this.props.outbreak && this.props.outbreak.contactFollowUpTemplate) {
-            let mappedAnswers = mapAnswers(this.props.outbreak.contactFollowUpTemplate, this.state.item.questionnaireAnswers);
+        if (this.props.contactFollowUpTemplate) {
+            let mappedAnswers = mapAnswers(this.props.contactFollowUpTemplate, this.state.item.questionnaireAnswers);
             this.setState({
                 previousAnswers: mappedAnswers.mappedAnswers,
                 mappedQuestions: mappedAnswers.mappedQuestions,
@@ -283,7 +284,7 @@ class FollowUpsSingleScreen extends Component {
         switch (route.key) {
             case 'genInfo':
                 return (
-                    <FollowUpsSingleGetInfoContainer
+                    <FollowUpsSingleContainer
                         isNew={this.props.isNew}
                         isEditMode={this.state.isEditMode}
                         item={this.state.item}
@@ -319,7 +320,7 @@ class FollowUpsSingleScreen extends Component {
                 );
             default:
                 return (
-                    <FollowUpsSingleGetInfoContainer
+                    <FollowUpsSingleContainer
                         item={this.state.item}
                         isEditMode={this.state.isEditMode}
                         contact={this.state.contact}
@@ -1028,7 +1029,7 @@ function mapStateToProps(state) {
         user: state.user,
         screenSize: state.app.screenSize,
         followUps: state.followUps,
-        outbreak: state.outbreak,
+        contactFollowUpTemplate: state.outbreak.contactFollowUpTemplate,
         errors: state.errors,
         contacts: state.contacts,
         translation: state.app.translation,

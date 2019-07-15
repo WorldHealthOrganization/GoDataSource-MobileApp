@@ -3,62 +3,81 @@
  */
 import {getDatabase} from './database';
 import config from './../utils/config';
+import {rawSQLQuery} from './sqlHelper';
 
 export function getAvailableLanguagesRequest (callback) {
-    let start =  new Date().getTime();
-    console.log('Result for find start time for getAvailableLanguages: ', new Date());
-    getDatabase(config.mongoCollections.language)
-        .then((database) => {
-            database.find({
-                selector: {
-                    _id: {
-                        $gt: 'language.json_',
-                        $lt: 'language.json_\uffff'
-                    },
-                    deleted: false
-                }
-            })
-                .then((resultFind) => {
-                    console.log('Result for find time for available languages: ', new Date().getTime() - start);
-                    callback(null, resultFind.docs)
-                })
-                .catch((errorFind) => {
-                    console.log('Error find for available languages: ', errorFind);
-                    callback(errorFind);
-                })
+
+    rawSQLQuery(config.mongoCollections.language, `${config.rawSQLQueryString}`, [])
+        .then((result) => {
+            callback(null, result);
         })
-        .catch((errorGetDatabase) => {
-            console.log('Error while getting database: ', errorGetDatabase);
-            callback(errorGetDatabase);
-        });
+        .catch((error) => {
+            console.log('Error get translations: ', error);
+            callback(error)
+        })
+
+    // let start =  new Date().getTime();
+    //
+    // getDatabase(config.mongoCollections.language)
+    //     .then((database) => {
+    //         database.find({
+    //             selector: {
+    //                 _id: {
+    //                     $gt: 'language.json_',
+    //                     $lt: 'language.json_\uffff'
+    //                 },
+    //                 deleted: false
+    //             }
+    //         })
+    //             .then((resultFind) => {
+    //                 console.log('Result for find time for available languages: ', new Date().getTime() - start);
+    //                 callback(null, resultFind.docs)
+    //             })
+    //             .catch((errorFind) => {
+    //                 console.log('Error find for available languages: ', errorFind);
+    //                 callback(errorFind);
+    //             })
+    //     })
+    //     .catch((errorGetDatabase) => {
+    //         console.log('Error while getting database: ', errorGetDatabase);
+    //         callback(errorGetDatabase);
+    //     });
 }
 
 export function getTranslationRequest (languageId, callback) {
     let start =  new Date().getTime();
-    console.log('Result for find start time for getTranslations: ', new Date());
-    getDatabase(config.mongoCollections.languageToken)
-        .then((database) => {
-            database.allDocs({
-                // selector: {
-                //     _id: {
-                //         $gte: `languageToken.json_${languageId}`,
-                //         $lte: `languageToken.json_${languageId}\uffff`,
-                //     },
-                //     deleted: false
-                    include_docs: true
-                // }
-            })
-                .then((resultFind) => {
-                    console.log('Result for find time for translations: ', new Date().getTime() - start, resultFind.rows.length);
-                    callback(null, resultFind.rows.map((e) => {return e.doc}))
-                })
-                .catch((errorFind) => {
-                    console.log('Error find for translations: ', errorFind);
-                    callback(errorFind);
-                })
+
+    rawSQLQuery(config.mongoCollections.languageToken, `${config.rawSQLQueryString}${config.rawSQLQueryWhereString}`, [`${config.mongoCollections.languageToken}.json_${languageId}_%`])
+        .then((result) => {
+            callback(null, result);
         })
-        .catch((errorGetDatabase) => {
-            console.log('Error while getting database: ', errorGetDatabase);
-            callback(errorGetDatabase);
-        });
+        .catch((error) => {
+            console.log('Error get translations: ', error);
+            callback(error)
+        })
+
+    // getDatabase(config.mongoCollections.languageToken)
+    //     .then((database) => {
+    //         database.find({
+    //             selector: {
+    //                 _id: {
+    //                     $gte: `languageToken.json_${languageId}`,
+    //                     $lte: `languageToken.json_${languageId}\uffff`,
+    //                 },
+    //                 deleted: false
+    //             }
+    //         })
+    //             .then((resultFind) => {
+    //                 console.log('Result for find time for translations: ', new Date().getTime() - start);
+    //                 callback(null, resultFind.docs)
+    //             })
+    //             .catch((errorFind) => {
+    //                 console.log('Error find for translations: ', errorFind);
+    //                 callback(errorFind);
+    //             })
+    //     })
+    //     .catch((errorGetDatabase) => {
+    //         console.log('Error while getting database: ', errorGetDatabase);
+    //         callback(errorGetDatabase);
+    //     });
 }

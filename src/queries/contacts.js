@@ -17,7 +17,7 @@ export function getContactsForOutbreakIdRequest (outbreakId, filter, token, call
                 let start =  new Date().getTime();
                 Promise.all(promiseArray)
                     .then((resultGetAll) => {
-                        console.log("Result for find get queries: ", new Date().getTime() - start, resultGetAll.length);
+                        console.log("Result for find time for get queries: ", new Date().getTime() - start);
                         callback(null, resultGetAll.filter((e) => {return e && e._id !== null}));
                     })
                     .catch((errorGetAll) => {
@@ -60,7 +60,7 @@ export function getContactsForOutbreakIdRequest (outbreakId, filter, token, call
                         },
                     })
                         .then((resultFilterContacts) => {
-                            console.log('Result when filtering contacts: ', new Date().getTime() - start);
+                            console.log('Result for find time for filtering contacts: ', new Date().getTime() - start);
 
                             let resultFilterContactsDocs = resultFilterContacts.docs
                             if (resultFilterContactsDocs && resultFilterContactsDocs !== undefined) {
@@ -153,7 +153,7 @@ export function checkForNameDuplicatesRequest (id, firstName, lastName, outbreak
                     lastName: lastName
                 },
             }).then((resultsContactsName) => {
-                console.log('Result get duplicates name time: ', new Date().getTime() - start);
+                console.log('Result for find time for get duplicates name time: ', new Date().getTime() - start);
                 // console.log('Result get duplicates name: ', resultsContactsName);
                 callback(null, resultsContactsName.docs)
             }).catch((errorContactsName) => {

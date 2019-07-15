@@ -4,16 +4,13 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, { PureComponent } from 'react';
-import { View, StyleSheet, ScrollView, findNodeHandle } from 'react-native';
-import { calculateDimension, getTranslation, handleExposedTo, getAddress, extractIdFromPouchId } from './../utils/functions';
-import config from './../utils/config';
+import { View, StyleSheet, ScrollView } from 'react-native';
+import { calculateDimension, getTranslation, handleExposedTo, getAddress, extractIdFromPouchId } from '../utils/functions';
+import config from '../utils/config';
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
-import styles from './../styles';
-import CardComponent from './../components/CardComponent';
-import Button from './../components/Button';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import translations from './../utils/translations'
+import styles from '../styles';
+import CardComponent from '../components/CardComponent';
 import ElevatedView from 'react-native-elevated-view';
 import _ from 'lodash';
 
@@ -27,13 +24,6 @@ class FollowUpsSingleGetInfoContainer extends PureComponent {
     }
 
     // Please add here the react lifecycle methods that you need
-    shouldComponentUpdate(nextProps, nextState) {
-        if (nextProps.activeIndex === 0) {
-            return true;
-        }
-        return false;
-    }
-
 
     // The render method should have at least business logic as possible,
     // because this will be called whenever there is a new setState call
@@ -41,51 +31,14 @@ class FollowUpsSingleGetInfoContainer extends PureComponent {
     render() {
         // console.log('FollowUpsSingleContainer render Details');
         return (
-            <View style={style.container}>
-                <Button
-                    title={getTranslation(translations.generalButtons.nextButtonLabel, this.props.translation)}
-                    onPress={this.props.onNext}
-                    color={styles.buttonGreen}
-                    titleColor={'white'}
-                    height={calculateDimension(25, true, this.props.screenSize)}
-                    width={calculateDimension(166, false, this.props.screenSize)}
-                    style={{
-                        marginVertical: calculateDimension(12.5, true, this.props.screenSize)
-                    }}
-                />
-                {/* <KeyboardAwareScrollView
-                    style={style.containerScrollView}
-                    contentContainerStyle={[style.contentContainerStyle, { paddingBottom: this.props.screenSize.height < 600 ? 70 : 20 }]}
-                    keyboardShouldPersistTaps={'always'}
-                    extraHeight={20 + 81 + 50 + 70}
-                    innerRef={ref => {
-                        this.scrollFollowUpsSingleGetInfo = ref
-                    }}
-                > */}
-                <ScrollView
-                    style={style.containerScrollView}
-                    contentContainerStyle={[style.contentContainerStyle, { paddingBottom: this.props.screenSize.height < 600 ? 70 : 20 }]}
-                >
-                    {
-                        config.followUpsSingleScreen.generalInfo.map((item) => {
-                            return this.handleRenderItem(item)
-                        })
-                    }
-                    <View style={style.container}>
-                        {
-                            this.props.item && this.props.item.address ? (
-                                this.handleRenderItemForAddress()
-                            ) : null
-                        }
-                    </View>
-                </ScrollView>
-                {/* </KeyboardAwareScrollView> */}
-            </View>
+            config.followUpsSingleScreen.generalInfo.map((item, index) => {
+                return this.handleRenderItem(item, index)
+            })
         );
     };
 
     // Please write here all the methods that are not react native lifecycle methods
-    handleRenderItem = (item) => {
+    handleRenderItem = (item, index) => {
         let fields = item.fields.map((field) => {
             if (this.props.isNew === false && field.id === 'date') {
                 return Object.assign({}, field, { isEditMode: false })
@@ -94,17 +47,12 @@ class FollowUpsSingleGetInfoContainer extends PureComponent {
             }
         });
 
-        return this.renderItemCardComponent(fields)
-    };
-
-    handleRenderItemForAddress = () => {
-        let fields = config.followUpsSingleScreen.address.fields
-        return this.renderItemCardComponent(fields)
+        return this.renderItemCardComponent(fields, index)
     };
 
     renderItemCardComponent = (fields, cardIndex = null) => {
         return (
-            <ElevatedView elevation={3} style={[style.containerCardComponent, {
+            <ElevatedView key={cardIndex} elevation={3} style={[style.containerCardComponent, {
                 marginHorizontal: calculateDimension(16, false, this.props.screenSize),
                 width: calculateDimension(config.designScreenSize.width - 32, false, this.props.screenSize),
                 marginVertical: 4,
@@ -125,7 +73,7 @@ class FollowUpsSingleGetInfoContainer extends PureComponent {
         return (
             <View style={[style.subcontainerCardComponent, { flex: 1 }]} key={index}>
                 {
-                    this.handleRenderItemByType(item, cardIndex)
+                    this.handleRenderItemByType(item, index)
                 }
             </View>
         )
@@ -133,15 +81,6 @@ class FollowUpsSingleGetInfoContainer extends PureComponent {
 
     handleRenderItemByType = (item, cardIndex) => {
         let value = '';
-
-        // if (this.props.item !== null && this.props.item !== undefined && this.props.contact !== undefined && this.props.contact !== null) {
-        //     let item = this.props.item;
-        //     let contact = this.props.contact;
-        //     if (item.type === 'DropdownInput') {
-        //         item.data = this.computeDataForDropdown(item, contact);
-        //     }
-        //     value = this.computeValueForId(item.type, item.id, item, contact);
-        // }
 
         if (item.type === 'DropdownInput') {
             item.data = this.computeDataForFollowUpSingleScreenDropdownInput(item);
@@ -151,18 +90,6 @@ class FollowUpsSingleGetInfoContainer extends PureComponent {
             value = this.props.item[item.id]
         } else if (item.type === 'SwitchInput' && this.props.item && this.props.item !== undefined && this.props.item[item.id] !== undefined) {
             value = this.props.item[item.id]
-        } else if (item.type === 'DropDownSectioned') {
-            if (this.props.item && this.props.item.address && this.props.item.address[item.id] && this.props.item.address[item.id] !== "") {
-                if (this.props.locations) {
-                    for (let i = 0; i < this.props.locations.length; i++) {
-                        let myLocationName = this.getLocationNameById(this.props.locations[i], this.props.item.address[item.id])
-                        if (myLocationName !== null) {
-                            value = myLocationName
-                            break
-                        }
-                    }
-                }
-            }
         } else {
             value = this.computeValueForFollowUpSingleScreen(item);
         }
@@ -170,11 +97,13 @@ class FollowUpsSingleGetInfoContainer extends PureComponent {
         if (item.type === 'DatePicker' && value === '') {
             value = null
         }
+
         return (
             <CardComponent
+                key={cardIndex}
                 item={item}
-                isEditMode={item.objectType === 'Address' ? false : this.props.isEditMode}
-                isEditModeForDropDownInput={item.objectType === 'Address' ? false : this.props.isEditMode}
+                isEditMode={this.props.isEditMode}
+                isEditModeForDropDownInput={this.props.isEditMode}
                 value={value}
                 index={cardIndex}
                 followUp={this.props.item}
@@ -185,8 +114,6 @@ class FollowUpsSingleGetInfoContainer extends PureComponent {
                 onChangeSwitch={this.props.onChangeSwitch}
                 onChangeDropDown={this.props.onChangeDropDown}
                 onChangeTextSwitchSelector={this.props.onChangeTextSwitchSelector}
-                onFocus={this.handleOnFocus}
-                onBlur={this.handleOnBlur}
             />
         )
     };
@@ -205,157 +132,6 @@ class FollowUpsSingleGetInfoContainer extends PureComponent {
                 .sort((a, b) => { return a.order - b.order; })
                 .map((o) => { return { label: getTranslation(o.value, this.props.translation), value: o.value } })
         }
-        if (item.id === 'typeId') {
-            return _.filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_ADDRESS_TYPE' })
-                .sort((a, b) => { return a.order - b.order; })
-                .map((o) => { return { value: getTranslation(o.value, this.props.translation), id: o.value } })
-        }
-    };
-
-    computeDataForDropdown = (item, contact) => {
-        if (item.id === 'exposedTo') {
-            if (this.props.cases && this.props.cases.length > 0) {
-                return this.props.cases.map((e) => { return { value: ((e.firstName ? e.firstName : '') + (e.lastName ? (" " + e.lastName) : '')) } });
-            }
-        }
-
-        if (item.id === 'address') {
-            return contact.addresses.map((e) => { return Object.assign({}, e, { value: getAddress(e, true) }) });
-        }
-
-        if (item.id === 'riskLevel') {
-            return _.filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId.includes("RISK_LEVEL") })
-                .sort((a, b) => { return a.order - b.order; })
-                .map((o) => { return { value: getTranslation(o.value, this.props.translation), id: o.value } })
-        }
-
-        if (item.id === 'classification') {
-            return _.filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId.includes("CASE_CLASSIFICATION") })
-                .sort((a, b) => { return a.order - b.order; })
-                .map((o) => { return { label: getTranslation(o.value, this.props.translation), value: o.value } })
-        }
-
-        if (item.id === 'gender') {
-            return _.filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_GENDER' })
-                .sort((a, b) => { return a.order - b.order; })
-                .map((o) => { return { label: getTranslation(o.value, this.props.translation), value: o.value } })
-        }
-
-        if (item.id === 'typeId') {
-            return _.filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_ADDRESS_TYPE' })
-                .sort((a, b) => { return a.order - b.order; })
-                .map((o) => { return { label: getTranslation(o.value, this.props.translation), value: o.value } })
-        }
-
-        if (item.id === 'labName') {
-            return _.filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_LAB_NAME' })
-                .sort((a, b) => { return a.order - b.order; })
-                .map((o) => { return { value: getTranslation(o.value, this.props.translation), id: o.value } })
-        }
-
-        if (item.id === 'sampleType') {
-            return _.filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_TYPE_OF_SAMPLE' })
-                .sort((a, b) => { return a.order - b.order; })
-                .map((o) => { return { value: getTranslation(o.value, this.props.translation), id: o.value } })
-        }
-
-        if (item.id === 'testType') {
-            return _.filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_TYPE_OF_LAB_TEST' })
-                .sort((a, b) => { return a.order - b.order; })
-                .map((o) => { return { value: getTranslation(o.value, this.props.translation), id: o.value } })
-        }
-
-        if (item.id === 'result') {
-            return _.filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_LAB_TEST_RESULT' })
-                .sort((a, b) => { return a.order - b.order; })
-                .map((o) => { return { value: getTranslation(o.value, this.props.translation), id: o.value } })
-        }
-
-        if (item.id === 'status') {
-            return _.filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_LAB_TEST_RESULT_STATUS' })
-                .sort((a, b) => { return a.order - b.order; })
-                .map((o) => { return { value: getTranslation(o.value, this.props.translation), id: o.value } })
-        }
-
-        if (item.id === 'categories') {
-            return _.filter(this.props.helpCategory, (o) => { return o.deleted === false && o.fileType === 'helpCategory.json' })
-                .sort((a, b) => { return a.order - b.order; })
-                .map((o) => { return { label: getTranslation(o.name, this.props.translation), value: o._id } })
-        }
-
-        return [];
-    };
-
-    getLocationNameById = (element, locationId) => {
-        if (extractIdFromPouchId(element._id, 'location') === locationId) {
-            return element.name;
-        } else {
-            if (element.children && element.children.length > 0) {
-                let i;
-                let result = null;
-
-                for (i = 0; result === null && i < element.children.length; i++) {
-                    result = this.getLocationNameById(element.children[i], locationId);
-                }
-                return result;
-            }
-        }
-        return null;
-    };
-
-
-    computeValueForId = (type, id, followUp, contact, cases = []) => {
-        // if (type === 'DropdownInput' && id === 'exposedTo') {
-        //     return handleExposedTo(contact, true, this.props.cases);
-        // }
-
-        if (type === 'DropdownInput' && id === 'address' && followUp.address) {
-            return getAddress(followUp.address, true)
-        }
-
-        if (type === 'SwitchInput' && id === "fillGeoLocation") {
-            return followUp.fillGeoLocation ? true : false
-        }
-
-        if (followUp[id]) {
-            if (typeof followUp[id] === 'string' && followUp[id].includes('LNG_')) {
-                return getTranslation(followUp[id], this.props.translation);
-            } else {
-                return followUp[id];
-            }
-        } else {
-            if (contact[id]) {
-                if (typeof contact[id] === 'string' && contact[id].includes('LNG_')) {
-                    return getTranslation(contact[id], this.props.translation);
-                } else {
-                    return contact[id];
-                }
-            } else {
-                if (cases[id]) {
-                    if (typeof cases[id] === 'string' && cases[id].includes('LNG_')) {
-                        return getTranslation(cases[id], this.props.translation);
-                    } else {
-                        return cases[id];
-                    }
-                } else {
-                    return '';
-                }
-            }
-        }
-    };
-
-    handleOnFocus = (event) => {
-        // this.scrollToInput(findNodeHandle(event.target))
-    };
-
-    handleOnBlur = (event) => {
-        // this.scrollFollowUpsSingleGetInfo.props.scrollToPosition(0, 0, false)
-        // this.scrollToInput(findNodeHandle(event.target))
-    }
-
-    scrollToInput(reactNode) {
-        // Add a 'scroll' ref to your ScrollView
-        // this.scrollFollowUpsSingleGetInfo.props.scrollToFocusedInput(reactNode)
     };
 }
 
@@ -380,10 +156,6 @@ const style = StyleSheet.create({
         marginVertical: 4,
         flex: 1
     },
-    containerScrollView: {
-        flex: 1,
-        backgroundColor: styles.screenBackgroundGrey
-    },
     contentContainerStyle: {
         alignItems: 'center'
     },
@@ -394,7 +166,6 @@ function mapStateToProps(state) {
         screenSize: state.app.screenSize,
         translation: state.app.translation,
         referenceData: state.referenceData,
-        locations: state.locations.locations,
     };
 }
 

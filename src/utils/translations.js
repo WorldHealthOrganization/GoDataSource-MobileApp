@@ -328,7 +328,11 @@ const alertMessages = {
 
     replaceCurrentCoordinates: 'LNG_DIALOG_ALERT_MESSAGE_DO_YOU_WANT_TO_REPLACE_CURRENT_COORDINATES_WITH_LOCATION_VALUES',
 
-    androidBackButtonMsg: 'LNG_DIALOG_ALERT_MESSAGE_ARE_YOU_SURE_YOU_WANT_TO_EXIT_THE_APP'
+    androidBackButtonMsg: 'LNG_DIALOG_ALERT_MESSAGE_ARE_YOU_SURE_YOU_WANT_TO_EXIT_THE_APP',
+
+
+    // TODO add translation to backend
+    copyAddress: 'LNG_DIALOG_ALERT_MESSAGE_ARE_YOU_SURE_YOU_WANT_TO_COPY_THE_ADDRESS_FROM_THE_PARENT_ENTITY'
 };
 
 const loadingScreenMessages = {
@@ -390,6 +394,7 @@ const manualConfigScreen = {
     nameLabel: 'HUB Name',
     hubUrlLabel: 'HUB URL',
     clientIdLabel: 'Client ID',
+    userEmailLabel: 'User Email',
     clientSecretPass: 'Client secret',
     saveHubConfigButton: 'Save and sync HUB',
     encryptDataLabel: 'Encrypted connection'
@@ -412,6 +417,9 @@ const addressFieldLabels = {
     longitude: 'LNG_ADDRESS_FIELD_LABEL_LONGITUDE',
     latitude: 'LNG_ADDRESS_FIELD_LABEL_LATITUDE',
     deleteButton: 'LNG_COMMON_BUTTON_DELETE',
+    copyAddress: 'LNG_ADDRESS_FIELD_LABEL_COPY_ADDRESS',
+    // TODO add to backend
+    isThePersonNextToYou: 'LNG_ADDRESS_FIELD_LABEL_IS_THE_PERSON_NEXT_TO_YOU'
 };
 
 const personTypes = {
@@ -523,6 +531,10 @@ const previousAnswersScreen = {
 
 // TODO add to backend
 const followUpAgenda = {
+    followUp: 'LNG_FOLLOW_UP_AGENDA_FOLLOW_UP',
+    followUpStatus: 'LNG_FOLLOW_UP_AGENDA_FOLLOW_UP_STATUS',
+    followUpQuestionnaire: 'LNG_FOLLOW_UP_AGENDA_FOLLOW_UP_QUESTIONNAIRE',
+    followUpAddress: 'LNG_FOLLOW_UP_AGENDA_FOLLOW_UP_ADDRESS',
     noFollUpsForDate: 'LNG_FOLLOW_UP_AGENDA_NO_FOLLOW_UPS_FOR_DATE'
 };
 

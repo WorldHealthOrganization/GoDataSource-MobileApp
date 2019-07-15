@@ -17,8 +17,8 @@ export function getUserTeams(userPouchId, dispatch) {
         getTeamsForUserRequest((error, response) => {
             if (error) {
                 console.log("*** getUserTeams error: ", error);
-                dispatch(addError(errorTypes.ERROR_USER_TEAMS));
-                reject(error);
+                // dispatch(addError(errorTypes.ERROR_USER_TEAMS));
+                reject(errorTypes.ERROR_USER_TEAMS);
             }
             if (response) {
                 // console.log ('getUserTeams response', response);
@@ -31,8 +31,9 @@ export function getUserTeams(userPouchId, dispatch) {
                         userTeams.push(teamId);
                     } 
                 });
-                dispatch(storeUserTeams(userTeams));
-                resolve(userTeams);
+                // dispatch(storeUserTeams(userTeams));
+                // resolve('Done user teams');
+                resolve({userTeams: userTeams});
             }
         })
     })

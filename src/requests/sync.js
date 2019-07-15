@@ -15,6 +15,7 @@ import uniq from 'lodash/uniq';
 import get from 'lodash/get';
 import {getHelpItemsRequest} from './helpItem';
 import {getHelpCategoriesRequest} from './helpCategory';
+import {handleResponseFromRNFetchBlob} from './../utils/functions'
 
 export function getDatabaseSnapshotRequest(hubConfig, lastSyncDate, dispatch, callback) {
 
@@ -42,7 +43,7 @@ export function getDatabaseSnapshotRequest(hubConfig, lastSyncDate, dispatch, ca
                 model: DeviceInfo.getModel().replace(/\u0022|\u0027|\u0060|\u00b4|\u2018|\u2019|\u201c|\u201d/g, `\'`),
                 name: DeviceInfo.getDeviceName().replace(/\u0022|\u0027|\u0060|\u00b4|\u2018|\u2019|\u201c|\u201d/g, `\'`)
             });
-            let requestUrl = `${hubConfiguration.url}/sync/get-mobile-database-snapshot?autoEncrypt=${hubConfiguration.encryptedData}${lastSyncDate ? `&filter=${JSON.stringify(filter)}` : ''}&chunkSize=5000`;
+            let requestUrl = `${hubConfiguration.url}/sync/get-mobile-database-snapshot?autoEncrypt=${hubConfiguration.encryptedData}${lastSyncDate ? `&filter=${JSON.stringify(filter)}` : ''}&chunkSize=5000${hubConfiguration.userEmail ? `&userEmail=${hubConfiguration.userEmail}` : ''}`;
 
             // console.log('Request URL: ', requestUrl);
 
@@ -95,21 +96,30 @@ export function getDatabaseSnapshotRequest(hubConfig, lastSyncDate, dispatch, ca
                                     }));
                                     console.log(received, total)
                                 })
+                                .then((res) => {return handleResponseFromRNFetchBlob(res)})
                                 .then((res) => {
-                                    console.log('Download time: ', new Date().getTime() - startDownload);
-                                    let status = res.info().status;
-                                    // After getting zip file from the server, unzip it and then proceed to the importing of the data to the SQLite database
-                                    if (status === 200) {
-                                        // After returning the database, return the path to it
-                                        console.log("Got database");
+                                    // console.log('Download time: ', new Date().getTime() - startDownload);
+                                    // let status = res.info().status;
+
+                                    // if (status === 200) {
+                                    //     // After returning the database, return the path to it
+                                    //     console.log("Got database");
                                         callback(null, databaseLocation)
-                                    } else {
-                                        if (status === 422) {
-                                            callback(`No data to export`);
-                                        } else {
-                                            callback(`Cannot connect to HUB, please check URL, Client ID and Client secret.\nStatus code: ${status}`);
-                                        }
-                                    }
+                                    // } else {
+                                    //     if (status === 422) {
+                                    //         callback(`No data to export`);
+                                    //     } else {
+                                    //         res.json()
+                                    //             .then((parsedError) => {
+                                    //                 console.log('Jsons: ', parsedError);
+                                    //                 // After getting zip file from the server, unzip it and then proceed to the importing of the data to the SQLite database
+                                    //                 callback(get(parsedError, 'error.message', 'Unknown error'));
+                                    //             })
+                                    //             .catch((errorParseError) => {
+                                    //                 callback(`Cannot connect to HUB, please check URL, Client ID and Client secret.\nStatus code: ${status}`);
+                                    //             })
+                                    //     }
+                                    // }
                                 })
                                 .catch((errorMessage, statusCode) => {
                                     // error handling

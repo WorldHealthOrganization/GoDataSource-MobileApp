@@ -218,6 +218,11 @@ export default {
     'Last follow-up': 'Last follow-up',
     'Next follow-up': 'Next follow-up',
 
+    // followUpAgenda
+    'LNG_FOLLOW_UP_AGENDA_FOLLOW_UP': 'Follow-up',
+    'LNG_FOLLOW_UP_AGENDA_FOLLOW_UP_STATUS': 'Status',
+    'LNG_FOLLOW_UP_AGENDA_FOLLOW_UP_QUESTIONNAIRE': 'Questionnaire',
+    'LNG_FOLLOW_UP_AGENDA_FOLLOW_UP_ADDRESS': 'Address',
 
     //followUpsScreenStatusFilterValues
     'LNG_FOLLOW_UPS_DROP_DOWN_FILTER_STATUS_LABEL_ALL': 'All',
@@ -283,6 +288,9 @@ export default {
     'LNG_DIALOG_ALERT_MESSAGE_DO_YOU_WANT_TO_REPLACE_CURRENT_COORDINATES_WITH_LOCATION_VALUES': "Do you want to replace current coordinates with location's values?",
     'LNG_DIALOG_ALERT_MESSAGE_ADD_PERSON': 'Would you like to add a new person for this id?',
 
+    // TODO add to backend
+    'LNG_DIALOG_ALERT_MESSAGE_ARE_YOU_SURE_YOU_WANT_TO_COPY_THE_ADDRESS_FROM_THE_PARENT_ENTITY': 'Are you sure you want to copy the address from the parent entity?',
+
     //loadingScreenMessages
     'LNG_LOADING_SCREEN_MESSAGE': 'Loading...',
 
@@ -336,7 +344,7 @@ export default {
 
 
     //loginScreen
-    'Welcome': 'Welcome',
+    // 'Welcome': 'Welcome',
     'Email': 'Email',
     'Password': 'Password',
     'LOGIN': 'LOGIN',
@@ -352,6 +360,8 @@ export default {
     'LNG_ADDRESS_FIELD_LABEL_LONGITUDE': 'Longitude',
     'LNG_ADDRESS_FIELD_LABEL_LATITUDE': 'Latitude',
     'LNG_COMMON_BUTTON_DELETE': 'Delete',
+    'LNG_ADDRESS_FIELD_LABEL_COPY_ADDRESS': 'Copy case address',
+    'LNG_ADDRESS_FIELD_LABEL_IS_THE_PERSON_NEXT_TO_YOU': 'Is the person next to you?',
 
 
     //personTypes

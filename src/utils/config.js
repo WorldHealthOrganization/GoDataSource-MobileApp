@@ -3,7 +3,7 @@
  */
 import styles from './../styles';
 import {Platform} from 'react-native';
-import translations from './translations'
+import translations from './translations';
 
 const baseUrls = [
     {value: 'gva11sucombee.who.int:3000'},
@@ -117,18 +117,18 @@ const followUpsSingleScreen = {
                     isEditMode: true,
                     objectType: 'FollowUp'
                 },
-                {
-                    cardNumber: 1,
-                    id: 'targeted',
-                    label: translations.followUpsSingleScreen.targeted,
-                    type: 'SwitchInput',
-                    value: false,
-                    isRequired: false,
-                    isEditMode: true,
-                    activeButtonColor: 'green',
-                    activeBackgroundColor: 'green',
-                    objectType: 'FollowUp'
-                },
+                // {
+                //     cardNumber: 1,
+                //     id: 'targeted',
+                //     label: translations.followUpsSingleScreen.targeted,
+                //     type: 'SwitchInput',
+                //     value: false,
+                //     isRequired: false,
+                //     isEditMode: true,
+                //     activeButtonColor: 'green',
+                //     activeBackgroundColor: 'green',
+                //     objectType: 'FollowUp'
+                // },
             ]
         }
     ],
@@ -515,7 +515,7 @@ const caseSingleScreen = {
             {
                 cardNumber: 1,
                 id: 'geoLocationAccurate',
-                label: 'Is the person next to you',
+                label: translations.addressFieldLabels.isThePersonNextToYou,
                 labelValue: 'test',
                 type: 'SwitchInput',
                 value: '',
@@ -1726,7 +1726,7 @@ const contactsSingleScreen = {
             {
                 cardNumber: 1,
                 id: 'geoLocationAccurate',
-                label: 'Is the person next to you?',
+                label: translations.addressFieldLabels.isThePersonNextToYou,
                 labelValue: 'test',
                 type: 'SwitchInput',
                 value: '',
@@ -2423,6 +2423,10 @@ const caseBlueprint = {
 
 const statusPendingWipe = 'LNG_DEVICE_WIPE_STATUS_PENDING';
 
+const rawSQLQueryString = 'SELECT json, doc_id as _id from `by-sequence`';
+
+const rawSQLQueryWhereString = ' WHERE doc_id LIKE ?';
+
 export default {
     designScreenSize,
     sideMenuItems,
@@ -2459,5 +2463,7 @@ export default {
     dateRangeTypes,
     documentTypes,
     caseBlueprint,
-    statusPendingWipe
+    statusPendingWipe,
+    rawSQLQueryString,
+    rawSQLQueryWhereString
 }

@@ -7,7 +7,8 @@ import RNFetchBlobFS from 'rn-fetch-blob/fs';
 import {zip, unzip} from 'react-native-zip-archive';
 import {updateFileInDatabase, processBulkDocs} from './../queries/database';
 import {setSyncState} from './../actions/app';
-import bcrypt from 'react-native-bcrypt';
+// import bcrypt from 'react-native-bcrypt';
+import {NativeModules} from 'react-native';
 import uuid from 'react-native-uuid';
 // import _ from 'lodash';
 import get from 'lodash/get';
@@ -39,6 +40,26 @@ export function handleResponse(response) {
         }
         throw new Error(errorTypes.UNKNOWN_ERROR);
     });
+};
+
+// RN-fetch-blob does not manage status codes, so, this
+export function handleResponseFromRNFetchBlob(response) {
+    return new Promise ((resolve, reject) => {
+        let status = response.info().status;
+
+        if (status === 200) {
+            resolve(response);
+        } else {
+            // Manage errors
+            response.json()
+                .then((parsedError) => {
+                    reject({message: get(parsedError, 'error.message', 'Unknown Error')});
+                })
+                .catch((errorParseError) => {
+                    reject({message: 'Unknown Error'});
+                })
+        }
+    })
 };
 
 // This method is used for calculating dimensions for components.
@@ -674,12 +695,33 @@ export async function processFile (path, type, totalNumberOfFiles, dispatch, isF
 }
 
 export function comparePasswords (password, encryptedPassword, callback) {
-    bcrypt.compare(password, encryptedPassword, (errorCompare, isMatch) => {
-        if (errorCompare) {
-            return callback(errorCompare)
-        }
-        callback(null, isMatch)
-    })
+    let start = new Date().getTime();
+    // try {
+    //     let isMatch = bcrypt.compareSync(password, encryptedPassword);
+    //     console.log('Result for find time for compare bcrypt: ', new Date().getTime() - start);
+    //     callback(null, isMatch);
+    // } catch (errorCompare) {
+    //     return callback(errorCompare)
+    // }
+
+    let RNBcrypt = NativeModules.RNBcrypt;
+    RNBcrypt.verifyPassword(password, encryptedPassword)
+        .then(() => {
+            console.log('Result for find time for check pass success', new Date().getTime() - start);
+            callback(null, true)
+        })
+        .catch((errorCompare) => {
+            console.log('Result for find time for check pass error', new Date().getTime() - start, errorCompare);
+            callback(new Error(errorCompare.userInfo));
+        });
+
+    // bcrypt.compare(password, encryptedPassword, (errorCompare, isMatch) => {
+    //     console.log('Result for find time for compare bcrypt: ', new Date().getTime() - start);
+    //     if (errorCompare) {
+    //         return callback(errorCompare)
+    //     }
+    //     callback(null, isMatch)
+    // })
 }
 
 function extractFromDatabase(database, fileType, lastSyncDate, startKey) {

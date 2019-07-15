@@ -22,12 +22,13 @@ export function getEventsForOutbreakId(outbreakId, token, dispatch) {
         getEventsForOutbreakIdRequest(outbreakId, token, (error, response) => {
             if (error) {
                 console.log("*** getContactsForOutbreakId error: ", error);
-                dispatch(addError(errorTypes.ERROR_EVENTS));
-                reject(error);
+                // dispatch(addError(errorTypes.ERROR_EVENTS));
+                reject(errorTypes.ERROR_EVENTS);
             }
             if (response) {
-                dispatch(storeEvents(response));
-                resolve('Done events');
+                // dispatch(storeEvents(response));
+                // resolve('Done events');
+                resolve({events: response});
             }
         })
     })

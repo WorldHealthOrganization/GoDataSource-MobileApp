@@ -1,9 +1,18 @@
 import {getDatabase} from './database';
 import config from './../utils/config';
+import {rawSQLQuery} from "./sqlHelper";
 
 export function getClustersdRequest (token, callback) {
+
+    // rawSQLQuery(config.mongoCollections.cluster, `${config.rawSQLQueryString}`, [])
+    //     .then((result) => {
+    //         callback(null, result);
+    //     })
+    //     .catch((error) => {
+    //         callback(error)
+    //     })
+
     let start = new Date().getTime();
-    console.log('Result for find start time for getClusters: ', new Date());
     getDatabase(config.mongoCollections.cluster)
         .then((database) => {
             database.find({
@@ -16,7 +25,7 @@ export function getClustersdRequest (token, callback) {
                 }
             })
                 .then((resultFind) => {
-                    console.log('Result for find clusters: ', new Date().getTime() - start);
+                    console.log('Result for find time for clusters: ', new Date().getTime() - start);
                     callback(null, resultFind.docs);
                 })
                 .catch((errorFind) => {

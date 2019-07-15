@@ -21,14 +21,15 @@ import PersonListItem from './../components/PersonListItem';
 import AnimatedListView from './../components/AnimatedListView';
 import Breadcrumb from './../components/Breadcrumb';
 import ValuePicker from './../components/ValuePicker';
-import { getFollowUpsForOutbreakId, getMissedFollowUpsForOutbreakId, addFollowUp, generateFollowUp } from './../actions/followUps';
+import { getFollowUpsForOutbreakId, getMissedFollowUpsForOutbreakId, addFollowUp } from './../actions/followUps';
 import { getContactsForOutbreakId } from './../actions/contacts';
 import { removeErrors } from './../actions/errors';
 import { addFilterForScreen, removeFilterForScreen, saveGeneratedFollowUps, setLoaderState } from './../actions/app';
 import ElevatedView from 'react-native-elevated-view';
 import _ from 'lodash';
 import AddFollowUpScreen from './AddFollowUpScreen';
-import GenerateFollowUpScreen from './GenerateFollowUpScreen';
+// import GenerateFollowUpScreen from './GenerateFollowUpScreen';
+import { LoaderScreen, Colors } from 'react-native-ui-lib';
 import { calculateDimension, navigation, extractIdFromPouchId, generateId, updateRequiredFields, getTranslation, localSortContactsForFollowUps, objSort } from './../utils/functions';
 import ViewHOC from './../components/ViewHOC';
 import { Popup } from 'react-native-map-link';
@@ -142,6 +143,7 @@ class FollowUpsScreen extends Component {
                 state.refreshing = false;
                 state.loading = false;
             } else {
+                state.followUps = [];
                 state.refreshing = false;
                 state.loading = false;
             }
@@ -348,6 +350,7 @@ class FollowUpsScreen extends Component {
                     <AnimatedListView
                         stickyHeaderIndices={[0]}
                         data={this.props.mappedFollowUps || []}
+                        extraData={this.props.contacts}
                         renderItem={this.renderFollowUp}
                         keyExtractor={this.keyExtractor}
                         ListHeaderComponent={
@@ -395,17 +398,17 @@ class FollowUpsScreen extends Component {
                                     sourceLongitude: this.state.sourceLongitude,
                                     dialogTitle: getTranslation(translations.alertMessages.mapsPopupMessage, this.props.translation),
                                     cancelText: getTranslation(translations.alertMessages.cancelButtonLabel, this.props.translation),
-                                    appsWhiteList: ['google-maps', 'apple-maps', 'waze', 'citymapper', 'uber', 'lyft', 'transit', 'yandex', 'moovit', 'yandex-maps']
+                                    appsWhiteList: ['google-maps', 'apple-maps', 'waze', 'citymapper', 'uber', 'lyft', 'transit', 'yandex', 'moovit']
                                 }}
                             />
                         ) : console.log('this.state.error', this.state.error)
                     }
                 </View>
-                <GenerateFollowUpScreen
-                    showGenerateFollowUpScreen={this.state.showGenerateFollowUpScreen}
-                    onCancelPressed={this.handleModalGenerateFollowUps}
-                    onOkPressed={this.handleGenerateNewFollowUps}
-                />
+                {/*<GenerateFollowUpScreen*/}
+                    {/*showGenerateFollowUpScreen={this.state.showGenerateFollowUpScreen}*/}
+                    {/*onCancelPressed={this.handleModalGenerateFollowUps}*/}
+                    {/*onOkPressed={this.handleGenerateNewFollowUps}*/}
+                {/*/>*/}
             </ViewHOC>
 
         );
@@ -442,6 +445,7 @@ class FollowUpsScreen extends Component {
         let margins = calculateDimension(16, false, this.props.screenSize);
         return(
             <PersonListItem
+                key={item._id}
                 type={'FollowUp'}
                 itemToRender={item}
                 onPressMapIconProp={this.handleOnPressMap}
@@ -481,9 +485,7 @@ class FollowUpsScreen extends Component {
         index
     });
 
-    keyExtractor = (item, index) => {
-        item._id;
-    };
+    keyExtractor = (item, index) => item._id;
 
     renderSeparatorComponent = () => {
         return (
@@ -726,34 +728,34 @@ class FollowUpsScreen extends Component {
         });
     };
 
-    handleGenerateFollowUps = (date) => {
-        this.setState({
-            generating: true,
-        }, () => {
-            this.props.generateFollowUp(this.props.user.activeOutbreakId, this.state.filter.date, date, this.props.user.token);
-            this.hideMenu();
-        });
-
-    };
-
-    handleGenerateNewFollowUps = (date) => {
-        this.setState({
-            showGenerateFollowUpScreen: !this.state.showGenerateFollowUpScreen,
-        }, () => {
-            this.handleGenerateFollowUps(date);
-        });
-    };
-
-    handleModalGenerateFollowUps = () => {
-        this.hideMenu();
-        setTimeout(function () {
-            this.setState({
-                showGenerateFollowUpScreen: !this.state.showGenerateFollowUpScreen,
-            }, () => {
-                console.log("showGenerateFollowUpScreen", this.state.showGenerateFollowUpScreen);
-            });
-        }.bind(this), 2000);
-    };
+    // handleGenerateFollowUps = (date) => {
+    //     this.setState({
+    //         generating: true,
+    //     }, () => {
+    //         this.props.generateFollowUp(this.props.user.activeOutbreakId, this.state.filter.date, date, this.props.user.token);
+    //         this.hideMenu();
+    //     });
+    //
+    // };
+    //
+    // handleGenerateNewFollowUps = (date) => {
+    //     this.setState({
+    //         showGenerateFollowUpScreen: !this.state.showGenerateFollowUpScreen,
+    //     }, () => {
+    //         this.handleGenerateFollowUps(date);
+    //     });
+    // };
+    //
+    // handleModalGenerateFollowUps = () => {
+    //     this.hideMenu();
+    //     setTimeout(function () {
+    //         this.setState({
+    //             showGenerateFollowUpScreen: !this.state.showGenerateFollowUpScreen,
+    //         }, () => {
+    //             console.log("showGenerateFollowUpScreen", this.state.showGenerateFollowUpScreen);
+    //         });
+    //     }.bind(this), 2000);
+    // };
 
     // Append to the existing filter newProp={name: value}
     appendToFilter = (newProp) => {
@@ -1126,7 +1128,6 @@ function matchDispatchProps(dispatch) {
         addFollowUp,
         saveGeneratedFollowUps,
         removeFilterForScreen,
-        generateFollowUp,
         setLoaderState
     }, dispatch);
 }

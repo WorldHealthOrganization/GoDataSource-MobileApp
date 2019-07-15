@@ -46,6 +46,7 @@ class AddSingleAnswerModalScreen extends Component {
             sortedQuestions = extractAllQuestions(sortedQuestions, props.currentAnswers);
             state.item = sortedQuestions[0];
         }
+        return null;
     }
 
     render() {

@@ -66,7 +66,7 @@ export function pushNewEditScreen(QRCodeInfo, navigator, user, translation, call
         }
 
         if (itemPouchId) {
-            getItemByIdRequest(outbreakId, itemPouchId, itemType, (error, response) => {
+            getItemByIdRequest(outbreakId, itemPouchId, itemType, null, (error, response) => {
                 if (error) {
                     console.log("*** getItemByIdRequest error: ", error);
                     return callback(translations.alertMessages.noItemAlert, itemType, {_id: itemPouchId});
@@ -101,3 +101,21 @@ export function pushNewEditScreen(QRCodeInfo, navigator, user, translation, call
         // }, 1000)
     }
 };
+
+export function pushToScreen(navigator, screen, passProps) {
+    try {
+        navigator.push({
+            screen,
+            passProps
+        })
+    } catch(screenPushError) {
+        console.log('Screen push error: ', screenPushError);
+        Alert.alert(getTranslation(translations.alertMessages.alertLabel, null), 'An unknown error occurred', [
+            {
+                text: getTranslation(translations.alertMessages.okButtonLabel, null), onPress: () => {
+                    console.log('Ok pressed')
+                }
+            }
+        ])
+    }
+}

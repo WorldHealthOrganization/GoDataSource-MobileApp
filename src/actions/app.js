@@ -14,7 +14,8 @@ import {
     ACTION_TYPE_SAVE_GENERATED_FOLLOWUPS,
     ACTION_TYPE_SET_LOGIN_STATE,
     ACTION_TYPE_SAVE_ACTIVE_DATABASE,
-    ACTION_TYPE_SET_LOADER_STATE
+    ACTION_TYPE_SET_LOADER_STATE,
+    ACTION_TYPE_SAVE_HELP_ITEM
 } from './../utils/enums';
 import url from '../utils/url';
 import config from './../utils/config';
@@ -37,6 +38,7 @@ import {addError} from './errors';
 // import {addError} from './errors';
 // import RNDB from 'react-native-nosql-to-sqlite';
 import {getSyncEncryptPassword} from './../utils/encryption';
+import errorTypes from "../utils/errorTypes";
 
 let arrayOfStatuses = [];
 
@@ -144,12 +146,13 @@ export function getTranslations(language, dispatch) {
         getTranslationRequest(language, (error, response) => {
             if (error) {
                 console.log("*** getTranslations error: ", error);
-                reject(error);
+                reject(errorTypes.ERROR_OUTBREAK);
             }
             if (response) {
                 console.log("### here should have the translations: ");
-                dispatch(saveTranslation(response));
-                resolve('Done translation');
+                // dispatch(saveTranslation(response));
+                // resolve('Done translations');
+                resolve({translations: response});
             }
         })
     })
@@ -213,12 +216,13 @@ export function getAvailableLanguages(dispatch) {
         getAvailableLanguagesRequest((error, response) => {
             if (error) {
                 console.log("*** getAvailableLanguages error: ", error);
-                reject(error);
+                reject(errorTypes.ERROR_OUTBREAK);
             }
             if (response) {
                 // console.log("### here should have available languages: ", response.map((e) => {return {id: extractIdFromPouchId(e._id, 'language'), name: e.name}}));
-                dispatch(saveAvailableLanguages(response.map((e) => {return {value: e._id.substr('language.json_'.length), label: e.name}})));
-                resolve('Done languages');
+                // dispatch(saveAvailableLanguages(response.map((e) => {return {value: e._id.substr('language.json_'.length), label: e.name}})));
+                // resolve('Done available languages');
+                resolve({availableLanguages: response.map((e) => {return {value: e._id.substr('language.json_'.length), label: e.name}})});
             }
         })
     })

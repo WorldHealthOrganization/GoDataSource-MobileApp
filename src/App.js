@@ -1,6 +1,7 @@
 import { Navigation, NativeEventsReceiver } from 'react-native-navigation';
 import {connect, Provider} from 'react-redux';
 import { createStore, applyMiddleware } from 'redux';
+import { enableBatching } from 'redux-batched-actions';
 import thunk from 'redux-thunk';
 import promise from 'redux-promise';
 import { createLogger } from 'redux-logger';
@@ -22,7 +23,7 @@ import {checkDeviceStatus} from "./requests/deviceStatus";
 console.disableYellowBox = true;
 
 // const logger = createLogger();
-export const store = createStore(appReducers, applyMiddleware(thunk, promise));
+export const store = createStore(enableBatching(appReducers), applyMiddleware(thunk, promise));
 
 registerScreens(store, Provider);
 

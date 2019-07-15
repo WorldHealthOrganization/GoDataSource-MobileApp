@@ -14,9 +14,14 @@ import moment from 'moment';
 import config from './../utils/config';
 import Database from './databaseController';
 
-let database = null;
+export let database = null;
 let databaseCache = null;
 let databaseCacheCollectionName = null;
+
+const SQLiteAdapter = SQLiteAdapterFactory(SQLite);
+PouchDB.plugin(SQLiteAdapter);
+PouchDB.plugin(PouchUpsert);
+PouchDB.plugin(PouchFind);
 
 let databaseIndexes = [
     {
@@ -167,6 +172,7 @@ export function getDatabase(collectionName) {
     return new Promise((resolve, reject) => {
         // Define the design documents that tells the database to build indexes in order to query
         let promisesArray = [];
+        let start = new Date().getTime();
 
         // Check first if the database is cached
         if (databaseCache && databaseCache.name.includes(collectionName)) {
@@ -181,15 +187,14 @@ export function getDatabase(collectionName) {
             pathToDatabase = `${RNFS.LibraryDirectoryPath}/NoCloud/${databaseName}`;
         }
 
+        console.log('Path to database: ', pathToDatabase);
+
         RNFetchBlobFS.exists(pathToDatabase)
             .then((exists) => {
                 console.log('Database exists? ', exists);
-                const SQLiteAdapter = SQLiteAdapterFactory(SQLite);
-                PouchDB.plugin(SQLiteAdapter);
-                PouchDB.plugin(PouchUpsert);
-                PouchDB.plugin(PouchFind);
                 // PouchDB.debug.enable('pouchdb:find');
                 databaseCache = new PouchDB(encodeName(databaseName, database.databasePassword), {adapter: 'react-native-sqlite'});
+                // console.log('Result for find time for chech if database exists: ', collectionName, new Date().getTime() - start);
 
                 if (!exists) {
                     // for (let i=0; i<databaseIndexes.length; i++) {
@@ -200,27 +205,27 @@ export function getDatabase(collectionName) {
                     // promisesArray.push(createIndex());
                     // promisesArray.push(createIndexPerson());
                     // Add all the design docs and then return the database
-                    Promise.all(promisesArray)
-                        .then((results) => {
-                            console.log("Results from creating indexes: ", results);
+                    // Promise.all(promisesArray)
+                    //     .then((results) => {
+                    //         console.log("Results from creating indexes: ", results);
                             databaseCacheCollectionName = collectionName;
                             resolve(databaseCache);
-                        })
-                        .catch((error) => {
-                            console.log("Error from creating indexes: ", error);
-                            databaseCacheCollectionName = collectionName;
-                            resolve(databaseCache);
-                        })
+                        // })
+                        // .catch((error) => {
+                        //     console.log("Error from creating indexes: ", error);
+                        //     databaseCacheCollectionName = collectionName;
+                        //     resolve(databaseCache);
+                        // })
                 } else {
                     resolve(databaseCache);
                 }
             })
             .catch((errorExistsDatabase) => {
                 console.log("Database exists error: ", errorExistsDatabase);
-                const SQLiteAdapter = SQLiteAdapterFactory(SQLite);
-                PouchDB.plugin(SQLiteAdapter);
-                PouchDB.plugin(PouchUpsert);
-                PouchDB.plugin(PouchFind);
+                // const SQLiteAdapter = SQLiteAdapterFactory(SQLite);
+                // PouchDB.plugin(SQLiteAdapter);
+                // PouchDB.plugin(PouchUpsert);
+                // PouchDB.plugin(PouchFind);
                 // PouchDB.debug.enable('pouchdb:find');
                 databaseCache = new PouchDB(encodeName(databaseName, database.databasePassword), {adapter: 'react-native-sqlite'});
                 // for (let i=0; i<databaseIndexes.length; i++) {
@@ -231,17 +236,17 @@ export function getDatabase(collectionName) {
                 // promisesArray.push(createIndex());
                 // promisesArray.push(createIndexPerson());
                 // Add al the design docs and then return the database
-                Promise.all(promisesArray)
-                    .then((results) => {
-                        console.log("Results from creating indexes: ", results);
+                // Promise.all(promisesArray)
+                //     .then((results) => {
+                //         console.log("Results from creating indexes: ", results);
                         databaseCacheCollectionName = collectionName;
                         resolve(databaseCache);
-                    })
-                    .catch((error) => {
-                        console.log("Error from creating indexes: ", error);
-                        databaseCacheCollectionName = collectionName;
-                        resolve(databaseCache);
-                    })
+                    // })
+                    // .catch((error) => {
+                    //     console.log("Error from creating indexes: ", error);
+                    //     databaseCacheCollectionName = collectionName;
+                    //     resolve(databaseCache);
+                    // })
             });
     })
 }
@@ -322,6 +327,12 @@ export function processBulkDocs(data, type) {
                 if (database) {
                     // New types: fileType.number.json
                     let fileType = `${type.split('.')[0]}.${type.split('.')[2]}`;
+                    // if (type.includes('location')) {
+                    //     data = data.splice(0, 1000);
+                    // }
+                    // if (type.includes('languageToken')) {
+                    //     data = data.filter((e) => {return e.languageId === 'english_en'})
+                    // }
                     database.bulkDocs(data.map((e) => {
                         return Object.assign({}, e, {_id: createIdForType(e, type), fileType})
                     }))

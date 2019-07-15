@@ -52,7 +52,7 @@ class CasesScreen extends Component {
             filterFromFilterScreen: this.props.filter && this.props.filter['CasesFilterScreen'] ? this.props.filter['CasesFilterScreen'] : null,
             cases: [],
             refreshing: false,
-            loading: true,
+            loading: false,
 
             sortData: false,
             isVisible: false,
@@ -78,18 +78,18 @@ class CasesScreen extends Component {
         for (let i=0; i<refData.length; i++) {
             riskColors[refData[i].value] = refData[i].colorCode || 'black'
         }
-        this.setState({
-            loading: true,
-            riskColors: riskColors
-        }, () => {
-            if (this.props.filter && (this.props.filter['CasesScreen'] || this.props.filter['CasesFilterScreen'])) {
+        // this.setState({
+        //     loading: true,
+        //     riskColors: riskColors
+        // }, () => {
+        //     if (this.props.filter && (this.props.filter['CasesScreen'] || this.props.filter['CasesFilterScreen'])) {
                 this.filterCases();
-            } else {
-                if (this.props.user && this.props.user.activeOutbreakId) {
-                    this.props.getCasesForOutbreakId(this.props.user.activeOutbreakId, null, null);
-                }
-            }
-        })
+        //     } else {
+        //         if (this.props.user && this.props.user.activeOutbreakId) {
+        //             this.props.getCasesForOutbreakId(this.props.user.activeOutbreakId, null, null);
+        //         }
+        //     }
+        // })
     }
 
     componentWillUnmount() {
@@ -113,31 +113,39 @@ class CasesScreen extends Component {
         return true;
     }
 
-    static getDerivedStateFromProps(props, state) {
-        if (props.errors && props.errors.type && props.errors.message) {
-            Alert.alert(props.errors.type, props.errors.message, [
-                {
-                    text: getTranslation(translations.alertMessages.okButtonLabel, props.translation), 
-                    onPress: () => {
-                    props.removeErrors();
-                    state.loading = false;
-                }
-                }
-            ])
-        }
+    // static getDerivedStateFromProps(props, state) {
+    //     //     if (props.errors && props.errors.type && props.errors.message) {
+    //     //         Alert.alert(props.errors.type, props.errors.message, [
+    //     //             {
+    //     //                 text: getTranslation(translations.alertMessages.okButtonLabel, props.translation),
+    //     //                 onPress: () => {
+    //     //                 props.removeErrors();
+    //     //                 state.loading = false;
+    //     //             }
+    //     //             }
+    //     //         ])
+    //     //     }
+    //     //
+    //     //     if (state.sortData === true){
+    //     //         state.loading = true;
+    //     //         state.sortData = false;
+    //     //         const allFilters = createFilterCasesObject(state.filterFromFilterScreen, state.filter);
+    //     //         props.getCasesForOutbreakId(props.user.activeOutbreakId, allFilters, null);
+    //     //     } else {
+    //     //         state.sortData = true
+    //     //     }
+    //     //
+    //     //     state.loading = false;
+    //     //     state.refreshing = false;
+    //     //     return null;
+    //     // }
 
-        if (state.sortData === true){
-            state.loading = true
-            state.sortData = false
-            const allFilters = createFilterCasesObject(state.filterFromFilterScreen, state.filter)
-            props.getCasesForOutbreakId(props.user.activeOutbreakId, allFilters, null);
-        } else {
-            state.sortData = true
+    componentDidUpdate(prevProps) {
+        if (!this.props.loaderState && this.state.refreshing) {
+            this.setState({
+                refreshing: false
+            })
         }
-
-        state.loading = false;
-        state.refreshing = false
-        return null;
     }
 
     clampedScroll = Animated.diffClamp(
@@ -162,6 +170,17 @@ class CasesScreen extends Component {
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
+        if (this.props.errors && this.props.errors.type && this.props.errors.message) {
+            Alert.alert(this.props.errors.type, this.props.errors.message, [
+                {
+                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+                    onPress: () => {
+                        this.props.removeErrors();
+                        // state.loading = false;
+                    }
+                }
+            ])
+        }
         const navbarTranslate = this.clampedScroll.interpolate({
             inputRange: [0, 30],
             outputRange: [0, -30],
@@ -193,7 +212,7 @@ class CasesScreen extends Component {
         let caseTitle = []; caseTitle[0] = getTranslation(translations.casesScreen.casesTitle, this.props.translation);
         return (
             <ViewHOC style={style.container}
-                     showLoader={(this.props && this.props.syncState && ((this.props.syncState.id === 'sync' && this.props.syncState.status !== null && this.props.syncState.status !== 'Success') && this.props.syncState.status !== 'Error')) || (this && this.state && this.state.loading)}
+                     showLoader={(this.props && this.props.loaderState) || (this.state && this.state.loading)}
                      loaderText={this.props && this.props.syncState ? 'Loading' : getTranslation(translations.loadingScreenMessages.loadingMsg, this.props.translation)}>
                 <NavBarCustom
                     title={null}
@@ -292,7 +311,7 @@ class CasesScreen extends Component {
                         style={[style.listViewStyle]}
                         componentContainerStyle={style.componentContainerStyle}
                         onScroll={this.handleScroll}
-                        refreshing={this.state.refreshing}
+                        refreshing={this.state.refreshing && this.props.loaderState}
                         onRefresh={this.handleOnRefresh}
                     />
                 </View>
@@ -312,7 +331,7 @@ class CasesScreen extends Component {
                                     sourceLongitude: this.state.sourceLongitude,
                                     dialogTitle: getTranslation(translations.alertMessages.mapsPopupMessage, this.props.translation),
                                     cancelText: getTranslation(translations.alertMessages.cancelButtonLabel, this.props.translation),
-                                    appsWhiteList: ['google-maps', 'apple-maps', 'waze', 'citymapper', 'uber', 'lyft', 'transit', 'yandex', 'moovit', 'yandex-maps']
+                                    appsWhiteList: ['google-maps', 'apple-maps', 'waze', 'citymapper', 'uber', 'lyft', 'transit', 'yandex', 'moovit']
                                     //other possibilities: citymapper, uber, lyft, transit, yandex, moovit
                                 }}
                             />
@@ -399,6 +418,7 @@ class CasesScreen extends Component {
 
     //Render a case tile
     renderCase = ({item}) => {
+        // console.log('Render Case: ', item.firstName);
         let margins = calculateDimension(16, false, this.props.screenSize);
         return (
             <PersonListItem
@@ -414,11 +434,11 @@ class CasesScreen extends Component {
                 textsStyleArray={[[styles.buttonTextActionsBar, {marginLeft: margins}], [styles.buttonTextActionsBar, {marginRight: margins}]]}
                 onPressTextsArray={[
                     () => {
-                        // console.log('Test performance renderFollowUpQuestion');
+                        console.log('Test performance renderFollowUpQuestion');
                         this.handleOnPressCase(item);
                     },
                     () => {
-                        // console.log('Test performance renderFollowUpQuestion');
+                        console.log('Test performance renderFollowUpQuestion');
                         this.handleOnPressAddContact(item, null);
                     }]}
             />
@@ -490,9 +510,18 @@ class CasesScreen extends Component {
             passProps: {
                 isNew: true,
                 addContactFromCasesScreen: true,
-                caseIdFromCasesScreen: item._id
+                caseIdFromCasesScreen: item._id,
+                caseAddress: this.extractCurrentAddress(item)
             }
         })
+    };
+
+    extractCurrentAddress = (item) => {
+        let itemToReturn = null;
+        if (item && item.addresses && Array.isArray(item.addresses) && item.addresses.length > 0) {
+            itemToReturn = item.addresses.find((e) => {return e.typeId === config.userResidenceAddress.userPlaceOfResidence})
+        }
+        return itemToReturn;
     };
 
     handleOnPressMap = (myCase) => {
@@ -557,14 +586,17 @@ class CasesScreen extends Component {
     };
 
     filterCases = () => {
-        const allFilters = createFilterCasesObject(this.state.filterFromFilterScreen, this.state.filter)
+        let allFilters = null;
+        if (this.props.filter && (this.props.filter['CasesScreen'] || this.props.filter['CasesFilterScreen'])) {
+            allFilters = createFilterCasesObject(this.state.filterFromFilterScreen, this.state.filter);
+        }
 
-        this.setState({
-            loading: true,
-            sortData: false
-        }, () => {
+        // this.setState({
+        //     loading: true,
+        //     sortData: false
+        // }, () => {
             this.props.getCasesForOutbreakId(this.props.user.activeOutbreakId, allFilters, null);
-        })
+        // })
     };
 
     goToHelpScreen = () => {
@@ -795,15 +827,16 @@ const style = StyleSheet.create({
 
 function mapStateToProps(state) {
     return {
-        user: state.user,
-        role: state.role,
-        cases: state.cases,
-        filter: state.app.filters,
-        screenSize: state.app.screenSize,
-        syncState: state.app.syncState,
-        errors: state.errors,
-        translation: state.app.translation,
-        referenceData: state.referenceData
+        user:           state.user,
+        filter:         state.app.filters,
+        screenSize:     state.app.screenSize,
+        syncState:      state.app.syncState,
+        translation:    state.app.translation,
+        loaderState:    state.app.loaderState,
+        role:           state.role,
+        cases:          state.cases,
+        errors:         state.errors,
+        referenceData:  state.referenceData
     };
 }
 

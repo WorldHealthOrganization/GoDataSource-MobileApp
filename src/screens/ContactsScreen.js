@@ -32,7 +32,6 @@ import {extractIdFromPouchId} from "../utils/functions";
 
 const scrollAnim = new Animated.Value(0);
 const offsetAnim = new Animated.Value(0);
-let callGetDerivedStateFromProps = true;
 
 class ContactsScreen extends Component {
     static navigatorStyle = {
@@ -48,7 +47,7 @@ class ContactsScreen extends Component {
                 searchText: ''
             },
             filterFromFilterScreen: this.props.filter && this.props.filter['ContactsFilterScreen'] ? this.props.filter['ContactsFilterScreen'] : null,
-            loading: true,
+            loading: false,
 
             sortData: false,
             isVisible: false,
@@ -68,49 +67,46 @@ class ContactsScreen extends Component {
     // Please add here the react lifecycle methods that you need
     componentDidMount() {
         BackHandler.addEventListener('hardwareBackPress', this.handleBackButtonClick);
-        callGetDerivedStateFromProps = false;
         let riskColors = {};
         let refData = this.props.referenceData.filter((e) => {return e.categoryId.includes("RISK_LEVEL")});
         for (let i=0; i<refData.length; i++) {
             riskColors[refData[i].value] = refData[i].colorCode || 'black'
         }
-        this.setState({
-            loading: true,
-            riskColors: riskColors
-        }, () => {
-            if (this.props && this.props.user && this.props.user.activeOutbreakId) {
-                if (this.props.filter && (this.props.filter['ContactsFilterScreen'] || this.props.filter['FollowUpsScreen'])) {
+        // this.setState({
+        //     loading: true,
+        //     riskColors: riskColors
+        // }, () => {
+        //     if (this.props && this.props.user && this.props.user.activeOutbreakId) {
+        //         if (this.props.filter && (this.props.filter['ContactsFilterScreen'] || this.props.filter['FollowUpsScreen'])) {
                     this.filterContacts();
-                } else {
-                    this.props.getContactsForOutbreakId(this.props.user.activeOutbreakId, null, null);
-                }
-            }
-        })
+        //         } else {
+        //             this.props.getContactsForOutbreakId(this.props.user.activeOutbreakId, null, null);
+        //         }
+        //     }
+        // })
     }
 
-    static getDerivedStateFromProps(props, state) {
-        if (callGetDerivedStateFromProps === true){
-            console.log('getDerivedStateFromProps - ContactsScreen')
+    // static getDerivedStateFromProps(props, state) {
+    //     if (state.sortData === true && props.user && props.user.activeOutbreakId){
+    //         state.sortData = false;
+    //         state.loading = true;
+    //         const allFilters = createFilterContactsObject(state.filterFromFilterScreen, state.filter);
+    //         props.getContactsForOutbreakId(props.user.activeOutbreakId, allFilters, null);
+    //     } else {
+    //         state.sortData = true
+    //     }
+    //
+    //     state.loading = false;
+    //     state.refreshing = false;
+    //     return null;
+    // }
 
-            if (state.sortData === true && props.user && props.user.activeOutbreakId){
-                state.sortData = false
-                state.loading = true
-                const allFilters = createFilterContactsObject(state.filterFromFilterScreen, state.filter)
-                props.getContactsForOutbreakId(props.user.activeOutbreakId, allFilters, null);
-
-                callGetDerivedStateFromProps = false;
-                console.log('sort done', allFilters);
-
-            } else {
-                state.sortData = true
-            }
-
-            state.loading = false;
-            state.refreshing = false;
-        } else {
-            callGetDerivedStateFromProps = true;
+    componentDidUpdate(prevProps) {
+        if (!this.props.loaderState && this.state.refreshing) {
+            this.setState({
+                refreshing: false
+            })
         }
-        return null;
     }
 
     componentWillUnmount() {
@@ -188,7 +184,7 @@ class ContactsScreen extends Component {
 
         return (
             <ViewHOC style={style.container}
-                     showLoader={(this.props && this.props.syncState && ((this.props.syncState.id === 'sync' && this.props.syncState.status !== null && this.props.syncState.status !== 'Success') && this.props.syncState.status !== 'Error')) || (this && this.state && this.state.loading)}
+                     showLoader={(this.props && this.props.loaderState) || (this.state && this.state.loading)}
                      loaderText={this.props && this.props.syncState ? 'Loading' : getTranslation(translations.loadingScreenMessages.loadingMsg, this.props.translation)}>
                 <NavBarCustom
                     title={null}
@@ -289,7 +285,7 @@ class ContactsScreen extends Component {
                         componentContainerStyle={style.componentContainerStyle}
                         onScroll={this.handleScroll}
                         getItemLayout={this.getItemLayout}
-                        refreshing={this.state.refreshing}
+                        refreshing={this.state.refreshing && this.props.loaderState}
                         onRefresh={this.handleOnRefresh}
                     />
                 </View>
@@ -299,15 +295,9 @@ class ContactsScreen extends Component {
                         this.state.error === null ? (
                             <Popup
                                 isVisible={this.state.isVisible}
-                                onCancelPressed={() => {
-                                    callGetDerivedStateFromProps = false;
-                                    this.setState({ isVisible: false })}}
-                                onAppPressed={() => {
-                                    callGetDerivedStateFromProps = false;
-                                    this.setState({ isVisible: false })}}
-                                onBackButtonPressed={() => {
-                                    callGetDerivedStateFromProps = false;
-                                    this.setState({ isVisible: false })}}
+                                onCancelPressed={() => this.setState({ isVisible: false })}
+                                onAppPressed={() => this.setState({ isVisible: false })}
+                                onBackButtonPressed={() => this.setState({ isVisible: false })}
                                 options={{
                                     latitude: this.state.latitude,
                                     longitude: this.state.longitude,
@@ -315,7 +305,7 @@ class ContactsScreen extends Component {
                                     sourceLongitude: this.state.sourceLongitude,
                                     dialogTitle: getTranslation(translations.alertMessages.mapsPopupMessage, this.props.translation),
                                     cancelText: getTranslation(translations.alertMessages.cancelButtonLabel, this.props.translation),
-                                    appsWhiteList: ['google-maps', 'apple-maps', 'waze', 'citymapper', 'uber', 'lyft', 'transit', 'yandex', 'moovit', 'yandex-maps']
+                                    appsWhiteList: ['google-maps', 'apple-maps', 'waze', 'citymapper', 'uber', 'lyft', 'transit', 'yandex', 'moovit']
                                     //other possibilities: citymapper, uber, lyft, transit, yandex, moovit
                                 }}
                             />
@@ -340,7 +330,6 @@ class ContactsScreen extends Component {
 
       //Refresh list of cases
     handleOnRefresh = () => {
-        callGetDerivedStateFromProps = false;
         this.setState({
             refreshing: true
         }, () => {
@@ -354,6 +343,7 @@ class ContactsScreen extends Component {
         let margins = calculateDimension(16, false, this.props.screenSize);
         return(
             <PersonListItem
+                key={item._id}
                 type={'Contact'}
                 titleColor={item && item.riskLevel ? this.state.riskColors[item.riskLevel] : 'black'}
                 itemToRender={item}
@@ -361,20 +351,20 @@ class ContactsScreen extends Component {
                 onPressNameProp={this.handleOnPressNameProp}
                 onPressExposureProp={this.handleOnPressExposureProp}
                 textsArray={[
-                    getTranslation(translations.contactsScreen.addFollowupsButton, this.props.translation),
+                    // getTranslation(translations.contactsScreen.addFollowupsButton, this.props.translation),
                     getTranslation(translations.contactsScreen.editButton, this.props.translation),
                     getTranslation(translations.followUpsScreen.addExposureFollowUpLabel, this.props.translation)
                 ]}
                 textsStyleArray={[
                     [styles.buttonTextActionsBar, {fontSize: 14, marginLeft: margins}],
-                    [styles.buttonTextActionsBar, {fontSize: 14}],
+                    // [styles.buttonTextActionsBar, {fontSize: 14}],
                     [styles.buttonTextActionsBar, {fontSize: 14, marginRight: margins}]]
                 }
                 onPressTextsArray={[
-                    () => {
-                        console.log('Test performance renderFollowUpQuestion');
-                        this.handlePressFollowUp(item)
-                    },
+                    // () => {
+                    //     console.log('Test performance renderFollowUpQuestion');
+                    //     this.handlePressFollowUp(item)
+                    // },
                     () => {
                         console.log('Test performance renderFollowUpQuestion');
                         this.handleOnPressMissing(item)
@@ -414,7 +404,6 @@ class ContactsScreen extends Component {
 
     handleOnChangeText = (text) => {
         console.log("### handleOnChangeText: ", text);
-        callGetDerivedStateFromProps = false;
         this.setState(prevState => ({
             filter: Object.assign({}, prevState.filter, {searchText: text})
         }), console.log('### filter after changed text: ', this.state.filter))
@@ -453,7 +442,6 @@ class ContactsScreen extends Component {
     };
 
     handleOnApplyFilters = (filter) => {
-        callGetDerivedStateFromProps = false;
         this.setState({
             filterFromFilterScreen: filter
         }, () => {
@@ -472,9 +460,9 @@ class ContactsScreen extends Component {
     };
 
     handlePressFollowUp = (item, contact) => {
-        let contactPlaceOfResidence = [];
+        let contactPlaceOfResidence = null;
         if (item && item.addresses && Array.isArray(item.addresses) && item.addresses.length > 0) {
-            contactPlaceOfResidence = item.addresses.filter((e) => {
+            contactPlaceOfResidence = item.addresses.find((e) => {
                 return e.typeId === config.userResidenceAddress.userPlaceOfResidence
             })
         }
@@ -488,7 +476,7 @@ class ContactsScreen extends Component {
                     date: new Date(),
                     outbreakId: this.props.user.activeOutbreakId,
                     lostToFollowUp: false,
-                    address: contactPlaceOfResidence[0] || null,
+                    address: contactPlaceOfResidence,
                     statusId: config.followUpStatuses.notPerformed
                 },
                 contact: contact || item,
@@ -567,7 +555,6 @@ class ContactsScreen extends Component {
             let contactPlaceOfResidenceLongitude = contactPlaceOfResidence[0] && contactPlaceOfResidence[0].geoLocation && contactPlaceOfResidence[0].geoLocation.coordinates && Array.isArray(contactPlaceOfResidence[0].geoLocation.coordinates) && contactPlaceOfResidence[0].geoLocation.coordinates.length === 2 && contactPlaceOfResidence[0].geoLocation.coordinates[0] !== undefined && contactPlaceOfResidence[0].geoLocation.coordinates[0] !== null ? contactPlaceOfResidence[0].geoLocation.coordinates[0] : 0
             navigator.geolocation.getCurrentPosition(
                 (position) => {
-                    callGetDerivedStateFromProps = false;
                     this.setState({
                         latitude: contactPlaceOfResidenceLatitude,
                         longitude: contactPlaceOfResidenceLongitude,
@@ -578,7 +565,6 @@ class ContactsScreen extends Component {
                     });
                 },
                 (error) => {
-                    callGetDerivedStateFromProps = false;
                     Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(error.message, this.props.translation), [
                         {
                             text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
@@ -602,15 +588,17 @@ class ContactsScreen extends Component {
     };
 
     filterContacts = () => {
-        const allFilters = createFilterContactsObject(this.state.filterFromFilterScreen, this.state.filter)
+        let allFilters = null;
+        if (this.props.filter && (this.props.filter['ContactsFilterScreen'] || this.props.filter['FollowUpsScreen'])) {
+            allFilters = createFilterContactsObject(this.state.filterFromFilterScreen, this.state.filter)
+        }
 
-        callGetDerivedStateFromProps = false;
-        this.setState({
-            loading: true,
-            sortData: false
-        }, () => {
+        // this.setState({
+        //     loading: true,
+        //     sortData: false
+        // }, () => {
             this.props.getContactsForOutbreakId(this.props.user.activeOutbreakId, allFilters, null);
-        })
+        // })
     };
 
     onNavigatorEvent = (event) => {
@@ -642,12 +630,11 @@ class ContactsScreen extends Component {
 
     pushNewEditScreenLocal = (QRCodeInfo) => {
         console.log('pushNewEditScreen QRCodeInfo do with method from another side', QRCodeInfo);
-        callGetDerivedStateFromProps = false;
+
         this.setState({
             loading: true
         }, () => {
             pushNewEditScreen(QRCodeInfo, this.props.navigator, this.props && this.props.user ? this.props.user : null, this.props && this.props.translation ? this.props.translation : null, (error, itemType, record) => {
-                callGetDerivedStateFromProps = false;
                 this.setState({
                     loading: false
                 }, () => {
@@ -850,16 +837,17 @@ const style = StyleSheet.create({
 
 function mapStateToProps(state) {
     return {
-        user: state.user,
-        screenSize: state.app.screenSize,
-        syncState: state.app.syncState,
-        filter: state.app.filters,
-        contacts: state.contacts,
-        errors: state.errors,
-        role: state.role,
-        referenceData: state.referenceData,
-        translation: state.app.translation,
-        cases: state.cases
+        user:           state.user,
+        screenSize:     state.app.screenSize,
+        syncState:      state.app.syncState,
+        filter:         state.app.filters,
+        translation:    state.app.translation,
+        loaderState:    state.app.loaderState,
+        contacts:       state.contacts,
+        errors:         state.errors,
+        role:           state.role,
+        referenceData:  state.referenceData,
+        cases:          state.cases
     };
 }
 

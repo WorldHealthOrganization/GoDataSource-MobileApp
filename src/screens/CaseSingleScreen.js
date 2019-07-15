@@ -1407,17 +1407,101 @@ class CaseSingleScreen extends Component {
     };
     onChangeSwitch = (value, id, objectTypeOrIndex, objectType) => {
         if (id === 'geoLocationAccurate' && typeof objectTypeOrIndex === 'number' && objectTypeOrIndex >= 0 && objectType === 'Address') {
-            if (value) {
-                console.log('Start getting position');
-                let addressesClone = _.cloneDeep(this.state.case.addresses);
-                addressesClone[objectTypeOrIndex].geoLocationAccurate = value;
-                this.setState(
-                    (prevState) => ({
-                        case: Object.assign({}, prevState.case, { addresses: addressesClone }),
-                        isModified: true
-                    }), () => {
-                        navigator.geolocation.getCurrentPosition((position) => {
-                            console.log("Get position for cases: ", position);
+            Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.alertMessages.replaceCurrentCoordinates, this.props.translation), [
+                {
+                    text: getTranslation(translations.generalLabels.noAnswer, this.props.translation), onPress: () => {
+                        let addressesClone = _.cloneDeep(this.state.case.addresses);
+                        addressesClone[objectTypeOrIndex].geoLocationAccurate = value;
+                        this.setState(
+                            (prevState) => ({
+                                case: Object.assign({}, prevState.case, { addresses: addressesClone }),
+                                isModified: true
+                            }), () => {
+                                console.log("onChangeSwitch", id, " ", value, " ", this.state.case);
+                            }
+                        )
+                    }
+                },
+                {
+                    text: getTranslation(translations.generalLabels.yesAnswer, this.props.translation), onPress: () => {
+                        if (value) {
+                            console.log('Start getting position');
+                            let addressesClone = _.cloneDeep(this.state.case.addresses);
+                            addressesClone[objectTypeOrIndex].geoLocationAccurate = value;
+                            this.setState(
+                                (prevState) => ({
+                                    case: Object.assign({}, prevState.case, { addresses: addressesClone }),
+                                    isModified: true
+                                }), () => {
+                                    navigator.geolocation.getCurrentPosition((position) => {
+                                            console.log("Get position for cases: ", position);
+                                            let addressesClone = _.cloneDeep(this.state.case.addresses);
+                                            // console.log('addressesClone: ', addressesClone);
+                                            if (!addressesClone[objectTypeOrIndex].geoLocation) {
+                                                addressesClone[objectTypeOrIndex].geoLocation = {};
+                                                addressesClone[objectTypeOrIndex].geoLocation.type = 'Point';
+                                                addressesClone[objectTypeOrIndex].geoLocation.coordinates = [];
+                                            }
+                                            if (!addressesClone[objectTypeOrIndex].geoLocation.type) {
+                                                addressesClone[objectTypeOrIndex].geoLocation.type = 'Point';
+                                            }
+                                            if (!addressesClone[objectTypeOrIndex].geoLocation.coordinates) {
+                                                addressesClone[objectTypeOrIndex].geoLocation.coordinates = [];
+                                            }
+                                            addressesClone[objectTypeOrIndex].geoLocation.coordinates = [value ? position.coords.longitude : 0, value ? position.coords.latitude : 0];
+                                            addressesClone[objectTypeOrIndex].geoLocationAccurate = value;
+                                            this.setState(
+                                                (prevState) => ({
+                                                    case: Object.assign({}, prevState.case, { addresses: addressesClone }),
+                                                    isModified: true
+                                                })
+                                                // , () => {
+                                                //     console.log("onChangeSwitch", id, " ", value, " ", this.state.case);
+                                                // }
+                                            )
+                                        },
+                                        (error) => {
+                                            console.log("Error while getting location: ", error);
+                                            Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(error.message, this.props.translation), [
+                                                {
+                                                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+                                                    onPress: () => {
+                                                        console.log("OK pressed");
+                                                        let addressesClone = _.cloneDeep(this.state.case.addresses);
+                                                        console.log('addressesClone: ', addressesClone);
+                                                        if (!addressesClone[objectTypeOrIndex].geoLocation) {
+                                                            addressesClone[objectTypeOrIndex].geoLocation = {};
+                                                            addressesClone[objectTypeOrIndex].geoLocation.type = 'Point';
+                                                            addressesClone[objectTypeOrIndex].geoLocation.coordinates = [];
+                                                        }
+                                                        if (!addressesClone[objectTypeOrIndex].geoLocation.type) {
+                                                            addressesClone[objectTypeOrIndex].geoLocation.type = 'Point';
+                                                        }
+                                                        if (!addressesClone[objectTypeOrIndex].geoLocation.coordinates) {
+                                                            addressesClone[objectTypeOrIndex].geoLocation.coordinates = [];
+                                                        }
+                                                        addressesClone[objectTypeOrIndex].geoLocation.coordinates = [null, null];
+                                                        addressesClone[objectTypeOrIndex].geoLocationAccurate = false;
+                                                        this.setState(
+                                                            (prevState) => ({
+                                                                case: Object.assign({}, prevState.case, { addresses: addressesClone }),
+                                                                isModified: true
+                                                            })
+                                                            // , () => {
+                                                            //     console.log("onChangeSwitch", id, " ", value, " ", this.state.case);
+                                                            // }
+                                                        )
+                                                    }
+                                                }
+                                            ])
+                                        },
+                                        {
+                                            timeout: 5000
+                                        }
+                                    )
+                                }
+                            )
+                        } else {
                             let addressesClone = _.cloneDeep(this.state.case.addresses);
                             // console.log('addressesClone: ', addressesClone);
                             if (!addressesClone[objectTypeOrIndex].geoLocation) {
@@ -1431,7 +1515,7 @@ class CaseSingleScreen extends Component {
                             if (!addressesClone[objectTypeOrIndex].geoLocation.coordinates) {
                                 addressesClone[objectTypeOrIndex].geoLocation.coordinates = [];
                             }
-                            addressesClone[objectTypeOrIndex].geoLocation.coordinates = [value ? position.coords.longitude : 0, value ? position.coords.latitude : 0];
+                            addressesClone[objectTypeOrIndex].geoLocation.coordinates = [null, null];
                             addressesClone[objectTypeOrIndex].geoLocationAccurate = value;
                             this.setState(
                                 (prevState) => ({
@@ -1442,74 +1526,10 @@ class CaseSingleScreen extends Component {
                                 //     console.log("onChangeSwitch", id, " ", value, " ", this.state.case);
                                 // }
                             )
-                        },
-                            (error) => {
-                                console.log("Error while getting location: ", error);
-                                Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(error.message, this.props.translation), [
-                                    {
-                                        text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
-                                        onPress: () => {
-                                            console.log("OK pressed");
-                                            let addressesClone = _.cloneDeep(this.state.case.addresses);
-                                            console.log('addressesClone: ', addressesClone);
-                                            if (!addressesClone[objectTypeOrIndex].geoLocation) {
-                                                addressesClone[objectTypeOrIndex].geoLocation = {};
-                                                addressesClone[objectTypeOrIndex].geoLocation.type = 'Point';
-                                                addressesClone[objectTypeOrIndex].geoLocation.coordinates = [];
-                                            }
-                                            if (!addressesClone[objectTypeOrIndex].geoLocation.type) {
-                                                addressesClone[objectTypeOrIndex].geoLocation.type = 'Point';
-                                            }
-                                            if (!addressesClone[objectTypeOrIndex].geoLocation.coordinates) {
-                                                addressesClone[objectTypeOrIndex].geoLocation.coordinates = [];
-                                            }
-                                            addressesClone[objectTypeOrIndex].geoLocation.coordinates = [null, null];
-                                            addressesClone[objectTypeOrIndex].geoLocationAccurate = false;
-                                            this.setState(
-                                                (prevState) => ({
-                                                    case: Object.assign({}, prevState.case, { addresses: addressesClone }),
-                                                    isModified: true
-                                                })
-                                                // , () => {
-                                                //     console.log("onChangeSwitch", id, " ", value, " ", this.state.case);
-                                                // }
-                                            )
-                                        }
-                                    }
-                                ])
-                            },
-                            {
-                                timeout: 5000
-                            }
-                        )
+                        }
                     }
-                )
-            } else {
-                let addressesClone = _.cloneDeep(this.state.case.addresses);
-                // console.log('addressesClone: ', addressesClone);
-                if (!addressesClone[objectTypeOrIndex].geoLocation) {
-                    addressesClone[objectTypeOrIndex].geoLocation = {};
-                    addressesClone[objectTypeOrIndex].geoLocation.type = 'Point';
-                    addressesClone[objectTypeOrIndex].geoLocation.coordinates = [];
-                }
-                if (!addressesClone[objectTypeOrIndex].geoLocation.type) {
-                    addressesClone[objectTypeOrIndex].geoLocation.type = 'Point';
-                }
-                if (!addressesClone[objectTypeOrIndex].geoLocation.coordinates) {
-                    addressesClone[objectTypeOrIndex].geoLocation.coordinates = [];
-                }
-                addressesClone[objectTypeOrIndex].geoLocation.coordinates = [null, null];
-                addressesClone[objectTypeOrIndex].geoLocationAccurate = value;
-                this.setState(
-                    (prevState) => ({
-                        case: Object.assign({}, prevState.case, { addresses: addressesClone }),
-                        isModified: true
-                    })
-                    // , () => {
-                    //     console.log("onChangeSwitch", id, " ", value, " ", this.state.case);
-                    // }
-                )
-            }
+                }]
+            );
         } else {
             if (objectType === 'Case') {
                 this.setState((prevState) => ({
@@ -2020,7 +2040,7 @@ function mapStateToProps(state) {
     return {
         user: state.user,
         screenSize: state.app.screenSize,
-        outbreak: state.outbreak,
+        // outbreak: state.outbreak,
         errors: state.errors,
         filter: state.app.filters,
         cases: state.cases,
