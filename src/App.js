@@ -120,6 +120,7 @@ export default class App {
         this.checkDevice(() => {
             store.dispatch(appActions.appInitialized(Platform.OS === 'ios' ? NativeModules.APNSEventEmitter : NativeModules.ParseReceiver));
         })
+
         // console.log('App loaded');
         // NativeModules.APNSEventEmitter.appLoaded();
     };

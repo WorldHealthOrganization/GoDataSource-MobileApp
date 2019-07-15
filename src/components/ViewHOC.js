@@ -75,7 +75,7 @@ class ViewHOC extends Component {
                     this.props.children
                 }
                 {
-                    this.props.showLoader ? (
+                    this.props.showLoader || this.props.showLoading ? (
                         <LoaderScreen
                             overlay={true}
                             backgroundColor={'rgba(255, 255, 255, 0.8)'}
@@ -152,7 +152,7 @@ function mapStateToProps(state) {
         syncState: syncState,
         showModal: showModal,
         showCloseModalButton: showCloseModalButton,
-        showLoader: state.app.loaderState
+        showLoading: state.app.loaderState
     };
 };
 

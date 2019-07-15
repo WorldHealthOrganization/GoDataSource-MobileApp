@@ -127,49 +127,76 @@ class ContactsSingleScreen extends Component {
     };
 
     // Please add here the react lifecycle methods that you need
-    static getDerivedStateFromProps(props, state) {
-        if (callGetDerivedStateFromProps === true){
-            console.log("getDerivedStateFromProps - ContactsSingleScreen");
-            if (props.errors && props.errors.type && props.errors.message) {
-                Alert.alert(props.errors.type, props.errors.message, [
-                    {
-                        text: getTranslation(translations.alertMessages.okButtonLabel, props.translation),
-                        onPress: () => {
-                            state.savePressed = false;
-                            props.removeErrors()
-                        }
-                    }
-                ])
-            } else {
-                if (state.savePressed || state.deletePressed) {
-                    if (props.handleUpdateContactFromFollowUp !== undefined && props.handleUpdateContactFromFollowUp !== null) {
-                        const { contact } = state
-                        props.handleUpdateContactFromFollowUp(contact)
-                    }
-                    props.navigator.pop()
-                }
-                // if (props.contacts && props.contact !== props.contacts[props.contacts.map((e) => {return e.id}).indexOf(props.contact.id)]) {
-                //     props.contact = props.contacts[props.contacts.map((e) => {return e.id}).indexOf(props.contact.id)];
-                // }
+    componentDidUpdate(prevProps) {
+        if (this.state.savePressed || this.state.deletePressed) {
+            if (this.props.handleUpdateContactFromFollowUp !== undefined && this.props.handleUpdateContactFromFollowUp !== null) {
+                const { contact } = this.state;
+                this.props.handleUpdateContactFromFollowUp(contact)
             }
-
-            if ((props.isNew === false || props.isNew === undefined) && state.updateExposure === true){
-                let updatedContact = props.contacts[props.contacts.map((e) => {return e._id}).indexOf(state.contact._id)]
-                if (updatedContact !== undefined && updatedContact !== null) {
-                    state.contact.relationships = updatedContact.relationships
-                    state.updateExposure = false
-                }
-            }
-
-            if (state.loading === true) {
-                state.loading = false
-            }
-        } else {
-            callGetDerivedStateFromProps = true
+            this.props.navigator.pop();
         }
 
-        return null;
-    };
+        if ((this.props.isNew === false || this.props.isNew === undefined) && this.state.updateExposure === true){
+            let updatedContact = this.props.contacts[this.props.contacts.map((e) => {return e._id}).indexOf(this.state.contact._id)];
+            if (updatedContact !== undefined && updatedContact !== null) {
+                this.setState(prevState => ({
+                    contact: Object.assign({}, this.state.contact, {relationships: updatedContact.relationships}),
+                    updateExposure: false
+                }));
+            }
+        }
+
+        if (this.state.loading === true) {
+            this.setState({
+                loading: false
+            })
+        }
+    }
+
+
+    // static getDerivedStateFromProps(props, state) {
+    //     if (callGetDerivedStateFromProps === true){
+    //         console.log("getDerivedStateFromProps - ContactsSingleScreen");
+    //         if (props.errors && props.errors.type && props.errors.message) {
+    //             Alert.alert(props.errors.type, props.errors.message, [
+    //                 {
+    //                     text: getTranslation(translations.alertMessages.okButtonLabel, props.translation),
+    //                     onPress: () => {
+    //                         state.savePressed = false;
+    //                         props.removeErrors()
+    //                     }
+    //                 }
+    //             ])
+    //         } else {
+    //             if (state.savePressed || state.deletePressed) {
+    //                 if (props.handleUpdateContactFromFollowUp !== undefined && props.handleUpdateContactFromFollowUp !== null) {
+    //                     const { contact } = state
+    //                     props.handleUpdateContactFromFollowUp(contact)
+    //                 }
+    //                 props.navigator.pop()
+    //             }
+    //             // if (props.contacts && props.contact !== props.contacts[props.contacts.map((e) => {return e.id}).indexOf(props.contact.id)]) {
+    //             //     props.contact = props.contacts[props.contacts.map((e) => {return e.id}).indexOf(props.contact.id)];
+    //             // }
+    //         }
+    //
+    //         if ((props.isNew === false || props.isNew === undefined) && state.updateExposure === true){
+    //             let updatedContact = props.contacts[props.contacts.map((e) => {return e._id}).indexOf(state.contact._id)]
+    //             if (updatedContact !== undefined && updatedContact !== null) {
+    //                 state.contact.relationships = updatedContact.relationships
+    //                 state.updateExposure = false
+    //             }
+    //         }
+    //
+    //         if (state.loading === true) {
+    //             state.loading = false
+    //         }
+    //     } else {
+    //         callGetDerivedStateFromProps = true
+    //     }
+    //
+    //     return null;
+    // };
 
     componentDidMount() {
         BackHandler.addEventListener('hardwareBackPress', this.handleBackButtonClick);
@@ -288,6 +315,21 @@ class ContactsSingleScreen extends Component {
     render() {
         // console.log("### contact from render ContactSingleScreen: ", this.state.contact);
 
+        if (this.props.errors && this.props.errors.type && this.props.errors.message) {
+            Alert.alert(this.props.errors.type, this.props.errors.message, [
+                {
+                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+                    onPress: () => {
+                        this.setState({
+                            savePressed: false
+                        }, () => {
+                            this.props.removeErrors();
+                        });
+                    }
+                }
+            ])
+        }
+
         return (
             <ViewHOC style={style.container}
                 showLoader={this && this.state && this.state.loading}
@@ -347,6 +389,7 @@ class ContactsSingleScreen extends Component {
                                                 }
                                                 <DateTimePicker
                                                     isVisible={this.state.isDateTimePickerVisible}
+                                                    timeZoneOffsetInMinutes={0}
                                                     onConfirm={this._handleDatePicked}
                                                     onCancel={this._hideDateTimePicker}
                                                 />
@@ -1554,7 +1597,7 @@ class ContactsSingleScreen extends Component {
 
         callGetDerivedStateFromProps = false;
         this.setState(prevState => ({
-            contact: Object.assign({}, prevState.contact, { deceased: true, dateDeceased: date })
+            contact: Object.assign({}, prevState.contact, { deceased: true, dateDeceased: moment.utc(date)._d })
         }), () => {
             this.handleOnPressSave();
         });

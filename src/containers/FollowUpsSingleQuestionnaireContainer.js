@@ -52,7 +52,13 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
         InteractionManager.runAfterInteractions(() => {
             this.setState({
                 interactionComplete: true,
-            })
+            }
+            // , () => {
+            //     if (this.props.previousAnswers && Object.keys(this.props.previousAnswers).length > 0) {
+            //         this.prepareQuestions();
+            //     }
+            // }
+            )
         })
     }
 
@@ -63,38 +69,70 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
     //     return false;
     // }
 
-    static getDerivedStateFromProps(props, state) {
-        // Get all additional questions recursively
-        // let sortedQuestions = sortBy(props.questions, ['order', 'variable']);
-        // sortedQuestions = extractAllQuestions(sortedQuestions, props.item);
-        // state.questions = sortedQuestions;
-        //
-        // return null;
-        if (props.previousAnswers) {
-            state.previousAnswers = props.previousAnswers;
-        }
-        // Sort the answers by date
-        if (state.previousAnswers && Object.keys(state.previousAnswers).length > 0) {
-            for (let questionId in state.previousAnswers) {
-                if (Array.isArray(state.previousAnswers[questionId]) && state.previousAnswers[questionId].length > 1) {
-                    state.previousAnswers[questionId] = state.previousAnswers[questionId].sort((a, b) => {
-                        if (new Date(a.date) > new Date(b.date)) {
-                            return -1;
-                        }
-                        if (new Date(a.date) < new Date(b.date)) {
-                            return 1;
-                        }
-                        return 0;
-                    })
-                }
-            }
-        }
+    // componentDidUpdate(prevProps) {
+    //     if (this.props.previousAnswers && Object.keys(this.props.previousAnswers).length > 0) {
+    //         this.prepareQuestions();
+    //     }
+    // }
+    //
+    // prepareQuestions = () => {
+    //     let previousAns = Object.assign({}, this.props.previousAnswers);
+    //
+    //
+    //     for (let questionId in previousAns) {
+    //         if (Array.isArray(previousAns[questionId]) && previousAns[questionId].length > 1) {
+    //             previousAns[questionId] = previousAns[questionId].sort((a, b) => {
+    //                 if (new Date(a.date) > new Date(b.date)) {
+    //                     return -1;
+    //                 }
+    //                 if (new Date(a.date) < new Date(b.date)) {
+    //                     return 1;
+    //                 }
+    //                 return 0;
+    //             })
+    //         }
+    //     }
+    //
+    //     let sortedQuestions = sortBy(cloneDeep(this.props.questions), ['order', 'variable']);
+    //
+    //     this.setState({
+    //         questions: extractAllQuestions(sortedQuestions, previousAns),
+    //         previousAnswers: previousAns
+    //     })
+    // }
 
-        let sortedQuestions = sortBy(cloneDeep(props.questions), ['order', 'variable']);
-        state.questions = extractAllQuestions(sortedQuestions, state.previousAnswers);
-
-        return null;
-    }
+    // static getDerivedStateFromProps(props, state) {
+    //     // Get all additional questions recursively
+    //     // let sortedQuestions = sortBy(props.questions, ['order', 'variable']);
+    //     // sortedQuestions = extractAllQuestions(sortedQuestions, props.item);
+    //     // state.questions = sortedQuestions;
+    //     //
+    //     // return null;
+    //     if (props.previousAnswers) {
+    //         state.previousAnswers = props.previousAnswers;
+    //     }
+    //     // Sort the answers by date
+    //     if (state.previousAnswers && Object.keys(state.previousAnswers).length > 0) {
+    //         for (let questionId in state.previousAnswers) {
+    //             if (Array.isArray(state.previousAnswers[questionId]) && state.previousAnswers[questionId].length > 1) {
+    //                 state.previousAnswers[questionId] = state.previousAnswers[questionId].sort((a, b) => {
+    //                     if (new Date(a.date) > new Date(b.date)) {
+    //                         return -1;
+    //                     }
+    //                     if (new Date(a.date) < new Date(b.date)) {
+    //                         return 1;
+    //                     }
+    //                     return 0;
+    //                 })
+    //             }
+    //         }
+    //     }
+    //
+    //     let sortedQuestions = sortBy(cloneDeep(props.questions), ['order', 'variable']);
+    //     state.questions = extractAllQuestions(sortedQuestions, state.previousAnswers);
+    //
+    //     return null;
+    // }
 
     // The render method should have at least business logic as possible,
     // because this will be called whenever there is a new setState call
@@ -113,6 +151,31 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
         let marginVertical = calculateDimension(12.5, true, this.props.screenSize);
         let viewWidth = calculateDimension(config.designScreenSize.width - 32, false, this.props.screenSize);
 
+        // Logic moved from the getDerivedStateFromProps
+        let previousAnswers = {};
+        if (this.props.previousAnswers) {
+            previousAnswers = Object.assign({}, this.props.previousAnswers);
+        }
+
+        if (previousAnswers && Object.keys(previousAnswers).length > 0) {
+            for (let questionId in previousAnswers) {
+                if (Array.isArray(previousAnswers[questionId]) && previousAnswers[questionId].length > 1) {
+                    previousAnswers[questionId] = previousAnswers[questionId].sort((a, b) => {
+                        if (new Date(a.date) > new Date(b.date)) {
+                            return -1;
+                        }
+                        if (new Date(a.date) < new Date(b.date)) {
+                            return 1;
+                        }
+                        return 0;
+                    })
+                }
+            }
+        }
+
+        let sortedQuestions = sortBy(cloneDeep(this.props.questions), ['order', 'variable']);
+        let questions = extractAllQuestions(sortedQuestions, previousAnswers);
+
         return (
             <View style={{ flex: 1 }}>
                 <View style={style.mainContainer}>
@@ -121,7 +184,7 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
                             <View style={[style.containerButtons, { marginVertical: marginVertical, width: viewWidth }]}>
                                 <Button
                                     title={getTranslation(translations.generalButtons.saveButtonLabel, this.props.translation)}
-                                    onPress={this.onPressSave}
+                                    onPress={() => {this.onPressSave(questions)}}
                                     color={styles.buttonGreen}
                                     titleColor={'white'}
                                     height={buttonHeight}
@@ -143,8 +206,8 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
                         contentContainerStyle={[style.contentContainerStyle, { paddingBottom: this.props.screenSize.height < 600 ? 70 : 20 }]}
                     >
                         {
-                            this.state && this.state.questions && Array.isArray(this.state.questions) && this.state.questions.length > 0 && this.state.questions.map((item, index) => {
-                                return this.handleRenderItem(item, index, this.state.questions.length);
+                            questions && Array.isArray(questions) && questions.length > 0 && questions.map((item, index) => {
+                                return this.handleRenderItem(item, index, questions.length);
                             })
                         }
                     </ScrollView>
@@ -179,9 +242,9 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
         }
     };
 
-    onPressSave = () => {
+    onPressSave = (questions) => {
         // First check if all the required questions are filled
-        let checkRequiredFields = checkRequiredQuestions(this.state.questions, this.props.previousAnswers);
+        let checkRequiredFields = checkRequiredQuestions(questions, this.props.previousAnswers);
         checkRequiredFields = checkRequiredFields.map((e) => { return getTranslation(e, this.props.translation) });
         console.log("Check required questions: ", checkRequiredFields);
         if (checkRequiredFields && Array.isArray(checkRequiredFields) && checkRequiredFields.length === 0) {

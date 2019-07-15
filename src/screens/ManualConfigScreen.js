@@ -215,151 +215,174 @@ class ManualConfigScreen extends PureComponent {
             }
         }
         return (
-            <KeyboardAwareScrollView
-                style={[style.container, {paddingTop: Platform.OS === 'ios' ? this.props.screenSize.height === 812 ? 44 : 20 : 0}]}
-                contentContainerStyle={style.contentContainerStyle}
-                keyboardShouldPersistTaps={'always'}
-            >
-
-                <View style={{width: '100%', flexDirection: 'row', flex: 0.35}}>
-                    <Ripple
-                        style={{flexDirection: 'row', alignItems: 'center', position: "absolute", top: 20, left: 20}}
-                        onPress={this.handleOnPressBack}>
-                        <Icon name="arrow-back"/>
-                        <Text style={{fontFamily: 'Roboto-Medium', fontSize: 18, color: 'white'}}>New hub</Text>
-                    </Ripple>
-
-                    {
-                        this.props && this.props.activeDatabase && !this.props.allowBack ? (
-                            <Ripple style={{
+            <View style={[style.container, {paddingTop: Platform.OS === 'ios' ? this.props.screenSize.height >= 812 ? 44 : 20 : 0}]}>
+                <View style={{width: '100%', paddingTop: 10}}>
+                    <View style={{
+                        width: '75%',
+                        alignSelf: 'center',
+                        justifyContent: 'space-between',
+                        flexDirection: 'row',
+                        // flex: Platform.OS === 'ios' && this.props && this.props.screenSize.height < 600 ? 0.05 : 0.35
+                    }}>
+                        <Ripple
+                            style={{
                                 flexDirection: 'row',
                                 alignItems: 'center',
-                                position: "absolute",
-                                top: 20,
-                                right: 20
-                            }} onPress={this.handleOnPressForward}>
-                                <Text style={{fontFamily: 'Roboto-Medium', fontSize: 18, color: 'white'}}>Login</Text>
-                                <Icon name="arrow-forward"/>
-                            </Ripple>
-                        ) : (null)
-                    }
+                                // position: "absolute",
+                                // top: 20,
+                                left: -20
+                            }}
+                            onPress={this.handleOnPressBack}>
+                            <Icon name="arrow-back"/>
+                            <Text style={{fontFamily: 'Roboto-Medium', fontSize: 18, color: 'white'}}>New hub</Text>
+                        </Ripple>
+
+                        {
+                            this.props && this.props.activeDatabase && !this.props.allowBack ? (
+                                <Ripple style={{
+                                    flexDirection: 'row',
+                                    alignItems: 'center',
+                                    // position: "absolute",
+                                    // top: 20,
+                                    right: -20
+                                }} onPress={this.handleOnPressForward}>
+                                    <Text
+                                        style={{fontFamily: 'Roboto-Medium', fontSize: 18, color: 'white'}}>Login</Text>
+                                    <Icon name="arrow-forward"/>
+                                </Ripple>
+                            ) : (null)
+                        }
+                    </View>
+                    <View
+                        style={[{width: '75%', alignSelf: 'center'}]}>
+                        <Text style={[style.welcomeText]}>
+                            {getTranslation(translations.manualConfigScreen.title, null)}
+                        </Text>
+                    </View>
                 </View>
-                <View style={[style.welcomeTextContainer, {flex: Platform.OS === 'ios' && this.props.screenSize.height <= 600 ? 0.05 : 0.35}]}>
-                    <Text style={style.welcomeText}>
-                        {getTranslation(translations.manualConfigScreen.title, null)}
-                    </Text>
-                </View>
-                <View style={style.inputsContainer}>
-                    <TextField
-                        ref={this.nameRef}
-                        value={this.state.name}
-                        autoCorrect={false}
-                        lineWidth={1}
-                        enablesReturnKeyAutomatically={true}
-                        containerStyle={style.textInput}
-                        onChangeText={this.handleTextChange}
-                        label={getTranslation(translations.manualConfigScreen.nameLabel, this.props.translation)}
-                        autoCapitalize={'none'}
-                        tintColor={styles.colorTint}
-                        baseColor={styles.colorBase}
-                        textColor={styles.colorWhite}
-                    />
-                    <TextField
-                        ref={this.urlRef}
-                        value={this.state.url}
-                        autoCorrect={false}
-                        lineWidth={1}
-                        enablesReturnKeyAutomatically={true}
-                        containerStyle={style.textInput}
-                        onChangeText={this.handleTextChange}
-                        label={getTranslation(translations.manualConfigScreen.hubUrlLabel, null)}
-                        autoCapitalize={'none'}
-                        tintColor={styles.colorTint}
-                        baseColor={styles.colorBase}
-                        textColor={styles.colorWhite}
-                    />
-                    <TextField
-                        ref={this.clientIDRef}
-                        value={this.state.clientId}
-                        autoCorrect={false}
-                        lineWidth={1}
-                        enablesReturnKeyAutomatically={true}
-                        containerStyle={style.textInput}
-                        onChangeText={this.handleTextChange}
-                        label={getTranslation(translations.manualConfigScreen.clientIdLabel, null)}
-                        autoCapitalize={'none'}
-                        tintColor={styles.colorTint}
-                        baseColor={styles.colorBase}
-                        textColor={styles.colorWhite}
-                    />
-                    <TextField
-                        ref={this.clientSecretRef}
-                        value={this.state.clientSecret}
-                        autoCorrect={false}
-                        lineWidth={1}
-                        enablesReturnKeyAutomatically={true}
-                        containerStyle={style.textInput}
-                        onChangeText={this.handleTextChange}
-                        label={getTranslation(translations.manualConfigScreen.clientSecretPass, null)}
-                        secureTextEntry={true}
-                        autoCapitalize={'none'}
-                        tintColor={styles.colorTint}
-                        baseColor={styles.colorBase}
-                        textColor={styles.colorWhite}
-                    />
-                    <TextField
-                        ref={this.userEmailRef}
-                        value={this.state.userEmail}
-                        autoCorrect={false}
-                        lineWidth={1}
-                        enablesReturnKeyAutomatically={true}
-                        containerStyle={style.textInput}
-                        onChangeText={this.handleTextChange}
-                        label={getTranslation(translations.manualConfigScreen.userEmailLabel, null)}
-                        autoCapitalize={'none'}
-                        tintColor={styles.colorTint}
-                        baseColor={styles.colorBase}
-                        textColor={styles.colorWhite}
-                    />
-                    <SwitchInput
-                        id="encryptedData"
-                        label={'Encrypted connection'}
-                        value={this.state.encryptedData}
-                        showValue={true}
-                        isEditMode={true}
-                        isRequired={false}
-                        onChange={this.handleCheck}
-                        activeButtonColor={'green'}
-                        activeBackgroundColor={'white'}
-                        style={{width: '100%'}}
-                        labelStyle={{fontFamily: 'Roboto-Medium', fontSize: 18, color: 'white'}}
-                        hasTooltip={true}
-                        tooltipsMessage={'Encrypted connection is more secure but the sync will take more time'}
-                    />
+                <KeyboardAwareScrollView
+                    style={{backgroundColor: '#55b5a6'}}
+                    contentContainerStyle={style.contentContainerStyle}
+                    keyboardShouldPersistTaps={'always'}
+                >
+                    <View style={style.inputsContainer}>
+                        <TextField
+                            ref={this.nameRef}
+                            value={this.state.name}
+                            autoCorrect={false}
+                            lineWidth={1}
+                            enablesReturnKeyAutomatically={true}
+                            containerStyle={style.textInput}
+                            onChangeText={this.handleTextChange}
+                            label={getTranslation(translations.manualConfigScreen.nameLabel, this.props.translation)}
+                            autoCapitalize={'none'}
+                            tintColor={styles.colorTint}
+                            baseColor={styles.colorBase}
+                            textColor={styles.colorWhite}
+                        />
+                        <TextField
+                            ref={this.urlRef}
+                            value={this.state.url}
+                            autoCorrect={false}
+                            lineWidth={1}
+                            enablesReturnKeyAutomatically={true}
+                            containerStyle={style.textInput}
+                            onChangeText={this.handleTextChange}
+                            label={getTranslation(translations.manualConfigScreen.hubUrlLabel, null)}
+                            autoCapitalize={'none'}
+                            tintColor={styles.colorTint}
+                            baseColor={styles.colorBase}
+                            textColor={styles.colorWhite}
+                        />
+                        <TextField
+                            ref={this.clientIDRef}
+                            value={this.state.clientId}
+                            autoCorrect={false}
+                            lineWidth={1}
+                            enablesReturnKeyAutomatically={true}
+                            containerStyle={style.textInput}
+                            onChangeText={this.handleTextChange}
+                            label={getTranslation(translations.manualConfigScreen.clientIdLabel, null)}
+                            autoCapitalize={'none'}
+                            tintColor={styles.colorTint}
+                            baseColor={styles.colorBase}
+                            textColor={styles.colorWhite}
+                        />
+                        <TextField
+                            ref={this.clientSecretRef}
+                            value={this.state.clientSecret}
+                            autoCorrect={false}
+                            lineWidth={1}
+                            enablesReturnKeyAutomatically={true}
+                            containerStyle={style.textInput}
+                            onChangeText={this.handleTextChange}
+                            label={getTranslation(translations.manualConfigScreen.clientSecretPass, null)}
+                            secureTextEntry={true}
+                            autoCapitalize={'none'}
+                            tintColor={styles.colorTint}
+                            baseColor={styles.colorBase}
+                            textColor={styles.colorWhite}
+                        />
+                        <TextField
+                            ref={this.userEmailRef}
+                            value={this.state.userEmail}
+                            autoCorrect={false}
+                            lineWidth={1}
+                            enablesReturnKeyAutomatically={true}
+                            keyboardType={'email-address'}
+                            containerStyle={style.textInput}
+                            onChangeText={this.handleTextChange}
+                            label={getTranslation(translations.manualConfigScreen.userEmailLabel, null)}
+                            autoCapitalize={'none'}
+                            tintColor={styles.colorTint}
+                            baseColor={styles.colorBase}
+                            textColor={styles.colorWhite}
+                        />
+                        <SwitchInput
+                            id="encryptedData"
+                            label={'Encrypted connection'}
+                            value={this.state.encryptedData}
+                            showValue={true}
+                            isEditMode={true}
+                            isRequired={false}
+                            onChange={this.handleCheck}
+                            activeButtonColor={'green'}
+                            activeBackgroundColor={'white'}
+                            style={{width: '100%'}}
+                            labelStyle={{fontFamily: 'Roboto-Medium', fontSize: 18, color: 'white'}}
+                            hasTooltip={true}
+                            tooltipsMessage={'Encrypted connection is more secure but the sync will take more time'}
+                        />
+                        {
+                            this.props && this.props.activeDatabase && !this.props.isNewHub ? (
+                                <Button upperCase={false} onPress={() => {
+                                    this.checkFields('editCurrentConfiguration')
+                                }} text={'Edit current configuration'} style={styles.buttonLogin}/>
+                            ) : (null)
+                        }
+                        <Button upperCase={false} onPress={() => {
+                            this.checkFields('saveHubConfiguration', true)
+                        }} text={getTranslation(translations.manualConfigScreen.saveHubConfigButton, null)}
+                                style={styles.buttonLogin}/>
+                    </View>
                     {
-                        this.props && this.props.activeDatabase && !this.props.isNewHub ? (
-                            <Button upperCase={false} onPress={() => {this.checkFields('editCurrentConfiguration')}} text={'Edit current configuration'} style={styles.buttonLogin} />
-                        ) : (null)
+                        Platform.OS === 'ios' && this.props && this.props.screenSize.height < 600 && this.props.activeDatabase ? (null) : (
+                            <View style={style.logoContainer}>
+                                <Image source={{uri: 'logo_app'}} style={style.logoStyle}/>
+                            </View>
+                        )
                     }
-                    <Button upperCase={false} onPress={() => {this.checkFields('saveHubConfiguration', true)}} text={getTranslation(translations.manualConfigScreen.saveHubConfigButton, null)} style={styles.buttonLogin} />
-                </View>
-                {
-                    Platform.OS === 'ios' && this.props && this.props.screenSize.height < 600 && this.props.activeDatabase ? (null) : (
-                        <View style={style.logoContainer}>
-                            <Image source={{uri: 'logo_app'}} style={style.logoStyle} />
-                        </View>
-                    )
-                }
 
-                <ModalSyncStatus
-                    showModal={this.props.showModal}
-                    syncState={this.props.syncState}
-                    showCloseModalButton={this.props.showCloseModalButton}
-                    screenSize={this.props.screenSize}
-                    closeModal={this.closeModal}
-                />
+                    <ModalSyncStatus
+                        showModal={this.props.showModal}
+                        syncState={this.props.syncState}
+                        showCloseModalButton={this.props.showCloseModalButton}
+                        screenSize={this.props.screenSize}
+                        closeModal={this.closeModal}
+                    />
 
-            </KeyboardAwareScrollView>
+                </KeyboardAwareScrollView>
+            </View>
         );
     }
 
@@ -601,7 +624,8 @@ const style = StyleSheet.create({
 });
 
 function mapStateToProps(state) {
-    const aux = handleChangingSyncState(state.app.syncState);
+    const aux = handleChangingSyncStateManualConfigScreen(state.app.syncState);
+    // console.log('UpdateRn: ', aux);
     const {showModal, showCloseModalButton} = aux;
 
     let syncState = aux.syncState;
@@ -628,7 +652,7 @@ let syncStateGlobal = [
         {id: 'sync', name: 'Sync', status: '...'}
         ];
 
-handleChangingSyncState = (syncState) => {
+handleChangingSyncStateManualConfigScreen = (syncState) => {
     let returnedValue = {
         showModal: !!(syncState && syncState.id && (syncState.status || syncState.name)),
         syncState: syncStateGlobal,
@@ -661,6 +685,7 @@ handleChangingSyncState = (syncState) => {
         }
     }
 
+    // console.log('UpdateRn: ', returnedValue);
     return returnedValue;
 };
 

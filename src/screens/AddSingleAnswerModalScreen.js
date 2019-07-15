@@ -34,20 +34,36 @@ class AddSingleAnswerModalScreen extends Component {
         };
     }
 
-    static getDerivedStateFromProps(props, state) {
-        if (props.item) {
-            if (typeof props.currentAnswers === 'object' && Object.keys(props.currentAnswers).length === 0) {
-                props.currentAnswers[props.item.variable] = [{
+    componentDidUpdate(prevProps) {
+        if (this.props.item && this.props.item !== prevProps.item) {
+            if (typeof this.props.currentAnswers === 'object' && Object.keys(this.props.currentAnswers).length === 0) {
+                this.props.currentAnswers[this.props.item.variable] = [{
                     date: new Date(),
                     value: ''
                 }]
             }
-            let sortedQuestions = sortBy([props.item], ['order', 'variable']);
-            sortedQuestions = extractAllQuestions(sortedQuestions, props.currentAnswers);
-            state.item = sortedQuestions[0];
+            let sortedQuestions = sortBy([this.props.item], ['order', 'variable']);
+            sortedQuestions = extractAllQuestions(sortedQuestions, this.props.currentAnswers);
+            this.setState({
+                item: sortedQuestions[0]
+            });
         }
-        return null;
     }
+
+    // static getDerivedStateFromProps(props, state) {
+    //     if (props.item) {
+    //         if (typeof props.currentAnswers === 'object' && Object.keys(props.currentAnswers).length === 0) {
+    //             props.currentAnswers[props.item.variable] = [{
+    //                 date: new Date(),
+    //                 value: ''
+    //             }]
+    //         }
+    //         let sortedQuestions = sortBy([props.item], ['order', 'variable']);
+    //         sortedQuestions = extractAllQuestions(sortedQuestions, props.currentAnswers);
+    //         state.item = sortedQuestions[0];
+    //     }
+    //     return null;
+    // }
 
     render() {
         let contentWidth = calculateDimension(350, false, this.props.screenSize);
@@ -55,7 +71,7 @@ class AddSingleAnswerModalScreen extends Component {
         let height = calculateDimension(450, true, this.props.screenSize);
 
         return (
-            < Dialog
+            <Dialog
                 visible={this.props.showAddSingleAnswerModalScreen}
                 width={contentWidth}
                 height={height}

@@ -162,29 +162,41 @@ class CaseSingleScreen extends Component {
     }
 
     // Please add here the react lifecycle methods that you need
-    static getDerivedStateFromProps(props, state) {
-        if (props.errors && props.errors.type && props.errors.message) {
-            Alert.alert(props.errors.type, props.errors.message, [
-                {
-                    text: getTranslation(translations.alertMessages.okButtonLabel, props.translation),
-                    onPress: () => {
-                        state.savePressed = false;
-                        props.removeErrors()
-                    }
-                }
-            ])
-        } else {
-            if (state.savePressed || state.deletePressed) {
-                props.navigator.pop()
-            }
+    componentDidUpdate(prevProps) {
+        if (this.state.savePressed || this.state.deletePressed) {
+            this.props.navigator.pop();
         }
 
-        if (state.loading === true) {
-            state.loading = false
+        if (this.state.loading) {
+            this.setState({
+                loading: false
+            })
         }
-
-        return null;
     }
+
+    // static getDerivedStateFromProps(props, state) {
+    //     if (props.errors && props.errors.type && props.errors.message) {
+    //         Alert.alert(props.errors.type, props.errors.message, [
+    //             {
+    //                 text: getTranslation(translations.alertMessages.okButtonLabel, props.translation),
+    //                 onPress: () => {
+    //                     state.savePressed = false;
+    //                     props.removeErrors()
+    //                 }
+    //             }
+    //         ])
+    //     } else {
+    //         if (state.savePressed || state.deletePressed) {
+    //             props.navigator.pop()
+    //         }
+    //     }
+    //
+    //     if (state.loading === true) {
+    //         state.loading = false
+    //     }
+    //
+    //     return null;
+    // }
 
     handleBackButtonClick() {
         // this.props.navigator.goBack(null);
@@ -221,6 +233,23 @@ class CaseSingleScreen extends Component {
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
+
+        if (this.props.errors && this.props.errors.type && this.props.errors.message) {
+            Alert.alert(this.props.errors.type, this.props.errors.message, [
+                {
+                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+                    onPress: () => {
+                        this.setState({
+                            savePressed: false
+                        }, () => {
+                            this.props.removeErrors();
+                        })
+                        // state.savePressed = false;
+                    }
+                }
+            ])
+        }
+
         return (
             <ViewHOC style={style.container}
                 showLoader={this && this.state && this.state.loading}

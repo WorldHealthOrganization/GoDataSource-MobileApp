@@ -4,23 +4,26 @@ PODS:
     - Parse/Core (= 1.17.2)
   - Parse/Core (1.17.2):
     - Bolts/Tasks (~> 1.9)
-  - React (0.55.4):
-    - React/Core (= 0.55.4)
-  - React/Core (0.55.4):
-    - yoga (= 0.55.4.React)
+  - React (0.59.10):
+    - React/Core (= 0.59.10)
+  - React/Core (0.59.10):
+    - yoga (= 0.59.10.React)
   - RNBcrypt (1.0.0):
+    - React
+  - RNCAsyncStorage (1.5.0):
     - React
   - SQLCipher (4.2.0):
     - SQLCipher/standard (= 4.2.0)
   - SQLCipher/common (4.2.0)
   - SQLCipher/standard (4.2.0):
     - SQLCipher/common
-  - yoga (0.55.4.React)
+  - yoga (0.59.10.React)
 
 DEPENDENCIES:
   - Parse
   - React (from `../node_modules/react-native`)
   - RNBcrypt (from `../node_modules/react-native-bcrypt`)
+  - "RNCAsyncStorage (from `../node_modules/@react-native-community/async-storage`)"
   - SQLCipher
   - yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
@@ -35,17 +38,20 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native"
   RNBcrypt:
     :path: "../node_modules/react-native-bcrypt"
+  RNCAsyncStorage:
+    :path: "../node_modules/@react-native-community/async-storage"
   yoga:
     :path: "../node_modules/react-native/ReactCommon/yoga"
 
 SPEC CHECKSUMS:
   Bolts: ac6567323eac61e203f6a9763667d0f711be34c8
   Parse: 3b31a3dd1777b07ee7f0caee32fafbff544483a5
-  React: aa2040dbb6f317b95314968021bd2888816e03d5
+  React: 1d605e098d69bdf08960787f3446f0a9dc2e2ccf
   RNBcrypt: 2f9a3bbaa400cd4aba173dc1ff95365c8a439a4e
+  RNCAsyncStorage: 6ae5aba8a41bfe0a9f21885ec91faf23ca3fe7ee
   SQLCipher: 0187a2180ac288ea686b670b7141da62cd013b16
-  yoga: a23273df0088bf7f2bb7e5d7b00044ea57a2a54a
+  yoga: 128daf064cacaede0c3bb27424b6b4c71052e6cd
 
-PODFILE CHECKSUM: e3f878e16ad734809df7e657d483f999e23fd64f
+PODFILE CHECKSUM: 0b0530c249a89265eef41e33cf12d667642c93d2
 
 COCOAPODS: 1.5.3

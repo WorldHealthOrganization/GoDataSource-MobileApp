@@ -70,7 +70,7 @@ class DatePicker extends PureComponent {
                                         color: 'rgb(60,60,60)',
                                         marginBottom: 7.5
                                     }}>
-                                        {this.props.value !== null && this.props.value !== undefined && this.props.value !== '' ? moment(this.props.value).format('MM/DD/YYYY') : ''}
+                                        {this.props.value !== null && this.props.value !== undefined && this.props.value !== '' ? moment.utc(this.props.value).format('MM/DD/YYYY') : ''}
                                     </Text>
                                 </Ripple>
                             </View>
@@ -95,6 +95,7 @@ class DatePicker extends PureComponent {
                     <DateTimePicker
                         minimumDate={this.props.minimumDate}
                         maximumDate={this.props.maximumDate}
+                        timeZoneOffsetInMinutes={0}
                         isVisible={this.state.isDateTimePickerVisible}
                         onConfirm={this.handleDatePicked}
                         onCancel={this.handleDateCancelled}
@@ -161,9 +162,9 @@ class DatePicker extends PureComponent {
     };
 
     handleDatePicked = (date) => {
-        console.log("### date picked: ", date, moment(date).format());
+        console.log("### date picked: ", date, moment.utc(date).format());
         this.props.onChange(
-            date, 
+            moment.utc(date)._d,
             this.props.id, 
             this.props.objectType ? (this.props.objectType === 'Address' || this.props.objectType === 'LabResult' || this.props.objectType === 'DateRanges' ? this.props.index : this.props.objectType) : null,
             this.props.objectType

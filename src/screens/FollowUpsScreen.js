@@ -92,32 +92,79 @@ class FollowUpsScreen extends Component {
     };
 
     // Please add here the react lifecycle methods that you need
-    static getDerivedStateFromProps(props, state) {
-        if (props.errors && props.errors.type && props.errors.message) {
-            Alert.alert(props.errors.type, props.errors.message, [
-                {
-                    text: getTranslation(translations.alertMessages.okButtonLabel, props.translation),
-                    onPress: () => {
-                        props.removeErrors();
-                        state.loading = false;
-                    }
-                }
-            ])
-        }
+    // static getDerivedStateFromProps(props, state) {
+    //     if (props.errors && props.errors.type && props.errors.message) {
+    //         Alert.alert(props.errors.type, props.errors.message, [
+    //             {
+    //                 text: getTranslation(translations.alertMessages.okButtonLabel, props.translation),
+    //                 onPress: () => {
+    //                     props.removeErrors();
+    //                     state.loading = false;
+    //                 }
+    //             }
+    //         ])
+    //     }
+    //
+    //     // console.log('props.contacts', JSON.stringify(props.contacts))
+    //     if (props.contacts) {
+    //
+    //         const contactsHasFollowUps = props.contacts.some(e => {
+    //             return e.followUps !== undefined && e.followUps !== null && e.followUps.length > 0
+    //         })
+    //
+    //         if (contactsHasFollowUps) {
+    //             let fUps = [];
+    //
+    //             let contactsCopy = _.cloneDeep(props.contacts);
+    //             if (state.filter || state.filterFromFilterScreen) {
+    //                 contactsCopy = localSortContactsForFollowUps(contactsCopy, props.filter, state.filter, state.filterFromFilterScreen)
+    //             } else {
+    //                 contactsCopy = objSort(contactsCopy, ['lastName', false])
+    //             }
+    //
+    //             for (let i = 0; i < contactsCopy.length; i++) {
+    //                 if (contactsCopy[i].followUps) {
+    //                     fUps = fUps.concat(contactsCopy[i].followUps);
+    //                 }
+    //             }
+    //
+    //             state.followUps = fUps;
+    //             if (state.filter && state.filter.performed && state.filter.performed.value && state.filter.performed.value !== 'LNG_FOLLOW_UPS_DROP_DOWN_FILTER_STATUS_LABEL_ALL') {
+    //                 fUps = fUps.filter((e) => { return e.statusId === state.filter.performed.value });
+    //             }
+    //
+    //             if (props.followUps && props.followUps.length > 0) {
+    //                 state.followUps = fUps;
+    //             }
+    //             else {
+    //                 state.followUps = []
+    //             }
+    //
+    //             state.refreshing = false;
+    //             state.loading = false;
+    //         } else {
+    //             state.followUps = [];
+    //             state.refreshing = false;
+    //             state.loading = false;
+    //         }
+    //     }
+    //
+    //     console.log(`Before making it false: state.refreshing - ${state.refreshing},  state.loading - ${state.loading}`);
+    //     return null;
+    // };
 
-        // console.log('props.contacts', JSON.stringify(props.contacts))
-        if (props.contacts) {
-
-            const contactsHasFollowUps = props.contacts.some(e => {
+    componentDidUpdate(prevProps) {
+        if (this.props.contacts && prevProps.contacts !== this.props.contacts) {
+            const contactsHasFollowUps = this.props.contacts.some(e => {
                 return e.followUps !== undefined && e.followUps !== null && e.followUps.length > 0
-            })
-
+            });
+            let fUps = [];
             if (contactsHasFollowUps) {
-                let fUps = [];
 
-                let contactsCopy = _.cloneDeep(props.contacts);
-                if (state.filter || state.filterFromFilterScreen) {
-                    contactsCopy = localSortContactsForFollowUps(contactsCopy, props.filter, state.filter, state.filterFromFilterScreen)
+
+                let contactsCopy = _.cloneDeep(this.props.contacts);
+                if (this.state.filter || this.state.filterFromFilterScreen) {
+                    contactsCopy = localSortContactsForFollowUps(contactsCopy, this.props.filter, this.state.filter, this.state.filterFromFilterScreen)
                 } else {
                     contactsCopy = objSort(contactsCopy, ['lastName', false])
                 }
@@ -128,30 +175,33 @@ class FollowUpsScreen extends Component {
                     }
                 }
 
-                state.followUps = fUps;
-                if (state.filter && state.filter.performed && state.filter.performed.value && state.filter.performed.value !== 'LNG_FOLLOW_UPS_DROP_DOWN_FILTER_STATUS_LABEL_ALL') {
-                    fUps = fUps.filter((e) => { return e.statusId === state.filter.performed.value });
+                // state.followUps = fUps;
+                if (this.state.filter && this.state.filter.performed && this.state.filter.performed.value && this.state.filter.performed.value !== 'LNG_FOLLOW_UPS_DROP_DOWN_FILTER_STATUS_LABEL_ALL') {
+                    fUps = fUps.filter((e) => { return e.statusId === this.state.filter.performed.value });
                 }
 
-                if (props.followUps && props.followUps.length > 0) {
-                    state.followUps = fUps;
-                }
-                else {
-                    state.followUps = []
-                }
-
-                state.refreshing = false;
-                state.loading = false;
-            } else {
-                state.followUps = [];
-                state.refreshing = false;
-                state.loading = false;
+                // if (props.followUps && props.followUps.length > 0) {
+                //     state.followUps = fUps;
+                // }
+                // else {
+                //     state.followUps = []
+                // }
+                //
+                // state.refreshing = false;
+                // state.loading = false;
             }
+            // else {
+            //     state.followUps = [];
+            //     state.refreshing = false;
+            //     state.loading = false;
+            // }
+            this.setState({
+                followUps: fUps,
+                refreshing: false,
+                loading: false
+            })
         }
-
-        console.log(`Before making it false: state.refreshing - ${state.refreshing},  state.loading - ${state.loading}`);
-        return null;
-    };
+    }
 
     componentDidMount() {
         console.log('Component Did mount');
@@ -260,7 +310,7 @@ class FollowUpsScreen extends Component {
         console.log(`Refreshing: ${this.state.refreshing}   Loading: ${this.state.loading}`);
 
         // Here call the method for filter/sorting
-        let sortedAndFilteredFollowUps = this.filterFollowUps(this.props);
+        // let sortedAndFilteredFollowUps = this.filterFollowUps(this.props);
 
         return (
             <ViewHOC style={style.container}>
@@ -349,7 +399,7 @@ class FollowUpsScreen extends Component {
                 <View style={style.containerContent}>
                     <AnimatedListView
                         stickyHeaderIndices={[0]}
-                        data={this.props.mappedFollowUps || []}
+                        data={this.state.followUps || []}
                         extraData={this.props.contacts}
                         renderItem={this.renderFollowUp}
                         keyExtractor={this.keyExtractor}
@@ -453,8 +503,8 @@ class FollowUpsScreen extends Component {
                 onPressExposureProp={this.handleOnPressExposureProp}
                 screenSize={this.props.screenSize}
                 textsArray={[
-                    item.additionalData.thirdComponentData.followUpStatus,
-                    item.additionalData.thirdComponentData.addExposureLabel
+                    getTranslation(item.statusId, this.props.translation),
+                    getTranslation(translations.followUpsScreen.addExposureFollowUpLabel, this.props.translation)
                 ]}
                 textsStyleArray={[[styles.buttonTextActionsBar, {color: this.state.followUpsColors[item.statusId], marginLeft: margins}], [styles.buttonTextActionsBar, {marginRight: margins}]]}
                 onPressTextsArray={[
@@ -614,15 +664,15 @@ class FollowUpsScreen extends Component {
     };
 
     handleOnPressMap = (contact) => {
-        contact = this.props.contacts.find((e) => {return extractIdFromPouchId(e._id, 'person') === contact});
+        // contact = this.props.contacts.find((e) => {return extractIdFromPouchId(e._id, 'person') === contact});
 
         if (contact && contact.addresses && Array.isArray(contact.addresses) && contact.addresses.length > 0) {
-            let contactPlaceOfResidence = contact.addresses.filter((e) => {
+            let contactPlaceOfResidence = contact.addresses.find((e) => {
                 return e.typeId === config.userResidenceAddress.userPlaceOfResidence
             })
             console.log('contactPlaceOfResidence', contactPlaceOfResidence)
-            let contactPlaceOfResidenceLatitude = contactPlaceOfResidence[0] && contactPlaceOfResidence[0].geoLocation && contactPlaceOfResidence[0].geoLocation.coordinates && Array.isArray(contactPlaceOfResidence[0].geoLocation.coordinates) && contactPlaceOfResidence[0].geoLocation.coordinates.length === 2 && contactPlaceOfResidence[0].geoLocation.coordinates[1] !== undefined && contactPlaceOfResidence[0].geoLocation.coordinates[1] !== null ? contactPlaceOfResidence[0].geoLocation.coordinates[1] : 0
-            let contactPlaceOfResidenceLongitude = contactPlaceOfResidence[0] && contactPlaceOfResidence[0].geoLocation && contactPlaceOfResidence[0].geoLocation.coordinates && Array.isArray(contactPlaceOfResidence[0].geoLocation.coordinates) && contactPlaceOfResidence[0].geoLocation.coordinates.length === 2 && contactPlaceOfResidence[0].geoLocation.coordinates[0] !== undefined && contactPlaceOfResidence[0].geoLocation.coordinates[0] !== null ? contactPlaceOfResidence[0].geoLocation.coordinates[0] : 0
+            let contactPlaceOfResidenceLatitude = contactPlaceOfResidence && contactPlaceOfResidence.geoLocation && contactPlaceOfResidence.geoLocation.coordinates && Array.isArray(contactPlaceOfResidence.geoLocation.coordinates) && contactPlaceOfResidence.geoLocation.coordinates.length === 2 && contactPlaceOfResidence.geoLocation.coordinates[1] !== undefined && contactPlaceOfResidence.geoLocation.coordinates[1] !== null ? contactPlaceOfResidence.geoLocation.coordinates[1] : 0
+            let contactPlaceOfResidenceLongitude = contactPlaceOfResidence && contactPlaceOfResidence.geoLocation && contactPlaceOfResidence.geoLocation.coordinates && Array.isArray(contactPlaceOfResidence.geoLocation.coordinates) && contactPlaceOfResidence.geoLocation.coordinates.length === 2 && contactPlaceOfResidence.geoLocation.coordinates[0] !== undefined && contactPlaceOfResidence.geoLocation.coordinates[0] !== null ? contactPlaceOfResidence.geoLocation.coordinates[0] : 0
             navigator.geolocation.getCurrentPosition(
                 (position) => {
                     this.setState({

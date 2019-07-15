@@ -20,8 +20,9 @@ import {getRelationshipsForTypeRequest} from './../queries/relationships';
 import {extractIdFromPouchId, mapContactsAndRelationships, mapContactsAndFollowUps, generateId, updateRequiredFields} from './../utils/functions';
 import {getContactsForFollowUpPeriodRequest} from './../queries/contacts';
 import {difference} from 'lodash';
-import {setSyncState, saveGeneratedFollowUps} from './app';
+import {setSyncState, saveGeneratedFollowUps, setLoaderState} from './app';
 import {batchActions} from 'redux-batched-actions';
+import {batch} from 'react-redux';
 
 // Add here only the actions, not also the requests that are executed. For that purpose is the requests directory
 export function storeFollowUps(followUps) {
@@ -69,7 +70,12 @@ export function getFollowUpsForOutbreak(outbreakId, filter, userTeams) {
     }
 }
 
-function computeFilters(filter) {
+// General method for constructing filters
+// Receives the filter and the screen(followUps, contacts, cases)
+// If screen is followUps, the method will create a filter for each of the data (fups, contacts, cases, events)
+// if screen is contacts, the method will create filters for contacts, cases and events
+// If screen is cases, the method will create filters for cases
+function computeFilters(filter, screen) {
     let returnedFilter = {
         followUpsFilter: {},
         contactsFilter: {},
@@ -113,6 +119,7 @@ function computeFilters(filter) {
 
 export function getFollowUpsForOutbreakId(outbreakId, filter, userTeams, token) {
     return async function (dispatch, getState) {
+        dispatch(setLoaderState(true));
         if (!filter) {
             filter = {};
             filter.date = new Date();
@@ -120,7 +127,10 @@ export function getFollowUpsForOutbreakId(outbreakId, filter, userTeams, token) 
         getFollowUpsForOutbreakIdRequest(outbreakId, filter, userTeams, token, (error, response) => {
             if (error) {
                 console.log("*** getFollowUpsForOutbreakId error: ", error);
-                dispatch(addError(errorTypes.ERROR_FOLLOWUPS));
+                batch(() => {
+                    dispatch(setLoaderState(false));
+                    dispatch(addError(errorTypes.ERROR_FOLLOWUPS));
+                });
             }
             if (response) {
                 console.log("*** getFollowUpsForOutbreakId response: ");
@@ -137,14 +147,23 @@ export function getFollowUpsForOutbreakId(outbreakId, filter, userTeams, token) 
                             mappedContact = mapContactsAndFollowUps(responseGetContacts, response);
                         }
                         // dispatch(storeContacts(mappedContact));
-                        dispatch(batchActions([
-                            storeFollowUps(response),
-                            storeContacts(mappedContact)
-                        ]))
+                        // dispatch(batchActions([
+                        //     setLoaderState(false),
+                        //     storeFollowUps(response),
+                        //     storeContacts(mappedContact)
+                        // ]))
+                        batch(() => {
+                            dispatch(setLoaderState(false));
+                            dispatch(storeFollowUps(response));
+                            dispatch(storeContacts(mappedContact));
+                        })
                     })
                     .catch((errorGetContactsForFollowUps) => {
-                        console.log ('getFollowUpsForOutbreakIdRequest getContactsForOutbreakIdWithPromises error', JSON.stringify(errorGetContactsForFollowUps))
-                        dispatch(addError(errorTypes.ERROR_CONTACT));
+                        console.log ('getFollowUpsForOutbreakIdRequest getContactsForOutbreakIdWithPromises error', JSON.stringify(errorGetContactsForFollowUps));
+                        batch(() => {
+                            dispatch(setLoaderState(false));
+                            dispatch(addError(errorTypes.ERROR_CONTACT));
+                        });
                     })
             }
         })

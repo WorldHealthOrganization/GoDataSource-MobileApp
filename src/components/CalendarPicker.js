@@ -2,20 +2,17 @@
  * Created by florinpopa on 16/07/2018.
  */
 import React, {PureComponent} from 'react';
-import {TextInput, View, Text, StyleSheet, Platform, Dimensions, TouchableOpacity} from 'react-native';
+import {StyleSheet} from 'react-native';
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
-import {ListItem, Icon, Button} from 'react-native-material-ui';
-import {calculateDimension, checkIfSameDay, getTranslation} from './../utils/functions';
-import config from './../utils/config';
+import {checkIfSameDay, getTranslation} from './../utils/functions';
 import CalendarPickerView from './CalendarPickerView';
-import Ripple from 'react-native-material-ripple';
 import ButtonWithIcons from './ButtonWithIcons';
-import { Calendar, CalendarList, Agenda } from 'react-native-calendars';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import ElevatedView from 'react-native-elevated-view';
-import translations from './../utils/translations'
+import translations from './../utils/translations';
+import moment from 'moment';
 
 class CalendarPicker extends PureComponent {
 
@@ -60,18 +57,20 @@ class CalendarPicker extends PureComponent {
     // Please write here all the methods that are not react native lifecycle methods
     handleDateChanged = (date) => {
         // Adjust timezone differences
+        console.log('Stuff: ', moment.utc(date.timestamp)._d);
         let dateAux = getTranslation(translations.generalLabels.today, this.props.translation);
         if (!checkIfSameDay(new Date(date.dateString), new Date())) {
             // dateAux format = "YYYY-MM-DD"
-            let date1Time = new Date(date.dateString).getTime();
-            dateAux = new Date(date1Time + (new Date(date1Time).getTimezoneOffset() * 60 * 1000)).toLocaleDateString();
+            // let date1Time = new Date(date.timestamp).getTime();
+            dateAux = moment.utc(date.timestamp)._d.toLocaleDateString();
+                // new Date(date1Time + (new Date(date1Time).getTimezoneOffset() * 60 * 1000)).toLocaleDateString();
         }
         // let dateAux = checkIfSameDay(new Date(date.dateString), new Date()) ? 'Today' : new Date(date.dateString).toLocaleDateString();
         this.setState({
             label: dateAux
         }, () => {
             this.props.openCalendarModal();
-            this.props.onDayPress(new Date(date.dateString));
+            this.props.onDayPress(moment.utc(date.timestamp)._d);
         })
     };
 }

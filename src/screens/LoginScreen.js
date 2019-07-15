@@ -118,6 +118,7 @@ class LoginScreen extends Component {
                         ref={this.emailRef}
                         value={this.state.email}
                         autoCorrect={false}
+                        keyboardType={'email-address'}
                         lineWidth={1}
                         enablesReturnKeyAutomatically={true}
                         containerStyle={style.textInput}

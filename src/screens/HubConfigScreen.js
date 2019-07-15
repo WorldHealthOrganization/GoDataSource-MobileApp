@@ -71,7 +71,8 @@ let textFieldsStructure = [
         type: 'TextInput',
         value: '',
         isRequired: false,
-        isEditMode: true
+        isEditMode: true,
+        keyboardType: 'user-email'
     },
     {
         id: 'encryptedData',
@@ -177,9 +178,9 @@ class FirstConfigScreen extends Component {
             });
     }
 
-    static getDerivedStateFromProps(props, state) {
-       return null;
-    }
+    // static getDerivedStateFromProps(props, state) {
+    //    return null;
+    // }
 
     // The render method should have at least business logic as possible,
     // because this will be called whenever there is a new setState call

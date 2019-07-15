@@ -1549,39 +1549,37 @@ export function localSortContactsForFollowUps (contactsCopy, propsFilter, stateF
     // Take care of search filter
     if (stateFilter.searchText) {
         contactsCopy = contactsCopy.filter((e) => {
-            let fullName = get(e, 'firstComponentData.fullName', null);
-            let casesExposedTo = get(e, 'secondComponentData.exposedTo', null);
-            if (casesExposedTo && Array.isArray(casesExposedTo) && casesExposedTo.length) {
-                casesExposedTo = casesExposedTo.map((e) => {return e.fullName});
-            }
-
-            return fullName.toLowerCase().includes(stateFilter.searchText.toLowerCase()) || casesExposedTo.find((e) => {return e.toLowerCase().includes(stateFilter.searchText.toLowerCase())});
+            return  e && e.firstName && stateFilter.searchText.toLowerCase().includes(e.firstName.toLowerCase()) ||
+                e && e.lastName && stateFilter.searchText.toLowerCase().includes(e.lastName.toLowerCase()) ||
+                e && e.firstName && e.firstName.toLowerCase().includes(stateFilter.searchText.toLowerCase()) ||
+                e && e.lastName && e.lastName.toLowerCase().includes(stateFilter.searchText.toLowerCase())
         });
     }
     // Take care of gender filter
     if (filterFromFilterScreen && filterFromFilterScreen.gender) {
-        contactsCopy = contactsCopy.filter((e) => {return e && e.firstComponentData && e.firstComponentData.genderId && e.firstComponentData.genderId === filterFromFilterScreen.gender});
+        contactsCopy = contactsCopy.filter((e) => {return e.gender === filterFromFilterScreen.gender});
     }
     // Take care of age range filter
     if (filterFromFilterScreen && filterFromFilterScreen.age && Array.isArray(filterFromFilterScreen.age) && filterFromFilterScreen.age.length === 2 && (filterFromFilterScreen.age[0] >= 0 || filterFromFilterScreen.age[1] <= 150)) {
         contactsCopy = contactsCopy.filter((e) => {
-            let age = get(e, 'firstComponentData.age', null);
-            if (age) {
-                return age >= filterFromFilterScreen.age[0] && age <= filterFromFilterScreen.age[1];
+            if (e.age && e.age.years !== null && e.age.years !== undefined && e.age.months !== null && e.age.months !== undefined) {
+                if (e.age.years > 0 && e.age.months === 0) {
+                    return e.age.years >= filterFromFilterScreen.age[0] && e.age.years <= filterFromFilterScreen.age[1]
+                } else if (e.age.years === 0 && e.age.months > 0){
+                    return e.age.months >= filterFromFilterScreen.age[0] && e.age.months <= filterFromFilterScreen.age[1]
+                } else if (e.age.years === 0 && e.age.months === 0) {
+                    return e.age.years >= filterFromFilterScreen.age[0] && e.age.years <= filterFromFilterScreen.age[1]
+                }
             }
         });
     }
     // Take care of locations filter
     if (filterFromFilterScreen  && filterFromFilterScreen.selectedLocations && filterFromFilterScreen.selectedLocations.length > 0) {
         contactsCopy = contactsCopy.filter((e) => {
-            let locationId = get(e, 'firstComponentData.locationId', null);
-            if (locationId) {
-                return filterFromFilterScreen.selectedLocations.indexOf(locationId) > -1;
-            }
-            // let addresses = e.addresses.filter((k) => {
-            //     return k.locationId !== '' && filterFromFilterScreen.selectedLocations.indexOf(k.locationId) >= 0
-            // })
-            // return addresses.length > 0
+            let addresses = e.addresses.filter((k) => {
+                return k.locationId !== '' && filterFromFilterScreen.selectedLocations.indexOf(k.locationId) >= 0
+            })
+            return addresses.length > 0
         })
     }
     // Take care of sort
@@ -1592,6 +1590,55 @@ export function localSortContactsForFollowUps (contactsCopy, propsFilter, stateF
     }
 
     return contactsCopy
+
+
+
+    // // Take care of search filter
+    // if (stateFilter.searchText) {
+    //     contactsCopy = contactsCopy.filter((e) => {
+    //         let fullName = get(e, 'firstComponentData.fullName', null);
+    //         let casesExposedTo = get(e, 'secondComponentData.exposedTo', null);
+    //         if (casesExposedTo && Array.isArray(casesExposedTo) && casesExposedTo.length) {
+    //             casesExposedTo = casesExposedTo.map((e) => {return e.fullName});
+    //         }
+    //
+    //         return fullName.toLowerCase().includes(stateFilter.searchText.toLowerCase()) || casesExposedTo.find((e) => {return e.toLowerCase().includes(stateFilter.searchText.toLowerCase())});
+    //     });
+    // }
+    // // Take care of gender filter
+    // if (filterFromFilterScreen && filterFromFilterScreen.gender) {
+    //     contactsCopy = contactsCopy.filter((e) => {return e && e.firstComponentData && e.firstComponentData.genderId && e.firstComponentData.genderId === filterFromFilterScreen.gender});
+    // }
+    // // Take care of age range filter
+    // if (filterFromFilterScreen && filterFromFilterScreen.age && Array.isArray(filterFromFilterScreen.age) && filterFromFilterScreen.age.length === 2 && (filterFromFilterScreen.age[0] >= 0 || filterFromFilterScreen.age[1] <= 150)) {
+    //     contactsCopy = contactsCopy.filter((e) => {
+    //         let age = get(e, 'firstComponentData.age', null);
+    //         if (age) {
+    //             return age >= filterFromFilterScreen.age[0] && age <= filterFromFilterScreen.age[1];
+    //         }
+    //     });
+    // }
+    // // Take care of locations filter
+    // if (filterFromFilterScreen  && filterFromFilterScreen.selectedLocations && filterFromFilterScreen.selectedLocations.length > 0) {
+    //     contactsCopy = contactsCopy.filter((e) => {
+    //         let locationId = get(e, 'firstComponentData.locationId', null);
+    //         if (locationId) {
+    //             return filterFromFilterScreen.selectedLocations.indexOf(locationId) > -1;
+    //         }
+    //         // let addresses = e.addresses.filter((k) => {
+    //         //     return k.locationId !== '' && filterFromFilterScreen.selectedLocations.indexOf(k.locationId) >= 0
+    //         // })
+    //         // return addresses.length > 0
+    //     })
+    // }
+    // // Take care of sort
+    // if (filterFromFilterScreen && filterFromFilterScreen.sort && filterFromFilterScreen.sort !== undefined && filterFromFilterScreen.sort.length > 0) {
+    //     contactsCopy = localSortItems(contactsCopy, filterFromFilterScreen.sort)
+    // } else {
+    //     contactsCopy = objSort(contactsCopy, ['lastName', false])
+    // }
+    //
+    // return contactsCopy
 }
 
 export function localSortHelpItem (helpItemsCopy, propsFilter, stateFilter, filterFromFilterScreen, translations) {

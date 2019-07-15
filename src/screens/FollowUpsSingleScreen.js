@@ -136,38 +136,69 @@ class FollowUpsSingleScreen extends Component {
     }
 
     // Please add here the react lifecycle methods that you need
-    static getDerivedStateFromProps(props, state) {
-        // console.log("FollowUpsSingleScreen: ", state);
-        if (props.errors && props.errors.type && props.errors.message) {
-            Alert.alert(props.errors.type, props.errors.message, [
-                {
-                    text: getTranslation(translations.alertMessages.okButtonLabel, props.translation),
-                    onPress: () => {
-                        state.savePressed = false;
-                        props.removeErrors()
-                    }
-                }
-            ])
-        } else {
-            if (state.savePressed || state.deletePressed) {
-                if (props.startLoadingScreen !== undefined) {
-                    props.startLoadingScreen()
-                }
-                props.navigator.pop(
-                    {
-                        animated: true,
-                        animationType: 'fade',
-                    }
-                )
+    componentDidUpdate(prevProps) {
+        if (this.state.savePressed || this.state.deletePressed) {
+            if (this.props.startLoadingScreen !== undefined) {
+                this.props.startLoadingScreen();
             }
+            this.props.navigator.pop(
+                {
+                    animated: true,
+                    animationType: 'fade',
+                }
+            )
         }
-        return null;
     }
+
+
+    // static getDerivedStateFromProps(props, state) {
+    //     // console.log("FollowUpsSingleScreen: ", state);
+    //     if (props.errors && props.errors.type && props.errors.message) {
+    //         Alert.alert(props.errors.type, props.errors.message, [
+    //             {
+    //                 text: getTranslation(translations.alertMessages.okButtonLabel, props.translation),
+    //                 onPress: () => {
+    //                     state.savePressed = false;
+    //                     props.removeErrors()
+    //                 }
+    //             }
+    //         ])
+    //     } else {
+    //         if (state.savePressed || state.deletePressed) {
+    //             if (props.startLoadingScreen !== undefined) {
+    //                 props.startLoadingScreen()
+    //             }
+    //             props.navigator.pop(
+    //                 {
+    //                     animated: true,
+    //                     animationType: 'fade',
+    //                 }
+    //             )
+    //         }
+    //     }
+    //     return null;
+    // }
 
     // The render method should have at least business logic as possible,
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
+
+        if (this.props.errors && this.props.errors.type && this.props.errors.message) {
+            Alert.alert(this.props.errors.type, this.props.errors.message, [
+                {
+                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+                    onPress: () => {
+                        this.setState({
+                            savePressed: false
+                        }, () => {
+                            this.props.removeErrors();
+                        });
+                    }
+                }
+            ])
+        }
+
         return (
             <ViewHOC style={style.container}
                 showLoader={this && this.state && this.state.loading}
@@ -212,9 +243,9 @@ class FollowUpsSingleScreen extends Component {
                                                     </Ripple>
                                                 }
                                             >
-                                                <MenuItem onPress={this.handleOnPressMissing}>
-                                                    {getTranslation(translations.followUpsSingleScreen.missingButton, this.props.translation)}
-                                                </MenuItem>
+                                                {/*<MenuItem onPress={this.handleOnPressMissing}>*/}
+                                                    {/*{getTranslation(translations.followUpsSingleScreen.missingButton, this.props.translation)}*/}
+                                                {/*</MenuItem>*/}
                                                 {/*<MenuItem onPress={this.handleOnPressDeceased}>*/}
                                                 {/*{getTranslation(translations.followUpsSingleScreen.deceasedButton, this.props.translation)}*/}
                                                 {/*</MenuItem>*/}
@@ -225,11 +256,11 @@ class FollowUpsSingleScreen extends Component {
                                                     {getTranslation(translations.followUpsSingleScreen.editContactButton, this.props.translation)}
                                                 </MenuItem>
 
-                                                <DateTimePicker
-                                                    isVisible={this.state.isDateTimePickerVisible}
-                                                    onConfirm={this._handleDatePicked}
-                                                    onCancel={this._hideDateTimePicker}
-                                                />
+                                                {/*<DateTimePicker*/}
+                                                    {/*isVisible={this.state.isDateTimePickerVisible}*/}
+                                                    {/*onConfirm={this._handleDatePicked}*/}
+                                                    {/*onCancel={this._hideDateTimePicker}*/}
+                                                {/*/>*/}
                                             </Menu>
                                         </View>
                                     ) : null

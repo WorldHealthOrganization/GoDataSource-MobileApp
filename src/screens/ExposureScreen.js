@@ -55,31 +55,51 @@ class ExposureScreen extends Component {
     }
 
     // Please add here the react lifecycle methods that you need
-
-    static getDerivedStateFromProps(props, state) {
-        // console.log("FollowUpsSingleScreen: ", state);
-        if (props.errors && props.errors.type && props.errors.message) {
-            Alert.alert(props.errors.type, props.errors.message, [
-                {
-                    text: getTranslation(translations.alertMessages.okButtonLabel, props.translation),
-                    onPress: () => {
-                        state.savePressed = false;
-                        props.removeErrors()
-                    }
-                }
-            ])
-        } else if (state.savePressed) {
-            props.navigator.dismissModal();
+    componentDidUpdate(prevProps) {
+        if (this.state.savePressed) {
+            this.props.navigator.dismissModal();
         }
-
-        return null;
     }
+
+    // static getDerivedStateFromProps(props, state) {
+    //     // console.log("FollowUpsSingleScreen: ", state);
+    //     if (props.errors && props.errors.type && props.errors.message) {
+    //         Alert.alert(props.errors.type, props.errors.message, [
+    //             {
+    //                 text: getTranslation(translations.alertMessages.okButtonLabel, props.translation),
+    //                 onPress: () => {
+    //                     state.savePressed = false;
+    //                     props.removeErrors()
+    //                 }
+    //             }
+    //         ])
+    //     } else if (state.savePressed) {
+    //         props.navigator.dismissModal();
+    //     }
+    //
+    //     return null;
+    // }
 
     // The render method should have at least business logic as possible,
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
         console.log('Render from ExposureScreen: ', this.state.exposure, this.props.exposure);
+
+        if (this.props.errors && this.props.errors.type && this.props.errors.message) {
+            Alert.alert(this.props.errors.type, this.props.errors.message, [
+                {
+                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+                    onPress: () => {
+                        this.setState({
+                            savePressed: false
+                        }, () => {
+                            this.props.removeErrors();
+                        });
+                    }
+                }
+            ])
+        }
 
         return (
             <ViewHOC style={style.viewHocContainer}

@@ -27,27 +27,27 @@ class CaseSingleInvestigationContainer extends Component {
         };
     }
 
-    static getDerivedStateFromProps(props, state) {
-        if (props.previousAnswers) {
-            state.previousAnswers = props.previousAnswers;
-        }
-        // Sort the answers by date
-        if (state.previousAnswers && Object.keys(state.previousAnswers).length > 0) {
-            for (let questionId in state.previousAnswers) {
-                if (Array.isArray(state.previousAnswers[questionId]) && state.previousAnswers[questionId].length > 1) {
-                    state.previousAnswers[questionId] = state.previousAnswers[questionId].sort((a, b) => {
-                        if (new Date(a.date) > new Date(b.date)) {
-                            return -1;
-                        }
-                        if (new Date(a.date) < new Date(b.date)) {
-                            return 1;
-                        }
-                        return 0;
-                    })
-                }
-            }
-        }
-    }
+    // static getDerivedStateFromProps(props, state) {
+    //     if (props.previousAnswers) {
+    //         state.previousAnswers = props.previousAnswers;
+    //     }
+    //     // Sort the answers by date
+    //     if (state.previousAnswers && Object.keys(state.previousAnswers).length > 0) {
+    //         for (let questionId in state.previousAnswers) {
+    //             if (Array.isArray(state.previousAnswers[questionId]) && state.previousAnswers[questionId].length > 1) {
+    //                 state.previousAnswers[questionId] = state.previousAnswers[questionId].sort((a, b) => {
+    //                     if (new Date(a.date) > new Date(b.date)) {
+    //                         return -1;
+    //                     }
+    //                     if (new Date(a.date) < new Date(b.date)) {
+    //                         return 1;
+    //                     }
+    //                     return 0;
+    //                 })
+    //             }
+    //         }
+    //     }
+    // }
 
     shouldComponentUpdate(nextProps, nextState) {
         if (nextProps.isEditMode !== this.props.isEditMode || nextProps.index === 3) {
@@ -62,8 +62,31 @@ class CaseSingleInvestigationContainer extends Component {
     render() {
         // console.log('CaseSingleContainer render Investigation');
         // Get all additional questions recursively
+
+        // Logic moved from the getDerivedStateFromProps
+        let previousAnswers = {};
+        if (this.props.previousAnswers) {
+            previousAnswers = Object.assign({}, this.props.previousAnswers);
+        }
+
+        if (previousAnswers && Object.keys(previousAnswers).length > 0) {
+            for (let questionId in previousAnswers) {
+                if (Array.isArray(previousAnswers[questionId]) && previousAnswers[questionId].length > 1) {
+                    previousAnswers[questionId] = previousAnswers[questionId].sort((a, b) => {
+                        if (new Date(a.date) > new Date(b.date)) {
+                            return -1;
+                        }
+                        if (new Date(a.date) < new Date(b.date)) {
+                            return 1;
+                        }
+                        return 0;
+                    })
+                }
+            }
+        }
+
         let sortedQuestions = sortBy(cloneDeep(this.props.questions), ['order', 'variable']);
-        sortedQuestions = extractAllQuestions(sortedQuestions, this.state.previousAnswers);
+        sortedQuestions = extractAllQuestions(sortedQuestions, previousAnswers);
 
         return (
             <View style={{ flex: 1 }}>
