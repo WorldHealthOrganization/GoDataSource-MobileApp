@@ -17,6 +17,7 @@ import { LoaderScreen } from 'react-native-ui-lib';
 import translations from './../utils/translations'
 import ElevatedView from 'react-native-elevated-view';
 import _ from 'lodash';
+import moment from 'moment';
 
 class ContactsSinglePersonal extends PureComponent {
 
@@ -200,7 +201,7 @@ class ContactsSinglePersonal extends PureComponent {
 
         if (item.type === 'DatePicker') {
             if (item.id === 'dob' || item.id === 'dateOfReporting') {
-                maximumDate = new Date()
+                maximumDate = moment.utc()._d
             }
         }
 

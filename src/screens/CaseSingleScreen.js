@@ -97,7 +97,7 @@ class CaseSingleScreen extends Component {
                             coordinates: [0, 0],
                             type: 'Point'
                         },
-                        date: new Date()
+                        date: moment.utc()._d
                     }
                 ],
                 documents: [],
@@ -941,7 +941,7 @@ class CaseSingleScreen extends Component {
                 coordinates: [0, 0],
                 type: 'Point'
             },
-            date: new Date()
+            date: moment.utc()._d
         });
 
         this.setState(prevState => ({
@@ -1338,7 +1338,7 @@ class CaseSingleScreen extends Component {
     onChangeDate = (value, id, objectTypeOrIndex, objectType) => {
         // console.log("case onChangeDate: ", value, id, objectTypeOrIndex, objectType);
         if (id === 'dob') {
-            let today = new Date()
+            let today = moment.utc()._d;
             let nrOFYears = this.calcDateDiff(value, today);
             if (nrOFYears !== undefined && nrOFYears !== null) {
                 let ageClone = { years: 0, months: 0 }
@@ -1698,8 +1698,8 @@ class CaseSingleScreen extends Component {
 
         if (this.state.case.dob !== null && this.state.case.dob !== undefined) {
             //get info from date
-            dobClone = this.state.case.dob
-            let today = new Date()
+            dobClone = this.state.case.dob;
+            let today = moment.utc()._d;
             let nrOFYears = this.calcDateDiff(dobClone, today);
             if (nrOFYears !== undefined && nrOFYears !== null) {
                 //calc age for save
@@ -1980,10 +1980,10 @@ class CaseSingleScreen extends Component {
         // currentAnswersClone[Object.keys(currentAnswersClone)[0]][0].date = currentAnswersClone[Object.keys(currentAnswersClone)[0]][0].date.toISOString();
         previousAnswersClone[Object.keys(currentAnswersClone)[0]].push(currentAnswersClone[Object.keys(currentAnswersClone)[0]][0]);
         previousAnswersClone[Object.keys(currentAnswersClone)[0]].sort((a, b) => {
-            if (new Date(a.date) > new Date(b.date)) {
+            if (moment.utc(a.date)._d > moment.utc(b.date)._d) {
                 return -1;
             }
-            if (new Date(a.date) < new Date(b.date)) {
+            if (moment.utc(a.date)._d < moment.utc(b.date)._d) {
                 return 1;
             }
             return 0;

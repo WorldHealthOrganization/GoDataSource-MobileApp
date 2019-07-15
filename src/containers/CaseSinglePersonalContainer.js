@@ -26,6 +26,7 @@ import ElevatedView from 'react-native-elevated-view';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import translations from './../utils/translations'
 import _ from 'lodash';
+import moment from 'moment';
 
 class CaseSinglePersonalContainer extends Component {
 
@@ -264,7 +265,7 @@ class CaseSinglePersonalContainer extends Component {
 
         if (item.type === 'DatePicker') {
             if (item.id === 'dob' || item.id === 'dateOfReporting') {
-                maximumDate = new Date()
+                maximumDate = moment.utc()._d;
             }
         }
 

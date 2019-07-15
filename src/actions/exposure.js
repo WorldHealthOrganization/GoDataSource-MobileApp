@@ -1,4 +1,9 @@
-import { ACTION_TYPE_STORE_EXPOSURES } from './../utils/enums';
+import {
+    ACTION_TYPE_STORE_EXPOSURES,
+    ACTION_TYPE_ADD_EXPOSURE,
+    ACTION_TYPE_REMOVE_EXPOSURE,
+    ACTION_TYPE_UPDATE_EXPOSURE
+} from './../utils/enums';
 import { getCasesForOutbreakIdRequest } from './../queries/cases';
 import { storeCases } from './cases';
 import { addError } from './errors';
@@ -9,7 +14,28 @@ export function storeExposures(exposures) {
         type: ACTION_TYPE_STORE_EXPOSURES,
         payload: exposures
     }
-};
+}
+
+export function addExposure(exposure) {
+    return {
+        type: ACTION_TYPE_ADD_EXPOSURE,
+        payload: exposure
+    }
+}
+
+export function updateExposure(exposure) {
+    return {
+        type: ACTION_TYPE_UPDATE_EXPOSURE,
+        payload: exposure
+    }
+}
+
+export function removeExposure(exposure) {
+    return {
+        type: ACTION_TYPE_REMOVE_EXPOSURE,
+        payload: exposure
+    }
+}
 
 export function getExposuresForOutbreakIdWithPromise(outbreakId, filter, alsoStoreCases, token, dispatch) {
     return new Promise((resolve, reject) => {
@@ -28,4 +54,4 @@ export function getExposuresForOutbreakIdWithPromise(outbreakId, filter, alsoSto
             }
         })
     })
-};
+}

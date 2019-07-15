@@ -28,6 +28,7 @@ import CardComponent from './../components/CardComponent';
 import translations from './../utils/translations'
 import ElevatedView from 'react-native-elevated-view';
 import _ from 'lodash';
+import moment from 'moment';
 
 class ContactsSingleAddress extends PureComponent {
 
@@ -289,7 +290,7 @@ class ContactsSingleAddress extends PureComponent {
 
         if (item.type === 'DatePicker') {
             if (item.objectType === 'Address' && item.id === 'date') {
-                maximumDate = new Date()
+                maximumDate = moment.utc()._d;
             }
         }
 

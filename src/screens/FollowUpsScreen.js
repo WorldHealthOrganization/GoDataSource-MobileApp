@@ -7,8 +7,8 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, { Component } from 'react';
-import { View, Text, StyleSheet, Alert, Animated, NativeModules, BackHandler } from 'react-native';
-import { Button, Icon } from 'react-native-material-ui';
+import { View, Text, StyleSheet, Alert, Animated, BackHandler } from 'react-native';
+import { Icon } from 'react-native-material-ui';
 import styles from './../styles';
 import NavBarCustom from './../components/NavBarCustom';
 import CalendarPicker from './../components/CalendarPicker';
@@ -17,12 +17,12 @@ import Ripple from 'react-native-material-ripple';
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import SearchFilterView from './../components/SearchFilterView';
-import FollowUpListItem from './../components/FollowUpListItem';
+// import FollowUpListItem from './../components/FollowUpListItem';
 import PersonListItem from './../components/PersonListItem';
-import MissedFollowUpListItem from './../components/MissedFollowUpListItem';
+// import MissedFollowUpListItem from './../components/MissedFollowUpListItem';
 import AnimatedListView from './../components/AnimatedListView';
 import Breadcrumb from './../components/Breadcrumb';
-import Menu, { MenuItem } from 'react-native-material-menu';
+// import Menu, { MenuItem } from 'react-native-material-menu';
 import ValuePicker from './../components/ValuePicker';
 import { getFollowUpsForOutbreakId, getMissedFollowUpsForOutbreakId, addFollowUp } from './../actions/followUps';
 import { getContactsForOutbreakId } from './../actions/contacts';
@@ -32,14 +32,14 @@ import ElevatedView from 'react-native-elevated-view';
 import _ from 'lodash';
 import AddFollowUpScreen from './AddFollowUpScreen';
 // import GenerateFollowUpScreen from './GenerateFollowUpScreen';
-import { LoaderScreen, Colors } from 'react-native-ui-lib';
+// import { LoaderScreen, Colors } from 'react-native-ui-lib';
 import { calculateDimension, navigation, extractIdFromPouchId, generateId, updateRequiredFields, getTranslation, localSortContactsForFollowUps, objSort } from './../utils/functions';
 import ViewHOC from './../components/ViewHOC';
 import { Popup } from 'react-native-map-link';
 import moment from 'moment';
 import translations from './../utils/translations'
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-import { getItemByIdRequest } from './../queries/cases';
+// import { getItemByIdRequest } from './../queries/cases';
 import { pushNewEditScreen } from './../utils/screenTransitionFunctions';
 import RNExitApp from 'react-native-exit-app';
 
@@ -54,10 +54,11 @@ class FollowUpsScreen extends Component {
 
     constructor(props) {
         super(props);
-        let now = new Date();
+        let now = moment.utc()._d;
         this.state = {
             filter: this.props.filter && this.props.filter['FollowUpsScreen'] ? this.props.filter['FollowUpsScreen'] : {
-                date: new Date(new Date((now.getUTCMonth() + 1) + '/' + now.getUTCDate() + '/' + now.getUTCFullYear()).getTime() - ((moment().isDST() ? now.getTimezoneOffset() : now.getTimezoneOffset() - 60) * 60 * 1000)),
+                date: now,
+                    // new Date(new Date((now.getUTCMonth() + 1) + '/' + now.getUTCDate() + '/' + now.getUTCFullYear()).getTime() - ((moment().isDST() ? now.getTimezoneOffset() : now.getTimezoneOffset() - 60) * 60 * 1000)),
                 searchText: ''
             },
             filterFromFilterScreen: this.props.filter && this.props.filter['FollowUpsFilterScreen'] ? this.props.filter['FollowUpsFilterScreen'] : null,
@@ -313,7 +314,7 @@ class FollowUpsScreen extends Component {
                         width={calculateDimension(124, false, this.props.screenSize)}
                         height={calculateDimension(25, true, this.props.screenSize)}
                         onDayPress={this.handleDayPress}
-                        value={this.state.filter.date || new Date().toLocaleString()}
+                        value={this.state.filter.date || moment.utc()._d.toLocaleString()}
                         pickerOpen={this.state.calendarPickerOpen}
                         openCalendarModal={this.openCalendarModal}
                     />
@@ -691,8 +692,8 @@ class FollowUpsScreen extends Component {
 
     handleOnSavePressed = (contact, date) => {
         // Here contact={label: <name>, value: <contactId>} and date is a regular date
-        let now = new Date();
-        date = new Date(date);
+        let now = moment.utc()._d;
+        date = moment.utc(date)._d;
         let followUp = {
             _id: 'followUp.json_' + this.props.user.activeOutbreakId + '_' + date.getTime() + '_' + generateId(),
             statusId: config.followUpStatuses.notPerformed,

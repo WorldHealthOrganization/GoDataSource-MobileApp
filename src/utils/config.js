@@ -4,6 +4,7 @@
 import styles from './../styles';
 import {Platform} from 'react-native';
 import translations from './translations';
+import moment from 'moment';
 
 const baseUrls = [
     {value: 'gva11sucombee.who.int:3000'},
@@ -1341,7 +1342,7 @@ const addExposureScreen = [
         cardNumber: 1,
         id: 'contactDate',
         label: translations.exposureScreen.contactDate,
-        value: new Date(),
+        value: moment.utc()._d,
         type: "DatePicker",
         isRequired: true,
         isEditMode: true,
@@ -1793,7 +1794,7 @@ const contactsSingleScreen = {
                 cardNumber: 1,
                 id: 'contactDate',
                 label: translations.exposureScreen.contactDate,
-                value: new Date(),
+                value: moment.utc()._d,
                 type: "DatePicker",
                 isRequired: true,
                 isEditMode: true,
@@ -2411,7 +2412,7 @@ const caseBlueprint = {
                 coordinates: [0, 0],
                 type: 'Point'
             },
-            date: new Date()
+            date: moment.utc()._d
         }
     ],
     documents: [],

@@ -15,7 +15,8 @@ import Button from '../components/Button';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import sortBy from 'lodash/sortBy';
 import cloneDeep from 'lodash/cloneDeep';
-import translations from './../utils/translations'
+import translations from './../utils/translations';
+import moment from 'moment';
 
 class CaseSingleInvestigationContainer extends Component {
 
@@ -36,10 +37,10 @@ class CaseSingleInvestigationContainer extends Component {
             for (let questionId in state.previousAnswers) {
                 if (Array.isArray(state.previousAnswers[questionId]) && state.previousAnswers[questionId].length > 1) {
                     state.previousAnswers[questionId] = state.previousAnswers[questionId].sort((a, b) => {
-                        if (new Date(a.date) > new Date(b.date)) {
+                        if (moment.utc(a.date)._d > moment.utc(b.date)._d) {
                             return -1;
                         }
-                        if (new Date(a.date) < new Date(b.date)) {
+                        if (moment.utc(a.date)._d < moment.utc(b.date)._d) {
                             return 1;
                         }
                         return 0;
