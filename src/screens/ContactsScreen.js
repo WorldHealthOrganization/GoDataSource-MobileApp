@@ -352,20 +352,20 @@ class ContactsScreen extends Component {
                 onPressNameProp={this.handleOnPressNameProp}
                 onPressExposureProp={this.handleOnPressExposureProp}
                 textsArray={[
-                    // getTranslation(translations.contactsScreen.addFollowupsButton, this.props.translation),
+                    getTranslation(translations.contactsScreen.addFollowupsButton, this.props.translation),
                     getTranslation(translations.contactsScreen.editButton, this.props.translation),
                     getTranslation(translations.followUpsScreen.addExposureFollowUpLabel, this.props.translation)
                 ]}
                 textsStyleArray={[
                     [styles.buttonTextActionsBar, {fontSize: 14, marginLeft: margins}],
-                    // [styles.buttonTextActionsBar, {fontSize: 14}],
+                    [styles.buttonTextActionsBar, {fontSize: 14}],
                     [styles.buttonTextActionsBar, {fontSize: 14, marginRight: margins}]]
                 }
                 onPressTextsArray={[
-                    // () => {
-                    //     console.log('Test performance renderFollowUpQuestion');
-                    //     this.handlePressFollowUp(item)
-                    // },
+                    () => {
+                        console.log('Test performance renderFollowUpQuestion');
+                        this.handlePressFollowUp(item)
+                    },
                     () => {
                         console.log('Test performance renderFollowUpQuestion');
                         this.handleOnPressMissing(item)
