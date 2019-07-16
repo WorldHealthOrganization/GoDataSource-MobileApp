@@ -15,7 +15,8 @@ import { Calendar, CalendarList, Agenda } from 'react-native-calendars';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import ElevatedView from 'react-native-elevated-view';
-import translations from './../utils/translations'
+import translations from './../utils/translations';
+import moment from 'moment';
 
 class CalendarPicker extends PureComponent {
 
@@ -63,8 +64,9 @@ class CalendarPicker extends PureComponent {
         let dateAux = getTranslation(translations.generalLabels.today, this.props.translation);
         if (!checkIfSameDay(new Date(date.dateString), new Date())) {
             // dateAux format = "YYYY-MM-DD"
-            let date1Time = new Date(date.dateString).getTime();
-            dateAux = new Date(date1Time + (new Date(date1Time).getTimezoneOffset() * 60 * 1000)).toLocaleDateString();
+            // let date1Time = new Date(date.dateString).getTime();
+            dateAux = moment.utc(date.timestamp)._d.toLocaleDateString();
+                // new Date(date1Time + (new Date(date1Time).getTimezoneOffset() * 60 * 1000)).toLocaleDateString();
         }
         // let dateAux = checkIfSameDay(new Date(date.dateString), new Date()) ? 'Today' : new Date(date.dateString).toLocaleDateString();
         this.setState({

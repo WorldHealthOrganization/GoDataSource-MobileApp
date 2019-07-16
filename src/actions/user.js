@@ -353,7 +353,7 @@ export function computeCommonData(storeUserBool, user, refreshFollowUps, filters
                 promises.push(getHelpCategory(null, dispatch));
                 promises.push(getHelpItem(null, dispatch));
                 if (refreshFollowUps) {
-                    let now = new Date();
+                    let now = moment.utc()._d;
                     promises.push(getFollowUpsForOutbreakIdWithPromises(user.activeOutbreakId, filters['FollowUpsScreen'] || {
                         date: new Date(new Date((now.getUTCMonth() + 1) + '/' + now.getUTCDate() + '/' + now.getUTCFullYear()).getTime() - ((moment().isDST() ? now.getTimezoneOffset() : now.getTimezoneOffset() - 60) * 60 * 1000)),
                         searchText: ''

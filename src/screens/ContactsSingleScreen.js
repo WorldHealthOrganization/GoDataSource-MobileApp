@@ -70,12 +70,12 @@ class ContactsSingleScreen extends Component {
                     years: 0,
                     months: 0
                 },
-                dateOfReporting: new Date(),
+                dateOfReporting: moment.utc()._d,
                 isDateOfReportingApproximate: false,
                 relationships: [
                     {
                         outbreakId: this.props.user.activeOutbreakId ? this.props.user.activeOutbreakId : '',
-                        contactDate: new Date(),
+                        contactDate: moment.utc()._d,
                         contactDateEstimated: false,
                         certaintyLevelId: '',
                         exposureTypeId: '',
@@ -102,7 +102,7 @@ class ContactsSingleScreen extends Component {
                             coordinates: [0, 0],
                             type: 'Point'
                         },
-                        date: new Date()
+                        date: moment.utc()._d
                     }
                 ],
             } : Object.assign({}, this.props.contact),
@@ -733,7 +733,7 @@ class ContactsSingleScreen extends Component {
             )
         } else {
             if (id === 'dob') {
-                let today = new Date();
+                let today = moment.utc()._d;
                 let nrOFYears = this.calcDateDiff(value, today);
                 if (nrOFYears !== undefined && nrOFYears !== null) {
                     let ageClone = { years: 0, months: 0 }
@@ -1304,8 +1304,8 @@ class ContactsSingleScreen extends Component {
 
         if (this.state.contact.dob !== null && this.state.contact.dob !== undefined) {
             //get info from date
-            dobClone = this.state.contact.dob
-            let today = new Date()
+            dobClone = this.state.contact.dob;
+            let today = moment.utc()._d;
             let nrOFYears = this.calcDateDiff(dobClone, today);
             if (nrOFYears !== undefined && nrOFYears !== null) {
                 //calc age for save
@@ -1506,7 +1506,7 @@ class ContactsSingleScreen extends Component {
         this._hideDateTimePicker();
 
         this.setState(prevState => ({
-            contact: Object.assign({}, prevState.contact, { deceased: true, dateDeceased: date })
+            contact: Object.assign({}, prevState.contact, { deceased: true, dateDeceased: moment.utc(date)._d })
         }), () => {
             this.handleOnPressSave();
         });
@@ -1586,7 +1586,7 @@ class ContactsSingleScreen extends Component {
                 coordinates: [0, 0],
                 type: 'Point'
             },
-            date: new Date()
+            date: moment.utc()._d
         });
 
         this.setState(prevState => ({

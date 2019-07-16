@@ -39,6 +39,7 @@ import {addError} from './errors';
 // import RNDB from 'react-native-nosql-to-sqlite';
 import {getSyncEncryptPassword} from './../utils/encryption';
 import errorTypes from "../utils/errorTypes";
+import moment from 'moment';
 
 let arrayOfStatuses = [];
 
@@ -362,7 +363,7 @@ function processFilesForSync(error, response, hubConfiguration, isFirstTime, syn
                                                 storeData('activeDatabase', hubConfiguration.url, (errorActiveDatabase) => {
                                                     if (!errorActiveDatabase) {
                                                         dispatch(saveActiveDatabase(hubConfiguration.url));
-                                                        storeData(hubConfiguration.url, new Date(), (errorStoreLastSync) => {
+                                                        storeData(hubConfiguration.url, moment.utc()._d, (errorStoreLastSync) => {
                                                             if (!errorStoreLastSync) {
                                                                 // if all was successful, then store the database in async storage
                                                                 AsyncStorage.getItem('databases')
@@ -555,7 +556,7 @@ function processFilesForSync(error, response, hubConfiguration, isFirstTime, syn
                                                 storeData('activeDatabase', hubConfiguration.url, (errorActiveDatabase) => {
                                                     if (!errorActiveDatabase) {
                                                         dispatch(saveActiveDatabase(hubConfiguration.url));
-                                                        storeData(hubConfiguration.url, new Date(), (errorStoreLastSync) => {
+                                                        storeData(hubConfiguration.url, moment.utc()._d, (errorStoreLastSync) => {
                                                             if (!errorStoreLastSync) {
                                                                 // if all was successful, then store the database in async storage
                                                                 AsyncStorage.getItem('databases')

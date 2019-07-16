@@ -29,6 +29,7 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import {pushNewEditScreen} from './../utils/screenTransitionFunctions';
 import RNExitApp from 'react-native-exit-app';
 import {extractIdFromPouchId} from "../utils/functions";
+import moment from 'moment';
 
 const scrollAnim = new Animated.Value(0);
 const offsetAnim = new Animated.Value(0);
@@ -43,7 +44,7 @@ class ContactsScreen extends Component {
         this.state = {
             contacts: [],
             filter: this.props.filter && this.props.filter['FollowUpsScreen'] ? this.props.filter['FollowUpsScreen'] : {
-                date: new Date(),
+                date: moment.utc()._d,
                 searchText: ''
             },
             filterFromFilterScreen: this.props.filter && this.props.filter['ContactsFilterScreen'] ? this.props.filter['ContactsFilterScreen'] : null,
@@ -351,20 +352,20 @@ class ContactsScreen extends Component {
                 onPressNameProp={this.handleOnPressNameProp}
                 onPressExposureProp={this.handleOnPressExposureProp}
                 textsArray={[
-                    // getTranslation(translations.contactsScreen.addFollowupsButton, this.props.translation),
+                    getTranslation(translations.contactsScreen.addFollowupsButton, this.props.translation),
                     getTranslation(translations.contactsScreen.editButton, this.props.translation),
                     getTranslation(translations.followUpsScreen.addExposureFollowUpLabel, this.props.translation)
                 ]}
                 textsStyleArray={[
                     [styles.buttonTextActionsBar, {fontSize: 14, marginLeft: margins}],
-                    // [styles.buttonTextActionsBar, {fontSize: 14}],
+                    [styles.buttonTextActionsBar, {fontSize: 14}],
                     [styles.buttonTextActionsBar, {fontSize: 14, marginRight: margins}]]
                 }
                 onPressTextsArray={[
-                    // () => {
-                    //     console.log('Test performance renderFollowUpQuestion');
-                    //     this.handlePressFollowUp(item)
-                    // },
+                    () => {
+                        console.log('Test performance renderFollowUpQuestion');
+                        this.handlePressFollowUp(item)
+                    },
                     () => {
                         console.log('Test performance renderFollowUpQuestion');
                         this.handleOnPressMissing(item)
@@ -473,7 +474,7 @@ class ContactsScreen extends Component {
             // animationType: 'fade',
             passProps: {
                 item: {
-                    date: new Date(),
+                    date: moment.utc()._d,
                     outbreakId: this.props.user.activeOutbreakId,
                     lostToFollowUp: false,
                     address: contactPlaceOfResidence,

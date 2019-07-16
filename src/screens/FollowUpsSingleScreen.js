@@ -26,6 +26,7 @@ import translations from './../utils/translations'
 import ElevatedView from 'react-native-elevated-view';
 import ViewHOC from './../components/ViewHOC';
 import AddSingleAnswerModalScreen from './AddSingleAnswerModalScreen';
+import moment from 'moment';
 
 
 class FollowUpsSingleScreen extends Component {
@@ -66,11 +67,11 @@ class FollowUpsSingleScreen extends Component {
 
         if (this.props.isNew === false) {
             if (this.props.role && this.props.role.find((e) => e === config.userPermissions.writeFollowUp) !== undefined) {
-                let today = new Date()
-                let itemDate = new Date(this.props.item.date)
+                let today = moment.utc()._d;
+                let itemDate = moment.utc(this.props.item.date)._d;
 
-                var todayDate = new Date(today.getFullYear(), today.getMonth(), today.getDate())
-                let followUpDate = new Date(itemDate.getFullYear(), itemDate.getMonth(), itemDate.getDate())
+                var todayDate = moment.utc([today.getFullYear(), today.getMonth(), today.getDate()])._d;
+                let followUpDate = moment.utc([itemDate.getFullYear(), itemDate.getMonth(), itemDate.getDate()])._d;
 
                 if (followUpDate > todayDate) {
                     console.log('follow-ups date < today => needitabil')
@@ -210,9 +211,9 @@ class FollowUpsSingleScreen extends Component {
                                                     </Ripple>
                                                 }
                                             >
-                                                <MenuItem onPress={this.handleOnPressMissing}>
-                                                    {getTranslation(translations.followUpsSingleScreen.missingButton, this.props.translation)}
-                                                </MenuItem>
+                                                {/*<MenuItem onPress={this.handleOnPressMissing}>*/}
+                                                    {/*{getTranslation(translations.followUpsSingleScreen.missingButton, this.props.translation)}*/}
+                                                {/*</MenuItem>*/}
                                                 {/*<MenuItem onPress={this.handleOnPressDeceased}>*/}
                                                 {/*{getTranslation(translations.followUpsSingleScreen.deceasedButton, this.props.translation)}*/}
                                                 {/*</MenuItem>*/}
@@ -223,11 +224,11 @@ class FollowUpsSingleScreen extends Component {
                                                     {getTranslation(translations.followUpsSingleScreen.editContactButton, this.props.translation)}
                                                 </MenuItem>
 
-                                                <DateTimePicker
-                                                    isVisible={this.state.isDateTimePickerVisible}
-                                                    onConfirm={this._handleDatePicked}
-                                                    onCancel={this._hideDateTimePicker}
-                                                />
+                                                {/*<DateTimePicker*/}
+                                                    {/*isVisible={this.state.isDateTimePickerVisible}*/}
+                                                    {/*onConfirm={this._handleDatePicked}*/}
+                                                    {/*onCancel={this._hideDateTimePicker}*/}
+                                                {/*/>*/}
                                             </Menu>
                                         </View>
                                     ) : null
@@ -735,7 +736,7 @@ class FollowUpsSingleScreen extends Component {
 
     handleOnPressSave = () => {
         // Mark followUp as performed, and then update to the server
-        let now = new Date();
+        let now = moment.utc()._d;
         this.setState(prevState => ({
             item: Object.assign({}, prevState.item,
                 {
@@ -858,7 +859,7 @@ class FollowUpsSingleScreen extends Component {
                         this.setState(prevState => ({
                             item: Object.assign({}, prevState.item, {
                                 deleted: true,
-                                deletedAt: new Date().toISOString()
+                                deletedAt:moment.utc()._d.toISOString()
                             })
                         }), () => {
                             this.handleOnPressSave();
@@ -972,10 +973,10 @@ class FollowUpsSingleScreen extends Component {
         // currentAnswersClone[Object.keys(currentAnswersClone)[0]][0].date = currentAnswersClone[Object.keys(currentAnswersClone)[0]][0].date.toISOString();
         previousAnswersClone[Object.keys(currentAnswersClone)[0]].push(currentAnswersClone[Object.keys(currentAnswersClone)[0]][0]);
         previousAnswersClone[Object.keys(currentAnswersClone)[0]].sort((a, b) => {
-            if (new Date(a.date) > new Date(b.date)) {
+            if (moment.utc(a.date)._d > moment.utc(b.date)._d) {
                 return -1;
             }
-            if (new Date(a.date) < new Date(b.date)) {
+            if (moment.utc(a.date)._d < moment.utc(b.date)._d) {
                 return 1;
             }
             return 0;

@@ -18,6 +18,7 @@ import defaultTranslations from './defaultTranslations'
 import {getSyncEncryptPassword, encrypt, decrypt} from './../utils/encryption';
 import RNFS from 'react-native-fs';
 import {Buffer} from 'buffer';
+import moment from 'moment';
 
 
 // This method is used for handling server responses. Please add here any custom error handling
@@ -1149,12 +1150,15 @@ export function mapContactsAndFollowUps(contacts, followUps) {
 
 export function updateRequiredFields(outbreakId, userId, record, action, fileType = '', type = '') {
 
+    // Set the date
+    let dateToBeSet = moment.utc()._d.toISOString();
+
     // console.log ('updateRequiredFields ', record, action)
     switch (action) {
         case 'create':
             record._id = record._id ? record._id : computeIdForFileType(fileType, outbreakId, record, type);
             record.fileType = fileType;
-            record.updatedAt = new Date().toISOString();
+            record.updatedAt = dateToBeSet;
             record.updatedBy = extractIdFromPouchId(userId, 'user');
             record.deleted = false;
             record.deletedAt = null;
@@ -1166,7 +1170,7 @@ export function updateRequiredFields(outbreakId, userId, record, action, fileTyp
 
         case 'update':
             //required fields: userId, record
-            record.updatedAt = new Date().toISOString();
+            record.updatedAt = dateToBeSet;
             record.updatedBy = extractIdFromPouchId(userId, 'user');
             record.deleted = false;
             record.deletedAt = null;
@@ -1175,10 +1179,10 @@ export function updateRequiredFields(outbreakId, userId, record, action, fileTyp
 
         case 'delete':
             //required fields: userId, record
-            record.updatedAt = new Date().toISOString();
+            record.updatedAt = dateToBeSet;
             record.updatedBy = extractIdFromPouchId(userId, 'user');
             record.deleted = true;
-            record.deletedAt = new Date().toISOString();
+            record.deletedAt = dateToBeSet;
             // console.log ('updateRequiredFields delete record', JSON.stringify(record))
 
             // WGD-1806 when removing cases/contacts and they have visualId, set it to null, and add a new document
@@ -1470,7 +1474,7 @@ export function reMapAnswers(answers) {
             return 0;
         });
         returnedAnswers[questionId] = returnedAnswers[questionId].map((e) => {
-            return {date: e.date ? new Date(e.date).toISOString() : e.date, value: e.value};
+            return {date: e.date ? moment.utc(e.date)._d.toISOString() : e.date, value: e.value};
         });
     }
 

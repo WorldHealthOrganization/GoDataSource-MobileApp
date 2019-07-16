@@ -14,7 +14,8 @@ import uniq from 'lodash/uniq';
 import get from 'lodash/get';
 import {getHelpItemsRequest} from './helpItem';
 import {getHelpCategoriesRequest} from './helpCategory';
-import {handleResponseFromRNFetchBlob} from './../utils/functions'
+import {handleResponseFromRNFetchBlob} from './../utils/functions';
+import moment from 'moment';
 
 export function getDatabaseSnapshotRequest(hubConfig, lastSyncDate, dispatch, callback) {
 
@@ -28,7 +29,7 @@ export function getDatabaseSnapshotRequest(hubConfig, lastSyncDate, dispatch, ca
 
     if (lastSyncDate) {
         filter.where = {
-            fromDate: new Date(lastSyncDate)
+            fromDate: moment.utc(lastSyncDate)._d
         }
     }
 

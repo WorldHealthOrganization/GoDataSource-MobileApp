@@ -281,7 +281,7 @@ export function addExposureForContact(outbreakId, contactId, exposure, token, co
 // Expects relationships to be an array of relationships
 function updateContactFollowUpFields(contact, outbreakPeriodOfFollowup) {
     if (contact && contact.relationships && Array.isArray(contact.relationships) && contact.relationships.length > 0) {
-        let maxDate = max(contact.relationships.map((e) => {return new Date(e.contactDate)}));
+        let maxDate = max(contact.relationships.map((e) => {return moment.utc(e.contactDate)._d}));
         let oldStartDate = contact && contact.followUp && contact.followUp.startDate ? contact.followUp.startDate : null;
         // let oldEndDate = contact && contact.followUp && contact.followUp.endDate ? contact.followUp.endDate : null;
 
