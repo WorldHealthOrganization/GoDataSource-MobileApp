@@ -15,7 +15,7 @@ import errorTypes from './../utils/errorTypes';
 // import config from './../utils/config';
 import {batchActions} from 'redux-batched-actions';
 import {setLoaderState} from "./app";
-
+import {addExposure, updateExposure, removeExposure} from './exposure';
 
 // Add here only the actions, not also the requests that are executed. For that purpose is the requests directory
 export function storeCases(cases) {
@@ -102,9 +102,16 @@ export function addCase(outbreakId, myCase, token, caseMatchFitler) {
             if (response) {
                 console.log("*** addCase response: ", JSON.stringify(response));
                 if (caseMatchFitler) {
-                    dispatch(addCaseAction(response));
+                    dispatch(batchActions([
+                        addCaseAction(response),
+                        addExposure(response)
+                    ]));
                 } else {
-                    dispatch(removeCaseAction(response));
+                    dispatch(batchActions([
+                        removeCaseAction(response),
+                        removeExposure(response)
+                    ])
+                    );
                 }
             }
         })
@@ -122,9 +129,15 @@ export function updateCase (outbreakId, caseId, myCase, token, caseMatchFitler) 
             if (response) {
                 console.log("*** updateCaseRequest response: ", JSON.stringify(response));
                 if (caseMatchFitler) {
-                    dispatch(updateCaseAction(response));
+                    dispatch(batchActions([
+                        updateCaseAction(response),
+                        updateExposure(response)
+                    ]));
                 } else {
-                    dispatch(removeCaseAction(response));
+                    dispatch(batchActions([
+                        removeCaseAction(response),
+                        removeExposure(response)
+                    ]));
                 }
             }
         })

@@ -15,7 +15,8 @@ import Button from '../components/Button';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import sortBy from 'lodash/sortBy';
 import cloneDeep from 'lodash/cloneDeep';
-import translations from './../utils/translations'
+import translations from './../utils/translations';
+import moment from 'moment';
 
 class CaseSingleInvestigationContainer extends Component {
 

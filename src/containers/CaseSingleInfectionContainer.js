@@ -17,6 +17,7 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import translations from './../utils/translations'
 import ElevatedView from 'react-native-elevated-view';
 import _ from 'lodash';
+import moment from 'moment';
 
 class CaseSingleInfectionContainer extends Component {
 
@@ -338,15 +339,15 @@ class CaseSingleInfectionContainer extends Component {
 
         if (item.type === 'DatePicker') {
             if (item.id === 'dateBecomeCase' || item.id === 'dateOfOutcome' || item.id === 'dateOfBurial' || item.id === 'dateOfOnset') {
-                maximumDate = new Date()
+                maximumDate = moment.utc()._d;
             } else if (item.id === 'dateOfInfection') {
                 if (this.props.case && this.props.case !== undefined && this.props.case.dateOfOnset && this.props.case.dateOfOnset !== undefined && this.props.case.dateOfOnset !== '') {
-                    maximumDate = new Date(this.props.case.dateOfOnset);
+                    maximumDate = moment.utc(this.props.case.dateOfOnset)._d;
                 } else {
-                    maximumDate = new Date()
+                    maximumDate = moment.utc()._d;
                 }
             } else if (item.id === 'dateDeceased') {
-                maximumDate = new Date();
+                maximumDate = moment.utc()._d;
                 let hasDateOfOnset = false
                 let hasDateOfReporting = false;
                 let hasDateOfInfection = false;

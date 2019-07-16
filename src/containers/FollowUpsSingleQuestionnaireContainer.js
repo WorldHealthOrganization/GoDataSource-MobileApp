@@ -27,6 +27,7 @@ import Section from './../components/Section';
 import { sortBy } from 'lodash';
 import translations from './../utils/translations'
 import cloneDeep from "lodash/cloneDeep";
+import moment from 'moment';
 
 class FollowUpsSingleQuestionnaireContainer extends PureComponent {
 
@@ -52,13 +53,7 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
         InteractionManager.runAfterInteractions(() => {
             this.setState({
                 interactionComplete: true,
-            }
-            // , () => {
-            //     if (this.props.previousAnswers && Object.keys(this.props.previousAnswers).length > 0) {
-            //         this.prepareQuestions();
-            //     }
-            // }
-            )
+            })
         })
     }
 

@@ -122,7 +122,7 @@ export function getFollowUpsForOutbreakId(outbreakId, filter, userTeams, token) 
         dispatch(setLoaderState(true));
         if (!filter) {
             filter = {};
-            filter.date = new Date();
+            filter.date = moment.utc()._d;
         }
         getFollowUpsForOutbreakIdRequest(outbreakId, filter, userTeams, token, (error, response) => {
             if (error) {
@@ -175,7 +175,7 @@ export function getFollowUpsForOutbreakIdWithPromises(outbreakId, filter, userTe
     return new Promise((resolve, reject) => {
         if (!filter) {
             filter = {};
-            filter.date = new Date();
+            filter.date = moment.utc()._d;
         }
         console.log("getFollowUpsForOutbreakId Filter: ", filter);
         getFollowUpsForOutbreakIdRequest(outbreakId, filter, userTeams, token, (error, response) => {

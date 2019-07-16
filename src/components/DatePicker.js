@@ -135,7 +135,7 @@ class DatePicker extends PureComponent {
                     textAlign: 'left',
                     color: 'rgb(60,60,60)',
                 }}>
-                    {this.props.value !== null && this.props.value !== undefined && this.props.value !== '' ? moment(this.props.value).format('MM/DD/YYYY') : ''}
+                    {this.props.value !== null && this.props.value !== undefined && this.props.value !== '' ? moment.utc(this.props.value).format('MM/DD/YYYY') : ''}
                 </Text>
                 </View>
                 {
