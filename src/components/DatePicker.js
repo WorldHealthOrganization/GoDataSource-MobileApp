@@ -3,7 +3,6 @@
  */
 import React, {PureComponent} from 'react';
 import {View, Text, StyleSheet} from 'react-native';
-import {Icon} from 'react-native-material-ui';
 import PropTypes from 'prop-types';
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
@@ -12,8 +11,7 @@ import DateTimePicker from 'react-native-modal-datetime-picker';
 import Ripple from 'react-native-material-ripple';
 import style from './../styles';
 import moment from 'moment';
-import translations from './../utils/translations'
-import {getTranslation, getTooltip} from './../utils/functions';
+import {getTranslation, getTooltip, createDate} from './../utils/functions';
 import TooltipComponent from './TooltipComponent'
 
 class DatePicker extends PureComponent {
@@ -164,7 +162,7 @@ class DatePicker extends PureComponent {
     handleDatePicked = (date) => {
         console.log("### date picked: ", date, moment.utc(date).format());
         this.props.onChange(
-            moment.utc(date)._d,
+            createDate(date),
             this.props.id, 
             this.props.objectType ? (this.props.objectType === 'Address' || this.props.objectType === 'LabResult' || this.props.objectType === 'DateRanges' ? this.props.index : this.props.objectType) : null,
             this.props.objectType

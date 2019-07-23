@@ -14,7 +14,7 @@ import {
     Keyboard,
     findNodeHandle
 } from 'react-native';
-import { calculateDimension, getTranslation } from './../utils/functions';
+import { calculateDimension, getTranslation, createDate } from './../utils/functions';
 import config from './../utils/config';
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
@@ -265,7 +265,7 @@ class CaseSinglePersonalContainer extends Component {
 
         if (item.type === 'DatePicker') {
             if (item.id === 'dob' || item.id === 'dateOfReporting') {
-                maximumDate = moment.utc()._d;
+                maximumDate = createDate(null);
             }
         }
 

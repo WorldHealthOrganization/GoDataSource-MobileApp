@@ -2,7 +2,7 @@
  * Created by florinpopa on 18/09/2018.
  */
 import {getDatabase} from './database';
-import {extractIdFromPouchId} from './../utils/functions';
+import {createDate} from './../utils/functions';
 import {generateId} from './../utils/functions';
 import moment from 'moment';
 import config from './../utils/config';
@@ -69,8 +69,8 @@ export function getFollowUpsForOutbreakIdRequest (outbreakId, filter, userTeams,
             let endDate = '';
             // new Date().getTimezoneOffset()
             if (filter && filter.date) {
-                startDate = new Date(`${filter.date.getMonth() + 1}/${filter.date.getDate()}/${filter.date.getFullYear()}`).getTime();
-                endDate = moment(filter.date.getTime() + (oneDay + (moment().isDST() ? filter.date.getTimezoneOffset() : (filter.date.getTimezoneOffset() - 60)) * 60 * 1000)).add(-1, 'second')._d.getTime();
+                startDate = createDate(filter.date).getTime();
+                endDate = createDate(filter.date, true).getTime();
             }
 
             database.find({

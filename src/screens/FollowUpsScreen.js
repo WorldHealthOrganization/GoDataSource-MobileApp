@@ -30,7 +30,7 @@ import _ from 'lodash';
 import AddFollowUpScreen from './AddFollowUpScreen';
 // import GenerateFollowUpScreen from './GenerateFollowUpScreen';
 // import { LoaderScreen, Colors } from 'react-native-ui-lib';
-import { calculateDimension, navigation, extractIdFromPouchId, generateId, updateRequiredFields, getTranslation, localSortContactsForFollowUps, objSort } from './../utils/functions';
+import { calculateDimension, navigation, extractIdFromPouchId, generateId, updateRequiredFields, getTranslation, localSortContactsForFollowUps, objSort, createDate } from './../utils/functions';
 import ViewHOC from './../components/ViewHOC';
 import { Popup } from 'react-native-map-link';
 import moment from 'moment';
@@ -53,7 +53,7 @@ class FollowUpsScreen extends Component {
 
     constructor(props) {
         super(props);
-        let now = moment.utc()._d;
+        let now = createDate(null);
         this.state = {
             filter: this.props.filter && this.props.filter['FollowUpsScreen'] ? this.props.filter['FollowUpsScreen'] : {
                 date: now,
@@ -363,10 +363,10 @@ class FollowUpsScreen extends Component {
                     handlePressNavbarButton={this.handlePressNavbarButton}
                 >
                     <CalendarPicker
-                        width={calculateDimension(124, false, this.props.screenSize)}
+                        width={calculateDimension(155, false, this.props.screenSize)}
                         height={calculateDimension(25, true, this.props.screenSize)}
                         onDayPress={this.handleDayPress}
-                        value={this.state.filter.date || moment.utc()._d.toLocaleString()}
+                        value={this.state.filter.date || createDate(null).toLocaleString()}
                         pickerOpen={this.state.calendarPickerOpen}
                         openCalendarModal={this.openCalendarModal}
                     />
@@ -375,27 +375,27 @@ class FollowUpsScreen extends Component {
                         onSelectValue={this.onSelectValue}
                         value={this.state.filter.performed && this.state.filter.performed.label ? this.state.filter.performed.label : config.dropDownValues[0].value}
                     />
-                    {
-                        this.props && this.props.role && Array.isArray(this.props.role) && this.props.role.length > 0 && this.props.role.find((e) => e === config.userPermissions.writeFollowUp) !== undefined ? (
-                            <ElevatedView
-                                elevation={3}
-                                style={{
-                                    backgroundColor: styles.buttonGreen,
-                                    width: calculateDimension(33, false, this.props.screenSize),
-                                    height: calculateDimension(25, true, this.props.screenSize),
-                                    borderRadius: 4
-                                }}
-                            >
-                                <Ripple style={{
-                                    flex: 1,
-                                    justifyContent: 'center',
-                                    alignItems: 'center'
-                                }} onPress={this.handleOnPressAddFollowUp}>
-                                    <Icon name="add" color={'white'} size={15} />
-                                </Ripple>
-                            </ElevatedView>
-                        ) : null
-                    }
+                    {/*{*/}
+                        {/*this.props && this.props.role && Array.isArray(this.props.role) && this.props.role.length > 0 && this.props.role.find((e) => e === config.userPermissions.writeFollowUp) !== undefined ? (*/}
+                            {/*<ElevatedView*/}
+                                {/*elevation={3}*/}
+                                {/*style={{*/}
+                                    {/*backgroundColor: styles.buttonGreen,*/}
+                                    {/*width: calculateDimension(33, false, this.props.screenSize),*/}
+                                    {/*height: calculateDimension(25, true, this.props.screenSize),*/}
+                                    {/*borderRadius: 4*/}
+                                {/*}}*/}
+                            {/*>*/}
+                                {/*<Ripple style={{*/}
+                                    {/*flex: 1,*/}
+                                    {/*justifyContent: 'center',*/}
+                                    {/*alignItems: 'center'*/}
+                                {/*}} onPress={this.handleOnPressAddFollowUp}>*/}
+                                    {/*<Icon name="add" color={'white'} size={15} />*/}
+                                {/*</Ripple>*/}
+                            {/*</ElevatedView>*/}
+                        {/*) : null*/}
+                    {/*}*/}
                 </NavBarCustom>
                 <View style={style.containerContent}>
                     <AnimatedListView
@@ -429,11 +429,11 @@ class FollowUpsScreen extends Component {
                     />
                 </View>
 
-                <AddFollowUpScreen
-                    showAddFollowUpScreen={this.state.showAddFollowUpScreen}
-                    onCancelPressed={this.handleOnCancelPressed}
-                    onSavePressed={this.handleOnSavePressed}
-                />
+                {/*<AddFollowUpScreen*/}
+                    {/*showAddFollowUpScreen={this.state.showAddFollowUpScreen}*/}
+                    {/*onCancelPressed={this.handleOnCancelPressed}*/}
+                    {/*onSavePressed={this.handleOnSavePressed}*/}
+                {/*/>*/}
                 <View style={styles.mapContainer}>
                     {
                         this.state.error === null ? (
@@ -756,8 +756,8 @@ class FollowUpsScreen extends Component {
 
     handleOnSavePressed = (contact, date) => {
         // Here contact={label: <name>, value: <contactId>} and date is a regular date
-        let now = moment.utc()._d;
-        date = moment.utc(date)._d;
+        let now = createDate(null);
+        date = createDate(date);
         let followUp = {
             _id: 'followUp.json_' + this.props.user.activeOutbreakId + '_' + date.getTime() + '_' + generateId(),
             statusId: config.followUpStatuses.notPerformed,

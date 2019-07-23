@@ -16,7 +16,7 @@ import {
     findNodeHandle
 } from 'react-native';
 import { LoaderScreen } from 'react-native-ui-lib';
-import { calculateDimension, getTranslation, extractIdFromPouchId } from './../utils/functions';
+import { calculateDimension, getTranslation, extractIdFromPouchId, createDate } from './../utils/functions';
 import config from './../utils/config';
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
@@ -290,7 +290,7 @@ class ContactsSingleAddress extends PureComponent {
 
         if (item.type === 'DatePicker') {
             if (item.objectType === 'Address' && item.id === 'date') {
-                maximumDate = moment.utc()._d;
+                maximumDate = createDate(null);
             }
         }
 

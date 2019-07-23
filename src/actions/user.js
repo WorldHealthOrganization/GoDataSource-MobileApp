@@ -33,6 +33,7 @@ import {getLocations} from './locations';
 import moment from 'moment';
 import get from 'lodash/get';
 import {middlewareFunction} from './app';
+import {createDate} from './../utils/functions';
 
 // Add here only the actions, not also the requests that are executed.
 // For that purpose is the requests directory
@@ -383,7 +384,7 @@ export function computeCommonData(storeUserBool, user, refreshFollowUps, filters
                 promises.push(getHelpCategory(null, dispatch));
                 promises.push(getHelpItem(null, dispatch));
                 if (refreshFollowUps) {
-                    let now = moment.utc()._d;
+                    let now = createDate(null);
                     promises.push(getFollowUpsForOutbreakIdWithPromises(user.activeOutbreakId, filters['FollowUpsScreen'] || {
                         date: new Date(new Date((now.getUTCMonth() + 1) + '/' + now.getUTCDate() + '/' + now.getUTCFullYear()).getTime() - ((moment().isDST() ? now.getTimezoneOffset() : now.getTimezoneOffset() - 60) * 60 * 1000)),
                         searchText: ''

@@ -14,7 +14,7 @@ import {
     findNodeHandle,
     ScrollView
 } from 'react-native';
-import { calculateDimension, extractAllQuestions, getTranslation, checkRequiredQuestions } from './../utils/functions';
+import { calculateDimension, extractAllQuestions, getTranslation, checkRequiredQuestions, createDate } from './../utils/functions';
 import config from './../utils/config';
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
@@ -77,10 +77,10 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
     //     for (let questionId in previousAns) {
     //         if (Array.isArray(previousAns[questionId]) && previousAns[questionId].length > 1) {
     //             previousAns[questionId] = previousAns[questionId].sort((a, b) => {
-    //                 if (new Date(a.date) > new Date(b.date)) {
+    //                 if (createDate(a.date) > createDate(b.date)) {
     //                     return -1;
     //                 }
-    //                 if (new Date(a.date) < new Date(b.date)) {
+    //                 if (createDate(a.date) < createDate(b.date)) {
     //                     return 1;
     //                 }
     //                 return 0;
@@ -156,10 +156,10 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
             for (let questionId in previousAnswers) {
                 if (Array.isArray(previousAnswers[questionId]) && previousAnswers[questionId].length > 1) {
                     previousAnswers[questionId] = previousAnswers[questionId].sort((a, b) => {
-                        if (new Date(a.date) > new Date(b.date)) {
+                        if (createDate(a.date) > createDate(b.date)) {
                             return -1;
                         }
-                        if (new Date(a.date) < new Date(b.date)) {
+                        if (createDate(a.date) < createDate(b.date)) {
                             return 1;
                         }
                         return 0;
