@@ -487,7 +487,7 @@ function processFilesForSync(error, response, hubConfiguration, isFirstTime, syn
                                                                         }
                                                                     })
                                                             } else {
-                                                                console.log('There was an error at storing last sync date: ', errorStoreLastSync);
+                                                                console.log('There was an error at storing last sync date: ', JSON.stringify(errorStoreLastSync));
                                                                 files = null;
                                                                 database = null;
                                                                 arrayOfStatuses.push({
@@ -503,7 +503,7 @@ function processFilesForSync(error, response, hubConfiguration, isFirstTime, syn
                                                             }
                                                         });
                                                     } else {
-                                                        console.log('There was an error at storing active database: ', errorActiveDatabase);
+                                                        console.log('There was an error at storing active database: ', JSON.stringify(errorActiveDatabase));
                                                         files = null;
                                                         database = null;
                                                         arrayOfStatuses.push({

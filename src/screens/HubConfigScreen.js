@@ -72,7 +72,7 @@ let textFieldsStructure = [
         value: '',
         isRequired: false,
         isEditMode: true,
-        keyboardType: 'user-email'
+        keyboardType: 'email-address'
     },
     {
         id: 'encryptedData',
@@ -192,7 +192,7 @@ class FirstConfigScreen extends Component {
         let minHeight = calculateDimension(72, true, this.props.screenSize);
 
         return (
-                <ViewHOC style={{flex: 1}} showLoader={this.state.showLoading} loaderText="Loading...">
+                <ViewHOC style={{flex: 1, backgroundColor: 'white'}} showLoader={this.state.showLoading} loaderText="Loading...">
                     <NavBarCustom style = {style.navbarContainer}
                                   title={getTranslation(translations.hubConfigScreen.label, this.props.translation)}
                                   navigator={this.props.navigator}

@@ -166,6 +166,7 @@ handleChangingSyncState = (syncState) => {
     };
 
     if (!syncState || syncState === 'Finished' || syncState === 'Reset') {
+        syncStateGlobal = cloneDeep(config.manualSyncStages);
         returnedValue = {
             showModal: false,
             syncState: syncState === 'Finished' ? syncState : cloneDeep(config.manualSyncStages),
@@ -180,7 +181,7 @@ handleChangingSyncState = (syncState) => {
 
             let index = syncStateGlobal.findIndex((e) => e.id === syncState.id);
             syncStateGlobal[index] = itemToBeChanged;
-            if (itemToBeChanged.status === 'Error' || (index === syncStateGlobal.length - 1 && itemToBeChanged.status === 'Success')) {
+            if (itemToBeChanged.status === 'Error' || ((index === syncStateGlobal.length - 1 || index === 3) && (itemToBeChanged.status === 'Success' || itemToBeChanged.status === 'No data to export'))) {
                 returnedValue.showCloseModalButton = true;
             }
         }
