@@ -13,7 +13,7 @@ import styles from './../styles';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import ElevatedView from 'react-native-elevated-view';
-import {calculateDimension, getTranslation} from './../utils/functions';
+import {calculateDimension, getTranslation, createDate} from './../utils/functions';
 import config from './../utils/config';
 import Section from './../components/Section';
 import DropdownInput from './../components/DropdownInput';
@@ -22,14 +22,14 @@ import {Dialog} from 'react-native-ui-lib';
 import {getContactsForOutbreakIdRequest} from './../queries/contacts';
 import DropdownSearchable from './../components/DropdownSearchable';
 import translations from './../utils/translations';
-import moment from 'moment';
+// import moment from 'moment';
 
 class AddFollowUpScreen extends PureComponent{
 
     constructor(props) {
         super(props);
         this.state = {
-            date: moment.utc().startOf('day')._d,
+            date: createDate(null),
             selectedContact: '',
             contacts: [],
             isModified: false,
@@ -134,7 +134,7 @@ class AddFollowUpScreen extends PureComponent{
 
     onSavePressed = () => {
         this.setState({
-            date: moment.utc().startOf('day')._d,
+            date: createDate(null),
             isModified: false
         }, () => {
             this.props.onSavePressed(this.state.date);
@@ -143,7 +143,7 @@ class AddFollowUpScreen extends PureComponent{
 
     onCancelPressed = () => {
         this.setState({
-            date: moment.utc().startOf('day')._d,
+            date: createDate(null),
             isModified: false
         }, () => {
             this.props.onCancelPressed();
