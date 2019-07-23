@@ -1162,7 +1162,7 @@ mapStateToProps = (state, ownProps) => {
         helpCategory: state.helpCategory,
         helpItem: state.helpItem,
         role: state.role,
-        cases: state.cases,
+        cases: state.exposure,
         referenceData: state.referenceData,
         mappedFollowUps: mappedFollowUps,
         showLoader: state.app.loaderState

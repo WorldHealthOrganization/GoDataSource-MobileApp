@@ -389,13 +389,13 @@ class ContactsSingleScreen extends Component {
                                                         </MenuItem>
                                                     ) : null
                                                 }
-                                                {
-                                                    !this.props.isNew && !this.state.contact.deleted ? (
-                                                        <MenuItem onPress={this.handleOnPressDeleteContact}>
-                                                            {getTranslation(translations.contactSingleScreen.deleteContactLabel, this.props.translation)}
-                                                        </MenuItem>
-                                                    ) : null
-                                                }
+                                                {/*{*/}
+                                                    {/*!this.props.isNew && !this.state.contact.deleted ? (*/}
+                                                        {/*<MenuItem onPress={this.handleOnPressDeleteContact}>*/}
+                                                            {/*{getTranslation(translations.contactSingleScreen.deleteContactLabel, this.props.translation)}*/}
+                                                        {/*</MenuItem>*/}
+                                                    {/*) : null*/}
+                                                {/*}*/}
                                                 <DateTimePicker
                                                     isVisible={this.state.isDateTimePickerVisible}
                                                     timeZoneOffsetInMinutes={0}

@@ -301,7 +301,7 @@ function mapStateToProps(state) {
     return {
         screenSize: state.app.screenSize,
         contacts: state.contacts,
-        cases: state.cases,
+        cases: state.exposure,
         events: state.events,
         translation: state.app.translation,
         role: state.role

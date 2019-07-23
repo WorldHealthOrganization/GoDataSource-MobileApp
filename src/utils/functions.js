@@ -1996,3 +1996,7 @@ export function daysSince(startDate, endDate) {
     }
     return moment.utc(endDate).startOf('day').diff(moment.utc(startDate).startOf('day'), 'days');
 }
+
+export function generateTeamId (contactAddress, teams, locations) {
+
+}

@@ -4,7 +4,7 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, { Component } from 'react';
-import { View, StyleSheet, Animated, Alert, BackHandler } from 'react-native';
+import { View, StyleSheet, Animated, Alert, BackHandler, Platform } from 'react-native';
 import { Icon } from 'react-native-material-ui';
 import styles from './../styles';
 import NavBarCustom from './../components/NavBarCustom';
@@ -249,9 +249,9 @@ class FollowUpsSingleScreen extends Component {
                                                 {/*<MenuItem onPress={this.handleOnPressDeceased}>*/}
                                                 {/*{getTranslation(translations.followUpsSingleScreen.deceasedButton, this.props.translation)}*/}
                                                 {/*</MenuItem>*/}
-                                                <MenuItem onPress={this.handleOnPressDelete}>
-                                                    {getTranslation(translations.followUpsSingleScreen.deleteButton, this.props.translation)}
-                                                </MenuItem>
+                                                {/*<MenuItem onPress={this.handleOnPressDelete}>*/}
+                                                    {/*{getTranslation(translations.followUpsSingleScreen.deleteButton, this.props.translation)}*/}
+                                                {/*</MenuItem>*/}
                                                 <MenuItem onPress={this.handleEditContact}>
                                                     {getTranslation(translations.followUpsSingleScreen.editContactButton, this.props.translation)}
                                                 </MenuItem>
