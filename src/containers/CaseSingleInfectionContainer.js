@@ -5,7 +5,7 @@
 // the material ui library, since it provides design and animations out of the box
 import React, { Component } from 'react';
 import { View, Text, StyleSheet, Alert, ScrollView, findNodeHandle } from 'react-native';
-import { calculateDimension, getTranslation, extractIdFromPouchId } from './../utils/functions';
+import { calculateDimension, getTranslation, extractIdFromPouchId, createDate } from './../utils/functions';
 import config from './../utils/config';
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
@@ -339,15 +339,15 @@ class CaseSingleInfectionContainer extends Component {
 
         if (item.type === 'DatePicker') {
             if (item.id === 'dateBecomeCase' || item.id === 'dateOfOutcome' || item.id === 'dateOfBurial' || item.id === 'dateOfOnset') {
-                maximumDate = moment.utc()._d;
+                maximumDate = createDate(null);
             } else if (item.id === 'dateOfInfection') {
                 if (this.props.case && this.props.case !== undefined && this.props.case.dateOfOnset && this.props.case.dateOfOnset !== undefined && this.props.case.dateOfOnset !== '') {
-                    maximumDate = moment.utc(this.props.case.dateOfOnset)._d;
+                    maximumDate = createDate(this.props.case.dateOfOnset);
                 } else {
-                    maximumDate = moment.utc()._d;
+                    maximumDate = createDate(null);
                 }
             } else if (item.id === 'dateDeceased') {
-                maximumDate = moment.utc()._d;
+                maximumDate = createDate(null);
                 let hasDateOfOnset = false
                 let hasDateOfReporting = false;
                 let hasDateOfInfection = false;

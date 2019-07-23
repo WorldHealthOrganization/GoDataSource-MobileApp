@@ -42,7 +42,7 @@ class ValuePicker extends PureComponent {
             <ElevatedView elevation={2}>
                 <ButtonWithIcons
                     label={this.props.value}
-                    width={calculateDimension(124, false, this.props.screenSize)}
+                    width={calculateDimension(155, false, this.props.screenSize)}
                     height={calculateDimension(25, true, this.props.screenSize)}
                     firstIcon="visibility"
                     secondIcon="arrow-drop-down"
@@ -59,7 +59,7 @@ class ValuePicker extends PureComponent {
                         }}
                         dropdownOffset={{
                             top: this.props.top,
-                            left: -calculateDimension(110, false, this.props.screenSize)
+                            left: -calculateDimension(145, false, this.props.screenSize)
                         }}
                         dropdownPosition={0}
                         onChangeText={this.handleChangeText}

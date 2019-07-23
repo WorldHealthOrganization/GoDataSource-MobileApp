@@ -30,7 +30,7 @@ import {unzipFile, readDir} from './../utils/functions';
 import RNFetchBlobFs from 'rn-fetch-blob/fs';
 import {processFile, getDataFromDatabaseFromFile} from './../utils/functions';
 import {createDatabase, getDatabase} from './../queries/database';
-import {setNumberOfFilesProcessed, createZipFileAtPath, extractIdFromPouchId} from './../utils/functions';
+import {setNumberOfFilesProcessed, createZipFileAtPath, createDate} from './../utils/functions';
 import {AsyncStorage} from 'react-native';
 import {getUserById} from './user';
 import {uniq} from 'lodash';
@@ -363,7 +363,7 @@ function processFilesForSync(error, response, hubConfiguration, isFirstTime, syn
                                                 storeData('activeDatabase', hubConfiguration.url, (errorActiveDatabase) => {
                                                     if (!errorActiveDatabase) {
                                                         dispatch(saveActiveDatabase(hubConfiguration.url));
-                                                        storeData(hubConfiguration.url, moment.utc()._d, (errorStoreLastSync) => {
+                                                        storeData(hubConfiguration.url, createDate(null), (errorStoreLastSync) => {
                                                             if (!errorStoreLastSync) {
                                                                 // if all was successful, then store the database in async storage
                                                                 AsyncStorage.getItem('databases')
@@ -556,7 +556,7 @@ function processFilesForSync(error, response, hubConfiguration, isFirstTime, syn
                                                 storeData('activeDatabase', hubConfiguration.url, (errorActiveDatabase) => {
                                                     if (!errorActiveDatabase) {
                                                         dispatch(saveActiveDatabase(hubConfiguration.url));
-                                                        storeData(hubConfiguration.url, moment.utc()._d, (errorStoreLastSync) => {
+                                                        storeData(hubConfiguration.url, createDate(null), (errorStoreLastSync) => {
                                                             if (!errorStoreLastSync) {
                                                                 // if all was successful, then store the database in async storage
                                                                 AsyncStorage.getItem('databases')

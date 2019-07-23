@@ -19,7 +19,7 @@ import {
 import { addError } from './errors';
 import errorTypes from './../utils/errorTypes';
 import {getRelationshipsForTypeRequest, getRelationshipsAndFollowUpsForContactRequest} from './../queries/relationships';
-import {extractIdFromPouchId, mapContactsAndRelationships, updateRequiredFields, mapContactsAndFollowUps} from './../utils/functions';
+import {extractIdFromPouchId, mapContactsAndRelationships, updateRequiredFields, mapContactsAndFollowUps, createDate} from './../utils/functions';
 import moment from 'moment';
 import config from './../utils/config';
 import {max} from 'lodash';
@@ -281,7 +281,7 @@ export function addExposureForContact(outbreakId, contactId, exposure, token, co
 // Expects relationships to be an array of relationships
 function updateContactFollowUpFields(contact, outbreakPeriodOfFollowup) {
     if (contact && contact.relationships && Array.isArray(contact.relationships) && contact.relationships.length > 0) {
-        let maxDate = max(contact.relationships.map((e) => {return moment.utc(e.contactDate)._d}));
+        let maxDate = max(contact.relationships.map((e) => {return createDate(e.contactDate)}));
         let oldStartDate = contact && contact.followUp && contact.followUp.startDate ? contact.followUp.startDate : null;
         // let oldEndDate = contact && contact.followUp && contact.followUp.endDate ? contact.followUp.endDate : null;
 

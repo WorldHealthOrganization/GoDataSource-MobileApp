@@ -14,7 +14,7 @@ import {
     findNodeHandle,
     ScrollView
 } from 'react-native';
-import { calculateDimension, extractAllQuestions, getTranslation, checkRequiredQuestions } from './../utils/functions';
+import { calculateDimension, extractAllQuestions, getTranslation, checkRequiredQuestions, createDate } from './../utils/functions';
 import config from './../utils/config';
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
@@ -79,10 +79,10 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
             for (let questionId in state.previousAnswers) {
                 if (Array.isArray(state.previousAnswers[questionId]) && state.previousAnswers[questionId].length > 1) {
                     state.previousAnswers[questionId] = state.previousAnswers[questionId].sort((a, b) => {
-                        if (moment.utc(a.date)._d > moment.utc(b.date)._d) {
+                        if (createDate(a.date) > createDate(b.date)) {
                             return -1;
                         }
-                        if (moment.utc(a.date)._d < moment.utc(b.date)._d) {
+                        if (createDate(a.date) < createDate(b.date)) {
                             return 1;
                         }
                         return 0;

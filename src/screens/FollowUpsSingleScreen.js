@@ -4,14 +4,14 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, { Component } from 'react';
-import { View, StyleSheet, Platform, Animated, Alert, BackHandler } from 'react-native';
+import { View, StyleSheet, Animated, Alert, BackHandler } from 'react-native';
 import { Icon } from 'react-native-material-ui';
 import styles from './../styles';
 import NavBarCustom from './../components/NavBarCustom';
 import config from './../utils/config';
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
-import { TabBar, TabView, SceneMap } from 'react-native-tab-view';
+import { TabBar, TabView } from 'react-native-tab-view';
 import FollowUpsSingleContainer from './../containers/FollowUpsSingleContainer';
 import FollowUpsSingleQuestionnaireContainer from './../containers/FollowUpsSingleQuestionnaireContainer';
 import Breadcrumb from './../components/Breadcrumb';
@@ -19,9 +19,8 @@ import Menu, { MenuItem } from 'react-native-material-menu';
 import Ripple from 'react-native-material-ripple';
 import { createFollowUp, updateFollowUpAndContact, deleteFollowUp } from './../actions/followUps';
 import { removeErrors } from './../actions/errors';
-import DateTimePicker from 'react-native-modal-datetime-picker';
 import _ from 'lodash';
-import { calculateDimension, extractIdFromPouchId, updateRequiredFields, getTranslation, mapAnswers, reMapAnswers } from './../utils/functions';
+import { calculateDimension, extractIdFromPouchId, updateRequiredFields, getTranslation, mapAnswers, reMapAnswers, createDate } from './../utils/functions';
 import translations from './../utils/translations'
 import ElevatedView from 'react-native-elevated-view';
 import ViewHOC from './../components/ViewHOC';
@@ -67,11 +66,11 @@ class FollowUpsSingleScreen extends Component {
 
         if (this.props.isNew === false) {
             if (this.props.role && this.props.role.find((e) => e === config.userPermissions.writeFollowUp) !== undefined) {
-                let today = moment.utc()._d;
-                let itemDate = moment.utc(this.props.item.date)._d;
+                let today = createDate(null);
+                let itemDate = createDate(this.props.item.date);
 
-                var todayDate = moment.utc([today.getFullYear(), today.getMonth(), today.getDate()])._d;
-                let followUpDate = moment.utc([itemDate.getFullYear(), itemDate.getMonth(), itemDate.getDate()])._d;
+                var todayDate = createDate(moment.utc([today.getFullYear(), today.getMonth(), today.getDate()])._d);
+                let followUpDate = createDate(moment.utc([itemDate.getFullYear(), itemDate.getMonth(), itemDate.getDate()])._d);
 
                 if (followUpDate > todayDate) {
                     console.log('follow-ups date < today => needitabil')
@@ -736,7 +735,7 @@ class FollowUpsSingleScreen extends Component {
 
     handleOnPressSave = () => {
         // Mark followUp as performed, and then update to the server
-        let now = moment.utc()._d;
+        let now = createDate(null);
         this.setState(prevState => ({
             item: Object.assign({}, prevState.item,
                 {
@@ -859,7 +858,7 @@ class FollowUpsSingleScreen extends Component {
                         this.setState(prevState => ({
                             item: Object.assign({}, prevState.item, {
                                 deleted: true,
-                                deletedAt:moment.utc()._d.toISOString()
+                                deletedAt: createDate().toISOString()
                             })
                         }), () => {
                             this.handleOnPressSave();
@@ -973,10 +972,10 @@ class FollowUpsSingleScreen extends Component {
         // currentAnswersClone[Object.keys(currentAnswersClone)[0]][0].date = currentAnswersClone[Object.keys(currentAnswersClone)[0]][0].date.toISOString();
         previousAnswersClone[Object.keys(currentAnswersClone)[0]].push(currentAnswersClone[Object.keys(currentAnswersClone)[0]][0]);
         previousAnswersClone[Object.keys(currentAnswersClone)[0]].sort((a, b) => {
-            if (moment.utc(a.date)._d > moment.utc(b.date)._d) {
+            if (createDate(a.date) > createDate(b.date)) {
                 return -1;
             }
-            if (moment.utc(a.date)._d < moment.utc(b.date)._d) {
+            if (createDate(a.date) < createDate(b.date)) {
                 return 1;
             }
             return 0;

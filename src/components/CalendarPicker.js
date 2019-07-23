@@ -5,13 +5,9 @@ import React, {PureComponent} from 'react';
 import {TextInput, View, Text, StyleSheet, Platform, Dimensions, TouchableOpacity} from 'react-native';
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
-import {ListItem, Icon, Button} from 'react-native-material-ui';
-import {calculateDimension, checkIfSameDay, getTranslation} from './../utils/functions';
-import config from './../utils/config';
+import {createDate, checkIfSameDay, getTranslation} from './../utils/functions';
 import CalendarPickerView from './CalendarPickerView';
-import Ripple from 'react-native-material-ripple';
 import ButtonWithIcons from './ButtonWithIcons';
-import { Calendar, CalendarList, Agenda } from 'react-native-calendars';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import ElevatedView from 'react-native-elevated-view';
@@ -50,7 +46,7 @@ class CalendarPicker extends PureComponent {
                 />
                 <CalendarPickerView
                     showPicker={this.props.pickerOpen}
-                    width={2.75 * this.props.width}
+                    width={2.21 * this.props.width}
                     dateChanged={this.handleDateChanged}
                     value={this.props.value}
                 />
@@ -65,7 +61,7 @@ class CalendarPicker extends PureComponent {
         if (!checkIfSameDay(new Date(date.dateString), new Date())) {
             // dateAux format = "YYYY-MM-DD"
             // let date1Time = new Date(date.dateString).getTime();
-            dateAux = moment.utc(date.timestamp)._d.toLocaleDateString();
+            dateAux = createDate(date.timestamp).toLocaleDateString();
                 // new Date(date1Time + (new Date(date1Time).getTimezoneOffset() * 60 * 1000)).toLocaleDateString();
         }
         // let dateAux = checkIfSameDay(new Date(date.dateString), new Date()) ? 'Today' : new Date(date.dateString).toLocaleDateString();

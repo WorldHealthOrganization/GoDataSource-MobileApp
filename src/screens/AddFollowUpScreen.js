@@ -13,7 +13,7 @@ import styles from './../styles';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import ElevatedView from 'react-native-elevated-view';
-import {calculateDimension, getTranslation} from './../utils/functions';
+import {calculateDimension, getTranslation, createDate} from './../utils/functions';
 import config from './../utils/config';
 import Section from './../components/Section';
 import DropdownInput from './../components/DropdownInput';
@@ -21,21 +21,22 @@ import DatePicker from './../components/DatePicker';
 import {Dialog} from 'react-native-ui-lib';
 import {getContactsForOutbreakIdRequest} from './../queries/contacts';
 import DropdownSearchable from './../components/DropdownSearchable';
-import translations from './../utils/translations'
+import translations from './../utils/translations';
+// import moment from 'moment';
 
 class AddFollowUpScreen extends PureComponent{
 
     constructor(props) {
         super(props);
         this.state = {
-            date: new Date(),
+            date: createDate(null),
             selectedContact: '',
             contacts: [],
             isModified: false,
         };
     }
 
-    componentDidMount() {
+    // componentDidMount() {
         // getContactsForOutbreakIdRequest(this.props.user.activeOutbreakId, null, null, (error, contacts) => {
         //     if (error) {
         //         console.log("An error occurred while getting all contacts for add contacts screen");
@@ -46,12 +47,12 @@ class AddFollowUpScreen extends PureComponent{
         //         })
         //     }
         // })
-    }
+    // }
 
     render () {
         let contentWidth = calculateDimension(297, false, this.props.screenSize);
         let marginHorizontal = calculateDimension(14, false, this.props.screenSize);
-        let height = calculateDimension(420, true, this.props.screenSize);
+        let height = calculateDimension(200, true, this.props.screenSize);
 
         return (
             <Dialog
@@ -68,7 +69,7 @@ class AddFollowUpScreen extends PureComponent{
                         borderRadius: 4,
                         marginVertical: 10,
                     }}>
-                    <View style={{flex: 0.1}}>
+                    <View style={{flex: 0.2}}>
                         <Section
                             label={getTranslation(translations.addFollowUpScreen.addFollowUpLabel, this.props.translation)}
                             hasBorderBottom={false}
@@ -76,7 +77,7 @@ class AddFollowUpScreen extends PureComponent{
                             translation={this.props.translation}
                         />
                     </View>
-                    <View style={{flex: 0.8, alignItems: 'center'}}>
+                    <View style={{flex: 0.4, alignItems: 'center'}}>
                         <DatePicker
                             id='followUpDate'
                             label={getTranslation(translations.addFollowUpScreen.followUpDateLabel, this.props.translation)}
@@ -87,14 +88,14 @@ class AddFollowUpScreen extends PureComponent{
                             style={{width: contentWidth, marginHorizontal, flex: 0.33}}
                             translation={this.props.translation}
                         />
-                        <DropdownSearchable
-                            outbreakId={this.props && this.props.user && this.props.user.activeOutbreakId ? this.props.user.activeOutbreakId : null}
-                            onChange={this.onDropdownSearchableChanged}
-                            placeholder={getTranslation(translations.addFollowUpScreen.searchContactPlacehodler, this.props.translation)}
-                            translation={this.props.translation}
-                        />
+                        {/*<DropdownSearchable*/}
+                            {/*outbreakId={this.props && this.props.user && this.props.user.activeOutbreakId ? this.props.user.activeOutbreakId : null}*/}
+                            {/*onChange={this.onDropdownSearchableChanged}*/}
+                            {/*placeholder={getTranslation(translations.addFollowUpScreen.searchContactPlacehodler, this.props.translation)}*/}
+                            {/*translation={this.props.translation}*/}
+                        {/*/>*/}
                     </View>
-                    <View style={{flex: 0.1, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-evenly'}}>
+                    <View style={{flex: 0.2, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-evenly'}}>
                         <Button
                             title={getTranslation(translations.generalButtons.cancelButtonLabel, this.props.translation)}
                             color="white"
@@ -133,16 +134,16 @@ class AddFollowUpScreen extends PureComponent{
 
     onSavePressed = () => {
         this.setState({
-            date: new Date(),
+            date: createDate(null),
             isModified: false
         }, () => {
-            this.props.onSavePressed(this.state.selectedContact, this.state.date);
+            this.props.onSavePressed(this.state.date);
         });
     };
 
     onCancelPressed = () => {
         this.setState({
-            date: new Date(),
+            date: createDate(null),
             isModified: false
         }, () => {
             this.props.onCancelPressed();
