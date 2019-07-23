@@ -11,12 +11,9 @@ import {
     InteractionManager,
     ScrollView,
     Alert,
-    TouchableWithoutFeedback,
-    Keyboard,
-    findNodeHandle
 } from 'react-native';
 import { LoaderScreen } from 'react-native-ui-lib';
-import { calculateDimension, getTranslation, extractIdFromPouchId } from './../utils/functions';
+import { calculateDimension, getTranslation, extractIdFromPouchId, createDate } from './../utils/functions';
 import config from './../utils/config';
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
@@ -24,7 +21,6 @@ import styles from './../styles';
 import CardComponent from './../components/CardComponent';
 import Button from './../components/Button';
 import Ripple from 'react-native-material-ripple';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import translations from './../utils/translations'
 import ElevatedView from 'react-native-elevated-view';
 import _ from 'lodash';
@@ -306,7 +302,7 @@ class CaseSingleAddressContainer extends PureComponent {
 
         if (item.type === 'DatePicker') {
             if (item.objectType === 'Address' && item.id === 'date') {
-                maximumDate = moment.utc()._d;
+                maximumDate = createDate(null);
             }
         }
 

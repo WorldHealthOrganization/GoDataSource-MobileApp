@@ -1,11 +1,9 @@
 /**
  * Created by florinpopa on 29/08/2018.
  */
-import url from './../utils/url';
 import RNFetchBlob from 'rn-fetch-blob';
 import base64 from 'base-64';
 import {Platform, AsyncStorage} from 'react-native';
-import {getSyncEncryptPassword} from './../utils/encryption';
 import {setSyncState} from './../actions/app';
 import DeviceInfo from 'react-native-device-info';
 import translations from './../utils/translations';
@@ -13,8 +11,7 @@ import {testApi} from './testApi';
 import uniq from 'lodash/uniq';
 import get from 'lodash/get';
 import {getHelpItemsRequest} from './helpItem';
-import {getHelpCategoriesRequest} from './helpCategory';
-import {handleResponseFromRNFetchBlob} from './../utils/functions';
+import {handleResponseFromRNFetchBlob, createDate} from './../utils/functions';
 import moment from 'moment';
 
 export function getDatabaseSnapshotRequest(hubConfig, lastSyncDate, dispatch, callback) {
@@ -29,7 +26,7 @@ export function getDatabaseSnapshotRequest(hubConfig, lastSyncDate, dispatch, ca
 
     if (lastSyncDate) {
         filter.where = {
-            fromDate: moment.utc(lastSyncDate)._d
+            fromDate: createDate(lastSyncDate)
         }
     }
 

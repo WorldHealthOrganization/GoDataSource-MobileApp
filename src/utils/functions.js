@@ -91,9 +91,10 @@ export function checkIfSameDay(date1, date2) {
         return false;
     }
     // Correct timezone differences
-    let date1Time = new Date(date1).getTime();
-    date1 = new Date(date1Time + (new Date(date1Time).getTimezoneOffset() * 60 * 1000));
-    return date1.getDate() === date2.getDate() && date1.getMonth() === date2.getMonth() && date1.getFullYear() === date2.getFullYear();
+    // let date1Time = new Date(date1).getTime();
+    // date1 = new Date(date1Time + (new Date(date1Time).getTimezoneOffset() * 60 * 1000));
+    // return date1.getDate() === date2.getDate() && date1.getMonth() === date2.getMonth() && date1.getFullYear() === date2.getFullYear();
+    return moment.utc(date1).isSame(moment.utc(date2), 'day')
 }
 
 export function getAddress(address, returnString, locationsList) {
@@ -1151,7 +1152,8 @@ export function mapContactsAndFollowUps(contacts, followUps) {
 export function updateRequiredFields(outbreakId, userId, record, action, fileType = '', type = '') {
 
     // Set the date
-    let dateToBeSet = moment.utc()._d.toISOString();
+    let dateToBeSet = moment.utc()._d;
+    dateToBeSet = dateToBeSet.toISOString();
 
     // console.log ('updateRequiredFields ', record, action)
     switch (action) {
@@ -1474,7 +1476,7 @@ export function reMapAnswers(answers) {
             return 0;
         });
         returnedAnswers[questionId] = returnedAnswers[questionId].map((e) => {
-            return {date: e.date ? moment.utc(e.date)._d.toISOString() : e.date, value: e.value};
+            return {date: e.date ? createDate().toISOString() : e.date, value: e.value};
         });
     }
 
@@ -1913,4 +1915,24 @@ export function getDropDownInputDisplayParameters(screenSize, dropDownDataLength
         itemCount: itemCount,
         dropdownPosition: dropdownPosition
     }
+}
+
+export function createDate(date, isEndOfDay) {
+    if (isEndOfDay) {
+        if (date) {
+            return moment.utc(date).endOf('day')._d;
+        }
+        return moment.utc().endOf('day')._d;
+    }
+    if (date) {
+        return moment.utc(date).startOf('day')._d;
+    }
+    return moment.utc().startOf('day')._d;
+}
+
+export function daysSince(startDate, endDate) {
+    if (!startDate || !endDate) {
+        return 0
+    }
+    return moment.utc(endDate).startOf('day').diff(moment.utc(startDate).startOf('day'), 'days');
 }

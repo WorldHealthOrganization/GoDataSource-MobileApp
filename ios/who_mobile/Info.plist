@@ -21,7 +21,9 @@
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>1.0.53</string>
+	<string>1.0.55</string>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<true/>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>comgooglemaps</string>

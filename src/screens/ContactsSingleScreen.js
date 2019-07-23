@@ -22,17 +22,18 @@ import { getContactsNameForDuplicateCheckRequest, checkForNameDuplicatesRequest 
 import Breadcrumb from './../components/Breadcrumb';
 import Menu, { MenuItem } from 'react-native-material-menu';
 import Ripple from 'react-native-material-ripple';
-import { updateFollowUpAndContact, deleteFollowUp } from './../actions/followUps';
+import { updateFollowUpAndContact, deleteFollowUp, addFollowUp } from './../actions/followUps';
 import { updateContact, deleteExposureForContact, addContact } from './../actions/contacts';
 import { removeErrors } from './../actions/errors';
 import DateTimePicker from 'react-native-modal-datetime-picker';
 import _ from 'lodash';
-import { calculateDimension, extractIdFromPouchId, updateRequiredFields, navigation, getTranslation } from './../utils/functions';
+import { calculateDimension, extractIdFromPouchId, updateRequiredFields, navigation, getTranslation, createDate, daysSince } from './../utils/functions';
 import { getFollowUpsForContactRequest } from './../queries/followUps'
-import ios from 'rn-fetch-blob/ios';
 import moment from 'moment'
 import translations from './../utils/translations'
 import ElevatedView from 'react-native-elevated-view';
+import AddFollowUpScreen from './AddFollowUpScreen';
+import {generateId} from "../utils/functions";
 
 const initialLayout = {
     height: 0,
@@ -70,12 +71,12 @@ class ContactsSingleScreen extends Component {
                     years: 0,
                     months: 0
                 },
-                dateOfReporting: moment.utc()._d,
+                dateOfReporting: createDate(null),
                 isDateOfReportingApproximate: false,
                 relationships: [
                     {
                         outbreakId: this.props.user.activeOutbreakId ? this.props.user.activeOutbreakId : '',
-                        contactDate: moment.utc()._d,
+                        contactDate: createDate(null),
                         contactDateEstimated: false,
                         certaintyLevelId: '',
                         exposureTypeId: '',
@@ -102,7 +103,7 @@ class ContactsSingleScreen extends Component {
                             coordinates: [0, 0],
                             type: 'Point'
                         },
-                        date: moment.utc()._d
+                        date: createDate(null)
                     }
                 ],
             } : Object.assign({}, this.props.contact),
@@ -118,6 +119,7 @@ class ContactsSingleScreen extends Component {
             isEditMode: true,
             selectedItemIndexForTextSwitchSelectorForAge: 0, // age/dob - switch tab
             selectedItemIndexForAgeUnitOfMeasureDropDown: this.props.isNew ? 0 : (this.props.contact && this.props.contact.age && this.props.contact.age.years !== undefined && this.props.contact.age.years !== null && this.props.contact.age.years > 0) ? 0 : 1, //default age dropdown value
+            showAddFollowUpScreen: false
         };
         // Bind here methods, or at least don't declare methods in the render method
         this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this));
@@ -326,6 +328,13 @@ class ContactsSingleScreen extends Component {
                                                     ) : null
                                                 }
                                                 {
+                                                    !this.props.isNew ? (
+                                                        <MenuItem onPress={this.handleOnAddFollowUp}>
+                                                            {getTranslation(translations.contactsScreen.addFollowupsButton, this.props.translation)}
+                                                        </MenuItem>
+                                                    ) : null
+                                                }
+                                                {
                                                     !this.props.isNew && !this.state.contact.deleted ? (
                                                         <MenuItem onPress={this.handleOnPressDeleteContact}>
                                                             {getTranslation(translations.contactSingleScreen.deleteContactLabel, this.props.translation)}
@@ -336,6 +345,11 @@ class ContactsSingleScreen extends Component {
                                                     isVisible={this.state.isDateTimePickerVisible}
                                                     onConfirm={this._handleDatePicked}
                                                     onCancel={this._hideDateTimePicker}
+                                                />
+                                                <AddFollowUpScreen
+                                                    showAddFollowUpScreen={this.state.showAddFollowUpScreen}
+                                                    onCancelPressed={this.handleOnCancelPressed}
+                                                    onSavePressed={this.handleOnSavePressed}
                                                 />
                                             </Menu>
                                         </View>
@@ -363,6 +377,44 @@ class ContactsSingleScreen extends Component {
     };
 
     // Please write here all the methods that are not react native lifecycle methods
+    handleOnAddFollowUp = () => {
+        this.setState({
+            showAddFollowUpScreen: !this.state.showAddFollowUpScreen
+        })
+    };
+
+    handleOnCancelPressed = () => {
+        this.setState({
+            showAddFollowUpScreen: !this.state.showAddFollowUpScreen
+        })
+    };
+
+    handleOnSavePressed = (date) => {
+        // Here contact={label: <name>, value: <contactId>} and date is a regular date
+        let now = createDate(null);
+        date = createDate(date);
+        let followUp = {
+            _id: 'followUp.json_' + this.props.user.activeOutbreakId + '_' + date.getTime() + '_' + generateId(),
+            statusId: config.followUpStatuses.notPerformed,
+            targeted: false,
+            date: date,
+            fileType: 'followUp.json',
+            outbreakId: this.props.user.activeOutbreakId,
+            index: daysSince(_.get(this.state, 'contact.followUp.startDate', null), now) + 1,
+            personId: extractIdFromPouchId(this.state.contact._id, 'person.json'),
+            updatedAt: now.toISOString(),
+            updatedBy: extractIdFromPouchId(this.props.user._id, 'user.json'),
+            deleted: false,
+            deletedAt: null
+        };
+
+        this.setState({
+            showAddFollowUpScreen: !this.state.showAddFollowUpScreen
+        }, () => {
+            this.props.addFollowUp(this.props.user.activeOutbreakId, this.state.contact._id, followUp, this.state.filter, this.props.teams, this.props.user.token);
+        });
+    };
+
     handlePressNavbarButton = () => {
         this.props.navigator.toggleDrawer({
             side: 'left',
@@ -733,7 +785,7 @@ class ContactsSingleScreen extends Component {
             )
         } else {
             if (id === 'dob') {
-                let today = moment.utc()._d;
+                let today = createDate(null);
                 let nrOFYears = this.calcDateDiff(value, today);
                 if (nrOFYears !== undefined && nrOFYears !== null) {
                     let ageClone = { years: 0, months: 0 }
@@ -1305,7 +1357,7 @@ class ContactsSingleScreen extends Component {
         if (this.state.contact.dob !== null && this.state.contact.dob !== undefined) {
             //get info from date
             dobClone = this.state.contact.dob;
-            let today = moment.utc()._d;
+            let today = createDate(null);
             let nrOFYears = this.calcDateDiff(dobClone, today);
             if (nrOFYears !== undefined && nrOFYears !== null) {
                 //calc age for save
@@ -1506,7 +1558,7 @@ class ContactsSingleScreen extends Component {
         this._hideDateTimePicker();
 
         this.setState(prevState => ({
-            contact: Object.assign({}, prevState.contact, { deceased: true, dateDeceased: moment.utc(date)._d })
+            contact: Object.assign({}, prevState.contact, { deceased: true, dateDeceased: createDate(date) })
         }), () => {
             this.handleOnPressSave();
         });
@@ -1586,7 +1638,7 @@ class ContactsSingleScreen extends Component {
                 coordinates: [0, 0],
                 type: 'Point'
             },
-            date: moment.utc()._d
+            date: createDate(null)
         });
 
         this.setState(prevState => ({
@@ -1658,6 +1710,7 @@ function matchDispatchProps(dispatch) {
         addContact,
         deleteExposureForContact,
         removeErrors,
+        addFollowUp
     }, dispatch);
 };
 

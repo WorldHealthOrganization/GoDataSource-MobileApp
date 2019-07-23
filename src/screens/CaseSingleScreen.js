@@ -2,13 +2,12 @@
  * Created by mobileclarisoft on 23/07/2018.
  */
 import React, { Component } from 'react';
-import { View, Alert, Text, StyleSheet, Animated, ScrollView, Dimensions, BackHandler } from 'react-native';
-import { TabBar, TabView, SceneMap } from 'react-native-tab-view';
+import { View, Alert, StyleSheet, Animated, Dimensions, BackHandler } from 'react-native';
+import { TabBar, TabView } from 'react-native-tab-view';
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import NavBarCustom from './../components/NavBarCustom';
 import Breadcrumb from './../components/Breadcrumb';
-import Menu, { MenuItem } from 'react-native-material-menu';
 import Ripple from 'react-native-material-ripple';
 import styles from './../styles';
 import config from './../utils/config';
@@ -25,7 +24,18 @@ import { Icon } from 'react-native-material-ui';
 import { checkForNameDuplicatesRequest } from './../queries/cases'
 import { removeErrors } from './../actions/errors';
 import { addCase, updateCase } from './../actions/cases';
-import { updateRequiredFields, extractIdFromPouchId, navigation, getTranslation, calculateDimension, mapAnswers, reMapAnswers, checkRequiredQuestions, extractAllQuestions } from './../utils/functions';
+import {
+    updateRequiredFields,
+    extractIdFromPouchId,
+    navigation,
+    getTranslation,
+    calculateDimension,
+    mapAnswers,
+    reMapAnswers,
+    checkRequiredQuestions,
+    extractAllQuestions,
+    createDate
+} from './../utils/functions';
 import moment from 'moment';
 import translations from './../utils/translations'
 import ElevatedView from 'react-native-elevated-view';
@@ -97,7 +107,7 @@ class CaseSingleScreen extends Component {
                             coordinates: [0, 0],
                             type: 'Point'
                         },
-                        date: moment.utc()._d
+                        date: createDate(null)
                     }
                 ],
                 documents: [],
@@ -941,7 +951,7 @@ class CaseSingleScreen extends Component {
                 coordinates: [0, 0],
                 type: 'Point'
             },
-            date: moment.utc()._d
+            date: createDate(null)
         });
 
         this.setState(prevState => ({
@@ -1338,7 +1348,7 @@ class CaseSingleScreen extends Component {
     onChangeDate = (value, id, objectTypeOrIndex, objectType) => {
         // console.log("case onChangeDate: ", value, id, objectTypeOrIndex, objectType);
         if (id === 'dob') {
-            let today = moment.utc()._d;
+            let today = createDate(null);
             let nrOFYears = this.calcDateDiff(value, today);
             if (nrOFYears !== undefined && nrOFYears !== null) {
                 let ageClone = { years: 0, months: 0 }
@@ -1699,7 +1709,7 @@ class CaseSingleScreen extends Component {
         if (this.state.case.dob !== null && this.state.case.dob !== undefined) {
             //get info from date
             dobClone = this.state.case.dob;
-            let today = moment.utc()._d;
+            let today = createDate(null);
             let nrOFYears = this.calcDateDiff(dobClone, today);
             if (nrOFYears !== undefined && nrOFYears !== null) {
                 //calc age for save
@@ -1980,10 +1990,10 @@ class CaseSingleScreen extends Component {
         // currentAnswersClone[Object.keys(currentAnswersClone)[0]][0].date = currentAnswersClone[Object.keys(currentAnswersClone)[0]][0].date.toISOString();
         previousAnswersClone[Object.keys(currentAnswersClone)[0]].push(currentAnswersClone[Object.keys(currentAnswersClone)[0]][0]);
         previousAnswersClone[Object.keys(currentAnswersClone)[0]].sort((a, b) => {
-            if (moment.utc(a.date)._d > moment.utc(b.date)._d) {
+            if (createDate(a.date) > createDate(b.date)) {
                 return -1;
             }
-            if (moment.utc(a.date)._d < moment.utc(b.date)._d) {
+            if (createDate(a.date) < createDate(b.date)) {
                 return 1;
             }
             return 0;

@@ -6,10 +6,9 @@
  */
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
-import React, {Component, PureComponent} from 'react';
+import React, {PureComponent} from 'react';
 import {View, Text, StyleSheet, WebView} from 'react-native';
-import {calculateDimension, getTranslation} from './../utils/functions';
-import config from './../utils/config';
+import {calculateDimension, getTranslation, createDate} from './../utils/functions';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import DropdownInput from './DropdownInput';
@@ -170,13 +169,13 @@ class CardComponent extends PureComponent {
                     <DatePicker
                         id={this.props.item.id}
                         label={this.props.item.label}
-                        value={this.props.value instanceof Date ? this.props.value : this.props.value ? moment.utc(this.props.value)._d : this.props.value}
+                        value={this.props.value instanceof Date ? this.props.value : this.props.value ? createDate(this.props.value): this.props.value}
                         index={this.props.index}
                         isEditMode={this.props.item.isEditMode}
                         isRequired={this.props.item.isRequired}
                         onChange={this.props.onChangeDate}
-                        minimumDate={this.props.minimumDate instanceof Date ? this.props.minimumDate : this.props.minimumDate ? moment.utc(this.props.minimumDate)._d : this.props.minimumDate}
-                        maximumDate={this.props.maximumDate instanceof Date ? this.props.maximumDate : this.props.maximumDate ? moment.utc(this.props.maximumDate)._d : this.props.maximumDate}
+                        minimumDate={this.props.minimumDate instanceof Date ? this.props.minimumDate : this.props.minimumDate ? createDate(this.props.minimumDate) : this.props.minimumDate}
+                        maximumDate={this.props.maximumDate instanceof Date ? this.props.maximumDate : this.props.maximumDate ? createDate(this.props.maximumDate) : this.props.maximumDate}
                         style={{width: width, marginHorizontal: marginHorizontal}}
                         objectType={this.props.item.objectType}
                         translation={this.props.translation}

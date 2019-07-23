@@ -5,7 +5,7 @@
 // the material ui library, since it provides design and animations out of the box
 import React, { Component } from 'react';
 import { View, StyleSheet, findNodeHandle, ScrollView } from 'react-native';
-import { calculateDimension, extractAllQuestions, mapQuestions, getTranslation } from '../utils/functions';
+import { calculateDimension, extractAllQuestions, mapQuestions, getTranslation, createDate } from '../utils/functions';
 import config from '../utils/config';
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
@@ -37,10 +37,10 @@ class CaseSingleInvestigationContainer extends Component {
             for (let questionId in state.previousAnswers) {
                 if (Array.isArray(state.previousAnswers[questionId]) && state.previousAnswers[questionId].length > 1) {
                     state.previousAnswers[questionId] = state.previousAnswers[questionId].sort((a, b) => {
-                        if (moment.utc(a.date)._d > moment.utc(b.date)._d) {
+                        if (createDate(a.date) > createDate(b.date)) {
                             return -1;
                         }
-                        if (moment.utc(a.date)._d < moment.utc(b.date)._d) {
+                        if (createDate(a.date) < createDate(b.date)) {
                             return 1;
                         }
                         return 0;

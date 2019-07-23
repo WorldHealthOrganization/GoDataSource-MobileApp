@@ -10,7 +10,7 @@ import NavBarCustom from './../components/NavBarCustom';
 import ElevatedView from 'react-native-elevated-view';
 import Ripple from 'react-native-material-ripple';
 import {Button, Icon} from 'react-native-material-ui';
-import {calculateDimension, getTranslation, navigation, createFilterContactsObject} from './../utils/functions';
+import {calculateDimension, getTranslation, navigation, createFilterContactsObject, createDate} from './../utils/functions';
 import FollowUpListItem from './../components/FollowUpListItem';
 import PersonListItem from './../components/PersonListItem';
 import SearchFilterView from './../components/SearchFilterView';
@@ -44,7 +44,7 @@ class ContactsScreen extends Component {
         this.state = {
             contacts: [],
             filter: this.props.filter && this.props.filter['FollowUpsScreen'] ? this.props.filter['FollowUpsScreen'] : {
-                date: moment.utc()._d,
+                date: createDate(null),
                 searchText: ''
             },
             filterFromFilterScreen: this.props.filter && this.props.filter['ContactsFilterScreen'] ? this.props.filter['ContactsFilterScreen'] : null,
@@ -352,26 +352,23 @@ class ContactsScreen extends Component {
                 onPressNameProp={this.handleOnPressNameProp}
                 onPressExposureProp={this.handleOnPressExposureProp}
                 textsArray={[
-                    getTranslation(translations.contactsScreen.addFollowupsButton, this.props.translation),
+                    // getTranslation(translations.contactsScreen.addFollowupsButton, this.props.translation),
                     getTranslation(translations.contactsScreen.editButton, this.props.translation),
                     getTranslation(translations.followUpsScreen.addExposureFollowUpLabel, this.props.translation)
                 ]}
                 textsStyleArray={[
                     [styles.buttonTextActionsBar, {fontSize: 14, marginLeft: margins}],
-                    [styles.buttonTextActionsBar, {fontSize: 14}],
+                    // [styles.buttonTextActionsBar, {fontSize: 14}],
                     [styles.buttonTextActionsBar, {fontSize: 14, marginRight: margins}]]
                 }
                 onPressTextsArray={[
+                    // () => {
+                    //     this.handlePressFollowUp(item)
+                    // },
                     () => {
-                        console.log('Test performance renderFollowUpQuestion');
-                        this.handlePressFollowUp(item)
-                    },
-                    () => {
-                        console.log('Test performance renderFollowUpQuestion');
                         this.handleOnPressMissing(item)
                     },
                     () => {
-                        console.log('Test performance renderFollowUpQuestion');
                         this.handleOnPressExposure(item)
                     }]}
             />
@@ -474,7 +471,7 @@ class ContactsScreen extends Component {
             // animationType: 'fade',
             passProps: {
                 item: {
-                    date: moment.utc()._d,
+                    date: createDate(null),
                     outbreakId: this.props.user.activeOutbreakId,
                     lostToFollowUp: false,
                     address: contactPlaceOfResidence,

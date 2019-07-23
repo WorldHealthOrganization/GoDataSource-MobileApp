@@ -17,7 +17,7 @@ import {
 import _ from 'lodash';
 import {storeContacts, getContactsForOutbreakId} from './contacts';
 import {getRelationshipsForTypeRequest} from './../queries/relationships';
-import {extractIdFromPouchId, mapContactsAndRelationships, mapContactsAndFollowUps, generateId, updateRequiredFields} from './../utils/functions';
+import {extractIdFromPouchId, mapContactsAndRelationships, mapContactsAndFollowUps, generateId, updateRequiredFields, createDate} from './../utils/functions';
 import {getContactsForFollowUpPeriodRequest} from './../queries/contacts';
 import {difference} from 'lodash';
 import {setSyncState, saveGeneratedFollowUps} from './app';
@@ -42,7 +42,10 @@ export function getFollowUpsForOutbreakId(outbreakId, filter, userTeams, token) 
     return async function (dispatch, getState) {
         if (!filter) {
             filter = {};
-            filter.date = moment.utc()._d;
+            filter.date = createDate(null);
+        }
+        if (!filter.date) {
+            filter.date = createDate(null);
         }
         getFollowUpsForOutbreakIdRequest(outbreakId, filter, userTeams, token, (error, response) => {
             if (error) {
@@ -83,7 +86,7 @@ export function getFollowUpsForOutbreakIdWithPromises(outbreakId, filter, userTe
     return new Promise((resolve, reject) => {
         if (!filter) {
             filter = {};
-            filter.date = moment.utc()._d;
+            filter.date = createDate(null);
         }
         console.log("getFollowUpsForOutbreakId Filter: ", filter);
         getFollowUpsForOutbreakIdRequest(outbreakId, filter, userTeams, token, (error, response) => {
