@@ -10,8 +10,6 @@ PODS:
     - yoga (= 0.59.10.React)
   - RNBcrypt (1.0.0):
     - React
-  - RNCAsyncStorage (1.5.0):
-    - React
   - SQLCipher (4.2.0):
     - SQLCipher/standard (= 4.2.0)
   - SQLCipher/common (4.2.0)
@@ -23,7 +21,6 @@ DEPENDENCIES:
   - Parse
   - React (from `../node_modules/react-native`)
   - RNBcrypt (from `../node_modules/react-native-bcrypt`)
-  - "RNCAsyncStorage (from `../node_modules/@react-native-community/async-storage`)"
   - SQLCipher
   - yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
@@ -38,8 +35,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native"
   RNBcrypt:
     :path: "../node_modules/react-native-bcrypt"
-  RNCAsyncStorage:
-    :path: "../node_modules/@react-native-community/async-storage"
   yoga:
     :path: "../node_modules/react-native/ReactCommon/yoga"
 
@@ -48,10 +43,9 @@ SPEC CHECKSUMS:
   Parse: 3b31a3dd1777b07ee7f0caee32fafbff544483a5
   React: 1d605e098d69bdf08960787f3446f0a9dc2e2ccf
   RNBcrypt: 2f9a3bbaa400cd4aba173dc1ff95365c8a439a4e
-  RNCAsyncStorage: 6ae5aba8a41bfe0a9f21885ec91faf23ca3fe7ee
   SQLCipher: 0187a2180ac288ea686b670b7141da62cd013b16
   yoga: 128daf064cacaede0c3bb27424b6b4c71052e6cd
 
-PODFILE CHECKSUM: 0b0530c249a89265eef41e33cf12d667642c93d2
+PODFILE CHECKSUM: bd57e64e339452bd5aae2f8bf9c23e976bcda673
 
 COCOAPODS: 1.5.3

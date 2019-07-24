@@ -4,7 +4,7 @@ target 'who_mobile' do
   pod 'Parse'
 
   # Add new pods below this line
-  pod 'RNCAsyncStorage', :path => '../node_modules/@react-native-community/async-storage'
+  #pod 'RNCAsyncStorage', :path => '../node_modules/@react-native-community/async-storage'
 
   pod 'React', :path => '../node_modules/react-native'
   pod 'yoga', :path => '../node_modules/react-native/ReactCommon/yoga'
@@ -18,7 +18,9 @@ target 'who_mobile' do
 
   post_install do |installer|
     installer.pods_project.targets.each do |target|
-      if target.name == "React"
+      targets_to_ignore = %w(React yoga)
+      
+      if targets_to_ignore.include? target.name
         target.remove_from_project
       end
     end

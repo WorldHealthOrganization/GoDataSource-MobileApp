@@ -1487,7 +1487,7 @@ export function reMapAnswers(answers) {
             return 0;
         });
         returnedAnswers[questionId] = returnedAnswers[questionId].map((e) => {
-            return {date: e.date ? createDate().toISOString() : e.date, value: e.value};
+            return {date: e.date ? createDate(null).toISOString() : e.date, value: e.value};
         });
     }
 

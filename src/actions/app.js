@@ -363,7 +363,7 @@ function processFilesForSync(error, response, hubConfiguration, isFirstTime, syn
                                                 storeData('activeDatabase', hubConfiguration.url, (errorActiveDatabase) => {
                                                     if (!errorActiveDatabase) {
                                                         dispatch(saveActiveDatabase(hubConfiguration.url));
-                                                        storeData(hubConfiguration.url, createDate(null), (errorStoreLastSync) => {
+                                                        storeData(hubConfiguration.url, createDate(null).toISOString(), (errorStoreLastSync) => {
                                                             if (!errorStoreLastSync) {
                                                                 // if all was successful, then store the database in async storage
                                                                 AsyncStorage.getItem('databases')
@@ -556,7 +556,7 @@ function processFilesForSync(error, response, hubConfiguration, isFirstTime, syn
                                                 storeData('activeDatabase', hubConfiguration.url, (errorActiveDatabase) => {
                                                     if (!errorActiveDatabase) {
                                                         dispatch(saveActiveDatabase(hubConfiguration.url));
-                                                        storeData(hubConfiguration.url, createDate(null), (errorStoreLastSync) => {
+                                                        storeData(hubConfiguration.url, createDate(null).toISOString(), (errorStoreLastSync) => {
                                                             if (!errorStoreLastSync) {
                                                                 // if all was successful, then store the database in async storage
                                                                 AsyncStorage.getItem('databases')
