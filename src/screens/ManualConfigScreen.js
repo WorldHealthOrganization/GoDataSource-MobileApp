@@ -4,7 +4,7 @@
 /**
  * Created by florinpopa on 14/06/2018.
  */
-import React, {PureComponent} from 'react';
+import React, {PureComponent, Suspense, } from 'react';
 import {View, Text, StyleSheet, Platform, Image, Alert} from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 // Since this app is based around the material ui is better to use the components from
@@ -137,7 +137,8 @@ class ManualConfigScreen extends PureComponent {
                         console.log('No database found');
                         if (this.props && this.props.QRCodeInfo && this.props.QRCodeInfo.data) {
                             //TO DO map this.props.QRCodeInfo info to props
-                            console.log('Here have the QRCodeInfo: ', JSON.parse(this.props.QRCodeInfo.data));
+                            // console.log('Here have the QRCodeInfo: ', JSON.parse(this.props.QRCodeInfo.data));
+                            console.log('TestQRCode has qr code data');
                             let QRCodeData = JSON.parse(this.props.QRCodeInfo.data);
                             this.setState({
                                 url: QRCodeData.url || '',
@@ -150,7 +151,8 @@ class ManualConfigScreen extends PureComponent {
                     console.log('Error get all databases: ', errorGetAllDatabases);
                     if (this.props && this.props.QRCodeInfo && this.props.QRCodeInfo.data) {
                         //TO DO map this.props.QRCodeInfo info to props
-                        console.log('Here have the QRCodeInfo: ', JSON.parse(this.props.QRCodeInfo.data));
+                        // console.log('Here have the QRCodeInfo: ', JSON.parse(this.props.QRCodeInfo.data));
+                        console.log('TestQRCode has qr code data');
                         let QRCodeData = JSON.parse(this.props.QRCodeInfo.data);
                         this.setState({
                             url: QRCodeData.url || '',
@@ -160,6 +162,10 @@ class ManualConfigScreen extends PureComponent {
                     }
                 }
     };
+
+    componentWillUnmount() {
+        this.props.setSyncState(null);
+    }
 
     // static getDerivedStateFromProps(props, state) {
     //     // if (props.errors && props.errors.type && props.errors.message && !state.hasAlert) {
@@ -205,8 +211,10 @@ class ManualConfigScreen extends PureComponent {
     render() {
         if (this.props.syncState === 'Finished' && this.props.showModal === false && this.props.showCloseModalButton === false) {
             if (this.props.isMultipleHub) {
+                console.log('TestQRCode go to login app root');
                 this.props.changeAppRoot('login');
             } else {
+                console.log('TestQRCode go to login without app root');
                 this.props.navigator.push({
                     screen: 'LoginScreen',
                     animated: true,

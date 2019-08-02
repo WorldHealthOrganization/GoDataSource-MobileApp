@@ -177,7 +177,7 @@ class CaseSingleInvestigationContainer extends Component {
                     >
                         {
                             sortedQuestions.map((item, index) => {
-                                return this.handleRenderItem(item, index, sortedQuestions.length)
+                                return this.handleRenderItem(previousAnswers, item, index, sortedQuestions.length)
                             })
                         }
                     </ScrollView>
@@ -207,7 +207,7 @@ class CaseSingleInvestigationContainer extends Component {
         )
     };
 
-    handleRenderItem = (item, index, totalNumberOfQuestions) => {
+    handleRenderItem = (previousAnswers, item, index, totalNumberOfQuestions) => {
         if (item.inactive === false) {
             return (
                 <QuestionCard
@@ -215,7 +215,7 @@ class CaseSingleInvestigationContainer extends Component {
                     isEditMode={this.props.isEditMode}
                     index={index + 1}
                     totalNumberOfQuestions={totalNumberOfQuestions}
-                    source={this.state.previousAnswers}
+                    source={previousAnswers}
                     onChangeTextAnswer={this.props.onChangeTextAnswer}
                     onChangeSingleSelection={this.props.onChangeSingleSelection}
                     onChangeMultipleSelection={this.props.onChangeMultipleSelection}
