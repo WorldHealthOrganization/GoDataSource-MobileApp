@@ -82,7 +82,7 @@
     "react-native-uuid": "^1.4.9",
     "react-native-vector-icons": "^6.1.0",
     "react-native-webview": "^5.5.0",
-    "react-native-zip-archive": "^4.0.1",
+    "react-native-zip-archive": "^4.1.2",
     "react-redux": "^7.0.3",
     "readable-stream": "^1.0.33",
     "redux": "^4.0.1",
