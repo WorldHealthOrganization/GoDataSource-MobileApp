@@ -12,7 +12,7 @@ import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import ElevatedView from 'react-native-elevated-view';
 import translations from './../utils/translations';
-import moment from 'moment';
+// import moment from 'moment';
 
 class CalendarPicker extends PureComponent {
 
@@ -69,7 +69,7 @@ class CalendarPicker extends PureComponent {
             label: dateAux
         }, () => {
             this.props.openCalendarModal();
-            this.props.onDayPress(moment.utc(date.timestamp)._d);
+            this.props.onDayPress(createDate(date.timestamp));
         })
     };
 }

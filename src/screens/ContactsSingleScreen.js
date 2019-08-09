@@ -40,7 +40,7 @@ const initialLayout = {
     width: Dimensions.get('window').width,
 };
 
-let callGetDerivedStateFromProps = true;
+// let callGetDerivedStateFromProps = true;
 
 class ContactsSingleScreen extends Component {
 
@@ -209,7 +209,7 @@ class ContactsSingleScreen extends Component {
                 updateAge = true
             }
             if (updateAge) {
-                callGetDerivedStateFromProps = false;
+                // callGetDerivedStateFromProps = false;
                 this.setState(prevState => ({
                     contact: Object.assign({}, prevState.contact, { age: ageClone }, { dob: this.props.contact.dob !== undefined ? this.props.contact.dob : null }),
                 }), () => {
@@ -224,7 +224,7 @@ class ContactsSingleScreen extends Component {
             } else if (this.props.role && this.props.role.find((e) => e === config.userPermissions.writeContact) === undefined && this.props.role.find((e) => e === config.userPermissions.readContact) !== undefined) {
                 isEditMode = false
             }
-            callGetDerivedStateFromProps = false;
+            // callGetDerivedStateFromProps = false;
             this.setState({
                 isEditMode
             })
@@ -239,7 +239,7 @@ class ContactsSingleScreen extends Component {
                         if (responseFollowUp.length > 0) {
                             let myContact = Object.assign({}, this.state.contact)
                             myContact.followUps = responseFollowUp;
-                            callGetDerivedStateFromProps = false;
+                            // callGetDerivedStateFromProps = false;
                             this.setState({
                                 contact: myContact
                             }, () => {
@@ -266,7 +266,7 @@ class ContactsSingleScreen extends Component {
 
                 let relationshipsClone = _.cloneDeep(this.state.contact.relationships)
                 relationshipsClone[0].persons = personsArray
-                callGetDerivedStateFromProps = false;
+                // callGetDerivedStateFromProps = false;
                 this.setState(prevState => ({
                     contact: Object.assign({}, prevState.contact, { relationships: relationshipsClone })
                 }), () => {
@@ -487,14 +487,14 @@ class ContactsSingleScreen extends Component {
     handleOnIndexChange = (index) => {
         if (this.props.isNew) {
             if (this.state.canChangeScreen) {
-                callGetDerivedStateFromProps = false;
+                // callGetDerivedStateFromProps = false;
                 this.setState({
                     canChangeScreen: false,
                     index
                 });
             }
         } else {
-            callGetDerivedStateFromProps = false;
+            // callGetDerivedStateFromProps = false;
             this.setState({
                 index
             });
@@ -504,7 +504,7 @@ class ContactsSingleScreen extends Component {
     handleMoveToNextScreenButton = () => {
         let nextIndex = this.state.index + 1;
 
-        callGetDerivedStateFromProps = false;
+        // callGetDerivedStateFromProps = false;
         this.setState({
             canChangeScreen: true,
         });
@@ -513,7 +513,7 @@ class ContactsSingleScreen extends Component {
 
     handleMoveToPrevieousScreenButton = () => {
         let nextIndex = this.state.index - 1
-        callGetDerivedStateFromProps = false;
+        // callGetDerivedStateFromProps = false;
         this.setState({
             canChangeScreen: true,
         });
@@ -683,7 +683,7 @@ class ContactsSingleScreen extends Component {
     };
 
     handleSaveExposure = (exposure, isUpdate = false) => {
-        callGetDerivedStateFromProps = false;
+        // callGetDerivedStateFromProps = false;
         this.setState({
             loading: true,
             updateExposure: true
@@ -730,7 +730,7 @@ class ContactsSingleScreen extends Component {
                     ageClone.years = Number(value);
                     ageClone.months = Number(value);
                 }
-                callGetDerivedStateFromProps = false;
+                // callGetDerivedStateFromProps = false;
                 this.setState(prevState => ({
                     contact: Object.assign({}, prevState.contact, { age: ageClone }, { dob: null }),
                     isModified: true
@@ -745,7 +745,7 @@ class ContactsSingleScreen extends Component {
         console.log("onChangeText: ", value, id, objectType);
         //Change TextInput
         if (objectType === 'FollowUp') {
-            callGetDerivedStateFromProps = false;
+            // callGetDerivedStateFromProps = false;
             this.setState(
                 (prevState) => ({
                     item: Object.assign({}, prevState.item, { [id]: value }),
@@ -753,7 +753,7 @@ class ContactsSingleScreen extends Component {
                 }))
         } else {
             if (objectType === 'Contact') {
-                callGetDerivedStateFromProps = false;
+                // callGetDerivedStateFromProps = false;
                 this.setState(
                     (prevState) => ({
                         contact: Object.assign({}, prevState.contact, { [id]: value }),
@@ -762,7 +762,7 @@ class ContactsSingleScreen extends Component {
             } else if (objectType === 'Exposure' && this.props.isNew === true) {
                 let relationshipsClone = _.cloneDeep(this.state.contact.relationships);
                 relationshipsClone[0][id] = value && value.value ? value.value : value;
-                callGetDerivedStateFromProps = false;
+                // callGetDerivedStateFromProps = false;
                 this.setState(prevState => ({
                     contact: Object.assign({}, prevState.contact, { relationships: relationshipsClone }),
                     isModified: true
@@ -802,7 +802,7 @@ class ContactsSingleScreen extends Component {
                 } else {
                     addressesClone[objectType][id] = value && value.value ? value.value : value;
                 }
-                callGetDerivedStateFromProps = false;
+                // callGetDerivedStateFromProps = false;
                 this.setState(prevState => ({
                     contact: Object.assign({}, prevState.contact, { addresses: addressesClone }),
                     isModified: true
@@ -821,7 +821,7 @@ class ContactsSingleScreen extends Component {
                     ageClone.months = ageClone.years
                 }
             }
-            callGetDerivedStateFromProps = false;
+            // callGetDerivedStateFromProps = false;
             this.setState(prevState => ({
                 [stateValue]: index,
                 contact: Object.assign({}, prevState.contact, { dob: null }, { age: ageClone }),
@@ -830,7 +830,7 @@ class ContactsSingleScreen extends Component {
                 console.log('handleOnChangeTextSwitchSelector', stateValue, this.state[stateValue])
             })
         } else {
-            callGetDerivedStateFromProps = false;
+            // callGetDerivedStateFromProps = false;
             this.setState({
                 [stateValue]: index,
                 isModified: true
@@ -844,7 +844,7 @@ class ContactsSingleScreen extends Component {
         console.log("onChangeDate: ", value, id, objectType);
 
         if (objectType === 'FollowUp') {
-            callGetDerivedStateFromProps = false;
+            // callGetDerivedStateFromProps = false;
             this.setState(
                 (prevState) => ({
                     item: Object.assign({}, prevState.item, { [id]: value }),
@@ -874,7 +874,7 @@ class ContactsSingleScreen extends Component {
                         }
                     }
                     console.log('ageClone', ageClone)
-                    callGetDerivedStateFromProps = false;
+                    // callGetDerivedStateFromProps = false;
                     this.setState(prevState => ({
                         contact: Object.assign({}, prevState.contact, { age: ageClone }, { dob: value }),
                         selectedItemIndexForAgeUnitOfMeasureDropDown,
@@ -885,7 +885,7 @@ class ContactsSingleScreen extends Component {
                 }
             } else {
                 if (objectType === 'Contact') {
-                    callGetDerivedStateFromProps = false;
+                    // callGetDerivedStateFromProps = false;
                     this.setState(
                         (prevState) => ({
                             contact: Object.assign({}, prevState.contact, { [id]: value }),
@@ -898,7 +898,7 @@ class ContactsSingleScreen extends Component {
                 } else if (objectType === 'Exposure' && this.props.isNew === true) {
                     let relationshipsClone = _.cloneDeep(this.state.contact.relationships);
                     relationshipsClone[0][id] = value && value.value ? value.value : value;
-                    callGetDerivedStateFromProps = false;
+                    // callGetDerivedStateFromProps = false;
                     this.setState(prevState => ({
                         contact: Object.assign({}, prevState.contact, { relationships: relationshipsClone }),
                         isModified: true
@@ -907,7 +907,7 @@ class ContactsSingleScreen extends Component {
                     let addressesClone = _.cloneDeep(this.state.contact.addresses);
                     addressesClone[objectType][id] = value && value.value ? value.value : value;
                     console.log ('addressesClone', addressesClone)
-                    callGetDerivedStateFromProps = false;
+                    // callGetDerivedStateFromProps = false;
                     this.setState(prevState => ({
                         contact: Object.assign({}, prevState.contact, { addresses: addressesClone }),
                         isModified: true
@@ -1037,7 +1037,7 @@ class ContactsSingleScreen extends Component {
             ])
         } else {
             if (objectType === 'FollowUp') {
-                callGetDerivedStateFromProps = false;
+                // callGetDerivedStateFromProps = false;
                 this.setState(
                     (prevState) => ({
                         item: Object.assign({}, prevState.item, { [id]: value }),
@@ -1048,7 +1048,7 @@ class ContactsSingleScreen extends Component {
                 )
             } else {
                 if (objectType === 'Contact') {
-                    callGetDerivedStateFromProps = false;
+                    // callGetDerivedStateFromProps = false;
                     this.setState(
                         (prevState) => ({
                             contact: Object.assign({}, prevState.contact, { [id]: value }),
@@ -1060,7 +1060,7 @@ class ContactsSingleScreen extends Component {
                 } else if (objectType === 'Exposure' && this.props.isNew === true) {
                     let relationshipsClone = _.cloneDeep(this.state.contact.relationships);
                     relationshipsClone[0][id] = value && value.value ? value.value : value;
-                    callGetDerivedStateFromProps = false;
+                    // callGetDerivedStateFromProps = false;
                     this.setState(prevState => ({
                         contact: Object.assign({}, prevState.contact, { relationships: relationshipsClone }),
                         isModified: true
@@ -1084,7 +1084,7 @@ class ContactsSingleScreen extends Component {
                         return value.includes(e.addressLine1 || '') && value.includes(e.addressLine2 || '') && value.includes(e.city || '') && value.includes(e.country || '') && value.includes(e.postalCode || '');
                     }) : [];
 
-                callGetDerivedStateFromProps = false;
+                // callGetDerivedStateFromProps = false;
                 this.setState(
                     (prevState) => ({
                         item: Object.assign({}, prevState.item, { [id]: address[0] }),
@@ -1094,7 +1094,7 @@ class ContactsSingleScreen extends Component {
                     }
                 )
             } else {
-                callGetDerivedStateFromProps = false;
+                // callGetDerivedStateFromProps = false;
                 this.setState(
                     (prevState) => ({
                         item: Object.assign({}, prevState.item, { [id]: value }),
@@ -1105,7 +1105,7 @@ class ContactsSingleScreen extends Component {
                 )
             }
         } else if (objectType === 'Contact') {
-            callGetDerivedStateFromProps = false;
+            // callGetDerivedStateFromProps = false;
             this.setState(
                 (prevState) => ({
                     contact: Object.assign({}, prevState.contact, { [id]: value && value.value !== undefined ? value.value : value }),
@@ -1117,7 +1117,7 @@ class ContactsSingleScreen extends Component {
         } else if (type && type === 'Exposure' && this.props.isNew === true) {
             let relationshipsClone = _.cloneDeep(this.state.contact.relationships);
             relationshipsClone[0][id] = value && value.value !== undefined  ? value.value : value;
-            callGetDerivedStateFromProps = false;
+            // callGetDerivedStateFromProps = false;
             this.setState(prevState => ({
                 contact: Object.assign({}, prevState.contact, { relationships: relationshipsClone }),
                 isModified: true
@@ -1146,7 +1146,7 @@ class ContactsSingleScreen extends Component {
                 if (contactPlaceOfResidence && contactPlaceOfResidence.length > 0) {
                     hasPlaceOfResidence = true
                 }
-                callGetDerivedStateFromProps = false;
+                // callGetDerivedStateFromProps = false;
                 this.setState(prevState => ({
                     contact: Object.assign({}, prevState.contact, { addresses: addressesClone }),
                     isModified: true,
@@ -1176,7 +1176,7 @@ class ContactsSingleScreen extends Component {
                                 text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation), onPress: () => {
                                     addresses[index].geoLocation = selectedItems['0'].geoLocation;
                                     console.log('Addresses biatch: ', addresses);
-                                    callGetDerivedStateFromProps = false;
+                                    // callGetDerivedStateFromProps = false;
                                     this.setState(prevState => ({
                                         contact: Object.assign({}, prevState.contact, { addresses }),
                                         isModified: true
@@ -1188,7 +1188,7 @@ class ContactsSingleScreen extends Component {
                 }
             } else {
                 console.log('Addresses biatch: ', addresses);
-                callGetDerivedStateFromProps = false;
+                // callGetDerivedStateFromProps = false;
                 this.setState(prevState => ({
                     contact: Object.assign({}, prevState.contact, { addresses }),
                     isModified: true
@@ -1205,7 +1205,7 @@ class ContactsSingleScreen extends Component {
             questionnaireAnswers = itemClone.questionnaireAnswers;
         }
         questionnaireAnswers[id] = value;
-        callGetDerivedStateFromProps = false;
+        // callGetDerivedStateFromProps = false;
         this.setState(prevState => ({
             item: Object.assign({}, prevState.item, { questionnaireAnswers: questionnaireAnswers }),
             isModified: true
@@ -1220,7 +1220,7 @@ class ContactsSingleScreen extends Component {
             questionnaireAnswers = itemClone.questionnaireAnswers;
         }
         questionnaireAnswers[id] = value.value;
-        callGetDerivedStateFromProps = false;
+        // callGetDerivedStateFromProps = false;
         this.setState(prevState => ({
             item: Object.assign({}, prevState.item, { questionnaireAnswers: questionnaireAnswers }),
             isModified: true
@@ -1235,7 +1235,7 @@ class ContactsSingleScreen extends Component {
             questionnaireAnswers = itemClone.questionnaireAnswers;
         }
         questionnaireAnswers[id] = selections.map((e) => {return e.value});
-        callGetDerivedStateFromProps = false;
+        // callGetDerivedStateFromProps = false;
         this.setState(prevState => ({
             item: Object.assign({}, prevState.item, { questionnaireAnswers: questionnaireAnswers }),
             isModified: true
@@ -1279,7 +1279,7 @@ class ContactsSingleScreen extends Component {
                         if (relations && Array.isArray(relations) && relations.map((e) => { return e._id }).indexOf(relation._id) > -1) {
                             relations.splice(relations.map((e) => { return e._id }).indexOf(relation._id), 1);
                             console.log('Relations after splice: ', relations);
-                            callGetDerivedStateFromProps = false;
+                            // callGetDerivedStateFromProps = false;
                             this.setState(prevState => ({
                                 contact: Object.assign({}, prevState.contact, { relationships: relations })
                             }), () => {
@@ -1634,12 +1634,12 @@ class ContactsSingleScreen extends Component {
     };
 
     _showDateTimePicker = () => {
-        callGetDerivedStateFromProps = false;
+        // callGetDerivedStateFromProps = false;
         this.setState({ isDateTimePickerVisible: true });
     };
 
     _hideDateTimePicker = () => {
-        callGetDerivedStateFromProps = false;
+        // callGetDerivedStateFromProps = false;
         this.setState({ isDateTimePickerVisible: false });
     };
 
@@ -1647,7 +1647,7 @@ class ContactsSingleScreen extends Component {
         console.log("Date selected: ", date);
         this._hideDateTimePicker();
 
-        callGetDerivedStateFromProps = false;
+        // callGetDerivedStateFromProps = false;
         this.setState(prevState => ({
             contact: Object.assign({}, prevState.contact, { deceased: true, dateDeceased: createDate(date) })
         }), () => {
@@ -1656,7 +1656,7 @@ class ContactsSingleScreen extends Component {
     };
 
     handleOnPressDeleteContact = () => {
-        callGetDerivedStateFromProps = false;
+        // callGetDerivedStateFromProps = false;
         this.setState ({
             deletePressed: true
         }, () => {
@@ -1681,7 +1681,7 @@ class ContactsSingleScreen extends Component {
                     if (contactPlaceOfResidence !== undefined) {
                         hasPlaceOfResidence = true
                     }
-                    callGetDerivedStateFromProps = false;
+                    // callGetDerivedStateFromProps = false;
                     this.setState(prevState => ({
                         contact: Object.assign({}, prevState.contact, { addresses: contactAddressesClone }),
                         hasPlaceOfResidence
@@ -1732,7 +1732,7 @@ class ContactsSingleScreen extends Component {
             },
             date: createDate(null)
         });
-        callGetDerivedStateFromProps = false;
+        // callGetDerivedStateFromProps = false;
         this.setState(prevState => ({
             contact: Object.assign({}, prevState.contact, { addresses })
         }), () => {
