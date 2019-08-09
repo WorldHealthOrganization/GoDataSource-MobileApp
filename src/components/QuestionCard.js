@@ -15,6 +15,7 @@ import ElevatedView from 'react-native-elevated-view';
 import translations from './../utils/translations';
 import QuestionCardTitle from './QuestionCardTitle';
 import QuestionCardContent from './QuestionCardContent';
+import get from "lodash/get";
 
 
 class QuestionCard extends PureComponent {
@@ -40,12 +41,20 @@ class QuestionCard extends PureComponent {
     //     return false;
     // }
 
-    static getDerivedStateFromProps(props, state) {
-        if (props.source && props.source[props.item.variable] && Array.isArray(props.source[props.item.variable]) && props.source[props.item.variable][0] && props.source[props.item.variable][0].date) {
-            state.answerDate = props.source[props.item.variable][0].date;
+    componentDidUpdate(prevProps) {
+        if (get(this.props, `source[${get(this.props, 'item.variable', null)}][0].date`, null) && get(this.props, `source[${get(this.props, 'item.variable', null)}][0].date`, null) !== get(prevProps, `source[${get(prevProps, 'item.variable', null)}][0].date`, null)) {
+            this.setState({
+                answerDate: get(this.props, `source[${get(this.props, 'item.variable', null)}][0].date`, null)
+            })
         }
-        return null;
     }
+
+    // static getDerivedStateFromProps(props, state) {
+    //     if (props.source && props.source[props.item.variable] && Array.isArray(props.source[props.item.variable]) && props.source[props.item.variable][0] && props.source[props.item.variable][0].date) {
+    //         state.answerDate = props.source[props.item.variable][0].date;
+    //     }
+    //     return null;
+    // }
 
     // Please add here the react lifecycle methods that you need
     // The render method should have at least business logic as possible,

@@ -25,12 +25,20 @@ class QuestionCardContent extends PureComponent {
         }
     }
 
-    static getDerivedStateFromProps(props, state) {
-        if (props.source && props.source[props.item.variable] && Array.isArray(props.source[props.item.variable]) && props.source[props.item.variable][0] && props.source[props.item.variable][0].date) {
-            state.answerDate = props.source[props.item.variable][0].date;
+    componentDidUpdate(prevProps) {
+        if (get(this.props, `source[${get(this.props, 'item.variable', null)}][0].date`, null) && get(this.props, `source[${get(this.props, 'item.variable', null)}][0].date`, null) !== get(prevProps, `source[${get(prevProps, 'item.variable', null)}][0].date`, null)) {
+            this.setState({
+                answerDate: get(this.props, `source[${get(this.props, 'item.variable', null)}][0].date`, null)
+            })
         }
-        return null;
     }
+
+    // static getDerivedStateFromProps(props, state) {
+    //     if (props.source && props.source[props.item.variable] && Array.isArray(props.source[props.item.variable]) && props.source[props.item.variable][0] && props.source[props.item.variable][0].date) {
+    //         state.answerDate = props.source[props.item.variable][0].date;
+    //     }
+    //     return null;
+    // }
 
     render() {
         // console.log("Render QuestionCardTitle");

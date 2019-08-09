@@ -3,7 +3,9 @@
  */
 import RNFetchBlob from 'rn-fetch-blob';
 import base64 from 'base-64';
-import {Platform, AsyncStorage} from 'react-native';
+import {Platform} from 'react-native';
+import AsyncStorage from '@react-native-community/async-storage';
+import {getSyncEncryptPassword} from './../utils/encryption';
 import {setSyncState} from './../actions/app';
 import DeviceInfo from 'react-native-device-info';
 import translations from './../utils/translations';
@@ -58,7 +60,7 @@ export function getDatabaseSnapshotRequest(hubConfig, lastSyncDate, dispatch, ca
             testApi(`${hubConfiguration.url}/system-settings/version`, deviceInfo, (errorTestApi, responseTestApi) => {
                 if (errorTestApi) {
                     console.log("*** testApi error: ", JSON.stringify(errorTestApi));
-                    dispatch(setSyncState({id: 'testApi', status: `Error`, error: 'The hub is not available'}));
+                    dispatch(setSyncState({id: 'testApi', status: `Error`, error: JSON.stringify(errorTestApi)}));
                     callback('The hub is not available');
                 }
                 if (responseTestApi) {

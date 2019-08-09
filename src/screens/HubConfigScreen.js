@@ -5,7 +5,8 @@
  * Created by florinpopa on 14/06/2018.
  */
 import React, {Component} from 'react';
-import {View, Text, StyleSheet, Platform, Image, Alert, AsyncStorage} from 'react-native';
+import {View, Text, StyleSheet, Platform, Image, Alert} from 'react-native';
+import AsyncStorage from '@react-native-community/async-storage';
 import ViewHOC from './../components/ViewHOC';
 import Section from './../components/Section';
 import ElevatedView from 'react-native-elevated-view';
@@ -70,7 +71,8 @@ let textFieldsStructure = [
         type: 'TextInput',
         value: '',
         isRequired: false,
-        isEditMode: true
+        isEditMode: true,
+        keyboardType: 'email-address'
     },
     {
         id: 'encryptedData',
@@ -176,9 +178,9 @@ class FirstConfigScreen extends Component {
             });
     }
 
-    static getDerivedStateFromProps(props, state) {
-       return null;
-    }
+    // static getDerivedStateFromProps(props, state) {
+    //    return null;
+    // }
 
     // The render method should have at least business logic as possible,
     // because this will be called whenever there is a new setState call
@@ -190,7 +192,7 @@ class FirstConfigScreen extends Component {
         let minHeight = calculateDimension(72, true, this.props.screenSize);
 
         return (
-                <ViewHOC style={{flex: 1}} showLoader={this.state.showLoading} loaderText="Loading...">
+                <ViewHOC style={{flex: 1, backgroundColor: 'white'}} showLoader={this.state.showLoading} loaderText="Loading...">
                     <NavBarCustom style = {style.navbarContainer}
                                   title={getTranslation(translations.hubConfigScreen.label, this.props.translation)}
                                   navigator={this.props.navigator}

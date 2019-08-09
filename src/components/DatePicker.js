@@ -160,7 +160,7 @@ class DatePicker extends PureComponent {
     };
 
     handleDatePicked = (date) => {
-        console.log("### date picked: ", date, moment(date).format());
+        console.log("### date picked: ", date, moment.utc(date).format());
         this.props.onChange(
             createDate(date),
             this.props.id, 

@@ -46,24 +46,34 @@ class HelpSingleScreen extends Component {
     };
 
     // Please add here the react lifecycle methods that you need
-    static getDerivedStateFromProps(props, state) {
-        if (props.errors && props.errors.type && props.errors.message) {
-            Alert.alert(props.errors.type, props.errors.message, [
-                {
-                    text: getTranslation(translations.alertMessages.okButtonLabel, props.translation),
-                    onPress: () => {
-                        props.removeErrors();
-                    }
-                }
-            ])
-        }
-        return null;
-    }
+    // static getDerivedStateFromProps(props, state) {
+    //     if (props.errors && props.errors.type && props.errors.message) {
+    //         Alert.alert(props.errors.type, props.errors.message, [
+    //             {
+    //                 text: getTranslation(translations.alertMessages.okButtonLabel, props.translation),
+    //                 onPress: () => {
+    //                     props.removeErrors();
+    //                 }
+    //             }
+    //         ])
+    //     }
+    //     return null;
+    // }
 
     // The render method should have at least business logic as possible,
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
+        if (this.props.errors && this.props.errors.type && this.props.errors.message) {
+            Alert.alert(this.props.errors.type, this.props.errors.message, [
+                {
+                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+                    onPress: () => {
+                        this.props.removeErrors();
+                    }
+                }
+            ])
+        }
         return (
             <View style={style.container}>
                 <NavBarCustom

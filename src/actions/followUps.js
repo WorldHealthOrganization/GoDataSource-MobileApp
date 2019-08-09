@@ -2,7 +2,7 @@
  * Created by florinpopa on 19/07/2018.
  */
 import {ACTION_TYPE_GET_FOLLOWUPS, ACTION_TYPE_STORE_FOLLOWUPS, ACTION_TYPE_UPDATE_FOLLOWUP, ACTION_TYPE_DELETE_FOLLOWUP} from './../utils/enums';
-import {updateContact, updateContactAction, getContactsForOutbreakIdWithPromises} from './contacts';
+import {updateContact, updateContactAction, getContactsForOutbreakIdWithPromises, getContactsForOutbreakPromise} from './contacts';
 import { addError } from './errors';
 import errorTypes from './../utils/errorTypes';
 import config from './../utils/config';
@@ -20,8 +20,9 @@ import {getRelationshipsForTypeRequest} from './../queries/relationships';
 import {extractIdFromPouchId, mapContactsAndRelationships, mapContactsAndFollowUps, generateId, updateRequiredFields, createDate} from './../utils/functions';
 import {getContactsForFollowUpPeriodRequest} from './../queries/contacts';
 import {difference} from 'lodash';
-import {setSyncState, saveGeneratedFollowUps} from './app';
+import {setSyncState, saveGeneratedFollowUps, setLoaderState} from './app';
 import {batchActions} from 'redux-batched-actions';
+import {batch} from 'react-redux';
 
 // Add here only the actions, not also the requests that are executed. For that purpose is the requests directory
 export function storeFollowUps(followUps) {
@@ -38,8 +39,87 @@ export function updateFollowUpAction(followUp) {
     }
 }
 
+// Replace method for getting the list of follow-ups. it has to support searching by case/contacts name and visualId, and location
+export function getFollowUpsForOutbreak(outbreakId, filter, userTeams) {
+    return async function (dispatch) {
+        // Filter props for follow-ups: date
+        // Filter props for contacts: firstName, lastName, locationId, visualId, age, gender
+        // Filter props for cases/events: firstName/lastName, visualId
+        let {followUpsFilter, contactsFilter, casesFilter} = computeFilters(filter);
+        // Get follow-ups filtered by date and user Teams
+        try {
+            let followUpsList = await getFollowUpsForOutbreakIdRequest(outbreakId, filter, userTeams);
+            if (followUpsList && Array.isArray(followUpsList) && followUpsList.length > 0) {
+                let mappedFollowUpsByContactIds = _.groupBy(followUpsList, 'personId');
+                try {
+                    let contactsWithRelationships = await getContactsForOutbreakPromise(outbreakId, filter);
+                    if (contactsWithRelationships) {
+
+                    }
+                } catch (errorGetContactsWithRelationships) {
+                    console.log('Error while getting contacts for followUps: ', errorGetContactsWithRelationships);
+                    dispatch(addError(errorTypes.ERROR_FOLLOWUPS));
+                }
+            } else {
+                dispatch(storeFollowUps([]));
+            }
+        } catch(errorGetFollowUpsList) {
+            console.log('Error while getting followUpsList: ', errorGetFollowUpsList);
+            dispatch(addError(errorTypes.ERROR_FOLLOWUPS));
+        }
+    }
+}
+
+// General method for constructing filters
+// Receives the filter and the screen(followUps, contacts, cases)
+// If screen is followUps, the method will create a filter for each of the data (fups, contacts, cases, events)
+// if screen is contacts, the method will create filters for contacts, cases and events
+// If screen is cases, the method will create filters for cases
+function computeFilters(filter, screen) {
+    let returnedFilter = {
+        followUpsFilter: {},
+        contactsFilter: {},
+        casesFilter: {}
+    };
+
+    // FollowUps filter
+    if (!filter) {
+        returnedFilter.followUpsFilter.date = new Date();
+    }
+    if (filter && filter.statusId) {
+        returnedFilter.followUpsFilter.statusId = filter.statusId;
+    }
+
+    // Common cases/contacts
+
+    if (filter && filter.date) {
+        returnedFilter.followUpsFilter.date = filter.date;
+    }
+
+    if (filter && filter.searchText) {
+        returnedFilter.contactsFilter.searchText = filter.searchText;
+        returnedFilter.casesFilter.searchText = filter.searchText;
+    }
+
+
+
+    if (filter && filter.age) {
+        returnedFilter.contactsFilter.age = filter.age;
+    }
+
+    if (filter && filter.locationId) {
+        returnedFilter.contactsFilter.locationId = filter.locationId;
+    }
+
+    if (filter && filter.gender) {
+        returnedFilter.contactsFilter.gender = filter.gender;
+    }
+
+}
+
 export function getFollowUpsForOutbreakId(outbreakId, filter, userTeams, token) {
     return async function (dispatch, getState) {
+        dispatch(setLoaderState(true));
         if (!filter) {
             filter = {};
             filter.date = createDate(null);
@@ -50,7 +130,10 @@ export function getFollowUpsForOutbreakId(outbreakId, filter, userTeams, token) 
         getFollowUpsForOutbreakIdRequest(outbreakId, filter, userTeams, token, (error, response) => {
             if (error) {
                 console.log("*** getFollowUpsForOutbreakId error: ", error);
-                dispatch(addError(errorTypes.ERROR_FOLLOWUPS));
+                batch(() => {
+                    dispatch(setLoaderState(false));
+                    dispatch(addError(errorTypes.ERROR_FOLLOWUPS));
+                });
             }
             if (response) {
                 console.log("*** getFollowUpsForOutbreakId response: ");
@@ -67,14 +150,23 @@ export function getFollowUpsForOutbreakId(outbreakId, filter, userTeams, token) 
                             mappedContact = mapContactsAndFollowUps(responseGetContacts, response);
                         }
                         // dispatch(storeContacts(mappedContact));
-                        dispatch(batchActions([
-                            storeFollowUps(response),
-                            storeContacts(mappedContact)
-                        ]))
+                        // dispatch(batchActions([
+                        //     setLoaderState(false),
+                        //     storeFollowUps(response),
+                        //     storeContacts(mappedContact)
+                        // ]))
+                        batch(() => {
+                            dispatch(setLoaderState(false));
+                            dispatch(storeFollowUps(response));
+                            dispatch(storeContacts(mappedContact));
+                        })
                     })
                     .catch((errorGetContactsForFollowUps) => {
-                        console.log ('getFollowUpsForOutbreakIdRequest getContactsForOutbreakIdWithPromises error', JSON.stringify(errorGetContactsForFollowUps))
-                        dispatch(addError(errorTypes.ERROR_CONTACT));
+                        console.log ('getFollowUpsForOutbreakIdRequest getContactsForOutbreakIdWithPromises error', JSON.stringify(errorGetContactsForFollowUps));
+                        batch(() => {
+                            dispatch(setLoaderState(false));
+                            dispatch(addError(errorTypes.ERROR_CONTACT));
+                        });
                     })
             }
         })

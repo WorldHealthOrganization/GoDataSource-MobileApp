@@ -56,33 +56,33 @@ class HelpScreen extends Component {
     }
 
     // Please add here the react lifecycle methods that you need
-    static getDerivedStateFromProps(props, state) {
-        if (props.errors && props.errors.type && props.errors.message) {
-            Alert.alert(props.errors.type, props.errors.message, [
-                {
-                    text: getTranslation(translations.alertMessages.okButtonLabel, props.translation),
-                    onPress: () => {
-                        props.removeErrors();
-                        state.loading = false;
-                    }
-                }
-            ])
-        }
-
-        let helpItemClone = _.cloneDeep(props.helpItem);
-        if (state.filter || state.filterFromFilterScreen) {
-            helpItemClone = localSortHelpItem(helpItemClone, props.filter, state.filter, state.filterFromFilterScreen, props.translation)
-        }
-
-        if (state.pageAskingHelpFrom && state.pageAskingHelpFrom !== undefined) {
-            helpItemClone = filterItemsForEachPage(helpItemClone, state.pageAskingHelpFrom)
-        }
-
-        if(helpItemClone){
-            state.helpItems = helpItemClone;
-        }
-        return null;
-    }
+    // static getDerivedStateFromProps(props, state) {
+    //     if (props.errors && props.errors.type && props.errors.message) {
+    //         Alert.alert(props.errors.type, props.errors.message, [
+    //             {
+    //                 text: getTranslation(translations.alertMessages.okButtonLabel, props.translation),
+    //                 onPress: () => {
+    //                     props.removeErrors();
+    //                     state.loading = false;
+    //                 }
+    //             }
+    //         ])
+    //     }
+    //
+    //     let helpItemClone = _.cloneDeep(props.helpItem);
+    //     if (state.filter || state.filterFromFilterScreen) {
+    //         helpItemClone = localSortHelpItem(helpItemClone, props.filter, state.filter, state.filterFromFilterScreen, props.translation)
+    //     }
+    //
+    //     if (state.pageAskingHelpFrom && state.pageAskingHelpFrom !== undefined) {
+    //         helpItemClone = filterItemsForEachPage(helpItemClone, state.pageAskingHelpFrom)
+    //     }
+    //
+    //     if(helpItemClone){
+    //         state.helpItems = helpItemClone;
+    //     }
+    //     return null;
+    // }
 
     componentDidMount() {
         BackHandler.addEventListener('hardwareBackPress', this.handleBackButtonClick);
@@ -174,6 +174,31 @@ class HelpScreen extends Component {
         }
         let filterText = filterNumbers === 0 ? `${getTranslation(translations.generalLabels.filterTitle, this.props.translation)}` : `${getTranslation(translations.generalLabels.filterTitle, this.props.translation)}(${filterNumbers})`;
 
+        if (this.props.errors && this.props.errors.type && this.props.errors.message) {
+            Alert.alert(this.props.errors.type, this.props.errors.message, [
+                {
+                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+                    onPress: () => {
+                        props.removeErrors();
+                        state.loading = false;
+                    }
+                }
+            ])
+        }
+
+        let helpItemClone = _.cloneDeep(this.props.helpItem);
+        if (this.state.filter || this.state.filterFromFilterScreen) {
+            helpItemClone = localSortHelpItem(helpItemClone, this.props.filter, this.state.filter, this.state.filterFromFilterScreen, this.props.translation)
+        }
+
+        if (this.state.pageAskingHelpFrom && this.state.pageAskingHelpFrom !== undefined) {
+            helpItemClone = filterItemsForEachPage(helpItemClone, this.state.pageAskingHelpFrom)
+        }
+
+        // if(helpItemClone){
+        //     state.helpItems = helpItemClone;
+        // }
+
         return (
             <ViewHOC style={style.container}
                      showLoader={(this.props && this.props.syncState && ((this.props.syncState.id === 'sync' && this.props.syncState.status !== null && this.props.syncState.status !== 'Success') && this.props.syncState.status !== 'Error')) || (this && this.state && this.state.loading)}
@@ -213,7 +238,7 @@ class HelpScreen extends Component {
                 <View style={style.containerContent}>
                     <AnimatedListView
                         stickyHeaderIndices={[0]}
-                        data={this.state.helpItems || []}
+                        data={helpItemClone || []}
                         renderItem={this.renderHelp}
                         keyExtractor={this.keyExtractor}
                         ListHeaderComponent={

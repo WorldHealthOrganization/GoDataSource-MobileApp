@@ -32,7 +32,7 @@ class LoginScreen extends Component {
             email: '',
             password: '',
             // url: config.baseUrls[0].value,
-            showLoading: false,
+            // showLoading: false,
             hasAlert: false
         };
         // Bind here methods, or at least don't declare methods in the render method
@@ -56,30 +56,43 @@ class LoginScreen extends Component {
         // })
     }
 
-    static getDerivedStateFromProps(props, state) {
-        if (props.errors && props.errors.type && props.errors.message && !state.hasAlert) {
-            state.hasAlert = true;
-            Alert.alert(props.errors.type, props.errors.message, [
-                {
-                    text: getTranslation(translations.alertMessages.okButtonLabel, props && props.translation ? props.translation : null),
-                    onPress: () => {
-                        state.hasAlert = false;
-                        props.removeErrors();
-                    }
-                }
-            ])
-        }
-        if (props.loginState && (props.loginState === 'Finished logging' || props.loginState === 'Error')) {
-            // props.changeAppRoot('after-login');
-            state.showLoading = false;
-        }
-        return null;
-    }
+    // static getDerivedStateFromProps(props, state) {
+        // if (props.errors && props.errors.type && props.errors.message && !state.hasAlert) {
+        //     state.hasAlert = true;
+        //     Alert.alert(props.errors.type, props.errors.message, [
+        //         {
+        //             text: getTranslation(translations.alertMessages.okButtonLabel, props && props.translation ? props.translation : null),
+        //             onPress: () => {
+        //                 state.hasAlert = false;
+        //                 props.removeErrors();
+        //             }
+        //         }
+        //     ])
+        // }
+        // if (props.loginState && (props.loginState === 'Finished logging' || props.loginState === 'Error')) {
+        //     // props.changeAppRoot('after-login');
+        //     state.showLoading = false;
+        // }
+        // return null;
+    // }
 
     // The render method should have at least business logic as possible,
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
+        let showLoaderScreen = this.props.loginState && this.props.loginState !== 'Finished logging' && this.props.loginState !== 'Error';
+
+        if (this.props.errors && this.props.errors.type && this.props.errors.message) {
+            Alert.alert(this.props.errors.type, this.props.errors.message, [
+                {
+                    text: getTranslation(translations.alertMessages.okButtonLabel, null),
+                    onPress: () => {
+                        this.props.removeErrors();
+                    }
+                }
+            ])
+        }
+
         return (
             <KeyboardAwareScrollView
                 style={[style.container, {paddingTop: Platform.OS === 'ios' ? this.props.screenSize.height === 812 ? 44 : 20 : 0}]}
@@ -87,7 +100,7 @@ class LoginScreen extends Component {
                 keyboardShouldPersistTaps={'always'}
             >
                 {
-                    this.state && this.state.showLoading ? (
+                    showLoaderScreen ? (
                         <LoaderScreen overlay={true} backgroundColor={'white'} message={this.props && this.props.loginState ? this.props.loginState : 'Loading'} />
                     ) : (null)
                 }
@@ -101,23 +114,11 @@ class LoginScreen extends Component {
                     </Text>
                 </View>
                 <View style={style.inputsContainer}>
-                    {/*<View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'}}>*/}
-                        {/*<TextField*/}
-                            {/*ref={this.urlRef}*/}
-                            {/*value={this.state.url}*/}
-                            {/*autoCorrect={false}*/}
-                            {/*lineWidth={1}*/}
-                            {/*enablesReturnKeyAutomatically={true}*/}
-                            {/*containerStyle={[style.textInput]}*/}
-                            {/*onChangeText={this.handleTextChange}*/}
-                            {/*label='URL'*/}
-                            {/*autoCapitalize={'none'}*/}
-                        {/*/>*/}
-                    {/*</View>*/}
                     <TextField
                         ref={this.emailRef}
                         value={this.state.email}
                         autoCorrect={false}
+                        keyboardType={'email-address'}
                         lineWidth={1}
                         enablesReturnKeyAutomatically={true}
                         containerStyle={style.textInput}
@@ -184,14 +185,14 @@ class LoginScreen extends Component {
                 // }
                 // url.setBaseUrl(urlNew);
 
-                this.setState({
-                    showLoading: true
-                }, () => {
+                // this.setState({
+                //     showLoading: true
+                // }, () => {
                     this.props.loginUser({
                         email: this.state.email.toLowerCase(),
                         password: this.state.password
                     });
-                });
+                // });
             }
         }
     };
@@ -267,7 +268,6 @@ function mapStateToProps(state) {
         screenSize: state.app.screenSize,
         errors: state.errors,
         loginState: state.app.loginState,
-        translation: state.app.translation,
         activeDatabase: state.app.activeDatabase
     };
 }

@@ -4,14 +4,16 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, { Component } from 'react';
-import { View, StyleSheet, Animated, Alert, BackHandler } from 'react-native';
+import { View, StyleSheet, Animated, Alert, BackHandler, Platform } from 'react-native';
 import { Icon } from 'react-native-material-ui';
 import styles from './../styles';
 import NavBarCustom from './../components/NavBarCustom';
 import config from './../utils/config';
-import { connect } from "react-redux";
-import { bindActionCreators } from "redux";
-import { TabBar, TabView } from 'react-native-tab-view';
+import {connect} from "react-redux";
+import {bindActionCreators} from "redux";
+import {getFollowUpsForOutbreakId, getMissedFollowUpsForOutbreakId} from './../actions/followUps';
+import {TabBar, TabView, PagerScroll} from 'react-native-tab-view';
+import FollowUpsSingleGetInfoContainer from './../containers/FollowUpsSingleGetInfoContainer';
 import FollowUpsSingleContainer from './../containers/FollowUpsSingleContainer';
 import FollowUpsSingleQuestionnaireContainer from './../containers/FollowUpsSingleQuestionnaireContainer';
 import Breadcrumb from './../components/Breadcrumb';
@@ -134,38 +136,69 @@ class FollowUpsSingleScreen extends Component {
     }
 
     // Please add here the react lifecycle methods that you need
-    static getDerivedStateFromProps(props, state) {
-        // console.log("FollowUpsSingleScreen: ", state);
-        if (props.errors && props.errors.type && props.errors.message) {
-            Alert.alert(props.errors.type, props.errors.message, [
-                {
-                    text: getTranslation(translations.alertMessages.okButtonLabel, props.translation),
-                    onPress: () => {
-                        state.savePressed = false;
-                        props.removeErrors()
-                    }
-                }
-            ])
-        } else {
-            if (state.savePressed || state.deletePressed) {
-                if (props.startLoadingScreen !== undefined) {
-                    props.startLoadingScreen()
-                }
-                props.navigator.pop(
-                    {
-                        animated: true,
-                        animationType: 'fade',
-                    }
-                )
+    componentDidUpdate(prevProps) {
+        if (this.state.savePressed || this.state.deletePressed) {
+            if (this.props.startLoadingScreen !== undefined) {
+                this.props.startLoadingScreen();
             }
+            this.props.navigator.pop(
+                {
+                    animated: true,
+                    animationType: 'fade',
+                }
+            )
         }
-        return null;
     }
+
+
+    // static getDerivedStateFromProps(props, state) {
+    //     // console.log("FollowUpsSingleScreen: ", state);
+    //     if (props.errors && props.errors.type && props.errors.message) {
+    //         Alert.alert(props.errors.type, props.errors.message, [
+    //             {
+    //                 text: getTranslation(translations.alertMessages.okButtonLabel, props.translation),
+    //                 onPress: () => {
+    //                     state.savePressed = false;
+    //                     props.removeErrors()
+    //                 }
+    //             }
+    //         ])
+    //     } else {
+    //         if (state.savePressed || state.deletePressed) {
+    //             if (props.startLoadingScreen !== undefined) {
+    //                 props.startLoadingScreen()
+    //             }
+    //             props.navigator.pop(
+    //                 {
+    //                     animated: true,
+    //                     animationType: 'fade',
+    //                 }
+    //             )
+    //         }
+    //     }
+    //     return null;
+    // }
 
     // The render method should have at least business logic as possible,
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
+
+        if (this.props.errors && this.props.errors.type && this.props.errors.message) {
+            Alert.alert(this.props.errors.type, this.props.errors.message, [
+                {
+                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+                    onPress: () => {
+                        this.setState({
+                            savePressed: false
+                        }, () => {
+                            this.props.removeErrors();
+                        });
+                    }
+                }
+            ])
+        }
+
         return (
             <ViewHOC style={style.container}
                 showLoader={this && this.state && this.state.loading}
@@ -216,9 +249,9 @@ class FollowUpsSingleScreen extends Component {
                                                 {/*<MenuItem onPress={this.handleOnPressDeceased}>*/}
                                                 {/*{getTranslation(translations.followUpsSingleScreen.deceasedButton, this.props.translation)}*/}
                                                 {/*</MenuItem>*/}
-                                                <MenuItem onPress={this.handleOnPressDelete}>
-                                                    {getTranslation(translations.followUpsSingleScreen.deleteButton, this.props.translation)}
-                                                </MenuItem>
+                                                {/*<MenuItem onPress={this.handleOnPressDelete}>*/}
+                                                    {/*{getTranslation(translations.followUpsSingleScreen.deleteButton, this.props.translation)}*/}
+                                                {/*</MenuItem>*/}
                                                 <MenuItem onPress={this.handleEditContact}>
                                                     {getTranslation(translations.followUpsSingleScreen.editContactButton, this.props.translation)}
                                                 </MenuItem>
@@ -243,6 +276,7 @@ class FollowUpsSingleScreen extends Component {
                     navigationState={this.state}
                     onIndexChange={this.handleOnIndexChange}
                     renderScene={this.handleRenderScene}
+                    renderPager={this.handleRenderPager}
                     renderTabBar={this.handleRenderTabBar}
                     useNativeDriver
                 />
@@ -257,6 +291,11 @@ class FollowUpsSingleScreen extends Component {
             </ViewHOC>
         );
     }
+
+    handleRenderPager = (props) => {
+        return (Platform.OS === 'ios') ? <PagerScroll {...props} swipeEnabled={false} animationEnabled={false} /> :
+            <PagerScroll {...props} swipeEnabled={false} animationEnabled={false} />
+    };
 
     // Please write here all the methods that are not react native lifecycle methods
     handlePressNavbarButton = () => {

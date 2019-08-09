@@ -5,7 +5,8 @@ import { enableBatching } from 'redux-batched-actions';
 import thunk from 'redux-thunk';
 import promise from 'redux-promise';
 import { createLogger } from 'redux-logger';
-import { Platform, DeviceEventEmitter, NativeEventEmitter, NativeModules, AsyncStorage } from 'react-native';
+import { Platform, DeviceEventEmitter, NativeEventEmitter, NativeModules } from 'react-native';
+import AsyncStorage from '@react-native-community/async-storage';
 import RNFetchBlobFS from 'rn-fetch-blob/fs';
 import RNFS from 'react-native-fs';
 import {getInternetCredentials} from 'react-native-keychain';
@@ -119,6 +120,7 @@ export default class App {
         this.checkDevice(() => {
             store.dispatch(appActions.appInitialized(Platform.OS === 'ios' ? NativeModules.APNSEventEmitter : NativeModules.ParseReceiver));
         })
+
         // console.log('App loaded');
         // NativeModules.APNSEventEmitter.appLoaded();
     };

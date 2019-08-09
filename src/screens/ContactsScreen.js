@@ -372,7 +372,7 @@ class ContactsScreen extends Component {
                         this.handleOnPressExposure(item)
                     }]}
             />
-                                                        
+
         // return (
         //     <FollowUpListItem
         //         item={item.item}
@@ -559,7 +559,7 @@ class ContactsScreen extends Component {
                         sourceLatitude: position.coords.latitude,
                         sourceLongitude: position.coords.longitude,
                         isVisible: true,
-                        error: null,
+                        error: null
                     });
                 },
                 (error) => {

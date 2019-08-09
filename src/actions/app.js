@@ -31,7 +31,7 @@ import RNFetchBlobFs from 'rn-fetch-blob/fs';
 import {processFile, getDataFromDatabaseFromFile} from './../utils/functions';
 import {createDatabase, getDatabase} from './../queries/database';
 import {setNumberOfFilesProcessed, createZipFileAtPath, createDate} from './../utils/functions';
-import {AsyncStorage} from 'react-native';
+import AsyncStorage from '@react-native-community/async-storage';
 import {getUserById} from './user';
 import {uniq} from 'lodash';
 import {addError} from './errors';
@@ -363,7 +363,7 @@ function processFilesForSync(error, response, hubConfiguration, isFirstTime, syn
                                                 storeData('activeDatabase', hubConfiguration.url, (errorActiveDatabase) => {
                                                     if (!errorActiveDatabase) {
                                                         dispatch(saveActiveDatabase(hubConfiguration.url));
-                                                        storeData(hubConfiguration.url, createDate(null), (errorStoreLastSync) => {
+                                                        storeData(hubConfiguration.url, createDate(null).toISOString(), (errorStoreLastSync) => {
                                                             if (!errorStoreLastSync) {
                                                                 // if all was successful, then store the database in async storage
                                                                 AsyncStorage.getItem('databases')
@@ -487,7 +487,7 @@ function processFilesForSync(error, response, hubConfiguration, isFirstTime, syn
                                                                         }
                                                                     })
                                                             } else {
-                                                                console.log('There was an error at storing last sync date: ', errorStoreLastSync);
+                                                                console.log('There was an error at storing last sync date: ', JSON.stringify(errorStoreLastSync));
                                                                 files = null;
                                                                 database = null;
                                                                 arrayOfStatuses.push({
@@ -503,7 +503,7 @@ function processFilesForSync(error, response, hubConfiguration, isFirstTime, syn
                                                             }
                                                         });
                                                     } else {
-                                                        console.log('There was an error at storing active database: ', errorActiveDatabase);
+                                                        console.log('There was an error at storing active database: ', JSON.stringify(errorActiveDatabase));
                                                         files = null;
                                                         database = null;
                                                         arrayOfStatuses.push({
@@ -556,7 +556,7 @@ function processFilesForSync(error, response, hubConfiguration, isFirstTime, syn
                                                 storeData('activeDatabase', hubConfiguration.url, (errorActiveDatabase) => {
                                                     if (!errorActiveDatabase) {
                                                         dispatch(saveActiveDatabase(hubConfiguration.url));
-                                                        storeData(hubConfiguration.url, createDate(null), (errorStoreLastSync) => {
+                                                        storeData(hubConfiguration.url, createDate(null).toISOString(), (errorStoreLastSync) => {
                                                             if (!errorStoreLastSync) {
                                                                 // if all was successful, then store the database in async storage
                                                                 AsyncStorage.getItem('databases')

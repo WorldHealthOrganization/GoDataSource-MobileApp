@@ -182,6 +182,36 @@ export function newLoginUser(credentials) {
     }
 }
 
+async function executeTasksSync (tasks) {
+    console.log('Here check you are in executeTaskSync: ', tasks);
+    let tasksResponses = [];
+    if (tasks && Array.isArray(tasks) && tasks.length > 0) {
+        console.log('Here check first validation');
+        for (let i=0; i<tasks.length; i++) {
+            console.log('Here check tasks: ', tasks[i]);
+            try {
+                let aux = await tasks[i];
+                console.log('Here check aux: ', aux);
+                if (aux) {
+                    tasksResponses.push(aux);
+                }
+            } catch (errorExecuteTask) {
+                console.log('Error while trying to execute task: ', errorExecuteTask);
+            }
+        }
+
+        console.log('Here check you have finished stuff: ', tasksResponses);
+
+        if (tasksResponses.length === tasks.length) {
+            return Promise.resolve('success');
+        } else {
+            return Promise.reject('failure');
+        }
+    } else {
+        return Promise.reject('failure')
+    };
+}
+
 export function logoutUser() {
     return async function (dispatch) {
         dispatch(changeAppRoot('login'));

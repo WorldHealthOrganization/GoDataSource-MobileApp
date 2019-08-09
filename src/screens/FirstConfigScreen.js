@@ -40,22 +40,33 @@ class FirstConfigScreen extends Component {
 
     // Please add here the react lifecycle methods that you need
 
-    static getDerivedStateFromProps(props, state) {
-        if (props.errors && props.errors.type && props.errors.message) {
-            Alert.alert(props.errors.type, props.errors.message, [
-                {
-                    text: getTranslation(translations.alertMessages.okButtonLabel, null), 
-                    onPress: () => {props.removeErrors()}
-                }
-            ])
-        }
-        return null;
-    }
+    // static getDerivedStateFromProps(props, state) {
+    //     if (props.errors && props.errors.type && props.errors.message) {
+    //         Alert.alert(props.errors.type, props.errors.message, [
+    //             {
+    //                 text: getTranslation(translations.alertMessages.okButtonLabel, null),
+    //                 onPress: () => {props.removeErrors()}
+    //             }
+    //         ])
+    //     }
+    //     return null;
+    // }
 
     // The render method should have at least business logic as possible,
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
+        if (this.props.errors && this.props.errors.type && this.props.errors.message) {
+            Alert.alert(this.props.errors.type, this.props.errors.message, [
+                {
+                    text: getTranslation(translations.alertMessages.okButtonLabel, null),
+                    onPress: () => {
+                        this.props.removeErrors()
+                    }
+                }
+            ])
+        }
+
         return (
             <KeyboardAwareScrollView
                 style={[style.container, {paddingTop: Platform.OS === 'ios' ? this.props.screenSize.height === 812 ? 44 : 20 : 0}]}
@@ -151,20 +162,39 @@ class FirstConfigScreen extends Component {
 
     pushNewScreen = (QRCodeInfo, allowBack, skipEdit, isMultipleHub) => {
         console.log('PushNewScreen: ', QRCodeInfo);
-        if (QRCodeInfo) {
-            // this.props.navigator.dismissAllModals();
-            this.props.navigator.push({
-                screen: 'ManualConfigScreen',
-                animated: true,
-                animationType: 'fade',
-                passProps: {
-                    QRCodeInfo: QRCodeInfo,
-                    allowBack: allowBack,
-                    isNewHub: true,
-                    skipEdit: skipEdit,
-                    isMultipleHub: isMultipleHub
+        if (QRCodeInfo && QRCodeInfo.data) {
+            try {
+                let QRCodeInfoData = JSON.parse(QRCodeInfo.data);
+                if (QRCodeInfoData && QRCodeInfoData.url && QRCodeInfoData.clientId && QRCodeInfoData.clientSecret) {
+                    // this.props.navigator.dismissAllModals();
+                    setTimeout(() => {
+                        this.props.navigator.push({
+                            screen: 'ManualConfigScreen',
+                            animated: true,
+                            animationType: 'fade',
+                            passProps: {
+                                QRCodeInfo: QRCodeInfo,
+                                allowBack: allowBack,
+                                isNewHub: true,
+                                skipEdit: skipEdit,
+                                isMultipleHub: isMultipleHub
+                            }
+                        })
+                    }, 250);
+                } else {
+                    Alert.alert('QR Code Error', 'The QR code scan failed to find a code. Please try again or add the credentials manually', [
+                        {
+                            text: 'Ok', onPress: () => {console.log('Ok pressed')}
+                        }
+                    ])
                 }
-            })
+            } catch (errorParse) {
+                Alert.alert('QR Code Error', 'The QR code scan failed to find a code. Please try again or add the credentials manually', [
+                    {
+                        text: 'Ok', onPress: () => {console.log('Ok pressed')}
+                    }
+                ])
+            }
         } else {
             Alert.alert('QR Code Error', 'The QR code scan failed to find a code. Please try again or add the credentials manually', [
                 {

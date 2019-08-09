@@ -8,6 +8,55 @@ import moment from 'moment';
 import config from './../utils/config';
 
 // Credentials: {email, encryptedPassword}
+export function getFollowUpsForOutbreakRequest (outbreakId, filter, userTeams) {
+    return new Promise((resolve, reject) => {
+        let start = new Date().getTime();
+        getDatabase(config.mongoCollections.followUp)
+            .then((database) => {
+                // Possible filters here are date and type, but we're not going to focus on type(to do, missed) since that can be mapped on the component
+                // Here we're only going to get the followUps from a certain date
+                // console.log('getFollowUpsForOutbreakIdRequest check date filter: ', filter);
+                let oneDay = 24 * 60 * 60 * 1000;
+                let startDate = '';
+                let endDate = '';
+                // new Date().getTimezoneOffset()
+                if (filter && filter.date) {
+                    startDate = new Date(`${filter.date.getMonth() + 1}/${filter.date.getDate()}/${filter.date.getFullYear()}`).getTime();
+                    endDate = moment(filter.date.getTime() + (oneDay + (moment().isDST() ? filter.date.getTimezoneOffset() : (filter.date.getTimezoneOffset() - 60)) * 60 * 1000)).add(-1, 'second')._d.getTime();
+                }
+
+                database.find({
+                    selector: {
+                        _id: {
+                            $gte: `followUp.json_${outbreakId}_${startDate}_`,
+                            $lte: `followUp.json_${outbreakId}_${endDate}_\uffff`
+                        },
+                        deleted: false
+                    }
+                })
+                    .then((resultFind) => {
+                        let followUpList = resultFind.docs;
+                        if (userTeams !== null && userTeams !== undefined && Array.isArray(userTeams) && userTeams.length > 0) {
+                            followUpList = followUpList.filter((e) => {
+                                return userTeams.indexOf(e.teamId) >= 0 || e.teamId === undefined || e.teamId === null
+                            })
+                        }
+                        console.log('Result for find time for followUps: ', new Date().getTime() - start);
+                        resolve(followUpList);
+                    })
+                    .catch((errorFind) => {
+                        console.log('Error find for followUps: ', errorFind);
+                        reject(errorFind);
+                    })
+            })
+            .catch((errorGetDatabase) => {
+                console.log('Error while getting database: ', errorGetDatabase);
+                reject(errorGetDatabase);
+            });
+    })
+}
+
+
 export function getFollowUpsForOutbreakIdRequest (outbreakId, filter, userTeams, token, callback) {
     let start = new Date().getTime();
     getDatabase(config.mongoCollections.followUp)

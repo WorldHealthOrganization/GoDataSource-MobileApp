@@ -2,8 +2,8 @@
  * Created by mobileclarisoft on 23/07/2018.
  */
 import React, { Component } from 'react';
-import { View, Alert, StyleSheet, Animated, Dimensions, BackHandler } from 'react-native';
-import { TabBar, TabView } from 'react-native-tab-view';
+import { View, Alert, Text, StyleSheet, Animated, Platform, Dimensions, BackHandler } from 'react-native';
+import { TabBar, TabView, PagerScroll } from 'react-native-tab-view';
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import NavBarCustom from './../components/NavBarCustom';
@@ -124,7 +124,7 @@ class CaseSingleScreen extends Component {
             anotherPlaceOfResidenceWasChosen: false,
             hasPlaceOfResidence: true,
             selectedItemIndexForTextSwitchSelectorForAge: 0, // age/dob - switch tab
-            selectedItemIndexForAgeUnitOfMeasureDropDown: this.props.isNew ? 0 : (this.props.case.age && this.props.case.age.years !== undefined && this.props.case.age.years !== null && this.props.case.age.years > 0) ? 0 : 1, //default age dropdown value,
+            selectedItemIndexForAgeUnitOfMeasureDropDown: this.props.isNew ? 0 : (this.props.case && this.props.case.age && this.props.case.age.years !== undefined && this.props.case.age.years !== null && this.props.case.age.years > 0) ? 0 : 1, //default age dropdown value,
             currentAnswers: {},
             previousAnswers: [],
             mappedQuestions: [],
@@ -153,7 +153,7 @@ class CaseSingleScreen extends Component {
         if (!this.props.isNew) {
             let ageClone = { years: 0, months: 0 }
             let updateAge = false;
-            if (this.props.case.age === null || this.props.case.age === undefined || (this.props.case.age.years === undefined && this.props.case.age.months === undefined)) {
+            if (this.props.case && (this.props.case.age === null || this.props.case.age === undefined || (this.props.case.age.years === undefined && this.props.case.age.months === undefined))) {
                 updateAge = true
             }
             if (updateAge) {
@@ -172,29 +172,41 @@ class CaseSingleScreen extends Component {
     }
 
     // Please add here the react lifecycle methods that you need
-    static getDerivedStateFromProps(props, state) {
-        if (props.errors && props.errors.type && props.errors.message) {
-            Alert.alert(props.errors.type, props.errors.message, [
-                {
-                    text: getTranslation(translations.alertMessages.okButtonLabel, props.translation),
-                    onPress: () => {
-                        state.savePressed = false;
-                        props.removeErrors()
-                    }
-                }
-            ])
-        } else {
-            if (state.savePressed || state.deletePressed) {
-                props.navigator.pop()
-            }
+    componentDidUpdate(prevProps) {
+        if (this.state.savePressed || this.state.deletePressed) {
+            this.props.navigator.pop();
         }
 
-        if (state.loading === true) {
-            state.loading = false
+        if (this.state.loading) {
+            this.setState({
+                loading: false
+            })
         }
-
-        return null;
     }
+
+    // static getDerivedStateFromProps(props, state) {
+    //     if (props.errors && props.errors.type && props.errors.message) {
+    //         Alert.alert(props.errors.type, props.errors.message, [
+    //             {
+    //                 text: getTranslation(translations.alertMessages.okButtonLabel, props.translation),
+    //                 onPress: () => {
+    //                     state.savePressed = false;
+    //                     props.removeErrors()
+    //                 }
+    //             }
+    //         ])
+    //     } else {
+    //         if (state.savePressed || state.deletePressed) {
+    //             props.navigator.pop()
+    //         }
+    //     }
+    //
+    //     if (state.loading === true) {
+    //         state.loading = false
+    //     }
+    //
+    //     return null;
+    // }
 
     handleBackButtonClick() {
         // this.props.navigator.goBack(null);
@@ -231,6 +243,23 @@ class CaseSingleScreen extends Component {
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
+
+        if (this.props.errors && this.props.errors.type && this.props.errors.message) {
+            Alert.alert(this.props.errors.type, this.props.errors.message, [
+                {
+                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+                    onPress: () => {
+                        this.setState({
+                            savePressed: false
+                        }, () => {
+                            this.props.removeErrors();
+                        })
+                        // state.savePressed = false;
+                    }
+                }
+            ])
+        }
+
         return (
             <ViewHOC style={style.container}
                 showLoader={this && this.state && this.state.loading}
@@ -295,6 +324,7 @@ class CaseSingleScreen extends Component {
                     onIndexChange={this.handleOnIndexChange}
                     renderScene={this.handleRenderScene}
                     renderTabBar={this.handleRenderTabBar}
+                    renderPager={this.handleRenderPager}
                     useNativeDriver={true}
                     initialLayout={initialLayout}
                     swipeEnabled={this.props.isNew ? false : true}
@@ -310,6 +340,11 @@ class CaseSingleScreen extends Component {
             </ViewHOC>
         );
     }
+
+    handleRenderPager = (props) => {
+        return (Platform.OS === 'ios') ? <PagerScroll {...props} swipeEnabled={false} animationEnabled={false} /> :
+            <PagerScroll {...props} swipeEnabled={false} animationEnabled={false} />
+    };
 
     // Please write here all the methods that are not react native lifecycle methods
     handlePressNavbarButton = () => {
@@ -536,7 +571,7 @@ class CaseSingleScreen extends Component {
             if (missingFields && Array.isArray(missingFields) && missingFields.length === 0) {
                 if (this.checkAgeYearsRequirements()) {
                     if (this.checkAgeMonthsRequirements()) {
-                        if ( this.state.case.addresses === undefined || this.state.case.addresses === null || this.state.case.addresses.length === 0 || 
+                        if ( this.state.case.addresses === undefined || this.state.case.addresses === null || this.state.case.addresses.length === 0 ||
                             (this.state.case.addresses.length > 0 && this.state.hasPlaceOfResidence === true)) {
                             if (this.checkIsolationOnsetDates()) {
                                 checkForNameDuplicatesRequest(this.props.isNew ? null : this.state.case._id, this.state.case.firstName, this.state.case.lastName, this.props.user.activeOutbreakId, (error, response) => {
@@ -1769,9 +1804,9 @@ class CaseSingleScreen extends Component {
             previousAnswers: questionnaireAnswers,
             isModified: true
         })
-            // , () => {
-            //     console.log ('onChangeMultipleSelection after setState', this.state.previousAnswers)
-            // }
+            , () => {
+                console.log ('onChangeMultipleSelection after setState', this.state.previousAnswers)
+            }
         )
     };
     onChangeSingleSelection = (value, id, parentId) => {
