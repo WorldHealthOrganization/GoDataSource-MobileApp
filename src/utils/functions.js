@@ -1997,6 +1997,12 @@ export function daysSince(startDate, endDate) {
     return moment.utc(endDate).startOf('day').diff(moment.utc(startDate).startOf('day'), 'days');
 }
 
-export function generateTeamId (contactAddress, teams, locations) {
-
+export function extractLocationId (person) {
+    let locationId = null;
+    let addresses = get(person, 'addresses', null);
+    if (addresses !== null) {
+        let currentAddress = addresses.find((e) => {return e.typeId === config.userResidenceAddress.userPlaceOfResidence});
+        locationId = get(currentAddress, 'locationId', null);
+    }
+    return locationId;
 }

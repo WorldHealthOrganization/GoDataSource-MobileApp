@@ -327,6 +327,10 @@ function processFilesForSync(error, response, hubConfiguration, isFirstTime, syn
                                         }
                                         return 0;
                                     });
+                                    // In order to do the sync for the searchable data here remove the used collections from the file list
+                                    // After that call the sql sync function
+
+
                                     // For every file of the database dump, do sync
                                     for (let i = 0; i < files.length; i++) {
                                         if (files[i] !== 'auditLog.json' && files[i] !== 'icon.json' && files[i] !== 'icons') {
