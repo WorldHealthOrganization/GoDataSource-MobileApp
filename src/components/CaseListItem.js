@@ -13,13 +13,12 @@ import {calculateDimension, getTranslation} from './../utils/functions';
 import config from './../utils/config';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
-import {TextField} from 'react-native-material-textfield';
-import Button from './Button';
 import styles from './../styles';
 import Ripple from 'react-native-material-ripple';
 import ElevatedView from 'react-native-elevated-view';
 import translations from './../utils/translations'
 import {getAddress} from './../utils/functions';
+import get from 'lodash/get';
 
 class CaseListItem extends Component {
 
@@ -227,7 +226,7 @@ function mapStateToProps(state) {
         role: state.role,
         contacts: state.contacts,
         events: state.events,
-        locations: state.locations.locationsList
+        locations: get(state, `locations.locationsList`, [])
     };
 }
 

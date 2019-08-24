@@ -4,14 +4,14 @@ import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import ElevatedView from 'react-native-elevated-view';
-import _ from 'lodash';
-
+import filter from 'lodash/filter';
+import get from 'lodash/get';
 import { calculateDimension, getTranslation, extractIdFromPouchId } from './../utils/functions';
 import config from './../utils/config';
 import Button from './../components/Button';
 import styles from './../styles';
 import CardComponent from './../components/CardComponent';
-import translations from './../utils/translations'
+import translations from './../utils/translations';
 
 class FiltersContainer extends PureComponent {
     constructor(props) {
@@ -171,11 +171,11 @@ class FiltersContainer extends PureComponent {
 
     computeDataForDropdown = (item) => {
         if (item.id === 'classification') {
-            return _.filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId.includes("CASE_CLASSIFICATION") })
+            return filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId.includes("CASE_CLASSIFICATION") })
                 .sort((a, b) => { return a.order - b.order; })
                 .map((o) => { return { label: getTranslation(o.value, this.props.translation), value: o.value } })
         } else if (item.id === 'categories') {
-            return _.filter(this.props.helpCategory, (o) => {
+            return filter(this.props.helpCategory, (o) => {
                 return o.deleted === false && o.fileType === 'helpCategory.json'
             }).map((o) => { return { label: getTranslation(o.name, this.props.translation), value: o._id } })
         }
@@ -233,7 +233,7 @@ function mapStateToProps(state) {
     return {
         screenSize: state.app.screenSize,
         translation: state.app.translation,
-        locations: state.locations.locations,
+        locations: get(state, `locations.locations`, []),
         helpCategory: state.helpCategory,
         referenceData: state.referenceData,
     };

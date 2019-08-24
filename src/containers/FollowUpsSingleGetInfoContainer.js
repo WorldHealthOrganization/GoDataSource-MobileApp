@@ -89,7 +89,14 @@ class FollowUpsSingleGetInfoContainer extends PureComponent {
         if (item.type === 'DatePicker' && this.props.item && this.props.item !== undefined && this.props.item[item.id] !== undefined) {
             value = this.props.item[item.id]
         } else if (item.type === 'SwitchInput' && this.props.item && this.props.item !== undefined && this.props.item[item.id] !== undefined) {
-            value = this.props.item[item.id]
+            if (item.id === 'fillLocation') {
+                value = false;
+                if (_.get(this.props, `item[${item.id}].geoLocation.lat`, null) !== null && _.get(this.props, `item[${item.id}].geoLocation.lng`, null) !== null) {
+                    value = true;
+                }
+            } else {
+                value = this.props.item[item.id]
+            }
         } else {
             value = this.computeValueForFollowUpSingleScreen(item);
         }

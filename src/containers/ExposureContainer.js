@@ -4,20 +4,14 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, { PureComponent } from 'react';
-import { View, Text, StyleSheet, InteractionManager, Alert, findNodeHandle, ScrollView, TouchableWithoutFeedback, Keyboard } from 'react-native';
-import { LoaderScreen } from 'react-native-ui-lib';
+import { View, StyleSheet, InteractionManager, ScrollView } from 'react-native';
 import { calculateDimension, getTranslation, extractIdFromPouchId } from './../utils/functions';
 import config from './../utils/config';
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
-import Button from './../components/Button';
 import styles from './../styles';
-import Ripple from 'react-native-material-ripple';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import CardComponent from './../components/CardComponent';
-import translations from './../utils/translations'
 import ElevatedView from 'react-native-elevated-view';
-import _ from 'lodash';
 
 class ExposureContainer extends PureComponent {
 
@@ -279,10 +273,10 @@ function mapStateToProps(state) {
     return {
         screenSize: state.app.screenSize,
         contacts: state.contacts,
-        cases: state.cases,
+        cases: state.exposure,
         translation: state.app.translation,
         referenceData: state.referenceData,
-        locations: state.locations.locations,
+        // locations: state.locations.locations,
         events: state.events,
         clusters: state.clusters,
     };

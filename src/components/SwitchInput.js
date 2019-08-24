@@ -98,7 +98,7 @@ class SwitchInput extends PureComponent {
                             color: 'rgb(60,60,60)',
                             lineHeight: 30,
                         }}>
-                            {this.props.value != true ? getTranslation(translations.generalLabels.noAnswer, this.props.translation) : getTranslation(translations.generalLabels.yesAnswer, this.props.translation)}
+                            {this.props.value !== true ? getTranslation(translations.generalLabels.noAnswer, this.props.translation) : getTranslation(translations.generalLabels.yesAnswer, this.props.translation)}
                         </Text>
                     ) : null
                 }

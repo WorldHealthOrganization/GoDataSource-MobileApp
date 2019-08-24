@@ -279,6 +279,9 @@ export function addExposureForContact(outbreakId, contactId, exposure, token, co
 
                         responseContact = updateContactFollowUpFields(responseContact, getState().outbreak.periodOfFollowup);
                         delete responseContact.relationships;
+
+                        // Update also the
+                        // responseContact = updateRequiredFields(outbreakId, extractIdFromPouchId(getState().user._id, 'user'), responseContact, 'update', 'person.json');
                         updateContactRequest(outbreakId, responseContact._id, responseContact, null, (errorUpdateContact, responseUpdateContact) => {
                             if (errorUpdateContact) {
                                 console.log("*** addExposureForContact updateContactRequest error: ", error);
@@ -327,6 +330,8 @@ function updateContactFollowUpFields(contact, outbreakPeriodOfFollowup) {
     return contact;
 }
 
+
+// TODO investigate why here the contact followUp fields are not updated
 export function updateExposureForContact(outbreakId, contactId, exposure, token, userTeams) {
     let contactIdForExposure = extractIdFromPouchId(contactId, 'person');
     return async function(dispatch, getState) {
@@ -360,6 +365,7 @@ export function updateExposureForContact(outbreakId, contactId, exposure, token,
     }
 }
 
+// TODO investigate why here the contact followUp fields are not updated
 export function deleteExposureForContact(outbreakId, contactId, exposure, token, userTeams) {
     return async function(dispatch, getState) {
         deleteExposureForContactRequest(outbreakId, contactId, exposure, token, (error, response) => {

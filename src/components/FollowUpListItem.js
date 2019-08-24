@@ -4,18 +4,16 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {PureComponent} from 'react';
-import {TextInput, View, Text, StyleSheet, Platform, Dimensions, Image, InteractionManager} from 'react-native';
-import {ListItem, Icon} from 'react-native-material-ui';
+import {View, Text, StyleSheet, Image, InteractionManager} from 'react-native';
+import {ListItem} from 'react-native-material-ui';
 import {calculateDimension, handleExposedTo, getAddress, extractIdFromPouchId, getTranslation} from './../utils/functions';
 import config from './../utils/config';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
-import {TextField} from 'react-native-material-textfield';
-import Button from './Button';
 import styles from './../styles';
 import Ripple from 'react-native-material-ripple';
 import ElevatedView from 'react-native-elevated-view';
-import _ from 'lodash';
+import get from 'lodash/get';
 import translations from './../utils/translations'
 
 class FollowUpListItem extends PureComponent {
@@ -269,7 +267,7 @@ function mapStateToProps(state) {
         exposure: state.exposure,
         events: state.events,
         role: state.role,
-        locations: state.locations.locationsList
+        locations: get(state, `locations.locations`, [])
     };
 }
 

@@ -119,6 +119,19 @@ const followUpsSingleScreen = {
                     isEditMode: true,
                     objectType: 'FollowUp'
                 },
+                {
+                    cardNumber: 1,
+                    id: 'fillLocation',
+                    label: translations.addressFieldLabels.isThePersonNextToYou,
+                    labelValue: 'test',
+                    type: 'SwitchInput',
+                    value: false,
+                    isRequired: true,
+                    isEditMode: true,
+                    activeButtonColor: styles.missedRedColor,
+                    activeBackgroundColor: styles.missedRedColorWithOpacity,
+                    objectType: 'FollowUp'
+                },
                 // {
                 //     cardNumber: 1,
                 //     id: 'targeted',

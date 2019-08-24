@@ -13,6 +13,7 @@ import _ from 'lodash';
 import moment from 'moment';
 import config from './../utils/config';
 import Database from './databaseController';
+import {extractIdFromPouchId} from './../utils/functions';
 
 export let database = null;
 let databaseCache = null;
@@ -261,43 +262,23 @@ export function updateFileInDatabase(file, type) {
                 if (database) {
                     file._id = createIdForType(file, type);
                     type = `${type.split('.')[0]}.${type.split('.')[2]}`;
+                    // Person needs special treatment
+                    if (type.includes('person') && (file.type === config.personTypes.cases || file.type === config.personTypes.contacts)) {
+                        // This method checks for changing id
+                        upsertDataWithChangingId(file, type, database)
+                            .then((res) => {
+                                // console.log("Res: ", res);
+                                file = null;
+                                resolve('Done');
+                            })
+                            .catch((error) => {
+                                console.log("Error: ", error);
+                                file = null;
+                                reject("Error at inserting: ", error);
+                            })
+                    }
                     database.upsert(file._id, (doc) => {
-                        // If we have to insert the doc, then add the type property
-                        if (!doc || (typeof doc === 'object' && Object.keys(doc).length === 0)) {
-                            // console.log("Insert Doc " + type);
-                            file.fileType = type;
-                            return file;
-                        }
-                        if (type === 'person.json' && file.firstName === 'JSON1') {
-                            return false;
-                        }
-                        // If the local version is the latest or they have the same updatedAt then we shouldn't update
-                        if (doc.updatedAt > file.updatedAt || doc.updatedAt === file.updatedAt) {
-                            // console.log("Don't update " + type);
-                            return false;
-                        }
-                        // Update the doc with the new fields: add the type and _rev fields to the file object and insert it
-                        // console.log("Update doc " + type);
-                        if (type === 'relationship.json') {
-                            if (file.persons[0].source) {
-                                file.source = file.persons[0].id;
-                            } else {
-                                if (file.persons[1].source) {
-                                    file.source = file.persons[1].id;
-                                }
-                            }
-
-                            if (file.persons[0].target) {
-                                file.target = file.persons[0].id;
-                            } else {
-                                if (file.persons[1].target) {
-                                    file.target = file.persons[1].id;
-                                }
-                            }
-                        }
-                        file.fileType = type;
-                        file._rev = doc.rev;
-                        return file;
+                        return upsertFunction(doc, file, type)
                     })
                         .then((res) => {
                             // console.log("Res: ", res);
@@ -317,6 +298,45 @@ export function updateFileInDatabase(file, type) {
                 return reject('nonexistent database');
             })
     })
+}
+
+function upsertFunction(doc, file, type) {
+    // If we have to insert the doc, then add the type property
+    if (!doc || (typeof doc === 'object' && Object.keys(doc).length === 0)) {
+        // console.log("Insert Doc " + type);
+        file.fileType = type;
+        return file;
+    }
+    if (type === 'person.json' && file.firstName === 'JSON1') {
+        return false;
+    }
+    // If the local version is the latest or they have the same updatedAt then we shouldn't update
+    if (doc.updatedAt > file.updatedAt || doc.updatedAt === file.updatedAt) {
+        // console.log("Don't update " + type);
+        return false;
+    }
+    // Update the doc with the new fields: add the type and _rev fields to the file object and insert it
+    // console.log("Update doc " + type);
+    if (type === 'relationship.json') {
+        if (file.persons[0].source) {
+            file.source = file.persons[0].id;
+        } else {
+            if (file.persons[1].source) {
+                file.source = file.persons[1].id;
+            }
+        }
+
+        if (file.persons[0].target) {
+            file.target = file.persons[0].id;
+        } else {
+            if (file.persons[1].target) {
+                file.target = file.persons[1].id;
+            }
+        }
+    }
+    file.fileType = type;
+    file._rev = doc.rev;
+    return file;
 }
 
 export function processBulkDocs(data, type) {
@@ -373,4 +393,43 @@ export function createIdForType(file, type) {
         default:
             return (fileType + '_' + file._id);
     }
+}
+
+
+// Algorithm
+function upsertDataWithChangingId(file, type, database) {
+    let alternateId = `person.json_${file.type === config.personTypes.contacts ? config.personTypes.cases : file.type === config.personTypes.cases ? config.personTypes.contacts : file.type}_${file.outbreakId}_${extractIdFromPouchId(file._id, 'person')}`;
+    let promiseForOriginalId = database.find({selector: { _id: file._id } })
+        .then((result) => {
+            return result.docs && Array.isArray(result.docs) && result.docs.length > 0 ? result.docs[0] : null;
+        });
+    let promiseForAlternateId = database.find({selector: {_id: alternateId } })
+        .then((result) => {
+            return result.docs && Array.isArray(result.docs) && result.docs.length > 0 ? result.docs[0] : null;
+        });
+    let upsertFile = database.upsert(file._id, (doc) => {
+        return upsertFunction(doc, file, type);
+    });
+
+    return Promise.all([promiseForOriginalId, promiseForAlternateId])
+        .then((results) => {
+            let promiseRemoveOldData = results[1] && database.remove(results[1]);
+            return Promise.all([promiseRemoveOldData, upsertFile])
+        })
+        .catch((errorGetData) => {
+            // If the operation failed, proceed to upsert
+            return upsertFile;
+        });
+}
+
+export function generalUpsert(collectionName, record) {
+    return getDatabase(collectionName)
+        .then((database) => {
+            return database.upsert(record._id, (doc) => {
+                return upsertFunction(doc, record, null);
+            })
+                .then((resultUpsert) => {
+                    return database.get(resultUpsert.id)
+                })
+        })
 }

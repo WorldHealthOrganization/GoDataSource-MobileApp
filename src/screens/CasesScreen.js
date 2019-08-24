@@ -587,9 +587,9 @@ class CasesScreen extends Component {
 
     filterCases = () => {
         let allFilters = null;
-        if (this.props.filter && (this.props.filter['CasesScreen'] || this.props.filter['CasesFilterScreen'])) {
+        // if (this.props.filter && (this.props.filter['CasesScreen'] || this.props.filter['CasesFilterScreen'])) {
             allFilters = createFilterCasesObject(this.state.filterFromFilterScreen, this.state.filter);
-        }
+        // }
 
         // this.setState({
         //     loading: true,
