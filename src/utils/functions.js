@@ -972,7 +972,7 @@ export async function createFilesWithName (fileName, data, password) {
                         arrayOfResponses.push(response);
                     } else {
                         console.log(`No response received from createFileWithIndex. fileName: ${fileName}, index: ${i}`);
-                        return reject('No response received from createFileWithIndex');
+                        return Promise.reject('No response received from createFileWithIndex');
                     }
                 } catch (errorCreateFileWithIndex) {
                     console.log('An error occurred while creating directory: ', errorCreateFileWithIndex);
@@ -1000,11 +1000,11 @@ export async function createFilesWithName (fileName, data, password) {
                             arrayOfResponses.push(response);
                         } else {
                             console.log(`No response received from createFileWithIndex. fileName: ${fileName}, index: ${i}`);
-                            return reject('No response received from createFileWithIndex');
+                            return Promise.reject('No response received from createFileWithIndex');
                         }
                     } catch (errorCreateFileWithIndex) {
                         console.log('An error occurred while creating directory: ', errorCreateFileWithIndex);
-                return Promise.reject(errorCreateFileWithIndex);
+                        return Promise.reject(errorCreateFileWithIndex);
                     }
                 }
 
@@ -1085,46 +1085,78 @@ export function generateId () {
 }
 
 export function mapContactsAndRelationships(contacts, relationships) {
-    console.log ('mapContactsAndRelationships')
+    // console.log ('mapContactsAndRelationships')
+    let start = new Date().getTime();
     // console.log ('mapContactsAndRelationships contacts', JSON.stringify(contacts))
     // console.log ('mapContactsAndRelationships relationships', JSON.stringify(relationships))
 
-    let mappedContacts = contacts;
-    for (let i = 0; i < relationships.length; i++) {
-        let contactObject = {};
+    // let mappedContacts = contacts;
 
-        let contactIndexAsFirstPerson = mappedContacts.findIndex((e) => {return extractIdFromPouchId(e._id, 'person') === relationships[i].persons[0].id});
-        let contactIndexAsSecondPerson = mappedContacts .findIndex((e) => {return extractIdFromPouchId(e._id, 'person') === relationships[i].persons[1].id});
-        if ((relationships[i].persons[0].type === 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT' || relationships[i].persons[0].type === 'contact') && contactIndexAsFirstPerson > -1) {
-            contactObject = Object.assign({}, contacts.find((e) => {
-                return extractIdFromPouchId(e._id, 'person') === relationships[i].persons[0].id
-            }))
 
-            if (!contactObject.relationships || contactObject.relationships.length === 0) {
-                contactObject.relationships = [];
+    let searchableContacts = groupBy(contacts, (data) => {return extractIdFromPouchId(data._id, 'person')});
+    for (let i=0; i<relationships.length; i++) {
+        if (searchableContacts[get(relationships, `[${i}].persons[0].id`)]) {
+            if(get(searchableContacts, `[${get(relationships, `[${i}].persons[0].id`)}][0].relationships`, null) === null) {
+                set(searchableContacts, `[${get(relationships, `[${i}].persons[0].id`)}][0].relationships`, [relationships[i]])
+            } else {
+                get(searchableContacts, `[${get(relationships, `[${i}].persons[0].id`)}][0].relationships`, null).push(relationships[i]);
             }
-            contactObject.relationships.push(relationships[i]);
-            mappedContacts[contactIndexAsFirstPerson] = contactObject;
-        } else {
-            if ((relationships[i].persons[1].type === 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT' || relationships[i].persons[1].type === 'contact') && contactIndexAsSecondPerson > -1) {
-                contactObject = Object.assign({}, contacts.find((e) => {
-                    return extractIdFromPouchId(e._id, 'person') === relationships[i].persons[1].id
-                }));
+        }
 
-                if (!contactObject.relationships || contactObject.relationships.length === 0) {
-                    contactObject.relationships = [];
-                }
-                contactObject.relationships.push(relationships[i]);
-                mappedContacts[contactIndexAsSecondPerson] = contactObject;
+        if (searchableContacts[get(relationships, `[${i}].persons[1].id`)]) {
+            if(get(searchableContacts, `[${get(relationships, `[${i}].persons[1].id`)}][0].relationships`, null) === null) {
+                set(searchableContacts, `[${get(relationships, `[${i}].persons[1].id`)}][0].relationships`, [relationships[i]])
+            } else {
+                get(searchableContacts, `[${get(relationships, `[${i}].persons[1].id`)}][0].relationships`, null).push(relationships[i]);
             }
         }
     }
 
+    let mappedContacts = [];
+    let keys = Object.keys(searchableContacts);
+    for(let i=0; i<Object.keys(searchableContacts).length; i++) {
+        mappedContacts.push(searchableContacts[Object.keys(searchableContacts)[i]][0]);
+    }
+
+
+
+    // for (let i = 0; i < relationships.length; i++) {
+    //     let contactObject = {};
+    //
+    //     let contactIndexAsFirstPerson = mappedContacts.findIndex((e) => {return extractIdFromPouchId(e._id, 'person') === relationships[i].persons[0].id});
+    //     let contactIndexAsSecondPerson = mappedContacts.findIndex((e) => {return extractIdFromPouchId(e._id, 'person') === relationships[i].persons[1].id});
+    //     if ((relationships[i].persons[0].type === 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT' || relationships[i].persons[0].type === 'contact') && contactIndexAsFirstPerson > -1) {
+    //         contactObject = Object.assign({}, contacts.find((e) => {
+    //             return extractIdFromPouchId(e._id, 'person') === relationships[i].persons[0].id
+    //         }))
+    //
+    //         if (!contactObject.relationships || contactObject.relationships.length === 0) {
+    //             contactObject.relationships = [];
+    //         }
+    //         contactObject.relationships.push(relationships[i]);
+    //         mappedContacts[contactIndexAsFirstPerson] = contactObject;
+    //     } else {
+    //         if ((relationships[i].persons[1].type === 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT' || relationships[i].persons[1].type === 'contact') && contactIndexAsSecondPerson > -1) {
+    //             contactObject = Object.assign({}, contacts.find((e) => {
+    //                 return extractIdFromPouchId(e._id, 'person') === relationships[i].persons[1].id
+    //             }));
+    //
+    //             if (!contactObject.relationships || contactObject.relationships.length === 0) {
+    //                 contactObject.relationships = [];
+    //             }
+    //             contactObject.relationships.push(relationships[i]);
+    //             mappedContacts[contactIndexAsSecondPerson] = contactObject;
+    //         }
+    //     }
+    // }
+
     // console.log ('mapContactsAndRelationships mappedContacts', JSON.stringify(mappedContacts))
+    console.log('Result for find time for mapContactsAndRelationships: ', new Date().getTime() - start);
     return mappedContacts;
 }
 
 export function mapContactsAndFollowUps(contacts, followUps) {
+    let start = new Date().getTime();
     console.log ('mapContactsAndFollowUps')
     // console.log ('mapContactsAndFollowUps contacts', JSON.stringify(contacts))
     // console.log ('mapContactsAndFollowUps followUps', JSON.stringify(followUps))
@@ -1156,6 +1188,7 @@ export function mapContactsAndFollowUps(contacts, followUps) {
     //     }
     // }
     // console.log ('mapContactsAndFollowUps mappedContacts', JSON.stringify(mappedContacts))
+    console.log('Result for find time for mapContactsAndFollowUps: ', new Date().getTime() - start);
     return contacts.filter((e) => {return e._id !== undefined && e._id});
 }
 
@@ -1174,6 +1207,9 @@ export function updateRequiredFields(outbreakId, userId, record, action, fileTyp
             record.updatedBy = extractIdFromPouchId(userId, 'user');
             record.deleted = false;
             record.deletedAt = null;
+            record.deletedBy = null;
+            record.createdAt = dateToBeSet;
+            record.createdBy = extractIdFromPouchId(userId, 'user');
             if (type !== '') {
                 record.type = type
             }
@@ -1186,6 +1222,7 @@ export function updateRequiredFields(outbreakId, userId, record, action, fileTyp
             record.updatedBy = extractIdFromPouchId(userId, 'user');
             record.deleted = false;
             record.deletedAt = null;
+            record.deletedBy = null;
             // console.log ('updateRequiredFields update record', JSON.stringify(record))
             return record;
 
@@ -1195,6 +1232,7 @@ export function updateRequiredFields(outbreakId, userId, record, action, fileTyp
             record.updatedBy = extractIdFromPouchId(userId, 'user');
             record.deleted = true;
             record.deletedAt = dateToBeSet;
+            record.deletedBy = extractIdFromPouchId(userId, 'user');
             // console.log ('updateRequiredFields delete record', JSON.stringify(record))
 
             // WGD-1806 when removing cases/contacts and they have visualId, set it to null, and add a new document
@@ -1977,7 +2015,13 @@ export function getDropDownInputDisplayParameters(screenSize, dropDownDataLength
     }
 }
 
-export function createDate(date, isEndOfDay) {
+export function createDate(date, isEndOfDay, accurateDate) {
+    if (accurateDate) {
+        if (date) {
+            return moment.utc(date)._d;
+        }
+        return moment.utc()._d;
+    }
     if (isEndOfDay) {
         if (date) {
             return moment.utc(date).endOf('day')._d;

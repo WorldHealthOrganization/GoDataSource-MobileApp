@@ -24,6 +24,7 @@ import config from "../utils/config";
 import PersonListItemNameAndAddressComponent from './PersonListItemNameAndAddressComponent';
 import PersonListItemExposuresComponent from './PersonListItemExposuresComponent';
 import isEqual from 'lodash/isEqual';
+import get from 'lodash/get';
 
 
 class PersonListItem extends Component {
@@ -435,7 +436,7 @@ function mapStateToProps(state) {
         contacts: state.contacts,
         events: state.events,
         referenceData: state.referenceData,
-        locations: state.locations.locationsList
+        locations: get(state, `locations.locationsList`, [])
     };
 }
 

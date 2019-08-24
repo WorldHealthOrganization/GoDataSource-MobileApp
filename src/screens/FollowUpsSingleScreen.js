@@ -505,11 +505,11 @@ class FollowUpsSingleScreen extends Component {
     };
     onChangeSwitch = (value, id, objectType) => {
         // console.log("onChangeSwitch: ", value, id, this.state.item);
-        if (id === 'fillGeoLocation') {
+        if (id === 'fillLocation') {
             navigator.geolocation.getCurrentPosition((position) => {
                 this.setState(
                     (prevState) => ({
-                        item: Object.assign({}, prevState.item, { [id]: value ? { lat: position.coords.latitude, lng: position.coords.longitude } : null }),
+                        item: Object.assign({}, prevState.item, { [id]: value ? {geoLocation: { lat: position.coords.latitude, lng: position.coords.longitude }} : {geoLocation: { lat: null, lng: null }} }),
                         isModified: true
                     }), () => {
                         console.log("onChangeSwitch", id, " ", value, " ", this.state.item);
@@ -517,7 +517,7 @@ class FollowUpsSingleScreen extends Component {
                 )
             },
                 (error) => {
-                    Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.alertMessages.getLocationError, this.props.translation), [
+                    Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(error.message, this.props.translation), [
                         {
                             text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
                             onPress: () => { console.log("OK pressed") }
@@ -525,7 +525,7 @@ class FollowUpsSingleScreen extends Component {
                     ])
                 },
                 {
-                    enableHighAccuracy: true, timeout: 20000, maximumAge: 1000
+                    timeout: 5000
                 }
             )
         } else {

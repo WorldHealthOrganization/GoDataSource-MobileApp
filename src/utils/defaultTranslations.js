@@ -361,7 +361,7 @@ export default {
     'LNG_ADDRESS_FIELD_LABEL_LATITUDE': 'Latitude',
     'LNG_COMMON_BUTTON_DELETE': 'Delete',
     'LNG_ADDRESS_FIELD_LABEL_COPY_ADDRESS': 'Copy case address',
-    'LNG_ADDRESS_FIELD_LABEL_IS_THE_PERSON_NEXT_TO_YOU': 'Is the person next to you?',
+    'LNG_ADDRESS_FIELD_LABEL_IS_THE_PERSON_NEXT_TO_YOU': 'Capture coordinates',
 
 
     //personTypes

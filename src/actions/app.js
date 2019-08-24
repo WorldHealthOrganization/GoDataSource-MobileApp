@@ -367,7 +367,7 @@ function processFilesForSync(error, response, hubConfiguration, isFirstTime, syn
                                                 storeData('activeDatabase', hubConfiguration.url, (errorActiveDatabase) => {
                                                     if (!errorActiveDatabase) {
                                                         dispatch(saveActiveDatabase(hubConfiguration.url));
-                                                        storeData(hubConfiguration.url, createDate(null).toISOString(), (errorStoreLastSync) => {
+                                                        storeData(hubConfiguration.url, createDate(null, null, true).toISOString(), (errorStoreLastSync) => {
                                                             if (!errorStoreLastSync) {
                                                                 // if all was successful, then store the database in async storage
                                                                 AsyncStorage.getItem('databases')
@@ -560,7 +560,7 @@ function processFilesForSync(error, response, hubConfiguration, isFirstTime, syn
                                                 storeData('activeDatabase', hubConfiguration.url, (errorActiveDatabase) => {
                                                     if (!errorActiveDatabase) {
                                                         dispatch(saveActiveDatabase(hubConfiguration.url));
-                                                        storeData(hubConfiguration.url, createDate(null).toISOString(), (errorStoreLastSync) => {
+                                                        storeData(hubConfiguration.url, createDate(null, null, true).toISOString(), (errorStoreLastSync) => {
                                                             if (!errorStoreLastSync) {
                                                                 // if all was successful, then store the database in async storage
                                                                 AsyncStorage.getItem('databases')
@@ -864,10 +864,17 @@ export function sendDatabaseToServer () {
 
                         let internetCredentials = await getInternetCredentials(activeDatabase);
                         if (internetCredentials) {
-                            let startTimeForFilesChanged = new Date().getTime();
+                            // let startTimeForFilesChanged = new Date().getTime();
+
+                            // First do some cleanup to ensure good zip archive (see WGD-2483)
+                            try {
+                                let deleted = await RNFetchBlobFs.unlink(`${RNFetchBlobFs.dirs.DocumentDir}/who_mobile`);
+                                console.log('Deleted file');
+                            } catch(errorDelete) {
+                                console.log('Error delete, but move forward: ', errorDelete);
+                            }
 
                             // To avoid performance issues, go through all the collections that can change and see if anything actually changed
-
                             // arrayOfStatuses.push({text: 'Getting local data', status: 'OK'});
                             let statusArray = [];
                             for (let i=0; i<config.changingMongoCollections.length; i++) {

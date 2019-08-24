@@ -32,7 +32,7 @@ function selectTranslations(state) {
 }
 
 function selectLocations(state) {
-    return state.locations.locationsList;
+    return get(state, `locations.locationsList`, []);
 }
 
 

@@ -134,7 +134,7 @@ class AddFollowUpScreen extends PureComponent{
 
     onSavePressed = () => {
         this.setState({
-            date: createDate(null),
+            date: createDate(this.state.date),
             isModified: false
         }, () => {
             this.props.onSavePressed(this.state.date);
