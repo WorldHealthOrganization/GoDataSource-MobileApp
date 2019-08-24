@@ -587,9 +587,9 @@ class ContactsScreen extends Component {
 
     filterContacts = () => {
         let allFilters = null;
-        if (this.props.filter && (this.props.filter['ContactsFilterScreen'] || this.props.filter['FollowUpsScreen'])) {
+        // if (this.props.filter && (this.props.filter['ContactsFilterScreen'] || this.props.filter['FollowUpsScreen'])) {
             allFilters = createFilterContactsObject(this.state.filterFromFilterScreen, this.state.filter)
-        }
+        // }
 
         // this.setState({
         //     loading: true,
@@ -845,7 +845,7 @@ function mapStateToProps(state) {
         errors:         state.errors,
         role:           state.role,
         referenceData:  state.referenceData,
-        cases:          state.cases
+        cases:          state.exposure
     };
 }
 

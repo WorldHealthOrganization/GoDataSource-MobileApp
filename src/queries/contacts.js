@@ -1,7 +1,7 @@
 /**
  * Created by florinpopa on 13/09/2018.
  */
-import {getDatabase} from './database';
+import {getDatabase, generalUpsert} from './database';
 import {objSort, localSortItems} from './../utils/functions';
 import config from './../utils/config';
 
@@ -104,6 +104,7 @@ export function getContactsForOutbreakIdRequest (outbreakId, filter, token, call
                                 }
                             }
 
+                            console.log('Result for find time for number of contacts: ', resultFilterContacts.length);
                             callback(null, resultFilterContactsDocs)
                         })
                         .catch((errorFilterContacts) => {
@@ -121,7 +122,7 @@ export function getContactsForOutbreakIdRequest (outbreakId, filter, token, call
                         }
                     })
                         .then((resultFind) => {
-                            console.log('Result for find time for contacts: ', new Date().getTime() - start);
+                            console.log('Result for find time for contacts: ', new Date().getTime() - start, resultFind.docs.length);
                             callback(null, objSort(resultFind.docs, ['lastName', false]));
                         })
                         .catch((errorFind) => {
@@ -243,47 +244,55 @@ export function getContactByIdRequest(outbreakId, contactId, token, callback) {
 export function updateContactRequest(outbreakId, contactId, contact, token, callback) {
     // console.log('updateContactRequest: ', outbreakId, contactId, contact, token);
 
-    getDatabase(config.mongoCollections.person)
-        .then((database) => {
-            database.get(contact._id)
-                .then((resultGetContact) => {
-                    console.log ('Get contact result: ');
-                    database.remove(resultGetContact)
-                        .then((resultRemove) => {
-                            console.log ('Remove contact result: ')
-                            delete contact._rev;
-                            database.put(contact)
-                                .then((responseUpdateContact) => {
-                                    console.log("Update contact response: ");
-                                    database.get(contact._id)
-                                        .then((resultGetUpdatedContact) => {
-                                            console.log("Response getUpdatedContact: ");
-                                            callback(null, resultGetUpdatedContact);
-                                        })
-                                        .catch((errorGetUpdatedContact) => {
-                                            console.log("Error getUpdatedContact: ", errorGetUpdatedContact);
-                                            callback(errorGetUpdatedContact);
-                                        })
-                                })
-                                .catch((errorUpdateContact) => {
-                                    console.log('Update contact error: ', errorUpdateContact);
-                                    callback(errorUpdateContact);
-                                })
-                        })
-                        .catch((errorRemove) => {
-                            console.log('Remove contact error: ', errorRemove);
-                            callback(errorRemove);
-                        })
-                })
-                .catch((errorGetContact) => {
-                    console.log('Get contact error:  ', errorGetContact);
-                    callback(errorGetContact);
-                })
+    generalUpsert(config.mongoCollections.person, contact)
+        .then((resultUpsert) => {
+            callback(null, resultUpsert);
         })
-        .catch((errorGetDatabase) => {
-            console.log('Error while getting database: ', errorGetDatabase);
-            callback(errorGetDatabase);
-        });
+        .catch((errorUpdate) => {
+            callback(errorUpdate);
+        })
+
+    // getDatabase(config.mongoCollections.person)
+    //     .then((database) => {
+    //         database.get(contact._id)
+    //             .then((resultGetContact) => {
+    //                 console.log ('Get contact result: ');
+    //                 database.remove(resultGetContact)
+    //                     .then((resultRemove) => {
+    //                         console.log ('Remove contact result: ')
+    //                         delete contact._rev;
+    //                         database.put(contact)
+    //                             .then((responseUpdateContact) => {
+    //                                 console.log("Update contact response: ");
+    //                                 database.get(contact._id)
+    //                                     .then((resultGetUpdatedContact) => {
+    //                                         console.log("Response getUpdatedContact: ");
+    //                                         callback(null, resultGetUpdatedContact);
+    //                                     })
+    //                                     .catch((errorGetUpdatedContact) => {
+    //                                         console.log("Error getUpdatedContact: ", errorGetUpdatedContact);
+    //                                         callback(errorGetUpdatedContact);
+    //                                     })
+    //                             })
+    //                             .catch((errorUpdateContact) => {
+    //                                 console.log('Update contact error: ', errorUpdateContact);
+    //                                 callback(errorUpdateContact);
+    //                             })
+    //                     })
+    //                     .catch((errorRemove) => {
+    //                         console.log('Remove contact error: ', errorRemove);
+    //                         callback(errorRemove);
+    //                     })
+    //             })
+    //             .catch((errorGetContact) => {
+    //                 console.log('Get contact error:  ', errorGetContact);
+    //                 callback(errorGetContact);
+    //             })
+    //     })
+    //     .catch((errorGetDatabase) => {
+    //         console.log('Error while getting database: ', errorGetDatabase);
+    //         callback(errorGetDatabase);
+    //     });
 }
 
 export function addContactRequest(outbreakId, contact, token, callback) {

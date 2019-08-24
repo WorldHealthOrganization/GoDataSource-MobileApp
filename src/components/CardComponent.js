@@ -19,7 +19,8 @@ import DropDownSectioned from './DropDownSectioned';
 import TextInput from './TextInput';
 import SwitchInput from './SwitchInput';
 import DatePicker from './DatePicker';
-import _ from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
+import get from 'lodash/get';
 import Section from './Section';
 import Selector from './Selector';
 import IntervalPicker from './IntervalPicker';
@@ -78,7 +79,7 @@ class CardComponent extends PureComponent {
                     />
                 );
             case 'DropdownInput':
-                const dataWithNoneOption = _.cloneDeep(this.props.item.data)
+                const dataWithNoneOption = cloneDeep(this.props.item.data)
                 if (dataWithNoneOption !== undefined && dataWithNoneOption !== null && dataWithNoneOption.length > 0) {
                     const dataFormatKeys = Object.keys(dataWithNoneOption[0])
                     if (dataFormatKeys.length === 2) {
@@ -290,7 +291,7 @@ const style = StyleSheet.create({
 function mapStateToProps(state) {
     return {
         screenSize: state.app.screenSize,
-        locations: state.locations.locations,
+        locations: get(state, `locations.locations`, []),
         translation: state.app.translation,
     };
 }

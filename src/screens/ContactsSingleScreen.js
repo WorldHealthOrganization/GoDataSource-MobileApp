@@ -462,12 +462,10 @@ class ContactsSingleScreen extends Component {
             fileType: 'followUp.json',
             outbreakId: this.props.user.activeOutbreakId,
             index: daysSince(_.get(this.state, 'contact.followUp.startDate', null), now) + 1,
-            personId: extractIdFromPouchId(this.state.contact._id, 'person.json'),
-            updatedAt: now.toISOString(),
-            updatedBy: extractIdFromPouchId(this.props.user._id, 'user.json'),
-            deleted: false,
-            deletedAt: null
+            personId: extractIdFromPouchId(this.state.contact._id, 'person.json')
         };
+
+        followUp = updateRequiredFields(this.props.user.outbreakId, this.props.user._id, followUp, 'create', 'followUp.json');
 
         this.setState({
             showAddFollowUpScreen: !this.state.showAddFollowUpScreen

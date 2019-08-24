@@ -25,6 +25,7 @@ import translations from './../utils/translations'
 import ElevatedView from 'react-native-elevated-view';
 import _ from 'lodash';
 import moment from 'moment';
+import get from "lodash/get";
 
 class CaseSingleAddressContainer extends PureComponent {
 
@@ -422,7 +423,7 @@ function mapStateToProps(state) {
         role: state.role,
         translation: state.app.translation,
         referenceData: state.referenceData,
-        locations: state.locations.locations,
+        locations: _.get(state, `locations.locations`, []),
     };
 
 }

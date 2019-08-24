@@ -248,16 +248,14 @@ class FollowUpsScreen extends Component {
         for (let i=0; i<refData.length; i++) {
             followUpsColors[refData[i].value] = refData[i].colorCode || styles.buttonGreen
         }
-        // this.setState({
-        //     loading: true,
-        //     generating: false,
-        //     followUpsColors
-        // }, () => {
-        if (this.props.user && this.props.user.activeOutbreakId) {
-            // this.props.setLoaderState(true);
-            this.props.getFollowUpsForOutbreakId(this.props.user.activeOutbreakId, this.state.filter, this.props.teams, null);
-        }
-        // })
+        this.setState({
+            followUpsColors
+        }, () => {
+            if (this.props.user && this.props.user.activeOutbreakId) {
+                // this.props.setLoaderState(true);
+                this.props.getFollowUpsForOutbreakId(this.props.user.activeOutbreakId, this.state.filter, this.props.teams, null);
+            }
+        })
     }
 
     clampedScroll = Animated.diffClamp(
@@ -1147,7 +1145,7 @@ const style = StyleSheet.create({
 });
 
 mapStateToProps = (state, ownProps) => {
-    const mappedFollowUps = mapFollowUps(state);
+    // const mappedFollowUps = mapFollowUps(state);
     return {
         user: state.user,
         teams: state.teams,
@@ -1164,7 +1162,7 @@ mapStateToProps = (state, ownProps) => {
         role: state.role,
         cases: state.exposure,
         referenceData: state.referenceData,
-        mappedFollowUps: mappedFollowUps,
+        // mappedFollowUps: mappedFollowUps,
         showLoader: state.app.loaderState
     };
 }

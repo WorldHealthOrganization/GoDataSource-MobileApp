@@ -420,7 +420,7 @@ function mapStateToProps(state) {
         contacts: state.contacts,
         translation: state.app.translation,
         referenceData: state.referenceData,
-        cases: state.cases,
+        cases: state.exposure,
         events: state.events,
         clusters: state.clusters,
     };
