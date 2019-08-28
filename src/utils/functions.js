@@ -2044,6 +2044,14 @@ export function daysSince(startDate, endDate) {
     return moment.utc(endDate).startOf('day').diff(moment.utc(startDate).startOf('day'), 'days');
 }
 
+
+// Algorithm:
+// - compute for each team all the locations that they are responsible for (with all its sublocations)
+//      - iterate through locationsTree
+//      - when a locationId matches one from the teams, all of the sub-locations will be added
+// - assign team id based on all the locations
+// - if multiple teams match, take the first one
+// - if no team match, leave it null
 export function generateTeamId (contactAddress, teams, locationsTree) {
     let currentAddress = contactAddress;
     if (Array.isArray(contactAddress)) {
@@ -2051,6 +2059,16 @@ export function generateTeamId (contactAddress, teams, locationsTree) {
     }
 
     // Create an array with all the locations of all the teams
+}
+
+export function computeAllLocationsForTeams(teams, locationsTree, addAllSubLocations) {
+    let mappedTeams = [];
+
+    for (let i=0; i<locationsTree.length; i++) {
+
+    }
+
+    return mappedTeams;
 }
 
 export function extractMainAddress (addressesArray) {
