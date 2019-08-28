@@ -1034,14 +1034,21 @@ class CaseSingleScreen extends Component {
                     setTimeout(() => {
                         Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.alertMessages.replaceCurrentCoordinates, this.props.translation), [
                             {
-                                text: getTranslation(translations.alertMessages.cancelButtonLabel, this.props.translation), onPress: () => { console.log('Cancel pressed') }
+                                text: getTranslation(translations.alertMessages.cancelButtonLabel, this.props.translation), onPress: () => {
+                                    console.log('Cancel pressed');
+                                    this.setState(prevState => ({
+                                        case: Object.assign({}, prevState.case, { addresses }),
+                                        isModified: true
+                                    }))
+                                }
                             },
                             {
                                 text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation), onPress: () => {
                                     addresses[index].geoLocation = selectedItems['0'].geoLocation;
                                     console.log('Addresses biatch: ', addresses);
                                     this.setState(prevState => ({
-                                        case: Object.assign({}, prevState.case, { addresses })
+                                        case: Object.assign({}, prevState.case, { addresses }),
+                                        isModified: true
                                     }))
                                 }
                             }
@@ -1051,7 +1058,8 @@ class CaseSingleScreen extends Component {
             } else {
                 console.log('Addresses biatch: ', addresses);
                 this.setState(prevState => ({
-                    case: Object.assign({}, prevState.case, { addresses })
+                    case: Object.assign({}, prevState.case, { addresses }),
+                    isModified: true
                 }))
             }
         }

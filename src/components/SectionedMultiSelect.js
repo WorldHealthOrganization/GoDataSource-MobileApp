@@ -51,7 +51,7 @@ class SectionedMultiSelect extends PureComponent {
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
-        console.log("SectionedMultiSelect screenSize: ", this.props.screenSize);
+        console.log("SectionedMultiSelect screenSize: ");
         return (
             <View>
                 {/*Component container*/}
@@ -84,7 +84,7 @@ class SectionedMultiSelect extends PureComponent {
                     }}>
                         <ElevatedView
                             style={{
-                                width: calculateDimension(this.props.screenSize.width - 28, false, this.props.screenSize),
+                                width: calculateDimension(config.designScreenSize.width - 28, false, this.props.screenSize),
                                 height: '80%',
                                 backgroundColor: 'white',
                                 alignSelf: 'center',
