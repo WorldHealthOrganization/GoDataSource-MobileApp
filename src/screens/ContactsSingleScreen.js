@@ -33,7 +33,7 @@ import moment from 'moment'
 import translations from './../utils/translations'
 import ElevatedView from 'react-native-elevated-view';
 import AddFollowUpScreen from './AddFollowUpScreen';
-import {generateId} from "../utils/functions";
+import {generateId, generateTeamId} from "../utils/functions";
 
 const initialLayout = {
     height: 0,
@@ -452,6 +452,9 @@ class ContactsSingleScreen extends Component {
 
     handleOnSavePressed = (date) => {
         // Here contact={label: <name>, value: <contactId>} and date is a regular date
+        // extract contact's main address
+        // let address = this.state.contact.addresses.find((e) => {return e.type === config.})
+
         let now = createDate(null);
         date = createDate(date);
         let followUp = {
@@ -462,6 +465,7 @@ class ContactsSingleScreen extends Component {
             fileType: 'followUp.json',
             outbreakId: this.props.user.activeOutbreakId,
             index: daysSince(_.get(this.state, 'contact.followUp.startDate', null), now) + 1,
+            // teamId: generateTeamId(),
             personId: extractIdFromPouchId(this.state.contact._id, 'person.json')
         };
 
@@ -1168,7 +1172,13 @@ class ContactsSingleScreen extends Component {
                     setTimeout(() => {
                         Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.alertMessages.replaceCurrentCoordinates, this.props.translation), [
                             {
-                                text: getTranslation(translations.alertMessages.cancelButtonLabel, this.props.translation), onPress: () => { console.log('Cancel pressed') }
+                                text: getTranslation(translations.alertMessages.cancelButtonLabel, this.props.translation), onPress: () => {
+                                    console.log('Cancel pressed');
+                                    this.setState(prevState => ({
+                                        contact: Object.assign({}, prevState.contact, { addresses }),
+                                        isModified: true
+                                    }))
+                                }
                             },
                             {
                                 text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation), onPress: () => {
@@ -1788,7 +1798,8 @@ function mapStateToProps(state) {
         errors: state.errors,
         contacts: state.contacts,
         filter: state.app.filters,
-        translation: state.app.translation
+        translation: state.app.translation,
+        locations: _.get(state, 'locations.locations', [])
     };
 };
 

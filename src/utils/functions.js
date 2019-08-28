@@ -789,6 +789,9 @@ export function getDataFromDatabaseFromFile (database, fileType, lastSyncDate, p
                 // If there are more than 1000 collections split in chunks of 1000 records
                 console.log('GetDataFromDatabaseFromFile query time: ', new Date().getTime() - start);
                 let responseArray = response.docs.map((e) => {
+                    if (fileType === 'user.json') {
+                        delete e.password;
+                    }
                     delete e._rev;
                     e._id = extractIdFromPouchId(e._id, fileType);
                     // delete e._id;
@@ -2041,6 +2044,19 @@ export function daysSince(startDate, endDate) {
     return moment.utc(endDate).startOf('day').diff(moment.utc(startDate).startOf('day'), 'days');
 }
 
-export function generateTeamId (contactAddress, teams, locations) {
+export function generateTeamId (contactAddress, teams, locationsTree) {
+    let currentAddress = contactAddress;
+    if (Array.isArray(contactAddress)) {
+        currentAddress = extractMainAddress(contactAddress);
+    }
 
+    // Create an array with all the locations of all the teams
+}
+
+export function extractMainAddress (addressesArray) {
+    if (!addressesArray || !Array.isArray(addressesArray) || addressesArray.length === 0) {
+        return null;
+    }
+
+    return addressesArray.find((e) => {return e.typeId === config.userResidenceAddress.userPlaceOfResidence})
 }
