@@ -79,16 +79,17 @@ class CardComponent extends PureComponent {
                     />
                 );
             case 'DropdownInput':
-                const dataWithNoneOption = cloneDeep(this.props.item.data)
-                if (dataWithNoneOption !== undefined && dataWithNoneOption !== null && dataWithNoneOption.length > 0) {
-                    const dataFormatKeys = Object.keys(dataWithNoneOption[0])
+                const dataWithNoneOption = cloneDeep(this.props.item.data);
+                if (!this.props.item.skipNone && dataWithNoneOption !== undefined && dataWithNoneOption !== null && dataWithNoneOption.length > 0) {
+                    const dataFormatKeys = Object.keys(dataWithNoneOption[0]);
                     if (dataFormatKeys.length === 2) {
-                        const noneLabel = getTranslation(translations.generalLabels.noneLabel, this.props.translation)
+                        const noneLabel = getTranslation(translations.generalLabels.noneLabel, this.props.translation);
+                        let noneData = null;
                         if (dataFormatKeys[0] === 'label' && dataFormatKeys[1] === 'value'){
-                            noneData = { label: noneLabel, value: null }
+                            noneData = { label: noneLabel, value: null };
                             dataWithNoneOption.unshift(noneData)
                         } else if (dataFormatKeys[0] === 'value' && dataFormatKeys[1] === 'id'){
-                            noneData = { value: noneLabel, id: null }
+                            noneData = { value: noneLabel, id: null };
                             dataWithNoneOption.unshift(noneData)
                         }
                     }
