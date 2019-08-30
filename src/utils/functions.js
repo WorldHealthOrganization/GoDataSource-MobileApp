@@ -229,7 +229,7 @@ export function unzipFile (source, dest, password, clientCredentials) {
                         //     .then((RNFSStatResponse) => {
                                 // Call decryptFile(filePath, fileSize, callback)
 
-                        unzip(source, dest)
+                        unzip(source, dest,'UTF-8')
                             .then((path) => {
                                 console.log(`unzip completed at ${path}`);
                                 // Delete the zip file after unzipping

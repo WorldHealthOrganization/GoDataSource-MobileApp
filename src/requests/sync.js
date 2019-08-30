@@ -15,6 +15,7 @@ import get from 'lodash/get';
 import {getHelpItemsRequest} from './helpItem';
 import {handleResponseFromRNFetchBlob, createDate} from './../utils/functions';
 import moment from 'moment';
+import {retriablePromise} from "../utils/typeCheckingFunctions";
 
 export function getDatabaseSnapshotRequest(hubConfig, lastSyncDate, dispatch, callback) {
 
@@ -72,7 +73,8 @@ export function getDatabaseSnapshotRequest(hubConfig, lastSyncDate, dispatch, ca
 
                     computeHelpItemsAndCategories(hubConfiguration, lastSyncDate)
                         .then((helpTranslations) => {
-                            RNFetchBlob.config({
+
+                            retriablePromise(RNFetchBlob.config({
                                 timeout: (30 * 60 * 10 * 1000),
                                 followRedirect: false,
                                 fileCache: true,
@@ -95,36 +97,36 @@ export function getDatabaseSnapshotRequest(hubConfig, lastSyncDate, dispatch, ca
                                     }));
                                     console.log(received, total)
                                 })
-                                .then((res) => {return handleResponseFromRNFetchBlob(res)})
-                                .then((res) => {
-                                    // console.log('Download time: ', new Date().getTime() - startDownload);
-                                    // let status = res.info().status;
+                                .then((res) => {return handleResponseFromRNFetchBlob(res)}), 3)
+                                    .then((res) => {
+                                        // console.log('Download time: ', new Date().getTime() - startDownload);
+                                        // let status = res.info().status;
 
-                                    // if (status === 200) {
-                                    //     // After returning the database, return the path to it
-                                    //     console.log("Got database");
+                                        // if (status === 200) {
+                                        //     // After returning the database, return the path to it
+                                        //     console.log("Got database");
                                         callback(null, databaseLocation)
-                                    // } else {
-                                    //     if (status === 422) {
-                                    //         callback(`No data to export`);
-                                    //     } else {
-                                    //         res.json()
-                                    //             .then((parsedError) => {
-                                    //                 console.log('Jsons: ', parsedError);
-                                    //                 // After getting zip file from the server, unzip it and then proceed to the importing of the data to the SQLite database
-                                    //                 callback(get(parsedError, 'error.message', 'Unknown error'));
-                                    //             })
-                                    //             .catch((errorParseError) => {
-                                    //                 callback(`Cannot connect to HUB, please check URL, Client ID and Client secret.\nStatus code: ${status}`);
-                                    //             })
-                                    //     }
-                                    // }
-                                })
-                                .catch((errorMessage, statusCode) => {
-                                    // error handling
-                                    console.log("*** getDatabaseSnapshotRequest error: ", JSON.stringify(errorMessage));
-                                    callback(errorMessage.message);
-                                });
+                                        // } else {
+                                        //     if (status === 422) {
+                                        //         callback(`No data to export`);
+                                        //     } else {
+                                        //         res.json()
+                                        //             .then((parsedError) => {
+                                        //                 console.log('Jsons: ', parsedError);
+                                        //                 // After getting zip file from the server, unzip it and then proceed to the importing of the data to the SQLite database
+                                        //                 callback(get(parsedError, 'error.message', 'Unknown error'));
+                                        //             })
+                                        //             .catch((errorParseError) => {
+                                        //                 callback(`Cannot connect to HUB, please check URL, Client ID and Client secret.\nStatus code: ${status}`);
+                                        //             })
+                                        //     }
+                                        // }
+                                    })
+                                    .catch((errorMessage, statusCode) => {
+                                        // error handling
+                                        console.log("*** getDatabaseSnapshotRequest error: ", JSON.stringify(errorMessage));
+                                        callback(errorMessage.message);
+                                    });
                         })
                 }
             })

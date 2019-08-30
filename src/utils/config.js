@@ -115,9 +115,10 @@ const followUpsSingleScreen = {
                     label: translations.followUpsSingleScreen.status,
                     type: 'DropdownInput',
                     value: '',
-                    isRequired: true,
+                    isRequired: false,
                     isEditMode: true,
-                    objectType: 'FollowUp'
+                    objectType: 'FollowUp',
+                    skipNone: true
                 },
                 {
                     cardNumber: 1,

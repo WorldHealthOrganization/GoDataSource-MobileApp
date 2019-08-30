@@ -28,6 +28,7 @@ import {getDatabaseSnapshotRequest, postDatabaseSnapshotRequest} from './../requ
 import {setInternetCredentials, getInternetCredentials} from 'react-native-keychain';
 import {unzipFile, readDir} from './../utils/functions';
 import RNFetchBlobFs from 'rn-fetch-blob/fs';
+import RNFS from 'react-native-fs';
 import {processFile, getDataFromDatabaseFromFile} from './../utils/functions';
 import {createDatabase, getDatabase} from './../queries/database';
 import {setNumberOfFilesProcessed, createZipFileAtPath, createDate} from './../utils/functions';
@@ -864,7 +865,7 @@ export function sendDatabaseToServer () {
 
                             // First do some cleanup to ensure good zip archive (see WGD-2483)
                             try {
-                                let deleted = await RNFetchBlobFs.unlink(`${RNFetchBlobFs.dirs.DocumentDir}/who_mobile`);
+                                let deleted = await RNFetchBlobFs.unlink(`${RNFetchBlobFs.dirs.DocumentDir}/who_files`);
                                 console.log('Deleted file');
                             } catch(errorDelete) {
                                 console.log('Error delete, but move forward: ', errorDelete);
@@ -948,7 +949,7 @@ export function sendDatabaseToServer () {
                                             // statuses.createLocalFiles.status = 'OK';
                                             dispatch(setSyncState({id: 'createFile', status: 'Success'}));
                                             dispatch(setSyncState({id: 'sendData', status: 'In progress'}));
-                                            postDatabaseSnapshotRequest(internetCredentials, resultCreateZipFile, (errorSendData, resultSendData) => {
+                                            postDatabaseSnapshotRequest(internetCredentials, resultCreateZipFile, async (errorSendData, resultSendData) => {
                                                 if (errorSendData && !resultSendData) {
                                                     console.log('An error occurred while sending data to server: ', errorSendData);
                                                     // dispatch(setSyncState('Error'));
@@ -965,6 +966,11 @@ export function sendDatabaseToServer () {
                                                     // dispatch(setSyncState('Getting updated data from the server'));
                                                     dispatch(setSyncState({id: 'sendData', status: errorSendData ? 'Error' : 'Success', error: errorSendData ? JSON.stringify(errorSendData) : null}));
                                                     dispatch(setSyncState({id: 'getDataFromServer', status: 'In progress'}));
+                                                    try {
+                                                        let deleted = await RNFetchBlobFs.unlink(resultCreateZipFile);
+                                                    } catch (errorDeletePreviousZip) {
+                                                        console.log('Error while deleting, but keep going: ', errorDeletePreviousZip);
+                                                    }
                                                     getDatabaseSnapshotRequest({url: internetCredentials.server ? internetCredentials.server : internetCredentials.service, clientId: internetCredentials.username, clientSecret: internetCredentials.password}, lastSyncDate, dispatch, (error, response) => {
                                                         if (error) {
                                                             // arrayOfStatuses.push({text: 'Getting updated data from the server', status: JSON.stringify(error)});
