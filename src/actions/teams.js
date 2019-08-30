@@ -33,7 +33,7 @@ export function getUserTeams(userPouchId, dispatch) {
                 });
                 // dispatch(storeUserTeams(userTeams));
                 // resolve('Done user teams');
-                resolve({userTeams: userTeams});
+                resolve(userTeams);
             }
         })
     })
