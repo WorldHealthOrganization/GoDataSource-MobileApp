@@ -2318,6 +2318,7 @@ const followUpStatuses = {
     seenOk: translations.followUpStatuses.seenOk,
     seenNotOk: translations.followUpStatuses.seenNotOk,
     missed: translations.followUpStatuses.missed,
+    notAttempted: translations.followUpStatuses.notAttempted
 };
 
 const TextSwitchSelectorAgeOrDobValues = [
