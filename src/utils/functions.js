@@ -2047,12 +2047,11 @@ export function daysSince(startDate, endDate) {
 
 
 // Algorithm:
-// - compute for each team all the locations that they are responsible for (with all its sublocations)
-//      - iterate through locationsTree
-//      - when a locationId matches one from the teams, all of the sub-locations will be added
-// - assign team id based on all the locations
-// - if multiple teams match, take the first one
-// - if no team match, leave it null
+// - Get contact's main address
+// - Go through all the locations and when meeting a location that is assigned to a team add it to teams,
+// then go recursively adding the team to the sub locations
+// - When finding the main address take the first team from the teams array or null if no team assigned
+// - Note: to be checked the performance
 export function generateTeamId (contactAddress, teams, locationsTree) {
     let start = new Date().getTime();
     let currentAddress = contactAddress;
