@@ -115,9 +115,10 @@ const followUpsSingleScreen = {
                     label: translations.followUpsSingleScreen.status,
                     type: 'DropdownInput',
                     value: '',
-                    isRequired: true,
+                    isRequired: false,
                     isEditMode: true,
-                    objectType: 'FollowUp'
+                    objectType: 'FollowUp',
+                    skipNone: true
                 },
                 {
                     cardNumber: 1,
@@ -2317,6 +2318,7 @@ const followUpStatuses = {
     seenOk: translations.followUpStatuses.seenOk,
     seenNotOk: translations.followUpStatuses.seenNotOk,
     missed: translations.followUpStatuses.missed,
+    notAttempted: translations.followUpStatuses.notAttempted
 };
 
 const TextSwitchSelectorAgeOrDobValues = [

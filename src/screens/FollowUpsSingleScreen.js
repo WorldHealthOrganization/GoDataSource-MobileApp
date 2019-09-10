@@ -28,6 +28,7 @@ import ElevatedView from 'react-native-elevated-view';
 import ViewHOC from './../components/ViewHOC';
 import AddSingleAnswerModalScreen from './AddSingleAnswerModalScreen';
 import moment from 'moment';
+import {checkArrayAndLength} from './../utils/typeCheckingFunctions';
 
 
 class FollowUpsSingleScreen extends Component {
@@ -418,7 +419,25 @@ class FollowUpsSingleScreen extends Component {
     };
 
     handleNextPress = () => {
-        this.handleOnIndexChange(this.state.index + 1);
+        // Before getting to the next screen, first do some checking of the required fields
+        let checkRequiredFields = [];
+        if (this.state.item.statusId === config.followUpStatuses.notPerformed || this.state.item.statusId === translations.generalLabels.noneLabel) {
+            checkRequiredFields.push(getTranslation(_.get(config, 'followUpsSingleScreen.fields[1].label', 'Status'), this.props.translation));
+        }
+        // if ((_.get(this.state, 'item.fillLocation.geoLocation.lat', null) === null && _.get(this.state, 'item.fillLocation.geoLocation.lng', null) === null)) {
+        //     checkRequiredFields.push(getTranslation(_.get(config, 'followUpsSingleScreen.fields[2].label', 'Capture coordinates'), this.props.translation));
+        // }
+
+        if (checkArrayAndLength(checkRequiredFields)) {
+            Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), `${getTranslation(translations.alertMessages.requiredFieldsMissingError, this.props.translation)}.\n${getTranslation(translations.alertMessages.missingFields, this.props.translation)}: ${checkRequiredFields}`, [
+                {
+                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+                    onPress: () => { console.log("OK pressed") }
+                }
+            ])
+        } else {
+            this.handleOnIndexChange(this.state.index + 1);
+        }
     };
 
     //Breadcrumb click

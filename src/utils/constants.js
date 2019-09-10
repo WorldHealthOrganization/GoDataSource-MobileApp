@@ -23,7 +23,12 @@ const appScreens = {
     inAppNotificationScreen: 'InAppNotificationScreen'
 };
 
+const NUMBER_OF_RETRIES = 3;
+const TIMEOUT_FOR_FETCH_BLOB = 500;
+
 
 export default {
-    appScreens
+    appScreens,
+    NUMBER_OF_RETRIES,
+    TIMEOUT_FOR_FETCH_BLOB
 }
