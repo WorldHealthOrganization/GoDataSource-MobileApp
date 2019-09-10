@@ -230,7 +230,7 @@ class ContactsSingleScreen extends Component {
             })
 
             if (this.props.user !== null) {
-                getFollowUpsForContactRequest(this.props.user.activeOutbreakId, [extractIdFromPouchId(this.state.contact._id, 'person')], this.state.contact.followUp, this.props.teams, (errorFollowUp, responseFollowUp) => {
+                getFollowUpsForContactRequest(this.props.user.activeOutbreakId, extractIdFromPouchId(this.state.contact._id, 'person'), this.state.contact.followUp, this.props.teams, (errorFollowUp, responseFollowUp) => {
                     if (errorFollowUp) {
                         console.log('getFollowUpsForContactRequest error: ', errorFollowUp)
                     }

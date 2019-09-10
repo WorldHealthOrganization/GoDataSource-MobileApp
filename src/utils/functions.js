@@ -2054,6 +2054,7 @@ export function daysSince(startDate, endDate) {
 // - if multiple teams match, take the first one
 // - if no team match, leave it null
 export function generateTeamId (contactAddress, teams, locationsTree) {
+    let start = new Date().getTime();
     let currentAddress = contactAddress;
     if (Array.isArray(contactAddress)) {
         currentAddress = extractMainAddress(contactAddress);
@@ -2062,7 +2063,7 @@ export function generateTeamId (contactAddress, teams, locationsTree) {
     // Map locations to include each team that is responsible for those locations
     let teamId = computeAllTeamsForLocations(teams, locationsTree, [], currentAddress.locationId);
 
-    console.log('Computed teamId', teamId);
+    console.log('Computed teamId in: ', new Date().getTime() - start);
     return teamId;
 }
 

@@ -6,6 +6,8 @@ import {createDate} from './../utils/functions';
 import {generateId} from './../utils/functions';
 import moment from 'moment';
 import config from './../utils/config';
+import groupBy from 'lodash/groupBy';
+import {checkArray, checkArrayAndLength} from './../utils/typeCheckingFunctions';
 
 // Credentials: {email, encryptedPassword}
 export function getFollowUpsForOutbreakRequest (outbreakId, filter, userTeams) {
@@ -35,13 +37,7 @@ export function getFollowUpsForOutbreakRequest (outbreakId, filter, userTeams) {
                     }
                 })
                     .then((resultFind) => {
-                        let followUpList = resultFind.docs;
-                        if (userTeams !== null && userTeams !== undefined && Array.isArray(userTeams) && userTeams.length > 0) {
-                            followUpList = followUpList.filter((e) => {
-                                return userTeams.indexOf(e.teamId) >= 0 || e.teamId === undefined || e.teamId === null
-                            })
-                        }
-                        console.log('Result for find time for followUps: ', new Date().getTime() - start);
+                        let followUpList = filterFollowUpsByTeams(resultFind.docs, userTeams);
                         resolve(followUpList);
                     })
                     .catch((errorFind) => {
@@ -83,12 +79,20 @@ export function getFollowUpsForOutbreakIdRequest (outbreakId, filter, userTeams,
                 }
             })
                 .then((resultFind) => {
-                    let followUpList = resultFind.docs;
-                    if (userTeams !== null && userTeams !== undefined && Array.isArray(userTeams) && userTeams.length > 0) {
-                        followUpList = followUpList.filter((e) => {
-                            return userTeams.indexOf(e.teamId) >= 0 || e.teamId === undefined || e.teamId === null
-                        })
-                    }
+                    let followUpList = filterFollowUpsByTeams(resultFind.docs, userTeams);
+
+                    // if (checkArrayAndLength(userTeams)) {
+                    //     userTeams = groupBy(userTeams, 'teamId');
+                    //     followUpList = followUpList.filter((e) => {
+                    //         return userTeams[e.teamId];
+                    //     })
+                    // }
+
+                    // if (userTeams !== null && userTeams !== undefined && Array.isArray(userTeams) && userTeams.length > 0) {
+                    //     followUpList = followUpList.filter((e) => {
+                    //         return userTeams.indexOf(e.teamId) >= 0 || e.teamId === undefined || e.teamId === null
+                    //     })
+                    // }
                     console.log('Result for find time for followUps: ', new Date().getTime() - start);
                     callback(null, followUpList);
                 })
@@ -265,14 +269,11 @@ export function getFollowUpsForContactRequest (outbreakId, keys, contactFollowUp
                     },
                     outbreakId: outbreakId,
                     deleted: false,
-                    personId: {$in: keys}
+                    personId: keys
                 }
             })
                 .then((result) => {
-                    let followUpList = result.docs;
-                    if (userTeams !== null && userTeams !== undefined && Array.isArray(userTeams) && userTeams.length > 0) {
-                        followUpList = followUpList.filter((e) => userTeams.indexOf(e.teamId) >= 0 || e.teamId === undefined || e.teamId === null)
-                    }
+                    let followUpList = filterFollowUpsByTeams(result.docs, userTeams);
                     console.log('Result for find time for getFollowUpsForContactRequest request time: ', new Date().getTime() - start);
                     callback(null, followUpList)
                 })
@@ -285,4 +286,21 @@ export function getFollowUpsForContactRequest (outbreakId, keys, contactFollowUp
             console.log('Error while getting database: ', errorGetDatabase);
             callback(errorGetDatabase);
         });
+}
+
+export function filterFollowUpsByTeams(followUpList, userTeams) {
+    if (!checkArray(followUpList) || !checkArray(userTeams)) {
+        throw new Error('Invalid data');
+    }
+
+    if (followUpList.length === 0 || userTeams.length === 0) {
+        return followUpList;
+    }
+
+    userTeams = groupBy(userTeams, 'teamId');
+    followUpList = followUpList.filter((e) => {
+        return userTeams[e.teamId];
+    });
+
+    return followUpList;
 }
