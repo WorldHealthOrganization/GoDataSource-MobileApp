@@ -230,7 +230,7 @@ class ContactsSingleScreen extends Component {
             })
 
             if (this.props.user !== null) {
-                getFollowUpsForContactRequest(this.props.user.activeOutbreakId, [extractIdFromPouchId(this.state.contact._id, 'person')], this.state.contact.followUp, this.props.teams, (errorFollowUp, responseFollowUp) => {
+                getFollowUpsForContactRequest(this.props.user.activeOutbreakId, extractIdFromPouchId(this.state.contact._id, 'person'), this.state.contact.followUp, this.props.teams, (errorFollowUp, responseFollowUp) => {
                     if (errorFollowUp) {
                         console.log('getFollowUpsForContactRequest error: ', errorFollowUp)
                     }
@@ -447,7 +447,7 @@ class ContactsSingleScreen extends Component {
     handleOnCancelPressed = () => {
         this.setState({
             showAddFollowUpScreen: !this.state.showAddFollowUpScreen
-        })
+        }, () => this.hideMenu())
     };
 
     handleOnSavePressed = (date) => {
@@ -465,7 +465,7 @@ class ContactsSingleScreen extends Component {
             fileType: 'followUp.json',
             outbreakId: this.props.user.activeOutbreakId,
             index: daysSince(_.get(this.state, 'contact.followUp.startDate', null), now) + 1,
-            // teamId: generateTeamId(),
+            teamId: generateTeamId(this.state.contact.addresses.slice(), this.props.teams, this.props.locations.slice()),
             personId: extractIdFromPouchId(this.state.contact._id, 'person.json')
         };
 
@@ -474,7 +474,8 @@ class ContactsSingleScreen extends Component {
         this.setState({
             showAddFollowUpScreen: !this.state.showAddFollowUpScreen
         }, () => {
-            this.props.addFollowUp(this.props.user.activeOutbreakId, this.state.contact._id, followUp, this.state.filter, this.props.teams, this.props.user.token);
+            this.hideMenu();
+            this.props.addFollowUp(this.props.user.activeOutbreakId, this.state.contact._id, followUp, this.state.filter, this.props.teams, this.props.previousScreen === translations.followUpsSingleScreen.title);
         });
     };
 

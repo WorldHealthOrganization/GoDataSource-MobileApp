@@ -5,7 +5,11 @@ export function isPromise(obj) {
 }
 
 export function checkArrayAndLength(array) {
-    return array && Array.isArray(array) && array.length > 0;
+    return checkArray(array) && array.length > 0;
+}
+
+export function checkArray(array) {
+    return array && Array.isArray(array);
 }
 
 export function retriablePromise (promise, numberOfRetries, timeout) {

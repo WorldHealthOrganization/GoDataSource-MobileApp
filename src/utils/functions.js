@@ -21,6 +21,7 @@ import {getSyncEncryptPassword, encrypt, decrypt} from './../utils/encryption';
 import RNFS from 'react-native-fs';
 import {Buffer} from 'buffer';
 import moment from 'moment';
+import {checkArrayAndLength} from './typeCheckingFunctions';
 
 
 // This method is used for handling server responses. Please add here any custom error handling
@@ -2044,13 +2045,58 @@ export function daysSince(startDate, endDate) {
     return moment.utc(endDate).startOf('day').diff(moment.utc(startDate).startOf('day'), 'days');
 }
 
+
+// Algorithm:
+// - Get contact's main address
+// - Go through all the locations and when meeting a location that is assigned to a team add it to teams,
+// then go recursively adding the team to the sub locations
+// - When finding the main address take the first team from the teams array or null if no team assigned
+// - Note: to be checked the performance
 export function generateTeamId (contactAddress, teams, locationsTree) {
+    let start = new Date().getTime();
     let currentAddress = contactAddress;
-    if (Array.isArray(contactAddress)) {
+    if (checkArrayAndLength(contactAddress)) {
         currentAddress = extractMainAddress(contactAddress);
     }
 
-    // Create an array with all the locations of all the teams
+    let teamId = computeAllTeamsForLocations(teams, locationsTree, [], currentAddress.locationId);
+
+    console.log('Computed teamId in: ', new Date().getTime() - start);
+    return teamId;
+}
+
+
+// Warning: this code makes an assumption that the user will be a member of a very few teams and that each team will have few locations assigned
+// This will have poor performance for large number of teams with large number of locations for each
+export function computeAllTeamsForLocations(teams, locationsTree, teamsToBeAttachedToAllLocations, followUpLocationId) {
+    let teamId = null;
+
+    if (!checkArrayAndLength(teams) || !checkArrayAndLength(locationsTree) || !followUpLocationId) {
+        return teamId;
+    }
+
+    for (let i=0; i<locationsTree.length; i++) {
+        let teamsToBeAdded = teams.filter((e) => {
+            return e.locationIds.includes(extractIdFromPouchId(locationsTree[i]._id, 'location'));
+        }).map((e) => {return extractIdFromPouchId(e._id, 'team')});
+        if (checkArrayAndLength(teamsToBeAdded)) {
+            teamsToBeAttachedToAllLocations = teamsToBeAttachedToAllLocations.concat(teamsToBeAdded);
+        }
+        if (extractIdFromPouchId(locationsTree[i]._id, 'location') === followUpLocationId) {
+            if (checkArrayAndLength(teamsToBeAttachedToAllLocations)) {
+                teamId = get(teamsToBeAttachedToAllLocations, `[0]`, null);
+            }
+            return teamId;
+        }
+        if (checkArrayAndLength(teamsToBeAttachedToAllLocations)) {
+            set(locationsTree, `[${i}].teamsResponsible`, teamsToBeAttachedToAllLocations);
+        }
+        if (checkArrayAndLength(get(locationsTree, `[${i}].children`, []))) {
+            teamId = computeAllTeamsForLocations(teams, get(locationsTree, `[${i}].children`, []), teamsToBeAttachedToAllLocations, followUpLocationId);
+        }
+    }
+
+    return teamId;
 }
 
 export function extractMainAddress (addressesArray) {
