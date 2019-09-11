@@ -447,7 +447,7 @@ class ContactsSingleScreen extends Component {
     handleOnCancelPressed = () => {
         this.setState({
             showAddFollowUpScreen: !this.state.showAddFollowUpScreen
-        })
+        }, () => this.hideMenu())
     };
 
     handleOnSavePressed = (date) => {
@@ -474,7 +474,8 @@ class ContactsSingleScreen extends Component {
         this.setState({
             showAddFollowUpScreen: !this.state.showAddFollowUpScreen
         }, () => {
-            this.props.addFollowUp(this.props.user.activeOutbreakId, this.state.contact._id, followUp, this.state.filter, this.props.teams, this.props.user.token);
+            this.hideMenu();
+            this.props.addFollowUp(this.props.user.activeOutbreakId, this.state.contact._id, followUp, this.state.filter, this.props.teams, this.props.previousScreen === translations.followUpsSingleScreen.title);
         });
     };
 

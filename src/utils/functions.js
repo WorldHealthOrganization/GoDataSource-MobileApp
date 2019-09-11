@@ -2055,11 +2055,10 @@ export function daysSince(startDate, endDate) {
 export function generateTeamId (contactAddress, teams, locationsTree) {
     let start = new Date().getTime();
     let currentAddress = contactAddress;
-    if (Array.isArray(contactAddress)) {
+    if (checkArrayAndLength(contactAddress)) {
         currentAddress = extractMainAddress(contactAddress);
     }
 
-    // Map locations to include each team that is responsible for those locations
     let teamId = computeAllTeamsForLocations(teams, locationsTree, [], currentAddress.locationId);
 
     console.log('Computed teamId in: ', new Date().getTime() - start);
@@ -2072,21 +2071,25 @@ export function generateTeamId (contactAddress, teams, locationsTree) {
 export function computeAllTeamsForLocations(teams, locationsTree, teamsToBeAttachedToAllLocations, followUpLocationId) {
     let teamId = null;
 
+    if (!checkArrayAndLength(teams) || !checkArrayAndLength(locationsTree) || !followUpLocationId) {
+        return teamId;
+    }
+
     for (let i=0; i<locationsTree.length; i++) {
         let teamsToBeAdded = teams.filter((e) => {
             return e.locationIds.includes(extractIdFromPouchId(locationsTree[i]._id, 'location'));
         }).map((e) => {return extractIdFromPouchId(e._id, 'team')});
-        if (teamsToBeAdded) {
+        if (checkArrayAndLength(teamsToBeAdded)) {
             teamsToBeAttachedToAllLocations = teamsToBeAttachedToAllLocations.concat(teamsToBeAdded);
         }
         if (extractIdFromPouchId(locationsTree[i]._id, 'location') === followUpLocationId) {
             if (checkArrayAndLength(teamsToBeAttachedToAllLocations)) {
-                teamId = teamsToBeAttachedToAllLocations[0];
+                teamId = get(teamsToBeAttachedToAllLocations, `[0]`, null);
             }
             return teamId;
         }
         if (checkArrayAndLength(teamsToBeAttachedToAllLocations)) {
-            locationsTree[i].teamsResponsible = teamsToBeAttachedToAllLocations;
+            set(locationsTree, `[${i}].teamsResponsible`, teamsToBeAttachedToAllLocations);
         }
         if (checkArrayAndLength(get(locationsTree, `[${i}].children`, []))) {
             teamId = computeAllTeamsForLocations(teams, get(locationsTree, `[${i}].children`, []), teamsToBeAttachedToAllLocations, followUpLocationId);

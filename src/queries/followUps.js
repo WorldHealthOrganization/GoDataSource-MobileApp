@@ -192,7 +192,7 @@ export function updateFollowUpRequest (outbreakId, contactId, followUpId, follow
         });
 }
 
-export function addFollowUpRequest (outbreakId, contactId, followUp, token, callback) {
+export function addFollowUpRequest (outbreakId, contactId, followUp, callback) {
     getDatabase(config.mongoCollections.followUp)
         .then((database) => {
             if (!followUp._id || !followUp._id.includes('followUp')) {
