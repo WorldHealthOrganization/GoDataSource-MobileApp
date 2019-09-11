@@ -28,12 +28,12 @@ export function getUserTeams(userPouchId, dispatch) {
                 response.map((e) =>{
                     if (e.userIds.indexOf(userId) > -1){
                         const teamId = e._id.split('_')[1];
-                        userTeams.push(teamId);
+                        userTeams.push(Object.assign({}, e, {teamId: teamId}));
                     } 
                 });
                 // dispatch(storeUserTeams(userTeams));
                 // resolve('Done user teams');
-                resolve({userTeams: userTeams});
+                resolve(userTeams);
             }
         })
     })

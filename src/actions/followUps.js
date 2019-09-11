@@ -254,15 +254,15 @@ export function updateFollowUpAndContact(outbreakId, contactId, followUpId, foll
     }
 }
 
-export function addFollowUp(outbreakId, contactId, followUp, activeFilters, userTeams, token) {
+export function addFollowUp(outbreakId, contactId, followUp, activeFilters, userTeams, refreshList) {
     return async function(dispatch, getState) {
-        addFollowUpRequest(outbreakId, contactId, followUp, token, (error, response) => {
+        addFollowUpRequest(outbreakId, contactId, followUp, (error, response) => {
             if (error) {
                 console.log("*** addFollowUp error: ", error);
                 dispatch(addError(errorTypes.ERROR_ADD_FOLLOWUP));
             }
-            if (response) {
-                dispatch(getFollowUpsForOutbreakId(outbreakId, activeFilters, userTeams, token));
+            if (response && refreshList) {
+                dispatch(getFollowUpsForOutbreakId(outbreakId, activeFilters, userTeams, null));
             }
         })
     }
