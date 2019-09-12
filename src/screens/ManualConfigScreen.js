@@ -18,7 +18,7 @@ import { loginUser } from './../actions/user';
 import { removeErrors } from './../actions/errors';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import url from './../utils/url';
-import {storeHubConfiguration} from './../actions/app';
+import {storeHubConfiguration, storeHubConfigurationNew} from './../actions/app';
 import Ripple from 'react-native-material-ripple';
 import {getTranslation, generateId} from './../utils/functions';
 import translations from './../utils/translations';
@@ -497,7 +497,7 @@ class ManualConfigScreen extends PureComponent {
                     userEmail: this.state.userEmail,
                     encryptedData: this.state.encryptedData
                 };
-                this.props.storeHubConfiguration({
+                this.props.storeHubConfigurationNew({
                     url: server,
                     clientId: JSON.stringify(username),
                     clientSecret: previousInternetCredentials.password
@@ -523,7 +523,7 @@ class ManualConfigScreen extends PureComponent {
             userEmail: this.state.userEmail,
             encryptedData: this.state.encryptedData
         };
-        this.props.storeHubConfiguration({
+        this.props.storeHubConfigurationNew({
             url: hubId,
             clientId: JSON.stringify(clientIdObject),
             clientSecret: hubPassword
@@ -702,6 +702,7 @@ function matchDispatchToProps(dispatch) {
         loginUser,
         removeErrors,
         storeHubConfiguration,
+        storeHubConfigurationNew,
         setSyncState,
         changeAppRoot
     }, dispatch);

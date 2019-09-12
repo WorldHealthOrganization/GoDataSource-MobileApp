@@ -1,3 +1,5 @@
+import RNFetchBlobFS from 'rn-fetch-blob/fs';
+
 const appScreens = {
     loginScreen: 'LoginScreen',
     firstConfigScreen: 'FirstConfigScreen',
@@ -26,9 +28,12 @@ const appScreens = {
 const NUMBER_OF_RETRIES = 3;
 const TIMEOUT_FOR_FETCH_BLOB = 500;
 
+const DATABASE_LOCATIONS = `${RNFetchBlobFS.dirs.DocumentDir}/who_databases`;
+
 
 export default {
     appScreens,
     NUMBER_OF_RETRIES,
-    TIMEOUT_FOR_FETCH_BLOB
+    TIMEOUT_FOR_FETCH_BLOB,
+    DATABASE_LOCATIONS
 }

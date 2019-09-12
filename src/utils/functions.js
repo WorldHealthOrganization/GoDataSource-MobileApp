@@ -497,6 +497,71 @@ export function getNumberOfFilesProcessed() {
     return numberOfFilesProcessed;
 }
 
+export function processFilePouch(path, type, totalNUmberOfFiles, dispatch, isFirstTime, forceBulk, encryptedData, hubConfig) {
+    let fileName = path.split('/')[path.split('/').length - 1];
+    let unzipLocation = path.substr(0, (path.length - fileName.length));
+    return Promise.resolve()
+        .then(() => {
+            return RNFetchBlobFS.exists(path)
+        })
+        .then((exists) => {
+            if (exists) {
+                return encryptedData ? processEncryptedFile(path, hubConfig) : processUnencryptedFile(path, fileName, unzipLocation, type, isFirstTime, forceBulk);
+            } else {
+                return Promise.reject('File does not exist');
+            }
+        })
+        .then((promiseResponse) => {
+            if (!encryptedData) {
+                return Promise.resolve(promiseResponse);
+            }
+            return processUnencryptedFile(path, fileName, unzipLocation, type, isFirstTime, forceBulk)
+        })
+        .then((data) => {
+            if (data) {
+                let promiseArray = [];
+                if (isFirstTime && forceBulk) {
+                    promiseArray.push(processBulkDocs(data, type));
+                } else {
+                    for (let i=0; i<data.length; i++) {
+                        promiseArray.push(updateFileInDatabase(data[i], type))
+                    }
+                }
+                return Promise.all(promiseArray);
+            }
+        })
+        .then((responses) => {
+            console.log('Finished syncing: ', responses);
+            let numberOfFilesProcessedAux = getNumberOfFilesProcessed();
+            numberOfFilesProcessedAux += 1;
+            setNumberOfFilesProcessed(numberOfFilesProcessedAux);
+            dispatch(setSyncState(({id: 'sync', name: 'Syncing', status: numberOfFilesProcessedAux + "/" + totalNumberOfFiles})));
+            return Promise.resolve('Finished syncing');
+        })
+        .catch((errorProccessingPouch) => Promise.reject(errorProccessingPouch));
+}
+
+function processEncryptedFile (path, hubConfig) {
+    let password = getSyncEncryptPassword(null, hubConfig);
+    return Promise.resolve()
+        .then(() => RNFetchBlobFS.readFile(path, 'base64'))
+        .then((encryptedData) => decrypt(password, encryptedData))
+        .then((decryptedData) => RNFetchBlobFS.writeFile(`${path}`, decryptedData, 'base64'))
+        .catch((errorDecrypt) => Promise.reject(errorDecrypt));
+}
+
+function processUnencryptedFile (path, fileName, unzipLocation, type, isFirstTime, forceBulk) {
+    return Promise.resolve()
+        .then(() => unzip(`${path}`, `${unzipLocation}`))
+        .then((unzipPath) => RNFetchBlobFS.readFile(getFilePath(unzipPath, fileName), 'utf8'))
+        .catch((processingUnencryptedData) => {
+            return Promise.reject('Error at syncing file' + fileName);
+        })
+}
+
+function getFilePath (unzipPath, fileName) {
+    return `${unzipPath}/${fileName.substring(0, fileName.length - 4)}`;
+}
 
 // hubConfig = {name, url, clientId, clientSecret, encryptDatabase}
 export async function processFile (path, type, totalNumberOfFiles, dispatch, isFirstTime, forceBulk, encryptedData, hubConfig) {
@@ -658,32 +723,6 @@ export async function processFile (path, type, totalNumberOfFiles, dispatch, isF
                                     reject('Error while unzipping file');
                                 })
                         }
-
-                        // RNFetchBlobFS.readStream(path, 'utf8')
-                        //     .then((stream) => {
-                        //         let data = '';
-                        //         stream.open();
-                        //         stream.onData((chunk) => {
-                        //             if (chunk.includes('[\n')) {
-                        //                 chunk = chunk.substr(2);
-                        //             }
-                        //             // If the chunk doesn't end in " }", then the previous read object is not finished
-                        //             if (!data && chunk.substr(chunk.length -3, 2) !== ' }') {
-                        //                 data = chunk;
-                        //             } else {
-                        //                 if (data && chunk.substr(chunk.length -3, 2) !== ' }') {
-                        //
-                        //                 }
-                        //             }
-                        //         });
-                        //         stream.onEnd(() => {
-                        //             console.log(data)
-                        //         });
-                        //     })
-                        //     .catch((errorReadStream) => {
-                        //         console.log('ErrorReadStream: ', errorReadStream);
-                        //         reject(errorReadStream);
-                        //     })
                     } else {
                         reject("The file does not exist")
                     }

@@ -9,7 +9,7 @@ import RNFS from 'react-native-fs';
 
 class DatabaseController {
     constructor(databaseName, databasePassword) {
-        this.databaseName = databaseName;
+        this.databaseName = databaseName.replace(/\/|\.|\:/g, '');
         this.databasePassword = databasePassword;
     }
 

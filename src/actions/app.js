@@ -40,7 +40,9 @@ import {addError} from './errors';
 // import RNDB from 'react-native-nosql-to-sqlite';
 import {getSyncEncryptPassword} from './../utils/encryption';
 import errorTypes from "../utils/errorTypes";
-import moment from 'moment';
+import constants from './../utils/constants';
+import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
+import sqlConstants from './../queries/sqlTools/constants';
 
 let arrayOfStatuses = [];
 
@@ -240,11 +242,11 @@ export function storeHubConfigurationNew(hubConfiguration) {
             .then(() => AsyncStorage.getItem(hubConfiguration.url))
             .then((lastSyncDate) => getDatabaseSnapshotRequestNew(hubConfiguration, lastSyncDate, dispatch))
             .then((databasePath) => {
-                dispatch(processFilesForSync(null, databasePath, hubConfiguration, true, true, true));
+                dispatch(processFilesForSyncNew(null, databasePath, hubConfiguration, true, true, true));
             })
             .catch((error) => {
                 console.log('Error while doing stuff: ', error);
-                dispatch(processFilesForSync(error, null, hubConfiguration, true, true, true));
+                dispatch(processFilesForSyncNew(error, null, hubConfiguration, true, true, true));
             })
     }
 }
@@ -294,8 +296,101 @@ export function storeHubConfiguration(hubConfiguration) {
 
 function processFilesForSyncNew(error, response, hubConfiguration, isFirstTime, syncSuccessful, forceBulk) {
     return async function (dispatch) {
+        let hubConfig = JSON.parse(hubConfiguration.clientId);
+        if (error) {
+            if (error === 'No data to export') {
+                dispatch(setSyncState({id: 'downloadDatabase', name: 'Download Database', status: error}));
+            } else {
+                dispatch(setSyncState({id: 'downloadDatabase', name: 'Download Database', status: 'Error', error: error}));
+                // dispatch(addError({type: 'Error downloading database', message: error}));
+            }
+        }
+        if (response) {
+            dispatch(setSyncState({id: 'downloadDatabase', name: 'Download Database', status: 'Success'}));
+            dispatch(setSyncState({id: 'unzipFile', name: "Unzipping database", status: 'In progress'}));
 
+            let responseUnzipPath = null;
+
+            Promise.resolve()
+                .then(() => unzipFile(response, constants.DATABASE_LOCATIONS, null, hubConfiguration))
+                .then((unzipPath) => {
+                    responseUnzipPath = unzipPath;
+                    dispatch(setSyncState({id: 'unzipFile', name: "Unzipping database", status: 'Success'}));
+                    dispatch(setSyncState({id: 'sync', name: 'Syncing', status: 'In progress'}));
+                    setNumberOfFilesProcessed(0);
+
+                    let databaseCreatePromise = createDatabase(hubConfiguration.url, hubConfiguration.clientSecret, true);
+                    let readDirPromise = readDir(responseUnzipPath);
+
+                    return Promise.all([databaseCreatePromise, readDirPromise])
+                })
+                .then(async (resultDatabaseCreationAndReadDir) => {
+                    let promises = [];
+                    let promiseResponses = [];
+                    let database = resultDatabaseCreationAndReadDir[0];
+                    let files = resultDatabaseCreationAndReadDir[1];
+
+                    if (database && checkArrayAndLength(files)) {
+                        files = sortFiles(files);
+                        let pouchFiles = files.filter((e) => {return !sqlConstants.databaseTables.includes(e.split('.')[0])});
+                        let sqlFiles = files.filter((e) => {return sqlConstants.databaseTables.includes(e.split('.')[0])});
+
+                        // Do the pouch processing first
+                        if (checkArrayAndLength(pouchFiles)) {
+                            for(let i=0; i<pouchFiles.length; i++) {
+                                try {
+                                    // console.log('Memory size of database: ', memorySizeOf(database));
+                                    let startTimeForProcessingOneFile = new Date().getTime();
+                                    let auxData = await processFile(constants.DATABASE_LOCATIONS + files[i], files[i], files.length, dispatch, isFirstTime, forceBulk, hubConfig.encryptedData, hubConfig);
+                                    if (auxData) {
+                                        console.log('auxData: ', auxData);
+                                        console.log(`Time for processing file: ${files[i]}: ${new Date().getTime() - startTimeForProcessingOneFile}`);
+                                        promiseResponses.push(auxData);
+                                    } else {
+                                        console.log('There was an error at processing file: ', files[i]);
+                                        dispatch(setSyncState({id: 'sync', status: 'Error', error: `There was an error at processing file: ${files[i]}`}));
+                                        break;
+                                    }
+                                } catch (errorProcessFile) {
+                                    console.log('There was an error at processing file: ', files[i], errorProcessFile);
+                                    dispatch(setSyncState({id: 'sync', status: 'Error', error: `There was an error at processing file: ${files[i]}: ${errorProcessFile}`}));
+                                    break;
+                                }
+                            }
+                        }
+
+                        // Do the sql processing
+                        if (checkArrayAndLength(sqlFiles)) {
+
+                        }
+                    }
+                })
+        }
     }
+}
+
+function sortFiles (files) {
+    files = files.sort((a, b) => {
+        if (a.split('.')[0] < b.split('.')[0]) {
+            return -1;
+        }
+        if (a.split('.')[0] > b.split('.')[0]) {
+            return 1;
+        }
+        return 0;
+    });
+
+    files = files.sort((a, b) => {
+        if (a.split('.')[0] === b.split('.')[0] && parseInt(a.split('.')[1]) < parseInt(b.split('.')[1])) {
+            return -1;
+        }
+        if (a.split('.')[0] === b.split('.')[0] && parseInt(a.split('.')[1]) > parseInt(b.split('.')[1])) {
+            return 1;
+        }
+        return 0;
+    });
+
+    return files;
 }
 
 function processFilesForSync(error, response, hubConfiguration, isFirstTime, syncSuccessful, forceBulk) {
