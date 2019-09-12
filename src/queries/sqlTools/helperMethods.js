@@ -3,8 +3,9 @@ import {database} from './../database';
 import constants from './constants';
 import get from 'lodash/get';
 import {extractLocationId} from './../../utils/functions';
+import {checkArray, checkArrayAndLength} from './../../utils/typeCheckingFunctions';
 
-function openDatabase(databaseName) {
+export function openDatabase(databaseName) {
     return new Promise((resolve, reject) => {
         let fullDatabaseName = `${databaseName}${database.getDatabaseName()}`;
         try {
@@ -13,6 +14,24 @@ function openDatabase(databaseName) {
         } catch(errorOpenDatabase) {
             reject(new Error('Could not open database'));
         }
+    })
+}
+
+export function wrapTransationInPromise (database) {
+    return new Promise((resole, reject) => {
+        database.transaction((transaction) => resolve(transaction), (errorTransaction) => reject(errorTransaction));
+    })
+}
+
+export function wrapReadTransactionInPromise (database) {
+    return new Promise((resole, reject) => {
+        database.readTransaction((transaction) => resolve(transaction), (errorTransaction) => reject(errorTransaction));
+    })
+}
+
+export function wrapExecuteSQLInPromise (transaction, sqlStatement, arguments) {
+    return new Promise((resolve, reject) => {
+        transaction.executeSql(sqlStatement, arguments, (transaction, resultSet) => resolve(resultSet), (transaction, errorStatement) => reject(errorStatement));
     })
 }
 
@@ -35,25 +54,34 @@ function createTableStringMethod(tableName) {
     return createTableString;
 }
 export function createTable(databaseName, tableName) {
-    return new Promise(async (resolve, reject) => {
-        try {
-            let createTableString = createTableStringMethod(tableName);
-            let sqlDb = await openDatabase(databaseName);
-            sqlDb.transaction((txn) => {
-                txn.executeSql(createTableString, [],
-                    (txn, resultSet) => {
-                        console.log('SQLite console: Created table: ', tableName);
-                        resolve(`Success ${tableName}`);
-                    },
-                    (txn, errorCreate) => {
-                        console.log('SQLite console: Error while creating database: ', errorCreate);
-                        reject(errorCreate);
-                    })
-            })
-        } catch(openDatabaseError) {
-            reject(new Error('Could not open database'));
-        }
-    })
+    let createTableString = createTableStringMethod(tableName);
+    return openDatabase(databaseName)
+            .then(wrapTransationInPromise)
+            .then((transaction) => wrapExecuteSQLInPromise(transaction, createTableString, []))
+            .then((resultSet) => Promise.resolve(`Success ${tableName}`))
+            .catch((errorStatement) => Promise.reject(errorStatement));
+
+
+
+    // return new Promise(async (resolve, reject) => {
+    //     try {
+    //         let createTableString = createTableStringMethod(tableName);
+    //         let sqlDb = await openDatabase(databaseName);
+    //         sqlDb.transaction((txn) => {
+    //             txn.executeSql(createTableString, [],
+    //                 (txn, resultSet) => {
+    //                     console.log('SQLite console: Created table: ', tableName);
+    //                     resolve(`Success ${tableName}`);
+    //                 },
+    //                 (txn, errorCreate) => {
+    //                     console.log('SQLite console: Error while creating database: ', errorCreate);
+    //                     reject(errorCreate);
+    //                 })
+    //         })
+    //     } catch(openDatabaseError) {
+    //         reject(new Error('Could not open database'));
+    //     }
+    // })
 }
 
 // The following methods refer to the bulk insert or update of mapped data. Data mapping will not be done here
@@ -82,29 +110,24 @@ function insertOrUpdateStringCreation (tableName) {
         console.log('SQLite console: error at creating insertOrUpdate string: ', errorAtCreatingString)
     }
 }
+
 // This method takes the databaseName, tableName and the mappedData and inserts it in bulk in the database
+// Use this even for a single value
 export function insertOrUpdate(databaseName, tableName, data) {
-    return new Promise(async(resolve, reject) => {
-        if (!mappedData || !Array.isArray(mappedData) || mappedData.length === 0) {
-            resolve('Success');
-        }
+    return new Promise((resolve, reject) => {
         try {
             let insertOrUpdateString = insertOrUpdateStringCreation(tableName);
             let mappedData = mapDataForInsert(tableName, data);
-            if (mappedData && Array.isArray(mappedData) && mappedData.length > 0) {
-                let sqlDb = await openDatabase(databaseName);
-                sqlDb.transaction((txn) => {
-                    for (let i=0; i<mappedData.length; i++) {
-                        sqlDb.executeSql(insertOrUpdateString, mappedData[i],
-                            (txn, resultSQL) => {
-                                console.log('SQL Console: insertOrUpdate result of insert: ', resultSQL);
-                            },
-                            (txn, errorSQL) => {
-                                console.log('SQL Console: insert or update error: ', errorSQL);
-                            })
-                    }
-                    resolve('Success');
-                });
+            if (checkArrayAndLength(mappedData)) {
+                openDatabase(databaseName)
+                    .then(wrapTransationInPromise)
+                    .then((txn) => {
+                        let dataToBeInsertedPromise = [];
+                        for (let i = 0; i < mappedData.length; i++) {
+                            dataToBeInsertedPromise.push(wrapExecuteSQLInPromise(txn, insertOrUpdateString, mappedData[i]));
+                        }
+                        return Promise.all(dataToBeInsertedPromise);
+                    })
             } else {
                 resolve('Success');
             }
@@ -116,7 +139,7 @@ export function insertOrUpdate(databaseName, tableName, data) {
 
 // Data mapping method based on the structure of the tables
 export function mapDataForInsert(tableName, data) {
-    if (!tableName || !data || !Array.isArray(data) || data.length === 0) {
+    if (!tableName || !checkArrayAndLength(data)) {
         return [];
     }
     let tableFields = constants.tableStructure[tableName].concat(constants.tableStructure.commonFields);
@@ -142,7 +165,7 @@ export function mapDataForInsert(tableName, data) {
 }
 // Method for mapping the relationship data as needed in the database structure
 function mapRelationshipFields(relationship, fieldName) {
-    if (!relationship || !relationship.persons || !Array.isArray(relationship.persons) || relationship.persons.length !== 2) {
+    if (!checkArray(get(relationship, 'persons', null)) || relationship.persons.length !== 2) {
         return null;
     }
     switch(fieldName) {

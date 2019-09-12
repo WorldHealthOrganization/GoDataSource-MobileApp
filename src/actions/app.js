@@ -24,7 +24,7 @@ import {Platform, Alert} from 'react-native';
 import {getAvailableLanguagesRequest, getTranslationRequest} from './../queries/translation';
 import {getHelpCategoryRequest} from '../queries/helpCategory';
 import {getHelpItemRequest} from '../queries/helpItem';
-import {getDatabaseSnapshotRequest, postDatabaseSnapshotRequest} from './../requests/sync';
+import {getDatabaseSnapshotRequest, postDatabaseSnapshotRequest, getDatabaseSnapshotRequestNew} from './../requests/sync';
 import {setInternetCredentials, getInternetCredentials} from 'react-native-keychain';
 import {unzipFile, readDir} from './../utils/functions';
 import RNFetchBlobFs from 'rn-fetch-blob/fs';
@@ -231,6 +231,24 @@ export function getAvailableLanguages(dispatch) {
     // }
 }
 
+export function storeHubConfigurationNew(hubConfiguration) {
+    return async function (dispatch) {
+        let hubConfig = JSON.parse(hubConfiguration.clientId);
+
+        Promise.resolve()
+            .then(() => setInternetCredentials(hubConfiguration.url, hubConfiguration.clientId, hubConfiguration.clientSecret))
+            .then(() => AsyncStorage.getItem(hubConfiguration.url))
+            .then((lastSyncDate) => getDatabaseSnapshotRequestNew(hubConfiguration, lastSyncDate, dispatch))
+            .then((databasePath) => {
+                dispatch(processFilesForSync(null, databasePath, hubConfiguration, true, true, true));
+            })
+            .catch((error) => {
+                console.log('Error while doing stuff: ', error);
+                dispatch(processFilesForSync(error, null, hubConfiguration, true, true, true));
+            })
+    }
+}
+
 export function storeHubConfiguration(hubConfiguration) {
     return async function (dispatch) {
         // hubConfiguration = {url: databaseName, clientId: JSON.stringify({name, url, clientId, clientSecret, encryptedData}), clientSecret: databasePass}
@@ -271,6 +289,12 @@ export function storeHubConfiguration(hubConfiguration) {
                  dispatch(processFilesForSync(error, response, hubConfiguration, true, true, true));
             })
         }
+    }
+}
+
+function processFilesForSyncNew(error, response, hubConfiguration, isFirstTime, syncSuccessful, forceBulk) {
+    return async function (dispatch) {
+
     }
 }
 

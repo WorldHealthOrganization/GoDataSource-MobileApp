@@ -9,13 +9,88 @@ import {getSyncEncryptPassword} from './../utils/encryption';
 import {setSyncState} from './../actions/app';
 import DeviceInfo from 'react-native-device-info';
 import translations from './../utils/translations';
-import {testApi} from './testApi';
+import {testApi, testApiPromise} from './testApi';
 import uniq from 'lodash/uniq';
 import get from 'lodash/get';
 import {getHelpItemsRequest} from './helpItem';
 import {handleResponseFromRNFetchBlob, createDate} from './../utils/functions';
 import moment from 'moment';
 import {retriablePromise} from "../utils/typeCheckingFunctions";
+import constants  from './constants';
+
+export function getDatabaseSnapshotRequestNew(hubConfig, lastSyncDate, dispatch) {
+    // hubConfiguration = {url: databaseName, clientId: JSON.stringify({name, url, clientId, clientSecret, encryptedData}), clientSecret: databasePass}
+    let hubConfiguration = JSON.parse(hubConfig.clientId);
+
+    let arrayOfTokens = getAllLanguageTokens();
+    // console.log("Array of Tokens: ", JSON.stringify(arrayOfTokens));
+
+    let filter = {};
+
+    if (lastSyncDate) {
+        filter.where = {
+            fromDate: createDate(lastSyncDate)
+        }
+    }
+    let requestUrl = `${hubConfiguration.url}${constants.getDatabase}?autoEncrypt=${hubConfiguration.encryptedData}${lastSyncDate ? `&filter=${JSON.stringify(filter)}` : ''}&chunkSize=5000${hubConfiguration.userEmail ? `&userEmail=${hubConfiguration.userEmail}` : ''}`;
+
+    let dirs = RNFetchBlob.fs.dirs.DocumentDir;
+
+    let databaseLocation = `${dirs}/database.zip`;
+    let deviceInfo = null;
+
+    // Get installationId first from the local storage
+    return AsyncStorage.getItem('installationId')
+        .then((installationId) => {
+            deviceInfo = JSON.stringify({
+                id: installationId,
+                os: Platform.OS,
+                manufacturer: DeviceInfo.getManufacturer().replace(/\u0022|\u0027|\u0060|\u00b4|\u2018|\u2019|\u201c|\u201d/g, `\'`),
+                model: DeviceInfo.getModel().replace(/\u0022|\u0027|\u0060|\u00b4|\u2018|\u2019|\u201c|\u201d/g, `\'`),
+                name: DeviceInfo.getDeviceName().replace(/\u0022|\u0027|\u0060|\u00b4|\u2018|\u2019|\u201c|\u201d/g, `\'`)
+            });
+
+            // Before starting a download, first test if the API responds
+            dispatch(setSyncState({id: 'testApi', status: 'In progress'}));
+            return testApiPromise(`${hubConfiguration.url}${constants.testApi}`, deviceInfo)
+        })
+        .then((responseTestApi) => {
+            // console.log('Response TestApi: ', responseTestApi);
+            dispatch(setSyncState({id: 'testApi', status: 'Success'}));
+            dispatch(setSyncState({id: 'downloadDatabase', status: 'In progress'}));
+            // Here call the method computeHelpItemsAndCategories
+
+            return computeHelpItemsAndCategories(hubConfiguration, lastSyncDate)
+        })
+        .then((helpTranslations) => retriablePromise(RNFetchBlob.config({
+            timeout: (30 * 60 * 10 * 1000),
+            followRedirect: false,
+            fileCache: true,
+            path: `${dirs}/database.zip`
+        })
+            .fetch('POST', encodeURI(requestUrl), {
+                    'device-info': deviceInfo,
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'Authorization': 'Basic ' + base64.encode(`${hubConfiguration.clientId}:${hubConfiguration.clientSecret}`)
+                },
+                JSON.stringify({
+                    languageTokens: lastSyncDate ? helpTranslations : arrayOfTokens.concat(helpTranslations)
+                })
+            )
+            .progress({count: 500}, (received, total) => {
+                dispatch(setSyncState({
+                    id: 'downloadDatabase',
+                    name: `Downloading database\nReceived ${received} bytes`
+                }));
+                console.log(received, total)
+            })
+            .then((res) => {
+                return handleResponseFromRNFetchBlob(res)
+            }), 3)
+            .then((response) => Promise.resolve(databaseLocation)))
+}
+
 
 export function getDatabaseSnapshotRequest(hubConfig, lastSyncDate, dispatch, callback) {
 
@@ -224,7 +299,7 @@ async function computeHelpItemsAndCategories(hubConfiguration, lastSyncDate) {
                 gt: lastSyncDate
             }
         };
-        getHelpItemsRequest(`${generalRequestUrl}/help-items`, authorization, filterItems, (errorGetItems, resultItems) => {
+        getHelpItemsRequest(`${generalRequestUrl}${constants.helpItems}`, authorization, filterItems, (errorGetItems, resultItems) => {
             if (errorGetItems) {
                 console.log('Error while getting items: ', errorGetItems);
                 resolve(translations);
