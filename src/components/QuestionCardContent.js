@@ -233,7 +233,7 @@ class QuestionCardContent extends PureComponent {
                         isRequired={item.required}
                         onChange={(text, id) => {
                             let valueToSend = {
-                                date: this.state.answerDate, value: text
+                                date: this.state.answerDate, value: parseFloat(text)
                             };
                             // if (source[item.variable][0].subAnswers) {
                             //     valueToSend.subAnswers = source[item.variable][0].subAnswers
