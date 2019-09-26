@@ -15,7 +15,6 @@ import get from 'lodash/get';
 
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
-
 class QuestionCardContent extends PureComponent {
     constructor(props) {
         super(props);
@@ -32,13 +31,6 @@ class QuestionCardContent extends PureComponent {
             })
         }
     }
-
-    // static getDerivedStateFromProps(props, state) {
-    //     if (props.source && props.source[props.item.variable] && Array.isArray(props.source[props.item.variable]) && props.source[props.item.variable][0] && props.source[props.item.variable][0].date) {
-    //         state.answerDate = props.source[props.item.variable][0].date;
-    //     }
-    //     return null;
-    // }
 
     render() {
         // console.log("Render QuestionCardTitle");
@@ -84,7 +76,6 @@ class QuestionCardContent extends PureComponent {
     // Please write here all the methods that are not react native lifecycle methods
     handleRenderItem = (item) => {
         // console.log('handleRenderItem: ', item);
-        // item = item.item;
         return (
             <View style={[style.containerCardComponent, {
                 minHeight: calculateDimension(72, true, this.props.screenSize)
@@ -188,12 +179,6 @@ class QuestionCardContent extends PureComponent {
                     }) : [];
             }
         }
-
-        // console.log("### questionAnswers: ", questionAnswers, item);
-        // if (item.type === 'DropdownInput' && item.isExposure) {
-        //     item.data = this.props.cases.map((e) => {return {value: ((e.firstName ? e.firstName : '') + (e.lastName ? (" " + e.lastName) : ''))}})
-        // }
-        // console.log('Itemm: ', item);
 
         switch(item.answerType) {
             case 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_FREE_TEXT':
@@ -348,6 +333,10 @@ class QuestionCardContent extends PureComponent {
                         dropDownStyle={{width: width, alignSelf: 'center'}}
                         showDropdown={this.state.showDropdown}
                     />
+                );
+            case 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_MARKUP':
+                return (
+                    <Section label={getTranslation(item.text, this.props.translation)}/>
                 );
             default:
                 return(

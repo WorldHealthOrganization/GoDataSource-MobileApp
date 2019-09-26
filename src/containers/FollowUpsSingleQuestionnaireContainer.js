@@ -9,9 +9,6 @@ import {
     StyleSheet,
     InteractionManager,
     Alert,
-    TouchableWithoutFeedback,
-    Keyboard,
-    findNodeHandle,
     ScrollView
 } from 'react-native';
 import { calculateDimension, extractAllQuestions, getTranslation, checkRequiredQuestions, createDate } from './../utils/functions';
@@ -20,14 +17,11 @@ import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import styles from './../styles';
 import QuestionCard from './../components/QuestionCard';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import Button from './../components/Button';
 import { LoaderScreen } from 'react-native-ui-lib';
-import Section from './../components/Section';
 import { sortBy } from 'lodash';
 import translations from './../utils/translations'
 import cloneDeep from "lodash/cloneDeep";
-import moment from 'moment';
 
 class FollowUpsSingleQuestionnaireContainer extends PureComponent {
 
@@ -41,14 +35,6 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
         };
     }
 
-    // Please add here the react lifecycle methods that you need
-    // shouldComponentUpdate(nextProps, nextState) {
-    //     if (isEqual(nextProps.item, this.props.item)) {
-    //         return false;
-    //     }
-    //     return true;
-    // }
-
     componentDidMount() {
         InteractionManager.runAfterInteractions(() => {
             this.setState({
@@ -56,78 +42,6 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
             })
         })
     }
-
-    // shouldComponentUpdate(nextProps, nextState) {
-    //     if (nextProps.activeIndex === 1) {
-    //         return true;
-    //     }
-    //     return false;
-    // }
-
-    // componentDidUpdate(prevProps) {
-    //     if (this.props.previousAnswers && Object.keys(this.props.previousAnswers).length > 0) {
-    //         this.prepareQuestions();
-    //     }
-    // }
-    //
-    // prepareQuestions = () => {
-    //     let previousAns = Object.assign({}, this.props.previousAnswers);
-    //
-    //
-    //     for (let questionId in previousAns) {
-    //         if (Array.isArray(previousAns[questionId]) && previousAns[questionId].length > 1) {
-    //             previousAns[questionId] = previousAns[questionId].sort((a, b) => {
-    //                 if (createDate(a.date) > createDate(b.date)) {
-    //                     return -1;
-    //                 }
-    //                 if (createDate(a.date) < createDate(b.date)) {
-    //                     return 1;
-    //                 }
-    //                 return 0;
-    //             })
-    //         }
-    //     }
-    //
-    //     let sortedQuestions = sortBy(cloneDeep(this.props.questions), ['order', 'variable']);
-    //
-    //     this.setState({
-    //         questions: extractAllQuestions(sortedQuestions, previousAns),
-    //         previousAnswers: previousAns
-    //     })
-    // }
-
-    // static getDerivedStateFromProps(props, state) {
-    //     // Get all additional questions recursively
-    //     // let sortedQuestions = sortBy(props.questions, ['order', 'variable']);
-    //     // sortedQuestions = extractAllQuestions(sortedQuestions, props.item);
-    //     // state.questions = sortedQuestions;
-    //     //
-    //     // return null;
-    //     if (props.previousAnswers) {
-    //         state.previousAnswers = props.previousAnswers;
-    //     }
-    //     // Sort the answers by date
-    //     if (state.previousAnswers && Object.keys(state.previousAnswers).length > 0) {
-    //         for (let questionId in state.previousAnswers) {
-    //             if (Array.isArray(state.previousAnswers[questionId]) && state.previousAnswers[questionId].length > 1) {
-    //                 state.previousAnswers[questionId] = state.previousAnswers[questionId].sort((a, b) => {
-    //                     if (new Date(a.date) > new Date(b.date)) {
-    //                         return -1;
-    //                     }
-    //                     if (new Date(a.date) < new Date(b.date)) {
-    //                         return 1;
-    //                     }
-    //                     return 0;
-    //                 })
-    //             }
-    //         }
-    //     }
-    //
-    //     let sortedQuestions = sortBy(cloneDeep(props.questions), ['order', 'variable']);
-    //     state.questions = extractAllQuestions(sortedQuestions, state.previousAnswers);
-    //
-    //     return null;
-    // }
 
     // The render method should have at least business logic as possible,
     // because this will be called whenever there is a new setState call
@@ -138,9 +52,7 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
                 <LoaderScreen overlay={true} backgroundColor={'white'} />
             )
         }
-        // console.log('FollowUpsSingleContainer render Questionnaire');
 
-        // console.log("### FollowUpsSingleQuestionnaire: ", this.props.questions);
         let buttonHeight = calculateDimension(25, true, this.props.screenSize);
         let buttonWidth = calculateDimension(165.5, false, this.props.screenSize);
         let marginVertical = calculateDimension(12.5, true, this.props.screenSize);
@@ -187,33 +99,24 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
                                 />
                             </View>) : (null)
                     }
-                    {/* <KeyboardAwareScrollView
-                        style={style.container}
-                        contentContainerStyle={[style.contentContainerStyle, {paddingBottom: this.props.screenSize.height < 600 ? 70 : 20}]}
-                        keyboardShouldPersistTaps={'always'}
-                        extraHeight={20 + 81 + 50 + 70}
-                        innerRef={ref => {
-                            this.scrollFollowUpsSingleQuestionnaire = ref
-                        }}
-                    > */}
                     <ScrollView
                         style={style.containerScrollView}
                         contentContainerStyle={[style.contentContainerStyle, { paddingBottom: this.props.screenSize.height < 600 ? 70 : 20 }]}
                     >
                         {
                             questions && Array.isArray(questions) && questions.length > 0 && questions.map((item, index) => {
-                                return this.handleRenderItem(item, index, questions.length);
+                                return this.handleRenderItem(item, index, questions);
                             })
                         }
                     </ScrollView>
-                    {/* </KeyboardAwareScrollView> */}
                 </View>
             </View>
         );
     }
 
     // Please write here all the methods that are not react native lifecycle methods
-    handleRenderItem = (item, index, totalNumberOfQuestions) => {
+    handleRenderItem = (item, index, totalQuestions) => {
+        const totalNumberOfQuestions = totalQuestions.length;
         if (item.inactive === false) {
             return (
                 <QuestionCard
@@ -221,6 +124,7 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
                     item={item}
                     index={index + 1}
                     totalNumberOfQuestions={totalNumberOfQuestions}
+                    totalQuestions={totalQuestions}
                     source={this.props.previousAnswers}
                     isEditMode={this.props.isEditMode}
                     onChangeTextAnswer={this.props.onChangeTextAnswer}
@@ -261,11 +165,6 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
     handleOnBlur = (event) => {
         // this.scrollFollowUpsSingleQuestionnaire.props.scrollToPosition(0, 0, false)
         // this.scrollToInput(findNodeHandle(event.target))
-    };
-
-    scrollToInput(reactNode) {
-        // Add a 'scroll' ref to your ScrollView
-        // this.scrollFollowUpsSingleQuestionnaire.props.scrollToFocusedInput(reactNode)
     };
 }
 

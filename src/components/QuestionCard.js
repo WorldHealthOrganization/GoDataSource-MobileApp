@@ -17,7 +17,6 @@ import QuestionCardTitle from './QuestionCardTitle';
 import QuestionCardContent from './QuestionCardContent';
 import get from "lodash/get";
 
-
 class QuestionCard extends PureComponent {
 
     // This will be a dumb component, so it's best not to put any business logic in it
@@ -28,19 +27,6 @@ class QuestionCard extends PureComponent {
         };
     }
 
-    // shouldComponentUpdate(nextProps, nextState) {
-    //     // console.log("Next source, old source: ", nextProps.source.questionnaireAnswers[nextProps.item.variable], this.props.source.questionnaireAnswers[this.props.item.variable]);
-    //     if (nextProps.isEditMode !== this.props.isEditMode ||
-    //         (nextProps.source && nextProps.source.questionnaireAnswers && nextProps.source.questionnaireAnswers[nextProps.item.variable] &&
-    //             this.props.source && this.props.source.questionnaireAnswers && this.props.source.questionnaireAnswers[this.props.item.variable] &&
-    //             !isEqual(nextProps.source.questionnaireAnswers[nextProps.item.variable], this.props.source.questionnaireAnswers[this.props.item.variable])) ||
-    //         nextProps.totalNumberOfQuestions !== this.props.totalNumberOfQuestions) {
-    //         // console.log("Next source, old source: ", nextProps.item.variable, nextProps.source.questionnaireAnswers[nextProps.item.variable], this.props.source.questionnaireAnswers[this.props.item.variable]);
-    //         return true;
-    //     }
-    //     return false;
-    // }
-
     componentDidUpdate(prevProps) {
         if (get(this.props, `source[${get(this.props, 'item.variable', null)}][0].date`, null) && get(this.props, `source[${get(this.props, 'item.variable', null)}][0].date`, null) !== get(prevProps, `source[${get(prevProps, 'item.variable', null)}][0].date`, null)) {
             this.setState({
@@ -49,24 +35,18 @@ class QuestionCard extends PureComponent {
         }
     }
 
-    // static getDerivedStateFromProps(props, state) {
-    //     if (props.source && props.source[props.item.variable] && Array.isArray(props.source[props.item.variable]) && props.source[props.item.variable][0] && props.source[props.item.variable][0].date) {
-    //         state.answerDate = props.source[props.item.variable][0].date;
-    //     }
-    //     return null;
-    // }
-
     // Please add here the react lifecycle methods that you need
     // The render method should have at least business logic as possible,
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
-        // console.log('Render QuestionCard: ', this.props.item, this.props.source);
+        // console.log('Render QuestionCard: ',this.props, this.props.item, this.props.source);
         let viewWidth = calculateDimension(315, false, this.props.screenSize);
         let viewHeight = calculateDimension(30, true, this.props.screenSize);
         let marginHorizontal = calculateDimension(14, false, this.props.screenSize);
         let buttonHeight = calculateDimension(25, true, this.props.screenSize);
         let buttonWidth = calculateDimension(120, false, this.props.screenSize);
+        let index = this.calculateIndex(this.props.totalQuestions, this.props.index);
         return (
             <ElevatedView elevation={3} style={[this.props.style, style.container, {
                 marginHorizontal: calculateDimension(16, false, this.props.screenSize),
@@ -75,17 +55,20 @@ class QuestionCard extends PureComponent {
             }]}
                 onPress={() => {this.setState({showDropdown: false})}}
             >
-                <QuestionCardTitle
-                    height={calculateDimension(43, true, this.props.screenSize)}
-                    paddingRight={calculateDimension(34, true, this.props.screenSize)}
-                    paddingLeft={calculateDimension(14, true, this.props.screenSize)}
-                    marginLeft={calculateDimension(8, false, this.props.screenSize)}
-                    marginRight={calculateDimension(34, false, this.props.screenSize)}
-                    questionNumber={getTranslation(translations.generalLabels.questionInitial, this.props.translation).charAt(0).toUpperCase() + this.props.index}
-                    questionText={getTranslation(this.props.item.text, this.props.translation)}
-                    questionCategory={this.props.item && this.props.item.category ?
-                        ' - ' + getTranslation(this.props.item.category, this.props.translation) : ''}
-                />
+                {
+                    this.props.item.answerType === 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_MARKUP' ? null :
+                        <QuestionCardTitle
+                            height={calculateDimension(43, true, this.props.screenSize)}
+                            paddingRight={calculateDimension(34, true, this.props.screenSize)}
+                            paddingLeft={calculateDimension(14, true, this.props.screenSize)}
+                            marginLeft={calculateDimension(8, false, this.props.screenSize)}
+                            marginRight={calculateDimension(34, false, this.props.screenSize)}
+                            questionNumber={getTranslation(translations.generalLabels.questionInitial, this.props.translation).charAt(0).toUpperCase() + index}
+                            questionText={getTranslation(this.props.item.text, this.props.translation)}
+                            questionCategory={this.props.item && this.props.item.category ?
+                                ' - ' + getTranslation(this.props.item.category, this.props.translation) : ''}
+                        />
+                }
                 <QuestionCardContent
                     item={this.props.item}
                     source={this.props.source}
@@ -141,9 +124,28 @@ class QuestionCard extends PureComponent {
     // Please write here all the methods that are not react native lifecycle methods
     onClickAddNewMultiFrequencyAnswer = (item) => {
         this.props.onClickAddNewMultiFrequencyAnswer(item);
-    }
-}
+    };
 
+    calculateIndex = (totalQuestions, itemIndex) => {
+        // console.log('~~~~~~~~~~ ', totalQuestions, itemIndex);
+        let finalIndex = itemIndex;
+        totalQuestions.map( (item, index) => {
+            //verify only for previous items
+            if( index < itemIndex ){
+                //remove inactive questions
+                if( item.inactive === true ){
+                    finalIndex = finalIndex - 1;
+                } else {
+                    //remove markup questions
+                    if( item.answerType === 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_MARKUP'){
+                        finalIndex = finalIndex - 1;
+                    }
+                }
+            }
+        });
+        return finalIndex;
+    };
+}
 
 // Create style outside the class, or for components that will be used by other components (buttons),
 // make a global style in the config directory
