@@ -476,6 +476,17 @@ class ContactsSingleScreen extends Component {
         }, () => {
             this.hideMenu();
             this.props.addFollowUp(this.props.user.activeOutbreakId, this.state.contact._id, followUp, this.state.filter, this.props.teams, this.props.previousScreen === translations.followUpsSingleScreen.title);
+            //navigate to followup
+            this.props.navigator.push({
+                screen: 'FollowUpsSingleScreen',
+                passProps: {
+                    isNew: false,
+                    isEditMode: true,
+                    item: followUp,
+                    contact: this.state.contact,
+                    filter: this.state.filter,
+                }
+            })
         });
     };
 
@@ -1634,12 +1645,16 @@ class ContactsSingleScreen extends Component {
     };
 
     showMenu = () => {
-        this.refs.menuRef.show();
+        if( this.refs.menuRef) {
+            this.refs.menuRef.show();
+        }
     };
 
     hideMenu = () => {
         // this.refs['menuRef'].hide();
-        this.refs.menuRef.hide();
+        if( this.refs.menuRef) {
+            this.refs.menuRef.hide();
+        }
     };
 
     _showDateTimePicker = () => {
