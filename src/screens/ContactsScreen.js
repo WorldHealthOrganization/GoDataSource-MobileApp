@@ -9,9 +9,8 @@ import styles from './../styles';
 import NavBarCustom from './../components/NavBarCustom';
 import ElevatedView from 'react-native-elevated-view';
 import Ripple from 'react-native-material-ripple';
-import {Button, Icon} from 'react-native-material-ui';
+import {Icon} from 'react-native-material-ui';
 import {calculateDimension, getTranslation, navigation, createFilterContactsObject, createDate} from './../utils/functions';
-import FollowUpListItem from './../components/FollowUpListItem';
 import PersonListItem from './../components/PersonListItem';
 import SearchFilterView from './../components/SearchFilterView';
 import {connect} from "react-redux";
@@ -23,13 +22,10 @@ import ViewHOC from './../components/ViewHOC';
 import config from './../utils/config';
 import { Popup } from 'react-native-map-link';
 import translations from './../utils/translations'
-import {getItemByIdRequest} from './../queries/cases'
 import Breadcrumb from './../components/Breadcrumb';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {pushNewEditScreen} from './../utils/screenTransitionFunctions';
 import RNExitApp from 'react-native-exit-app';
-import {extractIdFromPouchId} from "../utils/functions";
-import moment from 'moment';
 
 const scrollAnim = new Animated.Value(0);
 const offsetAnim = new Animated.Value(0);
@@ -49,7 +45,6 @@ class ContactsScreen extends Component {
             },
             filterFromFilterScreen: this.props.filter && this.props.filter['ContactsFilterScreen'] ? this.props.filter['ContactsFilterScreen'] : null,
             loading: false,
-
             sortData: false,
             isVisible: false,
             latitude: 0,
@@ -73,34 +68,8 @@ class ContactsScreen extends Component {
         for (let i=0; i<refData.length; i++) {
             riskColors[refData[i].value] = refData[i].colorCode || 'black'
         }
-        // this.setState({
-        //     loading: true,
-        //     riskColors: riskColors
-        // }, () => {
-        //     if (this.props && this.props.user && this.props.user.activeOutbreakId) {
-        //         if (this.props.filter && (this.props.filter['ContactsFilterScreen'] || this.props.filter['FollowUpsScreen'])) {
-                    this.filterContacts();
-        //         } else {
-        //             this.props.getContactsForOutbreakId(this.props.user.activeOutbreakId, null, null);
-        //         }
-        //     }
-        // })
+        this.filterContacts();
     }
-
-    // static getDerivedStateFromProps(props, state) {
-    //     if (state.sortData === true && props.user && props.user.activeOutbreakId){
-    //         state.sortData = false;
-    //         state.loading = true;
-    //         const allFilters = createFilterContactsObject(state.filterFromFilterScreen, state.filter);
-    //         props.getContactsForOutbreakId(props.user.activeOutbreakId, allFilters, null);
-    //     } else {
-    //         state.sortData = true
-    //     }
-    //
-    //     state.loading = false;
-    //     state.refreshing = false;
-    //     return null;
-    // }
 
     componentDidUpdate(prevProps) {
         if (!this.props.loaderState && this.state.refreshing) {
@@ -281,7 +250,6 @@ class ContactsScreen extends Component {
                                 filterText={filterText}
                             />}
                         ItemSeparatorComponent={this.renderSeparatorComponent}
-                        // ListEmptyComponent={this.listEmptyComponent}
                         style={[style.listViewStyle]}
                         componentContainerStyle={style.componentContainerStyle}
                         onScroll={this.handleScroll}
@@ -352,19 +320,14 @@ class ContactsScreen extends Component {
                 onPressNameProp={this.handleOnPressNameProp}
                 onPressExposureProp={this.handleOnPressExposureProp}
                 textsArray={[
-                    // getTranslation(translations.contactsScreen.addFollowupsButton, this.props.translation),
                     getTranslation(translations.contactsScreen.editButton, this.props.translation),
                     getTranslation(translations.followUpsScreen.addExposureFollowUpLabel, this.props.translation)
                 ]}
                 textsStyleArray={[
                     [styles.buttonTextActionsBar, {fontSize: 14, marginLeft: margins}],
-                    // [styles.buttonTextActionsBar, {fontSize: 14}],
                     [styles.buttonTextActionsBar, {fontSize: 14, marginRight: margins}]]
                 }
                 onPressTextsArray={[
-                    // () => {
-                    //     this.handlePressFollowUp(item)
-                    // },
                     () => {
                         this.handleOnPressMissing(item)
                     },
@@ -372,19 +335,6 @@ class ContactsScreen extends Component {
                         this.handleOnPressExposure(item)
                     }]}
             />
-
-        // return (
-        //     <FollowUpListItem
-        //         item={item.item}
-        //         riskLevelReferenceData={riskLevelReferenceData}
-        //         isContact={true}
-        //         firstActionText={getTranslation(translations.contactsScreen.addFollowupsButton, this.props.translation).toUpperCase()}
-        //         secondActionText={getTranslation(translations.contactsScreen.editButton, this.props.translation).toUpperCase()}
-        //         onPressFollowUp={this.handlePressFollowUp}
-        //         onPressMissing={this.handleOnPressMissing}
-        //         onPressExposure={this.handleOnPressExposure}
-        //         onPressMap={this.handleOnPressMap}
-        //     />
         )
     };
 
@@ -408,20 +358,7 @@ class ContactsScreen extends Component {
     };
 
     handleOnSubmitEditing = (text) => {
-        console.log ('text', text)
-        // this.props.addFilterForScreen("FollowUpsScreen", this.state.filter);
-        // let existingFilter = this.state.filterFromFilterScreen ? Object.assign({}, this.state.filterFromFilterScreen) : Object.assign({}, config.defaultFilterForContacts);
-        //
-        // if (!existingFilter.where || Object.keys(existingFilter.where).length === 0) {
-        //     existingFilter.where = {};
-        // }
-        // if (!existingFilter.where.or || existingFilter.where.or.length === 0) {
-        //     existingFilter.where.or = [];
-        // }
-        // existingFilter.where.or.push({firstName: {like: this.state.filter.searchText, options: 'i'}});
-        // existingFilter.where.or.push({lastName: {like: this.state.filter.searchText, options: 'i'}});
-        //
-        // this.props.getContactsForOutbreakId(this.props.user.activeOutbreakId, existingFilter, this.props.user.token);
+        console.log ('text', text);
 
         // Filter contacts by firstName and lastName
         this.filterContacts();
@@ -443,16 +380,6 @@ class ContactsScreen extends Component {
         this.setState({
             filterFromFilterScreen: filter
         }, () => {
-            // if (this.state.filter.searchText) {
-            //
-            //     if (!filter.where.or || filter.where.or.length === 0) {
-            //         filter.where.or = [];
-            //     }
-            //     filter.where.or.push({firstName: {like: this.state.filter.searchText, options: 'i'}});
-            //     filter.where.or.push({lastName: {like: this.state.filter.searchText, options: 'i'}});
-            // }
-            // this.props.getContactsForOutbreakId(this.props.user.activeOutbreakId, filter, this.props.user.token);
-
             this.filterContacts();
         })
     };
@@ -587,16 +514,9 @@ class ContactsScreen extends Component {
 
     filterContacts = () => {
         let allFilters = null;
-        // if (this.props.filter && (this.props.filter['ContactsFilterScreen'] || this.props.filter['FollowUpsScreen'])) {
-            allFilters = createFilterContactsObject(this.state.filterFromFilterScreen, this.state.filter)
-        // }
+        allFilters = createFilterContactsObject(this.state.filterFromFilterScreen, this.state.filter);
 
-        // this.setState({
-        //     loading: true,
-        //     sortData: false
-        // }, () => {
-            this.props.getContactsForOutbreakId(this.props.user.activeOutbreakId, allFilters, null);
-        // })
+        this.props.getContactsForOutbreakId(this.props.user.activeOutbreakId, allFilters, null);
     };
 
     onNavigatorEvent = (event) => {
