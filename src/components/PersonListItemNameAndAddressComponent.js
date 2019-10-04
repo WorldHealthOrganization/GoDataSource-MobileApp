@@ -6,18 +6,13 @@
  */
 import React, {PureComponent} from 'react';
 import {View, Text, StyleSheet, Image} from 'react-native';
-import PropTypes from 'prop-types';
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import styles from './../styles';
 import translations from './../utils/translations'
 import {getTranslation, calculateDimension} from './../utils/functions';
 import {connect} from "react-redux";
-import {bindActionCreators} from "redux";
-import GeneralListItem from './GeneralListItem';
 import Ripple from 'react-native-material-ripple';
-import {extractIdFromPouchId, getAddress, handleExposedTo} from "../utils/functions";
-import config from "../utils/config";
 
 
 class PersonListItemNameAndAddressComponent extends PureComponent {
@@ -56,6 +51,11 @@ class PersonListItemNameAndAddressComponent extends PureComponent {
                             marginHorizontal: 7,
                             display: firstComponentRenderData.addressString ? 'flex' : 'none'
                         }]}>{'\u2022 ' + getTranslation(translations.addressFieldLabels.address, translation) + ": " + firstComponentRenderData.addressString}</Text>
+                        {firstComponentRenderData.status && <Text style={[style.secondaryText, {
+                            flex: 1,
+                            marginHorizontal: 7,
+                            display: firstComponentRenderData.status ? 'flex' : 'none'
+                        }]}>{'\u2022 ' + getTranslation(translations.contactSingleScreen.followUpFinalStatus, translation) + ": " + firstComponentRenderData.status}</Text>}
                     </View>
                     <Ripple key={'secondView'} style={{width: 35, height: 35}} onPress={this.props.onPressMapIcon}>
                         <Image source={{uri: 'map_icon'}} style={{width: 35, height: 35}}/>
@@ -69,23 +69,6 @@ class PersonListItemNameAndAddressComponent extends PureComponent {
             </View>
         )
     }
-
-
-    // onPressMapIcon = () => {
-    //     let {type, itemToRender} = this.
-    //     InteractionManager.runAfterInteractions(() => {
-    //         let person = type === 'Contact' || type === 'Case' ? itemToRender : this.props.contacts && Array.isArray(this.props.contacts) && this.props.contacts.length > 0 ?  this.props.contacts.find((e) => {return extractIdFromPouchId(e._id, 'person') === itemToRender.personId}) : null;
-    //
-    //             this.props.onPressMapIcon(person)
-    //
-    //     })
-    // };
-    //
-    // handleOnPressName = (type, personId) => {
-    //     InteractionManager.runAfterInteractions(() => {
-    //         this.props.onPressNameProp(type, personId);
-    //     })
-    // };
 }
 
 // Create style outside the class, or for components that will be used by other components (buttons),
