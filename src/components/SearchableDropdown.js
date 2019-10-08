@@ -2,71 +2,86 @@
  * Created by florinpopa on 22/10/2018.
  */
 import React, { Component } from 'react';
-import {StyleSheet, Text, ListView, View, TouchableOpacity, Keyboard } from 'react-native';
+import {Text, View, FlatList } from 'react-native';
+import PropTypes from 'prop-types';
 import TextInput from './TextInput';
+import {connect} from "react-redux";
+import Ripple from 'react-native-material-ripple';
+import debounce from 'lodash/debounce';
+import get from 'lodash/get';
+import {getCasesByName} from './../actions/cases';
+import {computeFullName} from './../utils/functions';
 
-var ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
-
-export default class SearchableDropDown extends Component{
+class SearchableDropDown extends Component{
     constructor(props) {
         super(props);
         this.state = {
+            text: '',
             searchText: '',
             item: {},
             listItems: []
         };
-        this.renderList = this.renderList.bind(this);
+        this.searchedItems = debounce(this.searchedItems, 2000);
     };
 
-    renderList() {
-        return (
-            <ListView
-                style={{...this.props.itemsContainerStyle}}
-                keyboardShouldPersistTaps="always"
-                dataSource={ds.cloneWithRows(this.state.listItems)}
-                renderRow={this.renderItems}/>
-        )
-    }
-
     componentDidMount(){
-        const listItems = this.props.items;
-        const defaultIndex = this.props.defaultIndex;
-        if (defaultIndex && listItems.length > defaultIndex) {
-            this.setState({
-                listItems,
-                item: listItems[defaultIndex]
-            });
-        }
-        else {
-            this.setState({listItems});
-        }
+        this.setState({
+            text: get(this.props, 'value', '')
+        })
     }
 
-    searchedItems= (searchedText) => {
-        console.log('Searched text', searchedText);
+    updateText = (text) => {
         this.setState({
-            searchText: searchedText
+            text: text
+        });
+        this.searchedItems();
+    };
+
+    searchedItems = () => {
+        this.setState({
+            searchText: this.state.text
         }, () => {
-            this.props.onTextChange(searchedText);
+            if (this.state.searchText === '') {
+                this.setState({
+                    listItems: []
+                })
+            } else {
+                getCasesByName(this.props.outbreakId, this.state.searchText)
+                    .then((cases) => {
+                        // console.log('Cases: ', cases);
+                        this.setState({
+                            listItems: cases
+                        })
+                    })
+                    .catch((errorSearchCases) => {
+                        console.log('ErrorSearchCases: ', errorSearchCases);
+                    })
+            }
         })
     };
 
     renderItems = (item) => {
+        let caseItem = item.item;
+        caseItem.fullName = computeFullName(caseItem);
+
         return (
-            <TouchableOpacity style={{ ...this.props.itemStyle }} onPress={() => {
-                this.setState({ item: item });
-                Keyboard.dismiss();
-                setTimeout(() => {
-                    this.setState({
-                        searchText: item.name
-                    }, () => {
-                        this.props.onItemSelect(item);
-                    });
-                }, 0);
-            }}>
-                <Text style={{ ...this.props.itemTextStyle }}>{item.name}</Text>
-            </TouchableOpacity>
+            <Ripple style={{ ...this.props.itemStyle }} onPress={() => {this.setSelectedItem(caseItem)}}>
+                <Text style={{ ...this.props.itemTextStyle }}>{caseItem.fullName}</Text>
+            </Ripple>
         );
+    };
+
+    setSelectedItem = (selectedItem) => {
+        // Keyboard.dismiss();
+        this.setState({
+            item: selectedItem,
+            text: selectedItem.fullName,
+            searchText: selectedItem.fullName,
+            listItems: []
+        }, () => {
+            //Perform more actions
+            this.props.onSelectExposure(selectedItem);
+        })
     };
 
     render() {
@@ -75,22 +90,42 @@ export default class SearchableDropDown extends Component{
                 <TextInput
                     id={'SearchableDropDownId'}
                     ref={(e) => this.input = e}
-                    onChange={this.searchedItems}
-                    isEditMode={true}
-                    value={this.state.searchText}
+                    onChange={this.updateText}
+                    isEditMode={this.props.isEditMode}
+                    value={this.state.text}
                     label={this.props.placeholder}
                     onSubmitEditing={this.props.onSubmitEditing}
                     style={{width: '90%'}}
                     translation={this.props.translation}
                     isRequired={false}
                 />
-                <ListView
+                <FlatList
                     style={{...this.props.itemsContainerStyle}}
                     enableEmptySections={true}
                     keyboardShouldPersistTaps="always"
-                    dataSource={ds.cloneWithRows(this.props.items)}
-                    renderRow={this.renderItems}/>
+                    data={this.state.listItems || []}
+                    renderItem={this.renderItems}/>
             </View>
         );
     };
 }
+
+SearchableDropDown.propTypes = {
+    isEditMode: PropTypes.bool,
+    onSelectExposure: PropTypes.func,
+    value: PropTypes.string
+};
+
+SearchableDropDown.defaultProps = {
+    isEditMode: true,
+    onSelectExposure: () => {console.log('Default onSelectExposure')},
+
+};
+
+function mapStateToProps(state) {
+    return {
+        outbreakId: get(state, 'user.activeOutbreakId', null)
+    }
+}
+
+export default connect(mapStateToProps)(SearchableDropDown)

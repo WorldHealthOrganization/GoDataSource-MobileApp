@@ -4,13 +4,18 @@ import constants from './constants';
 import get from 'lodash/get';
 import {extractLocationId} from './../../utils/functions';
 import {checkArray, checkArrayAndLength} from './../../utils/typeCheckingFunctions';
+import translations from "../../utils/translations";
+import {generalMapping} from "../../actions/followUps";
+var jsonSql = require('json-sql')();
+jsonSql.setDialect('sqlite');
 
 export function openDatabase(databaseName) {
     return new Promise((resolve, reject) => {
         let fullDatabaseName = `${databaseName}${database.getDatabaseName()}`;
         try {
-            let sqlDb = SQLite.openDatabase(encodeName(fullDatabaseName, database.getDatabasePassword()));
-            resolve(sqlDb);
+            SQLite.openDatabase(encodeName(fullDatabaseName, database.getDatabasePassword()), null, null, null, (sqlDb) => {
+                resolve(sqlDb);
+            });
         } catch(errorOpenDatabase) {
             reject(new Error('Could not open database'));
         }
@@ -18,21 +23,49 @@ export function openDatabase(databaseName) {
 }
 
 export function wrapTransationInPromise (database) {
-    return new Promise((resole, reject) => {
+    return new Promise((resolve, reject) => {
         database.transaction((transaction) => resolve(transaction), (errorTransaction) => reject(errorTransaction));
     })
 }
 
 export function wrapReadTransactionInPromise (database) {
-    return new Promise((resole, reject) => {
+    return new Promise((resolve, reject) => {
         database.readTransaction((transaction) => resolve(transaction), (errorTransaction) => reject(errorTransaction));
     })
 }
 
-export function wrapExecuteSQLInPromise (transaction, sqlStatement, arguments) {
-    return new Promise((resolve, reject) => {
-        transaction.executeSql(sqlStatement, arguments, (transaction, resultSet) => resolve(resultSet), (transaction, errorStatement) => reject(errorStatement));
-    })
+export function wrapExecuteSQLInPromise (transaction, sqlStatement, arrayOfFields, skipCallback) {
+    console.log('Execute query: ', sqlStatement);
+    if (transaction && sqlStatement && checkArray(arrayOfFields)) {
+        return new Promise((resolve, reject) => {
+            if (skipCallback) {
+                transaction.executeSql(sqlStatement, arrayOfFields, null, (txn, errorStatement) => {return reject(errorStatement)});
+                return resolve('Success');
+            } else {
+                transaction.executeSql(sqlStatement, arrayOfFields
+                    , (transaction, resultSet) => {
+                        console.log('Good stuff:')
+                        return resolve(resultSet)
+                    },
+                    (transaction, errorStatement) => {
+                        console.log('Bad stuff: ', errorStatement)
+                        return reject(errorStatement)
+                    }
+                    );
+                // transaction.executeSql('SELECT * FROM person', []
+                //     , (transaction, resultSet) => {
+                //         console.log('result set: ', resultSet)
+                //         return resolve(resultSet)
+                //     },
+                //     (transaction, errorStatement) => {
+                //         return reject(errorStatement)
+                //     }
+                // )
+            }
+        })
+    } else {
+        return Promise.reject('Invalid arguments');
+    }
 }
 
 // This methods refer to the process of creating the needed database for the searchable data
@@ -53,12 +86,11 @@ function createTableStringMethod(tableName) {
 
     return createTableString;
 }
-export function createTable(databaseName, tableName) {
+export function createTable(transaction, tableName) {
     let createTableString = createTableStringMethod(tableName);
-    return openDatabase(databaseName)
-            .then(wrapTransationInPromise)
-            .then((transaction) => wrapExecuteSQLInPromise(transaction, createTableString, []))
+    return wrapExecuteSQLInPromise(transaction, createTableString, [], true)
             .then((resultSet) => Promise.resolve(`Success ${tableName}`))
+            .then(() => Promise.resolve(transaction))
             .catch((errorStatement) => Promise.reject(errorStatement));
 
 
@@ -97,11 +129,11 @@ function insertOrUpdateStringCreation (tableName) {
                 insertOrUpdateString = insertOrUpdateString + `, `;
             }
         }
-        insertOrUpdateString = insertOrUpdateString + ` ON CONFLICT (id) DO UPDATE SET `;
+        insertOrUpdateString = insertOrUpdateString + ` ON CONFLICT (_id) DO UPDATE SET `;
         // Skip the id field (first field in the declared structure)
         for (let i=1; i<tableFields.length; i++) {
             insertOrUpdateString = insertOrUpdateString + `${tableFields[i].fieldName}=excluded.${tableFields[i].fieldName}`;
-            if (i < tableFields - 1) {
+            if (i < tableFields.length - 1) {
                 insertOrUpdateString = insertOrUpdateString + `, `;
             }
         }
@@ -110,31 +142,41 @@ function insertOrUpdateStringCreation (tableName) {
         console.log('SQLite console: error at creating insertOrUpdate string: ', errorAtCreatingString)
     }
 }
-
 // This method takes the databaseName, tableName and the mappedData and inserts it in bulk in the database
 // Use this even for a single value
-export function insertOrUpdate(databaseName, tableName, data) {
-    return new Promise((resolve, reject) => {
-        try {
+export function insertOrUpdate(databaseName, tableName, data, createTableBool) {
+    // return new Promise((resolve, reject) => {
+    //     try {
             let insertOrUpdateString = insertOrUpdateStringCreation(tableName);
             let mappedData = mapDataForInsert(tableName, data);
             if (checkArrayAndLength(mappedData)) {
-                openDatabase(databaseName)
+                return Promise.resolve()
+                    .then(() => openDatabase(databaseName))
                     .then(wrapTransationInPromise)
+                    .then((txn) => {
+                        if (createTableBool) {
+                            return createTable(txn, tableName);
+                        }
+                        return Promise.resolve(txn);
+                    })
                     .then((txn) => {
                         let dataToBeInsertedPromise = [];
                         for (let i = 0; i < mappedData.length; i++) {
-                            dataToBeInsertedPromise.push(wrapExecuteSQLInPromise(txn, insertOrUpdateString, mappedData[i]));
+                            dataToBeInsertedPromise.push(wrapExecuteSQLInPromise(txn, insertOrUpdateString, mappedData[i], i < mappedData.length  - 1));
                         }
-                        return Promise.all(dataToBeInsertedPromise);
+                        return Promise.all(dataToBeInsertedPromise)
+                            .then((results) => {
+                                return Promise.resolve(results)
+                            });
                     })
+                    .catch((errorInsertOrUpdate) => Promise.reject(errorInsertOrUpdate))
             } else {
-                resolve('Success');
+                return Promise.resolve('Success');
             }
-        } catch (openDatabaseError) {
-            reject(new Error('Could not open database'));
-        }
-    })
+        // } catch (openDatabaseError) {
+        //     reject(new Error('Could not open database'));
+        // }
+    // })
 }
 
 // Data mapping method based on the structure of the tables
@@ -152,10 +194,24 @@ export function mapDataForInsert(tableName, data) {
                 if (tableFields[i].fieldName === 'locationId') {
                     innerArray.push(extractLocationId(e));
                 } else {
-                    if (constants.relationshipsMappedFields.includes(tableFields[i].fieldName)) {
-                        innerArray.push(mapRelationshipFields(e, tableFields[i].fieldName));
+                    if (tableFields[i].fieldName === 'age') {
+                        let years = get(e, `[${tableFields[i].fieldName}].years`, 0);
+                        let months = get(e, `[${tableFields[i].fieldName}].months`, 0);
+                        innerArray.push(Math.max(years, months));
                     } else {
-                        innerArray.push(get(e, `[${tableFields[i].fieldName}]`, null));
+                        if (tableFields[i].fieldName === 'indexDay') {
+                            innerArray.push(get(e, `[index]`, null));
+                        } else {
+                            if (constants.relationshipsMappedFields.includes(tableFields[i].fieldName)) {
+                                innerArray.push(mapRelationshipFields(e, tableFields[i].fieldName));
+                            } else {
+                                if (tableName === 'person' && e.type === translations.personTypes.events && tableFields[i].fieldName === 'firstName') {
+                                    innerArray.push(get(e, `name`, null));
+                                } else {
+                                    innerArray.push(get(e, `[${tableFields[i].fieldName}]`, null));
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -183,5 +239,55 @@ function mapRelationshipFields(relationship, fieldName) {
             return relationship.persons.find((e) => {return e.target === true;}).type;
         default:
             return null;
+    }
+}
+
+// Execute a query based on a query object
+export function executeQuery(queryObject) {
+    // return async function (dispatch) {
+    let start = new Date().getTime();
+    return openDatabase('common')
+        .then((database) => wrapTransationInPromise(database))
+        .then((transaction) => {
+
+            let sql = jsonSql.build(queryObject);
+
+            console.log('Sql statement: ', sql);
+            return wrapExecuteSQLInPromise(transaction, sql.query, Object.values(sql.values))
+        })
+        .then((result) => {
+            console.log('Result get stuff: ', new Date().getTime() - start);
+            // dispatch(storeFollowUps([]));
+            let mappedData = generalMapping1(result.rows._array, queryObject.fields);
+            return Promise.resolve(mappedData);
+        })
+        .catch((errorGetStuff) => {
+            console.log('Error get stuff: ', errorGetStuff);
+            return Promise.reject(errorGetStuff)
+        })
+    // }
+}
+function generalMapping1(unmappedData, queryFields) {
+    if (checkArrayAndLength(queryFields)) {
+        let fields = queryFields.map((e) => e.alias);
+        return unmappedData.map((e) => {
+            for (let i=0; i<fields.length; i++) {
+                if (fields[i].includes('xposure')) {
+                    if (e[fields[i]] !== null) {
+                        let exposures = e[fields[i]].split('***');
+                        e[fields[i]] = exposures.map((f) => JSON.parse(f));
+                    }
+                } else {
+                    try {
+                        e[fields[i]] = JSON.parse(e[fields[i]]);
+                    } catch(errorParseNonJson) {
+                        e[fields[i]] = e[fields[i]];
+                    }
+                }
+            }
+            return e;
+        })
+    } else {
+        throw new Error('Invalid object send to map: queryFields')
     }
 }

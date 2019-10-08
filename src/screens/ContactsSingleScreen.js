@@ -23,12 +23,21 @@ import Breadcrumb from './../components/Breadcrumb';
 import Menu, { MenuItem } from 'react-native-material-menu';
 import Ripple from 'react-native-material-ripple';
 import { updateFollowUpAndContact, deleteFollowUp, addFollowUp } from './../actions/followUps';
-import { updateContact, deleteExposureForContact, addContact } from './../actions/contacts';
+import {updateContact, deleteExposureForContact, addContact, getExposuresForContact, checkForNameDuplicated} from './../actions/contacts';
 import { removeErrors } from './../actions/errors';
 import DateTimePicker from 'react-native-modal-datetime-picker';
 import _ from 'lodash';
-import { calculateDimension, extractIdFromPouchId, updateRequiredFields, navigation, getTranslation, createDate, daysSince } from './../utils/functions';
-import { getFollowUpsForContactRequest } from './../queries/followUps'
+import {
+    calculateDimension,
+    extractIdFromPouchId,
+    updateRequiredFields,
+    navigation,
+    getTranslation,
+    createDate,
+    daysSince,
+    computeFullName
+} from './../utils/functions';
+import { getFollowUpsForContactId } from './../actions/followUps'
 import moment from 'moment'
 import translations from './../utils/translations'
 import ElevatedView from 'react-native-elevated-view';
@@ -111,7 +120,7 @@ class ContactsSingleScreen extends Component {
             } : Object.assign({}, this.props.contact),
             savePressed: false,
             deletePressed: false,
-            loading: false,
+            loading: !this.props.isNew,
             isModified: false,
             isDateTimePickerVisible: false,
             canChangeScreen: false,
@@ -129,76 +138,31 @@ class ContactsSingleScreen extends Component {
     };
 
     // Please add here the react lifecycle methods that you need
-    componentDidUpdate(prevProps) {
-        if (this.state.savePressed || this.state.deletePressed) {
-            if (this.props.handleUpdateContactFromFollowUp !== undefined && this.props.handleUpdateContactFromFollowUp !== null) {
-                const { contact } = this.state;
-                this.props.handleUpdateContactFromFollowUp(contact)
-            }
-            this.props.navigator.pop();
-        }
-
-        if ((this.props.isNew === false || this.props.isNew === undefined) && this.state.updateExposure === true){
-            let updatedContact = this.props.contacts[this.props.contacts.map((e) => {return e._id}).indexOf(this.state.contact._id)];
-            if (updatedContact !== undefined && updatedContact !== null) {
-                this.setState(prevState => ({
-                    contact: Object.assign({}, this.state.contact, {relationships: updatedContact.relationships}),
-                    updateExposure: false
-                }));
-            }
-        }
-
-        if (this.state.loading === true) {
-            this.setState({
-                loading: false
-            })
-        }
-    }
-
-
-    // static getDerivedStateFromProps(props, state) {
-    //     if (callGetDerivedStateFromProps === true){
-    //         console.log("getDerivedStateFromProps - ContactsSingleScreen");
-    //         if (props.errors && props.errors.type && props.errors.message) {
-    //             Alert.alert(props.errors.type, props.errors.message, [
-    //                 {
-    //                     text: getTranslation(translations.alertMessages.okButtonLabel, props.translation),
-    //                     onPress: () => {
-    //                         state.savePressed = false;
-    //                         props.removeErrors()
-    //                     }
-    //                 }
-    //             ])
-    //         } else {
-    //             if (state.savePressed || state.deletePressed) {
-    //                 if (props.handleUpdateContactFromFollowUp !== undefined && props.handleUpdateContactFromFollowUp !== null) {
-    //                     const { contact } = state
-    //                     props.handleUpdateContactFromFollowUp(contact)
-    //                 }
-    //                 props.navigator.pop()
-    //             }
-    //             // if (props.contacts && props.contact !== props.contacts[props.contacts.map((e) => {return e.id}).indexOf(props.contact.id)]) {
-    //             //     props.contact = props.contacts[props.contacts.map((e) => {return e.id}).indexOf(props.contact.id)];
-    //             // }
+    // componentDidUpdate(prevProps) {
+    //     if (this.state.savePressed || this.state.deletePressed) {
+    //         if (this.props.handleUpdateContactFromFollowUp !== undefined && this.props.handleUpdateContactFromFollowUp !== null) {
+    //             const { contact } = this.state;
+    //             this.props.handleUpdateContactFromFollowUp(contact)
     //         }
-    //
-    //         if ((props.isNew === false || props.isNew === undefined) && state.updateExposure === true){
-    //             let updatedContact = props.contacts[props.contacts.map((e) => {return e._id}).indexOf(state.contact._id)]
-    //             if (updatedContact !== undefined && updatedContact !== null) {
-    //                 state.contact.relationships = updatedContact.relationships
-    //                 state.updateExposure = false
-    //             }
-    //         }
-    //
-    //         if (state.loading === true) {
-    //             state.loading = false
-    //         }
-    //     } else {
-    //         callGetDerivedStateFromProps = true
+    //         this.props.navigator.pop();
     //     }
     //
-    //     return null;
-    // };
+    //     if ((this.props.isNew === false || this.props.isNew === undefined) && this.state.updateExposure === true){
+    //         let updatedContact = this.props.contacts[this.props.contacts.map((e) => {return e._id}).indexOf(this.state.contact._id)];
+    //         if (updatedContact !== undefined && updatedContact !== null) {
+    //             this.setState(prevState => ({
+    //                 contact: Object.assign({}, this.state.contact, {relationships: updatedContact.relationships}),
+    //                 updateExposure: false
+    //             }));
+    //         }
+    //     }
+    //
+    //     if (this.state.loading === true) {
+    //         this.setState({
+    //             loading: false
+    //         })
+    //     }
+    // }
 
     componentDidMount() {
         BackHandler.addEventListener('hardwareBackPress', this.handleBackButtonClick);
@@ -218,7 +182,7 @@ class ContactsSingleScreen extends Component {
             }
 
             //permissions check
-            let isEditMode = true
+            let isEditMode = true;
             if (this.props.role && this.props.role.find((e) => e === config.userPermissions.writeContact) !== undefined) {
                 isEditMode = true
             } else if (this.props.role && this.props.role.find((e) => e === config.userPermissions.writeContact) === undefined && this.props.role.find((e) => e === config.userPermissions.readContact) !== undefined) {
@@ -230,24 +194,43 @@ class ContactsSingleScreen extends Component {
             })
 
             if (this.props.user !== null) {
-                getFollowUpsForContactRequest(this.props.user.activeOutbreakId, extractIdFromPouchId(this.state.contact._id, 'person'), this.state.contact.followUp, this.props.teams, (errorFollowUp, responseFollowUp) => {
-                    if (errorFollowUp) {
-                        console.log('getFollowUpsForContactRequest error: ', errorFollowUp)
-                    }
-                    if (responseFollowUp) {
-                        // console.log ('getFollowUpsForContactRequest response: ', JSON.stringify(responseFollowUp))
-                        if (responseFollowUp.length > 0) {
-                            let myContact = Object.assign({}, this.state.contact)
-                            myContact.followUps = responseFollowUp;
-                            // callGetDerivedStateFromProps = false;
-                            this.setState({
-                                contact: myContact
-                            }, () => {
-                                console.log("After adding the followUps: ");
+
+                let followUpPromise = getFollowUpsForContactId(this.state.contact._id, this.props.user.activeOutbreakId, this.props.teams)
+                    .then((responseFollowUps) => responseFollowUps.map((e) => e.followUps));
+                let exposurePromise = getExposuresForContact(this.state.contact._id, this.props.user.activeOutbreakId);
+
+                Promise.all([followUpPromise, exposurePromise])
+                    .then(([followUps, relationshipsAndExposures]) => {
+                        this.setState(prevState => ({
+                            loading: !prevState.loading,
+                            contact: Object.assign({}, prevState.contact, {
+                                followUps,
+                                relationships: relationshipsAndExposures
                             })
-                        }
-                    }
-                })
+                        }))
+                    })
+                    .catch((errorGetFollowUpsAndRelationships) => {
+                        console.log('ErrorGetStuff: ', errorGetFollowUpsAndRelationships);
+                    })
+
+                // getExposuresForContact(this.state.contact._id, this.props.user.activeOutbreakId)
+                //     .then((responseExposure) => {
+                //         this.setState(prevState => ({
+                //             contact: Object.assign({}, prevState.contact, {relationships: responseExposure})
+                //         }))
+                //     })
+                //     .catch((errorGetExposures) => {
+                //         console.log('ErrorGetExposures: ', errorGetExposures);
+                //     })
+                // getFollowUpsForContactId(this.state.contact._id, this.props.user.activeOutbreakId, this.props.teams)
+                //     .then((responseFollowUp) => {
+                //         this.setState(prevState => ({
+                //             contact: Object.assign({}, prevState.contact, {followUps: responseFollowUp.map((e) => e.followUps)})
+                //         }))
+                //     })
+                //     .catch((errorGetFollowUpsForContact) => {
+                //         console.log('ErrorGetFollowUpsForContact: ', errorGetFollowUpsForContact);
+                //     });
             }
         } else if (this.props.isNew === true) {
             let personsArray = []
@@ -334,7 +317,7 @@ class ContactsSingleScreen extends Component {
 
         return (
             <ViewHOC style={style.container}
-                showLoader={this && this.state && this.state.loading}
+                showLoader={this.state.loading}
                 loaderText={this.props && this.props.syncState ? 'Loading' : getTranslation(translations.loadingScreenMessages.loadingMsg, this.props.translation)}>
                 <NavBarCustom
                     title={null}
@@ -475,7 +458,20 @@ class ContactsSingleScreen extends Component {
             showAddFollowUpScreen: !this.state.showAddFollowUpScreen
         }, () => {
             this.hideMenu();
-            this.props.addFollowUp(this.props.user.activeOutbreakId, this.state.contact._id, followUp, this.state.filter, this.props.teams, this.props.previousScreen === translations.followUpsSingleScreen.title);
+            addFollowUp(followUp)
+                .then((resultAddFollowUp) => {
+                    console.log('FollowUpAdded');
+                    this.props.navigator.showInAppNotification({
+                        screen: 'InAppNotificationScreen',
+                        autoDismissTimerSec: 1,
+                        passProps: {
+                            text: 'Follow-up added'
+                        }
+                    })
+                })
+                .catch((errorAddFollowUp) => {
+                    console.log('ErrorAddFollowUp: ', errorAddFollowUp);
+                })
         });
     };
 
@@ -631,6 +627,7 @@ class ContactsSingleScreen extends Component {
                         onChangeDate={this.handleOnChangeDate}
                         onChangeSwitch={this.handleOnChangeSwitch}
                         handleMoveToNextScreenButton={this.handleMoveToNextScreenButton}
+                        selectedExposure={this.props.singleCase}
                     />
                 );
             case 'calendar':
@@ -1252,16 +1249,20 @@ class ContactsSingleScreen extends Component {
     };
 
     handleOnPressEditExposure = (relation, index) => {
-        console.log('handleOnPressEditExposure: ', relation, index);
+        // console.log('handleOnPressEditExposure: ', relation, index);
+        _.set(relation, 'caseData.fullName', computeFullName(_.get(relation, 'caseData', null)));
         this.props.navigator.showModal({
             screen: 'ExposureScreen',
             animated: true,
             passProps: {
-                exposure: relation,
+                exposure: _.get(relation, 'relationshipData', null),
+                selectedExposure: _.get(relation, 'caseData', null),
                 contact: this.props.isNew ? null : this.props.contact,
                 type: 'Contact',
                 saveExposure: this.handleSaveExposure,
-                caseIdFromCasesScreen: this.props.caseIdFromCasesScreen
+                caseIdFromCasesScreen: this.props.caseIdFromCasesScreen,
+                isEditMode: false,
+                addContactFromCasesScreen: false
             }
         })
     };
@@ -1314,26 +1315,11 @@ class ContactsSingleScreen extends Component {
                         if (this.checkAgeMonthsRequirements()) {
                             if (this.state.contact.addresses === undefined || this.state.contact.addresses === null || this.state.contact.addresses.length === 0 ||
                                 (this.state.contact.addresses.length > 0 && this.state.hasPlaceOfResidence === true)) {
-                                const { contact } = this.state
-                                checkForNameDuplicatesRequest(this.props.isNew ? null : contact._id, contact.firstName, contact.lastName, this.props.user.activeOutbreakId, (error, response) => {
-                                    if (error) {
-                                        console.log('getContactsNameForDuplicateCheckRequest error: ', error);
-                                        this.setState({
-                                            loading: false
-                                        }, () => {
-                                            Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.checkForDuplicatesRequestError, this.props.translation), [
-                                                {
-                                                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
-                                                    onPress: () => { this.hideMenu() }
-                                                }
-                                            ])
-                                        })
-                                    }
-                                    if (response) {
-                                        console.log('getContactsNameForDuplicateCheckRequest response: ', response);
-                                        if (response.length === 0) {
-                                            this.saveContactAction()
-                                        } else {
+                                const { contact } = this.state;
+
+                                checkForNameDuplicated(this.props.isNew ? null : contact._id, contact.firstName, contact.lastName, this.props.user.activeOutbreakId)
+                                    .then((isDuplicate) => {
+                                        if (isDuplicate) {
                                             Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.contactDuplicateNameError, this.props.translation), [
                                                 {
                                                     text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
@@ -1350,9 +1336,54 @@ class ContactsSingleScreen extends Component {
                                                     onPress: () => { this.saveContactAction() }
                                                 }
                                             ])
+                                        } else {
+                                            this.saveContactAction();
                                         }
-                                    }
-                                });
+                                    })
+                                    .catch((errorIsDuplicate) => {
+                                        this.saveContactAction();
+                                    });
+
+
+
+                                // checkForNameDuplicatesRequest(this.props.isNew ? null : contact._id, contact.firstName, contact.lastName, this.props.user.activeOutbreakId, (error, response) => {
+                                //     if (error) {
+                                //         console.log('getContactsNameForDuplicateCheckRequest error: ', error);
+                                //         this.setState({
+                                //             loading: false
+                                //         }, () => {
+                                //             Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.checkForDuplicatesRequestError, this.props.translation), [
+                                //                 {
+                                //                     text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+                                //                     onPress: () => { this.hideMenu() }
+                                //                 }
+                                //             ])
+                                //         })
+                                //     }
+                                //     if (response) {
+                                //         console.log('getContactsNameForDuplicateCheckRequest response: ', response);
+                                //         if (response.length === 0) {
+                                //             this.saveContactAction()
+                                //         } else {
+                                //             Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.contactDuplicateNameError, this.props.translation), [
+                                //                 {
+                                //                     text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+                                //                     onPress: () => {
+                                //                         this.setState({
+                                //                             loading: false
+                                //                         }, () => {
+                                //                             this.hideMenu()
+                                //                         })
+                                //                     }
+                                //                 },
+                                //                 {
+                                //                     text: getTranslation(translations.alertMessages.saveAnywayLabel, this.props.translation),
+                                //                     onPress: () => { this.saveContactAction() }
+                                //                 }
+                                //             ])
+                                //         }
+                                //     }
+                                // });
                             } else {
                                 this.setState({ loading: false }, () => {
                                     Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.placeOfResidenceError, this.props.translation), [
@@ -1421,10 +1452,22 @@ class ContactsSingleScreen extends Component {
                     this.setState(prevState => ({
                         contact: Object.assign({}, prevState.contact, contactWithRequiredFields),
                     }), () => {
-                        let contactClone = _.cloneDeep(this.state.contact)
-                        let contactMatchFilter = this.checkIfContactMatchFilter()
-                        console.log('contactMatchFilter', contactMatchFilter)
-                        this.props.addContact(this.props.user.activeOutbreakId, contactClone, null, this.props.user.token, contactMatchFilter);
+                        let contactClone = _.cloneDeep(this.state.contact);
+                        // let contactMatchFilter = this.checkIfContactMatchFilter();
+                        // console.log('contactMatchFilter', contactMatchFilter)
+                        addContact(contactClone, _.get(this.props, 'periodOfFollowUp', 1), _.get(this.props, 'user._id'))
+                            .then((result) => {
+                                this.props.refresh();
+                                this.props.navigator.pop(
+                                    {
+                                        animated: true,
+                                        animationType: 'fade',
+                                    }
+                                )
+                            })
+                            .catch((errorAddContact) => {
+                                console.log('errorUpdateCase', errorAddContact);
+                            })
                     })
                 } else {
                     let contactWithRequiredFields = null;
@@ -1440,7 +1483,19 @@ class ContactsSingleScreen extends Component {
                         let contactClone = _.cloneDeep(this.state.contact)
                         let contactMatchFilter = this.checkIfContactMatchFilter()
                         console.log('contactMatchFilter', contactMatchFilter)
-                        this.props.updateContact(this.props.user.activeOutbreakId, contactClone._id, contactClone, this.props.user.token, null, contactMatchFilter, this.props.teams);
+                        updateContact(contactClone)
+                            .then((result) => {
+                                this.props.refresh();
+                                this.props.navigator.pop(
+                                    {
+                                        animated: true,
+                                        animationType: 'fade',
+                                    }
+                                )
+                            })
+                            .catch((errorUpdateContact) => {
+                                console.log('errorUpdateCase', errorUpdateContact);
+                            })
                     })
                 }
             })
@@ -1519,15 +1574,17 @@ class ContactsSingleScreen extends Component {
     checkFields = () => {
         // let pass = true;
         let requiredFields = [];
+        let relationships = _.get(this.state, 'contact.relationships', []);
+        relationships = relationships.map((e) => _.get(e, 'relationshipData', e));
         for (let i = 0; i < config.addExposureScreen.length; i++) {
             if (config.addExposureScreen[i].id === 'exposure') {
-                if (this.state.contact.relationships[0].persons.length === 0) {
+                if (relationships[0].persons.length === 0) {
                     requiredFields.push('Person')
                     // pass = false;
                 }
             } else {
                 if (config.addExposureScreen[i].isRequired) {
-                    if (!this.state.contact.relationships[0][config.addExposureScreen[i].id]) {
+                    if (!relationships[0][config.addExposureScreen[i].id]) {
                         requiredFields.push(getTranslation(config.addExposureScreen[i].label, this.props.translation));
                         // pass = false;
                     }
@@ -1800,7 +1857,8 @@ function mapStateToProps(state) {
         contacts: state.contacts,
         filter: state.app.filters,
         translation: state.app.translation,
-        locations: _.get(state, 'locations.locations', [])
+        locations: _.get(state, 'locations.locations', []),
+        periodOfFollowUp: _.get(state, 'outbreak.periodOfFollowUp', 1)
     };
 };
 

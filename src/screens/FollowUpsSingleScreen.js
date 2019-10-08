@@ -137,19 +137,19 @@ class FollowUpsSingleScreen extends Component {
     }
 
     // Please add here the react lifecycle methods that you need
-    componentDidUpdate(prevProps) {
-        if (this.state.savePressed || this.state.deletePressed) {
-            if (this.props.startLoadingScreen !== undefined) {
-                this.props.startLoadingScreen();
-            }
-            this.props.navigator.pop(
-                {
-                    animated: true,
-                    animationType: 'fade',
-                }
-            )
-        }
-    }
+    // componentDidUpdate(prevProps) {
+    //     if (this.state.savePressed || this.state.deletePressed) {
+    //         if (this.props.startLoadingScreen !== undefined) {
+    //             this.props.startLoadingScreen();
+    //         }
+    //         this.props.navigator.pop(
+    //             {
+    //                 animated: true,
+    //                 animationType: 'fade',
+    //             }
+    //         )
+    //     }
+    // }
 
 
     // static getDerivedStateFromProps(props, state) {
@@ -797,49 +797,58 @@ class FollowUpsSingleScreen extends Component {
         this.setState(prevState => ({
             item: Object.assign({}, prevState.item,
                 {
-                    updatedAt: now.toISOString(),
-                    updatedBy: extractIdFromPouchId(this.props.user._id, 'user.json'),
                     questionnaireAnswers: reMapAnswers(_.cloneDeep(this.state.previousAnswers))
                 }
             ),
-            contact: Object.assign({}, prevState.contact, {
-                updatedAt: now.toISOString(),
-                updatedBy: extractIdFromPouchId(this.props.user._id, 'user.json')
-            }),
-            savePressed: true,
             isModified: false,
         }), () => {
             let followUpClone = _.cloneDeep(this.state.item);
             if (followUpClone.targeted !== false && followUpClone.targeted !== true) {
                 followUpClone.targeted = false;
             }
-            let contactClone = _.cloneDeep(this.state.contact);
+            // let contactClone = _.cloneDeep(this.state.contact);
 
             if (followUpClone.address && followUpClone.address.location) {
                 delete followUpClone.address.location;
             }
 
-            if (contactClone.followUps) {
-                delete contactClone.followUps;
-            }
-
-            if (contactClone.relationships) {
-                delete contactClone.relationships;
-            }
-
             if (this.props.isNew) {
-                followUpClone = updateRequiredFields(this.props.user.activeOutbreakId, this.props.user._id, Object.assign({}, followUpClone), action = 'create', 'followUp.json');
-                console.log('followUpClone create', JSON.stringify(followUpClone))
-                this.props.createFollowUp(this.props.user.activeOutbreakId, contactClone._id, followUpClone, contactClone, null, this.props.user.token, this.props.teams)
+                followUpClone = updateRequiredFields(this.props.user.activeOutbreakId, this.props.user._id, Object.assign({}, followUpClone), action = 'create', 'followUp');
+                // console.log('followUpClone create', JSON.stringify(followUpClone))
+                createFollowUp(followUpClone)
+                    .then((responseCreateFollowUp) => {
+                        this.props.refresh();
+                        this.props.navigator.pop(
+                            {
+                                animated: true,
+                                animationType: 'fade',
+                            }
+                        )
+                    })
+                    .catch((errorCreateFollowUp) => {
+                        console.log(errorCreateFollowUp);
+                    })
             } else {
                 if (this.state.deletePressed === false) {
                     followUpClone = updateRequiredFields(this.props.user.activeOutbreakId, this.props.user._id, Object.assign({}, followUpClone), action = 'update');
-                    console.log('followUpClone update', JSON.stringify(followUpClone))
+                    // console.log('followUpClone update', JSON.stringify(followUpClone))
                 } else {
                     followUpClone = updateRequiredFields(this.props.user.activeOutbreakId, this.props.user._id, Object.assign({}, followUpClone), action = 'delete');
-                    console.log('followUpClone delete', JSON.stringify(followUpClone))
+                    // console.log('followUpClone delete', JSON.stringify(followUpClone))
                 }
-                this.props.updateFollowUpAndContact(this.props.user.activeOutbreakId, contactClone._id, followUpClone._id, followUpClone, contactClone, this.props.user.token, this.props.filter, this.props.teams);
+                updateFollowUpAndContact(followUpClone)
+                    .then((responseUpdateFollowUp) => {
+                        this.props.refresh();
+                        this.props.navigator.pop(
+                            {
+                                animated: true,
+                                animationType: 'fade',
+                            }
+                        )
+                    })
+                    .then((errorUpdateFollowUp) => {
+                        console.log(errorUpdateFollowUp);
+                    })
             }
         });
     };

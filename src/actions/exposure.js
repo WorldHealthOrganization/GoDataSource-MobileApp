@@ -8,6 +8,7 @@ import { getCasesForOutbreakIdRequest } from './../queries/cases';
 import { storeCases } from './cases';
 import { addError } from './errors';
 import errorTypes from './../utils/errorTypes';
+import {insertOrUpdate} from './../queries/sqlTools/helperMethods';
 
 export function storeExposures(exposures) {
     return {
@@ -48,10 +49,14 @@ export function getExposuresForOutbreakIdWithPromise(outbreakId, filter, alsoSto
             if (response) {
                 dispatch(storeExposures(response));
                 if (alsoStoreCases === true) {
-                    dispatch(storeCases(response));
+                    // dispatch(storeCases(response));
                 }
                 resolve('Done exposures');
             }
         })
     })
+}
+
+export function insertOrUpdateExposure(exposure) {
+    return insertOrUpdate('common', 'relationship', [exposure], true);
 }

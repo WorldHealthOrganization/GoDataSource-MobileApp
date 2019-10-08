@@ -35,7 +35,7 @@ class InAppNotificationScreen extends Component {
                         fontSize: 15
                     }}
                     numberOfLines={1}
-                >{this.props.number + ' ' + getTranslation(translations.inAppNotificationScreen.generatedFollowUps, this.props.translation)}</Text>
+                >{this.props.text}</Text>
             </View>
         )
     }

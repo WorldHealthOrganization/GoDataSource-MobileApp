@@ -22,6 +22,9 @@ import RNFS from 'react-native-fs';
 import {Buffer} from 'buffer';
 import moment from 'moment';
 import {checkArrayAndLength} from './typeCheckingFunctions';
+import {insertOrUpdate} from './../queries/sqlTools/helperMethods';
+import translations from "./translations";
+import sqlConstants from './../queries/sqlTools/constants';
 
 
 // This method is used for handling server responses. Please add here any custom error handling
@@ -180,9 +183,34 @@ export function navigation(event, navigator) {
     }
 }
 
+export function handleExposedTo(exposures, returnString) {
+    if (!checkArrayAndLength(exposures)) {
+        return ' ';
+    }
+    let relationshipsArray = [];
+
+    relationshipsArray = exposures.map((e) => {
+        return {
+            fullName: computeFullName(e),
+            id: e._id,
+            visualId: e.visualId,
+            type: e.type
+        }
+    });
+
+    return returnString ? relationshipsArray.join(', ') : relationshipsArray;
+}
+
+export function computeFullName(person) {
+    if (person.type === translations.personTypes.events) {
+        return person.name;
+    }
+    return (person.firstName || '') + ' ' + (person.lastName || '');
+}
+
 // This method returns the cases/events that a contact has been exposed to
 // It can return either as a string or as an array of cases
-export function handleExposedTo(contact, returnString, cases, events) {
+export function handleExposedTo1(contact, returnString, cases, events) {
     if (!contact || !contact.relationships || !Array.isArray(contact.relationships) || contact.relationships.length === 0) {
         return ' ';
     }
@@ -497,26 +525,11 @@ export function getNumberOfFilesProcessed() {
     return numberOfFilesProcessed;
 }
 
-export function processFilePouch(path, type, totalNUmberOfFiles, dispatch, isFirstTime, forceBulk, encryptedData, hubConfig) {
+export function processFilePouch(path, type, totalNumberOfFiles, dispatch, isFirstTime, forceBulk, encryptedData, hubConfig) {
     let fileName = path.split('/')[path.split('/').length - 1];
     let unzipLocation = path.substr(0, (path.length - fileName.length));
     return Promise.resolve()
-        .then(() => {
-            return RNFetchBlobFS.exists(path)
-        })
-        .then((exists) => {
-            if (exists) {
-                return encryptedData ? processEncryptedFile(path, hubConfig) : processUnencryptedFile(path, fileName, unzipLocation, type, isFirstTime, forceBulk);
-            } else {
-                return Promise.reject('File does not exist');
-            }
-        })
-        .then((promiseResponse) => {
-            if (!encryptedData) {
-                return Promise.resolve(promiseResponse);
-            }
-            return processUnencryptedFile(path, fileName, unzipLocation, type, isFirstTime, forceBulk)
-        })
+        .then(() => processFileGeneral(path, fileName, unzipLocation, hubConfig, encryptedData))
         .then((data) => {
             if (data) {
                 let promiseArray = [];
@@ -550,10 +563,11 @@ function processEncryptedFile (path, hubConfig) {
         .catch((errorDecrypt) => Promise.reject(errorDecrypt));
 }
 
-function processUnencryptedFile (path, fileName, unzipLocation, type, isFirstTime, forceBulk) {
+function processUnencryptedFile (path, fileName, unzipLocation) {
     return Promise.resolve()
         .then(() => unzip(`${path}`, `${unzipLocation}`))
         .then((unzipPath) => RNFetchBlobFS.readFile(getFilePath(unzipPath, fileName), 'utf8'))
+        .then((data) => Promise.resolve(JSON.parse(data)))
         .catch((processingUnencryptedData) => {
             return Promise.reject('Error at syncing file' + fileName);
         })
@@ -561,6 +575,43 @@ function processUnencryptedFile (path, fileName, unzipLocation, type, isFirstTim
 
 function getFilePath (unzipPath, fileName) {
     return `${unzipPath}/${fileName.substring(0, fileName.length - 4)}`;
+}
+
+// The files are sorted
+export function processFilesSql(path, table, totalNumberOfFiles, dispatch, encryptedData, hubConfig) {
+    let fileName = path.split('/')[path.split('/').length - 1];
+    let unzipLocation = path.substr(0, (path.length - fileName.length));
+    return Promise.resolve()
+        .then(() => processFileGeneral(path, fileName, unzipLocation, hubConfig, encryptedData))
+        .then((data) => insertOrUpdate('common', table, data, true))
+        .then((results) => {
+            console.log('Finished syncing: ', results);
+            let numberOfFilesProcessedAux = getNumberOfFilesProcessed();
+            numberOfFilesProcessedAux += 1;
+            setNumberOfFilesProcessed(numberOfFilesProcessedAux);
+            dispatch(setSyncState(({id: 'sync', name: 'Syncing', status: numberOfFilesProcessedAux + "/" + totalNumberOfFiles})));
+            return Promise.resolve('Finished syncing');
+        })
+        .catch((errorProcessingSql) => Promise.reject(errorProcessingSql));
+}
+
+function processFileGeneral(path, fileName, unzipLocation, hubConfig, encryptedData) {
+    return Promise.resolve()
+        .then(() => RNFetchBlobFS.exists(path))
+        .then((exists) => {
+            if (exists) {
+                return encryptedData ? processEncryptedFile(path, hubConfig) : processUnencryptedFile(path, fileName, unzipLocation);
+            } else {
+                return Promise.reject('File does not exist');
+            }
+        })
+        .then((promiseResponse) => {
+            if (!encryptedData) {
+                return Promise.resolve(promiseResponse);
+            }
+            return processUnencryptedFile(path, fileName, unzipLocation)
+        })
+        .catch((errorProcessFile) => Promise.reject(errorProcessFile));
 }
 
 // hubConfig = {name, url, clientId, clientSecret, encryptDatabase}
@@ -1112,12 +1163,12 @@ export function extractIdFromPouchId (pouchId, type) {
 export function computeIdForFileType (fileType, outbreakId, file, type) {
     switch (fileType) {
         case 'person.json':
-            return (fileType + '_' + type + '_' + outbreakId + '_' + generateId());
+            return generateId();
         case 'followUp.json':
-            return (fileType + '_' + outbreakId + '_' + new Date(file.date).getTime() + '_' + generateId());
+            return generateId();
         // return (type + '_' + file.outbreakId + '_' + file._id);
         case 'relationship.json':
-            return (fileType + '_' + outbreakId + '_' + generateId());
+            return generateId();
         default:
             return (fileType + '_' + generateId());
     }
@@ -1245,7 +1296,9 @@ export function updateRequiredFields(outbreakId, userId, record, action, fileTyp
     switch (action) {
         case 'create':
             record._id = record._id ? record._id : computeIdForFileType(fileType, outbreakId, record, type);
-            record.fileType = fileType;
+            if (!sqlConstants.databaseTables.includes(fileType)) {
+                record.fileType = fileType;
+            }
             record.updatedAt = dateToBeSet;
             record.updatedBy = extractIdFromPouchId(userId, 'user');
             record.deleted = false;

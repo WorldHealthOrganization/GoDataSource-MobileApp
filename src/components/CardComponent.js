@@ -26,7 +26,8 @@ import Selector from './Selector';
 import IntervalPicker from './IntervalPicker';
 import ActionsBar from './ActionsBar';
 import translations from './../utils/translations';
-import moment from 'moment';
+import SearchableDropdown from './SearchableDropdown';
+// import moment from 'moment';
 
 class CardComponent extends PureComponent {
 
@@ -254,6 +255,14 @@ class CardComponent extends PureComponent {
                         selectedItemIndexForAgeUnitOfMeasureDropDown ={this.props.item.selectedItemIndexForAgeUnitOfMeasureDropDown}
                         translation={this.props.translation}
                         screenSize={this.props.screenSize}
+                    />
+                );
+            case 'SearchableDropdown':
+                return (
+                    <SearchableDropdown
+                        onSelectExposure={this.props.onSelectExposure}
+                        isEditMode={this.props.item.isEditMode}
+                        value={this.props.value}
                     />
                 );
             case 'WebView':

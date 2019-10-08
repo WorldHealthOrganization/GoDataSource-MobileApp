@@ -1,14 +1,25 @@
 // Here will be stored different values in relation to the sql structure
+import moment from "moment/moment";
+import translations from './../../utils/translations';
+import get from 'lodash/get';
+import set from 'lodash/set';
+import {checkArrayAndLength} from './../../utils/typeCheckingFunctions';
+import config from './../../utils/config';
+
 const databaseTables = ['person', 'followUp', 'relationship'];
 const tableStructure = {
     person: [
         {
-            fieldName: 'id',
+            fieldName: '_id',
             fieldType: 'TEXT PRIMARY KEY'
         },
         {
-            fieldName: 'firstName',
+            fieldName: 'outbreakId',
             fieldType: 'TEXT NOT NULL'
+        },
+        {
+            fieldName: 'firstName',
+            fieldType: 'TEXT'
         },
         {
             fieldName: 'lastName',
@@ -30,23 +41,35 @@ const tableStructure = {
             fieldName: 'locationId',
             fieldType: 'TEXT'
         },
+        {
+            fieldName: 'visualId',
+            fieldType: 'TEXT'
+        },
     ],
     followUp: [
         {
-            fieldName: 'id',
+            fieldName: '_id',
             fieldType: 'TEXT PRIMARY KEY'
         },
         {
-            fieldName: 'status',
-            fieldType: 'TEXT NOT NULL'
+            fieldName: 'statusId',
+            fieldType: 'TEXT'
         },
         {
             fieldName: 'date',
             fieldType: 'TEXT NOT NULL'
         },
         {
-            fieldName: 'index',
-            fieldType: 'INT NOT NULL'
+            fieldName: 'indexDay',
+            fieldType: 'INT'
+        },
+        {
+            fieldName: 'outbreakId',
+            fieldType: 'TEXT NOT NULL'
+        },
+        {
+            fieldName: 'teamId',
+            fieldType: 'TEXT'
         },
         {
             fieldName: 'personId',
@@ -58,7 +81,7 @@ const tableStructure = {
     ],
     relationship: [
         {
-            fieldName: 'id',
+            fieldName: '_id',
             fieldType: 'TEXT PRIMARY KEY'
         },
         {
@@ -142,9 +165,294 @@ const updateQueries = {
 
 };
 
-const selectQueries = {
-
+const tableNamesAndAliases = {
+    selectQueryString: 'select',
+    followUpTable: databaseTables[1],
+    personTable: databaseTables[0],
+    relationshipTable: databaseTables[2],
+    followUpAlias: 'FollowUps',
+    followUpJsonAlias: 'followUpsJson',
+    contactsAlias: 'Contacts',
+    contactsJsonAlias: 'contactsJson',
+    relationshipsAlias: 'Relations',
+    relationshipsJsonAlias: 'relationsJson',
+    exposuresAlias: 'Exposures',
+    exposuresJsonAlias: 'exposuresJson',
+    casesAlias: 'Cases',
+    casesJsonAlias: 'casesJson',
+    jsonField: tableStructure.commonFields[tableStructure.commonFields.length - 1].fieldName,
+    innerJoinField: 'inner',
+    leftJoinField: 'left',
+    all: '*'
 };
+
+const tableIds = {
+    followUpPersonIdField: `${tableNamesAndAliases.followUpAlias}.${tableStructure.followUp[tableStructure.followUp.length - 1].fieldName}`,
+    contactsIdField: `${tableNamesAndAliases.contactsAlias}.${tableStructure.person[0].fieldName}`,
+    exposuresIdField: `${tableNamesAndAliases.exposuresAlias}.${tableStructure.person[0].fieldName}`,
+    sourceIdField: `${tableNamesAndAliases.relationshipsAlias}.${tableStructure.relationship[1].fieldName}`,
+    targetIdField: `${tableNamesAndAliases.relationshipsAlias}.${tableStructure.relationship[3].fieldName}`
+};
+
+const innerQueriesStrings = {
+    filteredRelationsTable: 'filteredRelations',
+    filteredRelationsExposureId: 'filteredRelationsExposureId',
+    filteredRelationsId: 'filteredRelationsId',
+    filteredExposuresTable: 'filteredExposures',
+    unfilteredRelationsTable: 'unfilteredRelations',
+    unfilteredRelationsExposureId: 'unfilteredRelationsExposureId',
+    unfilteredRelationsId: 'unfilteredRelationsId',
+    unfilteredExposuresTable: 'unfilteredExposures',
+    unfilteredExposuresAllExposures: 'AllExposures'
+};
+
+const selectQueries = {
+    contactsBaseQuery: {
+        type: tableNamesAndAliases.selectQueryString,
+        alias: tableNamesAndAliases.contactsAlias,
+        fields: [
+            {
+                table: tableNamesAndAliases.contactsAlias,
+                name: tableNamesAndAliases.jsonField,
+                alias: tableNamesAndAliases.contactsJsonAlias
+            }
+        ],
+        query: {
+            type: tableNamesAndAliases.selectQueryString,
+            alias: 'mappedData',
+            table: null
+        }
+        // condition: {'FollowUps.date': {$gt: moment.utc().subtract(30, 'd')._d.toISOString()}},
+        // sort: {'Contacts._id': 1},
+        // limit: 30
+    },
+    getContactsWithExposures: {
+        type: 'select',
+        table: 'person',
+        alias: 'filteredContacts',
+        fields: [
+            {
+                table: 'filteredContacts',
+                name: 'json',
+                alias: 'ContactData'
+            },
+            {
+                func: {
+                    name: 'group_concat',
+                    args: [{field: 'unfilteredData.AllExposures'}, '***']
+                },
+                alias: 'AllOfExposures'
+            }
+        ],
+        join: [
+            {
+                type: 'left',
+                query: createInnerQuery(false, translations.personTypes.contacts),
+                alias: 'filteredData',
+                on: {'filteredContacts._id': 'filteredData.filteredRelationsTargetId'}
+            },
+            {
+                type: 'left',
+                query: createInnerQuery(true, translations.personTypes.contacts),
+                alias: 'unfilteredData',
+                on: {'filteredContacts._id': 'unfilteredData.unfilteredRelationsTargetId'}
+            }
+        ],
+        group: 'filteredData.filteredRelationsId'
+    }
+};
+
+const mainQueryStrings = {
+    outerFilter: 'outerFilter',
+    mainData: 'MainData',
+    idField: 'IdField',
+    allOfExposures: 'AllOfExposures'
+};
+
+function createMainQuery(dataType, outbreakId, filter, search, lastElement) {
+    dataType = dataType ? dataType : translations.personTypes.contacts;
+    let sort = {};
+    let notQuery = [];
+    let outerFilterCondition = {
+        [`${mainQueryStrings.outerFilter}.deleted`]: 0,
+        [`${mainQueryStrings.outerFilter}.type`]: dataType,
+        // [`${innerQueriesStrings.filteredExposuresTable}.deleted`]: 0,
+        [`${mainQueryStrings.outerFilter}.outbreakId`]: outbreakId,
+        // [`${innerQueriesStrings.filteredExposuresTable}.outbreakId`]: outbreakId
+    };
+    if (search) {
+        if (dataType === translations.personTypes.cases) {
+            outerFilterCondition['$or'] = [
+                {[`${mainQueryStrings.outerFilter}.firstName`]: {'$like': `%${search}%`}},
+                {[`${mainQueryStrings.outerFilter}.lastName`]: {'$like': `%${search}%`}},
+                {[`${mainQueryStrings.outerFilter}.visualId`]: {'$like': `%${search}%`}},
+                // {[`${innerQueriesStrings.filteredExposuresTable}.firstName`]: {'$like': `%${search}%`}},
+                // {[`${innerQueriesStrings.filteredExposuresTable}.lastName`]: {'$like': `%${search}%`}},
+            ]
+        } else {
+            outerFilterCondition['$or'] = [
+                {[`${mainQueryStrings.outerFilter}.firstName`]: {'$like': `%${search}%`}},
+                {[`${mainQueryStrings.outerFilter}.lastName`]: {'$like': `%${search}%`}},
+                {[`${mainQueryStrings.outerFilter}.visualId`]: {'$like': `%${search}%`}},
+                {[`${innerQueriesStrings.filteredExposuresTable}.firstName`]: {'$like': `%${search}%`}},
+                {[`${innerQueriesStrings.filteredExposuresTable}.lastName`]: {'$like': `%${search}%`}},
+                {[`${innerQueriesStrings.filteredExposuresTable}.visualId`]: {'$like': `%${search}%`}}
+            ]
+        }
+    }
+    if (checkArrayAndLength(get(filter, 'age', null)) && filter.age.length === 2) {
+        outerFilterCondition[`${mainQueryStrings.outerFilter}.age`] = {
+            ['$gte']: get(filter, 'age[0]', 0),
+            ['$lte']: get(filter, 'age[1]', 150)
+        };
+    }
+    if (get(filter, 'gender', null) !== null) {
+        outerFilterCondition[`${mainQueryStrings.outerFilter}.gender`] = filter.gender;
+    }
+    if (checkArrayAndLength(get(filter, 'categories', null))) {
+        outerFilterCondition[`${mainQueryStrings.outerFilter}.categoryId`] = {
+            ['$in']: filter.categories
+        };
+    }
+    if (checkArrayAndLength(get(filter, 'selectedLocations', null))) {
+        outerFilterCondition[`${mainQueryStrings.outerFilter}.locationId`] = {
+            ['$in']: filter.selectedLocations
+        };
+    }
+    if (checkArrayAndLength(get(filter, 'sort', null))) {
+        for(let i=0; i<filter.sort.length; i++) {
+            let sortOrder = get(filter, `sort[${i}].sortOrder`, null) === translations.sortTab.sortOrderAsc ? 1 : -1;
+            if (get(filter, `sort[${i}].sortCriteria`, null) === translations.sortTab.sortFirstName) {
+                sort[`${mainQueryStrings.outerFilter}.firstName`] = sortOrder;
+                if (lastElement) {
+                    outerFilterCondition[`${mainQueryStrings.outerFilter}.firstName`] = {[sortOrder === 1 ? `$gte` : `$lte`]: get(lastElement, 'firstName', null)};
+                    notQuery.push({[`${mainQueryStrings.outerFilter}.firstName`]: get(lastElement, 'firstName', null)});
+                }
+            }
+            if (get(filter, `sort[${i}].sortCriteria`, null) === translations.sortTab.sortLastName) {
+                sort[`${mainQueryStrings.outerFilter}.lastName`] = sortOrder;
+                if (lastElement) {
+                    outerFilterCondition[`${mainQueryStrings.outerFilter}.lastName`] = {[sortOrder === 1 ? `$gte` : `$lte`]: get(lastElement, 'lastName', null)};
+                    notQuery.push({[`${mainQueryStrings.outerFilter}.lastName`]: get(lastElement, 'lastName', null)});
+                }
+            }
+        }
+        if (lastElement) {
+            notQuery.push({[`${mainQueryStrings.outerFilter}._id`]: get(lastElement, '_id', null)});
+        }
+    } else {
+        sort[`${mainQueryStrings.outerFilter}.lastName`] = 1;
+        if (lastElement) {
+            outerFilterCondition[`${mainQueryStrings.outerFilter}.lastName`] = {[`$gte`]: get(lastElement, 'lastName', null)};
+            notQuery.push({[`${mainQueryStrings.outerFilter}.lastName`]: get(lastElement, 'lastName', null)});
+            notQuery.push({[`${mainQueryStrings.outerFilter}._id`]: get(lastElement, '_id', null)});
+        }
+    }
+    outerFilterCondition['$not'] = notQuery;
+    // console.log('OuterFilterCondition: ', outerFilterCondition);
+    let query = {
+        type: tableNamesAndAliases.selectQueryString,
+        table: tableNamesAndAliases.personTable,
+        alias: mainQueryStrings.outerFilter,
+        distinct: true,
+        fields: [
+            {
+                table: mainQueryStrings.outerFilter,
+                name: tableStructure.person[0].fieldName,
+                alias: mainQueryStrings.idField
+            },
+            {
+                table: mainQueryStrings.outerFilter,
+                name: tableNamesAndAliases.jsonField,
+                alias: mainQueryStrings.mainData
+            },
+            {
+                func: {
+                    name: 'group_concat',
+                    args: [{field: `${innerQueriesStrings.unfilteredExposuresTable}.${innerQueriesStrings.unfilteredExposuresAllExposures}`}, '***']
+                },
+                alias: mainQueryStrings.allOfExposures
+            }
+        ],
+        join: [
+            {
+                type: tableNamesAndAliases.leftJoinField,
+                query: createInnerQuery(false, dataType, dataType === translations.personTypes.cases),
+                alias: innerQueriesStrings.filteredExposuresTable,
+                on: {[`${mainQueryStrings.outerFilter}.${tableStructure.person[0].fieldName}`]: `${innerQueriesStrings.filteredExposuresTable}.${innerQueriesStrings.filteredRelationsExposureId}`}
+            },
+            {
+                type: tableNamesAndAliases.leftJoinField,
+                query: createInnerQuery(true, dataType, dataType === translations.personTypes.cases),
+                alias: innerQueriesStrings.unfilteredExposuresTable,
+                on: {[`${mainQueryStrings.outerFilter}.${tableStructure.person[0].fieldName}`]: `${innerQueriesStrings.unfilteredExposuresTable}.${innerQueriesStrings.unfilteredRelationsExposureId}`}
+            }
+        ],
+        condition: outerFilterCondition,
+        group: `${innerQueriesStrings.filteredExposuresTable}.${innerQueriesStrings.filteredRelationsId}`,
+        limit: 10
+    };
+
+    sort[`${mainQueryStrings.outerFilter}._id`] = 1;
+    query['sort'] = sort;
+
+    if (dataType !== translations.personTypes.contacts) {
+        query.group = `${mainQueryStrings.outerFilter}._id`;
+    }
+
+    return query
+}
+
+function createInnerQuery(isAllExposures, differentFrom, isCase) {
+    let fields = isAllExposures ? [
+        {
+            table: innerQueriesStrings.unfilteredRelationsTable,
+            name: tableStructure.relationship[isCase ? 1 : 3].fieldName,
+            alias: innerQueriesStrings.unfilteredRelationsExposureId
+        },
+        {
+            table: innerQueriesStrings.unfilteredExposuresTable,
+            name: tableNamesAndAliases.jsonField,
+            alias: innerQueriesStrings.unfilteredExposuresAllExposures
+        }
+    ] : [
+        {
+            table: innerQueriesStrings.filteredRelationsTable,
+            name: tableStructure.relationship[isCase ? 1 : 3].fieldName,
+            alias: innerQueriesStrings.filteredRelationsExposureId
+        },
+        {
+            table: innerQueriesStrings.filteredRelationsTable,
+            name: tableStructure.relationship[0].fieldName,
+            alias: innerQueriesStrings.filteredRelationsId
+        },
+        {
+            table: innerQueriesStrings.filteredExposuresTable,
+            name: tableNamesAndAliases.all
+        },
+    ];
+    let relationTable = isAllExposures ? innerQueriesStrings.unfilteredRelationsTable : innerQueriesStrings.filteredRelationsTable;
+    let exposureTable = isAllExposures ? innerQueriesStrings.unfilteredExposuresTable : innerQueriesStrings.filteredExposuresTable;
+    return {
+        type: tableNamesAndAliases.selectQueryString,
+        table: tableNamesAndAliases.relationshipTable,
+        alias: relationTable,
+        fields: fields,
+        join: [
+            {
+                type: tableNamesAndAliases.leftJoinField,
+                table: tableNamesAndAliases.personTable,
+                alias: exposureTable,
+                on: {[`${relationTable}.${tableStructure.relationship[isCase ? 3 : 1].fieldName}`]: `${exposureTable}.${tableStructure.person[0].fieldName}`}
+            }
+        ],
+        condition: {
+            [`${exposureTable}.type`]: {'$ne': differentFrom},
+            [`${relationTable}.deleted`]: 0,
+            [`${exposureTable}.deleted`]: 0
+        }
+    }
+}
 
 export default {
     databaseTables,
@@ -153,5 +461,7 @@ export default {
     insertOrUpdateQueries,
     updateQueries,
     selectQueries,
-    relationshipsMappedFields
+    relationshipsMappedFields,
+    tableNamesAndAliases,
+    createMainQuery
 }

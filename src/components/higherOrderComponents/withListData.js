@@ -1,0 +1,382 @@
+import React, {Component} from 'react'
+import {Alert, BackHandler} from 'react-native';
+import PropTypes from 'prop-types'
+import get from 'lodash/get';
+import {createDate} from './../../utils/functions';
+import {getTranslation, navigation, extractMainAddress} from "../../utils/functions";
+import RNExitApp from "react-native-exit-app";
+import translations from "../../utils/translations";
+import constants from './../../utils/constants';
+import {getCaseAndExposuresById} from './../../actions/cases';
+
+// Here have access to redux props
+export function enhanceListWithGetData(methodForGettingData, screenType) {
+    return function withDataHandling(WrappedComponent) {
+        class WithListData extends Component {
+            static navigatorStyle = {
+                navBarHidden: true
+            };
+
+            constructor(props) {
+                super(props);
+                let now = createDate();
+                this.state={
+                    searchText: '',
+                    mainFilter: {},
+                    followUpFilter: {
+                        date: now,
+                        statusId: null
+                    },
+                    data: [],
+                    lastElement: null,
+                    limit: 15
+                };
+
+                this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this));
+            }
+
+            componentDidMount() {
+                BackHandler.addEventListener('hardwareBackPress', this.handleBackButtonClick);
+                this.getData();
+            }
+
+            componentWillUnmount() {
+                BackHandler.removeEventListener('hardwareBackPress', this.handleBackButtonClick);
+            };
+
+            handleBackButtonClick() {
+                Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.alertMessages.androidBackButtonMsg, this.props.translation), [
+                    {
+                        text: getTranslation(translations.alertMessages.yesButtonLabel, this.props.translation), onPress: () => {
+                            RNExitApp.exitApp();
+                            return true;
+                        }
+                    },
+                    {
+                        text: getTranslation(translations.alertMessages.cancelButtonLabel, this.props.translation), onPress: () => {
+                            return true;
+                        }
+                    }
+                ]);
+                return true;
+            };
+
+
+            render() {
+                let props = Object.assign({},
+                    this.props,
+                    {
+                        data: this.state.data,
+                        mainFilter: this.state.mainFilter,
+                        followUpFilter: this.state.followUpFilter
+                    });
+                return (
+                    <WrappedComponent
+                        setSearchText={this.setSearchText}
+                        setFollowUpFilter={this.setFollowUpFilter}
+                        setMainFilter={this.setMainFilter}
+                        onRefresh={this.refresh}
+                        onPressFilter={this.onPressFilter}
+                        onPressView={this.onPressView}
+                        onPressAddExposure={this.onPressAddExposure}
+                        onPressFullName={this.onPressFullName}
+                        onPressExposure={this.onPressExposure}
+                        onEndReached={this.getData}
+                        {...props} />
+                );
+            }
+
+            prepareFilters = () => {
+                let filter = {};
+                switch (screenType) {
+                    case 'FollowUpsScreen':
+                        let statusId = get(this.state, 'followUpFilter.statusId.value');
+                        filter = {
+                            outbreakId: get(this.props, 'user.activeOutbreakId', null),
+                            followUpFilter: Object.assign({}, get(this.state, 'followUpFilter', null), {statusId}),
+                            userTeams: get(this.props, 'teams', null),
+                            contactsFilter: get(this.state, 'mainFilter', null),
+                            exposureFilter: get(this.state, 'searchText', null),
+                            lastElement: get(this.state, 'lastElement', null)
+                        };
+                        break;
+                    case 'ContactsScreen':
+                        filter = {
+                            outbreakId: get(this.props, 'user.activeOutbreakId', null),
+                            contactsFilter: get(this.state, 'mainFilter', null),
+                            exposureFilter: get(this.state, 'searchText', null),
+                            lastElement: get(this.state, 'lastElement', null)
+                        };
+                        break;
+                    case 'CasesScreen':
+                        filter = {
+                            outbreakId: get(this.props, 'user.activeOutbreakId', null),
+                            casesFilter: get(this.state, 'mainFilter', null),
+                            searchText: get(this.state, 'searchText', null),
+                            lastElement: get(this.state, 'lastElement', null)
+                        };
+                        break;
+                    default:
+                        break;
+                }
+                return filter;
+            };
+
+            getData = () => {
+                let filters = this.prepareFilters();
+                if (get(this.state, 'lastElement', null) === null) {
+                    this.props.setLoaderState(true);
+                }
+                methodForGettingData(filters)
+                    .then((result) => {
+                        if (get(this.state, 'lastElement', null) === null) {
+                            this.props.setLoaderState(false);
+                        }
+                        this.setState(prevState => ({
+                            data: prevState.lastElement !== null ? prevState.data.concat(result) : result,
+                            lastElement: result.length === 10 ? get(result, '[9].mainData', null) : null
+                        }))
+                    })
+                    .catch((errorGetData) => {
+                        this.props.setLoaderState(false);
+                        Alert.alert('Error', 'An error occurred while getting data', [
+                            {
+                                text: 'Ok', onPress: () => {console.log('Ok pressed')}
+                            }
+                        ])
+                    })
+            };
+
+            refresh = () => {
+                this.setState({
+                    lastElement: null
+                },() => {this.getData()})
+            };
+
+            setSearchText = (text) => {
+                this.setState(prevState => ({
+                    searchText: text
+                }), () => this.refresh())
+            };
+
+            // Here will be mostly status and date
+            setFollowUpFilter = (key, value) => {
+                this.setState(prevState => ({
+                    followUpFilter: Object.assign({}, prevState.followUpFilter, {[key]: value})
+                }), () => this.refresh())
+            };
+
+            setMainFilter = (filter) => {
+                this.setState(prevState => ({
+                    mainFilter: filter
+                }), () => this.refresh())
+            };
+
+
+            // Navigator methods
+            onPressFilter = () => {
+                this.props.navigator.showModal({
+                    screen: constants.appScreens.filterScreen,
+                    animated: true,
+                    passProps: {
+                        activeFilters: this.state.mainFilter,
+                        onApplyFilters: this.setMainFilter,
+                        screen: screenType
+                    }
+                })
+            };
+
+            // onPressView handles what happens when the user clicks on the lower left button of the list
+            onPressView = (dataToForward) => {
+                let forwardScreen = this.computeForwardScreen('onPressView');
+                let forwardProps = {
+                    isNew: false,
+                    refresh: this.refresh
+                };
+                switch (screenType) {
+                    case 'FollowUpsScreen':
+                        forwardProps.item = dataToForward;
+                        break;
+                    case 'ContactsScreen':
+                        forwardProps.contact = dataToForward;
+                        break;
+                    case 'CasesScreen':
+                        forwardProps.case = dataToForward;
+                        break;
+                    default:
+                        break;
+                }
+                if (forwardScreen) {
+                    this.props.navigator.push({
+                        screen: forwardScreen,
+                        animated: true,
+                        animationTyp: 'fade',
+                        passProps: forwardProps
+                    });
+                }
+            };
+
+            onPressAddExposure = (dataToForward) => {
+                let forwardScreen = this.computeForwardScreen('onPressAddExposure');
+                if (screenType === 'CasesScreen') {
+                    this.props.navigator.push({
+                        screen: forwardScreen,
+                        animated: true,
+                        passProps: {
+                            isNew: true,
+                            addContactFromCasesScreen: true,
+                            caseIdFromCasesScreen: dataToForward._id,
+                            caseAddress: extractMainAddress(get(dataToForward, 'addresses', [])),
+                            singleCase: dataToForward,
+                            refresh: this.refresh
+                        }
+                    })
+                } else {
+                    let dataToForwardType = 'contact';
+                    if (forwardScreen && dataToForwardType && dataToForward) {
+                        this.props.navigator.showModal({
+                            screen: forwardScreen,
+                            animated: true,
+                            passProps: {
+                                [dataToForwardType]: dataToForward,
+                                type: 'Contact',
+                                refresh: this.refresh
+                            }
+                        })
+                    }
+                }
+            };
+
+            onPressFullName = (person, prevScreen) => {
+                let forwardScreen = this.computeForwardScreen('onPressFullName');
+                let forwardedProps = {};
+                let dataToSend = screenType === 'CasesScreen' ? 'case' : 'contact';
+                forwardedProps[dataToSend] = person;
+                forwardedProps['previousScreen'] = prevScreen;
+                forwardedProps['refresh'] = this.refresh;
+
+                if (forwardScreen) {
+                    this.props.navigator.push({
+                        screen: forwardScreen,
+                        animated: true,
+                        passProps: forwardedProps
+                    })
+                }
+            };
+
+            onPressExposure = (exposure) => {
+                let forwardScreen = this.computeForwardScreen('onPressExposure');
+
+                // Exposures are shown only on the data that involves contacts so here we do a query before
+                this.getDataForExposure(get(exposure, 'id', null))
+                    .then((result) => {
+                        if (forwardScreen && result) {
+                            this.props.navigator.push({
+                                screen: forwardScreen,
+                                animated: true,
+                                passProps: {
+                                    case: get(result, 'caseData', null),
+                                    refresh: this.refresh
+                                    // previousScreen: translations.followUpsSingleScreen.title
+                                }
+                            })
+                        }
+                    })
+                    .catch((errorGetCaseExposure) => {
+                        this.props.setLoaderState(false);
+                        Alert.alert('Error', errorGetCaseExposure,
+                            [
+                                {
+                                    text: 'Ok', onPress: () => {console.log("Ok pressed")}
+                                }
+                            ])
+                    });
+            };
+            getDataForExposure = (exposureId) => {
+                if (!exposureId) {
+                    return Promise.reject("An error occurred while getting exposure data");
+                }
+                this.props.setLoaderState(true);
+                return getCaseAndExposuresById(exposureId)
+                    .then((result) => {
+                        this.props.setLoaderState(false);
+                        return result;
+                    })
+            };
+
+            computeForwardScreen = (method) => {
+                let forwardScreen = null;
+                switch(screenType) {
+                    case constants.appScreens.followUpScreen:
+                        switch (method) {
+                            case 'onPressView':
+                                forwardScreen = constants.appScreens.followUpSingleScreen;
+                                break;
+                            case 'onPressAddExposure':
+                                forwardScreen = constants.appScreens.exposureScreen;
+                                break;
+                            case 'onPressFullName':
+                                forwardScreen = constants.appScreens.contactSingleScreen;
+                                break;
+                            case 'onPressExposure':
+                                forwardScreen = constants.appScreens.caseSingleScreen;
+                                break;
+                            default:
+                                forwardScreen = null;
+                        }
+                        break;
+                    case constants.appScreens.contactsScreen:
+                        switch (method) {
+                            case 'onPressView':
+                                forwardScreen = constants.appScreens.contactSingleScreen;
+                                break;
+                            case 'onPressAddExposure':
+                                forwardScreen = constants.appScreens.exposureScreen;
+                                break;
+                            case 'onPressFullName':
+                                forwardScreen = constants.appScreens.contactSingleScreen;
+                                break;
+                            case 'onPressExposure':
+                                forwardScreen = constants.appScreens.caseSingleScreen;
+                                break;
+                            default:
+                                forwardScreen = null;
+                        }
+                        break;
+                    case constants.appScreens.casesScreen:
+                        switch (method) {
+                            case 'onPressView':
+                                forwardScreen = constants.appScreens.caseSingleScreen;
+                                break;
+                            case 'onPressAddExposure':
+                                forwardScreen = constants.appScreens.contactSingleScreen;
+                                break;
+                            case 'onPressFullName':
+                                forwardScreen = constants.appScreens.caseSingleScreen;
+                                break;
+                            case 'onPressExposure':
+                                forwardScreen = constants.appScreens.contactSingleScreen;
+                                break;
+                            default:
+                                forwardScreen = null;
+                        }
+                        break;
+                    default:
+                        break;
+                }
+
+                return forwardScreen;
+            }
+
+
+            onNavigatorEvent = (event) => {
+                navigation(event, this.props.navigator);
+            };
+        }
+
+
+        WithListData.propTypes = {};
+
+        return WithListData;
+    }
+}
