@@ -16,7 +16,10 @@ import translations from './../utils/translations';
 import QuestionCardTitle from './QuestionCardTitle';
 import QuestionCardContent from './QuestionCardContent';
 import get from "lodash/get";
-
+import cloneDeep from "lodash/cloneDeep";
+import {sortBy} from "lodash";
+import {extractAllQuestions} from "../utils/functions";
+import PreviousAnswers from "./PreviousAnswers";
 
 class QuestionCard extends PureComponent {
 
@@ -24,51 +27,31 @@ class QuestionCard extends PureComponent {
     constructor(props) {
         super(props);
         this.state = {
-
+            previousAnswers: this.props.source
         };
     }
-
-    // shouldComponentUpdate(nextProps, nextState) {
-    //     // console.log("Next source, old source: ", nextProps.source.questionnaireAnswers[nextProps.item.variable], this.props.source.questionnaireAnswers[this.props.item.variable]);
-    //     if (nextProps.isEditMode !== this.props.isEditMode ||
-    //         (nextProps.source && nextProps.source.questionnaireAnswers && nextProps.source.questionnaireAnswers[nextProps.item.variable] &&
-    //             this.props.source && this.props.source.questionnaireAnswers && this.props.source.questionnaireAnswers[this.props.item.variable] &&
-    //             !isEqual(nextProps.source.questionnaireAnswers[nextProps.item.variable], this.props.source.questionnaireAnswers[this.props.item.variable])) ||
-    //         nextProps.totalNumberOfQuestions !== this.props.totalNumberOfQuestions) {
-    //         // console.log("Next source, old source: ", nextProps.item.variable, nextProps.source.questionnaireAnswers[nextProps.item.variable], this.props.source.questionnaireAnswers[this.props.item.variable]);
-    //         return true;
-    //     }
-    //     return false;
-    // }
 
     componentDidUpdate(prevProps) {
         if (get(this.props, `source[${get(this.props, 'item.variable', null)}][0].date`, null) && get(this.props, `source[${get(this.props, 'item.variable', null)}][0].date`, null) !== get(prevProps, `source[${get(prevProps, 'item.variable', null)}][0].date`, null)) {
             this.setState({
-                answerDate: get(this.props, `source[${get(this.props, 'item.variable', null)}][0].date`, null)
+                answerDate: get(this.props, `source[${get(this.props, 'item.variable', null)}][0].date`, null),
+                previousAnswers: this.props.source
             })
         }
     }
-
-    // static getDerivedStateFromProps(props, state) {
-    //     if (props.source && props.source[props.item.variable] && Array.isArray(props.source[props.item.variable]) && props.source[props.item.variable][0] && props.source[props.item.variable][0].date) {
-    //         state.answerDate = props.source[props.item.variable][0].date;
-    //     }
-    //     return null;
-    // }
 
     // Please add here the react lifecycle methods that you need
     // The render method should have at least business logic as possible,
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
-        // console.log('Render QuestionCard: ', this.props.item, this.props.source);
         let viewWidth = calculateDimension(315, false, this.props.screenSize);
         let viewHeight = calculateDimension(30, true, this.props.screenSize);
         let marginHorizontal = calculateDimension(14, false, this.props.screenSize);
         let buttonHeight = calculateDimension(25, true, this.props.screenSize);
         let buttonWidth = calculateDimension(120, false, this.props.screenSize);
         return (
-            <ElevatedView elevation={3} style={[this.props.style, style.container, {
+            <ElevatedView elevation={3} key={this.props.key} style={[this.props.style, style.container, {
                 marginHorizontal: calculateDimension(16, false, this.props.screenSize),
                 width: calculateDimension(config.designScreenSize.width - 32, false, this.props.screenSize),
                 marginVertical: 4
@@ -86,54 +69,74 @@ class QuestionCard extends PureComponent {
                     questionCategory={this.props.item && this.props.item.category ?
                         ' - ' + getTranslation(this.props.item.category, this.props.translation) : ''}
                 />
-                <QuestionCardContent
-                    item={this.props.item}
-                    source={this.props.source}
-                    viewWidth={viewWidth}
-                    viewMarginHorizontal={marginHorizontal}
-                    hideButtons={this.props.hideButtons}
-                    buttonWidth={buttonWidth}
-                    buttonHeight={buttonHeight}
-                    onClickAddNewMultiFrequencyAnswer={this.onClickAddNewMultiFrequencyAnswer}
-                    onChangeTextAnswer={this.props.onChangeTextAnswer}
-                    onChangeDateAnswer={this.props.onChangeDateAnswer}
-                    onChangeSingleSelection={this.props.onChangeSingleSelection}
-                    onChangeMultipleSelection={this.props.onChangeMultipleSelection}
-                    isEditMode={this.props.isEditMode}
-                    onChangeAnswerDate={this.props.onChangeAnswerDate}
-                    editableQuestionDate={this.props.editableQuestionDate}
-                    onFocus={this.props.onFocus}
-                    onBlur={this.props.onBlur}
-                >
-                    <View
-                        style={{
-                            flexDirection: 'row',
-                            justifyContent: 'space-between',
-                            alignItems: 'center',
-                            width: viewWidth,
-                            marginHorizontal,
-                            height: viewHeight,
-                            marginVertical: 5
-                        }}
-                    >
-                        <Button
-                            title={getTranslation(translations.questionCardLabels.addAnswer, this.props.translation)}
-                            width={buttonWidth}
-                            height={buttonHeight}
-                            titleColor={'white'}
-                            color={styles.buttonGreen}
-                            onPress={() => {this.props.onClickAddNewMultiFrequencyAnswer(this.props.item)}}
-                        />
-                        <Button
-                            title={getTranslation(translations.questionCardLabels.previousAnswers, this.props.translation)}
-                            width={buttonWidth}
-                            height={buttonHeight}
-                            titleColor={'white'}
-                            color={styles.buttonGreen}
-                            onPress={() => {this.props.onClickShowPreviousAnswers(this.props.item)}}
-                        />
-                    </View>
-                </QuestionCardContent>
+                <View key={this.props.key}>
+                    {
+                        this.props.item.multiAnswer && this.props.isEditMode && !this.props.hideButtons ? (
+                            <View
+                                style={{
+                                    flexDirection: 'row',
+                                    justifyContent: 'space-between',
+                                    alignItems: 'center',
+                                    width: viewWidth,
+                                    marginHorizontal,
+                                    height: viewHeight,
+                                    marginVertical: 5
+                                }}
+                            >
+                                <Button
+                                    title={getTranslation(translations.questionCardLabels.addAnswer, this.props.translation)}
+                                    width={buttonWidth}
+                                    height={buttonHeight}
+                                    titleColor={'white'}
+                                    color={styles.buttonGreen}
+                                    onPress={() => {this.props.onClickAddNewMultiFrequencyAnswer(this.props.item)}}
+                                />
+                                <Button
+                                    title={getTranslation(translations.questionCardLabels.previousAnswers, this.props.translation)}
+                                    width={buttonWidth}
+                                    height={buttonHeight}
+                                    titleColor={'white'}
+                                    color={styles.buttonGreen}
+                                    onPress={() => {
+                                        // this.props.onClickShowPreviousAnswers(this.props.item)
+                                        this.props.onCollapse(this.props.item)
+                                    }}
+                                />
+                            </View>
+                        ) : (null)
+                    }
+                    <QuestionCardContent
+                        key={this.props.key}
+                        item={this.props.item}
+                        source={this.props.source}
+                        viewWidth={viewWidth}
+                        viewMarginHorizontal={marginHorizontal}
+                        hideButtons={this.props.hideButtons}
+                        buttonWidth={buttonWidth}
+                        buttonHeight={buttonHeight}
+                        onClickAddNewMultiFrequencyAnswer={this.onClickAddNewMultiFrequencyAnswer}
+                        onChangeTextAnswer={this.props.onChangeTextAnswer}
+                        onChangeDateAnswer={this.props.onChangeDateAnswer}
+                        onChangeSingleSelection={this.props.onChangeSingleSelection}
+                        onChangeMultipleSelection={this.props.onChangeMultipleSelection}
+                        isEditMode={this.props.isEditMode}
+                        onChangeAnswerDate={this.props.onChangeAnswerDate}
+                        editableQuestionDate={this.props.editableQuestionDate}
+                        onFocus={this.props.onFocus}
+                        onBlur={this.props.onBlur}
+                    />
+                    {
+                        this.props.item.multiAnswer && this.props.isEditMode && this.props.isCollapsed &&
+                        <View>
+                            <PreviousAnswers
+                                item={this.props.item}
+                                previousAnswers={this.state.previousAnswers[this.props.item.variable]}
+                                previousAnswerVariable={this.props.item.variable}
+                                onCollapse={this.props.onCollapse}
+                            />
+                        </View>
+                    }
+                </View>
             </ElevatedView>
         );
     }
@@ -141,7 +144,7 @@ class QuestionCard extends PureComponent {
     // Please write here all the methods that are not react native lifecycle methods
     onClickAddNewMultiFrequencyAnswer = (item) => {
         this.props.onClickAddNewMultiFrequencyAnswer(item);
-    }
+    };
 }
 
 

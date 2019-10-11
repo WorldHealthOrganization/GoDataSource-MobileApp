@@ -12,7 +12,8 @@ import Section from './Section';
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
 import get from 'lodash/get';
-
+import Ripple from 'react-native-material-ripple';
+import {Icon} from 'react-native-material-ui';
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 
@@ -33,32 +34,57 @@ class QuestionCardContent extends PureComponent {
         }
     }
 
-    // static getDerivedStateFromProps(props, state) {
-    //     if (props.source && props.source[props.item.variable] && Array.isArray(props.source[props.item.variable]) && props.source[props.item.variable][0] && props.source[props.item.variable][0].date) {
-    //         state.answerDate = props.source[props.item.variable][0].date;
-    //     }
-    //     return null;
-    // }
-
     render() {
         // console.log("Render QuestionCardTitle");
         return (
             <ScrollView scrollEnabled={false} keyboardShouldPersistTaps={'always'}>
+
                 {
                     this.props.item.multiAnswer ? (
-                        <DatePicker
-                            id={'answerDate'}
-                            label={'Answer Date'}
-                            value={this.state.answerDate}
-                            isEditMode={!!(this.props.isEditMode && this.props.editableQuestionDate)}
-                            isRequired={true}
-                            style={{width: this.props.viewWidth, marginHorizontal: this.props.viewMarginHorizontal}}
-                            onChange={(value, id) => {this.onChangeAnswerDate(value, this.props.item.variable)}}
-                        />
-                    ) : (null)
-                }
-                {
-                    this.handleRenderItem(this.props.item)
+                        <View style = {{
+                            flex: 1,
+                            width: this.props.viewWidth,
+                            flexDirection: this.props.isEditMode ?
+                                // (this.props.item.answerType === 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_DATE_TIME' ? 'row' : 'column') : 'column'
+                                'row' : 'column'
+                        }}>
+                            <View style={{flexDirection: 'row', marginHorizontal: this.props.viewMarginHorizontal}}>
+                                <DatePicker
+                                    id={'answerDate'}
+                                    label={'Answer Date'}
+                                    value={this.state.answerDate}
+                                    multiAnswer={ this.props.item.multiAnswer }
+                                    isEditMode={!!(this.props.isEditMode && this.props.editableQuestionDate)}
+                                    isRequired={true}
+                                    style={{
+                                        width: this.props.isEditMode ?
+                                            // (this.props.item.answerType === 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_DATE_TIME' ? (this.props.viewWidth / 2) - 25 : this.props.viewWidth - 25) : this.props.viewWidth - 25,
+                                            (this.props.viewWidth / 2) - 25 : this.props.viewWidth - 25,
+                                    }}
+                                    onChange={(value, id) => {this.onChangeAnswerDate(value, this.props.item.variable)}}
+                                />
+                                {   this.props.isEditMode &&
+                                    <View style={{
+                                        minHeight: calculateDimension(72, true, this.props.screenSize),
+                                        justifyContent: 'center',
+                                        alignItems: 'center',
+                                        width: 25,
+                                    }}>
+                                        <Ripple onPress={() => this.props.onCollapse(this.props.item)}>
+                                            <Icon name="content-copy"/>
+                                        </Ripple>
+                                    </View>
+                                }
+                            </View>
+                            <View  style={{
+                                width: this.props.isEditMode ?
+                                    // (this.props.item.answerType === 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_DATE_TIME' ? this.props.viewWidth / 2 : this.props.viewWidth) :  this.props.viewWidth,
+                                    (this.props.viewWidth / 2) : this.props.viewWidth,
+                            }}>
+                                { this.handleRenderItem(this.props.item) }
+                            </View>
+                        </View>
+                    ) : ( this.handleRenderItem(this.props.item) )
                 }
                 {
                     this.props.item.additionalQuestions ? (
@@ -72,11 +98,6 @@ class QuestionCardContent extends PureComponent {
                         </View>
                     ) : (null)
                 }
-                {
-                    this.props.item.multiAnswer && this.props.isEditMode && !this.props.hideButtons ? (
-                        this.props.children
-                    ) : (null)
-                }
             </ScrollView>
         )
     }
@@ -84,7 +105,6 @@ class QuestionCardContent extends PureComponent {
     // Please write here all the methods that are not react native lifecycle methods
     handleRenderItem = (item) => {
         // console.log('handleRenderItem: ', item);
-        // item = item.item;
         return (
             <View style={[style.containerCardComponent, {
                 minHeight: calculateDimension(72, true, this.props.screenSize)
@@ -99,7 +119,7 @@ class QuestionCardContent extends PureComponent {
     handleRenderItemByType = (item, parentId) => {
         // console.log("Answers: ", item);
 
-        let width = calculateDimension(315, false, this.props.screenSize);
+        let width = calculateDimension(300, false, this.props.screenSize);
         let marginHorizontal = calculateDimension(14, false, this.props.screenSize);
         let source = cloneDeep(this.props.source);
         if (!source) {
@@ -189,12 +209,6 @@ class QuestionCardContent extends PureComponent {
             }
         }
 
-        // console.log("### questionAnswers: ", questionAnswers, item);
-        // if (item.type === 'DropdownInput' && item.isExposure) {
-        //     item.data = this.props.cases.map((e) => {return {value: ((e.firstName ? e.firstName : '') + (e.lastName ? (" " + e.lastName) : ''))}})
-        // }
-        // console.log('Itemm: ', item);
-
         switch(item.answerType) {
             case 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_FREE_TEXT':
                 return (
@@ -209,9 +223,6 @@ class QuestionCardContent extends PureComponent {
                             let valueToSend = {
                                 date: this.state.answerDate, value: text
                             };
-                            // if (source[item.variable][0].subAnswers) {
-                            //     valueToSend.subAnswers = source[item.variable][0].subAnswers
-                            // }
                             this.props.onChangeTextAnswer(valueToSend, id, parentId);
                         }}
                         multiline={true}
@@ -235,9 +246,6 @@ class QuestionCardContent extends PureComponent {
                             let valueToSend = {
                                 date: this.state.answerDate, value: parseFloat(text)
                             };
-                            // if (source[item.variable][0].subAnswers) {
-                            //     valueToSend.subAnswers = source[item.variable][0].subAnswers
-                            // }
                             this.props.onChangeTextAnswer(valueToSend, id, parentId);
                         }}
                         multiline={true}
@@ -261,9 +269,6 @@ class QuestionCardContent extends PureComponent {
                             let valueToSend = {
                                 date: this.state.answerDate, value: date
                             };
-                            // if (source[item.variable][0].subAnswers) {
-                            //     valueToSend.subAnswers = source[item.variable][0].subAnswers
-                            // }
                             this.props.onChangeDateAnswer(valueToSend, id, parentId);
                         }}
                         style={{width: width, marginHorizontal: marginHorizontal}}
@@ -362,10 +367,9 @@ class QuestionCardContent extends PureComponent {
     };
 
     handleRenderAdditionalQuestions = (additionalQuestion, parentId) => {
-        console.log('handleRenderAdditionalQuestions: ', additionalQuestion);
         return (
-            <View>
-                <Section label={getTranslation(additionalQuestion.text, this.props.translation)} />
+            <View key={this.props.key | parentId}>
+                <Section key={this.props.key} label={getTranslation(additionalQuestion.text, this.props.translation)} />
                 {
                     this.handleRenderItemByType(additionalQuestion, parentId)
                 }
