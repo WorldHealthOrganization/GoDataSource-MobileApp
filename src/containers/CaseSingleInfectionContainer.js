@@ -13,12 +13,9 @@ import styles from './../styles';
 import Ripple from 'react-native-material-ripple';
 import CardComponent from './../components/CardComponent';
 import Button from './../components/Button';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import translations from './../utils/translations'
 import ElevatedView from 'react-native-elevated-view';
 import _ from 'lodash';
-import moment from 'moment';
-import get from "lodash/get";
 
 class CaseSingleInfectionContainer extends Component {
 
@@ -186,7 +183,7 @@ class CaseSingleInfectionContainer extends Component {
     }
 
     // Please write here all the methods that are not react native lifecycle methods
-    handleRenderItem = (item) => {
+    handleRenderItem = (item, index) => {
         let fields = item.fields.map((field) => {
             return Object.assign({}, field, { isEditMode: this.props.isEditMode })
         });
@@ -197,7 +194,7 @@ class CaseSingleInfectionContainer extends Component {
             });
         }
 
-        return this.renderItemCardComponent(fields)
+        return this.renderItemCardComponent(fields, index)
     };
 
     handleRenderItemForDateRangesList = (item, index) => {
@@ -213,17 +210,9 @@ class CaseSingleInfectionContainer extends Component {
         return this.renderItemCardComponent(fields, index)
     };
 
-    handleRenderItemForIsolationDatesList = (item, index) => {
-        let fields = config.caseSingleScreen.isolationDate.fields.map((field) => {
-            return Object.assign({}, field, { isEditMode: this.props.isEditMode })
-        });
-
-        return this.renderItemCardComponent(fields, index)
-    };
-
     renderItemCardComponent = (fields, cardIndex = null) => {
         return (
-            <ElevatedView elevation={3} style={[style.containerCardComponent, {
+            <ElevatedView elevation={3} key={cardIndex} style={[style.containerCardComponent, {
                 marginHorizontal: calculateDimension(16, false, this.props.screenSize),
                 width: calculateDimension(config.designScreenSize.width - 32, false, this.props.screenSize),
                 marginVertical: 4,
@@ -349,7 +338,7 @@ class CaseSingleInfectionContainer extends Component {
                 }
             } else if (item.id === 'dateDeceased') {
                 maximumDate = createDate(null);
-                let hasDateOfOnset = false
+                let hasDateOfOnset = false;
                 let hasDateOfReporting = false;
                 let hasDateOfInfection = false;
 
@@ -388,16 +377,6 @@ class CaseSingleInfectionContainer extends Component {
                     }
                 }
             }
-            // else if (item.objectType === 'IsolationDates'){
-            //     if (this.props.case && this.props.case.isolationDates && Array.isArray(this.props.case.isolationDates) && this.props.case.isolationDates.length > 0 && this.props.case.isolationDates[cardIndex]) {
-            //         if (this.props.case.isolationDates[cardIndex].startDate !== null && item.id !== 'startDate') {
-            //             minimumDate = this.props.case.isolationDates[cardIndex].startDate
-            //         }
-            //         if (this.props.case.isolationDates[cardIndex].endDate !== null && item.id !== 'endDate') {
-            //             maximumDate = this.props.case.isolationDates[cardIndex].endDate
-            //         }
-            //     }
-            // }
         }
 
         let dateValidation = { minimumDate, maximumDate };
@@ -517,14 +496,13 @@ class CaseSingleInfectionContainer extends Component {
     handleOnBlur = (event) => {
         // this.scrollCasesSingleInfection.props.scrollToPosition(0, 0, false)
         // this.scrollToInput(findNodeHandle(event.target))
-    }
+    };
 
     scrollToInput(reactNode) {
         // Add a 'scroll' ref to your ScrollView
         // this.scrollCasesSingleInfection.props.scrollToFocusedInput(reactNode)
     };
 }
-
 
 // Create style outside the class, or for components that will be used by other components (buttons),
 // make a global style in the config directory

@@ -1,7 +1,8 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, { Component } from 'react';
-import { View, Text, StyleSheet, Alert, ScrollView, findNodeHandle } from 'react-native';
+import {Icon} from 'react-native-material-ui';
+import { View, Text, StyleSheet, Alert, ScrollView } from 'react-native';
 import styles from './../styles';
 import NavBarCustom from './../components/NavBarCustom';
 import { connect } from "react-redux";
@@ -11,7 +12,6 @@ import { calculateDimension, getTranslation } from './../utils/functions';
 import translations from './../utils/translations';
 import ElevatedView from 'react-native-elevated-view';
 import config from './../utils/config';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import QuestionCardContent from './../components/QuestionCardContent';
 import ActionsBar from './../components/ActionsBar';
 import cloneDeep from "lodash/cloneDeep";
@@ -19,9 +19,10 @@ import get from 'lodash/get';
 import set from 'lodash/set';
 import ViewHOC from './../components/ViewHOC';
 import { extractAllQuestions } from "../utils/functions";
+import Ripple from 'react-native-material-ripple';
 import Button from './../components/Button';
 
-class PreviousAnswersScreen extends Component {
+class PreviousAnswers extends Component {
 
     static navigatorStyle = {
         navBarHidden: true
@@ -41,62 +42,29 @@ class PreviousAnswersScreen extends Component {
     // and can slow down the app
     render() {
         return (
-            <ViewHOC style={{ flex: 1, backgroundColor: 'white' }}
-                showLoader={false}
-                loaderText={"test"}
+            <ViewHOC style={{ flex: 1, backgroundColor: styles.screenBackgroundGrey,}}
+                     showLoader={false}
+                     loaderText={"test"}
             >
-                <NavBarCustom customTitle={
-                    <View
-                        style={{
-                            flex: 1,
-                            flexDirection: 'row',
-                            alignItems: 'center',
-                            justifyContent: 'space-between',
-                            height: '100%'
-                        }}
-                    >
-                        <Text style={[style.title, { marginLeft: 30 }]}>
-                            {getTranslation(translations.previousAnswersScreen.previousAnswersTitle, this.props.translation)}
-                        </Text>
-                    </View>
-                }
-                    title={null}
-                    navigator={this.props.navigator}
-                    iconName="close"
-                    handlePressNavbarButton={this.handlePressNavbarButton}
-                />
-                <View style={{ backgroundColor: styles.screenBackgroundGrey, justifyContent: 'center', alignItems: 'center' }}>
-                    <Button
-                        title={getTranslation(translations.generalButtons.saveButtonLabel, this.props.translation)}
-                        onPress={this.savePreviousAnswers}
-                        color={styles.buttonGreen}
-                        titleColor={'white'}
-                        height={calculateDimension(25, true, this.props.screenSize)}
-                        width={calculateDimension(130, false, this.props.screenSize)}
-                        style={{
-                            marginVertical: calculateDimension(12.5, true, this.props.screenSize),
-                            marginHorizontal: calculateDimension(16, false, this.props.screenSize),
-                        }} />
-
+                <View style={{
+                    backgroundColor: styles.screenBackgroundGrey,
+                    flexDirection: 'row-reverse',
+                    alignSelf: 'center',
+                    width: '100%',
+                    borderTopColor: styles.screenBackgroundGrey,
+                    borderTopWidth: 1
+                }}>
+                    <Ripple onPress={() => this.props.onCollapse(this.props.item)}>
+                        <Icon name="arrow-drop-down"/>
+                    </Ripple>
                 </View>
-                {/* <KeyboardAwareScrollView
-                    style={style.containerScrollView}
-                    contentContainerStyle={[style.contentContainerStyle, { paddingBottom: this.props.screenSize.height < 600 ? 70 : 20 }]}
-                    keyboardShouldPersistTaps={'always'}
-                    // extraHeight={20 + 81 + 70}
-                    extraHeight={0}
-                    innerRef={ref => {
-                        this.scrollPrevAnswer = ref
-                    }}
-                > */}
-                <ScrollView style={style.mapContainer} contentContainerStyle={style.containerContent}>
+                <View style={style.mapContainer} contentContainerStyle={style.containerContent}>
                     {
                         this.state && this.state.previousAnswers && Array.isArray(this.state.previousAnswers) && this.state.previousAnswers.length > 0 && this.state.previousAnswers.map((previousAnswer, index) => {
                             return this.renderListOfPreviousAnswers(previousAnswer, index);
                         })
                     }
-                </ScrollView>
-                {/* </KeyboardAwareScrollView> */}
+                </View>
             </ViewHOC>
         );
     }
@@ -108,10 +76,6 @@ class PreviousAnswersScreen extends Component {
     handleOnBlur = (event) => {
         // this.scrollPrevAnswer.props.scrollToPosition(0, 0, false)
         // this.scrollToInput(findNodeHandle(event.target))
-    }
-
-    scrollToInput(reactNode) {
-        // this.scrollPrevAnswer.props.scrollToFocusedInput(reactNode)
     };
 
     // Please write here all the methods that are not react native lifecycle methods
@@ -129,6 +93,7 @@ class PreviousAnswersScreen extends Component {
             </View>
         )
     };
+
     renderListOfPreviousAnswers = (previousAnswer, index) => {
         console.log('renderListOfPreviousAnswers: ', previousAnswer, index);
         let width = calculateDimension(config.designScreenSize.width - 32, false, this.props.screenSize);
@@ -147,7 +112,8 @@ class PreviousAnswersScreen extends Component {
                 style={{
                     width: width,
                     marginVertical: 10,
-                    backgroundColor: 'white'
+                    backgroundColor: 'white',
+                    flexDirection: 'row',
                 }}
                 elevation={5}
                 key={index}
@@ -158,7 +124,7 @@ class PreviousAnswersScreen extends Component {
                     onFocus={this.handleOnFocus}
                     onBlur={this.handleOnBlur}
                     source={source}
-                    viewWidth={viewWidth}
+                    viewWidth={viewWidth - 30}
                     viewMarginHorizontal={marginHorizontal}
                     hideButtons={true}
                     buttonWidth={buttonWidth}
@@ -182,14 +148,16 @@ class PreviousAnswersScreen extends Component {
                         this.onChangeAnswerDate(value, questionId, index)
                     }}
                 />
-                <ActionsBar
-                    textsArray={[getTranslation(translations.caseSingleScreen.deleteButton, this.props.translation)]}
-                    textsStyleArray={[{ fontFamily: 'Roboto-Regular', fontSize: 14, color: 'red', marginHorizontal }]}
-                    onPressArray={[() => { this.handleDeletePrevAnswer(index) }]}
-                    containerStyle={[{ height: 54 }]}
-                    isEditMode={true}
-                    translation={this.props.translation}
-                />
+                <View style={{
+                    minHeight: calculateDimension(72, true, this.props.screenSize),
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    width: 25
+                }}>
+                    <Ripple onPress={() => { this.handleDeletePrevAnswer(index)}}>
+                        <Icon name="delete"/>
+                    </Ripple>
+                </View>
             </ElevatedView>
         )
     };
@@ -208,12 +176,9 @@ class PreviousAnswersScreen extends Component {
         this.setState({
             previousAnswers: questionnaireAnswers,
             isModified: true
-        }
-            // , () => {
-            //     console.log ('onChangeMultipleSelection after setState', this.state.previousAnswers)
-            // }
-        )
+        });
     };
+
     onChangeSingleSelection = (value, id, parentId, index) => {
         // console.log ('onChangeSingleSelection', value, id, parentId, index);
         let questionnaireAnswers = _.cloneDeep(this.state.previousAnswers);
@@ -227,12 +192,9 @@ class PreviousAnswersScreen extends Component {
         this.setState({
             previousAnswers: questionnaireAnswers,
             isModified: true
-        }
-            // , () => {
-            //     console.log ('onChangeMultipleSelection after setState', this.state.previousAnswers)
-            // }
-        )
+        });
     };
+
     onChangeMultipleSelection = (value, id, parentId, index) => {
         // console.log ('onChangeMultipleSelection', value, id, parentId, index);
         let questionnaireAnswers = _.cloneDeep(this.state.previousAnswers);
@@ -246,12 +208,9 @@ class PreviousAnswersScreen extends Component {
         this.setState({
             previousAnswers: questionnaireAnswers,
             isModified: true
-        }
-            // , () => {
-            //     console.log ('onChangeMultipleSelection after setState', this.state.previousAnswers)
-            // }
-        )
+        });
     };
+
     onChangeDateAnswer = (value, id, parentId, index) => {
         // console.log ('onChangeDateAnswer', value, id, parentId, index);
         let questionnaireAnswers = _.cloneDeep(this.state.previousAnswers);
@@ -265,12 +224,9 @@ class PreviousAnswersScreen extends Component {
         this.setState({
             previousAnswers: questionnaireAnswers,
             isModified: true
-        }
-            // , () => {
-            //     console.log ('onChangeDateAnswer after setState', this.state.previousAnswers)
-            // }
-        )
+        });
     };
+
     onChangeAnswerDate = (value, questionId, index) => {
         let questionnaireAnswers = _.cloneDeep(this.state.previousAnswers);
 
@@ -282,27 +238,10 @@ class PreviousAnswersScreen extends Component {
             }
         }
 
-        // if (questionnaireAnswers && questionnaireAnswers[questionId] && Array.isArray(questionnaireAnswers[questionId]) && questionnaireAnswers[questionId].length) {
-        //     if (questionnaireAnswers[questionId][0] && questionnaireAnswers[questionId][index].date) {
-        //         questionnaireAnswers[questionId][0].date = value;
-        //         if (questionnaireAnswers[questionId][0].subAnswers && typeof questionnaireAnswers[questionId][index].subAnswers === "object" && Object.keys(questionnaireAnswers[questionId][index].subAnswers).length > 0) {
-        //             for (let subQuestionId in questionnaireAnswers[questionId][index].subAnswers) {
-        //                 questionnaireAnswers[questionId][index].subAnswers[subQuestionId].map((e) => {
-        //                     return {value: e.value, date: value};
-        //                 })
-        //             }
-        //         }
-        //     }
-        // }
-
         this.setState({
             previousAnswers: questionnaireAnswers,
             isModified: true
-        }
-            // , () => {
-            //     console.log ('onChangeAnswerDate after setState', this.state.previousAnswers);
-            // }
-        )
+        });
     };
 
     savePreviousAnswers = () => {
@@ -317,10 +256,12 @@ class PreviousAnswersScreen extends Component {
             {
                 text: getTranslation(translations.generalLabels.yesAnswer, this.props.translation), onPress: () => {
                     this.deletePreviousAnswer(index);
+                    this.props.onCollapse(this.props.item);
                 }
             }
         ]);
     };
+
     deletePreviousAnswer = (index) => {
         let questionnaireAnswers = cloneDeep(this.state.previousAnswers);
 
@@ -348,7 +289,7 @@ const style = StyleSheet.create({
     },
     containerScrollView: {
         flex: 1,
-        backgroundColor: styles.screenBackgroundGrey
+        backgroundColor: styles.colorWhite
     },
     contentContainerStyle: {
         alignItems: 'center'
@@ -392,4 +333,4 @@ function matchDispatchProps(dispatch) {
     }, dispatch);
 }
 
-export default connect(mapStateToProps, matchDispatchProps)(PreviousAnswersScreen);
+export default connect(mapStateToProps, matchDispatchProps)(PreviousAnswers);

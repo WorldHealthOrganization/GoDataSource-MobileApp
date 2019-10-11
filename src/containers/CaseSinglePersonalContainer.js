@@ -9,10 +9,7 @@ import {
     Text,
     StyleSheet,
     Alert,
-    ScrollView,
-    TouchableWithoutFeedback,
-    Keyboard,
-    findNodeHandle
+    ScrollView
 } from 'react-native';
 import { calculateDimension, getTranslation, createDate } from './../utils/functions';
 import config from './../utils/config';
@@ -23,10 +20,8 @@ import CardComponent from './../components/CardComponent';
 import Ripple from 'react-native-material-ripple';
 import Button from './../components/Button';
 import ElevatedView from 'react-native-elevated-view';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import translations from './../utils/translations'
 import _ from 'lodash';
-import moment from 'moment';
 
 class CaseSinglePersonalContainer extends Component {
 
@@ -122,8 +117,8 @@ class CaseSinglePersonalContainer extends Component {
                         contentContainerStyle={[style.contentContainerStyle, { paddingBottom: this.props.screenSize.height < 600 ? 70 : 20 }]}
                     >
                         {
-                            config.caseSingleScreen.personal.map((item) => {
-                                return this.handleRenderItem(item)
+                            config.caseSingleScreen.personal.map((item, index) => {
+                                return this.handleRenderItem(item, index)
                             })
                         }
                         <View style={style.container}>
@@ -157,23 +152,23 @@ class CaseSinglePersonalContainer extends Component {
     }
 
     // Please write here all the methods that are not react native lifecycle methods
-    handleRenderItem = (item) => {
+    handleRenderItem = (item, index) => {
         let fields = item.fields.map((field) => {
             return Object.assign({}, field, { isEditMode: field.id === 'visualId' ? false : this.props.isEditMode })
         });
-        return this.renderItemCardComponent(fields)
-    }
+        return this.renderItemCardComponent(fields, index)
+    };
 
     handleRenderItemForDocumentsList = (item, index) => {
         let fields = config.caseSingleScreen.document.fields.map((field) => {
             return Object.assign({}, field, { isEditMode: field.id === 'visualId' ? false : this.props.isEditMode })
         });
         return this.renderItemCardComponent(fields, index)
-    }
+    };
 
     renderItemCardComponent = (fields, cardIndex = null) => {
         return (
-            <ElevatedView elevation={3} style={[style.containerCardComponent, {
+            <ElevatedView elevation={3} key={cardIndex} style={[style.containerCardComponent, {
                 marginHorizontal: calculateDimension(16, false, this.props.screenSize),
                 width: calculateDimension(config.designScreenSize.width - 32, false, this.props.screenSize),
                 marginVertical: 4,
@@ -188,7 +183,7 @@ class CaseSinglePersonalContainer extends Component {
                 </ScrollView>
             </ElevatedView>
         );
-    }
+    };
 
     handleRenderItemCardComponent = (item, index, cardIndex) => {
         return (
@@ -202,7 +197,7 @@ class CaseSinglePersonalContainer extends Component {
 
     handleRenderItemByType = (item, cardIndex) => {
         let value = '';
-        let isEditModeForDropDownInput = true
+        let isEditModeForDropDownInput = true;
         let minimumDate = undefined;
         let maximumDate = undefined;
 
@@ -219,7 +214,7 @@ class CaseSinglePersonalContainer extends Component {
         }
 
         if (this.props.selectedItemIndexForTextSwitchSelectorForAge !== null && this.props.selectedItemIndexForTextSwitchSelectorForAge !== undefined && item.objectType === 'Case' && item.dependsOn !== undefined && item.dependsOn !== null) {
-            let itemIndexInConfigTextSwitchSelectorValues = config[item.dependsOn].map((e) => { return e.value }).indexOf(item.id)
+            let itemIndexInConfigTextSwitchSelectorValues = config[item.dependsOn].map((e) => { return e.value }).indexOf(item.id);
             if (itemIndexInConfigTextSwitchSelectorValues > -1) {
                 if (itemIndexInConfigTextSwitchSelectorValues !== this.props.selectedItemIndexForTextSwitchSelectorForAge) {
                     return
@@ -269,9 +264,9 @@ class CaseSinglePersonalContainer extends Component {
             }
         }
 
-        let dateValidation = { minimumDate, maximumDate }
+        let dateValidation = { minimumDate, maximumDate };
         return dateValidation
-    }
+    };
 
     computeDataForCasesSingleScreenDropdownInput = (item) => {
         if (item.id === 'riskLevel') {
@@ -342,7 +337,7 @@ class CaseSinglePersonalContainer extends Component {
                 }
             ])
         }
-    }
+    };
 
     handleOnFocus = (event) => {
         // this.scrollToInput(findNodeHandle(event.target))
@@ -351,7 +346,7 @@ class CaseSinglePersonalContainer extends Component {
     handleOnBlur = (event) => {
         // this.scrollCasesSinglePersonal.props.scrollToPosition(0, 0, false)
         // this.scrollToInput(findNodeHandle(event.target))
-    }
+    };
 
     scrollToInput(reactNode) {
         // Add a 'scroll' ref to your ScrollView

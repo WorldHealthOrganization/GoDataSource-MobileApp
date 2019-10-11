@@ -119,7 +119,7 @@ export function getAddress(address, returnString, locationsList) {
 }
 
 export function navigation(event, navigator) {
-    console.log('Event: ', event);
+    // console.log('Event: ', event);
     if (event.type === 'DeepLink') {
         // console.log("###");
         if (event.link.includes('Navigate')) {

@@ -27,20 +27,14 @@ import { removeErrors } from './../actions/errors';
 import { addFilterForScreen, removeFilterForScreen, saveGeneratedFollowUps, setLoaderState } from './../actions/app';
 import ElevatedView from 'react-native-elevated-view';
 import _ from 'lodash';
-import AddFollowUpScreen from './AddFollowUpScreen';
-// import GenerateFollowUpScreen from './GenerateFollowUpScreen';
-// import { LoaderScreen, Colors } from 'react-native-ui-lib';
-import { calculateDimension, navigation, extractIdFromPouchId, generateId, updateRequiredFields, getTranslation, localSortContactsForFollowUps, objSort, createDate } from './../utils/functions';
+import { calculateDimension, navigation, extractIdFromPouchId, generateId, getTranslation, localSortContactsForFollowUps, objSort, createDate } from './../utils/functions';
 import ViewHOC from './../components/ViewHOC';
 import { Popup } from 'react-native-map-link';
-import moment from 'moment';
 import translations from './../utils/translations'
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-// import { getItemByIdRequest } from './../queries/cases';
 import { pushNewEditScreen } from './../utils/screenTransitionFunctions';
 import RNExitApp from 'react-native-exit-app';
 import {createSelector} from 'reselect';
-import {mapFollowUps} from './../selectors/followUpsScreen';
 
 const scrollAnim = new Animated.Value(0);
 const offsetAnim = new Animated.Value(0);
@@ -205,7 +199,7 @@ class FollowUpsScreen extends Component {
     }
 
     componentDidMount() {
-        console.log('Component Did mount');
+        // console.log('Component Did mount');
         BackHandler.addEventListener('hardwareBackPress', this.handleBackButtonClick);
         this.mimeComponentDidMount()
     };
@@ -238,13 +232,13 @@ class FollowUpsScreen extends Component {
                     return true;
                 }
             }
-        ])
+        ]);
         return true;
     };
 
     mimeComponentDidMount = () => {
         let followUpsColors = {};
-        let refData = this.props.referenceData.filter((e) => {return e.categoryId === "LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE"})
+        let refData = this.props.referenceData.filter((e) => {return e.categoryId === "LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE"});
         for (let i=0; i<refData.length; i++) {
             followUpsColors[refData[i].value] = refData[i].colorCode || styles.buttonGreen
         }
@@ -256,7 +250,7 @@ class FollowUpsScreen extends Component {
                 this.props.getFollowUpsForOutbreakId(this.props.user.activeOutbreakId, this.state.filter, this.props.teams, null);
             }
         })
-    }
+    };
 
     clampedScroll = Animated.diffClamp(
         Animated.add(
@@ -303,10 +297,10 @@ class FollowUpsScreen extends Component {
                 ++filterNumbers
             }
         }
-        let filterText = filterNumbers === 0 ? `${getTranslation(translations.generalLabels.filterTitle, this.props.translation)}` : `${getTranslation(translations.generalLabels.filterTitle, this.props.translation)}(${filterNumbers})`
+        let filterText = filterNumbers === 0 ? `${getTranslation(translations.generalLabels.filterTitle, this.props.translation)}` : `${getTranslation(translations.generalLabels.filterTitle, this.props.translation)}(${filterNumbers})`;
 
         let followUpTitle = []; followUpTitle[0] = getTranslation(translations.followUpsScreen.followUpsTitle, this.props.translation);
-        console.log(`Refreshing: ${this.state.refreshing}   Loading: ${this.state.loading}`);
+        // console.log(`Refreshing: ${this.state.refreshing}   Loading: ${this.state.loading}`);
 
         // Here call the method for filter/sorting
         // let sortedAndFilteredFollowUps = this.filterFollowUps(this.props);
@@ -465,7 +459,7 @@ class FollowUpsScreen extends Component {
 
     // Please write here all the methods that are not react native lifecycle methods
     openCalendarModal = () => {
-        console.log("You got another thing coming");
+        // console.log("You got another thing coming");
         this.setState({
             calendarPickerOpen: !this.state.calendarPickerOpen
         })
@@ -484,7 +478,7 @@ class FollowUpsScreen extends Component {
     };
 
     startLoadingScreen = () => {
-        console.log('startLoadingScreen: ', this.state.loading);
+        // console.log('startLoadingScreen: ', this.state.loading);
         this.setState({
             loading: true
         })
@@ -562,8 +556,7 @@ class FollowUpsScreen extends Component {
     );
 
     calculateTopForDropdown = () => {
-        let dim = calculateDimension(98, true, this.props.screenSize);
-        return dim;
+        return calculateDimension(98, true, this.props.screenSize);
     };
 
     listEmptyComponent = () => {
@@ -580,7 +573,7 @@ class FollowUpsScreen extends Component {
         this.setState(prevState => ({
             filter: Object.assign({}, prevState.filter, { performed: value })
         }), () => {
-            console.log("### filter from onSelectValue: ", this.state.filter);
+            // console.log("### filter from onSelectValue: ", this.state.filter);
             if (value && ((value.label && value.label === 'All') || (value.value && value.value === 'LNG_FOLLOW_UPS_DROP_DOWN_FILTER_STATUS_LABEL_ALL'))) {
                 this.removeFromFilter({ type: 'performed' });
             } else {
@@ -593,13 +586,13 @@ class FollowUpsScreen extends Component {
         this.setState(prevState => ({
             filter: Object.assign({}, prevState.filter, { date: day })
         }), () => {
-            console.log("### filter from handleDayPress: ", this.state.filter);
+            // console.log("### filter from handleDayPress: ", this.state.filter);
             this.appendToFilter({ type: 'date', value: day });
         });
     };
 
     handlePressFollowUp = (item, contact) => {
-        console.log("### handlePressFollowUp: ", item);
+        // console.log("### handlePressFollowUp: ", item);
 
         let itemClone = Object.assign({}, item);
         if (contact && contact.addresses && Array.isArray(contact.addresses) && contact.addresses.length > 0) {
@@ -648,7 +641,7 @@ class FollowUpsScreen extends Component {
         //     }
         //     }
         // ])
-        console.log('Missed button is not here anymore');
+        // console.log('Missed button is not here anymore');
     };
 
     handleOnPressExposure = (followUp, contact) => {
@@ -668,10 +661,10 @@ class FollowUpsScreen extends Component {
         if (contact && contact.addresses && Array.isArray(contact.addresses) && contact.addresses.length > 0) {
             let contactPlaceOfResidence = contact.addresses.find((e) => {
                 return e.typeId === config.userResidenceAddress.userPlaceOfResidence
-            })
-            console.log('contactPlaceOfResidence', contactPlaceOfResidence)
-            let contactPlaceOfResidenceLatitude = contactPlaceOfResidence && contactPlaceOfResidence.geoLocation && contactPlaceOfResidence.geoLocation.coordinates && Array.isArray(contactPlaceOfResidence.geoLocation.coordinates) && contactPlaceOfResidence.geoLocation.coordinates.length === 2 && contactPlaceOfResidence.geoLocation.coordinates[1] !== undefined && contactPlaceOfResidence.geoLocation.coordinates[1] !== null ? contactPlaceOfResidence.geoLocation.coordinates[1] : 0
-            let contactPlaceOfResidenceLongitude = contactPlaceOfResidence && contactPlaceOfResidence.geoLocation && contactPlaceOfResidence.geoLocation.coordinates && Array.isArray(contactPlaceOfResidence.geoLocation.coordinates) && contactPlaceOfResidence.geoLocation.coordinates.length === 2 && contactPlaceOfResidence.geoLocation.coordinates[0] !== undefined && contactPlaceOfResidence.geoLocation.coordinates[0] !== null ? contactPlaceOfResidence.geoLocation.coordinates[0] : 0
+            });
+            // console.log('contactPlaceOfResidence', contactPlaceOfResidence)
+            let contactPlaceOfResidenceLatitude = contactPlaceOfResidence && contactPlaceOfResidence.geoLocation && contactPlaceOfResidence.geoLocation.coordinates && Array.isArray(contactPlaceOfResidence.geoLocation.coordinates) && contactPlaceOfResidence.geoLocation.coordinates.length === 2 && contactPlaceOfResidence.geoLocation.coordinates[1] !== undefined && contactPlaceOfResidence.geoLocation.coordinates[1] !== null ? contactPlaceOfResidence.geoLocation.coordinates[1] : 0;
+            let contactPlaceOfResidenceLongitude = contactPlaceOfResidence && contactPlaceOfResidence.geoLocation && contactPlaceOfResidence.geoLocation.coordinates && Array.isArray(contactPlaceOfResidence.geoLocation.coordinates) && contactPlaceOfResidence.geoLocation.coordinates.length === 2 && contactPlaceOfResidence.geoLocation.coordinates[0] !== undefined && contactPlaceOfResidence.geoLocation.coordinates[0] !== null ? contactPlaceOfResidence.geoLocation.coordinates[0] : 0;
             navigator.geolocation.getCurrentPosition(
                 (position) => {
                     this.setState({
@@ -734,7 +727,7 @@ class FollowUpsScreen extends Component {
     };
 
     handleOnChangeText = (text) => {
-        console.log("### handleOnChangeText: ", text);
+        // console.log("### handleOnChangeText: ", text);
         this.setState(prevState => ({
             filter: Object.assign({}, prevState.filter, { searchText: text })
         }), console.log('### filter after changed text: ', this.state.filter))
@@ -776,35 +769,6 @@ class FollowUpsScreen extends Component {
             this.props.addFollowUp(this.props.user.activeOutbreakId, contact.id, followUp, this.state.filter, this.props.teams, this.props.user.token);
         });
     };
-
-    // handleGenerateFollowUps = (date) => {
-    //     this.setState({
-    //         generating: true,
-    //     }, () => {
-    //         this.props.generateFollowUp(this.props.user.activeOutbreakId, this.state.filter.date, date, this.props.user.token);
-    //         this.hideMenu();
-    //     });
-    //
-    // };
-    //
-    // handleGenerateNewFollowUps = (date) => {
-    //     this.setState({
-    //         showGenerateFollowUpScreen: !this.state.showGenerateFollowUpScreen,
-    //     }, () => {
-    //         this.handleGenerateFollowUps(date);
-    //     });
-    // };
-    //
-    // handleModalGenerateFollowUps = () => {
-    //     this.hideMenu();
-    //     setTimeout(function () {
-    //         this.setState({
-    //             showGenerateFollowUpScreen: !this.state.showGenerateFollowUpScreen,
-    //         }, () => {
-    //             console.log("showGenerateFollowUpScreen", this.state.showGenerateFollowUpScreen);
-    //         });
-    //     }.bind(this), 2000);
-    // };
 
     // Append to the existing filter newProp={name: value}
     appendToFilter = (newProp) => {
@@ -848,7 +812,7 @@ class FollowUpsScreen extends Component {
     };
 
     handleOnApplyFilters = (filter) => {
-        console.log('foolowUpsScreen handleOnApplyFilters', filter)
+        // console.log('foolowUpsScreen handleOnApplyFilters', filter)
         this.setState({
             filterFromFilterScreen: filter
         }, () => {
@@ -865,7 +829,7 @@ class FollowUpsScreen extends Component {
     // This means that on the contacts screen it has to be a filter on the database
     filterContacts = () => {
         let contactsCopy = _.cloneDeep(this.props.contacts);
-        contactsCopy = localSortContactsForFollowUps(contactsCopy, this.props.filter, this.state.filter, this.state.filterFromFilterScreen)
+        contactsCopy = localSortContactsForFollowUps(contactsCopy, this.props.filter, this.state.filter, this.state.filterFromFilterScreen);
 
         // After filtering the contacts, it's time to get their respective follow-ups to show
         this.getFollowUpsFromContacts(contactsCopy);
@@ -873,7 +837,7 @@ class FollowUpsScreen extends Component {
 
     getFollowUpsFromContacts = (contacts) => {
         let followUpsToBeShown = [];
-        const { filter } = this.state
+        const { filter } = this.state;
 
         if (contacts && Array.isArray(contacts) && contacts.length > 0) {
             for (let i = 0; i < contacts.length; i++) {
@@ -899,7 +863,7 @@ class FollowUpsScreen extends Component {
     };
 
     goToHelpScreen = () => {
-        let pageAskingHelpFrom = 'followUps'
+        let pageAskingHelpFrom = 'followUps';
         this.props.navigator.showModal({
             screen: 'HelpScreen',
             animated: true,
@@ -910,7 +874,7 @@ class FollowUpsScreen extends Component {
     };
 
     handleOnPressQRCode = () => {
-        console.log('handleOnPressQRCode');
+        // console.log('handleOnPressQRCode');
 
         this.props.navigator.showModal({
             screen: 'QRScanScreen',
@@ -922,7 +886,7 @@ class FollowUpsScreen extends Component {
     };
 
     pushNewEditScreenLocal = (QRCodeInfo) => {
-        console.log('pushNewEditScreen QRCodeInfo do with method from another side', QRCodeInfo);
+        // console.log('pushNewEditScreen QRCodeInfo do with method from another side', QRCodeInfo);
 
         this.setState({
             loading: true
@@ -1165,7 +1129,7 @@ mapStateToProps = (state, ownProps) => {
         // mappedFollowUps: mappedFollowUps,
         showLoader: state.app.loaderState
     };
-}
+};
 
 function matchDispatchProps(dispatch) {
     return bindActionCreators({

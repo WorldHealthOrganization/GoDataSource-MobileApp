@@ -4,19 +4,17 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, { Component } from 'react';
-import { View, StyleSheet, findNodeHandle, ScrollView } from 'react-native';
-import { calculateDimension, extractAllQuestions, mapQuestions, getTranslation, createDate } from '../utils/functions';
+import { View, StyleSheet, ScrollView } from 'react-native';
+import { calculateDimension, extractAllQuestions, getTranslation, createDate } from '../utils/functions';
 import config from '../utils/config';
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import styles from '../styles';
 import QuestionCard from '../components/QuestionCard';
 import Button from '../components/Button';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import sortBy from 'lodash/sortBy';
 import cloneDeep from 'lodash/cloneDeep';
 import translations from './../utils/translations';
-import moment from 'moment';
 
 class CaseSingleInvestigationContainer extends Component {
 
@@ -24,31 +22,10 @@ class CaseSingleInvestigationContainer extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            previousAnswers: this.props.previousAnswers
+            previousAnswers: this.props.previousAnswers,
+            collapsedQuestions: [],
         };
     }
-
-    // static getDerivedStateFromProps(props, state) {
-    //     if (props.previousAnswers) {
-    //         state.previousAnswers = props.previousAnswers;
-    //     }
-    //     // Sort the answers by date
-    //     if (state.previousAnswers && Object.keys(state.previousAnswers).length > 0) {
-    //         for (let questionId in state.previousAnswers) {
-    //             if (Array.isArray(state.previousAnswers[questionId]) && state.previousAnswers[questionId].length > 1) {
-    //                 state.previousAnswers[questionId] = state.previousAnswers[questionId].sort((a, b) => {
-    //                     if (new Date(a.date) > new Date(b.date)) {
-    //                         return -1;
-    //                     }
-    //                     if (new Date(a.date) < new Date(b.date)) {
-    //                         return 1;
-    //                     }
-    //                     return 0;
-    //                 })
-    //             }
-    //         }
-    //     }
-    // }
 
     shouldComponentUpdate(nextProps, nextState) {
         if (nextProps.isEditMode !== this.props.isEditMode || nextProps.index === 3) {
@@ -72,23 +49,24 @@ class CaseSingleInvestigationContainer extends Component {
 
         if (previousAnswers && Object.keys(previousAnswers).length > 0) {
             for (let questionId in previousAnswers) {
-                if (Array.isArray(previousAnswers[questionId]) && previousAnswers[questionId].length > 1) {
-                    previousAnswers[questionId] = previousAnswers[questionId].sort((a, b) => {
-                        if (createDate(a.date) > createDate(b.date)) {
-                            return -1;
-                        }
-                        if (createDate(a.date) < createDate(b.date)) {
-                            return 1;
-                        }
-                        return 0;
-                    })
+                if(previousAnswers.hasOwnProperty(questionId)) {
+                    if (Array.isArray(previousAnswers[questionId]) && previousAnswers[questionId].length > 1) {
+                        previousAnswers[questionId] = previousAnswers[questionId].sort((a, b) => {
+                            if (createDate(a.date) > createDate(b.date)) {
+                                return -1;
+                            }
+                            if (createDate(a.date) < createDate(b.date)) {
+                                return 1;
+                            }
+                            return 0;
+                        })
+                    }
                 }
             }
         }
 
         let sortedQuestions = sortBy(cloneDeep(this.props.questions), ['order', 'variable']);
         sortedQuestions = extractAllQuestions(sortedQuestions, previousAnswers);
-
         return (
             <View style={{ flex: 1 }}>
                 <View style={style.container}>
@@ -162,15 +140,6 @@ class CaseSingleInvestigationContainer extends Component {
                                         ))
                         }
                     </View>
-                    {/* <KeyboardAwareScrollView
-                        style={style.containerScrollView}
-                        contentContainerStyle={[style.contentContainerStyle, {paddingBottom: this.props.screenSize.height < 600 ? 70 : 20}]}
-                        keyboardShouldPersistTaps={'always'}
-                        extraHeight={20 + 81 + 50 + 70}
-                        innerRef={ref => {
-                            this.scrollCasesSingleInvestigation = ref
-                        }}
-                    > */}
                     <ScrollView
                         style={style.containerScrollView}
                         contentContainerStyle={[style.contentContainerStyle, { paddingBottom: this.props.screenSize.height < 600 ? 70 : 20 }]}
@@ -181,41 +150,24 @@ class CaseSingleInvestigationContainer extends Component {
                             })
                         }
                     </ScrollView>
-                    {/* </KeyboardAwareScrollView> */}
                 </View>
             </View >
         );
     }
 
     // Please write here all the methods that are not react native lifecycle methods
-    handleRenderSectionedList = (item, index) => {
-        return (
-            <View>
-                <Section
-                    label={getTranslation(item.categoryName, this.props.translation)}
-                    containerStyle={{
-                        marginVertical: 10
-                    }}
-                    translation={this.props.translation}
-                />
-                {
-                    item.questions.map((item, index) => {
-                        return this.handleRenderItem(item, index)
-                    })
-                }
-            </View>
-        )
-    };
-
     handleRenderItem = (previousAnswers, item, index, totalNumberOfQuestions) => {
         if (item.inactive === false) {
             return (
                 <QuestionCard
+                    key={item.variable}
                     item={item}
                     isEditMode={this.props.isEditMode}
                     index={index + 1}
+                    isCollapsed={ this.isCollapsed(item)}
                     totalNumberOfQuestions={totalNumberOfQuestions}
                     source={previousAnswers}
+                    onCollapse={ this.collapseQuestion}
                     onChangeTextAnswer={this.props.onChangeTextAnswer}
                     onChangeSingleSelection={this.props.onChangeSingleSelection}
                     onChangeMultipleSelection={this.props.onChangeMultipleSelection}
@@ -228,7 +180,7 @@ class CaseSingleInvestigationContainer extends Component {
                 />
             )
         }
-    }
+    };
 
     handleBackButton = () => {
         this.props.handleMoveToPrevieousScreenButton()
@@ -241,14 +193,37 @@ class CaseSingleInvestigationContainer extends Component {
     handleOnBlur = (event) => {
         // this.scrollCasesSingleInvestigation.props.scrollToPosition(0, 0, false)
         // this.scrollToInput(findNodeHandle(event.target))
-    }
+    };
 
-    scrollToInput(reactNode) {
-        // Add a 'scroll' ref to your ScrollView
-        // this.scrollCasesSingleInvestigation.props.scrollToFocusedInput(reactNode)
+    isCollapsed = (item) => {
+        let isCollapsed = false;
+        let collapsedQuestions = this.state.collapsedQuestions;
+        if( collapsedQuestions.length > 0) {
+            collapsedQuestions.map((question) => {
+                if (question.order === item.order && question.text === item.text)
+                    isCollapsed = true;
+            });
+        }
+        return isCollapsed;
+    };
+
+    collapseQuestion = (item) => {
+        let collapsedQuestions = this.state.collapsedQuestions;
+        if( this.isCollapsed(item)){
+            if(collapsedQuestions.length === 1){
+                collapsedQuestions = [];
+            } else {
+                collapsedQuestions = collapsedQuestions.filter( (question) => {
+                    if( question.order !== item.order && question.text !== item.text)
+                        return item;
+                });
+            }
+        } else {
+            collapsedQuestions.push(item);
+        }
+        this.setState({ collapsedQuestions: collapsedQuestions});
     };
 }
-
 
 // Create style outside the class, or for components that will be used by other components (buttons),
 // make a global style in the config directory

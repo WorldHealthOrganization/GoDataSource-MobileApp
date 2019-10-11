@@ -12,10 +12,8 @@ import Ripple from 'react-native-material-ripple';
 import styles from './../styles';
 import config from './../utils/config';
 import _, { sortBy } from 'lodash';
-
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
-// import {Button} from 'react-native-material-ui';
 import CaseSinglePersonalContainer from './../containers/CaseSinglePersonalContainer';
 import CaseSingleAddressContainer from './../containers/CaseSingleAddressContainer';
 import CaseSingleInfectionContainer from './../containers/CaseSingleInfectionContainer';
@@ -139,7 +137,6 @@ class CaseSingleScreen extends Component {
         this.handleBackButtonClick = this.handleBackButtonClick.bind(this);
     }
 
-
     componentDidMount() {
         BackHandler.addEventListener('hardwareBackPress', this.handleBackButtonClick);
         let mappedAnswers = mapAnswers(this.props.caseInvestigationQuestions, this.state.case.questionnaireAnswers);
@@ -148,7 +145,7 @@ class CaseSingleScreen extends Component {
             mappedQuestions: mappedAnswers.mappedQuestions
         }, () => {
             console.log('Previous Answers: ', this.state.previousAnswers);
-        })
+        });
 
         if (!this.props.isNew) {
             let ageClone = { years: 0, months: 0 }
@@ -183,30 +180,6 @@ class CaseSingleScreen extends Component {
             })
         }
     }
-
-    // static getDerivedStateFromProps(props, state) {
-    //     if (props.errors && props.errors.type && props.errors.message) {
-    //         Alert.alert(props.errors.type, props.errors.message, [
-    //             {
-    //                 text: getTranslation(translations.alertMessages.okButtonLabel, props.translation),
-    //                 onPress: () => {
-    //                     state.savePressed = false;
-    //                     props.removeErrors()
-    //                 }
-    //             }
-    //         ])
-    //     } else {
-    //         if (state.savePressed || state.deletePressed) {
-    //             props.navigator.pop()
-    //         }
-    //     }
-    //
-    //     if (state.loading === true) {
-    //         state.loading = false
-    //     }
-    //
-    //     return null;
-    // }
 
     handleBackButtonClick() {
         // this.props.navigator.goBack(null);
@@ -254,7 +227,6 @@ class CaseSingleScreen extends Component {
                         }, () => {
                             this.props.removeErrors();
                         })
-                        // state.savePressed = false;
                     }
                 }
             ])
@@ -262,8 +234,8 @@ class CaseSingleScreen extends Component {
 
         return (
             <ViewHOC style={style.container}
-                showLoader={this && this.state && this.state.loading}
-                loaderText={this.props && this.props.syncState ? 'Loading' : getTranslation(translations.loadingScreenMessages.loadingMsg, this.props.translation)}
+                     showLoader={this && this.state && this.state.loading}
+                     loaderText={this.props && this.props.syncState ? 'Loading' : getTranslation(translations.loadingScreenMessages.loadingMsg, this.props.translation)}
             >
                 <NavBarCustom
                     title={null}
@@ -371,7 +343,7 @@ class CaseSingleScreen extends Component {
         }
     };
     handleMoveToNextScreenButton = () => {
-        let nextIndex = this.state.index + 1
+        let nextIndex = this.state.index + 1;
 
         this.setState({
             canChangeScreen: true,
@@ -379,7 +351,7 @@ class CaseSingleScreen extends Component {
         this.handleOnIndexChange(nextIndex)
     };
     handleMoveToPrevieousScreenButton = () => {
-        let nextIndex = this.state.index - 1
+        let nextIndex = this.state.index - 1;
 
         this.setState({
             canChangeScreen: true,
@@ -435,7 +407,6 @@ class CaseSingleScreen extends Component {
 
     //Render scene
     handleRenderScene = ({ route }) => {
-        console.log('Route: ', route);
         switch (route.key) {
             case 'personal':
                 return (
@@ -540,28 +511,6 @@ class CaseSingleScreen extends Component {
         }
     };
 
-    //Delete case
-    // handleOnPressDeleteCase = () => {
-    //     Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.alertMessages.caseDeleteConfirmation, this.props.translation), [
-    //         {
-    //             text: getTranslation(translations.alertMessages.yesButtonLabel, this.props.translation),
-    //             onPress: () => {
-    //                 this.setState ({
-    //                     deletePressed: true
-    //                 }, () => {
-    //                     this.handleOnPressSave();
-    //                 })
-    //             }
-    //         },
-    //         {
-    //             text: getTranslation(translations.alertMessages.cancelButtonLabel, this.props.translation),
-    //             onPress: () => {
-    //                 this.hideMenu();
-    //             }
-    //         }
-    //     ])
-    // };
-
     //Save case
     handleOnPressSave = () => {
         this.setState({
@@ -589,7 +538,7 @@ class CaseSingleScreen extends Component {
                                         })
                                     }
                                     if (response) {
-                                        console.log('getCasessNameForDuplicateCheckRequest response: ', response);
+                                        // console.log('getCasessNameForDuplicateCheckRequest response: ', response);
                                         if (response.length === 0) {
                                             this.saveCaseAction()
                                         } else {
@@ -689,12 +638,12 @@ class CaseSingleScreen extends Component {
                     isModified: false,
                     caseBeforeEdit: {}
                 }, () => {
-                    let caseWithRequiredFields = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, this.state.case), action = 'update')
+                    let caseWithRequiredFields = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, this.state.case), action = 'update');
                     this.setState(prevState => ({
                         case: Object.assign({}, prevState.case, caseWithRequiredFields)
                     }), () => {
-                        let caseMatchFitler = this.checkIfCaseMatchFilter()
-                        console.log('caseMatchFitler', caseMatchFitler)
+                        let caseMatchFitler = this.checkIfCaseMatchFilter();
+                        console.log('caseMatchFitler', caseMatchFitler);
                         this.props.updateCase(this.props.user.activeOutbreakId, this.state.case._id, this.state.case, this.props.user.token, caseMatchFitler);
                     })
                 });
@@ -708,12 +657,12 @@ class CaseSingleScreen extends Component {
                         this.setState(prevState => ({
                             case: Object.assign({}, prevState.case, caseWithRequiredFields)
                         }), () => {
-                            let caseMatchFitler = this.checkIfCaseMatchFilter()
-                            console.log('caseMatchFitler', caseMatchFitler)
+                            let caseMatchFitler = this.checkIfCaseMatchFilter();
+                            console.log('caseMatchFitler', caseMatchFitler);
                             this.props.addCase(this.props.user.activeOutbreakId, this.state.case, this.props.user.token, caseMatchFitler);
                         })
                     } else {
-                        let caseWithRequiredFields = null
+                        let caseWithRequiredFields = null;
                         if (this.state.deletePressed === true) {
                             caseWithRequiredFields = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, this.state.case), action = 'delete', fileType = 'person.json', type = 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE')
                         } else {
@@ -722,15 +671,15 @@ class CaseSingleScreen extends Component {
                         this.setState(prevState => ({
                             case: Object.assign({}, prevState.case, caseWithRequiredFields)
                         }), () => {
-                            let caseMatchFitler = this.checkIfCaseMatchFilter()
-                            console.log('caseMatchFitler', caseMatchFitler)
+                            let caseMatchFitler = this.checkIfCaseMatchFilter();
+                            console.log('caseMatchFitler', caseMatchFitler);
                             this.props.updateCase(this.props.user.activeOutbreakId, this.state.case._id, this.state.case, this.props.user.token, caseMatchFitler);
                         })
                     }
                 });
             }
         })
-    }
+    };
     //Breadcrumb click
     handlePressBreadcrumb = () => {
         if (this.state.isModified === true) {
@@ -763,7 +712,7 @@ class CaseSingleScreen extends Component {
 
     checkIfCaseMatchFilter = () => {
         if (this.props.filter && (this.props.filter['CasesFilterScreen'] || this.props.filter['CasesScreen'])) {
-            let caseCopy = [_.cloneDeep(this.state.case)]
+            let caseCopy = [_.cloneDeep(this.state.case)];
 
             // Take care of search filter
             if (this.state.filter.searchText) {
@@ -798,7 +747,7 @@ class CaseSingleScreen extends Component {
                 caseCopy = caseCopy.filter((e) => {
                     let addresses = e.addresses.filter((k) => {
                         return k.locationId !== '' && this.state.filterFromFilterScreen.selectedLocations.indexOf(k.locationId) >= 0
-                    })
+                    });
                     return addresses.length > 0
                 })
             }
@@ -872,7 +821,7 @@ class CaseSingleScreen extends Component {
                                 {
                                     text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
                                     onPress: () => {
-                                        this.setState({ loading: false })
+                                        this.setState({ loading: false });
                                         this.hideMenu()
                                     }
                                 },
@@ -1008,7 +957,7 @@ class CaseSingleScreen extends Component {
                     caseAddressesClone.splice(index, 1);
 
                     let hasPlaceOfResidence = false;
-                    let caselaceOfResidence = caseAddressesClone.find((e) => { return e.typeId === config.userResidenceAddress.userPlaceOfResidence })
+                    let caselaceOfResidence = caseAddressesClone.find((e) => { return e.typeId === config.userResidenceAddress.userPlaceOfResidence });
                     if (caselaceOfResidence !== undefined) {
                         hasPlaceOfResidence = true
                     }
@@ -1264,7 +1213,6 @@ class CaseSingleScreen extends Component {
         let unAnsweredQuestions = checkRequiredQuestions(sortedQuestions, this.state.previousAnswers);
 
         return unAnsweredQuestions;
-        // return true;
     };
     checkRequiredFields = () => {
         let requiredFields = [];
@@ -1419,9 +1367,9 @@ class CaseSingleScreen extends Component {
         } else {
             if (objectTypeOrIndex === 'Case') {
                 this.setState((prevState) => ({
-                    case: Object.assign({}, prevState.case, { [id]: value }),
-                    isModified: true
-                })
+                        case: Object.assign({}, prevState.case, { [id]: value }),
+                        isModified: true
+                    })
                     , () => {
                         // console.log("onChangeDate", id, " ", value, " ", this.state.case);
                     })
@@ -1580,9 +1528,9 @@ class CaseSingleScreen extends Component {
         } else {
             if (objectType === 'Case') {
                 this.setState((prevState) => ({
-                    case: Object.assign({}, prevState.case, { [id]: value }),
-                    isModified: true
-                })
+                        case: Object.assign({}, prevState.case, { [id]: value }),
+                        isModified: true
+                    })
                     // , () => {
                     // console.log("onChangeSwitch", id, " ", value, " ", this.state.case);
                     // }
@@ -1606,7 +1554,7 @@ class CaseSingleScreen extends Component {
                 if (objectType === 'Address') {
                     let addressesClone = _.cloneDeep(this.state.case.addresses);
 
-                    let anotherPlaceOfResidenceWasChosen = false
+                    let anotherPlaceOfResidenceWasChosen = false;
                     if (value && value.value !== undefined) {
                         if (value.value === config.userResidenceAddress.userPlaceOfResidence) {
                             addressesClone.forEach(element => {
@@ -1619,13 +1567,13 @@ class CaseSingleScreen extends Component {
                     }
 
                     addressesClone[objectTypeOrIndex][id] = value && value.value !== undefined ? value.value : value;
-                    let hasPlaceOfResidence = false
-                    let casePlaceOfResidence = addressesClone.filter((e) => { return e.typeId === config.userResidenceAddress.userPlaceOfResidence })
+                    let hasPlaceOfResidence = false;
+                    let casePlaceOfResidence = addressesClone.filter((e) => { return e.typeId === config.userResidenceAddress.userPlaceOfResidence });
                     if (casePlaceOfResidence && casePlaceOfResidence.length > 0) {
                         hasPlaceOfResidence = true
                     }
 
-                    console.log('addressesClone', addressesClone, hasPlaceOfResidence)
+                    console.log('addressesClone', addressesClone, hasPlaceOfResidence);
                     this.setState(prevState => ({
                         case: Object.assign({}, prevState.case, { addresses: addressesClone }),
                         isModified: true,
@@ -1637,7 +1585,7 @@ class CaseSingleScreen extends Component {
                 } else if (objectType === 'Documents') {
                     let documentsClone = _.cloneDeep(this.state.case.documents);
                     documentsClone[objectTypeOrIndex][id] = value && value.value !== undefined ? value.value : value;
-                    console.log('documentsClone', documentsClone)
+                    console.log('documentsClone', documentsClone);
                     this.setState(prevState => ({
                         case: Object.assign({}, prevState.case, { documents: documentsClone }),
                         isModified: true
@@ -1689,7 +1637,7 @@ class CaseSingleScreen extends Component {
     };
     handleOnChangeTextSwitchSelector = (index, stateValue) => {
         if (stateValue === 'selectedItemIndexForAgeUnitOfMeasureDropDown') {
-            let ageClone = Object.assign({}, this.state.case.age)
+            let ageClone = Object.assign({}, this.state.case.age);
             if (!this.props.isNew) {
                 if (ageClone.years === 0 && ageClone.months !== 0) {
                     ageClone.years = ageClone.months
@@ -1728,9 +1676,9 @@ class CaseSingleScreen extends Component {
 
             //to calculate the days, first get the previous month and then subtract it
             startdateMoment.add(years, 'years').add(months, 'months');
-            var days = enddateMoment.diff(startdateMoment, 'days')
+            var days = enddateMoment.diff(startdateMoment, 'days');
 
-            console.log('calcDateDiff', { months: months, years: years })
+            console.log('calcDateDiff', { months: months, years: years });
             return nrOFYears = {
                 months: months,
                 years: years,
@@ -1746,7 +1694,7 @@ class CaseSingleScreen extends Component {
         })
     };
     ageAndDobPrepareForSave = () => {
-        let dobClone = null
+        let dobClone = null;
         let ageClone = { years: 0, months: 0 }
 
         if (this.state.case.dob !== null && this.state.case.dob !== undefined) {
@@ -1763,10 +1711,10 @@ class CaseSingleScreen extends Component {
                 }
             }
         } else if (this.state.selectedItemIndexForAgeUnitOfMeasureDropDown === 0 && this.state.case.dob === null) {
-            //years dropdown 
+            //years dropdown
             ageClone.years = this.state.case.age.years
         } else if (this.state.selectedItemIndexForAgeUnitOfMeasureDropDown === 1 && this.state.case.dob === null) {
-            //months dropdown 
+            //months dropdown
             ageClone.months = this.state.case.age.months
         }
 
@@ -1809,9 +1757,9 @@ class CaseSingleScreen extends Component {
 
         // questionnaireAnswers[id] = value;
         this.setState(prevState => ({
-            previousAnswers: questionnaireAnswers,
-            isModified: true
-        })
+                previousAnswers: questionnaireAnswers,
+                isModified: true
+            })
             , () => {
                 console.log ('onChangeMultipleSelection after setState', this.state.previousAnswers)
             }
@@ -1846,9 +1794,9 @@ class CaseSingleScreen extends Component {
         }
         // questionnaireAnswers[id] = value.value;
         this.setState(prevState => ({
-            previousAnswers: questionnaireAnswers,
-            isModified: true
-        })
+                previousAnswers: questionnaireAnswers,
+                isModified: true
+            })
             // , () => {
             //     console.log ('onChangeMultipleSelection after setState', this.state.previousAnswers)
             // }
@@ -1883,9 +1831,9 @@ class CaseSingleScreen extends Component {
         }
         // questionnaireAnswers[id] = selections.map((e) => {return e.value});
         this.setState(prevState => ({
-            previousAnswers: questionnaireAnswers,
-            isModified: true
-        })
+                previousAnswers: questionnaireAnswers,
+                isModified: true
+            })
             // , () => {
             //     console.log ('onChangeMultipleSelection after setState', this.state.previousAnswers)
             // }
@@ -1920,9 +1868,9 @@ class CaseSingleScreen extends Component {
         }
         // questionnaireAnswers[id] = value;
         this.setState(prevState => ({
-            previousAnswers: questionnaireAnswers,
-            isModified: true
-        })
+                previousAnswers: questionnaireAnswers,
+                isModified: true
+            })
             //     , () => {
             //     console.log ('onChangeDateAnswer after setState', this.state.previousAnswers)
             // }
@@ -1946,18 +1894,14 @@ class CaseSingleScreen extends Component {
         this.setState({
             previousAnswers: questionnaireAnswers,
             isModified: true
-        }
-            // , () => {
-            //     console.log ('onChangeAnswerDate after setState', this.state.previousAnswers);
-            // }
-        )
+        })
     };
 
     onNavigatorEvent = (event) => {
         navigation(event, this.props.navigator);
     };
     goToHelpScreen = () => {
-        let pageAskingHelpFrom = null
+        let pageAskingHelpFrom = null;
         if (this.props.isNew !== null && this.props.isNew !== undefined && this.props.isNew === true) {
             pageAskingHelpFrom = 'casesSingleScreenAdd'
         } else {
@@ -2052,9 +1996,9 @@ class CaseSingleScreen extends Component {
 
     updateCurrentAnswers = (currentAnswers) => {
         this.setState({
-            currentAnswers: currentAnswers,
-            isModified: true
-        }
+                currentAnswers: currentAnswers,
+                isModified: true
+            }
             // , () => {
             //     console.log('CurrentAnswers: ', this.state.currentAnswers);
             // }

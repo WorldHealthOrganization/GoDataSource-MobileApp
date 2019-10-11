@@ -24,10 +24,8 @@ import Ripple from 'react-native-material-ripple';
 import translations from './../utils/translations'
 import ElevatedView from 'react-native-elevated-view';
 import _ from 'lodash';
-import moment from 'moment';
-import get from "lodash/get";
 
-class CaseSingleAddressContainer extends PureComponent {
+class CaseSingleAddressContainer extends React.Component {
 
     // This will be a container, so put as less business logic here as possible
     constructor(props) {
@@ -186,11 +184,11 @@ class CaseSingleAddressContainer extends PureComponent {
             return Object.assign({}, field, { isEditMode: this.props.isEditMode })
         });
         return this.renderItemCardComponent(fields, index)
-    }
+    };
 
     renderItemCardComponent = (fields, cardIndex = null) => {
         return (
-            <ElevatedView elevation={3} style={[style.containerCardComponent, {
+            <ElevatedView elevation={3} key={cardIndex} style={[style.containerCardComponent, {
                 marginHorizontal: calculateDimension(16, false, this.props.screenSize),
                 width: calculateDimension(config.designScreenSize.width - 32, false, this.props.screenSize),
                 marginVertical: 4,
@@ -205,7 +203,7 @@ class CaseSingleAddressContainer extends PureComponent {
                 </ScrollView>
             </ElevatedView>
         );
-    }
+    };
 
     handleRenderItemCardComponent = (item, index, cardIndex) => {
         return (
@@ -231,9 +229,9 @@ class CaseSingleAddressContainer extends PureComponent {
         if (item.type === 'DropDownSectioned') {
             if (this.props.case && this.props.case.addresses && Array.isArray(this.props.case.addresses) && this.props.case.addresses[cardIndex] && this.props.case.addresses[cardIndex][item.id] && this.props.case.addresses[cardIndex][item.id] !== "") {
                 for (let i = 0; i < this.props.locations.length; i++) {
-                    let myLocationName = this.getLocationNameById(this.props.locations[i], this.props.case.addresses[cardIndex][item.id])
+                    let myLocationName = this.getLocationNameById(this.props.locations[i], this.props.case.addresses[cardIndex][item.id]);
                     if (myLocationName !== null) {
-                        value = myLocationName
+                        value = myLocationName;
                         break
                     }
                 }
@@ -307,7 +305,7 @@ class CaseSingleAddressContainer extends PureComponent {
             }
         }
 
-        let dateValidation = { minimumDate, maximumDate }
+        let dateValidation = { minimumDate, maximumDate };
         return dateValidation
     };
 
@@ -386,7 +384,6 @@ class CaseSingleAddressContainer extends PureComponent {
         // this.scrollCasesSingleAddress.props.scrollToFocusedInput(reactNode)
     };
 }
-
 
 // Create style outside the class, or for components that will be used by other components (buttons),
 // make a global style in the config directory

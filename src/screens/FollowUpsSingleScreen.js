@@ -11,9 +11,7 @@ import NavBarCustom from './../components/NavBarCustom';
 import config from './../utils/config';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
-import {getFollowUpsForOutbreakId, getMissedFollowUpsForOutbreakId} from './../actions/followUps';
 import {TabBar, TabView, PagerScroll} from 'react-native-tab-view';
-import FollowUpsSingleGetInfoContainer from './../containers/FollowUpsSingleGetInfoContainer';
 import FollowUpsSingleContainer from './../containers/FollowUpsSingleContainer';
 import FollowUpsSingleQuestionnaireContainer from './../containers/FollowUpsSingleQuestionnaireContainer';
 import Breadcrumb from './../components/Breadcrumb';
@@ -29,7 +27,6 @@ import ViewHOC from './../components/ViewHOC';
 import AddSingleAnswerModalScreen from './AddSingleAnswerModalScreen';
 import moment from 'moment';
 import {checkArrayAndLength} from './../utils/typeCheckingFunctions';
-
 
 class FollowUpsSingleScreen extends Component {
 
@@ -72,11 +69,11 @@ class FollowUpsSingleScreen extends Component {
                 let today = createDate(null);
                 let itemDate = createDate(this.props.item.date);
 
-                var todayDate = createDate(moment.utc([today.getFullYear(), today.getMonth(), today.getDate()])._d);
+                let todayDate = createDate(moment.utc([today.getFullYear(), today.getMonth(), today.getDate()])._d);
                 let followUpDate = createDate(moment.utc([itemDate.getFullYear(), itemDate.getMonth(), itemDate.getDate()])._d);
 
                 if (followUpDate > todayDate) {
-                    console.log('follow-ups date < today => needitabil')
+                    console.log('follow-ups date < today => needitabil');
                     isEditMode = false
                 }
             } else if (this.props.role && this.props.role.find((e) => e === config.userPermissions.writeFollowUp) === undefined && this.props.role.find((e) => e === config.userPermissions.readFollowUp) !== undefined) {
@@ -151,35 +148,6 @@ class FollowUpsSingleScreen extends Component {
         }
     }
 
-
-    // static getDerivedStateFromProps(props, state) {
-    //     // console.log("FollowUpsSingleScreen: ", state);
-    //     if (props.errors && props.errors.type && props.errors.message) {
-    //         Alert.alert(props.errors.type, props.errors.message, [
-    //             {
-    //                 text: getTranslation(translations.alertMessages.okButtonLabel, props.translation),
-    //                 onPress: () => {
-    //                     state.savePressed = false;
-    //                     props.removeErrors()
-    //                 }
-    //             }
-    //         ])
-    //     } else {
-    //         if (state.savePressed || state.deletePressed) {
-    //             if (props.startLoadingScreen !== undefined) {
-    //                 props.startLoadingScreen()
-    //             }
-    //             props.navigator.pop(
-    //                 {
-    //                     animated: true,
-    //                     animationType: 'fade',
-    //                 }
-    //             )
-    //         }
-    //     }
-    //     return null;
-    // }
-
     // The render method should have at least business logic as possible,
     // because this will be called whenever there is a new setState call
     // and can slow down the app
@@ -244,24 +212,9 @@ class FollowUpsSingleScreen extends Component {
                                                     </Ripple>
                                                 }
                                             >
-                                                {/*<MenuItem onPress={this.handleOnPressMissing}>*/}
-                                                    {/*{getTranslation(translations.followUpsSingleScreen.missingButton, this.props.translation)}*/}
-                                                {/*</MenuItem>*/}
-                                                {/*<MenuItem onPress={this.handleOnPressDeceased}>*/}
-                                                {/*{getTranslation(translations.followUpsSingleScreen.deceasedButton, this.props.translation)}*/}
-                                                {/*</MenuItem>*/}
-                                                {/*<MenuItem onPress={this.handleOnPressDelete}>*/}
-                                                    {/*{getTranslation(translations.followUpsSingleScreen.deleteButton, this.props.translation)}*/}
-                                                {/*</MenuItem>*/}
                                                 <MenuItem onPress={this.handleEditContact}>
                                                     {getTranslation(translations.followUpsSingleScreen.editContactButton, this.props.translation)}
                                                 </MenuItem>
-
-                                                {/*<DateTimePicker*/}
-                                                    {/*isVisible={this.state.isDateTimePickerVisible}*/}
-                                                    {/*onConfirm={this._handleDatePicked}*/}
-                                                    {/*onCancel={this._hideDateTimePicker}*/}
-                                                {/*/>*/}
                                             </Menu>
                                         </View>
                                     ) : null
@@ -384,16 +337,6 @@ class FollowUpsSingleScreen extends Component {
         )
     };
 
-    goToHelpScreen = () => {
-        this.props.navigator.showModal({
-            screen: 'HelpScreen',
-            animated: true,
-            passProps: {
-                pageAskingHelpFrom: 'followUps'
-            }
-        });
-    }
-
     handleRenderLabel = (props) => ({ route, index }) => {
         const inputRange = props.navigationState.routes.map((x, i) => i);
 
@@ -424,9 +367,6 @@ class FollowUpsSingleScreen extends Component {
         if (this.state.item.statusId === config.followUpStatuses.notPerformed || this.state.item.statusId === translations.generalLabels.noneLabel) {
             checkRequiredFields.push(getTranslation(_.get(config, 'followUpsSingleScreen.fields[1].label', 'Status'), this.props.translation));
         }
-        // if ((_.get(this.state, 'item.fillLocation.geoLocation.lat', null) === null && _.get(this.state, 'item.fillLocation.geoLocation.lng', null) === null)) {
-        //     checkRequiredFields.push(getTranslation(_.get(config, 'followUpsSingleScreen.fields[2].label', 'Capture coordinates'), this.props.translation));
-        // }
 
         if (checkArrayAndLength(checkRequiredFields)) {
             Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), `${getTranslation(translations.alertMessages.requiredFieldsMissingError, this.props.translation)}.\n${getTranslation(translations.alertMessages.missingFields, this.props.translation)}: ${checkRequiredFields}`, [
@@ -446,12 +386,7 @@ class FollowUpsSingleScreen extends Component {
             Alert.alert("", 'You have unsaved data. Are you sure you want to leave this page and lose all changes?', [
                 {
                     text: 'Yes', onPress: () => {
-                        this.props.navigator.pop(
-                            //     {
-                            //     animated: true,
-                            //     animationType: 'fade'
-                            // }
-                        )
+                        this.props.navigator.pop()
                     }
                 },
                 {
@@ -461,12 +396,7 @@ class FollowUpsSingleScreen extends Component {
                 }
             ])
         } else {
-            this.props.navigator.pop(
-                //     {
-                //     animated: true,
-                //     animationType: 'fade'
-                // }
-            );
+            this.props.navigator.pop();
         }
     };
 
@@ -632,11 +562,7 @@ class FollowUpsSingleScreen extends Component {
                 if (!questionnaireAnswers[parentId][0].subAnswers[id]) {
                     questionnaireAnswers[parentId][0].subAnswers[id] = [];
                 }
-                // if (!questionnaireAnswers[parentId][0].subAnswers[id][0]) {
                 questionnaireAnswers[parentId][0].subAnswers[id][0] = value;
-                // } else {
-                //     questionnaireAnswers[parentId][0].subAnswers[id].push(value);
-                // }
             }
         } else {
             if (!questionnaireAnswers[id]) {
@@ -645,15 +571,10 @@ class FollowUpsSingleScreen extends Component {
             questionnaireAnswers[id][0] = value;
         }
 
-        // questionnaireAnswers[id] = value;
         this.setState({
             previousAnswers: questionnaireAnswers,
             isModified: true
-        }
-            // , () => {
-            //     console.log ('onChangeMultipleSelection after setState', this.state.previousAnswers)
-            // }
-        )
+        })
     };
     onChangeDateAnswer = (value, id, parentId) => {
         // console.log ('onChangeDateAnswer', value, id)
@@ -670,11 +591,7 @@ class FollowUpsSingleScreen extends Component {
                 if (!questionnaireAnswers[parentId][0].subAnswers[id]) {
                     questionnaireAnswers[parentId][0].subAnswers[id] = [];
                 }
-                // if (!questionnaireAnswers[parentId][0].subAnswers[id][0]) {
                 questionnaireAnswers[parentId][0].subAnswers[id][0] = value;
-                // } else {
-                //     questionnaireAnswers[parentId][0].subAnswers[id].push(value);
-                // }
             }
         } else {
             if (!questionnaireAnswers[id]) {
@@ -682,15 +599,10 @@ class FollowUpsSingleScreen extends Component {
             }
             questionnaireAnswers[id][0] = value;
         }
-        // questionnaireAnswers[id] = value;
         this.setState(prevState => ({
             previousAnswers: questionnaireAnswers,
             isModified: true
-        })
-            //     , () => {
-            //     console.log ('onChangeDateAnswer after setState', this.state.previousAnswers)
-            // }
-        )
+        }))
     };
     onChangeSingleSelection = (value, id, parentId) => {
         // console.log ('onChangeSingleSelection', value, id)
@@ -707,11 +619,7 @@ class FollowUpsSingleScreen extends Component {
                 if (!questionnaireAnswers[parentId][0].subAnswers[id]) {
                     questionnaireAnswers[parentId][0].subAnswers[id] = [];
                 }
-                // if (!questionnaireAnswers[parentId][0].subAnswers[id][0]) {
                 questionnaireAnswers[parentId][0].subAnswers[id][0] = value;
-                // } else {
-                //     questionnaireAnswers[parentId][0].subAnswers[id].push(value);
-                // }
             }
         } else {
             if (!questionnaireAnswers[id]) {
@@ -719,15 +627,10 @@ class FollowUpsSingleScreen extends Component {
             }
             questionnaireAnswers[id][0] = value;
         }
-        // questionnaireAnswers[id] = value.value;
         this.setState(prevState => ({
             previousAnswers: questionnaireAnswers,
             isModified: true
-        })
-            //     , () => {
-            //     console.log ('onChangeMultipleSelection after setState', this.state.previousAnswers)
-            // }
-        )
+        }))
     };
     onChangeMultipleSelection = (value, id, parentId) => {
         // console.log ('onChangeMultipleSelection', selections, id)
@@ -744,11 +647,7 @@ class FollowUpsSingleScreen extends Component {
                 if (!questionnaireAnswers[parentId][0].subAnswers[id]) {
                     questionnaireAnswers[parentId][0].subAnswers[id] = [];
                 }
-                // if (!questionnaireAnswers[parentId][0].subAnswers[id][0]) {
                 questionnaireAnswers[parentId][0].subAnswers[id][0] = value;
-                // } else {
-                //     questionnaireAnswers[parentId][0].subAnswers[id].push(value);
-                // }
             }
         } else {
             if (!questionnaireAnswers[id]) {
@@ -756,15 +655,10 @@ class FollowUpsSingleScreen extends Component {
             }
             questionnaireAnswers[id][0] = value;
         }
-        // questionnaireAnswers[id] = selections.map((e) => {return e.value});
         this.setState(prevState => ({
             previousAnswers: questionnaireAnswers,
             isModified: true
-        })
-            //     , () => {
-            //     console.log ('onChangeMultipleSelection after setState', this.state.previousAnswers)
-            // }
-        )
+        }))
     };
     onChangeAnswerDate = (value, questionId) => {
         let questionnaireAnswers = _.cloneDeep(this.state.previousAnswers);
@@ -784,11 +678,7 @@ class FollowUpsSingleScreen extends Component {
         this.setState({
             previousAnswers: questionnaireAnswers,
             isModified: true
-        }
-            // , () => {
-            //     console.log ('onChangeAnswerDate after setState', this.state.previousAnswers);
-            // }
-        )
+        })
     };
 
     handleOnPressSave = () => {
@@ -829,7 +719,7 @@ class FollowUpsSingleScreen extends Component {
 
             if (this.props.isNew) {
                 followUpClone = updateRequiredFields(this.props.user.activeOutbreakId, this.props.user._id, Object.assign({}, followUpClone), action = 'create', 'followUp.json');
-                console.log('followUpClone create', JSON.stringify(followUpClone))
+                console.log('followUpClone create', JSON.stringify(followUpClone));
                 this.props.createFollowUp(this.props.user.activeOutbreakId, contactClone._id, followUpClone, contactClone, null, this.props.user.token, this.props.teams)
             } else {
                 if (this.state.deletePressed === false) {
@@ -866,7 +756,7 @@ class FollowUpsSingleScreen extends Component {
     };
 
     handleEditContact = () => {
-        console.log('handleEditContact: ', JSON.stringify(this.state.contact))
+        console.log('handleEditContact: ', JSON.stringify(this.state.contact));
         this.hideMenu();
 
         this.props.navigator.push({
@@ -876,7 +766,7 @@ class FollowUpsSingleScreen extends Component {
                 handleUpdateContactFromFollowUp: this.handleUpdateContactFromFollowUp
             }
         })
-    }
+    };
 
     handleUpdateContactFromFollowUp = (updatedContact) => {
         const { item } = this.state;
@@ -894,12 +784,12 @@ class FollowUpsSingleScreen extends Component {
         this.setState({
             item: itemCpy,
             contact: updatedContact,
-        })
+        });
 
         if (this.props.mimeComponentDidMount !== undefined) {
             this.props.mimeComponentDidMount()
         }
-    }
+    };
 
     handleOnPressDelete = () => {
         // console.log("### handleOnPressDelete");
@@ -954,7 +844,7 @@ class FollowUpsSingleScreen extends Component {
     };
 
     goToHelpScreen = () => {
-        let pageAskingHelpFrom = null
+        let pageAskingHelpFrom = null;
         if (this.props.isNew !== null && this.props.isNew !== undefined && this.props.isNew === true) {
             pageAskingHelpFrom = 'followUpSingleScreenAdd'
         } else {
@@ -972,7 +862,6 @@ class FollowUpsSingleScreen extends Component {
             }
         });
     };
-
 
     // used for adding multi-frequency answers
     onClickAddNewMultiFrequencyAnswer = (item) => {
@@ -1051,11 +940,7 @@ class FollowUpsSingleScreen extends Component {
         this.setState({
             currentAnswers: currentAnswers,
             isModified: true
-        }
-            // , () => {
-            //     console.log('CurrentAnswers: ', this.state.currentAnswers);
-            // }
-        )
+        })
     };
 }
 

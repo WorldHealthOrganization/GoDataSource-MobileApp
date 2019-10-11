@@ -3,15 +3,12 @@
  */
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
-import React, { PureComponent } from 'react';
+import React, { Component } from 'react';
 import {
     View,
     StyleSheet,
     InteractionManager,
     Alert,
-    TouchableWithoutFeedback,
-    Keyboard,
-    findNodeHandle,
     ScrollView
 } from 'react-native';
 import { calculateDimension, extractAllQuestions, getTranslation, checkRequiredQuestions, createDate } from './../utils/functions';
@@ -20,16 +17,13 @@ import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import styles from './../styles';
 import QuestionCard from './../components/QuestionCard';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import Button from './../components/Button';
 import { LoaderScreen } from 'react-native-ui-lib';
-import Section from './../components/Section';
 import { sortBy } from 'lodash';
 import translations from './../utils/translations'
 import cloneDeep from "lodash/cloneDeep";
-import moment from 'moment';
 
-class FollowUpsSingleQuestionnaireContainer extends PureComponent {
+class FollowUpsSingleQuestionnaireContainer extends Component {
 
     // This will be a container, so put as less business logic here as possible
     constructor(props) {
@@ -37,18 +31,12 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
         this.state = {
             interactionComplete: false,
             questions: [],
-            previousAnswers: this.props.previousAnswers
+            previousAnswers: this.props.previousAnswers,
+            collapsedQuestions: [],
         };
     }
 
     // Please add here the react lifecycle methods that you need
-    // shouldComponentUpdate(nextProps, nextState) {
-    //     if (isEqual(nextProps.item, this.props.item)) {
-    //         return false;
-    //     }
-    //     return true;
-    // }
-
     componentDidMount() {
         InteractionManager.runAfterInteractions(() => {
             this.setState({
@@ -56,78 +44,6 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
             })
         })
     }
-
-    // shouldComponentUpdate(nextProps, nextState) {
-    //     if (nextProps.activeIndex === 1) {
-    //         return true;
-    //     }
-    //     return false;
-    // }
-
-    // componentDidUpdate(prevProps) {
-    //     if (this.props.previousAnswers && Object.keys(this.props.previousAnswers).length > 0) {
-    //         this.prepareQuestions();
-    //     }
-    // }
-    //
-    // prepareQuestions = () => {
-    //     let previousAns = Object.assign({}, this.props.previousAnswers);
-    //
-    //
-    //     for (let questionId in previousAns) {
-    //         if (Array.isArray(previousAns[questionId]) && previousAns[questionId].length > 1) {
-    //             previousAns[questionId] = previousAns[questionId].sort((a, b) => {
-    //                 if (createDate(a.date) > createDate(b.date)) {
-    //                     return -1;
-    //                 }
-    //                 if (createDate(a.date) < createDate(b.date)) {
-    //                     return 1;
-    //                 }
-    //                 return 0;
-    //             })
-    //         }
-    //     }
-    //
-    //     let sortedQuestions = sortBy(cloneDeep(this.props.questions), ['order', 'variable']);
-    //
-    //     this.setState({
-    //         questions: extractAllQuestions(sortedQuestions, previousAns),
-    //         previousAnswers: previousAns
-    //     })
-    // }
-
-    // static getDerivedStateFromProps(props, state) {
-    //     // Get all additional questions recursively
-    //     // let sortedQuestions = sortBy(props.questions, ['order', 'variable']);
-    //     // sortedQuestions = extractAllQuestions(sortedQuestions, props.item);
-    //     // state.questions = sortedQuestions;
-    //     //
-    //     // return null;
-    //     if (props.previousAnswers) {
-    //         state.previousAnswers = props.previousAnswers;
-    //     }
-    //     // Sort the answers by date
-    //     if (state.previousAnswers && Object.keys(state.previousAnswers).length > 0) {
-    //         for (let questionId in state.previousAnswers) {
-    //             if (Array.isArray(state.previousAnswers[questionId]) && state.previousAnswers[questionId].length > 1) {
-    //                 state.previousAnswers[questionId] = state.previousAnswers[questionId].sort((a, b) => {
-    //                     if (new Date(a.date) > new Date(b.date)) {
-    //                         return -1;
-    //                     }
-    //                     if (new Date(a.date) < new Date(b.date)) {
-    //                         return 1;
-    //                     }
-    //                     return 0;
-    //                 })
-    //             }
-    //         }
-    //     }
-    //
-    //     let sortedQuestions = sortBy(cloneDeep(props.questions), ['order', 'variable']);
-    //     state.questions = extractAllQuestions(sortedQuestions, state.previousAnswers);
-    //
-    //     return null;
-    // }
 
     // The render method should have at least business logic as possible,
     // because this will be called whenever there is a new setState call
@@ -154,16 +70,18 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
 
         if (previousAnswers && Object.keys(previousAnswers).length > 0) {
             for (let questionId in previousAnswers) {
-                if (Array.isArray(previousAnswers[questionId]) && previousAnswers[questionId].length > 1) {
-                    previousAnswers[questionId] = previousAnswers[questionId].sort((a, b) => {
-                        if (createDate(a.date) > createDate(b.date)) {
-                            return -1;
-                        }
-                        if (createDate(a.date) < createDate(b.date)) {
-                            return 1;
-                        }
-                        return 0;
-                    })
+                if(previousAnswers.hasOwnProperty(questionId)) {
+                    if (Array.isArray(previousAnswers[questionId]) && previousAnswers[questionId].length > 1) {
+                        previousAnswers[questionId] = previousAnswers[questionId].sort((a, b) => {
+                            if (createDate(a.date) > createDate(b.date)) {
+                                return -1;
+                            }
+                            if (createDate(a.date) < createDate(b.date)) {
+                                return 1;
+                            }
+                            return 0;
+                        })
+                    }
                 }
             }
         }
@@ -187,15 +105,6 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
                                 />
                             </View>) : (null)
                     }
-                    {/* <KeyboardAwareScrollView
-                        style={style.container}
-                        contentContainerStyle={[style.contentContainerStyle, {paddingBottom: this.props.screenSize.height < 600 ? 70 : 20}]}
-                        keyboardShouldPersistTaps={'always'}
-                        extraHeight={20 + 81 + 50 + 70}
-                        innerRef={ref => {
-                            this.scrollFollowUpsSingleQuestionnaire = ref
-                        }}
-                    > */}
                     <ScrollView
                         style={style.containerScrollView}
                         contentContainerStyle={[style.contentContainerStyle, { paddingBottom: this.props.screenSize.height < 600 ? 70 : 20 }]}
@@ -206,7 +115,6 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
                             })
                         }
                     </ScrollView>
-                    {/* </KeyboardAwareScrollView> */}
                 </View>
             </View>
         );
@@ -217,12 +125,14 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
         if (item.inactive === false) {
             return (
                 <QuestionCard
-                    key={index}
+                    key={item.variable}
                     item={item}
                     index={index + 1}
+                    isCollapsed={ this.isCollapsed(item)}
                     totalNumberOfQuestions={totalNumberOfQuestions}
                     source={this.props.previousAnswers}
                     isEditMode={this.props.isEditMode}
+                    onCollapse={ this.collapseQuestion}
                     onChangeTextAnswer={this.props.onChangeTextAnswer}
                     onChangeDateAnswer={this.props.onChangeDateAnswer}
                     onChangeSingleSelection={this.props.onChangeSingleSelection}
@@ -267,8 +177,36 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
         // Add a 'scroll' ref to your ScrollView
         // this.scrollFollowUpsSingleQuestionnaire.props.scrollToFocusedInput(reactNode)
     };
-}
 
+    isCollapsed = (item) => {
+        let isCollapsed = false;
+        let collapsedQuestions = this.state.collapsedQuestions;
+        if( collapsedQuestions.length > 0) {
+            collapsedQuestions.map((question) => {
+                if (question.order === item.order && question.text === item.text)
+                    isCollapsed = true;
+            });
+        }
+        return isCollapsed;
+    };
+
+    collapseQuestion = (item) => {
+        let collapsedQuestions = this.state.collapsedQuestions;
+        if( this.isCollapsed(item)){
+            if(collapsedQuestions.length === 1){
+                collapsedQuestions = [];
+            } else {
+                collapsedQuestions = collapsedQuestions.filter( (question) => {
+                    if( question.order !== item.order && question.text !== item.text)
+                        return item;
+                });
+            }
+        } else {
+            collapsedQuestions.push(item);
+        }
+        this.setState({ collapsedQuestions: collapsedQuestions});
+    };
+}
 
 // Create style outside the class, or for components that will be used by other components (buttons),
 // make a global style in the config directory
