@@ -460,12 +460,22 @@ class ContactsSingleScreen extends Component {
             this.hideMenu();
             addFollowUp(followUp)
                 .then((resultAddFollowUp) => {
-                    console.log('FollowUpAdded');
-                    this.props.navigator.showInAppNotification({
-                        screen: 'InAppNotificationScreen',
-                        autoDismissTimerSec: 1,
+                    // console.log('FollowUpAdded');
+                    // this.props.navigator.showInAppNotification({
+                    //     screen: 'InAppNotificationScreen',
+                    //     autoDismissTimerSec: 1,
+                    //     passProps: {
+                    //         text: 'Follow-up added'
+                    //     }
+                    // })
+                    this.props.navigator.push({
+                        screen: 'FollowUpsSingleScreen',
                         passProps: {
-                            text: 'Follow-up added'
+                            isNew: false,
+                            isEditMode: true,
+                            item: followUp,
+                            contact: this.state.contact,
+                            filter: this.state.filter,
                         }
                     })
                 })
@@ -1691,12 +1701,16 @@ class ContactsSingleScreen extends Component {
     };
 
     showMenu = () => {
-        this.refs.menuRef.show();
+        if( this.refs.menuRef) {
+            this.refs.menuRef.show();
+        }
     };
 
     hideMenu = () => {
         // this.refs['menuRef'].hide();
-        this.refs.menuRef.hide();
+        if( this.refs.menuRef) {
+            this.refs.menuRef.hide();
+        }
     };
 
     _showDateTimePicker = () => {
