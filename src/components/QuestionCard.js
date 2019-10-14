@@ -79,6 +79,7 @@ class QuestionCard extends PureComponent {
                     height={calculateDimension(43, true, this.props.screenSize)}
                     paddingRight={calculateDimension(34, true, this.props.screenSize)}
                     paddingLeft={calculateDimension(14, true, this.props.screenSize)}
+                    paddingTopBottom={calculateDimension(5, false, this.props.screenSize)}
                     marginLeft={calculateDimension(8, false, this.props.screenSize)}
                     marginRight={calculateDimension(34, false, this.props.screenSize)}
                     questionNumber={getTranslation(translations.generalLabels.questionInitial, this.props.translation).charAt(0).toUpperCase() + this.props.index}
