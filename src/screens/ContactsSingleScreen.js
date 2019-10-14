@@ -458,8 +458,8 @@ class ContactsSingleScreen extends Component {
             showAddFollowUpScreen: !this.state.showAddFollowUpScreen
         }, () => {
             this.hideMenu();
-            addFollowUp(followUp)
-                .then((resultAddFollowUp) => {
+            // addFollowUp(followUp)
+            //     .then((resultAddFollowUp) => {
                     // console.log('FollowUpAdded');
                     // this.props.navigator.showInAppNotification({
                     //     screen: 'InAppNotificationScreen',
@@ -470,18 +470,20 @@ class ContactsSingleScreen extends Component {
                     // })
                     this.props.navigator.push({
                         screen: 'FollowUpsSingleScreen',
+                        animated: true,
+                        animationType: 'fade',
                         passProps: {
-                            isNew: false,
+                            isNew: true,
                             isEditMode: true,
                             item: followUp,
                             contact: this.state.contact,
-                            filter: this.state.filter,
+                            previousScreen: getTranslation(translations.contactSingleScreen.addContactTitle, this.props.translation),
                         }
                     })
-                })
-                .catch((errorAddFollowUp) => {
-                    console.log('ErrorAddFollowUp: ', errorAddFollowUp);
-                })
+                // })
+                // .catch((errorAddFollowUp) => {
+                //     console.log('ErrorAddFollowUp: ', errorAddFollowUp);
+                // })
         });
     };
 

@@ -53,7 +53,17 @@ export function getFollowUpsForOutbreakId({outbreakId, followUpFilter, userTeams
         followUpCondition['FollowUps.statusId'] = followUpFilter.statusId
     }
     if (checkArrayAndLength(userTeams)) {
-        followUpCondition['FollowUps.teamId'] = {'$in': userTeams.map((e) => e.teamId)};
+        // userTeams = userTeams.concat([{teamId: null}]);
+        // userTeams = userTeams.concat([{teamId: ''}]);
+        followUpCondition['$or'] = [
+            {
+                ['FollowUps.teamId']: {'$in': userTeams.map((e) => e.teamId)}
+            },
+            {
+                ['FollowUps.teamId']: {'$is': null}
+            }
+        ]
+        // followUpCondition['FollowUps.teamId'] = {'$in': userTeams.map((e) => e.teamId)};
     }
 
     let contactsAndExposuresQuery = {
