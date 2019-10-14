@@ -264,12 +264,8 @@ class PreviousAnswers extends Component {
 
     deletePreviousAnswer = (index) => {
         let questionnaireAnswers = cloneDeep(this.state.previousAnswers);
-
         questionnaireAnswers.splice(index, 1);
-
-        this.setState({
-            previousAnswers: questionnaireAnswers
-        })
+        this.props.savePreviousAnswers(questionnaireAnswers, this.props.previousAnswerVariable);
     };
 }
 

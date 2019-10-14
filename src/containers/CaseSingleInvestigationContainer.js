@@ -177,6 +177,7 @@ class CaseSingleInvestigationContainer extends Component {
                     onClickShowPreviousAnswers={this.props.onClickShowPreviousAnswers}
                     onBlur={this.handleOnBlur}
                     onChangeAnswerDate={this.props.onChangeAnswerDate}
+                    savePreviousAnswers={this.props.savePreviousAnswers}
                 />
             )
         }

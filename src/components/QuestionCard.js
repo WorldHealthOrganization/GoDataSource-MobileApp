@@ -38,6 +38,12 @@ class QuestionCard extends PureComponent {
                 previousAnswers: this.props.source
             })
         }
+        //update previous answers if item was deleted
+        if(get(this.props, `source[${get(this.props, 'item.variable', null)}]`, null) && get(this.props, `source[${get(this.props, 'item.variable', null)}].length`, null) !== get(prevProps, `source[${get(prevProps, 'item.variable', null)}].length`, null)){
+            this.setState({
+                previousAnswers: this.props.source
+            });
+        }
     }
 
     // Please add here the react lifecycle methods that you need
@@ -132,6 +138,7 @@ class QuestionCard extends PureComponent {
                                 item={this.props.item}
                                 previousAnswers={this.state.previousAnswers[this.props.item.variable]}
                                 previousAnswerVariable={this.props.item.variable}
+                                savePreviousAnswers={this.props.savePreviousAnswers}
                                 onCollapse={this.props.onCollapse}
                             />
                         </View>

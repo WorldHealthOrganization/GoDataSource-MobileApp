@@ -301,6 +301,7 @@ class FollowUpsSingleScreen extends Component {
                         onClickAddNewMultiFrequencyAnswer={this.onClickAddNewMultiFrequencyAnswer}
                         onClickShowPreviousAnswers={this.onClickShowPreviousAnswers}
                         onChangeAnswerDate={this.onChangeAnswerDate}
+                        savePreviousAnswers={this.savePreviousAnswers}
                     />
                 );
             default:

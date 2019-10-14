@@ -506,6 +506,7 @@ class CaseSingleScreen extends Component {
                     onClickAddNewMultiFrequencyAnswer={this.onClickAddNewMultiFrequencyAnswer}
                     onClickShowPreviousAnswers={this.onClickShowPreviousAnswers}
                     onChangeAnswerDate={this.onChangeAnswerDate}
+                    savePreviousAnswers={this.savePreviousAnswers}
                 />;
             default: return null;
         }
@@ -1946,8 +1947,6 @@ class CaseSingleScreen extends Component {
         })
     };
     savePreviousAnswers = (previousAnswers, previousAnswersId) => {
-        // console.log(previousAnswers, previousAnswersId);
-        // let questionnaireAnswers = _.cloneDeep(this.state.previousAnswers);
         this.setState(prevState => ({
             previousAnswers: Object.assign({}, prevState.previousAnswers, { [previousAnswersId]: previousAnswers }),
             isModified: true
