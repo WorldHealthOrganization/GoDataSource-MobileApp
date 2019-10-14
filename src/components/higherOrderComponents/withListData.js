@@ -28,8 +28,10 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                         statusId: null
                     },
                     data: [],
+                    dataCount: 0,
                     lastElement: null,
-                    limit: 15
+                    limit: 15,
+                    isAddFromNavigation: false
                 };
 
                 this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this));
@@ -37,7 +39,15 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
 
             componentDidMount() {
                 BackHandler.addEventListener('hardwareBackPress', this.handleBackButtonClick);
-                this.getData();
+                if (this.props.isAddFromNavigation && this.props.addScreen) {
+                    this.setState({
+                        isAddFromNavigation: true
+                    }, () => {
+                        this.getData(true);
+                    })
+                } else {
+                    this.getData(true);
+                }
             }
 
             componentWillUnmount() {
@@ -67,6 +77,7 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                     this.props,
                     {
                         data: this.state.data,
+                        dataCount: this.state.dataCount,
                         mainFilter: this.state.mainFilter,
                         followUpFilter: this.state.followUpFilter
                     });
@@ -122,35 +133,69 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                 return filter;
             };
 
-            getData = () => {
-                let filters = this.prepareFilters();
-                if (get(this.state, 'lastElement', null) === null) {
-                    this.props.setLoaderState(true);
-                }
-                methodForGettingData(filters)
-                    .then((result) => {
-                        if (get(this.state, 'lastElement', null) === null) {
-                            this.props.setLoaderState(false);
-                        }
-                        this.setState(prevState => ({
-                            data: prevState.lastElement !== null ? prevState.data.concat(result) : result,
-                            lastElement: result.length === 10 ? get(result, '[9].mainData', null) : null
-                        }))
-                    })
-                    .catch((errorGetData) => {
-                        this.props.setLoaderState(false);
-                        Alert.alert('Error', 'An error occurred while getting data', [
-                            {
-                                text: 'Ok', onPress: () => {console.log('Ok pressed')}
+            getData = (isRefresh) => {
+                if (this.state.isAddFromNavigation) {
+                    this.setState({
+                        isAddFromNavigation: false
+                    }, () => {
+                        this.props.navigator.push({
+                            screen: this.props.addScreen,
+                            animated: true,
+                            animationType: 'fade',
+                            passProps: {
+                                isNew: true,
+                                refresh: this.refresh
                             }
-                        ])
+                        })
                     })
+                } else {
+                    // If it's refresh or first getData get regular data
+                    // else it means that is onEndReached so check if data modulo 10 is zero and continue
+                    let doAction = false;
+                    if (isRefresh === true) {
+                        this.props.setLoaderState(true);
+                        doAction = true;
+                    } else {
+                        doAction = this.state.data.length % 10 === 0 && this.state.data.length !== this.state.dataCount;
+                    }
+                    if (doAction === true) {
+                        let filters = this.prepareFilters();
+                        methodForGettingData(filters, isRefresh === true ? isRefresh : false)
+                            .then((result) => {
+                                if (isRefresh === true) {
+                                    this.props.setLoaderState(false);
+                                }
+                                this.setState(prevState => ({
+                                    data: prevState.lastElement !== null ? prevState.data.concat(result.data) : result.data,
+                                    lastElement: result.data.length === 10 ? get(result, 'data[9].mainData', null) : null,
+                                    isAddFromNavigation: false,
+                                    dataCount: result.dataCount ? result.dataCount : prevState.dataCount
+                                }))
+                            })
+                            .catch((errorGetData) => {
+                                this.setState({
+                                    isAddFromNavigation: false
+                                }, () => {
+                                    this.props.setLoaderState(false);
+                                    Alert.alert('Error', 'An error occurred while getting data', [
+                                        {
+                                            text: 'Ok', onPress: () => {
+                                                console.log('Ok pressed')
+                                            }
+                                        }
+                                    ])
+                                });
+                            })
+                    }
+                }
             };
 
             refresh = () => {
                 this.setState({
                     lastElement: null
-                },() => {this.getData()})
+                }, () => {
+                    this.getData(true)
+                })
             };
 
             setSearchText = (text) => {
@@ -187,7 +232,7 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
             };
 
             // onPressView handles what happens when the user clicks on the lower left button of the list
-            onPressView = (dataToForward) => {
+            onPressView = (dataToForward, contactData) => {
                 let forwardScreen = this.computeForwardScreen('onPressView');
                 let forwardProps = {
                     isNew: false,
@@ -196,6 +241,7 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                 switch (screenType) {
                     case 'FollowUpsScreen':
                         forwardProps.item = dataToForward;
+                        forwardProps.contact = contactData;
                         break;
                     case 'ContactsScreen':
                         forwardProps.contact = dataToForward;

@@ -119,64 +119,112 @@ class FirstConfigScreen extends Component {
 
     // Please add here the react lifecycle methods that you need
     componentDidMount() {
-        // get active database's id
-        AsyncStorage.getItem('activeDatabase')
+        let activeDatabaseGlobal = null;
+        let lastSyncDateGlobal = null;
+        let internetCredentialsGlobal = null;
+        let databasesGlobal = null;
+        Promise.resolve()
+            .then(() => AsyncStorage.getItem('activeDatabase'))
             .then((activeDatabase) => {
-                // console.log('Active database: ', activeDatabase);
-                // Get last sync date
-                AsyncStorage.getItem(activeDatabase)
-                    .then((lastSyncDate) => {
-                        // For the active database get all credentials
-                        lastSyncDate = new Date(lastSyncDate).toUTCString();
-                        getInternetCredentials(activeDatabase)
-                            .then((activeDatabaseCredentials) => {
-                                let currentHubConfig = JSON.parse(activeDatabaseCredentials.username);
-                                // console.log('Active database credentials: ', JSON.parse(activeDatabaseCredentials.username));
-                                let databaseId = Platform.OS === 'ios' ? activeDatabaseCredentials.server : activeDatabaseCredentials.service;
-                                // console.log('State before: ', this.state);
-                                this.setState({
-                                    databaseId: databaseId,
-                                    name: currentHubConfig.name,
-                                    url: currentHubConfig.url,
-                                    clientId: currentHubConfig.clientId,
-                                    clientSecret: currentHubConfig.clientSecret,
-                                    userEmail: currentHubConfig.userEmail,
-                                    encryptedData: currentHubConfig.encryptedData,
-                                    lastSyncDate: lastSyncDate
-                                }, () => {
-                                    // console.log('State after: ', this.state);
-                                    AsyncStorage.getItem('databases')
-                                        .then((databases) => {
-                                            // console.log('All databases: ', databases);
-                                            let allDatabases = JSON.parse(databases);
-                                            allDatabases = allDatabases.filter((e) => {return e.id !== databaseId});
-                                            this.setState({
-                                                showLoading: false,
-                                                allDatabases: allDatabases
-                                            })
-                                        })
-                                        .catch((errorDatabases) => {
-                                            console.log("Error getting all databases: ", errorDatabases);
-                                            this.showAlert(getTranslation(translations.hubConfigScreen.getOtherHubsTitle, this.props.translation), getTranslation(translations.hubConfigScreen.getOtherHubsMessage, this.props.translation));
-                                        })
-                                });
-                            })
-                            .catch((errorActiveDatabaseCredentials) => {
-                                console.log('Error active database credentials: ', errorActiveDatabaseCredentials);
-                                this.showAlert(getTranslation(translations.hubConfigScreen.getCurrentHubTitle, this.props.translation), getTranslation(translations.hubConfigScreen.getCurrentHubMessage, this.props.translation));
-                            })
-                    })
-                    .catch((errorLastSyncDate) => {
-                        console.log('Error while getting last sync date: ', errorLastSyncDate);
-                        this.showAlert(getTranslation(translations.hubConfigScreen.getCurrentHubLastSyncDateTitle, this.props.translation), getTranslation(translations.hubConfigScreen.getCurrentHubLastSyncDateMessage, this.props.translation));
+                activeDatabaseGlobal = activeDatabase;
+                let lastSyncDatePromise = AsyncStorage.getItem(activeDatabase);
+                let internetCredentialsPromise = getInternetCredentials(activeDatabase);
+                let databasesPromise = AsyncStorage.getItem('databases');
 
-                    })
+                return Promise.all([lastSyncDatePromise, internetCredentialsPromise, databasesPromise])
             })
-            .catch((errorActiveDatabase) => {
-                console.log("Error while getting active database: ", errorActiveDatabase);
-                this.showAlert(getTranslation(translations.hubConfigScreen.getCurrentHubTitle, this.props.translation), getTranslation(translations.hubConfigScreen.getCurrentHubMessage, this.props.translation));
-            });
+            .then(([lastSyncDate, internetCredentials, databases]) => {
+                let currentHubConfig = JSON.parse(internetCredentials.username);
+                // console.log('Active database credentials: ', JSON.parse(activeDatabaseCredentials.username));
+                let databaseId = Platform.OS === 'ios' ? internetCredentials.server : internetCredentials.service;
+
+                // lastSyncDateGlobal = lastSyncDate;
+                // internetCredentialsGlobal = internetCredentials;
+                databasesGlobal = JSON.parse(databases);
+                databasesGlobal = databasesGlobal ? databasesGlobal.filter((e) => {return e.id !== databaseId}) : [];
+
+                this.setState({
+                    databaseId: databaseId,
+                    name: currentHubConfig.name,
+                    url: currentHubConfig.url,
+                    clientId: currentHubConfig.clientId,
+                    clientSecret: currentHubConfig.clientSecret,
+                    userEmail: currentHubConfig.userEmail,
+                    encryptedData: currentHubConfig.encryptedData,
+                    lastSyncDate: lastSyncDate,
+                    showLoading: false,
+                    allDatabases: databasesGlobal
+                })
+            })
+            .catch((errorGetData) => {
+                this.setState({
+                    showLoading: false
+                }, () => {
+                    this.showAlert(getTranslation(translations.hubConfigScreen.getOtherHubsTitle, this.props.translation), getTranslation(JSON.stringify(errorGetData), this.props.translation));
+                });
+            })
     }
+
+
+    // componentDidMount() {
+    //     // get active database's id
+    //     AsyncStorage.getItem('activeDatabase')
+    //         .then((activeDatabase) => {
+    //             // console.log('Active database: ', activeDatabase);
+    //             // Get last sync date
+    //             AsyncStorage.getItem(activeDatabase)
+    //                 .then((lastSyncDate) => {
+    //                     // For the active database get all credentials
+    //                     lastSyncDate = new Date(lastSyncDate).toUTCString();
+    //                     getInternetCredentials(activeDatabase)
+    //                         .then((activeDatabaseCredentials) => {
+    //                             let currentHubConfig = JSON.parse(activeDatabaseCredentials.username);
+    //                             // console.log('Active database credentials: ', JSON.parse(activeDatabaseCredentials.username));
+    //                             let databaseId = Platform.OS === 'ios' ? activeDatabaseCredentials.server : activeDatabaseCredentials.service;
+    //                             // console.log('State before: ', this.state);
+    //                             this.setState({
+    //                                 databaseId: databaseId,
+    //                                 name: currentHubConfig.name,
+    //                                 url: currentHubConfig.url,
+    //                                 clientId: currentHubConfig.clientId,
+    //                                 clientSecret: currentHubConfig.clientSecret,
+    //                                 userEmail: currentHubConfig.userEmail,
+    //                                 encryptedData: currentHubConfig.encryptedData,
+    //                                 lastSyncDate: lastSyncDate
+    //                             }, () => {
+    //                                 // console.log('State after: ', this.state);
+    //                                 AsyncStorage.getItem('databases')
+    //                                     .then((databases) => {
+    //                                         // console.log('All databases: ', databases);
+    //                                         let allDatabases = JSON.parse(databases);
+    //                                         allDatabases = allDatabases.filter((e) => {return e.id !== databaseId});
+    //                                         this.setState({
+    //                                             showLoading: false,
+    //                                             allDatabases: allDatabases
+    //                                         })
+    //                                     })
+    //                                     .catch((errorDatabases) => {
+    //                                         console.log("Error getting all databases: ", errorDatabases);
+    //                                         this.showAlert(getTranslation(translations.hubConfigScreen.getOtherHubsTitle, this.props.translation), getTranslation(translations.hubConfigScreen.getOtherHubsMessage, this.props.translation));
+    //                                     })
+    //                             });
+    //                         })
+    //                         .catch((errorActiveDatabaseCredentials) => {
+    //                             console.log('Error active database credentials: ', errorActiveDatabaseCredentials);
+    //                             this.showAlert(getTranslation(translations.hubConfigScreen.getCurrentHubTitle, this.props.translation), getTranslation(translations.hubConfigScreen.getCurrentHubMessage, this.props.translation));
+    //                         })
+    //                 })
+    //                 .catch((errorLastSyncDate) => {
+    //                     console.log('Error while getting last sync date: ', errorLastSyncDate);
+    //                     this.showAlert(getTranslation(translations.hubConfigScreen.getCurrentHubLastSyncDateTitle, this.props.translation), getTranslation(translations.hubConfigScreen.getCurrentHubLastSyncDateMessage, this.props.translation));
+    //
+    //                 })
+    //         })
+    //         .catch((errorActiveDatabase) => {
+    //             console.log("Error while getting active database: ", errorActiveDatabase);
+    //             this.showAlert(getTranslation(translations.hubConfigScreen.getCurrentHubTitle, this.props.translation), getTranslation(translations.hubConfigScreen.getCurrentHubMessage, this.props.translation));
+    //         });
+    // }
 
     // static getDerivedStateFromProps(props, state) {
     //    return null;

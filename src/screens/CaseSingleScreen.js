@@ -697,12 +697,12 @@ class CaseSingleScreen extends Component {
                         // console.log('caseMatchFitler', caseMatchFitler)
                         updateCase(this.state.case)
                             .then((result) => {
-                                this.props.refresh();
+                                // this.props.refresh();
                                 this.props.navigator.pop(
-                                    {
-                                        animated: true,
-                                        animationType: 'fade',
-                                    }
+                                    // {
+                                    //     animated: true,
+                                    //     animationType: 'fade',
+                                    // }
                                 )
                             })
                             .catch((errorUpdateCase) => {
@@ -720,9 +720,21 @@ class CaseSingleScreen extends Component {
                         this.setState(prevState => ({
                             case: Object.assign({}, prevState.case, caseWithRequiredFields)
                         }), () => {
-                            let caseMatchFitler = this.checkIfCaseMatchFilter()
-                            console.log('caseMatchFitler', caseMatchFitler)
-                            this.props.addCase(this.props.user.activeOutbreakId, this.state.case, this.props.user.token, caseMatchFitler);
+                            // let caseMatchFitler = this.checkIfCaseMatchFilter()
+                            // console.log('caseMatchFitler', caseMatchFitler)
+                            addCase(this.state.case)
+                                .then((result) => {
+                                    // this.props.refresh();
+                                    this.props.navigator.pop(
+                                        // {
+                                        //     animated: true,
+                                        //     animationType: 'fade',
+                                        // }
+                                    )
+                                })
+                                .catch((errorUpdateCase) => {
+                                    console.log('errorUpdateCase', errorUpdateCase);
+                                })
                         })
                     } else {
                         let caseWithRequiredFields = null;
@@ -736,12 +748,12 @@ class CaseSingleScreen extends Component {
                         }), () => {
                             updateCase(this.state.case)
                                 .then((result) => {
-                                    this.props.refresh();
+                                    // this.props.refresh();
                                     this.props.navigator.pop(
-                                        {
-                                            animated: true,
-                                            animationType: 'fade',
-                                        }
+                                        // {
+                                        //     animated: true,
+                                        //     animationType: 'fade',
+                                        // }
                                     )
                                 })
                                 .catch((errorUpdateCase) => {
@@ -1976,6 +1988,9 @@ class CaseSingleScreen extends Component {
     };
 
     onNavigatorEvent = (event) => {
+        if (event.id === 'didDisappear') {
+            this.props.refresh();
+        }
         navigation(event, this.props.navigator);
     };
     goToHelpScreen = () => {

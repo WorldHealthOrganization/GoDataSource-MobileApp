@@ -104,20 +104,24 @@ class AnimatedListView extends Component {
                 initialNumToRender={5}
                 windowSize={11}
                 ListHeaderComponent={
-                    <SearchFilterView
-                        style={{
-                            transform: [{
-                                translateY: navbarTranslate
-                            }],
-                            opacity: navbarOpacity
-                        }}
-                        value={this.state.searchText}
-                        onPress={this.props.onPressFilter}
-                        onChangeText={this.handleOnChangeText}
-                        onSubmitEditing={this.handleOnSubmitEditing}
-                        filterText={this.props.filterText}
-                    />}
-                onEndReached={this.props.onEndReached}
+                    <View>
+                        <SearchFilterView
+                            style={{
+                                transform: [{
+                                    translateY: navbarTranslate
+                                }],
+                                opacity: navbarOpacity
+                            }}
+                            value={this.state.searchText}
+                            onPress={this.props.onPressFilter}
+                            onChangeText={this.handleOnChangeText}
+                            onSubmitEditing={this.handleOnSubmitEditing}
+                            filterText={this.props.filterText}
+                        />
+                        {/*<Text>{this.props.dataCount} results</Text>*/}
+                    </View>
+                }
+                onEndReached={this.props.data.length >= 10 ? this.props.onEndReached : null}
                 onEndReachedThreshold={0.01}
             />
         );
@@ -132,6 +136,7 @@ class AnimatedListView extends Component {
         let id = null;
         let mainData = null;
         let exposureData = null;
+        let titleColor = null;
         switch(this.props.dataType){
             case 'FollowUp':
                 let followUpData = get(item, 'followUpData', null);
@@ -142,11 +147,11 @@ class AnimatedListView extends Component {
                     getTranslation(translations.followUpsScreen.addExposureFollowUpLabel, this.props.translation)
                 ];
                 textsStyleArray = [
-                    [styles.buttonTextActionsBar, {/*color: this.state.followUpsColors[item.statusId],*/ marginLeft: margins}],
+                    [styles.buttonTextActionsBar, {color: this.props.colors[followUpData.statusId], marginLeft: margins}],
                     [styles.buttonTextActionsBar, {marginRight: margins}]];
                 onPressTextsArray = [
                     () => {
-                        this.props.onPressView(followUpData);
+                        this.props.onPressView(followUpData, mainData);
                         // this.handlePressFollowUp(item, this.props.contacts.find((e) => {return extractIdFromPouchId(e._id, 'person') === item.personId}))
                     },
                     () => {
@@ -177,6 +182,7 @@ class AnimatedListView extends Component {
                     () => {
                         this.props.onPressAddExposure(mainData);
                     }];
+                titleColor = this.props.colors[mainData.riskLevel];
                 break;
             case 'Case':
                 mainData = get(item, 'mainData', null);
@@ -194,24 +200,27 @@ class AnimatedListView extends Component {
                     () => {
                         this.props.onPressAddExposure(mainData);
                     }];
+                titleColor = this.props.colors[mainData.classification];
                 break;
             default:
                 textsArray = [
-                    getTranslation(item.statusId, this.props.translation),
-                    getTranslation(translations.followUpsScreen.addExposureFollowUpLabel, this.props.translation)
+                    // getTranslation(item.statusId, this.props.translation),
+                    // getTranslation(translations.followUpsScreen.addExposureFollowUpLabel, this.props.translation)
                 ];
                 textsStyleArray = [
-                    [styles.buttonTextActionsBar, {color: this.state.followUpsColors[item.statusId], marginLeft: margins}],
-                    [styles.buttonTextActionsBar, {marginRight: margins}]];
+                    // [styles.buttonTextActionsBar, {color: this.state.followUpsColors[item.statusId], marginLeft: margins}],
+                    // [styles.buttonTextActionsBar, {marginRight: margins}]
+                    ];
                 onPressTextsArray = [
-                    () => {
-                        // console.log('Test performance renderFollowUpQuestion');
-                        this.handlePressFollowUp(item, this.props.contacts.find((e) => {return extractIdFromPouchId(e._id, 'person') === item.personId}))
-                    },
-                    () => {
-                        // console.log('Test performance renderFollowUpQuestion');
-                        this.handleOnPressExposure(item, this.props.contacts.find((e) => {return extractIdFromPouchId(e._id, 'person') === item.personId}))
-                    }];
+                    // () => {
+                    //     // console.log('Test performance renderFollowUpQuestion');
+                    //     this.onPressView(item, this.props.contacts.find((e) => {return extractIdFromPouchId(e._id, 'person') === item.personId}))
+                    // },
+                    // () => {
+                    //     // console.log('Test performance renderFollowUpQuestion');
+                    //     this.onPressAddExposure(item, this.props.contacts.find((e) => {return extractIdFromPouchId(e._id, 'person') === item.personId}))
+                    // }
+                    ];
                 break;
         }
         return(
@@ -226,11 +235,15 @@ class AnimatedListView extends Component {
                 textsArray={textsArray}
                 textsStyleArray={textsStyleArray}
                 onPressTextsArray={onPressTextsArray}
+                titleColor={titleColor}
             />
         )
     };
 
     listEmptyComponent = () => {
+        switch(this.props.dataType) {
+
+        }
         return (
             <View style={[style.emptyComponent, { height: calculateDimension((667 - 152), true, this.props.screenSize) }]}>
                 <Text style={style.emptyComponentTextView}>
@@ -297,6 +310,7 @@ class AnimatedListView extends Component {
 
 Animated.propTypes = {
     data: PropTypes.array.isRequired,
+    dataCount: PropTypes.number,
     dataType: PropTypes.oneOf(['FollowUp', 'Contact', 'Case']).isRequired,
     filterText: PropTypes.string,
     onSearch: PropTypes.func,
@@ -308,6 +322,7 @@ Animated.propTypes = {
 
 AnimatedListView.defaultProps = {
     data: [],
+    dataCount: 0,
     dataType: 'FollowUp',
     filterText: `${getTranslation(translations.generalLabels.filterTitle, get(this.props, 'translation', null))}`,
     onSearch: () => {console.log("Default function onSearch")},

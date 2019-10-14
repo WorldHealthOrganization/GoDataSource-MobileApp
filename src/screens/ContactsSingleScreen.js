@@ -439,9 +439,9 @@ class ContactsSingleScreen extends Component {
         // let address = this.state.contact.addresses.find((e) => {return e.type === config.})
 
         let now = createDate(null);
-        date = createDate(date);
+        date = createDate(date).toISOString();
         let followUp = {
-            _id: 'followUp.json_' + this.props.user.activeOutbreakId + '_' + date.getTime() + '_' + generateId(),
+            _id: generateId(),
             statusId: config.followUpStatuses.notPerformed,
             targeted: false,
             date: date,

@@ -1,31 +1,16 @@
 /**
  * Created by florinpopa on 19/07/2018.
  */
-import {ACTION_TYPE_GET_FOLLOWUPS, ACTION_TYPE_STORE_FOLLOWUPS, ACTION_TYPE_UPDATE_FOLLOWUP, ACTION_TYPE_DELETE_FOLLOWUP} from './../utils/enums';
-import {updateContact, updateContactAction, getContactsForOutbreakIdWithPromises, getContactsForOutbreakPromise} from './contacts';
+// import { ACTION_TYPE_STORE_FOLLOWUPS, ACTION_TYPE_UPDATE_FOLLOWUP} from './../utils/enums';
+// import { updateContactAction, getContactsForOutbreakIdWithPromises, getContactsForOutbreakPromise} from './contacts';
 import { addError } from './errors';
 import errorTypes from './../utils/errorTypes';
-import config from './../utils/config';
-import moment from 'moment';
 import {
     getFollowUpsForOutbreakIdRequest,
-    getFollowUpsForContactIds,
-    updateFollowUpRequest,
-    addFollowUpRequest,
-    addFollowUpsBulkRequest
 } from './../queries/followUps';
 import uniq from 'lodash/uniq';
 import get from 'lodash/get';
-import set from 'lodash/set';
-import groupBy from 'lodash/groupBy';
-import {getContactsForOutbreakId, getExposuresForContact} from './contacts';
-import {getRelationshipsForTypeRequest} from './../queries/relationships';
-import {extractIdFromPouchId, mapContactsAndRelationships, mapContactsAndFollowUps, generateId, updateRequiredFields, createDate} from './../utils/functions';
-import {getContactsForFollowUpPeriodRequest} from './../queries/contacts';
-// import {difference} from 'lodash';
-import {setSyncState, saveGeneratedFollowUps, setLoaderState} from './app';
-import {batchActions} from 'redux-batched-actions';
-import {batch} from 'react-redux';
+import {mapContactsAndFollowUps, createDate} from './../utils/functions';
 import {executeQuery, insertOrUpdate} from './../queries/sqlTools/helperMethods';
 import sqlConstants from './../queries/sqlTools/constants';
 import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
@@ -34,21 +19,23 @@ jsonSql.setDialect('sqlite');
 import translations from './../utils/translations';
 
 // Add here only the actions, not also the requests that are executed. For that purpose is the requests directory
-export function storeFollowUps(followUps) {
-    return {
-        type: ACTION_TYPE_STORE_FOLLOWUPS,
-        payload: followUps
-    }
-}
+// export function storeFollowUps(followUps) {
+//     return {
+//         type: ACTION_TYPE_STORE_FOLLOWUPS,
+//         payload: followUps
+//     }
+// }
+//
+// export function updateFollowUpAction(followUp) {
+//     return {
+//         type: ACTION_TYPE_UPDATE_FOLLOWUP,
+//         payload: followUp
+//     }
+// }
 
-export function updateFollowUpAction(followUp) {
-    return {
-        type: ACTION_TYPE_UPDATE_FOLLOWUP,
-        payload: followUp
-    }
-}
-
-export function getFollowUpsForOutbreakId({outbreakId, followUpFilter, userTeams, contactsFilter, exposureFilter, lastElement}) {
+export function getFollowUpsForOutbreakId({outbreakId, followUpFilter, userTeams, contactsFilter, exposureFilter, lastElement}, computeCount) {
+    let countPromise = null;
+    let followUpPromise = null;
 
     let followUpCondition = {
         'FollowUps.deleted': 0
@@ -71,7 +58,7 @@ export function getFollowUpsForOutbreakId({outbreakId, followUpFilter, userTeams
 
     let contactsAndExposuresQuery = {
         type: 'select',
-        query: sqlConstants.createMainQuery(translations.personTypes.contacts, contactsFilter, exposureFilter, lastElement), // Here will take place the contact/exposure filter/sort
+        query: sqlConstants.createMainQuery(translations.personTypes.contacts, outbreakId, contactsFilter, exposureFilter, lastElement), // Here will take place the contact/exposure filter/sort
         alias: 'MappedData',
         fields: [
             {
@@ -91,7 +78,6 @@ export function getFollowUpsForOutbreakId({outbreakId, followUpFilter, userTeams
             }
         ]
     };
-
     let followUpQuery = {
         type: 'select',
         table: 'followUp',
@@ -129,9 +115,51 @@ export function getFollowUpsForOutbreakId({outbreakId, followUpFilter, userTeams
         condition: followUpCondition
     };
 
-    return Promise.resolve()
-        .then(() => executeQuery(followUpQuery))
-        .then((mappedData) => Promise.resolve(mappedData))
+    if (computeCount) {
+        let contactsQueryCount = {
+            type: 'select',
+            query: sqlConstants.createMainQuery(translations.personTypes.contacts, outbreakId, contactsFilter, exposureFilter, lastElement, true), // Here will take place the contact/exposure filter/sort
+            alias: 'MappedData',
+            fields: [
+                {
+                    table: 'MappedData',
+                    name: 'IdField',
+                    alias: 'ContactId'
+                }
+            ]
+        };
+        let followUpCount = {
+            type: 'select',
+            table: 'followUp',
+            alias: 'FollowUps',
+            fields: [
+                {
+                    func: {
+                        name: 'count',
+                        args: [{field: `FollowUps._id`}]
+                    },
+                    alias: 'countRecords'
+                }
+            ],
+            join: [
+                {
+                    type: 'inner',
+                    query: contactsQueryCount,
+                    alias: 'ContactsWithExposures',
+                    on: {'FollowUps.personId': 'ContactsWithExposures.ContactId'}
+                }
+            ],
+            condition: followUpCondition
+        };
+        countPromise = executeQuery(followUpCount);
+    }
+    followUpPromise = executeQuery(followUpQuery);
+
+    return Promise.all([followUpPromise, countPromise])
+        .then(([followUps, followUpsCount]) => {
+            console.log('Returned values: ');
+            return Promise.resolve({data: followUps, dataCount: checkArrayAndLength(followUpsCount) ? followUpsCount[0].countRecords : null});
+        })
         .catch((errorGetFollowUps) => Promise.reject(errorGetFollowUps))
 }
 
@@ -160,7 +188,6 @@ export function generalMapping(unmappedData) {
 }
 
 export function getFollowUpsForOutbreakIdWithPromises(outbreakId, filter, userTeams, token, dispatch) {
-    // return async function (dispatch, getState) {
     return new Promise((resolve, reject) => {
         if (!filter) {
             filter = {};
@@ -195,7 +222,6 @@ export function getFollowUpsForOutbreakIdWithPromises(outbreakId, filter, userTe
             }
         })
     })
-    // }
 }
 
 export function updateFollowUpAndContact(followUp) {

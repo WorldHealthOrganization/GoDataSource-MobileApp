@@ -43,10 +43,6 @@ class CasesScreen extends Component {
             error: null,
             riskColors: {}
         };
-
-        // Bind here methods, or at least don't declare methods in the render method
-        // this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this));
-        // this.handleBackButtonClick = this.handleBackButtonClick.bind(this);
     }
 
     // Please add here the react lifecycle methods that you need
@@ -94,7 +90,9 @@ class CasesScreen extends Component {
         return (
             <ViewHOC style={style.container}
                      showLoader={(this.props && this.props.loaderState) || (this.state && this.state.loading)}
-                     loaderText={this.props && this.props.syncState ? 'Loading' : getTranslation(translations.loadingScreenMessages.loadingMsg, this.props.translation)}>
+                     loaderText={this.props && this.props.syncState ? 'Loading' : getTranslation(translations.loadingScreenMessages.loadingMsg, this.props.translation)}
+                     refresh={this.props.onRefresh}
+            >
                 <NavBarCustom
                     title={null}
                     customTitle={
@@ -170,7 +168,9 @@ class CasesScreen extends Component {
                 <View style={style.containerContent}>
                     <AnimatedListView
                         data={this.props.data || []}
+                        dataCount={this.props.dataCount || 0}
                         dataType={'Case'}
+                        colors={this.state.riskColors}
                         filterText={filterText}
                         style={[style.listViewStyle]}
                         componentContainerStyle={style.componentContainerStyle}
@@ -251,6 +251,7 @@ class CasesScreen extends Component {
             // animationType: 'fade',
             passProps: {
                 isNew: true,
+                refresh: this.props.onRefresh
             }
         })
     };
@@ -309,7 +310,8 @@ class CasesScreen extends Component {
                                                 case: Object.assign({}, record, {
                                                     outbreakId: this.props.user.activeOutbreakId,
                                                 }, config.caseBlueprint),
-                                                forceNew: true
+                                                forceNew: true,
+                                                refresh: this.props.onRefresh
                                             }
                                         })
                                     }
@@ -333,7 +335,8 @@ class CasesScreen extends Component {
                                     animated: true,
                                     animationType: 'fade',
                                     passProps: {
-                                        case: record
+                                        case: record,
+                                        refresh: this.props.onRefresh
                                     }
                                 })
                             } else if (itemType === 'contact') {
@@ -342,7 +345,8 @@ class CasesScreen extends Component {
                                     animated: true,
                                     animationType: 'fade',
                                     passProps: {
-                                        contact: record
+                                        contact: record,
+                                        refresh: this.props.onRefresh
                                     }
                                 })
                             }

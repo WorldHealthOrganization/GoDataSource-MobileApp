@@ -76,6 +76,11 @@ const sortTab = {
 
     sortFirstName: 'LNG_CONTACT_FIELD_LABEL_FIRST_NAME',
     sortLastName: 'LNG_CONTACT_FIELD_LABEL_LAST_NAME',
+    // TODO add to API
+    sortCreatedAt: 'LNG_SORT_CRITERIA_CREATED_AT',
+    sortVisualId: 'LNG_SORT_CRITERIA_VISUAL_ID',
+    sortUpdatedAt: 'LNG_SORT_CRITERIA_UPDATED_AT',
+
     sortCategory: 'LNG_HELP_ITEMS_FIELD_LABEL_CATEGORY',
     sortTitle: 'LNG_HELP_ITEMS_FIELD_LABEL_TITLE',
     sortOrderAsc: 'LNG_SIDE_FILTERS_SORT_BY_ASC_PLACEHOLDER',

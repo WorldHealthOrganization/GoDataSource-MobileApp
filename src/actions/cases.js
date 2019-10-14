@@ -2,56 +2,51 @@
  * Created by florinpopa on 19/07/2018.
  */
 // Add here only the actions, not also the requests that are executed. For that purpose is the requests directory
-import { ACTION_TYPE_STORE_CASES,
-    ACTION_TYPE_ADD_CASE,
-    ACTION_TYPE_UPDATE_CASE,
-    ACTION_TYPE_REMOVE_CASE} from './../utils/enums';
-// import {deleteCaseRequest} from './../requests/cases';
-// import {getCasesForOutbreakIdRequest, addCaseRequest, updateCaseRequest} from './../queries/cases';
-// import { addError } from './errors';
-// import errorTypes from './../utils/errorTypes';
-// import config from './../utils/config';
-// import {batchActions} from 'redux-batched-actions';
-// import {setLoaderState} from "./app";
-// import {addExposure, updateExposure, removeExposure} from './exposure';
+// import { ACTION_TYPE_STORE_CASES,
+//     ACTION_TYPE_ADD_CASE,
+//     ACTION_TYPE_UPDATE_CASE,
+//     ACTION_TYPE_REMOVE_CASE} from './../utils/enums';
 import {executeQuery, insertOrUpdate} from "../queries/sqlTools/helperMethods";
 import translations from "../utils/translations";
 import sqlConstants from "../queries/sqlTools/constants";
-// import {generalMapping} from "./followUps";
 import get from 'lodash/get';
+import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
 var jsonSql = require('json-sql')();
 jsonSql.setDialect('sqlite');
 
 // Add here only the actions, not also the requests that are executed. For that purpose is the requests directory
-export function storeCases(cases) {
-    return {
-        type: ACTION_TYPE_STORE_CASES,
-        payload: cases
-    }
-};
+// export function storeCases(cases) {
+//     return {
+//         type: ACTION_TYPE_STORE_CASES,
+//         payload: cases
+//     }
+// };
+//
+// export function addCaseAction(myCase) {
+//     return {
+//         type: ACTION_TYPE_ADD_CASE,
+//         payload: myCase
+//     }
+// }
+//
+// export function updateCaseAction(myCase) {
+//     return {
+//         type: ACTION_TYPE_UPDATE_CASE,
+//         payload: myCase
+//     }
+// }
+//
+// export function removeCaseAction(myCase) {
+//     return {
+//         type: ACTION_TYPE_REMOVE_CASE,
+//         payload: myCase
+//     }
+// }
 
-export function addCaseAction(myCase) {
-    return {
-        type: ACTION_TYPE_ADD_CASE,
-        payload: myCase
-    }
-}
+export function getCasesForOutbreakId({outbreakId, casesFilter, searchText, lastElement}, computeCount) {
+    let countPromise = null;
+    let casesPromise = null;
 
-export function updateCaseAction(myCase) {
-    return {
-        type: ACTION_TYPE_UPDATE_CASE,
-        payload: myCase
-    }
-}
-
-export function removeCaseAction(myCase) {
-    return {
-        type: ACTION_TYPE_REMOVE_CASE,
-        payload: myCase
-    }
-}
-
-export function getCasesForOutbreakId({outbreakId, casesFilter, searchText, lastElement}) {
     let casesQuery = {
         type: 'select',
         query: sqlConstants.createMainQuery(translations.personTypes.cases, outbreakId, casesFilter, searchText, lastElement), // Here will take place the contact/exposure filter/sort
@@ -75,10 +70,36 @@ export function getCasesForOutbreakId({outbreakId, casesFilter, searchText, last
         ]
     };
 
-    return Promise.resolve()
-        .then(() => executeQuery(casesQuery))
-        .then((mappedData) => Promise.resolve(mappedData))
-        .catch((errorGetCases) => Promise.reject(errorGetCases));
+
+    if (computeCount) {
+        let casesQueryCount = {
+            type: 'select',
+            query: sqlConstants.createMainQuery(translations.personTypes.cases, outbreakId, casesFilter, searchText, lastElement, true), // Here will take place the contact/exposure filter/sort
+            alias: 'MappedData',
+            fields: [
+                {
+                    func: {
+                        name: 'count',
+                        args: [{field: `MappedData.IdField`}]
+                    },
+                    alias: 'countRecords'
+                }
+            ]
+        };
+        countPromise = executeQuery(casesQueryCount);
+    }
+    casesPromise = executeQuery(casesQuery);
+
+    return Promise.all([casesPromise, countPromise])
+        .then(([cases, casesCount]) => {
+            console.log('Returned values: ');
+            return Promise.resolve({data: cases, dataCount: checkArrayAndLength(casesCount) ? casesCount[0].countRecords : null});
+        })
+        .catch((errorGetCases) => Promise.reject(errorGetCases))
+    // return Promise.resolve()
+    //     .then(() => executeQuery(casesQuery))
+    //     .then((mappedData) => Promise.resolve(mappedData))
+    //     .catch((errorGetCases) => Promise.reject(errorGetCases));
 };
 
 export function addCase(myCase) {

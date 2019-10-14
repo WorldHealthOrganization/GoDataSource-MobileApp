@@ -29,11 +29,13 @@ const NUMBER_OF_RETRIES = 3;
 const TIMEOUT_FOR_FETCH_BLOB = 500;
 
 const DATABASE_LOCATIONS = `${RNFetchBlobFS.dirs.DocumentDir}/who_databases`;
+const FILES_LOCATIONS = `${RNFetchBlobFS.dirs.DocumentDir}/who_files`;
 
 
 export default {
     appScreens,
     NUMBER_OF_RETRIES,
     TIMEOUT_FOR_FETCH_BLOB,
-    DATABASE_LOCATIONS
+    DATABASE_LOCATIONS,
+    FILES_LOCATIONS
 }

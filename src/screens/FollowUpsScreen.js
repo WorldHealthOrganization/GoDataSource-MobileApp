@@ -7,7 +7,7 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, { Component } from 'react';
-import { View, StyleSheet, Alert} from 'react-native';
+import { View, StyleSheet, Alert, Text} from 'react-native';
 import { Icon } from 'react-native-material-ui';
 import styles from './../styles';
 import NavBarCustom from './../components/NavBarCustom';
@@ -98,7 +98,7 @@ class FollowUpsScreen extends Component {
         let followUpTitle = []; followUpTitle[0] = getTranslation(translations.followUpsScreen.followUpsTitle, this.props.translation);
 
         return (
-            <ViewHOC style={style.container}>
+            <ViewHOC style={style.container} refresh={this.props.onRefresh}>
                 <NavBarCustom
                     title={null}
                     customTitle={
@@ -163,7 +163,9 @@ class FollowUpsScreen extends Component {
                 <View style={style.containerContent}>
                     <AnimatedListView
                         data={this.props.data || []}
+                        dataCount={this.props.dataCount || 0}
                         dataType={'FollowUp'}
+                        colors={this.state.followUpsColors}
                         filterText={filterText}
                         style={[style.listViewStyle]}
                         componentContainerStyle={style.componentContainerStyle}
@@ -222,13 +224,6 @@ class FollowUpsScreen extends Component {
                 animated: true,
                 to: 'open'
             })
-        })
-    };
-
-    startLoadingScreen = () => {
-        console.log('startLoadingScreen: ', this.state.loading);
-        this.setState({
-            loading: true
         })
     };
 

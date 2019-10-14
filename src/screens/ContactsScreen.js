@@ -91,7 +91,9 @@ class ContactsScreen extends Component {
         return (
             <ViewHOC style={style.container}
                      showLoader={(this.props && this.props.loaderState) || (this.state && this.state.loading)}
-                     loaderText={this.props && this.props.syncState ? 'Loading' : getTranslation(translations.loadingScreenMessages.loadingMsg, this.props.translation)}>
+                     loaderText={this.props && this.props.syncState ? 'Loading' : getTranslation(translations.loadingScreenMessages.loadingMsg, this.props.translation)}
+                     refresh={this.props.onRefresh}
+            >
                 <NavBarCustom
                     title={null}
                     customTitle={
@@ -168,6 +170,8 @@ class ContactsScreen extends Component {
                 <View style={style.containerContent}>
                     <AnimatedListView
                         data={this.props.data || []}
+                        dataCount={this.props.dataCount || 0}
+                        colors={this.state.riskColors}
                         dataType={'Contact'}
                         filterText={filterText}
                         style={[style.listViewStyle]}
@@ -222,15 +226,6 @@ class ContactsScreen extends Component {
             this.props.onRefresh();
         });
     };
-
-    // keyExtractor = (item, index) => item._id;
-
-    renderSeparatorComponent = () => {
-        return (
-            <View style={style.separatorComponentStyle} />
-        )
-    };
-
 
     handleOnPressMap = (dataFromMapHandler) => {
         this.setState(prevState => ({

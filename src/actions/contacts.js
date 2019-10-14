@@ -1,43 +1,25 @@
 /**
  * Created by florinpopa on 20/07/2018.
  */
-import {
-    ACTION_TYPE_STORE_CONTACTS,
-    ACTION_TYPE_UPDATE_CONTACT,
-    ACTION_TYPE_ADD_CONTACT,
-    ACTION_TYPE_REMOVE_CONTACT
-} from './../utils/enums';
-import {
-    getContactsForOutbreakIdRequest,
-    getContactByIdRequest,
-    // updateContactRequest,
-    addContactRequest,
-    addExposureForContactRequest,
-    updateExposureForContactRequest,
-    deleteExposureForContactRequest
-} from './../queries/contacts'
-import { addError } from './errors';
-import errorTypes from './../utils/errorTypes';
-import {getRelationshipsForTypeRequest, getRelationshipsAndFollowUpsForContactRequest} from './../queries/relationships';
-import {extractIdFromPouchId, mapContactsAndRelationships, updateRequiredFields, mapContactsAndFollowUps, createDate} from './../utils/functions';
+import {updateRequiredFields, createDate} from './../utils/functions';
 import moment from 'moment';
 import config from './../utils/config';
 import max from 'lodash/max';
 import get from 'lodash/get';
 import set from 'lodash/set';
-import {setLoaderState} from "./app";
-import {batchActions} from 'redux-batched-actions';
 import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
 import {executeQuery, insertOrUpdate} from "../queries/sqlTools/helperMethods";
 import translations from "../utils/translations";
 import sqlConstants from "../queries/sqlTools/constants";
-import {generalMapping} from "./followUps";
 import {insertOrUpdateExposure} from './exposure';
 var jsonSql = require('json-sql')();
 jsonSql.setDialect('sqlite');
 
 // Add here only the actions, not also the requests that are executed. For that purpose is the requests directory
-export function getContactsForOutbreakId({outbreakId, contactsFilter, exposureFilter, lastElement}) {
+export function getContactsForOutbreakId({outbreakId, contactsFilter, exposureFilter, lastElement}, computeCount) {
+    let countPromise = null;
+    let contactsPromise = null;
+
     let contactsAndExposuresQuery = {
         type: 'select',
         distinct: true,
@@ -60,16 +42,34 @@ export function getContactsForOutbreakId({outbreakId, contactsFilter, exposureFi
                 alias: 'exposureData'
             }
         ],
-        // limit: 10
     };
 
-    // if (lastElement) {
-    //     contactsAndExposuresQuery['condition'] = {
-    //         'MappedData.IdField': {'$gt': lastElement}
-    //     }
-    // }
+    if (computeCount) {
+        let contactsQueryCount = {
+            type: 'select',
+            query: sqlConstants.createMainQuery(translations.personTypes.contacts, outbreakId, contactsFilter, exposureFilter, lastElement, true), // Here will take place the contact/exposure filter/sort
+            alias: 'MappedData',
+            fields: [
+                {
+                    func: {
+                        name: 'count',
+                        args: [{field: `MappedData.IdField`}]
+                    },
+                    alias: 'countRecords'
+                }
+            ]
+        };
+        countPromise = executeQuery(contactsQueryCount);
+    }
+    contactsPromise = executeQuery(contactsAndExposuresQuery);
 
-    return executeQuery(contactsAndExposuresQuery)
+    return Promise.all([contactsPromise, countPromise])
+        .then(([contacts, contactsCount]) => {
+            console.log('Returned values: ');
+            return Promise.resolve({data: contacts, dataCount: checkArrayAndLength(contactsCount) ? contactsCount[0].countRecords : null});
+        })
+        .catch((errorGetContacts) => Promise.reject(errorGetContacts))
+    // return executeQuery(contactsAndExposuresQuery)
 }
 
 export function getContactById(outbreakId, contactId) {

@@ -7,10 +7,8 @@ import RNFetchBlobFS from 'rn-fetch-blob/fs';
 import {zip, unzip} from 'react-native-zip-archive';
 import {updateFileInDatabase, processBulkDocs} from './../queries/database';
 import {setSyncState} from './../actions/app';
-// import bcrypt from 'react-native-bcrypt';
 import {NativeModules} from 'react-native';
 import uuid from 'react-native-uuid';
-// import _ from 'lodash';
 import get from 'lodash/get';
 import sortBy from 'lodash/sortBy';
 import cloneDeep from 'lodash/cloneDeep';
@@ -22,10 +20,9 @@ import RNFS from 'react-native-fs';
 import {Buffer} from 'buffer';
 import moment from 'moment';
 import {checkArrayAndLength} from './typeCheckingFunctions';
-import {insertOrUpdate} from './../queries/sqlTools/helperMethods';
+import {executeQuery, insertOrUpdate} from './../queries/sqlTools/helperMethods';
 import translations from "./translations";
 import sqlConstants from './../queries/sqlTools/constants';
-
 
 // This method is used for handling server responses. Please add here any custom error handling
 export function handleResponse(response) {
@@ -160,17 +157,22 @@ export function navigation(event, navigator) {
                 if(addScreen) {
                     navigator.resetTo({
                         screen: screenToSwitchTo,
-                    })
-                    setTimeout(function(){ 
-                        navigator.push({
-                            screen: addScreen,
-                            // animated: true,
-                            // animationType: 'fade',
-                            passProps: {
-                                isNew: true,
-                            }
-                        })
-                    }, 1500);
+                        passProps: {
+                            isAddFromNavigation: true,
+                            addScreen: addScreen
+                        }
+                    });
+                    // setTimeout(function(){
+                    //     navigator.push({
+                    //         screen: addScreen,
+                    //         animated: true,
+                    //         animationType: 'fade',
+                    //         passProps: {
+                    //             isNew: true,
+                    //             refresh: refresh
+                    //         }
+                    //     })
+                    // }, 1500);
                 } else {
 
                     navigator.resetTo({
@@ -262,7 +264,7 @@ export function unzipFile (source, dest, password, clientCredentials) {
                             .then((path) => {
                                 console.log(`unzip completed at ${path}`);
                                 // Delete the zip file after unzipping
-                                RNFetchBlobFS.unlink(source)
+                                deleteFile(source, true)
                                     .then(() => {
                                         resolve(path);
                                     })
@@ -274,7 +276,7 @@ export function unzipFile (source, dest, password, clientCredentials) {
                             .catch((error) => {
                                 console.log(error);
                                 // Delete the zip file after unzipping
-                                RNFetchBlobFS.unlink(source)
+                                deleteFile(source, true)
                                     .then(() => {
                                         reject(error);
                                     })
@@ -513,6 +515,23 @@ export function readDir (path) {
                 reject(errorLs);
             })
     })
+}
+
+export function deleteFile (path, skipError) {
+    return Promise.resolve()
+        .then(() => RNFetchBlobFS.exists(path))
+        .then((exists) => {
+            if (exists) {
+                return RNFetchBlobFS.unlink(path)
+            }
+            return Promise.resolve();
+        })
+        .catch((errorDeleteFile) => {
+            if (skipError) {
+                return Promise.resolve();
+            }
+            return Promise.reject(errorDeleteFile);
+        })
 }
 
 let numberOfFilesProcessed = 0;
@@ -817,55 +836,38 @@ export function comparePasswords (password, encryptedPassword, callback) {
     // })
 }
 
-function extractFromDatabase(database, fileType, lastSyncDate, startKey) {
-    return new Promise((resolve, reject) => {
-        if(startKey) {
-            database.find({
-                selector: {
-                    _id: {
-                        $gte: `${fileType}_`,
-                        $lte: `${fileType}_\uffff`
-                    },
-                    fileType: {$eq: fileType},
-                    updatedAt: {$gte: lastSyncDate}
-                },
-                limit: 1000
-            })
-                .then((response) => {
-                    resolve(response.docs);
-                })
-                .catch((error) => {
-                    console.log('Error while getting data: ', error);
-                    reject(error);
-                })
-        } else {
-            database.find({
-                selector: {
-                    _id: {
-                        $gte: `${startKey}`,
-                        $lte: `${fileType}_\uffff`
-                    },
-                    fileType: {$eq: fileType},
-                    updatedAt: {$gte: lastSyncDate}
-                },
-                limit: 1000
-            })
-                .then((response) => {
-                    resolve(response.docs);
-                })
-                .catch((error) => {
-                    console.log('Error while getting data: ', error);
-                    reject(error);
-                })
+export function getDataFromDatabaseFromFileSql (table, lastSyncDate, password) {
+    let query = {
+        type: 'select',
+        table: table,
+        fields: [
+            {
+                table: table,
+                name: 'json',
+                alias: 'data'
+            }
+        ],
+        condition: {
+            'updatedAt': {'$gte': lastSyncDate}
         }
-    })
+    };
+
+    return executeQuery(query)
+        .then((resultQuery) => resultQuery.map((e) => e.data))
+        .then((response) => {
+            return handleDataForZip(response, table, password, true);
+        })
+        .catch((errorGetDataFromDatabaseFromFileSql) => {
+            console.log('getDataFromDatabaseFromFileSql: ', errorGetDataFromDatabaseFromFileSql);
+            return Promise.reject(errorGetDataFromDatabaseFromFileSql)
+        })
 }
 
 export function getDataFromDatabaseFromFile (database, fileType, lastSyncDate, password) {
-    return new Promise((resolve, reject) => {
+    // return new Promise((resolve, reject) => {
         fileType = `${fileType}.json`;
         let start = new Date().getTime();
-        database.find({
+        return database.find({
             selector: {
                 // _id: {
                 //     $gte: `${fileType}_`,
@@ -878,178 +880,86 @@ export function getDataFromDatabaseFromFile (database, fileType, lastSyncDate, p
             .then((response) => {
                 // Now that we have some files, we should recreate the mongo collections
                 // If there are more than 1000 collections split in chunks of 1000 records
-                console.log('GetDataFromDatabaseFromFile query time: ', new Date().getTime() - start);
-                let responseArray = response.docs.map((e) => {
-                    if (fileType === 'user.json') {
-                        delete e.password;
-                    }
-                    delete e._rev;
-                    e._id = extractIdFromPouchId(e._id, fileType);
-                    // delete e._id;
-                    delete e.fileType;
-                    return e;
-                });
-                if (responseArray && Array.isArray(responseArray) && responseArray.length > 0) {
-                    createFilesWithName(fileType, responseArray, password)
-                        .then((responseFromCreate) => {
-                            database = null;
-                            resolve(responseFromCreate);
-                        })
-                        .catch((errorFromCreate) => {
-                            database = null;
-                            console.log(`An error occurred while creating file: ${errorFromCreate}`);
-                            reject(errorFromCreate);
-                        })
-                } else {
-                    database = null;
-                    resolve(`No data to send`);
-                }
+                return handleDataForZip(response, fileType, password);
             })
             .catch((error) => {
                 database = null;
                 console.log(`An error occurred while getting data for collection: ${fileType}`);
-                reject(error);
+                return Promise.reject(error);
             })
-    })
+    // })
+}
 
-
-    // try {
-    //     let dataFromDb = await extractFromDatabase(database, fileType, lastSyncDate);
-    //     if (dataFromDb && Array.isArray(dataFromDb)) {
-    //         if (dataFromDb.length === 1000) {
-    //
-    //         } else {
-    //             createFilesWithName(fileType, JSON.stringify(dataFromDb), password)
-    //                 .then((responseFromCreate) => {
-    //                     database = null;
-    //                     return Promise.resolve(responseFromCreate);
-    //                 })
-    //                 .catch((errorFromCreate) => {
-    //                     database = null;
-    //                     console.log(`An error occurred while creating file: ${errorFromCreate}`);
-    //                     return Promise.reject(errorFromCreate);
-    //                 })
-    //         }
-    //     } else {
-    //         console.log(`Error while extracting first time from the database. fileType: ${fileType}, errorExtractFromDb: ${errorExtractFromDb}`);
-    //         return Promise.reject(`Error while extracting first time from the database`);
-    //     }
-    // } catch(errorExtractFromDb) {
-    //     console.log(`Error while extracting first time from the database. fileType: ${fileType}, errorExtractFromDb: ${errorExtractFromDb}`);
-    //     return Promise.reject(errorExtractFromDb);
-    // }
+function handleDataForZip (response, fileType, password, isSqlite) {
+    // Now that we have some files, we should recreate the mongo collections
+    // If there are more than 1000 collections split in chunks of 1000 records
+    // console.log('GetDataFromDatabaseFromFile query time: ', new Date().getTime() - start);
+    let responseArray = [];
+    if (!isSqlite) {
+        responseArray = response.docs.map((e) => {
+            if (fileType === 'user.json') {
+                delete e.password;
+            }
+            delete e._rev;
+            e._id = extractIdFromPouchId(e._id, fileType);
+            // delete e._id;
+            delete e.fileType;
+            return e;
+        });
+    } else {
+        responseArray = response;
+    }
+    if (responseArray && Array.isArray(responseArray) && responseArray.length > 0) {
+        return createFilesWithName(fileType, responseArray, password)
+            // .then((responseFromCreate) => {
+            //     resolve(responseFromCreate);
+            // })
+            // .catch((errorFromCreate) => {
+            //     console.log(`An error occurred while creating file: ${errorFromCreate}`);
+            //     reject(errorFromCreate);
+            // })
+    } else {
+        return Promise.resolve(`No data to send`);
+    }
 }
 
 function writeOperations (collectionName, index, data, password, jsonPath) {
-    return new Promise((resolve, reject) => {
-        RNFetchBlobFS.createFile(jsonPath, JSON.stringify(data), 'utf8')
-            .then((writtenBytes) => {
-                // After creating the json file, is time to create the zip
-                zip(jsonPath, `${jsonPath}.zip`)
-                    .then((zipPath) => {
-                        // After creating the zip file, delete the .json file and proceed to encrypt the zip file
-                        // First we have to read the base64 file
-                        RNFetchBlobFS.unlink(jsonPath)
-                            .then(() => {
-                                // If the password is null, then don't encrypt data
-                                if (password) {
-                                    RNFetchBlobFS.readFile(zipPath, 'base64')
-                                        .then((rawZipFile) => {
-                                            // Encrypt the file and overwrite the previous zip file
-                                            encrypt(password, rawZipFile)
-                                                .then((encryptedData) => {
-                                                    RNFetchBlobFS.writeFile(zipPath, encryptedData, 'base64')
-                                                        .then((writtenEncryptedData) => {
-                                                            console.log(`Finished creating file: ${collectionName}, index: ${index}, writtenEncryptedData: ${writtenEncryptedData}`);
-                                                            resolve('Finished creating file')
-                                                        })
-                                                        .catch((errorWrittenEncryptedData) => {
-                                                            console.log(`createFileWithIndex collectionName: ${collectionName}, index: ${index}, error: ${errorWrittenEncryptedData}`);
-                                                            reject(errorWrittenEncryptedData);
-                                                        })
-                                                })
-                                                .catch((errorEncryptedData) => {
-                                                    console.log(`createFileWithIndex collectionName: ${collectionName}, index: ${index}, error: ${errorEncryptedData}`);
-                                                    reject(errorEncryptedData);
-                                                })
-                                        })
-                                        .catch((errorRawZipFile) => {
-                                            console.log(`writeOperations collectionName: ${collectionName}, index: ${index}, error: ${errorRawZipFile}`);
-                                            reject(errorRawZipFile);
-                                        })
-                                } else {
-                                    resolve('Success');
-                                }
-                            })
-                            .catch((errorDeleteJsonFile) => {
-                                console.log(`writeOperations collectionName: ${collectionName}, index: ${index}, error: ${errorDeleteJsonFile}`);
-                                reject(errorDeleteJsonFile);
-                            });
-                    })
-                    .catch((zipPathError) => {
-                        console.log(`writeOperations collectionName: ${collectionName}, index: ${index}, error: ${zipPathError}`);
-                        reject(zipPathError);
-                    })
-            })
-            .catch((errorWriteBytes) => {
-                console.log(`writeOperations collectionName: ${collectionName}, index: ${index}, error: ${errorWriteBytes}`);
-                reject(errorWriteBytes);
-            })
-    });
-};
+    let zipPathGlobal = null;
+    return Promise.resolve()
+        .then(() => RNFetchBlobFS.createFile(jsonPath, JSON.stringify(data), 'utf8'))
+        .then((writtenBytes) => zip(jsonPath, `${jsonPath}.zip`))
+        .then((zipPath) => {
+            zipPathGlobal = zipPath;
+            return deleteFile(jsonPath)
+        })
+        .then(() => {
+            if (password) {
+                return RNFetchBlobFS.readFile(zipPathGlobal, 'base64')
+                    .then((rawZipFile) => encrypt(password, rawZipFile))
+                    .then((encryptedData) => RNFetchBlobFS.writeFile(zipPathGlobal, encryptedData, 'base64'))
+                    .then((writtenEncryptedData) => Promise.resolve('Finished creating file'));
+            }
+            return Promise.resolve('Success')
+        })
+}
 
 // This method creates the json file, archives it and encrypts it
 export function createFileWithIndex (collectionName, index, data, password) {
-    return new Promise((resolve, reject) => {
-        let jsonPath = `${RNFetchBlobFS.dirs.DocumentDir}/who_files/${collectionName.split('.')[0]}.${index}.json`;
-        // Check if the file exists. If it exists, delete and recreate it, else continue
+    let jsonPath = `${RNFetchBlobFS.dirs.DocumentDir}/who_files/${collectionName.split('.')[0]}.${index}.json`;
 
-        RNFetchBlobFS.exists(jsonPath)
-            .then((exists) => {
-                if (exists) {
-                    // Delete the file
-                    RNFetchBlobFS.unlink(jsonPath)
-                        .then(() => {
-                            writeOperations(collectionName, index, data, password, jsonPath)
-                                .then((result) => {
-                                    resolve('Success')
-                                })
-                                .catch((errorWriteOperations) => {
-                                    console.log(`Error write operations: method: createFileWithIndex collectionName: ${collectionName} index: ${index} error: ${JSON.stringify(errorWriteOperations)}`);
-                                    reject(errorWriteOperations)
-                                })
-                        })
-                        .catch((errorDeleteFile) => {
-                            console.log(`Error delete existing file: method: createFileWithIndex collectionName: ${collectionName} index: ${index} error: ${JSON.stringify(errorDeleteFile)}`);
-                            reject(errorDeleteFile);
-                        })
-                } else {
-                    writeOperations(collectionName, index, data, password, jsonPath)
-                        .then((result) => {
-                            resolve('Success')
-                        })
-                        .catch((errorWriteOperations) => {
-                            console.log(`Error write operations: method: createFileWithIndex collectionName: ${collectionName} index: ${index} error: ${JSON.stringify(errorWriteOperations)}`);
-                            reject(errorWriteOperations)
-                        })
-                }
-            })
-            .catch((errorFileExists) => {
-                console.log(`Error file exists: method: createFileWithIndex collectionName: ${collectionName} index: ${index} error: ${JSON.stringify(errorFileExists)}`);
-                writeOperations(collectionName, index, data, password, jsonPath)
-                    .then((result) => {
-                        resolve('Success')
-                    })
-                    .catch((errorWriteOperations) => {
-                        console.log(`Error write operations: method: createFileWithIndex collectionName: ${collectionName} index: ${index} error: ${JSON.stringify(errorWriteOperations)}`);
-                        reject(errorWriteOperations)
-                    })
-            })
-    })
+    return RNFetchBlobFS.exists(jsonPath)
+        .then((exists) => {
+            if (exists) {
+                return deleteFile(jsonPath, true);
+            } else {
+                return Promise.resolve();
+            }
+        })
+        .then(() => writeOperations(collectionName, index, data, password, jsonPath))
+        .catch((errorFileExists) => writeOperations(collectionName, index, data, password, jsonPath))
 }
 
 export async function createFilesWithName (fileName, data, password) {
-    // return new Promise((resolve, reject) => {
     // First check if the directory exists
     try {
         let exists = await RNFetchBlobFS.exists(RNFetchBlobFS.dirs.DocumentDir + '/who_files');
@@ -1114,35 +1024,18 @@ export async function createFilesWithName (fileName, data, password) {
         console.log("An error occurred while getting if the root directory exists: ", errorExists);
         return Promise.reject(errorExists);
     }
-
-    // })
 }
 
-export function createZipFileAtPath (source, target, callback) {
-    // First check if the source exists, so that we don't create an empty zip file
-    console.log('Checking source: ', source);
-    RNFetchBlobFS.exists(source)
+export function createZipFileAtPath (source, target) {
+    return Promise.resolve()
+        .then(() => RNFetchBlobFS.exists(source))
         .then((exists) => {
             if (exists) {
-                // We don't need to check for archives with the same name, since the zip function overwrites the previous archive
-                zip(source, target)
-                    .then((path) => {
-                        console.log('Zip file created at path: ', path);
-                        return callback(null, path);
-                    })
-                    .catch((errorCreateZip) => {
-                        console.log('Error while creating zip file: ', errorCreateZip);
-                        callback(errorCreateZip);
-                    })
+                return zip(source, target)
             } else {
-                console.log('File does not exist at path: ', source);
-                return callback('File does not exist');
+                return Promise.reject(`File does not exist at path: ${source}`);
             }
         })
-        .catch((errorFileExists) => {
-            console.log('Error while checking if file exists: ', errorFileExists);
-            return callback(errorFileExists);
-        });
 }
 
 // Method for extracting the mongo id from the pouch id
@@ -1212,39 +1105,6 @@ export function mapContactsAndRelationships(contacts, relationships) {
         mappedContacts.push(searchableContacts[Object.keys(searchableContacts)[i]][0]);
     }
 
-
-
-    // for (let i = 0; i < relationships.length; i++) {
-    //     let contactObject = {};
-    //
-    //     let contactIndexAsFirstPerson = mappedContacts.findIndex((e) => {return extractIdFromPouchId(e._id, 'person') === relationships[i].persons[0].id});
-    //     let contactIndexAsSecondPerson = mappedContacts.findIndex((e) => {return extractIdFromPouchId(e._id, 'person') === relationships[i].persons[1].id});
-    //     if ((relationships[i].persons[0].type === 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT' || relationships[i].persons[0].type === 'contact') && contactIndexAsFirstPerson > -1) {
-    //         contactObject = Object.assign({}, contacts.find((e) => {
-    //             return extractIdFromPouchId(e._id, 'person') === relationships[i].persons[0].id
-    //         }))
-    //
-    //         if (!contactObject.relationships || contactObject.relationships.length === 0) {
-    //             contactObject.relationships = [];
-    //         }
-    //         contactObject.relationships.push(relationships[i]);
-    //         mappedContacts[contactIndexAsFirstPerson] = contactObject;
-    //     } else {
-    //         if ((relationships[i].persons[1].type === 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT' || relationships[i].persons[1].type === 'contact') && contactIndexAsSecondPerson > -1) {
-    //             contactObject = Object.assign({}, contacts.find((e) => {
-    //                 return extractIdFromPouchId(e._id, 'person') === relationships[i].persons[1].id
-    //             }));
-    //
-    //             if (!contactObject.relationships || contactObject.relationships.length === 0) {
-    //                 contactObject.relationships = [];
-    //             }
-    //             contactObject.relationships.push(relationships[i]);
-    //             mappedContacts[contactIndexAsSecondPerson] = contactObject;
-    //         }
-    //     }
-    // }
-
-    // console.log ('mapContactsAndRelationships mappedContacts', JSON.stringify(mappedContacts))
     console.log('Result for find time for mapContactsAndRelationships: ', new Date().getTime() - start);
     return mappedContacts;
 }
@@ -1994,103 +1854,6 @@ export function getTooltip (label, translation, forceTooltip, tooltipsMessage) {
     return tooltip
 }
 
-export function createFilterCasesObject(filterFromFilterScreen, filter){
-    let allFilters = {}
-
-    //age
-    if (filterFromFilterScreen && filterFromFilterScreen.age) {
-        allFilters.age = filterFromFilterScreen.age
-    } else {
-        allFilters.age = null
-    }
-
-    //gender
-    if (filterFromFilterScreen && filterFromFilterScreen.gender && filterFromFilterScreen.gender !== null) {
-        allFilters.gender = filterFromFilterScreen.gender
-
-    } else {
-        allFilters.gender = null
-    }
-
-    //classification
-    if (filterFromFilterScreen && filterFromFilterScreen.classification) {
-        allFilters.classification = filterFromFilterScreen.classification;
-    } else {
-        allFilters.classification = null
-    }
-
-    //search text
-    if (filter && filter.searchText && filter.searchText.trim().length > 0) {
-        let splitedFilter= filter.searchText.split(" ")
-        splitedFilter = splitedFilter.filter((e) => {return e !== ""})
-        allFilters.searchText = new RegExp(splitedFilter.join("|"), "ig");
-    } else {
-        allFilters.searchText = null
-    }
-
-    //selected locations
-    if (filterFromFilterScreen && filterFromFilterScreen.selectedLocations && filterFromFilterScreen.selectedLocations.length > 0) {
-        allFilters.selectedLocations = filterFromFilterScreen.selectedLocations;
-    } else {
-        allFilters.selectedLocations = null
-    }
-
-    //sort rules
-    if (filterFromFilterScreen && filterFromFilterScreen.sort && filterFromFilterScreen.sort.length > 0) {
-        allFilters.sort = filterFromFilterScreen.sort;
-    } else {
-        allFilters.sort = null
-    }
-
-    if (!allFilters.age && !allFilters.gender && !allFilters.searchText && !allFilters.classification && !allFilters.selectedLocations && !allFilters.sort) {
-        allFilters = null
-    }
-
-    return allFilters;
-}
-
-export function createFilterContactsObject(filterFromFilterScreen, filter){
-    let allFilters = {}
-
-    if (filterFromFilterScreen && filterFromFilterScreen.age) {
-        allFilters.age = filterFromFilterScreen.age
-    } else {
-        allFilters.age = null
-    }
-
-    if (filterFromFilterScreen && filterFromFilterScreen.gender && filterFromFilterScreen.gender !== null) {
-        allFilters.gender = filterFromFilterScreen.gender
-    } else {
-        allFilters.gender = null
-    }
-
-    if (filter && filter.searchText && filter.searchText.trim().length > 0) {
-        let splitedFilter= filter.searchText.split(" ");
-        splitedFilter = splitedFilter.filter((e) => {return e !== ""});
-        allFilters.searchText = new RegExp(splitedFilter.join("|"), "ig");
-    } else {
-        allFilters.searchText = null
-    }
-
-    if (filterFromFilterScreen && filterFromFilterScreen.selectedLocations && filterFromFilterScreen.selectedLocations.length > 0) {
-        allFilters.selectedLocations = filterFromFilterScreen.selectedLocations;
-    } else {
-        allFilters.selectedLocations = null
-    }
-
-    if (filterFromFilterScreen && filterFromFilterScreen.sort && filterFromFilterScreen.sort.length > 0) {
-        allFilters.sort = filterFromFilterScreen.sort;
-    } else {
-        allFilters.sort = null
-    }
-    
-    if (!allFilters.age && !allFilters.gender && !allFilters.searchText && !allFilters.selectedLocations && !allFilters.sort) {
-        allFilters = null
-    }
-
-    return allFilters
-}
-
 export function getDropDownInputDisplayParameters(screenSize, dropDownDataLength ){
     let itemCount = 4
     let dropdownPosition = 3
@@ -2156,7 +1919,6 @@ export function generateTeamId (contactAddress, teams, locationsTree) {
     console.log('Computed teamId in: ', new Date().getTime() - start);
     return teamId;
 }
-
 
 // Warning: this code makes an assumption that the user will be a member of a very few teams and that each team will have few locations assigned
 // This will have poor performance for large number of teams with large number of locations for each

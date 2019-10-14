@@ -6,34 +6,24 @@ import { batchActions } from 'redux-batched-actions';
 import {changeAppRoot, getTranslations, saveTranslation, saveAvailableLanguages} from './app';
 import {loginUserRequest, getUserByIdRequest, updateUserRequest} from './../queries/user';
 import {getUserRoles} from './../actions/role';
-import {getUserTeams} from './../actions/teams'
-import { getFollowUpsForOutbreakIdWithPromises } from './followUps';
-import { getCasesForOutbreakIdWithPromise } from './cases';
+import {getUserTeams} from './../actions/teams';
+// import { getCasesForOutbreakIdWithPromise } from './cases';
 import { getClusters } from './clusters';
-import { getEventsForOutbreakId } from './events';
 import { getOutbreakById } from './outbreak';
 import { addError } from './errors';
 import {getReferenceData, storeReferenceData} from './referenceData';
 import {getHelpCategory} from './helpCategory';
 import {getHelpItem} from './helpItem';
 import errorTypes from './../utils/errorTypes';
-// import storeContacts} from './contacts';
-// import {storeCases} from './cases';
-// import {storeEvents} from './events';
 import {storeHelpCategory} from './helpCategory';
 import {storeHelpItem} from './helpItem';
-import {storeFollowUps} from './followUps';
 import {storeOutbreak, storeLocationsList, storeLocations} from './outbreak';
 import {storeUserTeams} from './teams';
 import {storeClusters} from './clusters';
 import {setLoginState, storeData, getAvailableLanguages, setSyncState} from './app';
 import {storePermissions} from './role';
-import {storeExposures} from './exposure';
 import {getLocations} from './locations';
-import moment from 'moment';
 import get from 'lodash/get';
-import {middlewareFunction} from './app';
-import {createDate} from './../utils/functions';
 
 // Add here only the actions, not also the requests that are executed.
 // For that purpose is the requests directory
@@ -81,11 +71,6 @@ export function cleanDataAfterLogout() {
             // Do logout cleanup as a batch
             dispatch(batchActions([
                 storeUser(null),
-                // storeContacts(null),
-                storeFollowUps(null),
-                // storeCases(null),
-                // storeExposures(null),
-                // storeEvents(null),
                 storeOutbreak(null),
                 storeHelpCategory(null),
                 storeHelpItem(null),
@@ -128,8 +113,6 @@ export function computeCommonData(storeUserBool, user, refreshFollowUps, filters
             if (outbreakAndLocationInfo) {
                 let promises = [];
 
-                // promises.push(getContactsForOutbreakIdWithPromises(response.activeOutbreakId, null, null, dispatch));
-                // promises.push(getFollowUpsForOutbreakIdWithPromises(response.activeOutbreakId, null, null, null, dispatch));
                 let userTeams = await getUserTeams(user._id, null);
                 promises.push(getUserRoles(user.roleIds, null));
                 promises.push(getClusters(null, null));
@@ -139,16 +122,6 @@ export function computeCommonData(storeUserBool, user, refreshFollowUps, filters
                 promises.push(getLocations(outbreakAndLocationInfo.locationIds || null, null));
                 promises.push(getHelpCategory(null, dispatch));
                 promises.push(getHelpItem(null, dispatch));
-                // if (refreshFollowUps) {
-                //     let now = createDate(null);
-                //     promises.push(getFollowUpsForOutbreakIdWithPromises(user.activeOutbreakId, filters['FollowUpsScreen'] || {
-                //         date: new Date(new Date((now.getUTCMonth() + 1) + '/' + now.getUTCDate() + '/' + now.getUTCFullYear()).getTime() - ((moment().isDST() ? now.getTimezoneOffset() : now.getTimezoneOffset() - 60) * 60 * 1000)),
-                //         searchText: ''
-                //     }, userTeams, null, dispatch));
-                // }
-                // promises.push(getEventsForOutbreakId(user.activeOutbreakId, null, null));
-                // promises.push(getCasesForOutbreakIdWithPromise(user.activeOutbreakId, null, null, null));
-                // promises.push(getUserTeams(user._id, null));
 
                 Promise.all(promises)
                     .then((dataArray) => {
@@ -168,8 +141,6 @@ export function computeCommonData(storeUserBool, user, refreshFollowUps, filters
                             storeClusters(get(actionsObject,  'clusters', null)),
                             storePermissions(get(actionsObject,  'userRoles', null)),
                             storeUserTeams(userTeams),
-                            // storeExposures(get(actionsObject,  'cases', null)),
-                            // storeEvents(get(actionsObject,  'events', null)),
                             storeHelpCategory(get(actionsObject,  'helpCategory', null)),
                             storeHelpItem(get(actionsObject,  'helpItem', null)),
                             setLoginState('Finished logging'),
@@ -178,8 +149,6 @@ export function computeCommonData(storeUserBool, user, refreshFollowUps, filters
 
                         if(refreshFollowUps) {
                             arrayOfActions.push(setSyncState({id: 'tests', status:'Success'}));
-                            // arrayOfActions.push(storeFollowUps(get(actionsObject, 'followUps.followUps', null)));
-                            // arrayOfActions.push(storeContacts(get(actionsObject, 'followUps.contacts', null)));
                         }
 
                         if (storeUserBool) {
