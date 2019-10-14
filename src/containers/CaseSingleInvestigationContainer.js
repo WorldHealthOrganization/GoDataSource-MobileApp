@@ -4,19 +4,17 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, { Component } from 'react';
-import { View, StyleSheet, findNodeHandle, ScrollView } from 'react-native';
-import { calculateDimension, extractAllQuestions, mapQuestions, getTranslation, createDate } from '../utils/functions';
+import { View, StyleSheet, ScrollView } from 'react-native';
+import { calculateDimension, extractAllQuestions, getTranslation, createDate } from '../utils/functions';
 import config from '../utils/config';
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import styles from '../styles';
 import QuestionCard from '../components/QuestionCard';
 import Button from '../components/Button';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import sortBy from 'lodash/sortBy';
 import cloneDeep from 'lodash/cloneDeep';
 import translations from './../utils/translations';
-import moment from 'moment';
 
 class CaseSingleInvestigationContainer extends Component {
 
@@ -27,28 +25,6 @@ class CaseSingleInvestigationContainer extends Component {
             previousAnswers: this.props.previousAnswers
         };
     }
-
-    // static getDerivedStateFromProps(props, state) {
-    //     if (props.previousAnswers) {
-    //         state.previousAnswers = props.previousAnswers;
-    //     }
-    //     // Sort the answers by date
-    //     if (state.previousAnswers && Object.keys(state.previousAnswers).length > 0) {
-    //         for (let questionId in state.previousAnswers) {
-    //             if (Array.isArray(state.previousAnswers[questionId]) && state.previousAnswers[questionId].length > 1) {
-    //                 state.previousAnswers[questionId] = state.previousAnswers[questionId].sort((a, b) => {
-    //                     if (new Date(a.date) > new Date(b.date)) {
-    //                         return -1;
-    //                     }
-    //                     if (new Date(a.date) < new Date(b.date)) {
-    //                         return 1;
-    //                     }
-    //                     return 0;
-    //                 })
-    //             }
-    //         }
-    //     }
-    // }
 
     shouldComponentUpdate(nextProps, nextState) {
         if (nextProps.isEditMode !== this.props.isEditMode || nextProps.index === 3) {
@@ -162,58 +138,31 @@ class CaseSingleInvestigationContainer extends Component {
                                         ))
                         }
                     </View>
-                    {/* <KeyboardAwareScrollView
-                        style={style.containerScrollView}
-                        contentContainerStyle={[style.contentContainerStyle, {paddingBottom: this.props.screenSize.height < 600 ? 70 : 20}]}
-                        keyboardShouldPersistTaps={'always'}
-                        extraHeight={20 + 81 + 50 + 70}
-                        innerRef={ref => {
-                            this.scrollCasesSingleInvestigation = ref
-                        }}
-                    > */}
                     <ScrollView
                         style={style.containerScrollView}
                         contentContainerStyle={[style.contentContainerStyle, { paddingBottom: this.props.screenSize.height < 600 ? 70 : 20 }]}
                     >
                         {
                             sortedQuestions.map((item, index) => {
-                                return this.handleRenderItem(previousAnswers, item, index, sortedQuestions.length)
+                                return this.handleRenderItem(previousAnswers, item, index, sortedQuestions)
                             })
                         }
                     </ScrollView>
-                    {/* </KeyboardAwareScrollView> */}
                 </View>
             </View >
         );
     }
 
     // Please write here all the methods that are not react native lifecycle methods
-    handleRenderSectionedList = (item, index) => {
-        return (
-            <View>
-                <Section
-                    label={getTranslation(item.categoryName, this.props.translation)}
-                    containerStyle={{
-                        marginVertical: 10
-                    }}
-                    translation={this.props.translation}
-                />
-                {
-                    item.questions.map((item, index) => {
-                        return this.handleRenderItem(item, index)
-                    })
-                }
-            </View>
-        )
-    };
-
-    handleRenderItem = (previousAnswers, item, index, totalNumberOfQuestions) => {
+    handleRenderItem = (previousAnswers, item, index, totalQuestions) => {
+        const totalNumberOfQuestions = totalQuestions.length;
         if (item.inactive === false) {
             return (
                 <QuestionCard
                     item={item}
                     isEditMode={this.props.isEditMode}
                     index={index + 1}
+                    totalQuestions={totalQuestions}
                     totalNumberOfQuestions={totalNumberOfQuestions}
                     source={previousAnswers}
                     onChangeTextAnswer={this.props.onChangeTextAnswer}
@@ -228,7 +177,7 @@ class CaseSingleInvestigationContainer extends Component {
                 />
             )
         }
-    }
+    };
 
     handleBackButton = () => {
         this.props.handleMoveToPrevieousScreenButton()
@@ -241,14 +190,8 @@ class CaseSingleInvestigationContainer extends Component {
     handleOnBlur = (event) => {
         // this.scrollCasesSingleInvestigation.props.scrollToPosition(0, 0, false)
         // this.scrollToInput(findNodeHandle(event.target))
-    }
-
-    scrollToInput(reactNode) {
-        // Add a 'scroll' ref to your ScrollView
-        // this.scrollCasesSingleInvestigation.props.scrollToFocusedInput(reactNode)
     };
 }
-
 
 // Create style outside the class, or for components that will be used by other components (buttons),
 // make a global style in the config directory
