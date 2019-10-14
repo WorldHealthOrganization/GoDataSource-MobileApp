@@ -195,7 +195,8 @@ const contactSingleScreen = {
     riskReason: 'LNG_CONTACT_FIELD_LABEL_RISK_REASON',
 
     // TODO add to backend
-    contactId: 'LNG_CONTACT_FIELD_LABEL_CONTACT_ID'
+    contactId: 'LNG_CONTACT_FIELD_LABEL_CONTACT_ID',
+    followUpFinalStatus: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_STATUS_DESCRIPTION'
 };
 
 const exposureScreen = {
@@ -392,7 +393,7 @@ const firstConfigScreen = {
 
 const qrScanScreen = {
     title: 'LNG_SCAN_QR_CODE_SCREEN_TITLE'
-}
+};
 
 const manualConfigScreen = {
     title: 'HUB configuration',

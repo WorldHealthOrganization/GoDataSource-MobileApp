@@ -6,17 +6,11 @@
  */
 import React, {PureComponent} from 'react';
 import {View, Text, StyleSheet, PixelRatio} from 'react-native';
-import PropTypes from 'prop-types';
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
-import styles from './../styles';
-import {ListItem} from 'react-native-ui-lib';
 import ElevatedView from 'react-native-elevated-view';
 import ActionsBar from './ActionsBar';
-import translations from './../utils/translations'
 import {getTranslation} from './../utils/functions';
-import {connect} from "react-redux";
-import {bindActionCreators} from "redux";
 
 GeneralListItem = ({title, primaryText, secondaryText, firstComponent, secondComponent, thirdComponent, hasActionsBar, textsArray, textsStyleArray, onPressArray, actionsBarContainerStyle, containerStyle, translation}) => (
     <ElevatedView
@@ -86,17 +80,5 @@ const style = StyleSheet.create({
         marginVertical: 8
     }
 });
-
-// GeneralListItem.propTypes = {
-//     label: PropTypes.string.isRequired,
-//     hasBorderBottom: PropTypes.boolean,
-//     borderBottomColor: PropTypes.string
-// };
-//
-// GeneralListItem.defaultProps = {
-//     label: 'Test',
-//     hasBorderBottom: false,
-//     borderBottomColor: styles.navigationDrawerSeparatorGrey
-// };
 
 export default (GeneralListItem);

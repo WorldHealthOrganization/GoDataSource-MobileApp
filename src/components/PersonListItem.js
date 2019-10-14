@@ -5,20 +5,14 @@
  * Created by florinpopa on 03/08/2018.
  */
 import React, {Component} from 'react';
-import {View, Text, StyleSheet, Image, InteractionManager} from 'react-native';
+import {StyleSheet, Image, InteractionManager} from 'react-native';
 import PropTypes from 'prop-types';
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import styles from './../styles';
-import {ListItem} from 'react-native-material-ui';
-import ElevatedView from 'react-native-elevated-view';
-import ActionsBar from './ActionsBar';
-import translations from './../utils/translations'
 import {getTranslation, calculateDimension} from './../utils/functions';
 import {connect} from "react-redux";
-import {bindActionCreators} from "redux";
 import GeneralListItem from './GeneralListItem';
-import Ripple from 'react-native-material-ripple';
 import {extractIdFromPouchId, getAddress, handleExposedTo} from "../utils/functions";
 import config from "../utils/config";
 import PersonListItemNameAndAddressComponent from './PersonListItemNameAndAddressComponent';
@@ -37,16 +31,6 @@ class PersonListItem extends Component {
         };
     }
 
-    // componentWillMount() {
-    //     let firstComponentData = this.prepareFirstComponentData(this.props.type, this.props.itemToRender);
-    //     let secondComponentData = this.prepareSecondComponentData(this.props.type, this.props.itemToRender);
-    //
-    //     this.setState({
-    //         firstComponentData,
-    //         secondComponentData
-    //     })
-    // }
-
     shouldComponentUpdate(nextProps, nextState) {
         if (!isEqual(nextProps.itemToRender, this.props.itemToRender)) {
             return true;
@@ -57,9 +41,6 @@ class PersonListItem extends Component {
     render() {
         let firstComponentData = this.prepareFirstComponentData(this.props.type, this.props.itemToRender);
         let secondComponentData = this.prepareSecondComponentData(this.props.type, this.props.itemToRender);
-
-
-        // console.log('Render PersonListItem main component');
 
         return (
             <GeneralListItem
@@ -98,7 +79,8 @@ class PersonListItem extends Component {
             age: '',
             visualId: '',
             addressString: '',
-            primaryColor: 'black'
+            primaryColor: 'black',
+            status: null
         };
         // the new implementation
         let person = get(itemToRender, 'mainData', null);
@@ -108,12 +90,13 @@ class PersonListItem extends Component {
         // Get followUp's contact
         // let person = type === 'Contact' || type === 'Case' ? itemToRender : this.props.contacts && Array.isArray(this.props.contacts) && this.props.contacts.length > 0 ?  this.props.contacts.find((e) => {return extractIdFromPouchId(e._id, 'person') === itemToRender.personId}) : null;
         returnValues.fullName = person ? ((person.firstName ? person.firstName : ' ') + (person.lastName ? (" " + person.lastName) : ' ')) : '';
+        // Gender
         let genderString = '';
         if (person && person.gender) {
             genderString = getTranslation(person.gender, this.props.translation);
         }
-
         returnValues.gender = person && genderString ? genderString.charAt(0) : '';
+        // Age
         if (person && person.age !== undefined && person.age !== null) {
             if (person.age.years !== undefined || person.age.months !== undefined) {
                 if (person.age.years !== 0 && person.age.years !== null && person.age.years !== undefined) {
@@ -123,20 +106,24 @@ class PersonListItem extends Component {
                 }
             }
         }
-
+        // Address
         if (person && person.addresses && Array.isArray(person.addresses) && person.addresses.length > 0) {
             let personPlaceOfResidence = person.addresses.find((e) => {return e.typeId === config.userResidenceAddress.userPlaceOfResidence});
             if (personPlaceOfResidence) {
                 returnValues.addressString = getAddress(personPlaceOfResidence, true, this.props.locations);
             }
         }
-
+        // Visual Id
         if (person && person.visualId) {
             returnValues.visualId = person.visualId;
         }
-
+        // Id
         if (person && person._id) {
             returnValues.id = person._id;
+        }
+        // Followup final status
+        if (type === 'Contact' && person && person.followUp){
+            returnValues.status = person.followUp.status ? getTranslation(person.followUp.status, this.props.translations) : null;
         }
 
         return returnValues;
