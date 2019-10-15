@@ -1,6 +1,8 @@
 /**
  * Created by mobileclarisoft on 23/07/2018.
  */
+// Since this app is based around the material ui is better to use the components from
+// the material ui library, since it provides design and animations out of the box
 import React, { Component } from 'react';
 import { View, Alert, Text, StyleSheet, Animated, Platform, Dimensions, BackHandler } from 'react-native';
 import { TabBar, TabView, PagerScroll } from 'react-native-tab-view';
@@ -12,8 +14,6 @@ import Ripple from 'react-native-material-ripple';
 import styles from './../styles';
 import config from './../utils/config';
 import _, { sortBy } from 'lodash';
-// Since this app is based around the material ui is better to use the components from
-// the material ui library, since it provides design and animations out of the box
 import CaseSinglePersonalContainer from './../containers/CaseSinglePersonalContainer';
 import CaseSingleAddressContainer from './../containers/CaseSingleAddressContainer';
 import CaseSingleInfectionContainer from './../containers/CaseSingleInfectionContainer';
@@ -148,7 +148,7 @@ class CaseSingleScreen extends Component {
         });
 
         if (!this.props.isNew) {
-            let ageClone = { years: 0, months: 0 }
+            let ageClone = { years: 0, months: 0 };
             let updateAge = false;
             if (this.props.case && (this.props.case.age === null || this.props.case.age === undefined || (this.props.case.age.years === undefined && this.props.case.age.months === undefined))) {
                 updateAge = true
@@ -182,17 +182,11 @@ class CaseSingleScreen extends Component {
     }
 
     handleBackButtonClick() {
-        // this.props.navigator.goBack(null);
         if (this.state.isModified === true) {
             Alert.alert("", 'You have unsaved data. Are you sure you want to leave this page and lose all changes?', [
                 {
                     text: 'Yes', onPress: () => {
-                        this.props.navigator.pop(
-                            //     {
-                            //     animated: true,
-                            //     animationType: 'fade'
-                            // }
-                        )
+                        this.props.navigator.pop()
                     }
                 },
                 {
@@ -202,12 +196,7 @@ class CaseSingleScreen extends Component {
                 }
             ])
         } else {
-            this.props.navigator.pop(
-                //     {
-                //     animated: true,
-                //     animationType: 'fade'
-                // }
-            )
+            this.props.navigator.pop()
         }
         return true;
     }
@@ -266,24 +255,6 @@ class CaseSingleScreen extends Component {
                                         <Icon name="help" color={'white'} size={15} />
                                     </Ripple>
                                 </ElevatedView>
-                                {/*<View>*/}
-                                {/*<Menu*/}
-                                {/*ref="menuRef"*/}
-                                {/*button={*/}
-                                {/*<Ripple onPress={this.showMenu} hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}>*/}
-                                {/*<Icon name="more-vert"/>*/}
-                                {/*</Ripple>*/}
-                                {/*}*/}
-                                {/*>*/}
-                                {/*{*/}
-                                {/*!this.props.isNew ? (*/}
-                                {/*<MenuItem onPress={this.handleOnPressDeleteCase}>*/}
-                                {/*{getTranslation(translations.caseSingleScreen.deleteCaseLabel, this.props.translation)}*/}
-                                {/*</MenuItem>*/}
-                                {/*) : null*/}
-                                {/*}*/}
-                                {/*</Menu>*/}
-                                {/*</View>*/}
                             </View>
                         </View>
                     }
@@ -687,12 +658,7 @@ class CaseSingleScreen extends Component {
             Alert.alert("", 'You have unsaved data. Are you sure you want to leave this page and lose all changes?', [
                 {
                     text: 'Yes', onPress: () => {
-                        this.props.navigator.pop(
-                            //     {
-                            //     animated: true,
-                            //     animationType: 'fade'
-                            // }
-                        )
+                        this.props.navigator.pop()
                     }
                 },
                 {
@@ -702,12 +668,7 @@ class CaseSingleScreen extends Component {
                 }
             ])
         } else {
-            this.props.navigator.pop(
-                //     {
-                //     animated: true,
-                //     animationType: 'fade'
-                // }
-            );
+            this.props.navigator.pop();
         }
     };
 
@@ -1193,19 +1154,7 @@ class CaseSingleScreen extends Component {
             }
         }
 
-        // isolation Date
-        // if (this.state.case && this.state.case.isolationDates && Array.isArray(this.state.case.isolationDates) && this.state.case.isolationDates.length > 0) {
-        //     for (let i=0; i < this.state.case.isolationDates.length; i++) {
-        //         for (let j=0; j<config.caseSingleScreen.isolationDate.fields.length; j++) {
-        //             if (config.caseSingleScreen.isolationDate.fields[j].isRequired && !this.state.case.isolationDates[i][config.caseSingleScreen.isolationDate.fields[j].id]) {
-        //                 requiredFields.push(getTranslation(config.caseSingleScreen.isolationDate.fields[j].label, this.props.translation));
-        //                 // return false;
-        //             }
-        //         }
-        //     }
-        // }
         return requiredFields;
-        // return true
     };
     checkRequiredFieldsCaseInvestigationQuestionnaire = () => {
         let sortedQuestions = sortBy(cloneDeep(this.props.caseInvestigationQuestions), ['order', 'variable']);
@@ -1318,7 +1267,7 @@ class CaseSingleScreen extends Component {
                 } else if (objectType && objectType === 'Documents') {
                     let documentsClone = _.cloneDeep(this.state.case.documents);
                     documentsClone[objectTypeOrIndex][id] = value && value.value ? value.value : value;
-                    console.log('documentsClone', documentsClone)
+                    console.log('documentsClone', documentsClone);
                     this.setState(prevState => ({
                         case: Object.assign({}, prevState.case, { documents: documentsClone }),
                         isModified: true
@@ -1343,17 +1292,17 @@ class CaseSingleScreen extends Component {
             let today = createDate(null);
             let nrOFYears = this.calcDateDiff(value, today);
             if (nrOFYears !== undefined && nrOFYears !== null) {
-                let ageClone = { years: 0, months: 0 }
-                let selectedItemIndexForAgeUnitOfMeasureDropDown = 0
+                let ageClone = { years: 0, months: 0 };
+                let selectedItemIndexForAgeUnitOfMeasureDropDown = 0;
 
                 if (nrOFYears.years === 0 && nrOFYears.months >= 0) {
-                    ageClone.months = nrOFYears.months
-                    ageClone.years = nrOFYears.months
+                    ageClone.months = nrOFYears.months;
+                    ageClone.years = nrOFYears.months;
                     selectedItemIndexForAgeUnitOfMeasureDropDown = 1
                 } else {
                     if (nrOFYears.years > 0) {
-                        ageClone.months = nrOFYears.years
-                        ageClone.years = nrOFYears.years
+                        ageClone.months = nrOFYears.years;
+                        ageClone.years = nrOFYears.years;
                         selectedItemIndexForAgeUnitOfMeasureDropDown = 0
                     }
                 }
@@ -1451,9 +1400,6 @@ class CaseSingleScreen extends Component {
                                                     case: Object.assign({}, prevState.case, { addresses: addressesClone }),
                                                     isModified: true
                                                 })
-                                                // , () => {
-                                                //     console.log("onChangeSwitch", id, " ", value, " ", this.state.case);
-                                                // }
                                             )
                                         },
                                         (error) => {
@@ -1483,9 +1429,6 @@ class CaseSingleScreen extends Component {
                                                                 case: Object.assign({}, prevState.case, { addresses: addressesClone }),
                                                                 isModified: true
                                                             })
-                                                            // , () => {
-                                                            //     console.log("onChangeSwitch", id, " ", value, " ", this.state.case);
-                                                            // }
                                                         )
                                                     }
                                                 }
@@ -1518,9 +1461,6 @@ class CaseSingleScreen extends Component {
                                     case: Object.assign({}, prevState.case, { addresses: addressesClone }),
                                     isModified: true
                                 })
-                                // , () => {
-                                //     console.log("onChangeSwitch", id, " ", value, " ", this.state.case);
-                                // }
                             )
                         }
                     }
@@ -1532,9 +1472,6 @@ class CaseSingleScreen extends Component {
                         case: Object.assign({}, prevState.case, { [id]: value }),
                         isModified: true
                     })
-                    // , () => {
-                    // console.log("onChangeSwitch", id, " ", value, " ", this.state.case);
-                    // }
                 )
             }
         }
@@ -1560,7 +1497,7 @@ class CaseSingleScreen extends Component {
                         if (value.value === config.userResidenceAddress.userPlaceOfResidence) {
                             addressesClone.forEach(element => {
                                 if (element[id] === value.value) {
-                                    element[id] = config.userResidenceAddress.userOtherResidence
+                                    element[id] = config.userResidenceAddress.userOtherResidence;
                                     anotherPlaceOfResidenceWasChosen = true
                                 }
                             });
@@ -1665,19 +1602,19 @@ class CaseSingleScreen extends Component {
 
     calcDateDiff = (startdate, enddate) => {
         //define moments for the startdate and enddate
-        var startdateMoment = moment(startdate);
-        var enddateMoment = moment(enddate);
+        let startdateMoment = moment(startdate);
+        let enddateMoment = moment(enddate);
 
         if (startdateMoment.isValid() === true && enddateMoment.isValid() === true) {
             //getting the difference in years
-            var years = enddateMoment.diff(startdateMoment, 'years');
+            let years = enddateMoment.diff(startdateMoment, 'years');
 
             //moment returns the total months between the two dates, subtracting the years
-            var months = enddateMoment.diff(startdateMoment, 'months') - (years * 12);
+            let months = enddateMoment.diff(startdateMoment, 'months') - (years * 12);
 
             //to calculate the days, first get the previous month and then subtract it
             startdateMoment.add(years, 'years').add(months, 'months');
-            var days = enddateMoment.diff(startdateMoment, 'days');
+            let days = enddateMoment.diff(startdateMoment, 'days');
 
             console.log('calcDateDiff', { months: months, years: years });
             return nrOFYears = {
@@ -1696,7 +1633,7 @@ class CaseSingleScreen extends Component {
     };
     ageAndDobPrepareForSave = () => {
         let dobClone = null;
-        let ageClone = { years: 0, months: 0 }
+        let ageClone = { years: 0, months: 0 };
 
         if (this.state.case.dob !== null && this.state.case.dob !== undefined) {
             //get info from date
@@ -1743,11 +1680,7 @@ class CaseSingleScreen extends Component {
                 if (!questionnaireAnswers[parentId][0].subAnswers[id]) {
                     questionnaireAnswers[parentId][0].subAnswers[id] = [];
                 }
-                // if (!questionnaireAnswers[parentId][0].subAnswers[id][0]) {
                 questionnaireAnswers[parentId][0].subAnswers[id][0] = value;
-                // } else {
-                //     questionnaireAnswers[parentId][0].subAnswers[id].push(value);
-                // }
             }
         } else {
             if (!questionnaireAnswers[id]) {
@@ -1781,11 +1714,7 @@ class CaseSingleScreen extends Component {
                 if (!questionnaireAnswers[parentId][0].subAnswers[id]) {
                     questionnaireAnswers[parentId][0].subAnswers[id] = [];
                 }
-                // if (!questionnaireAnswers[parentId][0].subAnswers[id][0]) {
                 questionnaireAnswers[parentId][0].subAnswers[id][0] = value;
-                // } else {
-                //     questionnaireAnswers[parentId][0].subAnswers[id].push(value);
-                // }
             }
         } else {
             if (!questionnaireAnswers[id]) {
@@ -1793,14 +1722,10 @@ class CaseSingleScreen extends Component {
             }
             questionnaireAnswers[id][0] = value;
         }
-        // questionnaireAnswers[id] = value.value;
         this.setState(prevState => ({
                 previousAnswers: questionnaireAnswers,
                 isModified: true
             })
-            // , () => {
-            //     console.log ('onChangeMultipleSelection after setState', this.state.previousAnswers)
-            // }
         )
     };
     onChangeMultipleSelection = (value, id, parentId) => {
@@ -1818,11 +1743,7 @@ class CaseSingleScreen extends Component {
                 if (!questionnaireAnswers[parentId][0].subAnswers[id]) {
                     questionnaireAnswers[parentId][0].subAnswers[id] = [];
                 }
-                // if (!questionnaireAnswers[parentId][0].subAnswers[id][0]) {
                 questionnaireAnswers[parentId][0].subAnswers[id][0] = value;
-                // } else {
-                //     questionnaireAnswers[parentId][0].subAnswers[id].push(value);
-                // }
             }
         } else {
             if (!questionnaireAnswers[id]) {
@@ -1830,14 +1751,10 @@ class CaseSingleScreen extends Component {
             }
             questionnaireAnswers[id][0] = value;
         }
-        // questionnaireAnswers[id] = selections.map((e) => {return e.value});
         this.setState(prevState => ({
                 previousAnswers: questionnaireAnswers,
                 isModified: true
             })
-            // , () => {
-            //     console.log ('onChangeMultipleSelection after setState', this.state.previousAnswers)
-            // }
         )
     };
     onChangeDateAnswer = (value, id, parentId) => {
@@ -1855,11 +1772,7 @@ class CaseSingleScreen extends Component {
                 if (!questionnaireAnswers[parentId][0].subAnswers[id]) {
                     questionnaireAnswers[parentId][0].subAnswers[id] = [];
                 }
-                // if (!questionnaireAnswers[parentId][0].subAnswers[id][0]) {
                 questionnaireAnswers[parentId][0].subAnswers[id][0] = value;
-                // } else {
-                //     questionnaireAnswers[parentId][0].subAnswers[id].push(value);
-                // }
             }
         } else {
             if (!questionnaireAnswers[id]) {
@@ -1867,14 +1780,10 @@ class CaseSingleScreen extends Component {
             }
             questionnaireAnswers[id][0] = value;
         }
-        // questionnaireAnswers[id] = value;
         this.setState(prevState => ({
                 previousAnswers: questionnaireAnswers,
                 isModified: true
             })
-            //     , () => {
-            //     console.log ('onChangeDateAnswer after setState', this.state.previousAnswers)
-            // }
         )
     };
     onChangeAnswerDate = (value, questionId) => {
@@ -1924,13 +1833,12 @@ class CaseSingleScreen extends Component {
 
     // used for adding multi-frequency answers
     onClickAddNewMultiFrequencyAnswer = (item) => {
-        this.setState({
-            newItem: item
-        }, () => {
-            this.setState({
-                showAddSingleAnswerModalScreen: !this.state.showAddSingleAnswerModalScreen
-            })
-        })
+        //add new empty item to question and update previousAnswers
+        let previousAnswersClone = _.cloneDeep(this.state.previousAnswers);
+        if(previousAnswersClone.hasOwnProperty(item.variable) && item.variable){
+            previousAnswersClone[item.variable].push({date:'', value:''});
+        }
+        this.savePreviousAnswers(previousAnswersClone[item.variable], item.variable);
     };
 
     onClickShowPreviousAnswers = (previousAnswer) => {
@@ -1951,7 +1859,6 @@ class CaseSingleScreen extends Component {
             previousAnswers: Object.assign({}, prevState.previousAnswers, { [previousAnswersId]: previousAnswers }),
             isModified: true
         }), () => {
-            // console.log('Updated previousAnswers: ', this.state.previousAnswers);
             this.props.navigator.dismissAllModals();
         })
     };
@@ -1973,7 +1880,6 @@ class CaseSingleScreen extends Component {
         if (!previousAnswersClone[Object.keys(currentAnswersClone)[0]]) {
             previousAnswersClone[Object.keys(currentAnswersClone)[0]] = [];
         }
-        // currentAnswersClone[Object.keys(currentAnswersClone)[0]][0].date = currentAnswersClone[Object.keys(currentAnswersClone)[0]][0].date.toISOString();
         previousAnswersClone[Object.keys(currentAnswersClone)[0]].push(currentAnswersClone[Object.keys(currentAnswersClone)[0]][0]);
         previousAnswersClone[Object.keys(currentAnswersClone)[0]].sort((a, b) => {
             if (createDate(a.date) > createDate(b.date)) {
@@ -1998,9 +1904,6 @@ class CaseSingleScreen extends Component {
                 currentAnswers: currentAnswers,
                 isModified: true
             }
-            // , () => {
-            //     console.log('CurrentAnswers: ', this.state.currentAnswers);
-            // }
         )
     };
 }

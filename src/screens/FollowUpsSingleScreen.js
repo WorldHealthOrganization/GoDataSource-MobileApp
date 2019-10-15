@@ -866,13 +866,14 @@ class FollowUpsSingleScreen extends Component {
 
     // used for adding multi-frequency answers
     onClickAddNewMultiFrequencyAnswer = (item) => {
-        this.setState({
-            newItem: item
-        }, () => {
-            this.setState({
-                showAddSingleAnswerModalScreen: !this.state.showAddSingleAnswerModalScreen
-            })
-        })
+        //add new empty item to question and update previousAnswers
+        let previousAnswersClone = _.cloneDeep(this.state.previousAnswers);
+        if(previousAnswersClone.hasOwnProperty(item.variable) && item.variable){
+            previousAnswersClone[item.variable].push({date:'', value:''});
+        }else{
+            previousAnswersClone = Object.assign({}, previousAnswersClone, { [item.variable]: [{date:'', value:''}] });
+        }
+        this.savePreviousAnswers(previousAnswersClone[item.variable], item.variable);
     };
 
     onClickShowPreviousAnswers = (previousAnswer) => {
@@ -889,8 +890,6 @@ class FollowUpsSingleScreen extends Component {
         })
     };
     savePreviousAnswers = (previousAnswers, previousAnswersId) => {
-        // console.log(previousAnswers, previousAnswersId);
-        // let questionnaireAnswers = _.cloneDeep(this.state.previousAnswers);
         this.setState(prevState => ({
             previousAnswers: Object.assign({}, prevState.previousAnswers, { [previousAnswersId]: previousAnswers }),
             isModified: true

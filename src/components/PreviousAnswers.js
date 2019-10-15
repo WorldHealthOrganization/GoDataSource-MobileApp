@@ -36,6 +36,13 @@ class PreviousAnswers extends Component {
     }
 
     // Please add here the react lifecycle methods that you need
+    componentDidUpdate(prevProps) {
+        if (prevProps.previousAnswers === undefined || this.props.previousAnswers.length !== prevProps.previousAnswers.length) {
+            this.setState({
+                previousAnswers: this.props.previousAnswers
+            });
+        }
+    }
 
     // The render method should have at least business logic as possible,
     // because this will be called whenever there is a new setState call
@@ -95,7 +102,7 @@ class PreviousAnswers extends Component {
     };
 
     renderListOfPreviousAnswers = (previousAnswer, index) => {
-        console.log('renderListOfPreviousAnswers: ', previousAnswer, index);
+        // console.log('renderListOfPreviousAnswers: ', previousAnswer, index);
         let width = calculateDimension(config.designScreenSize.width - 32, false, this.props.screenSize);
         let viewWidth = calculateDimension(315, false, this.props.screenSize);
         let viewHeight = calculateDimension(30, true, this.props.screenSize);
@@ -176,6 +183,8 @@ class PreviousAnswers extends Component {
         this.setState({
             previousAnswers: questionnaireAnswers,
             isModified: true
+        }, () => {
+            this.props.savePreviousAnswers(this.state.previousAnswers, this.props.previousAnswerVariable);
         });
     };
 
@@ -192,6 +201,8 @@ class PreviousAnswers extends Component {
         this.setState({
             previousAnswers: questionnaireAnswers,
             isModified: true
+        }, () => {
+            this.props.savePreviousAnswers(this.state.previousAnswers, this.props.previousAnswerVariable);
         });
     };
 
@@ -208,6 +219,8 @@ class PreviousAnswers extends Component {
         this.setState({
             previousAnswers: questionnaireAnswers,
             isModified: true
+        }, () => {
+            this.props.savePreviousAnswers(this.state.previousAnswers, this.props.previousAnswerVariable);
         });
     };
 
@@ -224,6 +237,8 @@ class PreviousAnswers extends Component {
         this.setState({
             previousAnswers: questionnaireAnswers,
             isModified: true
+        }, () => {
+            this.props.savePreviousAnswers(this.state.previousAnswers, this.props.previousAnswerVariable);
         });
     };
 
@@ -241,6 +256,8 @@ class PreviousAnswers extends Component {
         this.setState({
             previousAnswers: questionnaireAnswers,
             isModified: true
+        }, () => {
+            this.props.savePreviousAnswers(this.state.previousAnswers, this.props.previousAnswerVariable);
         });
     };
 
@@ -256,7 +273,6 @@ class PreviousAnswers extends Component {
             {
                 text: getTranslation(translations.generalLabels.yesAnswer, this.props.translation), onPress: () => {
                     this.deletePreviousAnswer(index);
-                    this.props.onCollapse(this.props.item);
                 }
             }
         ]);

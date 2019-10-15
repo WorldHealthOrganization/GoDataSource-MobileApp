@@ -111,7 +111,7 @@ class FollowUpsSingleQuestionnaireContainer extends Component {
                     >
                         {
                             questions && Array.isArray(questions) && questions.length > 0 && questions.map((item, index) => {
-                                return this.handleRenderItem(item, index, questions.length);
+                                return this.handleRenderItem(previousAnswers, item, index, questions.length);
                             })
                         }
                     </ScrollView>
@@ -121,7 +121,7 @@ class FollowUpsSingleQuestionnaireContainer extends Component {
     }
 
     // Please write here all the methods that are not react native lifecycle methods
-    handleRenderItem = (item, index, totalNumberOfQuestions) => {
+    handleRenderItem = (previousAnswers, item, index, totalNumberOfQuestions) => {
         if (item.inactive === false) {
             return (
                 <QuestionCard
@@ -130,7 +130,7 @@ class FollowUpsSingleQuestionnaireContainer extends Component {
                     index={index + 1}
                     isCollapsed={ this.isCollapsed(item)}
                     totalNumberOfQuestions={totalNumberOfQuestions}
-                    source={this.props.previousAnswers}
+                    source={previousAnswers}
                     isEditMode={this.props.isEditMode}
                     onCollapse={ this.collapseQuestion}
                     onChangeTextAnswer={this.props.onChangeTextAnswer}
