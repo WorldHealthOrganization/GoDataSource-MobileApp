@@ -51,11 +51,13 @@ class PersonListItemNameAndAddressComponent extends PureComponent {
                             marginHorizontal: 7,
                             display: firstComponentRenderData.addressString ? 'flex' : 'none'
                         }]}>{'\u2022 ' + getTranslation(translations.addressFieldLabels.address, translation) + ": " + firstComponentRenderData.addressString}</Text>
-                        {firstComponentRenderData.status && <Text style={[style.secondaryText, {
+                        {firstComponentRenderData.status ? (<Text style={[style.secondaryText, {
                             flex: 1,
                             marginHorizontal: 7,
                             display: firstComponentRenderData.status ? 'flex' : 'none'
-                        }]}>{'\u2022 ' + getTranslation(translations.contactSingleScreen.followUpFinalStatus, translation) + ": " + firstComponentRenderData.status}</Text>}
+                        }]}>{'\u2022 ' + getTranslation(translations.contactSingleScreen.followUpFinalStatus, translation) + ": " + firstComponentRenderData.status}</Text>) :
+                            (null)
+                        }
                     </View>
                     <Ripple key={'secondView'} style={{width: 35, height: 35}} onPress={this.props.onPressMapIcon}>
                         <Image source={{uri: 'map_icon'}} style={{width: 35, height: 35}}/>

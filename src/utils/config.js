@@ -80,6 +80,13 @@ const tabsValuesRoutes = {
         {key: 'infection', title: translations.caseSingleScreen.infectionTitle},
         {key: 'caseInvestigation', title: translations.caseSingleScreen.investigationTitle}
     ],
+    casesSingleViewEdit: [
+        {key: 'personal', title: translations.caseSingleScreen.personalTitle},
+        {key: 'address', title: translations.caseSingleScreen.addressTitle},
+        {key: 'infection', title: translations.caseSingleScreen.infectionTitle},
+        {key: 'exposures', title: 'Contacts'},
+        {key: 'caseInvestigation', title: translations.caseSingleScreen.investigationTitle}
+    ],
     contactsSingle: [
         {key: 'personal', title: translations.contactSingleScreen.personalTitle},
         {key: 'address', title: translations.contactSingleScreen.addressTitle},
@@ -439,6 +446,51 @@ const caseSingleScreen = {
                 textsStyleArray: [{color: styles.missedRedColor}],
                 onPressArray: [],
                 objectType: 'Documents'
+            }
+        ]
+    },
+    vaccinesReceived: {
+        fields: [
+            {
+                cardNumber: 2,
+                id: 'vaccine',
+                label: 'Vaccine',
+                type: 'DropdownInput',
+                value: '',
+                isRequired: true,
+                isEditMode: true,
+                objectType: 'Vaccines'
+            },
+            {
+                cardNumber: 2,
+                id: 'date',
+                label: 'Vaccine date',
+                labelValue: 'test',
+                type: 'DatePicker',
+                value: '',
+                isRequired: false,
+                isEditMode: true,
+                objectType: 'Vaccines'
+            },
+            {
+                cardNumber: 2,
+                id: 'status',
+                label: 'Vaccine status',
+                type: 'DropdownInput',
+                value: '',
+                isRequired: true,
+                isEditMode: true,
+                objectType: 'Vaccines'
+            },
+            {
+                cardNumber: 2,
+                id: 'deleteButton',
+                type: 'ActionsBar',
+                labelValue: 'test',
+                textsArray: [translations.caseSingleScreen.deleteButton],
+                textsStyleArray: [{color: styles.missedRedColor}],
+                onPressArray: [],
+                objectType: 'Vaccines'
             }
         ]
     },

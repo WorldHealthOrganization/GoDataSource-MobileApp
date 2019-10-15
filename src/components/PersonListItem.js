@@ -122,7 +122,7 @@ class PersonListItem extends Component {
             returnValues.id = person._id;
         }
         // Followup final status
-        if (type === 'Contact' && person && person.followUp){
+        if (type !== 'Case' && person && person.followUp){
             returnValues.status = person.followUp.status ? getTranslation(person.followUp.status, this.props.translations) : null;
         }
 

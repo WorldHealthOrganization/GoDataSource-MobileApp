@@ -513,8 +513,13 @@ class CaseSingleScreen extends Component {
                         onChangeSectionedDropDownDateRange={this.onChangeSectionedDropDownDateRange}
                         onChangeSectionedDropDownIsolation={this.onChangeSectionedDropDownIsolation}
                         checkDateOfOnsetOutcome={this.checkDateOfOnsetOutcome}
+                        onPressAddVaccine={this.onPressAddVaccine}
                     />
                 );
+            // case 'exposures':
+            //     return (
+            //
+            //     );
             case 'caseInvestigation':
                 return <CaseSingleInvestigationContainer
                     item={this.state.case}
@@ -1156,19 +1161,18 @@ class CaseSingleScreen extends Component {
 
 
     //isolationDates functions
-    onPressAddIsolationDates = () => {
-        let isolationDates = _.cloneDeep(this.state.case.isolationDates);
+    onPressAddVaccine = () => {
+        let isolationDates = _.cloneDeep(this.state.case.vaccinesReceived);
 
         isolationDates.push({
-            startDate: null,
-            endDate: null,
-            centerName: null,
-            locationId: null,
-            comments: null
+            id: null,
+            vaccine: null,
+            date: null,
+            status: null
         });
 
         this.setState(prevState => ({
-            case: Object.assign({}, prevState.case, { isolationDates }),
+            case: Object.assign({}, prevState.case, { vaccinesReceived: isolationDates }),
             isModified: true
         }), () => {
             console.log("### after updating the data: ", this.state.case);
@@ -1176,25 +1180,25 @@ class CaseSingleScreen extends Component {
     };
     handleOnPressDeleteIsolationDates = (index) => {
         console.log("DeletePressed: ", index);
-        let caseIsolationDatesClone = _.cloneDeep(this.state.case.isolationDates);
-        caseIsolationDatesClone.splice(index, 1);
+        let caseVaccinesReceived = _.cloneDeep(this.state.case.vaccinesReceived);
+        caseVaccinesReceived.splice(index, 1);
         this.setState(prevState => ({
-            case: Object.assign({}, prevState.case, { isolationDates: caseIsolationDatesClone }),
+            case: Object.assign({}, prevState.case, { vaccinesReceived: caseVaccinesReceived }),
             isModified: true
         }), () => {
-            console.log("After deleting the isolationDates: ", this.state.case);
+            console.log("After deleting the Vaccines: ", this.state.case);
         })
     };
-    onChangeSectionedDropDownIsolation = (selectedItems, index) => {
-        console.log('handleOnChangeSectionedDropDown', selectedItems, index);
-        // Here selectedItems is always an array with just one value and should pe mapped to the locationId field from the address from index
-        let isolationDates = _.cloneDeep(this.state.case.isolationDates);
-        isolationDates[index].locationId = extractIdFromPouchId(selectedItems['0']._id, 'location');
-        this.setState(prevState => ({
-            case: Object.assign({}, prevState.case, { isolationDates }),
-            isModified: true
-        }))
-    };
+    // onChangeSectionedDropDownIsolation = (selectedItems, index) => {
+    //     console.log('handleOnChangeSectionedDropDown', selectedItems, index);
+    //     // Here selectedItems is always an array with just one value and should pe mapped to the locationId field from the address from index
+    //     let isolationDates = _.cloneDeep(this.state.case.isolationDates);
+    //     isolationDates[index].locationId = extractIdFromPouchId(selectedItems['0']._id, 'location');
+    //     this.setState(prevState => ({
+    //         case: Object.assign({}, prevState.case, { isolationDates }),
+    //         isModified: true
+    //     }))
+    // };
 
 
     // show/hide Menu
@@ -1481,6 +1485,16 @@ class CaseSingleScreen extends Component {
                         }), () => {
                             // console.log("onChangeDate addressesClone", id, " ", value, " ", this.state.case);
                         })
+                    } else if (objectType === 'Vaccines') {
+                        let vaccinesClone = _.cloneDeep(this.state.case.vaccinesReceived);
+                        vaccinesClone[objectTypeOrIndex][id] = value && value.value !== undefined ? value.value : value;
+                        console.log('vaccinesClone', vaccinesClone);
+                        this.setState(prevState => ({
+                            case: Object.assign({}, prevState.case, { vaccinesReceived: vaccinesClone }),
+                            isModified: true
+                        }), () => {
+                            // console.log("onChangeDropDown", id, " ", value, " ", this.state.case);
+                        })
                     }
                 }
             }
@@ -1684,6 +1698,16 @@ class CaseSingleScreen extends Component {
                     console.log('dateRangesClone', dateRangesClone);
                     this.setState(prevState => ({
                         case: Object.assign({}, prevState.case, { dateRanges: dateRangesClone }),
+                        isModified: true
+                    }), () => {
+                        // console.log("onChangeDropDown", id, " ", value, " ", this.state.case);
+                    })
+                } else if (objectType === 'Vaccines') {
+                    let vaccinesClone = _.cloneDeep(this.state.case.vaccinesReceived);
+                    vaccinesClone[objectTypeOrIndex][id] = value && value.value !== undefined ? value.value : value;
+                    console.log('vaccinesClone', vaccinesClone);
+                    this.setState(prevState => ({
+                        case: Object.assign({}, prevState.case, { vaccinesReceived: vaccinesClone }),
                         isModified: true
                     }), () => {
                         // console.log("onChangeDropDown", id, " ", value, " ", this.state.case);

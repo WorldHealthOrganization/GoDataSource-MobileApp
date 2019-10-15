@@ -818,8 +818,9 @@ class FollowUpsSingleScreen extends Component {
                 createFollowUp(followUpClone)
                     .then((responseCreateFollowUp) => {
                         // this.props.refresh();
-                        this.props.navigator.pop(
+                        this.props.navigator.resetTo(
                             {
+                                screen: 'FollowUpsScreen',
                                 animated: true,
                                 animationType: 'fade',
                             }
