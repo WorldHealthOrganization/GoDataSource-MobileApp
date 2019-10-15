@@ -208,19 +208,25 @@ class CaseSingleInvestigationContainer extends Component {
         return isCollapsed;
     };
 
-    collapseQuestion = (item) => {
+    collapseQuestion = (item, shouldOpen) => {
         let collapsedQuestions = this.state.collapsedQuestions;
-        if( this.isCollapsed(item)){
-            if(collapsedQuestions.length === 1){
-                collapsedQuestions = [];
-            } else {
-                collapsedQuestions = collapsedQuestions.filter( (question) => {
-                    if( question.order !== item.order && question.text !== item.text)
-                        return item;
-                });
+        if(shouldOpen !== undefined){
+            if (!this.isCollapsed(item) && shouldOpen) {
+                collapsedQuestions.push(item);
             }
-        } else {
-            collapsedQuestions.push(item);
+        }else {
+            if (this.isCollapsed(item)) {
+                if (collapsedQuestions.length === 1) {
+                    collapsedQuestions = [];
+                } else {
+                    collapsedQuestions = collapsedQuestions.filter((question) => {
+                        if (question.order !== item.order && question.text !== item.text)
+                            return item;
+                    });
+                }
+            } else {
+                collapsedQuestions.push(item);
+            }
         }
         this.setState({ collapsedQuestions: collapsedQuestions});
     };

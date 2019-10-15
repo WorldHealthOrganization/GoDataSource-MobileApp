@@ -95,7 +95,10 @@ class QuestionCard extends PureComponent {
                                     height={buttonHeight}
                                     titleColor={'white'}
                                     color={styles.buttonGreen}
-                                    onPress={() => {this.props.onClickAddNewMultiFrequencyAnswer(this.props.item)}}
+                                    onPress={() => {
+                                        this.props.onCollapse(this.props.item, true);
+                                        this.props.onClickAddNewMultiFrequencyAnswer(this.props.item)
+                                    }}
                                 />
                                 <Button
                                     title={getTranslation(translations.questionCardLabels.previousAnswers, this.props.translation)}
@@ -104,7 +107,6 @@ class QuestionCard extends PureComponent {
                                     titleColor={'white'}
                                     color={styles.buttonGreen}
                                     onPress={() => {
-                                        // this.props.onClickShowPreviousAnswers(this.props.item)
                                         this.props.onCollapse(this.props.item)
                                     }}
                                 />
