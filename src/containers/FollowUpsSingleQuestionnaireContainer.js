@@ -54,9 +54,7 @@ class FollowUpsSingleQuestionnaireContainer extends Component {
                 <LoaderScreen overlay={true} backgroundColor={'white'} />
             )
         }
-        // console.log('FollowUpsSingleContainer render Questionnaire');
 
-        // console.log("### FollowUpsSingleQuestionnaire: ", this.props.questions);
         let buttonHeight = calculateDimension(25, true, this.props.screenSize);
         let buttonWidth = calculateDimension(165.5, false, this.props.screenSize);
         let marginVertical = calculateDimension(12.5, true, this.props.screenSize);
@@ -111,7 +109,7 @@ class FollowUpsSingleQuestionnaireContainer extends Component {
                     >
                         {
                             questions && Array.isArray(questions) && questions.length > 0 && questions.map((item, index) => {
-                                return this.handleRenderItem(previousAnswers, item, index, questions.length);
+                                return this.handleRenderItem(previousAnswers, item, index, questions);
                             })
                         }
                     </ScrollView>
@@ -121,7 +119,8 @@ class FollowUpsSingleQuestionnaireContainer extends Component {
     }
 
     // Please write here all the methods that are not react native lifecycle methods
-    handleRenderItem = (previousAnswers, item, index, totalNumberOfQuestions) => {
+    handleRenderItem = (previousAnswers, item, index, totalQuestions) => {
+        const totalNumberOfQuestions = totalQuestions.length;
         if (item.inactive === false) {
             return (
                 <QuestionCard
@@ -131,6 +130,7 @@ class FollowUpsSingleQuestionnaireContainer extends Component {
                     isCollapsed={ this.isCollapsed(item)}
                     totalNumberOfQuestions={totalNumberOfQuestions}
                     source={previousAnswers}
+                    totalQuestions={totalQuestions}
                     isEditMode={this.props.isEditMode}
                     onCollapse={ this.collapseQuestion}
                     onChangeTextAnswer={this.props.onChangeTextAnswer}

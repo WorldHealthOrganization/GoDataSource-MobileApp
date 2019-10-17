@@ -4,22 +4,21 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, { PureComponent } from 'react';
-import { View, StyleSheet, InteractionManager, Alert, TouchableWithoutFeedback, Keyboard, ScrollView, findNodeHandle } from 'react-native';
+import { View, StyleSheet, InteractionManager, Alert, ScrollView } from 'react-native';
 import { calculateDimension, getTranslation, createDate } from './../utils/functions';
 import config from './../utils/config';
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import Button from './../components/Button';
 import styles from './../styles';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import CardComponent from './../components/CardComponent';
 import { LoaderScreen } from 'react-native-ui-lib';
 import translations from './../utils/translations'
 import ElevatedView from 'react-native-elevated-view';
 import _ from 'lodash';
-import moment from 'moment';
+import lodashGet from "lodash/get";
 
-class ContactsSinglePersonal extends PureComponent {
+class ContactsSinglePersonal extends React.Component {
 
     // This will be a container, so put as less business logic here as possible
     constructor(props) {
@@ -55,8 +54,6 @@ class ContactsSinglePersonal extends PureComponent {
             )
         }
 
-        // console.log('ContactsSingleContainer render Personal');
-
         return (
             <View style={{ flex: 1 }}>
                 <View style={style.viewContainer}>
@@ -72,17 +69,7 @@ class ContactsSinglePersonal extends PureComponent {
                                 marginVertical: calculateDimension(12.5, true, this.props.screenSize),
                             }} />
                     </View>
-
-                    {/* <KeyboardAwareScrollView
-                        style={style.containerScrollView}
-                        contentContainerStyle={[style.contentContainerStyle, {paddingBottom: this.props.screenSize.height < 600 ? 70 : 20}]}
-                        keyboardShouldPersistTaps={'always'}
-                        extraHeight={20 + 81 + 50 + 70}
-                        innerRef={ref => {
-                            this.scrollContactsSinglePersonal = ref
-                        }}
-                    > */}
-                      <ScrollView
+                    <ScrollView
                         style={style.containerScrollView}
                         contentContainerStyle={[style.contentContainerStyle, { paddingBottom: this.props.screenSize.height < 600 ? 70 : 20 }]}
                     >
@@ -94,7 +81,6 @@ class ContactsSinglePersonal extends PureComponent {
                         }
                     </View>
                     </ScrollView>
-                    {/* </KeyboardAwareScrollView> */}
                 </View>
             </View>
         );
@@ -105,7 +91,7 @@ class ContactsSinglePersonal extends PureComponent {
         let fields = item.fields.map((field) => {
             return Object.assign({}, field, { isEditMode: field.id === 'visualId' ? false : this.props.isEditMode })
         });
-        return this.renderItemCardComponent(fields)
+        return this.renderItemCardComponent(fields);
     };
 
     renderItemCardComponent = (fields, cardIndex = null) => {
@@ -155,7 +141,7 @@ class ContactsSinglePersonal extends PureComponent {
         }
 
         if (this.props.selectedItemIndexForTextSwitchSelectorForAge !== null && this.props.selectedItemIndexForTextSwitchSelectorForAge !== undefined && item.objectType === 'Contact' && item.dependsOn !== undefined && item.dependsOn !== null) {
-            let itemIndexInConfigTextSwitchSelectorValues = config[item.dependsOn].map((e) => { return e.value }).indexOf(item.id)
+            let itemIndexInConfigTextSwitchSelectorValues = config[item.dependsOn].map((e) => { return e.value }).indexOf(item.id);
             if (itemIndexInConfigTextSwitchSelectorValues > -1) {
                 if (itemIndexInConfigTextSwitchSelectorValues != this.props.selectedItemIndexForTextSwitchSelectorForAge) {
                     return
@@ -205,14 +191,18 @@ class ContactsSinglePersonal extends PureComponent {
             }
         }
 
-        let dateValidation = { minimumDate, maximumDate }
+        let dateValidation = { minimumDate, maximumDate };
         return dateValidation
-    }
+    };
 
     computeValueForContactsSingleScreen = (item) => {
         if (item.id === 'age') {
             if (this.props.contact && this.props.contact[item.id] !== null && this.props.contact[item.id] !== undefined) {
                 return this.props.contact[item.id]
+            }
+        } else if (item.id === 'followUp.status'){
+            if (this.props.contact && this.props.contact.followUp && lodashGet(this.props.contact, item.id) !== undefined) {
+                return getTranslation(lodashGet(this.props.contact, item.id),this.props.translation);
             }
         } else {
             return this.props.contact && this.props.contact[item.id] ? getTranslation(this.props.contact[item.id], this.props.translation) : '';
@@ -232,6 +222,11 @@ class ContactsSinglePersonal extends PureComponent {
         }
         if (item.id === 'occupation') {
             return _.filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_OCCUPATION' })
+                .sort((a, b) => { return a.order - b.order; })
+                .map((o) => { return { value: getTranslation(o.value, this.props.translation), id: o.value } })
+        }
+        if (item.id === 'followUp.status') {
+            return _.filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CONTACT_FINAL_FOLLOW_UP_STATUS_TYPE' })
                 .sort((a, b) => { return a.order - b.order; })
                 .map((o) => { return { value: getTranslation(o.value, this.props.translation), id: o.value } })
         }
@@ -280,14 +275,8 @@ class ContactsSinglePersonal extends PureComponent {
     handleOnBlur = (event) => {
         // this.scrollContactsSinglePersonal.props.scrollToPosition(0, 0, false)
         // this.scrollToInput(findNodeHandle(event.target))
-    }
-
-    scrollToInput(reactNode) {
-        // Add a 'scroll' ref to your ScrollView
-        // this.scrollContactsSinglePersonal.props.scrollToFocusedInput(reactNode)
     };
 }
-
 
 // Create style outside the class, or for components that will be used by other components (buttons),
 // make a global style in the config directory

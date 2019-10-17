@@ -4,10 +4,10 @@
 /**
  * Created by florinpopa on 05/07/2018.
  */
-import React, { Component } from 'react';
-import { View, StyleSheet, Alert, ScrollView } from 'react-native';
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
+import React, { Component } from 'react';
+import { View, StyleSheet, Alert, ScrollView } from 'react-native';
 import Button from './../components/Button';
 import styles from './../styles';
 import { connect } from "react-redux";
@@ -88,6 +88,7 @@ class AddSingleAnswerModalScreen extends Component {
                                         isEditMode={true}
                                         index={1}
                                         isCollapsed={false}
+                                        totalQuestions={this.state.item}
                                         totalNumberOfQuestions={1}
                                         source={this.props.currentAnswers}
                                         onCollapse={() => { console.log('do nothing')}}
@@ -154,7 +155,6 @@ class AddSingleAnswerModalScreen extends Component {
             }
             questionnaireAnswers[id][0] = value;
         }
-        // console.log('onChangeMultipleSelection after setState', questionnaireAnswers);
         this.props.updateCurrentAnswers(questionnaireAnswers);
     };
 
@@ -180,7 +180,6 @@ class AddSingleAnswerModalScreen extends Component {
             }
             questionnaireAnswers[id][0] = value;
         }
-        // console.log('onChangeMultipleSelection after setState', questionnaireAnswers);
         this.props.updateCurrentAnswers(questionnaireAnswers);
     };
 
@@ -206,7 +205,6 @@ class AddSingleAnswerModalScreen extends Component {
             }
             questionnaireAnswers[id][0] = value;
         }
-        // console.log('onChangeMultipleSelection after setState', questionnaireAnswers);
         this.props.updateCurrentAnswers(questionnaireAnswers);
     };
 
@@ -232,7 +230,6 @@ class AddSingleAnswerModalScreen extends Component {
             }
             questionnaireAnswers[id][0] = value;
         }
-        // console.log('onChangeDateAnswer after setState', questionnaireAnswers);
         this.props.updateCurrentAnswers(questionnaireAnswers);
     };
 
@@ -277,11 +274,6 @@ class AddSingleAnswerModalScreen extends Component {
 
     handleOnFocus = (event) => {
         // this.scrollToInput(findNodeHandle(event.target))
-    };
-
-    scrollToInput(reactNode) {
-        // Add a 'scroll' ref to your ScrollView
-        // this.scrollAddSingleAnswerModal.props.scrollToFocusedInput(reactNode)
     };
 }
 

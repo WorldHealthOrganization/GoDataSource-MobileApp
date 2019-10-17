@@ -18,16 +18,19 @@ class QuestionCardTitle extends PureComponent {
         return (
             <View style={[style.containerQuestion,
                 {
-                    height: this.props.height,
+                    minHeight: this.props.height,
                     paddingRight: this.props.paddingRight,
-                    paddingLeft: this.props.paddingLeft
+                    paddingLeft: this.props.paddingLeft,
+                    paddingTop: this.props.paddingTopBottom,
+                    paddingBottom: this.props.paddingTopBottom
                 }]}>
                 <View style={style.containerQuestionNumber}>
                     <Text style={style.questionText}>{this.props.questionNumber}</Text>
                 </View>
                 <Text style={[style.questionText, {
                     marginLeft: this.props.marginLeft,
-                    marginRight: this.props.marginRight }]} numberOfLines={2}>
+                    marginRight: this.props.marginRight }]}
+                >
                     {this.props.questionText}
                     {this.props.questionCategory}
                 </Text>

@@ -16,7 +16,6 @@ import Ripple from 'react-native-material-ripple';
 import {Icon} from 'react-native-material-ui';
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
-
 class QuestionCardContent extends PureComponent {
     constructor(props) {
         super(props);
@@ -353,6 +352,10 @@ class QuestionCardContent extends PureComponent {
                         dropDownStyle={{width: width, alignSelf: 'center'}}
                         showDropdown={this.state.showDropdown}
                     />
+                );
+            case 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_MARKUP':
+                return (
+                    <Section label={getTranslation(item.text, this.props.translation)}/>
                 );
             default:
                 return(

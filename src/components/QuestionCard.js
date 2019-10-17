@@ -16,9 +16,7 @@ import translations from './../utils/translations';
 import QuestionCardTitle from './QuestionCardTitle';
 import QuestionCardContent from './QuestionCardContent';
 import get from "lodash/get";
-import cloneDeep from "lodash/cloneDeep";
 import {sortBy} from "lodash";
-import {extractAllQuestions} from "../utils/functions";
 import PreviousAnswers from "./PreviousAnswers";
 
 class QuestionCard extends PureComponent {
@@ -56,6 +54,7 @@ class QuestionCard extends PureComponent {
         let marginHorizontal = calculateDimension(14, false, this.props.screenSize);
         let buttonHeight = calculateDimension(25, true, this.props.screenSize);
         let buttonWidth = calculateDimension(120, false, this.props.screenSize);
+        let index = this.calculateIndex(this.props.totalQuestions, this.props.index);
         return (
             <ElevatedView elevation={3} key={this.props.key} style={[this.props.style, style.container, {
                 marginHorizontal: calculateDimension(16, false, this.props.screenSize),
@@ -64,17 +63,21 @@ class QuestionCard extends PureComponent {
             }]}
                 onPress={() => {this.setState({showDropdown: false})}}
             >
-                <QuestionCardTitle
-                    height={calculateDimension(43, true, this.props.screenSize)}
-                    paddingRight={calculateDimension(34, true, this.props.screenSize)}
-                    paddingLeft={calculateDimension(14, true, this.props.screenSize)}
-                    marginLeft={calculateDimension(8, false, this.props.screenSize)}
-                    marginRight={calculateDimension(34, false, this.props.screenSize)}
-                    questionNumber={getTranslation(translations.generalLabels.questionInitial, this.props.translation).charAt(0).toUpperCase() + this.props.index}
-                    questionText={getTranslation(this.props.item.text, this.props.translation)}
-                    questionCategory={this.props.item && this.props.item.category ?
-                        ' - ' + getTranslation(this.props.item.category, this.props.translation) : ''}
-                />
+                {
+                    this.props.item.answerType === 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_MARKUP' ? null :
+                        <QuestionCardTitle
+                            height={calculateDimension(43, true, this.props.screenSize)}
+                            paddingRight={calculateDimension(34, true, this.props.screenSize)}
+                            paddingLeft={calculateDimension(14, true, this.props.screenSize)}
+                            paddingTopBottom={calculateDimension(5, false, this.props.screenSize)}
+                            marginLeft={calculateDimension(8, false, this.props.screenSize)}
+                            marginRight={calculateDimension(34, false, this.props.screenSize)}
+                            questionNumber={getTranslation(translations.generalLabels.questionInitial, this.props.translation).charAt(0).toUpperCase() + index}
+                            questionText={getTranslation(this.props.item.text, this.props.translation)}
+                            questionCategory={this.props.item && this.props.item.category ?
+                                ' - ' + getTranslation(this.props.item.category, this.props.translation) : ''}
+                        />
+                }
                 <View key={this.props.key}>
                     {
                         this.props.item.multiAnswer && this.props.isEditMode && !this.props.hideButtons ? (
@@ -154,8 +157,27 @@ class QuestionCard extends PureComponent {
     onClickAddNewMultiFrequencyAnswer = (item) => {
         this.props.onClickAddNewMultiFrequencyAnswer(item);
     };
-}
 
+    calculateIndex = (totalQuestions, itemIndex) => {
+        // console.log('~~~~~~~~~~ ', totalQuestions, itemIndex);
+        let finalIndex = itemIndex;
+        totalQuestions.map( (item, index) => {
+            //verify only for previous items
+            if( index < itemIndex ){
+                //remove inactive questions
+                if( item.inactive === true ){
+                    finalIndex = finalIndex - 1;
+                } else {
+                    //remove markup questions
+                    if( item.answerType === 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_MARKUP'){
+                        finalIndex = finalIndex - 1;
+                    }
+                }
+            }
+        });
+        return finalIndex;
+    };
+}
 
 // Create style outside the class, or for components that will be used by other components (buttons),
 // make a global style in the config directory

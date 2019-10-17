@@ -146,7 +146,7 @@ class CaseSingleInvestigationContainer extends Component {
                     >
                         {
                             sortedQuestions.map((item, index) => {
-                                return this.handleRenderItem(previousAnswers, item, index, sortedQuestions.length)
+                                return this.handleRenderItem(previousAnswers, item, index, sortedQuestions)
                             })
                         }
                     </ScrollView>
@@ -156,7 +156,8 @@ class CaseSingleInvestigationContainer extends Component {
     }
 
     // Please write here all the methods that are not react native lifecycle methods
-    handleRenderItem = (previousAnswers, item, index, totalNumberOfQuestions) => {
+    handleRenderItem = (previousAnswers, item, index, totalQuestions) => {
+        const totalNumberOfQuestions = totalQuestions.length;
         if (item.inactive === false) {
             return (
                 <QuestionCard
@@ -165,6 +166,7 @@ class CaseSingleInvestigationContainer extends Component {
                     isEditMode={this.props.isEditMode}
                     index={index + 1}
                     isCollapsed={ this.isCollapsed(item)}
+                    totalQuestions={totalQuestions}
                     totalNumberOfQuestions={totalNumberOfQuestions}
                     source={previousAnswers}
                     onCollapse={ this.collapseQuestion}
