@@ -1650,7 +1650,7 @@ class CaseSingleScreen extends Component {
     };
 
     //labData Questionnaire onChange... functions
-    onChangeTextAnswer = (value, id, parentId) => {
+    onChangeTextAnswer = (value, id, parentId, index) => {
         // console.log ('onChangeTextAnswer', value, id)
         // let itemClone = _.cloneDeep(this.state.case);
         let questionnaireAnswers = _.cloneDeep(this.state.previousAnswers);
@@ -1685,7 +1685,7 @@ class CaseSingleScreen extends Component {
             }
         )
     };
-    onChangeSingleSelection = (value, id, parentId) => {
+    onChangeSingleSelection = (value, id, parentId, index) => {
         // console.log ('onChangeSingleSelection', value, id)
         let questionnaireAnswers = _.cloneDeep(this.state.previousAnswers);
 
@@ -1714,7 +1714,7 @@ class CaseSingleScreen extends Component {
             })
         )
     };
-    onChangeMultipleSelection = (value, id, parentId) => {
+    onChangeMultipleSelection = (value, id, parentId, index) => {
         // console.log ('onChangeMultipleSelection', selections, id)
         let questionnaireAnswers = _.cloneDeep(this.state.previousAnswers);
 
@@ -1743,7 +1743,7 @@ class CaseSingleScreen extends Component {
             })
         )
     };
-    onChangeDateAnswer = (value, id, parentId) => {
+    onChangeDateAnswer = (value, id, parentId, index) => {
         // console.log ('onChangeDateAnswer', value, id)
         let questionnaireAnswers = _.cloneDeep(this.state.previousAnswers);
 
@@ -1764,7 +1764,7 @@ class CaseSingleScreen extends Component {
             if (!questionnaireAnswers[id]) {
                 questionnaireAnswers[id] = [];
             }
-            questionnaireAnswers[id][0] = value;
+            questionnaireAnswers[id][index] = value;
         }
         this.setState(prevState => ({
                 previousAnswers: questionnaireAnswers,
@@ -1772,11 +1772,11 @@ class CaseSingleScreen extends Component {
             })
         )
     };
-    onChangeAnswerDate = (value, questionId) => {
+    onChangeAnswerDate = (value, questionId, index) => {
         let questionnaireAnswers = _.cloneDeep(this.state.previousAnswers);
         if (questionnaireAnswers && questionnaireAnswers[questionId] && Array.isArray(questionnaireAnswers[questionId]) && questionnaireAnswers[questionId].length) {
-            if (questionnaireAnswers[questionId][0] && questionnaireAnswers[questionId][0].date) {
-                questionnaireAnswers[questionId][0].date = value;
+            if (questionnaireAnswers[questionId][index] && questionnaireAnswers[questionId][index].date) {
+                questionnaireAnswers[questionId][index].date = value;
                 if (questionnaireAnswers[questionId][0].subAnswers && typeof questionnaireAnswers[questionId][0].subAnswers === "object" && Object.keys(questionnaireAnswers[questionId][0].subAnswers).length > 0) {
                     for (let subQuestionId in questionnaireAnswers[questionId][0].subAnswers) {
                         questionnaireAnswers[questionId][0].subAnswers[subQuestionId].map((e) => {

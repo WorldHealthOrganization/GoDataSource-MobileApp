@@ -535,7 +535,7 @@ class FollowUpsSingleScreen extends Component {
     };
 
     // Handle changes to the questionnaire fields
-    onChangeTextAnswer = (value, id, parentId) => {
+    onChangeTextAnswer = (value, id, parentId, index) => {
         let questionnaireAnswers = _.cloneDeep(this.state.previousAnswers);
 
         if (parentId) {
@@ -555,7 +555,7 @@ class FollowUpsSingleScreen extends Component {
             if (!questionnaireAnswers[id]) {
                 questionnaireAnswers[id] = [];
             }
-            questionnaireAnswers[id][0] = value;
+            questionnaireAnswers[id][index] = value;
         }
 
         this.setState({
@@ -563,7 +563,7 @@ class FollowUpsSingleScreen extends Component {
             isModified: true
         })
     };
-    onChangeDateAnswer = (value, id, parentId) => {
+    onChangeDateAnswer = (value, id, parentId, index) => {
         // console.log ('onChangeDateAnswer', value, id)
         let questionnaireAnswers = _.cloneDeep(this.state.previousAnswers);
 
@@ -584,14 +584,14 @@ class FollowUpsSingleScreen extends Component {
             if (!questionnaireAnswers[id]) {
                 questionnaireAnswers[id] = [];
             }
-            questionnaireAnswers[id][0] = value;
+            questionnaireAnswers[id][index] = value;
         }
         this.setState(prevState => ({
             previousAnswers: questionnaireAnswers,
             isModified: true
         }))
     };
-    onChangeSingleSelection = (value, id, parentId) => {
+    onChangeSingleSelection = (value, id, parentId, index) => {
         // console.log ('onChangeSingleSelection', value, id)
         let questionnaireAnswers = _.cloneDeep(this.state.previousAnswers);
 
@@ -612,14 +612,14 @@ class FollowUpsSingleScreen extends Component {
             if (!questionnaireAnswers[id]) {
                 questionnaireAnswers[id] = [];
             }
-            questionnaireAnswers[id][0] = value;
+            questionnaireAnswers[id][index] = value;
         }
         this.setState(prevState => ({
             previousAnswers: questionnaireAnswers,
             isModified: true
         }))
     };
-    onChangeMultipleSelection = (value, id, parentId) => {
+    onChangeMultipleSelection = (value, id, parentId, index) => {
         // console.log ('onChangeMultipleSelection', selections, id)
         let questionnaireAnswers = _.cloneDeep(this.state.previousAnswers);
 
@@ -640,18 +640,18 @@ class FollowUpsSingleScreen extends Component {
             if (!questionnaireAnswers[id]) {
                 questionnaireAnswers[id] = [];
             }
-            questionnaireAnswers[id][0] = value;
+            questionnaireAnswers[id][index] = value;
         }
         this.setState(prevState => ({
             previousAnswers: questionnaireAnswers,
             isModified: true
         }))
     };
-    onChangeAnswerDate = (value, questionId) => {
+    onChangeAnswerDate = (value, questionId, index) => {
         let questionnaireAnswers = _.cloneDeep(this.state.previousAnswers);
         if (questionnaireAnswers && questionnaireAnswers[questionId] && Array.isArray(questionnaireAnswers[questionId]) && questionnaireAnswers[questionId].length) {
-            if (questionnaireAnswers[questionId][0] && questionnaireAnswers[questionId][0].date) {
-                questionnaireAnswers[questionId][0].date = value;
+            if (questionnaireAnswers[questionId][index] && questionnaireAnswers[questionId][index].date) {
+                questionnaireAnswers[questionId][index].date = value;
                 if (questionnaireAnswers[questionId][0].subAnswers && typeof questionnaireAnswers[questionId][0].subAnswers === "object" && Object.keys(questionnaireAnswers[questionId][0].subAnswers).length > 0) {
                     for (let subQuestionId in questionnaireAnswers[questionId][0].subAnswers) {
                         questionnaireAnswers[questionId][0].subAnswers[subQuestionId].map((e) => {

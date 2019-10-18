@@ -27,16 +27,14 @@ class QuestionCardContent extends PureComponent {
     }
 
     componentDidUpdate(prevProps) {
-        if (get(this.props, `source[${get(this.props, 'item.variable', null)}][${this.props.index}].date`, null) !== get(prevProps, `source[${get(prevProps, 'item.variable', null)}][${this.props.index}].date`, null)) {
-            this.setState({
-                answerDate: get(this.props, `source[${get(this.props, 'item.variable', null)}][${this.props.index}].date`, null),
-                index: this.props.index
-            })
-        }
+        this.setState({
+            answerDate: get(this.props, `source[${get(this.props, 'item.variable', null)}][${this.props.index}].date`, null),
+            index: this.props.index
+        })
     }
 
     render() {
-         return (
+        return (
             <ScrollView scrollEnabled={false} keyboardShouldPersistTaps={'always'}>
 
                 {
