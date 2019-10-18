@@ -4,7 +4,6 @@ import React, { Component } from 'react';
 import {Icon} from 'react-native-material-ui';
 import { View, Text, StyleSheet, Alert, ScrollView } from 'react-native';
 import styles from './../styles';
-import NavBarCustom from './../components/NavBarCustom';
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import _, { sortBy } from 'lodash';
@@ -13,14 +12,12 @@ import translations from './../utils/translations';
 import ElevatedView from 'react-native-elevated-view';
 import config from './../utils/config';
 import QuestionCardContent from './../components/QuestionCardContent';
-import ActionsBar from './../components/ActionsBar';
 import cloneDeep from "lodash/cloneDeep";
 import get from 'lodash/get';
 import set from 'lodash/set';
 import ViewHOC from './../components/ViewHOC';
 import { extractAllQuestions } from "../utils/functions";
 import Ripple from 'react-native-material-ripple';
-import Button from './../components/Button';
 
 class PreviousAnswers extends Component {
 
@@ -37,10 +34,18 @@ class PreviousAnswers extends Component {
 
     // Please add here the react lifecycle methods that you need
     componentDidUpdate(prevProps) {
-        if (prevProps.previousAnswers === undefined || this.props.previousAnswers.length !== prevProps.previousAnswers.length) {
-            this.setState({
-                previousAnswers: this.props.previousAnswers
-            });
+        if (prevProps.previousAnswers !== undefined && this.props.previousAnswers !== undefined){
+            if( this.props.previousAnswers.length !== prevProps.previousAnswers.length){
+                this.setState({
+                    previousAnswers: this.props.previousAnswers
+                });
+            }
+        } else {
+            if (prevProps.previousAnswers === undefined && this.props.previousAnswers !== undefined){
+                this.setState({
+                    previousAnswers: this.props.previousAnswers
+                });
+            }
         }
     }
 
@@ -68,7 +73,9 @@ class PreviousAnswers extends Component {
                 <View style={style.mapContainer} contentContainerStyle={style.containerContent}>
                     {
                         this.state && this.state.previousAnswers && Array.isArray(this.state.previousAnswers) && this.state.previousAnswers.length > 0 && this.state.previousAnswers.map((previousAnswer, index) => {
-                            return this.renderListOfPreviousAnswers(previousAnswer, index);
+                            if( index > 0) {
+                                return this.renderListOfPreviousAnswers(previousAnswer, index);
+                            }
                         })
                     }
                 </View>
@@ -77,12 +84,9 @@ class PreviousAnswers extends Component {
     }
 
     handleOnFocus = (event) => {
-        // this.scrollToInput(findNodeHandle(event.target))
     };
 
     handleOnBlur = (event) => {
-        // this.scrollPrevAnswer.props.scrollToPosition(0, 0, false)
-        // this.scrollToInput(findNodeHandle(event.target))
     };
 
     // Please write here all the methods that are not react native lifecycle methods
@@ -102,18 +106,17 @@ class PreviousAnswers extends Component {
     };
 
     renderListOfPreviousAnswers = (previousAnswer, index) => {
-        // console.log('renderListOfPreviousAnswers: ', previousAnswer, index);
         let width = calculateDimension(config.designScreenSize.width - 32, false, this.props.screenSize);
         let viewWidth = calculateDimension(315, false, this.props.screenSize);
-        let viewHeight = calculateDimension(30, true, this.props.screenSize);
         let marginHorizontal = calculateDimension(14, false, this.props.screenSize);
         let buttonHeight = calculateDimension(25, true, this.props.screenSize);
         let buttonWidth = calculateDimension(120, false, this.props.screenSize);
 
         let source = {};
-        source[this.props.previousAnswerVariable] = [this.state.previousAnswers[index]];
+        source[this.props.previousAnswerVariable] = this.state.previousAnswers;
         let sortedQuestions = sortBy(cloneDeep([this.props.item]), ['order', 'variable']);
         sortedQuestions = extractAllQuestions(sortedQuestions, source);
+
         return (
             <ElevatedView
                 style={{
@@ -127,6 +130,7 @@ class PreviousAnswers extends Component {
             >
                 <QuestionCardContent
                     key={index}
+                    index={index}
                     item={sortedQuestions[0]}
                     onFocus={this.handleOnFocus}
                     onBlur={this.handleOnBlur}
@@ -137,21 +141,21 @@ class PreviousAnswers extends Component {
                     buttonWidth={buttonWidth}
                     buttonHeight={buttonHeight}
                     onClickAddNewMultiFrequencyAnswer={() => { }}
-                    onChangeTextAnswer={(value, id, parentId) => {
+                    onChangeTextAnswer={(value, id, parentId, index) => {
                         this.onChangeTextAnswer(value, id, parentId, index)
                     }}
-                    onChangeDateAnswer={(value, id, parentId) => {
+                    onChangeDateAnswer={(value, id, parentId, index) => {
                         this.onChangeDateAnswer(value, id, parentId, index)
                     }}
-                    onChangeSingleSelection={(value, id, parentId) => {
+                    onChangeSingleSelection={(value, id, parentId, index) => {
                         this.onChangeSingleSelection(value, id, parentId, index)
                     }}
-                    onChangeMultipleSelection={(value, id, parentId) => {
+                    onChangeMultipleSelection={(value, id, parentId, index) => {
                         this.onChangeMultipleSelection(value, id, parentId, index)
                     }}
                     isEditMode={true}
                     editableQuestionDate={true}
-                    onChangeAnswerDate={(value, questionId) => {
+                    onChangeAnswerDate={(value, questionId, index) => {
                         this.onChangeAnswerDate(value, questionId, index)
                     }}
                 />
@@ -225,7 +229,6 @@ class PreviousAnswers extends Component {
     };
 
     onChangeDateAnswer = (value, id, parentId, index) => {
-        // console.log ('onChangeDateAnswer', value, id, parentId, index);
         let questionnaireAnswers = _.cloneDeep(this.state.previousAnswers);
 
         if (parentId) {
@@ -244,7 +247,6 @@ class PreviousAnswers extends Component {
 
     onChangeAnswerDate = (value, questionId, index) => {
         let questionnaireAnswers = _.cloneDeep(this.state.previousAnswers);
-
         set(questionnaireAnswers, `[${index}].date`, value);
 
         if (get(questionnaireAnswers, `[${index}].subAnswers`, null) !== null && get(questionnaireAnswers, `[${index}].subAnswers`, null) !== {}) {

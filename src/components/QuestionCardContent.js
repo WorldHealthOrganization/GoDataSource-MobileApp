@@ -21,21 +21,22 @@ class QuestionCardContent extends PureComponent {
         super(props);
         this.state = {
             showDropdown: false,
-            answerDate: new Date()
+            answerDate: get(this.props, `source[${get(this.props, 'item.variable', null)}][${this.props.index}].date`, null),
+            index: this.props.index,
         }
     }
 
     componentDidUpdate(prevProps) {
-        if (get(this.props, `source[${get(this.props, 'item.variable', null)}][0].date`, null) && get(this.props, `source[${get(this.props, 'item.variable', null)}][0].date`, null) !== get(prevProps, `source[${get(prevProps, 'item.variable', null)}][0].date`, null)) {
+        if (get(this.props, `source[${get(this.props, 'item.variable', null)}][${this.props.index}].date`, null) !== get(prevProps, `source[${get(prevProps, 'item.variable', null)}][${this.props.index}].date`, null)) {
             this.setState({
-                answerDate: get(this.props, `source[${get(this.props, 'item.variable', null)}][0].date`, null)
+                answerDate: get(this.props, `source[${get(this.props, 'item.variable', null)}][${this.props.index}].date`, null),
+                index: this.props.index
             })
         }
     }
 
     render() {
-        // console.log("Render QuestionCardTitle");
-        return (
+         return (
             <ScrollView scrollEnabled={false} keyboardShouldPersistTaps={'always'}>
 
                 {
@@ -52,15 +53,15 @@ class QuestionCardContent extends PureComponent {
                                     id={'answerDate'}
                                     label={'Answer Date'}
                                     value={this.state.answerDate}
-                                    multiAnswer={ this.props.item.multiAnswer }
+                                    multiAnswer={this.props.item.multiAnswer}
                                     isEditMode={!!(this.props.isEditMode && this.props.editableQuestionDate)}
                                     isRequired={true}
                                     style={{
-                                        width: this.props.isEditMode ?
-                                            // (this.props.item.answerType === 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_DATE_TIME' ? (this.props.viewWidth / 2) - 25 : this.props.viewWidth - 25) : this.props.viewWidth - 25,
-                                            (this.props.viewWidth / 2) - 25 : this.props.viewWidth - 25,
+                                        width: this.props.isEditMode ? (this.props.viewWidth / 2) - 25 : this.props.viewWidth - 25,
                                     }}
-                                    onChange={(value, id) => {this.onChangeAnswerDate(value, this.props.item.variable)}}
+                                    onChange={(value, id, index) => {
+                                        this.onChangeAnswerDate(value, this.props.item.variable, this.props.index)
+                                    }}
                                 />
                                 {   this.props.isEditMode &&
                                     <View style={{
@@ -69,7 +70,7 @@ class QuestionCardContent extends PureComponent {
                                         alignItems: 'center',
                                         width: 25,
                                     }}>
-                                        <Ripple onPress={() => this.props.onCollapse(this.props.item)}>
+                                        <Ripple onPress={() => {}}>
                                             <Icon name="content-copy"/>
                                         </Ripple>
                                     </View>
@@ -130,25 +131,25 @@ class QuestionCardContent extends PureComponent {
                 source[parentId] = [];
                 source[parentId].push({subAnswers: {}});
             }
-            if (!source[parentId][0]) {
-                source[parentId][0] = {subAnswers: {}}
+            if (!source[parentId][this.props.index]) {
+                source[parentId][this.props.index] = {subAnswers: {}}
             }
-            if (!source[parentId][0].subAnswers) {
-                source[parentId][0].subAnswers = {};
+            if (!source[parentId][this.props.index].subAnswers) {
+                source[parentId][this.props.index].subAnswers = {};
             }
-            if (!source[parentId][0].subAnswers[item.variable]) {
+            if (!source[parentId][this.props.index].subAnswers[item.variable]) {
                 switch(item.answerType) {
                     case 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_FREE_TEXT':
-                        source[parentId][0].subAnswers[item.variable] = {date: item.multiAnswer ? this.state.answerDate : null, value: ''};
+                        source[parentId][this.props.index].subAnswers[item.variable] = {date: item.multiAnswer ? this.state.answerDate : null, value: ''};
                         break;
                     case 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_SINGLE_ANSWER':
-                        source[parentId][0].subAnswers[item.variable] = {date: item.multiAnswer ? this.state.answerDate : null, value: ''};
+                        source[parentId][this.props.index].subAnswers[item.variable] = {date: item.multiAnswer ? this.state.answerDate : null, value: ''};
                         break;
                     case 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_MULTIPLE_ANSWERS':
-                        source[parentId][0].subAnswers[item.variable] = {date: item.multiAnswer ? this.state.answerDate : null, value: []};
+                        source[parentId][this.props.index].subAnswers[item.variable] = {date: item.multiAnswer ? this.state.answerDate : null, value: []};
                         break;
                     default:
-                        source[parentId][0].subAnswers[item.variable] = {date: item.multiAnswer ? this.state.answerDate : null, value: ''};
+                        source[parentId][this.props.index].subAnswers[item.variable] = {date: item.multiAnswer ? this.state.answerDate : null, value: ''};
                         break;
                 }
             }
@@ -178,14 +179,14 @@ class QuestionCardContent extends PureComponent {
         let questionAnswers = null;
 
         questionAnswers = parentId ? source && source[parentId] && Array.isArray(source[parentId]) && source[parentId].length > 0 &&
-            source[parentId][0] && typeof source[parentId][0] === 'object' && Object.keys(source[parentId][0]).length > 0 &&
-            source[parentId][0].subAnswers && typeof source[parentId][0].subAnswers === "object" &&
-            Object.keys(source[parentId][0].subAnswers).length > 0 && source[parentId][0].subAnswers[item.variable] &&
-            Array.isArray(source[parentId][0].subAnswers[item.variable]) && source[parentId][0].subAnswers[item.variable].length > 0 &&
-            source[parentId][0].subAnswers[item.variable][0] && source[parentId][0].subAnswers[item.variable][0].value ?
-            source[parentId][0].subAnswers[item.variable][0].value : '' :
+            source[parentId][this.props.index] && typeof source[parentId][this.props.index] === 'object' && Object.keys(source[parentId][this.props.index]).length > 0 &&
+            source[parentId][this.props.index].subAnswers && typeof source[parentId][this.props.index].subAnswers === "object" &&
+            Object.keys(source[parentId][this.props.index].subAnswers).length > 0 && source[parentId][this.props.index].subAnswers[item.variable] &&
+            Array.isArray(source[parentId][this.props.index].subAnswers[item.variable]) && source[parentId][this.props.index].subAnswers[item.variable].length > 0 &&
+            source[parentId][this.props.index].subAnswers[item.variable][this.props.index] && source[parentId][this.props.index].subAnswers[item.variable][this.props.index].value ?
+            source[parentId][this.props.index].subAnswers[item.variable][this.props.index].value : '' :
             source[item.variable] && Array.isArray(source[item.variable]) && source[item.variable].length > 0 &&
-            source[item.variable][0] && source[item.variable][0].value ? source[item.variable][0].value : '';
+            source[item.variable][this.props.index] && source[item.variable][this.props.index].value ? source[item.variable][this.props.index].value : '';
 
         if (item.answerType === 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_SINGLE_ANSWER') {
             // console.log('QuestionCard: ', item);
@@ -200,7 +201,7 @@ class QuestionCardContent extends PureComponent {
                 // console.log('QuestionCard: ', item);
                 questionAnswers = questionAnswers !== null && questionAnswers !== undefined && Array.isArray(questionAnswers) && questionAnswers.length > 0 ?
                     item.answers.filter((e) => {
-                        console.log('Inside filter: ', e);
+                        // console.log('Inside filter: ', e);
                         return e && e.value && questionAnswers.indexOf(e.value) > -1;
                     }).map((e) => {
                         return {label: getTranslation(e.label, this.props.translation), value: e.value || null}
@@ -222,7 +223,7 @@ class QuestionCardContent extends PureComponent {
                             let valueToSend = {
                                 date: this.state.answerDate, value: text
                             };
-                            this.props.onChangeTextAnswer(valueToSend, id, parentId);
+                            this.props.onChangeTextAnswer(valueToSend, id, parentId, this.props.index);
                         }}
                         multiline={true}
                         style={{width: width, marginHorizontal: marginHorizontal}}
@@ -245,7 +246,7 @@ class QuestionCardContent extends PureComponent {
                             let valueToSend = {
                                 date: this.state.answerDate, value: parseFloat(text)
                             };
-                            this.props.onChangeTextAnswer(valueToSend, id, parentId);
+                            this.props.onChangeTextAnswer(valueToSend, id, parentId, this.props.index);
                         }}
                         multiline={true}
                         keyboardType={'numeric'}
@@ -268,7 +269,7 @@ class QuestionCardContent extends PureComponent {
                             let valueToSend = {
                                 date: this.state.answerDate, value: date
                             };
-                            this.props.onChangeDateAnswer(valueToSend, id, parentId);
+                            this.props.onChangeDateAnswer(valueToSend, id, parentId, this.props.index);
                         }}
                         style={{width: width, marginHorizontal: marginHorizontal}}
                         translation={this.props.translation}
@@ -311,7 +312,7 @@ class QuestionCardContent extends PureComponent {
                                     valueToSend.subAnswers[item.answers[index].additionalQuestions[i].variable] = [{date: this.state.answerDate, value: ''}]
                                 }
                             }
-                            this.props.onChangeSingleSelection(valueToSend, id, parentId);
+                            this.props.onChangeSingleSelection(valueToSend, id, parentId, this.props.index);
                         }}
                         style={{width: width, marginHorizontal: marginHorizontal}}
                         translation={this.props.translation}
@@ -346,7 +347,7 @@ class QuestionCardContent extends PureComponent {
                             if (subAnswers !== {}) {
                                 valueToSend.subAnswers = subAnswers;
                             }
-                            this.props.onChangeMultipleSelection(valueToSend, id, parentId);
+                            this.props.onChangeMultipleSelection(valueToSend, id, parentId, this.props.index);
                         }}
                         style={{width: width, marginHorizontal: marginHorizontal}}
                         dropDownStyle={{width: width, alignSelf: 'center'}}
@@ -380,11 +381,11 @@ class QuestionCardContent extends PureComponent {
         )
     };
 
-    onChangeAnswerDate = (date, id) => {
+    onChangeAnswerDate = (date, id, index) => {
         this.setState({
             answerDate: date
         }, () => {
-            this.props.onChangeAnswerDate(date, id)
+            this.props.onChangeAnswerDate(date, id, index)
         });
     };
 }
