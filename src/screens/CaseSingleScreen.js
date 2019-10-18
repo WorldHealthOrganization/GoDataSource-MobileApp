@@ -200,7 +200,6 @@ class CaseSingleScreen extends Component {
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
-
         if (this.props.errors && this.props.errors.type && this.props.errors.message) {
             Alert.alert(this.props.errors.type, this.props.errors.message, [
                 {
@@ -572,7 +571,6 @@ class CaseSingleScreen extends Component {
         })
     };
     saveCaseAction = () => {
-        // console.log("handleSavePress case", JSON.stringify(this.state.case));
         this.hideMenu();
         let ageConfig = this.ageAndDobPrepareForSave();
         let caseClone = _.cloneDeep(this.state.case);
@@ -732,7 +730,7 @@ class CaseSingleScreen extends Component {
                 selectedItemIndexForTextSwitchSelectorForAge: this.state.case.dob !== null ? 1 : 0,
             }, () => {
                 // console.log("onPressSaveEdit with changes");
-                this.handleOnPressSave()
+                this.handleOnPressSave();
             })
         } else {
             this.setState({
@@ -798,9 +796,6 @@ class CaseSingleScreen extends Component {
                 {
                     text: getTranslation(translations.alertMessages.yesButtonLabel, this.props.translation),
                     onPress: () => {
-                        // console.log("onPressCancelEdit case", this.state.case);
-                        // console.log("onPressCancelEdit caseBeforeEdit", this.state.caseBeforeEdit);
-                        // console.log("onPressCancelEdit Yes pressed - remove changes");
                         this.setState({
                             case: _.cloneDeep(this.state.caseBeforeEdit),
                             isModified: false,
@@ -1775,8 +1770,8 @@ class CaseSingleScreen extends Component {
     onChangeAnswerDate = (value, questionId, index) => {
         let questionnaireAnswers = _.cloneDeep(this.state.previousAnswers);
         if (questionnaireAnswers && questionnaireAnswers[questionId] && Array.isArray(questionnaireAnswers[questionId]) && questionnaireAnswers[questionId].length) {
-            if (questionnaireAnswers[questionId][index] && questionnaireAnswers[questionId][index].date) {
-                questionnaireAnswers[questionId][index].date = value;
+            if (questionnaireAnswers[questionId][0] && questionnaireAnswers[questionId][0].date) {
+                questionnaireAnswers[questionId][0].date = value;
                 if (questionnaireAnswers[questionId][0].subAnswers && typeof questionnaireAnswers[questionId][0].subAnswers === "object" && Object.keys(questionnaireAnswers[questionId][0].subAnswers).length > 0) {
                     for (let subQuestionId in questionnaireAnswers[questionId][0].subAnswers) {
                         questionnaireAnswers[questionId][0].subAnswers[subQuestionId].map((e) => {
@@ -1785,11 +1780,14 @@ class CaseSingleScreen extends Component {
                     }
                 }
             }
+        }else{
+            questionnaireAnswers[questionId]= [{date: value, value: null}];
         }
-        console.log('~~~~~~~~~ onChangeAnswerDate', questionnaireAnswers);
         this.setState({
             previousAnswers: questionnaireAnswers,
             isModified: true
+        }, () => {
+            console.log('~~~~~~~~~ onChangeAnswerDate', this.state.previousAnswers);
         });
     };
 
