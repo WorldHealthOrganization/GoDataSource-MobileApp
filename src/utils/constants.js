@@ -5,7 +5,6 @@ const appScreens = {
     navigationDrawer: 'NavigationDrawer',
     followUpScreen: 'FollowUpsScreen',
     addFollowUpScreen: 'AddFollowUpScreen',
-    addSingleAnswerModalScreen: 'AddSingleAnswerModalScreen',
     filterScreen: 'FilterScreen',
     followUpSingleScreen: 'FollowUpsSingleScreen',
     casesScreen: 'CasesScreen',
@@ -17,7 +16,6 @@ const appScreens = {
     helpSingleScreen: 'HelpSingleScreen',
     qrScanScreen: 'QRScanScreen',
     hubConfigScreen: 'HubConfigScreen',
-    previousAnswersScreen: 'PreviousAnswersScreen',
 
     generateFollowUpsScreen: 'GenerateFollowUpScreen',
     inAppNotificationScreen: 'InAppNotificationScreen'

@@ -521,16 +521,6 @@ const hubConfigScreen = {
     successMakingHubActiveMessage: 'LNG_HUB_CONFIGURATION_SCREEN_SUCCES_SET_HUB_AS_ACTIVE_AND_YOU_WILL_BE_LOGGED_OUT_MESSAGE'
 };
 
-const addSingleAnswerModalScreen = {
-    addNewAnswer: 'LNG_ADD_SINGLE_ANSWER_MODAL_SCREEN_ADD_NEW_ANSWER',
-
-};
-
-const previousAnswersScreen = {
-    previousAnswersTitle: 'LNG_PREVIOUS_ANSWERS_SCREEN_PREVIOUS_ANSWERS_TITLE',
-    noPreviousAnswersToShowMessage: 'LNG_PREVIOUS_ANSWERS_SCREEN_NO_PREVIOUS_ANSWERS_TO_SHOW'
-};
-
 // TODO add to backend
 const followUpAgenda = {
     followUp: 'LNG_FOLLOW_UP_AGENDA_FOLLOW_UP',
@@ -583,8 +573,6 @@ export default {
     questionCardLabels,
     hubConfigScreen,
     sortTab,
-    addSingleAnswerModalScreen,
-    previousAnswersScreen,
     followUpAgenda,
     personListItem
 };

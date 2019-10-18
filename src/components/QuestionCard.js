@@ -118,6 +118,7 @@ class QuestionCard extends PureComponent {
                     }
                     <QuestionCardContent
                         key={this.props.key}
+                        index={0}
                         item={this.props.item}
                         source={this.props.source}
                         viewWidth={viewWidth}

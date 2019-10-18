@@ -139,10 +139,10 @@ class FollowUpsSingleQuestionnaireContainer extends Component {
                     onChangeMultipleSelection={this.props.onChangeMultipleSelection}
                     onFocus={this.handleOnFocus}
                     onClickAddNewMultiFrequencyAnswer={this.props.onClickAddNewMultiFrequencyAnswer}
-                    onClickShowPreviousAnswers={this.props.onClickShowPreviousAnswers}
                     onBlur={this.handleOnBlur}
                     onChangeAnswerDate={this.props.onChangeAnswerDate}
                     savePreviousAnswers={this.props.savePreviousAnswers}
+                    editableQuestionDate={true}
                 />
             )
         }
@@ -172,11 +172,6 @@ class FollowUpsSingleQuestionnaireContainer extends Component {
     handleOnBlur = (event) => {
         // this.scrollFollowUpsSingleQuestionnaire.props.scrollToPosition(0, 0, false)
         // this.scrollToInput(findNodeHandle(event.target))
-    };
-
-    scrollToInput(reactNode) {
-        // Add a 'scroll' ref to your ScrollView
-        // this.scrollFollowUpsSingleQuestionnaire.props.scrollToFocusedInput(reactNode)
     };
 
     isCollapsed = (item) => {

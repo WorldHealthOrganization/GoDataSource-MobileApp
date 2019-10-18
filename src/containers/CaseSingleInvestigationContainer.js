@@ -38,7 +38,6 @@ class CaseSingleInvestigationContainer extends Component {
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
-        // console.log('CaseSingleContainer render Investigation');
         // Get all additional questions recursively
 
         // Logic moved from the getDerivedStateFromProps
@@ -176,10 +175,10 @@ class CaseSingleInvestigationContainer extends Component {
                     onChangeDateAnswer={this.props.onChangeDateAnswer}
                     onFocus={this.handleOnFocus}
                     onClickAddNewMultiFrequencyAnswer={this.props.onClickAddNewMultiFrequencyAnswer}
-                    onClickShowPreviousAnswers={this.props.onClickShowPreviousAnswers}
                     onBlur={this.handleOnBlur}
                     onChangeAnswerDate={this.props.onChangeAnswerDate}
                     savePreviousAnswers={this.props.savePreviousAnswers}
+                    editableQuestionDate={true}
                 />
             )
         }
