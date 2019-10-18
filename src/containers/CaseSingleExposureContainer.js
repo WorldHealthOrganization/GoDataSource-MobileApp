@@ -20,8 +20,8 @@ import GeneralListItem from '../components/GeneralListItem';
 import Ripple from 'react-native-material-ripple';
 import moment from 'moment';
 import translations from './../utils/translations';
-import ExposureContainer from '../containers/ExposureContainer';
 import get from 'lodash/get';
+import config from "../utils/config";
 
 const AnimatedFlatList = Animated.createAnimatedComponent(FlatList);
 
@@ -36,11 +36,6 @@ class ContactsSingleExposures extends Component {
     }
 
     // Please add here the react lifecycle methods that you need
-    // shouldComponentUpdate(nextProps, nextState) {
-    //     // console.log("NextPropsIndex ContactsSingleExposures: ", nextProps.activeIndex, this.props.activeIndex);
-    //     return nextProps.activeIndex === 2;
-    // }
-
     componentDidMount() {
         InteractionManager.runAfterInteractions(() => {
             this.setState({
@@ -50,7 +45,7 @@ class ContactsSingleExposures extends Component {
     }
 
     shouldComponentUpdate(nextProps, nextState) {
-        if (nextProps.activeIndex === 2) {
+        if (nextProps.activeIndex === 3) {
             return true;
         }
         return false;
@@ -67,28 +62,15 @@ class ContactsSingleExposures extends Component {
             )
         }
 
-        // console.log('ContactsSingleContainer render Exposures');
-
         return (
             <ElevatedView elevation={3} style={[style.container]}>
-                <View style = {{alignItems: 'center'}}>
-                    <View style={{flexDirection: 'row'}}>
-                        <Button
-                            title={getTranslation(translations.generalButtons.backButtonLabel, this.props.translation)}
-                            onPress={this.handleBackButton}
-                            color={styles.buttonGreen}
-                            titleColor={'white'}
-                            height={calculateDimension(25, true, this.props.screenSize)}
-                            width={calculateDimension(130, false, this.props.screenSize)}
-                            style={{
-                                marginVertical: calculateDimension(12.5, true, this.props.screenSize),
-                                marginHorizontal: calculateDimension(16, false, this.props.screenSize),
-                        }}/>
-                        {
-                            this.props.isEditMode === true ? this.props.isNew ? (
+                <View style={{ flexDirection: 'row' }}>
+                    {
+                        this.props.isNew ? (
+                            <View style={{ flexDirection: 'row' }}>
                                 <Button
-                                    title={getTranslation(translations.generalButtons.saveButtonLabel, this.props.translation)}
-                                    onPress={this.props.handleOnPressSave}
+                                    title={getTranslation(translations.generalButtons.backButtonLabel, this.props.translation)}
+                                    onPress={this.handleBackButton}
                                     color={styles.buttonGreen}
                                     titleColor={'white'}
                                     height={calculateDimension(25, true, this.props.screenSize)}
@@ -96,11 +78,10 @@ class ContactsSingleExposures extends Component {
                                     style={{
                                         marginVertical: calculateDimension(12.5, true, this.props.screenSize),
                                         marginHorizontal: calculateDimension(16, false, this.props.screenSize),
-                                }}/> 
-                            ) : (
+                                    }} />
                                 <Button
                                     title={getTranslation(translations.generalButtons.nextButtonLabel, this.props.translation)}
-                                    onPress={this.props.handleMoveToNextScreenButton}
+                                    onPress={this.handleNextButton}
                                     color={styles.buttonGreen}
                                     titleColor={'white'}
                                     height={calculateDimension(25, true, this.props.screenSize)}
@@ -108,42 +89,63 @@ class ContactsSingleExposures extends Component {
                                     style={{
                                         marginVertical: calculateDimension(12.5, true, this.props.screenSize),
                                         marginHorizontal: calculateDimension(16, false, this.props.screenSize),
-                                    }}/>
-                            ) : null
-                        }
-                    </View>
+                                    }} />
+                            </View>) : (
+                            this.props.isEditMode ? (
+                                <View style={{ flexDirection: 'row' }}>
+                                    <Button
+                                        title={getTranslation(translations.generalButtons.saveButtonLabel, this.props.translation)}
+                                        onPress={this.props.onPressSaveEdit}
+                                        color={styles.buttonGreen}
+                                        titleColor={'white'}
+                                        height={calculateDimension(25, true, this.props.screenSize)}
+                                        width={calculateDimension(166, false, this.props.screenSize)}
+                                        style={{
+                                            marginVertical: calculateDimension(12.5, true, this.props.screenSize),
+                                            marginRight: 10,
+                                        }} />
+                                    <Button
+                                        title={getTranslation(translations.generalButtons.cancelButtonLabel, this.props.translation)}
+                                        onPress={this.props.onPressCancelEdit}
+                                        color={styles.buttonGreen}
+                                        titleColor={'white'}
+                                        height={calculateDimension(25, true, this.props.screenSize)}
+                                        width={calculateDimension(166, false, this.props.screenSize)}
+                                        style={{
+                                            marginVertical: calculateDimension(12.5, true, this.props.screenSize),
+                                            marginRight: 10,
+                                        }} />
+                                </View>) : (
+                                this.props.role.find((e) => e === config.userPermissions.writeCase) !== undefined ? (
+                                    <Button
+                                        title={getTranslation(translations.generalButtons.editButtonLabel, this.props.translation)}
+                                        onPress={this.props.onPressEdit}
+                                        color={styles.buttonGreen}
+                                        titleColor={'white'}
+                                        height={calculateDimension(25, true, this.props.screenSize)}
+                                        width={calculateDimension(166, false, this.props.screenSize)}
+                                        style={{
+                                            marginVertical: calculateDimension(12.5, true, this.props.screenSize),
+                                            marginRight: 10,
+                                        }} />
+                                ) : null
+                            ))
+                    }
                 </View>
-                {
-                    !this.props.isNew ? (
-                        <ScrollView contentContainerStyle={{flexGrow: 1}}>
-                            <AnimatedFlatList
-                                data={get(this.props, 'contact.relationships', [])}
-                                renderItem={this.renderRelationship}
-                                keyExtractor={this.keyExtractor}
-                                ItemSeparatorComponent={this.renderSeparatorComponent}
-                                ListEmptyComponent={this.listEmptyComponent}
-                                style={[style.listViewStyle]}
-                                componentContainerStyle={style.componentContainerStyle}
-                            />
-                            <View style={{height: 30}}/>
-                        </ScrollView>
-                    ) : (
-                        <ExposureContainer
-                            exposure={this.props.contact.relationships[0]}
-                            addContactFromCasesScreen={this.props.addContactFromCasesScreen}
-                            fromExposureScreen={false}
-                            isEditMode={this.props.isEditMode}
-                            contact={this.props.contact}
-                            onChangeDropDown={this.props.onChangeDropDown}
-                            onChangeDate={this.props.onChangeDate}
-                            onChangeText={this.props.onChangeText}
-                            onChangeSwitch={this.props.onChangeSwitch}
-                            selectedExposure={this.props.selectedExposure}
-                        />
-                    )
-                }
+                <ScrollView contentContainerStyle={{flexGrow: 1}}>
+                    <AnimatedFlatList
+                        data={get(this.props, 'contact.relationships', [])}
+                        renderItem={this.renderRelationship}
+                        keyExtractor={this.keyExtractor}
+                        ItemSeparatorComponent={this.renderSeparatorComponent}
+                        ListEmptyComponent={this.listEmptyComponent}
+                        style={[style.listViewStyle]}
+                        componentContainerStyle={style.componentContainerStyle}
+                    />
+                    <View style={{height: 30}}/>
+                </ScrollView>
             </ElevatedView>
-            
+
         );
     }
 
@@ -191,7 +193,7 @@ class ContactsSingleExposures extends Component {
                 onPressArray={[
                     () => {this.props.onPressEditExposure(relation.item, relation.index)}
                     // () => {this.props.onPressDeleteExposure(relation.item, relation.index)}
-                    ]}
+                ]}
                 containerStyle={{flex: 1, height: '100%', marginHorizontal: calculateDimension(16, false, this.props.screenSize)}}
                 translation={this.props.translation}
             />
@@ -207,21 +209,21 @@ class ContactsSingleExposures extends Component {
     listEmptyComponent = () => {
         return (
             <View style={{alignSelf: 'flex-start', marginHorizontal: calculateDimension(16, false, this.props.screenSize), marginVertical: 20}}>
-            {
-                this.props.isEditMode !== null && this.props.isEditMode !== undefined && this.props.isEditMode === true ? (
-                    <Ripple
-                        style={{
-                            height: 25,
-                            justifyContent: 'center'
-                        }}
-                        onPress={this.onPressAddExposure}
-                    >
-                        <Text style={{fontFamily: 'Roboto-Medium', fontSize: 12, color: styles.buttonGreen}}>
-                            {getTranslation(translations.contactSingleScreen.exposureText, this.props.translation)}
-                        </Text>
-                    </Ripple>
-                ) : null
-            }
+                {
+                    this.props.isEditMode !== null && this.props.isEditMode !== undefined && this.props.isEditMode === true ? (
+                        <Ripple
+                            style={{
+                                height: 25,
+                                justifyContent: 'center'
+                            }}
+                            onPress={this.onPressAddExposure}
+                        >
+                            <Text style={{fontFamily: 'Roboto-Medium', fontSize: 12, color: styles.buttonGreen}}>
+                                {getTranslation(translations.contactSingleScreen.exposureText, this.props.translation)}
+                            </Text>
+                        </Ripple>
+                    ) : null
+                }
             </View>
         )
     };

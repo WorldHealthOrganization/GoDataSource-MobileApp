@@ -123,6 +123,9 @@ const caseSingleScreen = {
     riskReason: 'LNG_CASE_FIELD_LABEL_RISK_REASON',
 
     // TODO add to backend
+    pregnancyStatus: 'LNG_CASE_FIELD_LABEL_PREGNANCY_STATUS',
+
+    // TODO add to backend
     caseId: 'LNG_CASE_FIELD_LABEL_CASE_ID',
 
     documentType: 'LNG_CASE_FIELD_LABEL_DOCUMENT_TYPE',
@@ -236,13 +239,18 @@ const followUpsSingleScreen = {
 const casesScreen = {
     casesTitle: 'LNG_CASE_LIST_SCREEN_TITLE',
     viewButtonLabel: 'LNG_CASE_LIST_SCREEN_VIEW_BUTTON',
-    addContactButtonLabel: 'LNG_CASE_LIST_SCREEN_ADD_CONTACT_BUTTON'
+    addContactButtonLabel: 'LNG_CASE_LIST_SCREEN_ADD_CONTACT_BUTTON',
+    // TODO add to backend
+    noCases: 'LNG_CASE_LIST_SCREEN_NO_CASES',
 };
 
 const contactsScreen = {
     contactsTitle: 'LNG_CONTACT_LIST_SCREEN_TITLE',
     addFollowupsButton: 'LNG_CONTACT_LIST_SCREEN_ADD_FOLLOW_UP_BUTTON',
     editButton: 'LNG_CONTACT_LIST_SCREEN_EDIT_BUTTON',
+
+    // TODO add to backend
+    noContacts: 'LNG_CONTACT_LIST_SCREEN_NO_CONTACTS'
 };
 
 const followUpsScreen = {

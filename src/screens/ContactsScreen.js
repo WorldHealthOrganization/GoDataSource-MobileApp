@@ -12,10 +12,8 @@ import Ripple from 'react-native-material-ripple';
 import {Icon} from 'react-native-material-ui';
 import {calculateDimension, getTranslation} from './../utils/functions';
 import {connect} from "react-redux";
-import {bindActionCreators} from "redux";
 import AnimatedListView from './../components/AnimatedListView';
 import {getContactsForOutbreakId} from './../actions/contacts';
-import {addFilterForScreen, removeFilterForScreen, setLoaderState} from './../actions/app';
 import ViewHOC from './../components/ViewHOC';
 import config from './../utils/config';
 import { Popup } from 'react-native-map-link';
@@ -26,6 +24,8 @@ import {pushNewEditScreen} from './../utils/screenTransitionFunctions';
 import {enhanceListWithGetData} from './../components/higherOrderComponents/withListData';
 import get from "lodash/get";
 import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
+import {bindActionCreators} from "redux";
+import {setLoaderState} from "../actions/app";
 
 class ContactsScreen extends Component {
 
@@ -135,31 +135,6 @@ class ContactsScreen extends Component {
                                     </Ripple>
                                 </ElevatedView> 
                             </View>
-
-                           
-                            {/* {
-                                this.props.role.find((e) => e === config.userPermissions.writeContact) !== undefined ? (
-                                    <View style={{flex: 0.1}}>
-                                        <ElevatedView
-                                            elevation={3}
-                                            style={{
-                                                backgroundColor: styles.buttonGreen,
-                                                width: calculateDimension(33, false, this.props.screenSize),
-                                                height: calculateDimension(25, true, this.props.screenSize),
-                                                borderRadius: 4
-                                            }}
-                                        >
-                                            <Ripple style={{
-                                                flex: 1,
-                                                justifyContent: 'center',
-                                                alignItems: 'center'
-                                            }} onPress={this.handleOnPressAddContact}>
-                                                <Icon name="add" color={'white'} size={15}/>
-                                            </Ripple>
-                                        </ElevatedView>
-                                    </View>
-                                ) : null
-                            } */}
                         </View>
                     }
                     navigator={this.props.navigator}
@@ -382,22 +357,14 @@ function mapStateToProps(state) {
         user:           state.user,
         screenSize:     state.app.screenSize,
         syncState:      state.app.syncState,
-        filter:         state.app.filters,
         translation:    state.app.translation,
         loaderState:    state.app.loaderState,
-        contacts:       state.contacts,
-        errors:         state.errors,
-        role:           state.role,
-        referenceData:  state.referenceData,
-        cases:          state.exposure
+        referenceData:  state.referenceData
     };
 }
 
 function matchDispatchProps(dispatch) {
     return bindActionCreators({
-        getContactsForOutbreakId,
-        addFilterForScreen,
-        removeFilterForScreen,
         setLoaderState
     }, dispatch);
 }

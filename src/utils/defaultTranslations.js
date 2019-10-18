@@ -107,6 +107,8 @@ export default {
     'LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED': 'Refused transfer to treatment unit',
     'LNG_CASE_FIELD_LABEL_RISK_REASON': 'Risk reason',
     'LNG_CASE_FIELD_LABEL_CASE_ID': 'Case ID',
+    // TODO add to backend
+    'LNG_CASE_FIELD_LABEL_PREGNANCY_STATUS': 'Pregnancy status',
 
     'LNG_CASE_FIELD_LABEL_DOCUMENT_TYPE': 'Document Type',
     'LNG_CASE_FIELD_LABEL_DOCUMENT_NUMBER': 'Document number',
@@ -194,12 +196,16 @@ export default {
     'LNG_CASE_LIST_SCREEN_TITLE': 'Cases',
     'LNG_CASE_LIST_SCREEN_VIEW_BUTTON': 'View',
     'LNG_CASE_LIST_SCREEN_ADD_CONTACT_BUTTON': 'Add contact',
+    // TODO add to backend
+    'LNG_CASE_LIST_SCREEN_NO_CASES': 'There are no cases to display',
 
 
     //contactsScreen
     'LNG_CONTACT_LIST_SCREEN_TITLE': 'Contacts',
     'LNG_CONTACT_LIST_SCREEN_ADD_FOLLOW_UP_BUTTON': 'Add follow-up',
     'LNG_CONTACT_LIST_SCREEN_EDIT_BUTTON': 'Edit',
+    // TODO add to backend
+    'LNG_CONTACT_LIST_SCREEN_NO_CONTACTS': 'There are no contacts to display',
 
 
     //followUpsScreen

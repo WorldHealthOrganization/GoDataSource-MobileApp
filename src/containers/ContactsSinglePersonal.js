@@ -4,7 +4,7 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, { PureComponent } from 'react';
-import { View, StyleSheet, InteractionManager, Alert, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, InteractionManager, Alert, ScrollView } from 'react-native';
 import { calculateDimension, getTranslation, createDate } from './../utils/functions';
 import config from './../utils/config';
 import { connect } from "react-redux";
@@ -15,10 +15,12 @@ import CardComponent from './../components/CardComponent';
 import { LoaderScreen } from 'react-native-ui-lib';
 import translations from './../utils/translations'
 import ElevatedView from 'react-native-elevated-view';
+import Ripple from 'react-native-material-ripple';
 import _ from 'lodash';
 import lodashGet from "lodash/get";
+import {checkArray, checkArrayAndLength} from "../utils/typeCheckingFunctions";
 
-class ContactsSinglePersonal extends React.Component {
+class ContactsSinglePersonal extends PureComponent {
 
     // This will be a container, so put as less business logic here as possible
     constructor(props) {
@@ -79,6 +81,54 @@ class ContactsSinglePersonal extends React.Component {
                                 return this.handleRenderItem(item)
                             })
                         }
+
+                        <View style={style.container}>
+                            {
+                                checkArrayAndLength(_.get(this.props, 'contact.vaccinesReceived', [])) && _.get(this.props, 'contact.vaccinesReceived', []).map((item, index) => {
+                                    return this.handleRenderItemForVaccinesList(item, index)
+                                })
+                            }
+                        </View>
+                        {
+                            this.props.isEditMode ? (
+                                <View style={{ alignSelf: 'flex-start', marginHorizontal: calculateDimension(16, false, this.props.screenSize), marginVertical: 20 }}>
+                                    <Ripple
+                                        style={{
+                                            height: 25,
+                                            justifyContent: 'center'
+                                        }}
+                                        onPress={this.props.onPressAddVaccine}
+                                    >
+                                        <Text style={{ fontFamily: 'Roboto-Medium', fontSize: 12, color: styles.buttonGreen }}>
+                                            {!_.get(this.props, 'contact.vaccinesReceived', null) || checkArray(this.props.contact.vaccinesReceived) && this.props.contact.vaccinesReceived.length === 0 ? getTranslation('Add vaccine', this.props.translation) : getTranslation('Add another vaccine', this.props.translation)}
+                                        </Text>
+                                    </Ripple>
+                                </View>) : null
+                        }
+
+                        <View style={style.container}>
+                            {
+                                checkArray(_.get(this.props, 'contact.documents', [])) && _.get(this.props, 'contact.documents', []).map((item, index) => {
+                                    return this.handleRenderItemForDocumentsList(item, index)
+                                })
+                            }
+                        </View>
+                        {
+                            this.props.isEditMode ? (
+                                <View style={{ alignSelf: 'flex-start', marginHorizontal: calculateDimension(16, false, this.props.screenSize), marginVertical: 20 }}>
+                                    <Ripple
+                                        style={{
+                                            height: 25,
+                                            justifyContent: 'center'
+                                        }}
+                                        onPress={this.props.onPressAddDocument}
+                                    >
+                                        <Text style={{ fontFamily: 'Roboto-Medium', fontSize: 12, color: styles.buttonGreen }}>
+                                            {!_.get(this.props, 'contact.documents', null) || checkArray(this.props.contact.documents) && this.props.contact.documents.length === 0 ? getTranslation(translations.caseSingleScreen.oneDocumentText, this.props.translation) : getTranslation(translations.caseSingleScreen.moreDocumentsText, this.props.translation)}
+                                        </Text>
+                                    </Ripple>
+                                </View>) : null
+                        }
                     </View>
                     </ScrollView>
                 </View>
@@ -92,6 +142,20 @@ class ContactsSinglePersonal extends React.Component {
             return Object.assign({}, field, { isEditMode: field.id === 'visualId' ? false : this.props.isEditMode })
         });
         return this.renderItemCardComponent(fields);
+    };
+
+    handleRenderItemForDocumentsList = (item, index) => {
+        let fields = config.caseSingleScreen.document.fields.map((field) => {
+            return Object.assign({}, field, { isEditMode: field.id === 'visualId' ? false : this.props.isEditMode })
+        });
+        return this.renderItemCardComponent(fields, index)
+    };
+
+    handleRenderItemForVaccinesList = (item, index) => {
+        let fields = config.caseSingleScreen.vaccinesReceived.fields.map((field) => {
+            return Object.assign({}, field, { isEditMode: field.id === 'visualId' ? false : this.props.isEditMode })
+        });
+        return this.renderItemCardComponent(fields, index)
     };
 
     renderItemCardComponent = (fields, cardIndex = null) => {
@@ -130,14 +194,20 @@ class ContactsSinglePersonal extends React.Component {
 
         if (item.type === 'DropdownInput') {
             item.data = this.computeDataForContactsSingleScreenDropdownInput(item);
+        } else if (item.type === 'ActionsBar') {
+            if (item.objectType !== null && item.objectType !== undefined && item.objectType === 'Documents') {
+                item.onPressArray = [this.props.onDeletePress];
+            } else if (item.objectType !== null && item.objectType !== undefined && item.objectType === 'Vaccines') {
+                item.onPressArray = [this.props.onPressDeleteVaccines]
+            }
         }
 
-        if (item.type === 'DatePicker' && item.objectType !== 'Address') {
+        if (item.type === 'DatePicker' && item.objectType !== 'Address' && item.objectType !== 'Documents' && item.objectType !== 'Vaccines') {
             value = this.props.contact[item.id]
         } else if (item.type === 'SwitchInput' && this.props.contact[item.id] !== undefined) {
             value = this.props.contact[item.id]
         } else {
-            value = this.computeValueForContactsSingleScreen(item);
+            value = this.computeValueForContactsSingleScreen(item, cardIndex);
         }
 
         if (this.props.selectedItemIndexForTextSwitchSelectorForAge !== null && this.props.selectedItemIndexForTextSwitchSelectorForAge !== undefined && item.objectType === 'Contact' && item.dependsOn !== undefined && item.dependsOn !== null) {
@@ -168,6 +238,7 @@ class ContactsSinglePersonal extends React.Component {
                 value={value}
                 minimumDate={minimumDate}
                 maximumDate={maximumDate}
+                index={cardIndex}
 
                 onChangeText={this.props.onChangeText}
                 onChangeDate={this.props.onChangeDate}
@@ -195,7 +266,17 @@ class ContactsSinglePersonal extends React.Component {
         return dateValidation
     };
 
-    computeValueForContactsSingleScreen = (item) => {
+    computeValueForContactsSingleScreen = (item, index) => {
+        if (index !== null || index >= 0) {
+            if (item.objectType === 'Documents') {
+                return checkArrayAndLength(_.get(this.props, 'contact.documents')) && _.get(this.props, `contact.documents[${index}][${item.id}]`) !== null ?
+                    getTranslation(_.get(this.props, `contact.documents[${index}][${item.id}]`, null), this.props.translation) : '';
+            }
+            if (item.objectType === 'Vaccines') {
+                return checkArrayAndLength(_.get(this.props, 'contact.vaccinesReceived')) && _.get(this.props, `contact.vaccinesReceived[${index}][${item.id}]`) !== null ?
+                    getTranslation(_.get(this.props, `contact.vaccinesReceived[${index}][${item.id}]`, null), this.props.translation) : '';
+            }
+        }
         if (item.id === 'age') {
             if (this.props.contact && this.props.contact[item.id] !== null && this.props.contact[item.id] !== undefined) {
                 return this.props.contact[item.id]
@@ -229,6 +310,25 @@ class ContactsSinglePersonal extends React.Component {
             return _.filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CONTACT_FINAL_FOLLOW_UP_STATUS_TYPE' })
                 .sort((a, b) => { return a.order - b.order; })
                 .map((o) => { return { value: getTranslation(o.value, this.props.translation), id: o.value } })
+        }
+
+        // Documents data
+        if (item.id === 'type') {
+            return _.filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_DOCUMENT_TYPE' })
+                .sort((a, b) => { return a.order - b.order; })
+                .map((o) => { return { label: getTranslation(o.value, this.props.translation), value: o.value } })
+        }
+
+        // Vaccines data
+        if (item.id === 'vaccine') {
+            return _.filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_VACCINE' })
+                .sort((a, b) => { return a.order - b.order; })
+                .map((o) => { return { label: getTranslation(o.value, this.props.translation), value: o.value } })
+        }
+        if (item.id === 'status') {
+            return _.filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_VACCINE_STATUS' })
+                .sort((a, b) => { return a.order - b.order; })
+                .map((o) => { return { label: getTranslation(o.value, this.props.translation), value: o.value } })
         }
     };
 

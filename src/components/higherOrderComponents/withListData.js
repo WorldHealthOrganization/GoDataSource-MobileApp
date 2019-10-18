@@ -108,7 +108,8 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                             userTeams: get(this.props, 'teams', null),
                             contactsFilter: get(this.state, 'mainFilter', null),
                             exposureFilter: get(this.state, 'searchText', null),
-                            lastElement: get(this.state, 'lastElement', null)
+                            lastElement: get(this.state, 'lastElement', null),
+                            offset: get(this.state, 'data.length', 0)
                         };
                         break;
                     case 'ContactsScreen':
@@ -116,7 +117,8 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                             outbreakId: get(this.props, 'user.activeOutbreakId', null),
                             contactsFilter: get(this.state, 'mainFilter', null),
                             exposureFilter: get(this.state, 'searchText', null),
-                            lastElement: get(this.state, 'lastElement', null)
+                            lastElement: get(this.state, 'lastElement', null),
+                            offset: get(this.state, 'data.length', 0)
                         };
                         break;
                     case 'CasesScreen':
@@ -124,7 +126,8 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                             outbreakId: get(this.props, 'user.activeOutbreakId', null),
                             casesFilter: get(this.state, 'mainFilter', null),
                             searchText: get(this.state, 'searchText', null),
-                            lastElement: get(this.state, 'lastElement', null)
+                            lastElement: get(this.state, 'lastElement', null),
+                            offset: get(this.state, 'data.length', 0)
                         };
                         break;
                     default:
@@ -312,42 +315,19 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
 
             onPressExposure = (exposure) => {
                 let forwardScreen = this.computeForwardScreen('onPressExposure');
+                let previousScreen = screenType === constants.appScreens.followUpScreen ? translations.followUpsScreen.followUpsTitle : translations.contactsScreen.contactsTitle;
 
-                // Exposures are shown only on the data that involves contacts so here we do a query before
-                this.getDataForExposure(get(exposure, 'id', null))
-                    .then((result) => {
-                        if (forwardScreen && result) {
-                            this.props.navigator.push({
-                                screen: forwardScreen,
-                                animated: true,
-                                passProps: {
-                                    case: get(result, 'caseData', null),
-                                    refresh: this.refresh
-                                    // previousScreen: translations.followUpsSingleScreen.title
-                                }
-                            })
+                if (forwardScreen) {
+                    this.props.navigator.push({
+                        screen: forwardScreen,
+                        animated: true,
+                        passProps: {
+                            case: {_id: get(exposure, 'id', null)},
+                            refresh: this.refresh,
+                            previousScreen: previousScreen
                         }
                     })
-                    .catch((errorGetCaseExposure) => {
-                        this.props.setLoaderState(false);
-                        Alert.alert('Error', errorGetCaseExposure,
-                            [
-                                {
-                                    text: 'Ok', onPress: () => {console.log("Ok pressed")}
-                                }
-                            ])
-                    });
-            };
-            getDataForExposure = (exposureId) => {
-                if (!exposureId) {
-                    return Promise.reject("An error occurred while getting exposure data");
                 }
-                this.props.setLoaderState(true);
-                return getCaseAndExposuresById(exposureId)
-                    .then((result) => {
-                        this.props.setLoaderState(false);
-                        return result;
-                    })
             };
 
             computeForwardScreen = (method) => {
@@ -413,7 +393,6 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
 
                 return forwardScreen;
             }
-
 
             onNavigatorEvent = (event) => {
                 navigation(event, this.props.navigator);

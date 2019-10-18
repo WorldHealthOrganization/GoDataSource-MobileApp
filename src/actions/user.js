@@ -7,7 +7,6 @@ import {changeAppRoot, getTranslations, saveTranslation, saveAvailableLanguages}
 import {loginUserRequest, getUserByIdRequest, updateUserRequest} from './../queries/user';
 import {getUserRoles} from './../actions/role';
 import {getUserTeams} from './../actions/teams';
-// import { getCasesForOutbreakIdWithPromise } from './cases';
 import { getClusters } from './clusters';
 import { getOutbreakById } from './outbreak';
 import { addError } from './errors';
@@ -109,19 +108,19 @@ export function getUserById(userId, token, refreshFollowUps, nativeEventEmitter)
 export function computeCommonData(storeUserBool, user, refreshFollowUps, filters) {
     return async function (dispatch) {
         try {
-            let outbreakAndLocationInfo = await getOutbreakById(user.activeOutbreakId, null, null);
+            let outbreakAndLocationInfo = await getOutbreakById(user.activeOutbreakId);
             if (outbreakAndLocationInfo) {
                 let promises = [];
 
-                let userTeams = await getUserTeams(user._id, null);
-                promises.push(getUserRoles(user.roleIds, null));
-                promises.push(getClusters(null, null));
+                let userTeams = await getUserTeams(user._id);
+                promises.push(getUserRoles(user.roleIds));
+                promises.push(getClusters());
                 promises.push(getAvailableLanguages(dispatch));
-                promises.push(getReferenceData(null, dispatch));
-                promises.push(getTranslations(user.languageId, null));
-                promises.push(getLocations(outbreakAndLocationInfo.locationIds || null, null));
-                promises.push(getHelpCategory(null, dispatch));
-                promises.push(getHelpItem(null, dispatch));
+                promises.push(getReferenceData());
+                promises.push(getTranslations(user.languageId));
+                promises.push(getLocations(outbreakAndLocationInfo.locationIds || null));
+                promises.push(getHelpCategory());
+                promises.push(getHelpItem());
 
                 Promise.all(promises)
                     .then((dataArray) => {

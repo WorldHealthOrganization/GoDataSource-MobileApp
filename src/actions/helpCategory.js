@@ -3,7 +3,6 @@
  */
 import {ACTION_TYPE_STORE_HELP_CATEGORY} from './../utils/enums';
 import {getHelpCategoryRequest} from '../queries/helpCategory';
-import { addError } from './errors';
 import errorTypes from './../utils/errorTypes';
 
 
@@ -15,19 +14,14 @@ export function storeHelpCategory(helpCategory) {
     }
 }
 
-export function getHelpCategory(token, dispatch) {
+export function getHelpCategory() {
     return new Promise((resolve, reject) => {
         getHelpCategoryRequest (null, (error, response) => {
             if (error) {
                 console.log("*** getHelpCategoryRequest error: ", error);
-                // dispatch(addError(errorTypes.ERROR_HELP));
-                // reject(error);
                 reject(errorTypes.ERROR_HELP);
             }
             if (response) {
-                // console.log('response help category: ',response);
-                // dispatch(storeHelpCategory(response));
-                // resolve('Done help category');
                 resolve({helpCategory: response})
             }
         })

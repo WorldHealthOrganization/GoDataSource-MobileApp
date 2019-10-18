@@ -12,18 +12,7 @@ export function wipeCompleteRequest(url, installationId, clientId, clientSecret,
             manufacturer: DeviceInfo.getManufacturer().replace(/\u0022|\u0027|\u0060|\u00b4|\u2018|\u2019|\u201c|\u201d/g, `\'`),
             model: DeviceInfo.getModel().replace(/\u0022|\u0027|\u0060|\u00b4|\u2018|\u2019|\u201c|\u201d/g, `\'`),
             name: DeviceInfo.getDeviceName().replace(/\u0022|\u0027|\u0060|\u00b4|\u2018|\u2019|\u201c|\u201d/g, `\'`)
-        });
-    
-        // console.log ('operatingSystem: ', operatingSystem)
-        // console.log ('deviceManufacturer: ', deviceManufacturer)
-        // console.log ('deviceModel: ', deviceModel)
-        // console.log ('deviceName: ', deviceName)
-        // console.log ('deviceDescription: ', deviceDescription)
-        // console.log ('requestUrl: ', requestUrl)
-        // console.log ('installationId: ', installationId)
-
-        // let deviceInfoStringify = `{"id": "${installationId}", "os": "${operatingSystem}", "manufacturer": "${deviceManufacturer}", "model": "${deviceModel}", "name": "${deviceName}"}`
-        // console.log('deviceInfoStringify: ', deviceInfoStringify)
+        });0
 
         fetch( encodeURI(requestUrl), {
             method: 'POST',
@@ -43,5 +32,4 @@ export function wipeCompleteRequest(url, installationId, clientId, clientSecret,
                 callback(error);
             })
     }
-    
 };

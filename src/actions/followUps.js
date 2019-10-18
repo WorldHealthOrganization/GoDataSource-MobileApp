@@ -1,14 +1,6 @@
 /**
  * Created by florinpopa on 19/07/2018.
  */
-// import { ACTION_TYPE_STORE_FOLLOWUPS, ACTION_TYPE_UPDATE_FOLLOWUP} from './../utils/enums';
-// import { updateContactAction, getContactsForOutbreakIdWithPromises, getContactsForOutbreakPromise} from './contacts';
-import { addError } from './errors';
-import errorTypes from './../utils/errorTypes';
-import {
-    getFollowUpsForOutbreakIdRequest,
-} from './../queries/followUps';
-import uniq from 'lodash/uniq';
 import get from 'lodash/get';
 import {mapContactsAndFollowUps, createDate} from './../utils/functions';
 import {executeQuery, insertOrUpdate} from './../queries/sqlTools/helperMethods';
@@ -19,21 +11,7 @@ jsonSql.setDialect('sqlite');
 import translations from './../utils/translations';
 
 // Add here only the actions, not also the requests that are executed. For that purpose is the requests directory
-// export function storeFollowUps(followUps) {
-//     return {
-//         type: ACTION_TYPE_STORE_FOLLOWUPS,
-//         payload: followUps
-//     }
-// }
-//
-// export function updateFollowUpAction(followUp) {
-//     return {
-//         type: ACTION_TYPE_UPDATE_FOLLOWUP,
-//         payload: followUp
-//     }
-// }
-
-export function getFollowUpsForOutbreakId({outbreakId, followUpFilter, userTeams, contactsFilter, exposureFilter, lastElement}, computeCount) {
+export function getFollowUpsForOutbreakId({outbreakId, followUpFilter, userTeams, contactsFilter, exposureFilter, lastElement, offset}, computeCount) {
     let countPromise = null;
     let followUpPromise = null;
 
@@ -68,7 +46,7 @@ export function getFollowUpsForOutbreakId({outbreakId, followUpFilter, userTeams
 
     let contactsAndExposuresQuery = {
         type: 'select',
-        query: sqlConstants.createMainQuery(translations.personTypes.contacts, outbreakId, contactsFilter, exposureFilter, lastElement), // Here will take place the contact/exposure filter/sort
+        query: sqlConstants.createMainQuery(translations.personTypes.contacts, outbreakId, contactsFilter, exposureFilter, lastElement, offset), // Here will take place the contact/exposure filter/sort
         alias: 'MappedData',
         fields: [
             {
@@ -128,7 +106,7 @@ export function getFollowUpsForOutbreakId({outbreakId, followUpFilter, userTeams
     if (computeCount) {
         let contactsQueryCount = {
             type: 'select',
-            query: sqlConstants.createMainQuery(translations.personTypes.contacts, outbreakId, contactsFilter, exposureFilter, lastElement, true), // Here will take place the contact/exposure filter/sort
+            query: sqlConstants.createMainQuery(translations.personTypes.contacts, outbreakId, contactsFilter, exposureFilter, lastElement, offset, true), // Here will take place the contact/exposure filter/sort
             alias: 'MappedData',
             fields: [
                 {
@@ -194,43 +172,6 @@ export function generalMapping(unmappedData) {
         }
 
         return mappedObject;
-    })
-}
-
-export function getFollowUpsForOutbreakIdWithPromises(outbreakId, filter, userTeams, token, dispatch) {
-    return new Promise((resolve, reject) => {
-        if (!filter) {
-            filter = {};
-            filter.date = createDate(null);
-        }
-        console.log("getFollowUpsForOutbreakId Filter: ", filter);
-        getFollowUpsForOutbreakIdRequest(outbreakId, filter, userTeams, token, (error, response) => {
-            if (error) {
-                console.log("*** getFollowUpsForOutbreakId error: ", error);
-                // dispatch(addError(errorTypes.ERROR_FOLLOWUPS));
-                reject(errorTypes.ERROR_FOLLOWUPS)
-            }
-            if (response) {
-                // After getting the followUps by date, it's time to get their respective contacts
-                let keys = response.map((e) => {return e.personId});
-                keys = uniq(keys);
-                console.log('### Keys for getting contacts: ', keys);
-                getContactsForOutbreakIdWithPromises(outbreakId, {keys: keys}, null, dispatch)
-                    .then((responseGetContacts) => {
-                        // dispatch(storeFollowUps(response));
-                        // getRelationshipsForTypeRequest(outbreakId, 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT', keys, (errorGetRelationships, resultGetRelationships) => {
-                            let mappedContact = mapContactsAndFollowUps(responseGetContacts, response);
-                            // mappedContact = mapContactsAndRelationships(mappedContact, resultGetRelationships);
-                            // dispatch(storeContacts(mappedContact));
-                            resolve({followUps: {followUps: response, contacts: mappedContact}});
-                        // })
-                    })
-                    .catch((errorGetContactsForFollowUps) => {
-                        dispatch(addError(errorTypes.ERROR_CONTACT));
-                        reject(errorGetContactsForFollowUps);
-                    })
-            }
-        })
     })
 }
 

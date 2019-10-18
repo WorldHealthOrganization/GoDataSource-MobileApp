@@ -15,19 +15,14 @@ export function storeHelpItem(helpItem) {
     }
 }
 
-export function getHelpItem(token, dispatch) {
+export function getHelpItem() {
     return new Promise((resolve, reject) => {
         getHelpItemRequest (null, (error, response) => {
             if (error) {
                 console.log("*** getHelpItemRequest error: ", error);
-                // dispatch(addError(errorTypes.ERROR_HELP));
-                // reject(error);
                 reject(errorTypes.ERROR_HELP);
             }
             if (response) {
-                // console.log('response help item: ',response);
-                // dispatch(storeHelpItem(response));
-                // resolve('Done help item');
                 resolve({helpItem: response})
             }
         })

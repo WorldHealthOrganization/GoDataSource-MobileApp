@@ -2,9 +2,6 @@
  * Created by florinpopa on 19/07/2018.
  */
 import {ACTION_TYPE_STORE_OUTBREAK, ACTION_TYPE_STORE_LOCATIONS} from './../utils/enums';
-// import {getOutbreakByIdRequest} from './../requests/outbreak';
-import {getOutbreakByIdRequest} from './../queries/outbreak';
-import { addError } from './errors';
 import errorTypes from './../utils/errorTypes';
 import {getLocationsByOutbreakIdRequest} from './../queries/locations'
 import {mapLocations} from './../utils/functions'
@@ -26,19 +23,15 @@ export function storeLocations(locations) {
 }
 
 export function getLocations(locationIds) {
-    // return async function(dispatch, getState) {
     let start = new Date().getTime();
     return new Promise((resolve, reject) => {
-                        // console.log ('*** getOutbreakById response: ', response);
         getLocationsByOutbreakIdRequest(null, (error, responseLocations) => {
             if (error) {
                 console.log('*** getLocationsByOutbreakId error: ', error);
-                // dispatch(addError(errorTypes.ERROR_LOCATIONS));
                 reject(errorTypes.ERROR_LOCATIONS);
             }
             if (responseLocations) {
                 console.log('*** getLocationsByOutbreakId response: ');
-                // dispatch(storeLocationsList(responseLocations));
                 let treeLocationList = [];
                 if (responseLocations.length > 0) {
                     treeLocationList = mapLocations(responseLocations.filter((e) => {return e.active === true}));
@@ -47,17 +40,11 @@ export function getLocations(locationIds) {
                         treeLocationList = extractLocations(treeLocationList, locationIds);
                     }
                     console.log('Map locations: ', new Date().getTime() - start);
-                    // dispatch(storeLocations(treeLocationList));
-                } else {
-                    // dispatch(storeLocations(responseLocations));
                 }
-                // dispatch(storeOutbreak(response));
-                // resolve('Done outbreak');
                 resolve({locations: {locationsList: responseLocations, treeLocationsList: treeLocationList}});
             }
         });
     })
-    // }
 }
 
 function extractLocations (locationTree, locationIds) {

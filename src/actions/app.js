@@ -61,19 +61,6 @@ export function saveTranslation(translation) {
     }
 }
 
-export function saveHelpCategory(helpCategory) {
-    return {
-        type: ACTION_TYPE_SAVE_HELP_CATEGORY,
-        helpCategory: helpCategory
-    }
-}
-export function saveHelpItem(helpItem) {
-    return {
-        type: ACTION_TYPE_SAVE_HELP_ITEM,
-        helpItem: helpItem
-    }
-}
-
 export function saveActiveDatabase(activeDatabase) {
     return {
         type: ACTION_TYPE_SAVE_ACTIVE_DATABASE,
@@ -99,13 +86,6 @@ export function setSyncState(syncState) {
     return {
         type: ACTION_TYPE_SET_SYNC_STATE,
         syncState: syncState
-    }
-}
-
-export function saveGeneratedFollowUps(generatedFollowUps) {
-    return {
-        type: ACTION_TYPE_SAVE_GENERATED_FOLLOWUPS,
-        generatedFollowUps: generatedFollowUps
     }
 }
 
@@ -137,8 +117,7 @@ export function removeFilterForScreen(screenName) {
     }
 }
 
-export function getTranslations(language, dispatch) {
-    // return async function (dispatch) {
+export function getTranslations(language) {
     return new Promise((resolve, reject) => {
         getTranslationRequest(language, (error, response) => {
             if (error) {
@@ -147,48 +126,10 @@ export function getTranslations(language, dispatch) {
             }
             if (response) {
                 console.log("### here should have the translations: ");
-                // dispatch(saveTranslation(response));
-                // resolve('Done translations');
                 resolve({translations: response});
             }
         })
     })
-    // }
-}
-
-export function getHelpCategory(help, dispatch) {
-    // return async function (dispatch) {
-    return new Promise((resolve, reject) => {
-        getHelpCategoryRequest(language, (error, response) => {
-            if (error) {
-                console.log("*** getHelpCategory error: ", error);
-                reject(error);
-            }
-            if (response) {
-                console.log("### here should have the translations: ");
-                dispatch(saveHelpCategory(response));
-                resolve('Done help category');
-            }
-        })
-    })
-    // }
-}
-export function getHelpItem(help, dispatch) {
-    // return async function (dispatch) {
-    return new Promise((resolve, reject) => {
-        getHelpItemRequest(language, (error, response) => {
-            if (error) {
-                console.log("*** getHelpItem error: ", error);
-                reject(error);
-            }
-            if (response) {
-                console.log("### here should have the translations: ");
-                dispatch(saveHelpItem(response));
-                resolve('Done help item');
-            }
-        })
-    })
-    // }
 }
 
 export function getTranslationsAsync(language) {
@@ -257,7 +198,7 @@ function processFilesForSyncNew(error, response, hubConfiguration, isFirstTime, 
             if (error === 'No data to export') {
                 dispatch(setSyncState({id: 'downloadDatabase', name: 'Download Database', status: error}));
             } else {
-                dispatch(setSyncState({id: 'downloadDatabase', name: 'Download Database', status: 'Error', error: error}));
+                dispatch(setSyncState({id: 'downloadDatabase', name: 'Download Database', status: 'Error', error: JSON.stringify(error)}));
                 // dispatch(addError({type: 'Error downloading database', message: error}));
             }
         }
@@ -311,7 +252,7 @@ function processFilesForSyncNew(error, response, hubConfiguration, isFirstTime, 
                                     }
                                 } catch (errorProcessFile) {
                                     console.log('There was an error at processing file: ', pouchFiles[i], errorProcessFile);
-                                    dispatch(setSyncState({id: 'sync', status: 'Error', error: `There was an error at processing file: ${pouchFiles[i]}: ${errorProcessFile}`}));
+                                    dispatch(setSyncState({id: 'sync', status: 'Error', error: `There was an error at processing file: ${pouchFiles[i]}: ${JSON.stringify(errorProcessFile)}`}));
                                     break;
                                 }
                             }
@@ -334,31 +275,39 @@ function processFilesForSyncNew(error, response, hubConfiguration, isFirstTime, 
                                     }
                                 } catch(errorProcessingFilesForSql) {
                                     console.log('There was an error at processing file: ', sqlFiles[i], errorProcessingFilesForSql);
-                                    dispatch(setSyncState({id: 'sync', status: 'Error', error: `There was an error at processing file: ${sqlFiles[i]}: ${errorProcessingFilesForSql}`}));
+                                    dispatch(setSyncState({id: 'sync', status: 'Error', error: `There was an error at processing file: ${sqlFiles[i]}: ${JSON.stringify(errorProcessingFilesForSql)}`}));
                                     break;
                                 }
                             }
                         }
 
-                        saveActiveDatabaseAndCleanup(syncSuccessful, hubConfiguration, hubConfig, files.length === promiseResponses.length)
-                            .then((success) => {
-                                console.log('Responses promises: ', promiseResponses);
-                                files = null;
-                                database = null;
-                                dispatch(setSyncState({id: 'sync', status: 'Success'}));
-                                if (!isFirstTime) {
-                                    dispatch(setSyncState({id: 'getDataFromServer', status: 'Success'}));
-                                }
-                            })
-                            .catch((errorSaveActiveDatabaseAndCleanup) => {
-                                console.log('error saveActiveDatabaseAndCleanup: ', errorSaveActiveDatabaseAndCleanup);
-                                files = null;
-                                database = null;
-                                dispatch(setSyncState({id: 'sync', status: 'Error', error: `Error at storing database name: \n${JSON.stringify(errorSaveActiveDatabaseAndCleanup)}`}));
-                                if (!isFirstTime) {
-                                    dispatch(setSyncState({id: 'getDataFromServer', status: 'Error'}));
-                                }
-                            })
+                        if (promiseResponses.length === files.length) {
+                            saveActiveDatabaseAndCleanup(syncSuccessful, hubConfiguration, hubConfig, files.length === promiseResponses.length)
+                                .then((success) => {
+                                    console.log('Responses promises: ', promiseResponses);
+                                    files = null;
+                                    database = null;
+                                    dispatch(setSyncState({id: 'sync', status: 'Success'}));
+                                    if (!isFirstTime) {
+                                        dispatch(setSyncState({id: 'getDataFromServer', status: 'Success'}));
+                                    }
+                                })
+                                .catch((errorSaveActiveDatabaseAndCleanup) => {
+                                    console.log('error saveActiveDatabaseAndCleanup: ', errorSaveActiveDatabaseAndCleanup);
+                                    files = null;
+                                    database = null;
+                                    dispatch(setSyncState({
+                                        id: 'sync',
+                                        status: 'Error',
+                                        error: `Error at storing database name: \n${JSON.stringify(errorSaveActiveDatabaseAndCleanup)}`
+                                    }));
+                                    if (!isFirstTime) {
+                                        dispatch(setSyncState({id: 'getDataFromServer', status: 'Error'}));
+                                    }
+                                })
+                        } else {
+                            dispatch(setSyncState({id: 'sync', status: 'Error', error: 'Error while processing files'}));
+                        }
                     }
                 })
         }
@@ -573,19 +522,29 @@ export function storeData (key, value, callback) {
     });
 }
 
-// export function getData (key) {
-//     return async function () {
-//         try {
-//             const value = await AsyncStorage.getItem(key);
-//             console.log('Value from async storage: ', value);
-//             if (value !== null) {
-//                 return value
-//             } else {
-//                 return null;
-//             }
-//         } catch(error) {
-//             return null;
-//         }
+// export function appInitializedNew(nativeEventEmitter) {
+//     return async function (dispatch) {
+//         // Handle save screen size for measurements
+//         let width = Dimensions.get("window").width;
+//         let height = Dimensions.get('window').height;
+//         let screenSize = {width, height};
+//         dispatch(saveScreenSize(screenSize));
+//
+//         let loggedUserGlobal = null;
+//         let activeDatabaseGlobal = null;
+//
+//         AsyncStorage.getItem('loggedUser')
+//             .then((loggedUser) => {
+//                 loggedUserGlobal = loggedUser;
+//                 return Promise.resolve();
+//             })
+//             .catch((errorGetLoggedUser) => Promise.resolve())
+//             .then(() => AsyncStorage.getItem('activeDatabase'))
+//             .then((activeDatabase) => {
+//                 activeDatabaseGlobal = activeDatabase;
+//                 return Promise.resolve();
+//             })
+//             .catch((errorGetActiveDatabase) => Promise.resolve())
 //     }
 // }
 

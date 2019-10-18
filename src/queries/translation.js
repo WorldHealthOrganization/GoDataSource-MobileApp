@@ -1,7 +1,7 @@
 /**
  * Created by florinpopa on 18/09/2018.
  */
-import {getDatabase} from './database';
+// import {getDatabase} from './database';
 import config from './../utils/config';
 import {rawSQLQuery} from './sqlHelper';
 
@@ -45,7 +45,6 @@ export function getAvailableLanguagesRequest (callback) {
 }
 
 export function getTranslationRequest (languageId, callback) {
-    let start =  new Date().getTime();
 
     rawSQLQuery(config.mongoCollections.languageToken, `${config.rawSQLQueryString}${config.rawSQLQueryWhereString}`, [`${config.mongoCollections.languageToken}.json_${languageId}_%`])
         .then((result) => {

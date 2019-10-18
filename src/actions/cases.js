@@ -15,41 +15,13 @@ var jsonSql = require('json-sql')();
 jsonSql.setDialect('sqlite');
 
 // Add here only the actions, not also the requests that are executed. For that purpose is the requests directory
-// export function storeCases(cases) {
-//     return {
-//         type: ACTION_TYPE_STORE_CASES,
-//         payload: cases
-//     }
-// };
-//
-// export function addCaseAction(myCase) {
-//     return {
-//         type: ACTION_TYPE_ADD_CASE,
-//         payload: myCase
-//     }
-// }
-//
-// export function updateCaseAction(myCase) {
-//     return {
-//         type: ACTION_TYPE_UPDATE_CASE,
-//         payload: myCase
-//     }
-// }
-//
-// export function removeCaseAction(myCase) {
-//     return {
-//         type: ACTION_TYPE_REMOVE_CASE,
-//         payload: myCase
-//     }
-// }
-
-export function getCasesForOutbreakId({outbreakId, casesFilter, searchText, lastElement}, computeCount) {
+export function getCasesForOutbreakId({outbreakId, casesFilter, searchText, lastElement, offset}, computeCount) {
     let countPromise = null;
     let casesPromise = null;
 
     let casesQuery = {
         type: 'select',
-        query: sqlConstants.createMainQuery(translations.personTypes.cases, outbreakId, casesFilter, searchText, lastElement), // Here will take place the contact/exposure filter/sort
+        query: sqlConstants.createMainQuery(translations.personTypes.cases, outbreakId, casesFilter, searchText, lastElement, offset), // Here will take place the contact/exposure filter/sort
         alias: 'MappedData',
         fields: [
             {
@@ -74,7 +46,7 @@ export function getCasesForOutbreakId({outbreakId, casesFilter, searchText, last
     if (computeCount) {
         let casesQueryCount = {
             type: 'select',
-            query: sqlConstants.createMainQuery(translations.personTypes.cases, outbreakId, casesFilter, searchText, lastElement, true), // Here will take place the contact/exposure filter/sort
+            query: sqlConstants.createMainQuery(translations.personTypes.cases, outbreakId, casesFilter, searchText, lastElement, offset, true), // Here will take place the contact/exposure filter/sort
             alias: 'MappedData',
             fields: [
                 {
@@ -158,60 +130,58 @@ export function getCasesByName(outbreakId, search) {
         .catch((errorGetData) => Promise.reject(errorGetData))
 }
 
-export function getCaseAndExposuresById (caseId) {
-    let query = {
+export function getCaseAndExposuresById (caseId, outbreakId) {
+    let queryCase = {
         type: 'select',
         table: 'person',
-        alias: 'Main',
         fields: [
             {
-                table: 'Main',
+                table: 'person',
                 name: 'json',
                 alias: 'caseData'
-            },
+            }
+        ],
+        condition: {
+            '_id': caseId
+        }
+    };
+
+    let queryRelations = {
+        type: 'select',
+        table: 'relationship',
+        fields: [
             {
-                func: {
-                    name: 'group_concat',
-                    args: [{field: `relationship.json`}, '***']
-                },
+                table: 'relationship',
+                name: 'json',
                 alias: 'relationshipData'
             },
             {
-                func: {
-                    name: 'group_concat',
-                    args: [{field: `Exposure.json`}, '***']
-                },
-                alias: 'exposureData'
+                table: 'person',
+                name: 'json',
+                alias: 'contactData'
             }
         ],
         join: [
             {
-                type: 'left',
-                table: 'relationship',
-                on: {'Main._id': 'relationship.sourceId'}
-            },
-            {
-                type: 'left',
+                type: 'inner',
                 table: 'person',
-                alias: 'Exposure',
-                on: {'relationship.targetId': 'Exposure._id'}
+                on: {'person._id': 'relationship.targetId'}
             }
         ],
         condition: {
-            'Main._id': caseId,
-            'Exposure.type': translations.personTypes.contacts
+            'relationship.sourceId': caseId,
+            // 'relationship.outbreakId': outbreakId,
         }
     };
+    if (outbreakId) {
+        queryRelations.condition[`person.outbreakId`] = outbreakId;
+    }
 
-    return Promise.resolve()
-        .then(() => executeQuery(query))
-        .then((mappedData) => Promise.resolve(get(mappedData, '[0]', null)))
-        .then((mappedData) => {
-            if (mappedData['relationshipData'] !== null) {
-                let exposures = mappedData['relationshipData'].split('***');
-                mappedData['relationshipData'] = exposures.map((f) => JSON.parse(f));
-            }
-            return Promise.resolve(mappedData);
-        })
+    let promiseCaseData = executeQuery(queryCase)
+        .then((caseData) => Promise.resolve(get(caseData, `[0].caseData`, null)));
+    let promiseRelationsData = executeQuery(queryRelations);
+
+    return Promise.all([promiseCaseData, promiseRelationsData])
+        .then(([caseData, relationshipData]) => Promise.resolve({caseData: caseData, relationshipData: relationshipData}))
         .catch((errorGetData) => Promise.reject(errorGetData))
 }

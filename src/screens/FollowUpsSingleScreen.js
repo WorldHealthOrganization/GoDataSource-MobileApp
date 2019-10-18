@@ -820,7 +820,7 @@ class FollowUpsSingleScreen extends Component {
                         // this.props.refresh();
                         this.props.navigator.resetTo(
                             {
-                                screen: 'FollowUpsScreen',
+                                screen: 'ContactsScreen',
                                 animated: true,
                                 animationType: 'fade',
                             }

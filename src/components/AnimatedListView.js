@@ -102,7 +102,7 @@ class AnimatedListView extends Component {
                 maxToRenderPerBatch={5}
                 updateCellsBatchingPeriod={100}
                 initialNumToRender={5}
-                windowSize={11}
+                windowSize={10}
                 ListHeaderComponent={
                     <View>
                         <SearchFilterView
@@ -241,13 +241,24 @@ class AnimatedListView extends Component {
     };
 
     listEmptyComponent = () => {
+        let message = null;
         switch(this.props.dataType) {
-
+            case 'FollowUp':
+                message = translations.followUpsScreen.noFollowupsMessage;
+                break;
+            case 'Contact':
+                message = translations.contactsScreen.noContacts;
+                break;
+            case 'Case':
+                message = translations.casesScreen.noCases;
+                break;
+            default:
+                message = translations.followUpsScreen.noFollowupsMessage;
         }
         return (
             <View style={[style.emptyComponent, { height: calculateDimension((667 - 152), true, this.props.screenSize) }]}>
                 <Text style={style.emptyComponentTextView}>
-                    {getTranslation(translations.followUpsScreen.noFollowupsMessage, this.props.translation)}
+                    {getTranslation(message, this.props.translation)}
                 </Text>
             </View>
         )

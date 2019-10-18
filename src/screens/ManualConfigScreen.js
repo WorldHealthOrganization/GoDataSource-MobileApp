@@ -165,45 +165,13 @@ class ManualConfigScreen extends PureComponent {
 
     componentWillUnmount() {
         this.props.setSyncState(null);
+        syncStateGlobal = [
+            {id: 'testApi', name: 'Test API', status: '...'},
+            {id: 'downloadDatabase', name: 'Download database', status: '...'},
+            {id: 'unzipFile', name: 'Unzip', status: '...'},
+            {id: 'sync', name: 'Sync', status: '...'}
+        ];
     }
-
-    // static getDerivedStateFromProps(props, state) {
-    //     // if (props.errors && props.errors.type && props.errors.message && !state.hasAlert) {
-    //     //     state.hasAlert = true;
-    //     //     Alert.alert(props.errors.type, props.errors.message, [
-    //     //         {
-    //     //             text: getTranslation(translations.alertMessages.okButtonLabel, props.translation),
-    //     //             onPress: () => {
-    //     //                 state.hasAlert = false;
-    //     //                 props.removeErrors();
-    //     //             }
-    //     //         }
-    //     //     ])
-    //     // }
-    //     if (props.syncState) {
-    //         // props.navigator.push({
-    //         //     screen: 'LoginScreen',
-    //         //     animationType: 'fade',
-    //         //     animated: true
-    //         // })
-    //         if (props.syncState.id === 'testApi' && props.syncState.status === 'In progress') {
-    //             state.showModal = true;
-    //         }
-    //         let itemToBeChanged = state.syncState.find((e) => {return e.id === props.syncState.id});
-    //         if (itemToBeChanged) {
-    //             itemToBeChanged.name = props.syncState.name ? props.syncState.name : itemToBeChanged.name;
-    //             itemToBeChanged.error = props.syncState.error || null;
-    //             itemToBeChanged.status = props.syncState.status || '...';
-    //
-    //             let index = state.syncState.map((e) => {return e.id}).indexOf(props.syncState.id);
-    //             state.syncState[index] = itemToBeChanged;
-    //             if (itemToBeChanged.status === 'Error' || (index === state.syncState.length - 1 && itemToBeChanged.status === 'Success')) {
-    //                 state.showCloseModalButton = true;
-    //             }
-    //         }
-    //     }
-    //     return null;
-    // }
 
     // The render method should have at least business logic as possible,
     // because this will be called whenever there is a new setState call

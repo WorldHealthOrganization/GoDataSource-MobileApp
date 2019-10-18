@@ -269,7 +269,7 @@ const mainQueryStrings = {
     allOfExposures: 'AllOfExposures'
 };
 
-function createMainQuery(dataType, outbreakId, filter, search, lastElement, skipAllExposures) {
+function createMainQuery(dataType, outbreakId, filter, search, lastElement, offset, skipAllExposures) {
     dataType = dataType ? dataType : translations.personTypes.contacts;
     let sort = {};
     let notQuery = [];
@@ -323,60 +323,41 @@ function createMainQuery(dataType, outbreakId, filter, search, lastElement, skip
             // Sort by firstName
             if (get(filter, `sort[${i}].sortCriteria`, null) === translations.sortTab.sortFirstName) {
                 sort[`${mainQueryStrings.outerFilter}.firstName`] = sortOrder;
-                if (lastElement) {
-                    outerFilterCondition[`${mainQueryStrings.outerFilter}.firstName`] = {[sortOrder === 1 ? `$gte` : `$lte`]: get(lastElement, 'firstName', null)};
-                    notQuery.push({[`${mainQueryStrings.outerFilter}.firstName`]: get(lastElement, 'firstName', null)});
-                }
             }
             // Sort by lastName
             if (get(filter, `sort[${i}].sortCriteria`, null) === translations.sortTab.sortLastName) {
                 sort[`${mainQueryStrings.outerFilter}.lastName`] = sortOrder;
-                if (lastElement) {
-                    outerFilterCondition[`${mainQueryStrings.outerFilter}.lastName`] = {[sortOrder === 1 ? `$gte` : `$lte`]: get(lastElement, 'lastName', null)};
-                    notQuery.push({[`${mainQueryStrings.outerFilter}.lastName`]: get(lastElement, 'lastName', null)});
-                }
             }
             // Sort by visualId
             if (get(filter, `sort[${i}].sortCriteria`, null) === translations.sortTab.sortVisualId) {
                 sort[`${mainQueryStrings.outerFilter}.visualId`] = sortOrder;
-                if (lastElement) {
-                    outerFilterCondition[`${mainQueryStrings.outerFilter}.visualId`] = {[sortOrder === 1 ? `$gte` : `$lte`]: get(lastElement, 'visualId', null)};
-                    notQuery.push({[`${mainQueryStrings.outerFilter}.visualId`]: get(lastElement, 'visualId', null)});
-                }
             }
             // Sort by createdAt
             if (get(filter, `sort[${i}].sortCriteria`, null) === translations.sortTab.sortCreatedAt) {
                 sort[`${mainQueryStrings.outerFilter}.createdAt`] = sortOrder;
-                if (lastElement) {
-                    outerFilterCondition[`${mainQueryStrings.outerFilter}.createdAt`] = {[sortOrder === 1 ? `$gte` : `$lte`]: get(lastElement, 'createdAt', null)};
-                    notQuery.push({[`${mainQueryStrings.outerFilter}.createdAt`]: get(lastElement, 'createdAt', null)});
-                }
             }
             // Sort by updatedAt
             if (get(filter, `sort[${i}].sortCriteria`, null) === translations.sortTab.sortUpdatedAt) {
                 sort[`${mainQueryStrings.outerFilter}.updatedAt`] = sortOrder;
-                if (lastElement) {
-                    outerFilterCondition[`${mainQueryStrings.outerFilter}.updatedAt`] = {[sortOrder === 1 ? `$gte` : `$lte`]: get(lastElement, 'updatedAt', null)};
-                    notQuery.push({[`${mainQueryStrings.outerFilter}.updatedAt`]: get(lastElement, 'updatedAt', null)});
-                }
             }
         }
-        if (lastElement) {
-            notQuery.push({[`${mainQueryStrings.outerFilter}._id`]: get(lastElement, '_id', null)});
-        }
+        outerFilterCondition['$not'] = notQuery;
     } else {
         sort[`${mainQueryStrings.outerFilter}.lastName`] = 1;
         sort[`${mainQueryStrings.outerFilter}.firstName`] = 1;
         if (lastElement) {
-            outerFilterCondition[`${mainQueryStrings.outerFilter}.lastName`] = {[`$gte`]: get(lastElement, 'lastName', null)};
-            outerFilterCondition[`${mainQueryStrings.outerFilter}.firstName`] = {[`$gte`]: get(lastElement, 'firstName', null)};
-            notQuery.push({[`${mainQueryStrings.outerFilter}.lastName`]: get(lastElement, 'lastName', null)});
-            notQuery.push({[`${mainQueryStrings.outerFilter}.firstName`]: get(lastElement, 'firstName', null)});
-            notQuery.push({[`${mainQueryStrings.outerFilter}._id`]: get(lastElement, '_id', null)});
+            outerFilterCondition = Object.assign({}, outerFilterCondition, {
+                $expression: {
+                    pattern: `(${mainQueryStrings.outerFilter}.lastName, ${mainQueryStrings.outerFilter}.firstName, ${mainQueryStrings.outerFilter}._id)>({lastName}, {firstName}, {id})`,
+                    values: {
+                        lastName: get(lastElement, 'lastName', null),
+                        firstName: get(lastElement, 'firstName', null),
+                        id: get(lastElement, '_id', null)
+                    }
+                }
+            })
         }
     }
-    outerFilterCondition['$not'] = notQuery;
-    // console.log('OuterFilterCondition: ', outerFilterCondition);
     let query = {
         type: tableNamesAndAliases.selectQueryString,
         table: tableNamesAndAliases.personTable,
@@ -392,14 +373,7 @@ function createMainQuery(dataType, outbreakId, filter, search, lastElement, skip
                 table: mainQueryStrings.outerFilter,
                 name: tableNamesAndAliases.jsonField,
                 alias: mainQueryStrings.mainData
-            },
-            // {
-            //     func: {
-            //         name: 'group_concat',
-            //         args: [{field: `${innerQueriesStrings.unfilteredExposuresTable}.${innerQueriesStrings.unfilteredExposuresAllExposures}`}, '***']
-            //     },
-            //     alias: mainQueryStrings.allOfExposures
-            // }
+            }
         ],
         join: [
             {
@@ -407,17 +381,10 @@ function createMainQuery(dataType, outbreakId, filter, search, lastElement, skip
                 query: createInnerQuery(false, dataType, dataType === translations.personTypes.cases),
                 alias: innerQueriesStrings.filteredExposuresTable,
                 on: {[`${mainQueryStrings.outerFilter}.${tableStructure.person[0].fieldName}`]: `${innerQueriesStrings.filteredExposuresTable}.${innerQueriesStrings.filteredRelationsExposureId}`}
-            },
-            // {
-            //     type: tableNamesAndAliases.leftJoinField,
-            //     query: createInnerQuery(true, dataType, dataType === translations.personTypes.cases),
-            //     alias: innerQueriesStrings.unfilteredExposuresTable,
-            //     on: {[`${mainQueryStrings.outerFilter}.${tableStructure.person[0].fieldName}`]: `${innerQueriesStrings.unfilteredExposuresTable}.${innerQueriesStrings.unfilteredRelationsExposureId}`}
-            // }
+            }
         ],
         condition: outerFilterCondition,
-        group: `${innerQueriesStrings.filteredExposuresTable}.${innerQueriesStrings.filteredRelationsId}`,
-        // limit: 10
+        group: `${innerQueriesStrings.filteredExposuresTable}.${innerQueriesStrings.filteredRelationsId}`
     };
 
     sort[`${mainQueryStrings.outerFilter}._id`] = 1;
@@ -459,6 +426,10 @@ function createMainQuery(dataType, outbreakId, filter, search, lastElement, skip
         //     }
         // );
         delete query.sort;
+    }
+
+    if (checkArrayAndLength(get(filter, 'sort', null)) && lastElement) {
+        query['offset'] = offset;
     }
 
     return query

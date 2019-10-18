@@ -6,7 +6,6 @@
 // Add here only the actions, not also the requests that are executed. For that purpose is the requests directory
 import { ACTION_TYPE_STORE_CLUSTERS } from './../utils/enums';
 import {getClustersdRequest} from './../queries/clusters';
-import { addError } from './errors';
 import errorTypes from './../utils/errorTypes';
 
 // Add here only the actions, not also the requests that are executed. For that purpose is the requests directory
@@ -17,17 +16,15 @@ export function storeClusters(clusters) {
     }
 };
 
-export function getClusters(token, dispatch) {
+export function getClusters() {
     return new Promise((resolve, reject) => {
-        getClustersdRequest(token, (error, response) => {
+        getClustersdRequest((error, response) => {
             if (error) {
                 console.log("*** getClustersdRequest error: ", error);
                 // dispatch(addError(errorTypes.ERROR_CLUSTERS));
                 reject(errorTypes.ERROR_CLUSTERS);
             }
             if (response) {
-                // dispatch(storeClusters(response));
-                // resolve('Done clusters');
                 resolve({clusters: response});
             }
         })

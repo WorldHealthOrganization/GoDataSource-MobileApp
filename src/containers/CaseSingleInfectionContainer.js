@@ -128,22 +128,22 @@ class CaseSingleInfectionContainer extends Component {
                                 })
                             }
                         </View>
-                        {/*{*/}
-                            {/*this.props.isEditMode ? (*/}
-                                {/*<View style={{ alignSelf: 'flex-start', marginHorizontal: calculateDimension(16, false, this.props.screenSize), marginVertical: 20 }}>*/}
-                                    {/*<Ripple*/}
-                                        {/*style={{*/}
-                                            {/*height: 25,*/}
-                                            {/*justifyContent: 'center'*/}
-                                        {/*}}*/}
-                                        {/*onPress={this.props.onPressAddVaccine}*/}
-                                    {/*>*/}
-                                        {/*<Text style={{ fontFamily: 'Roboto-Medium', fontSize: 12, color: styles.buttonGreen }}>*/}
-                                            {/*{this.props.case.vaccinesReceived && this.props.case.vaccinesReceived.length === 0 ? getTranslation('Add vaccine', this.props.translation) : getTranslation('Add another vaccine', this.props.translation)}*/}
-                                        {/*</Text>*/}
-                                    {/*</Ripple>*/}
-                                {/*</View>) : null*/}
-                        {/*}*/}
+                        {
+                            this.props.isEditMode ? (
+                                <View style={{ alignSelf: 'flex-start', marginHorizontal: calculateDimension(16, false, this.props.screenSize), marginVertical: 20 }}>
+                                    <Ripple
+                                        style={{
+                                            height: 25,
+                                            justifyContent: 'center'
+                                        }}
+                                        onPress={this.props.onPressAddVaccine}
+                                    >
+                                        <Text style={{ fontFamily: 'Roboto-Medium', fontSize: 12, color: styles.buttonGreen }}>
+                                            {this.props.case.vaccinesReceived && this.props.case.vaccinesReceived.length === 0 ? getTranslation('Add vaccine', this.props.translation) : getTranslation('Add another vaccine', this.props.translation)}
+                                        </Text>
+                                    </Ripple>
+                                </View>) : null
+                        }
                         <View style={style.container}>
                             {
                                 this.props.case && this.props.case.dateRanges && this.props.case.dateRanges.map((item, index) => {
@@ -207,7 +207,7 @@ class CaseSingleInfectionContainer extends Component {
             return Object.assign({}, field, { isEditMode: field.id === 'visualId' ? false : this.props.isEditMode })
         });
         return this.renderItemCardComponent(fields, index)
-    }
+    };
 
     renderItemCardComponent = (fields, cardIndex = null) => {
         return (
@@ -250,9 +250,9 @@ class CaseSingleInfectionContainer extends Component {
             if (item.objectType !== null && item.objectType !== undefined && item.objectType === 'DateRanges') {
                 item.onPressArray = [this.props.handleOnPressDeleteDateRange]
             }
-            // else if (item.objectType !== null && item.objectType !== undefined && item.objectType === 'IsolationDates') {
-            //     item.onPressArray = [this.props.handleOnPressDeleteIsolationDates]
-            // }
+            else if (item.objectType !== null && item.objectType !== undefined && item.objectType === 'Vaccines') {
+                item.onPressArray = [this.props.onPressDeleteVaccines]
+            }
         }
 
         if (item.type === 'DatePicker' && this.props.case[item.id] !== undefined) {
@@ -267,15 +267,6 @@ class CaseSingleInfectionContainer extends Component {
                     }
                 }
             }
-            // else if (item.objectType === 'IsolationDates') {
-            //     for (let i = 0; i < this.props.locations.length; i++) {
-            //         let myLocationName = this.getLocationNameById(this.props.locations[i], this.props.case.isolationDates[cardIndex][item.id])
-            //         if (myLocationName !== null){
-            //             value = myLocationName;
-            //             break
-            //         }
-            //     }
-            // }
         } else if (item.type === 'SwitchInput' && this.props.case[item.id] !== undefined) {
             value = this.props.case[item.id]
         } else {
@@ -451,6 +442,7 @@ class CaseSingleInfectionContainer extends Component {
                 .map((o) => { return { value: getTranslation(o.value, this.props.translation), id: o.value } })
         }
 
+        // Vaccines data
         if (item.id === 'vaccine') {
             return _.filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_VACCINE' })
                 .sort((a, b) => { return a.order - b.order; })

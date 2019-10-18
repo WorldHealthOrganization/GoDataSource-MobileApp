@@ -16,8 +16,7 @@ import {bindActionCreators} from "redux";
 import ElevatedView from 'react-native-elevated-view';
 import Breadcrumb from './../components/Breadcrumb';
 import {getCasesForOutbreakId} from './../actions/cases';
-import {removeErrors} from './../actions/errors';
-import {addFilterForScreen, removeFilterForScreen, setLoaderState} from './../actions/app';
+import {setLoaderState} from './../actions/app';
 import AnimatedListView from './../components/AnimatedListView';
 import ViewHOC from './../components/ViewHOC';
 import translations from './../utils/translations'
@@ -488,24 +487,17 @@ const style = StyleSheet.create({
 function mapStateToProps(state) {
     return {
         user:           state.user,
-        filter:         state.app.filters,
         screenSize:     state.app.screenSize,
         syncState:      state.app.syncState,
         translation:    state.app.translation,
         loaderState:    state.app.loaderState,
         role:           state.role,
-        cases:          state.cases,
-        errors:         state.errors,
         referenceData:  state.referenceData
     };
 }
 
 function matchDispatchProps(dispatch) {
     return bindActionCreators({
-        getCasesForOutbreakId,
-        addFilterForScreen,
-        removeErrors,
-        removeFilterForScreen,
         setLoaderState
     }, dispatch);
 }

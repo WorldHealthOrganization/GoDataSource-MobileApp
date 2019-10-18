@@ -7,7 +7,7 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, { Component } from 'react';
-import { View, StyleSheet, Alert, Text} from 'react-native';
+import { View, StyleSheet, Alert } from 'react-native';
 import { Icon } from 'react-native-material-ui';
 import styles from './../styles';
 import NavBarCustom from './../components/NavBarCustom';
@@ -15,14 +15,10 @@ import CalendarPicker from './../components/CalendarPicker';
 import config from './../utils/config';
 import Ripple from 'react-native-material-ripple';
 import { connect } from "react-redux";
-import { bindActionCreators } from "redux";
 import AnimatedListView from './../components/AnimatedListView';
 import Breadcrumb from './../components/Breadcrumb';
 import ValuePicker from './../components/ValuePicker';
-import { getFollowUpsForOutbreakId, getMissedFollowUpsForOutbreakId, addFollowUp } from './../actions/followUps';
-import { getContactsForOutbreakId } from './../actions/contacts';
-import { removeErrors } from './../actions/errors';
-import { addFilterForScreen, removeFilterForScreen, saveGeneratedFollowUps, setLoaderState } from './../actions/app';
+import { getFollowUpsForOutbreakId } from './../actions/followUps';
 import ElevatedView from 'react-native-elevated-view';
 import get from 'lodash/get';
 import { calculateDimension, getTranslation, createDate } from './../utils/functions';
@@ -33,7 +29,8 @@ import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityI
 import { pushNewEditScreen } from './../utils/screenTransitionFunctions';
 import {enhanceListWithGetData} from './../components/higherOrderComponents/withListData';
 import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
-
+import {bindActionCreators} from "redux";
+import { setLoaderState } from './../actions/app';
 class FollowUpsScreen extends Component {
 
     constructor(props) {
@@ -63,7 +60,6 @@ class FollowUpsScreen extends Component {
     }
 
     componentDidMount = () => {
-        // this.props.setLoaderState(true);
         let followUpsColors = {};
         let refData = this.props.referenceData.filter((e) => {return e.categoryId === "LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE"});
         for (let i=0; i<refData.length; i++) {
@@ -406,33 +402,17 @@ const style = StyleSheet.create({
     }
 });
 
-mapStateToProps = (state, ownProps) => {
+mapStateToProps = (state) => {
     return {
         user: state.user,
-        teams: state.teams,
         screenSize: state.app.screenSize,
-        // filter: state.app.filters,
-        syncState: state.app.syncState,
-        errors: state.errors,
         translation: state.app.translation,
-        helpCategory: state.helpCategory,
-        helpItem: state.helpItem,
-        role: state.role,
-        referenceData: state.referenceData,
-        showLoader: state.app.loaderState
+        referenceData: state.referenceData
     };
 };
 
 function matchDispatchProps(dispatch) {
     return bindActionCreators({
-        getFollowUpsForOutbreakId,
-        getMissedFollowUpsForOutbreakId,
-        removeErrors,
-        addFilterForScreen,
-        getContactsForOutbreakId,
-        addFollowUp,
-        saveGeneratedFollowUps,
-        removeFilterForScreen,
         setLoaderState
     }, dispatch);
 }

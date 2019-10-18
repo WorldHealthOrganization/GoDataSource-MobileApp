@@ -16,14 +16,14 @@ var jsonSql = require('json-sql')();
 jsonSql.setDialect('sqlite');
 
 // Add here only the actions, not also the requests that are executed. For that purpose is the requests directory
-export function getContactsForOutbreakId({outbreakId, contactsFilter, exposureFilter, lastElement}, computeCount) {
+export function getContactsForOutbreakId({outbreakId, contactsFilter, exposureFilter, lastElement, offset}, computeCount) {
     let countPromise = null;
     let contactsPromise = null;
 
     let contactsAndExposuresQuery = {
         type: 'select',
         distinct: true,
-        query: sqlConstants.createMainQuery(translations.personTypes.contacts, outbreakId, contactsFilter, exposureFilter, lastElement), // Here will take place the contact/exposure filter/sort
+        query: sqlConstants.createMainQuery(translations.personTypes.contacts, outbreakId, contactsFilter, exposureFilter, lastElement, offset), // Here will take place the contact/exposure filter/sort
         alias: 'MappedData',
         fields: [
             {
@@ -47,7 +47,7 @@ export function getContactsForOutbreakId({outbreakId, contactsFilter, exposureFi
     if (computeCount) {
         let contactsQueryCount = {
             type: 'select',
-            query: sqlConstants.createMainQuery(translations.personTypes.contacts, outbreakId, contactsFilter, exposureFilter, lastElement, true), // Here will take place the contact/exposure filter/sort
+            query: sqlConstants.createMainQuery(translations.personTypes.contacts, outbreakId, contactsFilter, exposureFilter, lastElement, offset, true), // Here will take place the contact/exposure filter/sort
             alias: 'MappedData',
             fields: [
                 {
@@ -106,27 +106,6 @@ export function addContact(contact, periodOfFollowUp, userId) {
     return Promise.resolve()
         .then(() => insertOrUpdate('common', 'person', [contact], false))
         .then(() => addExposureForContact(exposure, contact, periodOfFollowUp, userId))
-    // // Since will have only one relationship, we can set here all the data needed dateOfLastContact, followUp: {originalStartDate, startDate, endDate, status}
-    // let relationship = contact.relationships[0];
-    // relationship = updateRequiredFields(outbreakId = outbreakId, userId = contact.updatedBy, record = relationship, action = 'create', fileType = 'relationship.json')
-    // delete contact.relationships;
-    //
-    // return async function(dispatch, getState) {
-    //     addContactRequest(outbreakId, contact, token, (error, response) => {
-    //         if (error) {
-    //             console.log("*** addContact error: ", error);
-    //             dispatch(addError(errorTypes.ERROR_ADD_CONTACT));
-    //         }
-    //         if (response) {
-    //             console.log("*** addContact response: ", JSON.stringify(response));
-    //             if (contactMatchFilter === true) {
-    //                 dispatch(addContactAction(response));
-    //                 console.log('test ajunge aici')
-    //             }
-    //             dispatch(addExposureForContact(outbreakId, response._id, relationship, token, null));
-    //         }
-    //     })
-    // }
 }
 
 export function updateContactRequest(contact) {
@@ -210,10 +189,7 @@ export function getExposuresForContact(contactId, outbreakId) {
         }
     };
 
-    return executeQuery(query)
-        // .then((resultGetRelations) => {
-        //     return Promise.resolve(resultGetRelations.map((e) => e.))
-        // })
+    return executeQuery(query);
 }
 
 export function checkForNameDuplicated(id, firstName, lastName, outbreakId) {

@@ -93,10 +93,6 @@ export function checkIfSameDay(date1, date2) {
     if (Object.prototype.toString.call(date1) !== '[object Date]' || Object.prototype.toString.call(date2) !== '[object Date]') {
         return false;
     }
-    // Correct timezone differences
-    // let date1Time = new Date(date1).getTime();
-    // date1 = new Date(date1Time + (new Date(date1Time).getTimezoneOffset() * 60 * 1000));
-    // return date1.getDate() === date2.getDate() && date1.getMonth() === date2.getMonth() && date1.getFullYear() === date2.getFullYear();
     return moment.utc(date1).isSame(moment.utc(date2), 'day')
 }
 
@@ -124,7 +120,6 @@ export function navigation(event, navigator) {
         // console.log("###");
         if (event.link.includes('Navigate')) {
             let linkComponents = event.link.split('/');
-            // console.log("### linkComponents: ", linkComponents);
             if (linkComponents.length > 0) {
                 let screenToSwitchTo = null;
                 let addScreen = null;
@@ -162,22 +157,10 @@ export function navigation(event, navigator) {
                             addScreen: addScreen
                         }
                     });
-                    // setTimeout(function(){
-                    //     navigator.push({
-                    //         screen: addScreen,
-                    //         animated: true,
-                    //         animationType: 'fade',
-                    //         passProps: {
-                    //             isNew: true,
-                    //             refresh: refresh
-                    //         }
-                    //     })
-                    // }, 1500);
                 } else {
 
                     navigator.resetTo({
                         screen: screenToSwitchTo,
-                        // animated: true
                     });
                 }
             }
@@ -204,304 +187,53 @@ export function handleExposedTo(exposures, returnString) {
 }
 
 export function computeFullName(person) {
+    if (!person || get(person, 'type', null) === null) {
+        return '';
+    }
     if (person.type === translations.personTypes.events) {
         return person.name;
     }
     return (person.firstName || '') + ' ' + (person.lastName || '');
 }
 
-// This method returns the cases/events that a contact has been exposed to
-// It can return either as a string or as an array of cases
-export function handleExposedTo1(contact, returnString, cases, events) {
-    if (!contact || !contact.relationships || !Array.isArray(contact.relationships) || contact.relationships.length === 0) {
-        return ' ';
-    }
-
-    let relationshipArray = [];
-
-    let relationships = contact.relationships;
-
-    for (let i=0; i<relationships.length; i++) {
-        // Get only the persons that the contact has been exposed to
-        // Since on the local storage we keep the ids as the actual id concatenated with other strings, we must parse this
-        let contactId = extractIdFromPouchId(contact._id, 'person');
-        let persons = relationships[i].persons.filter((e) => {return e.id !== contactId});
-        // console.log('PErsons: ', persons);
-        for (let j=0; j<persons.length; j++) {
-            if ((persons[j].type === 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE' || persons[j].type === 'case') && cases && Array.isArray(cases)) {
-                let auxCase = cases.find((e) => {return extractIdFromPouchId(e._id, 'person') === persons[j].id});
-                if (auxCase) {
-                    relationshipArray.push({fullName: (auxCase.firstName || '') + " " + (auxCase.lastName || ''), id: auxCase._id, visualId: auxCase.visualId});
-                }
-            } else {
-                if (events && Array.isArray(events)) {
-                    let auxEvent = events.find((e) => {return extractIdFromPouchId(e._id, 'person') === persons[j].id});
-                    if (auxEvent && auxEvent.name) {
-                        relationshipArray.push({fullName: auxEvent.name, id: auxEvent._id, visualId: auxEvent.visualId});
-                    }
-                }
-            }
-        }
-    }
-
-    // console.log('Relationship array: ', relationshipArray);
-
-    return returnString ? relationshipArray.join(", ") : relationshipArray;
-}
-
-export function unzipFile (source, dest, password, clientCredentials) {
+export function unzipFile(source, dest, password, clientCredentials) {
     console.log('Stuff: ', source, dest, password, clientCredentials);
-        return new Promise((resolve, reject) => {
-            RNFetchBlobFS.exists(source)
-                .then((exists) => {
-                    if (exists) {
-                        // If the encrypted file exists, compute its size, and decrypt it
-                        // RNFS.stat(source)
-                        //     .then((RNFSStatResponse) => {
-                                // Call decryptFile(filePath, fileSize, callback)
-
-                        unzip(source, dest,'UTF-8')
-                            .then((path) => {
-                                console.log(`unzip completed at ${path}`);
-                                // Delete the zip file after unzipping
-                                deleteFile(source, true)
-                                    .then(() => {
-                                        resolve(path);
-                                    })
-                                    .catch((errorDelete) => {
-                                        console.log('Error delete: ', errorDelete);
-                                        resolve(path);
-                                    })
-                            })
-                            .catch((error) => {
-                                console.log(error);
-                                // Delete the zip file after unzipping
-                                deleteFile(source, true)
-                                    .then(() => {
-                                        reject(error);
-                                    })
-                                    .catch((errorDelete) => {
-                                        console.log('Error delete: ', errorDelete);
-                                        reject(error);
-                                    });
-                            })
-                            // })
-                            // .catch((RNFSStatError) => {
-                            //     console.log('An error occurred while getting encrypted file status: ', RNFSStatError);
-                            //     reject(RNFSStatError);
-                            // })
-
-
-
-
-                        // Read file as stream, decrypt the chunks and append them to the new zip
-            // let password = getSyncEncryptPassword(password, clientCredentials);
-            // let numberOfChunks = 0;
-            // RNFetchBlobFS.readStream(source, 'base64', 131072, 10)
-            //     .then((stream) => {
-            //         stream.open();
-            //         let iv = '';
-            //         let salt = '';
-            //         stream.onData((chunk) => {
-            //             if (chunk) {
-            //                 console.log('Chunk length: ', chunk.length);
-            //                 if (numberOfChunks === 0) {
-            //                     let buffer = Buffer.from(chunk, 'base64');
-            //                     // read IV
-            //                     iv = buffer.slice(0, 16);
-            //                     // read salt
-            //                     salt = buffer.slice(16, 16 + 8);
-            //                     console.log('Time to create iv and salt: ', iv, salt);
-            //                 }
-            //                 decrypt(password, chunk, iv, salt, numberOfChunks)
-            //                     .then((decryptedChunk) => {
-            //                         RNFetchBlobFS.appendFile(`${source}.zip`, decryptedChunk, 'base64')
-            //                             .then(() => {
-            //                                 console.log('Appended chunk');
-            //                                 numberOfChunks++;
-            //                                 if (chunk.length < 174764) {
-            //                                     // this means that we are at the last chunk and should unzip
-            //                                     unzip(`${source}.zip`, dest)
-            //                                         .then((path) => {
-            //                                             console.log(`unzip completed at ${path}`);
-            //                                             resolve(path);
-            //                                         })
-            //                                         .catch((error) => {
-            //                                             console.log(error);
-            //                                             reject(error);
-            //                                         })
-            //                                 } else {
-            //                                     chunk = null;
-            //                                 }
-            //                             })
-            //                             .catch((errorAppend) => {
-            //                                 console.log("Error at appending file: ", errorAppend)
-            //                             })
-            //                     })
-            //                     .catch((errorDecryptChunk) => {
-            //                         console.log('Error at decrypting chunk: ', errorDecryptChunk);
-            //                     })
-            //             } else {
-            //                 console.log('Not chunk: ')
-            //             }
-            //         });
-            //         stream.onEnd(() => {
-            //             // After all the decryption is done, try unzipping the file
-            //             console.log("Finished returning all events from read stream. Number of chunks: ", numberOfChunks, numberOfChunks * 131072);
-            //         });
-            //     })
-
-                        // First get the raw file in order to decrypt it
-                        // readRawFile(source, (errorRawFile, rawFile) => {
-                        //     if (errorRawFile) {
-                        //         return callback('Error while reading raw file');
-                        //     }
-                        //     if (rawFile) {
-                        //         // Decrypt the raw file
-                        //         // Compute password
-                        //         let password = getSyncEncryptPassword(password, clientCredentials);
-                        //         decrypt(password, rawFile)
-                        //             .then((decryptedFile) => {
-                        //                 // Now that we have the decrypted zip file, it's time to write it on disk
-                        //                 writeFile(source + '.zip', decryptedFile, (errorWriteFile, pathToZip) => {
-                        //                     if (errorWriteFile) {
-                        //                         callback(errorWriteFile);
-                        //                     }
-                        //                     if (pathToZip) {
-                        //                         // Proceed to unzip the file to the specified destination
-                        //                         unzip(pathToZip, dest)
-                        //                             .then((path) => {
-                        //                                 console.log(`unzip completed at ${path}`);
-                        //                                 callback(null, path);
-                        //                             })
-                        //                             .catch((error) => {
-                        //                                 console.log(error);
-                        //                                 callback(error);
-                        //                             })
-                        //                     }
-                        //                 })
-                        //             })
-                        //             .catch((errorDecryptedFile) => {
-                        //                 console.log('Error while decrypting file: ', errorDecryptedFile);
-                        //                 callback(errorDecryptedFile);
-                        //             })
-                        //     }
-                        // })
-                    } else {
-                        reject('Zip file does not exist');
-                    }
-                })
-                .catch((existsError) => {
-                    reject(('There was an error with getting the zip file: ' + existsError));
-                });
-        })
-
-}
-
-async function decryptFile(filePath, password, fileSize) {
-    let numberOfBytes = 524288;
-    let numberOfIterations = Math.floor(fileSize / numberOfBytes);
-    let remainder = fileSize % numberOfBytes;
-    let iv = null;
-    let salt = null;
-
-    for (let i = 0; i < numberOfIterations; i++) {
-        try {
-            console.log(`Iteration ${i}/${numberOfIterations}`);
-            console.log(`Read from ${i === 0 ? 0 : (i * numberOfBytes)}, ${i === numberOfIterations - 1 ? remainder : numberOfBytes} number of bytes`);
-            let encryptedString = await RNFS.read(filePath, i === numberOfIterations - 1 ? remainder : numberOfBytes, i === 0 ? 0 : (i * numberOfBytes), 'base64');
-            if (encryptedString) {
-                console.log('Encrypted string length: ', encryptedString.length, encryptedString);
-                try {
-                    if (i === 0){
-                            let buffer = await Buffer.from(encryptedString, 'base64');
-                            // read IV
-                            iv = buffer.slice(0, 16);
-                            // read salt
-                            salt = buffer.slice(16, 16 + 8);
-                            console.log('Time to create iv and salt: ', iv, salt);
-                    }
-                    let decryptedString = await decrypt(password, encryptedString, iv, salt, i);
-                    if (decryptedString) {
-                        console.log('Decrypted string length: ', decryptedString.length, decryptedString);
-                        try {
-                            let appendedNumberOfBytes = await RNFetchBlobFS.appendFile(`${filePath}.zip`, decryptedString, 'base64');
-                            if (appendedNumberOfBytes > 0) {
-                                console.log(`Appended ${appendedNumberOfBytes} bytes i=${i}`);
-                                encryptedString = null;
-                                decryptedString = null;
-                                appendedNumberOfBytes = null;
-                            } else {
-                                console.log('Could not append file');
-                                return Promise.reject('Could not append file');
-                            }
-                        } catch (errorAppendFile) {
-                            console.log('Error while appending file: ', errorAppendFile);
-                            return Promise.reject(errorAppendFile);
-                        }
-                    } else {
-                        console.log('Could not decrypt');
-                        return Promise.reject('Could not decrypt')
-                    }
-                } catch (errorDecrypt) {
-                    console.log('Error while decrypting: ', errorDecrypt);
-                    return Promise.reject(errorDecrypt);
+    return new Promise((resolve, reject) => {
+        RNFetchBlobFS.exists(source)
+            .then((exists) => {
+                if (exists) {
+                    unzip(source, dest, 'UTF-8')
+                        .then((path) => {
+                            console.log(`unzip completed at ${path}`);
+                            // Delete the zip file after unzipping
+                            deleteFile(source, true)
+                                .then(() => {
+                                    resolve(path);
+                                })
+                                .catch((errorDelete) => {
+                                    console.log('Error delete: ', errorDelete);
+                                    resolve(path);
+                                })
+                        })
+                        .catch((error) => {
+                            console.log(error);
+                            // Delete the zip file after unzipping
+                            deleteFile(source, true)
+                                .then(() => {
+                                    reject(error);
+                                })
+                                .catch((errorDelete) => {
+                                    console.log('Error delete: ', errorDelete);
+                                    reject(error);
+                                });
+                        })
+                } else {
+                    reject('Zip file does not exist');
                 }
-            } else {
-                console.log('No encrypted string found');
-                return Promise.reject('No encrypted string found');
-            }
-        } catch (errorReadEncryptedString) {
-            console.log('Error while reading stream: ', errorReadEncryptedString);
-            return Promise.reject(errorReadEncryptedString);
-        }
-    }
-
-    return Promise.resolve(`${filePath}.zip`);
-}
-
-export function readRawFile (path, callback) {
-    RNFetchBlobFS.readFile(path, 'base64')
-        .then((data) => {
-            callback(null, data);
-        })
-        .catch((errorReadFile) => {
-            console.log("Error while reading the file: ", errorReadFile);
-            callback(errorReadFile)
-        })
-}
-
-export function writeFile (path, content, callback) {
-    RNFetchBlobFS.writeFile(path, content, 'base64')
-        .then(() => {
-            callback(null, path);
-        })
-        .catch((errorWriteFile) => {
-            console.log('Error while writing file: ', errorWriteFile);
-            callback(errorWriteFile);
-        })
-}
-
-export function readFile (path, callback) {
-    RNFetchBlobFS.readFile(path, 'utf8')
-        .then((data) => {
-            callback(null, JSON.parse(data));
-        })
-        .catch((errorReadFile) => {
-            console.log("Error while reading the file: ", errorReadFile);
-            callback(errorReadFile)
-        })
-}
-
-export function syncFile (path, callback) {
-    readFile(path, (errorReadFile, data) => {
-        if (errorReadFile) {
-            console.log("Error while reading the file: ", errorReadFile);
-            callback(errorReadFile)
-        }
-        if (data) {
-
-        }
+            })
+            .catch((existsError) => {
+                reject(('There was an error with getting the zip file: ' + existsError));
+            });
     })
 }
 
@@ -633,188 +365,8 @@ function processFileGeneral(path, fileName, unzipLocation, hubConfig, encryptedD
         .catch((errorProcessFile) => Promise.reject(errorProcessFile));
 }
 
-// hubConfig = {name, url, clientId, clientSecret, encryptDatabase}
-export async function processFile (path, type, totalNumberOfFiles, dispatch, isFirstTime, forceBulk, encryptedData, hubConfig) {
-    return new Promise((resolve, reject) => {
-        if (path) {
-            console.log('Process file: ', type, ' From path: ', path);
-            RNFetchBlobFS.exists(path)
-                .then((exists) => {
-                    if (exists) {
-                        // File exists, time to read it in order to process
-                        if (encryptedData) {
-                            // If the file is encrypted, read it raw, decrypt it, unzip it, and then process the data
-                            readRawFile(path, (errorEncryptedFile, encryptedData) => {
-                                if (errorEncryptedFile) {
-                                    console.log("Error while reading file: ", type, errorEncryptedFile);
-                                    reject("Error while reading file");
-                                }
-                                if (encryptedData) {
-                                    let password = getSyncEncryptPassword(null, hubConfig);
-                                    let startTimeDecrypt = new Date().getTime();
-                                    decrypt(password, encryptedData)
-                                        .then((decryptedData) => {
-                                            console.log(`Time for decrypting file: ${type}: ${new Date().getTime() - startTimeDecrypt}`);
-                                            encryptedData = null;
-                                            // Decrypted data is a zip file that needs first to be written to disk
-                                            RNFetchBlobFS.writeFile(`${path}`, decryptedData, 'base64')
-                                                .then((bytesWritten) => {
-                                                    // Now unzip the data
-                                                    let fileName = path.split('/')[path.split('/').length - 1];
-                                                    let unzipLocation = path.substr(0, (path.length - fileName.length));
-                                                    unzip(`${path}`, `${unzipLocation}`)
-                                                        .then((unzipPath) => {
-                                                            readFile(`${unzipPath}/${fileName.substring(0, fileName.length - 4)}`, (error, data) => {
-                                                                if (error) {
-                                                                    console.log("Error while reading file: ", type);
-                                                                    reject("Error while reading file");
-                                                                }
-                                                                if (data) {
-                                                                    if (isFirstTime && forceBulk) {
-                                                                        // If is first time processing files, do a bulk insert
-                                                                        processBulkDocs(data, type)
-                                                                            .then((resultBulk) => {
-                                                                                console.log('Bulk docs: ', resultBulk);
-                                                                                let numberOfFilesProcessedAux = getNumberOfFilesProcessed();
-                                                                                numberOfFilesProcessedAux += 1;
-                                                                                data = null;
-                                                                                setNumberOfFilesProcessed(numberOfFilesProcessedAux);
-                                                                                dispatch(setSyncState(({id: 'sync', name: 'Syncing', status: numberOfFilesProcessedAux + "/" + totalNumberOfFiles})));
-                                                                                resolve('Finished inserting');
-                                                                            })
-                                                                            .catch((errorBulk) => {
-                                                                                console.log('Error bulk docs: ', errorBulk);
-                                                                                data = null;
-                                                                                reject(errorBulk);
-                                                                            })
-                                                                    } else {
-                                                                        // Since there is data in the file, it's time to sync it
-                                                                        let promises = [];
-                                                                        for (let i=0; i<data.length; i++) {
-                                                                            promises.push(updateFileInDatabase(data[i], type))
-                                                                        }
-
-                                                                        Promise.all(promises)
-                                                                            .then((responses) => {
-                                                                                console.log('Finished syncing: ', responses);
-                                                                                let numberOfFilesProcessedAux = getNumberOfFilesProcessed();
-                                                                                numberOfFilesProcessedAux += 1;
-                                                                                data = null;
-                                                                                promises = null;
-                                                                                setNumberOfFilesProcessed(numberOfFilesProcessedAux);
-                                                                                dispatch(setSyncState(({id: 'sync', name: 'Syncing', status: numberOfFilesProcessedAux + "/" + totalNumberOfFiles})));
-                                                                                resolve('Finished syncing');
-                                                                            })
-                                                                            .catch((error) => {
-                                                                                console.log("Error at syncing file of type: ", type, error);
-                                                                                data = null;
-                                                                                promises = null;
-                                                                                reject("Error at syncing file");
-                                                                            })
-                                                                    }
-                                                                }
-                                                            })
-                                                        })
-                                                        .catch((errorUnzipFile) => {
-                                                            console.log(`Error while unzipping file ${type}: ${errorUnzipFile}`);
-                                                            reject('Error while unzipping file');
-                                                        })
-                                                })
-                                                .catch((errorWriteBytes) => {
-                                                    console.log("Error while creating inner zip: ", type, errorWriteBytes);
-                                                    reject("Error while creating inner zip");
-                                                })
-                                        })
-                                        .catch((errorDecryptingData) => {
-                                            console.log('Error while decrypting data: ', type, errorDecryptingData);
-                                            reject('Error while decrypting file');
-                                        })
-                                }
-                            })
-                        } else {
-                            let fileName = path.split('/')[path.split('/').length - 1];
-                            let unzipLocation = path.substr(0, (path.length - fileName.length));
-
-                            unzip(`${path}`, `${unzipLocation}`)
-                                .then((unzipPath) => {
-                                    readFile(`${unzipPath}/${fileName.substring(0, fileName.length - 4)}`, (error, data) => {
-                                        if (error) {
-                                            console.log("Error while reading file: ", type);
-                                            reject("Error while reading file");
-                                        }
-                                        if (data) {
-                                            if (isFirstTime && forceBulk) {
-                                                // If is first time processing files, do a bulk insert
-                                                processBulkDocs(data, type)
-                                                    .then((resultBulk) => {
-                                                        console.log('Bulk docs: ', resultBulk);
-                                                        let numberOfFilesProcessedAux = getNumberOfFilesProcessed();
-                                                        numberOfFilesProcessedAux += 1;
-                                                        data = null;
-                                                        setNumberOfFilesProcessed(numberOfFilesProcessedAux);
-                                                        dispatch(setSyncState(({id: 'sync', name: 'Syncing', status: numberOfFilesProcessedAux + "/" + totalNumberOfFiles})));
-                                                        resolve('Finished inserting');
-                                                    })
-                                                    .catch((errorBulk) => {
-                                                        console.log('Error bulk docs: ', errorBulk);
-                                                        data = null;
-                                                        reject(errorBulk);
-                                                    })
-                                            } else {
-                                                // Since there is data in the file, it's time to sync it
-                                                let promises = [];
-                                                for (let i=0; i<data.length; i++) {
-                                                    promises.push(updateFileInDatabase(data[i], type))
-                                                }
-
-                                                Promise.all(promises)
-                                                    .then((responses) => {
-                                                        console.log('Finished syncing: ', responses);
-                                                        let numberOfFilesProcessedAux = getNumberOfFilesProcessed();
-                                                        promises = null;
-                                                        numberOfFilesProcessedAux += 1;
-                                                        data = null;
-                                                        setNumberOfFilesProcessed(numberOfFilesProcessedAux);
-                                                        dispatch(setSyncState(({id: 'sync', name: 'Syncing', status: numberOfFilesProcessedAux + "/" + totalNumberOfFiles})));
-                                                        resolve('Finished syncing');
-                                                    })
-                                                    .catch((error) => {
-                                                        console.log("Error at syncing file of type: ", type, error);
-                                                        data = null;
-                                                        promises = null;
-                                                        reject("Error at syncing file");
-                                                    })
-                                            }
-                                        }
-                                    })
-                                })
-                                .catch((errorUnzipFile) => {
-                                    console.log(`Error while unzipping file ${type}: ${errorUnzipFile}`);
-                                    reject('Error while unzipping file');
-                                })
-                        }
-                    } else {
-                        reject("The file does not exist")
-                    }
-                })
-                .catch((fileNotExistsError) => {
-                    reject(fileNotExistsError);
-                })
-        } else {
-            reject("Path not defined");
-        }
-    })
-}
-
 export function comparePasswords (password, encryptedPassword, callback) {
     let start = new Date().getTime();
-    // try {
-    //     let isMatch = bcrypt.compareSync(password, encryptedPassword);
-    //     console.log('Result for find time for compare bcrypt: ', new Date().getTime() - start);
-    //     callback(null, isMatch);
-    // } catch (errorCompare) {
-    //     return callback(errorCompare)
-    // }
 
     let RNBcrypt = NativeModules.RNBcrypt;
     RNBcrypt.verifyPassword(password, encryptedPassword)
@@ -826,14 +378,6 @@ export function comparePasswords (password, encryptedPassword, callback) {
             console.log('Result for find time for check pass error', new Date().getTime() - start, errorCompare);
             callback(new Error(errorCompare.userInfo));
         });
-
-    // bcrypt.compare(password, encryptedPassword, (errorCompare, isMatch) => {
-    //     console.log('Result for find time for compare bcrypt: ', new Date().getTime() - start);
-    //     if (errorCompare) {
-    //         return callback(errorCompare)
-    //     }
-    //     callback(null, isMatch)
-    // })
 }
 
 export function getDataFromDatabaseFromFileSql (table, lastSyncDate, password) {
@@ -864,7 +408,6 @@ export function getDataFromDatabaseFromFileSql (table, lastSyncDate, password) {
 }
 
 export function getDataFromDatabaseFromFile (database, fileType, lastSyncDate, password) {
-    // return new Promise((resolve, reject) => {
         fileType = `${fileType}.json`;
         let start = new Date().getTime();
         return database.find({
@@ -887,7 +430,6 @@ export function getDataFromDatabaseFromFile (database, fileType, lastSyncDate, p
                 console.log(`An error occurred while getting data for collection: ${fileType}`);
                 return Promise.reject(error);
             })
-    // })
 }
 
 function handleDataForZip (response, fileType, password, isSqlite) {
@@ -911,13 +453,6 @@ function handleDataForZip (response, fileType, password, isSqlite) {
     }
     if (responseArray && Array.isArray(responseArray) && responseArray.length > 0) {
         return createFilesWithName(fileType, responseArray, password)
-            // .then((responseFromCreate) => {
-            //     resolve(responseFromCreate);
-            // })
-            // .catch((errorFromCreate) => {
-            //     console.log(`An error occurred while creating file: ${errorFromCreate}`);
-            //     reject(errorFromCreate);
-            // })
     } else {
         return Promise.resolve(`No data to send`);
     }
@@ -1071,88 +606,11 @@ export function generateId () {
     return uuid.v4();
 }
 
-export function mapContactsAndRelationships(contacts, relationships) {
-    // console.log ('mapContactsAndRelationships')
-    let start = new Date().getTime();
-    // console.log ('mapContactsAndRelationships contacts', JSON.stringify(contacts))
-    // console.log ('mapContactsAndRelationships relationships', JSON.stringify(relationships))
-
-    // let mappedContacts = contacts;
-
-
-    let searchableContacts = groupBy(contacts, (data) => {return extractIdFromPouchId(data._id, 'person')});
-    for (let i=0; i<relationships.length; i++) {
-        if (searchableContacts[get(relationships, `[${i}].persons[0].id`)]) {
-            if(get(searchableContacts, `[${get(relationships, `[${i}].persons[0].id`)}][0].relationships`, null) === null) {
-                set(searchableContacts, `[${get(relationships, `[${i}].persons[0].id`)}][0].relationships`, [relationships[i]])
-            } else {
-                get(searchableContacts, `[${get(relationships, `[${i}].persons[0].id`)}][0].relationships`, null).push(relationships[i]);
-            }
-        }
-
-        if (searchableContacts[get(relationships, `[${i}].persons[1].id`)]) {
-            if(get(searchableContacts, `[${get(relationships, `[${i}].persons[1].id`)}][0].relationships`, null) === null) {
-                set(searchableContacts, `[${get(relationships, `[${i}].persons[1].id`)}][0].relationships`, [relationships[i]])
-            } else {
-                get(searchableContacts, `[${get(relationships, `[${i}].persons[1].id`)}][0].relationships`, null).push(relationships[i]);
-            }
-        }
-    }
-
-    let mappedContacts = [];
-    let keys = Object.keys(searchableContacts);
-    for(let i=0; i<Object.keys(searchableContacts).length; i++) {
-        mappedContacts.push(searchableContacts[Object.keys(searchableContacts)[i]][0]);
-    }
-
-    console.log('Result for find time for mapContactsAndRelationships: ', new Date().getTime() - start);
-    return mappedContacts;
-}
-
-export function mapContactsAndFollowUps(contacts, followUps) {
-    let start = new Date().getTime();
-    console.log ('mapContactsAndFollowUps')
-    // console.log ('mapContactsAndFollowUps contacts', JSON.stringify(contacts))
-    // console.log ('mapContactsAndFollowUps followUps', JSON.stringify(followUps))
-
-    let groupedFollowUps = groupBy(followUps, 'personId');
-    for(let i=0; i<contacts.length; i++) {
-        let auxFollowUps = groupedFollowUps[extractIdFromPouchId(contacts[i]._id, 'person')];
-        if (auxFollowUps && Array.isArray(auxFollowUps) && auxFollowUps.length > 0) {
-            contacts[i].followUps = auxFollowUps;
-        }
-    }
-
-    // let mappedContacts = [];
-    // for (let i=0; i < followUps.length; i++) {
-    //     // Review Anda si devine in singur indexOf
-    //
-    //     let contactPersonIndex = mappedContacts.find((e) => {return extractIdFromPouchId(e._id, 'person') === followUps[i].personId});
-    //     if (contactPersonIndex === -1) {
-    //         let contactObject = {};
-    //         contactObject = Object.assign({}, contacts.find((e) => {
-    //             return extractIdFromPouchId(e._id, 'person') === followUps[i].personId
-    //         }))
-    //
-    //         contactObject.followUps = [];
-    //         contactObject.followUps.push(followUps[i]);
-    //         mappedContacts.push(contactObject);
-    //     } else {
-    //         mappedContacts[contactPersonIndex].followUps.push(followUps[i]);
-    //     }
-    // }
-    // console.log ('mapContactsAndFollowUps mappedContacts', JSON.stringify(mappedContacts))
-    console.log('Result for find time for mapContactsAndFollowUps: ', new Date().getTime() - start);
-    return contacts.filter((e) => {return e._id !== undefined && e._id});
-}
-
 export function updateRequiredFields(outbreakId, userId, record, action, fileType = '', type = '') {
-
     // Set the date
     let dateToBeSet = moment.utc()._d;
     dateToBeSet = dateToBeSet.toISOString();
 
-    // console.log ('updateRequiredFields ', record, action)
     switch (action) {
         case 'create':
             record._id = record._id ? record._id : computeIdForFileType(fileType, outbreakId, record, type);
@@ -1169,7 +627,6 @@ export function updateRequiredFields(outbreakId, userId, record, action, fileTyp
             if (type !== '') {
                 record.type = type
             }
-            // console.log ('updateRequiredFields create record', JSON.stringify(record))
             return record;
 
         case 'update':
@@ -1179,7 +636,6 @@ export function updateRequiredFields(outbreakId, userId, record, action, fileTyp
             record.deleted = false;
             record.deletedAt = null;
             record.deletedBy = null;
-            // console.log ('updateRequiredFields update record', JSON.stringify(record))
             return record;
 
         case 'delete':
@@ -1192,7 +648,7 @@ export function updateRequiredFields(outbreakId, userId, record, action, fileTyp
             // console.log ('updateRequiredFields delete record', JSON.stringify(record))
 
             // WGD-1806 when removing cases/contacts and they have visualId, set it to null, and add a new document
-            if (fileType === 'person.json' && (type === config.personTypes.contacts || type === config.personTypes.cases) && record.visualId) {
+            if (fileType === 'person' && (type === config.personTypes.contacts || type === config.personTypes.cases) && record.visualId) {
                 if (!record.documents || !Array.isArray(record.documents)) {
                     record.documents = [];
                 }
@@ -1229,7 +685,6 @@ export function createName(type, firstName, lastName) {
 // the new array will be the array that will be searched next
 export function mapLocations(locationList) {
     // start with the roots
-    let start = new Date().getTime();
     let sortedArrays = groupBy(locationList, 'geographicalLevelId');
     // delete undefined geographicalLevelId
     delete sortedArrays['undefined'];
@@ -1237,7 +692,6 @@ export function mapLocations(locationList) {
     let allKeys = Object.keys(sortedArrays).map((e) => {return e.split('_')[e.split('_').length - 1]}).sort((a, b) => {return b-a});
 
     let currentTree = sortedArrays[`LNG_REFERENCE_DATA_CATEGORY_LOCATION_GEOGRAPHICAL_LEVEL_ADMIN_LEVEL_${allKeys[0]}`];
-    // console.log("Map locations: initialized tree: ", new Date().getTime() - start);
     for (let levelIndex=1; levelIndex<allKeys.length; levelIndex++) {
         currentTree = groupBy(currentTree, 'parentLocationId');
         let currentLevelTree = [];
@@ -1249,22 +703,8 @@ export function mapLocations(locationList) {
             }
             currentLevelTree.push(currentElement);
         }
-        // console.log('Map locations: created level ', allKeys[levelIndex], new Date().getTime() - start);
         currentTree = currentLevelTree.slice();
     }
-    // console.log('Map locations: ', new Date().getTime() - start, currentTree);
-
-
-    // for (let i=0; i<locationList.length; i++) {
-    //     if(locationList[i].parentLocationId === parentLocationId) {
-    //         let children = mapLocations(locationList, extractIdFromPouchId(locationList[i]._id, 'location'))
-    //
-    //         if (children.length) {
-    //             locationList[i].children = children
-    //         }
-    //         output.push(locationList[i])
-    //     }
-    // }
     return currentTree;
 }
 
@@ -1298,7 +738,7 @@ export function extractAllQuestions (questions, item) {
     }
     // console.log('~~~~ Mapped questions: ', questions);
     return questions;
-};
+}
 
 // previousAnswer = {key}
 export function extractQuestionsRecursively (questions, item) {
@@ -1329,35 +769,6 @@ export function extractQuestionsRecursively (questions, item) {
         }
     }
     return returnedQuestions;
-};
-
-export function mapQuestions (questions) {
-    // mappedQuestions format: [{categoryName: 'cat1', questions: [{q1}, {q2}]}]
-    let mappedQuestions = [];
-
-    if (questions && Array.isArray(questions) && questions.length > 0) {
-        for (let i = 0; i < questions.length; i++) {
-            if (mappedQuestions.map((e) => {return e.categoryName}).indexOf(questions[i].category) === -1) {
-                mappedQuestions.push({categoryName: questions[i].category, questions: [questions[i]]});
-            } else {
-                if (mappedQuestions && Array.isArray(mappedQuestions) && mappedQuestions.length > 0 && mappedQuestions.map((e )=> {
-                        return e.categoryName
-                    }).indexOf(questions[i].category) > -1 && mappedQuestions[mappedQuestions.map((e) => {
-                        return e.categoryName
-                    }).indexOf(questions[i].category)] && mappedQuestions[mappedQuestions.map((e) => {
-                        return e.categoryName
-                    }).indexOf(questions[i].category)].questions && Array.isArray(mappedQuestions[mappedQuestions.map((e) => {
-                        return e.categoryName
-                    }).indexOf(questions[i].category)].questions)) {
-                        mappedQuestions[mappedQuestions.map((e) => {return e.categoryName}).indexOf(questions[i].category)].questions.push(questions[i]);
-                }
-            }
-        }
-    }
-
-    // console.log('Mapped questions: ', mappedQuestions);
-
-    return mappedQuestions;
 };
 
 export function mapAnswers(questions, answers) {
@@ -1545,102 +956,6 @@ export function getTranslation (value, allTransactions) {
     return valueToBeReturned;
 }
 
-export function localSortContactsForFollowUps (contactsCopy, propsFilter, stateFilter, filterFromFilterScreen) {
-    // Take care of search filter
-    if (stateFilter.searchText) {
-        contactsCopy = contactsCopy.filter((e) => {
-            return  e && e.firstName && stateFilter.searchText.toLowerCase().includes(e.firstName.toLowerCase()) ||
-                e && e.lastName && stateFilter.searchText.toLowerCase().includes(e.lastName.toLowerCase()) ||
-                e && e.firstName && e.firstName.toLowerCase().includes(stateFilter.searchText.toLowerCase()) ||
-                e && e.lastName && e.lastName.toLowerCase().includes(stateFilter.searchText.toLowerCase())
-        });
-    }
-    // Take care of gender filter
-    if (filterFromFilterScreen && filterFromFilterScreen.gender) {
-        contactsCopy = contactsCopy.filter((e) => {return e.gender === filterFromFilterScreen.gender});
-    }
-    // Take care of age range filter
-    if (filterFromFilterScreen && filterFromFilterScreen.age && Array.isArray(filterFromFilterScreen.age) && filterFromFilterScreen.age.length === 2 && (filterFromFilterScreen.age[0] >= 0 || filterFromFilterScreen.age[1] <= 150)) {
-        contactsCopy = contactsCopy.filter((e) => {
-            if (e.age && e.age.years !== null && e.age.years !== undefined && e.age.months !== null && e.age.months !== undefined) {
-                if (e.age.years > 0 && e.age.months === 0) {
-                    return e.age.years >= filterFromFilterScreen.age[0] && e.age.years <= filterFromFilterScreen.age[1]
-                } else if (e.age.years === 0 && e.age.months > 0){
-                    return e.age.months >= filterFromFilterScreen.age[0] && e.age.months <= filterFromFilterScreen.age[1]
-                } else if (e.age.years === 0 && e.age.months === 0) {
-                    return e.age.years >= filterFromFilterScreen.age[0] && e.age.years <= filterFromFilterScreen.age[1]
-                }
-            }
-        });
-    }
-    // Take care of locations filter
-    if (filterFromFilterScreen  && filterFromFilterScreen.selectedLocations && filterFromFilterScreen.selectedLocations.length > 0) {
-        contactsCopy = contactsCopy.filter((e) => {
-            let addresses = e.addresses.filter((k) => {
-                return k.locationId !== '' && filterFromFilterScreen.selectedLocations.indexOf(k.locationId) >= 0
-            })
-            return addresses.length > 0
-        })
-    }
-    // Take care of sort
-    if (filterFromFilterScreen && filterFromFilterScreen.sort && filterFromFilterScreen.sort !== undefined && filterFromFilterScreen.sort.length > 0) {
-        contactsCopy = localSortItems(contactsCopy, filterFromFilterScreen.sort)
-    } else {
-        contactsCopy = objSort(contactsCopy, ['lastName', false])
-    }
-
-    return contactsCopy
-
-
-
-    // // Take care of search filter
-    // if (stateFilter.searchText) {
-    //     contactsCopy = contactsCopy.filter((e) => {
-    //         let fullName = get(e, 'firstComponentData.fullName', null);
-    //         let casesExposedTo = get(e, 'secondComponentData.exposedTo', null);
-    //         if (casesExposedTo && Array.isArray(casesExposedTo) && casesExposedTo.length) {
-    //             casesExposedTo = casesExposedTo.map((e) => {return e.fullName});
-    //         }
-    //
-    //         return fullName.toLowerCase().includes(stateFilter.searchText.toLowerCase()) || casesExposedTo.find((e) => {return e.toLowerCase().includes(stateFilter.searchText.toLowerCase())});
-    //     });
-    // }
-    // // Take care of gender filter
-    // if (filterFromFilterScreen && filterFromFilterScreen.gender) {
-    //     contactsCopy = contactsCopy.filter((e) => {return e && e.firstComponentData && e.firstComponentData.genderId && e.firstComponentData.genderId === filterFromFilterScreen.gender});
-    // }
-    // // Take care of age range filter
-    // if (filterFromFilterScreen && filterFromFilterScreen.age && Array.isArray(filterFromFilterScreen.age) && filterFromFilterScreen.age.length === 2 && (filterFromFilterScreen.age[0] >= 0 || filterFromFilterScreen.age[1] <= 150)) {
-    //     contactsCopy = contactsCopy.filter((e) => {
-    //         let age = get(e, 'firstComponentData.age', null);
-    //         if (age) {
-    //             return age >= filterFromFilterScreen.age[0] && age <= filterFromFilterScreen.age[1];
-    //         }
-    //     });
-    // }
-    // // Take care of locations filter
-    // if (filterFromFilterScreen  && filterFromFilterScreen.selectedLocations && filterFromFilterScreen.selectedLocations.length > 0) {
-    //     contactsCopy = contactsCopy.filter((e) => {
-    //         let locationId = get(e, 'firstComponentData.locationId', null);
-    //         if (locationId) {
-    //             return filterFromFilterScreen.selectedLocations.indexOf(locationId) > -1;
-    //         }
-    //         // let addresses = e.addresses.filter((k) => {
-    //         //     return k.locationId !== '' && filterFromFilterScreen.selectedLocations.indexOf(k.locationId) >= 0
-    //         // })
-    //         // return addresses.length > 0
-    //     })
-    // }
-    // // Take care of sort
-    // if (filterFromFilterScreen && filterFromFilterScreen.sort && filterFromFilterScreen.sort !== undefined && filterFromFilterScreen.sort.length > 0) {
-    //     contactsCopy = localSortItems(contactsCopy, filterFromFilterScreen.sort)
-    // } else {
-    //     contactsCopy = objSort(contactsCopy, ['lastName', false])
-    // }
-    //
-    // return contactsCopy
-}
-
 export function localSortHelpItem (helpItemsCopy, propsFilter, stateFilter, filterFromFilterScreen, translations) {
     // Take care of search filter
     if (stateFilter.searchText) {
@@ -1753,28 +1068,6 @@ export function filterItemsForEachPage (helpItemsCopy, pageAskingHelpFrom) {
     })
 
     return helpItemsCopy
-}
-
-export function localSortItems (itemsToSort, sortFilter) {
-    if (sortFilter && sortFilter !== undefined && sortFilter.length > 0) {
-        let sortCriteria = []
-        let sortOrder = []
-        for(let i = 0; i < sortFilter.length; i++) {
-            if (sortFilter[i].sortCriteria && sortFilter[i].sortCriteria.trim().length > 0 && sortFilter[i].sortOrder && sortFilter[i].sortOrder.trim().length > 0){
-                sortCriteria.push(sortFilter[i].sortCriteria === 'LNG_CONTACT_FIELD_LABEL_FIRST_NAME' ? 'firstName' : 'lastName')
-                sortOrder.push(sortFilter[i].sortOrder === 'LNG_SIDE_FILTERS_SORT_BY_ASC_PLACEHOLDER' ? false : true)
-            }
-        }
-        if (sortCriteria.length > 0 && sortOrder.length > 0) {
-            if (sortOrder.length === 1) {
-                itemsToSort = objSort(itemsToSort, [sortCriteria[0], sortOrder[0]])
-            } else if (sortOrder.length === 2) {
-                itemsToSort = objSort(itemsToSort, [sortCriteria[0], sortOrder[0]], [sortCriteria[1], sortOrder[1]])
-            }
-        }
-    }
-    return itemsToSort
-
 }
 
 export function objSort() {
@@ -1899,7 +1192,6 @@ export function daysSince(startDate, endDate) {
     }
     return moment.utc(endDate).startOf('day').diff(moment.utc(startDate).startOf('day'), 'days');
 }
-
 
 // Algorithm:
 // - Get contact's main address

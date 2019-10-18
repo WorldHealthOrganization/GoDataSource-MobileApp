@@ -2,7 +2,7 @@ import {getDatabase} from './database';
 import config from './../utils/config';
 import {rawSQLQuery} from "./sqlHelper";
 
-export function getClustersdRequest (token, callback) {
+export function getClustersdRequest (callback) {
 
     // rawSQLQuery(config.mongoCollections.cluster, `${config.rawSQLQueryString}`, [])
     //     .then((result) => {
