@@ -1,5 +1,5 @@
 import React, {PureComponent} from 'react';
-import {View, Text, StyleSheet, Platform, ScrollView} from 'react-native';
+import {View, Text, StyleSheet, Platform, ScrollView, Alert} from 'react-native';
 import styles from './../styles';
 import cloneDeep from "lodash/cloneDeep";
 import translations from "../utils/translations";
@@ -67,11 +67,26 @@ class QuestionCardContent extends PureComponent {
                                 }
                             </View>
                             <View  style={{
+                                flexDirection: 'row',
                                 width: this.props.isEditMode ?
                                     // (this.props.item.answerType === 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_DATE_TIME' ? this.props.viewWidth / 2 : this.props.viewWidth) :  this.props.viewWidth,
                                     (this.props.viewWidth / 2) : this.props.viewWidth,
                             }}>
-                                { this.handleRenderItem(this.props.item) }
+                                <View style={{maxWidth:  this.props.isEditMode ? ( this.props.index === 0 ? (this.props.viewWidth / 2 ) - 25 : (this.props.viewWidth / 2 )) : this.props.viewWidth }}>
+                                    { this.handleRenderItem(this.props.item) }
+                                </View>
+                                {   this.props.isEditMode && this.props.index === 0 &&  Array.isArray(this.props.source[this.props.item.variable]) && this.props.source[this.props.item.variable].length > 1 &&
+                                    <View style={{
+                                        minHeight: calculateDimension(72, true, this.props.screenSize),
+                                        justifyContent: 'center',
+                                        alignItems: 'center',
+                                        width: 25,
+                                    }}>
+                                        <Ripple onPress={() => { this.handleDeletePrevAnswer(0)}}>
+                                            <Icon name="delete"/>
+                                        </Ripple>
+                                    </View>
+                                }
                             </View>
                         </View>
                     ) : ( this.handleRenderItem(this.props.item) )
@@ -373,6 +388,25 @@ class QuestionCardContent extends PureComponent {
 
     onChangeAnswerDate = (date, id, index) => {
         this.props.onChangeAnswerDate(date, id, index);
+    };
+
+    handleDeletePrevAnswer = (index) => {
+        Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.alertMessages.deletePreviousAnswer, this.state.translation), [
+            {
+                text: getTranslation(translations.generalLabels.noAnswer, this.props.translation), onPress: () => { console.log('Cancel pressed') }
+            },
+            {
+                text: getTranslation(translations.generalLabels.yesAnswer, this.props.translation), onPress: () => {
+                    this.deletePreviousAnswer(index);
+                }
+            }
+        ]);
+    };
+
+    deletePreviousAnswer = (index) => {
+        let questionnaireAnswers = cloneDeep(this.props.source[this.props.item.variable]);
+        questionnaireAnswers.splice(index, 1);
+        this.props.savePreviousAnswers(questionnaireAnswers, this.props.item.variable);
     };
 }
 

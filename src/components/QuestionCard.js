@@ -133,6 +133,7 @@ class QuestionCard extends PureComponent {
                         onChangeDateAnswer={this.props.onChangeDateAnswer}
                         onChangeSingleSelection={this.props.onChangeSingleSelection}
                         onChangeMultipleSelection={this.props.onChangeMultipleSelection}
+                        savePreviousAnswers={this.props.savePreviousAnswers}
                         isEditMode={this.props.isEditMode}
                         onChangeAnswerDate={this.props.onChangeAnswerDate}
                         editableQuestionDate={this.props.editableQuestionDate}

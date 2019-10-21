@@ -660,6 +660,8 @@ class FollowUpsSingleScreen extends Component {
                     }
                 }
             }
+        }else{
+            questionnaireAnswers[questionId]= [{date: value, value: null}];
         }
 
         this.setState({

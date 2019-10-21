@@ -45,6 +45,23 @@ class CaseSingleInvestigationContainer extends Component {
         if (this.props.previousAnswers) {
             previousAnswers = Object.assign({}, this.props.previousAnswers);
         }
+        if (previousAnswers && Object.keys(previousAnswers).length > 0) {
+            for (let questionId in previousAnswers) {
+                if (previousAnswers.hasOwnProperty(questionId)) {
+                    if (Array.isArray(previousAnswers[questionId]) && previousAnswers[questionId].length > 1) {
+                        previousAnswers[questionId] = previousAnswers[questionId].sort((a, b) => {
+                            if (createDate(a.date) > createDate(b.date)) {
+                                return -1;
+                            }
+                            if (createDate(a.date) < createDate(b.date)) {
+                                return 1;
+                            }
+                            return 0;
+                        })
+                    }
+                }
+            }
+        }
         let sortedQuestions = sortBy(cloneDeep(this.props.questions), ['order', 'variable']);
         sortedQuestions = extractAllQuestions(sortedQuestions, previousAnswers);
         return (
@@ -139,26 +156,6 @@ class CaseSingleInvestigationContainer extends Component {
     handleRenderItem = (previousAnswers, item, index, totalQuestions) => {
         const totalNumberOfQuestions = totalQuestions.length;
         if (item.inactive === false) {
-
-            if(!this.isCollapsed(item)) {
-                if (previousAnswers && Object.keys(previousAnswers).length > 0) {
-                    for (let questionId in previousAnswers) {
-                        if (previousAnswers.hasOwnProperty(questionId)) {
-                            if (Array.isArray(previousAnswers[questionId]) && previousAnswers[questionId].length > 1) {
-                                previousAnswers[questionId] = previousAnswers[questionId].sort((a, b) => {
-                                    if (createDate(a.date) > createDate(b.date)) {
-                                        return -1;
-                                    }
-                                    if (createDate(a.date) < createDate(b.date)) {
-                                        return 1;
-                                    }
-                                    return 0;
-                                })
-                            }
-                        }
-                    }
-                }
-            }
             return (
                 <QuestionCard
                     key={item.variable}
