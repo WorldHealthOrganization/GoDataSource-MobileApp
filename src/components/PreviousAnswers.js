@@ -39,6 +39,13 @@ class PreviousAnswers extends Component {
                 this.setState({
                     previousAnswers: this.props.previousAnswers
                 });
+            }else{
+                if( (this.props.previousAnswers[0].date !== prevProps.previousAnswers[0].date)
+                    || (this.props.previousAnswers[0].value !== prevProps.previousAnswers[0].value)){
+                    this.setState({
+                        previousAnswers: this.props.previousAnswers
+                    });
+                }
             }
         } else {
             if (prevProps.previousAnswers === undefined && this.props.previousAnswers !== undefined){

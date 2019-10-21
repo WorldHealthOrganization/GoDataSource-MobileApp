@@ -30,17 +30,19 @@ class QuestionCard extends PureComponent {
     }
 
     componentDidUpdate(prevProps) {
-        if (get(this.props, `source[${get(this.props, 'item.variable', null)}][0].date`, null) && get(this.props, `source[${get(this.props, 'item.variable', null)}][0].date`, null) !== get(prevProps, `source[${get(prevProps, 'item.variable', null)}][0].date`, null)) {
-            this.setState({
-                answerDate: get(this.props, `source[${get(this.props, 'item.variable', null)}][0].date`, null),
-                previousAnswers: this.props.source
-            })
-        }
-        //update previous answers if item was deleted
+        //update previous answers if length is different because item was deleted/added
         if(get(this.props, `source[${get(this.props, 'item.variable', null)}]`, null) && get(this.props, `source[${get(this.props, 'item.variable', null)}].length`, null) !== get(prevProps, `source[${get(prevProps, 'item.variable', null)}].length`, null)){
             this.setState({
                 previousAnswers: this.props.source
             });
+        }else{
+            //update previous answers if date or value was updated for current answer
+            if ( (get(this.props, `source[${get(this.props, 'item.variable', null)}][0].date`, null) && get(this.props, `source[${get(this.props, 'item.variable', null)}][0].date`, null) !== get(prevProps, `source[${get(prevProps, 'item.variable', null)}][0].date`, null) )
+                || (get(this.props, `source[${get(this.props, 'item.variable', null)}][0].value`, null) && get(this.props, `source[${get(this.props, 'item.variable', null)}][0].value`, null) !== get(prevProps, `source[${get(prevProps, 'item.variable', null)}][0].value`, null))) {
+                this.setState({
+                    previousAnswers: this.props.source
+                })
+            }
         }
     }
 

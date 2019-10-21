@@ -372,11 +372,7 @@ class QuestionCardContent extends PureComponent {
     };
 
     onChangeAnswerDate = (date, id, index) => {
-        this.setState({
-            answerDate: date
-        }, () => {
-            this.props.onChangeAnswerDate(date, id, index)
-        });
+        this.props.onChangeAnswerDate(date, id, index);
     };
 }
 
