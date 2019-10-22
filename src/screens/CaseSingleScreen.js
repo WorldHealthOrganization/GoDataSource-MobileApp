@@ -463,6 +463,7 @@ class CaseSingleScreen extends Component {
                     onClickAddNewMultiFrequencyAnswer={this.onClickAddNewMultiFrequencyAnswer}
                     onChangeAnswerDate={this.onChangeAnswerDate}
                     savePreviousAnswers={this.savePreviousAnswers}
+                    copyAnswerDate={this.handleCopyAnswerDate}
                 />;
             default: return null;
         }
@@ -1824,7 +1825,6 @@ class CaseSingleScreen extends Component {
         }
         this.savePreviousAnswers(previousAnswersClone[item.variable], item.variable);
     };
-
     savePreviousAnswers = (previousAnswers, previousAnswersId) => {
         this.setState(prevState => ({
             previousAnswers: Object.assign({}, prevState.previousAnswers, { [previousAnswersId]: previousAnswers }),
@@ -1832,6 +1832,25 @@ class CaseSingleScreen extends Component {
         }), () => {
             this.props.navigator.dismissAllModals();
         })
+    };
+    handleCopyAnswerDate = (value) => {
+        let previousAnswersClone = _.cloneDeep(this.state.previousAnswers);
+        console.log('~~~~~~~ handleCopyAnswerDate', previousAnswersClone);
+        for(let questionId in previousAnswersClone) {
+            if(previousAnswersClone.hasOwnProperty(questionId)) {
+                console.log('~~~~~~~ previousAnswersClone[questionId]', previousAnswersClone[questionId]);
+                previousAnswersClone[questionId] = previousAnswersClone[questionId].map((e) => {
+                    console.log('~~~~~~~ e', e);
+                    return {date: e.date === null ? createDate(value).toISOString() : e.date, value: e.value};
+                });
+            }
+        }
+        this.setState({
+            previousAnswers: previousAnswersClone,
+            isModified: true
+        }, () => {
+            console.log('~~~~~~~ previousAnswers', this.state.previousAnswers);
+        });
     };
 }
 

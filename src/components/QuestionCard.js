@@ -134,6 +134,7 @@ class QuestionCard extends PureComponent {
                         onChangeSingleSelection={this.props.onChangeSingleSelection}
                         onChangeMultipleSelection={this.props.onChangeMultipleSelection}
                         savePreviousAnswers={this.props.savePreviousAnswers}
+                        copyAnswerDate={this.props.copyAnswerDate}
                         isEditMode={this.props.isEditMode}
                         onChangeAnswerDate={this.props.onChangeAnswerDate}
                         editableQuestionDate={this.props.editableQuestionDate}
@@ -148,6 +149,7 @@ class QuestionCard extends PureComponent {
                                 previousAnswers={this.state.previousAnswers[this.props.item.variable]}
                                 previousAnswerVariable={this.props.item.variable}
                                 savePreviousAnswers={this.props.savePreviousAnswers}
+                                copyAnswerDate={this.props.copyAnswerDate}
                                 onCollapse={this.props.onCollapse}
                             />
                         </View>
@@ -163,7 +165,6 @@ class QuestionCard extends PureComponent {
     };
 
     calculateIndex = (totalQuestions, itemIndex) => {
-        // console.log('~~~~~~~~~~ ', totalQuestions, itemIndex);
         let finalIndex = itemIndex;
         totalQuestions.map( (item, index) => {
             //verify only for previous items

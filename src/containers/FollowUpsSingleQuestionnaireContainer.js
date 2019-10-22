@@ -143,6 +143,7 @@ class FollowUpsSingleQuestionnaireContainer extends Component {
                     onChangeAnswerDate={this.props.onChangeAnswerDate}
                     savePreviousAnswers={this.props.savePreviousAnswers}
                     editableQuestionDate={true}
+                    copyAnswerDate={this.props.copyAnswerDate}
                 />
             )
         }

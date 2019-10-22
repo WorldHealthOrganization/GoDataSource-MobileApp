@@ -288,6 +288,7 @@ class FollowUpsSingleScreen extends Component {
                         onClickAddNewMultiFrequencyAnswer={this.onClickAddNewMultiFrequencyAnswer}
                         onChangeAnswerDate={this.onChangeAnswerDate}
                         savePreviousAnswers={this.savePreviousAnswers}
+                        copyAnswerDate={this.handleCopyAnswerDate}
                     />
                 );
             default:
@@ -863,7 +864,6 @@ class FollowUpsSingleScreen extends Component {
         }
         this.savePreviousAnswers(previousAnswersClone[item.variable], item.variable);
     };
-
     savePreviousAnswers = (previousAnswers, previousAnswersId) => {
         this.setState(prevState => ({
             previousAnswers: Object.assign({}, prevState.previousAnswers, { [previousAnswersId]: previousAnswers }),
@@ -872,6 +872,20 @@ class FollowUpsSingleScreen extends Component {
             // console.log('Updated previousAnswers: ', this.state.previousAnswers);
             this.props.navigator.dismissAllModals();
         })
+    };
+    handleCopyAnswerDate = (value) => {
+        let previousAnswersClone = _.cloneDeep(this.state.previousAnswers);
+        for(let questionId in previousAnswersClone) {
+            if(previousAnswersClone.hasOwnProperty(questionId)) {
+                previousAnswersClone[questionId] = previousAnswersClone[questionId].map((e) => {
+                    return {date: e.date === null ? createDate(value).toISOString() : e.date, value: e.value};
+                });
+            }
+        }
+        this.setState({
+            previousAnswers: previousAnswersClone,
+            isModified: true
+        });
     };
 }
 

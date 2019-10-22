@@ -176,6 +176,7 @@ class CaseSingleInvestigationContainer extends Component {
                     onBlur={this.handleOnBlur}
                     onChangeAnswerDate={this.props.onChangeAnswerDate}
                     savePreviousAnswers={this.props.savePreviousAnswers}
+                    copyAnswerDate={this.props.copyAnswerDate}
                     editableQuestionDate={true}
                 />
             )

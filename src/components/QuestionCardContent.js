@@ -60,9 +60,9 @@ class QuestionCardContent extends PureComponent {
                                         alignItems: 'center',
                                         width: 25,
                                     }}>
-                                        <Ripple onPress={() => {}}>
-                                            <Icon name="content-copy"/>
-                                        </Ripple>
+                                        {
+                                            answerDate !== null && <Ripple onPress={() => this.handleCopyAnswerDate(answerDate)}><Icon name="content-copy"/></Ripple>
+                                        }
                                     </View>
                                 }
                             </View>
@@ -407,6 +407,23 @@ class QuestionCardContent extends PureComponent {
         let questionnaireAnswers = cloneDeep(this.props.source[this.props.item.variable]);
         questionnaireAnswers.splice(index, 1);
         this.props.savePreviousAnswers(questionnaireAnswers, this.props.item.variable);
+    };
+
+    handleCopyAnswerDate = (value) => {
+        Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.alertMessages.copyAnswerDate, this.state.translation), [
+            {
+                text: getTranslation(translations.generalLabels.noAnswer, this.props.translation), onPress: () => { console.log('Cancel pressed') }
+            },
+            {
+                text: getTranslation(translations.generalLabels.yesAnswer, this.props.translation), onPress: () => {
+                    this.copyAnswerDate(value);
+                }
+            }
+        ]);
+    };
+
+    copyAnswerDate = (value) => {
+        this.props.copyAnswerDate(value);
     };
 }
 

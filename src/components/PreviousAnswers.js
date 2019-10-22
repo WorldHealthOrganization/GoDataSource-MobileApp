@@ -165,6 +165,7 @@ class PreviousAnswers extends Component {
                     onChangeAnswerDate={(value, questionId, index) => {
                         this.onChangeAnswerDate(value, questionId, index)
                     }}
+                    copyAnswerDate={this.props.copyAnswerDate}
                 />
                 <View style={{
                     minHeight: calculateDimension(72, true, this.props.screenSize),
