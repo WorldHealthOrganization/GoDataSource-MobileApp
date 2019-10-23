@@ -18,6 +18,7 @@ import QuestionCardContent from './QuestionCardContent';
 import get from "lodash/get";
 import {sortBy} from "lodash";
 import PreviousAnswers from "./PreviousAnswers";
+import uniqueId from "lodash/uniqueId";
 
 class QuestionCard extends PureComponent {
 
@@ -58,7 +59,7 @@ class QuestionCard extends PureComponent {
         let buttonWidth = calculateDimension(120, false, this.props.screenSize);
         let index = this.calculateIndex(this.props.totalQuestions, this.props.index);
         return (
-            <ElevatedView elevation={3} key={this.props.key} style={[this.props.style, style.container, {
+            <ElevatedView elevation={3} key={uniqueId('key_')} style={[this.props.style, style.container, {
                 marginHorizontal: calculateDimension(16, false, this.props.screenSize),
                 width: calculateDimension(config.designScreenSize.width - 32, false, this.props.screenSize),
                 marginVertical: 4
@@ -80,7 +81,7 @@ class QuestionCard extends PureComponent {
                                 ' - ' + getTranslation(this.props.item.category, this.props.translation) : ''}
                         />
                 }
-                <View key={this.props.key}>
+                <View key={uniqueId('key_')}>
                     {
                         this.props.item.multiAnswer && this.props.isEditMode && !this.props.hideButtons ? (
                             <View
@@ -119,7 +120,7 @@ class QuestionCard extends PureComponent {
                         ) : (null)
                     }
                     <QuestionCardContent
-                        key={this.props.key}
+                        key={uniqueId('key_')}
                         index={0}
                         item={this.props.item}
                         source={this.props.source}

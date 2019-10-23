@@ -651,7 +651,7 @@ class FollowUpsSingleScreen extends Component {
     onChangeAnswerDate = (value, questionId, index) => {
         let questionnaireAnswers = _.cloneDeep(this.state.previousAnswers);
         if (questionnaireAnswers && questionnaireAnswers[questionId] && Array.isArray(questionnaireAnswers[questionId]) && questionnaireAnswers[questionId].length) {
-            if (questionnaireAnswers[questionId][index] && questionnaireAnswers[questionId][index].date) {
+            if (questionnaireAnswers[questionId][index]) {
                 questionnaireAnswers[questionId][index].date = value;
                 if (questionnaireAnswers[questionId][0].subAnswers && typeof questionnaireAnswers[questionId][0].subAnswers === "object" && Object.keys(questionnaireAnswers[questionId][0].subAnswers).length > 0) {
                     for (let subQuestionId in questionnaireAnswers[questionId][0].subAnswers) {

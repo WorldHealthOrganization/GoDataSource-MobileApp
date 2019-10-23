@@ -22,6 +22,7 @@ import { LoaderScreen } from 'react-native-ui-lib';
 import { sortBy } from 'lodash';
 import translations from './../utils/translations'
 import cloneDeep from "lodash/cloneDeep";
+import uniqueId from "lodash/uniqueId";
 
 class FollowUpsSingleQuestionnaireContainer extends Component {
 
@@ -124,7 +125,7 @@ class FollowUpsSingleQuestionnaireContainer extends Component {
         if (item.inactive === false) {
             return (
                 <QuestionCard
-                    key={item.variable}
+                    key={uniqueId('key_')}
                     item={item}
                     index={index + 1}
                     isCollapsed={ this.isCollapsed(item)}

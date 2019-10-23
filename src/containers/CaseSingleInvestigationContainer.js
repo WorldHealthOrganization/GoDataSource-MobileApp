@@ -15,6 +15,7 @@ import Button from '../components/Button';
 import sortBy from 'lodash/sortBy';
 import cloneDeep from 'lodash/cloneDeep';
 import translations from './../utils/translations';
+import uniqueId from 'lodash/uniqueId';
 
 class CaseSingleInvestigationContainer extends Component {
 
@@ -154,11 +155,11 @@ class CaseSingleInvestigationContainer extends Component {
 
     // Please write here all the methods that are not react native lifecycle methods
     handleRenderItem = (previousAnswers, item, index, totalQuestions) => {
-        const totalNumberOfQuestions = totalQuestions.length;
+        let totalNumberOfQuestions = totalQuestions.length;
         if (item.inactive === false) {
             return (
                 <QuestionCard
-                    key={item.variable}
+                    key={uniqueId('key_')}
                     item={item}
                     isEditMode={this.props.isEditMode}
                     index={index + 1}

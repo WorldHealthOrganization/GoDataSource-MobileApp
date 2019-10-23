@@ -14,6 +14,7 @@ import {connect} from "react-redux";
 import get from 'lodash/get';
 import Ripple from 'react-native-material-ripple';
 import {Icon} from 'react-native-material-ui';
+import uniqueId from "lodash/uniqueId";
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 class QuestionCardContent extends PureComponent {
@@ -27,7 +28,7 @@ class QuestionCardContent extends PureComponent {
     render() {
         let answerDate = get(this.props, `source[${get(this.props, 'item.variable', null)}][${this.props.index}].date`, null);
         return (
-            <ScrollView scrollEnabled={false} keyboardShouldPersistTaps={'always'}>
+            <ScrollView key={uniqueId('key_')} scrollEnabled={false} keyboardShouldPersistTaps={'always'}>
 
                 {
                     this.props.item.multiAnswer ? (
@@ -230,6 +231,7 @@ class QuestionCardContent extends PureComponent {
                             };
                             this.props.onChangeTextAnswer(valueToSend, id, parentId, this.props.index);
                         }}
+
                         multiline={true}
                         style={{width: width, marginHorizontal: marginHorizontal}}
                         translation={this.props.translation}
@@ -327,7 +329,7 @@ class QuestionCardContent extends PureComponent {
             case 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_MULTIPLE_ANSWERS':
                 return (
                     <DropDown
-                        key={item.variable}
+                        key={uniqueId('key_')}
                         id={item.variable}
                         label={translations.questionCardLabels.dropDownLabel}
                         labelValue={item.text}
@@ -377,8 +379,8 @@ class QuestionCardContent extends PureComponent {
 
     handleRenderAdditionalQuestions = (additionalQuestion, parentId) => {
         return (
-            <View key={this.props.key | parentId}>
-                <Section key={this.props.key} label={getTranslation(additionalQuestion.text, this.props.translation)} />
+            <View key={uniqueId('key_')}>
+                <Section key={uniqueId('key_')} label={getTranslation(additionalQuestion.text, this.props.translation)} />
                 {
                     this.handleRenderItemByType(additionalQuestion, parentId)
                 }
