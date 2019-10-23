@@ -123,7 +123,6 @@ class QuestionCardContent extends PureComponent {
     };
 
     handleRenderItemByType = (item, parentId) => {
-        // console.log("Answers: ", item);
         let answerDate = get(this.props, `source[${get(this.props, 'item.variable', null)}][${this.props.index}].date`, null);
         let width = calculateDimension(300, false, this.props.screenSize);
         let marginHorizontal = calculateDimension(14, false, this.props.screenSize);
@@ -189,8 +188,8 @@ class QuestionCardContent extends PureComponent {
             source[parentId][this.props.index].subAnswers && typeof source[parentId][this.props.index].subAnswers === "object" &&
             Object.keys(source[parentId][this.props.index].subAnswers).length > 0 && source[parentId][this.props.index].subAnswers[item.variable] &&
             Array.isArray(source[parentId][this.props.index].subAnswers[item.variable]) && source[parentId][this.props.index].subAnswers[item.variable].length > 0 &&
-            source[parentId][this.props.index].subAnswers[item.variable][this.props.index] && source[parentId][this.props.index].subAnswers[item.variable][this.props.index].value ?
-            source[parentId][this.props.index].subAnswers[item.variable][this.props.index].value : '' :
+            source[parentId][this.props.index].subAnswers[item.variable][0] && source[parentId][this.props.index].subAnswers[item.variable][0].value ?
+            source[parentId][this.props.index].subAnswers[item.variable][0].value : '' :
             source[item.variable] && Array.isArray(source[item.variable]) && source[item.variable].length > 0 &&
             source[item.variable][this.props.index] && source[item.variable][this.props.index].value ? source[item.variable][this.props.index].value : '';
 

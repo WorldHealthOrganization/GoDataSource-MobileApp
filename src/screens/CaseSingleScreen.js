@@ -1647,8 +1647,7 @@ class CaseSingleScreen extends Component {
 
     //labData Questionnaire onChange... functions
     onChangeTextAnswer = (value, id, parentId, index) => {
-        // console.log ('onChangeTextAnswer', value, id)
-        // let itemClone = _.cloneDeep(this.state.case);
+        console.log('onChangeTextAnswer', value, id, parentId, index);
         let questionnaireAnswers = _.cloneDeep(this.state.previousAnswers);
 
         if (parentId) {
@@ -1656,6 +1655,9 @@ class CaseSingleScreen extends Component {
                 questionnaireAnswers[parentId] = [];
             }
             if (questionnaireAnswers[parentId] && Array.isArray(questionnaireAnswers[parentId]) && questionnaireAnswers[parentId].length > 0 && questionnaireAnswers[parentId][0]) {
+                if(!questionnaireAnswers[parentId][0].hasOwnProperty("subAnswers")){
+                    questionnaireAnswers[parentId][0] = Object.assign({}, questionnaireAnswers[parentId][0],{ subAnswers: {}});
+                }
                 if (typeof questionnaireAnswers[parentId][0].subAnswers === "object" && Object.keys(questionnaireAnswers[parentId][0].subAnswers).length === 0) {
                     questionnaireAnswers[parentId][0].subAnswers = {};
                 }
@@ -1671,15 +1673,12 @@ class CaseSingleScreen extends Component {
             questionnaireAnswers[id][0] = value;
         }
 
-        // questionnaireAnswers[id] = value;
-        this.setState(prevState => ({
+        this.setState({
                 previousAnswers: questionnaireAnswers,
                 isModified: true
+            }, () => {
+                console.log ('onChangeMultipleSelection after setState', this.state.previousAnswers);
             })
-            , () => {
-                // console.log ('onChangeMultipleSelection after setState', this.state.previousAnswers)
-            }
-        )
     };
     onChangeSingleSelection = (value, id, parentId, index) => {
         // console.log ('onChangeSingleSelection', value, id)
@@ -1690,6 +1689,9 @@ class CaseSingleScreen extends Component {
                 questionnaireAnswers[parentId] = [];
             }
             if (questionnaireAnswers[parentId] && Array.isArray(questionnaireAnswers[parentId]) && questionnaireAnswers[parentId].length > 0 && questionnaireAnswers[parentId][0]) {
+                if(!questionnaireAnswers[parentId][0].hasOwnProperty("subAnswers")){
+                    questionnaireAnswers[parentId][0] = Object.assign({}, questionnaireAnswers[parentId][0],{ subAnswers: {}});
+                }
                 if (typeof questionnaireAnswers[parentId][0].subAnswers === "object" && Object.keys(questionnaireAnswers[parentId][0].subAnswers).length === 0) {
                     questionnaireAnswers[parentId][0].subAnswers = {};
                 }
@@ -1719,6 +1721,9 @@ class CaseSingleScreen extends Component {
                 questionnaireAnswers[parentId] = [];
             }
             if (questionnaireAnswers[parentId] && Array.isArray(questionnaireAnswers[parentId]) && questionnaireAnswers[parentId].length > 0 && questionnaireAnswers[parentId][0]) {
+                if(!questionnaireAnswers[parentId][0].hasOwnProperty("subAnswers")){
+                    questionnaireAnswers[parentId][0] = Object.assign({}, questionnaireAnswers[parentId][0],{ subAnswers: {}});
+                }
                 if (typeof questionnaireAnswers[parentId][0].subAnswers === "object" && Object.keys(questionnaireAnswers[parentId][0].subAnswers).length === 0) {
                     questionnaireAnswers[parentId][0].subAnswers = {};
                 }
@@ -1740,7 +1745,7 @@ class CaseSingleScreen extends Component {
         )
     };
     onChangeDateAnswer = (value, id, parentId, index) => {
-        // console.log ('onChangeDateAnswer', value, id)
+        // console.log ('onChangeDateAnswer', value, id, parentId, index);
         let questionnaireAnswers = _.cloneDeep(this.state.previousAnswers);
 
         if (parentId) {
@@ -1748,6 +1753,9 @@ class CaseSingleScreen extends Component {
                 questionnaireAnswers[parentId] = [];
             }
             if (questionnaireAnswers[parentId] && Array.isArray(questionnaireAnswers[parentId]) && questionnaireAnswers[parentId].length > 0 && questionnaireAnswers[parentId][0]) {
+                if(!questionnaireAnswers[parentId][0].hasOwnProperty("subAnswers")){
+                    questionnaireAnswers[parentId][0] = Object.assign({}, questionnaireAnswers[parentId][0],{ subAnswers: {}});
+                }
                 if (typeof questionnaireAnswers[parentId][0].subAnswers === "object" && Object.keys(questionnaireAnswers[parentId][0].subAnswers).length === 0) {
                     questionnaireAnswers[parentId][0].subAnswers = {};
                 }
@@ -1762,17 +1770,21 @@ class CaseSingleScreen extends Component {
             }
             questionnaireAnswers[id][index] = value;
         }
-        this.setState(prevState => ({
-                previousAnswers: questionnaireAnswers,
-                isModified: true
-            })
-        )
+        this.setState({
+            previousAnswers: questionnaireAnswers,
+            isModified: true
+        }, () => {
+            // console.log ('onChangeDateAnswer after setState', this.state.previousAnswers);
+        })
     };
     onChangeAnswerDate = (value, questionId, index) => {
         let questionnaireAnswers = _.cloneDeep(this.state.previousAnswers);
         if (questionnaireAnswers && questionnaireAnswers[questionId] && Array.isArray(questionnaireAnswers[questionId]) && questionnaireAnswers[questionId].length) {
             if (questionnaireAnswers[questionId][0]) {
                 questionnaireAnswers[questionId][0].date = value;
+                if(!questionnaireAnswers[questionId][0].hasOwnProperty("subAnswers")){
+                    questionnaireAnswers[questionId][0] = Object.assign({}, questionnaireAnswers[questionId][0],{ subAnswers: {}});
+                }
                 if (questionnaireAnswers[questionId][0].subAnswers && typeof questionnaireAnswers[questionId][0].subAnswers === "object" && Object.keys(questionnaireAnswers[questionId][0].subAnswers).length > 0) {
                     for (let subQuestionId in questionnaireAnswers[questionId][0].subAnswers) {
                         questionnaireAnswers[questionId][0].subAnswers[subQuestionId].map((e) => {
@@ -1788,7 +1800,7 @@ class CaseSingleScreen extends Component {
             previousAnswers: questionnaireAnswers,
             isModified: true
         }, () => {
-            console.log('~~~~~~~~~ onChangeAnswerDate', this.state.previousAnswers);
+            // console.log('~~~~~~~~~ onChangeAnswerDate', this.state.previousAnswers);
         });
     };
 

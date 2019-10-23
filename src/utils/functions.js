@@ -1488,35 +1488,7 @@ function extractQuestions(questions) {
 };
 
 export function reMapAnswers(answers) {
-    let returnedAnswers = {};
-        if (answers && typeof answers === 'object') {
-        for (let questionId in answers) {
-            if (answers[questionId] && Array.isArray(answers[questionId]) && answers[questionId].length > 0) {
-                for (let i = 0; i < answers[questionId].length; i++) {
-                    if (answers[questionId][i].subAnswers) {
-                        for (let subQuestionId in answers[questionId][i].subAnswers) {
-                            if (!returnedAnswers[subQuestionId]) {
-                                returnedAnswers[subQuestionId] = [];
-                            }
-                            returnedAnswers[subQuestionId].push(answers[questionId][i].subAnswers[subQuestionId][0]);
-
-                        }
-                        delete answers[questionId][i].subAnswers;
-                        if (!returnedAnswers[questionId]) {
-                            returnedAnswers[questionId] = [];
-                        }
-                        returnedAnswers[questionId].push(answers[questionId][i]);
-                    } else {
-                        if (!returnedAnswers[questionId]) {
-                            returnedAnswers[questionId] = [];
-                        }
-                        returnedAnswers[questionId].push(answers[questionId][i]);
-                    }
-                }
-            }
-        }
-    }
-
+    let returnedAnswers = answers;
     // Sort each returnedAnswer by date descending
     for(let questionId in returnedAnswers) {
         returnedAnswers[questionId].sort((a, b) => {
