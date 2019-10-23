@@ -1529,7 +1529,12 @@ export function reMapAnswers(answers) {
             return 0;
         });
         returnedAnswers[questionId] = returnedAnswers[questionId].map((e) => {
-            return {date: e.date ?  createDate(e.date).toISOString() : createDate(null).toISOString(), value: e.value};
+            if(e.date){
+                e.date  = createDate(e.date).toISOString();
+            }else{
+                e.date = null;
+            }
+            return e;
         });
     }
 

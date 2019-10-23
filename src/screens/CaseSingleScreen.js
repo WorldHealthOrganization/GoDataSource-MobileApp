@@ -1835,12 +1835,9 @@ class CaseSingleScreen extends Component {
     };
     handleCopyAnswerDate = (value) => {
         let previousAnswersClone = _.cloneDeep(this.state.previousAnswers);
-        console.log('~~~~~~~ handleCopyAnswerDate', previousAnswersClone);
         for(let questionId in previousAnswersClone) {
             if(previousAnswersClone.hasOwnProperty(questionId)) {
-                console.log('~~~~~~~ previousAnswersClone[questionId]', previousAnswersClone[questionId]);
                 previousAnswersClone[questionId] = previousAnswersClone[questionId].map((e) => {
-                    console.log('~~~~~~~ e', e);
                     return {date: e.date === null ? createDate(value).toISOString() : e.date, value: e.value};
                 });
             }
@@ -1848,8 +1845,6 @@ class CaseSingleScreen extends Component {
         this.setState({
             previousAnswers: previousAnswersClone,
             isModified: true
-        }, () => {
-            console.log('~~~~~~~ previousAnswers', this.state.previousAnswers);
         });
     };
 }
