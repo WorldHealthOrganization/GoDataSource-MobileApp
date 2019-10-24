@@ -130,11 +130,9 @@ class QuestionCardContent extends PureComponent {
         if (!source) {
             source = {};
         }
-
         if (parentId) {
             if (!source[parentId]) {
                 source[parentId] = [];
-                source[parentId].push({subAnswers: {}});
             }
             if (!source[parentId][this.props.index]) {
                 source[parentId][this.props.index] = {subAnswers: {}}
@@ -183,16 +181,33 @@ class QuestionCardContent extends PureComponent {
 
         let questionAnswers = null;
 
-        questionAnswers = parentId ? source && source[parentId] && Array.isArray(source[parentId]) && source[parentId].length > 0 &&
-            source[parentId][this.props.index] && typeof source[parentId][this.props.index] === 'object' && Object.keys(source[parentId][this.props.index]).length > 0 &&
-            source[parentId][this.props.index].subAnswers && typeof source[parentId][this.props.index].subAnswers === "object" &&
-            Object.keys(source[parentId][this.props.index].subAnswers).length > 0 && source[parentId][this.props.index].subAnswers[item.variable] &&
-            Array.isArray(source[parentId][this.props.index].subAnswers[item.variable]) && source[parentId][this.props.index].subAnswers[item.variable].length > 0 &&
-            source[parentId][this.props.index].subAnswers[item.variable][0] && source[parentId][this.props.index].subAnswers[item.variable][0].value ?
-            source[parentId][this.props.index].subAnswers[item.variable][0].value : '' :
-            source[item.variable] && Array.isArray(source[item.variable]) && source[item.variable].length > 0 &&
-            source[item.variable][this.props.index] && source[item.variable][this.props.index].value ? source[item.variable][this.props.index].value : '';
-
+        questionAnswers = parentId ?
+            (source
+            && source[parentId]
+            && Array.isArray(source[parentId])
+            && source[parentId].length > 0
+            && source[parentId][this.props.index]
+            && typeof source[parentId][this.props.index] === 'object'
+            && Object.keys(source[parentId][this.props.index]).length > 0
+            && source[parentId][this.props.index].hasOwnProperty('subAnswers')
+            && typeof source[parentId][this.props.index].subAnswers === "object"
+            && Object.keys(source[parentId][this.props.index].subAnswers).length > 0
+            && source[parentId][this.props.index].subAnswers[item.variable]
+            && Array.isArray(source[parentId][this.props.index].subAnswers[item.variable])
+            && source[parentId][this.props.index].subAnswers[item.variable].length > 0
+            && source[parentId][this.props.index].subAnswers[item.variable][0]
+            && source[parentId][this.props.index].subAnswers[item.variable][0].value ?
+                source[parentId][this.props.index].subAnswers[item.variable][0].value
+                : ''
+            ) :
+            (
+                source[item.variable]
+                && Array.isArray(source[item.variable])
+                && source[item.variable].length > 0
+                && source[item.variable][this.props.index]
+                && source[item.variable][this.props.index].value ?
+                    source[item.variable][this.props.index].value : ''
+            );
         if (item.answerType === 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_SINGLE_ANSWER') {
             // console.log('QuestionCard: ', item);
             questionAnswers = questionAnswers !== null &&
@@ -340,11 +355,10 @@ class QuestionCardContent extends PureComponent {
                             let valueToSend = {
                                 date: answerDate, value: selectedAnswers.map((e) => {return e.value})
                             };
-                            let subAnswers = [];
+                            let subAnswers = {};
                             for (let j=0; j<valueToSend.value.length; j++) {
                                 let index = item.answers.findIndex((e) => {return e.value === valueToSend.value[j]});
                                 if (item.answers[index] && item.answers[index].additionalQuestions) {
-                                    // valueToSend.subAnswers = {};
                                     for (let i=0; i<item.answers[index].additionalQuestions.length; i++) {
                                         subAnswers[item.answers[index].additionalQuestions[i].variable] = [{date: answerDate, value: ''}]
                                     }

@@ -217,6 +217,9 @@ class PreviousAnswers extends Component {
             if(!questionnaireAnswers[index].hasOwnProperty("subAnswers")){
                 questionnaireAnswers[index] = Object.assign({}, questionnaireAnswers[index],{ subAnswers: {}});
             }
+            if( typeof questionnaireAnswers[index].subAnswers !== 'object' ){
+                questionnaireAnswers[index].subAnswers = {};
+            }
             if (!questionnaireAnswers[index].subAnswers[id]) {
                 questionnaireAnswers[index].subAnswers[id] = [];
             }
@@ -225,6 +228,7 @@ class PreviousAnswers extends Component {
             set(questionnaireAnswers, `[${index}]`, value);
         }
 
+        // console.log('~~~~~~~~~~ onChangeTextAnswer', questionnaireAnswers);
         this.setState({
             previousAnswers: questionnaireAnswers,
             isModified: true
@@ -241,6 +245,9 @@ class PreviousAnswers extends Component {
             if(!questionnaireAnswers[index].hasOwnProperty("subAnswers")){
                 questionnaireAnswers[index] = Object.assign({}, questionnaireAnswers[index],{ subAnswers: {}});
             }
+            if( typeof questionnaireAnswers[index].subAnswers !== 'object' ){
+                questionnaireAnswers[index].subAnswers = {};
+            }
             if (!questionnaireAnswers[index].subAnswers[id]) {
                 questionnaireAnswers[index].subAnswers[id] = [];
             }
@@ -249,6 +256,7 @@ class PreviousAnswers extends Component {
             set(questionnaireAnswers, `[${index}]`, value);
         }
 
+        // console.log('~~~~~~~~~~ onChangeSingleSelection', questionnaireAnswers);
         this.setState({
             previousAnswers: questionnaireAnswers,
             isModified: true
@@ -258,11 +266,14 @@ class PreviousAnswers extends Component {
     };
 
     onChangeMultipleSelection = (value, id, parentId, index) => {
-        console.log ('onChangeMultipleSelection', value, id, parentId, index, this.state.previousAnswers);
+        // console.log ('onChangeMultipleSelection', value, id, parentId, index, this.state.previousAnswers);
         let questionnaireAnswers = _.cloneDeep(this.state.previousAnswers);
         if (parentId) {
             if(!questionnaireAnswers[index].hasOwnProperty("subAnswers")){
                 questionnaireAnswers[index] = Object.assign({}, questionnaireAnswers[index],{ subAnswers: {}});
+            }
+            if( typeof questionnaireAnswers[index].subAnswers !== 'object' ){
+                questionnaireAnswers[index].subAnswers = {};
             }
             if (!questionnaireAnswers[index].subAnswers[id]) {
                 questionnaireAnswers[index].subAnswers[id] = [];
@@ -271,6 +282,8 @@ class PreviousAnswers extends Component {
         } else {
             set(questionnaireAnswers, `[${index}]`, value);
         }
+
+        // console.log('~~~~~~~~~~ onChangeMultipleSelection', questionnaireAnswers);
         this.setState({
             previousAnswers: questionnaireAnswers,
             isModified: true
@@ -287,6 +300,9 @@ class PreviousAnswers extends Component {
             if(!questionnaireAnswers[index].hasOwnProperty("subAnswers")){
                 questionnaireAnswers[index] = Object.assign({}, questionnaireAnswers[index],{ subAnswers: {}});
             }
+            if( typeof questionnaireAnswers[index].subAnswers !== 'object' ){
+                questionnaireAnswers[index].subAnswers = {};
+            }
             if (!questionnaireAnswers[index].subAnswers[id]) {
                 questionnaireAnswers[index].subAnswers[id] = [];
             }
@@ -295,6 +311,7 @@ class PreviousAnswers extends Component {
             set(questionnaireAnswers, `[${index}]`, value);
         }
 
+        // console.log('~~~~~~~~~~ onChangeDateAnswer', questionnaireAnswers);
         this.setState({
             previousAnswers: questionnaireAnswers,
             isModified: true
@@ -313,6 +330,7 @@ class PreviousAnswers extends Component {
             }
         }
 
+        // console.log('~~~~~~~~~~ onChangeAnswerDate', questionnaireAnswers);
         this.setState({
             previousAnswers: questionnaireAnswers,
             isModified: true
