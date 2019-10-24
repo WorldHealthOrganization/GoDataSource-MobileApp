@@ -18,6 +18,7 @@ import set from 'lodash/set';
 import ViewHOC from './../components/ViewHOC';
 import { extractAllQuestions } from "../utils/functions";
 import Ripple from 'react-native-material-ripple';
+import uniqueId from "lodash/uniqueId";
 
 class PreviousAnswers extends Component {
 
@@ -45,6 +46,33 @@ class PreviousAnswers extends Component {
                     this.setState({
                         previousAnswers: this.props.previousAnswers
                     });
+                }else {
+                    let shouldUpdate = false;
+                    for (let i=0; i<this.props.previousAnswers.length; i++) {
+                        if(this.props.previousAnswers[i].hasOwnProperty('subAnswers')){
+                            //did not have subAnswer previously
+                            if(!prevProps.previousAnswers[i].hasOwnProperty('subAnswers')){
+                                shouldUpdate = true;
+                            }else {
+                                if (typeof this.props.previousAnswers[i].subAnswers === 'object') {
+                                    //did not have a key in subAnswers previously
+                                    if (typeof prevProps.previousAnswers[i].subAnswers !== 'object'){
+                                        shouldUpdate = true;
+                                    }else {
+                                        //has more keys in subAnswers than previously
+                                        if (Object.keys(this.props.previousAnswers[i].subAnswers).length !== Object.keys(prevProps.previousAnswers[i].subAnswers).length) {
+                                            shouldUpdate = true;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    if(shouldUpdate){
+                        this.setState({
+                            previousAnswers: this.props.previousAnswers
+                        });
+                    }
                 }
             }
         } else {
@@ -122,8 +150,7 @@ class PreviousAnswers extends Component {
         let source = {};
         source[this.props.previousAnswerVariable] = this.state.previousAnswers;
         let sortedQuestions = sortBy(cloneDeep([this.props.item]), ['order', 'variable']);
-        sortedQuestions = extractAllQuestions(sortedQuestions, source);
-
+        sortedQuestions = extractAllQuestions(sortedQuestions, source, index);
         return (
             <ElevatedView
                 style={{
@@ -133,10 +160,10 @@ class PreviousAnswers extends Component {
                     flexDirection: 'row',
                 }}
                 elevation={5}
-                key={index}
+                key={uniqueId('key_')}
             >
                 <QuestionCardContent
-                    key={index}
+                    key={uniqueId('key_')}
                     index={index}
                     item={sortedQuestions[0]}
                     onFocus={this.handleOnFocus}
@@ -187,7 +214,13 @@ class PreviousAnswers extends Component {
         let questionnaireAnswers = _.cloneDeep(this.state.previousAnswers);
 
         if (parentId) {
-            set(questionnaireAnswers, `[${index}].subAnswers[${id}][0]`, value);
+            if(!questionnaireAnswers[index].hasOwnProperty("subAnswers")){
+                questionnaireAnswers[index] = Object.assign({}, questionnaireAnswers[index],{ subAnswers: {}});
+            }
+            if (!questionnaireAnswers[index].subAnswers[id]) {
+                questionnaireAnswers[index].subAnswers[id] = [];
+            }
+            questionnaireAnswers[index].subAnswers[id][0] = value;
         } else {
             set(questionnaireAnswers, `[${index}]`, value);
         }
@@ -205,7 +238,13 @@ class PreviousAnswers extends Component {
         let questionnaireAnswers = _.cloneDeep(this.state.previousAnswers);
 
         if (parentId) {
-            set(questionnaireAnswers, `[${index}].subAnswers[${id}][0]`, value);
+            if(!questionnaireAnswers[index].hasOwnProperty("subAnswers")){
+                questionnaireAnswers[index] = Object.assign({}, questionnaireAnswers[index],{ subAnswers: {}});
+            }
+            if (!questionnaireAnswers[index].subAnswers[id]) {
+                questionnaireAnswers[index].subAnswers[id] = [];
+            }
+            questionnaireAnswers[index].subAnswers[id][0] = value;
         } else {
             set(questionnaireAnswers, `[${index}]`, value);
         }
@@ -219,19 +258,24 @@ class PreviousAnswers extends Component {
     };
 
     onChangeMultipleSelection = (value, id, parentId, index) => {
-        // console.log ('onChangeMultipleSelection', value, id, parentId, index);
+        console.log ('onChangeMultipleSelection', value, id, parentId, index, this.state.previousAnswers);
         let questionnaireAnswers = _.cloneDeep(this.state.previousAnswers);
-
         if (parentId) {
-            set(questionnaireAnswers, `[${index}].subAnswers[${id}][0]`, value);
+            if(!questionnaireAnswers[index].hasOwnProperty("subAnswers")){
+                questionnaireAnswers[index] = Object.assign({}, questionnaireAnswers[index],{ subAnswers: {}});
+            }
+            if (!questionnaireAnswers[index].subAnswers[id]) {
+                questionnaireAnswers[index].subAnswers[id] = [];
+            }
+            questionnaireAnswers[index].subAnswers[id][0] = value;
         } else {
             set(questionnaireAnswers, `[${index}]`, value);
         }
-
         this.setState({
             previousAnswers: questionnaireAnswers,
             isModified: true
         }, () => {
+            console.log ('questionnaireAnswers', this.state.previousAnswers);
             this.props.savePreviousAnswers(this.state.previousAnswers, this.props.previousAnswerVariable);
         });
     };
@@ -240,7 +284,13 @@ class PreviousAnswers extends Component {
         let questionnaireAnswers = _.cloneDeep(this.state.previousAnswers);
 
         if (parentId) {
-            set(questionnaireAnswers, `[${index}].subAnswers[${id}][0]`, value);
+            if(!questionnaireAnswers[index].hasOwnProperty("subAnswers")){
+                questionnaireAnswers[index] = Object.assign({}, questionnaireAnswers[index],{ subAnswers: {}});
+            }
+            if (!questionnaireAnswers[index].subAnswers[id]) {
+                questionnaireAnswers[index].subAnswers[id] = [];
+            }
+            questionnaireAnswers[index].subAnswers[id][0] = value;
         } else {
             set(questionnaireAnswers, `[${index}]`, value);
         }

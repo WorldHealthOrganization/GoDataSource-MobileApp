@@ -64,7 +64,7 @@ class CaseSingleInvestigationContainer extends Component {
             }
         }
         let sortedQuestions = sortBy(cloneDeep(this.props.questions), ['order', 'variable']);
-        sortedQuestions = extractAllQuestions(sortedQuestions, previousAnswers);
+        sortedQuestions = extractAllQuestions(sortedQuestions, previousAnswers, 0);
         return (
             <View style={{ flex: 1 }}>
                 <View style={style.container}>

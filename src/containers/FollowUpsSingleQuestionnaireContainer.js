@@ -86,7 +86,7 @@ class FollowUpsSingleQuestionnaireContainer extends Component {
         }
 
         let sortedQuestions = sortBy(cloneDeep(this.props.questions), ['order', 'variable']);
-        let questions = extractAllQuestions(sortedQuestions, previousAnswers);
+        let questions = extractAllQuestions(sortedQuestions, previousAnswers, 0);
 
         return (
             <View style={{ flex: 1 }}>

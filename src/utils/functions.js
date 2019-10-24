@@ -1319,7 +1319,7 @@ export function mapLocations(locationList) {
 
 //recursively functions for mapping questionCard questions (followUps and Cases)
 // item = {questionId1: [{date1, value1, subAnswers1}, {date2, value2}], questionId2: [{date: null, value1}]}
-export function extractAllQuestions (questions, item) {
+export function extractAllQuestions (questions, item, index) {
     if (questions && Array.isArray(questions) && questions.length > 0) {
         for (let i=0; i<questions.length; i++) {
             if (questions[i].additionalQuestions) {
@@ -1329,14 +1329,39 @@ export function extractAllQuestions (questions, item) {
                 for (let j = 0; j < questions[i].answers.length; j++) {
                     // First check for single select since it has only a value
                     if (questions[i].answerType === "LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_SINGLE_ANSWER" ) {
-                        if (item && typeof item === 'object' && Object.keys(item).length > 0 && item[questions[i].variable] && Array.isArray(item[questions[i].variable]) && item[questions[i].variable].length > 0 && typeof item[questions[i].variable][0] === "object" && Object.keys(item[questions[i].variable][0]).length > 0 && item[questions[i].variable][0].value && item[questions[i].variable][0].value === questions[i].answers[j].value && questions[i].answers[j].additionalQuestions) {
-                            questions[i].additionalQuestions = extractQuestionsRecursively(sortBy(questions[i].answers[j].additionalQuestions, ['order', 'variable']), item[questions[i].variable][0].subAnswers);
+                        if (item && typeof item === 'object'
+                            && Object.keys(item).length > 0
+                            && item[questions[i].variable]
+                            && Array.isArray(item[questions[i].variable])
+                            && item[questions[i].variable].length > 0
+                            && typeof item[questions[i].variable][index] === "object"
+                            && Object.keys(item[questions[i].variable][index]).length > 0
+                            && item[questions[i].variable][index].value
+                            && item[questions[i].variable][index].value === questions[i].answers[j].value
+                            && questions[i].answers[j].additionalQuestions) {
+                            questions[i].additionalQuestions = extractQuestionsRecursively(sortBy(questions[i].answers[j].additionalQuestions, ['order', 'variable']), item[questions[i].variable][index].subAnswers);
                         }
                     } else {
                         // For the multiple select the answers are in an array of values
                         if (questions[i].answerType === "LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_MULTIPLE_ANSWERS") {
-                            if (item && typeof item === 'object' && Object.keys(item).length > 0 && item[questions[i].variable] && Array.isArray(item[questions[i].variable]) && item[questions[i].variable].length > 0 && typeof item[questions[i].variable][0] === "object" && Object.keys(item[questions[i].variable][0]).length > 0 && item[questions[i].variable][0].value && Array.isArray(item[questions[i].variable][0].value) && item[questions[i].variable][0].value.length > 0 && item[questions[i].variable][0].value.indexOf(questions[i].answers[j].value) > -1 && questions[i].answers[j].additionalQuestions) {
-                                questions[i].additionalQuestions = questions[i].additionalQuestions ? questions[i].additionalQuestions.concat(extractQuestionsRecursively(sortBy(questions[i].answers[j].additionalQuestions, ['order', 'variable']), item[questions[i].variable][0].subAnswers)) : extractQuestionsRecursively(sortBy(questions[i].answers[j].additionalQuestions, ['order', 'variable']), item[questions[i].variable][0].subAnswers);
+                            if (item && typeof item === 'object'
+                                && Object.keys(item).length > 0
+                                && item[questions[i].variable]
+                                && Array.isArray(item[questions[i].variable])
+                                && item[questions[i].variable].length > 0
+                                && typeof item[questions[i].variable][index] === "object"
+                                && Object.keys(item[questions[i].variable][index]).length > 0
+                                && item[questions[i].variable][index].value
+                                && Array.isArray(item[questions[i].variable][index].value)
+                                && item[questions[i].variable][index].value.length > 0
+                                && item[questions[i].variable][index].value.indexOf(questions[i].answers[j].value) > -1
+                                && questions[i].answers[j].additionalQuestions) {
+                                questions[i].additionalQuestions = questions[i].additionalQuestions ?
+                                    questions[i].additionalQuestions.concat(
+                                            extractQuestionsRecursively(sortBy(questions[i].answers[j].additionalQuestions, ['order', 'variable']),
+                                            item[questions[i].variable][index].subAnswers)
+                                    )
+                                    : extractQuestionsRecursively(sortBy(questions[i].answers[j].additionalQuestions, ['order', 'variable']), item[questions[i].variable][index].subAnswers);
                             }
                         }
                     }
@@ -1344,7 +1369,6 @@ export function extractAllQuestions (questions, item) {
             }
         }
     }
-    // console.log('~~~~ Mapped questions: ', questions);
     return questions;
 };
 

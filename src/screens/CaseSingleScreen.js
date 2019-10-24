@@ -1140,7 +1140,7 @@ class CaseSingleScreen extends Component {
     };
     checkRequiredFieldsCaseInvestigationQuestionnaire = () => {
         let sortedQuestions = sortBy(cloneDeep(this.props.caseInvestigationQuestions), ['order', 'variable']);
-        sortedQuestions = extractAllQuestions(sortedQuestions, this.state.previousAnswers);
+        sortedQuestions = extractAllQuestions(sortedQuestions, this.state.previousAnswers, 0);
 
         let unAnsweredQuestions = checkRequiredQuestions(sortedQuestions, this.state.previousAnswers);
 
@@ -1647,7 +1647,7 @@ class CaseSingleScreen extends Component {
 
     //labData Questionnaire onChange... functions
     onChangeTextAnswer = (value, id, parentId, index) => {
-        console.log('onChangeTextAnswer', value, id, parentId, index);
+        // console.log('onChangeTextAnswer', value, id, parentId, index);
         let questionnaireAnswers = _.cloneDeep(this.state.previousAnswers);
 
         if (parentId) {
