@@ -42,6 +42,10 @@ const tableStructure = {
             fieldType: 'TEXT'
         },
         {
+            fieldName: 'classification',
+            fieldType: 'TEXT'
+        },
+        {
             fieldName: 'visualId',
             fieldType: 'TEXT'
         },
@@ -161,10 +165,6 @@ const insertOrUpdateQueries = {
     insertTableRelationship: `INSERT INTO relationship values (:id, :sourceId, :sourceType, :targetId, :targetType, :createdAt, :createdBy, :updatedAt, :updatedBy, :deleted, :deletedAt, :deletedBy, :json) ON CONFLICT (id) DO UPDATE SET sourceId=excluded.sourceId, sourceType=excluded.sourceType, targetId=excluded.targetId, targetTyp=excluded.targetType, createdAt=excluded.createdAt, createdBy=excluded.createdBy, updatedAt=excluded.updatedAt, updatedBy=excluded.updatedBy, deleted=excluded.deleted, deletedAt=excluded.deletedAt, deletedBy=excluded.deletedBy, json=excluded.json`
 };
 
-const updateQueries = {
-
-};
-
 const tableNamesAndAliases = {
     selectQueryString: 'select',
     followUpTable: databaseTables[1],
@@ -184,14 +184,6 @@ const tableNamesAndAliases = {
     innerJoinField: 'inner',
     leftJoinField: 'left',
     all: '*'
-};
-
-const tableIds = {
-    followUpPersonIdField: `${tableNamesAndAliases.followUpAlias}.${tableStructure.followUp[tableStructure.followUp.length - 1].fieldName}`,
-    contactsIdField: `${tableNamesAndAliases.contactsAlias}.${tableStructure.person[0].fieldName}`,
-    exposuresIdField: `${tableNamesAndAliases.exposuresAlias}.${tableStructure.person[0].fieldName}`,
-    sourceIdField: `${tableNamesAndAliases.relationshipsAlias}.${tableStructure.relationship[1].fieldName}`,
-    targetIdField: `${tableNamesAndAliases.relationshipsAlias}.${tableStructure.relationship[3].fieldName}`
 };
 
 const innerQueriesStrings = {
@@ -312,6 +304,11 @@ function createMainQuery(dataType, outbreakId, filter, search, lastElement, offs
             ['$in']: filter.categories
         };
     }
+    if (checkArrayAndLength(get(filter, 'classification', null))) {
+        outerFilterCondition[`${mainQueryStrings.outerFilter}.classification`] = {
+            ['$in']: filter.classification
+        };
+    }
     if (checkArrayAndLength(get(filter, 'selectedLocations', null))) {
         outerFilterCondition[`${mainQueryStrings.outerFilter}.locationId`] = {
             ['$in']: filter.selectedLocations
@@ -391,7 +388,10 @@ function createMainQuery(dataType, outbreakId, filter, search, lastElement, offs
     query['sort'] = sort;
 
     if (dataType !== translations.personTypes.contacts) {
-        query.group = `${mainQueryStrings.outerFilter}._id`;
+        query.group = [
+            `${mainQueryStrings.outerFilter}._id`,
+            `${innerQueriesStrings.filteredExposuresTable}.${innerQueriesStrings.filteredRelationsId}`
+        ];
     }
 
     if (!skipAllExposures) {
@@ -491,7 +491,6 @@ export default {
     tableStructure,
     createQueries,
     insertOrUpdateQueries,
-    updateQueries,
     selectQueries,
     relationshipsMappedFields,
     tableNamesAndAliases,

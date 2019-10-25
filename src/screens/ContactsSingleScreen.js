@@ -571,7 +571,7 @@ class ContactsSingleScreen extends Component {
                         onDeletePress={this.handleOnPressDeleteDocument}
                         onPressAddVaccine={this.onPressAddVaccine}
                         onPressDeleteVaccines={this.handleOnPressDeleteVaccines}
-                        onChangeextInputWithDropDown={this.handleOnChangeTextInputWithDropDown}
+                        onChangeTextInputWithDropDown={this.handleOnChangeTextInputWithDropDown}
                         handleMoveToNextScreenButton={this.handleMoveToNextScreenButton}
                         checkRequiredFieldsPersonalInfo={this.checkRequiredFieldsPersonalInfo}
                         isNew={this.props.isNew}
@@ -784,7 +784,7 @@ class ContactsSingleScreen extends Component {
 
     // Contact changes handlers
     handleOnChangeTextInputWithDropDown = (value, id, objectType, stateValue) => {
-        console.log("handleOnChangeTextInputWithDropDown: ", value, id, objectType, stateValue, this.state.contact);
+        // console.log("handleOnChangeTextInputWithDropDown: ", value, id, objectType, stateValue, this.state.contact);
 
         if (stateValue !== undefined && stateValue !== null) {
             if (id === 'age') {
@@ -804,11 +804,13 @@ class ContactsSingleScreen extends Component {
                 }
                 // callGetDerivedStateFromProps = false;
                 this.setState(prevState => ({
-                    contact: Object.assign({}, prevState.contact, { age: ageClone }, { dob: null }),
+                    contact: Object.assign({}, prevState.contact, { age: ageClone ,  dob: null }),
                     isModified: true
-                }), () => {
-                    console.log("handleOnChangeTextInputWithDropDown done", id, " ", value, " ", this.state.contact);
                 })
+                    , () => {
+                        console.log("handleOnChangeTextInputWithDropDown done", id, " ", value, " ", this.state.contact);
+                    }
+                )
             }
         }
     };
@@ -1905,10 +1907,8 @@ function mapStateToProps(state) {
 function matchDispatchProps(dispatch) {
     return bindActionCreators({
         updateFollowUpAndContact,
-        deleteFollowUp,
         updateContact,
         addContact,
-        deleteExposureForContact,
         removeErrors,
         addFollowUp
     }, dispatch);

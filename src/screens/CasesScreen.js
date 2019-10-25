@@ -179,6 +179,7 @@ class CasesScreen extends Component {
                         onPressFilter={this.props.onPressFilter}
                         onPressView={this.props.onPressView}
                         onPressAddExposure={this.props.onPressAddExposure}
+                        onPressCenterButton={this.props.onPressCenterButton}
                         onPressMap={this.handleOnPressMap}
                         onPressName={this.props.onPressFullName}
                         onPressExposure={this.props.onPressExposure}
@@ -354,110 +355,11 @@ class CasesScreen extends Component {
                 });
             })
         });
-
-        //     let itemId = null;
-        //     let itemType = null;
-        //     let outbreakId = null;
-        //
-        //     if (QRCodeInfo && QRCodeInfo !== undefined && QRCodeInfo.data && QRCodeInfo.data !== undefined){
-        //         let parsedData = null;
-        //         try {
-        //             parsedData =  JSON.parse(QRCodeInfo.data)
-        //         } catch(err) {
-        //             setTimeout(function(){
-        //                 Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props && this.props.translation ? this.props.translation : null), getTranslation(translations.alertMessages.errorOccuredMsg, this.props && this.props.translation ? this.props.translation : null), [
-        //                     {
-        //                         text: getTranslation(translations.alertMessages.okButtonLabel, this.props && this.props.translation ? this.props.translation : null),
-        //                         onPress: () => {console.log('Ok pressed')}
-        //                     }
-        //                 ])
-        //             }, 1000);
-        //             return
-        //         }
-        //         if (parsedData && parsedData !== undefined){
-        //             console.log('parsedData', parsedData);
-        //
-        //             if (parsedData.targetResource && parsedData.targetResource !== undefined) {
-        //                 if (parsedData.targetResource === 'case' || parsedData.targetResource === 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE') {
-        //                     itemType = 'case';
-        //                     if (parsedData.resourceContext && parsedData.resourceContext !== undefined &&
-        //                         parsedData.resourceContext.outbreakId && parsedData.resourceContext.outbreakId !== undefined &&
-        //                         parsedData.resourceContext.caseId && parsedData.resourceContext.caseId !== undefined) {
-        //                         itemId = parsedData.resourceContext.caseId;
-        //                         outbreakId = parsedData.resourceContext.outbreakId
-        //                     }
-        //                 } else if (parsedData.targetResource === 'contact' || parsedData.targetResource === 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT') {
-        //                     itemType = 'contact';
-        //                     if (parsedData.resourceContext && parsedData.resourceContext !== undefined &&
-        //                         parsedData.resourceContext.outbreakId && parsedData.resourceContext.outbreakId !== undefined &&
-        //                         parsedData.resourceContext.contactId && parsedData.resourceContext.contactId !== undefined) {
-        //                         itemId = parsedData.resourceContext.contactId;
-        //                         outbreakId = parsedData.resourceContext.outbreakId;
-        //                     }
-        //                 }
-        //             }
-        //         }
-        //     }
-        //
-        //     console.log('pushNewEditScreen', itemId, itemType, outbreakId);
-        //     if (itemId && itemType && outbreakId && outbreakId === this.props.user.activeOutbreakId) {
-        //         let itemPouchId = null;
-        //         if (itemType === 'case') {
-        //             itemPouchId = `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE_${outbreakId}_${itemId}`
-        //         } else if (itemType === 'contact') {
-        //             itemPouchId = `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT_${outbreakId}_${itemId}`
-        //         }
-        //
-        //         if (itemPouchId) {
-        //             getItemByIdRequest(outbreakId, itemPouchId, itemType, (error, response) => {
-        //                 if (error) {
-        //                     console.log("*** getItemByIdRequest error: ", error);
-        //                     Alert.alert(getTranslation(translations.alertMessages.alertLabel,  this.props && this.props.translation ? this.props.translation : null), getTranslation(translations.alertMessages.noItemAlert,  this.props && this.props.translation ? this.props.translation : null), [
-        //                         {
-        //                             text: getTranslation(translations.alertMessages.okButtonLabel,  this.props && this.props.translation ? this.props.translation : null),
-        //                             onPress: () => {console.log('Ok pressed')}
-        //                         }
-        //                     ])
-        //                 }
-        //                 if (response) {
-        //                     console.log("*** getItemByIdRequest response: ", response);
-        //                     if (itemType === 'case') {
-        //                         this.props.navigator.push({
-        //                             screen: 'CaseSingleScreen',
-        //                             animated: true,
-        //                             animationType: 'fade',
-        //                             passProps: {
-        //                                 case: response
-        //                             }
-        //                         })
-        //                     } else if (itemType === 'contact') {
-        //                         this.props.navigator.push({
-        //                             screen: 'ContactsSingleScreen',
-        //                             animated: true,
-        //                             animationType: 'fade',
-        //                             passProps: {
-        //                                 contact: response
-        //                             }
-        //                         })
-        //                     }
-        //                 }
-        //             })
-        //         }
-        //     } else {
-        //         setTimeout(function(){
-        //             Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props && this.props.translation ? this.props.translation : null), getTranslation(translations.alertMessages.noItemAlert,  this.props && this.props.translation ? this.props.translation : null), [
-        //                 {
-        //                     text: getTranslation(translations.alertMessages.okButtonLabel,  this.props && this.props.translation ? this.props.translation : null),
-        //                     onPress: () => {console.log('Ok pressed')}
-        //                 }
-        //             ])
-        //         }, 1000)
-        //     }
     };
 }
 
 // Create style outside the class, or for components that will be used by other components (buttons),
-// make a global style in the config directory
+// make a global style in the confcig directory
 const style = StyleSheet.create({
     mapContainer: {
         flex: 1,

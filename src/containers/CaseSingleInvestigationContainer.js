@@ -27,7 +27,7 @@ class CaseSingleInvestigationContainer extends Component {
     }
 
     shouldComponentUpdate(nextProps, nextState) {
-        if (nextProps.isEditMode !== this.props.isEditMode || nextProps.index === 3) {
+        if (nextProps.isEditMode !== this.props.isEditMode || (nextProps.index === 3 && nextProps.isNew) || (nextProps.index === 4 && !nextProps.isNew)) {
             return true;
         }
         return false;

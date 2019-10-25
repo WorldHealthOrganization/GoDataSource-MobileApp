@@ -45,7 +45,7 @@ class ContactsSingleExposures extends Component {
     }
 
     shouldComponentUpdate(nextProps, nextState) {
-        if (nextProps.activeIndex === 3) {
+        if (nextProps.index === 3) {
             return true;
         }
         return false;
@@ -64,7 +64,7 @@ class ContactsSingleExposures extends Component {
 
         return (
             <ElevatedView elevation={3} style={[style.container]}>
-                <View style={{ flexDirection: 'row' }}>
+                <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
                     {
                         this.props.isNew ? (
                             <View style={{ flexDirection: 'row' }}>
@@ -134,7 +134,7 @@ class ContactsSingleExposures extends Component {
                 </View>
                 <ScrollView contentContainerStyle={{flexGrow: 1}}>
                     <AnimatedFlatList
-                        data={get(this.props, 'contact.relationships', [])}
+                        data={get(this.props, 'relations', [])}
                         renderItem={this.renderRelationship}
                         keyExtractor={this.keyExtractor}
                         ItemSeparatorComponent={this.renderSeparatorComponent}
@@ -161,8 +161,8 @@ class ContactsSingleExposures extends Component {
 
     renderRelationship = (relation) => {
 
-        let {title, primaryText, secondaryText} = this.getCaseName(relation);
-        let textsArray = []
+        let {title, primaryText, secondaryText} = this.getContactName(relation);
+        let textsArray = [];
         if (this.props.isEditMode === true){
             textsArray = [
                 getTranslation(translations.generalButtons.editButtonLabel, this.props.translation)
@@ -228,27 +228,12 @@ class ContactsSingleExposures extends Component {
         )
     };
 
-    getCaseName = (relation) => {
+    getContactName = (relation) => {
         if (relation && relation.item) {
             relation = relation.item;
         }
-
         let relationshipData = get(relation, 'relationshipData');
-        let caseData = get(relation, 'caseData');
-
-        // let person = relation && relation.persons && relation.persons.filter((e) => {return e.id !== extractIdFromPouchId(this.props.contact._id, 'person')})[0];
-
-        // let caseName = '';
-        //
-        // if (person.type === config.personTypes.cases ) {
-        //     if (this.props.cases) {
-        //         let aux = this.props.cases.filter((e) => {return extractIdFromPouchId(e._id, 'person')  === person.id})[0];
-        //         caseName = (aux && aux.firstName ? (aux.firstName + ' ') : '') + (aux && aux.lastName ? aux.lastName : '');
-        //     }
-        // } else {
-        //     let aux = this.props.events.filter((e) => {return extractIdFromPouchId(e._id, 'person') === person.id})[0];
-        //     caseName = aux && aux.name ? aux.name : '';
-        // }
+        let caseData = get(relation, 'contactData');
 
         return {title: computeFullName(caseData), primaryText: moment.utc(relationshipData.contactDate).format("YYYY-MM-DD").toString(), secondaryText: getTranslation(relationshipData.certaintyLevelId, this.props.translation)};
     };

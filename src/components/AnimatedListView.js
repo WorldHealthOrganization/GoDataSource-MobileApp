@@ -100,7 +100,7 @@ class AnimatedListView extends Component {
                 refreshing={this.props.refreshing}
                 removeClippedSubviews={true}
                 maxToRenderPerBatch={5}
-                updateCellsBatchingPeriod={100}
+                updateCellsBatchingPeriod={50}
                 initialNumToRender={5}
                 windowSize={10}
                 ListHeaderComponent={
@@ -186,16 +186,22 @@ class AnimatedListView extends Component {
                 break;
             case 'Case':
                 mainData = get(item, 'mainData', null);
+                exposureData = get(item, 'exposureData', []);
                 textsArray = [
                     getTranslation(translations.casesScreen.viewButtonLabel, this.props.translation),
+                    `${getTranslation(translations.casesScreen.contactExposures, this.props.translation)}(${get(exposureData, 'length', 0)})`,
                     getTranslation(translations.casesScreen.addContactButtonLabel, this.props.translation)
                 ];
                 textsStyleArray = [
                     [styles.buttonTextActionsBar, {marginLeft: margins}],
+                    [styles.buttonTextActionsBar, {fontSize: 14}],
                     [styles.buttonTextActionsBar, {marginRight: margins}]];
                 onPressTextsArray = [
                     () => {
                         this.props.onPressView(mainData);
+                    },
+                    () => {
+                        this.props.onPressCenterButton(mainData);
                     },
                     () => {
                         this.props.onPressAddExposure(mainData);
@@ -328,7 +334,8 @@ Animated.propTypes = {
     onPressFilter: PropTypes.func,
     onPressView: PropTypes.func,
     onPressMap: PropTypes.func,
-    onPressName: PropTypes.func
+    onPressName: PropTypes.func,
+    onPressCenterButton: PropTypes.func
 };
 
 AnimatedListView.defaultProps = {
@@ -341,6 +348,7 @@ AnimatedListView.defaultProps = {
     onPressView: () => {console.log('Default function onPressView')},
     onPressMap: () => {console.log('Default function onPressMap')},
     onPressName: () => {console.log('Default function onPressName')},
+    onPressCenterButton: () => {console.log('Default function onPressCenterButton')}
 };
 
 // Create style outside the class, or for components that will be used by other components (buttons),

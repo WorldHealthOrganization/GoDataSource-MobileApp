@@ -790,12 +790,15 @@ export function mapAnswers(questions, answers) {
 
     // Look for the sub-questions
     for (let i=0; i<sortedQuestions.length; i++) {
-        if (sortedQuestions[i].answerType === 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_SINGLE_ANSWER' || sortedQuestions[i].answerType === 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_MULTIPLE_ANSWERS') {
-            if (sortedQuestions[i].answers && Array.isArray(sortedQuestions[i].answers) && sortedQuestions[i].answers.length > 0) {
+        if (sortedQuestions[i].answerType === 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_SINGLE_ANSWER' ||
+                sortedQuestions[i].answerType === 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_MULTIPLE_ANSWERS') {
+            if (checkArrayAndLength(get(sortedQuestions, `[${i}].answers`), null)) {
                 sortedQuestions[i].additionalQuestions = [];
                 for (let j = 0; j < sortedQuestions[i].answers.length; j++) {
                     let result = extractQuestions(sortBy(sortedQuestions[i].answers[j].additionalQuestions, ['order', 'variable']));
-                    sortedQuestions[i].additionalQuestions = sortedQuestions[i].additionalQuestions.concat(result);
+                    if (checkArrayAndLength(result)) {
+                        sortedQuestions[i].additionalQuestions = sortedQuestions[i].additionalQuestions.concat(result);
+                    }
                 }
             }
         }
@@ -804,9 +807,10 @@ export function mapAnswers(questions, answers) {
     if (questionnaireAnswers && mappedAnswers && Object.keys(mappedAnswers).length > 0) {
         for (let questionId in questionnaireAnswers) {
             for (let j=0; j<sortedQuestions.length; j++) {
-                if (!mappedAnswers[questionId] && sortedQuestions[j].additionalQuestions && Array.isArray(sortedQuestions[j].additionalQuestions) && sortedQuestions[j].additionalQuestions.findIndex((e) => {return e.variable === questionId}) > -1) {
+                if (!mappedAnswers[questionId] && checkArrayAndLength(get(sortedQuestions, `[${j}].additionalQuestions`), null) && sortedQuestions[j].additionalQuestions.findIndex((e) => {return e.variable === questionId}) > -1) {
                     for (let i=0; i<questionnaireAnswers[questionId].length; i++) {
-                        if (get(mappedAnswers, `sortedQuestions[${j}].variable`) && Array.isArray(get(mappedAnswers, `sortedQuestions[${j}].variable`)) && get(mappedAnswers, `sortedQuestions[${j}].variable`).length > 0) {
+                        console.log('This point fails: ', mappedAnswers[sortedQuestions[j].variable], get(mappedAnswers, `[${get(sortedQuestions, `[${j}].variable`, null)}]`, null));
+                        if (checkArrayAndLength(get(mappedAnswers, `[${get(sortedQuestions, `[${j}].variable`, null)}]`, null))) {
                             let indexForStuff = mappedAnswers[sortedQuestions[j].variable].findIndex((e) => {return e.date === questionnaireAnswers[questionId][i].date});
                             if (indexForStuff > -1) {
                                 if (mappedAnswers[sortedQuestions[j].variable][indexForStuff] && !mappedAnswers[sortedQuestions[j].variable][indexForStuff].subAnswers) {

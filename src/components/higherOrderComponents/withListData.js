@@ -90,6 +90,7 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                         onPressFilter={this.onPressFilter}
                         onPressView={this.onPressView}
                         onPressAddExposure={this.onPressAddExposure}
+                        onPressCenterButton={this.onPressCenterButton}
                         onPressFullName={this.onPressFullName}
                         onPressExposure={this.onPressExposure}
                         onEndReached={this.getData}
@@ -296,6 +297,22 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                 }
             };
 
+            onPressCenterButton = (caseData) => {
+                let forwardScreen = this.computeForwardScreen('onPressCenterButton');
+                if (screenType === 'CasesScreen') {
+                    this.props.navigator.push({
+                        screen: forwardScreen,
+                        animated: true,
+                        passProps: {
+                            isNew: false,
+                            refresh: this.refresh,
+                            case: caseData,
+                            index: 3
+                        }
+                    })
+                }
+            };
+
             onPressFullName = (person, prevScreen) => {
                 let forwardScreen = this.computeForwardScreen('onPressFullName');
                 let forwardedProps = {};
@@ -382,6 +399,9 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                                 break;
                             case 'onPressExposure':
                                 forwardScreen = constants.appScreens.contactSingleScreen;
+                                break;
+                            case 'onPressCenterButton':
+                                forwardScreen = constants.appScreens.caseSingleScreen;
                                 break;
                             default:
                                 forwardScreen = null;

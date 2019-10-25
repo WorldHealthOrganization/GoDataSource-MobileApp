@@ -234,7 +234,7 @@ class ContactsSinglePersonal extends PureComponent {
                 contact={this.props.contact}
                 isEditModeForDropDownInput={this.props.isEditMode}
                 selectedItemIndexForAgeUnitOfMeasureDropDown={this.props.selectedItemIndexForAgeUnitOfMeasureDropDown}
-                onChangeextInputWithDropDown={this.props.onChangeextInputWithDropDown}
+                onChangeextInputWithDropDown={this.props.onChangeTextInputWithDropDown}
                 value={value}
                 minimumDate={minimumDate}
                 maximumDate={maximumDate}

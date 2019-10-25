@@ -19,9 +19,16 @@ import CaseSinglePersonalContainer from './../containers/CaseSinglePersonalConta
 import CaseSingleAddressContainer from './../containers/CaseSingleAddressContainer';
 import CaseSingleInfectionContainer from './../containers/CaseSingleInfectionContainer';
 import CaseSingleInvestigationContainer from '../containers/CaseSingleInvestigationContainer';
+import CaseSingleExposureContainer from '../containers/CaseSingleExposureContainer';
 import { Icon } from 'react-native-material-ui';
 import { checkForNameDuplicatesRequest } from './../queries/cases';
-import { addCase, updateCase, getCaseAndExposuresById } from './../actions/cases';
+import {
+    addCase,
+    updateCase,
+    getCaseAndExposuresById,
+    editExposureForCase,
+    getRelationsForCase
+} from './../actions/cases';
 import {
     updateRequiredFields,
     extractIdFromPouchId,
@@ -61,7 +68,7 @@ class CaseSingleScreen extends Component {
             savePressed: false,
             saveFromEditPressed: false,
             routes: this.props.isNew ? config.tabsValuesRoutes.casesSingle : config.tabsValuesRoutes.casesSingleViewEdit,
-            index: 0,
+            index: _.get(this.props, 'index', 0),
             case: this.props.isNew ? {
                 outbreakId: this.props.user.activeOutbreakId,
                 riskLevel: '',
@@ -128,7 +135,10 @@ class CaseSingleScreen extends Component {
 
             // used for adding new multi-frequency answers
             showAddSingleAnswerModalScreen: false,
-            newItem: null
+            newItem: null,
+
+
+            relations: []
         };
         // Bind here methods, or at least don't declare methods in the render method
         this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this));
@@ -142,6 +152,7 @@ class CaseSingleScreen extends Component {
             getCaseAndExposuresById(this.props.case._id)
                 .then((caseAndRelations) => {
                     let caseData = _.get(caseAndRelations, 'caseData', null);
+                    let relations = _.get(caseAndRelations, 'relationshipData', []);
                     if (caseData !== null) {
                         let mappedAnswers = mapAnswers(this.props.caseInvestigationQuestions, caseData.questionnaireAnswers);
                         let ageClone = { years: 0, months: 0 };
@@ -157,6 +168,7 @@ class CaseSingleScreen extends Component {
                             previousAnswers: mappedAnswers.mappedAnswers,
                             mappedQuestions: mappedAnswers.mappedQuestions,
                             case: caseData,
+                            relations: relations,
                             loading: false
                         })
                     } else {
@@ -492,10 +504,25 @@ class CaseSingleScreen extends Component {
                         onPressDeleteVaccines={this.handleOnPressDeleteVaccines}
                     />
                 );
-            // case 'exposures':
-            //     return (
-            //
-            //     );
+            case 'exposures':
+                return (
+                    <CaseSingleExposureContainer
+                        case={this.state.case}
+                        relations={this.state.relations}
+                        index={this.state.index}
+                        onPressEdit={this.onPressEdit}
+                        onPressSaveEdit={this.onPressSaveEdit}
+                        onPressCancelEdit={this.onPressCancelEdit}
+                        onPressEditExposure={this.handleOnPressEditExposure}
+                        onPressDeleteExposure={this.handleOnPressDeleteExposure}
+                        navigator={this.props.navigator}
+                        saveExposure={this.handleSaveExposure}
+                        isNew={this.props.isNew}
+                        handleOnPressSave={this.handleOnPressSave}
+                        isEditMode={this.state.isEditMode}
+                        selectedExposure={this.props.singleCase}
+                    />
+                );
             case 'caseInvestigation':
                 return <CaseSingleInvestigationContainer
                     item={this.state.case}
@@ -922,6 +949,43 @@ class CaseSingleScreen extends Component {
                 }
             }
         ]);
+    };
+
+    // Exposures handlers
+    handleOnPressEditExposure = (relation, index) => {
+        // console.log('handleOnPressEditExposure: ', relation, index);
+        _.set(relation, 'contactData.fullName', computeFullName(_.get(relation, 'contactData', null)));
+        this.props.navigator.showModal({
+            screen: 'ExposureScreen',
+            animated: true,
+            passProps: {
+                exposure: _.get(relation, 'relationshipData', null),
+                selectedExposure: _.get(relation, 'contactData', null),
+                contact: this.props.isNew ? null : this.props.contact,
+                type: 'Case',
+                saveExposure: this.handleSaveExposure,
+                caseIdFromCasesScreen: this.props.caseIdFromCasesScreen,
+                isEditMode: false,
+                addContactFromCasesScreen: false,
+                refreshRelations: this.refreshRelations
+            }
+        })
+    };
+    refreshRelations = (exposure) => {
+        this.setState({
+            loading: true
+        }, () => {
+            getRelationsForCase(_.get(this.state, 'case._id', null))
+                .then((updatedRelations) => {
+                    this.setState({
+                        loading: false,
+                        relations: updatedRelations
+                    })
+                })
+                .catch((errorUpdateExposure) => {
+                    console.log('ErrorUpdateExposure', errorUpdateExposure);
+                })
+        })
     };
 
 
@@ -1756,7 +1820,7 @@ class CaseSingleScreen extends Component {
                 questionnaireAnswers[parentId] = [];
             }
             if (questionnaireAnswers[parentId] && Array.isArray(questionnaireAnswers[parentId]) && questionnaireAnswers[parentId].length > 0 && questionnaireAnswers[parentId][0]) {
-                if (typeof questionnaireAnswers[parentId][0].subAnswers === "object" && Object.keys(questionnaireAnswers[parentId][0].subAnswers).length === 0) {
+                if (_.get(questionnaireAnswers, `[${parentId}][0].subAnswers`, null) === null || (typeof questionnaireAnswers[parentId][0].subAnswers === "object" && Object.keys(questionnaireAnswers[parentId][0].subAnswers).length === 0)) {
                     questionnaireAnswers[parentId][0].subAnswers = {};
                 }
                 if (!questionnaireAnswers[parentId][0].subAnswers[id]) {
@@ -1794,7 +1858,7 @@ class CaseSingleScreen extends Component {
                 questionnaireAnswers[parentId] = [];
             }
             if (questionnaireAnswers[parentId] && Array.isArray(questionnaireAnswers[parentId]) && questionnaireAnswers[parentId].length > 0 && questionnaireAnswers[parentId][0]) {
-                if (typeof questionnaireAnswers[parentId][0].subAnswers === "object" && Object.keys(questionnaireAnswers[parentId][0].subAnswers).length === 0) {
+                if (_.get(questionnaireAnswers, `[${parentId}][0].subAnswers`, null) === null || (typeof questionnaireAnswers[parentId][0].subAnswers === "object" && Object.keys(questionnaireAnswers[parentId][0].subAnswers).length === 0)) {
                     questionnaireAnswers[parentId][0].subAnswers = {};
                 }
                 if (!questionnaireAnswers[parentId][0].subAnswers[id]) {
@@ -1831,7 +1895,7 @@ class CaseSingleScreen extends Component {
                 questionnaireAnswers[parentId] = [];
             }
             if (questionnaireAnswers[parentId] && Array.isArray(questionnaireAnswers[parentId]) && questionnaireAnswers[parentId].length > 0 && questionnaireAnswers[parentId][0]) {
-                if (typeof questionnaireAnswers[parentId][0].subAnswers === "object" && Object.keys(questionnaireAnswers[parentId][0].subAnswers).length === 0) {
+                if (_.get(questionnaireAnswers, `[${parentId}][0].subAnswers`, null) === null || (typeof questionnaireAnswers[parentId][0].subAnswers === "object" && Object.keys(questionnaireAnswers[parentId][0].subAnswers).length === 0)) {
                     questionnaireAnswers[parentId][0].subAnswers = {};
                 }
                 if (!questionnaireAnswers[parentId][0].subAnswers[id]) {
@@ -1868,7 +1932,7 @@ class CaseSingleScreen extends Component {
                 questionnaireAnswers[parentId] = [];
             }
             if (questionnaireAnswers[parentId] && Array.isArray(questionnaireAnswers[parentId]) && questionnaireAnswers[parentId].length > 0 && questionnaireAnswers[parentId][0]) {
-                if (typeof questionnaireAnswers[parentId][0].subAnswers === "object" && Object.keys(questionnaireAnswers[parentId][0].subAnswers).length === 0) {
+                if (_.get(questionnaireAnswers, `[${parentId}][0].subAnswers`, null) === null || (typeof questionnaireAnswers[parentId][0].subAnswers === "object" && Object.keys(questionnaireAnswers[parentId][0].subAnswers).length === 0)) {
                     questionnaireAnswers[parentId][0].subAnswers = {};
                 }
                 if (!questionnaireAnswers[parentId][0].subAnswers[id]) {

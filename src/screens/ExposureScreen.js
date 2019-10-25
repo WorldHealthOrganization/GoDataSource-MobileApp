@@ -23,6 +23,7 @@ import translations from './../utils/translations'
 import ElevatedView from 'react-native-elevated-view';
 import ExposureContainer from '../containers/ExposureContainer';
 import get from 'lodash/get';
+import {insertOrUpdateExposure} from "../actions/exposure";
 
 class ExposureScreen extends Component {
 
@@ -65,7 +66,7 @@ class ExposureScreen extends Component {
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
-        console.log('Render from ExposureScreen: ', this.state.exposure, this.props.exposure);
+        // console.log('Render from ExposureScreen: ', this.state.exposure, this.props.exposure);
 
         if (this.props.errors && this.props.errors.type && this.props.errors.message) {
             Alert.alert(this.props.errors.type, this.props.errors.message, [
@@ -340,6 +341,17 @@ class ExposureScreen extends Component {
                                 })
                         }
                     }
+                } else {
+                    let operation = this.props.exposure ? 'update' : 'create';
+                    let exposure = updateRequiredFields(get(this.props, 'user.activeOutbreakId', null), get(this.props, 'user._id', null), Object.assign({}, this.state.exposure), operation, 'relationship');
+                    insertOrUpdateExposure(exposure)
+                        .then((resultInsertUpdateExposure) => {
+                            this.props.refreshRelations();
+                            this.props.navigator.dismissModal();
+                        })
+                        .catch((errorInsertUpdateExposure) => {
+                            console.log('ErrorInsertUpdateExposure: ', errorInsertUpdateExposure);
+                        })
                 }
             });
         } else {

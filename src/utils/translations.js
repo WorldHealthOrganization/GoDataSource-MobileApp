@@ -242,6 +242,7 @@ const casesScreen = {
     addContactButtonLabel: 'LNG_CASE_LIST_SCREEN_ADD_CONTACT_BUTTON',
     // TODO add to backend
     noCases: 'LNG_CASE_LIST_SCREEN_NO_CASES',
+    contactExposures: 'LNG_CASE_LIST_SCREEN_SEE_CONTACTS'
 };
 
 const contactsScreen = {

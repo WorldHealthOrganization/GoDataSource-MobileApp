@@ -2,15 +2,12 @@
  * Created by florinpopa on 19/07/2018.
  */
 // Add here only the actions, not also the requests that are executed. For that purpose is the requests directory
-// import { ACTION_TYPE_STORE_CASES,
-//     ACTION_TYPE_ADD_CASE,
-//     ACTION_TYPE_UPDATE_CASE,
-//     ACTION_TYPE_REMOVE_CASE} from './../utils/enums';
 import {executeQuery, insertOrUpdate} from "../queries/sqlTools/helperMethods";
 import translations from "../utils/translations";
 import sqlConstants from "../queries/sqlTools/constants";
 import get from 'lodash/get';
 import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
+import {insertOrUpdateExposure} from "./exposure";
 var jsonSql = require('json-sql')();
 jsonSql.setDialect('sqlite');
 
@@ -184,4 +181,56 @@ export function getCaseAndExposuresById (caseId, outbreakId) {
     return Promise.all([promiseCaseData, promiseRelationsData])
         .then(([caseData, relationshipData]) => Promise.resolve({caseData: caseData, relationshipData: relationshipData}))
         .catch((errorGetData) => Promise.reject(errorGetData))
+}
+
+export function getRelationsForCase (caseId) {
+    let queryRelations = {
+        type: 'select',
+        table: 'relationship',
+        fields: [
+            {
+                table: 'relationship',
+                name: 'json',
+                alias: 'relationshipData'
+            },
+            {
+                table: 'person',
+                name: 'json',
+                alias: 'contactData'
+            }
+        ],
+        join: [
+            {
+                type: 'inner',
+                table: 'person',
+                on: {'person._id': 'relationship.targetId'}
+            }
+        ],
+        condition: {
+            'relationship.sourceId': caseId,
+            // 'relationship.outbreakId': outbreakId,
+        }
+    };
+
+    return executeQuery(queryRelations);
+}
+
+export function getItemByIdRequest (personId) {
+    let query = {
+        type: 'select',
+        table: 'person',
+        fields: [
+            {
+                table: 'person',
+                name: 'json',
+                alias: 'personData'
+            }
+        ],
+        condition: {
+            '_id': personId
+        }
+    };
+
+    return executeQuery(query)
+        .then((response) => Promise.resolve(get(response, `[0].personData`, null)))
 }

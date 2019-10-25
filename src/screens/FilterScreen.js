@@ -3,7 +3,8 @@ import { View, Text, StyleSheet, Animated, Platform } from 'react-native';
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import { TabBar, TabView, PagerScroll } from 'react-native-tab-view';
-import _ from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
+import get from 'lodash/get';
 
 import styles from './../styles';
 import NavBarCustom from './../components/NavBarCustom';
@@ -54,8 +55,8 @@ class FilterScreen extends Component {
         const { sortOrderDropDownItems, sortCriteriaDropDownItems, helpItemsSortCriteriaDropDownItems } = config;
         const { followUpsFilterScreen, casesFilterScreen, helpFilterScreen } = config;
 
-        let filterClone = _.cloneDeep(filter.filter);
-        let sortClone = _.cloneDeep(filter.sort);
+        let filterClone = cloneDeep(filter.filter);
+        let sortClone = cloneDeep(filter.sort);
         let screenTitle = '';
         let routes = null;
         let configFilterScreen = null;
@@ -96,19 +97,19 @@ class FilterScreen extends Component {
         }
 
         switch (screen) {
-            case 'ContactsFilterScreen':
+            case 'ContactsScreen':
                 screenTitle = getTranslation(translations.followUpFilter.contactFilterTitle, translation);
                 routes = tabsValuesRoutes.followUpsFilter;
                 configFilterScreen = followUpsFilterScreen;
                 mySortCriteriaDropDownItems = sortCriteriaDropDownItems;
                 break;
-            case 'FollowUpsFilterScreen':
+            case 'FollowUpsScreen':
                 screenTitle = getTranslation(translations.followUpFilter.followUpsFilterTitle, translation);
                 routes = tabsValuesRoutes.followUpsFilter;
                 configFilterScreen = followUpsFilterScreen;
                 mySortCriteriaDropDownItems = sortCriteriaDropDownItems;
                 break;
-            case 'CasesFilterScreen':
+            case 'CasesScreen':
                 screenTitle = getTranslation(translations.casesFilter.casesFilterTitle, translation);
                 routes = tabsValuesRoutes.casesFilter;
                 configFilterScreen = casesFilterScreen;
@@ -323,11 +324,7 @@ class FilterScreen extends Component {
         }
         if (filterStateClone.classification) {
             if (filterStateClone.classification.length > 0) {
-                let orClassification = [];
-                filterStateClone.classification.map((item, index) => {
-                    orClassification.push({ classification: item.value ? item.value : null });
-                });
-                filterClone.classification = orClassification;
+                filterClone.classification = filterStateClone.classification.map((e) => get(e, 'value', null));
             }
         }
         if (filterStateClone.categories) {
@@ -348,7 +345,7 @@ class FilterScreen extends Component {
         let sort = [];
 
         if (filter && filter.sort) {
-            sort = _.cloneDeep(filter.sort);
+            sort = cloneDeep(filter.sort);
         }
 
         sort.push({
@@ -364,7 +361,7 @@ class FilterScreen extends Component {
     };
 
     onDeleteSortRulePress = (index) => {
-        let filterSortClone = _.cloneDeep(this.state.filter.sort);
+        let filterSortClone = cloneDeep(this.state.filter.sort);
         filterSortClone.splice(index, 1);
         this.setState(prevState => ({
             filter: Object.assign({}, prevState.filter, { sort: filterSortClone }),
@@ -379,7 +376,7 @@ class FilterScreen extends Component {
         console.log("sort onChangeDropDown: ", value, id, objectTypeOrIndex, this.state.filter);
         if (typeof objectTypeOrIndex === 'number' && objectTypeOrIndex >= 0) {
             if (objectType === 'Sort') {
-                let sortClone = _.cloneDeep(this.state.filter.sort);
+                let sortClone = cloneDeep(this.state.filter.sort);
                 sortClone[objectTypeOrIndex][id] = value && value.value !== undefined ? value.value : value;
                 console.log('sortClone', sortClone)
                 this.setState(prevState => ({

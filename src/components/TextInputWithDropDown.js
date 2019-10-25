@@ -54,16 +54,17 @@ class TextInputWithDropDown extends Component {
         let tooltip = getTooltip(this.props.label, this.props.translation);
 
         //  get Value
-        const value = get(this.props, `value[${config[this.props.dropDownData]}][${this.props.selectedDropDownItemIndex}].value]`, '');
-        let stringValue = '';
-        if (value !== undefined && value !== null){
-            stringValue = value.toString();
-        }
+        // const value = get(this.props, `value[[${config[this.props.dropDownData]}][${this.props.selectedDropDownItemIndex}].value]`, '');
+        let stringValue = get(this.props, `value[${get(config, `[${this.props.dropDownData}][${this.props.selectedDropDownItemIndex}].value`, null)}]`, null);
+        // let stringValue = this.props.value[config[this.props.dropDownData][this.props.selectedDropDownItemIndex].value];
+        // if (value !== undefined && value !== null){
+        //     stringValue = value.toString();
+        // }
 
         //  get DropDown data
         let dropDownData = config[this.props.dropDownData].map((e) => {
             return {label: getTranslation(e.label, this.props.translation), value: e.value}
-        })
+        });
         dropDownData.unshift({ label: getTranslation(translations.generalLabels.noneLabel, this.props.translation), value: null})
 
         //  get labels
