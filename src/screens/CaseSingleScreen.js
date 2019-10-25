@@ -93,6 +93,8 @@ class CaseSingleScreen extends Component {
                 isDateOfOnsetApproximate: false,
                 safeBurial: false,
                 dateOfBurial: null,
+                burialLocationId: '',
+                burialPlaceName: '',
                 addresses: [
                     {
                         typeId: config.userResidenceAddress.userPlaceOfResidence,
@@ -243,7 +245,6 @@ class CaseSingleScreen extends Component {
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
-
         if (this.props.errors && this.props.errors.type && this.props.errors.message) {
             Alert.alert(this.props.errors.type, this.props.errors.message, [
                 {
@@ -512,6 +513,7 @@ class CaseSingleScreen extends Component {
                         checkIsolationOnsetDates={this.checkIsolationOnsetDates}
                         onChangeSectionedDropDownDateRange={this.onChangeSectionedDropDownDateRange}
                         onChangeSectionedDropDownIsolation={this.onChangeSectionedDropDownIsolation}
+                        onChangeSectionedDropDownBurial={this.onChangeSectionedDropDownBurial}
                         checkDateOfOnsetOutcome={this.checkDateOfOnsetOutcome}
                     />
                 );
@@ -1158,6 +1160,17 @@ class CaseSingleScreen extends Component {
         isolationDates[index].locationId = extractIdFromPouchId(selectedItems['0']._id, 'location');
         this.setState(prevState => ({
             case: Object.assign({}, prevState.case, { isolationDates }),
+            isModified: true
+        }))
+    };
+
+    onChangeSectionedDropDownBurial = (selectedItems, index) => {
+        console.log('handleOnChangeSectionedDropDown', selectedItems, index);
+        // Here selectedItems is always an array with just one value and should pe mapped to the locationId field from the address from index
+        let burialLocationId = _.cloneDeep(this.state.case.burialLocationId);
+        burialLocationId = extractIdFromPouchId(selectedItems['0']._id, 'location');
+        this.setState(prevState => ({
+            case: Object.assign({}, prevState.case, { burialLocationId: burialLocationId }),
             isModified: true
         }))
     };
