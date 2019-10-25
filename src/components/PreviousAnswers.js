@@ -2,7 +2,7 @@
 // the material ui library, since it provides design and animations out of the box
 import React, { Component } from 'react';
 import {Icon} from 'react-native-material-ui';
-import { View, Text, StyleSheet, Alert, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, Alert } from 'react-native';
 import styles from './../styles';
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
@@ -19,6 +19,7 @@ import ViewHOC from './../components/ViewHOC';
 import { extractAllQuestions } from "../utils/functions";
 import Ripple from 'react-native-material-ripple';
 import uniqueId from "lodash/uniqueId";
+import Button from '../components/Button';
 
 class PreviousAnswers extends Component {
 
@@ -29,59 +30,9 @@ class PreviousAnswers extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            previousAnswers: this.props.previousAnswers
+            previousAnswers: this.props.previousAnswers,
+            isModified: false,
         };
-    }
-
-    // Please add here the react lifecycle methods that you need
-    componentDidUpdate(prevProps) {
-        if (prevProps.previousAnswers !== undefined && this.props.previousAnswers !== undefined){
-            if( this.props.previousAnswers.length !== prevProps.previousAnswers.length){
-                this.setState({
-                    previousAnswers: this.props.previousAnswers
-                });
-            }else{
-                if( (this.props.previousAnswers[0].date !== prevProps.previousAnswers[0].date)
-                    || (this.props.previousAnswers[0].value !== prevProps.previousAnswers[0].value)){
-                    this.setState({
-                        previousAnswers: this.props.previousAnswers
-                    });
-                }else {
-                    let shouldUpdate = false;
-                    for (let i=0; i<this.props.previousAnswers.length; i++) {
-                        if(this.props.previousAnswers[i].hasOwnProperty('subAnswers')){
-                            //did not have subAnswer previously
-                            if(!prevProps.previousAnswers[i].hasOwnProperty('subAnswers')){
-                                shouldUpdate = true;
-                            }else {
-                                if (typeof this.props.previousAnswers[i].subAnswers === 'object') {
-                                    //did not have a key in subAnswers previously
-                                    if (typeof prevProps.previousAnswers[i].subAnswers !== 'object'){
-                                        shouldUpdate = true;
-                                    }else {
-                                        //has more keys in subAnswers than previously
-                                        if (Object.keys(this.props.previousAnswers[i].subAnswers).length !== Object.keys(prevProps.previousAnswers[i].subAnswers).length) {
-                                            shouldUpdate = true;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    if(shouldUpdate){
-                        this.setState({
-                            previousAnswers: this.props.previousAnswers
-                        });
-                    }
-                }
-            }
-        } else {
-            if (prevProps.previousAnswers === undefined && this.props.previousAnswers !== undefined){
-                this.setState({
-                    previousAnswers: this.props.previousAnswers
-                });
-            }
-        }
     }
 
     // The render method should have at least business logic as possible,
@@ -101,16 +52,28 @@ class PreviousAnswers extends Component {
                     borderTopColor: styles.screenBackgroundGrey,
                     borderTopWidth: 1
                 }}>
+
                     <Ripple onPress={() => this.props.onCollapse(this.props.item)}>
                         <Icon name="arrow-drop-down"/>
                     </Ripple>
                 </View>
                 <View style={style.mapContainer} contentContainerStyle={style.containerContent}>
+                    <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+                        <Button
+                            title={`${getTranslation(translations.generalButtons.saveButtonLabel, this.props.translation)} ${getTranslation(translations.questionCardLabels.previousAnswers, this.props.translation)}`}
+                            onPress={() => {this.savePreviousAnswers()}}
+                            color={styles.buttonGreen}
+                            titleColor={'white'}
+                            height={calculateDimension(25, true, this.props.screenSize)}
+                            width={calculateDimension(166, false, this.props.screenSize)}
+                            style={{
+                                marginVertical: calculateDimension(12.5, true, this.props.screenSize),
+                                marginRight: 10,
+                            }} />
+                    </View>
                     {
                         this.state && this.state.previousAnswers && Array.isArray(this.state.previousAnswers) && this.state.previousAnswers.length > 0 && this.state.previousAnswers.map((previousAnswer, index) => {
-                            if( index > 0) {
-                                return this.renderListOfPreviousAnswers(previousAnswer, index);
-                            }
+                            return this.renderListOfPreviousAnswers(previousAnswer, index);
                         })
                     }
                 </View>
@@ -127,17 +90,6 @@ class PreviousAnswers extends Component {
     // Please write here all the methods that are not react native lifecycle methods
     handlePressNavbarButton = () => {
         this.props.navigator.dismissModal();
-    };
-
-    // List render methods
-    listEmptyComponent = () => {
-        return (
-            <View style={[style.mapContainer, { height: calculateDimension((667 - 152), true, this.props.screenSize) }]}>
-                <Text style={style.emptyComponentTextView}>
-                    {getTranslation(translations.previousAnswersScreen.noPreviousAnswersToShowMessage, this.props.translation)}
-                </Text>
-            </View>
-        )
     };
 
     renderListOfPreviousAnswers = (previousAnswer, index) => {
@@ -165,6 +117,7 @@ class PreviousAnswers extends Component {
                 <QuestionCardContent
                     key={uniqueId('key_')}
                     index={index}
+                    isCollapsed={true}
                     item={sortedQuestions[0]}
                     onFocus={this.handleOnFocus}
                     onBlur={this.handleOnBlur}
@@ -233,7 +186,7 @@ class PreviousAnswers extends Component {
             previousAnswers: questionnaireAnswers,
             isModified: true
         }, () => {
-            this.props.savePreviousAnswers(this.state.previousAnswers, this.props.previousAnswerVariable);
+            // this.props.savePreviousAnswers(this.state.previousAnswers, this.props.previousAnswerVariable);
         });
     };
 
@@ -261,7 +214,7 @@ class PreviousAnswers extends Component {
             previousAnswers: questionnaireAnswers,
             isModified: true
         }, () => {
-            this.props.savePreviousAnswers(this.state.previousAnswers, this.props.previousAnswerVariable);
+            // this.props.savePreviousAnswers(this.state.previousAnswers, this.props.previousAnswerVariable);
         });
     };
 
@@ -289,7 +242,7 @@ class PreviousAnswers extends Component {
             isModified: true
         }, () => {
             console.log ('questionnaireAnswers', this.state.previousAnswers);
-            this.props.savePreviousAnswers(this.state.previousAnswers, this.props.previousAnswerVariable);
+            // this.props.savePreviousAnswers(this.state.previousAnswers, this.props.previousAnswerVariable);
         });
     };
 
@@ -316,7 +269,7 @@ class PreviousAnswers extends Component {
             previousAnswers: questionnaireAnswers,
             isModified: true
         }, () => {
-            this.props.savePreviousAnswers(this.state.previousAnswers, this.props.previousAnswerVariable);
+            // this.props.savePreviousAnswers(this.state.previousAnswers, this.props.previousAnswerVariable);
         });
     };
 
@@ -335,12 +288,13 @@ class PreviousAnswers extends Component {
             previousAnswers: questionnaireAnswers,
             isModified: true
         }, () => {
-            this.props.savePreviousAnswers(this.state.previousAnswers, this.props.previousAnswerVariable);
+            // this.props.savePreviousAnswers(this.state.previousAnswers, this.props.previousAnswerVariable);
         });
     };
 
     savePreviousAnswers = () => {
         this.props.savePreviousAnswers(this.state.previousAnswers, this.props.previousAnswerVariable);
+        this.props.onCollapse(this.props.item);
     };
 
     handleDeletePrevAnswer = (index) => {

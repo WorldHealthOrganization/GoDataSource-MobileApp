@@ -76,7 +76,7 @@ class QuestionCardContent extends PureComponent {
                                 <View style={{maxWidth:  this.props.isEditMode ? ( this.props.index === 0 ? (this.props.viewWidth / 2 ) - 25 : (this.props.viewWidth / 2 )) : this.props.viewWidth }}>
                                     { this.handleRenderItem(this.props.item) }
                                 </View>
-                                {   this.props.isEditMode && this.props.index === 0 &&  Array.isArray(this.props.source[this.props.item.variable]) && this.props.source[this.props.item.variable].length > 1 &&
+                                {   this.props.isEditMode && !this.props.isCollapsed && this.props.index === 0 &&  Array.isArray(this.props.source[this.props.item.variable]) && this.props.source[this.props.item.variable].length > 1 &&
                                     <View style={{
                                         minHeight: calculateDimension(72, true, this.props.screenSize),
                                         justifyContent: 'center',

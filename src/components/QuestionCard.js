@@ -119,29 +119,32 @@ class QuestionCard extends PureComponent {
                             </View>
                         ) : (null)
                     }
-                    <QuestionCardContent
-                        key={uniqueId('key_')}
-                        index={0}
-                        item={this.props.item}
-                        source={this.props.source}
-                        viewWidth={viewWidth}
-                        viewMarginHorizontal={marginHorizontal}
-                        hideButtons={this.props.hideButtons}
-                        buttonWidth={buttonWidth}
-                        buttonHeight={buttonHeight}
-                        onClickAddNewMultiFrequencyAnswer={this.onClickAddNewMultiFrequencyAnswer}
-                        onChangeTextAnswer={this.props.onChangeTextAnswer}
-                        onChangeDateAnswer={this.props.onChangeDateAnswer}
-                        onChangeSingleSelection={this.props.onChangeSingleSelection}
-                        onChangeMultipleSelection={this.props.onChangeMultipleSelection}
-                        savePreviousAnswers={this.props.savePreviousAnswers}
-                        copyAnswerDate={this.props.copyAnswerDate}
-                        isEditMode={this.props.isEditMode}
-                        onChangeAnswerDate={this.props.onChangeAnswerDate}
-                        editableQuestionDate={this.props.editableQuestionDate}
-                        onFocus={this.props.onFocus}
-                        onBlur={this.props.onBlur}
-                    />
+                    {this.props.item.multiAnswer && this.props.isEditMode && this.props.isCollapsed ? null :
+                        <QuestionCardContent
+                            key={uniqueId('key_')}
+                            index={0}
+                            item={this.props.item}
+                            isCollapsed={this.props.isCollapsed}
+                            source={this.props.source}
+                            viewWidth={viewWidth}
+                            viewMarginHorizontal={marginHorizontal}
+                            hideButtons={this.props.hideButtons}
+                            buttonWidth={buttonWidth}
+                            buttonHeight={buttonHeight}
+                            onClickAddNewMultiFrequencyAnswer={this.onClickAddNewMultiFrequencyAnswer}
+                            onChangeTextAnswer={this.props.onChangeTextAnswer}
+                            onChangeDateAnswer={this.props.onChangeDateAnswer}
+                            onChangeSingleSelection={this.props.onChangeSingleSelection}
+                            onChangeMultipleSelection={this.props.onChangeMultipleSelection}
+                            savePreviousAnswers={this.props.savePreviousAnswers}
+                            copyAnswerDate={this.props.copyAnswerDate}
+                            isEditMode={this.props.isEditMode}
+                            onChangeAnswerDate={this.props.onChangeAnswerDate}
+                            editableQuestionDate={this.props.editableQuestionDate}
+                            onFocus={this.props.onFocus}
+                            onBlur={this.props.onBlur}
+                        />
+                    }
                     {
                         this.props.item.multiAnswer && this.props.isEditMode && this.props.isCollapsed &&
                         <View>
