@@ -109,15 +109,6 @@ class CaseSingleInfectionContainer extends Component {
                                         ))
                         }
                     </View>
-                    {/* <KeyboardAwareScrollView
-                        style={style.containerScrollView}
-                        contentContainerStyle={[style.contentContainerStyle, {paddingBottom: this.props.screenSize.height < 600 ? 70 : 20}]}
-                        keyboardShouldPersistTaps={'always'}
-                        extraHeight={20 + 81 + 50 + 70}
-                        innerRef={ref => {
-                            this.scrollCasesSingleInfection = ref
-                        }}
-                    > */}
                     <ScrollView
                         style={style.containerScrollView}
                         contentContainerStyle={[style.contentContainerStyle, { paddingBottom: this.props.screenSize.height < 600 ? 70 : 20 }]}
@@ -151,32 +142,7 @@ class CaseSingleInfectionContainer extends Component {
                                 </View>
                             ) : null
                         }
-                        {/*<View style={style.container}>*/}
-                        {/*{*/}
-                        {/*this.props.case && this.props.case.isolationDates && this.props.case.isolationDates.map((item, index) => {*/}
-                        {/*return this.handleRenderItemForIsolationDatesList(item, index)*/}
-                        {/*})*/}
-                        {/*}*/}
-                        {/*</View>*/}
-                        {/*{*/}
-                        {/*this.props.isEditMode ? (*/}
-                        {/*<View style={{alignSelf: 'flex-start', marginHorizontal: calculateDimension(16, false, this.props.screenSize), marginVertical: 20}}>*/}
-                        {/*<Ripple*/}
-                        {/*style={{*/}
-                        {/*height: 25,*/}
-                        {/*justifyContent: 'center'*/}
-                        {/*}}*/}
-                        {/*onPress={this.props.onPressAddIsolationDates}*/}
-                        {/*>*/}
-                        {/*<Text style={{fontFamily: 'Roboto-Medium', fontSize: 12, color: styles.buttonGreen}}>*/}
-                        {/*{this.props.case.isolationDates && this.props.case.isolationDates.length === 0 ? getTranslation(translations.caseSingleScreen.oneIsolationDateText, this.props.translation) : getTranslation(translations.caseSingleScreen.moreIsolationDatesText, this.props.translation)}*/}
-                        {/*</Text>*/}
-                        {/*</Ripple>*/}
-                        {/*</View>*/}
-                        {/*) : null*/}
-                        {/*}*/}
                     </ScrollView>
-                    {/* </KeyboardAwareScrollView> */}
                 </View>
             </View>
         );
@@ -190,7 +156,7 @@ class CaseSingleInfectionContainer extends Component {
 
         if (this.props.case.outcomeId !== config.caseFieldsForHardCodeCheck.outcomeIdDeceasedValue) {
             fields = fields.filter((field) => {
-                return field.id !== 'safeBurial' && field.id !== 'dateOfBurial'
+                return field.id !== 'safeBurial' && field.id !== 'dateOfBurial' && field.id !== 'burialLocationId' && field.id !== 'burialPlaceName'
             });
         }
 
@@ -251,9 +217,6 @@ class CaseSingleInfectionContainer extends Component {
             if (item.objectType !== null && item.objectType !== undefined && item.objectType === 'DateRanges') {
                 item.onPressArray = [this.props.handleOnPressDeleteDateRange]
             }
-            // else if (item.objectType !== null && item.objectType !== undefined && item.objectType === 'IsolationDates') {
-            //     item.onPressArray = [this.props.handleOnPressDeleteIsolationDates]
-            // }
         }
 
         if (item.type === 'DatePicker' && this.props.case[item.id] !== undefined) {
@@ -268,15 +231,16 @@ class CaseSingleInfectionContainer extends Component {
                     }
                 }
             }
-            // else if (item.objectType === 'IsolationDates') {
-            //     for (let i = 0; i < this.props.locations.length; i++) {
-            //         let myLocationName = this.getLocationNameById(this.props.locations[i], this.props.case.isolationDates[cardIndex][item.id])
-            //         if (myLocationName !== null){
-            //             value = myLocationName;
-            //             break
-            //         }
-            //     }
-            // }
+
+            if(item.objectType === 'Case'){
+                for (let i = 0; i < this.props.locations.length; i++) {
+                    let myLocationName = this.getLocationNameById(this.props.locations[i], this.props.case[item.id]);
+                    if (myLocationName !== null) {
+                        value = myLocationName;
+                        break
+                    }
+                }
+            }
         } else if (item.type === 'SwitchInput' && this.props.case[item.id] !== undefined) {
             value = this.props.case[item.id]
         } else {
@@ -312,11 +276,16 @@ class CaseSingleInfectionContainer extends Component {
                     item.objectType !== null && item.objectType !== undefined && item.objectType === 'IsolationDates' ?
                         this.props.handleOnPressDeleteIsolationDates :
                         null}
-                onChangeSectionedDropDown={item.objectType !== null && item.objectType !== undefined && item.objectType === 'DateRanges' ?
-                    this.props.onChangeSectionedDropDownDateRange :
-                    item.objectType !== null && item.objectType !== undefined && item.objectType === 'IsolationDates' ?
-                        this.props.onChangeSectionedDropDownIsolation :
-                        null}
+                onChangeSectionedDropDown={
+                    item.objectType !== null && item.objectType !== undefined && item.objectType === 'DateRanges' ?
+                        this.props.onChangeSectionedDropDownDateRange :
+                        (item.objectType !== null && item.objectType !== undefined && item.objectType === 'IsolationDates' ?
+                            this.props.onChangeSectionedDropDownIsolation :
+                            (item.objectType !== null && item.objectType !== undefined && item.objectType === 'Case' ?
+                                this.props.onChangeSectionedDropDownBurial : null
+                            )
+                        )
+                }
                 onFocus={this.handleOnFocus}
                 onBlur={this.handleOnBlur}
             />

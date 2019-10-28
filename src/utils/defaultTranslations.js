@@ -118,6 +118,8 @@ export default {
     'LNG_CASE_FIELD_LABEL_DECEASED': 'Deceased',
     'LNG_CASE_FIELD_LABEL_SAFETY_BURIAL': 'Was Burial Safety Performed?',
     'LNG_CASE_FIELD_LABEL_DATE_OF_DECEASE': 'Date of decease',
+    'LNG_CASE_FIELD_LABEL_PLACE_OF_BURIAL_DESCRIPTION': 'Place of burial',
+    'LNG_CASE_FIELD_LABEL_BURIAL_PLACE_NAME_DESCRIPTION': 'Burial Place Name',
 
     'LNG_DATE_FIELD_LABEL_FROM': 'From',
     'LNG_DATE_FIELD_LABEL_TO': 'To',
