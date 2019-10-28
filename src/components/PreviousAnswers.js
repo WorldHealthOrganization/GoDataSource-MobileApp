@@ -35,6 +35,56 @@ class PreviousAnswers extends Component {
         };
     }
 
+    componentDidUpdate(prevProps) {
+        if (prevProps.previousAnswers !== undefined && this.props.previousAnswers !== undefined){
+            if( this.props.previousAnswers.length !== prevProps.previousAnswers.length){
+                this.setState({
+                    previousAnswers: this.props.previousAnswers
+                });
+            }else{
+                if( (this.props.previousAnswers[0].date !== prevProps.previousAnswers[0].date)
+                    || (this.props.previousAnswers[0].value !== prevProps.previousAnswers[0].value)){
+                    this.setState({
+                        previousAnswers: this.props.previousAnswers
+                    });
+                }else {
+                    let shouldUpdate = false;
+                    for (let i=0; i<this.props.previousAnswers.length; i++) {
+                        if(this.props.previousAnswers[i].hasOwnProperty('subAnswers')){
+                            //did not have subAnswer previously
+                            if(!prevProps.previousAnswers[i].hasOwnProperty('subAnswers')){
+                                shouldUpdate = true;
+                            }else {
+                                if (typeof this.props.previousAnswers[i].subAnswers === 'object') {
+                                    //did not have a key in subAnswers previously
+                                    if (typeof prevProps.previousAnswers[i].subAnswers !== 'object'){
+                                        shouldUpdate = true;
+                                    }else {
+                                        //has more keys in subAnswers than previously
+                                        if (Object.keys(this.props.previousAnswers[i].subAnswers).length !== Object.keys(prevProps.previousAnswers[i].subAnswers).length) {
+                                            shouldUpdate = true;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    if(shouldUpdate){
+                        this.setState({
+                            previousAnswers: this.props.previousAnswers
+                        });
+                    }
+                }
+            }
+        } else {
+            if (prevProps.previousAnswers === undefined && this.props.previousAnswers !== undefined){
+                this.setState({
+                    previousAnswers: this.props.previousAnswers
+                });
+            }
+        }
+    }
+
     // The render method should have at least business logic as possible,
     // because this will be called whenever there is a new setState call
     // and can slow down the app
@@ -186,7 +236,7 @@ class PreviousAnswers extends Component {
             previousAnswers: questionnaireAnswers,
             isModified: true
         }, () => {
-            // this.props.savePreviousAnswers(this.state.previousAnswers, this.props.previousAnswerVariable);
+            this.props.savePreviousAnswers(this.state.previousAnswers, this.props.previousAnswerVariable);
         });
     };
 
@@ -214,7 +264,7 @@ class PreviousAnswers extends Component {
             previousAnswers: questionnaireAnswers,
             isModified: true
         }, () => {
-            // this.props.savePreviousAnswers(this.state.previousAnswers, this.props.previousAnswerVariable);
+            this.props.savePreviousAnswers(this.state.previousAnswers, this.props.previousAnswerVariable);
         });
     };
 
@@ -242,7 +292,7 @@ class PreviousAnswers extends Component {
             isModified: true
         }, () => {
             console.log ('questionnaireAnswers', this.state.previousAnswers);
-            // this.props.savePreviousAnswers(this.state.previousAnswers, this.props.previousAnswerVariable);
+            this.props.savePreviousAnswers(this.state.previousAnswers, this.props.previousAnswerVariable);
         });
     };
 
@@ -269,7 +319,7 @@ class PreviousAnswers extends Component {
             previousAnswers: questionnaireAnswers,
             isModified: true
         }, () => {
-            // this.props.savePreviousAnswers(this.state.previousAnswers, this.props.previousAnswerVariable);
+            this.props.savePreviousAnswers(this.state.previousAnswers, this.props.previousAnswerVariable);
         });
     };
 
@@ -288,7 +338,7 @@ class PreviousAnswers extends Component {
             previousAnswers: questionnaireAnswers,
             isModified: true
         }, () => {
-            // this.props.savePreviousAnswers(this.state.previousAnswers, this.props.previousAnswerVariable);
+            this.props.savePreviousAnswers(this.state.previousAnswers, this.props.previousAnswerVariable);
         });
     };
 

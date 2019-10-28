@@ -1,18 +1,13 @@
 /**
  * Created by florinpopa on 04/07/2018.
  */
-import React, {PureComponent} from 'react';
-import {View, Text, StyleSheet} from 'react-native';
-import {Icon} from 'react-native-material-ui';
-import PropTypes from 'prop-types';
-import translations from './../utils/translations'
-import {getTranslation, calculateDimension, getTooltip} from './../utils/functions';
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
+import React, {PureComponent} from 'react';
+import {View, Text, StyleSheet} from 'react-native';
+import PropTypes from 'prop-types';
+import {getTranslation, getTooltip} from './../utils/functions';
 import { TextField } from 'react-native-material-textfield';
-import ElevatedView from 'react-native-elevated-view';
-import Ripple from 'react-native-material-ripple';
-import styles from './../styles';
 import TooltipComponent from './TooltipComponent'
 
 class TextInput extends PureComponent {
@@ -20,11 +15,12 @@ class TextInput extends PureComponent {
     // This will be a dumb component, so it's best not to put any business logic in it
     constructor(props) {
         super(props);
+        this.state = {
+            value: typeof this.props.value === 'number' ? isNaN(this.props.value) ? '' : this.props.value.toString() : this.props.value && this.props.value != undefined && (typeof this.props.value === 'string' || typeof this.props.value === 'number') ? this.props.value.toString() : ''
+        };
     }
 
     // Please add here the react lifecycle methods that you need
-
-
     // The render method should have at least business logic as possible,
     // because this will be called whenever there is a new setState call
     // and can slow down the app
@@ -38,13 +34,13 @@ class TextInput extends PureComponent {
 
     // Please write here all the methods that are not react native lifecycle methods
     editInput = () => {
-        let tooltip = getTooltip(this.props.label, this.props.translation)
+        let tooltip = getTooltip(this.props.label, this.props.translation);
         return (
             <View style={[{flexDirection: 'row'},this.props.style]}>
                 <View style={{flex: 1}}> 
                     <TextField
                         label={this.props.isRequired ? getTranslation(this.props.label, this.props.translation) + ' * ' : getTranslation(this.props.label, this.props.translation)}
-                        value={typeof this.props.value === 'number' ? isNaN(this.props.value) ? '' : this.props.value.toString() : this.props.value && this.props.value != undefined && (typeof this.props.value === 'string' || typeof this.props.value === 'number') ? this.props.value.toString() : ''}
+                        value={this.state.value}
                         onChangeText={this.handleOnChangeText}
                         textColor='rgb(0,0,0)'
                         fontSize={15}
@@ -55,13 +51,13 @@ class TextInput extends PureComponent {
                             textAlign: 'left'
                         }}
                         tintColor='rgb(77,176,160)'
-                        multiline={this.props.multiline != undefined ? this.props.multiline : false}
+                        multiline={this.props.multiline !== undefined ? this.props.multiline : false}
                         onPress={() => {console.log("On press textInput")}}
                         keyboardType={this.props.keyboardType ? this.props.keyboardType : 'default'}
-                        onSubmitEditing={this.props.onSubmitEditing}
+                        onSubmitEditing={this.handleSubmitEditing}
                         secureTextEntry={this.props.secureTextEntry}
                         onFocus={this.props.onFocus}
-                        onBlur={this.props.onBlur}
+                        onBlur={this.handleBlur}
                     />
                 </View>
                 {
@@ -76,8 +72,8 @@ class TextInput extends PureComponent {
     };
 
     viewInput = () => {
-        let localValue = this.extractAgeForViewInput()
-        let tooltip = getTooltip(this.props.label, this.props.translation)
+        let localValue = this.extractAgeForViewInput();
+        let tooltip = getTooltip(this.props.label, this.props.translation);
         return (
             <View style={[{flexDirection: 'row'},this.props.style]}>
                 <View style={{flex: 1}}>
@@ -109,7 +105,7 @@ class TextInput extends PureComponent {
                 }
             </View>
         );
-    }
+    };
 
     extractAgeForViewInput = () => {
         let localValue = typeof this.props.value === 'number' ? this.props.value : '';
@@ -126,26 +122,51 @@ class TextInput extends PureComponent {
             }
         }
         return localValue
-    }
+    };
 
     handleOnChangeText = (state) => {
+        this.setState({value: state});
+    };
+
+    handleBlur = () => {
         if (this.props.labelValue) {
             //QuestionCard
-            console.log("textInput has this.props.labelValue: ", this.props.data, state);
-                this.props.onChange(
-                    state,
-                    this.props.id
-                )
+            console.log("textInput has this.props.labelValue: ", this.props.data, this.state.value);
+            this.props.onChange(
+                this.state.value,
+                this.props.id
+            )
         } else {
             //CardComponent
             this.props.onChange(
-                state,
+                this.state.value,
                 this.props.id,
                 this.props.objectType ? (this.props.objectType === 'Address' || this.props.objectType === 'LabResult' || this.props.objectType === 'Documents' || this.props.objectType === 'DateRanges' ? this.props.index : this.props.objectType) : null,
                 this.props.objectType
             )
         }
-    }
+        this.props.onBlur();
+    };
+
+    handleSubmitEditing = () => {
+        if (this.props.labelValue) {
+            //QuestionCard
+            console.log("textInput has this.props.labelValue: ", this.props.data, this.state.value);
+            this.props.onChange(
+                this.state.value,
+                this.props.id
+            )
+        } else {
+            //CardComponent
+            this.props.onChange(
+                this.state.value,
+                this.props.id,
+                this.props.objectType ? (this.props.objectType === 'Address' || this.props.objectType === 'LabResult' || this.props.objectType === 'Documents' || this.props.objectType === 'DateRanges' ? this.props.index : this.props.objectType) : null,
+                this.props.objectType
+            )
+        }
+        this.props.onSubmitEditing();
+    };
 }
 
 // Create style outside the class, or for components that will be used by other components (buttons),
@@ -158,7 +179,6 @@ const style = StyleSheet.create({
 
     }
 });
-
 
 TextInput.propTypes = {
     id: PropTypes.string.isRequired,
