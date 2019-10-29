@@ -19,13 +19,15 @@ import Menu, { MenuItem } from 'react-native-material-menu';
 import Ripple from 'react-native-material-ripple';
 import { createFollowUp, updateFollowUpAndContact, deleteFollowUp } from './../actions/followUps';
 import { removeErrors } from './../actions/errors';
-import _ from 'lodash';
+import _, {sortBy} from 'lodash';
 import { calculateDimension, extractIdFromPouchId, updateRequiredFields, getTranslation, mapAnswers, reMapAnswers, createDate } from './../utils/functions';
 import translations from './../utils/translations'
 import ElevatedView from 'react-native-elevated-view';
 import ViewHOC from './../components/ViewHOC';
 import moment from 'moment';
 import {checkArrayAndLength} from './../utils/typeCheckingFunctions';
+import {extractAllQuestions} from "../utils/functions";
+import cloneDeep from "lodash/cloneDeep";
 
 class FollowUpsSingleScreen extends Component {
 
@@ -674,12 +676,14 @@ class FollowUpsSingleScreen extends Component {
     handleOnPressSave = () => {
         // Mark followUp as performed, and then update to the server
         let now = createDate(null);
+        let questionnaireAnswers = reMapAnswers(_.cloneDeep(this.state.previousAnswers));
+        questionnaireAnswers = this.filterUnasweredQuestions();
         this.setState(prevState => ({
             item: Object.assign({}, prevState.item,
                 {
                     updatedAt: now.toISOString(),
                     updatedBy: extractIdFromPouchId(this.props.user._id, 'user.json'),
-                    questionnaireAnswers: reMapAnswers(_.cloneDeep(this.state.previousAnswers))
+                    questionnaireAnswers: questionnaireAnswers
                 }
             ),
             contact: Object.assign({}, prevState.contact, {
@@ -886,6 +890,35 @@ class FollowUpsSingleScreen extends Component {
             previousAnswers: previousAnswersClone,
             isModified: true
         });
+    };
+    filterUnasweredQuestions = () => {
+        let previousAnswersClone = _.cloneDeep(this.state.previousAnswers);
+        let sortedQuestions = sortBy(cloneDeep(this.props.contactFollowUpTemplate), ['order', 'variable']);
+        sortedQuestions = extractAllQuestions(sortedQuestions, this.state.previousAnswers, 0);
+        if( Array.isArray(sortedQuestions) && sortedQuestions.length > 0) {
+            for (let i = 0; i < sortedQuestions.length; i++) {
+                //verify only multianswer questions and if they were answered
+                if (sortedQuestions[i].multiAnswer && previousAnswersClone.hasOwnProperty(sortedQuestions[i].variable)) {
+                    //current answers
+                    let answerValues = previousAnswersClone[sortedQuestions[i].variable];
+                    let answerValuesClone = [];
+                    //validate all the answers of the question
+                    if( Array.isArray(answerValues) && answerValues.length > 0){
+                        answerValuesClone = answerValues.filter((answer)=>{
+                            return answer.value !== null;
+                        });
+                    }
+                    if(answerValuesClone.length > 0){
+                        //update answer list
+                        previousAnswersClone[sortedQuestions[i].variable] = answerValuesClone;
+                    }else{
+                        //remove key
+                        delete previousAnswersClone[sortedQuestions[i].variable];
+                    }
+                }
+            }
+        }
+        return previousAnswersClone;
     };
 }
 

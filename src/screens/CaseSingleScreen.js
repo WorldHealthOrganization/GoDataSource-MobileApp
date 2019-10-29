@@ -501,7 +501,18 @@ class CaseSingleScreen extends Component {
                                     if (response) {
                                         // console.log('getCasessNameForDuplicateCheckRequest response: ', response);
                                         if (response.length === 0) {
-                                            this.saveCaseAction()
+                                            if( this.checkAnswerDatesQuestionnaire()){
+                                                this.saveCaseAction()
+                                            }else{
+                                                this.setState({ loading: false }, () => {
+                                                    Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.answerDateMissingError, this.props.translation), [
+                                                        {
+                                                            text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+                                                            onPress: () => { this.hideMenu() }
+                                                        }
+                                                    ])
+                                                })
+                                            }
                                         } else {
                                             Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.caseDuplicateNameError, this.props.translation), [
                                                 {
@@ -516,7 +527,20 @@ class CaseSingleScreen extends Component {
                                                 },
                                                 {
                                                     text: getTranslation(translations.alertMessages.saveAnywayLabel, this.props.translation),
-                                                    onPress: () => { this.saveCaseAction() }
+                                                    onPress: () => {
+                                                        if( this.checkAnswerDatesQuestionnaire()){
+                                                            this.saveCaseAction()
+                                                        }else{
+                                                            this.setState({ loading: false }, () => {
+                                                                Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.answerDateMissingError, this.props.translation), [
+                                                                    {
+                                                                        text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+                                                                        onPress: () => { this.hideMenu() }
+                                                                    }
+                                                                ])
+                                                            })
+                                                        }
+                                                    }
                                                 }
                                             ])
                                         }
@@ -580,6 +604,7 @@ class CaseSingleScreen extends Component {
         let caseClone = _.cloneDeep(this.state.case);
         // Remap the previous answers
         let questionnaireAnswers = reMapAnswers(_.cloneDeep(this.state.previousAnswers));
+        questionnaireAnswers = this.filterUnasweredQuestions();
         caseClone.age = ageConfig.ageClone;
         caseClone.dob = ageConfig.dobClone;
         caseClone.questionnaireAnswers = questionnaireAnswers;
@@ -1874,6 +1899,61 @@ class CaseSingleScreen extends Component {
             previousAnswers: previousAnswersClone,
             isModified: true
         });
+    };
+    checkAnswerDatesQuestionnaire = () => {
+        let previousAnswersClone = _.cloneDeep(this.state.previousAnswers);
+        let sortedQuestions = sortBy(cloneDeep(this.props.caseInvestigationQuestions), ['order', 'variable']);
+        sortedQuestions = extractAllQuestions(sortedQuestions, this.state.previousAnswers, 0);
+        let canSave = true;
+        //questions exist
+        if( Array.isArray(sortedQuestions) && sortedQuestions.length > 0){
+            for(let i=0; i < sortedQuestions.length; i++){
+                //verify only multianswer questions and if they were answered
+                if(sortedQuestions[i].multiAnswer && previousAnswersClone.hasOwnProperty(sortedQuestions[i].variable)){
+                    //current answers
+                    let answerValues = previousAnswersClone[sortedQuestions[i].variable];
+                    //validate all the answers of the question
+                    if( Array.isArray(answerValues) && answerValues.length > 0){
+                        for( let q=0; q < answerValues.length; q++){
+                            // if it has value then it must have date
+                            if(answerValues[q].value !== null && answerValues[q].date === null){
+                                canSave = false;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return canSave;
+    };
+    filterUnasweredQuestions = () => {
+        let previousAnswersClone = _.cloneDeep(this.state.previousAnswers);
+        let sortedQuestions = sortBy(cloneDeep(this.props.caseInvestigationQuestions), ['order', 'variable']);
+        sortedQuestions = extractAllQuestions(sortedQuestions, this.state.previousAnswers, 0);
+        if( Array.isArray(sortedQuestions) && sortedQuestions.length > 0) {
+            for (let i = 0; i < sortedQuestions.length; i++) {
+                //verify only multianswer questions and if they were answered
+                if (sortedQuestions[i].multiAnswer && previousAnswersClone.hasOwnProperty(sortedQuestions[i].variable)) {
+                    //current answers
+                    let answerValues = previousAnswersClone[sortedQuestions[i].variable];
+                    let answerValuesClone = [];
+                    //validate all the answers of the question
+                    if( Array.isArray(answerValues) && answerValues.length > 0){
+                        answerValuesClone = answerValues.filter((answer)=>{
+                            return answer.value !== null;
+                        });
+                    }
+                    if(answerValuesClone.length > 0){
+                        //update answer list
+                        previousAnswersClone[sortedQuestions[i].variable] = answerValuesClone;
+                    }else{
+                        //remove key
+                        delete previousAnswersClone[sortedQuestions[i].variable];
+                    }
+                }
+            }
+        }
+        return previousAnswersClone;
     };
 }
 

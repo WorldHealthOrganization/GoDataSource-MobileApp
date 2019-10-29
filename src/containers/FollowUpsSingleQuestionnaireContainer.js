@@ -23,6 +23,7 @@ import { sortBy } from 'lodash';
 import translations from './../utils/translations'
 import cloneDeep from "lodash/cloneDeep";
 import uniqueId from "lodash/uniqueId";
+import _ from "lodash";
 
 class FollowUpsSingleQuestionnaireContainer extends Component {
 
@@ -156,7 +157,16 @@ class FollowUpsSingleQuestionnaireContainer extends Component {
         checkRequiredFields = checkRequiredFields.map((e) => { return getTranslation(e, this.props.translation) });
         console.log("Check required questions: ", checkRequiredFields);
         if (checkRequiredFields && Array.isArray(checkRequiredFields) && checkRequiredFields.length === 0) {
-            this.props.onPressSave();
+            if( this.checkAnswerDatesQuestionnaire()){
+                this.props.onPressSave();
+            }else{
+                Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.answerDateMissingError, this.props.translation), [
+                    {
+                        text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+                        onPress: () => { console.log("OK pressed") }
+                    }
+                ])
+            }
         } else {
             Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), `${getTranslation(translations.alertMessages.requiredFieldsMissingError, this.props.translation)}.\n${getTranslation(translations.alertMessages.missingFields, this.props.translation)}: ${checkRequiredFields}`, [
                 {
@@ -165,6 +175,33 @@ class FollowUpsSingleQuestionnaireContainer extends Component {
                 }
             ])
         }
+    };
+
+    checkAnswerDatesQuestionnaire = () => {
+        let previousAnswersClone = _.cloneDeep(this.props.previousAnswers);
+        let sortedQuestions = sortBy(cloneDeep(this.props.questions), ['order', 'variable']);
+        sortedQuestions = extractAllQuestions(sortedQuestions, this.props.previousAnswers, 0);
+        let canSave = true;
+        //questions exist
+        if( Array.isArray(sortedQuestions) && sortedQuestions.length > 0){
+            for(let i=0; i < sortedQuestions.length; i++){
+                //verify only multianswer questions and if they were answered
+                if(sortedQuestions[i].multiAnswer && previousAnswersClone.hasOwnProperty(sortedQuestions[i].variable)){
+                    //current answers
+                    let answerValues = previousAnswersClone[sortedQuestions[i].variable];
+                    //validate all the answers of the question
+                    if( Array.isArray(answerValues) && answerValues.length > 0){
+                        for( let q=0; q < answerValues.length; q++){
+                            // if it has value then it must have date
+                            if(answerValues[q].value !== null && answerValues[q].date === null){
+                                canSave = false;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return canSave;
     };
 
     handleOnFocus = (event) => {
