@@ -108,19 +108,6 @@ class PreviousAnswers extends Component {
                     </Ripple>
                 </View>
                 <View style={style.mapContainer} contentContainerStyle={style.containerContent}>
-                    <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-                        <Button
-                            title={`${getTranslation(translations.generalButtons.saveButtonLabel, this.props.translation)} ${getTranslation(translations.questionCardLabels.previousAnswers, this.props.translation)}`}
-                            onPress={() => {this.savePreviousAnswers()}}
-                            color={styles.buttonGreen}
-                            titleColor={'white'}
-                            height={calculateDimension(25, true, this.props.screenSize)}
-                            width={calculateDimension(166, false, this.props.screenSize)}
-                            style={{
-                                marginVertical: calculateDimension(12.5, true, this.props.screenSize),
-                                marginRight: 10,
-                            }} />
-                    </View>
                     {
                         this.state && this.state.previousAnswers && Array.isArray(this.state.previousAnswers) && this.state.previousAnswers.length > 0 && this.state.previousAnswers.map((previousAnswer, index) => {
                             return this.renderListOfPreviousAnswers(previousAnswer, index);

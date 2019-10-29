@@ -145,7 +145,9 @@ class TextInput extends PureComponent {
                 this.props.objectType
             )
         }
-        this.props.onBlur();
+        if ( this.props.onBlur !== undefined) {
+            this.props.onBlur();
+        }
     };
 
     handleSubmitEditing = () => {
@@ -165,7 +167,9 @@ class TextInput extends PureComponent {
                 this.props.objectType
             )
         }
-        this.props.onSubmitEditing();
+        if ( this.props.onSubmitEditing !== undefined) {
+            this.props.onSubmitEditing();
+        }
     };
 }
 

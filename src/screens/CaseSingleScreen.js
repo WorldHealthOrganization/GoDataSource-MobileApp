@@ -1848,6 +1848,8 @@ class CaseSingleScreen extends Component {
         let previousAnswersClone = _.cloneDeep(this.state.previousAnswers);
         if(previousAnswersClone.hasOwnProperty(item.variable) && item.variable){
             previousAnswersClone[item.variable].push({date: null, value: null});
+        } else {
+            previousAnswersClone = Object.assign({}, previousAnswersClone, { [item.variable]: [{date: null, value: null}] });
         }
         this.savePreviousAnswers(previousAnswersClone[item.variable], item.variable);
     };
