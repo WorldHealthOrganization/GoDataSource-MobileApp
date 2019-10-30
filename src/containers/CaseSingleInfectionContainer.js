@@ -13,12 +13,9 @@ import styles from './../styles';
 import Ripple from 'react-native-material-ripple';
 import CardComponent from './../components/CardComponent';
 import Button from './../components/Button';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import translations from './../utils/translations'
 import ElevatedView from 'react-native-elevated-view';
 import _ from 'lodash';
-import moment from 'moment';
-import get from "lodash/get";
 
 class CaseSingleInfectionContainer extends Component {
 
@@ -182,7 +179,7 @@ class CaseSingleInfectionContainer extends Component {
 
         if (this.props.case.outcomeId !== config.caseFieldsForHardCodeCheck.outcomeIdDeceasedValue) {
             fields = fields.filter((field) => {
-                return field.id !== 'safeBurial' && field.id !== 'dateOfBurial'
+                return field.id !== 'safeBurial' && field.id !== 'dateOfBurial' && field.id !== 'burialLocationId' && field.id !== 'burialPlaceName'
             });
         }
 
@@ -267,6 +264,16 @@ class CaseSingleInfectionContainer extends Component {
                     }
                 }
             }
+
+            if(item.objectType === 'Case'){
+                for (let i = 0; i < this.props.locations.length; i++) {
+                    let myLocationName = this.getLocationNameById(this.props.locations[i], this.props.case[item.id]);
+                    if (myLocationName !== null) {
+                        value = myLocationName;
+                        break
+                    }
+                }
+            }
         } else if (item.type === 'SwitchInput' && this.props.case[item.id] !== undefined) {
             value = this.props.case[item.id]
         } else {
@@ -302,11 +309,16 @@ class CaseSingleInfectionContainer extends Component {
                     item.objectType !== null && item.objectType !== undefined && item.objectType === 'IsolationDates' ?
                         this.props.handleOnPressDeleteIsolationDates :
                         null}
-                onChangeSectionedDropDown={item.objectType !== null && item.objectType !== undefined && item.objectType === 'DateRanges' ?
-                    this.props.onChangeSectionedDropDownDateRange :
-                    item.objectType !== null && item.objectType !== undefined && item.objectType === 'IsolationDates' ?
-                        this.props.onChangeSectionedDropDownIsolation :
-                        null}
+                onChangeSectionedDropDown={
+                    item.objectType !== null && item.objectType !== undefined && item.objectType === 'DateRanges' ?
+                        this.props.onChangeSectionedDropDownDateRange :
+                        (item.objectType !== null && item.objectType !== undefined && item.objectType === 'IsolationDates' ?
+                            this.props.onChangeSectionedDropDownIsolation :
+                            (item.objectType !== null && item.objectType !== undefined && item.objectType === 'Case' ?
+                                this.props.onChangeSectionedDropDownBurial : null
+                            )
+                        )
+                }
                 onFocus={this.handleOnFocus}
                 onBlur={this.handleOnBlur}
             />
@@ -328,7 +340,7 @@ class CaseSingleInfectionContainer extends Component {
                 }
             } else if (item.id === 'dateDeceased') {
                 maximumDate = createDate(null);
-                let hasDateOfOnset = false
+                let hasDateOfOnset = false;
                 let hasDateOfReporting = false;
                 let hasDateOfInfection = false;
 
@@ -367,16 +379,6 @@ class CaseSingleInfectionContainer extends Component {
                     }
                 }
             }
-            // else if (item.objectType === 'IsolationDates'){
-            //     if (this.props.case && this.props.case.isolationDates && Array.isArray(this.props.case.isolationDates) && this.props.case.isolationDates.length > 0 && this.props.case.isolationDates[cardIndex]) {
-            //         if (this.props.case.isolationDates[cardIndex].startDate !== null && item.id !== 'startDate') {
-            //             minimumDate = this.props.case.isolationDates[cardIndex].startDate
-            //         }
-            //         if (this.props.case.isolationDates[cardIndex].endDate !== null && item.id !== 'endDate') {
-            //             maximumDate = this.props.case.isolationDates[cardIndex].endDate
-            //         }
-            //     }
-            // }
         }
 
         let dateValidation = { minimumDate, maximumDate };
@@ -512,7 +514,7 @@ class CaseSingleInfectionContainer extends Component {
     handleOnBlur = (event) => {
         // this.scrollCasesSingleInfection.props.scrollToPosition(0, 0, false)
         // this.scrollToInput(findNodeHandle(event.target))
-    }
+    };
 
     scrollToInput(reactNode) {
         // Add a 'scroll' ref to your ScrollView

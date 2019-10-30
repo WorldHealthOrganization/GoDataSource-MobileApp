@@ -758,6 +758,28 @@ const caseSingleScreen = {
                     format: 'YYYY-MM-dd',
                     objectType: 'Case'
                 },
+                {
+                    cardNumber: 1,
+                    id: 'burialLocationId',
+                    label: translations.caseSingleScreen.burialLocationId,
+                    labelValue: 'test',
+                    type: "DropDownSectioned",
+                    value: '',
+                    isRequired: false,
+                    isEditMode: false,
+                    objectType: 'Case',
+                    single: true
+                },
+                {
+                    cardNumber: 1,
+                    id: 'burialPlaceName',
+                    label: translations.caseSingleScreen.burialPlaceName,
+                    value: '',
+                    type: "TextInput",
+                    isRequired: false,
+                    isEditMode: false,
+                    objectType: 'Case'
+                }
                 // {
                 //     cardNumber: 1,
                 //     id: 'dateDeceased',
