@@ -23,7 +23,7 @@ export function storeLocations(locations) {
 }
 
 export function getLocations(locationIds) {
-    let start = new Date().getTime();
+    // let start = new Date().getTime();
     return new Promise((resolve, reject) => {
         getLocationsByOutbreakIdRequest(null, (error, responseLocations) => {
             if (error) {
@@ -31,15 +31,15 @@ export function getLocations(locationIds) {
                 reject(errorTypes.ERROR_LOCATIONS);
             }
             if (responseLocations) {
-                console.log('*** getLocationsByOutbreakId response: ');
+                // console.log('*** getLocationsByOutbreakId response: ');
                 let treeLocationList = [];
                 if (responseLocations.length > 0) {
                     treeLocationList = mapLocations(responseLocations.filter((e) => {return e.active === true}));
-                    console.log('Map locations: ', new Date().getTime() - start);
+                    // console.log('Map locations: ', new Date().getTime() - start);
                     if (locationIds && Array.isArray(locationIds) && locationIds.length > 0) {
                         treeLocationList = extractLocations(treeLocationList, locationIds);
                     }
-                    console.log('Map locations: ', new Date().getTime() - start);
+                    // console.log('Map locations: ', new Date().getTime() - start);
                 }
                 resolve({locations: {locationsList: responseLocations, treeLocationsList: treeLocationList}});
             }

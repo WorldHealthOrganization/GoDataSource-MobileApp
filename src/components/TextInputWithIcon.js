@@ -4,16 +4,13 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
-import {TextInput, View, Text, StyleSheet, Platform, Dimensions} from 'react-native';
-import {ListItem, Icon} from 'react-native-material-ui';
-import {calculateDimension, getTranslation} from './../utils/functions';
-import config from './../utils/config';
+import {TextInput, View, Text, StyleSheet} from 'react-native';
+import {Icon} from 'react-native-material-ui';
+import {getTranslation} from './../utils/functions';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
-import {TextField} from 'react-native-material-textfield';
-import Button from './Button';
-import styles from './../styles';
-import translations from './../utils/translations'
+import translations from './../utils/translations';
+import get from 'lodash/get';
 
 class TextInputWithIcon extends Component {
 
@@ -48,6 +45,7 @@ class TextInputWithIcon extends Component {
                     underlineColorAndroid={'transparent'}
                     onChangeText={this.handleTextChange}
                     onSubmitEditing={this.handleOnSubmitEditing}
+                    onEndEditing={this.handleOnEndEditing}
                     translation={this.props.translation}
                 />
             </View>
@@ -71,7 +69,11 @@ class TextInputWithIcon extends Component {
 
     handleOnSubmitEditing = () => {
         this.props.onSubmitEditing(this.state.search);
-    }
+    };
+
+    handleOnEndEditing = (event) => {
+        this.props.onEndEditing(get(event, 'nativeEvent.text'));
+    };
 }
 
 

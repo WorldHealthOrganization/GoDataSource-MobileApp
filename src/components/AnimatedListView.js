@@ -1,17 +1,16 @@
 /**
  * Created by florinpopa on 23/07/2018.
  */
-import React, {Component} from 'react';
-import {TextInput, View, Text, StyleSheet, Animated, FlatList, Alert} from 'react-native';
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
+import React, {Component} from 'react';
+import {View, Text, StyleSheet, Animated, FlatList, Alert} from 'react-native';
 import {calculateDimension, getTranslation} from './../utils/functions';
 import styles from './../styles';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import translations from './../utils/translations';
 import get from 'lodash/get';
-import {extractIdFromPouchId} from "../utils/functions";
 import PersonListItem from "./PersonListItem";
 import PropTypes from 'prop-types';
 import SearchFilterView from "./SearchFilterView";
@@ -58,13 +57,6 @@ class AnimatedListView extends Component {
     );
 
     // Please add here the react lifecycle methods that you need
-
-    // shouldComponentUpdate(nextProps, nextState) {
-    //     if (!isEqual(nextProps.data, this.props.data)) {
-    //         return true;
-    //     }
-    //     return false;
-    // }
 
     // The render method should have at least business logic as possible,
     // because this will be called whenever there is a new setState call
@@ -116,6 +108,7 @@ class AnimatedListView extends Component {
                             onPress={this.props.onPressFilter}
                             onChangeText={this.handleOnChangeText}
                             onSubmitEditing={this.handleOnSubmitEditing}
+                            onEndEditing={this.handleOnEndEditing}
                             filterText={this.props.filterText}
                         />
                         {/*<Text>{this.props.dataCount} results</Text>*/}
@@ -285,6 +278,10 @@ class AnimatedListView extends Component {
     };
 
     handleOnSubmitEditing = () => {
+        console.log("OnSubmitEditing");
+    };
+
+    handleOnEndEditing = (text) => {
         this.props.onSearch(this.state.searchText);
     };
 
@@ -295,7 +292,7 @@ class AnimatedListView extends Component {
             let placeOfResidence = person.addresses.find((e) => {
                 return e.typeId === config.userResidenceAddress.userPlaceOfResidence
             });
-            console.log('placeOfResidence', placeOfResidence)
+            // console.log('placeOfResidence', placeOfResidence);
             let placeOfResidenceLatitude = get(placeOfResidence, 'geoLocation.coordinates[1]', 0);
             let placeOfResidenceLongitude = get(placeOfResidence, 'geoLocation.coordinates[1]', 0);
             navigator.geolocation.getCurrentPosition(

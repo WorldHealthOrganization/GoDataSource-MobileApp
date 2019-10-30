@@ -71,7 +71,6 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                 return true;
             };
 
-
             render() {
                 let props = Object.assign({},
                     this.props,
@@ -246,6 +245,10 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                     case 'FollowUpsScreen':
                         forwardProps.item = dataToForward;
                         forwardProps.contact = contactData;
+                        // forwardProps.elementId = dataToForward._id;
+                        // forwardProps.additionalId = contactData._id;
+                        // forwardProps.elementType = 'followUp';
+                        // forwardProps.previousScreen = 'FollowUps';
                         break;
                     case 'ContactsScreen':
                         forwardProps.contact = dataToForward;
@@ -354,6 +357,7 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                         switch (method) {
                             case 'onPressView':
                                 forwardScreen = constants.appScreens.followUpSingleScreen;
+                                // forwardScreen = constants.appScreens.viewEditScreen;
                                 break;
                             case 'onPressAddExposure':
                                 forwardScreen = constants.appScreens.exposureScreen;

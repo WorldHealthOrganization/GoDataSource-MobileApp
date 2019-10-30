@@ -21,7 +21,7 @@ if (Platform.OS === 'ios') {
     KeyboardManager.setKeyboardDistanceFromTextField(10);
     KeyboardManager.setPreventShowingBottomBlankSpace(true);
     KeyboardManager.setEnableAutoToolbar(true);
-    KeyboardManager.setToolbarDoneBarButtonItemText("Done");
+    KeyboardManager.setToolbarDoneBarButtonItemText("Close");
     KeyboardManager.setToolbarManageBehaviour(0);
     KeyboardManager.setToolbarPreviousNextButtonEnable(false);
     KeyboardManager.setShouldToolbarUsesTextFieldTintColor(false);

@@ -4,14 +4,14 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
-import {TextInput, View, Text, StyleSheet, Platform, Dimensions, Animated} from 'react-native';
-import {ListItem, Icon} from 'react-native-material-ui';
+import {View, StyleSheet, Animated} from 'react-native';
+import ElevatedView from 'react-native-elevated-view';
 import {calculateDimension} from './../utils/functions';
-import config from './../utils/config';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
-import {TextField} from 'react-native-material-textfield';
+import PropTypes from 'prop-types';
 import Button from './Button';
+import IconButton from './ButtonWithIcons';
 import styles from './../styles';
 import TextInputWithIcon from './TextInputWithIcon';
 
@@ -47,9 +47,25 @@ class SearchFilterView extends Component {
                     marginHorizontal: calculateDimension(16, false, this.props.screenSize),
                     marginVertical: calculateDimension(12.5, true, this.props.screenSize)
                 }]}>
-                    <TextInputWithIcon onSubmitEditing={this.props.onSubmitEditing} onChangeText={this.props.onChangeText} value={this.props.value} />
-                    <Button title={this.props.filterText} color="white" titleColor={styles.buttonTextGray}
-                            onPress={this.props.onPress} height={25} width={35}/>
+                    <TextInputWithIcon
+                        onSubmitEditing={this.props.onSubmitEditing}
+                        onChangeText={this.props.onChangeText}
+                        onEndEditing={this.props.onEndEditing}
+                        value={this.props.value}
+                    />
+                    {/*<Button title={this.props.filterText} color="white" titleColor={styles.buttonTextGray}*/}
+                            {/*onPress={this.props.onPress} height={25} width={35}/>*/}
+                    <ElevatedView elevation={4}>
+                        <IconButton
+                            label={this.props.filterText}
+                            containerButton={{backgroundColor: 'white'}}
+                            onPress={this.props.onPress}
+                            firstIcon={null}
+                            isFirstIconPureMaterial={null}
+                            secondIcon={'filter-list'}
+                            isSecondIconPureMaterial={true}
+                        />
+                    </ElevatedView>
                 </View>
             </Animated.View>
         );
@@ -71,6 +87,25 @@ class SearchFilterView extends Component {
     };
 }
 
+SearchFilterView.propTypes = {
+    style: PropTypes.object,
+    value: PropTypes.string,
+    onPress: PropTypes.func,
+    onChangeText: PropTypes.func,
+    onSubmitEditing: PropTypes.func,
+    onEndEditing: PropTypes.func,
+    filterText: PropTypes.string
+};
+
+SearchFilterView.defaultProps = {
+    style: {},
+    value: '',
+    onPress: () => {console.log('SearchFilterView default onPress')},
+    onChangeText: () => {console.log('SearchFilterView default onChangeText')},
+    onSubmitEditing: () => {console.log('SearchFilterView default onSubmitEditing')},
+    onEndEditing: () => {console.log('SearchFilterView default onEndEditing')},
+    filterText: 'Filter By'
+};
 
 // Create style outside the class, or for components that will be used by other components (buttons),
 // make a global style in the config directory

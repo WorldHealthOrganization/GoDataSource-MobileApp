@@ -5,7 +5,7 @@ import get from 'lodash/get';
 import {mapContactsAndFollowUps, createDate} from './../utils/functions';
 import {executeQuery, insertOrUpdate} from './../queries/sqlTools/helperMethods';
 import sqlConstants from './../queries/sqlTools/constants';
-import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
+import {checkArrayAndLength, checkInteger} from "../utils/typeCheckingFunctions";
 var jsonSql = require('json-sql')();
 jsonSql.setDialect('sqlite');
 import translations from './../utils/translations';
@@ -31,8 +31,6 @@ export function getFollowUpsForOutbreakId({outbreakId, followUpFilter, userTeams
         followUpCondition['FollowUps.statusId'] = followUpFilter.statusId
     }
     if (checkArrayAndLength(userTeams)) {
-        // userTeams = userTeams.concat([{teamId: null}]);
-        // userTeams = userTeams.concat([{teamId: ''}]);
         followUpCondition['$or'] = [
             {
                 ['FollowUps.teamId']: {'$in': userTeams.map((e) => e.teamId)}
@@ -173,6 +171,29 @@ export function generalMapping(unmappedData) {
 
         return mappedObject;
     })
+}
+
+export function getFollowUpById(followUpId, outbreakId) {
+    let queryObject = {
+        type: 'select',
+        table: 'followUp',
+        fields: [
+            {
+                table: 'followUp',
+                name: 'json',
+                alias: 'followUpData'
+            }
+        ],
+        condition: {
+            '_id': followUpId,
+            'outbreakId': outbreakId
+        }
+    };
+
+    return executeQuery(queryObject)
+        .then((result) => {
+            return get(result, '[0].followUpData', null);
+        })
 }
 
 export function updateFollowUpAndContact(followUp) {

@@ -20,6 +20,7 @@ const appScreens = {
     qrScanScreen: 'QRScanScreen',
     hubConfigScreen: 'HubConfigScreen',
     previousAnswersScreen: 'PreviousAnswersScreen',
+    viewEditScreen: 'ViewEditScreen',
 
     generateFollowUpsScreen: 'GenerateFollowUpScreen',
     inAppNotificationScreen: 'InAppNotificationScreen'

@@ -25,6 +25,7 @@ import HelpSingleScreen from './HelpSingleScreen';
 import QRScanScreen from './QRScanScreen';
 import HubConfigScreen from './HubConfigScreen';
 import PreviousAnswersScreen from './PreviousAnswersScreen';
+import ViewEditScreen from './ViewEditScreen';
 
 const screens = [
     {screen: constants.appScreens.loginScreen, component: LoginScreen},
@@ -47,7 +48,8 @@ const screens = [
     {screen: constants.appScreens.helpSingleScreen, component: HelpSingleScreen},
     {screen: constants.appScreens.qrScanScreen, component: QRScanScreen},
     {screen: constants.appScreens.hubConfigScreen, component: HubConfigScreen},
-    {screen: constants.appScreens.previousAnswersScreen, component: PreviousAnswersScreen}
+    {screen: constants.appScreens.previousAnswersScreen, component: PreviousAnswersScreen},
+    {screen: constants.appScreens.viewEditScreen, component: ViewEditScreen},
 ];
 
 export function registerScreens(store, Provider) {

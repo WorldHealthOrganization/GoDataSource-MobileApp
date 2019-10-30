@@ -76,7 +76,6 @@ const sortTab = {
 
     sortFirstName: 'LNG_CONTACT_FIELD_LABEL_FIRST_NAME',
     sortLastName: 'LNG_CONTACT_FIELD_LABEL_LAST_NAME',
-    // TODO add to API
     sortCreatedAt: 'LNG_SORT_CRITERIA_CREATED_AT',
     sortVisualId: 'LNG_SORT_CRITERIA_VISUAL_ID',
     sortUpdatedAt: 'LNG_SORT_CRITERIA_UPDATED_AT',
@@ -122,10 +121,8 @@ const caseSingleScreen = {
     transferRefused: 'LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED',
     riskReason: 'LNG_CASE_FIELD_LABEL_RISK_REASON',
 
-    // TODO add to backend
-    pregnancyStatus: 'LNG_CASE_FIELD_LABEL_PREGNANCY_STATUS',
+    pregnancyStatus: 'LNG_MOBILE_CASE_FIELD_LABEL_PREGNANCY_STATUS',
 
-    // TODO add to backend
     caseId: 'LNG_CASE_FIELD_LABEL_CASE_ID',
 
     documentType: 'LNG_CASE_FIELD_LABEL_DOCUMENT_TYPE',
@@ -199,9 +196,8 @@ const contactSingleScreen = {
     riskLevel: 'LNG_CONTACT_FIELD_LABEL_RISK_LEVEL',
     riskReason: 'LNG_CONTACT_FIELD_LABEL_RISK_REASON',
 
-    // TODO add to backend
     contactId: 'LNG_CONTACT_FIELD_LABEL_CONTACT_ID',
-    followUpFinalStatus: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_STATUS_DESCRIPTION'
+    followUpFinalStatus: 'LNG_MOBILE_CONTACT_FIELD_LABEL_FOLLOW_UP_STATUS_DESCRIPTION'
 };
 
 const exposureScreen = {
@@ -242,7 +238,6 @@ const casesScreen = {
     casesTitle: 'LNG_CASE_LIST_SCREEN_TITLE',
     viewButtonLabel: 'LNG_CASE_LIST_SCREEN_VIEW_BUTTON',
     addContactButtonLabel: 'LNG_CASE_LIST_SCREEN_ADD_CONTACT_BUTTON',
-    // TODO add to backend
     noCases: 'LNG_CASE_LIST_SCREEN_NO_CASES',
     contactExposures: 'LNG_CASE_LIST_SCREEN_SEE_CONTACTS'
 };
@@ -251,8 +246,6 @@ const contactsScreen = {
     contactsTitle: 'LNG_CONTACT_LIST_SCREEN_TITLE',
     addFollowupsButton: 'LNG_CONTACT_LIST_SCREEN_ADD_FOLLOW_UP_BUTTON',
     editButton: 'LNG_CONTACT_LIST_SCREEN_EDIT_BUTTON',
-
-    // TODO add to backend
     noContacts: 'LNG_CONTACT_LIST_SCREEN_NO_CONTACTS'
 };
 
@@ -335,20 +328,14 @@ const alertMessages = {
     addressOfResidenceError: 'LNG_DIALOG_ALERT_MESSAGE_PLEASE_ADD_THE_PLACE_OF_RESIDENCE_ADDRESS',
     addressRequiredFieldsMissing: 'LNG_DIALOG_ALERT_MESSAGE_ADD_AT_LEAST_ONE_ADDRESS_WITH_ALL_REQUERED_FIELDS_COMPLETED',
 
-    // TODO add translation to backend
     // Delete alert messages
     deleteDocument: 'LNG_DIALOG_ALERT_MESSAGE_ARE_YOU_SURE_YOU_WANT_TO_DELETE_THIS_DOCUMENT',
     deleteAddress: 'LNG_DIALOG_ALERT_MESSAGE_ARE_YOU_SURE_YOU_WANT_TO_DELETE_THIS_ADDRESS',
     deleteDateRange: 'LNG_DIALOG_ALERT_MESSAGE_ARE_YOU_SURE_YOU_WANT_TO_DELETE_THIS_DATE_RANGE',
 
     deletePreviousAnswer: 'LNG_DIALOG_ALERT_MESSAGE_ARE_YOU_SURE_YOU_WANT_TO_DELETE_THIS_ANSWER',
-
     replaceCurrentCoordinates: 'LNG_DIALOG_ALERT_MESSAGE_DO_YOU_WANT_TO_REPLACE_CURRENT_COORDINATES_WITH_LOCATION_VALUES',
-
     androidBackButtonMsg: 'LNG_DIALOG_ALERT_MESSAGE_ARE_YOU_SURE_YOU_WANT_TO_EXIT_THE_APP',
-
-
-    // TODO add translation to backend
     copyAddress: 'LNG_DIALOG_ALERT_MESSAGE_ARE_YOU_SURE_YOU_WANT_TO_COPY_THE_ADDRESS_FROM_THE_PARENT_ENTITY'
 };
 
@@ -366,7 +353,7 @@ const generalButtons = {
 };
 
 const generalLabels = {
-    filterTitle: 'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER',
+    filterTitle: 'LNG_MOBILE_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER',
     applyFiltersButton: 'LNG_COMMON_BUTTON_LABEL_APPLY_FILTERS',
     resetFiltersButton: 'LNG_COMMON_BUTTON_LABEL_RESET_FILTERS',
     yesAnswer: 'LNG_COMMON_LABEL_YES',
@@ -435,7 +422,6 @@ const addressFieldLabels = {
     latitude: 'LNG_ADDRESS_FIELD_LABEL_LATITUDE',
     deleteButton: 'LNG_COMMON_BUTTON_DELETE',
     copyAddress: 'LNG_ADDRESS_FIELD_LABEL_COPY_ADDRESS',
-    // TODO add to backend
     isThePersonNextToYou: 'LNG_ADDRESS_FIELD_LABEL_IS_THE_PERSON_NEXT_TO_YOU'
 };
 
@@ -547,7 +533,6 @@ const previousAnswersScreen = {
     noPreviousAnswersToShowMessage: 'LNG_PREVIOUS_ANSWERS_SCREEN_NO_PREVIOUS_ANSWERS_TO_SHOW'
 };
 
-// TODO add to backend
 const followUpAgenda = {
     followUp: 'LNG_FOLLOW_UP_AGENDA_FOLLOW_UP',
     followUpStatus: 'LNG_FOLLOW_UP_AGENDA_FOLLOW_UP_STATUS',
@@ -556,7 +541,6 @@ const followUpAgenda = {
     noFollUpsForDate: 'LNG_FOLLOW_UP_AGENDA_NO_FOLLOW_UPS_FOR_DATE'
 };
 
-// TODO add to backend:
 const personListItem = {
     dayOfFollowUp: 'LNG_PERSON_LIST_ITEM_DAY_OF_FOLLOW_UP'
 };

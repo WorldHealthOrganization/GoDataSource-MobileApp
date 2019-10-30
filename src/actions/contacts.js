@@ -90,6 +90,8 @@ export function getContactById(outbreakId, contactId) {
     };
 
     return executeQuery(contactQueryObject)
+        .then((contacts) => Promise.resolve(get(contacts, '[0].contactJson', null)))
+
 }
 
 export function addContact(contact, periodOfFollowUp, userId) {
@@ -125,7 +127,7 @@ export function addExposureForContact(exposure, contact, periodOfFollowUp, userI
         .then(([contact, relationshipsArray]) => {
             relationshipsArray.push(exposure);
             // contact.relationships = relationshipsArray;
-            contact = get(contact, '[0].contactJson');
+            // contact = get(contact, '[0].contactJson');
             contact = updateContactFollowUpFields(contact, relationshipsArray, periodOfFollowUp);
             return updateContactRequest(contact)
         })
@@ -230,7 +232,8 @@ function updateContactFollowUpFields(contact, exposures, outbreakPeriodOfFollowu
         if (!contact.followUp.originalStartDate) {
             contact.followUp.originalStartDate = contact.followUp.startDate;
         }
-        contact.followUp.endDate = moment.utc(contact.followUp.startDate).add(outbreakPeriodOfFollowup, 'days')._d.toISOString();
+        contact.followUp.endDate = moment.utc(contact.followUp.startDate)
+            .add(outbreakPeriodOfFollowup > 0 ? outbreakPeriodOfFollowup - 1 : 0, 'days')._d.toISOString();
         if (oldStartDate !== contact.followUp.startDate) {
             contact.followUp.status = config.contactFollowUpStatuses.underFollowUp;
         }
