@@ -35,9 +35,7 @@ class QuestionCardContent extends PureComponent {
                         <View style = {{
                             flex: 1,
                             width: this.props.viewWidth,
-                            flexDirection: this.props.isEditMode ?
-                                // (this.props.item.answerType === 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_DATE_TIME' ? 'row' : 'column') : 'column'
-                                'row' : 'column'
+                            flexDirection: this.props.isEditMode ? 'row' : 'column'
                         }}>
                             <View style={{flexDirection: 'row', marginHorizontal: this.props.viewMarginHorizontal}}>
                                 <DatePicker
@@ -69,9 +67,7 @@ class QuestionCardContent extends PureComponent {
                             </View>
                             <View  style={{
                                 flexDirection: 'row',
-                                width: this.props.isEditMode ?
-                                    // (this.props.item.answerType === 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_DATE_TIME' ? this.props.viewWidth / 2 : this.props.viewWidth) :  this.props.viewWidth,
-                                    (this.props.viewWidth / 2) : this.props.viewWidth,
+                                width: this.props.isEditMode ? (this.props.viewWidth / 2) : this.props.viewWidth,
                             }}>
                                 <View style={{maxWidth:  this.props.isEditMode ? ( this.props.index === 0 ? (this.props.viewWidth / 2 ) - 25 : (this.props.viewWidth / 2 )) : this.props.viewWidth }}>
                                     { this.handleRenderItem(this.props.item) }
@@ -113,7 +109,8 @@ class QuestionCardContent extends PureComponent {
         // console.log('handleRenderItem: ', item);
         return (
             <View style={[style.containerCardComponent, {
-                minHeight: calculateDimension(72, true, this.props.screenSize)
+                minHeight: calculateDimension(72, true, this.props.screenSize),
+                maxWidth: this.props.viewWidth
             }]}>
                 {
                     this.handleRenderItemByType(item)
@@ -124,7 +121,9 @@ class QuestionCardContent extends PureComponent {
 
     handleRenderItemByType = (item, parentId) => {
         let answerDate = get(this.props, `source[${get(this.props, 'item.variable', null)}][${this.props.index}].date`, null);
+        let calculateWidth = this.props.isEditMode ? ( this.props.item.multiAnswer && !parentId ? (this.props.viewWidth / 2 ) - (this.props.isCollapsed ? 0 : 25) : 300) : 300;
         let width = calculateDimension(300, false, this.props.screenSize);
+        let alternateWidth = calculateDimension(calculateWidth, false, this.props.screenSize);
         let marginHorizontal = calculateDimension(14, false, this.props.screenSize);
         let source = cloneDeep(this.props.source);
         if (!source) {
@@ -247,7 +246,7 @@ class QuestionCardContent extends PureComponent {
                         }}
 
                         multiline={true}
-                        style={{width: width, marginHorizontal: marginHorizontal}}
+                        style={{width: alternateWidth, marginHorizontal: marginHorizontal}}
                         translation={this.props.translation}
                         screenSize={this.props.screenSize}
                         onFocus={this.props.onFocus}
@@ -271,7 +270,7 @@ class QuestionCardContent extends PureComponent {
                         }}
                         multiline={true}
                         keyboardType={'numeric'}
-                        style={{width: width, marginHorizontal: marginHorizontal}}
+                        style={{width: alternateWidth, marginHorizontal: marginHorizontal}}
                         translation={this.props.translation}
                         screenSize={this.props.screenSize}
                         onFocus={this.props.onFocus}
@@ -335,7 +334,7 @@ class QuestionCardContent extends PureComponent {
                             }
                             this.props.onChangeSingleSelection(valueToSend, id, parentId, this.props.index);
                         }}
-                        style={{width: width, marginHorizontal: marginHorizontal}}
+                        style={{width: alternateWidth, marginHorizontal: marginHorizontal}}
                         translation={this.props.translation}
                         screenSize={this.props.screenSize}
                     />
@@ -369,7 +368,7 @@ class QuestionCardContent extends PureComponent {
                             }
                             this.props.onChangeMultipleSelection(valueToSend, id, parentId, this.props.index);
                         }}
-                        style={{width: width, marginHorizontal: marginHorizontal}}
+                        style={{width: alternateWidth, marginHorizontal: marginHorizontal}}
                         dropDownStyle={{width: width, alignSelf: 'center'}}
                         showDropdown={this.state.showDropdown}
                     />
