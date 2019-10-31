@@ -96,24 +96,33 @@ class PreviousAnswers extends Component {
             >
                 <View style={{
                     backgroundColor: styles.screenBackgroundGrey,
-                    flexDirection: 'row-reverse',
+                    flexDirection: 'row',
                     alignSelf: 'center',
                     width: '100%',
+                    marginHorizontal: calculateDimension(24, false, this.props.screenSize),
+                    marginVertical: calculateDimension(5, true, this.props.screenSize),
+                    justifyContent: 'space-between',
                     borderTopColor: styles.screenBackgroundGrey,
                     borderTopWidth: 1
                 }}>
-
-                    <Ripple onPress={() => this.props.onCollapse(this.props.item)}>
-                        <Icon name="arrow-drop-down"/>
+                    <Text style={{ fontFamily: 'Roboto-Medium', fontSize: 16, marginLeft: 5, }}> { getTranslation(translations.questionCardLabels.previousAnswers, this.props.translation) } </Text>
+                    <Ripple style={{
+                        justifyContent: 'flex-end',
+                        width: calculateDimension(33, false, this.props.screenSize),
+                        height: calculateDimension(25, true, this.props.screenSize),
+                    }} onPress={() => this.props.onCollapse(this.props.item)}>
+                        <Icon name={this.props.isCollapsed ? "arrow-drop-up" : "arrow-drop-down"}/>
                     </Ripple>
                 </View>
-                <View style={style.mapContainer} contentContainerStyle={style.containerContent}>
-                    {
-                        this.state && this.state.previousAnswers && Array.isArray(this.state.previousAnswers) && this.state.previousAnswers.length > 0 && this.state.previousAnswers.map((previousAnswer, index) => {
-                            return this.renderListOfPreviousAnswers(previousAnswer, index);
-                        })
-                    }
-                </View>
+                { this.props.isCollapsed &&
+                    <View style={style.mapContainer} contentContainerStyle={style.containerContent}>
+                        {
+                            this.state && this.state.previousAnswers && Array.isArray(this.state.previousAnswers) && this.state.previousAnswers.length > 0 && this.state.previousAnswers.map((previousAnswer, index) => {
+                                return this.renderListOfPreviousAnswers(previousAnswer, index);
+                            })
+                        }
+                    </View>
+                }
             </ViewHOC>
         );
     }

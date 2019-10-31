@@ -56,7 +56,7 @@ class QuestionCard extends PureComponent {
         let viewHeight = calculateDimension(30, true, this.props.screenSize);
         let marginHorizontal = calculateDimension(14, false, this.props.screenSize);
         let buttonHeight = calculateDimension(25, true, this.props.screenSize);
-        let buttonWidth = calculateDimension(120, false, this.props.screenSize);
+        let buttonWidth = calculateDimension(165.5, false, this.props.screenSize);
         let index = this.calculateIndex(this.props.totalQuestions, this.props.index);
         return (
             <ElevatedView elevation={3} key={uniqueId('key_')} style={[this.props.style, style.container, {
@@ -87,7 +87,7 @@ class QuestionCard extends PureComponent {
                             <View
                                 style={{
                                     flexDirection: 'row',
-                                    justifyContent: 'space-between',
+                                    justifyContent: 'center',
                                     alignItems: 'center',
                                     width: viewWidth,
                                     marginHorizontal,
@@ -104,16 +104,6 @@ class QuestionCard extends PureComponent {
                                     onPress={() => {
                                         this.props.onCollapse(this.props.item, true);
                                         this.props.onClickAddNewMultiFrequencyAnswer(this.props.item)
-                                    }}
-                                />
-                                <Button
-                                    title={getTranslation(translations.questionCardLabels.previousAnswers, this.props.translation)}
-                                    width={buttonWidth}
-                                    height={buttonHeight}
-                                    titleColor={'white'}
-                                    color={styles.buttonGreen}
-                                    onPress={() => {
-                                        this.props.onCollapse(this.props.item)
                                     }}
                                 />
                             </View>
@@ -146,7 +136,7 @@ class QuestionCard extends PureComponent {
                         />
                     }
                     {
-                        this.props.item.multiAnswer && this.props.isEditMode && this.props.isCollapsed &&
+                        this.props.item.multiAnswer && this.props.isEditMode &&
                         <View>
                             <PreviousAnswers
                                 item={this.props.item}
@@ -155,6 +145,7 @@ class QuestionCard extends PureComponent {
                                 savePreviousAnswers={this.props.savePreviousAnswers}
                                 copyAnswerDate={this.props.copyAnswerDate}
                                 onCollapse={this.props.onCollapse}
+                                isCollapsed={this.props.isCollapsed}
                             />
                         </View>
                     }
