@@ -136,50 +136,6 @@ class FollowUpsSingleScreen extends Component {
         return true;
     }
 
-    // Please add here the react lifecycle methods that you need
-    // componentDidUpdate(prevProps) {
-    //     if (this.state.savePressed || this.state.deletePressed) {
-    //         if (this.props.startLoadingScreen !== undefined) {
-    //             this.props.startLoadingScreen();
-    //         }
-    //         this.props.navigator.pop(
-    //             {
-    //                 animated: true,
-    //                 animationType: 'fade',
-    //             }
-    //         )
-    //     }
-    // }
-
-
-    // static getDerivedStateFromProps(props, state) {
-    //     // console.log("FollowUpsSingleScreen: ", state);
-    //     if (props.errors && props.errors.type && props.errors.message) {
-    //         Alert.alert(props.errors.type, props.errors.message, [
-    //             {
-    //                 text: getTranslation(translations.alertMessages.okButtonLabel, props.translation),
-    //                 onPress: () => {
-    //                     state.savePressed = false;
-    //                     props.removeErrors()
-    //                 }
-    //             }
-    //         ])
-    //     } else {
-    //         if (state.savePressed || state.deletePressed) {
-    //             if (props.startLoadingScreen !== undefined) {
-    //                 props.startLoadingScreen()
-    //             }
-    //             props.navigator.pop(
-    //                 {
-    //                     animated: true,
-    //                     animationType: 'fade',
-    //                 }
-    //             )
-    //         }
-    //     }
-    //     return null;
-    // }
-
     // The render method should have at least business logic as possible,
     // because this will be called whenever there is a new setState call
     // and can slow down the app

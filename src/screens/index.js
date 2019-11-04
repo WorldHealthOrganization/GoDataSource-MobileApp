@@ -25,7 +25,7 @@ import HelpSingleScreen from './HelpSingleScreen';
 import QRScanScreen from './QRScanScreen';
 import HubConfigScreen from './HubConfigScreen';
 import PreviousAnswersScreen from './PreviousAnswersScreen';
-import ViewEditScreen from './ViewEditScreen';
+import ViewEditScreen from './viewEditScreen/ViewEditScreen';
 
 const screens = [
     {screen: constants.appScreens.loginScreen, component: LoginScreen},

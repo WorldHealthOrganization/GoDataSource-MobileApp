@@ -243,12 +243,12 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                 };
                 switch (screenType) {
                     case 'FollowUpsScreen':
-                        forwardProps.item = dataToForward;
-                        forwardProps.contact = contactData;
-                        // forwardProps.elementId = dataToForward._id;
-                        // forwardProps.additionalId = contactData._id;
-                        // forwardProps.elementType = 'followUp';
-                        // forwardProps.previousScreen = 'FollowUps';
+                        // forwardProps.item = dataToForward;
+                        // forwardProps.contact = contactData;
+                        forwardProps.elementId = dataToForward._id;
+                        forwardProps.additionalId = contactData._id;
+                        forwardProps.elementType = 'followUp';
+                        forwardProps.previousScreen = 'FollowUps';
                         break;
                     case 'ContactsScreen':
                         forwardProps.contact = dataToForward;
@@ -356,8 +356,8 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                     case constants.appScreens.followUpScreen:
                         switch (method) {
                             case 'onPressView':
-                                forwardScreen = constants.appScreens.followUpSingleScreen;
-                                // forwardScreen = constants.appScreens.viewEditScreen;
+                                // forwardScreen = constants.appScreens.followUpSingleScreen;
+                                forwardScreen = constants.appScreens.viewEditScreen;
                                 break;
                             case 'onPressAddExposure':
                                 forwardScreen = constants.appScreens.exposureScreen;
