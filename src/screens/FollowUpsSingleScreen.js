@@ -11,9 +11,7 @@ import NavBarCustom from './../components/NavBarCustom';
 import config from './../utils/config';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
-import {getFollowUpsForOutbreakId, getMissedFollowUpsForOutbreakId} from './../actions/followUps';
 import {TabBar, TabView, PagerScroll} from 'react-native-tab-view';
-import FollowUpsSingleGetInfoContainer from './../containers/FollowUpsSingleGetInfoContainer';
 import FollowUpsSingleContainer from './../containers/FollowUpsSingleContainer';
 import FollowUpsSingleQuestionnaireContainer from './../containers/FollowUpsSingleQuestionnaireContainer';
 import Breadcrumb from './../components/Breadcrumb';
@@ -21,15 +19,15 @@ import Menu, { MenuItem } from 'react-native-material-menu';
 import Ripple from 'react-native-material-ripple';
 import { createFollowUp, updateFollowUpAndContact, deleteFollowUp } from './../actions/followUps';
 import { removeErrors } from './../actions/errors';
-import _ from 'lodash';
+import _, {sortBy} from 'lodash';
 import { calculateDimension, extractIdFromPouchId, updateRequiredFields, getTranslation, mapAnswers, reMapAnswers, createDate } from './../utils/functions';
 import translations from './../utils/translations'
 import ElevatedView from 'react-native-elevated-view';
 import ViewHOC from './../components/ViewHOC';
-import AddSingleAnswerModalScreen from './AddSingleAnswerModalScreen';
 import moment from 'moment';
 import {checkArrayAndLength} from './../utils/typeCheckingFunctions';
-
+import {extractAllQuestions} from "../utils/functions";
+import cloneDeep from "lodash/cloneDeep";
 
 class FollowUpsSingleScreen extends Component {
 
@@ -53,10 +51,6 @@ class FollowUpsSingleScreen extends Component {
             currentAnswers: {},
             previousAnswers: [],
             mappedQuestions: [],
-
-            // used for adding new multi-frequency answers
-            showAddSingleAnswerModalScreen: false,
-            newItem: null
         };
         // Bind here methods, or at least don't declare methods in the render method
         this.handleBackButtonClick = this.handleBackButtonClick.bind(this);
@@ -72,11 +66,11 @@ class FollowUpsSingleScreen extends Component {
                 let today = createDate(null);
                 let itemDate = createDate(this.props.item.date);
 
-                var todayDate = createDate(moment.utc([today.getFullYear(), today.getMonth(), today.getDate()])._d);
+                let todayDate = createDate(moment.utc([today.getFullYear(), today.getMonth(), today.getDate()])._d);
                 let followUpDate = createDate(moment.utc([itemDate.getFullYear(), itemDate.getMonth(), itemDate.getDate()])._d);
 
                 if (followUpDate > todayDate) {
-                    console.log('follow-ups date < today => needitabil')
+                    console.log('follow-ups date < today => needitabil');
                     isEditMode = false
                 }
             } else if (this.props.role && this.props.role.find((e) => e === config.userPermissions.writeFollowUp) === undefined && this.props.role.find((e) => e === config.userPermissions.readFollowUp) !== undefined) {
@@ -151,35 +145,6 @@ class FollowUpsSingleScreen extends Component {
         }
     }
 
-
-    // static getDerivedStateFromProps(props, state) {
-    //     // console.log("FollowUpsSingleScreen: ", state);
-    //     if (props.errors && props.errors.type && props.errors.message) {
-    //         Alert.alert(props.errors.type, props.errors.message, [
-    //             {
-    //                 text: getTranslation(translations.alertMessages.okButtonLabel, props.translation),
-    //                 onPress: () => {
-    //                     state.savePressed = false;
-    //                     props.removeErrors()
-    //                 }
-    //             }
-    //         ])
-    //     } else {
-    //         if (state.savePressed || state.deletePressed) {
-    //             if (props.startLoadingScreen !== undefined) {
-    //                 props.startLoadingScreen()
-    //             }
-    //             props.navigator.pop(
-    //                 {
-    //                     animated: true,
-    //                     animationType: 'fade',
-    //                 }
-    //             )
-    //         }
-    //     }
-    //     return null;
-    // }
-
     // The render method should have at least business logic as possible,
     // because this will be called whenever there is a new setState call
     // and can slow down the app
@@ -244,24 +209,9 @@ class FollowUpsSingleScreen extends Component {
                                                     </Ripple>
                                                 }
                                             >
-                                                {/*<MenuItem onPress={this.handleOnPressMissing}>*/}
-                                                    {/*{getTranslation(translations.followUpsSingleScreen.missingButton, this.props.translation)}*/}
-                                                {/*</MenuItem>*/}
-                                                {/*<MenuItem onPress={this.handleOnPressDeceased}>*/}
-                                                {/*{getTranslation(translations.followUpsSingleScreen.deceasedButton, this.props.translation)}*/}
-                                                {/*</MenuItem>*/}
-                                                {/*<MenuItem onPress={this.handleOnPressDelete}>*/}
-                                                    {/*{getTranslation(translations.followUpsSingleScreen.deleteButton, this.props.translation)}*/}
-                                                {/*</MenuItem>*/}
                                                 <MenuItem onPress={this.handleEditContact}>
                                                     {getTranslation(translations.followUpsSingleScreen.editContactButton, this.props.translation)}
                                                 </MenuItem>
-
-                                                {/*<DateTimePicker*/}
-                                                    {/*isVisible={this.state.isDateTimePickerVisible}*/}
-                                                    {/*onConfirm={this._handleDatePicked}*/}
-                                                    {/*onCancel={this._hideDateTimePicker}*/}
-                                                {/*/>*/}
                                             </Menu>
                                         </View>
                                     ) : null
@@ -280,14 +230,6 @@ class FollowUpsSingleScreen extends Component {
                     renderPager={this.handleRenderPager}
                     renderTabBar={this.handleRenderTabBar}
                     useNativeDriver
-                />
-                <AddSingleAnswerModalScreen
-                    showAddSingleAnswerModalScreen={this.state.showAddSingleAnswerModalScreen}
-                    item={this.state.newItem}
-                    currentAnswers={this.state.currentAnswers}
-                    onCancelPressed={this.onCancelPressed}
-                    saveCurrentAnswer={this.saveCurrentAnswer}
-                    updateCurrentAnswers={this.updateCurrentAnswers}
                 />
             </ViewHOC>
         );
@@ -346,8 +288,9 @@ class FollowUpsSingleScreen extends Component {
                         onPressSave={this.handleOnPressSave}
                         onPressMissing={this.handleOnPressMissing}
                         onClickAddNewMultiFrequencyAnswer={this.onClickAddNewMultiFrequencyAnswer}
-                        onClickShowPreviousAnswers={this.onClickShowPreviousAnswers}
                         onChangeAnswerDate={this.onChangeAnswerDate}
+                        savePreviousAnswers={this.savePreviousAnswers}
+                        copyAnswerDate={this.handleCopyAnswerDate}
                     />
                 );
             default:
@@ -384,16 +327,6 @@ class FollowUpsSingleScreen extends Component {
         )
     };
 
-    goToHelpScreen = () => {
-        this.props.navigator.showModal({
-            screen: 'HelpScreen',
-            animated: true,
-            passProps: {
-                pageAskingHelpFrom: 'followUps'
-            }
-        });
-    }
-
     handleRenderLabel = (props) => ({ route, index }) => {
         const inputRange = props.navigationState.routes.map((x, i) => i);
 
@@ -424,9 +357,6 @@ class FollowUpsSingleScreen extends Component {
         if (this.state.item.statusId === config.followUpStatuses.notPerformed || this.state.item.statusId === translations.generalLabels.noneLabel) {
             checkRequiredFields.push(getTranslation(_.get(config, 'followUpsSingleScreen.fields[1].label', 'Status'), this.props.translation));
         }
-        // if ((_.get(this.state, 'item.fillLocation.geoLocation.lat', null) === null && _.get(this.state, 'item.fillLocation.geoLocation.lng', null) === null)) {
-        //     checkRequiredFields.push(getTranslation(_.get(config, 'followUpsSingleScreen.fields[2].label', 'Capture coordinates'), this.props.translation));
-        // }
 
         if (checkArrayAndLength(checkRequiredFields)) {
             Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), `${getTranslation(translations.alertMessages.requiredFieldsMissingError, this.props.translation)}.\n${getTranslation(translations.alertMessages.missingFields, this.props.translation)}: ${checkRequiredFields}`, [
@@ -446,12 +376,7 @@ class FollowUpsSingleScreen extends Component {
             Alert.alert("", 'You have unsaved data. Are you sure you want to leave this page and lose all changes?', [
                 {
                     text: 'Yes', onPress: () => {
-                        this.props.navigator.pop(
-                            //     {
-                            //     animated: true,
-                            //     animationType: 'fade'
-                            // }
-                        )
+                        this.props.navigator.pop()
                     }
                 },
                 {
@@ -461,12 +386,7 @@ class FollowUpsSingleScreen extends Component {
                 }
             ])
         } else {
-            this.props.navigator.pop(
-                //     {
-                //     animated: true,
-                //     animationType: 'fade'
-                // }
-            );
+            this.props.navigator.pop();
         }
     };
 
@@ -618,7 +538,7 @@ class FollowUpsSingleScreen extends Component {
     };
 
     // Handle changes to the questionnaire fields
-    onChangeTextAnswer = (value, id, parentId) => {
+    onChangeTextAnswer = (value, id, parentId, index) => {
         let questionnaireAnswers = _.cloneDeep(this.state.previousAnswers);
 
         if (parentId) {
@@ -632,30 +552,21 @@ class FollowUpsSingleScreen extends Component {
                 if (!questionnaireAnswers[parentId][0].subAnswers[id]) {
                     questionnaireAnswers[parentId][0].subAnswers[id] = [];
                 }
-                // if (!questionnaireAnswers[parentId][0].subAnswers[id][0]) {
                 questionnaireAnswers[parentId][0].subAnswers[id][0] = value;
-                // } else {
-                //     questionnaireAnswers[parentId][0].subAnswers[id].push(value);
-                // }
             }
         } else {
             if (!questionnaireAnswers[id]) {
                 questionnaireAnswers[id] = [];
             }
-            questionnaireAnswers[id][0] = value;
+            questionnaireAnswers[id][index] = value;
         }
 
-        // questionnaireAnswers[id] = value;
         this.setState({
             previousAnswers: questionnaireAnswers,
             isModified: true
-        }
-            // , () => {
-            //     console.log ('onChangeMultipleSelection after setState', this.state.previousAnswers)
-            // }
-        )
+        })
     };
-    onChangeDateAnswer = (value, id, parentId) => {
+    onChangeDateAnswer = (value, id, parentId, index) => {
         // console.log ('onChangeDateAnswer', value, id)
         let questionnaireAnswers = _.cloneDeep(this.state.previousAnswers);
 
@@ -670,29 +581,20 @@ class FollowUpsSingleScreen extends Component {
                 if (!questionnaireAnswers[parentId][0].subAnswers[id]) {
                     questionnaireAnswers[parentId][0].subAnswers[id] = [];
                 }
-                // if (!questionnaireAnswers[parentId][0].subAnswers[id][0]) {
                 questionnaireAnswers[parentId][0].subAnswers[id][0] = value;
-                // } else {
-                //     questionnaireAnswers[parentId][0].subAnswers[id].push(value);
-                // }
             }
         } else {
             if (!questionnaireAnswers[id]) {
                 questionnaireAnswers[id] = [];
             }
-            questionnaireAnswers[id][0] = value;
+            questionnaireAnswers[id][index] = value;
         }
-        // questionnaireAnswers[id] = value;
         this.setState(prevState => ({
             previousAnswers: questionnaireAnswers,
             isModified: true
-        })
-            //     , () => {
-            //     console.log ('onChangeDateAnswer after setState', this.state.previousAnswers)
-            // }
-        )
+        }))
     };
-    onChangeSingleSelection = (value, id, parentId) => {
+    onChangeSingleSelection = (value, id, parentId, index) => {
         // console.log ('onChangeSingleSelection', value, id)
         let questionnaireAnswers = _.cloneDeep(this.state.previousAnswers);
 
@@ -707,29 +609,20 @@ class FollowUpsSingleScreen extends Component {
                 if (!questionnaireAnswers[parentId][0].subAnswers[id]) {
                     questionnaireAnswers[parentId][0].subAnswers[id] = [];
                 }
-                // if (!questionnaireAnswers[parentId][0].subAnswers[id][0]) {
                 questionnaireAnswers[parentId][0].subAnswers[id][0] = value;
-                // } else {
-                //     questionnaireAnswers[parentId][0].subAnswers[id].push(value);
-                // }
             }
         } else {
             if (!questionnaireAnswers[id]) {
                 questionnaireAnswers[id] = [];
             }
-            questionnaireAnswers[id][0] = value;
+            questionnaireAnswers[id][index] = value;
         }
-        // questionnaireAnswers[id] = value.value;
         this.setState(prevState => ({
             previousAnswers: questionnaireAnswers,
             isModified: true
-        })
-            //     , () => {
-            //     console.log ('onChangeMultipleSelection after setState', this.state.previousAnswers)
-            // }
-        )
+        }))
     };
-    onChangeMultipleSelection = (value, id, parentId) => {
+    onChangeMultipleSelection = (value, id, parentId, index) => {
         // console.log ('onChangeMultipleSelection', selections, id)
         let questionnaireAnswers = _.cloneDeep(this.state.previousAnswers);
 
@@ -744,33 +637,24 @@ class FollowUpsSingleScreen extends Component {
                 if (!questionnaireAnswers[parentId][0].subAnswers[id]) {
                     questionnaireAnswers[parentId][0].subAnswers[id] = [];
                 }
-                // if (!questionnaireAnswers[parentId][0].subAnswers[id][0]) {
                 questionnaireAnswers[parentId][0].subAnswers[id][0] = value;
-                // } else {
-                //     questionnaireAnswers[parentId][0].subAnswers[id].push(value);
-                // }
             }
         } else {
             if (!questionnaireAnswers[id]) {
                 questionnaireAnswers[id] = [];
             }
-            questionnaireAnswers[id][0] = value;
+            questionnaireAnswers[id][index] = value;
         }
-        // questionnaireAnswers[id] = selections.map((e) => {return e.value});
         this.setState(prevState => ({
             previousAnswers: questionnaireAnswers,
             isModified: true
-        })
-            //     , () => {
-            //     console.log ('onChangeMultipleSelection after setState', this.state.previousAnswers)
-            // }
-        )
+        }))
     };
-    onChangeAnswerDate = (value, questionId) => {
+    onChangeAnswerDate = (value, questionId, index) => {
         let questionnaireAnswers = _.cloneDeep(this.state.previousAnswers);
         if (questionnaireAnswers && questionnaireAnswers[questionId] && Array.isArray(questionnaireAnswers[questionId]) && questionnaireAnswers[questionId].length) {
-            if (questionnaireAnswers[questionId][0] && questionnaireAnswers[questionId][0].date) {
-                questionnaireAnswers[questionId][0].date = value;
+            if (questionnaireAnswers[questionId][index]) {
+                questionnaireAnswers[questionId][index].date = value;
                 if (questionnaireAnswers[questionId][0].subAnswers && typeof questionnaireAnswers[questionId][0].subAnswers === "object" && Object.keys(questionnaireAnswers[questionId][0].subAnswers).length > 0) {
                     for (let subQuestionId in questionnaireAnswers[questionId][0].subAnswers) {
                         questionnaireAnswers[questionId][0].subAnswers[subQuestionId].map((e) => {
@@ -779,27 +663,27 @@ class FollowUpsSingleScreen extends Component {
                     }
                 }
             }
+        }else{
+            questionnaireAnswers[questionId]= [{date: value, value: null}];
         }
 
         this.setState({
             previousAnswers: questionnaireAnswers,
             isModified: true
-        }
-            // , () => {
-            //     console.log ('onChangeAnswerDate after setState', this.state.previousAnswers);
-            // }
-        )
+        })
     };
 
     handleOnPressSave = () => {
         // Mark followUp as performed, and then update to the server
         let now = createDate(null);
+        let questionnaireAnswers = reMapAnswers(_.cloneDeep(this.state.previousAnswers));
+        questionnaireAnswers = this.filterUnasweredQuestions();
         this.setState(prevState => ({
             item: Object.assign({}, prevState.item,
                 {
                     updatedAt: now.toISOString(),
                     updatedBy: extractIdFromPouchId(this.props.user._id, 'user.json'),
-                    questionnaireAnswers: reMapAnswers(_.cloneDeep(this.state.previousAnswers))
+                    questionnaireAnswers: questionnaireAnswers
                 }
             ),
             contact: Object.assign({}, prevState.contact, {
@@ -829,7 +713,7 @@ class FollowUpsSingleScreen extends Component {
 
             if (this.props.isNew) {
                 followUpClone = updateRequiredFields(this.props.user.activeOutbreakId, this.props.user._id, Object.assign({}, followUpClone), action = 'create', 'followUp.json');
-                console.log('followUpClone create', JSON.stringify(followUpClone))
+                console.log('followUpClone create', JSON.stringify(followUpClone));
                 this.props.createFollowUp(this.props.user.activeOutbreakId, contactClone._id, followUpClone, contactClone, null, this.props.user.token, this.props.teams)
             } else {
                 if (this.state.deletePressed === false) {
@@ -866,7 +750,7 @@ class FollowUpsSingleScreen extends Component {
     };
 
     handleEditContact = () => {
-        console.log('handleEditContact: ', JSON.stringify(this.state.contact))
+        console.log('handleEditContact: ', JSON.stringify(this.state.contact));
         this.hideMenu();
 
         this.props.navigator.push({
@@ -876,7 +760,7 @@ class FollowUpsSingleScreen extends Component {
                 handleUpdateContactFromFollowUp: this.handleUpdateContactFromFollowUp
             }
         })
-    }
+    };
 
     handleUpdateContactFromFollowUp = (updatedContact) => {
         const { item } = this.state;
@@ -894,12 +778,12 @@ class FollowUpsSingleScreen extends Component {
         this.setState({
             item: itemCpy,
             contact: updatedContact,
-        })
+        });
 
         if (this.props.mimeComponentDidMount !== undefined) {
             this.props.mimeComponentDidMount()
         }
-    }
+    };
 
     handleOnPressDelete = () => {
         // console.log("### handleOnPressDelete");
@@ -954,7 +838,7 @@ class FollowUpsSingleScreen extends Component {
     };
 
     goToHelpScreen = () => {
-        let pageAskingHelpFrom = null
+        let pageAskingHelpFrom = null;
         if (this.props.isNew !== null && this.props.isNew !== undefined && this.props.isNew === true) {
             pageAskingHelpFrom = 'followUpSingleScreenAdd'
         } else {
@@ -973,34 +857,18 @@ class FollowUpsSingleScreen extends Component {
         });
     };
 
-
     // used for adding multi-frequency answers
     onClickAddNewMultiFrequencyAnswer = (item) => {
-        this.setState({
-            newItem: item
-        }, () => {
-            this.setState({
-                showAddSingleAnswerModalScreen: !this.state.showAddSingleAnswerModalScreen
-            })
-        })
-    };
-
-    onClickShowPreviousAnswers = (previousAnswer) => {
-        // console.log("Previous answers button clicked: ", this.state.previousAnswers[previousAnswer.variable]);
-        this.props.navigator.showModal({
-            screen: 'PreviousAnswersScreen',
-            animated: true,
-            passProps: {
-                item: previousAnswer,
-                previousAnswers: this.state.previousAnswers[previousAnswer.variable],
-                previousAnswerVariable: previousAnswer.variable,
-                savePreviousAnswers: this.savePreviousAnswers
-            }
-        })
+        //add new empty item to question and update previousAnswers
+        let previousAnswersClone = _.cloneDeep(this.state.previousAnswers);
+        if(previousAnswersClone.hasOwnProperty(item.variable) && item.variable){
+            previousAnswersClone[item.variable].push({date: null, value: null});
+        }else{
+            previousAnswersClone = Object.assign({}, previousAnswersClone, { [item.variable]: [{date: null, value: null}] });
+        }
+        this.savePreviousAnswers(previousAnswersClone[item.variable], item.variable);
     };
     savePreviousAnswers = (previousAnswers, previousAnswersId) => {
-        // console.log(previousAnswers, previousAnswersId);
-        // let questionnaireAnswers = _.cloneDeep(this.state.previousAnswers);
         this.setState(prevState => ({
             previousAnswers: Object.assign({}, prevState.previousAnswers, { [previousAnswersId]: previousAnswers }),
             isModified: true
@@ -1009,53 +877,48 @@ class FollowUpsSingleScreen extends Component {
             this.props.navigator.dismissAllModals();
         })
     };
-
-    onCancelPressed = () => {
-        this.setState({
-            newItem: null,
-            currentAnswers: {},
-            showAddSingleAnswerModalScreen: !this.state.showAddSingleAnswerModalScreen
-        })
-    };
-
-    saveCurrentAnswer = () => {
+    handleCopyAnswerDate = (value) => {
         let previousAnswersClone = _.cloneDeep(this.state.previousAnswers);
-        let currentAnswersClone = _.cloneDeep(this.state.currentAnswers);
-        if (!previousAnswersClone) {
-            previousAnswersClone = {};
-        }
-        if (!previousAnswersClone[Object.keys(currentAnswersClone)[0]]) {
-            previousAnswersClone[Object.keys(currentAnswersClone)[0]] = [];
-        }
-        // currentAnswersClone[Object.keys(currentAnswersClone)[0]][0].date = currentAnswersClone[Object.keys(currentAnswersClone)[0]][0].date.toISOString();
-        previousAnswersClone[Object.keys(currentAnswersClone)[0]].push(currentAnswersClone[Object.keys(currentAnswersClone)[0]][0]);
-        previousAnswersClone[Object.keys(currentAnswersClone)[0]].sort((a, b) => {
-            if (createDate(a.date) > createDate(b.date)) {
-                return -1;
+        for(let questionId in previousAnswersClone) {
+            if(previousAnswersClone.hasOwnProperty(questionId)) {
+                previousAnswersClone[questionId] = previousAnswersClone[questionId].map((e) => {
+                    return {date: e.date === null ? createDate(value).toISOString() : e.date, value: e.value};
+                });
             }
-            if (createDate(a.date) < createDate(b.date)) {
-                return 1;
-            }
-            return 0;
-        });
+        }
         this.setState({
             previousAnswers: previousAnswersClone,
-            newItem: null,
-            currentAnswers: {},
-            showAddSingleAnswerModalScreen: !this.state.showAddSingleAnswerModalScreen,
             isModified: true
-        })
+        });
     };
-
-    updateCurrentAnswers = (currentAnswers) => {
-        this.setState({
-            currentAnswers: currentAnswers,
-            isModified: true
+    filterUnasweredQuestions = () => {
+        let previousAnswersClone = _.cloneDeep(this.state.previousAnswers);
+        let sortedQuestions = sortBy(cloneDeep(this.props.contactFollowUpTemplate), ['order', 'variable']);
+        sortedQuestions = extractAllQuestions(sortedQuestions, this.state.previousAnswers, 0);
+        if( Array.isArray(sortedQuestions) && sortedQuestions.length > 0) {
+            for (let i = 0; i < sortedQuestions.length; i++) {
+                //verify only multianswer questions and if they were answered
+                if (sortedQuestions[i].multiAnswer && previousAnswersClone.hasOwnProperty(sortedQuestions[i].variable)) {
+                    //current answers
+                    let answerValues = previousAnswersClone[sortedQuestions[i].variable];
+                    let answerValuesClone = [];
+                    //validate all the answers of the question
+                    if( Array.isArray(answerValues) && answerValues.length > 0){
+                        answerValuesClone = answerValues.filter((answer)=>{
+                            return answer.value !== null;
+                        });
+                    }
+                    if(answerValuesClone.length > 0){
+                        //update answer list
+                        previousAnswersClone[sortedQuestions[i].variable] = answerValuesClone;
+                    }else{
+                        //remove key
+                        delete previousAnswersClone[sortedQuestions[i].variable];
+                    }
+                }
+            }
         }
-            // , () => {
-            //     console.log('CurrentAnswers: ', this.state.currentAnswers);
-            // }
-        )
+        return previousAnswersClone;
     };
 }
 

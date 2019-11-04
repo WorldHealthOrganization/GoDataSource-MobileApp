@@ -149,7 +149,7 @@ class CaseSingleInfectionContainer extends Component {
     }
 
     // Please write here all the methods that are not react native lifecycle methods
-    handleRenderItem = (item) => {
+    handleRenderItem = (item, index) => {
         let fields = item.fields.map((field) => {
             return Object.assign({}, field, { isEditMode: this.props.isEditMode })
         });
@@ -160,7 +160,7 @@ class CaseSingleInfectionContainer extends Component {
             });
         }
 
-        return this.renderItemCardComponent(fields)
+        return this.renderItemCardComponent(fields, index)
     };
 
     handleRenderItemForDateRangesList = (item, index) => {
@@ -178,7 +178,7 @@ class CaseSingleInfectionContainer extends Component {
 
     renderItemCardComponent = (fields, cardIndex = null) => {
         return (
-            <ElevatedView elevation={3} style={[style.containerCardComponent, {
+            <ElevatedView elevation={3} key={cardIndex} style={[style.containerCardComponent, {
                 marginHorizontal: calculateDimension(16, false, this.props.screenSize),
                 width: calculateDimension(config.designScreenSize.width - 32, false, this.props.screenSize),
                 marginVertical: 4,
@@ -472,7 +472,6 @@ class CaseSingleInfectionContainer extends Component {
         // this.scrollCasesSingleInfection.props.scrollToFocusedInput(reactNode)
     };
 }
-
 
 // Create style outside the class, or for components that will be used by other components (buttons),
 // make a global style in the config directory

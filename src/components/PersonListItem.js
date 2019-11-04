@@ -121,7 +121,7 @@ class PersonListItem extends Component {
             returnValues.status = person.followUp.status ? getTranslation(person.followUp.status, this.props.translations) : null;
         }
 
-        console.log(' ~~~~~~~~~', returnValues);
+        // console.log(' ~~~~~~~~~', returnValues);
         return returnValues;
     };
 

@@ -304,6 +304,7 @@ const alertMessages = {
     contactDuplicateNameError: 'LNG_DIALOG_ALERT_MESSAGE_CONTACT_WITH_DUPLICATE_NAME',
     caseDuplicateNameError: 'LNG_DIALOG_ALERT_MESSAGE_CASE_WITH_DUPLICATE_NAME',
     dateOfOnsetError: 'LNG_DIALOG_ALERT_MESSAGE_DATE_OF_ISOLATION_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET',
+    answerDateMissingError: 'LNG_DIALOG_ALERT_MESSAGE_ANSWER_DATE_MISSING',
     dateOfOutcomeError: 'LNG_DIALOG_ALERT_MESSAGE_DATE_OF_OUTCOME_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET',
     monthsValueError: 'LNG_DIALOG_ALERT_MESSAGE_NUMBER_OF_MONTHS_MUST_BE_BETWEEN_MESSAGE',
     yearsValueError: 'LNG_DIALOG_ALERT_MESSAGE_NUMBER_OF_YEARS_MUST_BE_BETWEEN_MESSAGE',
@@ -328,7 +329,7 @@ const alertMessages = {
     deleteDateRange: 'LNG_DIALOG_ALERT_MESSAGE_ARE_YOU_SURE_YOU_WANT_TO_DELETE_THIS_DATE_RANGE',
 
     deletePreviousAnswer: 'LNG_DIALOG_ALERT_MESSAGE_ARE_YOU_SURE_YOU_WANT_TO_DELETE_THIS_ANSWER',
-
+    copyAnswerDate: 'LNG_DIALOG_ALERT_MESSAGE_ARE_YOU_SURE_YOU_WANT_TO_COPY_THIS_ANSWER_DATE',
     replaceCurrentCoordinates: 'LNG_DIALOG_ALERT_MESSAGE_DO_YOU_WANT_TO_REPLACE_CURRENT_COORDINATES_WITH_LOCATION_VALUES',
 
     androidBackButtonMsg: 'LNG_DIALOG_ALERT_MESSAGE_ARE_YOU_SURE_YOU_WANT_TO_EXIT_THE_APP',
@@ -523,16 +524,6 @@ const hubConfigScreen = {
     successMakingHubActiveMessage: 'LNG_HUB_CONFIGURATION_SCREEN_SUCCES_SET_HUB_AS_ACTIVE_AND_YOU_WILL_BE_LOGGED_OUT_MESSAGE'
 };
 
-const addSingleAnswerModalScreen = {
-    addNewAnswer: 'LNG_ADD_SINGLE_ANSWER_MODAL_SCREEN_ADD_NEW_ANSWER',
-
-};
-
-const previousAnswersScreen = {
-    previousAnswersTitle: 'LNG_PREVIOUS_ANSWERS_SCREEN_PREVIOUS_ANSWERS_TITLE',
-    noPreviousAnswersToShowMessage: 'LNG_PREVIOUS_ANSWERS_SCREEN_NO_PREVIOUS_ANSWERS_TO_SHOW'
-};
-
 // TODO add to backend
 const followUpAgenda = {
     followUp: 'LNG_FOLLOW_UP_AGENDA_FOLLOW_UP',
@@ -585,8 +576,6 @@ export default {
     questionCardLabels,
     hubConfigScreen,
     sortTab,
-    addSingleAnswerModalScreen,
-    previousAnswersScreen,
     followUpAgenda,
     personListItem
 };

@@ -4,8 +4,8 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
-import {TextInput, View, Text, Alert, StyleSheet, Dimensions, Platform, FlatList, Animated, BackHandler} from 'react-native';
-import {Button, Icon} from 'react-native-material-ui';
+import {View, Alert, StyleSheet, Dimensions, Animated, BackHandler} from 'react-native';
+import {Icon} from 'react-native-material-ui';
 import styles from './../styles';
 import NavBarCustom from './../components/NavBarCustom';
 import {calculateDimension, navigation, getTranslation, createFilterCasesObject} from './../utils/functions';
@@ -14,7 +14,6 @@ import Ripple from 'react-native-material-ripple';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import SearchFilterView from './../components/SearchFilterView';
-import CaseListItem from './../components/CaseListItem';
 import ElevatedView from 'react-native-elevated-view';
 import Breadcrumb from './../components/Breadcrumb';
 import {getCasesForOutbreakId} from './../actions/cases';
@@ -22,15 +21,12 @@ import {removeErrors} from './../actions/errors';
 import {addFilterForScreen, removeFilterForScreen} from './../actions/app';
 import AnimatedListView from './../components/AnimatedListView';
 import ViewHOC from './../components/ViewHOC';
-import _ from 'lodash';
 import { Popup } from 'react-native-map-link';
 import translations from './../utils/translations'
-import {getItemByIdRequest} from './../queries/cases'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {pushNewEditScreen} from './../utils/screenTransitionFunctions';
 import RNExitApp from 'react-native-exit-app';
 import PersonListItem from "../components/PersonListItem";
-import {extractIdFromPouchId} from "../utils/functions";
 
 let height = Dimensions.get('window').height;
 let width = Dimensions.get('window').width;
@@ -78,18 +74,7 @@ class CasesScreen extends Component {
         for (let i=0; i<refData.length; i++) {
             riskColors[refData[i].value] = refData[i].colorCode || 'black'
         }
-        // this.setState({
-        //     loading: true,
-        //     riskColors: riskColors
-        // }, () => {
-        //     if (this.props.filter && (this.props.filter['CasesScreen'] || this.props.filter['CasesFilterScreen'])) {
-                this.filterCases();
-        //     } else {
-        //         if (this.props.user && this.props.user.activeOutbreakId) {
-        //             this.props.getCasesForOutbreakId(this.props.user.activeOutbreakId, null, null);
-        //         }
-        //     }
-        // })
+        this.filterCases();
     }
 
     componentWillUnmount() {
@@ -109,36 +94,9 @@ class CasesScreen extends Component {
                     return true;
                 }
             }
-        ])
+        ]);
         return true;
     }
-
-    // static getDerivedStateFromProps(props, state) {
-    //     //     if (props.errors && props.errors.type && props.errors.message) {
-    //     //         Alert.alert(props.errors.type, props.errors.message, [
-    //     //             {
-    //     //                 text: getTranslation(translations.alertMessages.okButtonLabel, props.translation),
-    //     //                 onPress: () => {
-    //     //                 props.removeErrors();
-    //     //                 state.loading = false;
-    //     //             }
-    //     //             }
-    //     //         ])
-    //     //     }
-    //     //
-    //     //     if (state.sortData === true){
-    //     //         state.loading = true;
-    //     //         state.sortData = false;
-    //     //         const allFilters = createFilterCasesObject(state.filterFromFilterScreen, state.filter);
-    //     //         props.getCasesForOutbreakId(props.user.activeOutbreakId, allFilters, null);
-    //     //     } else {
-    //     //         state.sortData = true
-    //     //     }
-    //     //
-    //     //     state.loading = false;
-    //     //     state.refreshing = false;
-    //     //     return null;
-    //     // }
 
     componentDidUpdate(prevProps) {
         if (!this.props.loaderState && this.state.refreshing) {
@@ -176,7 +134,6 @@ class CasesScreen extends Component {
                     text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
                     onPress: () => {
                         this.props.removeErrors();
-                        // state.loading = false;
                     }
                 }
             ])
@@ -207,7 +164,7 @@ class CasesScreen extends Component {
                 ++filterNumbers
             }
         }
-        let filterText = filterNumbers === 0 ? `${getTranslation(translations.generalLabels.filterTitle, this.props.translation)}` : `${getTranslation(translations.generalLabels.filterTitle, this.props.translation)}(${filterNumbers})`
+        let filterText = filterNumbers === 0 ? `${getTranslation(translations.generalLabels.filterTitle, this.props.translation)}` : `${getTranslation(translations.generalLabels.filterTitle, this.props.translation)}(${filterNumbers})`;
 
         let caseTitle = []; caseTitle[0] = getTranslation(translations.casesScreen.casesTitle, this.props.translation);
         return (
@@ -353,30 +310,18 @@ class CasesScreen extends Component {
 
     //Search cases using keyword
     handleOnSubmitEditing = () => {
-        // this.props.addFilterForScreen("CasesScreen", this.state.filter);
-        // let existingFilter = this.state.filterFromFilterScreen ? Object.assign({}, this.state.filterFromFilterScreen) : Object.assign({}, config.defaultFilterForCases);
-        //
-        // if (!existingFilter.where || Object.keys(existingFilter.where).length === 0) {
-        //     existingFilter.where = {};
-        // }
-        // if (!existingFilter.where.or || existingFilter.where.or.length === 0) {
-        //     existingFilter.where.or = [];
-        // }
-        // existingFilter.where.or.push({firstName: {like: this.state.filter.searchText, options: 'i'}});
-        // existingFilter.where.or.push({lastName: {like: this.state.filter.searchText, options: 'i'}});
-        //
-        // this.props.getCasesForOutbreakId(this.props.user.activeOutbreakId, existingFilter, this.props.user.token);
-
         // Filter cases by firstName and lastName
         this.filterCases();
     };
 
     //Save keyword for search in cases
     handleOnChangeText = (text) => {
-        console.log("### handleOnChangeText: ", text);
+        // console.log("### handleOnChangeText: ", text);
         this.setState(prevState => ({
             filter: Object.assign({}, prevState.filter, {searchText: text})
-        }), console.log('### filter after changed text: ', this.state.filter))
+        }),
+            // console.log('### filter after changed text: ', this.state.filter)
+        )
     };
 
     //Open filter screen for cases
@@ -397,20 +342,6 @@ class CasesScreen extends Component {
         this.setState({
             filterFromFilterScreen: filter
         }, () => {
-            // if (this.state.filter.searchText) {
-            //
-            //     if(!filter.hasOwnProperty('where')){
-            //         filter.where = {};
-            //     }
-            //
-            //     if (!filter.where.or || filter.where.or.length === 0) {
-            //         filter.where.or = [];
-            //     }
-            //     filter.where.or.push({firstName: {like: this.state.filter.searchText, options: 'i'}});
-            //     filter.where.or.push({lastName: {like: this.state.filter.searchText, options: 'i'}});
-            // }
-            // this.props.getCasesForOutbreakId(this.props.user.activeOutbreakId, filter, this.props.user.token);
-
             // Filter cases
             this.filterCases();
         })
@@ -434,23 +365,15 @@ class CasesScreen extends Component {
                 textsStyleArray={[[styles.buttonTextActionsBar, {marginLeft: margins}], [styles.buttonTextActionsBar, {marginRight: margins}]]}
                 onPressTextsArray={[
                     () => {
-                        console.log('Test performance renderFollowUpQuestion');
+                        // console.log('Test performance renderFollowUpQuestion');
                         this.handleOnPressCase(item);
                     },
                     () => {
-                        console.log('Test performance renderFollowUpQuestion');
+                        // console.log('Test performance renderFollowUpQuestion');
                         this.handleOnPressAddContact(item, null);
                     }]}
             />
         )
-        // return (
-        //     <CaseListItem
-        //         item={item}
-        //         onPressCase={this.handleOnPressCase}
-        //         onPressMap={this.handleOnPressMap}
-        //         onPressAddContact={this.handleOnPressAddContact}
-        //     />
-        // )
     };
 
     //Key extractor for case list
@@ -468,20 +391,6 @@ class CasesScreen extends Component {
         this.setState({
             refreshing: true
         }, () => {
-            // this.props.addFilterForScreen("CasesScreen", this.state.filter);
-            // let existingFilter = this.state.filterFromFilterScreen ? Object.assign({}, this.state.filterFromFilterScreen) : Object.assign({}, config.defaultFilterForCases);
-            //
-            // if (!existingFilter.where || Object.keys(existingFilter.where).length === 0) {
-            //     existingFilter.where = {};
-            // }
-            // if (!existingFilter.where.or || existingFilter.where.or.length === 0) {
-            //     existingFilter.where.or = [];
-            // }
-            // existingFilter.where.or.push({firstName: {like: this.state.filter.searchText, options: 'i'}});
-            // existingFilter.where.or.push({lastName: {like: this.state.filter.searchText, options: 'i'}});
-            //
-            // this.props.getCasesForOutbreakId(this.props.user.activeOutbreakId, existingFilter, this.props.user.token);
-
             // Filter cases
             this.filterCases();
         });
@@ -489,7 +398,7 @@ class CasesScreen extends Component {
 
     //Open single case CaseSingleScreen
     handleOnPressCase = (item, contact) => {
-        console.log("### handlePressCases: ", JSON.stringify(item));
+        // console.log("### handlePressCases: ", JSON.stringify(item));
         this.props.navigator.push({
             screen: 'CaseSingleScreen',
             // animated: true,
@@ -502,7 +411,7 @@ class CasesScreen extends Component {
 
     //Create new contact in ContactSingleScreen
     handleOnPressAddContact = (item, contact) => {
-        console.log('*** handleOnPressAddContact: ', item, contact)
+        // console.log('*** handleOnPressAddContact: ', item, contact)
         this.props.navigator.push({
             screen: 'ContactsSingleScreen',
             // animated: true,
@@ -528,10 +437,10 @@ class CasesScreen extends Component {
         if (myCase && myCase.addresses && Array.isArray(myCase.addresses) && myCase.addresses.length > 0) {
             let casePlaceOfResidence = myCase.addresses.filter((e) => {
                 return e.typeId === config.userResidenceAddress.userPlaceOfResidence
-            })
-            console.log('casePlaceOfResidence', casePlaceOfResidence)
-            let casePlaceOfResidenceLatitude = casePlaceOfResidence[0] && casePlaceOfResidence[0].geoLocation && casePlaceOfResidence[0].geoLocation.coordinates && Array.isArray(casePlaceOfResidence[0].geoLocation.coordinates) && casePlaceOfResidence[0].geoLocation.coordinates.length === 2 && casePlaceOfResidence[0].geoLocation.coordinates[1] !== undefined && casePlaceOfResidence[0].geoLocation.coordinates[1] !== null ? casePlaceOfResidence[0].geoLocation.coordinates[1] : 0
-            let casePlaceOfResidenceLongitude = casePlaceOfResidence[0] && casePlaceOfResidence[0].geoLocation && casePlaceOfResidence[0].geoLocation.coordinates && Array.isArray(casePlaceOfResidence[0].geoLocation.coordinates) && casePlaceOfResidence[0].geoLocation.coordinates.length === 2 && casePlaceOfResidence[0].geoLocation.coordinates[0] !== undefined && casePlaceOfResidence[0].geoLocation.coordinates[0] !== null ? casePlaceOfResidence[0].geoLocation.coordinates[0] : 0
+            });
+            // console.log('casePlaceOfResidence', casePlaceOfResidence)
+            let casePlaceOfResidenceLatitude = casePlaceOfResidence[0] && casePlaceOfResidence[0].geoLocation && casePlaceOfResidence[0].geoLocation.coordinates && Array.isArray(casePlaceOfResidence[0].geoLocation.coordinates) && casePlaceOfResidence[0].geoLocation.coordinates.length === 2 && casePlaceOfResidence[0].geoLocation.coordinates[1] !== undefined && casePlaceOfResidence[0].geoLocation.coordinates[1] !== null ? casePlaceOfResidence[0].geoLocation.coordinates[1] : 0;
+            let casePlaceOfResidenceLongitude = casePlaceOfResidence[0] && casePlaceOfResidence[0].geoLocation && casePlaceOfResidence[0].geoLocation.coordinates && Array.isArray(casePlaceOfResidence[0].geoLocation.coordinates) && casePlaceOfResidence[0].geoLocation.coordinates.length === 2 && casePlaceOfResidence[0].geoLocation.coordinates[0] !== undefined && casePlaceOfResidence[0].geoLocation.coordinates[0] !== null ? casePlaceOfResidence[0].geoLocation.coordinates[0] : 0;
             navigator.geolocation.getCurrentPosition(
                 (position) => {
                     this.setState({
@@ -587,20 +496,12 @@ class CasesScreen extends Component {
 
     filterCases = () => {
         let allFilters = null;
-        // if (this.props.filter && (this.props.filter['CasesScreen'] || this.props.filter['CasesFilterScreen'])) {
-            allFilters = createFilterCasesObject(this.state.filterFromFilterScreen, this.state.filter);
-        // }
-
-        // this.setState({
-        //     loading: true,
-        //     sortData: false
-        // }, () => {
-            this.props.getCasesForOutbreakId(this.props.user.activeOutbreakId, allFilters, null);
-        // })
+        allFilters = createFilterCasesObject(this.state.filterFromFilterScreen, this.state.filter);
+        this.props.getCasesForOutbreakId(this.props.user.activeOutbreakId, allFilters, null);
     };
 
     goToHelpScreen = () => {
-        let pageAskingHelpFrom = 'cases'
+        let pageAskingHelpFrom = 'cases';
         this.props.navigator.showModal({
             screen: 'HelpScreen',
             animated: true,
@@ -611,7 +512,7 @@ class CasesScreen extends Component {
     };
 
     handleOnPressQRCode = () => {
-        console.log('handleOnPressQRCode');
+        // console.log('handleOnPressQRCode');
 
         this.props.navigator.showModal({
             screen: 'QRScanScreen',
@@ -623,7 +524,7 @@ class CasesScreen extends Component {
     };
 
     pushNewEditScreenLocal = (QRCodeInfo) => {
-        console.log('pushNewEditScreen QRCodeInfo do with method from another side', QRCodeInfo);
+        // console.log('pushNewEditScreen QRCodeInfo do with method from another side', QRCodeInfo);
 
         this.setState({
             loading: true
@@ -644,7 +545,7 @@ class CasesScreen extends Component {
                                 {
                                     text: getTranslation(translations.alertMessages.yesButtonLabel, this.props && this.props.translation ? this.props.translation : null),
                                     onPress: () => {
-                                        console.log('Yes pressed');
+                                        // console.log('Yes pressed');
                                         this.props.navigator.push({
                                             screen: 'CaseSingleScreen',
                                             animated: true,
@@ -695,105 +596,6 @@ class CasesScreen extends Component {
                 });
             })
         });
-
-        //     let itemId = null;
-        //     let itemType = null;
-        //     let outbreakId = null;
-        //
-        //     if (QRCodeInfo && QRCodeInfo !== undefined && QRCodeInfo.data && QRCodeInfo.data !== undefined){
-        //         let parsedData = null;
-        //         try {
-        //             parsedData =  JSON.parse(QRCodeInfo.data)
-        //         } catch(err) {
-        //             setTimeout(function(){
-        //                 Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props && this.props.translation ? this.props.translation : null), getTranslation(translations.alertMessages.errorOccuredMsg, this.props && this.props.translation ? this.props.translation : null), [
-        //                     {
-        //                         text: getTranslation(translations.alertMessages.okButtonLabel, this.props && this.props.translation ? this.props.translation : null),
-        //                         onPress: () => {console.log('Ok pressed')}
-        //                     }
-        //                 ])
-        //             }, 1000);
-        //             return
-        //         }
-        //         if (parsedData && parsedData !== undefined){
-        //             console.log('parsedData', parsedData);
-        //
-        //             if (parsedData.targetResource && parsedData.targetResource !== undefined) {
-        //                 if (parsedData.targetResource === 'case' || parsedData.targetResource === 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE') {
-        //                     itemType = 'case';
-        //                     if (parsedData.resourceContext && parsedData.resourceContext !== undefined &&
-        //                         parsedData.resourceContext.outbreakId && parsedData.resourceContext.outbreakId !== undefined &&
-        //                         parsedData.resourceContext.caseId && parsedData.resourceContext.caseId !== undefined) {
-        //                         itemId = parsedData.resourceContext.caseId;
-        //                         outbreakId = parsedData.resourceContext.outbreakId
-        //                     }
-        //                 } else if (parsedData.targetResource === 'contact' || parsedData.targetResource === 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT') {
-        //                     itemType = 'contact';
-        //                     if (parsedData.resourceContext && parsedData.resourceContext !== undefined &&
-        //                         parsedData.resourceContext.outbreakId && parsedData.resourceContext.outbreakId !== undefined &&
-        //                         parsedData.resourceContext.contactId && parsedData.resourceContext.contactId !== undefined) {
-        //                         itemId = parsedData.resourceContext.contactId;
-        //                         outbreakId = parsedData.resourceContext.outbreakId;
-        //                     }
-        //                 }
-        //             }
-        //         }
-        //     }
-        //
-        //     console.log('pushNewEditScreen', itemId, itemType, outbreakId);
-        //     if (itemId && itemType && outbreakId && outbreakId === this.props.user.activeOutbreakId) {
-        //         let itemPouchId = null;
-        //         if (itemType === 'case') {
-        //             itemPouchId = `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE_${outbreakId}_${itemId}`
-        //         } else if (itemType === 'contact') {
-        //             itemPouchId = `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT_${outbreakId}_${itemId}`
-        //         }
-        //
-        //         if (itemPouchId) {
-        //             getItemByIdRequest(outbreakId, itemPouchId, itemType, (error, response) => {
-        //                 if (error) {
-        //                     console.log("*** getItemByIdRequest error: ", error);
-        //                     Alert.alert(getTranslation(translations.alertMessages.alertLabel,  this.props && this.props.translation ? this.props.translation : null), getTranslation(translations.alertMessages.noItemAlert,  this.props && this.props.translation ? this.props.translation : null), [
-        //                         {
-        //                             text: getTranslation(translations.alertMessages.okButtonLabel,  this.props && this.props.translation ? this.props.translation : null),
-        //                             onPress: () => {console.log('Ok pressed')}
-        //                         }
-        //                     ])
-        //                 }
-        //                 if (response) {
-        //                     console.log("*** getItemByIdRequest response: ", response);
-        //                     if (itemType === 'case') {
-        //                         this.props.navigator.push({
-        //                             screen: 'CaseSingleScreen',
-        //                             animated: true,
-        //                             animationType: 'fade',
-        //                             passProps: {
-        //                                 case: response
-        //                             }
-        //                         })
-        //                     } else if (itemType === 'contact') {
-        //                         this.props.navigator.push({
-        //                             screen: 'ContactsSingleScreen',
-        //                             animated: true,
-        //                             animationType: 'fade',
-        //                             passProps: {
-        //                                 contact: response
-        //                             }
-        //                         })
-        //                     }
-        //                 }
-        //             })
-        //         }
-        //     } else {
-        //         setTimeout(function(){
-        //             Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props && this.props.translation ? this.props.translation : null), getTranslation(translations.alertMessages.noItemAlert,  this.props && this.props.translation ? this.props.translation : null), [
-        //                 {
-        //                     text: getTranslation(translations.alertMessages.okButtonLabel,  this.props && this.props.translation ? this.props.translation : null),
-        //                     onPress: () => {console.log('Ok pressed')}
-        //                 }
-        //             ])
-        //         }, 1000)
-        //     }
     };
 }
 

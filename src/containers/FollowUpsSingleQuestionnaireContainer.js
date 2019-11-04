@@ -3,7 +3,7 @@
  */
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
-import React, { PureComponent } from 'react';
+import React, { Component } from 'react';
 import {
     View,
     StyleSheet,
@@ -22,8 +22,10 @@ import { LoaderScreen } from 'react-native-ui-lib';
 import { sortBy } from 'lodash';
 import translations from './../utils/translations'
 import cloneDeep from "lodash/cloneDeep";
+import uniqueId from "lodash/uniqueId";
+import _ from "lodash";
 
-class FollowUpsSingleQuestionnaireContainer extends PureComponent {
+class FollowUpsSingleQuestionnaireContainer extends Component {
 
     // This will be a container, so put as less business logic here as possible
     constructor(props) {
@@ -31,10 +33,12 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
         this.state = {
             interactionComplete: false,
             questions: [],
-            previousAnswers: this.props.previousAnswers
+            previousAnswers: this.props.previousAnswers,
+            collapsedQuestions: [],
         };
     }
 
+    // Please add here the react lifecycle methods that you need
     componentDidMount() {
         InteractionManager.runAfterInteractions(() => {
             this.setState({
@@ -66,22 +70,24 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
 
         if (previousAnswers && Object.keys(previousAnswers).length > 0) {
             for (let questionId in previousAnswers) {
-                if (Array.isArray(previousAnswers[questionId]) && previousAnswers[questionId].length > 1) {
-                    previousAnswers[questionId] = previousAnswers[questionId].sort((a, b) => {
-                        if (createDate(a.date) > createDate(b.date)) {
-                            return -1;
-                        }
-                        if (createDate(a.date) < createDate(b.date)) {
-                            return 1;
-                        }
-                        return 0;
-                    })
+                if(previousAnswers.hasOwnProperty(questionId)) {
+                    if (Array.isArray(previousAnswers[questionId]) && previousAnswers[questionId].length > 1) {
+                        previousAnswers[questionId] = previousAnswers[questionId].sort((a, b) => {
+                            if (createDate(a.date) > createDate(b.date)) {
+                                return -1;
+                            }
+                            if (createDate(a.date) < createDate(b.date)) {
+                                return 1;
+                            }
+                            return 0;
+                        })
+                    }
                 }
             }
         }
 
         let sortedQuestions = sortBy(cloneDeep(this.props.questions), ['order', 'variable']);
-        let questions = extractAllQuestions(sortedQuestions, previousAnswers);
+        let questions = extractAllQuestions(sortedQuestions, previousAnswers, 0);
 
         return (
             <View style={{ flex: 1 }}>
@@ -105,7 +111,7 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
                     >
                         {
                             questions && Array.isArray(questions) && questions.length > 0 && questions.map((item, index) => {
-                                return this.handleRenderItem(item, index, questions);
+                                return this.handleRenderItem(previousAnswers, item, index, questions);
                             })
                         }
                     </ScrollView>
@@ -115,27 +121,31 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
     }
 
     // Please write here all the methods that are not react native lifecycle methods
-    handleRenderItem = (item, index, totalQuestions) => {
+    handleRenderItem = (previousAnswers, item, index, totalQuestions) => {
         const totalNumberOfQuestions = totalQuestions.length;
         if (item.inactive === false) {
             return (
                 <QuestionCard
-                    key={index}
+                    key={uniqueId('key_')}
                     item={item}
                     index={index + 1}
+                    isCollapsed={ this.isCollapsed(item)}
                     totalNumberOfQuestions={totalNumberOfQuestions}
+                    source={previousAnswers}
                     totalQuestions={totalQuestions}
-                    source={this.props.previousAnswers}
                     isEditMode={this.props.isEditMode}
+                    onCollapse={ this.collapseQuestion}
                     onChangeTextAnswer={this.props.onChangeTextAnswer}
                     onChangeDateAnswer={this.props.onChangeDateAnswer}
                     onChangeSingleSelection={this.props.onChangeSingleSelection}
                     onChangeMultipleSelection={this.props.onChangeMultipleSelection}
                     onFocus={this.handleOnFocus}
                     onClickAddNewMultiFrequencyAnswer={this.props.onClickAddNewMultiFrequencyAnswer}
-                    onClickShowPreviousAnswers={this.props.onClickShowPreviousAnswers}
                     onBlur={this.handleOnBlur}
                     onChangeAnswerDate={this.props.onChangeAnswerDate}
+                    savePreviousAnswers={this.props.savePreviousAnswers}
+                    editableQuestionDate={true}
+                    copyAnswerDate={this.props.copyAnswerDate}
                 />
             )
         }
@@ -147,7 +157,16 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
         checkRequiredFields = checkRequiredFields.map((e) => { return getTranslation(e, this.props.translation) });
         console.log("Check required questions: ", checkRequiredFields);
         if (checkRequiredFields && Array.isArray(checkRequiredFields) && checkRequiredFields.length === 0) {
-            this.props.onPressSave();
+            if( this.checkAnswerDatesQuestionnaire()){
+                this.props.onPressSave();
+            }else{
+                Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.answerDateMissingError, this.props.translation), [
+                    {
+                        text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+                        onPress: () => { console.log("OK pressed") }
+                    }
+                ])
+            }
         } else {
             Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), `${getTranslation(translations.alertMessages.requiredFieldsMissingError, this.props.translation)}.\n${getTranslation(translations.alertMessages.missingFields, this.props.translation)}: ${checkRequiredFields}`, [
                 {
@@ -158,6 +177,33 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
         }
     };
 
+    checkAnswerDatesQuestionnaire = () => {
+        let previousAnswersClone = _.cloneDeep(this.props.previousAnswers);
+        let sortedQuestions = sortBy(cloneDeep(this.props.questions), ['order', 'variable']);
+        sortedQuestions = extractAllQuestions(sortedQuestions, this.props.previousAnswers, 0);
+        let canSave = true;
+        //questions exist
+        if( Array.isArray(sortedQuestions) && sortedQuestions.length > 0){
+            for(let i=0; i < sortedQuestions.length; i++){
+                //verify only multianswer questions and if they were answered
+                if(sortedQuestions[i].multiAnswer && previousAnswersClone.hasOwnProperty(sortedQuestions[i].variable)){
+                    //current answers
+                    let answerValues = previousAnswersClone[sortedQuestions[i].variable];
+                    //validate all the answers of the question
+                    if( Array.isArray(answerValues) && answerValues.length > 0){
+                        for( let q=0; q < answerValues.length; q++){
+                            // if it has value then it must have date
+                            if(answerValues[q].value !== null && answerValues[q].date === null){
+                                canSave = false;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return canSave;
+    };
+
     handleOnFocus = (event) => {
         // this.scrollToInput(findNodeHandle(event.target))
     };
@@ -166,8 +212,42 @@ class FollowUpsSingleQuestionnaireContainer extends PureComponent {
         // this.scrollFollowUpsSingleQuestionnaire.props.scrollToPosition(0, 0, false)
         // this.scrollToInput(findNodeHandle(event.target))
     };
-}
 
+    isCollapsed = (item) => {
+        let isCollapsed = false;
+        let collapsedQuestions = this.state.collapsedQuestions;
+        if( collapsedQuestions.length > 0) {
+            collapsedQuestions.map((question) => {
+                if (question.order === item.order && question.text === item.text)
+                    isCollapsed = true;
+            });
+        }
+        return isCollapsed;
+    };
+
+    collapseQuestion = (item, shouldOpen) => {
+        let collapsedQuestions = this.state.collapsedQuestions;
+        if(shouldOpen !== undefined){
+            if (!this.isCollapsed(item) && shouldOpen) {
+                collapsedQuestions.push(item);
+            }
+        }else {
+            if (this.isCollapsed(item)) {
+                if (collapsedQuestions.length === 1) {
+                    collapsedQuestions = [];
+                } else {
+                    collapsedQuestions = collapsedQuestions.filter((question) => {
+                        if (question.order !== item.order && question.text !== item.text)
+                            return item;
+                    });
+                }
+            } else {
+                collapsedQuestions.push(item);
+            }
+        }
+        this.setState({ collapsedQuestions: collapsedQuestions});
+    };
+}
 
 // Create style outside the class, or for components that will be used by other components (buttons),
 // make a global style in the config directory

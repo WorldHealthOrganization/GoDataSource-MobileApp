@@ -28,13 +28,13 @@ class ModalSyncStatus extends PureComponent {
                     <ScrollView style={{width: '100%'}} contentContainerStyle={{flexGrow: 1, justifyContent: 'center', alignItems: 'center'}}>
                         {
                             this.props && this.props.syncState && Array.isArray(this.props.syncState) && this.props.syncState.map((item, index) => {
-                                console.log('syncState map: ', item);
+                                // console.log('syncState map: ', item);
                                 return (
                                     <View style={{
                                         width: '85%',
                                         justifyContent: 'space-between',
                                         marginVertical: 8
-                                    }}>
+                                    }} key={index}>
                                         <View style={{
                                             flexDirection: 'row',
                                             justifyContent: 'space-between'
