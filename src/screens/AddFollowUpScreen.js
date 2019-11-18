@@ -4,25 +4,19 @@
 /**
  * Created by florinpopa on 05/07/2018.
  */
-import React, {PureComponent} from 'react';
-import {View, StyleSheet, Platform, Alert} from 'react-native';
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
+import React, {PureComponent} from 'react';
+import {View, StyleSheet} from 'react-native';
 import Button from './../components/Button';
 import styles from './../styles';
 import {connect} from "react-redux";
-import {bindActionCreators} from "redux";
 import ElevatedView from 'react-native-elevated-view';
 import {calculateDimension, getTranslation, createDate} from './../utils/functions';
-import config from './../utils/config';
 import Section from './../components/Section';
-import DropdownInput from './../components/DropdownInput';
 import DatePicker from './../components/DatePicker';
 import {Dialog} from 'react-native-ui-lib';
-import {getContactsForOutbreakIdRequest} from './../queries/contacts';
-import DropdownSearchable from './../components/DropdownSearchable';
 import translations from './../utils/translations';
-// import moment from 'moment';
 
 class AddFollowUpScreen extends PureComponent{
 
@@ -35,19 +29,6 @@ class AddFollowUpScreen extends PureComponent{
             isModified: false,
         };
     }
-
-    // componentDidMount() {
-        // getContactsForOutbreakIdRequest(this.props.user.activeOutbreakId, null, null, (error, contacts) => {
-        //     if (error) {
-        //         console.log("An error occurred while getting all contacts for add contacts screen");
-        //     }
-        //     if (contacts) {
-        //         this.setState({
-        //             contacts
-        //         })
-        //     }
-        // })
-    // }
 
     render () {
         let contentWidth = calculateDimension(297, false, this.props.screenSize);
@@ -88,12 +69,6 @@ class AddFollowUpScreen extends PureComponent{
                             style={{width: contentWidth, marginHorizontal, flex: 0.33}}
                             translation={this.props.translation}
                         />
-                        {/*<DropdownSearchable*/}
-                            {/*outbreakId={this.props && this.props.user && this.props.user.activeOutbreakId ? this.props.user.activeOutbreakId : null}*/}
-                            {/*onChange={this.onDropdownSearchableChanged}*/}
-                            {/*placeholder={getTranslation(translations.addFollowUpScreen.searchContactPlacehodler, this.props.translation)}*/}
-                            {/*translation={this.props.translation}*/}
-                        {/*/>*/}
                     </View>
                     <View style={{flex: 0.2, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-evenly'}}>
                         <Button
@@ -117,13 +92,6 @@ class AddFollowUpScreen extends PureComponent{
             </Dialog>
         );
     }
-
-    onDropdownSearchableChanged = (value) => {
-        this.setState({
-            selectedContact: value,
-            isModified: true
-        })
-    };
 
     onDateChanged = (date, id, objectType) => {
         this.setState({
@@ -151,8 +119,6 @@ class AddFollowUpScreen extends PureComponent{
     };
 }
 
-
-
 // Create style outside the class, or for components that will be used by other components (buttons),
 // make a global style in the config directory
 const style = StyleSheet.create({
@@ -165,16 +131,9 @@ const style = StyleSheet.create({
 
 function mapStateToProps(state) {
     return {
-        user: state.user,
         screenSize: state.app.screenSize,
-        contacts: state.contacts,
         translation: state.app.translation
     };
 }
 
-function matchDispatchProps(dispatch) {
-    return bindActionCreators({
-    }, dispatch);
-}
-
-export default connect(mapStateToProps, matchDispatchProps)(AddFollowUpScreen);
+export default connect(mapStateToProps)(AddFollowUpScreen);

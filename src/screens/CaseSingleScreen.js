@@ -18,10 +18,16 @@ import CaseSinglePersonalContainer from './../containers/CaseSinglePersonalConta
 import CaseSingleAddressContainer from './../containers/CaseSingleAddressContainer';
 import CaseSingleInfectionContainer from './../containers/CaseSingleInfectionContainer';
 import CaseSingleInvestigationContainer from '../containers/CaseSingleInvestigationContainer';
+import CaseSingleExposureContainer from '../containers/CaseSingleExposureContainer';
 import { Icon } from 'react-native-material-ui';
-import { checkForNameDuplicatesRequest } from './../queries/cases'
-import { removeErrors } from './../actions/errors';
-import { addCase, updateCase } from './../actions/cases';
+import { checkForNameDuplicatesRequest } from './../queries/cases';
+import {
+    addCase,
+    updateCase,
+    getCaseAndExposuresById,
+    editExposureForCase,
+    getRelationsForCase
+} from './../actions/cases';
 import {
     updateRequiredFields,
     extractIdFromPouchId,
@@ -32,7 +38,8 @@ import {
     reMapAnswers,
     checkRequiredQuestions,
     extractAllQuestions,
-    createDate
+    createDate,
+    computeFullName
 } from './../utils/functions';
 import moment from 'moment';
 import translations from './../utils/translations'
@@ -54,19 +61,16 @@ class CaseSingleScreen extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            filter: this.props.filter && this.props.filter['CasesScreen'] ? this.props.filter['CasesScreen'] : {
-                searchText: ''
-            },
-            filterFromFilterScreen: this.props.filter && this.props.filter['CasesFilterScreen'] ? this.props.filter['CasesFilterScreen'] : null,
             interactionComplete: false,
             deletePressed: false,
             savePressed: false,
             saveFromEditPressed: false,
-            routes: config.tabsValuesRoutes.casesSingle,
-            index: 0,
+            routes: this.props.isNew ? config.tabsValuesRoutes.casesSingle : config.tabsValuesRoutes.casesSingleViewEdit,
+            index: _.get(this.props, 'index', 0),
             case: this.props.isNew ? {
                 outbreakId: this.props.user.activeOutbreakId,
                 riskLevel: '',
+                pregnancyStatus: '',
                 dateOfReporting: null,
                 isDateOfReportingApproximate: false,
                 transferRefused: false,
@@ -125,9 +129,16 @@ class CaseSingleScreen extends Component {
             selectedItemIndexForTextSwitchSelectorForAge: 0, // age/dob - switch tab
             selectedItemIndexForAgeUnitOfMeasureDropDown: this.props.isNew ? 0 : (this.props.case && this.props.case.age && this.props.case.age.years !== undefined && this.props.case.age.years !== null && this.props.case.age.years > 0) ? 0 : 1, //default age dropdown value,
             currentAnswers: {},
-            previousAnswers: [],
+            previousAnswers: {},
             mappedQuestions: [],
-            loading: false,
+            loading: true,
+
+            // used for adding new multi-frequency answers
+            showAddSingleAnswerModalScreen: false,
+            newItem: null,
+
+
+            relations: []
         };
         // Bind here methods, or at least don't declare methods in the render method
         this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this));
@@ -136,27 +147,42 @@ class CaseSingleScreen extends Component {
 
     componentDidMount() {
         BackHandler.addEventListener('hardwareBackPress', this.handleBackButtonClick);
-        let mappedAnswers = mapAnswers(this.props.caseInvestigationQuestions, this.state.case.questionnaireAnswers);
-        this.setState({
-            previousAnswers: mappedAnswers.mappedAnswers,
-            mappedQuestions: mappedAnswers.mappedQuestions
-        }, () => {
-            // console.log('Previous Answers: ', this.state.previousAnswers);
-        });
-
         if (!this.props.isNew) {
-            let ageClone = { years: 0, months: 0 };
-            let updateAge = false;
-            if (this.props.case && (this.props.case.age === null || this.props.case.age === undefined || (this.props.case.age.years === undefined && this.props.case.age.months === undefined))) {
-                updateAge = true
-            }
-            if (updateAge) {
-                this.setState(prevState => ({
-                    case: Object.assign({}, prevState.case, { age: ageClone }, { dob: this.props.case.dob !== undefined ? this.props.case.dob : null }),
-                }), () => {
-                    // console.log('old case with age as string update')
+            getCaseAndExposuresById(this.props.case._id)
+                .then((caseAndRelations) => {
+                    let caseData = _.get(caseAndRelations, 'caseData', null);
+                    let relations = _.get(caseAndRelations, 'relationshipData', []);
+                    if (caseData !== null) {
+                        let mappedAnswers = mapAnswers(this.props.caseInvestigationQuestions, caseData.questionnaireAnswers);
+                        let ageClone = { years: 0, months: 0 };
+                        let updateAge = false;
+                        if (_.get(caseData, 'age.years', null) !== null || _.get(caseData, 'age.months', null) !== null) {
+                            updateAge = true
+                        }
+                        if (updateAge) {
+                            caseData = Object.assign({}, caseData, { age: ageClone }, { dob: caseData.dob !== undefined ? caseData.dob : null });
+                        }
+
+                        this.setState({
+                            previousAnswers: mappedAnswers.mappedAnswers,
+                            mappedQuestions: mappedAnswers.mappedQuestions,
+                            case: caseData,
+                            relations: relations,
+                            loading: false
+                        })
+                    } else {
+                        this.setState({
+                            case: null
+                        })
+                    }
                 })
-            }
+                .catch((errorCaseAndRelations) => {
+                    console.log(errorCaseAndRelations);
+                })
+        } else {
+            this.setState({
+                loading: false
+            })
         }
 
     }
@@ -164,20 +190,6 @@ class CaseSingleScreen extends Component {
     componentWillUnmount() {
         BackHandler.removeEventListener('hardwareBackPress', this.handleBackButtonClick);
     }
-
-    // Please add here the react lifecycle methods that you need
-    componentDidUpdate(prevProps) {
-        if (this.state.savePressed || this.state.deletePressed) {
-            this.props.navigator.pop();
-        }
-
-        if (this.state.loading) {
-            this.setState({
-                loading: false
-            })
-        }
-    }
-
     handleBackButtonClick() {
         if (this.state.isModified === true) {
             Alert.alert("", 'You have unsaved data. Are you sure you want to leave this page and lose all changes?', [
@@ -202,20 +214,20 @@ class CaseSingleScreen extends Component {
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
-        if (this.props.errors && this.props.errors.type && this.props.errors.message) {
-            Alert.alert(this.props.errors.type, this.props.errors.message, [
-                {
-                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
-                    onPress: () => {
-                        this.setState({
-                            savePressed: false
-                        }, () => {
-                            this.props.removeErrors();
-                        })
-                    }
-                }
-            ])
-        }
+        // if (this.props.errors && this.props.errors.type && this.props.errors.message) {
+        //     Alert.alert(this.props.errors.type, this.props.errors.message, [
+        //         {
+        //             text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+        //             onPress: () => {
+        //                 this.setState({
+        //                     savePressed: false
+        //                 }, () => {
+        //                     this.props.removeErrors();
+        //                 })
+        //             }
+        //         }
+        //     ])
+        // }
 
         return (
             <ViewHOC style={style.container}
@@ -228,7 +240,12 @@ class CaseSingleScreen extends Component {
                         <View
                             style={[style.breadcrumbContainer]}>
                             <Breadcrumb
-                                entities={[getTranslation(this.props && this.props.previousScreen ? this.props.previousScreen : translations.caseSingleScreen.title, this.props.translation), this.props.isNew ? getTranslation(translations.caseSingleScreen.addCaseTitle, this.props.translation) : ((this.props.case && this.props.case.firstName ? (this.props.case.firstName + " ") : '') + (this.props.case && this.props.case.lastName ? this.props.case.lastName : ''))]}
+                                entities={
+                                    [
+                                        getTranslation(this.props && this.props.previousScreen ? this.props.previousScreen : translations.caseSingleScreen.title, this.props.translation),
+                                        this.props.isNew ? getTranslation(translations.caseSingleScreen.addCaseTitle, this.props.translation) : (computeFullName(_.get(this.state, 'case', null)))
+                                    ]
+                                }
                                 navigator={this.props.navigator}
                                 onPress={this.handlePressBreadcrumb}
                             />
@@ -306,8 +323,9 @@ class CaseSingleScreen extends Component {
 
         this.setState({
             canChangeScreen: true,
+        }, () => {
+            this.handleOnIndexChange(nextIndex)
         });
-        this.handleOnIndexChange(nextIndex)
     };
     handleMoveToPrevieousScreenButton = () => {
         let nextIndex = this.state.index - 1;
@@ -373,6 +391,7 @@ class CaseSingleScreen extends Component {
                         case={this.state.case}
                         isEditMode={this.state.isEditMode}
                         index={this.state.index}
+                        numberOfTabs={this.state.routes.length}
                         onPressEdit={this.onPressEdit}
                         onPressSaveEdit={this.onPressSaveEdit}
                         onPressCancelEdit={this.onPressCancelEdit}
@@ -380,7 +399,7 @@ class CaseSingleScreen extends Component {
                         onChangeDate={this.onChangeDate}
                         onChangeSwitch={this.onChangeSwitch}
                         onChangeDropDown={this.onChangeDropDown}
-                        handleMoveToNextScreenButton={this.handleMoveToNextScreenButton}
+                        onPressNextButton={this.handleMoveToNextScreenButton}
                         checkRequiredFieldsPersonalInfo={this.checkRequiredFieldsPersonalInfo}
                         isNew={this.props.isNew ? true : this.props.forceNew ? true : false}
                         onPressAddDocument={this.onPressAddDocument}
@@ -401,6 +420,7 @@ class CaseSingleScreen extends Component {
                         index={this.state.index}
                         onPressEdit={this.onPressEdit}
                         onPressSaveEdit={this.onPressSaveEdit}
+                        numberOfTabs={this.state.routes.length}
                         onPressCancelEdit={this.onPressCancelEdit}
                         onChangeText={this.onChangeText}
                         onChangeDropDown={this.onChangeDropDown}
@@ -409,7 +429,7 @@ class CaseSingleScreen extends Component {
                         onChangeSectionedDropDown={this.handleOnChangeSectionedDropDownAddress}
                         onDeletePress={this.handleOnPressDeleteAddress}
                         onPressAddAddress={this.handleOnPressAddAddress}
-                        handleMoveToNextScreenButton={this.handleMoveToNextScreenButton}
+                        onPressNextButton={this.handleMoveToNextScreenButton}
                         handleMoveToPrevieousScreenButton={this.handleMoveToPrevieousScreenButton}
                         checkRequiredFieldsAddresses={this.checkRequiredFieldsAddresses}
                         isNew={this.props.isNew ? true : this.props.forceNew ? true : false}
@@ -424,6 +444,7 @@ class CaseSingleScreen extends Component {
                         case={this.state.case}
                         isEditMode={this.state.isEditMode}
                         index={this.state.index}
+                        numberOfTabs={this.state.routes.length}
                         onPressEdit={this.onPressEdit}
                         onPressSaveEdit={this.onPressSaveEdit}
                         onPressCancelEdit={this.onPressCancelEdit}
@@ -431,19 +452,41 @@ class CaseSingleScreen extends Component {
                         onChangeDropDown={this.onChangeDropDown}
                         onChangeDate={this.onChangeDate}
                         onChangeSwitch={this.onChangeSwitch}
-                        handleMoveToNextScreenButton={this.handleMoveToNextScreenButton}
+                        onPressNextButton={this.handleMoveToNextScreenButton}
                         handleMoveToPrevieousScreenButton={this.handleMoveToPrevieousScreenButton}
                         checkRequiredFieldsInfection={this.checkRequiredFieldsInfection}
                         isNew={this.props.isNew ? true : this.props.forceNew ? true : false}
                         onPressAddDateRange={this.onPressAddDateRange}
                         handleOnPressDeleteDateRange={this.handleOnPressDeleteDateRange}
-                        onPressAddIsolationDates={this.onPressAddIsolationDates}
-                        handleOnPressDeleteIsolationDates={this.handleOnPressDeleteIsolationDates}
+                        //onPressAddIsolationDates={this.onPressAddIsolationDates}
+
                         checkIsolationOnsetDates={this.checkIsolationOnsetDates}
                         onChangeSectionedDropDownDateRange={this.onChangeSectionedDropDownDateRange}
                         onChangeSectionedDropDownIsolation={this.onChangeSectionedDropDownIsolation}
                         onChangeSectionedDropDownBurial={this.onChangeSectionedDropDownBurial}
                         checkDateOfOnsetOutcome={this.checkDateOfOnsetOutcome}
+                        onPressAddVaccine={this.onPressAddVaccine}
+                        onPressDeleteVaccines={this.handleOnPressDeleteVaccines}
+                    />
+                );
+            case 'exposures':
+                return (
+                    <CaseSingleExposureContainer
+                        case={this.state.case}
+                        relations={this.state.relations}
+                        index={this.state.index}
+                        numberOfTabs={this.state.routes.length}
+                        onPressEdit={this.onPressEdit}
+                        onPressSaveEdit={this.onPressSaveEdit}
+                        onPressCancelEdit={this.onPressCancelEdit}
+                        onPressEditExposure={this.handleOnPressEditExposure}
+                        onPressDeleteExposure={this.handleOnPressDeleteExposure}
+                        navigator={this.props.navigator}
+                        saveExposure={this.handleSaveExposure}
+                        isNew={this.props.isNew}
+                        handleOnPressSave={this.handleOnPressSave}
+                        isEditMode={this.state.isEditMode}
+                        selectedExposure={this.props.singleCase}
                     />
                 );
             case 'caseInvestigation':
@@ -453,6 +496,7 @@ class CaseSingleScreen extends Component {
                     previousAnswers={this.state.previousAnswers}
                     isEditMode={this.state.isEditMode}
                     index={this.state.index}
+                    numberOfTabs={this.state.routes.length}
                     onPressEdit={this.onPressEdit}
                     onPressSave={this.handleOnPressSave}
                     onPressSaveEdit={this.onPressSaveEdit}
@@ -474,10 +518,10 @@ class CaseSingleScreen extends Component {
 
     //Save case
     handleOnPressSave = () => {
-        this.setState({
-            loading: true
-        }, () => {
-            let missingFields = this.checkRequiredFields();
+        // this.setState({
+        //     loading: true
+        // }, () => {
+            let missingFields = this.checkRequiredFields().map((e) => getTranslation(e, this.props.translation));
             if (missingFields && Array.isArray(missingFields) && missingFields.length === 0) {
                 if (this.checkAgeYearsRequirements()) {
                     if (this.checkAgeMonthsRequirements()) {
@@ -596,7 +640,7 @@ class CaseSingleScreen extends Component {
                     ])
                 })
             }
-        })
+        // })
     };
     saveCaseAction = () => {
         this.hideMenu();
@@ -627,9 +671,21 @@ class CaseSingleScreen extends Component {
                     this.setState(prevState => ({
                         case: Object.assign({}, prevState.case, caseWithRequiredFields)
                     }), () => {
-                        let caseMatchFitler = this.checkIfCaseMatchFilter();
-                        // console.log('caseMatchFitler', caseMatchFitler);
-                        this.props.updateCase(this.props.user.activeOutbreakId, this.state.case._id, this.state.case, this.props.user.token, caseMatchFitler);
+                        // let caseMatchFitler = this.checkIfCaseMatchFilter()
+                        // console.log('caseMatchFitler', caseMatchFitler)
+                        updateCase(this.state.case)
+                            .then((result) => {
+                                // this.props.refresh();
+                                this.props.navigator.pop(
+                                    {
+                                        animated: true,
+                                        animationType: 'fade',
+                                    }
+                                )
+                            })
+                            .catch((errorUpdateCase) => {
+                                console.log('errorUpdateCase', errorUpdateCase);
+                            })
                     })
                 });
             } else {
@@ -642,9 +698,21 @@ class CaseSingleScreen extends Component {
                         this.setState(prevState => ({
                             case: Object.assign({}, prevState.case, caseWithRequiredFields)
                         }), () => {
-                            let caseMatchFitler = this.checkIfCaseMatchFilter();
-                            // console.log('caseMatchFitler', caseMatchFitler);
-                            this.props.addCase(this.props.user.activeOutbreakId, this.state.case, this.props.user.token, caseMatchFitler);
+                            // let caseMatchFitler = this.checkIfCaseMatchFilter()
+                            // console.log('caseMatchFitler', caseMatchFitler)
+                            addCase(this.state.case)
+                                .then((result) => {
+                                    // this.props.refresh();
+                                    this.props.navigator.pop(
+                                        {
+                                            animated: true,
+                                            animationType: 'fade',
+                                        }
+                                    )
+                                })
+                                .catch((errorUpdateCase) => {
+                                    console.log('errorUpdateCase', errorUpdateCase);
+                                })
                         })
                     } else {
                         let caseWithRequiredFields = null;
@@ -656,9 +724,19 @@ class CaseSingleScreen extends Component {
                         this.setState(prevState => ({
                             case: Object.assign({}, prevState.case, caseWithRequiredFields)
                         }), () => {
-                            let caseMatchFitler = this.checkIfCaseMatchFilter();
-                            // console.log('caseMatchFitler', caseMatchFitler);
-                            this.props.updateCase(this.props.user.activeOutbreakId, this.state.case._id, this.state.case, this.props.user.token, caseMatchFitler);
+                            updateCase(this.state.case)
+                                .then((result) => {
+                                    // this.props.refresh();
+                                    this.props.navigator.pop(
+                                        // {
+                                        //     animated: true,
+                                        //     animationType: 'fade',
+                                        // }
+                                    )
+                                })
+                                .catch((errorUpdateCase) => {
+                                    console.log('errorUpdateCase', errorUpdateCase);
+                                })
                         })
                     }
                 });
@@ -682,64 +760,6 @@ class CaseSingleScreen extends Component {
             ])
         } else {
             this.props.navigator.pop();
-        }
-    };
-
-    checkIfCaseMatchFilter = () => {
-        if (this.props.filter && (this.props.filter['CasesFilterScreen'] || this.props.filter['CasesScreen'])) {
-            let caseCopy = [_.cloneDeep(this.state.case)];
-
-            // Take care of search filter
-            if (this.state.filter.searchText) {
-                caseCopy = caseCopy.filter((e) => {
-                    return e && e.firstName && this.state.filter.searchText.toLowerCase().includes(e.firstName.toLowerCase()) ||
-                        e && e.lastName && this.state.filter.searchText.toLowerCase().includes(e.lastName.toLowerCase()) ||
-                        e && e.firstName && e.firstName.toLowerCase().includes(this.state.filter.searchText.toLowerCase()) ||
-                        e && e.lastName && e.lastName.toLowerCase().includes(this.state.filter.searchText.toLowerCase())
-                });
-            }
-
-            // Take care of gender filter
-            if (this.state.filterFromFilterScreen && this.state.filterFromFilterScreen.gender) {
-                caseCopy = caseCopy.filter((e) => { return e.gender === this.state.filterFromFilterScreen.gender });
-            }
-            // Take care of age range filter
-            if (this.state.filterFromFilterScreen && this.state.filterFromFilterScreen.age && Array.isArray(this.state.filterFromFilterScreen.age) && this.state.filterFromFilterScreen.age.length === 2 && (this.state.filterFromFilterScreen.age[0] >= 0 || this.state.filterFromFilterScreen.age[1] <= 150)) {
-                caseCopy = caseCopy.filter((e) => {
-                    if (e.age && e.age.years !== null && e.age.years !== undefined && e.age.months !== null && e.age.months !== undefined) {
-                        if (e.age.years > 0 && e.age.months === 0) {
-                            return e.age.years >= this.state.filterFromFilterScreen.age[0] && e.age.years <= this.state.filterFromFilterScreen.age[1]
-                        } else if (e.age.years === 0 && e.age.months > 0) {
-                            return e.age.months >= this.state.filterFromFilterScreen.age[0] && e.age.months <= this.state.filterFromFilterScreen.age[1]
-                        } else if (e.age.years === 0 && e.age.months === 0) {
-                            return e.age.years >= this.state.filterFromFilterScreen.age[0] && e.age.years <= this.state.filterFromFilterScreen.age[1]
-                        }
-                    }
-                });
-            }
-            // Take care of locations filter
-            if (this.state.filterFromFilterScreen && this.state.filterFromFilterScreen.selectedLocations && this.state.filterFromFilterScreen.selectedLocations.length > 0) {
-                caseCopy = caseCopy.filter((e) => {
-                    let addresses = e.addresses.filter((k) => {
-                        return k.locationId !== '' && this.state.filterFromFilterScreen.selectedLocations.indexOf(k.locationId) >= 0
-                    });
-                    return addresses.length > 0
-                })
-            }
-            //Take care of classification filter
-            if (this.state.filterFromFilterScreen && this.state.filterFromFilterScreen.classification && this.state.filterFromFilterScreen.classification.length > 0) {
-                caseCopy = caseCopy.filter((e) => {
-                    return this.state.filterFromFilterScreen.classification.map((f) => { return f.classification }).indexOf(e.classification) > -1
-                })
-            }
-
-            if (caseCopy.length > 0) {
-                return true
-            } else {
-                return false
-            }
-        } else {
-            return true
         }
     };
 
@@ -886,6 +906,43 @@ class CaseSingleScreen extends Component {
                 }
             }
         ]);
+    };
+
+    // Exposures handlers
+    handleOnPressEditExposure = (relation, index) => {
+        // console.log('handleOnPressEditExposure: ', relation, index);
+        _.set(relation, 'contactData.fullName', computeFullName(_.get(relation, 'contactData', null)));
+        this.props.navigator.showModal({
+            screen: 'ExposureScreen',
+            animated: true,
+            passProps: {
+                exposure: _.get(relation, 'relationshipData', null),
+                selectedExposure: _.get(relation, 'contactData', null),
+                contact: this.props.isNew ? null : this.props.contact,
+                type: 'Case',
+                saveExposure: this.handleSaveExposure,
+                caseIdFromCasesScreen: this.props.caseIdFromCasesScreen,
+                isEditMode: false,
+                addContactFromCasesScreen: false,
+                refreshRelations: this.refreshRelations
+            }
+        })
+    };
+    refreshRelations = (exposure) => {
+        this.setState({
+            loading: true
+        }, () => {
+            getRelationsForCase(_.get(this.state, 'case._id', null))
+                .then((updatedRelations) => {
+                    this.setState({
+                        loading: false,
+                        relations: updatedRelations
+                    })
+                })
+                .catch((errorUpdateExposure) => {
+                    console.log('ErrorUpdateExposure', errorUpdateExposure);
+                })
+        })
     };
 
 
@@ -1042,34 +1099,36 @@ class CaseSingleScreen extends Component {
     };
 
 
-    //isolationDates functions
-    onPressAddIsolationDates = () => {
-        let isolationDates = _.cloneDeep(this.state.case.isolationDates);
+    // vaccinesReceived functions
+    onPressAddVaccine = () => {
+        let vaccinesReceived = _.cloneDeep(this.state.case.vaccinesReceived);
+        if (!vaccinesReceived) {
+            vaccinesReceived = [];
+        }
 
-        isolationDates.push({
-            startDate: null,
-            endDate: null,
-            centerName: null,
-            locationId: null,
-            comments: null
+        vaccinesReceived.push({
+            id: null,
+            vaccine: null,
+            date: null,
+            status: null
         });
 
         this.setState(prevState => ({
-            case: Object.assign({}, prevState.case, { isolationDates }),
+            case: Object.assign({}, prevState.case, { vaccinesReceived: vaccinesReceived }),
             isModified: true
         }), () => {
             // console.log("### after updating the data: ", this.state.case);
         })
     };
-    handleOnPressDeleteIsolationDates = (index) => {
-        // console.log("DeletePressed: ", index);
-        let caseIsolationDatesClone = _.cloneDeep(this.state.case.isolationDates);
-        caseIsolationDatesClone.splice(index, 1);
+    handleOnPressDeleteVaccines = (index) => {
+        console.log("DeletePressed: ", index);
+        let caseVaccinesReceived = _.cloneDeep(this.state.case.vaccinesReceived);
+        caseVaccinesReceived.splice(index, 1);
         this.setState(prevState => ({
-            case: Object.assign({}, prevState.case, { isolationDates: caseIsolationDatesClone }),
+            case: Object.assign({}, prevState.case, { vaccinesReceived: caseVaccinesReceived }),
             isModified: true
         }), () => {
-            // console.log("After deleting the isolationDates: ", this.state.case);
+            console.log("After deleting the Vaccines: ", this.state.case);
         })
     };
     onChangeSectionedDropDownIsolation = (selectedItems, index) => {
@@ -1175,6 +1234,17 @@ class CaseSingleScreen extends Component {
             }
         }
 
+        // isolation Date
+        if (this.state.case && this.state.case.vaccinesReceived && Array.isArray(this.state.case.vaccinesReceived) && this.state.case.vaccinesReceived.length > 0) {
+            for (let i=0; i < this.state.case.vaccinesReceived.length; i++) {
+                for (let j=0; j<config.caseSingleScreen.vaccinesReceived.fields.length; j++) {
+                    if (config.caseSingleScreen.vaccinesReceived.fields[j].isRequired && !this.state.case.vaccinesReceived[i][config.caseSingleScreen.vaccinesReceived.fields[j].id]) {
+                        requiredFields.push(getTranslation(config.caseSingleScreen.vaccinesReceived.fields[j].label, this.props.translation));
+                        // return false;
+                    }
+                }
+            }
+        }
         return requiredFields;
     };
     checkRequiredFieldsCaseInvestigationQuestionnaire = () => {
@@ -1234,7 +1304,7 @@ class CaseSingleScreen extends Component {
     // onChangeStuff functions
     onChangeText = (value, id, objectTypeOrIndex, objectType) => {
         // console.log("case onChangeText: ", value, id, objectTypeOrIndex, objectType);
-        if (objectTypeOrIndex == 'Case') {
+        if (objectTypeOrIndex === 'Case') {
             this.setState(
                 (prevState) => ({
                     case: Object.assign({}, prevState.case, { [id]: value }),
@@ -1365,6 +1435,16 @@ class CaseSingleScreen extends Component {
                             isModified: true
                         }), () => {
                             // console.log("onChangeDate addressesClone", id, " ", value, " ", this.state.case);
+                        })
+                    } else if (objectType === 'Vaccines') {
+                        let vaccinesClone = _.cloneDeep(this.state.case.vaccinesReceived);
+                        vaccinesClone[objectTypeOrIndex][id] = value && value.value !== undefined ? value.value : value;
+                        console.log('vaccinesClone', vaccinesClone);
+                        this.setState(prevState => ({
+                            case: Object.assign({}, prevState.case, { vaccinesReceived: vaccinesClone }),
+                            isModified: true
+                        }), () => {
+                            // console.log("onChangeDropDown", id, " ", value, " ", this.state.case);
                         })
                     }
                 }
@@ -1561,6 +1641,16 @@ class CaseSingleScreen extends Component {
                     }), () => {
                         // console.log("onChangeDropDown", id, " ", value, " ", this.state.case);
                     })
+                } else if (objectType === 'Vaccines') {
+                    let vaccinesClone = _.cloneDeep(this.state.case.vaccinesReceived);
+                    vaccinesClone[objectTypeOrIndex][id] = value && value.value !== undefined ? value.value : value;
+                    console.log('vaccinesClone', vaccinesClone);
+                    this.setState(prevState => ({
+                        case: Object.assign({}, prevState.case, { vaccinesReceived: vaccinesClone }),
+                        isModified: true
+                    }), () => {
+                        // console.log("onChangeDropDown", id, " ", value, " ", this.state.case);
+                    })
                 }
             }
         }
@@ -1699,9 +1789,6 @@ class CaseSingleScreen extends Component {
                 }
                 if (typeof questionnaireAnswers[parentId][0].subAnswers === "object" && Object.keys(questionnaireAnswers[parentId][0].subAnswers).length === 0) {
                     questionnaireAnswers[parentId][0].subAnswers = {};
-                }
-                if (!questionnaireAnswers[parentId][0].subAnswers[id]) {
-                    questionnaireAnswers[parentId][0].subAnswers[id] = [];
                 }
                 questionnaireAnswers[parentId][0].subAnswers[id][0] = value;
             }
@@ -1844,6 +1931,9 @@ class CaseSingleScreen extends Component {
     };
 
     onNavigatorEvent = (event) => {
+        if (event.id === 'didDisappear') {
+            this.props.refresh();
+        }
         navigation(event, this.props.navigator);
     };
     goToHelpScreen = () => {
@@ -1982,21 +2072,10 @@ function mapStateToProps(state) {
     return {
         user: state.user,
         screenSize: state.app.screenSize,
-        // outbreak: state.outbreak,
         errors: state.errors,
-        filter: state.app.filters,
-        cases: state.cases,
         caseInvestigationQuestions: state.outbreak.caseInvestigationTemplate,
         translation: state.app.translation
     };
 }
 
-function matchDispatchProps(dispatch) {
-    return bindActionCreators({
-        addCase,
-        updateCase,
-        removeErrors
-    }, dispatch);
-}
-
-export default connect(mapStateToProps, matchDispatchProps)(CaseSingleScreen);
+export default connect(mapStateToProps)(CaseSingleScreen);

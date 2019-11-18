@@ -22,6 +22,7 @@ import Button from './../components/Button';
 import ElevatedView from 'react-native-elevated-view';
 import translations from './../utils/translations'
 import _ from 'lodash';
+import TopContainerButtons from "../components/TopContainerButtons";
 
 class CaseSinglePersonalContainer extends Component {
 
@@ -48,70 +49,72 @@ class CaseSinglePersonalContainer extends Component {
         return (
             <View style={{ flex: 1 }}>
                 <View style={style.container}>
-                    <View style={{ flexDirection: 'row' }}>
-                        {
-                            this.props.isNew ? (
-                                <Button
-                                    title={getTranslation(translations.generalButtons.nextButtonLabel, this.props.translation)}
-                                    onPress={this.handleNextButton}
-                                    color={styles.buttonGreen}
-                                    titleColor={'white'}
-                                    height={calculateDimension(25, true, this.props.screenSize)}
-                                    width={calculateDimension(130, false, this.props.screenSize)}
-                                    style={{
-                                        marginVertical: calculateDimension(12.5, true, this.props.screenSize),
-                                        marginRight: 10,
-                                    }} />) : (
-                                    this.props.isEditMode ? (
-                                        <View style={{ flexDirection: 'row' }}>
-                                            <Button
-                                                title={getTranslation(translations.generalButtons.saveButtonLabel, this.props.translation)}
-                                                onPress={this.props.onPressSaveEdit}
-                                                color={styles.buttonGreen}
-                                                titleColor={'white'}
-                                                height={calculateDimension(25, true, this.props.screenSize)}
-                                                width={calculateDimension(166, false, this.props.screenSize)}
-                                                style={{
-                                                    marginVertical: calculateDimension(12.5, true, this.props.screenSize),
-                                                    marginRight: 10,
-                                                }} />
-                                            <Button
-                                                title={getTranslation(translations.generalButtons.cancelButtonLabel, this.props.translation)}
-                                                onPress={this.props.onPressCancelEdit}
-                                                color={styles.buttonGreen}
-                                                titleColor={'white'}
-                                                height={calculateDimension(25, true, this.props.screenSize)}
-                                                width={calculateDimension(166, false, this.props.screenSize)}
-                                                style={{
-                                                    marginVertical: calculateDimension(12.5, true, this.props.screenSize),
-                                                    marginRight: 10,
-                                                }} />
-                                        </View>) : (
-                                            this.props.role.find((e) => e === config.userPermissions.writeCase) !== undefined ? (
-                                                <Button
-                                                    title={getTranslation(translations.generalButtons.editButtonLabel, this.props.translation)}
-                                                    onPress={this.props.onPressEdit}
-                                                    color={styles.buttonGreen}
-                                                    titleColor={'white'}
-                                                    height={calculateDimension(25, true, this.props.screenSize)}
-                                                    width={calculateDimension(166, false, this.props.screenSize)}
-                                                    style={{
-                                                        marginVertical: calculateDimension(12.5, true, this.props.screenSize),
-                                                        marginRight: 10,
-                                                    }} />
-                                            ) : null
-                                        ))
-                        }
-                    </View>
-                    {/* <KeyboardAwareScrollView
-                        style={style.containerScrollView}
-                        contentContainerStyle={[style.contentContainerStyle, {paddingBottom: this.props.screenSize.height < 600 ? 70 : 20}]}
-                        keyboardShouldPersistTaps={'always'}
-                        extraHeight={20 + 81 + 50 + 70}
-                        innerRef={ref => {
-                            this.scrollCasesSinglePersonal = ref
-                        }}
-                    > */}
+                    <TopContainerButtons
+                        isNew={this.props.isNew}
+                        isEditMode={this.props.isEditMode}
+                        index={this.props.index}
+                        numberOfTabs={this.props.numberOfTabs}
+                        onPressEdit={this.props.onPressEdit}
+                        onPressSaveEdit={this.props.onPressSaveEdit}
+                        onPressCancelEdit={this.props.onPressCancelEdit}
+                        onPressNextButton={this.handleNextButton}
+                    />
+
+                    {/*<View style={{ flexDirection: 'row' }}>*/}
+                        {/*{*/}
+                            {/*this.props.isNew ? (*/}
+                                {/*<Button*/}
+                                    {/*title={getTranslation(translations.generalButtons.nextButtonLabel, this.props.translation)}*/}
+                                    {/*onPress={this.handleNextButton}*/}
+                                    {/*color={styles.buttonGreen}*/}
+                                    {/*titleColor={'white'}*/}
+                                    {/*height={calculateDimension(25, true, this.props.screenSize)}*/}
+                                    {/*width={calculateDimension(130, false, this.props.screenSize)}*/}
+                                    {/*style={{*/}
+                                        {/*marginVertical: calculateDimension(12.5, true, this.props.screenSize),*/}
+                                        {/*marginRight: 10,*/}
+                                    {/*}} />) : (*/}
+                                    {/*this.props.isEditMode ? (*/}
+                                        {/*<View style={{ flexDirection: 'row' }}>*/}
+                                            {/*<Button*/}
+                                                {/*title={getTranslation(translations.generalButtons.saveButtonLabel, this.props.translation)}*/}
+                                                {/*onPress={this.props.onPressSaveEdit}*/}
+                                                {/*color={styles.buttonGreen}*/}
+                                                {/*titleColor={'white'}*/}
+                                                {/*height={calculateDimension(25, true, this.props.screenSize)}*/}
+                                                {/*width={calculateDimension(166, false, this.props.screenSize)}*/}
+                                                {/*style={{*/}
+                                                    {/*marginVertical: calculateDimension(12.5, true, this.props.screenSize),*/}
+                                                    {/*marginRight: 10,*/}
+                                                {/*}} />*/}
+                                            {/*<Button*/}
+                                                {/*title={getTranslation(translations.generalButtons.cancelButtonLabel, this.props.translation)}*/}
+                                                {/*onPress={this.props.onPressCancelEdit}*/}
+                                                {/*color={styles.buttonGreen}*/}
+                                                {/*titleColor={'white'}*/}
+                                                {/*height={calculateDimension(25, true, this.props.screenSize)}*/}
+                                                {/*width={calculateDimension(166, false, this.props.screenSize)}*/}
+                                                {/*style={{*/}
+                                                    {/*marginVertical: calculateDimension(12.5, true, this.props.screenSize),*/}
+                                                    {/*marginRight: 10,*/}
+                                                {/*}} />*/}
+                                        {/*</View>) : (*/}
+                                            {/*this.props.role.find((e) => e === config.userPermissions.writeCase) !== undefined ? (*/}
+                                                {/*<Button*/}
+                                                    {/*title={getTranslation(translations.generalButtons.editButtonLabel, this.props.translation)}*/}
+                                                    {/*onPress={this.props.onPressEdit}*/}
+                                                    {/*color={styles.buttonGreen}*/}
+                                                    {/*titleColor={'white'}*/}
+                                                    {/*height={calculateDimension(25, true, this.props.screenSize)}*/}
+                                                    {/*width={calculateDimension(166, false, this.props.screenSize)}*/}
+                                                    {/*style={{*/}
+                                                        {/*marginVertical: calculateDimension(12.5, true, this.props.screenSize),*/}
+                                                        {/*marginRight: 10,*/}
+                                                    {/*}} />*/}
+                                            {/*) : null*/}
+                                        {/*))*/}
+                        {/*}*/}
+                    {/*</View>*/}
                     <ScrollView
                         style={style.containerScrollView}
                         contentContainerStyle={[style.contentContainerStyle, { paddingBottom: this.props.screenSize.height < 600 ? 70 : 20 }]}
@@ -145,7 +148,6 @@ class CaseSinglePersonalContainer extends Component {
                                 </View>) : null
                         }
                     </ScrollView>
-                    {/* </KeyboardAwareScrollView> */}
                 </View>
             </View >
         );
@@ -289,6 +291,11 @@ class CaseSinglePersonalContainer extends Component {
                 .sort((a, b) => { return a.order - b.order; })
                 .map((o) => { return { label: getTranslation(o.value, this.props.translation), value: o.value } })
         }
+        if (item.id === 'pregnancyStatus') {
+            return _.filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId.includes("LNG_REFERENCE_DATA_CATEGORY_PREGNANCY_STATUS") })
+                .sort((a, b) => { return a.order - b.order; })
+                .map((o) => { return { value: getTranslation(o.value, this.props.translation), id: o.value } })
+        }
     };
 
     computeValueForCasesSingleScreen = (item, index) => {
@@ -303,7 +310,7 @@ class CaseSinglePersonalContainer extends Component {
                 return this.props.case[item.id]
             }
         } else {
-            return this.props.case && this.props.case[item.id] ? getTranslation(this.props.case[item.id], this.props.translation) : '';
+            return _.get(this.props, `case[${item.id}]`, 'missing');
         }
     };
 
@@ -312,7 +319,7 @@ class CaseSinglePersonalContainer extends Component {
         if (missingFields && Array.isArray(missingFields) && missingFields.length === 0) {
             if (this.props.checkAgeYearsRequirements()) {
                 if (this.props.checkAgeMonthsRequirements()) {
-                    this.props.handleMoveToNextScreenButton()
+                    this.props.onPressNextButton()
                 } else {
                     Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.monthsValueError, this.props.translation), [
                         {

@@ -19,6 +19,7 @@ import PersonListItemNameAndAddressComponent from './PersonListItemNameAndAddres
 import PersonListItemExposuresComponent from './PersonListItemExposuresComponent';
 import isEqual from 'lodash/isEqual';
 import get from 'lodash/get';
+import {checkArrayAndLength} from './../utils/typeCheckingFunctions';
 
 
 class PersonListItem extends Component {
@@ -81,9 +82,13 @@ class PersonListItem extends Component {
             primaryColor: 'black',
             status: null
         };
+        // the new implementation
+        let person = get(itemToRender, 'mainData', null);
+
+
+
         // Get followUp's contact
-        let person = type === 'Contact' || type === 'Case' ? itemToRender : this.props.contacts && Array.isArray(this.props.contacts) && this.props.contacts.length > 0 ?  this.props.contacts.find((e) => {return extractIdFromPouchId(e._id, 'person') === itemToRender.personId}) : null;
-        // Full name
+        // let person = type === 'Contact' || type === 'Case' ? itemToRender : this.props.contacts && Array.isArray(this.props.contacts) && this.props.contacts.length > 0 ?  this.props.contacts.find((e) => {return extractIdFromPouchId(e._id, 'person') === itemToRender.personId}) : null;
         returnValues.fullName = person ? ((person.firstName ? person.firstName : ' ') + (person.lastName ? (" " + person.lastName) : ' ')) : '';
         // Gender
         let genderString = '';
@@ -117,24 +122,21 @@ class PersonListItem extends Component {
             returnValues.id = person._id;
         }
         // Followup final status
-        if (type === 'Contact' && person && person.followUp){
+        if (type !== 'Case' && person && person.followUp){
             returnValues.status = person.followUp.status ? getTranslation(person.followUp.status, this.props.translations) : null;
         }
 
-        // console.log(' ~~~~~~~~~', returnValues);
         return returnValues;
     };
 
     prepareSecondComponentData = (type, itemToRender) => {
         let returnedValues = {};
-        let person = type === 'Contact' || type === 'Case' ? itemToRender : this.props.contacts && Array.isArray(this.props.contacts) && this.props.contacts.length > 0 ?  this.props.contacts.find((e) => {return extractIdFromPouchId(e._id, 'person') === itemToRender.personId}) : null;
+        let exposures = get(itemToRender, 'exposureData', null);
         // For follow-ups and contact we need to compute exposures
         if (type === 'FollowUp' || type === 'Contact') {
-            if (this.props.cases && this.props.events && person && person.relationships && Array.isArray(person.relationships) && person.relationships.length > 0) {
-                returnedValues.exposures = handleExposedTo(person, false, this.props.cases, this.props.events);
-            }
-            if (type === 'FollowUp' && itemToRender.index) {
-                returnedValues.followUpDay = itemToRender.index
+            returnedValues.exposures = handleExposedTo(exposures, false);
+            if (type === 'FollowUp') {
+                returnedValues.followUpDay = get(itemToRender, 'followUpData.index', null);
             }
         }
 
@@ -143,17 +145,11 @@ class PersonListItem extends Component {
 
     onPressMapIcon = () => {
         InteractionManager.runAfterInteractions(() => {
-            let person = this.props.type === 'Contact' || this.props.type === 'Case' ? this.props.itemToRender : this.props.contacts && Array.isArray(this.props.contacts) && this.props.contacts.length > 0 ?  this.props.contacts.find((e) => {return extractIdFromPouchId(e._id, 'person') === this.props.itemToRender.personId}) : null;
+            // let person = this.props.type === 'Contact' || this.props.type === 'Case' ? this.props.itemToRender : this.props.contacts && Array.isArray(this.props.contacts) && this.props.contacts.length > 0 ?  this.props.contacts.find((e) => {return extractIdFromPouchId(e._id, 'person') === this.props.itemToRender.personId}) : null;
 
             if (this.props.onPressMapIconProp !== undefined) {
-                this.props.onPressMapIconProp(person)
+                this.props.onPressMapIconProp()
             }
-        })
-    };
-
-    handleOnPressName = (type, personId) => {
-        InteractionManager.runAfterInteractions(() => {
-            this.props.onPressNameProp(type, personId);
         })
     };
 }

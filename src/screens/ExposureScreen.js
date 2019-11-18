@@ -2,7 +2,7 @@
  * Created by florinpopa on 05/07/2018.
  */
 import React, {Component} from 'react';
-import {View, Text, StyleSheet, ScrollView, Alert, Keyboard, TouchableWithoutFeedback} from 'react-native';
+import {View, Text, StyleSheet, Alert} from 'react-native';
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import Button from './../components/Button';
@@ -14,14 +14,16 @@ import {bindActionCreators} from "redux";
 import {addExposureForContact, updateExposureForContact} from './../actions/contacts';
 import NavBarCustom from './../components/NavBarCustom';
 import config from './../utils/config';
-import CardComponent from './../components/CardComponent';
+// import CardComponent from './../components/CardComponent';
 import Ripple from 'react-native-material-ripple';
 import {removeErrors} from './../actions/errors';
 import {calculateDimension, extractIdFromPouchId, updateRequiredFields, getTranslation} from './../utils/functions';
-import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+// import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import translations from './../utils/translations'
 import ElevatedView from 'react-native-elevated-view';
 import ExposureContainer from '../containers/ExposureContainer';
+import get from 'lodash/get';
+import {insertOrUpdateExposure} from "../actions/exposure";
 
 class ExposureScreen extends Component {
 
@@ -49,9 +51,8 @@ class ExposureScreen extends Component {
             },
             savePressed: false,
             isModified: false,
+            selectedExposure: this.props.selectedExposure
         };
-        // Bind here methods, or at least don't declare methods in the render method
-
     }
 
     // Please add here the react lifecycle methods that you need
@@ -61,54 +62,35 @@ class ExposureScreen extends Component {
         }
     }
 
-    // static getDerivedStateFromProps(props, state) {
-    //     // console.log("FollowUpsSingleScreen: ", state);
-    //     if (props.errors && props.errors.type && props.errors.message) {
-    //         Alert.alert(props.errors.type, props.errors.message, [
-    //             {
-    //                 text: getTranslation(translations.alertMessages.okButtonLabel, props.translation),
-    //                 onPress: () => {
-    //                     state.savePressed = false;
-    //                     props.removeErrors()
-    //                 }
-    //             }
-    //         ])
-    //     } else if (state.savePressed) {
-    //         props.navigator.dismissModal();
-    //     }
-    //
-    //     return null;
-    // }
-
     // The render method should have at least business logic as possible,
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
-        console.log('Render from ExposureScreen: ', this.state.exposure, this.props.exposure);
+        // console.log('Render from ExposureScreen: ', this.state.exposure, this.props.exposure);
 
-        if (this.props.errors && this.props.errors.type && this.props.errors.message) {
-            Alert.alert(this.props.errors.type, this.props.errors.message, [
-                {
-                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
-                    onPress: () => {
-                        this.setState({
-                            savePressed: false
-                        }, () => {
-                            this.props.removeErrors();
-                        });
-                    }
-                }
-            ])
-        }
+        // if (this.props.errors && this.props.errors.type && this.props.errors.message) {
+        //     Alert.alert(this.props.errors.type, this.props.errors.message, [
+        //         {
+        //             text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+        //             onPress: () => {
+        //                 this.setState({
+        //                     savePressed: false
+        //                 }, () => {
+        //                     this.props.removeErrors();
+        //                 });
+        //             }
+        //         }
+        //     ])
+        // }
 
         return (
             <ViewHOC style={style.viewHocContainer}
                 showLoader={this && this.state && this.state.loading}
                 loaderText={this.props && this.props.syncState ? 'Loading' : getTranslation(translations.loadingScreenMessages.loadingMsg, this.props.translation)}>
             
-                <TouchableWithoutFeedback onPress={() => {
-                    Keyboard.dismiss()
-                }} accessible={false}>
+                {/*<TouchableWithoutFeedback onPress={() => {*/}
+                    {/*Keyboard.dismiss()*/}
+                {/*}} accessible={false}>*/}
                     <View style={style.container}>
                         <NavBarCustom style = {style.navbarContainer}
                             customTitle={
@@ -168,15 +150,18 @@ class ExposureScreen extends Component {
                                 contact={null}
                                 fromExposureScreen={true}
                                 type={this.props.type}
-                                isEditMode={true}
+                                isEditMode={this.props.isEditMode}
                                 onChangeText={this.handleOnChangeText}
                                 onChangeDropDown={this.handleOnChangeDropDown}
                                 onChangeDate={this.handleOnChangeDate}
                                 onChangeSwitch={this.handleOnChangeSwitch}
+                                onSelectExposure={this.handleOnSelectExposure}
+                                selectedExposure={this.state.selectedExposure}
+                                addContactFromCasesScreen={this.props.addContactFromCasesScreen}
                             />
                         </View>
                     </View>
-                </TouchableWithoutFeedback>
+                {/*</TouchableWithoutFeedback>*/}
             </ViewHOC>
         )
     }
@@ -273,15 +258,54 @@ class ExposureScreen extends Component {
         }))
     };
 
+    handleOnSelectExposure = (selectedExposure) => {
+        console.log('OnSelectExposure: ', selectedExposure);
+        let personsArray = [];
+        if (this.props.type === 'Contact') {
+            personsArray = [{
+                id: get(selectedExposure, '_id', null),
+                type: get(selectedExposure, 'type', null),
+                source: true,
+                target: null
+            },{
+                id: get(this.props, 'contact._id', null),
+                type: get(this.props, 'contact.type', null),
+                source: null,
+                target: true
+            }];
+        } else {
+            // Here add logic for cases/events
+            personsArray = [{
+                id: value.value,
+                type: type
+            }]
+        }
+
+        let source = personsArray && Array.isArray(personsArray) && personsArray.length === 2 ? personsArray[0].source ? personsArray[0].id : personsArray[1].id : null;
+        let target = personsArray && Array.isArray(personsArray) && personsArray.length === 2 ? personsArray[0].target ? personsArray[0].id : personsArray[1].id : null;
+
+        this.setState(prevState => ({
+            exposure: Object.assign({}, prevState.exposure, {persons: personsArray, source: source, target: target, active: true}),
+            isModified: true,
+            selectedExposure: selectedExposure
+        }), () => {
+            console.log('After changing state if: ', this.state.exposure);
+        })
+    };
+
     handleSaveExposure = () => {
         let missingFields = this.checkFields();
         if (missingFields && Array.isArray(missingFields) && missingFields.length === 0) {
             console.log("Here should save the exposure and dismiss the modal");
             this.setState({
-                savePressed: true,
+                // savePressed: true,
                 isModified: false,
             }, () => {
                 if (this.props.type === 'Contact') {
+                    let operation = this.props.exposure ? 'update' : 'create';
+                    let exposure = updateRequiredFields(get(this.props, 'user.activeOutbreakId', null), get(this.props, 'user._id', null), Object.assign({}, this.state.exposure), operation, 'relationship');
+
+
                     if (this.props.exposure) {
                         if (!this.props.contact) {
                             this.setState(prevState => ({
@@ -290,9 +314,12 @@ class ExposureScreen extends Component {
                                 this.props.navigator.dismissModal(this.props.saveExposure(this.state.exposure, true));
                             })
                         } else {
-                            let exposure = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id.split('_')[this.props.user._id.split('_').length - 1], record = Object.assign({}, this.state.exposure), action = 'update')
-                            this.props.updateExposureForContact(this.props.user.activeOutbreakId, this.props.contact._id, exposure, this.props.user.token, this.props.teams);
-                            this.props.navigator.dismissModal(this.props.saveExposure(this.state.exposure, true));
+                            let exposure = updateRequiredFields(get(this.props, 'outbreakId', null), get(this.props, 'user._id', null), this.state.exposure, 'update');
+                            updateExposureForContact(exposure, this.props.contact, get(this.props, 'periodOfFollowUp', null), get(this.props, 'user._id', null))
+                                .then((result) => {
+                                    // this.props.refres
+                                    this.props.navigator.dismissModal();
+                                })
                         }
                     } else {
                         if (!this.props.contact) {
@@ -303,9 +330,28 @@ class ExposureScreen extends Component {
                             })
                         } else {
                             let exposure = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id.split('_')[this.props.user._id.split('_').length - 1], record = Object.assign({}, this.state.exposure), action = 'create', fileType = 'relationship.json')
-                            this.props.addExposureForContact(this.props.user.activeOutbreakId, this.props.contact._id, exposure, this.props.user.token, Object.assign({}, this.props.contact));
+                            addExposureForContact(exposure, this.props.contact, this.props.periodOfFollowUp, get(this.props, 'user._id', null))
+                                .then((result) => {
+                                    console.log('Successful at adding exposures');
+                                    this.props.refresh();
+                                    this.props.navigator.dismissModal();
+                                })
+                                .catch((errorAddExposure) => {
+                                    console.log(errorAddExposure)
+                                })
                         }
                     }
+                } else {
+                    let operation = this.props.exposure ? 'update' : 'create';
+                    let exposure = updateRequiredFields(get(this.props, 'user.activeOutbreakId', null), get(this.props, 'user._id', null), Object.assign({}, this.state.exposure), operation, 'relationship');
+                    insertOrUpdateExposure(exposure)
+                        .then((resultInsertUpdateExposure) => {
+                            this.props.refreshRelations();
+                            this.props.navigator.dismissModal();
+                        })
+                        .catch((errorInsertUpdateExposure) => {
+                            console.log('ErrorInsertUpdateExposure: ', errorInsertUpdateExposure);
+                        })
                 }
             });
         } else {
@@ -423,6 +469,8 @@ function mapStateToProps(state) {
         cases: state.exposure,
         events: state.events,
         clusters: state.clusters,
+        periodOfFollowUp: get(state, 'outbreak.periodOfFollowup', null),
+        outbreakId: get(state, 'outbreak._id', null)
     };
 }
 

@@ -1,145 +1,236 @@
 /**
  * Created by florinpopa on 19/07/2018.
  */
-
+// Add here only the actions, not also the requests that are executed. For that purpose is the requests directory
+import {executeQuery, insertOrUpdate} from "../queries/sqlTools/helperMethods";
+import translations from "../utils/translations";
+import sqlConstants from "../queries/sqlTools/constants";
+import get from 'lodash/get';
+import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
+import {insertOrUpdateExposure} from "./exposure";
+var jsonSql = require('json-sql')();
+jsonSql.setDialect('sqlite');
 
 // Add here only the actions, not also the requests that are executed. For that purpose is the requests directory
-import { ACTION_TYPE_STORE_CASES,
-    ACTION_TYPE_ADD_CASE,
-    ACTION_TYPE_UPDATE_CASE,
-    ACTION_TYPE_REMOVE_CASE} from './../utils/enums';
-import {deleteCaseRequest} from './../requests/cases';
-import {getCasesForOutbreakIdRequest, addCaseRequest, updateCaseRequest} from './../queries/cases';
-import { addError } from './errors';
-import errorTypes from './../utils/errorTypes';
-// import config from './../utils/config';
-import {batchActions} from 'redux-batched-actions';
-import {setLoaderState} from "./app";
-import {addExposure, updateExposure, removeExposure} from './exposure';
+export function getCasesForOutbreakId({outbreakId, casesFilter, searchText, lastElement, offset}, computeCount) {
+    let countPromise = null;
+    let casesPromise = null;
 
-// Add here only the actions, not also the requests that are executed. For that purpose is the requests directory
-export function storeCases(cases) {
-    return {
-        type: ACTION_TYPE_STORE_CASES,
-        payload: cases
-    }
-};
-
-export function addCaseAction(myCase) {
-    return {
-        type: ACTION_TYPE_ADD_CASE,
-        payload: myCase
-    }
-}
-
-export function updateCaseAction(myCase) {
-    return {
-        type: ACTION_TYPE_UPDATE_CASE,
-        payload: myCase
-    }
-}
-
-export function removeCaseAction(myCase) {
-    return {
-        type: ACTION_TYPE_REMOVE_CASE,
-        payload: myCase
-    }
-}
-
-export function getCasesForOutbreakIdWithPromise(outbreakId, filter, token, dispatch) {
-    // return async function (dispatch, getState) {
-    return new Promise((resolve, reject) => {
-        getCasesForOutbreakIdRequest(outbreakId, filter, token, (error, response) => {
-            if (error) {
-                console.log("*** getCasesForOutbreakId error: ", error);
-                // dispatch(addError(errorTypes.ERROR_CASES));
-                reject(errorTypes.ERROR_CASES);
+    let casesQuery = {
+        type: 'select',
+        query: sqlConstants.createMainQuery(translations.personTypes.cases, outbreakId, casesFilter, searchText, lastElement, offset), // Here will take place the contact/exposure filter/sort
+        alias: 'MappedData',
+        fields: [
+            {
+                table: 'MappedData',
+                name: 'IdField',
+                alias: '_id'
+            },
+            {
+                table: 'MappedData',
+                name: 'MainData',
+                alias: 'mainData'
+            },
+            {
+                table: 'MappedData',
+                name: 'AllOfExposures',
+                alias: 'exposureData'
             }
-            if (response) {
-                // dispatch(storeCases(response));
-                // resolve('Done cases');
-                resolve({cases: response});
-            }
-        })
-    })
-    // }
-};
+        ]
+    };
 
-export function getCasesForOutbreakId(outbreakId, filter, token) {
-    return async function (dispatch, getState) {
-    // return new Promise((resolve, reject) => {
-        getCasesForOutbreakIdRequest(outbreakId, filter, token, (error, response) => {
-            if (error) {
-                console.log("*** getCasesForOutbreakId error: ", error);
-                dispatch(batchActions([
-                    addError(errorTypes.ERROR_CASES),
-                    setLoaderState(false)
-                ]))
-                // dispatch(addError(errorTypes.ERROR_CASES));
-                // reject(error);
-            }
-            if (response) {
-                dispatch(batchActions([
-                    storeCases(response),
-                    setLoaderState(false)
-                ]))
-                // dispatch(storeCases(response));
-                // resolve('Done cases');
-            }
-        })
-    // })
-    }
-};
 
-export function addCase(outbreakId, myCase, token, caseMatchFitler) {
-    console.log('addCase', JSON.stringify(myCase))
-    return async function(dispatch, getState) {
-        addCaseRequest(outbreakId, myCase, token, (error, response) => {
-            if (error) {
-                console.log("*** addCase error: ", error);
-                dispatch(addError(errorTypes.ERROR_UPDATE_CASE));
-            }
-            if (response) {
-                console.log("*** addCase response: ", JSON.stringify(response));
-                if (caseMatchFitler) {
-                    dispatch(batchActions([
-                        addCaseAction(response),
-                        addExposure(response)
-                    ]));
-                } else {
-                    dispatch(batchActions([
-                        removeCaseAction(response),
-                        removeExposure(response)
-                    ])
-                    );
+    if (computeCount) {
+        let casesQueryCount = {
+            type: 'select',
+            query: sqlConstants.createMainQuery(translations.personTypes.cases, outbreakId, casesFilter, searchText, lastElement, offset, true), // Here will take place the contact/exposure filter/sort
+            alias: 'MappedData',
+            fields: [
+                {
+                    func: {
+                        name: 'count',
+                        args: [{field: `MappedData.IdField`}]
+                    },
+                    alias: 'countRecords'
                 }
-            }
-        })
+            ]
+        };
+        countPromise = executeQuery(casesQueryCount);
     }
+    casesPromise = executeQuery(casesQuery);
+
+    return Promise.all([casesPromise, countPromise])
+        .then(([cases, casesCount]) => {
+            console.log('Returned values: ');
+            return Promise.resolve({data: cases, dataCount: checkArrayAndLength(casesCount) ? casesCount[0].countRecords : null});
+        })
+        .catch((errorGetCases) => Promise.reject(errorGetCases))
+    // return Promise.resolve()
+    //     .then(() => executeQuery(casesQuery))
+    //     .then((mappedData) => Promise.resolve(mappedData))
+    //     .catch((errorGetCases) => Promise.reject(errorGetCases));
 };
 
-export function updateCase (outbreakId, caseId, myCase, token, caseMatchFitler) {
-    console.log('updateCase', JSON.stringify(myCase))
-    return async function(dispatch, getState) {
-        updateCaseRequest(outbreakId, caseId, myCase, token, (error, response) => {
-            if (error) {
-                console.log("*** updateCaseRequest error: ", error);
-                dispatch(addError(errorTypes.ERROR_UPDATE_CASE));
+export function addCase(myCase) {
+    return insertOrUpdate('common', 'person', [myCase], false);
+};
+
+export function updateCase (myCase) {
+    return  insertOrUpdate('common', 'person', [myCase], false)
+}
+
+export function getCasesByName(outbreakId, search) {
+    let casesQuery = {
+        type: 'select',
+        table: 'person',
+        fields: [
+            {
+                table: 'person',
+                name: '_id',
+                alias: '_id',
+            },
+            {
+                table: 'person',
+                name: 'firstName',
+                alias: 'firstName',
+            },
+            {
+                table: 'person',
+                name: 'lastName',
+                alias: 'lastName',
+            },
+            {
+                table: 'person',
+                name: 'visualId',
+                alias: 'visualId',
+            },
+            {
+                table: 'person',
+                name: 'type',
+                alias: 'type',
             }
-            if (response) {
-                console.log("*** updateCaseRequest response: ", JSON.stringify(response));
-                if (caseMatchFitler) {
-                    dispatch(batchActions([
-                        updateCaseAction(response),
-                        updateExposure(response)
-                    ]));
-                } else {
-                    dispatch(batchActions([
-                        removeCaseAction(response),
-                        removeExposure(response)
-                    ]));
-                }
+        ],
+        condition: {
+            'outbreakId': outbreakId,
+            'type': {'$ne': translations.personTypes.contacts},
+            '$or': [
+                {'firstName': {'$like': `%${search}%`}},
+                {'lastName': {'$like': `%${search}%`}},
+                {'visualId': {'$like': `%${search}%`}},
+            ]
+        }
+    };
+
+    return Promise.resolve()
+        .then(() => executeQuery(casesQuery))
+        .then((mappedData) => Promise.resolve(mappedData))
+        .catch((errorGetData) => Promise.reject(errorGetData))
+}
+
+export function getCaseAndExposuresById (caseId, outbreakId) {
+    let queryCase = {
+        type: 'select',
+        table: 'person',
+        fields: [
+            {
+                table: 'person',
+                name: 'json',
+                alias: 'caseData'
             }
-        })
+        ],
+        condition: {
+            '_id': caseId
+        }
+    };
+
+    let queryRelations = {
+        type: 'select',
+        table: 'relationship',
+        fields: [
+            {
+                table: 'relationship',
+                name: 'json',
+                alias: 'relationshipData'
+            },
+            {
+                table: 'person',
+                name: 'json',
+                alias: 'contactData'
+            }
+        ],
+        join: [
+            {
+                type: 'inner',
+                table: 'person',
+                on: {'person._id': 'relationship.targetId'}
+            }
+        ],
+        condition: {
+            'relationship.sourceId': caseId,
+            // 'relationship.outbreakId': outbreakId,
+        }
+    };
+    if (outbreakId) {
+        queryRelations.condition[`person.outbreakId`] = outbreakId;
     }
+
+    let promiseCaseData = executeQuery(queryCase)
+        .then((caseData) => Promise.resolve(get(caseData, `[0].caseData`, null)));
+    let promiseRelationsData = executeQuery(queryRelations);
+
+    return Promise.all([promiseCaseData, promiseRelationsData])
+        .then(([caseData, relationshipData]) => Promise.resolve({caseData: caseData, relationshipData: relationshipData}))
+        .catch((errorGetData) => Promise.reject(errorGetData))
+}
+
+export function getRelationsForCase (caseId) {
+    let queryRelations = {
+        type: 'select',
+        table: 'relationship',
+        fields: [
+            {
+                table: 'relationship',
+                name: 'json',
+                alias: 'relationshipData'
+            },
+            {
+                table: 'person',
+                name: 'json',
+                alias: 'contactData'
+            }
+        ],
+        join: [
+            {
+                type: 'inner',
+                table: 'person',
+                on: {'person._id': 'relationship.targetId'}
+            }
+        ],
+        condition: {
+            'relationship.sourceId': caseId,
+            // 'relationship.outbreakId': outbreakId,
+        }
+    };
+
+    return executeQuery(queryRelations);
+}
+
+export function getItemByIdRequest (personId) {
+    let query = {
+        type: 'select',
+        table: 'person',
+        fields: [
+            {
+                table: 'person',
+                name: 'json',
+                alias: 'personData'
+            }
+        ],
+        condition: {
+            '_id': personId
+        }
+    };
+
+    return executeQuery(query)
+        .then((response) => Promise.resolve(get(response, `[0].personData`, null)))
 }

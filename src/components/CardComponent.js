@@ -26,7 +26,8 @@ import Selector from './Selector';
 import IntervalPicker from './IntervalPicker';
 import ActionsBar from './ActionsBar';
 import translations from './../utils/translations';
-import moment from 'moment';
+import SearchableDropdown from './SearchableDropdown';
+// import moment from 'moment';
 
 class CardComponent extends PureComponent {
 
@@ -52,7 +53,7 @@ class CardComponent extends PureComponent {
             case 'Section':
                 return (
                     <Section
-                        label={this.props.item.label}
+                        label={get(this.props, 'item.label', null)}
                         hasBorderBottom={this.props.item.hasBorderBottom}
                         borderBottomColor={this.props.item.borderBottomColor}
                         containerStyle={{height: calculateDimension(54, true, this.props.screenSize)}}
@@ -63,7 +64,7 @@ class CardComponent extends PureComponent {
                 return (
                     <TextInput
                         id={this.props.item.id}
-                        label={this.props.item.label}
+                        label={get(this.props, 'item.label', null)}
                         index={this.props.index}
                         value={this.props.value}
                         isEditMode={this.props.item.isEditMode}
@@ -98,7 +99,7 @@ class CardComponent extends PureComponent {
                     <DropdownInput
                         id={this.props.item.id}
                         index={this.props.index}
-                        label={this.props.item.label}
+                        label={get(this.props, 'item.label', null)}
                         labelValue={this.props.item.labelValue}
                         value={this.props.value}
                         data={dataWithNoneOption}
@@ -117,7 +118,7 @@ class CardComponent extends PureComponent {
                         key={this.props.item.id}
                         id={this.props.item.id}
                         label={translations.dropDownLabels.selectedAnswersLabel}
-                        labelValue={this.props.item.label}
+                        labelValue={get(this.props ,'item.label', null)}
                         value={this.props.value}
                         data={this.props.data}
                         isEditMode={true}
@@ -134,7 +135,7 @@ class CardComponent extends PureComponent {
                     <DropDownSectioned
                         key={this.props.item.id}
                         id={this.props.item.id}
-                        label={this.props.item.label}
+                        label={get(this.props, 'item.label', null)}
                         index={this.props.index}
                         value={this.props.value}
                         data={this.props.locations}
@@ -152,7 +153,7 @@ class CardComponent extends PureComponent {
                 return(
                     <SwitchInput
                         id={this.props.item.id}
-                        label={this.props.item.label}
+                        label={get(this.props, 'item.label', null)}
                         index={this.props.index}
                         value={this.props.value}
                         showValue={true}
@@ -170,7 +171,7 @@ class CardComponent extends PureComponent {
                 return (
                     <DatePicker
                         id={this.props.item.id}
-                        label={this.props.item.label}
+                        label={get(this.props, 'item.label', null)}
                         value={this.props.value instanceof Date ? this.props.value : this.props.value ? createDate(this.props.value): this.props.value}
                         index={this.props.index}
                         isEditMode={this.props.item.isEditMode}
@@ -198,7 +199,7 @@ class CardComponent extends PureComponent {
                 return (
                     <IntervalPicker
                         id={this.props.item.id}
-                        label={this.props.item.label}
+                        label={get(this.props, 'item.label', null)}
                         value={this.props.item.value}
                         min={this.props.item.min}
                         max={this.props.item.max}
@@ -238,7 +239,7 @@ class CardComponent extends PureComponent {
                 return (
                     <TextInputWithDropDown 
                         id={this.props.item.id}
-                        label={this.props.item.label}
+                        label={get(this.props, 'item.label', null)}
                         index={this.props.index}
                         value={this.props.value}
                         isEditMode={this.props.item.isEditMode}
@@ -254,6 +255,14 @@ class CardComponent extends PureComponent {
                         selectedItemIndexForAgeUnitOfMeasureDropDown ={this.props.item.selectedItemIndexForAgeUnitOfMeasureDropDown}
                         translation={this.props.translation}
                         screenSize={this.props.screenSize}
+                    />
+                );
+            case 'SearchableDropdown':
+                return (
+                    <SearchableDropdown
+                        onSelectExposure={this.props.onSelectExposure}
+                        isEditMode={this.props.item.isEditMode}
+                        value={this.props.value}
                     />
                 );
             case 'WebView':

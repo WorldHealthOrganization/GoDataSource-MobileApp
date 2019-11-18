@@ -21,7 +21,7 @@ if (Platform.OS === 'ios') {
     KeyboardManager.setKeyboardDistanceFromTextField(10);
     KeyboardManager.setPreventShowingBottomBlankSpace(true);
     KeyboardManager.setEnableAutoToolbar(true);
-    KeyboardManager.setToolbarDoneBarButtonItemText("Done");
+    KeyboardManager.setToolbarDoneBarButtonItemText("Close");
     KeyboardManager.setToolbarManageBehaviour(0);
     KeyboardManager.setToolbarPreviousNextButtonEnable(false);
     KeyboardManager.setShouldToolbarUsesTextFieldTintColor(false);
@@ -45,27 +45,6 @@ class ViewHOC extends Component {
             // showCloseModalButton: false
         };
     }
-
-    // static getDerivedStateFromProps(props, state) {
-    //     if (props.syncState && props.syncState.id === 'getData' && props.syncState.status === 'In progress') {
-    //         state.showModal = true;
-    //     }
-    //     if (props.syncState && state.showModal) {
-    //         let itemToBeChanged = state.syncState.find((e) => { return e.id === props.syncState.id });
-    //         if (itemToBeChanged) {
-    //             itemToBeChanged.name = props.syncState.name ? props.syncState.name : itemToBeChanged.name;
-    //             itemToBeChanged.error = props.syncState.error || null;
-    //             itemToBeChanged.status = props.syncState.status || '...';
-    //
-    //             let index = state.syncState.map((e) => { return e.id }).indexOf(props.syncState.id);
-    //             state.syncState[index] = itemToBeChanged;
-    //             if (itemToBeChanged.status === 'Error' || (index === state.syncState.length - 1 && itemToBeChanged.status === 'Success') || itemToBeChanged.status === 'No data to export') {
-    //                 state.showCloseModalButton = true;
-    //             }
-    //         }
-    //     }
-    //     return null;
-    // }
 
     render() {
         console.log('Selectors logic: ViewHOC: ', this.props.showLoader);
@@ -116,7 +95,8 @@ class ViewHOC extends Component {
             //         })
             //     }
             // })
-            this.props.setSyncState('Finished')
+            this.props.setSyncState('Finished');
+            this.props.refresh();
         } else {
             // this.resetModalProps(() => {
             //     console.log('reset props')

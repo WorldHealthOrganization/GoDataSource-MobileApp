@@ -18,7 +18,7 @@ import { loginUser } from './../actions/user';
 import { removeErrors } from './../actions/errors';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import url from './../utils/url';
-import {storeHubConfiguration} from './../actions/app';
+import {storeHubConfiguration, storeHubConfigurationNew} from './../actions/app';
 import Ripple from 'react-native-material-ripple';
 import {getTranslation, generateId} from './../utils/functions';
 import translations from './../utils/translations';
@@ -165,45 +165,13 @@ class ManualConfigScreen extends PureComponent {
 
     componentWillUnmount() {
         this.props.setSyncState(null);
+        syncStateGlobal = [
+            {id: 'testApi', name: 'Test API', status: '...'},
+            {id: 'downloadDatabase', name: 'Download database', status: '...'},
+            {id: 'unzipFile', name: 'Unzip', status: '...'},
+            {id: 'sync', name: 'Sync', status: '...'}
+        ];
     }
-
-    // static getDerivedStateFromProps(props, state) {
-    //     // if (props.errors && props.errors.type && props.errors.message && !state.hasAlert) {
-    //     //     state.hasAlert = true;
-    //     //     Alert.alert(props.errors.type, props.errors.message, [
-    //     //         {
-    //     //             text: getTranslation(translations.alertMessages.okButtonLabel, props.translation),
-    //     //             onPress: () => {
-    //     //                 state.hasAlert = false;
-    //     //                 props.removeErrors();
-    //     //             }
-    //     //         }
-    //     //     ])
-    //     // }
-    //     if (props.syncState) {
-    //         // props.navigator.push({
-    //         //     screen: 'LoginScreen',
-    //         //     animationType: 'fade',
-    //         //     animated: true
-    //         // })
-    //         if (props.syncState.id === 'testApi' && props.syncState.status === 'In progress') {
-    //             state.showModal = true;
-    //         }
-    //         let itemToBeChanged = state.syncState.find((e) => {return e.id === props.syncState.id});
-    //         if (itemToBeChanged) {
-    //             itemToBeChanged.name = props.syncState.name ? props.syncState.name : itemToBeChanged.name;
-    //             itemToBeChanged.error = props.syncState.error || null;
-    //             itemToBeChanged.status = props.syncState.status || '...';
-    //
-    //             let index = state.syncState.map((e) => {return e.id}).indexOf(props.syncState.id);
-    //             state.syncState[index] = itemToBeChanged;
-    //             if (itemToBeChanged.status === 'Error' || (index === state.syncState.length - 1 && itemToBeChanged.status === 'Success')) {
-    //                 state.showCloseModalButton = true;
-    //             }
-    //         }
-    //     }
-    //     return null;
-    // }
 
     // The render method should have at least business logic as possible,
     // because this will be called whenever there is a new setState call
@@ -497,7 +465,7 @@ class ManualConfigScreen extends PureComponent {
                     userEmail: this.state.userEmail,
                     encryptedData: this.state.encryptedData
                 };
-                this.props.storeHubConfiguration({
+                this.props.storeHubConfigurationNew({
                     url: server,
                     clientId: JSON.stringify(username),
                     clientSecret: previousInternetCredentials.password
@@ -523,7 +491,7 @@ class ManualConfigScreen extends PureComponent {
             userEmail: this.state.userEmail,
             encryptedData: this.state.encryptedData
         };
-        this.props.storeHubConfiguration({
+        this.props.storeHubConfigurationNew({
             url: hubId,
             clientId: JSON.stringify(clientIdObject),
             clientSecret: hubPassword
@@ -702,6 +670,7 @@ function matchDispatchToProps(dispatch) {
         loginUser,
         removeErrors,
         storeHubConfiguration,
+        storeHubConfigurationNew,
         setSyncState,
         changeAppRoot
     }, dispatch);

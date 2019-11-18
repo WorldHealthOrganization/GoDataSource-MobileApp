@@ -7,25 +7,24 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
-import {Animated, StyleSheet, InteractionManager, ScrollView, View, Text} from 'react-native';
+import {Animated, StyleSheet, InteractionManager, ScrollView, View, Text, FlatList} from 'react-native';
 import {calculateDimension} from './../utils/functions';
-import config from './../utils/config';
 import {connect} from "react-redux";
 import Button from './../components/Button';
-import {extractIdFromPouchId, getTranslation} from './../utils/functions';
+import {extractIdFromPouchId, getTranslation, computeFullName} from './../utils/functions';
 import {bindActionCreators} from "redux";
 import styles from './../styles';
 import ElevatedView from 'react-native-elevated-view';
 import {LoaderScreen} from 'react-native-ui-lib';
-import AnimatedListView from './../components/AnimatedListView';
 import GeneralListItem from '../components/GeneralListItem';
 import Ripple from 'react-native-material-ripple';
 import moment from 'moment';
-import translations from './../utils/translations'
+import translations from './../utils/translations';
 import ExposureContainer from '../containers/ExposureContainer';
+import get from 'lodash/get';
+import TopContainerButtons from "./../components/TopContainerButtons";
 
-const scrollAnim = new Animated.Value(0);
-const offsetAnim = new Animated.Value(0);
+const AnimatedFlatList = Animated.createAnimatedComponent(FlatList);
 
 class ContactsSingleExposures extends Component {
 
@@ -51,24 +50,6 @@ class ContactsSingleExposures extends Component {
         });
     }
 
-    clampedScroll= Animated.diffClamp(
-        Animated.add(
-            scrollAnim.interpolate({
-                inputRange: [0, 1],
-                outputRange: [0, 1],
-                extrapolateLeft: 'clamp',
-            }),
-            offsetAnim,
-        ),
-        0,
-        30,
-    );
-
-    handleScroll = Animated.event(
-        [{nativeEvent: {contentOffset: {y: scrollAnim}}}],
-        {useNativeDriver: true}
-    );
-
     shouldComponentUpdate(nextProps, nextState) {
         if (nextProps.activeIndex === 2) {
             return true;
@@ -92,59 +73,70 @@ class ContactsSingleExposures extends Component {
         return (
             <ElevatedView elevation={3} style={[style.container]}>
                 <View style = {{alignItems: 'center'}}>
-                    <View style={{flexDirection: 'row'}}>
-                        <Button
-                            title={getTranslation(translations.generalButtons.backButtonLabel, this.props.translation)}
-                            onPress={this.handleBackButton}
-                            color={styles.buttonGreen}
-                            titleColor={'white'}
-                            height={calculateDimension(25, true, this.props.screenSize)}
-                            width={calculateDimension(130, false, this.props.screenSize)}
-                            style={{
-                                marginVertical: calculateDimension(12.5, true, this.props.screenSize),
-                                marginHorizontal: calculateDimension(16, false, this.props.screenSize),
-                        }}/>
-                        {
-                            this.props.isEditMode === true ? this.props.isNew ? (
-                                <Button
-                                    title={getTranslation(translations.generalButtons.saveButtonLabel, this.props.translation)}
-                                    onPress={this.props.handleOnPressSave}
-                                    color={styles.buttonGreen}
-                                    titleColor={'white'}
-                                    height={calculateDimension(25, true, this.props.screenSize)}
-                                    width={calculateDimension(130, false, this.props.screenSize)}
-                                    style={{
-                                        marginVertical: calculateDimension(12.5, true, this.props.screenSize),
-                                        marginHorizontal: calculateDimension(16, false, this.props.screenSize),
-                                }}/> 
-                            ) : (
-                                <Button
-                                    title={getTranslation(translations.generalButtons.nextButtonLabel, this.props.translation)}
-                                    onPress={this.props.handleMoveToNextScreenButton}
-                                    color={styles.buttonGreen}
-                                    titleColor={'white'}
-                                    height={calculateDimension(25, true, this.props.screenSize)}
-                                    width={calculateDimension(130, false, this.props.screenSize)}
-                                    style={{
-                                        marginVertical: calculateDimension(12.5, true, this.props.screenSize),
-                                        marginHorizontal: calculateDimension(16, false, this.props.screenSize),
-                                    }}/>
-                            ) : null
-                        }
-                    </View>
+                    {/*<View style={{flexDirection: 'row'}}>*/}
+                        {/*<Button*/}
+                            {/*title={getTranslation(translations.generalButtons.backButtonLabel, this.props.translation)}*/}
+                            {/*onPress={this.handleBackButton}*/}
+                            {/*color={styles.buttonGreen}*/}
+                            {/*titleColor={'white'}*/}
+                            {/*height={calculateDimension(25, true, this.props.screenSize)}*/}
+                            {/*width={calculateDimension(130, false, this.props.screenSize)}*/}
+                            {/*style={{*/}
+                                {/*marginVertical: calculateDimension(12.5, true, this.props.screenSize),*/}
+                                {/*marginHorizontal: calculateDimension(16, false, this.props.screenSize),*/}
+                        {/*}}/>*/}
+                        {/*{*/}
+                            {/*this.props.isEditMode === true ? this.props.isNew ? (*/}
+                                {/*<Button*/}
+                                    {/*title={getTranslation(translations.generalButtons.saveButtonLabel, this.props.translation)}*/}
+                                    {/*onPress={this.props.handleOnPressSave}*/}
+                                    {/*color={styles.buttonGreen}*/}
+                                    {/*titleColor={'white'}*/}
+                                    {/*height={calculateDimension(25, true, this.props.screenSize)}*/}
+                                    {/*width={calculateDimension(130, false, this.props.screenSize)}*/}
+                                    {/*style={{*/}
+                                        {/*marginVertical: calculateDimension(12.5, true, this.props.screenSize),*/}
+                                        {/*marginHorizontal: calculateDimension(16, false, this.props.screenSize),*/}
+                                {/*}}/> */}
+                            {/*) : (*/}
+                                {/*<Button*/}
+                                    {/*title={getTranslation(translations.generalButtons.nextButtonLabel, this.props.translation)}*/}
+                                    {/*onPress={this.props.handleMoveToNextScreenButton}*/}
+                                    {/*color={styles.buttonGreen}*/}
+                                    {/*titleColor={'white'}*/}
+                                    {/*height={calculateDimension(25, true, this.props.screenSize)}*/}
+                                    {/*width={calculateDimension(130, false, this.props.screenSize)}*/}
+                                    {/*style={{*/}
+                                        {/*marginVertical: calculateDimension(12.5, true, this.props.screenSize),*/}
+                                        {/*marginHorizontal: calculateDimension(16, false, this.props.screenSize),*/}
+                                    {/*}}/>*/}
+                            {/*) : null*/}
+                        {/*}*/}
+                    {/*</View>*/}
+
+                    <TopContainerButtons
+                        isNew={this.props.isNew}
+                        isEditMode={this.props.isEditMode}
+                        index={this.props.activeIndex}
+                        numberOfTabs={this.props.numberOfTabs}
+                        onPressEdit={this.props.onPressEdit}
+                        onPressSaveEdit={this.props.onPressSaveEdit}
+                        onPressCancelEdit={this.props.onPressCancelEdit}
+                        onPressNextButton={this.props.onPressNextButton}
+                        onPressPreviousButton={this.handleBackButton}
+                    />
                 </View>
                 {
                     !this.props.isNew ? (
                         <ScrollView contentContainerStyle={{flexGrow: 1}}>
-                            <AnimatedListView
-                                data={this.props.contact && this.props.contact.relationships && Array.isArray(this.props.contact.relationships) ? this.props.contact.relationships : []}
+                            <AnimatedFlatList
+                                data={get(this.props, 'contact.relationships', [])}
                                 renderItem={this.renderRelationship}
                                 keyExtractor={this.keyExtractor}
                                 ItemSeparatorComponent={this.renderSeparatorComponent}
                                 ListEmptyComponent={this.listEmptyComponent}
                                 style={[style.listViewStyle]}
                                 componentContainerStyle={style.componentContainerStyle}
-                                onScroll={this.handleScroll}
                             />
                             <View style={{height: 30}}/>
                         </ScrollView>
@@ -159,6 +151,7 @@ class ContactsSingleExposures extends Component {
                             onChangeDate={this.props.onChangeDate}
                             onChangeText={this.props.onChangeText}
                             onChangeSwitch={this.props.onChangeSwitch}
+                            selectedExposure={this.props.selectedExposure}
                         />
                     )
                 }
@@ -174,7 +167,7 @@ class ContactsSingleExposures extends Component {
     };
 
     handleBackButton = () => {
-        this.props.handleMoveToPrevieousScreenButton()
+        this.props.onPressPreviousButton()
     };
 
     renderRelationship = (relation) => {
@@ -182,7 +175,10 @@ class ContactsSingleExposures extends Component {
         let {title, primaryText, secondaryText} = this.getCaseName(relation);
         let textsArray = []
         if (this.props.isEditMode === true){
-            textsArray = [getTranslation(translations.generalButtons.editButtonLabel, this.props.translation), getTranslation(translations.generalButtons.deleteButtonLabel, this.props.translation)]
+            textsArray = [
+                getTranslation(translations.generalButtons.editButtonLabel, this.props.translation)
+                // getTranslation(translations.generalButtons.deleteButtonLabel, this.props.translation)
+            ]
         }
         return (
             <GeneralListItem
@@ -197,15 +193,18 @@ class ContactsSingleExposures extends Component {
                         color: styles.buttonGreen,
                         fontFamily: 'Roboto-Medium',
                         fontSize: 12
-                    },
-                    {
-                        marginRight: calculateDimension(14, false, this.props.screenSize),
-                        color: styles.missedRedColor,
-                        fontFamily: 'Roboto-Medium',
-                        fontSize: 12
                     }
+                    // {
+                    //     marginRight: calculateDimension(14, false, this.props.screenSize),
+                    //     color: styles.missedRedColor,
+                    //     fontFamily: 'Roboto-Medium',
+                    //     fontSize: 12
+                    // }
                 ]}
-                onPressArray={[() => {this.props.onPressEditExposure(relation.item, relation.index)}, () => {this.props.onPressDeleteExposure(relation.item, relation.index)}]}
+                onPressArray={[
+                    () => {this.props.onPressEditExposure(relation.item, relation.index)}
+                    // () => {this.props.onPressDeleteExposure(relation.item, relation.index)}
+                    ]}
                 containerStyle={{flex: 1, height: '100%', marginHorizontal: calculateDimension(16, false, this.props.screenSize)}}
                 translation={this.props.translation}
             />
@@ -245,21 +244,24 @@ class ContactsSingleExposures extends Component {
             relation = relation.item;
         }
 
-        let person = relation && relation.persons && relation.persons.filter((e) => {return e.id !== extractIdFromPouchId(this.props.contact._id, 'person')})[0];
+        let relationshipData = get(relation, 'relationshipData');
+        let caseData = get(relation, 'caseData');
 
-        let caseName = '';
+        // let person = relation && relation.persons && relation.persons.filter((e) => {return e.id !== extractIdFromPouchId(this.props.contact._id, 'person')})[0];
 
-        if (person.type === config.personTypes.cases ) {
-            if (this.props.cases) {
-                let aux = this.props.cases.filter((e) => {return extractIdFromPouchId(e._id, 'person')  === person.id})[0];
-                caseName = (aux && aux.firstName ? (aux.firstName + ' ') : '') + (aux && aux.lastName ? aux.lastName : '');
-            }
-        } else {
-            let aux = this.props.events.filter((e) => {return extractIdFromPouchId(e._id, 'person') === person.id})[0];
-            caseName = aux && aux.name ? aux.name : '';
-        }
+        // let caseName = '';
+        //
+        // if (person.type === config.personTypes.cases ) {
+        //     if (this.props.cases) {
+        //         let aux = this.props.cases.filter((e) => {return extractIdFromPouchId(e._id, 'person')  === person.id})[0];
+        //         caseName = (aux && aux.firstName ? (aux.firstName + ' ') : '') + (aux && aux.lastName ? aux.lastName : '');
+        //     }
+        // } else {
+        //     let aux = this.props.events.filter((e) => {return extractIdFromPouchId(e._id, 'person') === person.id})[0];
+        //     caseName = aux && aux.name ? aux.name : '';
+        // }
 
-        return {title: caseName, primaryText: moment(relation.contactDate).format("YYYY-MM-DD").toString(), secondaryText: getTranslation(relation.certaintyLevelId, this.props.translation)};
+        return {title: computeFullName(caseData), primaryText: moment.utc(relationshipData.contactDate).format("YYYY-MM-DD").toString(), secondaryText: getTranslation(relationshipData.certaintyLevelId, this.props.translation)};
     };
 
     onPressAddExposure = () => {

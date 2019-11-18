@@ -3,24 +3,41 @@
  */
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
-import React, {PureComponent} from 'react';
+import React, {Component} from 'react';
 import {View, Text, StyleSheet} from 'react-native';
 import PropTypes from 'prop-types';
 import {getTranslation, getTooltip} from './../utils/functions';
 import { TextField } from 'react-native-material-textfield';
-import TooltipComponent from './TooltipComponent'
+import TooltipComponent from './TooltipComponent';
+import lodashGet from 'lodash/get';
 
-class TextInput extends PureComponent {
+class TextInput extends Component {
 
     // This will be a dumb component, so it's best not to put any business logic in it
     constructor(props) {
         super(props);
         this.state = {
-            value: typeof this.props.value === 'number' ? isNaN(this.props.value) ? '' : this.props.value.toString() : this.props.value && this.props.value != undefined && (typeof this.props.value === 'string' || typeof this.props.value === 'number') ? this.props.value.toString() : ''
+            // value: typeof this.props.value === 'number' ? isNaN(this.props.value) ? '' : this.props.value.toString() : this.props.value && this.props.value != undefined && (typeof this.props.value === 'string' || typeof this.props.value === 'number') ? this.props.value.toString() : ''
+            value: lodashGet(this.props, 'value', ' ')
         };
     }
 
     // Please add here the react lifecycle methods that you need
+    componentDidMount() {
+        // console.log('CDM TextInput: ', this.props.label, this.props.value);
+        this.setState({
+            value: lodashGet(this.props, 'value', ' ')
+        })
+    }
+
+    componentDidUpdate(prevProps, prevState) {
+        if (prevProps.isEditMode !== this.props.isEditMode || prevProps.value !== this.props.value) {
+            this.setState({
+                value: lodashGet(this.props, 'value', ' ')
+            })
+        }
+    }
+
     // The render method should have at least business logic as possible,
     // because this will be called whenever there is a new setState call
     // and can slow down the app
@@ -35,12 +52,14 @@ class TextInput extends PureComponent {
     // Please write here all the methods that are not react native lifecycle methods
     editInput = () => {
         let tooltip = getTooltip(this.props.label, this.props.translation);
+        let value = lodashGet(this.state, 'value', ' ');
+        console.log('Value stuff: ', value);
         return (
             <View style={[{flexDirection: 'row'},this.props.style]}>
                 <View style={{flex: 1}}> 
                     <TextField
                         label={this.props.isRequired ? getTranslation(this.props.label, this.props.translation) + ' * ' : getTranslation(this.props.label, this.props.translation)}
-                        value={this.state.value}
+                        value={value ? value.toString() : ''}
                         onChangeText={this.handleOnChangeText}
                         textColor='rgb(0,0,0)'
                         fontSize={15}
@@ -54,10 +73,10 @@ class TextInput extends PureComponent {
                         multiline={this.props.multiline !== undefined ? this.props.multiline : false}
                         onPress={() => {console.log("On press textInput")}}
                         keyboardType={this.props.keyboardType ? this.props.keyboardType : 'default'}
-                        onSubmitEditing={this.handleSubmitEditing}
+                        onEndEditing={this.handleSubmitEditing}
                         secureTextEntry={this.props.secureTextEntry}
                         onFocus={this.props.onFocus}
-                        onBlur={this.handleBlur}
+                        // onBlur={this.handleBlur}
                     />
                 </View>
                 {

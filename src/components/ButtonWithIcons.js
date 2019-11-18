@@ -1,19 +1,17 @@
 /**
  * Created by florinpopa on 16/07/2018.
  */
-import React, {PureComponent} from 'react';
-import {TextInput, View, Text, StyleSheet, Platform, Dimensions, TouchableOpacity} from 'react-native';
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
-import {ListItem, Icon, Button} from 'react-native-material-ui';
+import React, {PureComponent} from 'react';
+import {View, Text, StyleSheet} from 'react-native';
+import {Icon} from 'react-native-material-ui';
 import {calculateDimension, getTranslation} from './../utils/functions';
-import config from './../utils/config';
 import Ripple from 'react-native-material-ripple';
 import IconMaterial from 'react-native-vector-icons/MaterialCommunityIcons';
 import styles from './../styles';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
-import translations from './../utils/translations'
 
 class ButtonWithIcons extends PureComponent {
 

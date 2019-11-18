@@ -48,25 +48,3 @@ export const ACTION_TYPE_STORE_EXPOSURES = 'STORE_EXPOSURES';
 export const ACTION_TYPE_ADD_EXPOSURE = 'ADD_EXPOSURE';
 export const ACTION_TYPE_REMOVE_EXPOSURE = 'REMOVE_EXPOSURE';
 export const ACTION_TYPE_UPDATE_EXPOSURE = 'UPDATE_EXPOSURE';
-
-// SQL query strings
-export const DROP_TABLE_USER = 'DROP TABLE IF EXISTS User';
-export const CREATE_TABLE_USER = 'CREATE TABLE IF NOT EXISTS User(' +
-    'id TEXT PRIMARY KEY NOT NULL, ' +
-    'firstName TEXT NOT NULL, ' +
-    'lastName TEXT NOT NULL, ' +
-    'roleIds TEXT NOT NULL, ' +
-    'languageId TEXT NOT NULL, ' +
-    'email TEXT NOT NULL,' +
-    'deleted BOOLEAN NOT NULL DEFAULT 0, ' +
-    'outbreakIds TEXT, ' +
-    'activeOutbreakId TEXT, ' +
-    'passwordChange BOOLEAN DEFAULT 1, ' +
-    'securityQuestions TEXT, ' +
-    'realm TEXT, ' +
-    'username TEXT, ' +
-    'emailVerified BOOLEAN DEFAULT 0, ' +
-    'createdAt DATETIME, ' +
-    'updatedAt DATETIME, ' +
-    'updatedBy TEXT, ' +
-    'deletedAt DATETIME)';

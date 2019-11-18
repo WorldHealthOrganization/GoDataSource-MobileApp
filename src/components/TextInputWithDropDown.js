@@ -7,9 +7,10 @@ import config from './../utils/config'
 import PropTypes from 'prop-types';
 import { TextField } from 'react-native-material-textfield';
 import { Dropdown } from 'react-native-material-dropdown';
-import translations from './../utils/translations'
+import translations from './../utils/translations';
 import {getTranslation, getTooltip, getDropDownInputDisplayParameters} from './../utils/functions';
-import TooltipComponent from './TooltipComponent'
+import TooltipComponent from './TooltipComponent';
+import get from 'lodash/get';
 
 
 class TextInputWithDropDown extends Component {
@@ -50,26 +51,27 @@ class TextInputWithDropDown extends Component {
     }
 
     editInput() {
-        let tooltip = getTooltip(this.props.label, this.props.translation)
+        let tooltip = getTooltip(this.props.label, this.props.translation);
 
         //  get Value
-        const value = this.props.value[config[this.props.dropDownData][this.props.selectedDropDownItemIndex].value];
-        let stringValue = ''
-        if (value !== undefined && value !== null){
-            stringValue = value.toString();
-        }
+        // const value = get(this.props, `value[[${config[this.props.dropDownData]}][${this.props.selectedDropDownItemIndex}].value]`, '');
+        let stringValue = get(this.props, `value[${get(config, `[${this.props.dropDownData}][${this.props.selectedDropDownItemIndex}].value`, null)}]`, ' ');
+        // let stringValue = this.props.value[config[this.props.dropDownData][this.props.selectedDropDownItemIndex].value];
+        // if (value !== undefined && value !== null){
+        //     stringValue = value.toString();
+        // }
 
         //  get DropDown data
         let dropDownData = config[this.props.dropDownData].map((e) => {
             return {label: getTranslation(e.label, this.props.translation), value: e.value}
-        })
-        dropDownData.unshift({ label: getTranslation(translations.generalLabels.noneLabel, this.props.translation), value: null})
+        });
+        dropDownData.unshift({ label: getTranslation(translations.generalLabels.noneLabel, this.props.translation), value: null});
 
         //  get labels
-        const textLabel = getTranslation(config[this.props.dropDownData][this.props.selectedDropDownItemIndex].label, this.props.translation)
+        const textLabel = getTranslation(get(config, `[${this.props.dropDownData}][${this.props.selectedDropDownItemIndex}].label`, ' '), this.props.translation);
         const dropdownLabel =  `${getTranslation(translations.ageUnitOfMeasureDropDown.yearsLabel, this.props.translation)} / ${getTranslation(translations.ageUnitOfMeasureDropDown.monthsLabel, this.props.translation)}`
 
-        const dropDownParams = getDropDownInputDisplayParameters(this.props.screenSize, dropDownData.length)
+        const dropDownParams = getDropDownInputDisplayParameters(this.props.screenSize, dropDownData.length);
         return (
             <View style={[{width: '100%'},this.props.style]}>
                 <View style={{flexDirection: 'row',  justifyContent: 'space-between'}}>
@@ -105,7 +107,7 @@ class TextInputWithDropDown extends Component {
                         value={
                             this.state.noneValueSelectedInDropdown === true 
                                 ? 'None'
-                                : config[this.props.dropDownData][this.props.selectedDropDownItemIndex].value || ''
+                                : get(config, `[${this.props.dropDownData}][${this.props.selectedDropDownItemIndex}].value`, '')
                         }
                         fontSize={15}
                         labelFontSize={12.5}
@@ -128,10 +130,10 @@ class TextInputWithDropDown extends Component {
     }
 
     viewInput() {
-        let tooltip = getTooltip(this.props.label, this.props.translation)
+        let tooltip = getTooltip(this.props.label, this.props.translation);
 
-        const value = this.props.value[config[this.props.dropDownData][this.props.selectedDropDownItemIndex].value];
-        let stringValue = ''
+        const value = get(this.props, `value[${config[this.props.dropDownData]}][${this.props.selectedDropDownItemIndex}].value]`, '');
+        let stringValue = '';
         if (value !== undefined && value !== null){
             stringValue = value.toString();
         }
@@ -156,7 +158,7 @@ class TextInputWithDropDown extends Component {
                             textAlign: 'left',
                             color: 'rgb(60,60,60)',
                         }}>
-                            {stringValue !== '' ? stringValue + ' ' + config[this.props.dropDownData][this.props.selectedDropDownItemIndex].value || '' : ''}
+                            {stringValue !== '' ? stringValue + ' ' + get(config, `[${this.props.dropDownData}][${this.props.selectedDropDownItemIndex}].value`, '') : ''}
                         </Text>
                     </View>
                     {

@@ -12,12 +12,14 @@ import ElevatedView from 'react-native-elevated-view';
 import ActionsBar from './ActionsBar';
 import {getTranslation} from './../utils/functions';
 
-GeneralListItem = ({title, primaryText, secondaryText, firstComponent, secondComponent, thirdComponent, hasActionsBar, textsArray, textsStyleArray, onPressArray, actionsBarContainerStyle, containerStyle, translation}) => (
-    <ElevatedView
-        elevation={3}
-        style={[{borderRadius: 2, backgroundColor: 'white'}, containerStyle]}
-    >
-        <View containerStyle={containerStyle}>
+GeneralListItem = ({title, primaryText, secondaryText, firstComponent, secondComponent, thirdComponent, hasActionsBar, textsArray, textsStyleArray, onPressArray, actionsBarContainerStyle, containerStyle, translation}) => {
+    console.log('GeneralListItem render called');
+    return (
+        <ElevatedView
+            elevation={3}
+            style={[{borderRadius: 2, backgroundColor: 'white'}, containerStyle]}
+        >
+            <View containerStyle={containerStyle}>
                 {
                     firstComponent ? (
                         firstComponent
@@ -47,17 +49,18 @@ GeneralListItem = ({title, primaryText, secondaryText, firstComponent, secondCom
                 }
                 {
                     hasActionsBar ? (<ActionsBar
-                            textsArray={textsArray}
-                            textsStyleArray={textsStyleArray}
-                            onPressArray={onPressArray}
-                            containerStyle={{height: 54}}
-                            isEditMode={true}
-                            translation={translation}
-                        />) : (null)
+                        textsArray={textsArray}
+                        textsStyleArray={textsStyleArray}
+                        onPressArray={onPressArray}
+                        containerStyle={{height: 54}}
+                        isEditMode={true}
+                        translation={translation}
+                    />) : (null)
                 }
-        </View>
-    </ElevatedView>
-);
+            </View>
+        </ElevatedView>
+    );
+}
 
 // Create style outside the class, or for components that will be used by other components (buttons),
 // make a global style in the config directory

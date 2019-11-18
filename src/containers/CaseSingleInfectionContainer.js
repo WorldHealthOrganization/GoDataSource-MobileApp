@@ -16,6 +16,7 @@ import Button from './../components/Button';
 import translations from './../utils/translations'
 import ElevatedView from 'react-native-elevated-view';
 import _ from 'lodash';
+import TopContainerButtons from "../components/TopContainerButtons";
 
 class CaseSingleInfectionContainer extends Component {
 
@@ -41,74 +42,85 @@ class CaseSingleInfectionContainer extends Component {
         return (
             <View style={{ flex: 1 }}>
                 <View style={style.container}>
-                    <View style={{ flexDirection: 'row' }}>
-                        {
-                            this.props.isNew ? (
-                                <View style={{ flexDirection: 'row' }}>
-                                    <Button
-                                        title={getTranslation(translations.generalButtons.backButtonLabel, this.props.translation)}
-                                        onPress={this.handleBackButton}
-                                        color={styles.buttonGreen}
-                                        titleColor={'white'}
-                                        height={calculateDimension(25, true, this.props.screenSize)}
-                                        width={calculateDimension(130, false, this.props.screenSize)}
-                                        style={{
-                                            marginVertical: calculateDimension(12.5, true, this.props.screenSize),
-                                            marginHorizontal: calculateDimension(16, false, this.props.screenSize),
-                                        }} />
-                                    <Button
-                                        title={getTranslation(translations.generalButtons.nextButtonLabel, this.props.translation)}
-                                        onPress={this.handleNextButton}
-                                        color={styles.buttonGreen}
-                                        titleColor={'white'}
-                                        height={calculateDimension(25, true, this.props.screenSize)}
-                                        width={calculateDimension(130, false, this.props.screenSize)}
-                                        style={{
-                                            marginVertical: calculateDimension(12.5, true, this.props.screenSize),
-                                            marginHorizontal: calculateDimension(16, false, this.props.screenSize),
-                                        }} />
-                                </View>) : (
-                                    this.props.isEditMode ? (
-                                        <View style={{ flexDirection: 'row' }}>
-                                            <Button
-                                                title={getTranslation(translations.generalButtons.saveButtonLabel, this.props.translation)}
-                                                onPress={this.props.onPressSaveEdit}
-                                                color={styles.buttonGreen}
-                                                titleColor={'white'}
-                                                height={calculateDimension(25, true, this.props.screenSize)}
-                                                width={calculateDimension(166, false, this.props.screenSize)}
-                                                style={{
-                                                    marginVertical: calculateDimension(12.5, true, this.props.screenSize),
-                                                    marginRight: 10,
-                                                }} />
-                                            <Button
-                                                title={getTranslation(translations.generalButtons.cancelButtonLabel, this.props.translation)}
-                                                onPress={this.props.onPressCancelEdit}
-                                                color={styles.buttonGreen}
-                                                titleColor={'white'}
-                                                height={calculateDimension(25, true, this.props.screenSize)}
-                                                width={calculateDimension(166, false, this.props.screenSize)}
-                                                style={{
-                                                    marginVertical: calculateDimension(12.5, true, this.props.screenSize),
-                                                    marginRight: 10,
-                                                }} />
-                                        </View>) : (
-                                            this.props.role.find((e) => e === config.userPermissions.writeCase) !== undefined ? (
-                                                <Button
-                                                    title={getTranslation(translations.generalButtons.editButtonLabel, this.props.translation)}
-                                                    onPress={this.props.onPressEdit}
-                                                    color={styles.buttonGreen}
-                                                    titleColor={'white'}
-                                                    height={calculateDimension(25, true, this.props.screenSize)}
-                                                    width={calculateDimension(166, false, this.props.screenSize)}
-                                                    style={{
-                                                        marginVertical: calculateDimension(12.5, true, this.props.screenSize),
-                                                        marginRight: 10,
-                                                    }} />
-                                            ) : null
-                                        ))
-                        }
-                    </View>
+                    <TopContainerButtons
+                        isNew={this.props.isNew}
+                        isEditMode={this.props.isEditMode}
+                        index={this.props.index}
+                        numberOfTabs={this.props.numberOfTabs}
+                        onPressEdit={this.props.onPressEdit}
+                        onPressSaveEdit={this.props.onPressSaveEdit}
+                        onPressCancelEdit={this.props.onPressCancelEdit}
+                        onPressNextButton={this.handleNextButton}
+                        onPressPreviousButton={this.handleBackButton}
+                    />
+                    {/*<View style={{ flexDirection: 'row' }}>*/}
+                        {/*{*/}
+                            {/*this.props.isNew ? (*/}
+                                {/*<View style={{ flexDirection: 'row' }}>*/}
+                                    {/*<Button*/}
+                                        {/*title={getTranslation(translations.generalButtons.backButtonLabel, this.props.translation)}*/}
+                                        {/*onPress={this.handleBackButton}*/}
+                                        {/*color={styles.buttonGreen}*/}
+                                        {/*titleColor={'white'}*/}
+                                        {/*height={calculateDimension(25, true, this.props.screenSize)}*/}
+                                        {/*width={calculateDimension(130, false, this.props.screenSize)}*/}
+                                        {/*style={{*/}
+                                            {/*marginVertical: calculateDimension(12.5, true, this.props.screenSize),*/}
+                                            {/*marginHorizontal: calculateDimension(16, false, this.props.screenSize),*/}
+                                        {/*}} />*/}
+                                    {/*<Button*/}
+                                        {/*title={getTranslation(translations.generalButtons.nextButtonLabel, this.props.translation)}*/}
+                                        {/*onPress={this.handleNextButton}*/}
+                                        {/*color={styles.buttonGreen}*/}
+                                        {/*titleColor={'white'}*/}
+                                        {/*height={calculateDimension(25, true, this.props.screenSize)}*/}
+                                        {/*width={calculateDimension(130, false, this.props.screenSize)}*/}
+                                        {/*style={{*/}
+                                            {/*marginVertical: calculateDimension(12.5, true, this.props.screenSize),*/}
+                                            {/*marginHorizontal: calculateDimension(16, false, this.props.screenSize),*/}
+                                        {/*}} />*/}
+                                {/*</View>) : (*/}
+                                    {/*this.props.isEditMode ? (*/}
+                                        {/*<View style={{ flexDirection: 'row' }}>*/}
+                                            {/*<Button*/}
+                                                {/*title={getTranslation(translations.generalButtons.saveButtonLabel, this.props.translation)}*/}
+                                                {/*onPress={this.props.onPressSaveEdit}*/}
+                                                {/*color={styles.buttonGreen}*/}
+                                                {/*titleColor={'white'}*/}
+                                                {/*height={calculateDimension(25, true, this.props.screenSize)}*/}
+                                                {/*width={calculateDimension(166, false, this.props.screenSize)}*/}
+                                                {/*style={{*/}
+                                                    {/*marginVertical: calculateDimension(12.5, true, this.props.screenSize),*/}
+                                                    {/*marginRight: 10,*/}
+                                                {/*}} />*/}
+                                            {/*<Button*/}
+                                                {/*title={getTranslation(translations.generalButtons.cancelButtonLabel, this.props.translation)}*/}
+                                                {/*onPress={this.props.onPressCancelEdit}*/}
+                                                {/*color={styles.buttonGreen}*/}
+                                                {/*titleColor={'white'}*/}
+                                                {/*height={calculateDimension(25, true, this.props.screenSize)}*/}
+                                                {/*width={calculateDimension(166, false, this.props.screenSize)}*/}
+                                                {/*style={{*/}
+                                                    {/*marginVertical: calculateDimension(12.5, true, this.props.screenSize),*/}
+                                                    {/*marginRight: 10,*/}
+                                                {/*}} />*/}
+                                        {/*</View>) : (*/}
+                                            {/*this.props.role.find((e) => e === config.userPermissions.writeCase) !== undefined ? (*/}
+                                                {/*<Button*/}
+                                                    {/*title={getTranslation(translations.generalButtons.editButtonLabel, this.props.translation)}*/}
+                                                    {/*onPress={this.props.onPressEdit}*/}
+                                                    {/*color={styles.buttonGreen}*/}
+                                                    {/*titleColor={'white'}*/}
+                                                    {/*height={calculateDimension(25, true, this.props.screenSize)}*/}
+                                                    {/*width={calculateDimension(166, false, this.props.screenSize)}*/}
+                                                    {/*style={{*/}
+                                                        {/*marginVertical: calculateDimension(12.5, true, this.props.screenSize),*/}
+                                                        {/*marginRight: 10,*/}
+                                                    {/*}} />*/}
+                                            {/*) : null*/}
+                                        {/*))*/}
+                        {/*}*/}
+                    {/*</View>*/}
                     <ScrollView
                         style={style.containerScrollView}
                         contentContainerStyle={[style.contentContainerStyle, { paddingBottom: this.props.screenSize.height < 600 ? 70 : 20 }]}
@@ -117,6 +129,29 @@ class CaseSingleInfectionContainer extends Component {
                             config.caseSingleScreen.infection.map((item, index) => {
                                 return this.handleRenderItem(item, index)
                             })
+                        }
+                        <View style={style.container}>
+                            {
+                                this.props.case && this.props.case.vaccinesReceived && this.props.case.vaccinesReceived.map((item, index) => {
+                                    return this.handleRenderItemForVaccinesList(item, index)
+                                })
+                            }
+                        </View>
+                        {
+                            this.props.isEditMode ? (
+                                <View style={{ alignSelf: 'flex-start', marginHorizontal: calculateDimension(16, false, this.props.screenSize), marginVertical: 20 }}>
+                                    <Ripple
+                                        style={{
+                                            height: 25,
+                                            justifyContent: 'center'
+                                        }}
+                                        onPress={this.props.onPressAddVaccine}
+                                    >
+                                        <Text style={{ fontFamily: 'Roboto-Medium', fontSize: 12, color: styles.buttonGreen }}>
+                                            {this.props.case.vaccinesReceived && this.props.case.vaccinesReceived.length === 0 ? getTranslation('Add vaccine', this.props.translation) : getTranslation('Add another vaccine', this.props.translation)}
+                                        </Text>
+                                    </Ripple>
+                                </View>) : null
                         }
                         <View style={style.container}>
                             {
@@ -176,6 +211,13 @@ class CaseSingleInfectionContainer extends Component {
         return this.renderItemCardComponent(fields, index)
     };
 
+    handleRenderItemForVaccinesList = (item, index) => {
+        let fields = config.caseSingleScreen.vaccinesReceived.fields.map((field) => {
+            return Object.assign({}, field, { isEditMode: field.id === 'visualId' ? false : this.props.isEditMode })
+        });
+        return this.renderItemCardComponent(fields, index)
+    };
+
     renderItemCardComponent = (fields, cardIndex = null) => {
         return (
             <ElevatedView elevation={3} key={cardIndex} style={[style.containerCardComponent, {
@@ -216,6 +258,9 @@ class CaseSingleInfectionContainer extends Component {
         } else if (item.type === 'ActionsBar') {
             if (item.objectType !== null && item.objectType !== undefined && item.objectType === 'DateRanges') {
                 item.onPressArray = [this.props.handleOnPressDeleteDateRange]
+            }
+            else if (item.objectType !== null && item.objectType !== undefined && item.objectType === 'Vaccines') {
+                item.onPressArray = [this.props.onPressDeleteVaccines]
             }
         }
 
@@ -410,6 +455,18 @@ class CaseSingleInfectionContainer extends Component {
                 .sort((a, b) => { return a.order - b.order; })
                 .map((o) => { return { value: getTranslation(o.value, this.props.translation), id: o.value } })
         }
+
+        // Vaccines data
+        if (item.id === 'vaccine') {
+            return _.filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_VACCINE' })
+                .sort((a, b) => { return a.order - b.order; })
+                .map((o) => { return { label: getTranslation(o.value, this.props.translation), value: o.value } })
+        }
+        if (item.id === 'status') {
+            return _.filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_VACCINE_STATUS' })
+                .sort((a, b) => { return a.order - b.order; })
+                .map((o) => { return { label: getTranslation(o.value, this.props.translation), value: o.value } })
+        }
     };
 
     computeValueForCasesSingleScreen = (item, index) => {
@@ -417,6 +474,10 @@ class CaseSingleInfectionContainer extends Component {
             if (item.objectType === 'DateRanges') {
                 return this.props.case && this.props.case.dateRanges && Array.isArray(this.props.case.dateRanges) && this.props.case.dateRanges.length > 0 && this.props.case.dateRanges[index][item.id] !== undefined ?
                     getTranslation(this.props.case.dateRanges[index][item.id], this.props.translation) : '';
+            }
+            if (item.objectType === 'Vaccines') {
+                return this.props.case && this.props.case.vaccinesReceived && Array.isArray(this.props.case.vaccinesReceived) && this.props.case.vaccinesReceived.length > 0 && this.props.case.vaccinesReceived[index][item.id] !== undefined ?
+                    getTranslation(this.props.case.vaccinesReceived[index][item.id], this.props.translation) : '';
             }
         }
         return this.props.case && this.props.case[item.id] ? getTranslation(this.props.case[item.id], this.props.translation) : '';
@@ -427,7 +488,7 @@ class CaseSingleInfectionContainer extends Component {
         if (missingFields && Array.isArray(missingFields) && missingFields.length === 0) {
             if (this.props.checkDateOfOnsetOutcome()) {
                 if (this.props.checkIsolationOnsetDates()) {
-                    this.props.handleMoveToNextScreenButton(true);
+                    this.props.onPressNextButton(true);
                 } else {
                     Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.dateOfOnsetError, this.props.translation), [
                         {

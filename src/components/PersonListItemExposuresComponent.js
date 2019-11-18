@@ -65,7 +65,7 @@ class PersonListItemNameAndAddressComponent extends PureComponent {
 
     renderExposures = (exposure, index) => {
         return(
-            <Ripple key={index} onPress={() => this.props.onPressExposureProp(exposure.id)}>
+            <Ripple key={index} onPress={() => this.props.onPressExposureProp(exposure)}>
                 <Text style={[style.secondaryText, {marginVertical: 5, marginHorizontal: 7}]} numberOfLines={1}>{`\u2022 ${exposure.fullName} ${exposure.visualId ? `(${exposure.visualId})` : ''}`}</Text>
             </Ripple>
         )

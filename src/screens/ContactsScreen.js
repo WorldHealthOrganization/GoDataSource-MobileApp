@@ -1,23 +1,19 @@
 /**
  * Created by florinpopa on 18/07/2018.
  */
-import React, {Component} from 'react';
-import {View, StyleSheet, Animated, Text, BackHandler, Alert} from 'react-native';
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
+import React, {Component} from 'react';
+import {View, StyleSheet, Alert} from 'react-native';
 import styles from './../styles';
 import NavBarCustom from './../components/NavBarCustom';
 import ElevatedView from 'react-native-elevated-view';
 import Ripple from 'react-native-material-ripple';
 import {Icon} from 'react-native-material-ui';
-import {calculateDimension, getTranslation, navigation, createFilterContactsObject, createDate} from './../utils/functions';
-import PersonListItem from './../components/PersonListItem';
-import SearchFilterView from './../components/SearchFilterView';
+import {calculateDimension, getTranslation} from './../utils/functions';
 import {connect} from "react-redux";
-import {bindActionCreators} from "redux";
 import AnimatedListView from './../components/AnimatedListView';
 import {getContactsForOutbreakId} from './../actions/contacts';
-import {addFilterForScreen, removeFilterForScreen} from './../actions/app';
 import ViewHOC from './../components/ViewHOC';
 import config from './../utils/config';
 import { Popup } from 'react-native-map-link';
@@ -25,25 +21,17 @@ import translations from './../utils/translations'
 import Breadcrumb from './../components/Breadcrumb';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {pushNewEditScreen} from './../utils/screenTransitionFunctions';
-import RNExitApp from 'react-native-exit-app';
-
-const scrollAnim = new Animated.Value(0);
-const offsetAnim = new Animated.Value(0);
+import {enhanceListWithGetData} from './../components/higherOrderComponents/withListData';
+import get from "lodash/get";
+import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
+import {bindActionCreators} from "redux";
+import {setLoaderState} from "../actions/app";
 
 class ContactsScreen extends Component {
-    static navigatorStyle = {
-        navBarHidden: true
-    };
 
     constructor(props) {
         super(props);
         this.state = {
-            contacts: [],
-            filter: this.props.filter && this.props.filter['FollowUpsScreen'] ? this.props.filter['FollowUpsScreen'] : {
-                date: createDate(null),
-                searchText: ''
-            },
-            filterFromFilterScreen: this.props.filter && this.props.filter['ContactsFilterScreen'] ? this.props.filter['ContactsFilterScreen'] : null,
             loading: false,
             sortData: false,
             isVisible: false,
@@ -55,107 +43,57 @@ class ContactsScreen extends Component {
             refreshing: false,
             riskColors: {}
         };
-        // Bind here methods, or at least don't declare methods in the render method
-        this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this));
-        this.handleBackButtonClick = this.handleBackButtonClick.bind(this);
     }
 
     // Please add here the react lifecycle methods that you need
     componentDidMount() {
-        BackHandler.addEventListener('hardwareBackPress', this.handleBackButtonClick);
         let riskColors = {};
         let refData = this.props.referenceData.filter((e) => {return e.categoryId.includes("RISK_LEVEL")});
         for (let i=0; i<refData.length; i++) {
             riskColors[refData[i].value] = refData[i].colorCode || 'black'
         }
-        this.filterContacts();
+        this.setState({
+            riskColors: riskColors
+        })
     }
 
     componentDidUpdate(prevProps) {
-        if (!this.props.loaderState && this.state.refreshing) {
+        if (this.props.data && prevProps.data !== this.props.data) {
             this.setState({
                 refreshing: false
             })
         }
     }
 
-    componentWillUnmount() {
-        BackHandler.removeEventListener('hardwareBackPress', this.handleBackButtonClick);
-    }
-
-    handleBackButtonClick() {
-        Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.alertMessages.androidBackButtonMsg, this.props.translation), [
-            {
-                text: getTranslation(translations.alertMessages.yesButtonLabel, this.props.translation), onPress: () => {
-                    RNExitApp.exitApp();
-                    return true;
-                }
-            },
-            {
-                text: getTranslation(translations.alertMessages.cancelButtonLabel, this.props.translation), onPress: () => {
-                    return true;
-                }
-            }
-        ])
-        return true;
-    }
-
-    clampedScroll= Animated.diffClamp(
-        Animated.add(
-            scrollAnim.interpolate({
-                inputRange: [0, 1],
-                outputRange: [0, 1],
-                extrapolateLeft: 'clamp',
-            }),
-            offsetAnim,
-        ),
-        0,
-        30,
-    );
-
-    handleScroll = Animated.event(
-        [{nativeEvent: {contentOffset: {y: scrollAnim}}}],
-        {useNativeDriver: true}
-    );
-
     // The render method should have at least business logic as possible,
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
-        const navbarTranslate = this.clampedScroll.interpolate({
-            inputRange: [0, 30],
-            outputRange: [0, -30],
-            extrapolate: 'clamp',
-        });
-        const navbarOpacity = this.clampedScroll.interpolate({
-            inputRange: [0, 30],
-            outputRange: [1, 0],
-            extrapolate: 'clamp',
-        });
+        let {mainFilter} = this.props;
 
-        let filterNumbers = 0
-        if (this.state.filterFromFilterScreen) {
-            if (this.state.filterFromFilterScreen.gender && this.state.filterFromFilterScreen.gender !== null && this.state.filterFromFilterScreen.gender !== undefined) {
+        let filterNumbers = 0;
+        if (mainFilter) {
+            if (get(mainFilter, 'gender', null) !== null) {
                 ++filterNumbers
             }
-            if (this.state.filterFromFilterScreen.age && this.state.filterFromFilterScreen.age.length > 0) {
+            if (get(mainFilter, 'age', null) !== null) {
                 ++filterNumbers
             }
-            if (this.state.filterFromFilterScreen.selectedLocations && this.state.filterFromFilterScreen.selectedLocations.length > 0) {
-                ++filterNumbers
-            }
-            if (this.state.filterFromFilterScreen.classification && this.state.filterFromFilterScreen.classification.length > 0) {
+            if (checkArrayAndLength(get(mainFilter, 'selectedLocations', null))) {
                 ++filterNumbers
             }
         }
-        let filterText = filterNumbers === 0 ? `${getTranslation(translations.generalLabels.filterTitle, this.props.translation)}` : `${getTranslation(translations.generalLabels.filterTitle, this.props.translation)}(${filterNumbers})`
+        let filterText = filterNumbers === 0 ? `${getTranslation(translations.generalLabels.filterTitle, this.props.translation)}` : `(${filterNumbers})`;
+
 
         let contactTitle = []; contactTitle[0] = getTranslation(translations.contactsScreen.contactsTitle, this.props.translation);
 
         return (
             <ViewHOC style={style.container}
                      showLoader={(this.props && this.props.loaderState) || (this.state && this.state.loading)}
-                     loaderText={this.props && this.props.syncState ? 'Loading' : getTranslation(translations.loadingScreenMessages.loadingMsg, this.props.translation)}>
+                     loaderText={this.props && this.props.syncState ? 'Loading' : getTranslation(translations.loadingScreenMessages.loadingMsg, this.props.translation)}
+                     refresh={this.props.onRefresh}
+            >
                 <NavBarCustom
                     title={null}
                     customTitle={
@@ -197,31 +135,6 @@ class ContactsScreen extends Component {
                                     </Ripple>
                                 </ElevatedView> 
                             </View>
-
-                           
-                            {/* {
-                                this.props.role.find((e) => e === config.userPermissions.writeContact) !== undefined ? (
-                                    <View style={{flex: 0.1}}>
-                                        <ElevatedView
-                                            elevation={3}
-                                            style={{
-                                                backgroundColor: styles.buttonGreen,
-                                                width: calculateDimension(33, false, this.props.screenSize),
-                                                height: calculateDimension(25, true, this.props.screenSize),
-                                                borderRadius: 4
-                                            }}
-                                        >
-                                            <Ripple style={{
-                                                flex: 1,
-                                                justifyContent: 'center',
-                                                alignItems: 'center'
-                                            }} onPress={this.handleOnPressAddContact}>
-                                                <Icon name="add" color={'white'} size={15}/>
-                                            </Ripple>
-                                        </ElevatedView>
-                                    </View>
-                                ) : null
-                            } */}
                         </View>
                     }
                     navigator={this.props.navigator}
@@ -231,31 +144,25 @@ class ContactsScreen extends Component {
                 </NavBarCustom>
                 <View style={style.containerContent}>
                     <AnimatedListView
-                        stickyHeaderIndices={[0]}
-                        data={this.props.contacts || []}
-                        renderItem={this.renderContact}
-                        keyExtractor={this.keyExtractor}
-                        ListHeaderComponent={
-                            <SearchFilterView
-                                style={{
-                                    transform: [{
-                                        translateY: navbarTranslate
-                                    }],
-                                    opacity: navbarOpacity
-                                }}
-                                value={this.state.filter.searchText}
-                                onPress={this.handlePressFilter}
-                                onChangeText={this.handleOnChangeText}
-                                onSubmitEditing={this.handleOnSubmitEditing}
-                                filterText={filterText}
-                            />}
-                        ItemSeparatorComponent={this.renderSeparatorComponent}
+                        data={this.props.data || []}
+                        dataCount={this.props.dataCount || 0}
+                        colors={this.state.riskColors}
+                        dataType={'Contact'}
+                        filterText={filterText}
                         style={[style.listViewStyle]}
                         componentContainerStyle={style.componentContainerStyle}
-                        onScroll={this.handleScroll}
-                        getItemLayout={this.getItemLayout}
-                        refreshing={this.state.refreshing && this.props.loaderState}
+                        refreshing={this.state.refreshing}
                         onRefresh={this.handleOnRefresh}
+                        onSearch={this.props.setSearchText}
+                        onPressFilter={this.props.onPressFilter}
+                        onPressView={this.props.onPressView}
+                        onPressCenterButton={this.props.onPressCenterButton}
+                        onPressAddExposure={this.props.onPressAddExposure}
+                        onPressMap={this.handleOnPressMap}
+                        onPressName={this.props.onPressFullName}
+                        onPressExposure={this.props.onPressExposure}
+                        screen={translations.contactSingleScreen.title}
+                        onEndReached={this.props.onEndReached}
                     />
                 </View>
 
@@ -286,222 +193,25 @@ class ContactsScreen extends Component {
     }
 
     // Please write here all the methods that are not react native lifecycle methods
-    handleOnPressAddContact = () => {
-        this.props.navigator.push({
-            screen: 'ContactsSingleScreen',
-            // animated: true,
-            // animationType: 'fade',
-            passProps: {
-                isNew: true
-            }
-        })
-    };
 
-      //Refresh list of cases
+      //Refresh list of contacts
     handleOnRefresh = () => {
         this.setState({
             refreshing: true
         }, () => {
-            this.filterContacts();
+            this.props.onRefresh();
         });
     };
 
-    keyExtractor = (item, index) => item._id;
-
-    renderContact = ({item}) => {
-        let margins = calculateDimension(16, false, this.props.screenSize);
-        return(
-            <PersonListItem
-                key={item._id}
-                type={'Contact'}
-                titleColor={item && item.riskLevel ? this.state.riskColors[item.riskLevel] : 'black'}
-                itemToRender={item}
-                onPressMapIconProp={this.handleOnPressMap}
-                onPressNameProp={this.handleOnPressNameProp}
-                onPressExposureProp={this.handleOnPressExposureProp}
-                textsArray={[
-                    getTranslation(translations.contactsScreen.editButton, this.props.translation),
-                    getTranslation(translations.followUpsScreen.addExposureFollowUpLabel, this.props.translation)
-                ]}
-                textsStyleArray={[
-                    [styles.buttonTextActionsBar, {fontSize: 14, marginLeft: margins}],
-                    [styles.buttonTextActionsBar, {fontSize: 14, marginRight: margins}]]
-                }
-                onPressTextsArray={[
-                    () => {
-                        this.handleOnPressMissing(item)
-                    },
-                    () => {
-                        this.handleOnPressExposure(item)
-                    }]}
-            />
-        )
-    };
-
-    getItemLayout = (data, index) => ({
-        length: calculateDimension(178, true, this.props.screenSize),
-        offset: calculateDimension(178, true, this.props.screenSize) * index,
-        index
-    });
-
-    renderSeparatorComponent = () => {
-        return (
-            <View style={style.separatorComponentStyle} />
-        )
-    };
-
-    handleOnChangeText = (text) => {
-        console.log("### handleOnChangeText: ", text);
+    handleOnPressMap = (dataFromMapHandler) => {
         this.setState(prevState => ({
-            filter: Object.assign({}, prevState.filter, {searchText: text})
-        }), console.log('### filter after changed text: ', this.state.filter))
-    };
-
-    handleOnSubmitEditing = (text) => {
-        console.log ('text', text);
-
-        // Filter contacts by firstName and lastName
-        this.filterContacts();
-    };
-
-    handlePressFilter = () => {
-        this.props.navigator.showModal({
-            screen: 'FilterScreen',
-            animated: true,
-            passProps: {
-                activeFilters: this.state.filterFromFilterScreen || null,
-                onApplyFilters: this.handleOnApplyFilters,
-                screen: 'ContactsFilterScreen'
-            }
-        })
-    };
-
-    handleOnApplyFilters = (filter) => {
-        this.setState({
-            filterFromFilterScreen: filter
-        }, () => {
-            this.filterContacts();
-        })
-    };
-
-    handlePressFollowUp = (item, contact) => {
-        let contactPlaceOfResidence = null;
-        if (item && item.addresses && Array.isArray(item.addresses) && item.addresses.length > 0) {
-            contactPlaceOfResidence = item.addresses.find((e) => {
-                return e.typeId === config.userResidenceAddress.userPlaceOfResidence
-            })
-        }
-
-        this.props.navigator.push({
-            screen: 'FollowUpsSingleScreen',
-            // animated: true,
-            // animationType: 'fade',
-            passProps: {
-                item: {
-                    date: createDate(null),
-                    outbreakId: this.props.user.activeOutbreakId,
-                    lostToFollowUp: false,
-                    address: contactPlaceOfResidence,
-                    statusId: config.followUpStatuses.notPerformed
-                },
-                contact: contact || item,
-                filter: this.state.filter,
-                isNew: true
-            }
-        })
-    };
-
-    handleOnPressMissing = (followUp, contact) => {
-        console.log("Handle on press edit followUp: ", JSON.stringify(followUp));
-        console.log("Handle on press edit contact: ", JSON.stringify(contact));
-        this.props.navigator.push({
-            screen: 'ContactsSingleScreen',
-            // animated: true,
-            // animationType: 'fade',
-            passProps: {
-                contact: contact || followUp
-            }
-        })
-    };
-
-    handleOnPressExposure = (followUp, contact) => {
-        console.log('handleOnPressExposure', followUp. contact)
-        this.props.navigator.showModal({
-            screen: "ExposureScreen",
-            animated: true,
-            passProps: {
-                contact: contact || followUp,
-                type: 'Contact'
-            }
-        })
-    };
-
-    handleOnPressNameProp = (type, personId) => {
-        this.props.navigator.push({
-            screen: 'ContactsSingleScreen',
-            animated: true,
-            passProps: {
-                contact: this.props.contacts.find((e) => {return e._id === personId}),
-                previousScreen: translations.contactSingleScreen.title
-            }
-        })
-    };
-
-    handleOnPressExposureProp = (exposureId) => {
-        if (exposureId.includes('person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE_'))
-            this.props.navigator.push({
-                screen: 'CaseSingleScreen',
-                animated: true,
-                passProps: {
-                    case: this.props.cases.find((e) => {return e._id === exposureId}),
-                    previousScreen: translations.contactSingleScreen.title
-                }
-            })
-    };
-
-    handleOnPressMap = (followUp, contact) => {
-        // console.log("Handle on press map followUp: ", JSON.stringify(followUp));
-        // console.log("Handle on press map contact: ", JSON.stringify(contact));
-
-        let contactPlaceOfResidence = null
-        if (contact && contact.addresses && Array.isArray(contact.addresses) && contact.addresses.length > 0) {
-            contactPlaceOfResidence = contact.addresses.filter((e) => {
-                return e.typeId === config.userResidenceAddress.userPlaceOfResidence
-            })
-        } else if (followUp && followUp.addresses && Array.isArray(followUp.addresses) && followUp.addresses.length > 0) {
-            contactPlaceOfResidence = followUp.addresses.filter((e) => {
-                return e.typeId === config.userResidenceAddress.userPlaceOfResidence
-            })
-        }
-
-        console.log('contactPlaceOfResidence', contactPlaceOfResidence);
-        if (contactPlaceOfResidence !== undefined && contactPlaceOfResidence !== null && Array.isArray(contactPlaceOfResidence) && contactPlaceOfResidence.length > 0 && contactPlaceOfResidence[0] !== undefined && contactPlaceOfResidence[0] !== null) {
-            let contactPlaceOfResidenceLatitude = contactPlaceOfResidence[0] && contactPlaceOfResidence[0].geoLocation && contactPlaceOfResidence[0].geoLocation.coordinates && Array.isArray(contactPlaceOfResidence[0].geoLocation.coordinates) && contactPlaceOfResidence[0].geoLocation.coordinates.length === 2 && contactPlaceOfResidence[0].geoLocation.coordinates[1] !== undefined && contactPlaceOfResidence[0].geoLocation.coordinates[1] !== null ? contactPlaceOfResidence[0].geoLocation.coordinates[1] : 0
-            let contactPlaceOfResidenceLongitude = contactPlaceOfResidence[0] && contactPlaceOfResidence[0].geoLocation && contactPlaceOfResidence[0].geoLocation.coordinates && Array.isArray(contactPlaceOfResidence[0].geoLocation.coordinates) && contactPlaceOfResidence[0].geoLocation.coordinates.length === 2 && contactPlaceOfResidence[0].geoLocation.coordinates[0] !== undefined && contactPlaceOfResidence[0].geoLocation.coordinates[0] !== null ? contactPlaceOfResidence[0].geoLocation.coordinates[0] : 0
-            navigator.geolocation.getCurrentPosition(
-                (position) => {
-                    this.setState({
-                        latitude: contactPlaceOfResidenceLatitude,
-                        longitude: contactPlaceOfResidenceLongitude,
-                        sourceLatitude: position.coords.latitude,
-                        sourceLongitude: position.coords.longitude,
-                        isVisible: true,
-                        error: null
-                    });
-                },
-                (error) => {
-                    Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(error.message, this.props.translation), [
-                        {
-                            text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
-                            onPress: () => { console.log("OK pressed") }
-                        }
-                    ])
-                },
-                {
-                    timeout: 5000
-                }
-            );
-        }
+            latitude: get(dataFromMapHandler, 'latitude', 0),
+            longitude: get(dataFromMapHandler, 'longitude', 0),
+            sourceLatitude: get(dataFromMapHandler, 'sourceLatitude', 0),
+            sourceLongitude: get(dataFromMapHandler, 'sourceLongitude', 0),
+            isVisible: get(dataFromMapHandler, 'isVisible', false),
+            error: get(dataFromMapHandler, 'error', null)
+        }))
     };
 
     handlePressNavbarButton = () => {
@@ -512,19 +222,8 @@ class ContactsScreen extends Component {
         })
     };
 
-    filterContacts = () => {
-        let allFilters = null;
-        allFilters = createFilterContactsObject(this.state.filterFromFilterScreen, this.state.filter);
-
-        this.props.getContactsForOutbreakId(this.props.user.activeOutbreakId, allFilters, null);
-    };
-
-    onNavigatorEvent = (event) => {
-        navigation(event, this.props.navigator);
-    };
-
     goToHelpScreen = () => {
-        let pageAskingHelpFrom = 'contacts'
+        let pageAskingHelpFrom = 'contacts';
         this.props.navigator.showModal({
             screen: 'HelpScreen',
             animated: true,
@@ -619,105 +318,6 @@ class ContactsScreen extends Component {
                 });
             })
         });
-
-        //     let itemId = null;
-        //     let itemType = null;
-        //     let outbreakId = null;
-        //
-        //     if (QRCodeInfo && QRCodeInfo !== undefined && QRCodeInfo.data && QRCodeInfo.data !== undefined){
-        //         let parsedData = null;
-        //         try {
-        //             parsedData =  JSON.parse(QRCodeInfo.data)
-        //         } catch(err) {
-        //             setTimeout(function(){
-        //                 Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props && this.props.translation ? this.props.translation : null), getTranslation(translations.alertMessages.errorOccuredMsg, this.props && this.props.translation ? this.props.translation : null), [
-        //                     {
-        //                         text: getTranslation(translations.alertMessages.okButtonLabel, this.props && this.props.translation ? this.props.translation : null),
-        //                         onPress: () => {console.log('Ok pressed')}
-        //                     }
-        //                 ])
-        //             }, 1000);
-        //             return
-        //         }
-        //         if (parsedData && parsedData !== undefined){
-        //             console.log('parsedData', parsedData);
-        //
-        //             if (parsedData.targetResource && parsedData.targetResource !== undefined) {
-        //                 if (parsedData.targetResource === 'case' || parsedData.targetResource === 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE') {
-        //                     itemType = 'case';
-        //                     if (parsedData.resourceContext && parsedData.resourceContext !== undefined &&
-        //                         parsedData.resourceContext.outbreakId && parsedData.resourceContext.outbreakId !== undefined &&
-        //                         parsedData.resourceContext.caseId && parsedData.resourceContext.caseId !== undefined) {
-        //                         itemId = parsedData.resourceContext.caseId;
-        //                         outbreakId = parsedData.resourceContext.outbreakId
-        //                     }
-        //                 } else if (parsedData.targetResource === 'contact' || parsedData.targetResource === 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT') {
-        //                     itemType = 'contact';
-        //                     if (parsedData.resourceContext && parsedData.resourceContext !== undefined &&
-        //                         parsedData.resourceContext.outbreakId && parsedData.resourceContext.outbreakId !== undefined &&
-        //                         parsedData.resourceContext.contactId && parsedData.resourceContext.contactId !== undefined) {
-        //                         itemId = parsedData.resourceContext.contactId;
-        //                         outbreakId = parsedData.resourceContext.outbreakId;
-        //                     }
-        //                 }
-        //             }
-        //         }
-        //     }
-        //
-        //     console.log('pushNewEditScreen', itemId, itemType, outbreakId);
-        //     if (itemId && itemType && outbreakId && outbreakId === this.props.user.activeOutbreakId) {
-        //         let itemPouchId = null;
-        //         if (itemType === 'case') {
-        //             itemPouchId = `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE_${outbreakId}_${itemId}`
-        //         } else if (itemType === 'contact') {
-        //             itemPouchId = `person.json_LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT_${outbreakId}_${itemId}`
-        //         }
-        //
-        //         if (itemPouchId) {
-        //             getItemByIdRequest(outbreakId, itemPouchId, itemType, (error, response) => {
-        //                 if (error) {
-        //                     console.log("*** getItemByIdRequest error: ", error);
-        //                     Alert.alert(getTranslation(translations.alertMessages.alertLabel,  this.props && this.props.translation ? this.props.translation : null), getTranslation(translations.alertMessages.noItemAlert,  this.props && this.props.translation ? this.props.translation : null), [
-        //                         {
-        //                             text: getTranslation(translations.alertMessages.okButtonLabel,  this.props && this.props.translation ? this.props.translation : null),
-        //                             onPress: () => {console.log('Ok pressed')}
-        //                         }
-        //                     ])
-        //                 }
-        //                 if (response) {
-        //                     console.log("*** getItemByIdRequest response: ", response);
-        //                     if (itemType === 'case') {
-        //                         this.props.navigator.push({
-        //                             screen: 'CaseSingleScreen',
-        //                             animated: true,
-        //                             animationType: 'fade',
-        //                             passProps: {
-        //                                 case: response
-        //                             }
-        //                         })
-        //                     } else if (itemType === 'contact') {
-        //                         this.props.navigator.push({
-        //                             screen: 'ContactsSingleScreen',
-        //                             animated: true,
-        //                             animationType: 'fade',
-        //                             passProps: {
-        //                                 contact: response
-        //                             }
-        //                         })
-        //                     }
-        //                 }
-        //             })
-        //         }
-        //     } else {
-        //         setTimeout(function(){
-        //             Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props && this.props.translation ? this.props.translation : null), getTranslation(translations.alertMessages.noItemAlert,  this.props && this.props.translation ? this.props.translation : null), [
-        //                 {
-        //                     text: getTranslation(translations.alertMessages.okButtonLabel,  this.props && this.props.translation ? this.props.translation : null),
-        //                     onPress: () => {console.log('Ok pressed')}
-        //                 }
-        //             ])
-        //         }, 1000)
-        //     }
     };
 }
 
@@ -758,23 +358,16 @@ function mapStateToProps(state) {
         user:           state.user,
         screenSize:     state.app.screenSize,
         syncState:      state.app.syncState,
-        filter:         state.app.filters,
         translation:    state.app.translation,
         loaderState:    state.app.loaderState,
-        contacts:       state.contacts,
-        errors:         state.errors,
-        role:           state.role,
-        referenceData:  state.referenceData,
-        cases:          state.exposure
+        referenceData:  state.referenceData
     };
 }
 
 function matchDispatchProps(dispatch) {
     return bindActionCreators({
-        getContactsForOutbreakId,
-        addFilterForScreen,
-        removeFilterForScreen
+        setLoaderState
     }, dispatch);
 }
 
-export default connect(mapStateToProps, matchDispatchProps)(ContactsScreen);
+export default connect(mapStateToProps, matchDispatchProps)(enhanceListWithGetData(getContactsForOutbreakId, 'ContactsScreen')(ContactsScreen));

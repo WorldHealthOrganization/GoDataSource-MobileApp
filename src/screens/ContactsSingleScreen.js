@@ -12,28 +12,37 @@ import ViewHOC from './../components/ViewHOC';
 import config from './../utils/config';
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
-import { TabBar, TabView, PagerScroll, PagerAndroid, SceneMap } from 'react-native-tab-view';
+import { TabBar, TabView, PagerScroll} from 'react-native-tab-view';
 import ContactsSingleAddress from './../containers/ContactsSingleAddress';
 import ContactsSingleCalendar from './../containers/ContactsSingleCalendar';
 import ContactsSingleExposures from './../containers/ContactsSingleExposures';
 import ContactsSinglePersonal from './../containers/ContactsSinglePersonal';
 import ExposureScreen from './../screens/ExposureScreen';
-import { getContactsNameForDuplicateCheckRequest, checkForNameDuplicatesRequest } from './../queries/contacts'
 import Breadcrumb from './../components/Breadcrumb';
 import Menu, { MenuItem } from 'react-native-material-menu';
 import Ripple from 'react-native-material-ripple';
-import { updateFollowUpAndContact, deleteFollowUp, addFollowUp } from './../actions/followUps';
-import { updateContact, deleteExposureForContact, addContact } from './../actions/contacts';
+import { updateFollowUpAndContact, addFollowUp } from './../actions/followUps';
+import {updateContact,  addContact, getExposuresForContact, checkForNameDuplicated} from './../actions/contacts';
 import { removeErrors } from './../actions/errors';
 import DateTimePicker from 'react-native-modal-datetime-picker';
 import _ from 'lodash';
-import { calculateDimension, extractIdFromPouchId, updateRequiredFields, navigation, getTranslation, createDate, daysSince } from './../utils/functions';
-import { getFollowUpsForContactRequest } from './../queries/followUps'
+import {
+    calculateDimension,
+    extractIdFromPouchId,
+    updateRequiredFields,
+    navigation,
+    getTranslation,
+    createDate,
+    daysSince,
+    computeFullName
+} from './../utils/functions';
+import { getFollowUpsForContactId } from './../actions/followUps'
 import moment from 'moment'
 import translations from './../utils/translations'
 import ElevatedView from 'react-native-elevated-view';
 import AddFollowUpScreen from './AddFollowUpScreen';
 import {generateId, generateTeamId} from "../utils/functions";
+import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
 
 const initialLayout = {
     height: 0,
@@ -105,11 +114,12 @@ class ContactsSingleScreen extends Component {
                         },
                         date: createDate(null)
                     }
-                ],
+                ]
             } : Object.assign({}, this.props.contact),
+            contactBeforeEdit: {},
             savePressed: false,
             deletePressed: false,
-            loading: false,
+            loading: !this.props.isNew,
             isModified: false,
             isDateTimePickerVisible: false,
             canChangeScreen: false,
@@ -127,31 +137,31 @@ class ContactsSingleScreen extends Component {
     };
 
     // Please add here the react lifecycle methods that you need
-    componentDidUpdate(prevProps) {
-        if (this.state.savePressed || this.state.deletePressed) {
-            if (this.props.handleUpdateContactFromFollowUp !== undefined && this.props.handleUpdateContactFromFollowUp !== null) {
-                const { contact } = this.state;
-                this.props.handleUpdateContactFromFollowUp(contact)
-            }
-            this.props.navigator.pop();
-        }
-
-        if ((this.props.isNew === false || this.props.isNew === undefined) && this.state.updateExposure === true){
-            let updatedContact = this.props.contacts[this.props.contacts.map((e) => {return e._id}).indexOf(this.state.contact._id)];
-            if (updatedContact !== undefined && updatedContact !== null) {
-                this.setState(prevState => ({
-                    contact: Object.assign({}, this.state.contact, {relationships: updatedContact.relationships}),
-                    updateExposure: false
-                }));
-            }
-        }
-
-        if (this.state.loading === true) {
-            this.setState({
-                loading: false
-            })
-        }
-    }
+    // componentDidUpdate(prevProps) {
+    //     if (this.state.savePressed || this.state.deletePressed) {
+    //         if (this.props.handleUpdateContactFromFollowUp !== undefined && this.props.handleUpdateContactFromFollowUp !== null) {
+    //             const { contact } = this.state;
+    //             this.props.handleUpdateContactFromFollowUp(contact)
+    //         }
+    //         this.props.navigator.pop();
+    //     }
+    //
+    //     if ((this.props.isNew === false || this.props.isNew === undefined) && this.state.updateExposure === true){
+    //         let updatedContact = this.props.contacts[this.props.contacts.map((e) => {return e._id}).indexOf(this.state.contact._id)];
+    //         if (updatedContact !== undefined && updatedContact !== null) {
+    //             this.setState(prevState => ({
+    //                 contact: Object.assign({}, this.state.contact, {relationships: updatedContact.relationships}),
+    //                 updateExposure: false
+    //             }));
+    //         }
+    //     }
+    //
+    //     if (this.state.loading === true) {
+    //         this.setState({
+    //             loading: false
+    //         })
+    //     }
+    // }
 
     componentDidMount() {
         BackHandler.addEventListener('hardwareBackPress', this.handleBackButtonClick);
@@ -171,36 +181,55 @@ class ContactsSingleScreen extends Component {
             }
 
             //permissions check
-            let isEditMode = true;
-            if (this.props.role && this.props.role.find((e) => e === config.userPermissions.writeContact) !== undefined) {
-                isEditMode = true
-            } else if (this.props.role && this.props.role.find((e) => e === config.userPermissions.writeContact) === undefined && this.props.role.find((e) => e === config.userPermissions.readContact) !== undefined) {
-                isEditMode = false
-            }
+            let isEditMode = _.get(this.props, 'isEditMode', false);
+            // if (this.props.role && this.props.role.find((e) => e === config.userPermissions.writeContact) !== undefined) {
+            //     isEditMode = true
+            // } else if (this.props.role && this.props.role.find((e) => e === config.userPermissions.writeContact) === undefined && this.props.role.find((e) => e === config.userPermissions.readContact) !== undefined) {
+            //     isEditMode = false
+            // }
             // callGetDerivedStateFromProps = false;
             this.setState({
                 isEditMode
             });
 
             if (this.props.user !== null) {
-                getFollowUpsForContactRequest(this.props.user.activeOutbreakId, extractIdFromPouchId(this.state.contact._id, 'person'), this.state.contact.followUp, this.props.teams, (errorFollowUp, responseFollowUp) => {
-                    if (errorFollowUp) {
-                        console.log('getFollowUpsForContactRequest error: ', errorFollowUp)
-                    }
-                    if (responseFollowUp) {
-                        // console.log ('getFollowUpsForContactRequest response: ', JSON.stringify(responseFollowUp))
-                        if (responseFollowUp.length > 0) {
-                            let myContact = Object.assign({}, this.state.contact)
-                            myContact.followUps = responseFollowUp;
-                            // callGetDerivedStateFromProps = false;
-                            this.setState({
-                                contact: myContact
-                            }, () => {
-                                console.log("After adding the followUps: ");
+
+                let followUpPromise = getFollowUpsForContactId(this.state.contact._id, this.props.user.activeOutbreakId, this.props.teams)
+                    .then((responseFollowUps) => responseFollowUps.map((e) => e.followUps));
+                let exposurePromise = getExposuresForContact(this.state.contact._id, this.props.user.activeOutbreakId);
+
+                Promise.all([followUpPromise, exposurePromise])
+                    .then(([followUps, relationshipsAndExposures]) => {
+                        this.setState(prevState => ({
+                            loading: !prevState.loading,
+                            contact: Object.assign({}, prevState.contact, {
+                                followUps,
+                                relationships: relationshipsAndExposures
                             })
-                        }
-                    }
-                })
+                        }))
+                    })
+                    .catch((errorGetFollowUpsAndRelationships) => {
+                        console.log('ErrorGetStuff: ', errorGetFollowUpsAndRelationships);
+                    })
+
+                // getExposuresForContact(this.state.contact._id, this.props.user.activeOutbreakId)
+                //     .then((responseExposure) => {
+                //         this.setState(prevState => ({
+                //             contact: Object.assign({}, prevState.contact, {relationships: responseExposure})
+                //         }))
+                //     })
+                //     .catch((errorGetExposures) => {
+                //         console.log('ErrorGetExposures: ', errorGetExposures);
+                //     })
+                // getFollowUpsForContactId(this.state.contact._id, this.props.user.activeOutbreakId, this.props.teams)
+                //     .then((responseFollowUp) => {
+                //         this.setState(prevState => ({
+                //             contact: Object.assign({}, prevState.contact, {followUps: responseFollowUp.map((e) => e.followUps)})
+                //         }))
+                //     })
+                //     .catch((errorGetFollowUpsForContact) => {
+                //         console.log('ErrorGetFollowUpsForContact: ', errorGetFollowUpsForContact);
+                //     });
             }
         } else if (this.props.isNew === true) {
             let personsArray = [];
@@ -260,24 +289,24 @@ class ContactsSingleScreen extends Component {
     render() {
         // console.log("### contact from render ContactSingleScreen: ", this.state.contact);
 
-        if (this.props.errors && this.props.errors.type && this.props.errors.message) {
-            Alert.alert(this.props.errors.type, this.props.errors.message, [
-                {
-                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
-                    onPress: () => {
-                        this.setState({
-                            savePressed: false
-                        }, () => {
-                            this.props.removeErrors();
-                        });
-                    }
-                }
-            ])
-        }
+        // if (this.props.errors && this.props.errors.type && this.props.errors.message) {
+        //     Alert.alert(this.props.errors.type, this.props.errors.message, [
+        //         {
+        //             text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+        //             onPress: () => {
+        //                 this.setState({
+        //                     savePressed: false
+        //                 }, () => {
+        //                     this.props.removeErrors();
+        //                 });
+        //             }
+        //         }
+        //     ])
+        // }
 
         return (
             <ViewHOC style={style.container}
-                showLoader={this && this.state && this.state.loading}
+                showLoader={this.state.loading}
                 loaderText={this.props && this.props.syncState ? 'Loading' : getTranslation(translations.loadingScreenMessages.loadingMsg, this.props.translation)}>
                 <NavBarCustom
                     title={null}
@@ -392,9 +421,9 @@ class ContactsSingleScreen extends Component {
         // let address = this.state.contact.addresses.find((e) => {return e.type === config.})
 
         let now = createDate(null);
-        date = createDate(date);
+        date = createDate(date).toISOString();
         let followUp = {
-            _id: 'followUp.json_' + this.props.user.activeOutbreakId + '_' + date.getTime() + '_' + generateId(),
+            _id: generateId(),
             statusId: config.followUpStatuses.notPerformed,
             targeted: false,
             date: date,
@@ -411,18 +440,32 @@ class ContactsSingleScreen extends Component {
             showAddFollowUpScreen: !this.state.showAddFollowUpScreen
         }, () => {
             this.hideMenu();
-            this.props.addFollowUp(this.props.user.activeOutbreakId, this.state.contact._id, followUp, this.state.filter, this.props.teams, this.props.previousScreen === translations.followUpsSingleScreen.title);
-            //navigate to followup
-            this.props.navigator.push({
-                screen: 'FollowUpsSingleScreen',
-                passProps: {
-                    isNew: false,
-                    isEditMode: true,
-                    item: followUp,
-                    contact: this.state.contact,
-                    filter: this.state.filter,
-                }
-            })
+            // addFollowUp(followUp)
+            //     .then((resultAddFollowUp) => {
+                    // console.log('FollowUpAdded');
+                    // this.props.navigator.showInAppNotification({
+                    //     screen: 'InAppNotificationScreen',
+                    //     autoDismissTimerSec: 1,
+                    //     passProps: {
+                    //         text: 'Follow-up added'
+                    //     }
+                    // })
+                    this.props.navigator.push({
+                        screen: 'FollowUpsSingleScreen',
+                        animated: true,
+                        animationType: 'fade',
+                        passProps: {
+                            isNew: true,
+                            isEditMode: true,
+                            item: followUp,
+                            contact: this.state.contact,
+                            previousScreen: getTranslation(translations.contactSingleScreen.addContactTitle, this.props.translation),
+                        }
+                    })
+                // })
+                // .catch((errorAddFollowUp) => {
+                //     console.log('ErrorAddFollowUp: ', errorAddFollowUp);
+                // })
         });
     };
 
@@ -452,23 +495,55 @@ class ContactsSingleScreen extends Component {
     };
 
     handleMoveToNextScreenButton = () => {
-        let nextIndex = this.state.index + 1;
+        // Before moving to the next screen do the checks for the current screen
+        let missingFields = [];
+        switch(this.state.index) {
+            case 0:
+                missingFields = this.checkRequiredFieldsPersonalInfo();
+                if (!this.checkAgeYearsRequirements()) {
+                    missingFields.push(getTranslation(translations.alertMessages.yearsValueError, this.props.translation));
+                }
+                if (!this.checkAgeMonthsRequirements()) {
+                    missingFields.push(getTranslation(translations.alertMessages.monthsValueError, this.props.translation));
+                }
+                break;
+            case 1:
+                missingFields = this.checkRequiredFieldsAddresses();
+                break;
+            case 2:
+                missingFields = this.checkFields();
+                break;
+            default:
+                break;
+        }
 
-        // callGetDerivedStateFromProps = false;
-        this.setState({
-            canChangeScreen: true,
-        });
-        this.handleOnIndexChange(nextIndex)
+        if (checkArrayAndLength(missingFields)) {
+            Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), `${getTranslation(translations.alertMessages.requiredFieldsMissingError, this.props.translation)}.\n${getTranslation(translations.alertMessages.missingFields, this.props.translation)}: ${missingFields}`, [
+                {
+                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+                    onPress: () => { this.hideMenu() }
+                }
+            ])
+        } else {
+            let nextIndex = this.state.index + 1;
+
+            // callGetDerivedStateFromProps = false;
+            this.setState({
+                canChangeScreen: true,
+            });
+            this.handleOnIndexChange(nextIndex)
+        }
     };
 
     handleMoveToPrevieousScreenButton = () => {
-        let nextIndex = this.state.index - 1
+        let nextIndex = this.state.index - 1;
         // callGetDerivedStateFromProps = false;
         this.setState({
             canChangeScreen: true,
+        }, () => {
+            this.handleOnIndexChange(nextIndex)
         });
 
-        this.handleOnIndexChange(nextIndex)
     };
 
     handleRenderTabBar = (props) => {
@@ -525,7 +600,11 @@ class ContactsSingleScreen extends Component {
                         onChangeDropDown={this.handleOnChangeDropDown}
                         onChangeDate={this.handleOnChangeDate}
                         onChangeSwitch={this.handleOnChangeSwitch}
-                        onChangeextInputWithDropDown={this.handleOnChangeTextInputWithDropDown}
+                        onPressAddDocument={this.onPressAddDocument}
+                        onDeletePress={this.handleOnPressDeleteDocument}
+                        onPressAddVaccine={this.onPressAddVaccine}
+                        onPressDeleteVaccines={this.handleOnPressDeleteVaccines}
+                        onChangeTextInputWithDropDown={this.handleOnChangeTextInputWithDropDown}
                         handleMoveToNextScreenButton={this.handleMoveToNextScreenButton}
                         checkRequiredFieldsPersonalInfo={this.checkRequiredFieldsPersonalInfo}
                         isNew={this.props.isNew}
@@ -535,6 +614,13 @@ class ContactsSingleScreen extends Component {
                         checkAgeMonthsRequirements={this.checkAgeMonthsRequirements}
                         checkAgeYearsRequirements={this.checkAgeYearsRequirements}
                         isEditMode={this.state.isEditMode}
+
+                        numberOfTabs={this.state.routes.length}
+                        onPressPreviousButton={this.handlePreviousPress}
+                        onPressNextButton={this.handleMoveToNextScreenButton}
+                        onPressSaveEdit={this.handleOnPressSave}
+                        onPressEdit={this.onPressEdit}
+                        onPressCancelEdit={this.onPressCancelEdit}
                     />
                 );
             case 'address':
@@ -551,12 +637,19 @@ class ContactsSingleScreen extends Component {
                         onPressCopyAddress={this.handleOnPressCopyAddress}
                         onPressAddAdrress={this.handleOnPressAddAdrress}
                         handleMoveToNextScreenButton={this.handleMoveToNextScreenButton}
-                        handleMoveToPrevieousScreenButton={this.handleMoveToPrevieousScreenButton}
+                        onPressPreviousButton={this.handleMoveToPrevieousScreenButton}
                         checkRequiredFieldsAddresses={this.checkRequiredFieldsAddresses}
                         isNew={this.props.isNew}
                         anotherPlaceOfResidenceWasChosen={this.state.anotherPlaceOfResidenceWasChosen}
                         hasPlaceOfResidence={this.state.hasPlaceOfResidence}
                         isEditMode={this.state.isEditMode}
+
+                        numberOfTabs={this.state.routes.length}
+                        // onPressPreviousButton={this.handlePreviousPress}
+                        onPressNextButton={this.handleMoveToNextScreenButton}
+                        onPressSaveEdit={this.handleOnPressSave}
+                        onPressEdit={this.onPressEdit}
+                        onPressCancelEdit={this.onPressCancelEdit}
                     />
                 );
             case 'exposures':
@@ -569,7 +662,7 @@ class ContactsSingleScreen extends Component {
                         addContactFromCasesScreen={this.props.addContactFromCasesScreen}
                         navigator={this.props.navigator}
                         saveExposure={this.handleSaveExposure}
-                        handleMoveToPrevieousScreenButton={this.handleMoveToPrevieousScreenButton}
+                        onPressPreviousButton={this.handleMoveToPrevieousScreenButton}
                         isNew={this.props.isNew}
                         handleOnPressSave={this.handleOnPressSave}
                         isEditMode={this.state.isEditMode}
@@ -578,6 +671,14 @@ class ContactsSingleScreen extends Component {
                         onChangeDate={this.handleOnChangeDate}
                         onChangeSwitch={this.handleOnChangeSwitch}
                         handleMoveToNextScreenButton={this.handleMoveToNextScreenButton}
+                        selectedExposure={this.props.singleCase}
+
+                        numberOfTabs={this.state.routes.length}
+                        // onPressPreviousButton={this.handlePreviousPress}
+                        onPressNextButton={this.handleMoveToNextScreenButton}
+                        onPressSaveEdit={this.handleOnPressSave}
+                        onPressEdit={this.onPressEdit}
+                        onPressCancelEdit={this.onPressCancelEdit}
                     />
                 );
             case 'calendar':
@@ -586,7 +687,14 @@ class ContactsSingleScreen extends Component {
                         contact={this.state.contact}
                         activeIndex={this.state.index}
                         handleOnPressSave={this.handleOnPressSave}
-                        handleMoveToPrevieousScreenButton={this.handleMoveToPrevieousScreenButton}
+                        onPressPreviousButton={this.handleMoveToPrevieousScreenButton}
+
+                        numberOfTabs={this.state.routes.length}
+                        // onPressPreviousButton={this.handlePreviousPress}
+                        onPressNextButton={this.handleMoveToNextScreenButton}
+                        onPressSaveEdit={this.handleOnPressSave}
+                        onPressEdit={this.onPressEdit}
+                        onPressCancelEdit={this.onPressCancelEdit}
                     />
                 );
             default:
@@ -609,10 +717,10 @@ class ContactsSingleScreen extends Component {
                 {
                     text: 'Yes', onPress: () => {
                         this.props.navigator.pop(
-                            //     {
-                            //     animated: true,
-                            //     animationType: 'fade'
-                            // }
+                                {
+                                animated: true,
+                                animationType: 'fade'
+                            }
                         )
                     }
                 },
@@ -624,10 +732,10 @@ class ContactsSingleScreen extends Component {
             ])
         } else {
             this.props.navigator.pop(
-                //     {
-                //     animated: true,
-                //     animationType: 'fade'
-                // }
+                    {
+                    animated: true,
+                    animationType: 'fade'
+                }
             );
         }
     };
@@ -661,8 +769,83 @@ class ContactsSingleScreen extends Component {
         })
     };
 
+    // documents functions
+    onPressAddDocument = () => {
+        let documents = _.cloneDeep(this.state.contact.documents);
+
+        if (!checkArrayAndLength(documents)) {
+            documents = [];
+        }
+
+        documents.push({
+            type: '',
+            number: ''
+        });
+
+        this.setState(prevState => ({
+            contact: Object.assign({}, prevState.contact, { documents }),
+            isModified: true
+        }), () => {
+            // console.log("### after updating the data: ", this.state.contact);
+        })
+    };
+    handleOnPressDeleteDocument = (index) => {
+        // console.log("DeletePressed: ", index);
+        Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.alertMessages.deleteDocument, this.state.translation), [
+            {
+                text: getTranslation(translations.generalLabels.noAnswer, this.props.translation), onPress: () => { console.log('Cancel pressed') }
+            },
+            {
+                text: getTranslation(translations.generalLabels.yesAnswer, this.props.translation), onPress: () => {
+                    let contactDocumentsClone = _.cloneDeep(this.state.contact.documents);
+                    contactDocumentsClone.splice(index, 1);
+                    this.setState(prevState => ({
+                        contact: Object.assign({}, prevState.contact, { documents: contactDocumentsClone }),
+                        isModified: true
+                    }), () => {
+                        // console.log("After deleting the document: ", this.state.contact);
+                    })
+                }
+            }
+        ]);
+    };
+
+    // vaccinesReceived functions
+    onPressAddVaccine = () => {
+        let vaccinesReceived = _.cloneDeep(this.state.contact.vaccinesReceived);
+        if (!vaccinesReceived) {
+            vaccinesReceived = [];
+        }
+
+        vaccinesReceived.push({
+            id: null,
+            vaccine: null,
+            date: null,
+            status: null
+        });
+
+        this.setState(prevState => ({
+            contact: Object.assign({}, prevState.contact, { vaccinesReceived: vaccinesReceived }),
+            isModified: true
+        }), () => {
+            // console.log("### after updating the data: ", this.state.contact);
+        })
+    };
+    handleOnPressDeleteVaccines = (index) => {
+        console.log("DeletePressed: ", index);
+        let vaccinesReceived = _.cloneDeep(this.state.contact.vaccinesReceived);
+        vaccinesReceived.splice(index, 1);
+        this.setState(prevState => ({
+            contact: Object.assign({}, prevState.contact, { vaccinesReceived: vaccinesReceived }),
+            isModified: true
+        }), () => {
+            // console.log("After deleting the Vaccines: ", this.state.contact);
+        })
+    };
+
+    // Contact changes handlers
     handleOnChangeTextInputWithDropDown = (value, id, objectType, stateValue) => {
-        console.log("handleOnChangeTextInputWithDropDown: ", value, id, objectType, stateValue, this.state.contact);
+        // console.log("handleOnChangeTextInputWithDropDown: ", value, id, objectType, stateValue, this.state.contact);
 
         if (stateValue !== undefined && stateValue !== null) {
             if (id === 'age') {
@@ -682,85 +865,95 @@ class ContactsSingleScreen extends Component {
                 }
                 // callGetDerivedStateFromProps = false;
                 this.setState(prevState => ({
-                    contact: Object.assign({}, prevState.contact, { age: ageClone }, { dob: null }),
+                    contact: Object.assign({}, prevState.contact, { age: ageClone ,  dob: null }),
                     isModified: true
-                }), () => {
-                    console.log("handleOnChangeTextInputWithDropDown done", id, " ", value, " ", this.state.contact);
                 })
+                    , () => {
+                        console.log("handleOnChangeTextInputWithDropDown done", id, " ", value, " ", this.state.contact);
+                    }
+                )
             }
         }
     };
-
-    handleOnChangeText = (value, id, objectType) => {
-        console.log("onChangeText: ", value, id, objectType);
+    handleOnChangeText = (value, id, objectTypeOrIndex, objectType) => {
+        console.log("onChangeText: ", value, id, objectTypeOrIndex);
         //Change TextInput
-        if (objectType === 'FollowUp') {
-            // callGetDerivedStateFromProps = false;
-            this.setState(
-                (prevState) => ({
-                    item: Object.assign({}, prevState.item, { [id]: value }),
-                    isModified: true
-                }))
-        } else {
-            if (objectType === 'Contact') {
+        // if (objectTypeOrIndex === 'FollowUp') {
+        //     // callGetDerivedStateFromProps = false;
+        //     this.setState(
+        //         (prevState) => ({
+        //             item: Object.assign({}, prevState.item, {[id]: value}),
+        //             isModified: true
+        //         }))
+        // } else {
+            if (objectTypeOrIndex === 'Contact') {
                 // callGetDerivedStateFromProps = false;
                 this.setState(
                     (prevState) => ({
-                        contact: Object.assign({}, prevState.contact, { [id]: value }),
+                        contact: Object.assign({}, prevState.contact, {[id]: value}),
                         isModified: true
                     }))
-            } else if (objectType === 'Exposure' && this.props.isNew === true) {
+            } else if (objectTypeOrIndex === 'Exposure' && this.props.isNew === true) {
                 let relationshipsClone = _.cloneDeep(this.state.contact.relationships);
                 relationshipsClone[0][id] = value && value.value ? value.value : value;
                 // callGetDerivedStateFromProps = false;
                 this.setState(prevState => ({
-                    contact: Object.assign({}, prevState.contact, { relationships: relationshipsClone }),
+                    contact: Object.assign({}, prevState.contact, {relationships: relationshipsClone}),
                     isModified: true
                 }))
-            } else if (typeof objectType === 'phoneNumber' && objectType >= 0 || typeof objectType === 'number' && objectType >= 0) {
-                let addressesClone = _.cloneDeep(this.state.contact.addresses);
-                if (id === 'lng') {
-                    if (!addressesClone[objectType].geoLocation) {
-                        addressesClone[objectType].geoLocation = {};
-                        addressesClone[objectType].geoLocation.type = 'Point';
-                        if (!addressesClone[objectType].geoLocation.coordinates) {
-                            addressesClone[objectType].geoLocation.coordinates = [];
+            } else if (typeof objectTypeOrIndex === 'phoneNumber' && objectTypeOrIndex >= 0 || typeof objectTypeOrIndex === 'number' && objectTypeOrIndex >= 0) {
+                if (objectType && objectType === 'Address') {
+                    let addressesClone = _.cloneDeep(this.state.contact.addresses);
+                    if (id === 'lng') {
+                        if (!addressesClone[objectTypeOrIndex].geoLocation) {
+                            addressesClone[objectTypeOrIndex].geoLocation = {};
+                            addressesClone[objectTypeOrIndex].geoLocation.type = 'Point';
+                            if (!addressesClone[objectTypeOrIndex].geoLocation.coordinates) {
+                                addressesClone[objectTypeOrIndex].geoLocation.coordinates = [];
+                            }
                         }
-                    }
-                    if (!addressesClone[objectType].geoLocation.coordinates) {
-                        addressesClone[objectType].geoLocation.coordinates = [];
-                    }
-                    if (!addressesClone[objectType].geoLocation.type) {
-                        addressesClone[objectType].geoLocation.type = 'Point';
-                    }
-                    addressesClone[objectType].geoLocation.coordinates[0] = value && value.value ? value.value : parseFloat(value);
-                } else if (id === 'lat') {
-                    if (!addressesClone[objectType].geoLocation) {
-                        addressesClone[objectType].geoLocation = {};
-                        addressesClone[objectType].geoLocation.type = 'Point';
-                        if (!addressesClone[objectType].geoLocation.coordinates) {
-                            addressesClone[objectType].geoLocation.coordinates = [];
+                        if (!addressesClone[objectTypeOrIndex].geoLocation.coordinates) {
+                            addressesClone[objectTypeOrIndex].geoLocation.coordinates = [];
                         }
+                        if (!addressesClone[objectTypeOrIndex].geoLocation.type) {
+                            addressesClone[objectTypeOrIndex].geoLocation.type = 'Point';
+                        }
+                        addressesClone[objectTypeOrIndex].geoLocation.coordinates[0] = value && value.value ? value.value : parseFloat(value);
+                    } else if (id === 'lat') {
+                        if (!addressesClone[objectTypeOrIndex].geoLocation) {
+                            addressesClone[objectTypeOrIndex].geoLocation = {};
+                            addressesClone[objectTypeOrIndex].geoLocation.type = 'Point';
+                            if (!addressesClone[objectTypeOrIndex].geoLocation.coordinates) {
+                                addressesClone[objectTypeOrIndex].geoLocation.coordinates = [];
+                            }
+                        }
+                        if (!addressesClone[objectTypeOrIndex].geoLocation.coordinates) {
+                            addressesClone[objectTypeOrIndex].geoLocation.coordinates = [];
+                        }
+                        if (!addressesClone[objectTypeOrIndex].geoLocation.type) {
+                            addressesClone[objectTypeOrIndex].geoLocation.type = 'Point';
+                        }
+                        addressesClone[objectTypeOrIndex].geoLocation.coordinates[1] = value && value.value ? value.value : parseFloat(value);
+                    } else {
+                        addressesClone[objectTypeOrIndex][id] = value && value.value ? value.value : value;
                     }
-                    if (!addressesClone[objectType].geoLocation.coordinates) {
-                        addressesClone[objectType].geoLocation.coordinates = [];
-                    }
-                    if (!addressesClone[objectType].geoLocation.type) {
-                        addressesClone[objectType].geoLocation.type = 'Point';
-                    }
-                    addressesClone[objectType].geoLocation.coordinates[1] = value && value.value ? value.value : parseFloat(value);
-                } else {
-                    addressesClone[objectType][id] = value && value.value ? value.value : value;
+                    // callGetDerivedStateFromProps = false;
+                    this.setState(prevState => ({
+                        contact: Object.assign({}, prevState.contact, {addresses: addressesClone}),
+                        isModified: true
+                    }))
+                } else if (objectType && objectType === 'Documents') {
+                    let documentsClone = _.cloneDeep(this.state.contact.documents);
+                    documentsClone[objectTypeOrIndex][id] = value && value.value ? value.value : value;
+                    console.log('documentsClone', documentsClone);
+                    this.setState(prevState => ({
+                        contact: Object.assign({}, prevState.contact, {documents: documentsClone}),
+                        isModified: true
+                    }))
                 }
-                // callGetDerivedStateFromProps = false;
-                this.setState(prevState => ({
-                    contact: Object.assign({}, prevState.contact, { addresses: addressesClone }),
-                    isModified: true
-                }))
             }
-        }
+        // }
     };
-
     handleOnChangeTextSwitchSelector = (index, stateValue) => {
         if (stateValue === 'selectedItemIndexForAgeUnitOfMeasureDropDown') {
             let ageClone = Object.assign({}, this.state.contact.age);
@@ -789,22 +982,21 @@ class ContactsSingleScreen extends Component {
             })
         }
     };
-
-    handleOnChangeDate = (value, id, objectType) => {
+    handleOnChangeDate = (value, id, objectTypeOrIndex, objectType) => {
         console.log("onChangeDate: ", value, id, objectType);
 
-        if (objectType === 'FollowUp') {
-            // callGetDerivedStateFromProps = false;
-            this.setState(
-                (prevState) => ({
-                    item: Object.assign({}, prevState.item, { [id]: value }),
-                    isModified: true
-                })
-                , () => {
-                    console.log("onChangeDate", id, " ", value, " ", this.state.item);
-                }
-            )
-        } else {
+        // if (objectType === 'FollowUp') {
+        //     // callGetDerivedStateFromProps = false;
+        //     this.setState(
+        //         (prevState) => ({
+        //             item: Object.assign({}, prevState.item, { [id]: value }),
+        //             isModified: true
+        //         })
+        //         , () => {
+        //             console.log("onChangeDate", id, " ", value, " ", this.state.item);
+        //         }
+        //     )
+        // } else {
             if (id === 'dob') {
                 let today = createDate(null);
                 let nrOFYears = this.calcDateDiff(value, today);
@@ -834,7 +1026,7 @@ class ContactsSingleScreen extends Component {
                     })
                 }
             } else {
-                if (objectType === 'Contact') {
+                if (objectTypeOrIndex === 'Contact') {
                     // callGetDerivedStateFromProps = false;
                     this.setState(
                         (prevState) => ({
@@ -845,7 +1037,7 @@ class ContactsSingleScreen extends Component {
                             console.log("onChangeDate", id, " ", value, " ", this.state.contact);
                         }
                     )
-                } else if (objectType === 'Exposure' && this.props.isNew === true) {
+                } else if (objectTypeOrIndex === 'Exposure' && this.props.isNew === true) {
                     let relationshipsClone = _.cloneDeep(this.state.contact.relationships);
                     relationshipsClone[0][id] = value && value.value ? value.value : value;
                     // callGetDerivedStateFromProps = false;
@@ -853,22 +1045,43 @@ class ContactsSingleScreen extends Component {
                         contact: Object.assign({}, prevState.contact, { relationships: relationshipsClone }),
                         isModified: true
                     }))
-                } else if (typeof objectType === 'phoneNumber' && objectType >= 0 || typeof objectType === 'number' && objectType >= 0) {
-                    let addressesClone = _.cloneDeep(this.state.contact.addresses);
-                    addressesClone[objectType][id] = value && value.value ? value.value : value;
-                    console.log ('addressesClone', addressesClone)
-                    // callGetDerivedStateFromProps = false;
-                    this.setState(prevState => ({
-                        contact: Object.assign({}, prevState.contact, { addresses: addressesClone }),
-                        isModified: true
-                    }), () => {
-                        console.log("handleOnChangeDate", id, " ", value, " ", this.state.contact);
-                    })
+                } else if (typeof objectTypeOrIndex === 'phoneNumber' && objectTypeOrIndex >= 0 || typeof objectTypeOrIndex === 'number' && objectTypeOrIndex >= 0) {
+                    if (objectType && objectType === 'Address') {
+                        let addressesClone = _.cloneDeep(this.state.contact.addresses);
+                        addressesClone[objectTypeOrIndex][id] = value && value.value ? value.value : value;
+                        console.log('addressesClone', addressesClone);
+                        // callGetDerivedStateFromProps = false;
+                        this.setState(prevState => ({
+                            contact: Object.assign({}, prevState.contact, {addresses: addressesClone}),
+                            isModified: true
+                        }), () => {
+                            console.log("handleOnChangeDate", id, " ", value, " ", this.state.contact);
+                        })
+                    } else if (objectType === 'Vaccines') {
+                        let vaccinesClone = _.cloneDeep(this.state.contact.vaccinesReceived);
+                        vaccinesClone[objectTypeOrIndex][id] = value && value.value !== undefined ? value.value : value;
+                        console.log('vaccinesClone', vaccinesClone);
+                        this.setState(prevState => ({
+                            contact: Object.assign({}, prevState.contact, { vaccinesReceived: vaccinesClone }),
+                            isModified: true
+                        }), () => {
+                            // console.log("onChangeDropDown", id, " ", value, " ", this.state.case);
+                        })
+                    } else if (objectType === 'Documents') {
+                        let documentsClone = _.cloneDeep(this.state.contact.documents);
+                        documentsClone[objectTypeOrIndex][id] = value && value.value !== undefined ? value.value : value;
+                        console.log('vaccinesClone', documentsClone);
+                        this.setState(prevState => ({
+                            contact: Object.assign({}, prevState.contact, { documents: documentsClone }),
+                            isModified: true
+                        }), () => {
+                            // console.log("onChangeDropDown", id, " ", value, " ", this.state.case);
+                        })
+                    }
                 }
             }
-        }
+        // }
     };
-
     calcDateDiff = (startdate, enddate) => {
         //define moments for the startdate and enddate
         var startdateMoment = moment(startdate);
@@ -896,7 +1109,6 @@ class ContactsSingleScreen extends Component {
             return undefined;
         }
     };
-
     handleOnChangeSwitch = (value, id, objectTypeOrIndex, objectType) => {
         // console.log("onChangeSwitch: ", value, id, this.state.item);
         if (id === 'geoLocationAccurate' && typeof objectTypeOrIndex === 'number' && objectTypeOrIndex >= 0 && objectType === 'Address') {
@@ -1020,7 +1232,6 @@ class ContactsSingleScreen extends Component {
         }
 
     };
-
     handleOnChangeDropDown = (value, id, objectType, type) => {
         console.log("onChangeDropDown: ", value, id, objectType, this.state.contact);
         if (objectType === 'FollowUp' || id === 'address') {
@@ -1112,10 +1323,29 @@ class ContactsSingleScreen extends Component {
                 }), () => {
                     console.log("onChangeDropDown", id, " ", value, " ", this.state.contact);
                 })
+            } else if (type === 'Vaccines') {
+                let vaccinesClone = _.cloneDeep(this.state.contact.vaccinesReceived);
+                vaccinesClone[objectType][id] = value && value.value !== undefined ? value.value : value;
+                console.log('vaccinesClone', vaccinesClone);
+                this.setState(prevState => ({
+                    contact: Object.assign({}, prevState.contact, { vaccinesReceived: vaccinesClone }),
+                    isModified: true
+                }), () => {
+                    // console.log("onChangeDropDown", id, " ", value, " ", this.state.case);
+                })
+            } else if (type === 'Documents') {
+                let documentsClone = _.cloneDeep(this.state.contact.documents);
+                documentsClone[objectType][id] = value && value.value !== undefined ? value.value : value;
+                console.log('vaccinesClone', documentsClone);
+                this.setState(prevState => ({
+                    contact: Object.assign({}, prevState.contact, { documents: documentsClone }),
+                    isModified: true
+                }), () => {
+                    // console.log("onChangeDropDown", id, " ", value, " ", this.state.case);
+                })
             }
         }
     };
-
     handleOnChangeSectionedDropDown = (selectedItems, index) => {
         console.log('handleOnChangeSectionedDropDown', selectedItems, index);
         // Here selectedItems is always an array with just one value and should pe mapped to the locationId field from the address from index
@@ -1160,6 +1390,7 @@ class ContactsSingleScreen extends Component {
         }
     };
 
+    // Answers handlers
     onChangeTextAnswer = (value, id) => {
         let itemClone = _.cloneDeep(this.state.item);
         let questionnaireAnswers = itemClone && itemClone.questionnaireAnswers ? itemClone.questionnaireAnswers : null;
@@ -1174,7 +1405,6 @@ class ContactsSingleScreen extends Component {
             isModified: true
         }))
     };
-
     onChangeSingleSelection = (value, id) => {
         let itemClone = _.cloneDeep(this.state.item);
         let questionnaireAnswers = itemClone && itemClone.questionnaireAnswers ? itemClone.questionnaireAnswers : null;
@@ -1189,7 +1419,6 @@ class ContactsSingleScreen extends Component {
             isModified: true
         }))
     };
-
     onChangeMultipleSelection = (selections, id) => {
         let itemClone = Object.assign({}, this.state.item);
         let questionnaireAnswers = itemClone && itemClone.questionnaireAnswers ? itemClone.questionnaireAnswers : null;
@@ -1205,21 +1434,25 @@ class ContactsSingleScreen extends Component {
         }))
     };
 
+    // Exposures handlers
     handleOnPressEditExposure = (relation, index) => {
-        console.log('handleOnPressEditExposure: ', relation, index);
+        // console.log('handleOnPressEditExposure: ', relation, index);
+        _.set(relation, 'caseData.fullName', computeFullName(_.get(relation, 'caseData', null)));
         this.props.navigator.showModal({
             screen: 'ExposureScreen',
             animated: true,
             passProps: {
-                exposure: relation,
+                exposure: _.get(relation, 'relationshipData', null),
+                selectedExposure: _.get(relation, 'caseData', null),
                 contact: this.props.isNew ? null : this.props.contact,
                 type: 'Contact',
                 saveExposure: this.handleSaveExposure,
-                caseIdFromCasesScreen: this.props.caseIdFromCasesScreen
+                caseIdFromCasesScreen: this.props.caseIdFromCasesScreen,
+                isEditMode: false,
+                addContactFromCasesScreen: false
             }
         })
     };
-
     handleOnPressDeleteExposure = (relation, index) => {
         if (this.state.contact.relationships.length === 1) {
             Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.alertMessages.contactDeleteLastExposureError, this.props.translation), [
@@ -1268,26 +1501,11 @@ class ContactsSingleScreen extends Component {
                         if (this.checkAgeMonthsRequirements()) {
                             if (this.state.contact.addresses === undefined || this.state.contact.addresses === null || this.state.contact.addresses.length === 0 ||
                                 (this.state.contact.addresses.length > 0 && this.state.hasPlaceOfResidence === true)) {
-                                const { contact } = this.state
-                                checkForNameDuplicatesRequest(this.props.isNew ? null : contact._id, contact.firstName, contact.lastName, this.props.user.activeOutbreakId, (error, response) => {
-                                    if (error) {
-                                        console.log('getContactsNameForDuplicateCheckRequest error: ', error);
-                                        this.setState({
-                                            loading: false
-                                        }, () => {
-                                            Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.checkForDuplicatesRequestError, this.props.translation), [
-                                                {
-                                                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
-                                                    onPress: () => { this.hideMenu() }
-                                                }
-                                            ])
-                                        })
-                                    }
-                                    if (response) {
-                                        console.log('getContactsNameForDuplicateCheckRequest response: ', response);
-                                        if (response.length === 0) {
-                                            this.saveContactAction()
-                                        } else {
+                                const { contact } = this.state;
+
+                                checkForNameDuplicated(this.props.isNew ? null : contact._id, contact.firstName, contact.lastName, this.props.user.activeOutbreakId)
+                                    .then((isDuplicate) => {
+                                        if (isDuplicate) {
                                             Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.contactDuplicateNameError, this.props.translation), [
                                                 {
                                                     text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
@@ -1304,9 +1522,13 @@ class ContactsSingleScreen extends Component {
                                                     onPress: () => { this.saveContactAction() }
                                                 }
                                             ])
+                                        } else {
+                                            this.saveContactAction();
                                         }
-                                    }
-                                });
+                                    })
+                                    .catch((errorIsDuplicate) => {
+                                        this.saveContactAction();
+                                    });
                             } else {
                                 this.setState({ loading: false }, () => {
                                     Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.placeOfResidenceError, this.props.translation), [
@@ -1364,8 +1586,8 @@ class ContactsSingleScreen extends Component {
         this.setState({
             savePressed: true
         }, () => {
-            this.hideMenu()
-            let ageConfig = this.ageAndDobPrepareForSave()
+            this.hideMenu();
+            let ageConfig = this.ageAndDobPrepareForSave();
             this.setState(prevState => ({
                 contact: Object.assign({}, prevState.contact, { age: ageConfig.ageClone }, { dob: ageConfig.dobClone }),
             }), () => {
@@ -1375,10 +1597,22 @@ class ContactsSingleScreen extends Component {
                     this.setState(prevState => ({
                         contact: Object.assign({}, prevState.contact, contactWithRequiredFields),
                     }), () => {
-                        let contactClone = _.cloneDeep(this.state.contact)
-                        let contactMatchFilter = this.checkIfContactMatchFilter()
-                        console.log('contactMatchFilter', contactMatchFilter)
-                        this.props.addContact(this.props.user.activeOutbreakId, contactClone, null, this.props.user.token, contactMatchFilter);
+                        let contactClone = _.cloneDeep(this.state.contact);
+                        // let contactMatchFilter = this.checkIfContactMatchFilter();
+                        // console.log('contactMatchFilter', contactMatchFilter)
+                        addContact(contactClone, _.get(this.props, 'periodOfFollowUp', 1), _.get(this.props, 'user._id'))
+                            .then((result) => {
+                                this.props.refresh();
+                                this.props.navigator.pop(
+                                    {
+                                        animated: true,
+                                        animationType: 'fade',
+                                    }
+                                )
+                            })
+                            .catch((errorAddContact) => {
+                                console.log('errorUpdateCase', errorAddContact);
+                            })
                     })
                 } else {
                     let contactWithRequiredFields = null;
@@ -1391,10 +1625,20 @@ class ContactsSingleScreen extends Component {
                     this.setState(prevState => ({
                         contact: Object.assign({}, prevState.contact, contactWithRequiredFields),
                     }), () => {
-                        let contactClone = _.cloneDeep(this.state.contact)
-                        let contactMatchFilter = this.checkIfContactMatchFilter()
-                        console.log('contactMatchFilter', contactMatchFilter)
-                        this.props.updateContact(this.props.user.activeOutbreakId, contactClone._id, contactClone, this.props.user.token, null, contactMatchFilter, this.props.teams);
+                        let contactClone = _.cloneDeep(this.state.contact);
+                        updateContact(contactClone)
+                            .then((result) => {
+                                this.props.refresh();
+                                this.props.navigator.pop(
+                                    {
+                                        animated: true,
+                                        animationType: 'fade',
+                                    }
+                                )
+                            })
+                            .catch((errorUpdateContact) => {
+                                console.log('errorUpdateCase', errorUpdateContact);
+                            })
                     })
                 }
             })
@@ -1447,6 +1691,29 @@ class ContactsSingleScreen extends Component {
                 }
             }
         }
+
+        if (checkArrayAndLength(_.get(this.state , 'contact.documents', []))) {
+            for (let i = 0; i < _.get(this.state, 'contact.documents.length', 0); i++) {
+                for (let j = 0; j < _.get(config, 'caseSingleScreen.document.fields.length', 0); j++) {
+                    if (_.get(config, `caseSingleScreen.document.fields[${j}].isRequired`, false) && !_.get(this.state, `contact.documents[${i}][${config.caseSingleScreen.document.fields[j].id}]`, null)) {
+                        personalInfo.push(getTranslation(_.get(config, `caseSingleScreen.document.fields[${j}].label`, null), this.props.translation));
+                        // return false;
+                    }
+                }
+            }
+        }
+
+        if (checkArrayAndLength(_.get(this.state , 'contact.vaccinesReceived', []))) {
+            for (let i = 0; i < _.get(this.state, 'contact.vaccinesReceived.length', 0); i++) {
+                for (let j = 0; j < _.get(config, 'caseSingleScreen.vaccinesReceived.fields.length', 0); j++) {
+                    if (_.get(config, `caseSingleScreen.vaccinesReceived.fields[${j}].isRequired`, false) && !_.get(this.state, `contact.vaccinesReceived[${i}][${config.caseSingleScreen.vaccinesReceived.fields[j].id}]`, null)) {
+                        personalInfo.push(getTranslation(_.get(config, `caseSingleScreen.vaccinesReceived.fields[${j}].label`, null), this.props.translation));
+                        // return false;
+                    }
+                }
+            }
+        }
+
         return personalInfo;
         // return true;
     };
@@ -1473,15 +1740,17 @@ class ContactsSingleScreen extends Component {
     checkFields = () => {
         // let pass = true;
         let requiredFields = [];
+        let relationships = _.get(this.state, 'contact.relationships', []);
+        relationships = relationships.map((e) => _.get(e, 'relationshipData', e));
         for (let i = 0; i < config.addExposureScreen.length; i++) {
             if (config.addExposureScreen[i].id === 'exposure') {
-                if (this.state.contact.relationships[0].persons.length === 0) {
+                if (relationships[0].persons.length === 0) {
                     requiredFields.push('Person')
                     // pass = false;
                 }
             } else {
                 if (config.addExposureScreen[i].isRequired) {
-                    if (!this.state.contact.relationships[0][config.addExposureScreen[i].id]) {
+                    if (!relationships[0][config.addExposureScreen[i].id]) {
                         requiredFields.push(getTranslation(config.addExposureScreen[i].label, this.props.translation));
                         // pass = false;
                     }
@@ -1518,57 +1787,6 @@ class ContactsSingleScreen extends Component {
         let requiredFields = [];
         return requiredFields.concat(this.checkRequiredFieldsPersonalInfo(), this.checkRequiredFieldsAddresses());
         // return this.checkRequiredFieldsPersonalInfo() && this.checkRequiredFieldsAddresses() && this.checkRequiredFieldsRelationships()
-    };
-
-    checkIfContactMatchFilter = () => {
-        if (this.props.filter && (this.props.filter['ContactsFilterScreen'] || this.props.filter['FollowUpsScreen'])) {
-            let contactCopy = [_.cloneDeep(this.state.contact)]
-
-            // Take care of search filter
-            if (this.state.filter.searchText) {
-                contactCopy = contactCopy.filter((e) => {
-                    return e && e.firstName && this.state.filter.searchText.toLowerCase().includes(e.firstName.toLowerCase()) ||
-                        e && e.lastName && this.state.filter.searchText.toLowerCase().includes(e.lastName.toLowerCase()) ||
-                        e && e.firstName && e.firstName.toLowerCase().includes(this.state.filter.searchText.toLowerCase()) ||
-                        e && e.lastName && e.lastName.toLowerCase().includes(this.state.filter.searchText.toLowerCase())
-                });
-            }
-
-            // Take care of gender filter
-            if (this.state.filterFromFilterScreen && this.state.filterFromFilterScreen.gender) {
-                contactCopy = contactCopy.filter((e) => { return e.gender === this.state.filterFromFilterScreen.gender });
-            }
-            // Take care of age range filter
-            if (this.state.filterFromFilterScreen && this.state.filterFromFilterScreen.age && Array.isArray(this.state.filterFromFilterScreen.age) && this.state.filterFromFilterScreen.age.length === 2 && (this.state.filterFromFilterScreen.age[0] >= 0 || this.state.filterFromFilterScreen.age[1] <= 150)) {
-                contactCopy = contactCopy.filter((e) => {
-                    if (e.age && e.age.years !== null && e.age.years !== undefined && e.age.months !== null && e.age.months !== undefined) {
-                        if (e.age.years > 0 && e.age.months === 0) {
-                            return e.age.years >= this.state.filterFromFilterScreen.age[0] && e.age.years <= this.state.filterFromFilterScreen.age[1]
-                        } else if (e.age.years === 0 && e.age.months > 0) {
-                            return e.age.months >= this.state.filterFromFilterScreen.age[0] && e.age.months <= this.state.filterFromFilterScreen.age[1]
-                        } else if (e.age.years === 0 && e.age.months === 0) {
-                            return e.age.years >= this.state.filterFromFilterScreen.age[0] && e.age.years <= this.state.filterFromFilterScreen.age[1]
-                        }
-                    }
-                });
-            }
-            // Take care of locations filter
-            if (this.state.filterFromFilterScreen && this.state.filterFromFilterScreen.selectedLocations && this.state.filterFromFilterScreen.selectedLocations.length > 0) {
-                contactCopy = contactCopy.filter((e) => {
-                    let addresses = e.addresses.filter((k) => {
-                        return k.locationId !== '' && this.state.filterFromFilterScreen.selectedLocations.indexOf(k.locationId) >= 0
-                    })
-                    return addresses.length > 0
-                })
-            }
-            if (contactCopy.length > 0) {
-                return true
-            } else {
-                return false
-            }
-        } else {
-            return true
-        }
     };
 
     showMenu = () => {
@@ -1714,7 +1932,42 @@ class ContactsSingleScreen extends Component {
                 pageAskingHelpFrom: pageAskingHelpFrom
             }
         });
-    }
+    };
+
+    onPressEdit = () => {
+        this.setState({
+            isEditMode: true,
+            isModified: false,
+            contactBeforeEdit: _.cloneDeep(this.state.contact)
+        })
+    };
+    onPressCancelEdit = () => {
+        if (this.state.isModified === true) {
+            Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.alertMessages.caseDiscardAllChangesConfirmation, this.props.translation), [
+                {
+                    text: getTranslation(translations.alertMessages.yesButtonLabel, this.props.translation),
+                    onPress: () => {
+                        this.setState({
+                            contact: _.cloneDeep(this.state.contactBeforeEdit),
+                            isModified: false,
+                            isEditMode: false
+                        })
+                    }
+                },
+                {
+                    text: getTranslation(translations.alertMessages.cancelButtonLabel, this.props.translation),
+                    onPress: () => {
+                        console.log("onPressCancelEdit No pressed - nothing changes")
+                    }
+                }
+            ])
+        } else {
+            //there are no changes
+            this.setState({
+                isEditMode: false
+            })
+        }
+    };
 }
 
 // Create style outside the class, or for components that will be used by other components (buttons),
@@ -1742,17 +1995,16 @@ function mapStateToProps(state) {
         contacts: state.contacts,
         filter: state.app.filters,
         translation: state.app.translation,
-        locations: _.get(state, 'locations.locations', [])
+        locations: _.get(state, 'locations.locations', []),
+        periodOfFollowUp: _.get(state, 'outbreak.periodOfFollowUp', 1)
     };
 };
 
 function matchDispatchProps(dispatch) {
     return bindActionCreators({
         updateFollowUpAndContact,
-        deleteFollowUp,
         updateContact,
         addContact,
-        deleteExposureForContact,
         removeErrors,
         addFollowUp
     }, dispatch);

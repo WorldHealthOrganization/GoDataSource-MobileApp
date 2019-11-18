@@ -41,7 +41,7 @@ class Button extends PureComponent {
                 style={[{
                     borderRadius: 4,
                     height: this.props.height,
-                    width: this.props.width,
+                    width: this.props.width
                 },this.props.style]}
             />
         );

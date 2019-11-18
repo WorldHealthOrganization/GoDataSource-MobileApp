@@ -1,4 +1,5 @@
 import constants from './constants';
+import lodashIsObject from 'lodash/isObject';
 
 export function isPromise(obj) {
     return !!obj && (typeof obj === 'object' || typeof obj === 'function') && typeof obj.then === 'function';
@@ -10,6 +11,10 @@ export function checkArrayAndLength(array) {
 
 export function checkArray(array) {
     return array && Array.isArray(array);
+}
+
+export function checkObject(object) {
+    return lodashIsObject(object);
 }
 
 export function retriablePromise (promise, numberOfRetries, timeout) {

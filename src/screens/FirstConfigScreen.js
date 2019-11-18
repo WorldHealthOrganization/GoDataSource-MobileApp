@@ -56,16 +56,16 @@ class FirstConfigScreen extends Component {
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
-        if (this.props.errors && this.props.errors.type && this.props.errors.message) {
-            Alert.alert(this.props.errors.type, this.props.errors.message, [
-                {
-                    text: getTranslation(translations.alertMessages.okButtonLabel, null),
-                    onPress: () => {
-                        this.props.removeErrors()
-                    }
-                }
-            ])
-        }
+        // if (this.props.errors && this.props.errors.type && this.props.errors.message) {
+        //     Alert.alert(this.props.errors.type, this.props.errors.message, [
+        //         {
+        //             text: getTranslation(translations.alertMessages.okButtonLabel, null),
+        //             onPress: () => {
+        //                 this.props.removeErrors()
+        //             }
+        //         }
+        //     ])
+        // }
 
         return (
             <KeyboardAwareScrollView

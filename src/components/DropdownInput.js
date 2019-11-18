@@ -119,7 +119,8 @@ class DropdownInput extends PureComponent {
                                     this.props.objectType === 'LabResult' || 
                                     this.props.objectType === 'Documents' || 
                                     this.props.objectType === 'Sort' || 
-                                    this.props.objectType === 'DateRanges' 
+                                    this.props.objectType === 'DateRanges' ||
+                                    this.props.objectType === 'Vaccines'
                                         ? this.props.index 
                                         : this.props.objectType
                                 ) 
@@ -136,7 +137,8 @@ class DropdownInput extends PureComponent {
                         this.props.objectType === 'LabResult' || 
                         this.props.objectType === 'Documents' || 
                         this.props.objectType === 'Sort' || 
-                        this.props.objectType === 'DateRanges' 
+                        this.props.objectType === 'DateRanges' ||
+                        this.props.objectType === 'Vaccines'
                             ? this.props.index 
                             : this.props.objectType) 
                     : null,

@@ -23,6 +23,7 @@ import HelpScreen from './HelpScreen';
 import HelpSingleScreen from './HelpSingleScreen';
 import QRScanScreen from './QRScanScreen';
 import HubConfigScreen from './HubConfigScreen';
+import ViewEditScreen from './viewEditScreen/ViewEditScreen';
 
 const screens = [
     {screen: constants.appScreens.loginScreen, component: LoginScreen},
@@ -44,6 +45,7 @@ const screens = [
     {screen: constants.appScreens.helpSingleScreen, component: HelpSingleScreen},
     {screen: constants.appScreens.qrScanScreen, component: QRScanScreen},
     {screen: constants.appScreens.hubConfigScreen, component: HubConfigScreen},
+    {screen: constants.appScreens.viewEditScreen, component: ViewEditScreen},
 ];
 
 export function registerScreens(store, Provider) {

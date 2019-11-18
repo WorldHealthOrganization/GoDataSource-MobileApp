@@ -69,6 +69,9 @@ export default {
 
     'LNG_CONTACT_FIELD_LABEL_FIRST_NAME': 'First Name',
     'LNG_CONTACT_FIELD_LABEL_LAST_NAME': 'Last Name',
+    'LNG_SORT_CRITERIA_CREATED_AT': 'Date Created',
+    'LNG_SORT_CRITERIA_UPDATED_AT': 'Date Updated',
+    'LNG_SORT_CRITERIA_VISUAL_ID': 'ID',
     'LNG_SIDE_FILTERS_SORT_BY_ASC_PLACEHOLDER': 'Ascending',
     'LNG_SIDE_FILTERS_SORT_BY_DESC_PLACEHOLDER': 'Descending',
 
@@ -104,6 +107,7 @@ export default {
     'LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED': 'Refused transfer to treatment unit',
     'LNG_CASE_FIELD_LABEL_RISK_REASON': 'Risk reason',
     'LNG_CASE_FIELD_LABEL_CASE_ID': 'Case ID',
+    'LNG_MOBILE_CASE_FIELD_LABEL_PREGNANCY_STATUS': 'Pregnancy status',
 
     'LNG_CASE_FIELD_LABEL_DOCUMENT_TYPE': 'Document Type',
     'LNG_CASE_FIELD_LABEL_DOCUMENT_NUMBER': 'Document number',
@@ -193,12 +197,15 @@ export default {
     'LNG_CASE_LIST_SCREEN_TITLE': 'Cases',
     'LNG_CASE_LIST_SCREEN_VIEW_BUTTON': 'View',
     'LNG_CASE_LIST_SCREEN_ADD_CONTACT_BUTTON': 'Add contact',
+    'LNG_CASE_LIST_SCREEN_NO_CASES': 'There are no cases to display',
+    'LNG_CASE_LIST_SCREEN_SEE_CONTACTS': 'Contacts',
 
 
     //contactsScreen
     'LNG_CONTACT_LIST_SCREEN_TITLE': 'Contacts',
     'LNG_CONTACT_LIST_SCREEN_ADD_FOLLOW_UP_BUTTON': 'Add follow-up',
     'LNG_CONTACT_LIST_SCREEN_EDIT_BUTTON': 'Edit',
+    'LNG_CONTACT_LIST_SCREEN_NO_CONTACTS': 'There are no contacts to display',
 
 
     //followUpsScreen
@@ -294,7 +301,6 @@ export default {
     'LNG_DIALOG_ALERT_MESSAGE_DO_YOU_WANT_TO_REPLACE_CURRENT_COORDINATES_WITH_LOCATION_VALUES': "Do you want to replace current coordinates with location's values?",
     'LNG_DIALOG_ALERT_MESSAGE_ADD_PERSON': 'Would you like to add a new person for this id?',
 
-    // TODO add to backend
     'LNG_DIALOG_ALERT_MESSAGE_ARE_YOU_SURE_YOU_WANT_TO_COPY_THE_ADDRESS_FROM_THE_PARENT_ENTITY': 'Are you sure you want to copy the address from the parent entity?',
 
     //loadingScreenMessages
@@ -309,7 +315,8 @@ export default {
 
 
     //generalLabels
-    'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER': 'Filter By',
+    'LNG_MOBILE_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER': 'More Filters',
+
     'LNG_COMMON_BUTTON_LABEL_APPLY_FILTERS': 'Apply filters',
     'LNG_COMMON_BUTTON_LABEL_RESET_FILTERS': 'Reset',
     'LNG_COMMON_LABEL_YES': 'Yes',
@@ -385,7 +392,7 @@ export default {
     'LNG_REFERENCE_DATA_CONTACT_FINAL_FOLLOW_UP_STATUS_TYPE_UNDER_FOLLOW_UP': 'Under Follow-up',
     'LNG_REFERENCE_DATA_CONTACT_FINAL_FOLLOW_UP_STATUS_TYPE_FOLLOW_UP_COMPLETED': 'Follow-up Completed',
     'LNG_REFERENCE_DATA_CONTACT_FINAL_FOLLOW_UP_STATUS_TYPE_LOST_TO_FOLLOW_UP': 'Lost To Follow-up',
-    'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_STATUS_DESCRIPTION': 'Follow-up final status',
+    'LNG_MOBILE_CONTACT_FIELD_LABEL_FOLLOW_UP_STATUS_DESCRIPTION': 'Follow-up final status',
 
     //followUpStatuses
     'LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE_SEEN_OK': 'Seen Ok',
@@ -471,9 +478,7 @@ export default {
     'LNG_QUESTIONNAIRE_LABEL_ADD_ANSWER': 'Add Answer',
     'LNG_QUESTIONNAIRE_LABEL_PREVIOUS_ANSWERS': 'Prev Answers',
 
-    // TODO add to backend
     'LNG_FOLLOW_UP_AGENDA_NO_FOLLOW_UPS_FOR_DATE': 'No follow-ups to show for this day',
 
-    // TODO add to backend
     'LNG_PERSON_LIST_ITEM_DAY_OF_FOLLOW_UP': 'Day of follow-up: '
 };

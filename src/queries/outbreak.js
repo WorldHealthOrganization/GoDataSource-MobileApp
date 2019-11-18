@@ -10,7 +10,6 @@ export function getOutbreakByIdRequest (outbreakId, token, callback) {
     getDatabase(config.mongoCollections.outbreak)
         .then((database) => {
             // For searching by ID it is recommended to use the PouchDB allDocs method with the ID as a key, since primary indexes are much faster than secondary ones
-
             database.get('outbreak.json_' + outbreakId)
                 .then((result) => {
                     console.log("Result for find time for getting outbreak: ", new Date().getTime() - start);

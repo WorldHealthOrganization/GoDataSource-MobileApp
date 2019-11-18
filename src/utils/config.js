@@ -80,6 +80,13 @@ const tabsValuesRoutes = {
         {key: 'infection', title: translations.caseSingleScreen.infectionTitle},
         {key: 'caseInvestigation', title: translations.caseSingleScreen.investigationTitle}
     ],
+    casesSingleViewEdit: [
+        {key: 'personal', title: translations.caseSingleScreen.personalTitle},
+        {key: 'address', title: translations.caseSingleScreen.addressTitle},
+        {key: 'infection', title: translations.caseSingleScreen.infectionTitle},
+        {key: 'exposures', title: 'Contacts'},
+        {key: 'caseInvestigation', title: translations.caseSingleScreen.investigationTitle}
+    ],
     contactsSingle: [
         {key: 'personal', title: translations.contactSingleScreen.personalTitle},
         {key: 'address', title: translations.contactSingleScreen.addressTitle},
@@ -114,7 +121,7 @@ const followUpsSingleScreen = {
                     label: translations.followUpsSingleScreen.status,
                     type: 'DropdownInput',
                     value: '',
-                    isRequired: false,
+                    isRequired: true,
                     isEditMode: true,
                     objectType: 'FollowUp',
                     skipNone: true
@@ -372,6 +379,19 @@ const caseSingleScreen = {
                 },
                 {
                     cardNumber: 2,
+                    id: 'pregnancyStatus',
+                    label: translations.caseSingleScreen.pregnancyStatus,
+                    labelValue: 'test',
+                    type: 'DropdownInput',
+                    value: '',
+                    isRequired: false,
+                    isEditMode: false,
+                    activeButtonColor: 'red',
+                    activeBackgroundColor: 'red',
+                    objectType: 'Case'
+                },
+                {
+                    cardNumber: 2,
                     id: 'isDateOfReportingApproximate',
                     label: translations.caseSingleScreen.isDateOfReportingApproximate,
                     type: 'SwitchInput',
@@ -439,6 +459,51 @@ const caseSingleScreen = {
                 textsStyleArray: [{color: styles.missedRedColor}],
                 onPressArray: [],
                 objectType: 'Documents'
+            }
+        ]
+    },
+    vaccinesReceived: {
+        fields: [
+            {
+                cardNumber: 2,
+                id: 'vaccine',
+                label: 'Vaccine',
+                type: 'DropdownInput',
+                value: '',
+                isRequired: true,
+                isEditMode: true,
+                objectType: 'Vaccines'
+            },
+            {
+                cardNumber: 2,
+                id: 'date',
+                label: 'Vaccine date',
+                labelValue: 'test',
+                type: 'DatePicker',
+                value: '',
+                isRequired: false,
+                isEditMode: true,
+                objectType: 'Vaccines'
+            },
+            {
+                cardNumber: 2,
+                id: 'status',
+                label: 'Vaccine status',
+                type: 'DropdownInput',
+                value: '',
+                isRequired: true,
+                isEditMode: true,
+                objectType: 'Vaccines'
+            },
+            {
+                cardNumber: 2,
+                id: 'deleteButton',
+                type: 'ActionsBar',
+                labelValue: 'test',
+                textsArray: [translations.caseSingleScreen.deleteButton],
+                textsStyleArray: [{color: styles.missedRedColor}],
+                onPressArray: [],
+                objectType: 'Vaccines'
             }
         ]
     },
@@ -808,142 +873,6 @@ const caseSingleScreen = {
             }
         ]
     },
-
-    // hospitalizationDate: {
-    //     fields: [
-    //         {
-    //             cardNumber: 2,
-    //             id: 'startDate',
-    //             label: translations.caseSingleScreen.hospitalisationStartDate,
-    //             type: 'DatePicker',
-    //             value: '',
-    //             isEditMode: true,
-    //             format: 'YYYY-MM-dd',
-    //             objectType: 'HospitalizationDates'
-    //         },
-    //         {
-    //             cardNumber: 2,
-    //             id: 'endDate',
-    //             label: translations.caseSingleScreen.hospitalisationEndDate,
-    //             type: 'DatePicker',
-    //             value: '',
-    //             isEditMode: true,
-    //             format: 'YYYY-MM-dd',
-    //             objectType: 'HospitalizationDates'
-    //         },
-    //         {
-    //             cardNumber: 2,
-    //             id: 'centerName',
-    //             label: translations.caseSingleScreen.hospitalisationCenterName,
-    //             type: 'TextInput',
-    //             value: '',
-    //             isRequired: false,
-    //             isEditMode: false,
-    //             objectType: 'HospitalizationDates'
-    //         },
-    //         {
-    //             cardNumber: 2,
-    //             id: 'locationId',
-    //             label: translations.caseSingleScreen.hospitalisationLocation,
-    //             labelValue: 'test',
-    //             type: 'DropDownSectioned',
-    //             value: '',
-    //             isRequired: false,
-    //             isEditMode: true,
-    //             objectType: 'HospitalizationDates',
-    //             single: true
-    //         },
-    //         {
-    //             cardNumber: 2,
-    //             id: 'comments',
-    //             label: translations.caseSingleScreen.hospitalisationComments,
-    //             type: 'TextInput',
-    //             value: '',
-    //             isRequired: false,
-    //             isEditMode: false,
-    //             objectType: 'HospitalizationDates',
-    //             multiline: true
-    //         },
-    //         {
-    //             cardNumber: 2,
-    //             id: 'deleteButton',
-    //             type: 'ActionsBar',
-    //             labelValue: 'test',
-    //             textsArray: [translations.caseSingleScreen.deleteButton],
-    //             textsStyleArray: [{color: styles.missedRedColor}],
-    //             onPressArray: [],
-    //             objectType: 'HospitalizationDates'
-    //         }
-    //     ]
-    // },
-    // isolationDate: {
-    //     fields: [
-    //         {
-    //             cardNumber: 3,
-    //             id: 'startDate',
-    //             label: translations.caseSingleScreen.isolationStartDate,
-    //             type: 'DatePicker',
-    //             value: '',
-    //             isEditMode: true,
-    //             format: 'YYYY-MM-dd',
-    //             objectType: 'IsolationDates'
-    //         },
-    //         {
-    //             cardNumber: 3,
-    //             id: 'endDate',
-    //             label: translations.caseSingleScreen.isolationEndDate,
-    //             type: 'DatePicker',
-    //             value: '',
-    //             isEditMode: true,
-    //             format: 'YYYY-MM-dd',
-    //             objectType: 'IsolationDates'
-    //         },
-    //         {
-    //             cardNumber: 3,
-    //             id: 'centerName',
-    //             label: translations.caseSingleScreen.isolationCenterName,
-    //             type: 'TextInput',
-    //             value: '',
-    //             isRequired: false,
-    //             isEditMode: false,
-    //             objectType: 'IsolationDates'
-    //         },
-    //         {
-    //             cardNumber: 3,
-    //             id: 'locationId',
-    //             label: translations.caseSingleScreen.isolationLocation,
-    //             labelValue: 'test',
-    //             type: 'DropDownSectioned',
-    //             value: '',
-    //             isRequired: false,
-    //             isEditMode: true,
-    //             objectType: 'IsolationDates',
-    //             single: true
-    //         },
-    //         {
-    //             cardNumber: 3,
-    //             id: 'comments',
-    //             label: translations.caseSingleScreen.isolationComments,
-    //             type: 'TextInput',
-    //             value: '',
-    //             isRequired: false,
-    //             isEditMode: false,
-    //             objectType: 'IsolationDates',
-    //             multiline: true
-    //         },
-    //         {
-    //             cardNumber: 3,
-    //             id: 'deleteButton',
-    //             type: 'ActionsBar',
-    //             labelValue: 'test',
-    //             textsArray: [translations.caseSingleScreen.deleteButton],
-    //             textsStyleArray: [{color: styles.missedRedColor}],
-    //             onPressArray: [],
-    //             objectType: 'IsolationDates'
-    //         }
-    //     ]
-    // },
-
 };
 
 const followUpsFilterScreen = {
@@ -1368,7 +1297,7 @@ const addExposureScreen = [
         id: 'exposure',
         label: translations.exposureScreen.chooseCaseOrEvent,
         labelValue: 'test',
-        type: 'DropdownInput',
+        type: 'SearchableDropdown',
         value: '',
         isRequired: true,
         isEditMode: true,
@@ -1832,7 +1761,7 @@ const contactsSingleScreen = {
                 id: 'exposure',
                 label: translations.exposureScreen.chooseCaseOrEvent,
                 labelValue: 'test',
-                type: 'DropdownInput',
+                type: 'SearchableDropdown',
                 value: '',
                 isRequired: true,
                 isEditMode: true,
@@ -1997,343 +1926,15 @@ const mongoCollections = {
 };
 
 const changingMongoCollections = [
-    'followUp',
     'labResult',
-    'person',
-    'relationship',
     'user'
 ];
 
-const RNDBConfig = {
-    "cluster": {
-        "_id": {
-            "type": "VARCHAR(100)",
-            "pk": true
-        },
-        "name": {
-            "type": "VARCHAR(100)"
-        },
-        "updatedAt": {
-            "type": "DATE"
-        },
-        "updatedBy": {
-            "type": "VARCHAR(100)"
-        },
-        "deleted": {
-            "type": "BOOLEAN"
-        },
-        "deletedAt": {
-            "type": "DATE"
-        }
-    },
-    "followUp": {
-        "_id": {
-            "type": "VARCHAR(100)",
-            "pk": true
-        },
-        "date": {
-            "type": "DATE"
-        },
-        "performed": {
-            "type": "BOOLEAN"
-        },
-        "lostToFollowUp": {
-            "type": "BOOLEAN"
-        },
-        "outbreakId": {
-            "type": "VARCHAR(100)",
-            "references": "outbreak",
-            "referencesOn": "_id"
-        },
-        "personId": {
-            "type": "VARCHAR(100)",
-            "references": "person",
-            "referencesOn": "_id"
-        },
-        "updatedAt": {
-            "type": "DATE"
-        },
-        "updatedBy": {
-            "type": "VARCHAR(100)"
-        },
-        "deleted": {
-            "type": "BOOLEAN"
-        },
-        "deletedAt": {
-            "type": "DATE"
-        }
-    },
-    "language": {
-        "_id": {
-            "type": "VARCHAR(100)",
-            "pk": true
-        },
-        "name": {
-            "type": "VARCHAR(100)"
-        },
-        "deleted": {
-            "type": "BOOLEAN"
-        }
-    },
-    "languageToken": {
-        "_id": {
-            "type": "VARCHAR(100)",
-            "pk": true
-        },
-        "token": {
-            "type": "VARCHAR(100)",
-            "unique": true
-        },
-        "languageId": {
-            "type": "VARCHAR(100)",
-            "references": "language",
-            "referencesOn": "_id"
-        },
-        "translation": {
-            "type": "VARCHAR(100)"
-        },
-        "deleted": {
-            "type": "BOOLEAN"
-        }
-    },
-    "location": {
-        "_id": {
-            "type": "VARCHAR(100)",
-            "pk": true
-        },
-        "name": {
-            "type": "VARCHAR(100)"
-        },
-        "parentLocationId": {
-            "type": "VARCHAR(100)",
-            "references": "language",
-            "referencesOn": "_id"
-        },
-        "active": {
-            "type": "BOOLEAN"
-        },
-        "deleted": {
-            "type": "BOOLEAN"
-        }
-    },
-    "outbreak": {
-        "_id": {
-            "type": "VARCHAR(100)",
-            "pk": true
-        },
-        "deleted": {
-            "type": "BOOLEAN"
-        }
-    },
-    "person": {
-        "_id": {
-            "type": "VARCHAR(100)",
-            "pk": true
-        },
-        "type": {
-            "type": "VARCHAR(100)"
-        },
-        "outbreakId": {
-            "type": "VARCHAR(100)",
-            "references": "outbreak",
-            "referencesOn": "_id"
-        },
-        "firstName": {
-            "type": "VARCHAR(100)"
-        },
-        "middleName": {
-            "type": "VARCHAR(100)"
-        },
-        "lastName": {
-            "type": "VARCHAR(100)"
-        },
-        "age_years": {
-            "type": "INT"
-        },
-        "age_months": {
-            "type": "INT"
-        },
-        "gender": {
-            "type": "VARCHAR(20)"
-        },
-        "occupation": {
-            "type": "VARCHAR(100)"
-        },
-        "addresses_locationId": {
-            "type": "VARCHAR(100)",
-            "references": "location",
-            "referencesOn": "_id",
-            "manyOn": "_id"
-        },
-        "updatedAt": {
-            "type": "DATE"
-        },
-        "updatedBy": {
-            "type": "VARCHAR(100)",
-            "references": "user",
-            "referencesOn": "_id"
-        },
-        "deleted": {
-            "type": "BOOLEAN"
-        },
-        "deletedAt": {
-            "type": "DATE"
-        }
-    },
-    "referenceData": {
-        "_id": {
-            "type": "VARCHAR(100)",
-            "pk": true
-        },
-        "categoryId": {
-            "type": "VARCHAR(100)",
-            "references": "language",
-            "referencesOn": "token"
-        },
-        "value": {
-            "type": "VARCHAR(100)",
-            "references": "language",
-            "referencesOn": "token"
-        },
-        "deleted": {
-            "type": "BOOLEAN"
-        }
-    },
-    "relationship": {
-        "_id": {
-            "type": "VARCHAR(100)",
-            "pk": true
-        },
-        "outbreakId": {
-            "type": "VARCHAR(100)",
-            "references": "outbreak",
-            "referencesOn": "_id"
-        },
-        "active": {
-            "type": "BOOLEAN"
-        },
-        "persons_0_id": {
-            "type": "VARCHAR(100)",
-            "references": "person",
-            "referencesOn": "_id"
-        },
-        "persons_0_type": {
-            "type": "VARCHAR(100)",
-            "references": "language",
-            "referencesOn": "token"
-        },
-        "persons_1_id": {
-            "type": "VARCHAR(100)",
-            "references": "person",
-            "referencesOn": "_id"
-        },
-        "persons_1_type": {
-            "type": "VARCHAR(100)",
-            "references": "language",
-            "referencesOn": "token"
-        },
-        "updatedAt": {
-            "type": "DATE"
-        },
-        "updatedBy": {
-            "type": "VARCHAR(100)",
-            "references": "user",
-            "referencesOn": "_id"
-        },
-        "deleted": {
-            "type": "BOOLEAN"
-        },
-        "deletedAt": {
-            "type": "DATE"
-        }
-    },
-    "role": {
-        "_id": {
-            "type": "VARCHAR(100)",
-            "pk": true
-        },
-        "name": {
-            "type": "VARCHAR(100)"
-        },
-        "deleted": {
-            "type": "BOOLEAN"
-        }
-    },
-    "team": {
-        "_id": {
-            "type": "VARCHAR(100)",
-            "pk": true
-        },
-        "name": {
-            "type": "VARCHAR(100)"
-        },
-        "deleted": {
-            "type": "BOOLEAN"
-        }
-    },
-    "helpCategory": {
-        "_id": {
-            "type": "VARCHAR(100)",
-            "pk": true
-        },
-        "name": {
-            "type": "VARCHAR(100)"
-        },
-        "order": {
-            "type": "INT"
-        },
-        "description": {
-            "type": "VARCHAR(100)"
-        },
-        "deleted": {
-            "type": "BOOLEAN"
-        },
-        "deletedAt": {
-            "type": "DATE"
-        }
-    },
-    "helpItem": {
-        "_id": {
-            "type": "VARCHAR(100)",
-            "pk": true
-        },
-        "title": {
-            "type": "VARCHAR(100)"
-        },
-        "content": {
-            "type": "VARCHAR(100)"
-        },
-        "categoryId": {
-            "type": "VARCHAR(100)",
-            "references": "language",
-            "referencesOn": "token"
-        },
-        "approved": {
-            "type": "BOOLEAN"
-        },
-        "deleted": {
-            "type": "BOOLEAN"
-        },
-        "deletedAt": {
-            "type": "DATE"
-        }
-    },
-    "user": {
-        "_id": {
-            "type": "VARCHAR(100)",
-            "pk": true
-        },
-        "email": {
-            "type": "VARCHAR(100)"
-        },
-        "deleted": {
-            "type": "BOOLEAN"
-        },
-        "deletedAt": {
-            "type": "DATE"
-        }
-    }
-};
+const changingSQLiteCollections = [
+    'followUp',
+    'person',
+    'relationship'
+];
 
 const userResidenceAddress = {
     userPlaceOfResidence: translations.userResidenceAddress.userPlaceOfResidence,
@@ -2379,7 +1980,10 @@ const sortOrderDropDownItems = [
 
 const sortCriteriaDropDownItems = [
     { value: translations.sortTab.sortFirstName },
-    { value: translations.sortTab.sortLastName  }
+    { value: translations.sortTab.sortLastName  },
+    { value: translations.sortTab.sortVisualId  },
+    { value: translations.sortTab.sortCreatedAt  },
+    { value: translations.sortTab.sortUpdatedAt  },
 ];
 
 const helpItemsSortCriteriaDropDownItems = [
@@ -2496,7 +2100,7 @@ export default {
     personTypes,
     mongoCollections,
     changingMongoCollections,
-    RNDBConfig,
+    changingSQLiteCollections,
     userResidenceAddress,
     contactFollowUpStatuses,
     followUpStatuses,

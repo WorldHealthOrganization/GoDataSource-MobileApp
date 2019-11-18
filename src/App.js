@@ -79,10 +79,10 @@ export default class App {
                                                                                 store.dispatch(appActions.saveActiveDatabase(null));
                                                                                 store.dispatch(appActions.changeAppRoot('config'));
                                                                                 store.dispatch(appActions.storeUser(null));
-                                                                                store.dispatch(appActions.storeContacts(null));
-                                                                                store.dispatch(appActions.storeFollowUps(null));
-                                                                                store.dispatch(appActions.storeCases(null));
-                                                                                store.dispatch(appActions.storeEvents(null));
+                                                                                // store.dispatch(appActions.storeContacts(null));
+                                                                                // store.dispatch(appActions.storeFollowUps(null));
+                                                                                // store.dispatch(appActions.storeCases(null));
+                                                                                // store.dispatch(appActions.storeEvents(null));
                                                                                 store.dispatch(appActions.storeOutbreak(null));
                                                                                 store.dispatch(appActions.storeHelpCategory(null));
                                                                                 store.dispatch(appActions.storeHelpItem(null));
