@@ -243,11 +243,12 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                 };
                 switch (screenType) {
                     case 'FollowUpsScreen':
-                        // forwardProps.item = dataToForward;
-                        // forwardProps.contact = contactData;
-                        forwardProps.elementId = dataToForward._id;
-                        forwardProps.additionalId = contactData._id;
-                        forwardProps.elementType = 'followUp';
+                        forwardProps.item = dataToForward;
+                        forwardProps.contact = contactData;
+                        forwardProps.isEditMode = false;
+                        // forwardProps.elementId = dataToForward._id;
+                        // forwardProps.additionalId = contactData._id;
+                        // forwardProps.elementType = 'followUp';
                         forwardProps.previousScreen = 'FollowUps';
                         break;
                     case 'ContactsScreen':
@@ -314,6 +315,17 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                         }
                     })
                 }
+                if (screenType === 'ContactsScreen') {
+                    this.props.navigator.push({
+                        screen: forwardScreen,
+                        animated: true,
+                        passProps: {
+                            isNew: false,
+                            isEditMode: true,
+                            contact: caseData
+                        }
+                    })
+                }
             };
 
             onPressFullName = (person, prevScreen) => {
@@ -323,6 +335,7 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                 forwardedProps[dataToSend] = person;
                 forwardedProps['previousScreen'] = prevScreen;
                 forwardedProps['refresh'] = this.refresh;
+                forwardedProps['isEditMode'] = false;
 
                 if (forwardScreen) {
                     this.props.navigator.push({
@@ -342,6 +355,8 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                         screen: forwardScreen,
                         animated: true,
                         passProps: {
+                            // elementType: 'case',
+                            // elementId: get(exposure, 'id', null),
                             case: {_id: get(exposure, 'id', null)},
                             refresh: this.refresh,
                             previousScreen: previousScreen
@@ -356,17 +371,19 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                     case constants.appScreens.followUpScreen:
                         switch (method) {
                             case 'onPressView':
-                                // forwardScreen = constants.appScreens.followUpSingleScreen;
-                                forwardScreen = constants.appScreens.viewEditScreen;
+                                forwardScreen = constants.appScreens.followUpSingleScreen;
+                                // forwardScreen = constants.appScreens.viewEditScreen;
                                 break;
                             case 'onPressAddExposure':
                                 forwardScreen = constants.appScreens.exposureScreen;
                                 break;
                             case 'onPressFullName':
                                 forwardScreen = constants.appScreens.contactSingleScreen;
+                                // forwardScreen = constants.appScreens.viewEditScreen;
                                 break;
                             case 'onPressExposure':
                                 forwardScreen = constants.appScreens.caseSingleScreen;
+                                // forwardScreen = constants.appScreens.viewEditScreen;
                                 break;
                             default:
                                 forwardScreen = null;
@@ -385,6 +402,9 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                                 break;
                             case 'onPressExposure':
                                 forwardScreen = constants.appScreens.caseSingleScreen;
+                                break;
+                            case 'onPressCenterButton':
+                                forwardScreen = constants.appScreens.contactSingleScreen;
                                 break;
                             default:
                                 forwardScreen = null;
@@ -416,7 +436,7 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                 }
 
                 return forwardScreen;
-            }
+            };
 
             onNavigatorEvent = (event) => {
                 navigation(event, this.props.navigator);

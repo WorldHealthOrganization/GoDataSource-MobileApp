@@ -29,6 +29,7 @@ import translations from './../utils/translations'
 import ElevatedView from 'react-native-elevated-view';
 import _ from 'lodash';
 import moment from 'moment';
+import TopContainerButtons from "./../components/TopContainerButtons";
 
 class ContactsSingleAddress extends PureComponent {
 
@@ -74,30 +75,41 @@ class ContactsSingleAddress extends PureComponent {
                 Keyboard.dismiss()
             }} accessible={false}>
                 <View style={style.viewContainer}>
-                    <View style={{ flexDirection: 'row' }}>
-                        <Button
-                            title={getTranslation(translations.generalButtons.backButtonLabel, this.props.translation)}
-                            onPress={this.handleBackButton}
-                            color={styles.buttonGreen}
-                            titleColor={'white'}
-                            height={calculateDimension(25, true, this.props.screenSize)}
-                            width={calculateDimension(130, false, this.props.screenSize)}
-                            style={{
-                                marginVertical: calculateDimension(12.5, true, this.props.screenSize),
-                                marginHorizontal: calculateDimension(16, false, this.props.screenSize),
-                            }} />
-                        <Button
-                            title={getTranslation(translations.generalButtons.nextButtonLabel, this.props.translation)}
-                            onPress={this.handleNextButton}
-                            color={styles.buttonGreen}
-                            titleColor={'white'}
-                            height={calculateDimension(25, true, this.props.screenSize)}
-                            width={calculateDimension(130, false, this.props.screenSize)}
-                            style={{
-                                marginVertical: calculateDimension(12.5, true, this.props.screenSize),
-                                marginHorizontal: calculateDimension(16, false, this.props.screenSize),
-                            }} />
-                    </View>
+                    {/*<View style={{ flexDirection: 'row' }}>*/}
+                        {/*<Button*/}
+                            {/*title={getTranslation(translations.generalButtons.backButtonLabel, this.props.translation)}*/}
+                            {/*onPress={this.handleBackButton}*/}
+                            {/*color={styles.buttonGreen}*/}
+                            {/*titleColor={'white'}*/}
+                            {/*height={calculateDimension(25, true, this.props.screenSize)}*/}
+                            {/*width={calculateDimension(130, false, this.props.screenSize)}*/}
+                            {/*style={{*/}
+                                {/*marginVertical: calculateDimension(12.5, true, this.props.screenSize),*/}
+                                {/*marginHorizontal: calculateDimension(16, false, this.props.screenSize),*/}
+                            {/*}} />*/}
+                        {/*<Button*/}
+                            {/*title={getTranslation(translations.generalButtons.nextButtonLabel, this.props.translation)}*/}
+                            {/*onPress={this.handleNextButton}*/}
+                            {/*color={styles.buttonGreen}*/}
+                            {/*titleColor={'white'}*/}
+                            {/*height={calculateDimension(25, true, this.props.screenSize)}*/}
+                            {/*width={calculateDimension(130, false, this.props.screenSize)}*/}
+                            {/*style={{*/}
+                                {/*marginVertical: calculateDimension(12.5, true, this.props.screenSize),*/}
+                                {/*marginHorizontal: calculateDimension(16, false, this.props.screenSize),*/}
+                            {/*}} />*/}
+                    {/*</View>*/}
+
+                    <TopContainerButtons
+                        isNew={this.props.isNew}
+                        isEditMode={this.props.isEditMode}
+                        index={this.props.activeIndex}
+                        numberOfTabs={this.props.numberOfTabs}
+                        onPressEdit={this.props.onPressEdit}
+                        onPressSaveEdit={this.props.onPressSaveEdit}
+                        onPressCancelEdit={this.props.onPressCancelEdit}
+                        onPressNextButton={this.props.onPressNextButton}
+                    />
 
                     {/* <KeyboardAwareScrollView
                         style={style.containerScrollView}

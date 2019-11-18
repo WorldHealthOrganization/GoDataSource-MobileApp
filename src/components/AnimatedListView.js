@@ -157,20 +157,20 @@ class AnimatedListView extends Component {
                 mainData = get(item, 'mainData', null);
                 exposureData = get(item, 'exposureData', null);
                 textsArray = [
-                    // getTranslation(translations.contactsScreen.addFollowupsButton, this.props.translation),
+                    getTranslation(translations.casesScreen.viewButtonLabel, this.props.translation),
                     getTranslation(translations.contactsScreen.editButton, this.props.translation),
                     getTranslation(translations.followUpsScreen.addExposureFollowUpLabel, this.props.translation)
                 ];
                 textsStyleArray = [
                     [styles.buttonTextActionsBar, {fontSize: 14, marginLeft: margins}],
-                    // [styles.buttonTextActionsBar, {fontSize: 14}],
+                    [styles.buttonTextActionsBar, {fontSize: 14}],
                     [styles.buttonTextActionsBar, {fontSize: 14, marginRight: margins}]];
                 onPressTextsArray = [
-                    // () => {
-                    //     this.handlePressFollowUp(item)
-                    // },
                     () => {
                         this.props.onPressView(mainData)
+                    },
+                    () => {
+                        this.props.onPressCenterButton(mainData)
                     },
                     () => {
                         this.props.onPressAddExposure(mainData);

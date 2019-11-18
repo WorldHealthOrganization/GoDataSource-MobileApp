@@ -26,8 +26,9 @@ import ElevatedView from 'react-native-elevated-view';
 import ViewHOC from './../components/ViewHOC';
 import moment from 'moment';
 import {checkArrayAndLength} from './../utils/typeCheckingFunctions';
-import {extractAllQuestions} from "../utils/functions";
+import {checkRequiredQuestions, extractAllQuestions} from "../utils/functions";
 import cloneDeep from "lodash/cloneDeep";
+import {checkForNameDuplicatesRequest} from "../queries/cases";
 
 class FollowUpsSingleScreen extends Component {
 
@@ -45,11 +46,12 @@ class FollowUpsSingleScreen extends Component {
             savePressed: false,
             deletePressed: false,
             isDateTimePickerVisible: false,
-            isEditMode: true,
+            isEditMode: _.get(this.props, 'isEditMode', false),
             isModified: false,
+            itemBeforeEdit: {},
 
             currentAnswers: {},
-            previousAnswers: [],
+            previousAnswers: {},
             mappedQuestions: [],
         };
         // Bind here methods, or at least don't declare methods in the render method
@@ -59,7 +61,7 @@ class FollowUpsSingleScreen extends Component {
     componentDidMount() {
         BackHandler.addEventListener('hardwareBackPress', this.handleBackButtonClick);
 
-        let isEditMode = true;
+        let isEditMode = _.get(this.props, 'isEditMode', true);
 
         if (this.props.isNew === false) {
             if (this.props.role && this.props.role.find((e) => e === config.userPermissions.writeFollowUp) !== undefined) {
@@ -79,8 +81,8 @@ class FollowUpsSingleScreen extends Component {
             }
         }
 
-        if (this.props.contactFollowUpTemplate) {
-            let mappedAnswers = mapAnswers(this.props.contactFollowUpTemplate, this.state.item.questionnaireAnswers);
+        if (this.props.questions) {
+            let mappedAnswers = mapAnswers(this.props.questions, this.state.item.questionnaireAnswers);
             this.setState({
                 previousAnswers: mappedAnswers.mappedAnswers,
                 mappedQuestions: mappedAnswers.mappedQuestions,
@@ -249,11 +251,16 @@ class FollowUpsSingleScreen extends Component {
                         item={this.state.item}
                         contact={this.state.contact}
                         activeIndex={this.state.index}
-                        onNext={this.handleNextPress}
+                        onPressNextButton={this.handleNextPress}
+                        onPressPreviousButton={this.handlePreviousPress}
                         onChangeText={this.onChangeText}
                         onChangeDate={this.onChangeDate}
                         onChangeSwitch={this.onChangeSwitch}
                         onChangeDropDown={this.onChangeDropDown}
+                        onPressSaveEdit={this.handleOnPressSave}
+                        numberOfTabs={this.state.routes.length}
+                        onPressEdit={this.onPressEdit}
+                        onPressCancelEdit={this.onPressCancelEdit}
                     />
                 );
             case 'quest':
@@ -270,12 +277,14 @@ class FollowUpsSingleScreen extends Component {
                         onChangeDateAnswer={this.onChangeDateAnswer}
                         onChangeSingleSelection={this.onChangeSingleSelection}
                         onChangeMultipleSelection={this.onChangeMultipleSelection}
-                        onPressSave={this.handleOnPressSave}
+                        onPressSaveEdit={this.handleOnPressSave}
                         onPressMissing={this.handleOnPressMissing}
                         onClickAddNewMultiFrequencyAnswer={this.onClickAddNewMultiFrequencyAnswer}
                         onChangeAnswerDate={this.onChangeAnswerDate}
                         savePreviousAnswers={this.savePreviousAnswers}
                         copyAnswerDate={this.handleCopyAnswerDate}
+                        onPressPreviousButton={this.handlePreviousPress}
+                        numberOfTabs={this.state.routes.length}
                     />
                 );
             default:
@@ -336,12 +345,17 @@ class FollowUpsSingleScreen extends Component {
         );
     };
 
-    handleNextPress = () => {
-        // Before getting to the next screen, first do some checking of the required fields
+    checkRequiredFields = () => {
         let checkRequiredFields = [];
         if (this.state.item.statusId === config.followUpStatuses.notPerformed || this.state.item.statusId === translations.generalLabels.noneLabel) {
             checkRequiredFields.push(getTranslation(_.get(config, 'followUpsSingleScreen.fields[1].label', 'Status'), this.props.translation));
         }
+        return checkRequiredFields
+    }
+
+    handleNextPress = () => {
+        // Before getting to the next screen, first do some checking of the required fields
+        let checkRequiredFields = this.checkRequiredFields();
 
         if (checkArrayAndLength(checkRequiredFields)) {
             Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), `${getTranslation(translations.alertMessages.requiredFieldsMissingError, this.props.translation)}.\n${getTranslation(translations.alertMessages.missingFields, this.props.translation)}: ${checkRequiredFields}`, [
@@ -354,6 +368,9 @@ class FollowUpsSingleScreen extends Component {
             this.handleOnIndexChange(this.state.index + 1);
         }
     };
+    handlePreviousPress = () => {
+        this.handleOnIndexChange(this.state.index - 1);
+    }
 
     //Breadcrumb click
     handlePressBreadcrumb = () => {
@@ -661,66 +678,128 @@ class FollowUpsSingleScreen extends Component {
     handleOnPressSave = () => {
         // Mark followUp as performed, and then update to the server
         let now = createDate(null);
-        let questionnaireAnswers = reMapAnswers(_.cloneDeep(this.state.previousAnswers));
-        questionnaireAnswers = this.filterUnasweredQuestions();
-        this.setState(prevState => ({
-            item: Object.assign({}, prevState.item,
+        let checkRequiredFields = this.checkRequiredFields();
+
+        if (checkArrayAndLength(checkRequiredFields)) {
+            Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), `${getTranslation(translations.alertMessages.requiredFieldsMissingError, this.props.translation)}.\n${getTranslation(translations.alertMessages.missingFields, this.props.translation)}: ${checkRequiredFields}`, [
                 {
-                    questionnaireAnswers: questionnaireAnswers
+                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+                    onPress: () => { console.log("OK pressed") }
                 }
-            ),
-            isModified: false,
-        }), () => {
-            let followUpClone = _.cloneDeep(this.state.item);
-            if (followUpClone.targeted !== false && followUpClone.targeted !== true) {
-                followUpClone.targeted = false;
-            }
-            // let contactClone = _.cloneDeep(this.state.contact);
-
-            if (followUpClone.address && followUpClone.address.location) {
-                delete followUpClone.address.location;
-            }
-
-            if (this.props.isNew) {
-                followUpClone = updateRequiredFields(this.props.user.activeOutbreakId, this.props.user._id, Object.assign({}, followUpClone), action = 'create', 'followUp');
-                // console.log('followUpClone create', JSON.stringify(followUpClone))
-                createFollowUp(followUpClone)
-                    .then((responseCreateFollowUp) => {
-                        // this.props.refresh();
-                        this.props.navigator.resetTo(
+            ])
+        } else {
+            let sortedQuestions = sortBy(cloneDeep(this.props.questions), ['order', 'variable']);
+            let questions = extractAllQuestions(sortedQuestions, this.state.previousAnswers, 0);
+            let checkRequiredFields = checkRequiredQuestions(questions, this.state.previousAnswers);
+            checkRequiredFields = checkRequiredFields.map((e) => { return getTranslation(e, this.props.translation) });
+            // console.log("Check required questions: ", checkRequiredFields);
+            if (checkRequiredFields && Array.isArray(checkRequiredFields) && checkRequiredFields.length === 0) {
+                if( this.checkAnswerDatesQuestionnaire()){
+                    let questionnaireAnswers = reMapAnswers(_.cloneDeep(this.state.previousAnswers));
+                    questionnaireAnswers = this.filterUnasweredQuestions();
+                    this.setState(prevState => ({
+                        item: Object.assign({}, prevState.item,
                             {
-                                screen: 'ContactsScreen',
-                                animated: true,
-                                animationType: 'fade',
+                                questionnaireAnswers: questionnaireAnswers
                             }
-                        )
-                    })
-                    .catch((errorCreateFollowUp) => {
-                        console.log(errorCreateFollowUp);
-                    })
+                        ),
+                        isModified: false,
+                    }), () => {
+                        let followUpClone = _.cloneDeep(this.state.item);
+                        if (followUpClone.targeted !== false && followUpClone.targeted !== true) {
+                            followUpClone.targeted = false;
+                        }
+                        // let contactClone = _.cloneDeep(this.state.contact);
+
+                        if (followUpClone.address && followUpClone.address.location) {
+                            delete followUpClone.address.location;
+                        }
+
+                        if (this.props.isNew) {
+                            followUpClone = updateRequiredFields(this.props.user.activeOutbreakId, this.props.user._id, Object.assign({}, followUpClone), action = 'create', 'followUp');
+                            // console.log('followUpClone create', JSON.stringify(followUpClone))
+                            createFollowUp(followUpClone)
+                                .then((responseCreateFollowUp) => {
+                                    // this.props.refresh();
+                                    this.props.navigator.resetTo(
+                                        {
+                                            screen: 'ContactsScreen',
+                                            animated: true,
+                                            animationType: 'fade',
+                                        }
+                                    )
+                                })
+                                .catch((errorCreateFollowUp) => {
+                                    console.log(errorCreateFollowUp);
+                                })
+                        } else {
+                            if (this.state.deletePressed === false) {
+                                followUpClone = updateRequiredFields(this.props.user.activeOutbreakId, this.props.user._id, Object.assign({}, followUpClone), action = 'update');
+                                // console.log('followUpClone update', JSON.stringify(followUpClone))
+                            } else {
+                                followUpClone = updateRequiredFields(this.props.user.activeOutbreakId, this.props.user._id, Object.assign({}, followUpClone), action = 'delete');
+                                // console.log('followUpClone delete', JSON.stringify(followUpClone))
+                            }
+                            updateFollowUpAndContact(followUpClone)
+                                .then((responseUpdateFollowUp) => {
+                                    this.props.refresh();
+                                    this.props.navigator.pop(
+                                        {
+                                            animated: true,
+                                            animationType: 'fade',
+                                        }
+                                    )
+                                })
+                                .catch((errorUpdateFollowUp) => {
+                                    console.log(errorUpdateFollowUp);
+                                })
+                        }
+                    });
+                }else{
+                    Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.answerDateMissingError, this.props.translation), [
+                        {
+                            text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+                            onPress: () => { console.log("OK pressed") }
+                        }
+                    ])
+                }
             } else {
-                if (this.state.deletePressed === false) {
-                    followUpClone = updateRequiredFields(this.props.user.activeOutbreakId, this.props.user._id, Object.assign({}, followUpClone), action = 'update');
-                    // console.log('followUpClone update', JSON.stringify(followUpClone))
-                } else {
-                    followUpClone = updateRequiredFields(this.props.user.activeOutbreakId, this.props.user._id, Object.assign({}, followUpClone), action = 'delete');
-                    // console.log('followUpClone delete', JSON.stringify(followUpClone))
-                }
-                updateFollowUpAndContact(followUpClone)
-                    .then((responseUpdateFollowUp) => {
-                        this.props.refresh();
-                        this.props.navigator.pop(
-                            {
-                                animated: true,
-                                animationType: 'fade',
-                            }
-                        )
-                    })
-                    .then((errorUpdateFollowUp) => {
-                        console.log(errorUpdateFollowUp);
-                    })
+                Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), `${getTranslation(translations.alertMessages.requiredFieldsMissingError, this.props.translation)}.\n${getTranslation(translations.alertMessages.missingFields, this.props.translation)}: ${checkRequiredFields}`, [
+                    {
+                        text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+                        onPress: () => { console.log("OK pressed") }
+                    }
+                ])
             }
-        });
+
+        }
+    };
+
+    checkAnswerDatesQuestionnaire = () => {
+        let previousAnswersClone = _.cloneDeep(this.state.previousAnswers);
+        let sortedQuestions = sortBy(cloneDeep(this.props.questions), ['order', 'variable']);
+        sortedQuestions = extractAllQuestions(sortedQuestions, this.state.previousAnswers, 0);
+        let canSave = true;
+        //questions exist
+        if( Array.isArray(sortedQuestions) && sortedQuestions.length > 0){
+            for(let i=0; i < sortedQuestions.length; i++){
+                //verify only multianswer questions and if they were answered
+                if(sortedQuestions[i].multiAnswer && previousAnswersClone.hasOwnProperty(sortedQuestions[i].variable)){
+                    //current answers
+                    let answerValues = previousAnswersClone[sortedQuestions[i].variable];
+                    //validate all the answers of the question
+                    if( Array.isArray(answerValues) && answerValues.length > 0){
+                        for( let q=0; q < answerValues.length; q++){
+                            // if it has value then it must have date
+                            if(answerValues[q].value !== null && answerValues[q].date === null){
+                                canSave = false;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return canSave;
     };
 
     handleOnPressMissing = () => {
@@ -887,7 +966,7 @@ class FollowUpsSingleScreen extends Component {
     };
     filterUnasweredQuestions = () => {
         let previousAnswersClone = _.cloneDeep(this.state.previousAnswers);
-        let sortedQuestions = sortBy(cloneDeep(this.props.contactFollowUpTemplate), ['order', 'variable']);
+        let sortedQuestions = sortBy(cloneDeep(this.props.questions), ['order', 'variable']);
         sortedQuestions = extractAllQuestions(sortedQuestions, this.state.previousAnswers, 0);
         if( Array.isArray(sortedQuestions) && sortedQuestions.length > 0) {
             for (let i = 0; i < sortedQuestions.length; i++) {
@@ -914,6 +993,42 @@ class FollowUpsSingleScreen extends Component {
         }
         return previousAnswersClone;
     };
+
+
+    onPressEdit = () => {
+        this.setState({
+            isEditMode: true,
+            isModified: false,
+            itemBeforeEdit: _.cloneDeep(this.state.item)
+        })
+    };
+    onPressCancelEdit = () => {
+        if (this.state.isModified === true) {
+            Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.alertMessages.caseDiscardAllChangesConfirmation, this.props.translation), [
+                {
+                    text: getTranslation(translations.alertMessages.yesButtonLabel, this.props.translation),
+                    onPress: () => {
+                        this.setState({
+                            item: _.cloneDeep(this.state.itemBeforeEdit),
+                            isModified: false,
+                            isEditMode: false
+                        })
+                    }
+                },
+                {
+                    text: getTranslation(translations.alertMessages.cancelButtonLabel, this.props.translation),
+                    onPress: () => {
+                        console.log("onPressCancelEdit No pressed - nothing changes")
+                    }
+                }
+            ])
+        } else {
+            //there are no changes
+            this.setState({
+                isEditMode: false
+            })
+        }
+    };
 }
 
 // Create style outside the class, or for components that will be used by other components (buttons),
@@ -936,7 +1051,7 @@ function mapStateToProps(state) {
         user: state.user,
         screenSize: state.app.screenSize,
         followUps: state.followUps,
-        contactFollowUpTemplate: state.outbreak.contactFollowUpTemplate,
+        questions: state.outbreak.contactFollowUpTemplate,
         errors: state.errors,
         contacts: state.contacts,
         translation: state.app.translation,

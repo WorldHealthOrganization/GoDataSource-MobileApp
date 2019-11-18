@@ -156,6 +156,7 @@ class ContactsScreen extends Component {
                         onSearch={this.props.setSearchText}
                         onPressFilter={this.props.onPressFilter}
                         onPressView={this.props.onPressView}
+                        onPressCenterButton={this.props.onPressCenterButton}
                         onPressAddExposure={this.props.onPressAddExposure}
                         onPressMap={this.handleOnPressMap}
                         onPressName={this.props.onPressFullName}

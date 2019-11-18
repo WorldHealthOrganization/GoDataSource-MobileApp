@@ -1198,6 +1198,34 @@ export function daysSince(startDate, endDate) {
     return moment.utc(endDate).startOf('day').diff(moment.utc(startDate).startOf('day'), 'days');
 }
 
+export function calcDateDiff(startdate, enddate) {
+    //define moments for the startdate and enddate
+    var startdateMoment = moment(startdate);
+    var enddateMoment = moment(enddate);
+
+    if (startdateMoment.isValid() === true && enddateMoment.isValid() === true) {
+        //getting the difference in years
+        var years = enddateMoment.diff(startdateMoment, 'years');
+
+        //moment returns the total months between the two dates, subtracting the years
+        var months = enddateMoment.diff(startdateMoment, 'months') - (years * 12);
+
+        //to calculate the days, first get the previous month and then subtract it
+        startdateMoment.add(years, 'years').add(months, 'months');
+        var days = enddateMoment.diff(startdateMoment, 'days')
+
+
+        console.log('calcDateDiff', { months: months, years: years })
+        return nrOFYears = {
+            months: months,
+            years: years,
+        };
+    }
+    else {
+        return undefined;
+    }
+};
+
 // Algorithm:
 // - Get contact's main address
 // - Go through all the locations and when meeting a location that is assigned to a team add it to teams,
@@ -1266,4 +1294,24 @@ export function extractLocationId (person) {
         locationId = get(currentAddress, 'locationId', null);
     }
     return locationId;
+}
+
+// Promise wrapper around getCurrentPosition from react-native
+export function getLocationAccurate () {
+    return new Promise((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                return resolve({
+                    lat: get(position, 'coords.latitude', null),
+                    lng: get(position, 'coords.longitude', null)
+                })
+            },
+            (errorGetPosition) => {
+                return reject(errorGetPosition);
+            },
+            {
+                timeout: 5000
+            }
+        )
+    })
 }

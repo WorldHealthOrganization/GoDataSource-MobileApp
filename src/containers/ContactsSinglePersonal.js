@@ -19,6 +19,7 @@ import Ripple from 'react-native-material-ripple';
 import _ from 'lodash';
 import lodashGet from "lodash/get";
 import {checkArray, checkArrayAndLength} from "../utils/typeCheckingFunctions";
+import TopContainerButtons from "./../components/TopContainerButtons";
 
 class ContactsSinglePersonal extends PureComponent {
 
@@ -59,18 +60,28 @@ class ContactsSinglePersonal extends PureComponent {
         return (
             <View style={{ flex: 1 }}>
                 <View style={style.viewContainer}>
-                    <View style={{ flexDirection: 'row' }}>
-                        <Button
-                            title={getTranslation(translations.generalButtons.nextButtonLabel, this.props.translation)}
-                            onPress={this.handleNextButton}
-                            color={styles.buttonGreen}
-                            titleColor={'white'}
-                            height={calculateDimension(25, true, this.props.screenSize)}
-                            width={calculateDimension(130, false, this.props.screenSize)}
-                            style={{
-                                marginVertical: calculateDimension(12.5, true, this.props.screenSize),
-                            }} />
-                    </View>
+                    {/*<View style={{ flexDirection: 'row' }}>*/}
+                        {/*<Button*/}
+                            {/*title={getTranslation(translations.generalButtons.nextButtonLabel, this.props.translation)}*/}
+                            {/*onPress={this.handleNextButton}*/}
+                            {/*color={styles.buttonGreen}*/}
+                            {/*titleColor={'white'}*/}
+                            {/*height={calculateDimension(25, true, this.props.screenSize)}*/}
+                            {/*width={calculateDimension(130, false, this.props.screenSize)}*/}
+                            {/*style={{*/}
+                                {/*marginVertical: calculateDimension(12.5, true, this.props.screenSize),*/}
+                            {/*}} />*/}
+                    {/*</View>*/}
+                    <TopContainerButtons
+                        isNew={this.props.isNew}
+                        isEditMode={this.props.isEditMode}
+                        index={this.props.activeIndex}
+                        numberOfTabs={this.props.numberOfTabs}
+                        onPressEdit={this.props.onPressEdit}
+                        onPressSaveEdit={this.props.onPressSaveEdit}
+                        onPressCancelEdit={this.props.onPressCancelEdit}
+                        onPressNextButton={this.props.onPressNextButton}
+                    />
                     <ScrollView
                         style={style.containerScrollView}
                         contentContainerStyle={[style.contentContainerStyle, { paddingBottom: this.props.screenSize.height < 600 ? 70 : 20 }]}
@@ -286,7 +297,9 @@ class ContactsSinglePersonal extends PureComponent {
                 return getTranslation(lodashGet(this.props.contact, item.id),this.props.translation);
             }
         } else {
-            return this.props.contact && this.props.contact[item.id] ? getTranslation(this.props.contact[item.id], this.props.translation) : '';
+            console.log('Missing: ', item.id, this.props.contact[item.id]);
+            return lodashGet(this.props, `contact[${item.id}]`, 'Missing');
+            // return this.props.contact && this.props.contact[item.id] ? getTranslation(this.props.contact[item.id], this.props.translation) : '';
         }
     };
 

@@ -24,6 +24,7 @@ import translations from './../utils/translations'
 import cloneDeep from "lodash/cloneDeep";
 import uniqueId from "lodash/uniqueId";
 import _ from "lodash";
+import TopContainerButtons from './../components/TopContainerButtons';
 
 class FollowUpsSingleQuestionnaireContainer extends Component {
 
@@ -57,11 +58,6 @@ class FollowUpsSingleQuestionnaireContainer extends Component {
             )
         }
 
-        let buttonHeight = calculateDimension(25, true, this.props.screenSize);
-        let buttonWidth = calculateDimension(165.5, false, this.props.screenSize);
-        let marginVertical = calculateDimension(12.5, true, this.props.screenSize);
-        let viewWidth = calculateDimension(config.designScreenSize.width - 32, false, this.props.screenSize);
-
         // Logic moved from the getDerivedStateFromProps
         let previousAnswers = {};
         if (this.props.previousAnswers) {
@@ -92,19 +88,30 @@ class FollowUpsSingleQuestionnaireContainer extends Component {
         return (
             <View style={{ flex: 1 }}>
                 <View style={style.mainContainer}>
-                    {
-                        this && this.props && this.props.isEditMode ? (
-                            <View style={[style.containerButtons, { marginVertical: marginVertical, width: viewWidth }]}>
-                                <Button
-                                    title={getTranslation(translations.generalButtons.saveButtonLabel, this.props.translation)}
-                                    onPress={() => {this.onPressSave(questions)}}
-                                    color={styles.buttonGreen}
-                                    titleColor={'white'}
-                                    height={buttonHeight}
-                                    width={buttonWidth}
-                                />
-                            </View>) : (null)
-                    }
+                    <TopContainerButtons
+                        isNew={this.props.isNew}
+                        isEditMode={this.props.isEditMode}
+                        index={this.props.activeIndex}
+                        numberOfTabs={this.props.numberOfTabs}
+                        onPressEdit={this.props.onPressEdit}
+                        onPressSaveEdit={this.props.onPressSaveEdit}
+                        onPressCancelEdit={this.props.onPressCancelEdit}
+                        onPressNextButton={this.props.handleNextButton}
+                        onPressPreviousButton={this.props.onPressPreviousButton}
+                    />
+                    {/*{*/}
+                        {/*this && this.props && this.props.isEditMode ? (*/}
+                            {/*<View style={[style.containerButtons, { marginVertical: marginVertical, width: viewWidth }]}>*/}
+                                {/*<Button*/}
+                                    {/*title={getTranslation(translations.generalButtons.saveButtonLabel, this.props.translation)}*/}
+                                    {/*onPress={() => {this.onPressSave(questions)}}*/}
+                                    {/*color={styles.buttonGreen}*/}
+                                    {/*titleColor={'white'}*/}
+                                    {/*height={buttonHeight}*/}
+                                    {/*width={buttonWidth}*/}
+                                {/*/>*/}
+                            {/*</View>) : (null)*/}
+                    {/*}*/}
                     <ScrollView
                         style={style.containerScrollView}
                         contentContainerStyle={[style.contentContainerStyle, { paddingBottom: this.props.screenSize.height < 600 ? 70 : 20 }]}

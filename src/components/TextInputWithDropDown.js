@@ -55,7 +55,7 @@ class TextInputWithDropDown extends Component {
 
         //  get Value
         // const value = get(this.props, `value[[${config[this.props.dropDownData]}][${this.props.selectedDropDownItemIndex}].value]`, '');
-        let stringValue = get(this.props, `value[${get(config, `[${this.props.dropDownData}][${this.props.selectedDropDownItemIndex}].value`, null)}]`, null);
+        let stringValue = get(this.props, `value[${get(config, `[${this.props.dropDownData}][${this.props.selectedDropDownItemIndex}].value`, null)}]`, ' ');
         // let stringValue = this.props.value[config[this.props.dropDownData][this.props.selectedDropDownItemIndex].value];
         // if (value !== undefined && value !== null){
         //     stringValue = value.toString();
@@ -65,13 +65,13 @@ class TextInputWithDropDown extends Component {
         let dropDownData = config[this.props.dropDownData].map((e) => {
             return {label: getTranslation(e.label, this.props.translation), value: e.value}
         });
-        dropDownData.unshift({ label: getTranslation(translations.generalLabels.noneLabel, this.props.translation), value: null})
+        dropDownData.unshift({ label: getTranslation(translations.generalLabels.noneLabel, this.props.translation), value: null});
 
         //  get labels
-        const textLabel = getTranslation(config[this.props.dropDownData][this.props.selectedDropDownItemIndex].label, this.props.translation)
+        const textLabel = getTranslation(get(config, `[${this.props.dropDownData}][${this.props.selectedDropDownItemIndex}].label`, ' '), this.props.translation);
         const dropdownLabel =  `${getTranslation(translations.ageUnitOfMeasureDropDown.yearsLabel, this.props.translation)} / ${getTranslation(translations.ageUnitOfMeasureDropDown.monthsLabel, this.props.translation)}`
 
-        const dropDownParams = getDropDownInputDisplayParameters(this.props.screenSize, dropDownData.length)
+        const dropDownParams = getDropDownInputDisplayParameters(this.props.screenSize, dropDownData.length);
         return (
             <View style={[{width: '100%'},this.props.style]}>
                 <View style={{flexDirection: 'row',  justifyContent: 'space-between'}}>

@@ -116,6 +116,7 @@ class ContactsSingleScreen extends Component {
                     }
                 ]
             } : Object.assign({}, this.props.contact),
+            contactBeforeEdit: {},
             savePressed: false,
             deletePressed: false,
             loading: !this.props.isNew,
@@ -180,12 +181,12 @@ class ContactsSingleScreen extends Component {
             }
 
             //permissions check
-            let isEditMode = true;
-            if (this.props.role && this.props.role.find((e) => e === config.userPermissions.writeContact) !== undefined) {
-                isEditMode = true
-            } else if (this.props.role && this.props.role.find((e) => e === config.userPermissions.writeContact) === undefined && this.props.role.find((e) => e === config.userPermissions.readContact) !== undefined) {
-                isEditMode = false
-            }
+            let isEditMode = _.get(this.props, 'isEditMode', false);
+            // if (this.props.role && this.props.role.find((e) => e === config.userPermissions.writeContact) !== undefined) {
+            //     isEditMode = true
+            // } else if (this.props.role && this.props.role.find((e) => e === config.userPermissions.writeContact) === undefined && this.props.role.find((e) => e === config.userPermissions.readContact) !== undefined) {
+            //     isEditMode = false
+            // }
             // callGetDerivedStateFromProps = false;
             this.setState({
                 isEditMode
@@ -494,13 +495,44 @@ class ContactsSingleScreen extends Component {
     };
 
     handleMoveToNextScreenButton = () => {
-        let nextIndex = this.state.index + 1;
+        // Before moving to the next screen do the checks for the current screen
+        let missingFields = [];
+        switch(this.state.index) {
+            case 0:
+                missingFields = this.checkRequiredFieldsPersonalInfo();
+                if (!this.checkAgeYearsRequirements()) {
+                    missingFields.push(getTranslation(translations.alertMessages.yearsValueError, this.props.translation));
+                }
+                if (!this.checkAgeMonthsRequirements()) {
+                    missingFields.push(getTranslation(translations.alertMessages.monthsValueError, this.props.translation));
+                }
+                break;
+            case 1:
+                missingFields = this.checkRequiredFieldsAddresses();
+                break;
+            case 2:
+                missingFields = this.checkFields();
+                break;
+            default:
+                break;
+        }
 
-        // callGetDerivedStateFromProps = false;
-        this.setState({
-            canChangeScreen: true,
-        });
-        this.handleOnIndexChange(nextIndex)
+        if (checkArrayAndLength(missingFields)) {
+            Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), `${getTranslation(translations.alertMessages.requiredFieldsMissingError, this.props.translation)}.\n${getTranslation(translations.alertMessages.missingFields, this.props.translation)}: ${missingFields}`, [
+                {
+                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+                    onPress: () => { this.hideMenu() }
+                }
+            ])
+        } else {
+            let nextIndex = this.state.index + 1;
+
+            // callGetDerivedStateFromProps = false;
+            this.setState({
+                canChangeScreen: true,
+            });
+            this.handleOnIndexChange(nextIndex)
+        }
     };
 
     handleMoveToPrevieousScreenButton = () => {
@@ -581,6 +613,13 @@ class ContactsSingleScreen extends Component {
                         checkAgeMonthsRequirements={this.checkAgeMonthsRequirements}
                         checkAgeYearsRequirements={this.checkAgeYearsRequirements}
                         isEditMode={this.state.isEditMode}
+
+                        numberOfTabs={this.state.routes.length}
+                        onPressPreviousButton={this.handlePreviousPress}
+                        onPressNextButton={this.handleMoveToNextScreenButton}
+                        onPressSaveEdit={this.handleOnPressSave}
+                        onPressEdit={this.onPressEdit}
+                        onPressCancelEdit={this.onPressCancelEdit}
                     />
                 );
             case 'address':
@@ -603,6 +642,13 @@ class ContactsSingleScreen extends Component {
                         anotherPlaceOfResidenceWasChosen={this.state.anotherPlaceOfResidenceWasChosen}
                         hasPlaceOfResidence={this.state.hasPlaceOfResidence}
                         isEditMode={this.state.isEditMode}
+
+                        numberOfTabs={this.state.routes.length}
+                        onPressPreviousButton={this.handlePreviousPress}
+                        onPressNextButton={this.handleMoveToNextScreenButton}
+                        onPressSaveEdit={this.handleOnPressSave}
+                        onPressEdit={this.onPressEdit}
+                        onPressCancelEdit={this.onPressCancelEdit}
                     />
                 );
             case 'exposures':
@@ -625,6 +671,13 @@ class ContactsSingleScreen extends Component {
                         onChangeSwitch={this.handleOnChangeSwitch}
                         handleMoveToNextScreenButton={this.handleMoveToNextScreenButton}
                         selectedExposure={this.props.singleCase}
+
+                        numberOfTabs={this.state.routes.length}
+                        onPressPreviousButton={this.handlePreviousPress}
+                        onPressNextButton={this.handleMoveToNextScreenButton}
+                        onPressSaveEdit={this.handleOnPressSave}
+                        onPressEdit={this.onPressEdit}
+                        onPressCancelEdit={this.onPressCancelEdit}
                     />
                 );
             case 'calendar':
@@ -634,6 +687,13 @@ class ContactsSingleScreen extends Component {
                         activeIndex={this.state.index}
                         handleOnPressSave={this.handleOnPressSave}
                         handleMoveToPrevieousScreenButton={this.handleMoveToPrevieousScreenButton}
+
+                        numberOfTabs={this.state.routes.length}
+                        onPressPreviousButton={this.handlePreviousPress}
+                        onPressNextButton={this.handleMoveToNextScreenButton}
+                        onPressSaveEdit={this.handleOnPressSave}
+                        onPressEdit={this.onPressEdit}
+                        onPressCancelEdit={this.onPressCancelEdit}
                     />
                 );
             default:
@@ -1525,8 +1585,8 @@ class ContactsSingleScreen extends Component {
         this.setState({
             savePressed: true
         }, () => {
-            this.hideMenu()
-            let ageConfig = this.ageAndDobPrepareForSave()
+            this.hideMenu();
+            let ageConfig = this.ageAndDobPrepareForSave();
             this.setState(prevState => ({
                 contact: Object.assign({}, prevState.contact, { age: ageConfig.ageClone }, { dob: ageConfig.dobClone }),
             }), () => {
@@ -1871,7 +1931,42 @@ class ContactsSingleScreen extends Component {
                 pageAskingHelpFrom: pageAskingHelpFrom
             }
         });
-    }
+    };
+
+    onPressEdit = () => {
+        this.setState({
+            isEditMode: true,
+            isModified: false,
+            contactBeforeEdit: _.cloneDeep(this.state.contact)
+        })
+    };
+    onPressCancelEdit = () => {
+        if (this.state.isModified === true) {
+            Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.alertMessages.caseDiscardAllChangesConfirmation, this.props.translation), [
+                {
+                    text: getTranslation(translations.alertMessages.yesButtonLabel, this.props.translation),
+                    onPress: () => {
+                        this.setState({
+                            contact: _.cloneDeep(this.state.contactBeforeEdit),
+                            isModified: false,
+                            isEditMode: false
+                        })
+                    }
+                },
+                {
+                    text: getTranslation(translations.alertMessages.cancelButtonLabel, this.props.translation),
+                    onPress: () => {
+                        console.log("onPressCancelEdit No pressed - nothing changes")
+                    }
+                }
+            ])
+        } else {
+            //there are no changes
+            this.setState({
+                isEditMode: false
+            })
+        }
+    };
 }
 
 // Create style outside the class, or for components that will be used by other components (buttons),
