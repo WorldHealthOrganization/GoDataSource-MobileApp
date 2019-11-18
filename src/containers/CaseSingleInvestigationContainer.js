@@ -72,10 +72,10 @@ class CaseSingleInvestigationContainer extends Component {
                     <TopContainerButtons
                         isNew={this.props.isNew}
                         isEditMode={this.props.isEditMode}
-                        index={this.props.activeIndex}
+                        index={this.props.index}
                         numberOfTabs={this.props.numberOfTabs}
                         onPressEdit={this.props.onPressEdit}
-                        onPressSaveEdit={this.props.onPressSaveEdit}
+                        onPressSaveEdit={this.props.isNew ? this.props.onPressSave : this.props.onPressSaveEdit}
                         onPressCancelEdit={this.props.onPressCancelEdit}
                         onPressNextButton={this.props.handleNextButton}
                     />

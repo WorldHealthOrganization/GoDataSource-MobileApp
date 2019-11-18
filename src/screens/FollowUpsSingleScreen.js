@@ -137,20 +137,20 @@ class FollowUpsSingleScreen extends Component {
     // and can slow down the app
     render() {
 
-        if (this.props.errors && this.props.errors.type && this.props.errors.message) {
-            Alert.alert(this.props.errors.type, this.props.errors.message, [
-                {
-                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
-                    onPress: () => {
-                        this.setState({
-                            savePressed: false
-                        }, () => {
-                            this.props.removeErrors();
-                        });
-                    }
-                }
-            ])
-        }
+        // if (this.props.errors && this.props.errors.type && this.props.errors.message) {
+        //     Alert.alert(this.props.errors.type, this.props.errors.message, [
+        //         {
+        //             text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+        //             onPress: () => {
+        //                 this.setState({
+        //                     savePressed: false
+        //                 }, () => {
+        //                     this.props.removeErrors();
+        //                 });
+        //             }
+        //         }
+        //     ])
+        // }
 
         return (
             <ViewHOC style={style.container}

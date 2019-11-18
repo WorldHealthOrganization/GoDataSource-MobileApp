@@ -17,7 +17,7 @@ class TopContainerButtons extends Component {
 
     render() {
         return (
-            <View>
+            <View style={{alignItems: 'center'}}>
                 {
                     this.props.isNew ?
                         this.props.index === 0 ? this.renderIsNewModeFirstTab() :
@@ -42,7 +42,7 @@ class TopContainerButtons extends Component {
                 width={calculateDimension(166, false, this.props.screenSize)}
                 style={{
                     marginVertical: calculateDimension(12.5, true, this.props.screenSize),
-                    marginRight: 10,
+                    marginRight: 10
                 }} />
         )
     }

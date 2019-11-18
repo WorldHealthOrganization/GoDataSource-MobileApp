@@ -298,7 +298,7 @@ class ContactsSinglePersonal extends PureComponent {
             }
         } else {
             console.log('Missing: ', item.id, this.props.contact[item.id]);
-            return lodashGet(this.props, `contact[${item.id}]`, 'Missing');
+            return lodashGet(this.props, `contact[${item.id}]`, ' ');
             // return this.props.contact && this.props.contact[item.id] ? getTranslation(this.props.contact[item.id], this.props.translation) : '';
         }
     };

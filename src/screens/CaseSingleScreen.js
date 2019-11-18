@@ -129,7 +129,7 @@ class CaseSingleScreen extends Component {
             selectedItemIndexForTextSwitchSelectorForAge: 0, // age/dob - switch tab
             selectedItemIndexForAgeUnitOfMeasureDropDown: this.props.isNew ? 0 : (this.props.case && this.props.case.age && this.props.case.age.years !== undefined && this.props.case.age.years !== null && this.props.case.age.years > 0) ? 0 : 1, //default age dropdown value,
             currentAnswers: {},
-            previousAnswers: [],
+            previousAnswers: {},
             mappedQuestions: [],
             loading: true,
 
@@ -214,20 +214,20 @@ class CaseSingleScreen extends Component {
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
-        if (this.props.errors && this.props.errors.type && this.props.errors.message) {
-            Alert.alert(this.props.errors.type, this.props.errors.message, [
-                {
-                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
-                    onPress: () => {
-                        this.setState({
-                            savePressed: false
-                        }, () => {
-                            this.props.removeErrors();
-                        })
-                    }
-                }
-            ])
-        }
+        // if (this.props.errors && this.props.errors.type && this.props.errors.message) {
+        //     Alert.alert(this.props.errors.type, this.props.errors.message, [
+        //         {
+        //             text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+        //             onPress: () => {
+        //                 this.setState({
+        //                     savePressed: false
+        //                 }, () => {
+        //                     this.props.removeErrors();
+        //                 })
+        //             }
+        //         }
+        //     ])
+        // }
 
         return (
             <ViewHOC style={style.container}
@@ -323,8 +323,9 @@ class CaseSingleScreen extends Component {
 
         this.setState({
             canChangeScreen: true,
+        }, () => {
+            this.handleOnIndexChange(nextIndex)
         });
-        this.handleOnIndexChange(nextIndex)
     };
     handleMoveToPrevieousScreenButton = () => {
         let nextIndex = this.state.index - 1;
@@ -390,6 +391,7 @@ class CaseSingleScreen extends Component {
                         case={this.state.case}
                         isEditMode={this.state.isEditMode}
                         index={this.state.index}
+                        numberOfTabs={this.state.routes.length}
                         onPressEdit={this.onPressEdit}
                         onPressSaveEdit={this.onPressSaveEdit}
                         onPressCancelEdit={this.onPressCancelEdit}
@@ -397,7 +399,7 @@ class CaseSingleScreen extends Component {
                         onChangeDate={this.onChangeDate}
                         onChangeSwitch={this.onChangeSwitch}
                         onChangeDropDown={this.onChangeDropDown}
-                        handleMoveToNextScreenButton={this.handleMoveToNextScreenButton}
+                        onPressNextButton={this.handleMoveToNextScreenButton}
                         checkRequiredFieldsPersonalInfo={this.checkRequiredFieldsPersonalInfo}
                         isNew={this.props.isNew ? true : this.props.forceNew ? true : false}
                         onPressAddDocument={this.onPressAddDocument}
@@ -418,6 +420,7 @@ class CaseSingleScreen extends Component {
                         index={this.state.index}
                         onPressEdit={this.onPressEdit}
                         onPressSaveEdit={this.onPressSaveEdit}
+                        numberOfTabs={this.state.routes.length}
                         onPressCancelEdit={this.onPressCancelEdit}
                         onChangeText={this.onChangeText}
                         onChangeDropDown={this.onChangeDropDown}
@@ -426,7 +429,7 @@ class CaseSingleScreen extends Component {
                         onChangeSectionedDropDown={this.handleOnChangeSectionedDropDownAddress}
                         onDeletePress={this.handleOnPressDeleteAddress}
                         onPressAddAddress={this.handleOnPressAddAddress}
-                        handleMoveToNextScreenButton={this.handleMoveToNextScreenButton}
+                        onPressNextButton={this.handleMoveToNextScreenButton}
                         handleMoveToPrevieousScreenButton={this.handleMoveToPrevieousScreenButton}
                         checkRequiredFieldsAddresses={this.checkRequiredFieldsAddresses}
                         isNew={this.props.isNew ? true : this.props.forceNew ? true : false}
@@ -441,6 +444,7 @@ class CaseSingleScreen extends Component {
                         case={this.state.case}
                         isEditMode={this.state.isEditMode}
                         index={this.state.index}
+                        numberOfTabs={this.state.routes.length}
                         onPressEdit={this.onPressEdit}
                         onPressSaveEdit={this.onPressSaveEdit}
                         onPressCancelEdit={this.onPressCancelEdit}
@@ -448,7 +452,7 @@ class CaseSingleScreen extends Component {
                         onChangeDropDown={this.onChangeDropDown}
                         onChangeDate={this.onChangeDate}
                         onChangeSwitch={this.onChangeSwitch}
-                        handleMoveToNextScreenButton={this.handleMoveToNextScreenButton}
+                        onPressNextButton={this.handleMoveToNextScreenButton}
                         handleMoveToPrevieousScreenButton={this.handleMoveToPrevieousScreenButton}
                         checkRequiredFieldsInfection={this.checkRequiredFieldsInfection}
                         isNew={this.props.isNew ? true : this.props.forceNew ? true : false}
@@ -471,6 +475,7 @@ class CaseSingleScreen extends Component {
                         case={this.state.case}
                         relations={this.state.relations}
                         index={this.state.index}
+                        numberOfTabs={this.state.routes.length}
                         onPressEdit={this.onPressEdit}
                         onPressSaveEdit={this.onPressSaveEdit}
                         onPressCancelEdit={this.onPressCancelEdit}
@@ -491,6 +496,7 @@ class CaseSingleScreen extends Component {
                     previousAnswers={this.state.previousAnswers}
                     isEditMode={this.state.isEditMode}
                     index={this.state.index}
+                    numberOfTabs={this.state.routes.length}
                     onPressEdit={this.onPressEdit}
                     onPressSave={this.handleOnPressSave}
                     onPressSaveEdit={this.onPressSaveEdit}
@@ -515,7 +521,7 @@ class CaseSingleScreen extends Component {
         // this.setState({
         //     loading: true
         // }, () => {
-            let missingFields = this.checkRequiredFields();
+            let missingFields = this.checkRequiredFields().map((e) => getTranslation(e, this.props.translation));
             if (missingFields && Array.isArray(missingFields) && missingFields.length === 0) {
                 if (this.checkAgeYearsRequirements()) {
                     if (this.checkAgeMonthsRequirements()) {

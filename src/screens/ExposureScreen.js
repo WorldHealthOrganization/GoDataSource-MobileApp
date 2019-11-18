@@ -68,20 +68,20 @@ class ExposureScreen extends Component {
     render() {
         // console.log('Render from ExposureScreen: ', this.state.exposure, this.props.exposure);
 
-        if (this.props.errors && this.props.errors.type && this.props.errors.message) {
-            Alert.alert(this.props.errors.type, this.props.errors.message, [
-                {
-                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
-                    onPress: () => {
-                        this.setState({
-                            savePressed: false
-                        }, () => {
-                            this.props.removeErrors();
-                        });
-                    }
-                }
-            ])
-        }
+        // if (this.props.errors && this.props.errors.type && this.props.errors.message) {
+        //     Alert.alert(this.props.errors.type, this.props.errors.message, [
+        //         {
+        //             text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+        //             onPress: () => {
+        //                 this.setState({
+        //                     savePressed: false
+        //                 }, () => {
+        //                     this.props.removeErrors();
+        //                 });
+        //             }
+        //         }
+        //     ])
+        // }
 
         return (
             <ViewHOC style={style.viewHocContainer}

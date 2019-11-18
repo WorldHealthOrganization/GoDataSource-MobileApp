@@ -123,6 +123,7 @@ class ContactsSingleExposures extends Component {
                         onPressSaveEdit={this.props.onPressSaveEdit}
                         onPressCancelEdit={this.props.onPressCancelEdit}
                         onPressNextButton={this.props.onPressNextButton}
+                        onPressPreviousButton={this.handleBackButton}
                     />
                 </View>
                 {
@@ -166,7 +167,7 @@ class ContactsSingleExposures extends Component {
     };
 
     handleBackButton = () => {
-        this.props.handleMoveToPrevieousScreenButton()
+        this.props.onPressPreviousButton()
     };
 
     renderRelationship = (relation) => {

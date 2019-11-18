@@ -105,6 +105,7 @@ class ContactsSingleCalendar extends Component {
                         onPressSaveEdit={this.props.onPressSaveEdit}
                         onPressCancelEdit={this.props.onPressCancelEdit}
                         onPressNextButton={this.props.onPressNextButton}
+                        onPressPreviousButton={this.props.onPressPreviousButton}
                     />
 
                 </View>

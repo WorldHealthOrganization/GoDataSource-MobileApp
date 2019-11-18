@@ -68,12 +68,13 @@ class ContactsSingleExposures extends Component {
                 <TopContainerButtons
                     isNew={this.props.isNew}
                     isEditMode={this.props.isEditMode}
-                    index={this.props.activeIndex}
+                    index={this.props.index}
                     numberOfTabs={this.props.numberOfTabs}
                     onPressEdit={this.props.onPressEdit}
                     onPressSaveEdit={this.props.onPressSaveEdit}
                     onPressCancelEdit={this.props.onPressCancelEdit}
-                    onPressNextButton={this.props.handleNextButton}
+                    onPressNextButton={this.handleNextButton}
+                    onPressPreviousButton={this.handleBackButton}
                 />
                 {/*<View style={{ flexDirection: 'row', justifyContent: 'center' }}>*/}
                     {/*{*/}

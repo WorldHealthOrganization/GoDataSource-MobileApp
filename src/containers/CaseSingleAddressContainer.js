@@ -68,12 +68,13 @@ class CaseSingleAddressContainer extends React.Component {
                     <TopContainerButtons
                         isNew={this.props.isNew}
                         isEditMode={this.props.isEditMode}
-                        index={this.props.activeIndex}
+                        index={this.props.index}
                         numberOfTabs={this.props.numberOfTabs}
                         onPressEdit={this.props.onPressEdit}
                         onPressSaveEdit={this.props.onPressSaveEdit}
                         onPressCancelEdit={this.props.onPressCancelEdit}
-                        onPressNextButton={this.props.handleNextButton}
+                        onPressNextButton={this.handleNextButton}
+                        onPressPreviousButton={this.handleBackButton}
                     />
                     {/*<View style={{ flexDirection: 'row' }}>*/}
                         {/*{*/}
@@ -358,7 +359,7 @@ class CaseSingleAddressContainer extends React.Component {
         let missingFields = this.props.checkRequiredFieldsAddresses();
         if (missingFields && Array.isArray(missingFields) && missingFields.length === 0) {
             if (this.props.case.addresses.length === 0 || (this.props.case.addresses.length > 0 && this.props.hasPlaceOfResidence)) {
-                this.props.handleMoveToNextScreenButton(true)
+                this.props.onPressNextButton(true)
             } else {
                 Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.alertMessages.addressOfResidenceError, this.props.translation), [
                     {

@@ -52,12 +52,12 @@ class CaseSinglePersonalContainer extends Component {
                     <TopContainerButtons
                         isNew={this.props.isNew}
                         isEditMode={this.props.isEditMode}
-                        index={this.props.activeIndex}
+                        index={this.props.index}
                         numberOfTabs={this.props.numberOfTabs}
                         onPressEdit={this.props.onPressEdit}
                         onPressSaveEdit={this.props.onPressSaveEdit}
                         onPressCancelEdit={this.props.onPressCancelEdit}
-                        onPressNextButton={this.props.handleNextButton}
+                        onPressNextButton={this.handleNextButton}
                     />
 
                     {/*<View style={{ flexDirection: 'row' }}>*/}
@@ -319,7 +319,7 @@ class CaseSinglePersonalContainer extends Component {
         if (missingFields && Array.isArray(missingFields) && missingFields.length === 0) {
             if (this.props.checkAgeYearsRequirements()) {
                 if (this.props.checkAgeMonthsRequirements()) {
-                    this.props.handleMoveToNextScreenButton()
+                    this.props.onPressNextButton()
                 } else {
                     Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.monthsValueError, this.props.translation), [
                         {

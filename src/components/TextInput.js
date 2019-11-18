@@ -18,7 +18,7 @@ class TextInput extends Component {
         super(props);
         this.state = {
             // value: typeof this.props.value === 'number' ? isNaN(this.props.value) ? '' : this.props.value.toString() : this.props.value && this.props.value != undefined && (typeof this.props.value === 'string' || typeof this.props.value === 'number') ? this.props.value.toString() : ''
-            value: lodashGet(this.props, 'value', null)
+            value: lodashGet(this.props, 'value', ' ')
         };
     }
 
@@ -26,14 +26,14 @@ class TextInput extends Component {
     componentDidMount() {
         // console.log('CDM TextInput: ', this.props.label, this.props.value);
         this.setState({
-            value: lodashGet(this.props, 'value', null)
+            value: lodashGet(this.props, 'value', ' ')
         })
     }
 
     componentDidUpdate(prevProps, prevState) {
         if (prevProps.isEditMode !== this.props.isEditMode || prevProps.value !== this.props.value) {
             this.setState({
-                value: lodashGet(this.props, 'value', null)
+                value: lodashGet(this.props, 'value', ' ')
             })
         }
     }
@@ -52,12 +52,14 @@ class TextInput extends Component {
     // Please write here all the methods that are not react native lifecycle methods
     editInput = () => {
         let tooltip = getTooltip(this.props.label, this.props.translation);
+        let value = lodashGet(this.state, 'value', ' ');
+        console.log('Value stuff: ', value);
         return (
             <View style={[{flexDirection: 'row'},this.props.style]}>
                 <View style={{flex: 1}}> 
                     <TextField
                         label={this.props.isRequired ? getTranslation(this.props.label, this.props.translation) + ' * ' : getTranslation(this.props.label, this.props.translation)}
-                        value={this.state.value.toString()}
+                        value={value ? value.toString() : ''}
                         onChangeText={this.handleOnChangeText}
                         textColor='rgb(0,0,0)'
                         fontSize={15}

@@ -57,33 +57,6 @@ class HelpScreen extends Component {
     }
 
     // Please add here the react lifecycle methods that you need
-    // static getDerivedStateFromProps(props, state) {
-    //     if (props.errors && props.errors.type && props.errors.message) {
-    //         Alert.alert(props.errors.type, props.errors.message, [
-    //             {
-    //                 text: getTranslation(translations.alertMessages.okButtonLabel, props.translation),
-    //                 onPress: () => {
-    //                     props.removeErrors();
-    //                     state.loading = false;
-    //                 }
-    //             }
-    //         ])
-    //     }
-    //
-    //     let helpItemClone = _.cloneDeep(props.helpItem);
-    //     if (state.filter || state.filterFromFilterScreen) {
-    //         helpItemClone = localSortHelpItem(helpItemClone, props.filter, state.filter, state.filterFromFilterScreen, props.translation)
-    //     }
-    //
-    //     if (state.pageAskingHelpFrom && state.pageAskingHelpFrom !== undefined) {
-    //         helpItemClone = filterItemsForEachPage(helpItemClone, state.pageAskingHelpFrom)
-    //     }
-    //
-    //     if(helpItemClone){
-    //         state.helpItems = helpItemClone;
-    //     }
-    //     return null;
-    // }
 
     componentDidMount() {
         BackHandler.addEventListener('hardwareBackPress', this.handleBackButtonClick);

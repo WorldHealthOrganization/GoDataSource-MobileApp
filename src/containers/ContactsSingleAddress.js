@@ -109,6 +109,7 @@ class ContactsSingleAddress extends PureComponent {
                         onPressSaveEdit={this.props.onPressSaveEdit}
                         onPressCancelEdit={this.props.onPressCancelEdit}
                         onPressNextButton={this.props.onPressNextButton}
+                        onPressPreviousButton={this.handleBackButton}
                     />
 
                     {/* <KeyboardAwareScrollView
@@ -347,7 +348,7 @@ class ContactsSingleAddress extends PureComponent {
     };
 
     handleBackButton = () => {
-        this.props.handleMoveToPrevieousScreenButton()
+        this.props.onPressPreviousButton();
     };
 
     handleOnFocus = (event) => {

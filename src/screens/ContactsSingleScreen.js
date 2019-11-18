@@ -289,20 +289,20 @@ class ContactsSingleScreen extends Component {
     render() {
         // console.log("### contact from render ContactSingleScreen: ", this.state.contact);
 
-        if (this.props.errors && this.props.errors.type && this.props.errors.message) {
-            Alert.alert(this.props.errors.type, this.props.errors.message, [
-                {
-                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
-                    onPress: () => {
-                        this.setState({
-                            savePressed: false
-                        }, () => {
-                            this.props.removeErrors();
-                        });
-                    }
-                }
-            ])
-        }
+        // if (this.props.errors && this.props.errors.type && this.props.errors.message) {
+        //     Alert.alert(this.props.errors.type, this.props.errors.message, [
+        //         {
+        //             text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+        //             onPress: () => {
+        //                 this.setState({
+        //                     savePressed: false
+        //                 }, () => {
+        //                     this.props.removeErrors();
+        //                 });
+        //             }
+        //         }
+        //     ])
+        // }
 
         return (
             <ViewHOC style={style.container}
@@ -536,13 +536,14 @@ class ContactsSingleScreen extends Component {
     };
 
     handleMoveToPrevieousScreenButton = () => {
-        let nextIndex = this.state.index - 1
+        let nextIndex = this.state.index - 1;
         // callGetDerivedStateFromProps = false;
         this.setState({
             canChangeScreen: true,
+        }, () => {
+            this.handleOnIndexChange(nextIndex)
         });
 
-        this.handleOnIndexChange(nextIndex)
     };
 
     handleRenderTabBar = (props) => {
@@ -636,7 +637,7 @@ class ContactsSingleScreen extends Component {
                         onPressCopyAddress={this.handleOnPressCopyAddress}
                         onPressAddAdrress={this.handleOnPressAddAdrress}
                         handleMoveToNextScreenButton={this.handleMoveToNextScreenButton}
-                        handleMoveToPrevieousScreenButton={this.handleMoveToPrevieousScreenButton}
+                        onPressPreviousButton={this.handleMoveToPrevieousScreenButton}
                         checkRequiredFieldsAddresses={this.checkRequiredFieldsAddresses}
                         isNew={this.props.isNew}
                         anotherPlaceOfResidenceWasChosen={this.state.anotherPlaceOfResidenceWasChosen}
@@ -644,7 +645,7 @@ class ContactsSingleScreen extends Component {
                         isEditMode={this.state.isEditMode}
 
                         numberOfTabs={this.state.routes.length}
-                        onPressPreviousButton={this.handlePreviousPress}
+                        // onPressPreviousButton={this.handlePreviousPress}
                         onPressNextButton={this.handleMoveToNextScreenButton}
                         onPressSaveEdit={this.handleOnPressSave}
                         onPressEdit={this.onPressEdit}
@@ -661,7 +662,7 @@ class ContactsSingleScreen extends Component {
                         addContactFromCasesScreen={this.props.addContactFromCasesScreen}
                         navigator={this.props.navigator}
                         saveExposure={this.handleSaveExposure}
-                        handleMoveToPrevieousScreenButton={this.handleMoveToPrevieousScreenButton}
+                        onPressPreviousButton={this.handleMoveToPrevieousScreenButton}
                         isNew={this.props.isNew}
                         handleOnPressSave={this.handleOnPressSave}
                         isEditMode={this.state.isEditMode}
@@ -673,7 +674,7 @@ class ContactsSingleScreen extends Component {
                         selectedExposure={this.props.singleCase}
 
                         numberOfTabs={this.state.routes.length}
-                        onPressPreviousButton={this.handlePreviousPress}
+                        // onPressPreviousButton={this.handlePreviousPress}
                         onPressNextButton={this.handleMoveToNextScreenButton}
                         onPressSaveEdit={this.handleOnPressSave}
                         onPressEdit={this.onPressEdit}
@@ -686,10 +687,10 @@ class ContactsSingleScreen extends Component {
                         contact={this.state.contact}
                         activeIndex={this.state.index}
                         handleOnPressSave={this.handleOnPressSave}
-                        handleMoveToPrevieousScreenButton={this.handleMoveToPrevieousScreenButton}
+                        onPressPreviousButton={this.handleMoveToPrevieousScreenButton}
 
                         numberOfTabs={this.state.routes.length}
-                        onPressPreviousButton={this.handlePreviousPress}
+                        // onPressPreviousButton={this.handlePreviousPress}
                         onPressNextButton={this.handleMoveToNextScreenButton}
                         onPressSaveEdit={this.handleOnPressSave}
                         onPressEdit={this.onPressEdit}
