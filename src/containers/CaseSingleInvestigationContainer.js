@@ -15,6 +15,7 @@ import Button from '../components/Button';
 import sortBy from 'lodash/sortBy';
 import cloneDeep from 'lodash/cloneDeep';
 import translations from './../utils/translations';
+import uniqueId from 'lodash/uniqueId';
 
 class CaseSingleInvestigationContainer extends Component {
 
@@ -22,7 +23,8 @@ class CaseSingleInvestigationContainer extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            previousAnswers: this.props.previousAnswers
+            previousAnswers: this.props.previousAnswers,
+            collapsedQuestions: [],
         };
     }
 
@@ -37,7 +39,6 @@ class CaseSingleInvestigationContainer extends Component {
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
-        // console.log('CaseSingleContainer render Investigation');
         // Get all additional questions recursively
 
         // Logic moved from the getDerivedStateFromProps
@@ -45,26 +46,25 @@ class CaseSingleInvestigationContainer extends Component {
         if (this.props.previousAnswers) {
             previousAnswers = Object.assign({}, this.props.previousAnswers);
         }
-
         if (previousAnswers && Object.keys(previousAnswers).length > 0) {
             for (let questionId in previousAnswers) {
-                if (Array.isArray(previousAnswers[questionId]) && previousAnswers[questionId].length > 1) {
-                    previousAnswers[questionId] = previousAnswers[questionId].sort((a, b) => {
-                        if (createDate(a.date) > createDate(b.date)) {
-                            return -1;
-                        }
-                        if (createDate(a.date) < createDate(b.date)) {
-                            return 1;
-                        }
-                        return 0;
-                    })
+                if (previousAnswers.hasOwnProperty(questionId)) {
+                    if (Array.isArray(previousAnswers[questionId]) && previousAnswers[questionId].length > 1) {
+                        previousAnswers[questionId] = previousAnswers[questionId].sort((a, b) => {
+                            if (createDate(a.date) > createDate(b.date)) {
+                                return -1;
+                            }
+                            if (createDate(a.date) < createDate(b.date)) {
+                                return 1;
+                            }
+                            return 0;
+                        })
+                    }
                 }
             }
         }
-
         let sortedQuestions = sortBy(cloneDeep(this.props.questions), ['order', 'variable']);
-        sortedQuestions = extractAllQuestions(sortedQuestions, previousAnswers);
-
+        sortedQuestions = extractAllQuestions(sortedQuestions, previousAnswers, 0);
         return (
             <View style={{ flex: 1 }}>
                 <View style={style.container}>
@@ -155,25 +155,30 @@ class CaseSingleInvestigationContainer extends Component {
 
     // Please write here all the methods that are not react native lifecycle methods
     handleRenderItem = (previousAnswers, item, index, totalQuestions) => {
-        const totalNumberOfQuestions = totalQuestions.length;
+        let totalNumberOfQuestions = totalQuestions.length;
         if (item.inactive === false) {
             return (
                 <QuestionCard
+                    key={uniqueId('key_')}
                     item={item}
                     isEditMode={this.props.isEditMode}
                     index={index + 1}
+                    isCollapsed={ this.isCollapsed(item)}
                     totalQuestions={totalQuestions}
                     totalNumberOfQuestions={totalNumberOfQuestions}
                     source={previousAnswers}
+                    onCollapse={ this.collapseQuestion}
                     onChangeTextAnswer={this.props.onChangeTextAnswer}
                     onChangeSingleSelection={this.props.onChangeSingleSelection}
                     onChangeMultipleSelection={this.props.onChangeMultipleSelection}
                     onChangeDateAnswer={this.props.onChangeDateAnswer}
                     onFocus={this.handleOnFocus}
                     onClickAddNewMultiFrequencyAnswer={this.props.onClickAddNewMultiFrequencyAnswer}
-                    onClickShowPreviousAnswers={this.props.onClickShowPreviousAnswers}
                     onBlur={this.handleOnBlur}
                     onChangeAnswerDate={this.props.onChangeAnswerDate}
+                    savePreviousAnswers={this.props.savePreviousAnswers}
+                    copyAnswerDate={this.props.copyAnswerDate}
+                    editableQuestionDate={true}
                 />
             )
         }
@@ -190,6 +195,41 @@ class CaseSingleInvestigationContainer extends Component {
     handleOnBlur = (event) => {
         // this.scrollCasesSingleInvestigation.props.scrollToPosition(0, 0, false)
         // this.scrollToInput(findNodeHandle(event.target))
+    };
+
+    isCollapsed = (item) => {
+        let isCollapsed = false;
+        let collapsedQuestions = this.state.collapsedQuestions;
+        if( collapsedQuestions.length > 0) {
+            collapsedQuestions.map((question) => {
+                if (question.order === item.order && question.text === item.text)
+                    isCollapsed = true;
+            });
+        }
+        return isCollapsed;
+    };
+
+    collapseQuestion = (item, shouldOpen) => {
+        let collapsedQuestions = this.state.collapsedQuestions;
+        if(shouldOpen !== undefined){
+            if (!this.isCollapsed(item) && shouldOpen) {
+                collapsedQuestions.push(item);
+            }
+        }else {
+            if (this.isCollapsed(item)) {
+                if (collapsedQuestions.length === 1) {
+                    collapsedQuestions = [];
+                } else {
+                    collapsedQuestions = collapsedQuestions.filter((question) => {
+                        if (question.order !== item.order && question.text !== item.text)
+                            return item;
+                    });
+                }
+            } else {
+                collapsedQuestions.push(item);
+            }
+        }
+        this.setState({ collapsedQuestions: collapsedQuestions});
     };
 }
 

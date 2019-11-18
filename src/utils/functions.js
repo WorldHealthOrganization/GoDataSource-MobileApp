@@ -115,7 +115,7 @@ export function getAddress(address, returnString, locationsList) {
 }
 
 export function navigation(event, navigator) {
-    console.log('Event: ', event);
+    // console.log('Event: ', event);
     if (event.type === 'DeepLink') {
         // console.log("###");
         if (event.link.includes('Navigate')) {
@@ -711,7 +711,7 @@ export function mapLocations(locationList) {
 
 //recursively functions for mapping questionCard questions (followUps and Cases)
 // item = {questionId1: [{date1, value1, subAnswers1}, {date2, value2}], questionId2: [{date: null, value1}]}
-export function extractAllQuestions (questions, item) {
+export function extractAllQuestions (questions, item, index) {
     if (questions && Array.isArray(questions) && questions.length > 0) {
         for (let i=0; i<questions.length; i++) {
             if (questions[i].additionalQuestions) {
@@ -721,14 +721,39 @@ export function extractAllQuestions (questions, item) {
                 for (let j = 0; j < questions[i].answers.length; j++) {
                     // First check for single select since it has only a value
                     if (questions[i].answerType === "LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_SINGLE_ANSWER" ) {
-                        if (item && typeof item === 'object' && Object.keys(item).length > 0 && item[questions[i].variable] && Array.isArray(item[questions[i].variable]) && item[questions[i].variable].length > 0 && typeof item[questions[i].variable][0] === "object" && Object.keys(item[questions[i].variable][0]).length > 0 && item[questions[i].variable][0].value && item[questions[i].variable][0].value === questions[i].answers[j].value && questions[i].answers[j].additionalQuestions) {
-                            questions[i].additionalQuestions = extractQuestionsRecursively(sortBy(questions[i].answers[j].additionalQuestions, ['order', 'variable']), item[questions[i].variable][0].subAnswers);
+                        if (item && typeof item === 'object'
+                            && Object.keys(item).length > 0
+                            && item[questions[i].variable]
+                            && Array.isArray(item[questions[i].variable])
+                            && item[questions[i].variable].length > 0
+                            && typeof item[questions[i].variable][index] === "object"
+                            && Object.keys(item[questions[i].variable][index]).length > 0
+                            && item[questions[i].variable][index].value
+                            && item[questions[i].variable][index].value === questions[i].answers[j].value
+                            && questions[i].answers[j].additionalQuestions) {
+                            questions[i].additionalQuestions = extractQuestionsRecursively(sortBy(questions[i].answers[j].additionalQuestions, ['order', 'variable']), item[questions[i].variable][index].subAnswers);
                         }
                     } else {
                         // For the multiple select the answers are in an array of values
                         if (questions[i].answerType === "LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_MULTIPLE_ANSWERS") {
-                            if (item && typeof item === 'object' && Object.keys(item).length > 0 && item[questions[i].variable] && Array.isArray(item[questions[i].variable]) && item[questions[i].variable].length > 0 && typeof item[questions[i].variable][0] === "object" && Object.keys(item[questions[i].variable][0]).length > 0 && item[questions[i].variable][0].value && Array.isArray(item[questions[i].variable][0].value) && item[questions[i].variable][0].value.length > 0 && item[questions[i].variable][0].value.indexOf(questions[i].answers[j].value) > -1 && questions[i].answers[j].additionalQuestions) {
-                                questions[i].additionalQuestions = questions[i].additionalQuestions ? questions[i].additionalQuestions.concat(extractQuestionsRecursively(sortBy(questions[i].answers[j].additionalQuestions, ['order', 'variable']), item[questions[i].variable][0].subAnswers)) : extractQuestionsRecursively(sortBy(questions[i].answers[j].additionalQuestions, ['order', 'variable']), item[questions[i].variable][0].subAnswers);
+                            if (item && typeof item === 'object'
+                                && Object.keys(item).length > 0
+                                && item[questions[i].variable]
+                                && Array.isArray(item[questions[i].variable])
+                                && item[questions[i].variable].length > 0
+                                && typeof item[questions[i].variable][index] === "object"
+                                && Object.keys(item[questions[i].variable][index]).length > 0
+                                && item[questions[i].variable][index].value
+                                && Array.isArray(item[questions[i].variable][index].value)
+                                && item[questions[i].variable][index].value.length > 0
+                                && item[questions[i].variable][index].value.indexOf(questions[i].answers[j].value) > -1
+                                && questions[i].answers[j].additionalQuestions) {
+                                questions[i].additionalQuestions = questions[i].additionalQuestions ?
+                                    questions[i].additionalQuestions.concat(
+                                            extractQuestionsRecursively(sortBy(questions[i].answers[j].additionalQuestions, ['order', 'variable']),
+                                            item[questions[i].variable][index].subAnswers)
+                                    )
+                                    : extractQuestionsRecursively(sortBy(questions[i].answers[j].additionalQuestions, ['order', 'variable']), item[questions[i].variable][index].subAnswers);
                             }
                         }
                     }
@@ -736,7 +761,6 @@ export function extractAllQuestions (questions, item) {
             }
         }
     }
-    // console.log('~~~~ Mapped questions: ', questions);
     return questions;
 }
 
@@ -855,35 +879,7 @@ function extractQuestions(questions) {
 };
 
 export function reMapAnswers(answers) {
-    let returnedAnswers = {};
-        if (answers && typeof answers === 'object') {
-        for (let questionId in answers) {
-            if (answers[questionId] && Array.isArray(answers[questionId]) && answers[questionId].length > 0) {
-                for (let i = 0; i < answers[questionId].length; i++) {
-                    if (answers[questionId][i].subAnswers) {
-                        for (let subQuestionId in answers[questionId][i].subAnswers) {
-                            if (!returnedAnswers[subQuestionId]) {
-                                returnedAnswers[subQuestionId] = [];
-                            }
-                            returnedAnswers[subQuestionId].push(answers[questionId][i].subAnswers[subQuestionId][0]);
-
-                        }
-                        delete answers[questionId][i].subAnswers;
-                        if (!returnedAnswers[questionId]) {
-                            returnedAnswers[questionId] = [];
-                        }
-                        returnedAnswers[questionId].push(answers[questionId][i]);
-                    } else {
-                        if (!returnedAnswers[questionId]) {
-                            returnedAnswers[questionId] = [];
-                        }
-                        returnedAnswers[questionId].push(answers[questionId][i]);
-                    }
-                }
-            }
-        }
-    }
-
+    let returnedAnswers = answers;
     // Sort each returnedAnswer by date descending
     for(let questionId in returnedAnswers) {
         returnedAnswers[questionId].sort((a, b) => {
@@ -896,7 +892,12 @@ export function reMapAnswers(answers) {
             return 0;
         });
         returnedAnswers[questionId] = returnedAnswers[questionId].map((e) => {
-            return {date: e.date ? createDate(null).toISOString() : e.date, value: e.value};
+            if(e.date){
+                e.date  = createDate(e.date).toISOString();
+            }else{
+                e.date = null;
+            }
+            return e;
         });
     }
 

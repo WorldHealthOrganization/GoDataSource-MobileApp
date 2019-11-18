@@ -268,7 +268,7 @@ class CasesScreen extends Component {
     };
 
     handleOnPressQRCode = () => {
-        console.log('handleOnPressQRCode');
+        // console.log('handleOnPressQRCode');
 
         this.props.navigator.showModal({
             screen: 'QRScanScreen',
@@ -280,7 +280,7 @@ class CasesScreen extends Component {
     };
 
     pushNewEditScreenLocal = (QRCodeInfo) => {
-        console.log('pushNewEditScreen QRCodeInfo do with method from another side', QRCodeInfo);
+        // console.log('pushNewEditScreen QRCodeInfo do with method from another side', QRCodeInfo);
 
         this.setState({
             loading: true
@@ -301,7 +301,7 @@ class CasesScreen extends Component {
                                 {
                                     text: getTranslation(translations.alertMessages.yesButtonLabel, this.props && this.props.translation ? this.props.translation : null),
                                     onPress: () => {
-                                        console.log('Yes pressed');
+                                        // console.log('Yes pressed');
                                         this.props.navigator.push({
                                             screen: 'CaseSingleScreen',
                                             animated: true,

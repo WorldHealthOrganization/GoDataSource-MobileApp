@@ -25,8 +25,6 @@ class DatePicker extends PureComponent {
     }
 
     // Please add here the react lifecycle methods that you need
-
-
     // The render method should have at least business logic as possible,
     // because this will be called whenever there is a new setState call
     // and can slow down the app
@@ -41,8 +39,8 @@ class DatePicker extends PureComponent {
     // Please write here all the methods that are not react native lifecycle methods
     editInput = () => {
         // console.log('This.props.value: ', this.props.value);
-        let tooltip = getTooltip(this.props.label, this.props.translation)
-        let customStyle = this.props.value !== undefined && this.props.value !== null ? styles.hasDateTooltipStyle : style.emptyDateTooltipStyle
+        let tooltip = getTooltip(this.props.label, this.props.translation);
+        let customStyle = this.props.value !== undefined && this.props.value !== null ? styles.hasDateTooltipStyle : style.emptyDateTooltipStyle;
         return (
             <View style={[{marginVertical: 10, flexDirection: 'row'},this.props.style]}>
                 <View style = {{flex: 1}}>
@@ -112,7 +110,7 @@ class DatePicker extends PureComponent {
     };
 
     viewInput = () => {
-        let tooltip = getTooltip(this.props.label, this.props.translation)
+        let tooltip = getTooltip(this.props.label, this.props.translation);
         return (
             <View style={[{flexDirection: 'row'}, this.props.style]}>
                 <View style={{flex: 1}}> 
@@ -148,9 +146,7 @@ class DatePicker extends PureComponent {
     };
 
     handleShowDatePicker = () => {
-        // if (!this.state.isDateTimePickerVisible && this.refs.textField.isFocused()) {
-            this.setState({isDateTimePickerVisible: true})
-        // }
+        this.setState({isDateTimePickerVisible: true})
     };
 
     handleDateCancelled = () => {

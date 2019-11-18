@@ -1,13 +1,11 @@
 /**
  * Created by florinpopa on 25/07/2018.
  */
-import React, {PureComponent} from 'react';
-import {View, Text, StyleSheet} from 'react-native';
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
+import React, {PureComponent} from 'react';
+import {View, Text, StyleSheet} from 'react-native';
 import {Icon} from 'react-native-material-ui';
-import {calculateDimension} from './../utils/functions';
-import config from './../utils/config';
 import Ripple from 'react-native-material-ripple';
 import styles from './../styles';
 import {connect} from "react-redux";
@@ -15,7 +13,6 @@ import {bindActionCreators} from "redux";
 import Modal from 'react-native-modal';
 import ElevatedView from "react-native-elevated-view";
 import SelectMultiple from 'react-native-select-multiple';
-import SectionedMultiSelect from 'react-native-sectioned-multi-select';
 import translations from './../utils/translations'
 import {getTranslation, getTooltip} from './../utils/functions';
 import TooltipComponent from './TooltipComponent'
@@ -33,7 +30,6 @@ class DropDown extends PureComponent {
     }
 
     // Please add here the react lifecycle methods that you need
-
     componentDidUpdate(prevProps) {
         if (this.props.value && this.props.value !== prevProps.value) {
             this.setState({
@@ -41,13 +37,6 @@ class DropDown extends PureComponent {
             })
         }
     }
-
-    // static getDerivedStateFromProps(props, state) {
-    //     if (props.value) {
-    //         state.selectedItems = props.value;
-    //     }
-    //     return null;
-    // }
 
     // The render method should have at least business logic as possible,
     // because this will be called whenever there is a new setState call
@@ -61,7 +50,7 @@ class DropDown extends PureComponent {
     };
 
     editInput = () => {
-        let tooltip = getTooltip(translations.dropDownLabels.selectedAnswersLabel, this.props.translation)
+        let tooltip = getTooltip(translations.dropDownLabels.selectedAnswersLabel, this.props.translation);
         return (
             <View style={[{flexDirection: 'row'}, this.props.style]}>
                 <Ripple style={{
@@ -85,12 +74,16 @@ class DropDown extends PureComponent {
                             height: this.props.screenSize.height / 2,
                             backgroundColor: 'transparent'
                         }]}
-                        onBackdropPress={() => this.setState({ showDropdown: false })}
+                        onBackdropPress={() => this.setState({ showDropdown: false }, () => {
+                            this.props.onChange(this.state.selectedItems, this.props.id);
+                        })}
                     >
                         <ElevatedView elevation={3} style={[{backgroundColor: 'white'}]}>
                             <Ripple 
                                 style={style.navbarContainer}
-                                onPress={() => this.setState({ showDropdown: false })} 
+                                onPress={() => this.setState({ showDropdown: false },()=> {
+                                    this.props.onChange(this.state.selectedItems, this.props.id);
+                                })}
                                 hitSlop={{top: 20, bottom: 20, left: 20, right: 20}}
                             >
                                 <Icon name="close"/>
@@ -115,7 +108,7 @@ class DropDown extends PureComponent {
     };
 
     viewInput = () => {
-        let tooltip = getTooltip(translations.dropDownLabels.selectedAnswersLabel, this.props.translation)
+        let tooltip = getTooltip(translations.dropDownLabels.selectedAnswersLabel, this.props.translation);
         return (
             <View style={[{flexDirection: 'row'}, this.props.style]}>
                 {
@@ -156,18 +149,10 @@ class DropDown extends PureComponent {
         this.setState({
             selectedItems: selections
         }, () => {
-            this.props.onChange(selections, this.props.id);
+            // this.props.onChange(selections, this.props.id);
         })
     };
 }
-
-// DropDown.defaultProps = {
-//     label: 'DropDownLabel',
-//     value: 'Test',
-//     data: [],
-//     isEditMode: true,
-//     isRequired: true,
-// };
 
 // Create style outside the class, or for components that will be used by other components (buttons),
 // make a global style in the config directory

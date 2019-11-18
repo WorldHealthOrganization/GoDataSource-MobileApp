@@ -205,7 +205,6 @@ class FollowUpsScreen extends Component {
 
     // Please write here all the methods that are not react native lifecycle methods
     openCalendarModal = () => {
-        console.log("You got another thing coming");
         this.setState({
             calendarPickerOpen: !this.state.calendarPickerOpen
         })
@@ -232,8 +231,7 @@ class FollowUpsScreen extends Component {
     };
 
     calculateTopForDropdown = () => {
-        let dim = calculateDimension(98, true, this.props.screenSize);
-        return dim;
+        return calculateDimension(98, true, this.props.screenSize);
     };
 
     onSelectValue = (value) => {
@@ -267,7 +265,7 @@ class FollowUpsScreen extends Component {
     };
 
     handleOnPressQRCode = () => {
-        console.log('handleOnPressQRCode');
+        // console.log('handleOnPressQRCode');
 
         this.props.navigator.showModal({
             screen: 'QRScanScreen',
@@ -279,7 +277,7 @@ class FollowUpsScreen extends Component {
     };
 
     pushNewEditScreenLocal = (QRCodeInfo) => {
-        console.log('pushNewEditScreen QRCodeInfo do with method from another side', QRCodeInfo);
+        // console.log('pushNewEditScreen QRCodeInfo do with method from another side', QRCodeInfo);
 
         this.setState({
             loading: true
