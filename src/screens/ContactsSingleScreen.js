@@ -1602,7 +1602,9 @@ class ContactsSingleScreen extends Component {
                         // console.log('contactMatchFilter', contactMatchFilter)
                         addContact(contactClone, _.get(this.props, 'periodOfFollowUp', 1), _.get(this.props, 'user._id'))
                             .then((result) => {
-                                this.props.refresh();
+                                if (_.isFunction(this.props.refresh)) {
+                                    this.props.refresh();
+                                }
                                 this.props.navigator.pop(
                                     {
                                         animated: true,
@@ -1628,7 +1630,9 @@ class ContactsSingleScreen extends Component {
                         let contactClone = _.cloneDeep(this.state.contact);
                         updateContact(contactClone)
                             .then((result) => {
-                                this.props.refresh();
+                                if (_.isFunction(this.props.refresh)) {
+                                    this.props.refresh();
+                                }
                                 this.props.navigator.pop(
                                     {
                                         animated: true,

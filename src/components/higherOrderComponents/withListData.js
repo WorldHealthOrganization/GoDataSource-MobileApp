@@ -322,7 +322,8 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                         passProps: {
                             isNew: false,
                             isEditMode: true,
-                            contact: caseData
+                            contact: caseData,
+                            refresh: this.refresh
                         }
                     })
                 }

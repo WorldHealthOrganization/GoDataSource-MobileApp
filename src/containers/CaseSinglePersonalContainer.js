@@ -310,7 +310,7 @@ class CaseSinglePersonalContainer extends Component {
                 return this.props.case[item.id]
             }
         } else {
-            return _.get(this.props, `case[${item.id}]`, 'missing');
+            return getTranslation(_.get(this.props, `case[${item.id}]`, ' '), this.props.translation);
         }
     };
 
