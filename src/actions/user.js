@@ -16,13 +16,14 @@ import {getHelpItem} from './helpItem';
 import errorTypes from './../utils/errorTypes';
 import {storeHelpCategory} from './helpCategory';
 import {storeHelpItem} from './helpItem';
-import {storeOutbreak, storeLocationsList, storeLocations} from './outbreak';
+import {storeOutbreak, storeLocationsList, storeLocations, storeUserLocationsList, storeUserLocations} from './outbreak';
 import {storeUserTeams} from './teams';
 import {storeClusters} from './clusters';
 import {setLoginState, storeData, getAvailableLanguages, setSyncState} from './app';
 import {storePermissions} from './role';
-import {getLocations} from './locations';
+import {getLocations, getUserLocations} from './locations';
 import get from 'lodash/get';
+import {filterByUser} from './../utils/functions'
 
 // Add here only the actions, not also the requests that are executed.
 // For that purpose is the requests directory
@@ -119,6 +120,7 @@ export function computeCommonData(storeUserBool, user, refreshFollowUps, filters
                 promises.push(getReferenceData());
                 promises.push(getTranslations(user.languageId));
                 promises.push(getLocations(outbreakAndLocationInfo.locationIds || null));
+                promises.push(getUserLocations(outbreakAndLocationInfo.locationIds || null));
                 promises.push(getHelpCategory());
                 promises.push(getHelpItem());
 
@@ -128,12 +130,13 @@ export function computeCommonData(storeUserBool, user, refreshFollowUps, filters
                             let key = Object.keys(item)[0];
                             return Object.assign({}, obj, {[key]: item[key]});
                         }, {});
-
                         let arrayOfActions = [
                             storeUser(user),
                             storeOutbreak(outbreakAndLocationInfo || null),
                             storeLocationsList(get(actionsObject, 'locations.locationsList', null)),
                             storeLocations(get(actionsObject, 'locations.treeLocationsList', null)),
+                            storeUserLocationsList(get(actionsObject, 'userLocations.userLocationsList', null)),
+                            storeUserLocations(filterByUser(get(actionsObject, 'userLocations.userTreeLocationsList', null), userTeams)),
                             saveAvailableLanguages(get(actionsObject,  'availableLanguages', null)),
                             storeReferenceData(get(actionsObject,  'referenceData', null)),
                             saveTranslation(get(actionsObject,  'translations', null)),
