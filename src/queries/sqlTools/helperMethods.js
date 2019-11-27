@@ -22,6 +22,19 @@ export function openDatabase(databaseName) {
     })
 }
 
+export function initTables () {
+    let promiseArray = [];
+    return Promise.resolve()
+        .then(() => openDatabase('common'))
+        .then(wrapTransationInPromise)
+        .then((txn) => {
+            for(let i=0; i<constants.databaseTables.length; i++) {
+                promiseArray.push(createTable(txn, constants.databaseTables[i]))
+            }
+            return Promise.all(promiseArray);
+        })
+}
+
 export function wrapTransationInPromise (database) {
     return new Promise((resolve, reject) => {
         database.transaction((transaction) => resolve(transaction), (errorTransaction) => reject(errorTransaction));

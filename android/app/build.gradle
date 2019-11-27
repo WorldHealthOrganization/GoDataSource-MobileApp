@@ -92,7 +92,7 @@ def enableSeparateBuildPerCPUArchitecture = false
 /**
  * Run Proguard to shrink the Java bytecode in release builds.
  */
-def enableProguardInReleaseBuilds = false
+def enableProguardInReleaseBuilds = true
 
 android {
     compileSdkVersion 28
@@ -103,8 +103,8 @@ android {
         minSdkVersion 20
         targetSdkVersion 28
         multiDexEnabled true
-        versionCode 8
-        versionName "1.0.6"
+        versionCode 9
+        versionName "1.0.7"
         ndk {
             abiFilters "armeabi-v7a", "x86", 'arm64-v8a', 'x86_64'
         }
@@ -119,11 +119,13 @@ android {
     }
     buildTypes {
         release {
-            minifyEnabled enableProguardInReleaseBuilds
-            proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+            debuggable false
+            minifyEnabled false
+            shrinkResources false
+            proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
         }
         debug {
-            debuggable false
+            debuggable true
         }
     }
     // applicationVariants are e.g. debug, release
@@ -142,6 +144,7 @@ android {
 }
 
 dependencies {
+    implementation project(':react-native-version-number')
     implementation project(':react-native-randombytes')
     implementation project(':react-native-webview')
     implementation project(':@react-native-community_async-storage')

@@ -403,10 +403,10 @@ const style = StyleSheet.create({
 
 mapStateToProps = (state) => {
     return {
-        user: state.user,
-        screenSize: state.app.screenSize,
-        translation: state.app.translation,
-        referenceData: state.referenceData
+        user: get(state, 'user', {}),
+        screenSize: get(state, 'app.screenSize', config.designScreenSize),
+        translation: get(state, 'app.translation', []),
+        referenceData: get(state, 'referenceData', [])
     };
 };
 

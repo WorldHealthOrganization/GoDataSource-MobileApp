@@ -19,10 +19,8 @@ import {
 } from './../utils/enums';
 import config from './../utils/config';
 import {Dimensions} from 'react-native';
-import {Platform, Alert} from 'react-native';
+import {Platform} from 'react-native';
 import {getAvailableLanguagesRequest, getTranslationRequest} from './../queries/translation';
-import {getHelpCategoryRequest} from '../queries/helpCategory';
-import {getHelpItemRequest} from '../queries/helpItem';
 import {postDatabaseSnapshotRequest, getDatabaseSnapshotRequestNew} from './../requests/sync';
 import {setInternetCredentials, getInternetCredentials} from 'react-native-keychain';
 import {unzipFile, readDir} from './../utils/functions';
@@ -38,6 +36,7 @@ import errorTypes from "../utils/errorTypes";
 import constants from './../utils/constants';
 import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
 import sqlConstants from './../queries/sqlTools/constants';
+import {initTables} from './../queries/sqlTools/helperMethods';
 
 // Add here only the actions, not also the requests that are executed. For that purpose is the requests directory
 export function changeAppRoot(root) {
@@ -169,7 +168,7 @@ export function getAvailableLanguages(dispatch) {
 
 export function storeHubConfigurationNew(hubConfiguration) {
     return async function (dispatch) {
-        let hubConfig = JSON.parse(hubConfiguration.clientId);
+        // let hubConfig = JSON.parse(hubConfiguration.clientId);
         console.log('Hub credentials: ', hubConfiguration);
 
         Promise.resolve()
@@ -242,7 +241,7 @@ function processFilesForSyncNew(error, response, hubConfiguration, isFirstTime, 
                                     let startTimeForProcessingOneFile = new Date().getTime();
                                     let auxData = await processFilePouch(`${constants.DATABASE_LOCATIONS}/${pouchFiles[i]}`, pouchFiles[i], files.length, dispatch, isFirstTime, forceBulk, hubConfig.encryptedData, hubConfig);
                                     if (auxData) {
-                                        console.log('auxData: ', auxData);
+                                        // console.log('auxData: ', auxData);
                                         console.log(`Time for processing file: ${pouchFiles[i]}: ${new Date().getTime() - startTimeForProcessingOneFile}`);
                                         promiseResponses.push(auxData);
                                     } else {
@@ -256,6 +255,13 @@ function processFilesForSyncNew(error, response, hubConfiguration, isFirstTime, 
                                     break;
                                 }
                             }
+                        }
+
+                        // Create tables first
+                        try {
+                            let initTablesResults = await initTables();
+                        } catch(errorInitTables) {
+                            console.log('An error occurred while creating tables: ', errorInitTables);
                         }
 
                         // Do the sql processing

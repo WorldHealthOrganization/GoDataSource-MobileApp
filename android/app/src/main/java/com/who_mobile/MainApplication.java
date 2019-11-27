@@ -23,7 +23,7 @@ import com.facebook.soloader.SoLoader;
 import com.bitgo.randombytes.RandomBytesPackage;
 import io.sentry.RNSentryPackage;
 import com.reactlibrary.RNBcryptPackage;
-
+import com.apsl.versionnumber.RNVersionNumberPackage;
 import java.util.Arrays;
 import java.util.List;
 
@@ -66,7 +66,8 @@ public class MainApplication extends NavigationApplication {
                  new ParseReceiverPackage(),
                  new RandomBytesPackage(),
                  new RNSentryPackage(),
-                 new RNBcryptPackage()
+                 new RNBcryptPackage(),
+                 new RNVersionNumberPackage()
          );
      }
 

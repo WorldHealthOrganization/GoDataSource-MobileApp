@@ -195,7 +195,18 @@ class CaseSingleScreen extends Component {
             Alert.alert("", 'You have unsaved data. Are you sure you want to leave this page and lose all changes?', [
                 {
                     text: 'Yes', onPress: () => {
-                        this.props.navigator.pop()
+                        if (this.props.isAddFromNavigation) {
+                            this.props.navigator.resetTo({
+                                screen: 'CasesScreen',
+                                animated: true,
+                                animationStyle: 'fade'
+                            })
+                        } else {
+                            this.props.navigator.pop({
+                                animated: true,
+                                animationType: 'fade'
+                            })
+                        }
                     }
                 },
                 {
@@ -205,7 +216,18 @@ class CaseSingleScreen extends Component {
                 }
             ])
         } else {
-            this.props.navigator.pop()
+            if (this.props.isAddFromNavigation) {
+                this.props.navigator.resetTo({
+                    screen: 'CasesScreen',
+                    animated: true,
+                    animationStyle: 'fade'
+                })
+            } else {
+                this.props.navigator.pop({
+                    animated: true,
+                    animationType: 'fade'
+                })
+            }
         }
         return true;
     }
@@ -214,21 +236,6 @@ class CaseSingleScreen extends Component {
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
-        // if (this.props.errors && this.props.errors.type && this.props.errors.message) {
-        //     Alert.alert(this.props.errors.type, this.props.errors.message, [
-        //         {
-        //             text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
-        //             onPress: () => {
-        //                 this.setState({
-        //                     savePressed: false
-        //                 }, () => {
-        //                     this.props.removeErrors();
-        //                 })
-        //             }
-        //         }
-        //     ])
-        // }
-
         return (
             <ViewHOC style={style.container}
                      showLoader={this && this.state && this.state.loading}
@@ -647,11 +654,12 @@ class CaseSingleScreen extends Component {
         let ageConfig = this.ageAndDobPrepareForSave();
         let caseClone = _.cloneDeep(this.state.case);
         // Remap the previous answers
-        let questionnaireAnswers = reMapAnswers(_.cloneDeep(this.state.previousAnswers));
-        questionnaireAnswers = this.filterUnasweredQuestions();
+        // let questionnaireAnswers = reMapAnswers(_.cloneDeep(this.state.previousAnswers));
+        // questionnaireAnswers = this.filterUnasweredQuestions();
         caseClone.age = ageConfig.ageClone;
         caseClone.dob = ageConfig.dobClone;
-        caseClone.questionnaireAnswers = questionnaireAnswers;
+        caseClone.questionnaireAnswers = reMapAnswers(_.cloneDeep(this.state.previousAnswers));
+        caseClone.questionnaireAnswers = this.filterUnasweredQuestions();
         if (caseClone.outcomeId !== config.caseFieldsForHardCodeCheck.outcomeIdDeceasedValue) {
             caseClone.safeBurial = false;
             caseClone.dateOfBurial = null;
@@ -671,8 +679,6 @@ class CaseSingleScreen extends Component {
                     this.setState(prevState => ({
                         case: Object.assign({}, prevState.case, caseWithRequiredFields)
                     }), () => {
-                        // let caseMatchFitler = this.checkIfCaseMatchFilter()
-                        // console.log('caseMatchFitler', caseMatchFitler)
                         updateCase(this.state.case)
                             .then((result) => {
                                 // this.props.refresh();
@@ -698,17 +704,21 @@ class CaseSingleScreen extends Component {
                         this.setState(prevState => ({
                             case: Object.assign({}, prevState.case, caseWithRequiredFields)
                         }), () => {
-                            // let caseMatchFitler = this.checkIfCaseMatchFilter()
-                            // console.log('caseMatchFitler', caseMatchFitler)
                             addCase(this.state.case)
                                 .then((result) => {
                                     // this.props.refresh();
-                                    this.props.navigator.pop(
-                                        {
+                                    if (this.props.isAddFromNavigation) {
+                                        this.props.navigator.resetTo({
+                                            screen: 'CasesScreen',
                                             animated: true,
-                                            animationType: 'fade',
-                                        }
-                                    )
+                                            animationStyle: 'fade'
+                                        })
+                                    } else {
+                                        this.props.navigator.pop({
+                                            animated: true,
+                                            animationType: 'fade'
+                                        })
+                                    }
                                 })
                                 .catch((errorUpdateCase) => {
                                     console.log('errorUpdateCase', errorUpdateCase);
@@ -727,12 +737,18 @@ class CaseSingleScreen extends Component {
                             updateCase(this.state.case)
                                 .then((result) => {
                                     // this.props.refresh();
-                                    this.props.navigator.pop(
-                                        // {
-                                        //     animated: true,
-                                        //     animationType: 'fade',
-                                        // }
-                                    )
+                                    if (this.props.isAddFromNavigation) {
+                                        this.props.navigator.resetTo({
+                                            screen: 'CasesScreen',
+                                            animated: true,
+                                            animationStyle: 'fade'
+                                        })
+                                    } else {
+                                        this.props.navigator.pop({
+                                            animated: true,
+                                            animationType: 'fade'
+                                        })
+                                    }
                                 })
                                 .catch((errorUpdateCase) => {
                                     console.log('errorUpdateCase', errorUpdateCase);
@@ -749,7 +765,18 @@ class CaseSingleScreen extends Component {
             Alert.alert("", 'You have unsaved data. Are you sure you want to leave this page and lose all changes?', [
                 {
                     text: 'Yes', onPress: () => {
-                        this.props.navigator.pop()
+                        if (this.props.isAddFromNavigation) {
+                            this.props.navigator.resetTo({
+                                screen: 'CasesScreen',
+                                animated: true,
+                                animationStyle: 'fade'
+                            })
+                        } else {
+                            this.props.navigator.pop({
+                                animated: true,
+                                animationType: 'fade'
+                            })
+                        }
                     }
                 },
                 {
@@ -759,7 +786,18 @@ class CaseSingleScreen extends Component {
                 }
             ])
         } else {
-            this.props.navigator.pop();
+            if (this.props.isAddFromNavigation) {
+                this.props.navigator.resetTo({
+                    screen: 'CasesScreen',
+                    animated: true,
+                    animationStyle: 'fade'
+                })
+            } else {
+                this.props.navigator.pop({
+                    animated: true,
+                    animationType: 'fade'
+                })
+            }
         }
     };
 

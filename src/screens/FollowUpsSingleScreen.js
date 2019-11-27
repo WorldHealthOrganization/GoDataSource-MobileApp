@@ -830,7 +830,8 @@ class FollowUpsSingleScreen extends Component {
             screen: 'ContactsSingleScreen',
             passProps: {
                 contact: this.state.contact,
-                handleUpdateContactFromFollowUp: this.handleUpdateContactFromFollowUp
+                handleUpdateContactFromFollowUp: this.handleUpdateContactFromFollowUp,
+                refresh: this.props.refresh
             }
         })
     };

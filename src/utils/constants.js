@@ -29,6 +29,7 @@ const TIMEOUT_FOR_FETCH_BLOB = 500;
 
 const DATABASE_LOCATIONS = `${RNFetchBlobFS.dirs.DocumentDir}/who_databases`;
 const FILES_LOCATIONS = `${RNFetchBlobFS.dirs.DocumentDir}/who_files`;
+const CHUNK_SIZE_TOOLTIP = 'Number of records per file in the sync process. A lower number will mean lower RAM consumption but a longer sync process. For slow devices use a lower number of records';
 
 
 export default {
@@ -36,5 +37,6 @@ export default {
     NUMBER_OF_RETRIES,
     TIMEOUT_FOR_FETCH_BLOB,
     DATABASE_LOCATIONS,
-    FILES_LOCATIONS
+    FILES_LOCATIONS,
+    CHUNK_SIZE_TOOLTIP
 }

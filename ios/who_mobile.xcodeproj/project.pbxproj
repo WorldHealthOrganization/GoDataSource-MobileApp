@@ -83,6 +83,7 @@
 		F2315FB3219601360088153C /* libRNDocumentPicker.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F2315FAA219601240088153C /* libRNDocumentPicker.a */; };
 		F2316EAF229D328F002B7854 /* libRNReanimated.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F2316EAE229D3281002B7854 /* libRNReanimated.a */; };
 		F234FF5F22E896B10087A880 /* libRNCAsyncStorage.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F234FF3C22E896410087A880 /* libRNCAsyncStorage.a */; };
+		F23BFFAC238974D6001FD8FE /* libRNVersionNumber.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F23BFFA8238974C1001FD8FE /* libRNVersionNumber.a */; };
 		F250AA102136B7EB002386CF /* libRNFetchBlob.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F250AA0F2136B7E3002386CF /* libRNFetchBlob.a */; };
 		F255A1F42170B49400D93AFE /* libRNFS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F255A1EC2170B48100D93AFE /* libRNFS.a */; };
 		F265C95A21AD721E0055A97C /* libRNRandomBytes.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F265C95421AD720B0055A97C /* libRNRandomBytes.a */; };
@@ -469,6 +470,20 @@
 			remoteGlobalIDString = FDBB176E229BF04900D1E455;
 			remoteInfo = "RNReanimated-tvOS";
 		};
+		F23BFFA7238974C1001FD8FE /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F23BFF65238974C0001FD8FE /* RNVersionNumber.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 134814201AA4EA6300B7C361;
+			remoteInfo = RNVersionNumber;
+		};
+		F23BFFA9238974C1001FD8FE /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F23BFF65238974C0001FD8FE /* RNVersionNumber.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 2858ECD01F8B91B400610575;
+			remoteInfo = "RNVersionNumber-tvOS";
+		};
 		F250AA0E2136B7E3002386CF /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = F250AA0A2136B7E3002386CF /* RNFetchBlob.xcodeproj */;
@@ -626,6 +641,7 @@
 		F2316EA9229D3281002B7854 /* RNReanimated.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNReanimated.xcodeproj; path = "../node_modules/react-native-reanimated/ios/RNReanimated.xcodeproj"; sourceTree = "<group>"; };
 		F2320F6A22708CA100754AEB /* RNVectorIcons.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNVectorIcons.xcodeproj; path = "../node_modules/react-native-vector-icons/RNVectorIcons.xcodeproj"; sourceTree = "<group>"; };
 		F234FF3522E896400087A880 /* RNCAsyncStorage.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNCAsyncStorage.xcodeproj; path = "../node_modules/@react-native-community/async-storage/ios/RNCAsyncStorage.xcodeproj"; sourceTree = "<group>"; };
+		F23BFF65238974C0001FD8FE /* RNVersionNumber.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNVersionNumber.xcodeproj; path = "../node_modules/react-native-version-number/ios/RNVersionNumber.xcodeproj"; sourceTree = "<group>"; };
 		F250AA0A2136B7E3002386CF /* RNFetchBlob.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNFetchBlob.xcodeproj; path = "../node_modules/rn-fetch-blob/ios/RNFetchBlob.xcodeproj"; sourceTree = "<group>"; };
 		F255A1BE2170B48100D93AFE /* RNFS.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNFS.xcodeproj; path = "../node_modules/react-native-fs/RNFS.xcodeproj"; sourceTree = "<group>"; };
 		F265C91E21AD720A0055A97C /* RNRandomBytes.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNRandomBytes.xcodeproj; path = "../node_modules/react-native-randombytes/RNRandomBytes.xcodeproj"; sourceTree = "<group>"; };
@@ -648,6 +664,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F23BFFAC238974D6001FD8FE /* libRNVersionNumber.a in Frameworks */,
 				F234FF5F22E896B10087A880 /* libRNCAsyncStorage.a in Frameworks */,
 				F208B62A22AFCFD300B84216 /* libRNSentry.a in Frameworks */,
 				F2316EAF229D328F002B7854 /* libRNReanimated.a in Frameworks */,
@@ -938,6 +955,7 @@
 		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
+				F23BFF65238974C0001FD8FE /* RNVersionNumber.xcodeproj */,
 				F234FF3522E896400087A880 /* RNCAsyncStorage.xcodeproj */,
 				F208B5E622AFCFBD00B84216 /* RNSentry.xcodeproj */,
 				F2316EA9229D3281002B7854 /* RNReanimated.xcodeproj */,
@@ -1075,6 +1093,15 @@
 			isa = PBXGroup;
 			children = (
 				F234FF3C22E896410087A880 /* libRNCAsyncStorage.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		F23BFF66238974C0001FD8FE /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				F23BFFA8238974C1001FD8FE /* libRNVersionNumber.a */,
+				F23BFFAA238974C1001FD8FE /* libRNVersionNumber-tvOS.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1404,6 +1431,10 @@
 				{
 					ProductGroup = F2320F6B22708CA100754AEB /* Products */;
 					ProjectRef = F2320F6A22708CA100754AEB /* RNVectorIcons.xcodeproj */;
+				},
+				{
+					ProductGroup = F23BFF66238974C0001FD8FE /* Products */;
+					ProjectRef = F23BFF65238974C0001FD8FE /* RNVersionNumber.xcodeproj */;
 				},
 				{
 					ProductGroup = F250AAA8213701EF002386CF /* Products */;
@@ -1783,6 +1814,20 @@
 			fileType = archive.ar;
 			path = "libRNReanimated-tvOS.a";
 			remoteRef = F2385DB022D343B2000F74EC /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		F23BFFA8238974C1001FD8FE /* libRNVersionNumber.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libRNVersionNumber.a;
+			remoteRef = F23BFFA7238974C1001FD8FE /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		F23BFFAA238974C1001FD8FE /* libRNVersionNumber-tvOS.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = "libRNVersionNumber-tvOS.a";
+			remoteRef = F23BFFA9238974C1001FD8FE /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		F250AA0F2136B7E3002386CF /* libRNFetchBlob.a */ = {

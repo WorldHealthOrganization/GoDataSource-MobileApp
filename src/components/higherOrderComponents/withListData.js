@@ -141,15 +141,17 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                     this.setState({
                         isAddFromNavigation: false
                     }, () => {
-                        this.props.navigator.push({
-                            screen: this.props.addScreen,
-                            animated: true,
-                            animationType: 'fade',
-                            passProps: {
-                                isNew: true,
-                                refresh: this.refresh
-                            }
-                        })
+                        setTimeout(() => {
+                            this.props.navigator.push({
+                                screen: this.props.addScreen,
+                                animated: true,
+                                animationType: 'fade',
+                                passProps: {
+                                    isNew: true,
+                                    refresh: this.refresh
+                                }
+                            })
+                        }, 100)
                     })
                 } else {
                     // If it's refresh or first getData get regular data
@@ -322,7 +324,8 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                         passProps: {
                             isNew: false,
                             isEditMode: true,
-                            contact: caseData
+                            contact: caseData,
+                            refresh: this.refresh
                         }
                     })
                 }

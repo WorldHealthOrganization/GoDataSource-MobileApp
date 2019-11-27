@@ -4,6 +4,8 @@ target 'who_mobile' do
   pod 'Parse'
 
   # Add new pods below this line
+  pod 'react-native-version-number', :path => '../node_modules/react-native-version-number'
+
   #pod 'RNCAsyncStorage', :path => '../node_modules/@react-native-community/async-storage'
 
   pod 'React', :path => '../node_modules/react-native'

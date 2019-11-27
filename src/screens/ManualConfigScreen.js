@@ -18,14 +18,18 @@ import { loginUser } from './../actions/user';
 import { removeErrors } from './../actions/errors';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import url from './../utils/url';
-import {storeHubConfiguration, storeHubConfigurationNew} from './../actions/app';
+import {storeHubConfigurationNew} from './../actions/app';
 import Ripple from 'react-native-material-ripple';
-import {getTranslation, generateId} from './../utils/functions';
+import {getTranslation, generateId, calculateDimension} from './../utils/functions';
 import translations from './../utils/translations';
 import SwitchInput from './../components/SwitchInput';
-import {getInternetCredentials, setInternetCredentials} from 'react-native-keychain';
+import {getInternetCredentials} from 'react-native-keychain';
 import {setSyncState, changeAppRoot} from './../actions/app';
 import ModalSyncStatus from './../components/ModalSyncStatus';
+import VersionNumber from 'react-native-version-number';
+import IntervalPicker from './../components/IntervalPicker';
+import constants from './../utils/constants';
+// import get from "lodash/get";
 
 class ManualConfigScreen extends PureComponent {
 
@@ -42,6 +46,7 @@ class ManualConfigScreen extends PureComponent {
             clientSecret: '',
             userEmail: '',
             encryptedData: true,
+            chunkSize: 2500,
             hasAlert: false,
             syncState: [
                 {id: 'testApi', name: 'Test API', status: '...'},
@@ -92,7 +97,7 @@ class ManualConfigScreen extends PureComponent {
 
                         if (this.props && this.props.QRCodeInfo && this.props.QRCodeInfo.data) {
                             //TO DO map this.props.QRCodeInfo info to props
-                            console.log('Here have the QRCodeInfo: ', JSON.parse(this.props.QRCodeInfo.data));
+                            // console.log('Here have the QRCodeInfo: ', JSON.parse(this.props.QRCodeInfo.data));
                             let QRCodeData = JSON.parse(this.props.QRCodeInfo.data);
                             this.setState({
                                 url: QRCodeData.url || '',
@@ -152,7 +157,7 @@ class ManualConfigScreen extends PureComponent {
                     if (this.props && this.props.QRCodeInfo && this.props.QRCodeInfo.data) {
                         //TO DO map this.props.QRCodeInfo info to props
                         // console.log('Here have the QRCodeInfo: ', JSON.parse(this.props.QRCodeInfo.data));
-                        console.log('TestQRCode has qr code data');
+                        // console.log('TestQRCode has qr code data');
                         let QRCodeData = JSON.parse(this.props.QRCodeInfo.data);
                         this.setState({
                             url: QRCodeData.url || '',
@@ -179,10 +184,10 @@ class ManualConfigScreen extends PureComponent {
     render() {
         if (this.props.syncState === 'Finished' && this.props.showModal === false && this.props.showCloseModalButton === false) {
             if (this.props.isMultipleHub) {
-                console.log('TestQRCode go to login app root');
+                // console.log('TestQRCode go to login app root');
                 this.props.changeAppRoot('login');
             } else {
-                console.log('TestQRCode go to login without app root');
+                // console.log('TestQRCode go to login without app root');
                 this.props.navigator.push({
                     screen: 'LoginScreen',
                     animated: true,
@@ -329,6 +334,25 @@ class ManualConfigScreen extends PureComponent {
                             hasTooltip={true}
                             tooltipsMessage={'Encrypted connection is more secure but the sync will take more time'}
                         />
+                        <IntervalPicker
+                            id={'chunkSize'}
+                            label={'Number of records per file'}
+                            value={[this.state.chunkSize]}
+                            min={500}
+                            max={5000}
+                            step={500}
+                            style={{
+                                width: '100%',
+                                backgroundColor: styles.backgroundGreen
+                            }}
+                            selectedStyle={'white'}
+                            unselectedStyle={'white'}
+                            sliderLength={calculateDimension(240, false, this.props.screenSize)}
+                            onChange={this.onChangeInterval}
+                            markerColor={'white'}
+                            hasTooltip={true}
+                            tooltipsMessage={constants.CHUNK_SIZE_TOOLTIP}
+                        />
                         {
                             this.props && this.props.activeDatabase && !this.props.isNewHub ? (
                                 <Button upperCase={false} onPress={() => {
@@ -345,6 +369,15 @@ class ManualConfigScreen extends PureComponent {
                         Platform.OS === 'ios' && this.props && this.props.screenSize.height < 600 && this.props.activeDatabase ? (null) : (
                             <View style={style.logoContainer}>
                                 <Image source={{uri: 'logo_app'}} style={style.logoStyle}/>
+                                <Text
+                                    style={{
+                                        color: 'white',
+                                        fontFamily: 'Roboto-Medium',
+                                        fontSize: 14
+                                    }}
+                                >
+                                    {`Version: ${VersionNumber.appVersion} - build ${VersionNumber.buildVersion}`}
+                                </Text>
                             </View>
                         )
                     }
@@ -452,7 +485,7 @@ class ManualConfigScreen extends PureComponent {
     // Change database name from allDatabases store
     // Will not do syncing since the user can do it manually
     editCurrentConfiguration = () => {
-        console.log("Edit current hub config");
+        // console.log("Edit current hub config");
         getInternetCredentials(this.props.activeDatabase)
             .then((previousInternetCredentials) => {
                 console.log("Previous internet credentials: ", previousInternetCredentials);
@@ -463,7 +496,8 @@ class ManualConfigScreen extends PureComponent {
                     clientId: this.state.clientId,
                     clientSecret: this.state.clientSecret,
                     userEmail: this.state.userEmail,
-                    encryptedData: this.state.encryptedData
+                    encryptedData: this.state.encryptedData,
+                    chunkSize: this.state.chunkSize
                 };
                 this.props.storeHubConfigurationNew({
                     url: server,
@@ -472,7 +506,7 @@ class ManualConfigScreen extends PureComponent {
                 })
             })
             .catch((errorPreviousInternetCredentials) => {
-                console.log('Error while getting internet credentials: ', errorPreviousInternetCredentials);
+                // console.log('Error while getting internet credentials: ', errorPreviousInternetCredentials);
                 this.showAlert(getTranslation(translations.hubConfigScreen.saveCurrentHubTitle, this.props.translation), getTranslation(translations.hubConfigScreen.saveCurrentHubMessage, this.props.translation));
             })
     };
@@ -489,7 +523,8 @@ class ManualConfigScreen extends PureComponent {
             clientId: this.state.clientId,
             clientSecret: this.state.clientSecret,
             userEmail: this.state.userEmail,
-            encryptedData: this.state.encryptedData
+            encryptedData: this.state.encryptedData,
+            chunkSize: this.state.chunkSize
         };
         this.props.storeHubConfigurationNew({
             url: hubId,
@@ -507,11 +542,17 @@ class ManualConfigScreen extends PureComponent {
             });
     };
 
+    onChangeInterval = (value, id) => {
+        this.setState(prevState => ({
+            [id]: value[0]
+        }))
+    };
+
     handleCheck = (check) => {
         this.setState({
             encryptedData: check
         }, () => {
-            console.log('State: ', this.state);
+            // console.log('State: ', this.state);
         })
     };
 
@@ -669,7 +710,6 @@ function matchDispatchToProps(dispatch) {
     return bindActionCreators({
         loginUser,
         removeErrors,
-        storeHubConfiguration,
         storeHubConfigurationNew,
         setSyncState,
         changeAppRoot

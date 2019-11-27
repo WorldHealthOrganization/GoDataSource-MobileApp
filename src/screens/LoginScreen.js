@@ -1,10 +1,10 @@
 /**
  * Created by florinpopa on 14/06/2018.
  */
-import React, {Component} from 'react';
-import {View, Text, StyleSheet, Platform, Image, Alert, TouchableOpacity} from 'react-native';
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
+import React, {Component} from 'react';
+import {View, Text, StyleSheet, Platform, Image, Alert} from 'react-native';
 import {Button, Icon} from 'react-native-material-ui';
 import { TextField } from 'react-native-material-textfield';
 import styles from './../styles';
@@ -14,11 +14,11 @@ import { loginUser, cleanDataAfterLogout } from './../actions/user';
 import { removeErrors } from './../actions/errors';
 import {changeAppRoot, setSyncState} from './../actions/app';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
-import url from './../utils/url';
 import {LoaderScreen} from 'react-native-ui-lib';
 import Ripple from 'react-native-material-ripple';
 import translations from './../utils/translations'
 import {getTranslation} from './../utils/functions';
+import VersionNumber from 'react-native-version-number';
 
 class LoginScreen extends Component {
 
@@ -31,8 +31,6 @@ class LoginScreen extends Component {
         this.state = {
             email: '',
             password: '',
-            // url: config.baseUrls[0].value,
-            // showLoading: false,
             hasAlert: false
         };
         // Bind here methods, or at least don't declare methods in the render method
@@ -41,40 +39,15 @@ class LoginScreen extends Component {
 
         this.emailRef = this.updateRef.bind(this, 'email');
         this.passwordRef = this.updateRef.bind(this, 'password');
-        // this.urlRef = this.updateRef.bind(this, 'url');
     }
 
     // Please add here the react lifecycle methods that you need
     componentDidMount() {
-        // createDatabase('testDatabase', 'testPassword', (database) => {
-        //     if (database) {
-                setTimeout(() => {
-                    console.log("Component LoginScreen mounted. Time to clean the redux mess");
-                    this.props.cleanDataAfterLogout();
-                }, 500);
-        //     }
-        // })
+        setTimeout(() => {
+            console.log("Component LoginScreen mounted. Time to clean the redux mess");
+            this.props.cleanDataAfterLogout();
+        }, 500);
     }
-
-    // static getDerivedStateFromProps(props, state) {
-        // if (props.errors && props.errors.type && props.errors.message && !state.hasAlert) {
-        //     state.hasAlert = true;
-        //     Alert.alert(props.errors.type, props.errors.message, [
-        //         {
-        //             text: getTranslation(translations.alertMessages.okButtonLabel, props && props.translation ? props.translation : null),
-        //             onPress: () => {
-        //                 state.hasAlert = false;
-        //                 props.removeErrors();
-        //             }
-        //         }
-        //     ])
-        // }
-        // if (props.loginState && (props.loginState === 'Finished logging' || props.loginState === 'Error')) {
-        //     // props.changeAppRoot('after-login');
-        //     state.showLoading = false;
-        // }
-        // return null;
-    // }
 
     // The render method should have at least business logic as possible,
     // because this will be called whenever there is a new setState call
@@ -148,6 +121,15 @@ class LoginScreen extends Component {
                 </View>
                 <View style={style.logoContainer}>
                     <Image source={{uri: 'logo_app'}} style={style.logoStyle} />
+                    <Text
+                        style={{
+                            color: 'white',
+                            fontFamily: 'Roboto-Medium',
+                            fontSize: 14
+                        }}
+                    >
+                        {`Version: ${VersionNumber.appVersion} - build ${VersionNumber.buildVersion}`}
+                    </Text>
                 </View>
             </KeyboardAwareScrollView>
         );
@@ -176,23 +158,10 @@ class LoginScreen extends Component {
                     }
                 ])
             } else {
-                // let urlNew = this.state.url.toLowerCase();
-                // if (!urlNew.includes('http://')) {
-                //     urlNew = 'http://' + urlNew;
-                // }
-                // if (!urlNew.includes('/api')) {
-                //     urlNew += '/api';
-                // }
-                // url.setBaseUrl(urlNew);
-
-                // this.setState({
-                //     showLoading: true
-                // }, () => {
-                    this.props.loginUser({
-                        email: this.state.email.toLowerCase(),
-                        password: this.state.password
-                    });
-                // });
+                this.props.loginUser({
+                    email: this.state.email.toLowerCase(),
+                    password: this.state.password
+                });
             }
         }
     };

@@ -78,6 +78,7 @@ class CaseSingleInvestigationContainer extends Component {
                         onPressSaveEdit={this.props.isNew ? this.props.onPressSave : this.props.onPressSaveEdit}
                         onPressCancelEdit={this.props.onPressCancelEdit}
                         onPressNextButton={this.props.handleNextButton}
+                        onPressPreviousButton={this.handleBackButton}
                     />
                     {/*<View style={{ flexDirection: 'row' }}>*/}
                         {/*{*/}
