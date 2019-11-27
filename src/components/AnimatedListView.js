@@ -111,7 +111,17 @@ class AnimatedListView extends Component {
                             onEndEditing={this.handleOnEndEditing}
                             filterText={this.props.filterText}
                         />
-                        {/*<Text>{this.props.dataCount} results</Text>*/}
+                        <Animated.View style={{
+                            transform: [{
+                                translateY: navbarTranslate
+                            }],
+                            opacity: navbarOpacity,
+                            width: calculateDimension(375 - 32, false, this.props.screenSize),
+                            marginHorizontal: calculateDimension(16, false, this.props.screenSize),
+                            backgroundColor: '#eeeeee'
+                        }}>
+                            <Text style={{ marginBottom: 5, fontWeight: 'bold'}}>{this.props.dataCount} RESULTS</Text>
+                        </Animated.View>
                     </View>
                 }
                 onEndReached={this.props.data.length >= 10 ? this.props.onEndReached : null}
