@@ -47,7 +47,7 @@ class ViewHOC extends Component {
     }
 
     render() {
-        console.log('Selectors logic: ViewHOC: ', this.props.showLoader);
+        // console.log('Selectors logic: ViewHOC: ', this.props.showLoader);
         return (
             <View style={[this.props.style]}>
                 {

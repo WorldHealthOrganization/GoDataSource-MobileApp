@@ -138,7 +138,7 @@ export function navigation(event, navigator) {
                         screenToSwitchTo = "CasesScreen";
                         break;
                     case '2-add':
-                        screenToSwitchTo = "CasesScreen";
+                        screenToSwitchTo = "CaseSingleScreen";
                         addScreen = "CaseSingleScreen";
                         break;
                     case 'help':
@@ -150,11 +150,12 @@ export function navigation(event, navigator) {
                 }
 
                 if(addScreen) {
-                    navigator.resetTo({
+                    navigator.push({
                         screen: screenToSwitchTo,
                         passProps: {
+                            isNew: true,
                             isAddFromNavigation: true,
-                            addScreen: addScreen
+                            refresh: () => {console.log('Default refresh')}
                         }
                     });
                 } else {
@@ -295,7 +296,7 @@ export function processFilePouch(path, type, totalNumberOfFiles, dispatch, isFir
             }
         })
         .then((responses) => {
-            console.log('Finished syncing: ', responses);
+            // console.log('Finished syncing: ', responses);
             let numberOfFilesProcessedAux = getNumberOfFilesProcessed();
             numberOfFilesProcessedAux += 1;
             setNumberOfFilesProcessed(numberOfFilesProcessedAux);
@@ -336,7 +337,7 @@ export function processFilesSql(path, table, totalNumberOfFiles, dispatch, encry
         .then(() => processFileGeneral(path, fileName, unzipLocation, hubConfig, encryptedData))
         .then((data) => insertOrUpdate('common', table, data, true))
         .then((results) => {
-            console.log('Finished syncing: ', results);
+            // console.log('Finished syncing: ', results);
             let numberOfFilesProcessedAux = getNumberOfFilesProcessed();
             numberOfFilesProcessedAux += 1;
             setNumberOfFilesProcessed(numberOfFilesProcessedAux);

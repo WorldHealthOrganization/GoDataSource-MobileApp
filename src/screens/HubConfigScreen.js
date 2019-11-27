@@ -24,7 +24,7 @@ import { saveActiveDatabase } from './../actions/app';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import NavBarCustom from './../components/NavBarCustom';
 import config from './../utils/config';
-import Ripple from 'react-native-material-ripple';
+import IntervalPicker from './../components/IntervalPicker';
 import translations from './../utils/translations';
 import {setInternetCredentials, getInternetCredentials} from 'react-native-keychain';
 import {createDatabase} from './../queries/database';
@@ -85,6 +85,16 @@ let textFieldsStructure = [
         activeBackgroundColor: 'green',
     },
     {
+        id: 'chunkSize',
+        label: 'Number of records per file',
+        type: 'IntervalPicker',
+        value: 2500,
+        min: 500,
+        max: 5000,
+        isRequired: false,
+        isEditMode: true
+    },
+    {
         id: 'lastSyncDate',
         label: translations.hubConfigScreen.lastSyncDate,
         type: 'TextInput',
@@ -111,6 +121,7 @@ class FirstConfigScreen extends Component {
             clientSecret: '',
             userEmail: '',
             encryptedData: true,
+            chunkSize: 2500,
             allDatabases: [],
             lastSyncDate: null,
             isModified: false
@@ -151,6 +162,7 @@ class FirstConfigScreen extends Component {
                     clientSecret: currentHubConfig.clientSecret,
                     userEmail: currentHubConfig.userEmail,
                     encryptedData: currentHubConfig.encryptedData,
+                    chunkSize: currentHubConfig.chunkSize,
                     lastSyncDate: lastSyncDate,
                     showLoading: false,
                     allDatabases: databasesGlobal
@@ -417,6 +429,22 @@ class FirstConfigScreen extends Component {
                         translation={this.props.translation}
                     />
                 );
+            case 'IntervalPicker':
+                return (
+                    <IntervalPicker
+                        id={'chunkSize'}
+                        label={'Number of records per file'}
+                        value={[this.state.chunkSize]}
+                        min={item.min}
+                        max={item.max}
+                        step={500}
+                        // style={{
+                        //     backgroundColor: styles.backgroundGreen
+                        // }}
+                        onChange={this.onChangeInterval}
+                        markerColor={'black'}
+                    />
+                );
             default:
                 return (
                     <Text>No component found</Text>
@@ -425,15 +453,27 @@ class FirstConfigScreen extends Component {
     };
 
     onChangeText = (text, id) => {
-        this.setState({[id]: text, isModified: true}, () => {
-            console.log('OnChangeText: ', this.state);
-        })
+        this.setState({[id]: text, isModified: true}
+        // , () => {
+        //     console.log('OnChangeText: ', this.state);
+        // }
+        )
     };
 
     onChangeSwitch = (value, itemId) => {
-        this.setState({[itemId]: value, isModified: true}, () => {
-            console.log('onChangeSwitch: ', this.state);
-        })
+        this.setState({[itemId]: value, isModified: true}
+        // , () => {
+        //     console.log('onChangeSwitch: ', this.state);
+        // }
+        )
+    };
+
+    onChangeInterval = (value, id) => {
+        this.setState({[id]: value[0], isModified: true}
+        // , () => {
+        //     console.log('onChangeSwitch: ', this.state);
+        // }
+        )
     };
 
     renderDatabase = (database, width) => {
@@ -481,7 +521,14 @@ class FirstConfigScreen extends Component {
             .then((previousInternetCredentials) => {
                 console.log("Previous internet credentials: ", previousInternetCredentials);
                 let server = Platform.OS === 'ios' ? previousInternetCredentials.server : previousInternetCredentials.service;
-                previousInternetCredentials.username = JSON.stringify({name: this.state.name, url: this.state.url, clientId: this.state.clientId, clientSecret: this.state.clientSecret, encryptedData: this.state.encryptedData});
+                previousInternetCredentials.username = JSON.stringify({
+                    name: this.state.name,
+                    url: this.state.url,
+                    clientId: this.state.clientId,
+                    clientSecret: this.state.clientSecret,
+                    encryptedData: this.state.encryptedData,
+                    chunkSize: this.state.chunkSize
+                });
                 setInternetCredentials(server, previousInternetCredentials.username, previousInternetCredentials.password)
                     .then(() => {
                         // Edit the all databases store with the potential new name

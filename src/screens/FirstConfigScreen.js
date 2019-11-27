@@ -4,26 +4,21 @@
 /**
  * Created by florinpopa on 14/06/2018.
  */
-import React, {Component} from 'react';
-import {View, Text, StyleSheet, Platform, Image, Alert} from 'react-native';
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
+import React, {Component} from 'react';
+import {View, Text, StyleSheet, Platform, Image, Alert} from 'react-native';
 import {Button, Icon} from 'react-native-material-ui';
-import { TextField } from 'react-native-material-textfield';
 import styles from './../styles';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { loginUser } from './../actions/user';
 import { removeErrors } from './../actions/errors';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
-import DropdownInput from './../components/DropdownInput';
-import config from './../utils/config';
-import url from './../utils/url';
 import Ripple from 'react-native-material-ripple';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import { DocumentPicker, DocumentPickerUtil } from 'react-native-document-picker';
 import translations from './../utils/translations'
 import {getTranslation} from './../utils/functions';
+import VersionNumber from 'react-native-version-number';
 
 class FirstConfigScreen extends Component {
 
@@ -40,33 +35,10 @@ class FirstConfigScreen extends Component {
 
     // Please add here the react lifecycle methods that you need
 
-    // static getDerivedStateFromProps(props, state) {
-    //     if (props.errors && props.errors.type && props.errors.message) {
-    //         Alert.alert(props.errors.type, props.errors.message, [
-    //             {
-    //                 text: getTranslation(translations.alertMessages.okButtonLabel, null),
-    //                 onPress: () => {props.removeErrors()}
-    //             }
-    //         ])
-    //     }
-    //     return null;
-    // }
-
     // The render method should have at least business logic as possible,
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
-        // if (this.props.errors && this.props.errors.type && this.props.errors.message) {
-        //     Alert.alert(this.props.errors.type, this.props.errors.message, [
-        //         {
-        //             text: getTranslation(translations.alertMessages.okButtonLabel, null),
-        //             onPress: () => {
-        //                 this.props.removeErrors()
-        //             }
-        //         }
-        //     ])
-        // }
-
         return (
             <KeyboardAwareScrollView
                 style={[style.container, {paddingTop: Platform.OS === 'ios' ? this.props.screenSize.height === 812 ? 44 : 20 : 0}]}
@@ -104,6 +76,15 @@ class FirstConfigScreen extends Component {
                 </View>
                 <View style={style.logoContainer}>
                     <Image source={{uri: 'logo_app'}} style={style.logoStyle} />
+                    <Text
+                        style={{
+                            color: 'white',
+                            fontFamily: 'Roboto-Medium',
+                            fontSize: 14
+                        }}
+                    >
+                        {`Version: ${VersionNumber.appVersion} - build ${VersionNumber.buildVersion}`}
+                    </Text>
                 </View>
             </KeyboardAwareScrollView>
         );

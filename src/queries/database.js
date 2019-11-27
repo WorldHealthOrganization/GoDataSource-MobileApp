@@ -192,7 +192,7 @@ export function getDatabase(collectionName) {
 
         RNFetchBlobFS.exists(pathToDatabase)
             .then((exists) => {
-                console.log('Database exists? ', exists);
+                // console.log('Database exists? ', exists);
                 // PouchDB.debug.enable('pouchdb:find');
                 databaseCache = new PouchDB(encodeName(databaseName, database.databasePassword), {adapter: 'react-native-sqlite'});
                 // console.log('Result for find time for chech if database exists: ', collectionName, new Date().getTime() - start);

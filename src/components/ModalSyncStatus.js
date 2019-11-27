@@ -2,7 +2,7 @@
  * Created by florinpopa on 04/07/2018.
  */
 import React, {PureComponent} from 'react';
-import {View, Text, StyleSheet, Platform, ScrollView, Modal} from 'react-native';
+import {View, Text, Platform, ScrollView, Modal} from 'react-native';
 import styles from './../styles';
 import {Button} from 'react-native-material-ui';
 
@@ -63,8 +63,8 @@ class ModalSyncStatus extends PureComponent {
 
 // Create style outside the class, or for components that will be used by other components (buttons),
 // make a global style in the config directory
-const style = StyleSheet.create({
-
-});
+// const style = StyleSheet.create({
+//
+// });
 
 export default ModalSyncStatus;

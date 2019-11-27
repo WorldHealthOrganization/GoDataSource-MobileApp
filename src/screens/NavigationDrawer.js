@@ -2,7 +2,7 @@
  * Created by florinpopa on 03/07/2018.
  */
 import React, {Component} from 'react';
-import {Text, View, Platform, Image, StyleSheet, ScrollView} from 'react-native';
+import {Text, View, Platform, StyleSheet, ScrollView} from 'react-native';
 import NavigationDrawerListItem from './../components/NavigationDrawerListItem';
 import config from './../utils/config';
 import {connect} from "react-redux";
@@ -13,8 +13,9 @@ import styles from './../styles';
 import {ListItem, Icon} from 'react-native-material-ui';
 import DropdownInput from './../components/DropdownInput';
 import {updateUser} from './../actions/user';
-import {updateRequiredFields, calculateDimension, getTranslation} from './../utils/functions';
-import translations from './../utils/translations'
+import {updateRequiredFields, getTranslation} from './../utils/functions';
+import translations from './../utils/translations';
+import VersionNumber from 'react-native-version-number';
 
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
@@ -123,6 +124,17 @@ class NavigationDrawer extends Component {
                     </View>
                     <NavigationDrawerListItem key={'help'} label={getTranslation(translations.navigationDrawer.helpLabel, this.props.translation)} name="help" onPress={() => this.handlePressOnListItem('help')} isSelected={'help' === this.state.selectedScreen}/>
                     <NavigationDrawerListItem label={getTranslation(translations.navigationDrawer.logoutLabel, this.props.translation)} name="power-settings-new" onPress={this.handleLogout} />
+                    <Text
+                        style={{
+                            color: styles.navigationDrawerItemText,
+                            fontFamily: 'Roboto-Medium',
+                            fontSize: 14,
+                            marginTop: 10,
+                            marginHorizontal: 16
+                        }}
+                    >
+                        {`Version: ${VersionNumber.appVersion} - build ${VersionNumber.buildVersion}`}
+                    </Text>
                 </ScrollView>
             </View>
         );

@@ -168,7 +168,7 @@ export function getAvailableLanguages(dispatch) {
 
 export function storeHubConfigurationNew(hubConfiguration) {
     return async function (dispatch) {
-        let hubConfig = JSON.parse(hubConfiguration.clientId);
+        // let hubConfig = JSON.parse(hubConfiguration.clientId);
         console.log('Hub credentials: ', hubConfiguration);
 
         Promise.resolve()
@@ -241,7 +241,7 @@ function processFilesForSyncNew(error, response, hubConfiguration, isFirstTime, 
                                     let startTimeForProcessingOneFile = new Date().getTime();
                                     let auxData = await processFilePouch(`${constants.DATABASE_LOCATIONS}/${pouchFiles[i]}`, pouchFiles[i], files.length, dispatch, isFirstTime, forceBulk, hubConfig.encryptedData, hubConfig);
                                     if (auxData) {
-                                        console.log('auxData: ', auxData);
+                                        // console.log('auxData: ', auxData);
                                         console.log(`Time for processing file: ${pouchFiles[i]}: ${new Date().getTime() - startTimeForProcessingOneFile}`);
                                         promiseResponses.push(auxData);
                                     } else {

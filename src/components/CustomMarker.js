@@ -7,7 +7,7 @@ import {View, Text, StyleSheet} from 'react-native';
 // the material ui library, since it provides design and animations out of the box
 import styles from './../styles';
 
-CustomMarker = ({markerStyle, style, currentValue}) => {
+CustomMarker = ({markerStyle, style, currentValue, markerColor}) => {
     let formMarkerStyle = {};
     if(Array.isArray(markerStyle)){
         formMarkerStyle = markerStyle[1];
@@ -23,7 +23,7 @@ CustomMarker = ({markerStyle, style, currentValue}) => {
                     fontSize: 15,
                     width: '100%',
                     alignSelf: 'center',
-                    color: 'black'
+                    color: markerColor || 'black'
                 }]}
             >
                 {currentValue}

@@ -32,7 +32,7 @@ export function getDatabaseSnapshotRequestNew(hubConfig, lastSyncDate, dispatch)
             fromDate: createDate(lastSyncDate)
         }
     }
-    let requestUrl = `${hubConfiguration.url}${constants.getDatabase}?autoEncrypt=${hubConfiguration.encryptedData}${lastSyncDate ? `&filter=${JSON.stringify(filter)}` : ''}&chunkSize=5000${hubConfiguration.userEmail ? `&userEmail=${hubConfiguration.userEmail}` : ''}`;
+    let requestUrl = `${hubConfiguration.url}${constants.getDatabase}?autoEncrypt=${hubConfiguration.encryptedData}${lastSyncDate ? `&filter=${JSON.stringify(filter)}` : ''}&chunkSize=${hubConfiguration.chunkSize || 5000}${hubConfiguration.userEmail ? `&userEmail=${hubConfiguration.userEmail}` : ''}`;
 
     let dirs = RNFetchBlob.fs.dirs.DocumentDir;
 

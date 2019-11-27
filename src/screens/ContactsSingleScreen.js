@@ -511,7 +511,7 @@ class ContactsSingleScreen extends Component {
                 missingFields = this.checkRequiredFieldsAddresses();
                 break;
             case 2:
-                missingFields = this.checkFields();
+                missingFields = this.lds();
                 break;
             default:
                 break;
@@ -1745,25 +1745,27 @@ class ContactsSingleScreen extends Component {
         // let pass = true;
         let requiredFields = [];
         let relationships = _.get(this.state, 'contact.relationships', []);
-        relationships = relationships.map((e) => _.get(e, 'relationshipData', e));
-        for (let i = 0; i < config.addExposureScreen.length; i++) {
-            if (config.addExposureScreen[i].id === 'exposure') {
-                if (relationships[0].persons.length === 0) {
-                    requiredFields.push('Person')
-                    // pass = false;
-                }
-            } else {
-                if (config.addExposureScreen[i].isRequired) {
-                    if (!relationships[0][config.addExposureScreen[i].id]) {
-                        requiredFields.push(getTranslation(config.addExposureScreen[i].label, this.props.translation));
+        if (checkArrayAndLength(relationships)) {
+            relationships = relationships.map((e) => _.get(e, 'relationshipData', e));
+            for (let i = 0; i < config.addExposureScreen.length; i++) {
+                if (config.addExposureScreen[i].id === 'exposure') {
+                    if (relationships[0].persons.length === 0) {
+                        requiredFields.push('Person')
                         // pass = false;
+                    }
+                } else {
+                    if (config.addExposureScreen[i].isRequired) {
+                        if (!relationships[0][config.addExposureScreen[i].id]) {
+                            requiredFields.push(getTranslation(config.addExposureScreen[i].label, this.props.translation));
+                            // pass = false;
+                        }
                     }
                 }
             }
         }
         return requiredFields;
         // return pass;
-    }
+    };
 
     checkAgeYearsRequirements = () => {
         if (this.state.selectedItemIndexForAgeUnitOfMeasureDropDown === 0) {
