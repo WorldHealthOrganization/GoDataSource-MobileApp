@@ -1,14 +1,12 @@
 import React, {PureComponent} from 'react';
-import {View, Text, Modal, StyleSheet, TextInput, FlatList, Platform} from 'react-native';
+import {View, Text, Modal, StyleSheet, TextInput, FlatList} from 'react-native';
 import {Icon} from 'react-native-material-ui';
 import config from './../utils/config';
 import Ripple from 'react-native-material-ripple';
 import stylesGlobal from './../styles';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
-import translations from './../utils/translations'
-import {getTranslation, getTooltip, calculateDimension} from './../utils/functions';
-import TooltipComponent from './TooltipComponent';
+import {calculateDimension} from './../utils/functions';
 import ElevatedView from 'react-native-elevated-view';
 import Button from './Button';
 import SectionedMultiSelectListItem from './SectionedMultiSelectListItem';
@@ -21,12 +19,14 @@ class SectionedMultiSelect extends PureComponent {
         super(props);
         this.state = {
             searchText: '',
+            showAll: false,
             isModalVisible: false,
             reRenderProps: {
                 selectedItems: [],
                 expandedItems: []
             },
-            allItems: this.props.items
+            allItems: this.props.allItems,
+            items: this.props.items,
         };
     }
 
@@ -34,14 +34,12 @@ class SectionedMultiSelect extends PureComponent {
     componentWillMount() {
         let selectedItems = [];
         if (this.props.selectedItems && Array.isArray(this.props.selectedItems) && this.props.selectedItems.length > 0) {
-            selectedItems = this.extractSelectedItems(this.props.items, this.props.selectedItems, '_id');
+            selectedItems = this.extractSelectedItems(this.props.allItems, this.props.selectedItems, '_id');
         } else {
             if (typeof this.props.selectedItems === 'string') {
-                selectedItems = this.extractSelectedItems(this.props.items, [this.props.selectedItems], 'name');
+                selectedItems = this.extractSelectedItems(this.props.allItems, [this.props.selectedItems], 'name');
             }
         }
-
-        console.log('SectionedMultiSelect componentWillMount selectedItems: ', selectedItems);
         this.setState(prevState => ({
             reRenderProps: Object.assign({}, prevState.reRenderProps, {selectedItems: selectedItems})
         }));
@@ -51,12 +49,11 @@ class SectionedMultiSelect extends PureComponent {
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
-        console.log("SectionedMultiSelect screenSize: ");
         return (
             <View>
-                {/*Component container*/}
+                {/**Component container*/}
                 <Ripple onPress={this.handleOnPress}>
-                    {/*Text and dropdown icon container*/}
+                    {/**Text and dropdown icon container*/}
                     <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
                         <Text>{this.props.selectText}</Text>
                         <Icon name={'arrow-drop-down'} />
@@ -92,7 +89,7 @@ class SectionedMultiSelect extends PureComponent {
                             }}
                             elevation={5}
                         >
-                            {/*Search header*/}
+                            {/**Search header*/}
                             <View
                                 style={{
                                     flex: 0.1,
@@ -121,7 +118,30 @@ class SectionedMultiSelect extends PureComponent {
                                     placeholder={this.props.searchPlaceholderText}
                                 />
                             </View>
-                            {/*List container*/}
+                            {/** Toggle list button */}
+                            <View  style={{
+                                flex: 0.1,
+                                flexDirection: 'row',
+                                alignSelf: 'center',
+                                backgroundColor: 'white',
+                                alignItems: 'center'
+                            }}>
+                                <Button
+                                    title={this.state.showAll ? 'SHOW LESS' : 'SHOW ALL'}
+                                    height={calculateDimension(32, true, this.props.screenSize)}
+                                    width={calculateDimension(32, true, this.props.screenSize)}
+                                    style={{
+                                        alignSelf:'center',
+                                        marginHorizontal: 6.5,
+                                        flex: 0.75
+                                    }}
+                                    color={stylesGlobal.buttonGreen}
+                                    titleColor={'white'}
+                                    titleStyle={{fontFamily: 'Roboto-Medium', fontSize: 14}}
+                                    onPress={this.handleOnPressShowAll}
+                                />
+                            </View>
+                            {/**List container*/}
                             <View
                                 style={{
                                     flex: 0.8,
@@ -130,10 +150,10 @@ class SectionedMultiSelect extends PureComponent {
                                 }}
                             >
                                 {
-                                    this.handleRenderList(this.state.allItems)
+                                    this.handleRenderList(this.state.showAll ? this.state.allItems : this.state.items)
                                 }
                             </View>
-                            {/*Action buttons container*/}
+                            {/**Action buttons container*/}
                             <View
                                 style={{
                                     flexDirection: 'row',
@@ -201,7 +221,6 @@ class SectionedMultiSelect extends PureComponent {
     };
 
     handleRenderItem = ({item, index}) => {
-        // console.log('handleRenderItem: ', this.props.selectedItems);
         return (
             <SectionedMultiSelectListItem
                 item={item}
@@ -239,7 +258,7 @@ class SectionedMultiSelect extends PureComponent {
         this.setState(prevState => ({
             reRenderProps: Object.assign({}, prevState.reRenderProps, {selectedItems: selectedItemsClone})
         }), () => {
-            console.log('Selected Items biatch: ', this.state.reRenderProps.selectedItems);
+            console.log('Selected items: ', this.state.reRenderProps.selectedItems);
         })
     };
 
@@ -273,20 +292,25 @@ class SectionedMultiSelect extends PureComponent {
             this.setState({
                 searchText: text
             }, () => {
-                console.log('Here do the filtering');
                 let filteredData = this.filterData(cloneDeep(this.props.items), text);
-                // let expandedItems = this.filterDataToExpand(cloneDeep(this.props.items), text);
+                let filteredAllData = this.filterData(cloneDeep(this.props.allItems), text);
                 this.setState(prevState => ({
-                    allItems: filteredData.filteredData,
-                    reRenderProps: Object.assign({}, prevState.reRenderProps, {expandedItems: filteredData.expandedItems})
+                    allItems: filteredAllData.filteredData,
+                    items: filteredData.filteredData,
+                    reRenderProps: Object.assign({}, prevState.reRenderProps, {expandedItems: this.state.showAll ? filteredAllData.expandedItems : filteredData.expandedItems})
                 }))
             })
         } else {
             this.setState(prevState => ({
-                allItems: cloneDeep(this.props.items),
+                allItems: cloneDeep(this.props.allItems),
+                items: cloneDeep(this.props.items),
                 reRenderProps: Object.assign({}, prevState.reRenderProps, {expandedItems: []})
             }))
         }
+    };
+
+    handleOnPressShowAll = () => {
+        this.setState({showAll: !this.state.showAll});
     };
 
     filterData = (items, text) => {
@@ -294,7 +318,6 @@ class SectionedMultiSelect extends PureComponent {
             filteredData: [],
             expandedItems: []
         };
-        let filteredData = [];
         for (let i=0; i<items.length; i++) {
             let keepData = null;
             if (items[i][this.props.subKey]) {
@@ -342,7 +365,6 @@ class SectionedMultiSelect extends PureComponent {
     };
 
     extractSelectedItems = (items, selectedItemsIds, parameter) => {
-        // console.log('extractSelectedItems selectedItemsIds: ', selectedItemsIds, parameter)
         let selectedItems = [];
         for (let i=0; i<items.length; i++) {
             if (items[i].children) {

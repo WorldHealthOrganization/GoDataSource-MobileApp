@@ -16,8 +16,7 @@ import groupBy from 'lodash/groupBy';
 import set from 'lodash/set';
 import defaultTranslations from './defaultTranslations'
 import {getSyncEncryptPassword, encrypt, decrypt} from './../utils/encryption';
-import RNFS from 'react-native-fs';
-import {Buffer} from 'buffer';
+import {extractLocations} from './../actions/locations';
 import moment from 'moment';
 import {checkArrayAndLength} from './typeCheckingFunctions';
 import {executeQuery, insertOrUpdate} from './../queries/sqlTools/helperMethods';
@@ -42,7 +41,7 @@ export function handleResponse(response) {
         }
         throw new Error(errorTypes.UNKNOWN_ERROR);
     });
-};
+}
 
 // RN-fetch-blob does not manage status codes, so, this
 export function handleResponseFromRNFetchBlob(response) {
@@ -62,7 +61,7 @@ export function handleResponseFromRNFetchBlob(response) {
                 })
         }
     })
-};
+}
 
 // This method is used for calculating dimensions for components.
 // Because the design is made only for one screen, this means that for other screen resolutions, the views will not be scaled
@@ -794,7 +793,7 @@ export function extractQuestionsRecursively (questions, item) {
         }
     }
     return returnedQuestions;
-};
+}
 
 export function mapAnswers(questions, answers) {
     let mappedAnswers = {};
@@ -858,7 +857,7 @@ export function mapAnswers(questions, answers) {
     // }, () => {
     return {mappedQuestions: sortedQuestions, mappedAnswers: mappedAnswers};
     // });
-};
+}
 
 // Extract all sub questions of the sub-questions
 function extractQuestions(questions) {
@@ -877,7 +876,7 @@ function extractQuestions(questions) {
 
     // console.log('extract le questions:  ', returnedQuestions);
     return returnedQuestions;
-};
+}
 
 export function reMapAnswers(answers) {
     let returnedAnswers = answers;
@@ -903,7 +902,7 @@ export function reMapAnswers(answers) {
     }
 
     return returnedAnswers;
-};
+}
 
 export function checkRequiredQuestions(questions, previousAnswers) {
     let requiredQuestions = [];
@@ -927,7 +926,7 @@ export function checkRequiredQuestions(questions, previousAnswers) {
         }
     }
     return requiredQuestions;
-};
+}
 
 export function getTranslation (value, allTransactions) {
     if (!getTranslation.cache) {
@@ -943,7 +942,7 @@ export function getTranslation (value, allTransactions) {
     }
     let valueToBeReturned = value;
     if (value && typeof value === 'string' && value.includes('LNG')) {
-        let item = null
+        let item = null;
         if (value && allTransactions && Array.isArray(allTransactions)) {
             item = allTransactions.find(e => {return e && e.token === value})
         }
@@ -983,8 +982,8 @@ export function localSortHelpItem (helpItemsCopy, propsFilter, stateFilter, filt
 
     // Take care of sort
     if (filterFromFilterScreen && filterFromFilterScreen.sort && filterFromFilterScreen.sort !== undefined && filterFromFilterScreen.sort.length > 0) {
-        let sortCriteria = []
-        let sortOrder = []
+        let sortCriteria = [];
+        let sortOrder = [];
         for(let i = 0; i < filterFromFilterScreen.sort.length; i++) {
             if (filterFromFilterScreen.sort[i].sortCriteria && filterFromFilterScreen.sort[i].sortCriteria.trim().length > 0 && filterFromFilterScreen.sort[i].sortOrder && filterFromFilterScreen.sort[i].sortOrder.trim().length > 0){
                 sortCriteria.push(filterFromFilterScreen.sort[i].sortCriteria === 'LNG_HELP_ITEMS_FIELD_LABEL_TITLE' ? 'title' : 'categoryId')
@@ -1000,9 +999,9 @@ export function localSortHelpItem (helpItemsCopy, propsFilter, stateFilter, filt
                 e.categoryId = getTranslation(e.categoryId, translations) 
             }
             return e
-        })
+        });
 
-        helpItemsCopy = helpItemsCopyMapped
+        helpItemsCopy = helpItemsCopyMapped;
 
         if (sortCriteria.length > 0 && sortOrder.length > 0) {
             if (sortOrder.length === 1) {
@@ -1018,7 +1017,7 @@ export function localSortHelpItem (helpItemsCopy, propsFilter, stateFilter, filt
 
 export function filterItemsForEachPage (helpItemsCopy, pageAskingHelpFrom) {
     helpItemsCopy = helpItemsCopy.filter((e) => {
-        let itemPage = null
+        let itemPage = null;
         if (e.page && e.page !== undefined) {
             itemPage = e.page
         }
@@ -1071,13 +1070,13 @@ export function filterItemsForEachPage (helpItemsCopy, pageAskingHelpFrom) {
                     e.page.toLowerCase().includes('view')) && !e.page.toLowerCase().includes('add') && !e.page.toLowerCase().includes('create')
             }
         }
-    })
+    });
 
     return helpItemsCopy
 }
 
 export function objSort() {
-    var args = arguments,
+    let args = arguments,
         array = args[0],
         case_sensitive, keys_length, key, desc, a, b, i;
 
@@ -1135,35 +1134,36 @@ export function getTooltip (label, translation, forceTooltip, tooltipsMessage) {
         };
     }
 
-    let hasTooltip = false
-    let tooltipMessage = ''
+    let hasTooltip = false;
+    let tooltipMessage = '';
 
-    let labelTooltip = label + '_DESCRIPTION'
-    let tooltipTranslation = getTranslation(labelTooltip, translation)
+    let labelTooltip = label + '_DESCRIPTION';
+    let tooltipTranslation = getTranslation(labelTooltip, translation);
     if (tooltipTranslation && typeof tooltipTranslation === 'string' && !tooltipTranslation.includes('LNG') && !tooltipTranslation.includes('_DESCRIPTION') && tooltipTranslation.trim().length > 0){
-        hasTooltip = true
+        hasTooltip = true;
         tooltipMessage = tooltipTranslation
     }
 
     let tooltip = {
         hasTooltip: hasTooltip,
         tooltipMessage: tooltipMessage
-    }
+    };
     
     return tooltip
 }
 
 export function getDropDownInputDisplayParameters(screenSize, dropDownDataLength ){
-    let itemCount = 4
-    let dropdownPosition = 3
+    let itemCount = 4;
+    let dropdownPosition = 3;
 
     if (dropDownDataLength < 4){
-        itemCount = dropDownDataLength
-        dropdownPosition = dropDownDataLength - 1
+        itemCount = dropDownDataLength;
+        dropdownPosition = dropDownDataLength - 1;
     } else {
-        if (screenSize.height !== undefined && screenSize.height < 667) { //iPhone 6
-            itemCount = 3
-            dropdownPosition = 2
+        if (screenSize.height !== undefined && screenSize.height < 667) {
+            //iPhone 6
+            itemCount = 3;
+            dropdownPosition = 2;
         }
     }
     
@@ -1201,22 +1201,22 @@ export function daysSince(startDate, endDate) {
 
 export function calcDateDiff(startdate, enddate) {
     //define moments for the startdate and enddate
-    var startdateMoment = moment(startdate);
-    var enddateMoment = moment(enddate);
+    let startdateMoment = moment(startdate);
+    let enddateMoment = moment(enddate);
 
     if (startdateMoment.isValid() === true && enddateMoment.isValid() === true) {
         //getting the difference in years
-        var years = enddateMoment.diff(startdateMoment, 'years');
+        let years = enddateMoment.diff(startdateMoment, 'years');
 
         //moment returns the total months between the two dates, subtracting the years
-        var months = enddateMoment.diff(startdateMoment, 'months') - (years * 12);
+        let months = enddateMoment.diff(startdateMoment, 'months') - (years * 12);
 
         //to calculate the days, first get the previous month and then subtract it
         startdateMoment.add(years, 'years').add(months, 'months');
-        var days = enddateMoment.diff(startdateMoment, 'days')
+        let days = enddateMoment.diff(startdateMoment, 'days');
 
 
-        console.log('calcDateDiff', { months: months, years: years })
+        console.log('calcDateDiff', { months: months, years: years });
         return nrOFYears = {
             months: months,
             years: years,
@@ -1225,7 +1225,7 @@ export function calcDateDiff(startdate, enddate) {
     else {
         return undefined;
     }
-};
+}
 
 // Algorithm:
 // - Get contact's main address
@@ -1315,4 +1315,20 @@ export function getLocationAccurate () {
             }
         )
     })
+}
+
+export function filterByUser(locationTree, userTeams){
+    let locationIds = [];
+    for (let i=0; i<userTeams.length; i++){
+        if (userTeams[i].hasOwnProperty('locationIds') && userTeams[i].locationIds.length > 0){
+            let teamLocations = userTeams[i].locationIds;
+            for ( let j=0; j< teamLocations.length; j++){
+                if(locationIds.indexOf(teamLocations[j]) === -1) {
+                    locationIds.push(teamLocations[j]);
+                }
+            }
+        }
+
+    }
+    return extractLocations(locationTree,locationIds);
 }

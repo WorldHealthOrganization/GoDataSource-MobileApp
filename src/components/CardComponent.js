@@ -1,11 +1,8 @@
 /**
  * Created by florinpopa on 25/07/2018.
  */
-/**
- * Created by florinpopa on 19/07/2018.
- */
-// Since this app is based around the material ui is better to use the components from
-// the material ui library, since it provides design and animations out of the box
+/** Since this app is based around the material ui is better to use the components from
+ the material ui library, since it provides design and animations out of the box */
 import React, {PureComponent} from 'react';
 import {View, Text, StyleSheet, WebView} from 'react-native';
 import {calculateDimension, getTranslation, createDate} from './../utils/functions';
@@ -27,11 +24,10 @@ import IntervalPicker from './IntervalPicker';
 import ActionsBar from './ActionsBar';
 import translations from './../utils/translations';
 import SearchableDropdown from './SearchableDropdown';
-// import moment from 'moment';
 
 class CardComponent extends PureComponent {
 
-    // This will be a dumb component, so it's best not to put any business logic in it
+    /** This will be a dumb component, so it's best not to put any business logic in it */
     constructor(props) {
         super(props);
         this.state = {
@@ -39,12 +35,11 @@ class CardComponent extends PureComponent {
         };
     }
 
-    // Please add here the react lifecycle methods that you need
-   
-    
-    // The render method should have at least business logic as possible,
-    // because this will be called whenever there is a new setState call
-    // and can slow down the app
+    /** Please add here the react lifecycle methods that you need
+     * The render method should have at least business logic as possible,
+     * because this will be called whenever there is a new setState call
+     * and can slow down the app
+     */
     render() {
         let width = calculateDimension(315, false, this.props.screenSize);
         let marginHorizontal = calculateDimension(14, false, this.props.screenSize);
@@ -139,6 +134,7 @@ class CardComponent extends PureComponent {
                         index={this.props.index}
                         value={this.props.value}
                         data={this.props.locations}
+                        userData={this.props.userLocations}
                         isEditMode={this.props.item.isEditMode}
                         isRequired={this.props.item.isRequired}
                         sectionedSelectedItems={this.props.sectionedSelectedItems}
@@ -226,7 +222,6 @@ class CardComponent extends PureComponent {
                 return (
                     <TextSwitchSelector 
                         selectedItem={this.props.selectedItemIndexForTextSwitchSelectorForAge}
-                        // selectedItem={this.props[this.props.item.selectedItemIndexForTextSwitchSelector]}
                         selectedItemIndexForTextSwitchSelector={this.props.item.selectedItemIndexForTextSwitchSelector}
                         onChange={this.props.onChangeTextSwitchSelector}
                         values={this.props.item.values}
@@ -285,8 +280,10 @@ class CardComponent extends PureComponent {
     };
 }
 
-// Create style outside the class, or for components that will be used by other components (buttons),
-// make a global style in the config directory
+/**
+ * Create style outside the class, or for components that will be used by other components (buttons),
+ * make a global style in the config directory
+ */
 const style = StyleSheet.create({
     container: {
         backgroundColor: 'white',
@@ -302,6 +299,7 @@ function mapStateToProps(state) {
     return {
         screenSize: state.app.screenSize,
         locations: get(state, `locations.locations`, []),
+        userLocations: get(state, `locations.userLocations`, []),
         translation: state.app.translation,
     };
 }
