@@ -1,7 +1,7 @@
 /**
  * Created by florinpopa on 19/07/2018.
  */
-import {ACTION_TYPE_STORE_OUTBREAK, ACTION_TYPE_STORE_LOCATIONS} from './../utils/enums';
+import {ACTION_TYPE_STORE_OUTBREAK, ACTION_TYPE_STORE_LOCATIONS, ACTION_TYPE_STORE_USER_LOCATIONS} from './../utils/enums';
 import errorTypes from './../utils/errorTypes';
 import {getLocationsByOutbreakIdRequest} from './../queries/locations'
 import {mapLocations} from './../utils/functions'
@@ -19,6 +19,13 @@ export function storeLocations(locations) {
     return {
         type: ACTION_TYPE_STORE_LOCATIONS,
         payload: locations
+    }
+}
+
+export function storeUserLocations(userLocations) {
+    return {
+        type: ACTION_TYPE_STORE_USER_LOCATIONS,
+        payload: userLocations
     }
 }
 
@@ -47,7 +54,29 @@ export function getLocations(locationIds) {
     })
 }
 
-function extractLocations (locationTree, locationIds) {
+export function getUserLocations(locationIds){
+    return new Promise((resolve, reject) => {
+        getLocationsByOutbreakIdRequest(null, (error, responseLocations) => {
+            if (error) {
+                console.log('*** getLocationsByOutbreakId error: ', error);
+                reject(errorTypes.ERROR_LOCATIONS);
+            }
+            if (responseLocations) {
+                console.log('*** getUserLocationsByOutbreakId response: ', responseLocations);
+                let treeLocationList = [];
+                if (responseLocations.length > 0) {
+                    treeLocationList = mapLocations(responseLocations.filter((e) => {return e.active === true}));
+                    if (locationIds && Array.isArray(locationIds) && locationIds.length > 0) {
+                        treeLocationList = extractLocations(treeLocationList, locationIds);
+                    }
+                }
+                resolve({userLocations: {userLocationsList: responseLocations, userTreeLocationsList: treeLocationList}});
+            }
+        });
+    })
+}
+
+export function extractLocations (locationTree, locationIds) {
     let newLocationTree = [];
 
     for (let i=0; i<locationTree.length; i++) {
