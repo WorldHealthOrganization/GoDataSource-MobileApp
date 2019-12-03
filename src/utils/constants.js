@@ -19,7 +19,7 @@ const appScreens = {
     qrScanScreen: 'QRScanScreen',
     hubConfigScreen: 'HubConfigScreen',
     viewEditScreen: 'ViewEditScreen',
-
+    usersScreen: 'UsersScreen',
     generateFollowUpsScreen: 'GenerateFollowUpScreen',
     inAppNotificationScreen: 'InAppNotificationScreen'
 };

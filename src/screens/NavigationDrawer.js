@@ -43,18 +43,17 @@ class NavigationDrawer extends Component {
                 <View
                     style={{
                         flex: 0.2,
-                        marginTop: Platform.OS === 'ios' ? this.props.screenSize.height === 812 ? 44 : 20 : 0,
+                        marginTop: Platform.OS === 'ios' ? (this.props.screenSize.height === 812 ? 44 : 20) : 0,
                         justifyContent: 'space-around'
                     }}>
                         <ListItem
                             numberOfLines={2}
-                            leftElement={<Icon name="account-circle" size={40} color={styles.buttonGreen}/>}
+                            leftElement={<Icon name="account-circle" size={38} color={styles.buttonGreen}/>}
                             centerElement={{
                                 primaryText: (this.props.user && this.props.user.firstName ? (this.props.user.firstName + ' ') : ' ') + (this.props.user && this.props.user.lastName ? this.props.user.lastName : ' '),
                                 secondaryText: this.props.user && this.props.user.email ? this.props.user.email : ' '
                             }}
                             style={{
-                                // container: {height: '75%'},
                                 primaryText: {fontFamily: 'Roboto-Medium', fontSize: 18},
                                 secondaryText: {fontFamily: 'Roboto-Regular', fontSize: 12},
                                 centerElementContainer: {height: '100%', justifyContent: 'center'}
@@ -71,7 +70,7 @@ class NavigationDrawer extends Component {
                     <View style={styles.lineStyle} />
                 </View>
 
-                <ScrollView scrollEnabled={true} style={{flex: 0.8}} contentContainerStyle={{flexGrow: 1}}>
+                <ScrollView scrollEnabled={true} style={{flex: 0.9}} contentContainerStyle={{flexGrow: 1}}>
                     {
                         config.sideMenuItems.map((item, index) => {
                             let addButton = false;
@@ -122,6 +121,14 @@ class NavigationDrawer extends Component {
                             screenSize={this.props.screenSize}
                         />
                     </View>
+                    <NavigationDrawerListItem
+                        label={getTranslation(translations.navigationDrawer.usersLabel, this.props.translation)}
+                        name={'contact-phone'}
+                        key={3}
+                        onPress={() => this.handlePressOnListItem(3)}
+                        isSelected={3 === this.state.selectedScreen}
+                        addButton={false}
+                    />
                     <NavigationDrawerListItem key={'help'} label={getTranslation(translations.navigationDrawer.helpLabel, this.props.translation)} name="help" onPress={() => this.handlePressOnListItem('help')} isSelected={'help' === this.state.selectedScreen}/>
                     <NavigationDrawerListItem label={getTranslation(translations.navigationDrawer.logoutLabel, this.props.translation)} name="power-settings-new" onPress={this.handleLogout} />
                     <Text
@@ -129,7 +136,7 @@ class NavigationDrawer extends Component {
                             color: styles.navigationDrawerItemText,
                             fontFamily: 'Roboto-Medium',
                             fontSize: 14,
-                            marginTop: 10,
+                            // marginTop: 10,
                             marginHorizontal: 16
                         }}
                     >
@@ -219,7 +226,7 @@ class NavigationDrawer extends Component {
             animated: true
         })
     };
-
+    
     handleOnChangeLanguage = (value, label) => {
         let user = Object.assign({}, this.props.user);
         user.languageId = value;

@@ -6,6 +6,7 @@ export default {
     'LNG_NAVIGATION_DRAWER_CASES': 'Cases',
     'LNG_NAVIGATION_DRAWER_SYNC_HUB_MANUAL': 'Sync HUB manually',
     'LNG_NAVIGATION_DRAWER_CHANGE_HUB_CONFIG': 'Change HUB configuration',
+    'LNG_NAVIGATION_DRAWER_USERS': 'Users',
     'LNG_NAVIGATION_DRAWER_LANGUAGES': 'Languages',
     'LNG_NAVIGATION_DRAWER_LOGOUT': 'Logout',
     'LNG_LAYOUT_MENU_ITEM_HELP_LABEL': 'Help & support',
