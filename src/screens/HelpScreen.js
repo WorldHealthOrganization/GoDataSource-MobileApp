@@ -11,7 +11,6 @@ import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import SearchFilterView from './../components/SearchFilterView';
 import HelpListItem from './../components/HelpListItem';
-// import AnimatedListView from './../components/AnimatedListView';
 import {removeErrors} from './../actions/errors';
 import {addFilterForScreen, removeFilterForScreen} from './../actions/app';
 import _ from 'lodash';
@@ -63,9 +62,9 @@ class HelpScreen extends Component {
         
         this.props.removeFilterForScreen('HelpFilterScreen');
 
-        console.log('componentDidMount HelpScreen', this.props.pageAskingHelpFrom)
+        console.log('componentDidMount HelpScreen', this.props.pageAskingHelpFrom);
         if (this.state.pageAskingHelpFrom && this.state.pageAskingHelpFrom !== undefined) {
-            let itemsToSetInState = this.prepareFieldsForHelpFromPage()
+            let itemsToSetInState = this.prepareFieldsForHelpFromPage();
             this.setState({
                 filter: itemsToSetInState.filter,
                 filterFromFilterScreen: null,
@@ -102,7 +101,7 @@ class HelpScreen extends Component {
                     return true;
                 }
             }
-        ])
+        ]);
         return true;
     }
 
@@ -140,7 +139,7 @@ class HelpScreen extends Component {
         });
         let helpTitle = []; helpTitle[1] = getTranslation(translations.helpScreen.helpTitle, this.props.translation);
 
-        let filterNumbers = 0
+        let filterNumbers = 0;
         if (this.state.filterFromFilterScreen) {
             if (this.state.filterFromFilterScreen.categories && this.state.filterFromFilterScreen.categories.length > 0) {
                 ++filterNumbers
@@ -168,10 +167,6 @@ class HelpScreen extends Component {
         if (this.state.pageAskingHelpFrom && this.state.pageAskingHelpFrom !== undefined) {
             helpItemClone = filterItemsForEachPage(helpItemClone, this.state.pageAskingHelpFrom)
         }
-
-        // if(helpItemClone){
-        //     state.helpItems = helpItemClone;
-        // }
 
         return (
             <ViewHOC style={style.container}
@@ -335,40 +330,52 @@ class HelpScreen extends Component {
 
     //PrepareFieldsForHelpFromPage
     prepareFieldsForHelpFromPage = () => {
-        let filter = {searchText: ''}
-        let pageAskingHelpFromNameToDisplay = ''
+        let filter = {searchText: ''};
+        let pageAskingHelpFromNameToDisplay = '';
 
         if (this.state.pageAskingHelpFrom === 'followUps') {
             pageAskingHelpFromNameToDisplay = getTranslation(translations.followUpsScreen.followUpsTitle, this.props.translation)
-        } else if (this.state.pageAskingHelpFrom === 'contacts') {
+        }
+        else if (this.state.pageAskingHelpFrom === 'contacts') {
             pageAskingHelpFromNameToDisplay = getTranslation(translations.contactsScreen.contactsTitle, this.props.translation)
-        } else if (this.state.pageAskingHelpFrom === 'cases') {
+        }
+        else if (this.state.pageAskingHelpFrom === 'cases') {
             pageAskingHelpFromNameToDisplay = getTranslation(translations.casesScreen.casesTitle, this.props.translation)
-        } 
+        }
+        else if (this.state.pageAskingHelpFrom === 'users') {
+            pageAskingHelpFromNameToDisplay = getTranslation(translations.usersScreen.usersTitle, this.props.translation)
+        }
         else if (this.state.pageAskingHelpFrom === 'followUpSingleScreenAdd') {
             pageAskingHelpFromNameToDisplay = `${getTranslation(translations.helpScreen.addMessage, this.props.translation)} ${getTranslation(translations.followUpsSingleScreen.title, this.props.translation)}`
-        } else if (this.state.pageAskingHelpFrom === 'contactsSingleScreenAdd') {
+        }
+        else if (this.state.pageAskingHelpFrom === 'contactsSingleScreenAdd') {
             pageAskingHelpFromNameToDisplay = `${getTranslation(translations.helpScreen.addMessage, this.props.translation)} ${getTranslation(translations.contactSingleScreen.title, this.props.translation)}`
-        } else if (this.state.pageAskingHelpFrom === 'casesSingleScreenAdd') {
+        }
+        else if (this.state.pageAskingHelpFrom === 'casesSingleScreenAdd') {
             pageAskingHelpFromNameToDisplay = `${getTranslation(translations.helpScreen.addMessage, this.props.translation)} ${getTranslation(translations.caseSingleScreen.title, this.props.translation)}`
         } 
         else if (this.state.pageAskingHelpFrom === 'followUpSingleScreenEdit') {
             pageAskingHelpFromNameToDisplay = `${getTranslation(translations.helpScreen.editMessage, this.props.translation)} ${getTranslation(translations.followUpsSingleScreen.title, this.props.translation)}`
-        } else if (this.state.pageAskingHelpFrom === 'contactsSingleScreenEdit') {
+        }
+        else if (this.state.pageAskingHelpFrom === 'contactsSingleScreenEdit') {
             pageAskingHelpFromNameToDisplay = `${getTranslation(translations.helpScreen.editMessage, this.props.translation)} ${getTranslation(translations.contactSingleScreen.title, this.props.translation)}`
-        } else if (this.state.pageAskingHelpFrom === 'casesSingleScreenEdit') {
+        }
+        else if (this.state.pageAskingHelpFrom === 'casesSingleScreenEdit') {
             pageAskingHelpFromNameToDisplay = `${getTranslation(translations.helpScreen.editMessage, this.props.translation)} ${getTranslation(translations.caseSingleScreen.title, this.props.translation)}`
         } 
         else if (this.state.pageAskingHelpFrom === 'followUpSingleScreenView') {
             pageAskingHelpFromNameToDisplay = `${getTranslation(translations.helpScreen.viewMessage, this.props.translation)} ${getTranslation(translations.followUpsSingleScreen.title, this.props.translation)}`
-        } else if (this.state.pageAskingHelpFrom === 'contactsSingleScreenView') {
+        }
+        else if (this.state.pageAskingHelpFrom === 'contactsSingleScreenView') {
             pageAskingHelpFromNameToDisplay = `${getTranslation(translations.helpScreen.viewMessage, this.props.translation)} ${getTranslation(translations.contactSingleScreen.title, this.props.translation)}`
-        } else if (this.state.pageAskingHelpFrom === 'casesSingleScreenView') {
+        }
+        else if (this.state.pageAskingHelpFrom === 'casesSingleScreenView') {
             pageAskingHelpFromNameToDisplay = `${getTranslation(translations.helpScreen.viewMessage, this.props.translation)} ${getTranslation(translations.caseSingleScreen.title, this.props.translation)}`
         }
         else if (this.state.pageAskingHelpFrom === 'exposureAdd') {
             pageAskingHelpFromNameToDisplay = `${getTranslation(translations.exposureScreen.editExposureLabel, this.props.translation)}`
-        } else if (this.state.pageAskingHelpFrom === 'exposureEdit') {
+        }
+        else if (this.state.pageAskingHelpFrom === 'exposureEdit') {
             pageAskingHelpFromNameToDisplay = `${getTranslation(translations.exposureScreen.editExposureLabel, this.props.translation)}`
         }
 
@@ -376,7 +383,7 @@ class HelpScreen extends Component {
             filter: filter,
             pageAskingHelpFromNameToDisplay: pageAskingHelpFromNameToDisplay
         }
-    }
+    };
 
     //Filters 
     applyFilters = () => {
@@ -393,7 +400,7 @@ class HelpScreen extends Component {
     };
 
     handleOnApplyFilters = (filter) => {
-        console.log ('foolowUpsScreen handleOnApplyFilters', filter)
+        console.log ('foolowUpsScreen handleOnApplyFilters', filter);
         this.setState({
             filterFromFilterScreen: filter
         }, () => {
@@ -434,7 +441,6 @@ class HelpScreen extends Component {
             filter: Object.assign({}, prevState.filter, {searchText: text})
         }), console.log('### filter after changed text: ', this.state.filter))
     };
-
 
     //Other
     showMenu = () => {

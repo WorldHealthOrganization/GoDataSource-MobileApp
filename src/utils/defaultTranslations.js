@@ -201,6 +201,9 @@ export default {
     'LNG_CASE_LIST_SCREEN_NO_CASES': 'There are no cases to display',
     'LNG_CASE_LIST_SCREEN_SEE_CONTACTS': 'Contacts',
 
+    //usersScreen
+    'LNG_USER_LIST_SCREEN_TITLE': 'Users',
+    'LNG_USER_LIST_SCREEN_PHONE_BUTTON': 'Call',
 
     //contactsScreen
     'LNG_CONTACT_LIST_SCREEN_TITLE': 'Contacts',

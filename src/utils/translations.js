@@ -243,6 +243,11 @@ const casesScreen = {
     contactExposures: 'LNG_CASE_LIST_SCREEN_SEE_CONTACTS'
 };
 
+const usersScreen = {
+    usersTitle: 'LNG_USER_LIST_SCREEN_TITLE',
+    phoneButtonLabel: 'LNG_USER_LIST_SCREEN_PHONE_BUTTON'
+};
+
 const contactsScreen = {
     contactsTitle: 'LNG_CONTACT_LIST_SCREEN_TITLE',
     addFollowupsButton: 'LNG_CONTACT_LIST_SCREEN_ADD_FOLLOW_UP_BUTTON',
@@ -544,6 +549,7 @@ export default {
     casesFilter,
     caseSingleScreen,
     casesScreen,
+    usersScreen,
     contactsScreen,
     generalLabels,
     alertMessages,
