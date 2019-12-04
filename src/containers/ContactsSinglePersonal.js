@@ -9,7 +9,6 @@ import { calculateDimension, getTranslation, createDate } from './../utils/funct
 import config from './../utils/config';
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
-import Button from './../components/Button';
 import styles from './../styles';
 import CardComponent from './../components/CardComponent';
 import { LoaderScreen } from 'react-native-ui-lib';
@@ -20,6 +19,7 @@ import _ from 'lodash';
 import lodashGet from "lodash/get";
 import {checkArray, checkArrayAndLength} from "../utils/typeCheckingFunctions";
 import TopContainerButtons from "./../components/TopContainerButtons";
+import PermissionComponent from './../components/PermissionComponent';
 
 class ContactsSinglePersonal extends PureComponent {
 
@@ -60,28 +60,22 @@ class ContactsSinglePersonal extends PureComponent {
         return (
             <View style={{ flex: 1 }}>
                 <View style={style.viewContainer}>
-                    {/*<View style={{ flexDirection: 'row' }}>*/}
-                        {/*<Button*/}
-                            {/*title={getTranslation(translations.generalButtons.nextButtonLabel, this.props.translation)}*/}
-                            {/*onPress={this.handleNextButton}*/}
-                            {/*color={styles.buttonGreen}*/}
-                            {/*titleColor={'white'}*/}
-                            {/*height={calculateDimension(25, true, this.props.screenSize)}*/}
-                            {/*width={calculateDimension(130, false, this.props.screenSize)}*/}
-                            {/*style={{*/}
-                                {/*marginVertical: calculateDimension(12.5, true, this.props.screenSize),*/}
-                            {/*}} />*/}
-                    {/*</View>*/}
-                    <TopContainerButtons
-                        isNew={this.props.isNew}
-                        isEditMode={this.props.isEditMode}
-                        index={this.props.activeIndex}
-                        numberOfTabs={this.props.numberOfTabs}
-                        onPressEdit={this.props.onPressEdit}
-                        onPressSaveEdit={this.props.onPressSaveEdit}
-                        onPressCancelEdit={this.props.onPressCancelEdit}
-                        onPressNextButton={this.props.onPressNextButton}
+                    <PermissionComponent
+                        render={() => (
+                            <TopContainerButtons
+                                isNew={this.props.isNew}
+                                isEditMode={this.props.isEditMode}
+                                index={this.props.activeIndex}
+                                numberOfTabs={this.props.numberOfTabs}
+                                onPressEdit={this.props.onPressEdit}
+                                onPressSaveEdit={this.props.onPressSaveEdit}
+                                onPressCancelEdit={this.props.onPressCancelEdit}
+                                onPressNextButton={this.props.onPressNextButton}
+                            />
+                        )}
+                        permissionsList={['contact_all', 'contact_edit']}
                     />
+
                     <ScrollView
                         style={style.containerScrollView}
                         contentContainerStyle={[style.contentContainerStyle, { paddingBottom: this.props.screenSize.height < 600 ? 70 : 20 }]}
