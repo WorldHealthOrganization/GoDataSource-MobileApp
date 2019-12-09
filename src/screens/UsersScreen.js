@@ -15,13 +15,12 @@ import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import ElevatedView from 'react-native-elevated-view';
 import Breadcrumb from './../components/Breadcrumb';
-import {getCasesForOutbreakId} from './../actions/cases';
+import {getUsersForOutbreakId} from './../actions/user';
 import {setLoaderState} from './../actions/app';
 import AnimatedListView from './../components/AnimatedListView';
 import ViewHOC from './../components/ViewHOC';
 import translations from './../utils/translations'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import {pushNewEditScreen} from './../utils/screenTransitionFunctions';
 import {enhanceListWithGetData} from './../components/higherOrderComponents/withListData';
 import get from "lodash/get";
 import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
@@ -85,7 +84,7 @@ class UsersScreen extends Component {
         let filterText = filterNumbers === 0 ? `${getTranslation(translations.generalLabels.filterTitle, this.props.translation)}` : `(${filterNumbers})`;
 
 
-        let caseTitle = []; caseTitle[0] = getTranslation(translations.casesScreen.casesTitle, this.props.translation);
+        let usersTitle = []; usersTitle[0] = getTranslation(translations.usersScreen.usersTitle, this.props.translation);
         return (
             <ViewHOC style={style.container}
                      showLoader={(this.props && this.props.loaderState) || (this.state && this.state.loading)}
@@ -99,29 +98,21 @@ class UsersScreen extends Component {
                             <View
                                 style={[style.breadcrumbContainer]}>
                                 <Breadcrumb
-                                    key="caseKey"
-                                    entities={caseTitle}
+                                    key="userKey"
+                                    entities={usersTitle}
                                     navigator={this.props.navigator}
                                 />
                             </View>
-                            <View style={{flex: 0.15, marginRight: 10}}>
-                                <Ripple style={{
-                                    flex: 1,
-                                    justifyContent: 'center',
-                                    alignItems: 'center'
-                                }} onPress={this.handleOnPressQRCode}>
-                                    <MaterialCommunityIcons name="qrcode-scan" color={'black'} size={20}/>
-                                </Ripple>
+                            <View style={{ flex: 0.15 }}>
                             </View>
-
-                            <View style={{flex: 0.15, marginRight: 10}}>
+                            <View style={{ flex: 0.15 }}>
                                 <ElevatedView
                                     elevation={3}
                                     style={{
                                         backgroundColor: styles.buttonGreen,
                                         width: calculateDimension(33, false, this.props.screenSize),
                                         height: calculateDimension(25, true, this.props.screenSize),
-                                        borderRadius: 4
+                                        borderRadius: 4, marginLeft: 10
                                     }}
                                 >
                                     <Ripple style={{
@@ -133,29 +124,6 @@ class UsersScreen extends Component {
                                     </Ripple>
                                 </ElevatedView>
                             </View>
-                            {
-                                this.props.role !== null && this.props.role.find((e) => e === config.userPermissions.writeCase) !== undefined ? (
-                                    <View style={{flex: 0.15}}>
-                                        <ElevatedView
-                                            elevation={3}
-                                            style={{
-                                                backgroundColor: styles.buttonGreen,
-                                                width: calculateDimension(33, false, this.props.screenSize),
-                                                height: calculateDimension(25, true, this.props.screenSize),
-                                                borderRadius: 4
-                                            }}
-                                        >
-                                            <Ripple style={{
-                                                flex: 1,
-                                                justifyContent: 'center',
-                                                alignItems: 'center'
-                                            }} onPress={this.handleOnPressAddCase}>
-                                                <Icon name="add" color={'white'} size={15}/>
-                                            </Ripple>
-                                        </ElevatedView>
-                                    </View>
-                                ) : null
-                            }
                         </View>
                     }
                     navigator={this.props.navigator}
@@ -163,12 +131,11 @@ class UsersScreen extends Component {
                     handlePressNavbarButton={this.handlePressNavbarButton}
                 >
                 </NavBarCustom>
-
                 <View style={style.containerContent}>
                     <AnimatedListView
                         data={this.props.data || []}
                         dataCount={this.props.dataCount || 0}
-                        dataType={'Case'}
+                        dataType={'User'}
                         colors={this.state.riskColors}
                         filterText={filterText}
                         style={[style.listViewStyle]}
@@ -234,7 +201,7 @@ class UsersScreen extends Component {
         }))
     };
 
-    //Refresh list of cases
+    //Refresh list of users
     handleOnRefresh = () => {
         this.setState({
             refreshing: true
@@ -243,117 +210,14 @@ class UsersScreen extends Component {
         });
     };
 
-    //Create new case in CaseSingleScreen
-    handleOnPressAddCase = () => {
-        this.props.navigator.push({
-            screen: 'CaseSingleScreen',
-            animated: true,
-            // animationType: 'fade',
-            passProps: {
-                isNew: true,
-                refresh: this.props.onRefresh
-            }
-        })
-    };
-
     goToHelpScreen = () => {
-        let pageAskingHelpFrom = 'cases';
+        let pageAskingHelpFrom = 'users';
         this.props.navigator.showModal({
             screen: 'HelpScreen',
             animated: true,
             passProps: {
                 pageAskingHelpFrom: pageAskingHelpFrom
             }
-        });
-    };
-
-    handleOnPressQRCode = () => {
-        // console.log('handleOnPressQRCode');
-
-        this.props.navigator.showModal({
-            screen: 'QRScanScreen',
-            animated: true,
-            passProps: {
-                pushNewScreen: this.pushNewEditScreenLocal
-            }
-        })
-    };
-
-    pushNewEditScreenLocal = (QRCodeInfo) => {
-        // console.log('pushNewEditScreen QRCodeInfo do with method from another side', QRCodeInfo);
-
-        this.setState({
-            loading: true
-        }, () => {
-            pushNewEditScreen(QRCodeInfo, this.props.navigator, this.props && this.props.user ? this.props.user : null, this.props && this.props.translation ? this.props.translation : null, (error, itemType, record) => {
-                this.setState({
-                    loading: false
-                }, () => {
-                    if (error) {
-                        if (error === translations.alertMessages.noItemAlert && itemType === 'case' && record) {
-                            Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props && this.props.translation ? this.props.translation : null), `${getTranslation(error, this.props && this.props.translation ? this.props.translation : null)}.\n${getTranslation(translations.alertMessages.addMissingPerson, this.props && this.props.translation ? this.props.translation : null)}`, [
-                                {
-                                    text: getTranslation(translations.alertMessages.cancelButtonLabel, this.props && this.props.translation ? this.props.translation : null),
-                                    onPress: () => {
-                                        console.log('Cancel pressed');
-                                    }
-                                },
-                                {
-                                    text: getTranslation(translations.alertMessages.yesButtonLabel, this.props && this.props.translation ? this.props.translation : null),
-                                    onPress: () => {
-                                        // console.log('Yes pressed');
-                                        this.props.navigator.push({
-                                            screen: 'CaseSingleScreen',
-                                            animated: true,
-                                            animationType: 'fade',
-                                            passProps: {
-                                                case: Object.assign({}, record, {
-                                                    outbreakId: this.props.user.activeOutbreakId,
-                                                }, config.caseBlueprint),
-                                                forceNew: true,
-                                                refresh: this.props.onRefresh
-                                            }
-                                        })
-                                    }
-                                },
-                            ])
-                        } else {
-                            Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props && this.props.translation ? this.props.translation : null), getTranslation(error, this.props && this.props.translation ? this.props.translation : null), [
-                                {
-                                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props && this.props.translation ? this.props.translation : null),
-                                    onPress: () => {
-                                        console.log('Ok pressed');
-                                    }
-                                }
-                            ])
-                        }
-                    } else {
-                        if (itemType && record) {
-                            if (itemType === 'case') {
-                                this.props.navigator.push({
-                                    screen: 'CaseSingleScreen',
-                                    animated: true,
-                                    animationType: 'fade',
-                                    passProps: {
-                                        case: record,
-                                        refresh: this.props.onRefresh
-                                    }
-                                })
-                            } else if (itemType === 'contact') {
-                                this.props.navigator.push({
-                                    screen: 'ContactsSingleScreen',
-                                    animated: true,
-                                    animationType: 'fade',
-                                    passProps: {
-                                        contact: record,
-                                        refresh: this.props.onRefresh
-                                    }
-                                })
-                            }
-                        }
-                    }
-                });
-            })
         });
     };
 }
@@ -404,4 +268,4 @@ function matchDispatchProps(dispatch) {
     }, dispatch);
 }
 
-export default connect(mapStateToProps, matchDispatchProps)(enhanceListWithGetData(getCasesForOutbreakId, 'UsersScreen')(UsersScreen));
+export default connect(mapStateToProps, matchDispatchProps)(enhanceListWithGetData(getUsersForOutbreakId, 'UsersScreen')(UsersScreen));

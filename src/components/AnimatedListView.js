@@ -211,25 +211,32 @@ class AnimatedListView extends Component {
                     }];
                 titleColor = this.props.colors[mainData.classification];
                 break;
-            default:
+            case 'User':
+                mainData = get(item, 'mainData', null);
+                exposureData = get(item, 'exposureData', []);
                 textsArray = [
-                    // getTranslation(item.statusId, this.props.translation),
-                    // getTranslation(translations.followUpsScreen.addExposureFollowUpLabel, this.props.translation)
+                    getTranslation(translations.usersScreen.phoneButtonLabel, this.props.translation)
                 ];
                 textsStyleArray = [
-                    // [styles.buttonTextActionsBar, {color: this.state.followUpsColors[item.statusId], marginLeft: margins}],
-                    // [styles.buttonTextActionsBar, {marginRight: margins}]
-                    ];
+                    [styles.buttonTextActionsBar, {marginLeft: margins}],
+                    [styles.buttonTextActionsBar, {fontSize: 14}],
+                    [styles.buttonTextActionsBar, {marginRight: margins}]];
                 onPressTextsArray = [
-                    // () => {
-                    //     // console.log('Test performance renderFollowUpQuestion');
-                    //     this.onPressView(item, this.props.contacts.find((e) => {return extractIdFromPouchId(e._id, 'person') === item.personId}))
-                    // },
-                    // () => {
-                    //     // console.log('Test performance renderFollowUpQuestion');
-                    //     this.onPressAddExposure(item, this.props.contacts.find((e) => {return extractIdFromPouchId(e._id, 'person') === item.personId}))
-                    // }
-                    ];
+                    () => {
+                        this.props.onPressView(mainData);
+                    },
+                    () => {
+                        this.props.onPressCenterButton(mainData);
+                    },
+                    () => {
+                        this.props.onPressAddExposure(mainData);
+                    }];
+                titleColor = 'black';
+                break;
+            default:
+                textsArray = [];
+                textsStyleArray = [];
+                onPressTextsArray = [];
                 break;
         }
         return(
@@ -260,6 +267,9 @@ class AnimatedListView extends Component {
                 break;
             case 'Case':
                 message = translations.casesScreen.noCases;
+                break;
+            case 'User':
+                message = translations.usersScreen.noUsers;
                 break;
             default:
                 message = translations.followUpsScreen.noFollowupsMessage;
@@ -296,13 +306,10 @@ class AnimatedListView extends Component {
     };
 
     handleOnPressMap = (person) => {
-        // contact = this.props.contacts.find((e) => {return extractIdFromPouchId(e._id, 'person') === contact});
-
         if (checkArrayAndLength(get(person, 'addresses', null))) {
             let placeOfResidence = person.addresses.find((e) => {
                 return e.typeId === config.userResidenceAddress.userPlaceOfResidence
             });
-            // console.log('placeOfResidence', placeOfResidence);
             let placeOfResidenceLatitude = get(placeOfResidence, 'geoLocation.coordinates[1]', 0);
             let placeOfResidenceLongitude = get(placeOfResidence, 'geoLocation.coordinates[1]', 0);
             navigator.geolocation.getCurrentPosition(

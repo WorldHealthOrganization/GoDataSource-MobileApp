@@ -245,7 +245,9 @@ const casesScreen = {
 
 const usersScreen = {
     usersTitle: 'LNG_USER_LIST_SCREEN_TITLE',
-    phoneButtonLabel: 'LNG_USER_LIST_SCREEN_PHONE_BUTTON'
+    phoneButtonLabel: 'LNG_USER_LIST_SCREEN_PHONE_BUTTON',
+    noUsers: 'LNG_USER_LIST_SCREEN_NO_USERS',
+    primaryPhone: 'LNG_USER_FIELD_LABEL_PRIMARY_TELEPHONE'
 };
 
 const contactsScreen = {

@@ -4,7 +4,7 @@
 import {ACTION_TYPE_STORE_USER} from './../utils/enums';
 import { batchActions } from 'redux-batched-actions';
 import {changeAppRoot, getTranslations, saveTranslation, saveAvailableLanguages} from './app';
-import {loginUserRequest, getUserByIdRequest, updateUserRequest} from './../queries/user';
+import {loginUserRequest, getUserByIdRequest, updateUserRequest, getUserTeamMembers} from './../queries/user';
 import {getUserRoles} from './../actions/role';
 import {getUserTeams} from './../actions/teams';
 import { getClusters } from './clusters';
@@ -24,6 +24,7 @@ import {storePermissions} from './role';
 import {getLocations, getUserLocations} from './locations';
 import get from 'lodash/get';
 import {filterByUser} from './../utils/functions'
+import translations from "../utils/translations";
 
 // Add here only the actions, not also the requests that are executed.
 // For that purpose is the requests directory
@@ -92,8 +93,6 @@ export function getUserById(userId, token, refreshFollowUps, nativeEventEmitter)
                 // dispatch(changeAppRoot('login'));
             }
             if (response) {
-                // console.log('getUserById: ', response);
-
                 // Here is the local storage handling
                 if (refreshFollowUps) {
                     dispatch(setSyncState({ id: 'sync', status: 'test' }));
@@ -204,4 +203,20 @@ export function updateUser(user) {
             }
         })
     }
+}
+
+export function getUsersForOutbreakId({outbreakId, usersFilter, searchText, lastElement, offset}, computeCount) {
+    return new Promise((resolve, reject) => {
+        getUserTeamMembers((error, response) => {
+            if (error) {
+                console.log("*** getUserTeamMembers error: ", error);
+                reject(errorTypes.ERROR_USER_TEAM_MEMBERS);
+            }
+            if (response) {
+                let users = response.map((user) => { return {_id: user._id, mainData: user, exposureData: null}});
+                users = users.filter((user) => { return (user.mainData.email === 'ioana.tudor@clarisoft.com');});
+                resolve({data: users ? users : [], dataCount: users ? users.length : null});
+            }
+        })
+    })
 }

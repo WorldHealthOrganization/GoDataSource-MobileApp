@@ -1,26 +1,22 @@
 /**
  * Created by florinpopa on 23/08/2018.
  */
-/**
- * Created by florinpopa on 03/08/2018.
- */
-import React, {Component} from 'react';
-import {StyleSheet, Image, InteractionManager} from 'react-native';
-import PropTypes from 'prop-types';
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
+import React, {Component} from 'react';
+import {StyleSheet, InteractionManager} from 'react-native';
+import PropTypes from 'prop-types';
 import styles from './../styles';
 import {getTranslation, calculateDimension} from './../utils/functions';
 import {connect} from "react-redux";
 import GeneralListItem from './GeneralListItem';
-import {extractIdFromPouchId, getAddress, handleExposedTo} from "../utils/functions";
+import {getAddress, handleExposedTo} from "../utils/functions";
 import config from "../utils/config";
 import PersonListItemNameAndAddressComponent from './PersonListItemNameAndAddressComponent';
 import PersonListItemExposuresComponent from './PersonListItemExposuresComponent';
 import isEqual from 'lodash/isEqual';
 import get from 'lodash/get';
-import {checkArrayAndLength} from './../utils/typeCheckingFunctions';
-
+import translations from "../utils/translations";
 
 class PersonListItem extends Component {
     constructor(props) {
@@ -56,7 +52,7 @@ class PersonListItem extends Component {
                         onPressName={this.props.onPressNameProp}
                     />
                 }
-                secondComponent={this.props.type !== 'Case' ? (
+                secondComponent={this.props.type !== 'Case' && this.props.type !== 'User' ? (
                     <PersonListItemExposuresComponent
                         data={secondComponentData}
                         onPressExposureProp={this.props.onPressExposureProp}
@@ -80,12 +76,12 @@ class PersonListItem extends Component {
             visualId: '',
             addressString: '',
             primaryColor: 'black',
-            status: null
+            status: null,
+            institutionName: '',
+            telephoneNumbers: '',
         };
         // the new implementation
         let person = get(itemToRender, 'mainData', null);
-
-
 
         // Get followUp's contact
         // let person = type === 'Contact' || type === 'Case' ? itemToRender : this.props.contacts && Array.isArray(this.props.contacts) && this.props.contacts.length > 0 ?  this.props.contacts.find((e) => {return extractIdFromPouchId(e._id, 'person') === itemToRender.personId}) : null;
@@ -123,9 +119,15 @@ class PersonListItem extends Component {
         }
         // Followup final status
         if (type !== 'Case' && person && person.followUp){
-            returnValues.status = person.followUp.status ? getTranslation(person.followUp.status, this.props.translations) : null;
+            returnValues.status = person.followUp.status ? getTranslation(person.followUp.status, this.props.translation) : null;
         }
-
+        // User institution and phone number
+        if (person &&  person.hasOwnProperty('institutionName')){
+            returnValues.institutionName =  getTranslation(person.institutionName, this.props.translation);
+        }
+        if (person &&  person.hasOwnProperty('telephoneNumbers')){
+            returnValues.telephoneNumbers = person.telephoneNumbers[translations.usersScreen.primaryPhone];
+        }
         return returnValues;
     };
 
@@ -145,8 +147,6 @@ class PersonListItem extends Component {
 
     onPressMapIcon = () => {
         InteractionManager.runAfterInteractions(() => {
-            // let person = this.props.type === 'Contact' || this.props.type === 'Case' ? this.props.itemToRender : this.props.contacts && Array.isArray(this.props.contacts) && this.props.contacts.length > 0 ?  this.props.contacts.find((e) => {return extractIdFromPouchId(e._id, 'person') === this.props.itemToRender.personId}) : null;
-
             if (this.props.onPressMapIconProp !== undefined) {
                 this.props.onPressMapIconProp()
             }

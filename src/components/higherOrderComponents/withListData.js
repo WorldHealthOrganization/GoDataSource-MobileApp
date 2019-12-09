@@ -130,6 +130,15 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                             offset: get(this.state, 'data.length', 0)
                         };
                         break;
+                    case 'UsersScreen':
+                        filter = {
+                            outbreakId: get(this.props, 'user.activeOutbreakId', null),
+                            casesFilter: get(this.state, 'mainFilter', null),
+                            searchText: get(this.state, 'searchText', null),
+                            lastElement: get(this.state, 'lastElement', null),
+                            offset: get(this.state, 'data.length', 0)
+                        };
+                        break;
                     default:
                         break;
                 }
@@ -248,9 +257,6 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                         forwardProps.item = dataToForward;
                         forwardProps.contact = contactData;
                         forwardProps.isEditMode = false;
-                        // forwardProps.elementId = dataToForward._id;
-                        // forwardProps.additionalId = contactData._id;
-                        // forwardProps.elementType = 'followUp';
                         forwardProps.previousScreen = 'FollowUps';
                         break;
                     case 'ContactsScreen':

@@ -162,3 +162,30 @@ export function getTeamsForUserRequest(callback) {
             callback(errorGetDatabase);
         });
 }
+
+export function getUserTeamMembers(callback){
+    getDatabase(config.mongoCollections.user)
+        .then((database) => {
+            database.find({
+                selector: {
+                    _id: {
+                        $gte: `user.json_`,
+                        $lte: `user.json_\uffff`,
+                    },
+                    deleted: false,
+                }
+            })
+                .then((resultFind) => {
+                    console.log('getUserTeamMembers: ', resultFind);
+                    callback(null, resultFind.docs);
+                })
+                .catch((errorFind) => {
+                    console.log('Error find user: ', errorFind);
+                    callback(errorFind, null);
+                })
+        })
+        .catch((errorGetDatabase) => {
+            console.log('Error while getting database: ', errorGetDatabase);
+            callback(errorGetDatabase);
+        });
+}

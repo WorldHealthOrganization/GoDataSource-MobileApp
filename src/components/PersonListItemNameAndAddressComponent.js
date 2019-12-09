@@ -59,9 +59,13 @@ class PersonListItemNameAndAddressComponent extends PureComponent {
                             (null)
                         }
                     </View>
-                    <Ripple key={'secondView'} style={{width: 35, height: 35}} onPress={this.props.onPressMapIcon}>
-                        <Image source={{uri: 'map_icon'}} style={{width: 35, height: 35}}/>
-                    </Ripple>
+                    {
+                        this.props.type !== 'User' ? (
+                            <Ripple key={'secondView'} style={{width: 35, height: 35}} onPress={this.props.onPressMapIcon}>
+                                <Image source={{uri: 'map_icon'}} style={{width: 35, height: 35}}/>
+                            </Ripple>
+                        ) : (null)
+                    }
                 </View>
                 {
                     this.props.type !== 'Case' ? (
