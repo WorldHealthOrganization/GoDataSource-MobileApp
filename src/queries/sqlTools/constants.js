@@ -261,7 +261,7 @@ const mainQueryStrings = {
     allOfExposures: 'AllOfExposures'
 };
 
-function createMainQuery(dataType, outbreakId, filter, search, lastElement, offset, skipAllExposures) {
+function createMainQuery(dataType, outbreakId, filter, search, lastElement, offset, skipAllExposures, skipLimit) {
     dataType = dataType ? dataType : translations.personTypes.contacts;
     let sort = {};
     let notQuery = [];
@@ -314,45 +314,47 @@ function createMainQuery(dataType, outbreakId, filter, search, lastElement, offs
             ['$in']: filter.selectedLocations
         };
     }
-    if (checkArrayAndLength(get(filter, 'sort', null))) {
-        for(let i=0; i<filter.sort.length; i++) {
-            let sortOrder = get(filter, `sort[${i}].sortOrder`, null) === translations.sortTab.sortOrderAsc ? 1 : -1;
-            // Sort by firstName
-            if (get(filter, `sort[${i}].sortCriteria`, null) === translations.sortTab.sortFirstName) {
-                sort[`${mainQueryStrings.outerFilter}.firstName`] = sortOrder;
-            }
-            // Sort by lastName
-            if (get(filter, `sort[${i}].sortCriteria`, null) === translations.sortTab.sortLastName) {
-                sort[`${mainQueryStrings.outerFilter}.lastName`] = sortOrder;
-            }
-            // Sort by visualId
-            if (get(filter, `sort[${i}].sortCriteria`, null) === translations.sortTab.sortVisualId) {
-                sort[`${mainQueryStrings.outerFilter}.visualId`] = sortOrder;
-            }
-            // Sort by createdAt
-            if (get(filter, `sort[${i}].sortCriteria`, null) === translations.sortTab.sortCreatedAt) {
-                sort[`${mainQueryStrings.outerFilter}.createdAt`] = sortOrder;
-            }
-            // Sort by updatedAt
-            if (get(filter, `sort[${i}].sortCriteria`, null) === translations.sortTab.sortUpdatedAt) {
-                sort[`${mainQueryStrings.outerFilter}.updatedAt`] = sortOrder;
-            }
-        }
-        outerFilterCondition['$not'] = notQuery;
-    } else {
-        sort[`${mainQueryStrings.outerFilter}.lastName`] = 1;
-        sort[`${mainQueryStrings.outerFilter}.firstName`] = 1;
-        if (lastElement) {
-            outerFilterCondition = Object.assign({}, outerFilterCondition, {
-                $expression: {
-                    pattern: `(${mainQueryStrings.outerFilter}.lastName, ${mainQueryStrings.outerFilter}.firstName, ${mainQueryStrings.outerFilter}._id)>({lastName}, {firstName}, {id})`,
-                    values: {
-                        lastName: get(lastElement, 'lastName', null),
-                        firstName: get(lastElement, 'firstName', null),
-                        id: get(lastElement, '_id', null)
-                    }
+    if (!skipLimit) {
+        if (checkArrayAndLength(get(filter, 'sort', null))) {
+            for (let i = 0; i < filter.sort.length; i++) {
+                let sortOrder = get(filter, `sort[${i}].sortOrder`, null) === translations.sortTab.sortOrderAsc ? 1 : -1;
+                // Sort by firstName
+                if (get(filter, `sort[${i}].sortCriteria`, null) === translations.sortTab.sortFirstName) {
+                    sort[`${mainQueryStrings.outerFilter}.firstName`] = sortOrder;
                 }
-            })
+                // Sort by lastName
+                if (get(filter, `sort[${i}].sortCriteria`, null) === translations.sortTab.sortLastName) {
+                    sort[`${mainQueryStrings.outerFilter}.lastName`] = sortOrder;
+                }
+                // Sort by visualId
+                if (get(filter, `sort[${i}].sortCriteria`, null) === translations.sortTab.sortVisualId) {
+                    sort[`${mainQueryStrings.outerFilter}.visualId`] = sortOrder;
+                }
+                // Sort by createdAt
+                if (get(filter, `sort[${i}].sortCriteria`, null) === translations.sortTab.sortCreatedAt) {
+                    sort[`${mainQueryStrings.outerFilter}.createdAt`] = sortOrder;
+                }
+                // Sort by updatedAt
+                if (get(filter, `sort[${i}].sortCriteria`, null) === translations.sortTab.sortUpdatedAt) {
+                    sort[`${mainQueryStrings.outerFilter}.updatedAt`] = sortOrder;
+                }
+            }
+            outerFilterCondition['$not'] = notQuery;
+        } else {
+            sort[`${mainQueryStrings.outerFilter}.lastName`] = 1;
+            sort[`${mainQueryStrings.outerFilter}.firstName`] = 1;
+            if (lastElement) {
+                outerFilterCondition = Object.assign({}, outerFilterCondition, {
+                    $expression: {
+                        pattern: `(${mainQueryStrings.outerFilter}.lastName, ${mainQueryStrings.outerFilter}.firstName, ${mainQueryStrings.outerFilter}._id)>({lastName}, {firstName}, {id})`,
+                        values: {
+                            lastName: get(lastElement, 'lastName', ''),
+                            firstName: get(lastElement, 'firstName', ''),
+                            id: get(lastElement, '_id', '')
+                        }
+                    }
+                })
+            }
         }
     }
     let query = {
@@ -413,7 +415,9 @@ function createMainQuery(dataType, outbreakId, filter, search, lastElement, offs
                 alias: mainQueryStrings.allOfExposures
             }
         );
-        query.limit = 10;
+        if (!skipLimit) {
+            query.limit = 10;
+        }
     }
     if (skipAllExposures === true) {
         // query.fields.push(
@@ -428,8 +432,10 @@ function createMainQuery(dataType, outbreakId, filter, search, lastElement, offs
         delete query.sort;
     }
 
-    if (checkArrayAndLength(get(filter, 'sort', null)) && lastElement) {
-        query['offset'] = offset;
+    if (!skipLimit) {
+        if (checkArrayAndLength(get(filter, 'sort', null)) && lastElement) {
+            query['offset'] = offset;
+        }
     }
 
     return query

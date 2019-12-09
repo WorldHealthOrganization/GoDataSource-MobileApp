@@ -48,7 +48,7 @@ export function wrapReadTransactionInPromise (database) {
 }
 
 export function wrapExecuteSQLInPromise (transaction, sqlStatement, arrayOfFields, skipCallback) {
-    // console.log('Execute query: ', sqlStatement);
+    // console.log('Execute query: ', sqlStatement, arrayOfFields);
     if (transaction && sqlStatement && checkArray(arrayOfFields)) {
         return new Promise((resolve, reject) => {
             if (skipCallback) {
@@ -105,28 +105,6 @@ export function createTable(transaction, tableName) {
             .then((resultSet) => Promise.resolve(`Success ${tableName}`))
             .then(() => Promise.resolve(transaction))
             .catch((errorStatement) => Promise.reject(errorStatement));
-
-
-
-    // return new Promise(async (resolve, reject) => {
-    //     try {
-    //         let createTableString = createTableStringMethod(tableName);
-    //         let sqlDb = await openDatabase(databaseName);
-    //         sqlDb.transaction((txn) => {
-    //             txn.executeSql(createTableString, [],
-    //                 (txn, resultSet) => {
-    //                     console.log('SQLite console: Created table: ', tableName);
-    //                     resolve(`Success ${tableName}`);
-    //                 },
-    //                 (txn, errorCreate) => {
-    //                     console.log('SQLite console: Error while creating database: ', errorCreate);
-    //                     reject(errorCreate);
-    //                 })
-    //         })
-    //     } catch(openDatabaseError) {
-    //         reject(new Error('Could not open database'));
-    //     }
-    // })
 }
 
 // The following methods refer to the bulk insert or update of mapped data. Data mapping will not be done here
@@ -221,7 +199,11 @@ export function mapDataForInsert(tableName, data) {
                                 if (tableName === 'person' && e.type === translations.personTypes.events && tableFields[i].fieldName === 'firstName') {
                                     innerArray.push(get(e, `name`, null));
                                 } else {
-                                    innerArray.push(get(e, `[${tableFields[i].fieldName}]`, null));
+                                    if (tableName === 'person' && (tableFields[i].fieldName === 'firstName' || tableFields[i].fieldName === 'lastName')) {
+                                        innerArray.push(get(e, `[${tableFields[i].fieldName}]`, ''));
+                                    } else {
+                                        innerArray.push(get(e, `[${tableFields[i].fieldName}]`, null));
+                                    }
                                 }
                             }
                         }

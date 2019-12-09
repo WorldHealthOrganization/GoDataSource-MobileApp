@@ -172,7 +172,7 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                                 }
                                 this.setState(prevState => ({
                                     data: prevState.lastElement !== null ? prevState.data.concat(result.data) : result.data,
-                                    lastElement: result.data.length === 10 ? get(result, 'data[9].mainData', null) : null,
+                                    lastElement: result.data.length === 10 ? screenType === 'FollowUpsScreen' ? Object.assign({}, get(result, 'data[9].mainData', null), {followUpId: get(result, 'data[9].followUpData._id', null)}) : get(result, 'data[9].mainData', null) : null,
                                     isAddFromNavigation: false,
                                     dataCount: result.dataCount ? result.dataCount : prevState.dataCount
                                 }))
