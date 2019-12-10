@@ -184,7 +184,6 @@ function createMainQuery (dataType, outbreakId, mainFilter, search, lastElement,
         type: 'select',
         table: 'person',
         alias: 'MainQuery',
-        distinct:true,
         fields: [
             {
                 table: 'MainQuery',
@@ -207,7 +206,7 @@ function createMainQuery (dataType, outbreakId, mainFilter, search, lastElement,
             }
         ],
         condition: condition,
-        group: 'Relations._id'
+        group: 'FollowUps._id'
     };
 
     if (!skipExposures) {
@@ -254,7 +253,10 @@ function createMainQuery (dataType, outbreakId, mainFilter, search, lastElement,
             {
                 func: {
                     name: 'count',
-                    args: [{field: `MainQuery._id`}]
+                    args: [{
+                        expression: {
+                            pattern: `distinct FollowUps._id`
+                        }}]
                 },
                 alias: 'countRecords'
             }
