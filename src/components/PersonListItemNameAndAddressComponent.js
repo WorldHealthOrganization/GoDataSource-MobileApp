@@ -1,19 +1,15 @@
 /**
  * Created by florinpopa on 23/08/2018.
  */
-/**
- * Created by florinpopa on 03/08/2018.
- */
-import React, {PureComponent} from 'react';
-import {View, Text, StyleSheet, Image} from 'react-native';
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
+import React, {PureComponent} from 'react';
+import {View, Text, StyleSheet, Image} from 'react-native';
 import styles from './../styles';
 import translations from './../utils/translations'
 import {getTranslation, calculateDimension} from './../utils/functions';
 import {connect} from "react-redux";
 import Ripple from 'react-native-material-ripple';
-
 
 class PersonListItemNameAndAddressComponent extends PureComponent {
     constructor(props) {
@@ -21,7 +17,6 @@ class PersonListItemNameAndAddressComponent extends PureComponent {
     }
 
     render() {
-        // console.log(`Render PersonListItem subComponent 1 ${this.props.firstComponentRenderData.fullName}`);
         let {firstComponentRenderData, translation, titleColor} = this.props;
         return (
             <View>
@@ -50,13 +45,44 @@ class PersonListItemNameAndAddressComponent extends PureComponent {
                             flex: 1,
                             marginHorizontal: 7,
                             display: firstComponentRenderData.addressString ? 'flex' : 'none'
-                        }]}>{'\u2022 ' + getTranslation(translations.addressFieldLabels.address, translation) + ": " + firstComponentRenderData.addressString}</Text>
-                        {firstComponentRenderData.status ? (<Text style={[style.secondaryText, {
-                            flex: 1,
-                            marginHorizontal: 7,
-                            display: firstComponentRenderData.status ? 'flex' : 'none'
-                        }]}>{'\u2022 ' + getTranslation(translations.contactSingleScreen.followUpFinalStatus, translation) + ": " + firstComponentRenderData.status}</Text>) :
-                            (null)
+                        }]}>
+                            {'\u2022 ' + getTranslation(translations.addressFieldLabels.address, translation) + ": " + firstComponentRenderData.addressString}
+                        </Text>
+                        {
+                            firstComponentRenderData.status ?
+                            (
+                                <Text style={[style.secondaryText, {
+                                    flex: 1,
+                                    marginHorizontal: 7,
+                                    display: firstComponentRenderData.status ? 'flex' : 'none'
+                                }]}>
+                                    {'\u2022 ' + getTranslation(translations.contactSingleScreen.followUpFinalStatus, translation) + ": " + firstComponentRenderData.status}
+                                </Text>
+                            ) : (null)
+                        }
+                        {
+                            firstComponentRenderData.institutionName ?
+                                (
+                                    <Text style={[style.secondaryText, {
+                                        flex: 1,
+                                        marginHorizontal: 7,
+                                        display: firstComponentRenderData.institutionName ? 'flex' : 'none'
+                                    }]}>
+                                        {'\u2022 ' + getTranslation(translations.usersScreen.institutionName, translation) + ": " + firstComponentRenderData.institutionName}
+                                    </Text>
+                                ) : (null)
+                        }
+                        {
+                            firstComponentRenderData.telephoneNumbers ?
+                                (
+                                    <Text style={[style.secondaryText, {
+                                        flex: 1,
+                                        marginHorizontal: 7,
+                                        display: firstComponentRenderData.telephoneNumbers ? 'flex' : 'none'
+                                    }]}>
+                                        {'\u2022 ' + getTranslation(translations.usersScreen.primaryPhone, translation) + ": " + firstComponentRenderData.telephoneNumbers}
+                                    </Text>
+                                ) : (null)
                         }
                     </View>
                     {

@@ -4,12 +4,11 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
-import {View, Alert, StyleSheet} from 'react-native';
+import {View, StyleSheet} from 'react-native';
 import {Icon} from 'react-native-material-ui';
 import styles from './../styles';
 import NavBarCustom from './../components/NavBarCustom';
 import {calculateDimension, getTranslation} from './../utils/functions';
-import config from './../utils/config';
 import Ripple from 'react-native-material-ripple';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -19,12 +18,12 @@ import {getUsersForOutbreakId} from './../actions/user';
 import {setLoaderState} from './../actions/app';
 import AnimatedListView from './../components/AnimatedListView';
 import ViewHOC from './../components/ViewHOC';
-import translations from './../utils/translations'
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import translations from './../utils/translations';
 import {enhanceListWithGetData} from './../components/higherOrderComponents/withListData';
 import get from "lodash/get";
 import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
 import { Popup } from 'react-native-map-link';
+import call from 'react-native-phone-call';
 
 class UsersScreen extends Component {
 
@@ -82,9 +81,8 @@ class UsersScreen extends Component {
             }
         }
         let filterText = filterNumbers === 0 ? `${getTranslation(translations.generalLabels.filterTitle, this.props.translation)}` : `(${filterNumbers})`;
-
-
         let usersTitle = []; usersTitle[0] = getTranslation(translations.usersScreen.usersTitle, this.props.translation);
+
         return (
             <ViewHOC style={style.container}
                      showLoader={(this.props && this.props.loaderState) || (this.state && this.state.loading)}
@@ -138,13 +136,14 @@ class UsersScreen extends Component {
                         dataType={'User'}
                         colors={this.state.riskColors}
                         filterText={filterText}
+                        hasFilter={false}
                         style={[style.listViewStyle]}
                         componentContainerStyle={style.componentContainerStyle}
                         refreshing={this.state.refreshing}
                         onRefresh={this.handleOnRefresh}
                         onSearch={this.props.setSearchText}
                         onPressFilter={this.props.onPressFilter}
-                        onPressView={this.props.onPressView}
+                        onPressView={this.handleCallUsers}
                         onPressAddExposure={this.props.onPressAddExposure}
                         onPressCenterButton={this.props.onPressCenterButton}
                         onPressMap={this.handleOnPressMap}
@@ -219,6 +218,17 @@ class UsersScreen extends Component {
                 pageAskingHelpFrom: pageAskingHelpFrom
             }
         });
+    };
+
+    handleCallUsers = (mainData) => {
+        let primaryPhone = mainData.hasOwnProperty('telephoneNumbers') ? mainData.telephoneNumbers[translations.usersScreen.primaryPhone] : null;
+        if ( primaryPhone ) {
+            const args = {
+                number: primaryPhone, // String value with the number to call
+                prompt: false // Optional boolean property. Determines if the user should be prompt prior to the call
+            };
+            call(args).catch(console.error)
+        }
     };
 }
 

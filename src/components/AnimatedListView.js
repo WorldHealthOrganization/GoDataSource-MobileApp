@@ -105,6 +105,7 @@ class AnimatedListView extends Component {
                                 opacity: navbarOpacity
                             }}
                             value={this.state.searchText}
+                            hasFilter={this.props.hasFilter}
                             onPress={this.props.onPressFilter}
                             onChangeText={this.handleOnChangeText}
                             onSubmitEditing={this.handleOnSubmitEditing}

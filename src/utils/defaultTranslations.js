@@ -206,6 +206,7 @@ export default {
     'LNG_USER_LIST_SCREEN_PHONE_BUTTON': 'Call',
     'LNG_USER_LIST_SCREEN_NO_USERS': 'There are no users to display',
     'LNG_USER_FIELD_LABEL_PRIMARY_TELEPHONE': 'Primary telephone',
+    'LNG_USER_FIELD_LABEL_INSTITUTION_NAME': 'Institution name',
 
     //contactsScreen
     'LNG_CONTACT_LIST_SCREEN_TITLE': 'Contacts',

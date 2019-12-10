@@ -10,9 +10,7 @@ import {calculateDimension} from './../utils/functions';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import PropTypes from 'prop-types';
-import Button from './Button';
 import IconButton from './ButtonWithIcons';
-import styles from './../styles';
 import TextInputWithIcon from './TextInputWithIcon';
 
 class SearchFilterView extends Component {
@@ -30,8 +28,6 @@ class SearchFilterView extends Component {
     }
 
     // Please add here the react lifecycle methods that you need
-
-
     // The render method should have at least business logic as possible,
     // because this will be called whenever there is a new setState call
     // and can slow down the app
@@ -53,19 +49,19 @@ class SearchFilterView extends Component {
                         onEndEditing={this.props.onEndEditing}
                         value={this.props.value}
                     />
-                    {/*<Button title={this.props.filterText} color="white" titleColor={styles.buttonTextGray}*/}
-                            {/*onPress={this.props.onPress} height={25} width={35}/>*/}
-                    <ElevatedView elevation={4}>
-                        <IconButton
-                            label={this.props.filterText}
-                            containerButton={{backgroundColor: 'white'}}
-                            onPress={this.props.onPress}
-                            firstIcon={null}
-                            isFirstIconPureMaterial={null}
-                            secondIcon={'filter-list'}
-                            isSecondIconPureMaterial={true}
-                        />
-                    </ElevatedView>
+                    { this.props.hasFilter &&
+                        <ElevatedView elevation={4}>
+                            <IconButton
+                                label={this.props.filterText}
+                                containerButton={{backgroundColor: 'white'}}
+                                onPress={this.props.onPress}
+                                firstIcon={null}
+                                isFirstIconPureMaterial={null}
+                                secondIcon={'filter-list'}
+                                isSecondIconPureMaterial={true}
+                            />
+                        </ElevatedView>
+                    }
                 </View>
             </Animated.View>
         );
@@ -90,6 +86,7 @@ class SearchFilterView extends Component {
 SearchFilterView.propTypes = {
     style: PropTypes.object,
     value: PropTypes.string,
+    hasFilter: PropTypes.bool,
     onPress: PropTypes.func,
     onChangeText: PropTypes.func,
     onSubmitEditing: PropTypes.func,
@@ -100,6 +97,7 @@ SearchFilterView.propTypes = {
 SearchFilterView.defaultProps = {
     style: {},
     value: '',
+    hasFilter: true,
     onPress: () => {console.log('SearchFilterView default onPress')},
     onChangeText: () => {console.log('SearchFilterView default onChangeText')},
     onSubmitEditing: () => {console.log('SearchFilterView default onSubmitEditing')},
