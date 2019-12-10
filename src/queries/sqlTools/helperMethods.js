@@ -57,12 +57,12 @@ export function wrapExecuteSQLInPromise (transaction, sqlStatement, arrayOfField
             } else {
                 transaction.executeSql(sqlStatement, arrayOfFields
                     , (transaction, resultSet) => {
-                        console.log('Good stuff:')
+                        // console.log('Good stuff:');
                         return resolve(resultSet)
                     },
                     (transaction, errorStatement) => {
-                        console.log('Bad stuff: ', errorStatement)
-                        return reject(errorStatement)
+                        console.log('Error query execution: ', errorStatement);
+                        return reject(errorStatement);
                     }
                     );
                 // transaction.executeSql('SELECT * FROM person', []
@@ -247,17 +247,17 @@ export function executeQuery(queryObject) {
 
             let sql = jsonSql.build(queryObject);
 
-            console.log('Sql statement: ', sql);
+            // console.log('Sql statement: ', sql);
             return wrapExecuteSQLInPromise(transaction, sql.query, Object.values(sql.values))
         })
         .then((result) => {
-            console.log('Result get stuff: ', new Date().getTime() - start);
+            console.log('Query executed in: ', new Date().getTime() - start);
             // dispatch(storeFollowUps([]));
             let mappedData = generalMapping1(result.rows._array, queryObject.fields);
             return Promise.resolve(mappedData);
         })
         .catch((errorGetStuff) => {
-            console.log('Error get stuff: ', errorGetStuff);
+            console.log('Error for query execution: ', errorGetStuff);
             return Promise.reject(errorGetStuff)
         })
     // }
