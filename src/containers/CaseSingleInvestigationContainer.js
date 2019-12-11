@@ -5,18 +5,16 @@
 // the material ui library, since it provides design and animations out of the box
 import React, { Component } from 'react';
 import { View, StyleSheet, ScrollView } from 'react-native';
-import { calculateDimension, extractAllQuestions, getTranslation, createDate } from '../utils/functions';
-import config from '../utils/config';
+import { extractAllQuestions, createDate } from '../utils/functions';
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import styles from '../styles';
 import QuestionCard from '../components/QuestionCard';
-import Button from '../components/Button';
 import sortBy from 'lodash/sortBy';
 import cloneDeep from 'lodash/cloneDeep';
-import translations from './../utils/translations';
 import uniqueId from 'lodash/uniqueId';
 import TopContainerButtons from "../components/TopContainerButtons";
+import PermissionComponent from './../components/PermissionComponent';
 
 class CaseSingleInvestigationContainer extends Component {
 
@@ -69,87 +67,22 @@ class CaseSingleInvestigationContainer extends Component {
         return (
             <View style={{ flex: 1 }}>
                 <View style={style.container}>
-                    <TopContainerButtons
-                        isNew={this.props.isNew}
-                        isEditMode={this.props.isEditMode}
-                        index={this.props.index}
-                        numberOfTabs={this.props.numberOfTabs}
-                        onPressEdit={this.props.onPressEdit}
-                        onPressSaveEdit={this.props.isNew ? this.props.onPressSave : this.props.onPressSaveEdit}
-                        onPressCancelEdit={this.props.onPressCancelEdit}
-                        onPressNextButton={this.props.handleNextButton}
-                        onPressPreviousButton={this.handleBackButton}
+                    <PermissionComponent
+                        render={() => (
+                            <TopContainerButtons
+                                isNew={this.props.isNew}
+                                isEditMode={this.props.isEditMode}
+                                index={this.props.index}
+                                numberOfTabs={this.props.numberOfTabs}
+                                onPressEdit={this.props.onPressEdit}
+                                onPressSaveEdit={this.props.isNew ? this.props.onPressSave : this.props.onPressSaveEdit}
+                                onPressCancelEdit={this.props.onPressCancelEdit}
+                                onPressNextButton={this.props.handleNextButton}
+                                onPressPreviousButton={this.handleBackButton}
+                            />
+                        )}
+                        permissionsList={['case_all', 'case_modify']}
                     />
-                    {/*<View style={{ flexDirection: 'row' }}>*/}
-                        {/*{*/}
-                            {/*this.props.isNew ? (*/}
-                                {/*<View style={{ flexDirection: 'row', width: '90%', alignItems: 'center' }}>*/}
-                                    {/*<Button*/}
-                                        {/*title={getTranslation(translations.generalButtons.backButtonLabel, this.props.translation)}*/}
-                                        {/*onPress={this.handleBackButton}*/}
-                                        {/*color={styles.buttonGreen}*/}
-                                        {/*titleColor={'white'}*/}
-                                        {/*height={calculateDimension(25, true, this.props.screenSize)}*/}
-                                        {/*width={calculateDimension(130, false, this.props.screenSize)}*/}
-                                        {/*style={{*/}
-                                            {/*marginVertical: calculateDimension(12.5, true, this.props.screenSize),*/}
-                                            {/*marginHorizontal: calculateDimension(16, false, this.props.screenSize),*/}
-                                        {/*}} />*/}
-                                    {/*<Button*/}
-                                        {/*title={getTranslation(translations.generalButtons.saveButtonLabel, this.props.translation)}*/}
-                                        {/*onPress={this.props.onPressSave}*/}
-                                        {/*color={styles.buttonGreen}*/}
-                                        {/*titleColor={'white'}*/}
-                                        {/*height={calculateDimension(25, true, this.props.screenSize)}*/}
-                                        {/*width={calculateDimension(130, false, this.props.screenSize)}*/}
-                                        {/*style={{*/}
-                                            {/*marginVertical: calculateDimension(12.5, true, this.props.screenSize),*/}
-                                            {/*marginHorizontal: calculateDimension(16, false, this.props.screenSize),*/}
-                                        {/*}} />*/}
-                                {/*</View>*/}
-                            {/*)*/}
-                                {/*: (*/}
-                                    {/*this.props.isEditMode ? (*/}
-                                        {/*<View style={{ flexDirection: 'row' }}>*/}
-                                            {/*<Button*/}
-                                                {/*title={getTranslation(translations.generalButtons.saveButtonLabel, this.props.translation)}*/}
-                                                {/*onPress={this.props.onPressSaveEdit}*/}
-                                                {/*color={styles.buttonGreen}*/}
-                                                {/*titleColor={'white'}*/}
-                                                {/*height={calculateDimension(25, true, this.props.screenSize)}*/}
-                                                {/*width={calculateDimension(166, false, this.props.screenSize)}*/}
-                                                {/*style={{*/}
-                                                    {/*marginVertical: calculateDimension(12.5, true, this.props.screenSize),*/}
-                                                    {/*marginRight: 10,*/}
-                                                {/*}} />*/}
-                                            {/*<Button*/}
-                                                {/*title={getTranslation(translations.generalButtons.cancelButtonLabel, this.props.translation)}*/}
-                                                {/*onPress={this.props.onPressCancelEdit}*/}
-                                                {/*color={styles.buttonGreen}*/}
-                                                {/*titleColor={'white'}*/}
-                                                {/*height={calculateDimension(25, true, this.props.screenSize)}*/}
-                                                {/*width={calculateDimension(166, false, this.props.screenSize)}*/}
-                                                {/*style={{*/}
-                                                    {/*marginVertical: calculateDimension(12.5, true, this.props.screenSize),*/}
-                                                    {/*marginRight: 10,*/}
-                                                {/*}} />*/}
-                                        {/*</View>) : (*/}
-                                            {/*this.props.role.find((e) => e === config.userPermissions.writeCase) !== undefined ? (*/}
-                                                {/*<Button*/}
-                                                    {/*title={getTranslation(translations.generalButtons.editButtonLabel, this.props.translation)}*/}
-                                                    {/*onPress={this.props.onPressEdit}*/}
-                                                    {/*color={styles.buttonGreen}*/}
-                                                    {/*titleColor={'white'}*/}
-                                                    {/*height={calculateDimension(25, true, this.props.screenSize)}*/}
-                                                    {/*width={calculateDimension(166, false, this.props.screenSize)}*/}
-                                                    {/*style={{*/}
-                                                        {/*marginVertical: calculateDimension(12.5, true, this.props.screenSize),*/}
-                                                        {/*marginRight: 10,*/}
-                                                    {/*}} />*/}
-                                            {/*) : null*/}
-                                        {/*))*/}
-                        {/*}*/}
-                    {/*</View>*/}
                     <ScrollView
                         style={style.containerScrollView}
                         contentContainerStyle={[style.contentContainerStyle, { paddingBottom: this.props.screenSize.height < 600 ? 70 : 20 }]}

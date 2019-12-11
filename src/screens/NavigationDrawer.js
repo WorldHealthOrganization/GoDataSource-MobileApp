@@ -16,6 +16,7 @@ import {updateUser} from './../actions/user';
 import {updateRequiredFields, getTranslation} from './../utils/functions';
 import translations from './../utils/translations';
 import VersionNumber from 'react-native-version-number';
+import PermissionComponent from './../components/PermissionComponent';
 
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
@@ -75,15 +76,15 @@ class NavigationDrawer extends Component {
                     {
                         config.sideMenuItems.map((item, index) => {
                             let addButton = false;
+                            let findPermission = undefined;
                             if (this.props && this.props.role) {
                                 if (item.addButton && item.addButton === true) {
-                                    let findPermission = undefined;
                                     if (item.key === 'followups') {
-                                        findPermission = this.props.role.find((e) => e === config.userPermissions.writeFollowUp)
+                                        findPermission = ['follow_up_all', 'follow_up_view'];
                                     } else if (item.key === 'contacts') {
-                                        findPermission = this.props.role.find((e) => e === config.userPermissions.writeContact)
+                                        findPermission = ['contact_all', 'contact_view'];
                                     } else if (item.key === 'cases') {
-                                        findPermission = this.props.role.find((e) => e === config.userPermissions.writeCase)
+                                        findPermission = ['case_all', 'case_view'];
                                     }
                                     if (findPermission !== undefined) {
                                         addButton = true
@@ -92,14 +93,19 @@ class NavigationDrawer extends Component {
                             }
 
                             return (
-                                <NavigationDrawerListItem
-                                    key={index}
-                                    label={getTranslation(item.label, this.props.translation)} 
-                                    name={item.name}
-                                    onPress={() => this.handlePressOnListItem(index)}
-                                    handleOnPressAdd={() => this.handleOnPressAdd(item.key, index)}
-                                    isSelected={index === this.state.selectedScreen}
-                                    addButton={addButton}
+                                <PermissionComponent
+                                    render={() => (
+                                        <NavigationDrawerListItem
+                                            key={index}
+                                            label={getTranslation(item.label, this.props.translation)}
+                                            name={item.name}
+                                            onPress={() => this.handlePressOnListItem(index)}
+                                            handleOnPressAdd={() => this.handleOnPressAdd(item.key, index)}
+                                            isSelected={index === this.state.selectedScreen}
+                                            addButton={addButton}
+                                        />
+                                    )}
+                                    permissionsList={findPermission}
                                 />
                             )
                         })

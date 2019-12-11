@@ -73,7 +73,7 @@ class ContactsSinglePersonal extends PureComponent {
                                 onPressNextButton={this.props.onPressNextButton}
                             />
                         )}
-                        permissionsList={['contact_all', 'contact_edit']}
+                        permissionsList={['contact_all', 'contact_modify']}
                     />
 
                     <ScrollView

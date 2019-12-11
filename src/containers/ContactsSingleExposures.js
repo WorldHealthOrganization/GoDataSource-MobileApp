@@ -10,8 +10,7 @@ import React, {Component} from 'react';
 import {Animated, StyleSheet, InteractionManager, ScrollView, View, Text, FlatList} from 'react-native';
 import {calculateDimension} from './../utils/functions';
 import {connect} from "react-redux";
-import Button from './../components/Button';
-import {extractIdFromPouchId, getTranslation, computeFullName} from './../utils/functions';
+import {getTranslation, computeFullName} from './../utils/functions';
 import {bindActionCreators} from "redux";
 import styles from './../styles';
 import ElevatedView from 'react-native-elevated-view';
@@ -23,6 +22,7 @@ import translations from './../utils/translations';
 import ExposureContainer from '../containers/ExposureContainer';
 import get from 'lodash/get';
 import TopContainerButtons from "./../components/TopContainerButtons";
+import PermissionComponent from './../components/PermissionComponent';
 
 const AnimatedFlatList = Animated.createAnimatedComponent(FlatList);
 
@@ -73,58 +73,24 @@ class ContactsSingleExposures extends Component {
         return (
             <ElevatedView elevation={3} style={[style.container]}>
                 <View style = {{alignItems: 'center'}}>
-                    {/*<View style={{flexDirection: 'row'}}>*/}
-                        {/*<Button*/}
-                            {/*title={getTranslation(translations.generalButtons.backButtonLabel, this.props.translation)}*/}
-                            {/*onPress={this.handleBackButton}*/}
-                            {/*color={styles.buttonGreen}*/}
-                            {/*titleColor={'white'}*/}
-                            {/*height={calculateDimension(25, true, this.props.screenSize)}*/}
-                            {/*width={calculateDimension(130, false, this.props.screenSize)}*/}
-                            {/*style={{*/}
-                                {/*marginVertical: calculateDimension(12.5, true, this.props.screenSize),*/}
-                                {/*marginHorizontal: calculateDimension(16, false, this.props.screenSize),*/}
-                        {/*}}/>*/}
-                        {/*{*/}
-                            {/*this.props.isEditMode === true ? this.props.isNew ? (*/}
-                                {/*<Button*/}
-                                    {/*title={getTranslation(translations.generalButtons.saveButtonLabel, this.props.translation)}*/}
-                                    {/*onPress={this.props.handleOnPressSave}*/}
-                                    {/*color={styles.buttonGreen}*/}
-                                    {/*titleColor={'white'}*/}
-                                    {/*height={calculateDimension(25, true, this.props.screenSize)}*/}
-                                    {/*width={calculateDimension(130, false, this.props.screenSize)}*/}
-                                    {/*style={{*/}
-                                        {/*marginVertical: calculateDimension(12.5, true, this.props.screenSize),*/}
-                                        {/*marginHorizontal: calculateDimension(16, false, this.props.screenSize),*/}
-                                {/*}}/> */}
-                            {/*) : (*/}
-                                {/*<Button*/}
-                                    {/*title={getTranslation(translations.generalButtons.nextButtonLabel, this.props.translation)}*/}
-                                    {/*onPress={this.props.handleMoveToNextScreenButton}*/}
-                                    {/*color={styles.buttonGreen}*/}
-                                    {/*titleColor={'white'}*/}
-                                    {/*height={calculateDimension(25, true, this.props.screenSize)}*/}
-                                    {/*width={calculateDimension(130, false, this.props.screenSize)}*/}
-                                    {/*style={{*/}
-                                        {/*marginVertical: calculateDimension(12.5, true, this.props.screenSize),*/}
-                                        {/*marginHorizontal: calculateDimension(16, false, this.props.screenSize),*/}
-                                    {/*}}/>*/}
-                            {/*) : null*/}
-                        {/*}*/}
-                    {/*</View>*/}
 
-                    <TopContainerButtons
-                        isNew={this.props.isNew}
-                        isEditMode={this.props.isEditMode}
-                        index={this.props.activeIndex}
-                        numberOfTabs={this.props.numberOfTabs}
-                        onPressEdit={this.props.onPressEdit}
-                        onPressSaveEdit={this.props.onPressSaveEdit}
-                        onPressCancelEdit={this.props.onPressCancelEdit}
-                        onPressNextButton={this.props.onPressNextButton}
-                        onPressPreviousButton={this.handleBackButton}
+                    <PermissionComponent
+                        render={() => (
+                            <TopContainerButtons
+                                isNew={this.props.isNew}
+                                isEditMode={this.props.isEditMode}
+                                index={this.props.activeIndex}
+                                numberOfTabs={this.props.numberOfTabs}
+                                onPressEdit={this.props.onPressEdit}
+                                onPressSaveEdit={this.props.onPressSaveEdit}
+                                onPressCancelEdit={this.props.onPressCancelEdit}
+                                onPressNextButton={this.props.onPressNextButton}
+                                onPressPreviousButton={this.handleBackButton}
+                            />
+                        )}
+                        permissionsList={['contact_all', 'contact_modify']}
                     />
+
                 </View>
                 {
                     !this.props.isNew ? (
