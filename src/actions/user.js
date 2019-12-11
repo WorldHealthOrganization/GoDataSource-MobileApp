@@ -205,16 +205,27 @@ export function updateUser(user) {
     }
 }
 
-export function getUsersForOutbreakId({outbreakId, usersFilter, searchText, lastElement, offset}, computeCount) {
+export function getUsersForOutbreakId({outbreakId, usersFilter, searchText, lastElement, offset}, computeCount, props) {
+    let teams = props.hasOwnProperty('teams') ? props.teams : [];
+    let userList = [];
+    for (let i=0; i< teams.length; i++){
+        let userIds = teams[i].hasOwnProperty('userIds') ? teams[i].userIds : [];
+        if (userIds.length > 0){
+            for(let j=0; j< userIds.length; j++){
+                if(userList.indexOf(userIds[j]) === -1){
+                    userList.push(userIds[j]);
+                }
+            }
+        }
+    }
     return new Promise((resolve, reject) => {
-        getUserTeamMembers((error, response) => {
+        getUserTeamMembers(userList, {outbreakId, usersFilter, searchText, lastElement, offset}, (error, response) => {
             if (error) {
                 console.log("*** getUserTeamMembers error: ", error);
                 reject(errorTypes.ERROR_USER_TEAM_MEMBERS);
             }
             if (response) {
                 let users = response.map((user) => { return {_id: user._id, mainData: user, exposureData: null}});
-                users = users.filter((user) => { return (user.mainData.email === 'ioana.tudor@clarisoft.com');});
                 resolve({data: users ? users : [], dataCount: users ? users.length : null});
             }
         })

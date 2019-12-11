@@ -1,13 +1,11 @@
 import React, {Component} from 'react'
 import {Alert, BackHandler} from 'react-native';
-import PropTypes from 'prop-types'
 import get from 'lodash/get';
 import {createDate} from './../../utils/functions';
 import {getTranslation, navigation, extractMainAddress} from "../../utils/functions";
 import RNExitApp from "react-native-exit-app";
 import translations from "../../utils/translations";
 import constants from './../../utils/constants';
-import {getCaseAndExposuresById} from './../../actions/cases';
 
 // Here have access to redux props
 export function enhanceListWithGetData(methodForGettingData, screenType) {
@@ -33,7 +31,6 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                     limit: 15,
                     isAddFromNavigation: false
                 };
-
                 this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this));
             }
 
@@ -174,7 +171,7 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                     }
                     if (doAction === true) {
                         let filters = this.prepareFilters();
-                        methodForGettingData(filters, isRefresh === true ? isRefresh : false)
+                        methodForGettingData(filters, isRefresh === true ? isRefresh : false, this.props)
                             .then((result) => {
                                 if (isRefresh === true) {
                                     this.props.setLoaderState(false);
@@ -451,7 +448,6 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                 navigation(event, this.props.navigator);
             };
         }
-
 
         WithListData.propTypes = {};
 

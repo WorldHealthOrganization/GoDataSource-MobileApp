@@ -263,6 +263,7 @@ const style = StyleSheet.create({
 function mapStateToProps(state) {
     return {
         user:           state.user,
+        teams:          state.teams,
         screenSize:     state.app.screenSize,
         syncState:      state.app.syncState,
         translation:    state.app.translation,

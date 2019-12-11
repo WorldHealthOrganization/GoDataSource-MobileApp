@@ -163,17 +163,26 @@ export function getTeamsForUserRequest(callback) {
         });
 }
 
-export function getUserTeamMembers(callback){
+export function getUserTeamMembers(userList, {outbreakId, usersFilter, searchText, lastElement, offset}, callback){
+    let reg = new RegExp(searchText, 'i');
     getDatabase(config.mongoCollections.user)
         .then((database) => {
+            let userListMapped = userList.map((e) => {
+                return 'user.json_' + e
+            });
             database.find({
                 selector: {
                     _id: {
                         $gte: `user.json_`,
                         $lte: `user.json_\uffff`,
+                        $in: userListMapped,
                     },
                     deleted: false,
-                }
+                    $or: [
+                        {"firstName": {$regex: reg}},
+                        {"lastName": {$regex: reg}}
+                    ]
+                },
             })
                 .then((resultFind) => {
                     console.log('getUserTeamMembers: ', resultFind);
