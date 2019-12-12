@@ -249,7 +249,7 @@ class CaseSingleScreen extends Component {
                             <Breadcrumb
                                 entities={
                                     [
-                                        getTranslation(this.props && this.props.previousScreen ? this.props.previousScreen : translations.caseSingleScreen.title, this.props.translation),
+                                        getTranslation(translations.caseSingleScreen.title, this.props.translation),
                                         this.props.isNew ? getTranslation(translations.caseSingleScreen.addCaseTitle, this.props.translation) : (computeFullName(_.get(this.state, 'case', null)))
                                     ]
                                 }
@@ -765,18 +765,11 @@ class CaseSingleScreen extends Component {
             Alert.alert("", 'You have unsaved data. Are you sure you want to leave this page and lose all changes?', [
                 {
                     text: 'Yes', onPress: () => {
-                        if (this.props.isAddFromNavigation) {
                             this.props.navigator.resetTo({
                                 screen: 'CasesScreen',
                                 animated: true,
                                 animationStyle: 'fade'
-                            })
-                        } else {
-                            this.props.navigator.pop({
-                                animated: true,
-                                animationType: 'fade'
-                            })
-                        }
+                            });
                     }
                 },
                 {
@@ -786,18 +779,11 @@ class CaseSingleScreen extends Component {
                 }
             ])
         } else {
-            if (this.props.isAddFromNavigation) {
                 this.props.navigator.resetTo({
                     screen: 'CasesScreen',
                     animated: true,
                     animationStyle: 'fade'
                 })
-            } else {
-                this.props.navigator.pop({
-                    animated: true,
-                    animationType: 'fade'
-                })
-            }
         }
     };
 

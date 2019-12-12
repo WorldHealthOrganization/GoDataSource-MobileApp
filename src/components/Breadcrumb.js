@@ -1,23 +1,19 @@
 /**
  * Created by florinpopa on 26/07/2018.
  */
-/**
- * Created by florinpopa on 25/07/2018.
- */
-import React, {PureComponent} from 'react';
-import {View, Text, StyleSheet, InteractionManager} from 'react-native';
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
+import React, {PureComponent} from 'react';
+import {View, Text, StyleSheet, InteractionManager} from 'react-native';
 import {Icon} from 'react-native-material-ui';
 import Ripple from 'react-native-material-ripple';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import {calculateDimension, getTranslation} from './../utils/functions';
-import translations from './../utils/translations'
 
 const Crumb = ({isCrumbActive, index, text, numberOfEntities, crumbPress, translation}) => {
     return (
-        <Ripple onPress={() => crumbPress(index)} style={[style.crumbStyle, {flex: 1}]}>
+        <Ripple onPress={() => crumbPress(index)} style={[style.crumbStyle, index !== 0 ? {flex: 1}: {}]}>
             <Text
                 style={[isCrumbActive ? style.activeCrumbTextStyle : style.crumbTextStyle]}
                 numberOfLines={1}
@@ -29,7 +25,7 @@ const Crumb = ({isCrumbActive, index, text, numberOfEntities, crumbPress, transl
             }
         </Ripple>
     )
-}
+};
 
 class Breadcrumb extends PureComponent {
 
@@ -42,8 +38,6 @@ class Breadcrumb extends PureComponent {
     }
 
     // Please add here the react lifecycle methods that you need
-
-
     // The render method should have at least business logic as possible,
     // because this will be called whenever there is a new setState call
     // and can slow down the app
@@ -87,12 +81,7 @@ class Breadcrumb extends PureComponent {
                 if(this.props.onPress){
                     this.props.onPress();
                 }else {
-                    this.props.navigator.pop(
-                    //     {
-                    //     animated: true,
-                    //     animationType: 'fade'
-                    // }
-                    )
+                    this.props.navigator.pop()
                 }
             }
         });
