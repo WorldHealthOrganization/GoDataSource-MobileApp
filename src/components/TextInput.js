@@ -53,7 +53,7 @@ class TextInput extends Component {
     editInput = () => {
         let tooltip = getTooltip(this.props.label, this.props.translation);
         let value = lodashGet(this.state, 'value', ' ');
-        console.log('Value stuff: ', value);
+        // console.log('Value stuff: ', value);
         return (
             <View style={[{flexDirection: 'row'},this.props.style]}>
                 <View style={{flex: 1}}> 
