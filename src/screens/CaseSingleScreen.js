@@ -4,10 +4,9 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, { Component } from 'react';
-import { View, Alert, Text, StyleSheet, Animated, Platform, Dimensions, BackHandler } from 'react-native';
-import { TabBar, TabView, PagerScroll } from 'react-native-tab-view';
+import { View, Alert, StyleSheet, Animated, Platform, Dimensions, BackHandler } from 'react-native';
+import { TabBar, TabView, PagerPan, PagerAndroid, PagerScroll } from 'react-native-tab-view';
 import { connect } from "react-redux";
-import { bindActionCreators } from "redux";
 import NavBarCustom from './../components/NavBarCustom';
 import Breadcrumb from './../components/Breadcrumb';
 import Ripple from 'react-native-material-ripple';
@@ -25,7 +24,6 @@ import {
     addCase,
     updateCase,
     getCaseAndExposuresById,
-    editExposureForCase,
     getRelationsForCase
 } from './../actions/cases';
 import {
@@ -286,7 +284,7 @@ class CaseSingleScreen extends Component {
                     onIndexChange={this.handleOnIndexChange}
                     renderScene={this.handleRenderScene}
                     renderTabBar={this.handleRenderTabBar}
-                    renderPager={this.handleRenderPager}
+                    renderPager={this._renderPager}
                     useNativeDriver={true}
                     initialLayout={initialLayout}
                     swipeEnabled={this.props.isNew ? false : true}
@@ -294,11 +292,6 @@ class CaseSingleScreen extends Component {
             </ViewHOC>
         );
     }
-
-    handleRenderPager = (props) => {
-        return (Platform.OS === 'ios') ? <PagerScroll {...props} swipeEnabled={false} animationEnabled={false} /> :
-            <PagerScroll {...props} swipeEnabled={false} animationEnabled={false} />
-    };
 
     // Please write here all the methods that are not react native lifecycle methods
     handlePressNavbarButton = () => {
@@ -363,10 +356,38 @@ class CaseSingleScreen extends Component {
         )
     };
 
-    //Render label for TabBar
-    handleRenderLabel = (props) => ({ route, index }) => {
-        const inputRange = props.navigationState.routes.map((x, i) => i);
+    _renderPager = (props) => {
+        switch (Platform.OS) {
+            case 'ios':
+                return (
+                    <PagerScroll
+                        {...props}
+                        animationEnabled={false}
+                        swipeEnabled={false}
+                    />
+                );
+            case 'android':
+                return (
+                    <PagerAndroid
+                        {...props}
+                        animationEnabled={false}
+                        swipeEnabled={false}
+                    />
+                );
+            default:
+                return (
+                    <PagerPan
+                        {...props}
+                        swipeEnabled={false}
+                    />
+                );
+        }
+    };
 
+    //Render label for TabBar
+    handleRenderLabel = (props) => ({ route }) => {
+        const inputRange = props.navigationState.routes.map((x, i) => i);
+        let index = props.navigationState.index;
         const outputRange = inputRange.map(
             inputIndex => (inputIndex === index ? styles.colorLabelActiveTab : styles.colorLabelInactiveTab)
         );
@@ -418,6 +439,7 @@ class CaseSingleScreen extends Component {
                         onChangeextInputWithDropDown={this.handleOnChangeTextInputWithDropDown}
                     />
                 );
+                break;
             case 'address':
                 return (
                     <CaseSingleAddressContainer
@@ -444,6 +466,8 @@ class CaseSingleScreen extends Component {
                         hasPlaceOfResidence={this.state.hasPlaceOfResidence}
                     />
                 );
+
+                break;
             case 'infection':
                 return (
                     <CaseSingleInfectionContainer
@@ -475,6 +499,7 @@ class CaseSingleScreen extends Component {
                         onPressDeleteVaccines={this.handleOnPressDeleteVaccines}
                     />
                 );
+                break;
             case 'exposures':
                 return (
                     <CaseSingleExposureContainer
@@ -495,8 +520,10 @@ class CaseSingleScreen extends Component {
                         selectedExposure={this.props.singleCase}
                     />
                 );
+                break;
             case 'caseInvestigation':
-                return <CaseSingleInvestigationContainer
+                return (
+                    <CaseSingleInvestigationContainer
                     item={this.state.case}
                     currentAnswers={this.state.currentAnswers}
                     previousAnswers={this.state.previousAnswers}
@@ -517,7 +544,9 @@ class CaseSingleScreen extends Component {
                     onChangeAnswerDate={this.onChangeAnswerDate}
                     savePreviousAnswers={this.savePreviousAnswers}
                     copyAnswerDate={this.handleCopyAnswerDate}
-                />;
+                />
+                );
+                break;
             default: return null;
         }
     };
