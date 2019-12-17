@@ -18,7 +18,6 @@ import { bindActionCreators } from "redux";
 import styles from './../styles';
 import CardComponent from './../components/CardComponent';
 import Ripple from 'react-native-material-ripple';
-import Button from './../components/Button';
 import ElevatedView from 'react-native-elevated-view';
 import translations from './../utils/translations'
 import _ from 'lodash';
@@ -45,7 +44,6 @@ class CaseSinglePersonalContainer extends Component {
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
-        // console.log('CaseSingleContainer render Personal');
         return (
             <View style={{ flex: 1 }}>
                 <View style={style.container}>
@@ -59,6 +57,7 @@ class CaseSinglePersonalContainer extends Component {
                         onPressCancelEdit={this.props.onPressCancelEdit}
                         onPressNextButton={this.handleNextButton}
                     />
+
                     <ScrollView
                         style={style.containerScrollView}
                         contentContainerStyle={[style.contentContainerStyle, { paddingBottom: this.props.screenSize.height < 600 ? 70 : 20 }]}

@@ -12,7 +12,6 @@ import {getTranslation, getTooltip, getDropDownInputDisplayParameters} from './.
 import TooltipComponent from './TooltipComponent';
 import get from 'lodash/get';
 
-
 class TextInputWithDropDown extends Component {
 
     // This will be a dumb component, so it's best not to put any business logic in it
@@ -21,9 +20,9 @@ class TextInputWithDropDown extends Component {
 
         this.state={
             noneValueSelectedInDropdown: false
-        }
+        };
 
-        this.changeDropdown = this.changeDropdown.bind(this)
+        this.changeDropdown = this.changeDropdown.bind(this);
     }
 
     // Please add here the react lifecycle methods that you need
@@ -54,12 +53,13 @@ class TextInputWithDropDown extends Component {
         let tooltip = getTooltip(this.props.label, this.props.translation);
 
         //  get Value
-        // const value = get(this.props, `value[[${config[this.props.dropDownData]}][${this.props.selectedDropDownItemIndex}].value]`, '');
-        let stringValue = get(this.props, `value[${get(config, `[${this.props.dropDownData}][${this.props.selectedDropDownItemIndex}].value`, null)}]`, ' ');
-        // let stringValue = this.props.value[config[this.props.dropDownData][this.props.selectedDropDownItemIndex].value];
-        // if (value !== undefined && value !== null){
-        //     stringValue = value.toString();
-        // }
+        const unit =  get(config, `[${this.props.dropDownData}][${this.props.selectedDropDownItemIndex}].value`, '');
+        const value = get(this.props.value, `[${unit}]`, '');
+
+        let stringValue = '';
+        if (value !== undefined && value !== null){
+            stringValue = value.toString();
+        }
 
         //  get DropDown data
         let dropDownData = config[this.props.dropDownData].map((e) => {
@@ -131,8 +131,9 @@ class TextInputWithDropDown extends Component {
 
     viewInput() {
         let tooltip = getTooltip(this.props.label, this.props.translation);
+        const unit =  get(config, `[${this.props.dropDownData}][${this.props.selectedDropDownItemIndex}].value`, '');
+        const value = get(this.props.value, `[${unit}]`, '');
 
-        const value = get(this.props, `value[${config[this.props.dropDownData]}][${this.props.selectedDropDownItemIndex}].value]`, '');
         let stringValue = '';
         if (value !== undefined && value !== null){
             stringValue = value.toString();
@@ -179,8 +180,7 @@ class TextInputWithDropDown extends Component {
             this.setState({
                 noneValueSelectedInDropdown: false
             }, () => {
-                let selectedValueIndex = config[this.props.dropDownData].map((e) => {return e.value}).indexOf(selectedValue)
-                console.log ('TextInputWithDropDown changeDropdown', selectedValueIndex, this.props.selectedItemIndexForAgeUnitOfMeasureDropDown)
+                let selectedValueIndex = config[this.props.dropDownData].map((e) => {return e.value}).indexOf(selectedValue);
                 this.props.onChangeDropDown(selectedValueIndex, this.props.selectedItemIndexForAgeUnitOfMeasureDropDown)
             });
         } else {
