@@ -1,10 +1,10 @@
 /**
  * Created by florinpopa on 25/02/2019.
  */
-import {Alert} from 'react-native';
-import {getTranslation} from './functions';
 import translations from './translations';
 import {getItemByIdRequest} from './../actions/cases';
+import lodashIntersection from 'lodash/intersection';
+import {checkArrayAndLength} from './typeCheckingFunctions';
 
 export function pushNewEditScreen(QRCodeInfo, navigator, user, translation, callback) {
     console.log('pushNewEditScreen QRCodeInfo', QRCodeInfo);
@@ -70,20 +70,27 @@ export function pushNewEditScreen(QRCodeInfo, navigator, user, translation, call
     }
 }
 
-// export function pushToScreen(navigator, screen, passProps) {
-//     try {
-//         navigator.push({
-//             screen,
-//             passProps
-//         })
-//     } catch(screenPushError) {
-//         console.log('Screen push error: ', screenPushError);
-//         Alert.alert(getTranslation(translations.alertMessages.alertLabel, null), 'An unknown error occurred', [
-//             {
-//                 text: getTranslation(translations.alertMessages.okButtonLabel, null), onPress: () => {
-//                     console.log('Ok pressed')
-//                 }
-//             }
-//         ])
-//     }
-// }
+export function screenTransition(navigator, transition, nextScreen, passProps, userPermissions, requiredPermissions) {
+    if (checkArrayAndLength(lodashIntersection(userPermissions, requiredPermissions))) {
+        switch (transition) {
+            case 'push':
+                navigator.push({
+                    screen: nextScreen,
+                    animated: true,
+                    // animationType: 'fade',
+                    passProps: passProps
+                });
+                break;
+            case 'showModal':
+                navigator.showModal({
+                    screen: nextScreen,
+                    animated: true,
+                    // animationType: 'fade',
+                    passProps: passProps
+                });
+                break;
+            default:
+                break
+        }
+    }
+}

@@ -7,7 +7,7 @@ import {getTranslation, navigation, extractMainAddress} from "../../utils/functi
 import RNExitApp from "react-native-exit-app";
 import translations from "../../utils/translations";
 import constants from './../../utils/constants';
-import {getCaseAndExposuresById} from './../../actions/cases';
+import {screenTransition} from './../../utils/screenTransitionFunctions';
 
 // Here have access to redux props
 export function enhanceListWithGetData(methodForGettingData, screenType) {
@@ -222,7 +222,6 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                 }), () => this.refresh())
             };
 
-
             // Navigator methods
             onPressFilter = () => {
                 this.props.navigator.showModal({
@@ -332,6 +331,7 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
             };
 
             onPressFullName = (person, prevScreen) => {
+                let requiredPermissions = this.computePermissions('onPressFullName');
                 let forwardScreen = this.computeForwardScreen('onPressFullName');
                 let forwardedProps = {};
                 let dataToSend = screenType === 'CasesScreen' ? 'case' : 'contact';
@@ -341,30 +341,38 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                 forwardedProps['isEditMode'] = false;
 
                 if (forwardScreen) {
-                    this.props.navigator.push({
-                        screen: forwardScreen,
-                        animated: true,
-                        passProps: forwardedProps
-                    })
+                    screenTransition(this.props.navigator, 'push', forwardScreen, forwardedProps, this.props.role, requiredPermissions);
+                    // this.props.navigator.push({
+                    //     screen: forwardScreen,
+                    //     animated: true,
+                    //     passProps: forwardedProps
+                    // })
                 }
             };
 
             onPressExposure = (exposure) => {
+                let requiredPermissions = this.computePermissions('onPressExposure');
                 let forwardScreen = this.computeForwardScreen('onPressExposure');
                 let previousScreen = screenType === constants.appScreens.followUpScreen ? translations.followUpsScreen.followUpsTitle : translations.contactsScreen.contactsTitle;
 
                 if (forwardScreen) {
-                    this.props.navigator.push({
-                        screen: forwardScreen,
-                        animated: true,
-                        passProps: {
-                            // elementType: 'case',
-                            // elementId: get(exposure, 'id', null),
-                            case: {_id: get(exposure, 'id', null)},
-                            refresh: this.refresh,
-                            previousScreen: previousScreen
-                        }
-                    })
+                    let forwardProps = {
+                        case: {_id: get(exposure, 'id', null)},
+                        refresh: this.refresh,
+                        previousScreen: previousScreen
+                    };
+
+                    screenTransition(this.props.navigator, 'push', forwardScreen, forwardProps, this.props.role, requiredPermissions);
+
+                    // this.props.navigator.push({
+                    //     screen: forwardScreen,
+                    //     animated: true,
+                    //     passProps: {
+                    //         case: {_id: get(exposure, 'id', null)},
+                    //         refresh: this.refresh,
+                    //         previousScreen: previousScreen
+                    //     }
+                    // })
                 }
             };
 
@@ -439,6 +447,63 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                 }
 
                 return forwardScreen;
+            };
+
+            computePermissions = (method) => {
+                let permissions = [];
+                switch(screenType) {
+                    case constants.appScreens.followUpScreen:
+                        switch (method) {
+                            case 'onPressFullName':
+                                permissions = [
+                                    constants.PERMISSIONS_CONTACT.contactAll,
+                                    constants.PERMISSIONS_CONTACT.contactView,
+                                ];
+                                break;
+                            case 'onPressExposure':
+                                permissions = [
+                                    constants.PERMISSIONS_CASE.caseAll,
+                                    constants.PERMISSIONS_CASE.caseView,
+                                ];
+                                break;
+                            default:
+                                permissions = [];
+                        }
+                        break;
+                    case constants.appScreens.contactsScreen:
+                        switch (method) {
+                            case 'onPressFullName':
+                                permissions = [
+                                    constants.PERMISSIONS_CONTACT.contactAll,
+                                    constants.PERMISSIONS_CONTACT.contactView,
+                                ];
+                                break;
+                            case 'onPressExposure':
+                                permissions = [
+                                    constants.PERMISSIONS_CASE.caseAll,
+                                    constants.PERMISSIONS_CASE.caseView,
+                                ];
+                                break;
+                            default:
+                                permissions = [];
+                        }
+                        break;
+                    case constants.appScreens.casesScreen:
+                        switch (method) {
+                            case 'onPressFullName':
+                                permissions = [
+                                    constants.PERMISSIONS_CASE.caseAll,
+                                    constants.PERMISSIONS_CASE.caseView,
+                                ];
+                                break;
+                            default:
+                                permissions = [];
+                        }
+                        break;
+                    default:
+                        break;
+                }
+                return permissions;
             };
 
             onNavigatorEvent = (event) => {

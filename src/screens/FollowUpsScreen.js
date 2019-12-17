@@ -31,6 +31,8 @@ import {enhanceListWithGetData} from './../components/higherOrderComponents/with
 import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
 import {bindActionCreators} from "redux";
 import { setLoaderState } from './../actions/app';
+import PermissionComponent from './../components/PermissionComponent';
+
 class FollowUpsScreen extends Component {
 
     constructor(props) {
@@ -157,26 +159,31 @@ class FollowUpsScreen extends Component {
                     />
                 </NavBarCustom>
                 <View style={style.containerContent}>
-                    <AnimatedListView
-                        data={this.props.data || []}
-                        dataCount={this.props.dataCount || 0}
-                        dataType={'FollowUp'}
-                        colors={this.state.followUpsColors}
-                        filterText={filterText}
-                        style={[style.listViewStyle]}
-                        componentContainerStyle={style.componentContainerStyle}
-                        refreshing={this.state.refreshing}
-                        onRefresh={this.handleOnRefresh}
-                        onSearch={this.props.setSearchText}
-                        onPressFilter={this.props.onPressFilter}
-                        onPressView={this.props.onPressView}
-                        onPressCenterButton={this.props.onPressCenterButton}
-                        onPressAddExposure={this.props.onPressAddExposure}
-                        onPressMap={this.handleOnPressMap}
-                        onPressName={this.props.onPressFullName}
-                        onPressExposure={this.props.onPressExposure}
-                        screen={translations.followUpsScreen.followUpsTitle}
-                        onEndReached={this.props.onEndReached}
+                    <PermissionComponent
+                        render={() => (
+                            <AnimatedListView
+                                data={this.props.data || []}
+                                dataCount={this.props.dataCount || 0}
+                                dataType={'FollowUp'}
+                                colors={this.state.followUpsColors}
+                                filterText={filterText}
+                                style={[style.listViewStyle]}
+                                componentContainerStyle={style.componentContainerStyle}
+                                refreshing={this.state.refreshing}
+                                onRefresh={this.handleOnRefresh}
+                                onSearch={this.props.setSearchText}
+                                onPressFilter={this.props.onPressFilter}
+                                onPressView={this.props.onPressView}
+                                onPressCenterButton={this.props.onPressCenterButton}
+                                onPressAddExposure={this.props.onPressAddExposure}
+                                onPressMap={this.handleOnPressMap}
+                                onPressName={this.props.onPressFullName}
+                                onPressExposure={this.props.onPressExposure}
+                                screen={translations.followUpsScreen.followUpsTitle}
+                                onEndReached={this.props.onEndReached}
+                            />
+                        )}
+                        permissionsList={['follow_up_all', 'follow_up_list']}
                     />
                 </View>
                 <View style={styles.mapContainer}>
@@ -406,7 +413,8 @@ mapStateToProps = (state) => {
         user: get(state, 'user', {}),
         screenSize: get(state, 'app.screenSize', config.designScreenSize),
         translation: get(state, 'app.translation', []),
-        referenceData: get(state, 'referenceData', [])
+        referenceData: get(state, 'referenceData', []),
+        role: get(state, 'role', [])
     };
 };
 

@@ -42,7 +42,10 @@ import translations from './../utils/translations'
 import ElevatedView from 'react-native-elevated-view';
 import AddFollowUpScreen from './AddFollowUpScreen';
 import {generateId, generateTeamId} from "../utils/functions";
+import constants from "../utils/constants";
 import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
+import PermissionComponent from './../components/PermissionComponent';
+import lodashIntersect from 'lodash/intersection';
 
 const initialLayout = {
     height: 0,
@@ -337,7 +340,12 @@ class ContactsSingleScreen extends Component {
                                     </Ripple>
                                 </ElevatedView>
                                 {
-                                    this.props.role && this.props.role.find((e) => e === config.userPermissions.writeContact) !== undefined ? (
+                                    this.props.role && checkArrayAndLength(lodashIntersect(this.props.role, [
+                                        constants.PERMISSIONS_FOLLOW_UP.followUpAll,
+                                        constants.PERMISSIONS_FOLLOW_UP.followUpCreate,
+                                        constants.PERMISSIONS_CONTACT.contactAll,
+                                        constants.PERMISSIONS_CONTACT.contactModify
+                                    ])) ? (
                                         <View>
                                             <Menu
                                                 ref="menuRef"
@@ -349,16 +357,32 @@ class ContactsSingleScreen extends Component {
                                             >
                                                 {
                                                     !this.props.isNew ? (
-                                                        <MenuItem onPress={this.handleOnPressDeceased}>
-                                                            {getTranslation(translations.contactSingleScreen.deceasedContactLabel, this.props.translation)}
-                                                        </MenuItem>
+                                                        <PermissionComponent
+                                                            render={() => (
+                                                                <MenuItem onPress={this.handleOnPressDeceased}>
+                                                                    {getTranslation(translations.contactSingleScreen.deceasedContactLabel, this.props.translation)}
+                                                                </MenuItem>
+                                                            )}
+                                                            permissionsList={[constants.PERMISSIONS_CONTACT.contactAll, constants.PERMISSIONS_CONTACT.contactModify]}
+                                                            alternativeRender={() => (
+                                                                <View style={[style.rippleStyle, {width: 60}]}/>
+                                                            )}
+                                                        />
                                                     ) : null
                                                 }
                                                 {
                                                     !this.props.isNew ? (
-                                                        <MenuItem onPress={this.handleOnAddFollowUp}>
-                                                            {getTranslation(translations.contactsScreen.addFollowupsButton, this.props.translation)}
-                                                        </MenuItem>
+                                                        <PermissionComponent
+                                                            render={() => (
+                                                                <MenuItem onPress={this.handleOnAddFollowUp}>
+                                                                    {getTranslation(translations.contactsScreen.addFollowupsButton, this.props.translation)}
+                                                                </MenuItem>
+                                                            )}
+                                                            permissionsList={[constants.PERMISSIONS_FOLLOW_UP.followUpAll, constants.PERMISSIONS_FOLLOW_UP.followUpCreate]}
+                                                            alternativeRender={() => (
+                                                                <View style={[style.rippleStyle, {width: 60}]}/>
+                                                            )}
+                                                        />
                                                     ) : null
                                                 }
                                                 <DateTimePicker

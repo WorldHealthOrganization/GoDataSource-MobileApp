@@ -26,6 +26,7 @@ import get from "lodash/get";
 import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
 import {bindActionCreators} from "redux";
 import {setLoaderState} from "../actions/app";
+import PermissionComponent from './../components/PermissionComponent';
 
 class ContactsScreen extends Component {
 
@@ -143,26 +144,31 @@ class ContactsScreen extends Component {
                 >
                 </NavBarCustom>
                 <View style={style.containerContent}>
-                    <AnimatedListView
-                        data={this.props.data || []}
-                        dataCount={this.props.dataCount || 0}
-                        colors={this.state.riskColors}
-                        dataType={'Contact'}
-                        filterText={filterText}
-                        style={[style.listViewStyle]}
-                        componentContainerStyle={style.componentContainerStyle}
-                        refreshing={this.state.refreshing}
-                        onRefresh={this.handleOnRefresh}
-                        onSearch={this.props.setSearchText}
-                        onPressFilter={this.props.onPressFilter}
-                        onPressView={this.props.onPressView}
-                        onPressCenterButton={this.props.onPressCenterButton}
-                        onPressAddExposure={this.props.onPressAddExposure}
-                        onPressMap={this.handleOnPressMap}
-                        onPressName={this.props.onPressFullName}
-                        onPressExposure={this.props.onPressExposure}
-                        screen={translations.contactSingleScreen.title}
-                        onEndReached={this.props.onEndReached}
+                    <PermissionComponent
+                        render={() => (
+                            <AnimatedListView
+                                data={this.props.data || []}
+                                dataCount={this.props.dataCount || 0}
+                                colors={this.state.riskColors}
+                                dataType={'Contact'}
+                                filterText={filterText}
+                                style={[style.listViewStyle]}
+                                componentContainerStyle={style.componentContainerStyle}
+                                refreshing={this.state.refreshing}
+                                onRefresh={this.handleOnRefresh}
+                                onSearch={this.props.setSearchText}
+                                onPressFilter={this.props.onPressFilter}
+                                onPressView={this.props.onPressView}
+                                onPressCenterButton={this.props.onPressCenterButton}
+                                onPressAddExposure={this.props.onPressAddExposure}
+                                onPressMap={this.handleOnPressMap}
+                                onPressName={this.props.onPressFullName}
+                                onPressExposure={this.props.onPressExposure}
+                                screen={translations.contactSingleScreen.title}
+                                onEndReached={this.props.onEndReached}
+                            />
+                        )}
+                        permissionsList={['contact_all', 'case_list']}
                     />
                 </View>
 
@@ -360,7 +366,8 @@ function mapStateToProps(state) {
         syncState:      state.app.syncState,
         translation:    state.app.translation,
         loaderState:    state.app.loaderState,
-        referenceData:  state.referenceData
+        referenceData:  state.referenceData,
+        role:           get(state, 'role', [])
     };
 }
 

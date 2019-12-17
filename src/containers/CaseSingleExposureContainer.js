@@ -22,6 +22,7 @@ import translations from './../utils/translations';
 import get from 'lodash/get';
 import TopContainerButtons from "../components/TopContainerButtons";
 import PermissionComponent from './../components/PermissionComponent';
+import constants from "../utils/constants";
 
 const AnimatedFlatList = Animated.createAnimatedComponent(FlatList);
 
@@ -79,6 +80,23 @@ class ContactsSingleExposures extends Component {
                         />
                     )}
                     permissionsList={['case_all', 'case_modify']}
+                />
+                <PermissionComponent
+                    render={() => (
+                        <ScrollView contentContainerStyle={{flexGrow: 1}}>
+                            <AnimatedFlatList
+                                data={get(this.props, 'relations', [])}
+                                renderItem={this.renderRelationship}
+                                keyExtractor={this.keyExtractor}
+                                ItemSeparatorComponent={this.renderSeparatorComponent}
+                                ListEmptyComponent={this.listEmptyComponent}
+                                style={[style.listViewStyle]}
+                                componentContainerStyle={style.componentContainerStyle}
+                            />
+                            <View style={{height: 30}}/>
+                        </ScrollView>
+                    )}
+                    permissionsList={[constants.PERMISSIONS_RELATIONSHIP.relationshipAll, constants.PERMISSIONS_RELATIONSHIP.relationshipView]}
                 />
                 <ScrollView contentContainerStyle={{flexGrow: 1}}>
                     <AnimatedFlatList
@@ -141,6 +159,9 @@ class ContactsSingleExposures extends Component {
                 onPressArray={[
                     () => {this.props.onPressEditExposure(relation.item, relation.index)}
                     // () => {this.props.onPressDeleteExposure(relation.item, relation.index)}
+                ]}
+                arrayPermisssions={[
+                    [constants.PERMISSIONS_RELATIONSHIP.relationshipAll, constants.PERMISSIONS_RELATIONSHIP.relationshipModify]
                 ]}
                 containerStyle={{flex: 1, height: '100%', marginHorizontal: calculateDimension(16, false, this.props.screenSize)}}
                 translation={this.props.translation}

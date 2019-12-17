@@ -12,8 +12,8 @@ import ElevatedView from 'react-native-elevated-view';
 import ActionsBar from './ActionsBar';
 import {getTranslation} from './../utils/functions';
 
-GeneralListItem = ({title, primaryText, secondaryText, firstComponent, secondComponent, thirdComponent, hasActionsBar, textsArray, textsStyleArray, onPressArray, actionsBarContainerStyle, containerStyle, translation}) => {
-    console.log('GeneralListItem render called');
+GeneralListItem = ({title, primaryText, secondaryText, firstComponent, secondComponent, thirdComponent, hasActionsBar, textsArray, textsStyleArray, onPressArray, arrayPermissions, actionsBarContainerStyle, containerStyle, translation}) => {
+    // console.log('GeneralListItem render called');
     return (
         <ElevatedView
             elevation={3}
@@ -55,6 +55,7 @@ GeneralListItem = ({title, primaryText, secondaryText, firstComponent, secondCom
                         containerStyle={{height: 54}}
                         isEditMode={true}
                         translation={translation}
+                        arrayPermissions={arrayPermissions}
                     />) : (null)
                 }
             </View>

@@ -76,36 +76,32 @@ class NavigationDrawer extends Component {
                     {
                         config.sideMenuItems.map((item, index) => {
                             let addButton = false;
-                            let findPermission = undefined;
-                            if (this.props && this.props.role) {
-                                if (item.addButton && item.addButton === true) {
-                                    if (item.key === 'followups') {
-                                        findPermission = ['follow_up_all', 'follow_up_view'];
-                                    } else if (item.key === 'contacts') {
-                                        findPermission = ['contact_all', 'contact_view'];
-                                    } else if (item.key === 'cases') {
-                                        findPermission = ['case_all', 'case_view'];
-                                    }
-                                    if (findPermission !== undefined) {
-                                        addButton = true
-                                    }
-                                }
-                            }
+                            // let findPermission = undefined;
+                            // if (this.props && this.props.role) {
+                            //     if (item.addButton && item.addButton === true) {
+                            //         if (item.key === 'followups') {
+                            //             findPermission = ['follow_up_all', 'follow_up_list'];
+                            //         } else if (item.key === 'contacts') {
+                            //             findPermission = ['contact_all', 'contact_list'];
+                            //         } else if (item.key === 'cases') {
+                            //             findPermission = ['case_all', 'case_list'];
+                            //         }
+                            //         if (findPermission !== undefined) {
+                            //             addButton = true
+                            //         }
+                                // }
+                            // }
 
                             return (
-                                <PermissionComponent
-                                    render={() => (
-                                        <NavigationDrawerListItem
-                                            key={index}
-                                            label={getTranslation(item.label, this.props.translation)}
-                                            name={item.name}
-                                            onPress={() => this.handlePressOnListItem(index)}
-                                            handleOnPressAdd={() => this.handleOnPressAdd(item.key, index)}
-                                            isSelected={index === this.state.selectedScreen}
-                                            addButton={addButton}
-                                        />
-                                    )}
-                                    permissionsList={findPermission}
+                                <NavigationDrawerListItem
+                                    key={index}
+                                    itemKey={item.key}
+                                    label={getTranslation(item.label, this.props.translation)}
+                                    name={item.name}
+                                    onPress={() => this.handlePressOnListItem(index)}
+                                    handleOnPressAdd={() => this.handleOnPressAdd(item.key, index)}
+                                    isSelected={index === this.state.selectedScreen}
+                                    addButton={addButton}
                                 />
                             )
                         })

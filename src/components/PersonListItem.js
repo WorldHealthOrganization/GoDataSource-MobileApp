@@ -66,6 +66,7 @@ class PersonListItem extends Component {
                 textsArray={this.props.textsArray}
                 textsStyleArray={this.props.textsStyleArray}
                 onPressArray={this.props.onPressTextsArray}
+                arrayPermissions={this.props.arrayPermissions}
             />
         )
     }

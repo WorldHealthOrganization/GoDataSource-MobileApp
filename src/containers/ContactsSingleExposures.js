@@ -23,6 +23,7 @@ import ExposureContainer from '../containers/ExposureContainer';
 import get from 'lodash/get';
 import TopContainerButtons from "./../components/TopContainerButtons";
 import PermissionComponent from './../components/PermissionComponent';
+import constants from './../utils/constants';
 
 const AnimatedFlatList = Animated.createAnimatedComponent(FlatList);
 
@@ -88,24 +89,29 @@ class ContactsSingleExposures extends Component {
                                 onPressPreviousButton={this.handleBackButton}
                             />
                         )}
-                        permissionsList={['contact_all', 'contact_modify']}
+                        permissionsList={[constants.PERMISSIONS_CONTACT.contactAll, constants.PERMISSIONS_CONTACT.contactModify]}
                     />
 
                 </View>
                 {
                     !this.props.isNew ? (
-                        <ScrollView contentContainerStyle={{flexGrow: 1}}>
-                            <AnimatedFlatList
-                                data={get(this.props, 'contact.relationships', [])}
-                                renderItem={this.renderRelationship}
-                                keyExtractor={this.keyExtractor}
-                                ItemSeparatorComponent={this.renderSeparatorComponent}
-                                ListEmptyComponent={this.listEmptyComponent}
-                                style={[style.listViewStyle]}
-                                componentContainerStyle={style.componentContainerStyle}
-                            />
-                            <View style={{height: 30}}/>
-                        </ScrollView>
+                        <PermissionComponent
+                            render={() => (
+                                <ScrollView contentContainerStyle={{flexGrow: 1}}>
+                                    <AnimatedFlatList
+                                        data={get(this.props, 'contact.relationships', [])}
+                                        renderItem={this.renderRelationship}
+                                        keyExtractor={this.keyExtractor}
+                                        ItemSeparatorComponent={this.renderSeparatorComponent}
+                                        ListEmptyComponent={this.listEmptyComponent}
+                                        style={[style.listViewStyle]}
+                                        componentContainerStyle={style.componentContainerStyle}
+                                    />
+                                    <View style={{height: 30}}/>
+                                </ScrollView>
+                            )}
+                            permissionsList={[constants.PERMISSIONS_RELATIONSHIP.relationshipAll, constants.PERMISSIONS_RELATIONSHIP.relationshipView]}
+                        />
                     ) : (
                         <ExposureContainer
                             exposure={this.props.contact.relationships[0]}
@@ -171,6 +177,9 @@ class ContactsSingleExposures extends Component {
                     () => {this.props.onPressEditExposure(relation.item, relation.index)}
                     // () => {this.props.onPressDeleteExposure(relation.item, relation.index)}
                     ]}
+                arrayPermisssions={[
+                    [constants.PERMISSIONS_RELATIONSHIP.relationshipAll, constants.PERMISSIONS_RELATIONSHIP.relationshipModify]
+                ]}
                 containerStyle={{flex: 1, height: '100%', marginHorizontal: calculateDimension(16, false, this.props.screenSize)}}
                 translation={this.props.translation}
             />

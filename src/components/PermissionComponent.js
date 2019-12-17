@@ -12,7 +12,11 @@ class PermissionComponent extends Component {
         if (checkArrayAndLength(lodashIntersection(this.props.permissionsList, this.props.permissions))) {
             return this.props.render();
         } else {
-            return null;
+            if (this.props.alternativeRender) {
+                return this.props.alternativeRender();
+            } else {
+                return null;
+            }
         }
     }
 }
@@ -20,13 +24,15 @@ class PermissionComponent extends Component {
 PermissionComponent.propTypes = {
     render: PropTypes.func.isRequired,
     permissionsList: PropTypes.array.isRequired,
+    alternativeRender: PropTypes.func,
 };
 
 PermissionComponent.defaultProps = {
     render: () => (
         <Text>The render function was empty</Text>
     ),
-    permissionsList: []
+    permissionsList: [],
+    alternativeRender: null
 };
 
 function mapStateToProps(state) {

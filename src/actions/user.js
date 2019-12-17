@@ -142,7 +142,16 @@ export function computeCommonData(storeUserBool, user, refreshFollowUps, filters
                             saveTranslation(get(actionsObject,  'translations', null)),
                             storeClusters(get(actionsObject,  'clusters', null)),
                             // storePermissions(get(actionsObject,  'userRoles', null)),
-                            storePermissions(['contact_modify', 'location_list', 'outbreak_view']),
+                            storePermissions([
+                                // 'contact_modify',
+                                'outbreak_view',
+                                'follow_up_list',
+                                'contact_list',
+                                // 'contact_view',
+                                'case_list',
+                                'case_view',
+                                // 'relationship_all'
+                            ]),
                             storeUserTeams(userTeams),
                             storeHelpCategory(get(actionsObject,  'helpCategory', null)),
                             storeHelpItem(get(actionsObject,  'helpItem', null)),
