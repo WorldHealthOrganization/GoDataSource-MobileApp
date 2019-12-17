@@ -30,7 +30,7 @@ import {createDatabase, getDatabase} from './../queries/database';
 import {setNumberOfFilesProcessed, createZipFileAtPath, createDate, getDataFromDatabaseFromFileSql} from './../utils/functions';
 import AsyncStorage from '@react-native-community/async-storage';
 import {getUserById} from './user';
-import {uniq} from 'lodash';
+import get from 'lodash/get';
 import {getSyncEncryptPassword} from './../utils/encryption';
 import errorTypes from "../utils/errorTypes";
 import constants from './../utils/constants';
@@ -197,7 +197,7 @@ function processFilesForSyncNew(error, response, hubConfiguration, isFirstTime, 
             if (error === 'No data to export') {
                 dispatch(setSyncState({id: 'downloadDatabase', name: 'Download Database', status: error}));
             } else {
-                dispatch(setSyncState({id: 'downloadDatabase', name: 'Download Database', status: 'Error', error: JSON.stringify(error)}));
+                dispatch(setSyncState({id: 'downloadDatabase', name: 'Download Database', status: 'Error', error: JSON.stringify(get(error, 'message', error))}));
                 // dispatch(addError({type: 'Error downloading database', message: error}));
             }
         }

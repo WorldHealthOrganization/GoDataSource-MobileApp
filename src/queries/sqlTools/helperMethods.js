@@ -48,7 +48,7 @@ export function wrapReadTransactionInPromise (database) {
 }
 
 export function wrapExecuteSQLInPromise (transaction, sqlStatement, arrayOfFields, skipCallback) {
-    // console.log('Execute query: ', sqlStatement);
+    // console.log('Execute query: ', sqlStatement, arrayOfFields);
     if (transaction && sqlStatement && checkArray(arrayOfFields)) {
         return new Promise((resolve, reject) => {
             if (skipCallback) {
@@ -57,12 +57,12 @@ export function wrapExecuteSQLInPromise (transaction, sqlStatement, arrayOfField
             } else {
                 transaction.executeSql(sqlStatement, arrayOfFields
                     , (transaction, resultSet) => {
-                        console.log('Good stuff:')
+                        // console.log('Good stuff:');
                         return resolve(resultSet)
                     },
                     (transaction, errorStatement) => {
-                        console.log('Bad stuff: ', errorStatement)
-                        return reject(errorStatement)
+                        console.log('Error query execution: ', errorStatement);
+                        return reject(errorStatement);
                     }
                     );
                 // transaction.executeSql('SELECT * FROM person', []
@@ -105,28 +105,6 @@ export function createTable(transaction, tableName) {
             .then((resultSet) => Promise.resolve(`Success ${tableName}`))
             .then(() => Promise.resolve(transaction))
             .catch((errorStatement) => Promise.reject(errorStatement));
-
-
-
-    // return new Promise(async (resolve, reject) => {
-    //     try {
-    //         let createTableString = createTableStringMethod(tableName);
-    //         let sqlDb = await openDatabase(databaseName);
-    //         sqlDb.transaction((txn) => {
-    //             txn.executeSql(createTableString, [],
-    //                 (txn, resultSet) => {
-    //                     console.log('SQLite console: Created table: ', tableName);
-    //                     resolve(`Success ${tableName}`);
-    //                 },
-    //                 (txn, errorCreate) => {
-    //                     console.log('SQLite console: Error while creating database: ', errorCreate);
-    //                     reject(errorCreate);
-    //                 })
-    //         })
-    //     } catch(openDatabaseError) {
-    //         reject(new Error('Could not open database'));
-    //     }
-    // })
 }
 
 // The following methods refer to the bulk insert or update of mapped data. Data mapping will not be done here
@@ -221,7 +199,11 @@ export function mapDataForInsert(tableName, data) {
                                 if (tableName === 'person' && e.type === translations.personTypes.events && tableFields[i].fieldName === 'firstName') {
                                     innerArray.push(get(e, `name`, null));
                                 } else {
-                                    innerArray.push(get(e, `[${tableFields[i].fieldName}]`, null));
+                                    if (tableName === 'person' && (tableFields[i].fieldName === 'firstName' || tableFields[i].fieldName === 'lastName')) {
+                                        innerArray.push(get(e, `[${tableFields[i].fieldName}]`, ''));
+                                    } else {
+                                        innerArray.push(get(e, `[${tableFields[i].fieldName}]`, null));
+                                    }
                                 }
                             }
                         }
@@ -265,17 +247,17 @@ export function executeQuery(queryObject) {
 
             let sql = jsonSql.build(queryObject);
 
-            console.log('Sql statement: ', sql);
+            // console.log('Sql statement: ', sql);
             return wrapExecuteSQLInPromise(transaction, sql.query, Object.values(sql.values))
         })
         .then((result) => {
-            console.log('Result get stuff: ', new Date().getTime() - start);
+            console.log('Query executed in: ', new Date().getTime() - start);
             // dispatch(storeFollowUps([]));
             let mappedData = generalMapping1(result.rows._array, queryObject.fields);
             return Promise.resolve(mappedData);
         })
         .catch((errorGetStuff) => {
-            console.log('Error get stuff: ', errorGetStuff);
+            console.log('Error for query execution: ', errorGetStuff);
             return Promise.reject(errorGetStuff)
         })
     // }
