@@ -159,7 +159,7 @@ class FollowUpsScreen extends Component {
                 <View style={style.containerContent}>
                     <AnimatedListView
                         data={this.props.data || []}
-                        dataCount={this.props.dataCount || 0}
+                        dataCount={get(this.props, 'dataCount', 0)}
                         dataType={'FollowUp'}
                         colors={this.state.followUpsColors}
                         filterText={filterText}
