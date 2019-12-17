@@ -13,7 +13,7 @@ import ActionsBar from './ActionsBar';
 import {getTranslation} from './../utils/functions';
 
 GeneralListItem = ({title, primaryText, secondaryText, firstComponent, secondComponent, thirdComponent, hasActionsBar, textsArray, textsStyleArray, onPressArray, actionsBarContainerStyle, containerStyle, translation}) => {
-    console.log('GeneralListItem render called');
+    // console.log('GeneralListItem render called');
     return (
         <ElevatedView
             elevation={3}

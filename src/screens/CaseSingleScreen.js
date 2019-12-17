@@ -248,7 +248,7 @@ class CaseSingleScreen extends Component {
                             <Breadcrumb
                                 entities={
                                     [
-                                        getTranslation(this.props && this.props.previousScreen ? this.props.previousScreen : translations.caseSingleScreen.title, this.props.translation),
+                                        getTranslation(translations.caseSingleScreen.title, this.props.translation),
                                         this.props.isNew ? getTranslation(translations.caseSingleScreen.addCaseTitle, this.props.translation) : (computeFullName(_.get(this.state, 'case', null)))
                                     ]
                                 }
