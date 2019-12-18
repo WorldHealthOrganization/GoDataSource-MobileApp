@@ -47,6 +47,7 @@ class CalendarPickerView extends PureComponent {
             >
                 <ElevatedView elevation={4} style={{flex: 1}}>
                     <Calendar
+                        current={ this.state.selectedDate }
                         markedDates={{[this.state.selectedDate]: {marked: true}}}
                         onDayPress={this.handleDateChanged}
                         monthFormat={'MMMM yyyy'}
