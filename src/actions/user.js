@@ -147,7 +147,7 @@ export function computeCommonData(storeUserBool, user, refreshFollowUps, filters
                                 'outbreak_view',
                                 'follow_up_list',
                                 'contact_list',
-                                // 'contact_view',
+                                'contact_view',
                                 'case_list',
                                 'case_view',
                                 // 'relationship_all'

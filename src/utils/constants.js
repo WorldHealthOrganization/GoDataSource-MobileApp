@@ -73,6 +73,14 @@ const PERMISSIONS_RELATIONSHIP = {
     relationshipDelete: 'relationship_delete'
 };
 
+const PERMISSIONS_HELP = {
+    helpAll: 'help_all',
+    helpViewCategory: 'help_view_category',
+    helpListCategory: 'help_list_category',
+    helpViewCategoryItem: 'help_view_category_item',
+    helpListCategoryItem: 'help_list_category_item'
+};
+
 const PERMISSIONS_COMMON = {
     outbreakView: 'outbreak_view',
     locationList: 'location_list'
@@ -90,5 +98,6 @@ export default {
     PERMISSIONS_FOLLOW_UP,
     PERMISSIONS_RELATIONSHIP,
     PERMISSIONS_USER,
+    PERMISSIONS_HELP,
     PERMISSIONS_COMMON
 }

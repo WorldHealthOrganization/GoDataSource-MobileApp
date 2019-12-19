@@ -17,6 +17,7 @@ import {updateRequiredFields, getTranslation} from './../utils/functions';
 import translations from './../utils/translations';
 import VersionNumber from 'react-native-version-number';
 import PermissionComponent from './../components/PermissionComponent';
+import constants from "../utils/constants";
 
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
@@ -124,7 +125,21 @@ class NavigationDrawer extends Component {
                             screenSize={this.props.screenSize}
                         />
                     </View>
-                    <NavigationDrawerListItem key={'help'} label={getTranslation(translations.navigationDrawer.helpLabel, this.props.translation)} name="help" onPress={() => this.handlePressOnListItem('help')} isSelected={'help' === this.state.selectedScreen}/>
+                    <PermissionComponent
+                        render={() => (
+                            <NavigationDrawerListItem
+                                key={'help'}
+                                label={getTranslation(translations.navigationDrawer.helpLabel, this.props.translation)}
+                                name="help"
+                                onPress={() => this.handlePressOnListItem('help')}
+                                isSelected={'help' === this.state.selectedScreen}
+                            />
+                        )}
+                        permissionsList={[
+                            constants.PERMISSIONS_HELP.helpAll,
+                            constants.PERMISSIONS_HELP.helpListCategoryItem
+                        ]}
+                    />
                     <NavigationDrawerListItem label={getTranslation(translations.navigationDrawer.logoutLabel, this.props.translation)} name="power-settings-new" onPress={this.handleLogout} />
                     <Text
                         style={{
