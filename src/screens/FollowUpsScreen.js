@@ -32,6 +32,7 @@ import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
 import {bindActionCreators} from "redux";
 import { setLoaderState } from './../actions/app';
 import PermissionComponent from './../components/PermissionComponent';
+import constants from "../utils/constants";
 
 class FollowUpsScreen extends Component {
 
@@ -119,24 +120,32 @@ class FollowUpsScreen extends Component {
                                 </Ripple>
                             </View>
 
-                            <View style={{ flex: 0.135 /*, marginRight: 10*/ }}>
-                                <ElevatedView
-                                    elevation={3}
-                                    style={{
-                                        backgroundColor: styles.buttonGreen,
-                                        width: calculateDimension(33, false, this.props.screenSize),
-                                        height: calculateDimension(25, true, this.props.screenSize),
-                                        borderRadius: 4
-                                    }}
-                                >
-                                    <Ripple style={{
-                                        flex: 1,
-                                        justifyContent: 'center',
-                                        alignItems: 'center'
-                                    }} onPress={this.goToHelpScreen}>
-                                        <Icon name="help" color={'white'} size={15} />
-                                    </Ripple>
-                                </ElevatedView>
+                            <View style={{flex: 0.135 /*, marginRight: 10*/}}>
+                                <PermissionComponent
+                                    render={() => (
+                                        <ElevatedView
+                                            elevation={3}
+                                            style={{
+                                                backgroundColor: styles.buttonGreen,
+                                                width: calculateDimension(33, false, this.props.screenSize),
+                                                height: calculateDimension(25, true, this.props.screenSize),
+                                                borderRadius: 4
+                                            }}
+                                        >
+                                            <Ripple style={{
+                                                flex: 1,
+                                                justifyContent: 'center',
+                                                alignItems: 'center'
+                                            }} onPress={this.goToHelpScreen}>
+                                                <Icon name="help" color={'white'} size={15}/>
+                                            </Ripple>
+                                        </ElevatedView>
+                                    )}
+                                    permissionsList={[
+                                        constants.PERMISSIONS_HELP.helpAll,
+                                        constants.PERMISSIONS_HELP.helpListCategoryItem
+                                    ]}
+                                />
                             </View>
                         </View>
                     }

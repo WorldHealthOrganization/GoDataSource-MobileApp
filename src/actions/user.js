@@ -150,7 +150,7 @@ export function computeCommonData(storeUserBool, user, refreshFollowUps, filters
                                 'contact_view',
                                 'case_list',
                                 'case_view',
-                                // 'relationship_all'
+                                'help_list_category_item'
                             ]),
                             storeUserTeams(userTeams),
                             storeHelpCategory(get(actionsObject,  'helpCategory', null)),
