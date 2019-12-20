@@ -14,6 +14,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import KeyboardManager  from 'react-native-keyboard-manager';
 import ModalSyncStatus from './ModalSyncStatus';
 import {setSyncState, setLoaderState} from "../actions/app";
+import isFunction from 'lodash/isFunction';
 
 if (Platform.OS === 'ios') {
     KeyboardManager.setEnable(true);
@@ -96,7 +97,9 @@ class ViewHOC extends Component {
             //     }
             // })
             this.props.setSyncState('Finished');
-            this.props.refresh();
+            if (this.props.refresh && isFunction(this.props.refresh)) {
+                this.props.refresh();
+            }
         } else {
             // this.resetModalProps(() => {
             //     console.log('reset props')

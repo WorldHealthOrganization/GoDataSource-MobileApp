@@ -218,7 +218,7 @@ class ContactsSinglePersonal extends PureComponent {
         if (this.props.selectedItemIndexForTextSwitchSelectorForAge !== null && this.props.selectedItemIndexForTextSwitchSelectorForAge !== undefined && item.objectType === 'Contact' && item.dependsOn !== undefined && item.dependsOn !== null) {
             let itemIndexInConfigTextSwitchSelectorValues = config[item.dependsOn].map((e) => { return e.value }).indexOf(item.id);
             if (itemIndexInConfigTextSwitchSelectorValues > -1) {
-                if (itemIndexInConfigTextSwitchSelectorValues != this.props.selectedItemIndexForTextSwitchSelectorForAge) {
+                if (itemIndexInConfigTextSwitchSelectorValues !== this.props.selectedItemIndexForTextSwitchSelectorForAge) {
                     return
                 }
             }
@@ -244,13 +244,11 @@ class ContactsSinglePersonal extends PureComponent {
                 minimumDate={minimumDate}
                 maximumDate={maximumDate}
                 index={cardIndex}
-
                 onChangeText={this.props.onChangeText}
                 onChangeDate={this.props.onChangeDate}
                 onChangeSwitch={this.props.onChangeSwitch}
                 onChangeDropDown={this.props.onChangeDropDown}
                 onChangeTextSwitchSelector={this.props.onChangeTextSwitchSelector}
-
                 onFocus={this.handleOnFocus}
                 onBlur={this.handleOnBlur}
             />
@@ -267,8 +265,7 @@ class ContactsSinglePersonal extends PureComponent {
             }
         }
 
-        let dateValidation = { minimumDate, maximumDate };
-        return dateValidation
+        return { minimumDate, maximumDate };
     };
 
     computeValueForContactsSingleScreen = (item, index) => {
@@ -291,7 +288,7 @@ class ContactsSinglePersonal extends PureComponent {
                 return getTranslation(lodashGet(this.props.contact, item.id),this.props.translation);
             }
         } else {
-            console.log('Missing: ', item.id, this.props.contact[item.id]);
+            // console.log('Missing: ', item.id, this.props.contact[item.id]);
             return getTranslation(lodashGet(this.props, `contact[${item.id}]`, ' '), this.props.translation);
             // return this.props.contact && this.props.contact[item.id] ? getTranslation(this.props.contact[item.id], this.props.translation) : '';
         }

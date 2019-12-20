@@ -2,10 +2,9 @@
  * Created by florinpopa on 19/07/2018.
  */
 import get from 'lodash/get';
-import {mapContactsAndFollowUps, createDate} from './../utils/functions';
+import {createDate} from './../utils/functions';
 import {executeQuery, insertOrUpdate} from './../queries/sqlTools/helperMethods';
-import sqlConstants from './../queries/sqlTools/constants';
-import {checkArrayAndLength, checkInteger} from "../utils/typeCheckingFunctions";
+import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
 var jsonSql = require('json-sql')();
 jsonSql.setDialect('sqlite');
 import translations from './../utils/translations';
@@ -15,9 +14,23 @@ export function getFollowUpsForOutbreakId({outbreakId, followUpFilter, userTeams
     let countPromise = null;
     let followUpPromise = null;
 
-    let followUpCondition = {
-        'FollowUps.deleted': 0
-    };
+    // need to do custom logic for followUps
+    let queryFUps = createMainQuery(translations.personTypes.contacts, outbreakId, contactsFilter, exposureFilter, lastElement, offset, false);
+
+    queryFUps.join.push({
+        type: 'inner',
+        table: 'followUp',
+        alias: 'FollowUps',
+        on: {[`MainQuery._id`]: `FollowUps.personId`}
+    });
+    queryFUps.fields.push({
+        table: 'FollowUps',
+        name: 'json',
+        alias: 'followUpData'
+    });
+
+    let followUpCondition = Object.assign({}, queryFUps.condition);
+    followUpCondition['FollowUps.deleted'] = 0;
     if (outbreakId) {
         followUpCondition['FollowUps.outbreakId'] = outbreakId;
     }
@@ -39,138 +52,223 @@ export function getFollowUpsForOutbreakId({outbreakId, followUpFilter, userTeams
                 ['FollowUps.teamId']: {'$is': null}
             }
         ]
-        // followUpCondition['FollowUps.teamId'] = {'$in': userTeams.map((e) => e.teamId)};
     }
 
-    let contactsAndExposuresQuery = {
-        type: 'select',
-        query: sqlConstants.createMainQuery(translations.personTypes.contacts, outbreakId, contactsFilter, exposureFilter, lastElement, offset), // Here will take place the contact/exposure filter/sort
-        alias: 'MappedData',
-        fields: [
-            {
-                table: 'MappedData',
-                name: 'IdField',
-                alias: 'ContactId'
-            },
-            {
-                table: 'MappedData',
-                name: 'MainData',
-                alias: 'MainData'
-            },
-            {
-                table: 'MappedData',
-                name: 'AllOfExposures',
-                alias: 'ExposureData'
+    let sort = {};
+
+    if (checkArrayAndLength(get(contactsFilter, 'sort', null))) {
+        for (let i = 0; i < contactsFilter.sort.length; i++) {
+            let sortOrder = get(contactsFilter, `sort[${i}].sortOrder`, null) === translations.sortTab.sortOrderAsc ? 1 : -1;
+            // Sort by firstName
+            if (get(contactsFilter, `sort[${i}].sortCriteria`, null) === translations.sortTab.sortFirstName) {
+                sort[`ContactsWithExposures.firstName`] = sortOrder;
             }
-        ]
-    };
-    let followUpQuery = {
-        type: 'select',
-        table: 'followUp',
-        alias: 'FollowUps',
-        fields: [
-            {
-                table: 'FollowUps',
-                name: '_id',
-                alias: '_id'
-            },
-            {
-                table: 'FollowUps',
-                name: 'json',
-                alias: 'followUpData'
-            },
-            {
-                table: 'ContactsWithExposures',
-                name: 'MainData',
-                alias: 'mainData'
-            },
-            {
-                table: 'ContactsWithExposures',
-                name: 'ExposureData',
-                alias: 'exposureData'
+            // Sort by lastName
+            if (get(contactsFilter, `sort[${i}].sortCriteria`, null) === translations.sortTab.sortLastName) {
+                sort[`ContactsWithExposures.lastName`] = sortOrder;
             }
-        ],
-        join: [
-            {
-                type: 'inner',
-                query: contactsAndExposuresQuery,
-                alias: 'ContactsWithExposures',
-                on: {'FollowUps.personId': 'ContactsWithExposures.ContactId'}
+            // Sort by visualId
+            if (get(contactsFilter, `sort[${i}].sortCriteria`, null) === translations.sortTab.sortVisualId) {
+                sort[`ContactsWithExposures.visualId`] = sortOrder;
             }
-        ],
-        condition: followUpCondition
-    };
+            // Sort by createdAt
+            if (get(contactsFilter, `sort[${i}].sortCriteria`, null) === translations.sortTab.sortCreatedAt) {
+                sort[`ContactsWithExposures.createdAt`] = sortOrder;
+            }
+            // Sort by updatedAt
+            if (get(contactsFilter, `sort[${i}].sortCriteria`, null) === translations.sortTab.sortUpdatedAt) {
+                sort[`ContactsWithExposures.updatedAt`] = sortOrder;
+            }
+        }
+        // followUpCondition['$not'] = notQuery;
+    } else {
+        sort[`MainQuery.lastName`] = 1;
+        sort[`MainQuery.firstName`] = 1;
+        sort['MainQuery._id'] = 1;
+        sort['FollowUps._id'] = 1;
+        if (lastElement) {
+            followUpCondition = Object.assign({}, followUpCondition, {
+                $expression: {
+                    pattern: `(MainQuery.lastName, MainQuery.firstName, MainQuery._id, FollowUps._id)>({lastName}, {firstName}, {id}, {followUpId})`,
+                    values: {
+                        lastName: get(lastElement, 'lastName', ''),
+                        firstName: get(lastElement, 'firstName', ''),
+                        id: get(lastElement, '_id', ''),
+                        followUpId: get(lastElement, 'followUpId', '')
+                    }
+                }
+            })
+        }
+    }
+
+    queryFUps.condition = followUpCondition;
+    queryFUps.sort = sort;
 
     if (computeCount) {
-        let contactsQueryCount = {
-            type: 'select',
-            query: sqlConstants.createMainQuery(translations.personTypes.contacts, outbreakId, contactsFilter, exposureFilter, lastElement, offset, true), // Here will take place the contact/exposure filter/sort
-            alias: 'MappedData',
-            fields: [
-                {
-                    table: 'MappedData',
-                    name: 'IdField',
-                    alias: 'ContactId'
-                }
-            ]
-        };
-        let followUpCount = {
-            type: 'select',
+        let followUpCount = createMainQuery(translations.personTypes.contacts, outbreakId, contactsFilter, exposureFilter, lastElement, offset, true);
+        followUpCount.join.push({
+            type: 'inner',
             table: 'followUp',
             alias: 'FollowUps',
-            fields: [
-                {
-                    func: {
-                        name: 'count',
-                        args: [{field: `FollowUps._id`}]
-                    },
-                    alias: 'countRecords'
-                }
-            ],
-            join: [
-                {
-                    type: 'inner',
-                    query: contactsQueryCount,
-                    alias: 'ContactsWithExposures',
-                    on: {'FollowUps.personId': 'ContactsWithExposures.ContactId'}
-                }
-            ],
-            condition: followUpCondition
-        };
+            on: {[`MainQuery._id`]: `FollowUps.personId`}
+        });
+        followUpCount.condition = followUpCondition;
+        delete followUpCount.limit;
+        delete followUpCount.group;
         countPromise = executeQuery(followUpCount);
     }
-    followUpPromise = executeQuery(followUpQuery);
+    followUpPromise = executeQuery(queryFUps);
 
     return Promise.all([followUpPromise, countPromise])
         .then(([followUps, followUpsCount]) => {
-            console.log('Returned values: ');
-            return Promise.resolve({data: followUps, dataCount: checkArrayAndLength(followUpsCount) ? followUpsCount[0].countRecords : null});
+            console.log('Returned values FollowUps: ', followUps.length);
+            return Promise.resolve({data: followUps, dataCount: checkArrayAndLength(followUpsCount) ? followUpsCount[0].countRecords : undefined});
         })
         .catch((errorGetFollowUps) => Promise.reject(errorGetFollowUps))
 }
 
-export function generalMapping(unmappedData) {
-    return unmappedData.map((e) => {
-        let followUpData = JSON.parse(get(e, 'FollowUpsData', null));
-        let mainData = JSON.parse(get(e, 'MainData', null));
-        let unparsedExposureData = e.ExposuresData ? e.ExposuresData.split('***') : null;
-        let exposureData = [];
-        if (unparsedExposureData) {
-            exposureData = unparsedExposureData.map((e) => JSON.parse(e));
-        }
-        let mappedObject = {};
-        if(followUpData) {
-            mappedObject['followUpData'] = followUpData;
-        }
-        if (mainData) {
-            mappedObject['mainData'] = mainData
-        }
-        if (exposureData) {
-            mappedObject['exposureData'] = exposureData;
-        }
+function createMainQuery (dataType, outbreakId, mainFilter, search, lastElement, offset, skipExposures) {
+    let condition = {
+        [`MainQuery.deleted`]: 0,
+        [`MainQuery.type`]: dataType,
+        [`MainQuery.outbreakId`]: outbreakId
+    };
+    let joinFieldMainQueryRelations = dataType !== translations.personTypes.cases ? 'targetId' : 'sourceId';
+    let joinFieldRelationsFilteredExposures = dataType !== translations.personTypes.cases ? 'sourceId' : 'targetId';
 
-        return mappedObject;
-    })
+    if (search) {
+        if (dataType === translations.personTypes.cases) {
+            condition['$or'] = [
+                {[`MainQuery.firstName`]: {'$like': `%${search}%`}},
+                {[`MainQuery.lastName`]: {'$like': `%${search}%`}},
+                {[`MainQuery.visualId`]: {'$like': `%${search}%`}}
+            ]
+        } else {
+            condition['$or'] = [
+                {[`MainQuery.firstName`]: {'$like': `%${search}%`}},
+                {[`MainQuery.lastName`]: {'$like': `%${search}%`}},
+                {[`MainQuery.visualId`]: {'$like': `%${search}%`}},
+                {[`FilteredExposures.firstName`]: {'$like': `%${search}%`}},
+                {[`FilteredExposures.lastName`]: {'$like': `%${search}%`}},
+                {[`FilteredExposures.visualId`]: {'$like': `%${search}%`}}
+            ]
+        }
+    }
+
+    if (checkArrayAndLength(get(mainFilter, 'age', null)) && mainFilter.age.length === 2) {
+        condition[`MainQuery.age`] = {
+            ['$gte']: get(mainFilter, 'age[0]', 0),
+            ['$lte']: get(mainFilter, 'age[1]', 150)
+        };
+    }
+    if (get(mainFilter, 'gender', null) !== null) {
+        condition[`MainQuery.gender`] = mainFilter.gender;
+    }
+    if (checkArrayAndLength(get(mainFilter, 'categories', null))) {
+        condition[`MainQuery.categoryId`] = {
+            ['$in']: mainFilter.categories
+        };
+    }
+    if (checkArrayAndLength(get(mainFilter, 'classification', null))) {
+        condition[`MainQuery.classification`] = {
+            ['$in']: mainFilter.classification
+        };
+    }
+    if (checkArrayAndLength(get(mainFilter, 'selectedLocations', null))) {
+        condition[`MainQuery.locationId`] = {
+            ['$in']: mainFilter.selectedLocations
+        };
+    }
+
+    let query = {
+        type: 'select',
+        table: 'person',
+        alias: 'MainQuery',
+        fields: [
+            {
+                table: 'MainQuery',
+                name: 'json',
+                alias: 'mainData',
+            }
+        ],
+        join: [
+            {
+                type: 'left',
+                table: 'relationship',
+                alias: 'Relations',
+                on: {[`MainQuery._id`]: `Relations.${joinFieldMainQueryRelations}`}
+            },
+            {
+                type: 'left',
+                table: 'person',
+                alias: 'FilteredExposures',
+                on: {[`Relations.${joinFieldRelationsFilteredExposures}`]: `FilteredExposures._id`}
+            }
+        ],
+        condition: condition,
+        group: 'FollowUps._id'
+    };
+
+    if (!skipExposures) {
+        query.join.push({
+            type: 'left',
+            query: {
+                type: 'select',
+                table: 'relationship',
+                alias: 'AllRelations',
+                fields: [
+                    {
+                        table: 'AllRelations',
+                        name: dataType !== translations.personTypes.cases ? 'targetId' : 'sourceId',
+                        alias: 'linkExposures'
+                    },
+                    {
+                        table: 'AllPersons',
+                        name: 'json',
+                        alias: 'AllExposuresString'
+                    }
+                ],
+                join: [
+                    {
+                        type: 'inner',
+                        table: 'person',
+                        alias: 'AllPersons',
+                        on: {[`AllRelations.${joinFieldRelationsFilteredExposures}`]: `AllPersons._id`}
+                    }
+                ]
+            },
+            alias: 'AllExposures',
+            on: {[`MainQuery._id`]: `AllExposures.linkExposures`}
+        });
+        query.fields.push({
+            func: {
+                name: 'group_concat',
+                args: [{field: `AllExposures.AllExposuresString`}, '***']
+            },
+            alias: 'exposureData'
+        });
+        query.limit = 10;
+    } else {
+        query.fields = [
+            {
+                func: {
+                    name: 'count',
+                    args: [{
+                        expression: {
+                            pattern: `distinct FollowUps._id`
+                        }}]
+                },
+                alias: 'countRecords'
+            }
+        ]
+    }
+
+    if (checkArrayAndLength(get(mainFilter, 'sort', null)) && lastElement) {
+        query['offset'] = offset;
+    }
+
+
+    return query;
 }
 
 export function getFollowUpById(followUpId, outbreakId) {

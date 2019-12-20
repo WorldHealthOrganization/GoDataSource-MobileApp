@@ -1392,7 +1392,6 @@ class ContactsSingleScreen extends Component {
                             {
                                 text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation), onPress: () => {
                                     addresses[index].geoLocation = selectedItems['0'].geoLocation;
-                                    console.log('Addresses biatch: ', addresses);
                                     // callGetDerivedStateFromProps = false;
                                     this.setState(prevState => ({
                                         contact: Object.assign({}, prevState.contact, { addresses }),

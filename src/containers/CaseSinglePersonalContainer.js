@@ -45,7 +45,6 @@ class CaseSinglePersonalContainer extends Component {
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
-        // console.log('CaseSingleContainer render Personal');
         return (
             <View style={{ flex: 1 }}>
                 <View style={style.container}>
