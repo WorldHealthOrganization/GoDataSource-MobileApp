@@ -1332,3 +1332,7 @@ export function filterByUser(locationTree, userTeams){
     }
     return extractLocations(locationTree,locationIds);
 }
+
+export function generatePermissionMessage(mainPermission, dataType, translation) {
+    return `${getTranslation(translations.alertMessages.permission, translation)}${getTranslation(mainPermission, translation)} ${getTranslation(dataType, translation)}`;
+}

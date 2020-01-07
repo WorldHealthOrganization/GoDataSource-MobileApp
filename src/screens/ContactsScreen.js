@@ -266,74 +266,17 @@ class ContactsScreen extends Component {
         this.setState({
             loading: true
         }, () => {
-            pushNewEditScreen(QRCodeInfo, this.props.navigator, this.props && this.props.user ? this.props.user : null, this.props && this.props.translation ? this.props.translation : null, (error, itemType, record) => {
+            pushNewEditScreen(QRCodeInfo, this.props.navigator, get(this.props, 'user', null), get(this.props, 'translation', null), (error, itemType, record) => {
                 this.setState({
                     loading: false
                 }, () => {
-                    if (error) {
-                        if (error === translations.alertMessages.noItemAlert && itemType === 'case' && record) {
-                            Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props && this.props.translation ? this.props.translation : null), `${getTranslation(error, this.props && this.props.translation ? this.props.translation : null)}.\n${getTranslation(translations.alertMessages.addMissingPerson, this.props && this.props.translation ? this.props.translation : null)}`, [
-                                {
-                                    text: getTranslation(translations.alertMessages.cancelButtonLabel, this.props && this.props.translation ? this.props.translation : null),
-                                    onPress: () => {
-                                        console.log('Cancel pressed');
-                                    }
-                                },
-                                {
-                                    text: getTranslation(translations.alertMessages.yesButtonLabel, this.props && this.props.translation ? this.props.translation : null),
-                                    onPress: () => {
-                                        console.log('Yes pressed');
-                                        this.props.navigator.push({
-                                            screen: 'CaseSingleScreen',
-                                            animated: true,
-                                            animationType: 'fade',
-                                            passProps: {
-                                                case: Object.assign({}, record, {
-                                                    outbreakId: this.props.user.activeOutbreakId,
-                                                }, config.caseBlueprint),
-                                                forceNew: true
-                                            }
-                                        })
-                                    }
-                                },
-                            ])
-                        } else {
-                            Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props && this.props.translation ? this.props.translation : null), getTranslation(error, this.props && this.props.translation ? this.props.translation : null), [
-                                {
-                                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props && this.props.translation ? this.props.translation : null),
-                                    onPress: () => {
-                                        console.log('Ok pressed');
-                                    }
-                                }
-                            ])
-                        }
-                    } else {
-                        if (itemType && record) {
-                            if (itemType === 'case') {
-                                this.props.navigator.push({
-                                    screen: 'CaseSingleScreen',
-                                    animated: true,
-                                    animationType: 'fade',
-                                    passProps: {
-                                        case: record
-                                    }
-                                })
-                            } else if (itemType === 'contact') {
-                                this.props.navigator.push({
-                                    screen: 'ContactsSingleScreen',
-                                    animated: true,
-                                    animationType: 'fade',
-                                    passProps: {
-                                        contact: record
-                                    }
-                                })
-                            }
-                        }
-                    }
+                    this.handleQRSearchTransition(this.props.navigator, error, itemType, record, get(this.props, 'user', null), get(this.props, 'translation', null));
                 });
             })
         });
     };
+
+
 }
 
 // Create style outside the class, or for components that will be used by other components (buttons),
