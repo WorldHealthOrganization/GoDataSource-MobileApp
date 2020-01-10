@@ -28,6 +28,7 @@ import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
 import { Popup } from 'react-native-map-link';
 import PermissionComponent from './../components/PermissionComponent';
 import constants from "../utils/constants";
+import {handleQRSearchTransition} from "../utils/screenTransitionFunctions";
 
 class CasesScreen extends Component {
 
@@ -305,69 +306,7 @@ class CasesScreen extends Component {
                 this.setState({
                     loading: false
                 }, () => {
-                    if (error) {
-                        if (error === translations.alertMessages.noItemAlert && itemType === 'case' && record) {
-                            Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props && this.props.translation ? this.props.translation : null), `${getTranslation(error, this.props && this.props.translation ? this.props.translation : null)}.\n${getTranslation(translations.alertMessages.addMissingPerson, this.props && this.props.translation ? this.props.translation : null)}`, [
-                                {
-                                    text: getTranslation(translations.alertMessages.cancelButtonLabel, this.props && this.props.translation ? this.props.translation : null),
-                                    onPress: () => {
-                                        console.log('Cancel pressed');
-                                    }
-                                },
-                                {
-                                    text: getTranslation(translations.alertMessages.yesButtonLabel, this.props && this.props.translation ? this.props.translation : null),
-                                    onPress: () => {
-                                        // console.log('Yes pressed');
-                                        this.props.navigator.push({
-                                            screen: 'CaseSingleScreen',
-                                            animated: true,
-                                            animationType: 'fade',
-                                            passProps: {
-                                                case: Object.assign({}, record, {
-                                                    outbreakId: this.props.user.activeOutbreakId,
-                                                }, config.caseBlueprint),
-                                                forceNew: true,
-                                                refresh: this.props.onRefresh
-                                            }
-                                        })
-                                    }
-                                },
-                            ])
-                        } else {
-                            Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props && this.props.translation ? this.props.translation : null), getTranslation(error, this.props && this.props.translation ? this.props.translation : null), [
-                                {
-                                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props && this.props.translation ? this.props.translation : null),
-                                    onPress: () => {
-                                        console.log('Ok pressed');
-                                    }
-                                }
-                            ])
-                        }
-                    } else {
-                        if (itemType && record) {
-                            if (itemType === 'case') {
-                                this.props.navigator.push({
-                                    screen: 'CaseSingleScreen',
-                                    animated: true,
-                                    animationType: 'fade',
-                                    passProps: {
-                                        case: record,
-                                        refresh: this.props.onRefresh
-                                    }
-                                })
-                            } else if (itemType === 'contact') {
-                                this.props.navigator.push({
-                                    screen: 'ContactsSingleScreen',
-                                    animated: true,
-                                    animationType: 'fade',
-                                    passProps: {
-                                        contact: record,
-                                        refresh: this.props.onRefresh
-                                    }
-                                })
-                            }
-                        }
-                    }
+                    handleQRSearchTransition(this.props.navigator, error, itemType, record, get(this.props, 'user', null), get(this.props, 'translation', null));
                 });
             })
         });

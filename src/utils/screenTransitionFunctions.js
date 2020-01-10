@@ -100,22 +100,22 @@ export function screenTransition(navigator, transition, nextScreen, passProps, u
     }
 }
 
-export function handleQRSearchTransition (navigator, error, itemType, record, user, translations, userPermissions, ) {
+export function handleQRSearchTransition (navigator, error, itemType, record, user, translation, userPermissions, ) {
     if (error) {
         if (error === translations.alertMessages.noItemAlert && itemType === 'case' && record) {
             if (checkArrayAndLength(lodashIntersection([
                 constants.PERMISSIONS_CASE.caseAll,
                 constants.PERMISSIONS_CASE.caseCreate
             ], userPermissions))) {
-                Alert.alert(getTranslation(translations.alertMessages.alertLabel, translations), `${getTranslation(error, translations)}.\n${getTranslation(translations.alertMessages.addMissingPerson, translations)}`, [
+                Alert.alert(getTranslation(translations.alertMessages.alertLabel, translation), `${getTranslation(error, translation)}.\n${getTranslation(translations.alertMessages.addMissingPerson, translation)}`, [
                     {
-                        text: getTranslation(translations.alertMessages.cancelButtonLabel, translations),
+                        text: getTranslation(translations.alertMessages.cancelButtonLabel, translation),
                         onPress: () => {
                             console.log('Cancel pressed');
                         }
                     },
                     {
-                        text: getTranslation(translations.alertMessages.yesButtonLabel, translations),
+                        text: getTranslation(translations.alertMessages.yesButtonLabel, translation),
                         onPress: () => {
                             console.log('Yes pressed');
                             navigator.push({
@@ -135,19 +135,20 @@ export function handleQRSearchTransition (navigator, error, itemType, record, us
             } else {
                 // user doesn't have permission to create case
                 Alert.alert(
-                    getTranslation(translations.alertMessages.alertLabel, translations),
-                    generatePermissionMessage('create', 'case', translations),
+                    getTranslation(translations.alertMessages.alertLabel, translation),
+                    generatePermissionMessage(translations.helpScreen.addMessage, translations.personTypes.cases, translation),
                     [
                         {
-                            text: getTranslation(translations.)
+                            text: getTranslation(translations.alertMessages.okButtonLabel),
+                            onPress: () => {console.log('Ok pressed')}
                         }
                     ]
                 )
             }
         } else {
-            Alert.alert(getTranslation(translations.alertMessages.alertLabel, translations), getTranslation(error, translations), [
+            Alert.alert(getTranslation(translations.alertMessages.alertLabel, translation), getTranslation(error, translation), [
                 {
-                    text: getTranslation(translations.alertMessages.okButtonLabel, translations),
+                    text: getTranslation(translations.alertMessages.okButtonLabel, translation),
                     onPress: () => {
                         console.log('Ok pressed');
                     }
@@ -171,6 +172,16 @@ export function handleQRSearchTransition (navigator, error, itemType, record, us
                         })
                 } else {
                     // user doesn't have permission to view case
+                    Alert.alert(
+                        getTranslation(translations.alertMessages.alertLabel, translation),
+                        generatePermissionMessage(translations.helpScreen.viewMessage, translations.personTypes.cases, translation),
+                        [
+                            {
+                                text: getTranslation(translations.alertMessages.okButtonLabel),
+                                onPress: () => {console.log('Ok pressed')}
+                            }
+                        ]
+                    )
                 }
             } else if (itemType === 'contact') {
                 if (checkArrayAndLength(lodashIntersection([
@@ -187,6 +198,16 @@ export function handleQRSearchTransition (navigator, error, itemType, record, us
                         })
                 } else {
                     // user doesn't have permission to view contact
+                    Alert.alert(
+                        getTranslation(translations.alertMessages.alertLabel, translation),
+                        generatePermissionMessage(translations.helpScreen.viewMessage, translations.personTypes.contacts, translation),
+                        [
+                            {
+                                text: getTranslation(translations.alertMessages.okButtonLabel),
+                                onPress: () => {console.log('Ok pressed')}
+                            }
+                        ]
+                    )
                 }
             }
         }

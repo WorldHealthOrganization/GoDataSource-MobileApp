@@ -24,6 +24,7 @@ import {pushNewEditScreen} from './../utils/screenTransitionFunctions';
 import {enhanceListWithGetData} from './../components/higherOrderComponents/withListData';
 import get from "lodash/get";
 import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
+import {handleQRSearchTransition} from "../utils/screenTransitionFunctions";
 import {bindActionCreators} from "redux";
 import {setLoaderState} from "../actions/app";
 import PermissionComponent from './../components/PermissionComponent';
@@ -270,7 +271,7 @@ class ContactsScreen extends Component {
                 this.setState({
                     loading: false
                 }, () => {
-                    this.handleQRSearchTransition(this.props.navigator, error, itemType, record, get(this.props, 'user', null), get(this.props, 'translation', null));
+                    handleQRSearchTransition(this.props.navigator, error, itemType, record, get(this.props, 'user', null), get(this.props, 'translation', null));
                 });
             })
         });
