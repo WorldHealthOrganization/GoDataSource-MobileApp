@@ -1526,7 +1526,7 @@ class ContactsSingleScreen extends Component {
                     })
                 }
             })
-        }, 5000);
+        }, Platform.OS == 'android' ? 5000 : 0);
     };
 
     saveContactAction = () => {

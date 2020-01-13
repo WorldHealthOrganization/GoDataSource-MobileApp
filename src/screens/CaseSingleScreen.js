@@ -894,7 +894,7 @@ class CaseSingleScreen extends Component {
                     });
                 })
             }
-        }, 5000);
+        }, Platform.OS == 'android' ? 5000 : 0);
     };
     onPressCancelEdit = () => {
         if (this.state.isModified === true) {
