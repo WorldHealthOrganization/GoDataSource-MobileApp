@@ -4,7 +4,7 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, { Component } from 'react';
-import { View, Alert, StyleSheet, Animated, Platform, Dimensions, BackHandler } from 'react-native';
+import { View, Alert, StyleSheet, Animated, Platform, Dimensions, BackHandler, Keyboard } from 'react-native';
 import { TabBar, TabView, PagerPan, PagerAndroid, PagerScroll } from 'react-native-tab-view';
 import { connect } from "react-redux";
 import NavBarCustom from './../components/NavBarCustom';
@@ -553,11 +553,8 @@ class CaseSingleScreen extends Component {
 
     //Save case
     handleOnPressSave = () => {
-        // this.setState({
-        //     loading: true
-        // }, () => {
-            let missingFields = this.checkRequiredFields().map((e) => getTranslation(e, this.props.translation));
-            if (missingFields && Array.isArray(missingFields) && missingFields.length === 0) {
+        let missingFields = this.checkRequiredFields().map((e) => getTranslation(e, this.props.translation));
+        if (missingFields && Array.isArray(missingFields) && missingFields.length === 0) {
                 if (this.checkAgeYearsRequirements()) {
                     if (this.checkAgeMonthsRequirements()) {
                         if ( this.state.case.addresses === undefined || this.state.case.addresses === null || this.state.case.addresses.length === 0 ||
@@ -673,7 +670,6 @@ class CaseSingleScreen extends Component {
                     ])
                 })
             }
-        // })
     };
     saveCaseAction = () => {
         this.hideMenu();
@@ -836,66 +832,69 @@ class CaseSingleScreen extends Component {
         })
     };
     onPressSaveEdit = () => {
-        if (this.state.isModified) {
-            this.setState({
-                saveFromEditPressed: true,
-                selectedItemIndexForTextSwitchSelectorForAge: this.state.case.dob !== null ? 1 : 0,
-            }, () => {
-                this.handleOnPressSave();
-            })
-        } else {
-            this.setState({
-                loading: true
-            }, () => {
-                checkForNameDuplicatesRequest(this.props.isNew ? null : this.state.case._id, this.state.case.firstName, this.state.case.lastName, this.props.user.activeOutbreakId, (error, response) => {
-                    if (error) {
-                        this.setState({
-                            loading: false
-                        }, () => {
-                            Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.checkForDuplicatesRequestError, this.props.translation), [
-                                {
-                                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
-                                    onPress: () => {
-                                        this.hideMenu()
-                                    }
-                                }
-                            ])
-                        })
-                    }
-                    if (response) {
-                        if (response.length === 0) {
+        Keyboard.dismiss();
+        setTimeout(() => {
+            if (this.state.isModified) {
+                this.setState({
+                    saveFromEditPressed: true,
+                    selectedItemIndexForTextSwitchSelectorForAge: this.state.case.dob !== null ? 1 : 0,
+                }, () => {
+                    this.handleOnPressSave();
+                })
+            } else {
+                this.setState({
+                    loading: true
+                }, () => {
+                    checkForNameDuplicatesRequest(this.props.isNew ? null : this.state.case._id, this.state.case.firstName, this.state.case.lastName, this.props.user.activeOutbreakId, (error, response) => {
+                        if (error) {
                             this.setState({
-                                isEditMode: false,
-                                selectedItemIndexForTextSwitchSelectorForAge: this.state.case.dob !== null ? 1 : 0,
+                                loading: false
                             }, () => {
-                                this.setState({ loading: false })
+                                Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.checkForDuplicatesRequestError, this.props.translation), [
+                                    {
+                                        text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+                                        onPress: () => {
+                                            this.hideMenu()
+                                        }
+                                    }
+                                ])
                             })
-                        } else {
-                            Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.caseDuplicateNameError, this.props.translation), [
-                                {
-                                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
-                                    onPress: () => {
-                                        this.setState({ loading: false });
-                                        this.hideMenu()
-                                    }
-                                },
-                                {
-                                    text: getTranslation(translations.alertMessages.saveAnywayLabel, this.props.translation),
-                                    onPress: () => {
-                                        this.setState({
-                                            isEditMode: false,
-                                            selectedItemIndexForTextSwitchSelectorForAge: this.state.case.dob !== null ? 1 : 0,
-                                        }, () => {
-                                            this.setState({ loading: false })
-                                        })
-                                    }
-                                }
-                            ])
                         }
-                    }
-                });
-            })
-        }
+                        if (response) {
+                            if (response.length === 0) {
+                                this.setState({
+                                    isEditMode: false,
+                                    selectedItemIndexForTextSwitchSelectorForAge: this.state.case.dob !== null ? 1 : 0,
+                                }, () => {
+                                    this.setState({ loading: false })
+                                })
+                            } else {
+                                Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.caseDuplicateNameError, this.props.translation), [
+                                    {
+                                        text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+                                        onPress: () => {
+                                            this.setState({ loading: false });
+                                            this.hideMenu()
+                                        }
+                                    },
+                                    {
+                                        text: getTranslation(translations.alertMessages.saveAnywayLabel, this.props.translation),
+                                        onPress: () => {
+                                            this.setState({
+                                                isEditMode: false,
+                                                selectedItemIndexForTextSwitchSelectorForAge: this.state.case.dob !== null ? 1 : 0,
+                                            }, () => {
+                                                this.setState({ loading: false })
+                                            })
+                                        }
+                                    }
+                                ])
+                            }
+                        }
+                    });
+                })
+            }
+        }, 5000);
     };
     onPressCancelEdit = () => {
         if (this.state.isModified === true) {
