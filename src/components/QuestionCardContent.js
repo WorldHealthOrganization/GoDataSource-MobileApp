@@ -392,7 +392,11 @@ class QuestionCardContent extends PureComponent {
     handleRenderAdditionalQuestions = (additionalQuestion, parentId) => {
         return (
             <View key={uniqueId('key_')}>
-                <Section key={uniqueId('key_')} label={getTranslation(additionalQuestion.text, this.props.translation)} />
+                {
+                    additionalQuestion.answerType !== 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_MARKUP' ? (
+                        <Section key={uniqueId('key_')} label={getTranslation(additionalQuestion.text, this.props.translation)} />
+                    ) : (null)
+                }
                 {
                     this.handleRenderItemByType(additionalQuestion, parentId)
                 }
