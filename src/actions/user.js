@@ -23,7 +23,10 @@ import {setLoginState, storeData, getAvailableLanguages, setSyncState} from './a
 import {storePermissions} from './role';
 import {getLocations, getUserLocations} from './locations';
 import get from 'lodash/get';
-import {filterByUser} from './../utils/functions'
+import lodashIntersection from 'lodash/intersection';
+import {filterByUser} from './../utils/functions';
+import constants from './../utils/constants';
+import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
 
 // Add here only the actions, not also the requests that are executed.
 // For that purpose is the requests directory
@@ -130,53 +133,63 @@ export function computeCommonData(storeUserBool, user, refreshFollowUps, filters
                             let key = Object.keys(item)[0];
                             return Object.assign({}, obj, {[key]: item[key]});
                         }, {});
-                        let arrayOfActions = [
-                            storeUser(user),
-                            storeOutbreak(outbreakAndLocationInfo || null),
-                            storeLocationsList(get(actionsObject, 'locations.locationsList', null)),
-                            storeLocations(get(actionsObject, 'locations.treeLocationsList', null)),
-                            storeUserLocationsList(get(actionsObject, 'userLocations.userLocationsList', null)),
-                            storeUserLocations(filterByUser(get(actionsObject, 'userLocations.userTreeLocationsList', null), userTeams)),
-                            saveAvailableLanguages(get(actionsObject,  'availableLanguages', null)),
-                            storeReferenceData(get(actionsObject,  'referenceData', null)),
-                            saveTranslation(get(actionsObject,  'translations', null)),
-                            storeClusters(get(actionsObject,  'clusters', null)),
-                            // storePermissions(get(actionsObject,  'userRoles', null)),
-                            storePermissions([
-                                // 'contact_modify',
-                                'outbreak_view',
-                                // 'follow_up_list',
-                                'contact_list',
-                                'contact_view',
-                                'case_list',
-                                'case_view',
-                                'help_list_category_item'
-                            ]),
-                            storeUserTeams(userTeams),
-                            storeHelpCategory(get(actionsObject,  'helpCategory', null)),
-                            storeHelpItem(get(actionsObject,  'helpItem', null)),
-                            setLoginState('Finished logging'),
-                            changeAppRoot('after-login')
-                        ];
+                        // First check if the user has at least one of the required permissions to see data
+                        if (checkArrayAndLength(lodashIntersection(get(actionsObject, 'userRoles', []), [
+                            constants.PERMISSIONS_FOLLOW_UP.followUpAll,
+                            constants.PERMISSIONS_FOLLOW_UP.followUpList,
+                            constants.PERMISSIONS_CONTACT.contactAll,
+                            constants.PERMISSIONS_CONTACT.contactList,
+                            constants.PERMISSIONS_CASE.caseAll,
+                            constants.PERMISSIONS_CASE.caseList
+                        ]))) {
+                            let arrayOfActions = [
+                                storeUser(user),
+                                storeOutbreak(outbreakAndLocationInfo || null),
+                                storeLocationsList(get(actionsObject, 'locations.locationsList', null)),
+                                storeLocations(get(actionsObject, 'locations.treeLocationsList', null)),
+                                storeUserLocationsList(get(actionsObject, 'userLocations.userLocationsList', null)),
+                                storeUserLocations(filterByUser(get(actionsObject, 'userLocations.userTreeLocationsList', null), userTeams)),
+                                saveAvailableLanguages(get(actionsObject,  'availableLanguages', null)),
+                                storeReferenceData(get(actionsObject,  'referenceData', null)),
+                                saveTranslation(get(actionsObject,  'translations', null)),
+                                storeClusters(get(actionsObject,  'clusters', null)),
+                                storePermissions(get(actionsObject,  'userRoles', null)),
+                                // storePermissions([
+                                //     // 'contact_modify',
+                                //     'outbreak_view',
+                                //     // 'follow_up_list',
+                                //     'contact_list',
+                                //     'contact_view',
+                                //     'case_list',
+                                //     'case_view',
+                                //     'help_list_category_item'
+                                // ]),
+                                storeUserTeams(userTeams),
+                                storeHelpCategory(get(actionsObject,  'helpCategory', null)),
+                                storeHelpItem(get(actionsObject,  'helpItem', null)),
+                                setLoginState('Finished logging'),
+                                changeAppRoot('after-login')
+                            ];
 
-                        if(refreshFollowUps) {
-                            arrayOfActions.push(setSyncState({id: 'tests', status:'Success'}));
-                        }
+                            if(refreshFollowUps) {
+                                arrayOfActions.push(setSyncState({id: 'tests', status:'Success'}));
+                            }
 
-                        if (storeUserBool) {
-                            storeData('loggedUser', user._id, (error, success) => {
-                                if (error) {
-                                    dispatch(batchActions([
-                                        setLoginState('Error'),
-                                        addError({type: 'Login error', message: "Error while saving logged user"})
-                                    ]))
-                                }
-                                if (success) {
-                                    dispatch(batchActions(arrayOfActions));
-                                }
-                            })
-                        } else {
-                            dispatch(batchActions(arrayOfActions));
+                            if (storeUserBool) {
+                                storeData('loggedUser', user._id, (error, success) => {
+                                    if (error) {
+                                        dispatch(batchActions([
+                                            setLoginState('Error'),
+                                            addError({type: 'Login error', message: "Error while saving logged user"})
+                                        ]))
+                                    }
+                                    if (success) {
+                                        dispatch(batchActions(arrayOfActions));
+                                    }
+                                })
+                            } else {
+                                dispatch(batchActions(arrayOfActions));
+                            }
                         }
                     })
                     .catch((errorProcessInitialData) => {

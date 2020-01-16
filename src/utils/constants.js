@@ -37,7 +37,17 @@ const PERMISSIONS_CONTACT = {
     contactList: 'contact_list',
     contactCreate: 'contact_create',
     contactModify: 'contact_modify',
-    contactDelete: 'contact_delete'
+    contactDelete: 'contact_delete',
+    contactListRelationshipContacts: 'contact_list_relationship_contacts',
+    contactViewRelationshipContacts: 'contact_view_relationship_contacts',
+    contactCreateRelationshipContacts: 'contact_create_relationship_contacts',
+    contactModifyRelationshipContacts: 'contact_modify_relationship_contacts',
+    contactDeleteRelationshipContact: 'contact_delete_relationship_contacts',
+    contactListRelationshipExposures: 'contact_list_relationship_exposures',
+    contactViewRelationshipExposures: 'contact_view_relationship_exposures',
+    contactCreateRelationshipExposures: 'contact_create_relationship_exposures',
+    contactModifyRelationshipExposures: 'contact_modify_relationship_exposures',
+    contactDeleteRelationshipExposures: 'contact_delete_relationship_exposures',
 };
 
 const PERMISSIONS_CASE = {
@@ -46,7 +56,18 @@ const PERMISSIONS_CASE = {
     caseList: 'case_list',
     caseCreate: 'case_create',
     caseModify: 'case_modify',
-    caseDelete: 'case_delete'
+    caseDelete: 'case_delete',
+    caseCreateContact: 'case_create_contact',
+    caseListRelationshipContacts: 'case_list_relationship_contacts',
+    caseViewRelationshipContacts: 'case_view_relationship_contacts',
+    caseCreateRelationshipContacts: 'case_create_relationship_contacts',
+    caseModifyRelationshipContacts: 'case_modify_relationship_contacts',
+    caseDeleteRelationshipContacts: 'case_delete_relationship_contacts',
+    caseListRelationshipExposures: 'case_list_relationship_exposures',
+    caseViewRelationshipExposures: 'case_view_relationship_exposures',
+    caseCreateRelationshipExposures: 'case_create_relationship_exposures',
+    caseModifyRelationshipExposures: 'case_modify_relationship_exposures',
+    caseDeleteRelationshipExposures: 'case_delete_relationship_exposures',
 };
 
 const PERMISSIONS_FOLLOW_UP = {

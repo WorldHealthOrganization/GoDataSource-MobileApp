@@ -130,6 +130,7 @@ function mapStateToProps(state) {
     return {
         screenSize: state.app.screenSize,
         translation: state.app.translation,
+        roles: state.role
     };
 }
 
