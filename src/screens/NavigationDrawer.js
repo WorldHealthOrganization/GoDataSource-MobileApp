@@ -8,7 +8,7 @@ import config from './../utils/config';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import {logoutUser} from './../actions/user';
-import {sendDatabaseToServer, getTranslationsAsync, changeAppRoot} from './../actions/app';
+import {sendDatabaseToServer, getTranslationsAsync, changeAppRoot, saveSelectedScreen} from './../actions/app';
 import styles from './../styles';
 import {ListItem, Icon} from 'react-native-material-ui';
 import DropdownInput from './../components/DropdownInput';
@@ -35,7 +35,13 @@ class NavigationDrawer extends Component {
     }
 
     // Please add here the react lifecycle methods that you need
-
+    componentDidUpdate(prevProps) {
+        if (this.props.selectedScreen && prevProps.selectedScreen !== this.props.selectedScreen) {
+            this.setState({
+                selectedScreen: this.props.selectedScreen
+            })
+        }
+    }
     // The render method should have at least business logic as possible,
     // because this will be called whenever there is a new setState call
     // and can slow down the app
@@ -159,6 +165,7 @@ class NavigationDrawer extends Component {
 
     // Please write here all the methods that are not react native lifecycle methods
     handlePressOnListItem = (index) => {
+        this.props.saveSelectedScreen(index);
         this.setState({
             selectedScreen: index
             }, () => {
@@ -176,6 +183,7 @@ class NavigationDrawer extends Component {
 
     handleOnPressAdd = (key, index) => {
         console.log('handleOnPressAdd', key, index);
+        this.props.saveSelectedScreen(index);
         this.setState({
             selectedScreen: index
         }, () => {
@@ -209,19 +217,6 @@ class NavigationDrawer extends Component {
             animated: true,
             to: 'missing'
         });
-
-        // let arrayOfTexts = [{text: 'Get Data', status: 'OK'}, {text: 'Be cool', status: 'Ceva'}];
-        //
-        // let text = '';
-        // for (let i=0; i<arrayOfTexts.length; i++) {
-        //     text += arrayOfTexts[i].text + '\n' + 'Status: ' + arrayOfTexts[i].status + '\n';
-        // }
-        // Alert.alert("Alert", text, [
-        //     {
-        //         text: 'Ok', onPress: () => {console.log('Ok pressed')}
-        //     }
-        // ])
-
         this.props.sendDatabaseToServer();
     };
 
@@ -273,6 +268,7 @@ function mapStateToProps(state) {
         user: state.user,
         role: state.role,
         screenSize: state.app.screenSize,
+        selectedScreen: state.app.selectedScreen,
         availableLanguages: state.app.availableLanguages,
         outbreak: state.outbreak,
         translation: state.app.translation
@@ -285,7 +281,8 @@ function matchDispatchProps(dispatch) {
         sendDatabaseToServer,
         updateUser,
         getTranslationsAsync,
-        changeAppRoot
+        changeAppRoot,
+        saveSelectedScreen
     }, dispatch);
 }
 

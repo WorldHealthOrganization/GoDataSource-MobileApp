@@ -6,7 +6,8 @@
 import React, { Component } from 'react';
 import { View, Alert, StyleSheet, Animated, Platform, Dimensions, BackHandler } from 'react-native';
 import { TabBar, TabView, PagerPan, PagerAndroid, PagerScroll } from 'react-native-tab-view';
-import { connect } from "react-redux";
+import {connect} from "react-redux";
+import {bindActionCreators} from "redux";
 import NavBarCustom from './../components/NavBarCustom';
 import Breadcrumb from './../components/Breadcrumb';
 import Ripple from 'react-native-material-ripple';
@@ -26,6 +27,7 @@ import {
     getCaseAndExposuresById,
     getRelationsForCase
 } from './../actions/cases';
+import { saveSelectedScreen } from "../actions/app";
 import {
     updateRequiredFields,
     extractIdFromPouchId,
@@ -791,18 +793,14 @@ class CaseSingleScreen extends Component {
             Alert.alert("", 'You have unsaved data. Are you sure you want to leave this page and lose all changes?', [
                 {
                     text: 'Yes', onPress: () => {
-                        if (this.props.isAddFromNavigation) {
-                            this.props.navigator.resetTo({
+                        if(this.props.selectedScreen !== 2) {
+                            this.props.saveSelectedScreen(2);
+                        }
+                        this.props.navigator.resetTo({
                                 screen: 'CasesScreen',
                                 animated: true,
                                 animationStyle: 'fade'
                             })
-                        } else {
-                            this.props.navigator.pop({
-                                animated: true,
-                                animationType: 'fade'
-                            })
-                        }
                     }
                 },
                 {
@@ -812,18 +810,14 @@ class CaseSingleScreen extends Component {
                 }
             ])
         } else {
-            if (this.props.isAddFromNavigation) {
-                this.props.navigator.resetTo({
+            if(this.props.selectedScreen !== 2) {
+                this.props.saveSelectedScreen(2);
+            }
+            this.props.navigator.resetTo({
                     screen: 'CasesScreen',
                     animated: true,
                     animationStyle: 'fade'
                 })
-            } else {
-                this.props.navigator.pop({
-                    animated: true,
-                    animationType: 'fade'
-                })
-            }
         }
     };
 
@@ -2092,10 +2086,16 @@ function mapStateToProps(state) {
     return {
         user: state.user,
         screenSize: state.app.screenSize,
+        selectedScreen: state.app.selectedScreen,
         errors: state.errors,
         caseInvestigationQuestions: state.outbreak.caseInvestigationTemplate,
         translation: state.app.translation
     };
 }
+function matchDispatchProps(dispatch) {
+    return bindActionCreators({
+        saveSelectedScreen
+    }, dispatch);
+}
 
-export default connect(mapStateToProps)(CaseSingleScreen);
+export default connect(mapStateToProps, matchDispatchProps)(CaseSingleScreen);
