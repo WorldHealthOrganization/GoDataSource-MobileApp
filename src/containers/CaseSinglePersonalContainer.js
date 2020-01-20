@@ -23,6 +23,7 @@ import translations from './../utils/translations'
 import _ from 'lodash';
 import TopContainerButtons from "../components/TopContainerButtons";
 import PermissionComponent from './../components/PermissionComponent';
+import constants from "./../utils/constants";
 
 class CaseSinglePersonalContainer extends Component {
 
@@ -61,7 +62,11 @@ class CaseSinglePersonalContainer extends Component {
                                 onPressNextButton={this.handleNextButton}
                             />
                         )}
-                        permissionsList={['case_all', 'case_modify']}
+                        permissionsList={[
+                            constants.PERMISSIONS_CASE.caseAll,
+                            constants.PERMISSIONS_CASE.caseCreate,
+                            constants.PERMISSIONS_CASE.caseModify
+                        ]}
                     />
                     <ScrollView
                         style={style.containerScrollView}

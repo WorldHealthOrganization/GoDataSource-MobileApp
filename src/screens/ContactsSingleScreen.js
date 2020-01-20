@@ -60,9 +60,24 @@ class ContactsSingleScreen extends Component {
 
     constructor(props) {
         super(props);
+
+        // Process what the tab contents will be based on
+        let routes = this.props.isNew ?
+                            config.tabsValuesRoutes.contactsAdd :
+                            checkArrayAndLength(lodashIntersect(
+                                this.props.role,
+                                [
+                                    constants.PERMISSIONS_CONTACT.contactAll,
+                                    constants.PERMISSIONS_CONTACT.contactListRelationshipExposures,
+                                    constants.PERMISSIONS_CONTACT.contactListRelationshipContacts
+                                ]
+                            )) ?
+            config.tabsValuesRoutes.contactsSingle :
+            config.tabsValuesRoutes.contactsSingleWithoutExposures;
+
         this.state = {
             interactionComplete: false,
-            routes: this.props.isNew ? config.tabsValuesRoutes.contactsAdd : config.tabsValuesRoutes.contactsSingle,
+            routes: routes,
             index: 0,
             item: this.props.item,
             filter: this.props.filter && this.props.filter['FollowUpsScreen'] ? this.props.filter['FollowUpsScreen'] : {
@@ -140,32 +155,6 @@ class ContactsSingleScreen extends Component {
     };
 
     // Please add here the react lifecycle methods that you need
-    // componentDidUpdate(prevProps) {
-    //     if (this.state.savePressed || this.state.deletePressed) {
-    //         if (this.props.handleUpdateContactFromFollowUp !== undefined && this.props.handleUpdateContactFromFollowUp !== null) {
-    //             const { contact } = this.state;
-    //             this.props.handleUpdateContactFromFollowUp(contact)
-    //         }
-    //         this.props.navigator.pop();
-    //     }
-    //
-    //     if ((this.props.isNew === false || this.props.isNew === undefined) && this.state.updateExposure === true){
-    //         let updatedContact = this.props.contacts[this.props.contacts.map((e) => {return e._id}).indexOf(this.state.contact._id)];
-    //         if (updatedContact !== undefined && updatedContact !== null) {
-    //             this.setState(prevState => ({
-    //                 contact: Object.assign({}, this.state.contact, {relationships: updatedContact.relationships}),
-    //                 updateExposure: false
-    //             }));
-    //         }
-    //     }
-    //
-    //     if (this.state.loading === true) {
-    //         this.setState({
-    //             loading: false
-    //         })
-    //     }
-    // }
-
     componentDidMount() {
         BackHandler.addEventListener('hardwareBackPress', this.handleBackButtonClick);
         if (!this.props.isNew) {
@@ -290,23 +279,6 @@ class ContactsSingleScreen extends Component {
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
-        // console.log("### contact from render ContactSingleScreen: ", this.state.contact);
-
-        // if (this.props.errors && this.props.errors.type && this.props.errors.message) {
-        //     Alert.alert(this.props.errors.type, this.props.errors.message, [
-        //         {
-        //             text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
-        //             onPress: () => {
-        //                 this.setState({
-        //                     savePressed: false
-        //                 }, () => {
-        //                     this.props.removeErrors();
-        //                 });
-        //             }
-        //         }
-        //     ])
-        // }
-
         return (
             <ViewHOC style={style.container}
                 showLoader={this.state.loading}

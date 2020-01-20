@@ -19,11 +19,12 @@ import {storeHelpItem} from './helpItem';
 import {storeOutbreak, storeLocationsList, storeLocations, storeUserLocationsList, storeUserLocations} from './outbreak';
 import {storeUserTeams} from './teams';
 import {storeClusters} from './clusters';
-import {setLoginState, storeData, getAvailableLanguages, setSyncState} from './app';
+import {setLoginState, storeData, getAvailableLanguages, setSyncState, saveSelectedScreen} from './app';
 import {storePermissions} from './role';
 import {getLocations, getUserLocations} from './locations';
 import get from 'lodash/get';
 import lodashIntersection from 'lodash/intersection';
+import set from 'lodash/set';
 import {filterByUser} from './../utils/functions';
 import constants from './../utils/constants';
 import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
@@ -133,6 +134,14 @@ export function computeCommonData(storeUserBool, user, refreshFollowUps, filters
                             let key = Object.keys(item)[0];
                             return Object.assign({}, obj, {[key]: item[key]});
                         }, {});
+
+                        // TODO remove after testing
+                        // actionsObject.userRoles.push(constants.PERMISSIONS_CONTACT.contactAll);
+                        // actionsObject.userRoles.push(constants.PERMISSIONS_CASE.caseAll);
+                        // actionsObject.userRoles.push(constants.PERMISSIONS_FOLLOW_UP.followUpDelete);
+                        // actionsObject.userRoles.push(constants.PERMISSIONS_FOLLOW_UP.followUpView);
+                        // actionsObject.userRoles.push(constants.PERMISSIONS_FOLLOW_UP.followUpCreate);
+
                         // First check if the user has at least one of the required permissions to see data
                         if (checkArrayAndLength(lodashIntersection(get(actionsObject, 'userRoles', []), [
                             constants.PERMISSIONS_FOLLOW_UP.followUpAll,
@@ -142,6 +151,26 @@ export function computeCommonData(storeUserBool, user, refreshFollowUps, filters
                             constants.PERMISSIONS_CASE.caseAll,
                             constants.PERMISSIONS_CASE.caseList
                         ]))) {
+                            let selectedScreen = 0;
+
+                            if (!checkArrayAndLength(
+                                lodashIntersection(get(actionsObject, 'userRoles', []), [
+                                    constants.PERMISSIONS_FOLLOW_UP.followUpAll,
+                                    constants.PERMISSIONS_FOLLOW_UP.followUpList
+                                ])
+                            )) {
+                                    if (checkArrayAndLength(
+                                        lodashIntersection(get(actionsObject, 'userRoles', []), [
+                                            constants.PERMISSIONS_FOLLOW_UP.followUpAll,
+                                            constants.PERMISSIONS_FOLLOW_UP.followUpList
+                                        ])
+                                    )) {
+                                        selectedScreen = 1;
+                                    } else {
+                                        selectedScreen = 2;
+                                    }
+                            }
+
                             let arrayOfActions = [
                                 storeUser(user),
                                 storeOutbreak(outbreakAndLocationInfo || null),
@@ -168,6 +197,7 @@ export function computeCommonData(storeUserBool, user, refreshFollowUps, filters
                                 storeHelpCategory(get(actionsObject,  'helpCategory', null)),
                                 storeHelpItem(get(actionsObject,  'helpItem', null)),
                                 setLoginState('Finished logging'),
+                                saveSelectedScreen(selectedScreen),
                                 changeAppRoot('after-login')
                             ];
 
@@ -190,6 +220,14 @@ export function computeCommonData(storeUserBool, user, refreshFollowUps, filters
                             } else {
                                 dispatch(batchActions(arrayOfActions));
                             }
+                        } else {
+                            // This means the user hasn't any of the permissions to view at least one type of data so
+                            // the login should not occur
+                            dispatch(batchActions([
+                                cleanDataAfterLogout(),
+                                setLoginState('Error'),
+                                addError({type: 'Permissions error', message: `You don't have permissions to see the any of the data types. Please speak to the system administrator to see if there is an issue to your permissions`})
+                            ]))
                         }
                     })
                     .catch((errorProcessInitialData) => {

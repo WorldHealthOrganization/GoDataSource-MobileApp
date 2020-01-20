@@ -17,18 +17,18 @@ import FollowUpsSingleQuestionnaireContainer from './../containers/FollowUpsSing
 import Breadcrumb from './../components/Breadcrumb';
 import Menu, { MenuItem } from 'react-native-material-menu';
 import Ripple from 'react-native-material-ripple';
-import { createFollowUp, updateFollowUpAndContact, deleteFollowUp } from './../actions/followUps';
+import { createFollowUp, updateFollowUpAndContact } from './../actions/followUps';
 import { removeErrors } from './../actions/errors';
-import _, {sortBy} from 'lodash';
+import _, {sortBy, cloneDeep} from 'lodash';
 import { calculateDimension, extractIdFromPouchId, updateRequiredFields, getTranslation, mapAnswers, reMapAnswers, createDate } from './../utils/functions';
 import translations from './../utils/translations'
 import ElevatedView from 'react-native-elevated-view';
 import ViewHOC from './../components/ViewHOC';
+import PermissionComponent from './../components/PermissionComponent';
 import moment from 'moment';
 import {checkArrayAndLength} from './../utils/typeCheckingFunctions';
 import {checkRequiredQuestions, extractAllQuestions} from "../utils/functions";
-import cloneDeep from "lodash/cloneDeep";
-import {checkForNameDuplicatesRequest} from "../queries/cases";
+import constants from './../utils/constants';
 
 class FollowUpsSingleScreen extends Component {
 
@@ -136,22 +136,6 @@ class FollowUpsSingleScreen extends Component {
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
-
-        // if (this.props.errors && this.props.errors.type && this.props.errors.message) {
-        //     Alert.alert(this.props.errors.type, this.props.errors.message, [
-        //         {
-        //             text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
-        //             onPress: () => {
-        //                 this.setState({
-        //                     savePressed: false
-        //                 }, () => {
-        //                     this.props.removeErrors();
-        //                 });
-        //             }
-        //         }
-        //     ])
-        // }
-
         return (
             <ViewHOC style={style.container}
                 showLoader={this && this.state && this.state.loading}
@@ -186,7 +170,15 @@ class FollowUpsSingleScreen extends Component {
                                     </Ripple>
                                 </ElevatedView>
                                 {
-                                    this.props.role && this.props.role.find((e) => e === config.userPermissions.writeFollowUp) !== undefined ? (
+                                    checkArrayAndLength(_.intersection(
+                                        _.get(this.props, 'role', []),
+                                        [
+                                            constants.PERMISSIONS_FOLLOW_UP.followUpAll,
+                                            constants.PERMISSIONS_FOLLOW_UP.followUpDelete,
+                                            constants.PERMISSIONS_CONTACT.contactAll,
+                                            constants.PERMISSIONS_CONTACT.contactView,
+                                        ]
+                                    )) ? (
                                         <View>
                                             <Menu
                                                 ref="menuRef"
@@ -196,9 +188,28 @@ class FollowUpsSingleScreen extends Component {
                                                     </Ripple>
                                                 }
                                             >
-                                                <MenuItem onPress={this.handleEditContact}>
-                                                    {getTranslation(translations.followUpsSingleScreen.editContactButton, this.props.translation)}
-                                                </MenuItem>
+                                                <PermissionComponent
+                                                    render={() => (
+                                                        <MenuItem onPress={this.handleEditContact}>
+                                                            {getTranslation(translations.followUpsSingleScreen.editContactButton, this.props.translation)}
+                                                        </MenuItem>
+                                                    )}
+                                                    permissionsList={[
+                                                        constants.PERMISSIONS_CONTACT.contactAll,
+                                                        constants.PERMISSIONS_CONTACT.contactView
+                                                    ]}
+                                                />
+                                                <PermissionComponent
+                                                    render={() => (
+                                                        <MenuItem onPress={this.handleOnPressDelete}>
+                                                            {getTranslation(translations.followUpsSingleScreen.deleteButton, this.props.translation)}
+                                                        </MenuItem>
+                                                    )}
+                                                    permissionsList={[
+                                                        constants.PERMISSIONS_FOLLOW_UP.followUpAll,
+                                                        constants.PERMISSIONS_FOLLOW_UP.followUpDelete
+                                                    ]}
+                                                />
                                             </Menu>
                                         </View>
                                     ) : null
@@ -1052,7 +1063,7 @@ function mapStateToProps(state) {
         user: state.user,
         screenSize: state.app.screenSize,
         followUps: state.followUps,
-        questions: state.outbreak.contactFollowUpTemplate,
+        questions: _.get(state, 'outbreak.contactFollowUpTemplate', null),
         errors: state.errors,
         contacts: state.contacts,
         translation: state.app.translation,
@@ -1064,7 +1075,6 @@ function matchDispatchProps(dispatch) {
     return bindActionCreators({
         createFollowUp,
         updateFollowUpAndContact,
-        deleteFollowUp,
         removeErrors
     }, dispatch);
 }

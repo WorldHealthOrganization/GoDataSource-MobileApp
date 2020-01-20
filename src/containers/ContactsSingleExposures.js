@@ -89,7 +89,11 @@ class ContactsSingleExposures extends Component {
                                 onPressPreviousButton={this.handleBackButton}
                             />
                         )}
-                        permissionsList={[constants.PERMISSIONS_CONTACT.contactAll, constants.PERMISSIONS_CONTACT.contactModify]}
+                        permissionsList={[
+                            constants.PERMISSIONS_CONTACT.contactAll,
+                            constants.PERMISSIONS_CONTACT.contactCreate,
+                            constants.PERMISSIONS_CONTACT.contactModify
+                        ]}
                     />
 
                 </View>

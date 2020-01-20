@@ -571,7 +571,7 @@ export function appInitialized(nativeEventEmitter) {
         let screenSize = {width, height};
 
         dispatch(saveScreenSize(screenSize));
-        dispatch(saveSelectedScreen(0));
+        // dispatch(saveSelectedScreen(0));
 
         try {
             let loggedUser = await AsyncStorage.getItem('loggedUser');

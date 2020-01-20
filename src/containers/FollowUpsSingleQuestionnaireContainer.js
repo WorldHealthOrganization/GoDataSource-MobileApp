@@ -18,7 +18,8 @@ import styles from './../styles';
 import QuestionCard from './../components/QuestionCard';
 import { LoaderScreen } from 'react-native-ui-lib';
 import { sortBy } from 'lodash';
-import translations from './../utils/translations'
+import translations from './../utils/translations';
+import constants from './../utils/constants';
 import cloneDeep from "lodash/cloneDeep";
 import uniqueId from "lodash/uniqueId";
 import _ from "lodash";
@@ -101,7 +102,11 @@ class FollowUpsSingleQuestionnaireContainer extends Component {
                                 onPressPreviousButton={this.props.onPressPreviousButton}
                             />
                         )}
-                        permissionsList={['follow_up_all', 'follow_up_modify']}
+                        permissionsList={[
+                            constants.PERMISSIONS_FOLLOW_UP.followUpAll,
+                            constants.PERMISSIONS_FOLLOW_UP.followUpCreate,
+                            constants.PERMISSIONS_FOLLOW_UP.followUpsModify
+                        ]}
                     />
                     <ScrollView
                         style={style.containerScrollView}

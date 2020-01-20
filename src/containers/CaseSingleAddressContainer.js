@@ -18,6 +18,7 @@ import config from './../utils/config';
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import styles from './../styles';
+import constants from './../utils/constants';
 import CardComponent from './../components/CardComponent';
 import Ripple from 'react-native-material-ripple';
 import translations from './../utils/translations'
@@ -79,7 +80,11 @@ class CaseSingleAddressContainer extends React.Component {
                                 onPressPreviousButton={this.handleBackButton}
                             />
                         )}
-                        permissionsList={['case_all', 'case_modify']}
+                        permissionsList={[
+                            constants.PERMISSIONS_CASE.caseAll,
+                            constants.PERMISSIONS_CASE.caseCreate,
+                            constants.PERMISSIONS_CASE.caseModify
+                        ]}
                     />
 
                     <ScrollView

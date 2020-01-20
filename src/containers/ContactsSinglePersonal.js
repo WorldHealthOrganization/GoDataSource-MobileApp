@@ -20,6 +20,7 @@ import lodashGet from "lodash/get";
 import {checkArray, checkArrayAndLength} from "../utils/typeCheckingFunctions";
 import TopContainerButtons from "./../components/TopContainerButtons";
 import PermissionComponent from './../components/PermissionComponent';
+import constants from "./../utils/constants";
 
 class ContactsSinglePersonal extends PureComponent {
 
@@ -73,7 +74,11 @@ class ContactsSinglePersonal extends PureComponent {
                                 onPressNextButton={this.props.onPressNextButton}
                             />
                         )}
-                        permissionsList={['contact_all', 'contact_modify']}
+                        permissionsList={[
+                            constants.PERMISSIONS_CONTACT.contactAll,
+                            constants.PERMISSIONS_CONTACT.contactCreate,
+                            constants.PERMISSIONS_CONTACT.contactModify
+                        ]}
                     />
 
                     <ScrollView

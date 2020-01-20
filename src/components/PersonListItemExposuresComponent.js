@@ -4,23 +4,19 @@
 /**
  * Created by florinpopa on 03/08/2018.
  */
-import React, {PureComponent} from 'react';
-import {View, Text, StyleSheet, Image, InteractionManager} from 'react-native';
-import PropTypes from 'prop-types';
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
+import React, {PureComponent} from 'react';
+import {View, Text, StyleSheet} from 'react-native';
 import styles from './../styles';
-import {ListItem} from 'react-native-material-ui';
-import ElevatedView from 'react-native-elevated-view';
-import ActionsBar from './ActionsBar';
 import translations from './../utils/translations'
 import {getTranslation, calculateDimension} from './../utils/functions';
 import {connect} from "react-redux";
-import {bindActionCreators} from "redux";
-import GeneralListItem from './GeneralListItem';
 import Ripple from 'react-native-material-ripple';
-import {extractIdFromPouchId, getAddress, handleExposedTo} from "../utils/functions";
-import config from "../utils/config";
+import {checkArrayAndLength} from './../utils/typeCheckingFunctions';
+import lodashGet from 'lodash/get';
+import lodashIntersection from 'lodash/intersection';
+import constants from './../utils/constants';
 
 
 class PersonListItemNameAndAddressComponent extends PureComponent {
@@ -47,7 +43,7 @@ class PersonListItemNameAndAddressComponent extends PureComponent {
                     ) : (null)
                 }
                 {
-                    data && data.exposures && Array.isArray(data.exposures) && data.exposures.length > 0 ? (
+                    checkArrayAndLength(lodashGet(data, 'exposures', null)) ? (
                         <View>
                             <Text style={style.exposedToTextStyle}>{getTranslation(translations.followUpsScreen.exposedToMessage, translation) + ":"}</Text>
                             {

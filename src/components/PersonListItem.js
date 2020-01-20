@@ -5,7 +5,7 @@
  * Created by florinpopa on 03/08/2018.
  */
 import React, {Component} from 'react';
-import {StyleSheet, Image, InteractionManager} from 'react-native';
+import {StyleSheet, InteractionManager} from 'react-native';
 import PropTypes from 'prop-types';
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
@@ -17,10 +17,10 @@ import {extractIdFromPouchId, getAddress, handleExposedTo} from "../utils/functi
 import config from "../utils/config";
 import PersonListItemNameAndAddressComponent from './PersonListItemNameAndAddressComponent';
 import PersonListItemExposuresComponent from './PersonListItemExposuresComponent';
+import PermissionComponent from './PermissionComponent';
 import isEqual from 'lodash/isEqual';
 import get from 'lodash/get';
-import {checkArrayAndLength} from './../utils/typeCheckingFunctions';
-
+import constants from './../utils/constants';
 
 class PersonListItem extends Component {
     constructor(props) {
@@ -57,9 +57,18 @@ class PersonListItem extends Component {
                     />
                 }
                 secondComponent={this.props.type !== 'Case' ? (
-                    <PersonListItemExposuresComponent
-                        data={secondComponentData}
-                        onPressExposureProp={this.props.onPressExposureProp}
+                    <PermissionComponent
+                        render={() => (
+                            <PersonListItemExposuresComponent
+                                data={secondComponentData}
+                                onPressExposureProp={this.props.onPressExposureProp}
+                            />
+                        )}
+                        permissionsList={[
+                            constants.PERMISSIONS_CONTACT.contactAll,
+                            constants.PERMISSIONS_CONTACT.contactListRelationshipContacts,
+                            constants.PERMISSIONS_CONTACT.contactListRelationshipExposures
+                        ]}
                     />) : (null)
                 }
                 hasActionsBar={true}

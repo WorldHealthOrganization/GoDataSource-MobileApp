@@ -1,9 +1,6 @@
 /**
  * Created by florinpopa on 21/08/2018.
  */
-/**
- * Created by florinpopa on 25/07/2018.
- */
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
@@ -17,6 +14,7 @@ import FollowUpAgenda from './../components/FollowUpAgenda';
 import moment from 'moment';
 import TopContainerButtons from "./../components/TopContainerButtons";
 import PermissionComponent from './../components/PermissionComponent';
+import constants from "./../utils/constants";
 
 class ContactsSingleCalendar extends Component {
 
@@ -81,7 +79,11 @@ class ContactsSingleCalendar extends Component {
                                 onPressPreviousButton={this.props.onPressPreviousButton}
                             />
                         )}
-                        permissionsList={['contact_all', 'contact_modify']}
+                        permissionsList={[
+                            constants.PERMISSIONS_CONTACT.contactAll,
+                            constants.PERMISSIONS_CONTACT.contactCreate,
+                            constants.PERMISSIONS_CONTACT.contactModify
+                        ]}
                     />
                 </View>
                 <FollowUpAgenda

@@ -17,6 +17,7 @@ import ElevatedView from 'react-native-elevated-view';
 import _ from 'lodash';
 import TopContainerButtons from "../components/TopContainerButtons";
 import PermissionComponent from './../components/PermissionComponent';
+import constants from "./../utils/constants";
 
 class CaseSingleInfectionContainer extends Component {
 
@@ -56,7 +57,11 @@ class CaseSingleInfectionContainer extends Component {
                                 onPressPreviousButton={this.handleBackButton}
                             />
                         )}
-                        permissionsList={['case_all', 'case_modify']}
+                        permissionsList={[
+                            constants.PERMISSIONS_CASE.caseAll,
+                            constants.PERMISSIONS_CASE.caseCreate,
+                            constants.PERMISSIONS_CASE.caseModify
+                        ]}
                     />
 
                     <ScrollView

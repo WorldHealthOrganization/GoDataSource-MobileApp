@@ -20,6 +20,7 @@ import config from './../utils/config';
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import styles from './../styles';
+import constants from './../utils/constants';
 import Ripple from 'react-native-material-ripple';
 import CardComponent from './../components/CardComponent';
 import translations from './../utils/translations'
@@ -86,7 +87,11 @@ class ContactsSingleAddress extends PureComponent {
                                 onPressPreviousButton={this.handleBackButton}
                             />
                         )}
-                        permissionsList={['contact_all', 'contact_modify']}
+                        permissionsList={[
+                            constants.PERMISSIONS_CONTACT.contactAll,
+                            constants.PERMISSIONS_CONTACT.contactCreate,
+                            constants.PERMISSIONS_CONTACT.contactModify
+                        ]}
                     />
                     <ScrollView
                         style={style.containerScrollView}

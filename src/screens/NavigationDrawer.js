@@ -27,7 +27,7 @@ class NavigationDrawer extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            selectedScreen: 0
+            selectedScreen: this.props.selectedScreen
         };
         // Bind here methods, or at least don't declare methods in the render method
         this.handlePressOnListItem = this.handlePressOnListItem.bind(this);

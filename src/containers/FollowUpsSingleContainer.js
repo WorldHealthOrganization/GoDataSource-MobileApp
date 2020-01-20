@@ -8,6 +8,7 @@ import { View, StyleSheet, ScrollView } from 'react-native';
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import styles from '../styles';
+import constants from './../utils/constants';
 import FollowUpsSingleAddressContainer from './FollowUpsSingleAddressContainer'
 import FollowUpsSingleGetInfoContainer from './FollowUpsSingleGetInfoContainer'
 import TopContainerButtons from './../components/TopContainerButtons';
@@ -52,7 +53,11 @@ class FollowUpsSingleContainer extends Component {
                             onPressPreviousButton={this.props.onPressPreviousButton}
                         />
                     )}
-                    permissionsList={['follow_up_all', 'follow_up_modify']}
+                    permissionsList={[
+                        constants.PERMISSIONS_FOLLOW_UP.followUpAll,
+                        constants.PERMISSIONS_FOLLOW_UP.followUpCreate,
+                        constants.PERMISSIONS_FOLLOW_UP.followUpsModify
+                    ]}
                 />
 
                 <ScrollView
