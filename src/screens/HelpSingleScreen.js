@@ -11,10 +11,8 @@ import {bindActionCreators} from "redux";
 import HelpSingleDetailsContainer from './../containers/HelpSingleDetailsContainer';
 import Breadcrumb from './../components/Breadcrumb';
 import {removeErrors} from './../actions/errors';
-import _ from 'lodash';
 import {getTranslation} from './../utils/functions';
 import translations from './../utils/translations'
-
 
 class HelpSingleScreen extends Component {
 
@@ -41,24 +39,9 @@ class HelpSingleScreen extends Component {
     }
     
     handleBackButtonClick() {
-        this.props.navigator.pop()
+        this.props.navigator.pop();
         return true;
     };
-
-    // Please add here the react lifecycle methods that you need
-    // static getDerivedStateFromProps(props, state) {
-    //     if (props.errors && props.errors.type && props.errors.message) {
-    //         Alert.alert(props.errors.type, props.errors.message, [
-    //             {
-    //                 text: getTranslation(translations.alertMessages.okButtonLabel, props.translation),
-    //                 onPress: () => {
-    //                     props.removeErrors();
-    //                 }
-    //             }
-    //         ])
-    //     }
-    //     return null;
-    // }
 
     // The render method should have at least business logic as possible,
     // because this will be called whenever there is a new setState call

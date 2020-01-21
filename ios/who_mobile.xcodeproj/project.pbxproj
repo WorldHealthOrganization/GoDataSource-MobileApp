@@ -84,6 +84,7 @@
 		F2316EAF229D328F002B7854 /* libRNReanimated.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F2316EAE229D3281002B7854 /* libRNReanimated.a */; };
 		F234FF5F22E896B10087A880 /* libRNCAsyncStorage.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F234FF3C22E896410087A880 /* libRNCAsyncStorage.a */; };
 		F23BFFAC238974D6001FD8FE /* libRNVersionNumber.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F23BFFA8238974C1001FD8FE /* libRNVersionNumber.a */; };
+		F2417D0A23D72B9C00656961 /* libRNCWebView.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F2417CF423D72B7E00656961 /* libRNCWebView.a */; };
 		F250AA102136B7EB002386CF /* libRNFetchBlob.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F250AA0F2136B7E3002386CF /* libRNFetchBlob.a */; };
 		F255A1F42170B49400D93AFE /* libRNFS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F255A1EC2170B48100D93AFE /* libRNFS.a */; };
 		F265C95A21AD721E0055A97C /* libRNRandomBytes.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F265C95421AD720B0055A97C /* libRNRandomBytes.a */; };
@@ -484,6 +485,13 @@
 			remoteGlobalIDString = 2858ECD01F8B91B400610575;
 			remoteInfo = "RNVersionNumber-tvOS";
 		};
+		F2417CF323D72B7E00656961 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F2417CC423D72B7D00656961 /* RNCWebView.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 134814201AA4EA6300B7C361;
+			remoteInfo = RNCWebView;
+		};
 		F250AA0E2136B7E3002386CF /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = F250AA0A2136B7E3002386CF /* RNFetchBlob.xcodeproj */;
@@ -642,6 +650,7 @@
 		F2320F6A22708CA100754AEB /* RNVectorIcons.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNVectorIcons.xcodeproj; path = "../node_modules/react-native-vector-icons/RNVectorIcons.xcodeproj"; sourceTree = "<group>"; };
 		F234FF3522E896400087A880 /* RNCAsyncStorage.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNCAsyncStorage.xcodeproj; path = "../node_modules/@react-native-community/async-storage/ios/RNCAsyncStorage.xcodeproj"; sourceTree = "<group>"; };
 		F23BFF65238974C0001FD8FE /* RNVersionNumber.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNVersionNumber.xcodeproj; path = "../node_modules/react-native-version-number/ios/RNVersionNumber.xcodeproj"; sourceTree = "<group>"; };
+		F2417CC423D72B7D00656961 /* RNCWebView.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNCWebView.xcodeproj; path = "../node_modules/react-native-webview/ios/RNCWebView.xcodeproj"; sourceTree = "<group>"; };
 		F250AA0A2136B7E3002386CF /* RNFetchBlob.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNFetchBlob.xcodeproj; path = "../node_modules/rn-fetch-blob/ios/RNFetchBlob.xcodeproj"; sourceTree = "<group>"; };
 		F255A1BE2170B48100D93AFE /* RNFS.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNFS.xcodeproj; path = "../node_modules/react-native-fs/RNFS.xcodeproj"; sourceTree = "<group>"; };
 		F265C91E21AD720A0055A97C /* RNRandomBytes.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNRandomBytes.xcodeproj; path = "../node_modules/react-native-randombytes/RNRandomBytes.xcodeproj"; sourceTree = "<group>"; };
@@ -664,6 +673,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F2417D0A23D72B9C00656961 /* libRNCWebView.a in Frameworks */,
 				F23BFFAC238974D6001FD8FE /* libRNVersionNumber.a in Frameworks */,
 				F234FF5F22E896B10087A880 /* libRNCAsyncStorage.a in Frameworks */,
 				F208B62A22AFCFD300B84216 /* libRNSentry.a in Frameworks */,
@@ -955,6 +965,7 @@
 		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
+				F2417CC423D72B7D00656961 /* RNCWebView.xcodeproj */,
 				F23BFF65238974C0001FD8FE /* RNVersionNumber.xcodeproj */,
 				F234FF3522E896400087A880 /* RNCAsyncStorage.xcodeproj */,
 				F208B5E622AFCFBD00B84216 /* RNSentry.xcodeproj */,
@@ -1102,6 +1113,14 @@
 			children = (
 				F23BFFA8238974C1001FD8FE /* libRNVersionNumber.a */,
 				F23BFFAA238974C1001FD8FE /* libRNVersionNumber-tvOS.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		F2417CC523D72B7D00656961 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				F2417CF423D72B7E00656961 /* libRNCWebView.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1387,6 +1406,10 @@
 				{
 					ProductGroup = F234FF3622E896400087A880 /* Products */;
 					ProjectRef = F234FF3522E896400087A880 /* RNCAsyncStorage.xcodeproj */;
+				},
+				{
+					ProductGroup = F2417CC523D72B7D00656961 /* Products */;
+					ProjectRef = F2417CC423D72B7D00656961 /* RNCWebView.xcodeproj */;
 				},
 				{
 					ProductGroup = 2B7B458F21C8ECA90060111B /* Products */;
@@ -1828,6 +1851,13 @@
 			fileType = archive.ar;
 			path = "libRNVersionNumber-tvOS.a";
 			remoteRef = F23BFFA9238974C1001FD8FE /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		F2417CF423D72B7E00656961 /* libRNCWebView.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libRNCWebView.a;
+			remoteRef = F2417CF323D72B7E00656961 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		F250AA0F2136B7E3002386CF /* libRNFetchBlob.a */ = {

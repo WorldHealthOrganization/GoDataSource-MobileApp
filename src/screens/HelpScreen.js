@@ -11,7 +11,6 @@ import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import SearchFilterView from './../components/SearchFilterView';
 import HelpListItem from './../components/HelpListItem';
-// import AnimatedListView from './../components/AnimatedListView';
 import {removeErrors} from './../actions/errors';
 import {addFilterForScreen, removeFilterForScreen} from './../actions/app';
 import _ from 'lodash';
@@ -59,15 +58,14 @@ class HelpScreen extends Component {
     }
 
     // Please add here the react lifecycle methods that you need
-
     componentDidMount() {
         BackHandler.addEventListener('hardwareBackPress', this.handleBackButtonClick);
         
         this.props.removeFilterForScreen('HelpFilterScreen');
 
-        console.log('componentDidMount HelpScreen', this.props.pageAskingHelpFrom)
+        console.log('componentDidMount HelpScreen', this.props.pageAskingHelpFrom);
         if (this.state.pageAskingHelpFrom && this.state.pageAskingHelpFrom !== undefined) {
-            let itemsToSetInState = this.prepareFieldsForHelpFromPage()
+            let itemsToSetInState = this.prepareFieldsForHelpFromPage();
             this.setState({
                 filter: itemsToSetInState.filter,
                 filterFromFilterScreen: null,
@@ -104,7 +102,7 @@ class HelpScreen extends Component {
                     return true;
                 }
             }
-        ])
+        ]);
         return true;
     }
 
@@ -142,7 +140,7 @@ class HelpScreen extends Component {
         });
         let helpTitle = []; helpTitle[1] = getTranslation(translations.helpScreen.helpTitle, this.props.translation);
 
-        let filterNumbers = 0
+        let filterNumbers = 0;
         if (this.state.filterFromFilterScreen) {
             if (this.state.filterFromFilterScreen.categories && this.state.filterFromFilterScreen.categories.length > 0) {
                 ++filterNumbers
@@ -170,10 +168,6 @@ class HelpScreen extends Component {
         if (this.state.pageAskingHelpFrom && this.state.pageAskingHelpFrom !== undefined) {
             helpItemClone = filterItemsForEachPage(helpItemClone, this.state.pageAskingHelpFrom)
         }
-
-        // if(helpItemClone){
-        //     state.helpItems = helpItemClone;
-        // }
 
         return (
             <ViewHOC style={style.container}
@@ -332,8 +326,6 @@ class HelpScreen extends Component {
         let itemClone = Object.assign({}, item);
         this.props.navigator.push({
             screen: 'HelpSingleScreen',
-            // animated: true,
-            // animationType: 'fade',
             passProps: {
                 isNew: false,
                 item: itemClone,
@@ -345,8 +337,8 @@ class HelpScreen extends Component {
 
     //PrepareFieldsForHelpFromPage
     prepareFieldsForHelpFromPage = () => {
-        let filter = {searchText: ''}
-        let pageAskingHelpFromNameToDisplay = ''
+        let filter = {searchText: ''};
+        let pageAskingHelpFromNameToDisplay = '';
 
         if (this.state.pageAskingHelpFrom === 'followUps') {
             pageAskingHelpFromNameToDisplay = getTranslation(translations.followUpsScreen.followUpsTitle, this.props.translation)
@@ -386,7 +378,7 @@ class HelpScreen extends Component {
             filter: filter,
             pageAskingHelpFromNameToDisplay: pageAskingHelpFromNameToDisplay
         }
-    }
+    };
 
     //Filters 
     applyFilters = () => {
@@ -403,7 +395,7 @@ class HelpScreen extends Component {
     };
 
     handleOnApplyFilters = (filter) => {
-        console.log ('foolowUpsScreen handleOnApplyFilters', filter)
+        console.log ('foolowUpsScreen handleOnApplyFilters', filter);
         this.setState({
             filterFromFilterScreen: filter
         }, () => {

@@ -4,7 +4,8 @@
 /** Since this app is based around the material ui is better to use the components from
  the material ui library, since it provides design and animations out of the box */
 import React, {PureComponent} from 'react';
-import {View, Text, StyleSheet, WebView} from 'react-native';
+import {View, Text, StyleSheet} from 'react-native';
+import {WebView} from 'react-native-webview';
 import {calculateDimension, getTranslation, createDate} from './../utils/functions';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -267,7 +268,7 @@ class CardComponent extends PureComponent {
                             height: calculateDimension(300, true, this.props.screenSize),
                             width: width
                         }}
-                        source={{html: `<html><head></head><body>${this.props.value}</body></html>`}}
+                        source={{html: `<html><head><meta name="viewport" content="width=device-width, initial-scale=1"></head><body>${this.props.value}</body></html>`}}
                     />
                 );
             default:

@@ -4,7 +4,7 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {PureComponent} from 'react';
-import {View, StyleSheet, ScrollView, TouchableWithoutFeedback, Keyboard} from 'react-native';
+import {View, StyleSheet, ScrollView} from 'react-native';
 import {calculateDimension, getTranslation} from './../utils/functions';
 import config from './../utils/config';
 import {connect} from "react-redux";
@@ -13,7 +13,6 @@ import styles from './../styles';
 import CardComponent from './../components/CardComponent';
 import ElevatedView from 'react-native-elevated-view';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
-import _ from 'lodash';
 
 class HelpSingleDetailsContainer extends PureComponent {
 
@@ -39,8 +38,8 @@ class HelpSingleDetailsContainer extends PureComponent {
                         keyboardShouldPersistTaps={'always'}
                     >
                         {
-                            config.helpSingleScreen.details.map((item) => {
-                                return this.handleRenderItem(item)
+                            config.helpSingleScreen.details.map((item, index) => {
+                                return this.handleRenderItem(item, index)
                             })
                         }
                     </KeyboardAwareScrollView>
@@ -50,11 +49,11 @@ class HelpSingleDetailsContainer extends PureComponent {
     }
 
     // Please write here all the methods that are not react native lifecycle methods
-    handleRenderItem = (item) => {
+    handleRenderItem = (item, index) => {
         let fields = item.fields.map((field) => {
             return Object.assign({},field, {isEditMode: this.props.isEditMode})
         });
-        return this.renderItemCardComponent(fields)
+        return this.renderItemCardComponent(fields, index)
     };
 
     renderItemCardComponent = (fields, cardIndex = null) => {
@@ -64,7 +63,7 @@ class HelpSingleDetailsContainer extends PureComponent {
                 width: calculateDimension(config.designScreenSize.width - 32, false, this.props.screenSize),
                 marginVertical: 4,
                 minHeight: calculateDimension(72, true, this.props.screenSize)
-            }, style.cardStyle]}>
+            }, style.cardStyle]} key={cardIndex}>
                 <ScrollView scrollEnabled={false} style={{flex: 1}} contentContainerStyle={{flexGrow: 1}}>
                     {
                         fields && fields.map((item, index) => {
@@ -74,7 +73,7 @@ class HelpSingleDetailsContainer extends PureComponent {
                 </ScrollView>
             </ElevatedView>
         );
-    }
+    };
 
     handleRenderItemCardComponent = (item, index, cardIndex) => {
         return (
@@ -89,12 +88,12 @@ class HelpSingleDetailsContainer extends PureComponent {
     handleRenderItemByType = (item, cardIndex) => {
         let value = '';
 
-        value = this.computeValueForHelpSingleScreen(item)
+        value = this.computeValueForHelpSingleScreen(item);
 
         if (item.type === 'DatePicker' && value === '') {
             value = null
         }
-
+        // console.log('!!!!!!!!!!!!', item, value);
         return (
             <CardComponent
                 item={item}
