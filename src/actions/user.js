@@ -141,6 +141,7 @@ export function computeCommonData(storeUserBool, user, refreshFollowUps, filters
                         // actionsObject.userRoles.push(constants.PERMISSIONS_FOLLOW_UP.followUpDelete);
                         // actionsObject.userRoles.push(constants.PERMISSIONS_FOLLOW_UP.followUpView);
                         // actionsObject.userRoles.push(constants.PERMISSIONS_FOLLOW_UP.followUpCreate);
+                        // actionsObject.userRoles.push(constants.PERMISSIONS_USER.userModifyOwnAccount);
 
                         // First check if the user has at least one of the required permissions to see data
                         if (checkArrayAndLength(lodashIntersection(get(actionsObject, 'userRoles', []), [

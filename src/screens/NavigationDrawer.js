@@ -118,17 +118,25 @@ class NavigationDrawer extends Component {
                     <NavigationDrawerListItem label={getTranslation(translations.navigationDrawer.changeHubConfig, this.props.translation)} name={'settings'} onPress={this.handleOnPressChangeHubConfig} />
                     <View style={styles.lineStyle} />
                     <View style={{justifyContent: 'center', alignItems: 'center'}}>
-                        <DropdownInput
-                            id="test"
-                            label={getTranslation(translations.navigationDrawer.languagesLabel, this.props.translation)}
-                            value={this.props.availableLanguages && this.props.user && this.props.user.languageId && this.props.availableLanguages[this.props.availableLanguages.map((e) => {return e.value}).indexOf(this.props.user.languageId)] ? this.props.availableLanguages[this.props.availableLanguages.map((e) => {return e.value}).indexOf(this.props.user.languageId)].label : null}
-                            data={this.props.availableLanguages}
-                            isEditMode={true}
-                            isRequired={false}
-                            onChange={this.handleOnChangeLanguage}
-                            style={{width: '90%'}}
-                            translation={this.props.translation}
-                            screenSize={this.props.screenSize}
+                        <PermissionComponent
+                            render={() => (
+                                <DropdownInput
+                                    id="test"
+                                    label={getTranslation(translations.navigationDrawer.languagesLabel, this.props.translation)}
+                                    value={this.props.availableLanguages && this.props.user && this.props.user.languageId && this.props.availableLanguages[this.props.availableLanguages.map((e) => {return e.value}).indexOf(this.props.user.languageId)] ? this.props.availableLanguages[this.props.availableLanguages.map((e) => {return e.value}).indexOf(this.props.user.languageId)].label : null}
+                                    data={this.props.availableLanguages}
+                                    isEditMode={true}
+                                    isRequired={false}
+                                    onChange={this.handleOnChangeLanguage}
+                                    style={{width: '90%'}}
+                                    translation={this.props.translation}
+                                    screenSize={this.props.screenSize}
+                                />
+                            )}
+                            permissionsList={[
+                                constants.PERMISSIONS_USER.userAll,
+                                constants.PERMISSIONS_USER.userModifyOwnAccount
+                            ]}
                         />
                     </View>
                     <PermissionComponent

@@ -82,7 +82,8 @@ const PERMISSIONS_FOLLOW_UP = {
 const PERMISSIONS_USER = {
     userAll: 'user_all',
     userView: 'user_view',
-    userList: 'user_list'
+    userList: 'user_list',
+    userModifyOwnAccount: 'user_modify_own_account'
 };
 
 const PERMISSIONS_RELATIONSHIP = {
