@@ -144,9 +144,9 @@ android {
 }
 
 dependencies {
+    implementation project(':react-native-webview')
     implementation project(':react-native-version-number')
     implementation project(':react-native-randombytes')
-    implementation project(':react-native-webview')
     implementation project(':@react-native-community_async-storage')
     implementation project(':react-native-bcrypt')
     implementation project(':react-native-sentry')

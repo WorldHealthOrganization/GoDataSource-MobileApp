@@ -93,7 +93,7 @@ class HelpSingleDetailsContainer extends PureComponent {
         if (item.type === 'DatePicker' && value === '') {
             value = null
         }
-        console.log('!!!!!!!!!!!!', item, value);
+        // console.log('!!!!!!!!!!!!', item, value);
         return (
             <CardComponent
                 item={item}
