@@ -4,7 +4,7 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, { Component } from 'react';
-import { View, StyleSheet, Dimensions, Animated, Alert, Platform, BackHandler } from 'react-native';
+import { View, StyleSheet, Dimensions, Animated, Alert, Platform, BackHandler, Keyboard } from 'react-native';
 import { Icon } from 'react-native-material-ui';
 import styles from './../styles';
 import NavBarCustom from './../components/NavBarCustom';
@@ -136,33 +136,6 @@ class ContactsSingleScreen extends Component {
         this.handleBackButtonClick = this.handleBackButtonClick.bind(this);
     };
 
-    // Please add here the react lifecycle methods that you need
-    // componentDidUpdate(prevProps) {
-    //     if (this.state.savePressed || this.state.deletePressed) {
-    //         if (this.props.handleUpdateContactFromFollowUp !== undefined && this.props.handleUpdateContactFromFollowUp !== null) {
-    //             const { contact } = this.state;
-    //             this.props.handleUpdateContactFromFollowUp(contact)
-    //         }
-    //         this.props.navigator.pop();
-    //     }
-    //
-    //     if ((this.props.isNew === false || this.props.isNew === undefined) && this.state.updateExposure === true){
-    //         let updatedContact = this.props.contacts[this.props.contacts.map((e) => {return e._id}).indexOf(this.state.contact._id)];
-    //         if (updatedContact !== undefined && updatedContact !== null) {
-    //             this.setState(prevState => ({
-    //                 contact: Object.assign({}, this.state.contact, {relationships: updatedContact.relationships}),
-    //                 updateExposure: false
-    //             }));
-    //         }
-    //     }
-    //
-    //     if (this.state.loading === true) {
-    //         this.setState({
-    //             loading: false
-    //         })
-    //     }
-    // }
-
     componentDidMount() {
         BackHandler.addEventListener('hardwareBackPress', this.handleBackButtonClick);
         if (!this.props.isNew) {
@@ -287,23 +260,6 @@ class ContactsSingleScreen extends Component {
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
-        // console.log("### contact from render ContactSingleScreen: ", this.state.contact);
-
-        // if (this.props.errors && this.props.errors.type && this.props.errors.message) {
-        //     Alert.alert(this.props.errors.type, this.props.errors.message, [
-        //         {
-        //             text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
-        //             onPress: () => {
-        //                 this.setState({
-        //                     savePressed: false
-        //                 }, () => {
-        //                     this.props.removeErrors();
-        //                 });
-        //             }
-        //         }
-        //     ])
-        // }
-
         return (
             <ViewHOC style={style.container}
                 showLoader={this.state.loading}
@@ -419,7 +375,6 @@ class ContactsSingleScreen extends Component {
         // Here contact={label: <name>, value: <contactId>} and date is a regular date
         // extract contact's main address
         // let address = this.state.contact.addresses.find((e) => {return e.type === config.})
-
         let now = createDate(null);
         date = createDate(date).toISOString();
         let followUp = {
@@ -877,16 +832,7 @@ class ContactsSingleScreen extends Component {
     };
     handleOnChangeText = (value, id, objectTypeOrIndex, objectType) => {
         console.log("onChangeText: ", value, id, objectTypeOrIndex);
-        //Change TextInput
-        // if (objectTypeOrIndex === 'FollowUp') {
-        //     // callGetDerivedStateFromProps = false;
-        //     this.setState(
-        //         (prevState) => ({
-        //             item: Object.assign({}, prevState.item, {[id]: value}),
-        //             isModified: true
-        //         }))
-        // } else {
-            if (objectTypeOrIndex === 'Contact') {
+        if (objectTypeOrIndex === 'Contact') {
                 // callGetDerivedStateFromProps = false;
                 this.setState(
                     (prevState) => ({
@@ -952,7 +898,6 @@ class ContactsSingleScreen extends Component {
                     }))
                 }
             }
-        // }
     };
     handleOnChangeTextSwitchSelector = (index, stateValue) => {
         if (stateValue === 'selectedItemIndexForAgeUnitOfMeasureDropDown') {
@@ -1489,6 +1434,7 @@ class ContactsSingleScreen extends Component {
     };
 
     handleOnPressSave = () => {
+        Keyboard.dismiss();
         this.setState({
             loading: true
         }, () => {
@@ -1500,7 +1446,7 @@ class ContactsSingleScreen extends Component {
                         if (this.checkAgeMonthsRequirements()) {
                             if (this.state.contact.addresses === undefined || this.state.contact.addresses === null || this.state.contact.addresses.length === 0 ||
                                 (this.state.contact.addresses.length > 0 && this.state.hasPlaceOfResidence === true)) {
-                                const { contact } = this.state;
+                                const {contact} = this.state;
 
                                 checkForNameDuplicated(this.props.isNew ? null : contact._id, contact.firstName, contact.lastName, this.props.user.activeOutbreakId)
                                     .then((isDuplicate) => {
@@ -1518,7 +1464,9 @@ class ContactsSingleScreen extends Component {
                                                 },
                                                 {
                                                     text: getTranslation(translations.alertMessages.saveAnywayLabel, this.props.translation),
-                                                    onPress: () => { this.saveContactAction() }
+                                                    onPress: () => {
+                                                        this.saveContactAction()
+                                                    }
                                                 }
                                             ])
                                         } else {
@@ -1529,51 +1477,61 @@ class ContactsSingleScreen extends Component {
                                         this.saveContactAction();
                                     });
                             } else {
-                                this.setState({ loading: false }, () => {
+                                this.setState({loading: false}, () => {
                                     Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.placeOfResidenceError, this.props.translation), [
                                         {
                                             text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
-                                            onPress: () => { this.hideMenu() }
+                                            onPress: () => {
+                                                this.hideMenu()
+                                            }
                                         }
                                     ])
                                 })
                             }
                         } else {
-                            this.setState({ loading: false }, () => {
+                            this.setState({loading: false}, () => {
                                 Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.monthsValueError, this.props.translation), [
                                     {
                                         text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
-                                        onPress: () => { console.log("OK pressed") }
+                                        onPress: () => {
+                                            console.log("OK pressed")
+                                        }
                                     }
                                 ])
                             })
                         }
                     } else {
-                        this.setState({ loading: false }, () => {
+                        this.setState({loading: false}, () => {
                             Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.yearsValueError, this.props.translation), [
                                 {
                                     text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
-                                    onPress: () => { console.log("OK pressed") }
+                                    onPress: () => {
+                                        console.log("OK pressed")
+                                    }
                                 }
                             ])
                         })
                     }
                 } else {
-                    this.setState({ loading: false }, () => {
+                    this.setState({loading: false}, () => {
                         Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), `${getTranslation(translations.alertMessages.requiredFieldsMissingError, this.props.translation)}.\n${getTranslation(translations.alertMessages.missingFields, this.props.translation)}: ${missingFields}`, [
                             {
                                 text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
-                                onPress: () => { this.hideMenu() }
+                                onPress: () => {
+                                    this.hideMenu()
+                                }
                             }
                         ])
                     })
                 }
             } else {
-                this.setState({ loading: false }, () => {
+                this.setState({loading: false}, () => {
                     Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), `${getTranslation(translations.alertMessages.requiredFieldsMissingError, this.props.translation)}.\n${getTranslation(translations.alertMessages.missingFields, this.props.translation)}: ${relationshipsMissingFields}`, [
                         {
                             text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
-                            onPress: () => { this.hideMenu() }
+                            onPress: () => {
+                                this.hideMenu()
+                            }
                         }
                     ])
                 })

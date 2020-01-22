@@ -66,7 +66,7 @@ export function getContactsForOutbreakId({outbreakId, contactsFilter, exposureFi
     return Promise.all([contactsPromise, countPromise])
         .then(([contacts, contactsCount]) => {
             console.log('Returned values: ');
-            return Promise.resolve({data: contacts, dataCount: checkArrayAndLength(contactsCount) ? contactsCount[0].countRecords : null});
+            return Promise.resolve({data: contacts, dataCount: checkArrayAndLength(contactsCount) ? contactsCount[0].countRecords : undefined});
         })
         .catch((errorGetContacts) => Promise.reject(errorGetContacts))
     // return executeQuery(contactsAndExposuresQuery)

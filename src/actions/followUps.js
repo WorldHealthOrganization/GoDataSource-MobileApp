@@ -122,7 +122,7 @@ export function getFollowUpsForOutbreakId({outbreakId, followUpFilter, userTeams
     return Promise.all([followUpPromise, countPromise])
         .then(([followUps, followUpsCount]) => {
             console.log('Returned values FollowUps: ', followUps.length);
-            return Promise.resolve({data: followUps, dataCount: checkArrayAndLength(followUpsCount) ? followUpsCount[0].countRecords : null});
+            return Promise.resolve({data: followUps, dataCount: checkArrayAndLength(followUpsCount) ? followUpsCount[0].countRecords : undefined});
         })
         .catch((errorGetFollowUps) => Promise.reject(errorGetFollowUps))
 }

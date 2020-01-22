@@ -56,7 +56,6 @@ class HelpScreen extends Component {
     }
 
     // Please add here the react lifecycle methods that you need
-
     componentDidMount() {
         BackHandler.addEventListener('hardwareBackPress', this.handleBackButtonClick);
         
@@ -317,8 +316,6 @@ class HelpScreen extends Component {
         let itemClone = Object.assign({}, item);
         this.props.navigator.push({
             screen: 'HelpSingleScreen',
-            // animated: true,
-            // animationType: 'fade',
             passProps: {
                 isNew: false,
                 item: itemClone,

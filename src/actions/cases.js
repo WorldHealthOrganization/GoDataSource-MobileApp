@@ -60,7 +60,7 @@ export function getCasesForOutbreakId({outbreakId, casesFilter, searchText, last
     return Promise.all([casesPromise, countPromise])
         .then(([cases, casesCount]) => {
             console.log('Returned values: ');
-            return Promise.resolve({data: cases, dataCount: checkArrayAndLength(casesCount) ? casesCount[0].countRecords : null});
+            return Promise.resolve({data: cases, dataCount: checkArrayAndLength(casesCount) ? casesCount[0].countRecords : undefined});
         })
         .catch((errorGetCases) => Promise.reject(errorGetCases))
 }
