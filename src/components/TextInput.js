@@ -10,16 +10,17 @@ import {getTranslation, getTooltip} from './../utils/functions';
 import { TextField } from 'react-native-material-textfield';
 import TooltipComponent from './TooltipComponent';
 import lodashGet from 'lodash/get';
+import lodashDebounce from 'lodash/debounce';
 
 class TextInput extends Component {
-
-    // This will be a dumb component, so it's best not to put any business logic in it
     constructor(props) {
         super(props);
         this.state = {
-            // value: typeof this.props.value === 'number' ? isNaN(this.props.value) ? '' : this.props.value.toString() : this.props.value && this.props.value != undefined && (typeof this.props.value === 'string' || typeof this.props.value === 'number') ? this.props.value.toString() : ''
             value: lodashGet(this.props, 'value', ' ')
         };
+
+        // If there are any bugs with saving data, please change the delay accordingly
+        this.handleSubmitEditing = lodashDebounce(this.handleSubmitEditing, 1000);
     }
 
     // Please add here the react lifecycle methods that you need
@@ -53,7 +54,6 @@ class TextInput extends Component {
     editInput = () => {
         let tooltip = getTooltip(this.props.label, this.props.translation);
         let value = lodashGet(this.state, 'value', ' ');
-        // console.log('Value stuff: ', value);
         return (
             <View style={[{flexDirection: 'row'},this.props.style]}>
                 <View style={{flex: 1}}> 
@@ -73,7 +73,7 @@ class TextInput extends Component {
                         multiline={this.props.multiline !== undefined ? this.props.multiline : false}
                         onPress={() => {console.log("On press textInput")}}
                         keyboardType={this.props.keyboardType ? this.props.keyboardType : 'default'}
-                        onEndEditing={this.handleSubmitEditing}
+                        // onEndEditing={this.handleSubmitEditing}
                         secureTextEntry={this.props.secureTextEntry}
                         onFocus={this.props.onFocus}
                         // onBlur={this.handleBlur}
@@ -145,28 +145,7 @@ class TextInput extends Component {
 
     handleOnChangeText = (state) => {
         this.setState({value: state});
-    };
-
-    handleBlur = () => {
-        if (this.props.labelValue) {
-            //QuestionCard
-            console.log("textInput has this.props.labelValue: ", this.props.data, this.state.value);
-            this.props.onChange(
-                this.state.value,
-                this.props.id
-            )
-        } else {
-            //CardComponent
-            this.props.onChange(
-                this.state.value,
-                this.props.id,
-                this.props.objectType ? (this.props.objectType === 'Address' || this.props.objectType === 'LabResult' || this.props.objectType === 'Documents' || this.props.objectType === 'DateRanges' ? this.props.index : this.props.objectType) : null,
-                this.props.objectType
-            )
-        }
-        if ( this.props.onBlur !== undefined) {
-            this.props.onBlur();
-        }
+        this.handleSubmitEditing();
     };
 
     handleSubmitEditing = () => {
