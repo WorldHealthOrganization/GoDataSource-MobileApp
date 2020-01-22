@@ -1435,7 +1435,7 @@ class ContactsSingleScreen extends Component {
 
     handleOnPressSave = () => {
         Keyboard.dismiss();
-        setTimeout(() => {
+        // setTimeout(() => {
             this.setState({
                 loading: true
             }, () => {
@@ -1526,7 +1526,7 @@ class ContactsSingleScreen extends Component {
                     })
                 }
             })
-        }, Platform.OS == 'android' ? 5000 : 0);
+        // }, Platform.OS == 'android' ? 5000 : 0);
     };
 
     saveContactAction = () => {

@@ -833,7 +833,7 @@ class CaseSingleScreen extends Component {
     };
     onPressSaveEdit = () => {
         Keyboard.dismiss();
-        setTimeout(() => {
+        // setTimeout(() => {
             if (this.state.isModified) {
                 this.setState({
                     saveFromEditPressed: true,
@@ -894,7 +894,7 @@ class CaseSingleScreen extends Component {
                     });
                 })
             }
-        }, Platform.OS == 'android' ? 5000 : 0);
+        // }, Platform.OS == 'android' ? 5000 : 0);
     };
     onPressCancelEdit = () => {
         if (this.state.isModified === true) {
