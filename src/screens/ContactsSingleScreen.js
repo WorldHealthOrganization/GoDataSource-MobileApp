@@ -1435,98 +1435,108 @@ class ContactsSingleScreen extends Component {
 
     handleOnPressSave = () => {
         Keyboard.dismiss();
-        // setTimeout(() => {
-            this.setState({
-                loading: true
-            }, () => {
-                let relationshipsMissingFields = this.checkFields();
-                if (relationshipsMissingFields && Array.isArray(relationshipsMissingFields) && relationshipsMissingFields.length === 0) {
-                    let missingFields = this.checkRequiredFields();
-                    if (missingFields && Array.isArray(missingFields) && missingFields.length === 0) {
-                        if (this.checkAgeYearsRequirements()) {
-                            if (this.checkAgeMonthsRequirements()) {
-                                if (this.state.contact.addresses === undefined || this.state.contact.addresses === null || this.state.contact.addresses.length === 0 ||
-                                    (this.state.contact.addresses.length > 0 && this.state.hasPlaceOfResidence === true)) {
-                                    const { contact } = this.state;
+        this.setState({
+            loading: true
+        }, () => {
+            let relationshipsMissingFields = this.checkFields();
+            if (relationshipsMissingFields && Array.isArray(relationshipsMissingFields) && relationshipsMissingFields.length === 0) {
+                let missingFields = this.checkRequiredFields();
+                if (missingFields && Array.isArray(missingFields) && missingFields.length === 0) {
+                    if (this.checkAgeYearsRequirements()) {
+                        if (this.checkAgeMonthsRequirements()) {
+                            if (this.state.contact.addresses === undefined || this.state.contact.addresses === null || this.state.contact.addresses.length === 0 ||
+                                (this.state.contact.addresses.length > 0 && this.state.hasPlaceOfResidence === true)) {
+                                const {contact} = this.state;
 
-                                    checkForNameDuplicated(this.props.isNew ? null : contact._id, contact.firstName, contact.lastName, this.props.user.activeOutbreakId)
-                                        .then((isDuplicate) => {
-                                            if (isDuplicate) {
-                                                Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.contactDuplicateNameError, this.props.translation), [
-                                                    {
-                                                        text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
-                                                        onPress: () => {
-                                                            this.setState({
-                                                                loading: false
-                                                            }, () => {
-                                                                this.hideMenu()
-                                                            })
-                                                        }
-                                                    },
-                                                    {
-                                                        text: getTranslation(translations.alertMessages.saveAnywayLabel, this.props.translation),
-                                                        onPress: () => { this.saveContactAction() }
+                                checkForNameDuplicated(this.props.isNew ? null : contact._id, contact.firstName, contact.lastName, this.props.user.activeOutbreakId)
+                                    .then((isDuplicate) => {
+                                        if (isDuplicate) {
+                                            Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.contactDuplicateNameError, this.props.translation), [
+                                                {
+                                                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+                                                    onPress: () => {
+                                                        this.setState({
+                                                            loading: false
+                                                        }, () => {
+                                                            this.hideMenu()
+                                                        })
                                                     }
-                                                ])
-                                            } else {
-                                                this.saveContactAction();
-                                            }
-                                        })
-                                        .catch((errorIsDuplicate) => {
+                                                },
+                                                {
+                                                    text: getTranslation(translations.alertMessages.saveAnywayLabel, this.props.translation),
+                                                    onPress: () => {
+                                                        this.saveContactAction()
+                                                    }
+                                                }
+                                            ])
+                                        } else {
                                             this.saveContactAction();
-                                        });
-                                } else {
-                                    this.setState({ loading: false }, () => {
-                                        Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.placeOfResidenceError, this.props.translation), [
-                                            {
-                                                text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
-                                                onPress: () => { this.hideMenu() }
-                                            }
-                                        ])
+                                        }
                                     })
-                                }
+                                    .catch((errorIsDuplicate) => {
+                                        this.saveContactAction();
+                                    });
                             } else {
-                                this.setState({ loading: false }, () => {
-                                    Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.monthsValueError, this.props.translation), [
+                                this.setState({loading: false}, () => {
+                                    Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.placeOfResidenceError, this.props.translation), [
                                         {
                                             text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
-                                            onPress: () => { console.log("OK pressed") }
+                                            onPress: () => {
+                                                this.hideMenu()
+                                            }
                                         }
                                     ])
                                 })
                             }
                         } else {
-                            this.setState({ loading: false }, () => {
-                                Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.yearsValueError, this.props.translation), [
+                            this.setState({loading: false}, () => {
+                                Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.monthsValueError, this.props.translation), [
                                     {
                                         text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
-                                        onPress: () => { console.log("OK pressed") }
+                                        onPress: () => {
+                                            console.log("OK pressed")
+                                        }
                                     }
                                 ])
                             })
                         }
                     } else {
-                        this.setState({ loading: false }, () => {
-                            Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), `${getTranslation(translations.alertMessages.requiredFieldsMissingError, this.props.translation)}.\n${getTranslation(translations.alertMessages.missingFields, this.props.translation)}: ${missingFields}`, [
+                        this.setState({loading: false}, () => {
+                            Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.yearsValueError, this.props.translation), [
                                 {
                                     text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
-                                    onPress: () => { this.hideMenu() }
+                                    onPress: () => {
+                                        console.log("OK pressed")
+                                    }
                                 }
                             ])
                         })
                     }
                 } else {
-                    this.setState({ loading: false }, () => {
-                        Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), `${getTranslation(translations.alertMessages.requiredFieldsMissingError, this.props.translation)}.\n${getTranslation(translations.alertMessages.missingFields, this.props.translation)}: ${relationshipsMissingFields}`, [
+                    this.setState({loading: false}, () => {
+                        Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), `${getTranslation(translations.alertMessages.requiredFieldsMissingError, this.props.translation)}.\n${getTranslation(translations.alertMessages.missingFields, this.props.translation)}: ${missingFields}`, [
                             {
                                 text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
-                                onPress: () => { this.hideMenu() }
+                                onPress: () => {
+                                    this.hideMenu()
+                                }
                             }
                         ])
                     })
                 }
-            })
-        // }, Platform.OS == 'android' ? 5000 : 0);
+            } else {
+                this.setState({loading: false}, () => {
+                    Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), `${getTranslation(translations.alertMessages.requiredFieldsMissingError, this.props.translation)}.\n${getTranslation(translations.alertMessages.missingFields, this.props.translation)}: ${relationshipsMissingFields}`, [
+                        {
+                            text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+                            onPress: () => {
+                                this.hideMenu()
+                            }
+                        }
+                    ])
+                })
+            }
+        })
     };
 
     saveContactAction = () => {

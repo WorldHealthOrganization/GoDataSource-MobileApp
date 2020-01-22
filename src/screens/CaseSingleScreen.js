@@ -833,68 +833,66 @@ class CaseSingleScreen extends Component {
     };
     onPressSaveEdit = () => {
         Keyboard.dismiss();
-        // setTimeout(() => {
-            if (this.state.isModified) {
-                this.setState({
-                    saveFromEditPressed: true,
-                    selectedItemIndexForTextSwitchSelectorForAge: this.state.case.dob !== null ? 1 : 0,
-                }, () => {
-                    this.handleOnPressSave();
-                })
-            } else {
-                this.setState({
-                    loading: true
-                }, () => {
-                    checkForNameDuplicatesRequest(this.props.isNew ? null : this.state.case._id, this.state.case.firstName, this.state.case.lastName, this.props.user.activeOutbreakId, (error, response) => {
-                        if (error) {
+        if (this.state.isModified) {
+            this.setState({
+                saveFromEditPressed: true,
+                selectedItemIndexForTextSwitchSelectorForAge: this.state.case.dob !== null ? 1 : 0,
+            }, () => {
+                this.handleOnPressSave();
+            })
+        } else {
+            this.setState({
+                loading: true
+            }, () => {
+                checkForNameDuplicatesRequest(this.props.isNew ? null : this.state.case._id, this.state.case.firstName, this.state.case.lastName, this.props.user.activeOutbreakId, (error, response) => {
+                    if (error) {
+                        this.setState({
+                            loading: false
+                        }, () => {
+                            Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.checkForDuplicatesRequestError, this.props.translation), [
+                                {
+                                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+                                    onPress: () => {
+                                        this.hideMenu()
+                                    }
+                                }
+                            ])
+                        })
+                    }
+                    if (response) {
+                        if (response.length === 0) {
                             this.setState({
-                                loading: false
+                                isEditMode: false,
+                                selectedItemIndexForTextSwitchSelectorForAge: this.state.case.dob !== null ? 1 : 0,
                             }, () => {
-                                Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.checkForDuplicatesRequestError, this.props.translation), [
-                                    {
-                                        text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
-                                        onPress: () => {
-                                            this.hideMenu()
-                                        }
-                                    }
-                                ])
+                                this.setState({loading: false})
                             })
-                        }
-                        if (response) {
-                            if (response.length === 0) {
-                                this.setState({
-                                    isEditMode: false,
-                                    selectedItemIndexForTextSwitchSelectorForAge: this.state.case.dob !== null ? 1 : 0,
-                                }, () => {
-                                    this.setState({ loading: false })
-                                })
-                            } else {
-                                Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.caseDuplicateNameError, this.props.translation), [
-                                    {
-                                        text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
-                                        onPress: () => {
-                                            this.setState({ loading: false });
-                                            this.hideMenu()
-                                        }
-                                    },
-                                    {
-                                        text: getTranslation(translations.alertMessages.saveAnywayLabel, this.props.translation),
-                                        onPress: () => {
-                                            this.setState({
-                                                isEditMode: false,
-                                                selectedItemIndexForTextSwitchSelectorForAge: this.state.case.dob !== null ? 1 : 0,
-                                            }, () => {
-                                                this.setState({ loading: false })
-                                            })
-                                        }
+                        } else {
+                            Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.caseDuplicateNameError, this.props.translation), [
+                                {
+                                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+                                    onPress: () => {
+                                        this.setState({loading: false});
+                                        this.hideMenu()
                                     }
-                                ])
-                            }
+                                },
+                                {
+                                    text: getTranslation(translations.alertMessages.saveAnywayLabel, this.props.translation),
+                                    onPress: () => {
+                                        this.setState({
+                                            isEditMode: false,
+                                            selectedItemIndexForTextSwitchSelectorForAge: this.state.case.dob !== null ? 1 : 0,
+                                        }, () => {
+                                            this.setState({loading: false})
+                                        })
+                                    }
+                                }
+                            ])
                         }
-                    });
-                })
-            }
-        // }, Platform.OS == 'android' ? 5000 : 0);
+                    }
+                });
+            })
+        }
     };
     onPressCancelEdit = () => {
         if (this.state.isModified === true) {
