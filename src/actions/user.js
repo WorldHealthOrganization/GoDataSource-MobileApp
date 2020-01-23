@@ -25,6 +25,7 @@ import {getLocations, getUserLocations} from './locations';
 import get from 'lodash/get';
 import {filterByUser} from './../utils/functions'
 import translations from "../utils/translations";
+import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
 
 // Add here only the actions, not also the requests that are executed.
 // For that purpose is the requests directory
@@ -206,28 +207,19 @@ export function updateUser(user) {
 }
 
 export function getUsersForOutbreakId({outbreakId, usersFilter, searchText, lastElement, offset}, computeCount, props) {
-    let teams = props.hasOwnProperty('teams') ? props.teams : [];
+    let teams = get(props, 'teams', []);
     let userList = [];
     for (let i=0; i< teams.length; i++){
-        let userIds = teams[i].hasOwnProperty('userIds') ? teams[i].userIds : [];
-        if (userIds.length > 0){
-            for(let j=0; j< userIds.length; j++){
-                if(userList.indexOf(userIds[j]) === -1){
-                    userList.push(userIds[j]);
-                }
-            }
-        }
+        userList = userList.concat(get(teams, `[${i}].userIds`, []));
     }
-    return new Promise((resolve, reject) => {
-        getUserTeamMembers(userList, {outbreakId, usersFilter, searchText, lastElement, offset}, (error, response) => {
-            if (error) {
-                console.log("*** getUserTeamMembers error: ", error);
-                reject(errorTypes.ERROR_USER_TEAM_MEMBERS);
-            }
-            if (response) {
-                let users = response.map((user) => { return {_id: user._id, mainData: user, exposureData: null}});
-                resolve({data: users ? users : [], dataCount: users ? users.length : null});
+
+    return getUserTeamMembers(userList, {outbreakId, usersFilter, searchText})
+        .then((response) => {
+            return {
+                data: response.map((user) => {
+                    return {_id: user._id, mainData: user, exposureData: null}
+                }),
+                dataCount: checkArrayAndLength(response) ? response.length : 0
             }
         })
-    })
 }

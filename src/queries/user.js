@@ -163,38 +163,23 @@ export function getTeamsForUserRequest(callback) {
         });
 }
 
-export function getUserTeamMembers(userList, {outbreakId, usersFilter, searchText, lastElement, offset}, callback){
+export function getUserTeamMembers(userList, {outbreakId, usersFilter, searchText}){
     let reg = new RegExp(searchText, 'i');
-    getDatabase(config.mongoCollections.user)
-        .then((database) => {
-            let userListMapped = userList.map((e) => {
-                return 'user.json_' + e
-            });
-            database.find({
-                selector: {
-                    _id: {
-                        $gte: `user.json_`,
-                        $lte: `user.json_\uffff`,
-                        $in: userListMapped,
-                    },
-                    deleted: false,
-                    $or: [
-                        {"firstName": {$regex: reg}},
-                        {"lastName": {$regex: reg}}
-                    ]
+    let userListMapped = userList.map((e) => {
+        return 'user.json_' + e
+    });
+    return getDatabase(config.mongoCollections.user)
+        .then((database) => database.find({selector: {
+                _id: {
+                    $gte: `user.json_`,
+                    $lte: `user.json_\uffff`,
+                    $in: userListMapped,
                 },
-            })
-                .then((resultFind) => {
-                    console.log('getUserTeamMembers: ', resultFind);
-                    callback(null, resultFind.docs);
-                })
-                .catch((errorFind) => {
-                    console.log('Error find user: ', errorFind);
-                    callback(errorFind, null);
-                })
-        })
-        .catch((errorGetDatabase) => {
-            console.log('Error while getting database: ', errorGetDatabase);
-            callback(errorGetDatabase);
-        });
+                deleted: false,
+                $or: [
+                    {"firstName": {$regex: reg}},
+                    {"lastName": {$regex: reg}}
+                ]
+            }}))
+        .then((result) => result.docs);
 }

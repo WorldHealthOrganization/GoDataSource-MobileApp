@@ -20,9 +20,6 @@ import AnimatedListView from './../components/AnimatedListView';
 import ViewHOC from './../components/ViewHOC';
 import translations from './../utils/translations';
 import {enhanceListWithGetData} from './../components/higherOrderComponents/withListData';
-import get from "lodash/get";
-import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
-import { Popup } from 'react-native-map-link';
 import call from 'react-native-phone-call';
 
 class UsersScreen extends Component {
@@ -30,30 +27,11 @@ class UsersScreen extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            refreshing: false,
-            sortData: false,
-            isVisible: false,
-            latitude: 0,
-            longitude: 0,
-            sourceLatitude: 0,
-            sourceLongitude: 0,
-            error: null,
-            riskColors: {}
+            refreshing: false
         };
     }
 
     // Please add here the react lifecycle methods that you need
-    componentDidMount() {
-        let riskColors = {};
-        let refData = this.props.referenceData.filter((e) => {return e.categoryId.includes("RISK_LEVEL")});
-        for (let i=0; i<refData.length; i++) {
-            riskColors[refData[i].value] = refData[i].colorCode || 'black'
-        }
-        this.setState({
-            riskColors: riskColors
-        });
-    }
-
     componentDidUpdate(prevProps) {
         if (this.props.data && prevProps.data !== this.props.data) {
             this.setState({
@@ -66,21 +44,6 @@ class UsersScreen extends Component {
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
-        let {mainFilter} = this.props;
-
-        let filterNumbers = 0;
-        if (mainFilter) {
-            if (get(mainFilter, 'gender', null) !== null) {
-                ++filterNumbers
-            }
-            if (get(mainFilter, 'age', null) !== null) {
-                ++filterNumbers
-            }
-            if (checkArrayAndLength(get(mainFilter, 'selectedLocations', null))) {
-                ++filterNumbers
-            }
-        }
-        let filterText = filterNumbers === 0 ? `${getTranslation(translations.generalLabels.filterTitle, this.props.translation)}` : `(${filterNumbers})`;
         let usersTitle = []; usersTitle[0] = getTranslation(translations.usersScreen.usersTitle, this.props.translation);
 
         return (
@@ -134,47 +97,15 @@ class UsersScreen extends Component {
                         data={this.props.data || []}
                         dataCount={this.props.dataCount || 0}
                         dataType={'User'}
-                        colors={this.state.riskColors}
-                        filterText={filterText}
                         hasFilter={false}
                         style={[style.listViewStyle]}
                         componentContainerStyle={style.componentContainerStyle}
                         refreshing={this.state.refreshing}
                         onRefresh={this.handleOnRefresh}
                         onSearch={this.props.setSearchText}
-                        onPressFilter={this.props.onPressFilter}
                         onPressView={this.handleCallUsers}
-                        onPressAddExposure={this.props.onPressAddExposure}
-                        onPressCenterButton={this.props.onPressCenterButton}
-                        onPressMap={this.handleOnPressMap}
-                        onPressName={this.props.onPressFullName}
-                        onPressExposure={this.props.onPressExposure}
-                        screen={translations.caseSingleScreen.title}
-                        onEndReached={this.props.onEndReached}
+                        screen={translations.usersScreen.usersTitle}
                     />
-                </View>
-
-                <View style={styles.mapContainer}>
-                    {
-                        this.state.error === null ? (
-                            <Popup
-                                isVisible={this.state.isVisible}
-                                onCancelPressed={() => this.setState({ isVisible: false })}
-                                onAppPressed={() => this.setState({ isVisible: false })}
-                                onBackButtonPressed={() => this.setState({ isVisible: false })}
-                                options={{
-                                    latitude: this.state.latitude,
-                                    longitude: this.state.longitude,
-                                    sourceLatitude: this.state.sourceLatitude,
-                                    sourceLongitude: this.state.sourceLongitude,
-                                    dialogTitle: getTranslation(translations.alertMessages.mapsPopupMessage, this.props.translation),
-                                    cancelText: getTranslation(translations.alertMessages.cancelButtonLabel, this.props.translation),
-                                    appsWhiteList: ['google-maps', 'apple-maps', 'waze', 'citymapper', 'uber', 'lyft', 'transit', 'yandex', 'moovit']
-                                    //other possibilities: citymapper, uber, lyft, transit, yandex, moovit
-                                }}
-                            />
-                        ) : console.log('this.state.error', this.state.error)
-                    }
                 </View>
             </ViewHOC>
         );
@@ -187,17 +118,6 @@ class UsersScreen extends Component {
             animated: true,
             to: 'open'
         })
-    };
-
-    handleOnPressMap = (dataFromMapHandler) => {
-        this.setState(prevState => ({
-            latitude: get(dataFromMapHandler, 'latitude', 0),
-            longitude: get(dataFromMapHandler, 'longitude', 0),
-            sourceLatitude: get(dataFromMapHandler, 'sourceLatitude', 0),
-            sourceLongitude: get(dataFromMapHandler, 'sourceLongitude', 0),
-            isVisible: get(dataFromMapHandler, 'isVisible', false),
-            error: get(dataFromMapHandler, 'error', null)
-        }))
     };
 
     //Refresh list of users
@@ -262,14 +182,10 @@ const style = StyleSheet.create({
 
 function mapStateToProps(state) {
     return {
-        user:           state.user,
-        teams:          state.teams,
         screenSize:     state.app.screenSize,
         syncState:      state.app.syncState,
         translation:    state.app.translation,
-        loaderState:    state.app.loaderState,
-        role:           state.role,
-        referenceData:  state.referenceData
+        loaderState:    state.app.loaderState
     };
 }
 
