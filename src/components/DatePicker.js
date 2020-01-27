@@ -117,17 +117,17 @@ class DatePicker extends PureComponent {
                     <Text style={{
                         fontFamily: 'Roboto-Regular',
                         fontSize: 15,
-                        lineHeight: 30,
                         textAlign: 'left',
                         color: 'rgb(0,0,0)',
-                        marginBottom: 7.5
+                        marginBottom: 2,
+                        marginTop: 2,
                     }}>
                         {getTranslation(this.props.label, this.props.translation)}
                     </Text>
                     <Text
                 style={{
                     fontFamily: 'Roboto-Light',
-                    fontSize: 12.5,
+                    fontSize: 15,
                     textAlign: 'left',
                     color: 'rgb(60,60,60)',
                 }}>

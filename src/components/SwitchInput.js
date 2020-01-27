@@ -85,7 +85,7 @@ class SwitchInput extends PureComponent {
     viewInput = () => {
         let tooltip = getTooltip(this.props.label, this.props.translation)
         return (
-            <View style={[{flexDirection: 'row', marginVertical: 10}, this.props.style]}>
+            <View style={[{flexDirection: 'row'}, this.props.style]}>
                 <Text style={[{flex: 1}, this.props.labelStyle]}>
                     {getTranslation(this.props.label, this.props.translation)}
                 </Text>
@@ -93,10 +93,9 @@ class SwitchInput extends PureComponent {
                     this.props.showValue ? (
                         <Text style={{
                             fontFamily: 'Roboto-Light',
-                            fontSize: 12.5,
+                            fontSize: 15,
                             textAlign: 'left',
                             color: 'rgb(60,60,60)',
-                            lineHeight: 30,
                         }}>
                             {this.props.value !== true ? getTranslation(translations.generalLabels.noAnswer, this.props.translation) : getTranslation(translations.generalLabels.yesAnswer, this.props.translation)}
                         </Text>
