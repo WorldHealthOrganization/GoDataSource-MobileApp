@@ -46,7 +46,7 @@ class DropdownInput extends PureComponent {
                         data={this.props.data}
                         value={this.props.value || ''}
                         fontSize={15}
-                        labelFontSize={12.5}
+                        labelFontSize={15}
                         selectedItemColor={'rgb(255,60,56)'}
                         onChangeText={this.handleOnChangeText}
                         dropdownMargins={{min: 4, max: 8}}

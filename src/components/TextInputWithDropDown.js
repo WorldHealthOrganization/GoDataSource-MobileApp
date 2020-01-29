@@ -84,8 +84,8 @@ class TextInputWithDropDown extends Component {
                             onChangeText={(value) => this.handleOnChangeText(value)}
                             textColor='rgb(0,0,0)'
                             fontSize={15}
-                            labelFontSize={12.5}
-                            labelHeight={30}
+                            labelFontSize={15}
+                            // labelHeight={30}
                             labelTextStyle={{
                                 fontFamily: 'Roboto',
                                 textAlign: 'left'

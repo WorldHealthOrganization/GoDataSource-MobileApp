@@ -43,7 +43,7 @@ class DropDownSectioned extends Component {
                 <View style = {{flex: 1}}>
                     <Text style={{
                         fontFamily: 'Roboto',
-                        fontSize: 12.5,
+                        fontSize: 15,
                         textAlign: 'left',
                         color: 'rgba(0,0,0,0.38)'
                     }}>
