@@ -65,7 +65,7 @@ class FollowUpsScreen extends Component {
 
     componentDidMount = () => {
         let followUpsColors = {};
-        let refData = this.props.referenceData.filter((e) => {return e.categoryId === "LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE"});
+        let refData = checkArrayAndLength(this.props.referenceData) ? this.props.referenceData.filter((e) => {return e.categoryId === "LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE"}) : {};
         for (let i=0; i<refData.length; i++) {
             followUpsColors[refData[i].value] = refData[i].colorCode || styles.buttonGreen
         }
@@ -122,31 +122,23 @@ class FollowUpsScreen extends Component {
                             </View>
 
                             <View style={{flex: 0.135 /*, marginRight: 10*/}}>
-                                <PermissionComponent
-                                    render={() => (
-                                        <ElevatedView
-                                            elevation={3}
-                                            style={{
-                                                backgroundColor: styles.buttonGreen,
-                                                width: calculateDimension(33, false, this.props.screenSize),
-                                                height: calculateDimension(25, true, this.props.screenSize),
-                                                borderRadius: 4
-                                            }}
-                                        >
-                                            <Ripple style={{
-                                                flex: 1,
-                                                justifyContent: 'center',
-                                                alignItems: 'center'
-                                            }} onPress={this.goToHelpScreen}>
-                                                <Icon name="help" color={'white'} size={15}/>
-                                            </Ripple>
-                                        </ElevatedView>
-                                    )}
-                                    permissionsList={[
-                                        constants.PERMISSIONS_HELP.helpAll,
-                                        constants.PERMISSIONS_HELP.helpListCategoryItem
-                                    ]}
-                                />
+                                <ElevatedView
+                                    elevation={3}
+                                    style={{
+                                        backgroundColor: styles.buttonGreen,
+                                        width: calculateDimension(33, false, this.props.screenSize),
+                                        height: calculateDimension(25, true, this.props.screenSize),
+                                        borderRadius: 4
+                                    }}
+                                >
+                                    <Ripple style={{
+                                        flex: 1,
+                                        justifyContent: 'center',
+                                        alignItems: 'center'
+                                    }} onPress={this.goToHelpScreen}>
+                                        <Icon name="help" color={'white'} size={15}/>
+                                    </Ripple>
+                                </ElevatedView>
                             </View>
                         </View>
                     }

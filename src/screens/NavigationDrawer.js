@@ -18,6 +18,8 @@ import translations from './../utils/translations';
 import VersionNumber from 'react-native-version-number';
 import PermissionComponent from './../components/PermissionComponent';
 import constants from "../utils/constants";
+import lodashGet from 'lodash/get';
+import isNumber from 'lodash/isNumber';
 
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
@@ -36,7 +38,8 @@ class NavigationDrawer extends Component {
 
     // Please add here the react lifecycle methods that you need
     componentDidUpdate(prevProps) {
-        if (this.props.selectedScreen && prevProps.selectedScreen !== this.props.selectedScreen) {
+        let thisPropsSelectedScreen = lodashGet(this.props, 'selectedScreen', 0);
+        if (isNumber(thisPropsSelectedScreen) && thisPropsSelectedScreen >= 0 && prevProps.selectedScreen !== this.props.selectedScreen) {
             this.setState({
                 selectedScreen: this.props.selectedScreen
             })
@@ -139,20 +142,13 @@ class NavigationDrawer extends Component {
                             ]}
                         />
                     </View>
-                    <PermissionComponent
-                        render={() => (
-                            <NavigationDrawerListItem
-                                key={'help'}
-                                label={getTranslation(translations.navigationDrawer.helpLabel, this.props.translation)}
-                                name="help"
-                                onPress={() => this.handlePressOnListItem('help')}
-                                isSelected={'help' === this.state.selectedScreen}
-                            />
-                        )}
-                        permissionsList={[
-                            constants.PERMISSIONS_HELP.helpAll,
-                            constants.PERMISSIONS_HELP.helpListCategoryItem
-                        ]}
+
+                    <NavigationDrawerListItem
+                        key={'help'}
+                        label={getTranslation(translations.navigationDrawer.helpLabel, this.props.translation)}
+                        name="help"
+                        onPress={() => this.handlePressOnListItem('help')}
+                        isSelected={'help' === this.state.selectedScreen}
                     />
                     <NavigationDrawerListItem label={getTranslation(translations.navigationDrawer.logoutLabel, this.props.translation)} name="power-settings-new" onPress={this.handleLogout} />
                     <Text

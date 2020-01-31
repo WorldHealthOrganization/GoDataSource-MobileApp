@@ -117,33 +117,26 @@ class CasesScreen extends Component {
                                 </Ripple>
                             </View>
 
-                            <PermissionComponent
-                                render={() => (
-                                    <View style={{flex: 0.15, marginRight: 10}}>
-                                        <ElevatedView
-                                            elevation={3}
-                                            style={{
-                                                backgroundColor: styles.buttonGreen,
-                                                width: calculateDimension(33, false, this.props.screenSize),
-                                                height: calculateDimension(25, true, this.props.screenSize),
-                                                borderRadius: 4
-                                            }}
-                                        >
-                                            <Ripple style={{
-                                                flex: 1,
-                                                justifyContent: 'center',
-                                                alignItems: 'center'
-                                            }} onPress={this.goToHelpScreen}>
-                                                <Icon name="help" color={'white'} size={15}/>
-                                            </Ripple>
-                                        </ElevatedView>
-                                    </View>
-                                )}
-                                permissionsList={[
-                                    constants.PERMISSIONS_HELP.helpAll,
-                                    constants.PERMISSIONS_HELP.helpListCategoryItem
-                                ]}
-                            />
+                            <View style={{flex: 0.15, marginRight: 10}}>
+                                <ElevatedView
+                                    elevation={3}
+                                    style={{
+                                        backgroundColor: styles.buttonGreen,
+                                        width: calculateDimension(33, false, this.props.screenSize),
+                                        height: calculateDimension(25, true, this.props.screenSize),
+                                        borderRadius: 4
+                                    }}
+                                >
+                                    <Ripple style={{
+                                        flex: 1,
+                                        justifyContent: 'center',
+                                        alignItems: 'center'
+                                    }} onPress={this.goToHelpScreen}>
+                                        <Icon name="help" color={'white'} size={15}/>
+                                    </Ripple>
+                                </ElevatedView>
+                            </View>
+
                             <PermissionComponent
                                 render={() => (
                                     <View style={{flex: 0.15}}>

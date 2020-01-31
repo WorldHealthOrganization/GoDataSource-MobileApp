@@ -24,7 +24,6 @@ import {storePermissions} from './role';
 import {getLocations, getUserLocations} from './locations';
 import get from 'lodash/get';
 import lodashIntersection from 'lodash/intersection';
-import set from 'lodash/set';
 import {filterByUser} from './../utils/functions';
 import constants from './../utils/constants';
 import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
@@ -128,6 +127,8 @@ export function computeCommonData(storeUserBool, user, refreshFollowUps, filters
                 promises.push(getHelpCategory());
                 promises.push(getHelpItem());
 
+                dispatch(changeAppRoot('after-login'));
+
                 Promise.all(promises)
                     .then((dataArray) => {
                         let actionsObject = dataArray.reduce((obj, item) => {
@@ -199,7 +200,7 @@ export function computeCommonData(storeUserBool, user, refreshFollowUps, filters
                                 storeHelpItem(get(actionsObject,  'helpItem', null)),
                                 setLoginState('Finished logging'),
                                 saveSelectedScreen(selectedScreen),
-                                changeAppRoot('after-login')
+                                // changeAppRoot('after-login')
                             ];
 
                             if(refreshFollowUps) {
