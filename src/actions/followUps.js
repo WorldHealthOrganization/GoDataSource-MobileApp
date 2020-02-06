@@ -14,6 +14,11 @@ export function getFollowUpsForOutbreakId({outbreakId, followUpFilter, userTeams
     let countPromise = null;
     let followUpPromise = null;
 
+    // Query for follow-ups
+    let fUpsQuery = {};
+    // contactFilters will apply here but exposureFilter will apply on the fUpsQuery
+    let contactsWithRelationshipsQuery = {};
+
     // need to do custom logic for followUps
     let queryFUps = createMainQuery(translations.personTypes.contacts, outbreakId, contactsFilter, exposureFilter, lastElement, offset, false);
 
