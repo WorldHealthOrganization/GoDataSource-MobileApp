@@ -11,7 +11,7 @@ import {getTranslation} from './../utils/functions';
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 
-Section = ({label, hasBorderBottom, borderBottomColor, containerStyle, translation}) => (
+Section = React.memo(({label, hasBorderBottom, borderBottomColor, containerStyle, translation}) => (
     <View style={[style.containerStyle, containerStyle]}>
         <View style={[style.containerText]}>
             <Text style={style.textStyle}>
@@ -20,7 +20,7 @@ Section = ({label, hasBorderBottom, borderBottomColor, containerStyle, translati
         </View>
         <View style={[style.separatorStyle, {backgroundColor: borderBottomColor, display: hasBorderBottom ? 'flex' : 'none'}]}/>
     </View>
-);
+));
 
 // Create style outside the class, or for components that will be used by other components (buttons),
 // make a global style in the config directory

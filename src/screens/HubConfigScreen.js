@@ -527,6 +527,7 @@ class FirstConfigScreen extends Component {
                     clientId: this.state.clientId,
                     clientSecret: this.state.clientSecret,
                     encryptedData: this.state.encryptedData,
+                    userEmail: this.state.userEmail,
                     chunkSize: this.state.chunkSize
                 });
                 setInternetCredentials(server, previousInternetCredentials.username, previousInternetCredentials.password)

@@ -16,7 +16,7 @@ import {checkArrayAndLength} from './../utils/typeCheckingFunctions';
 import PermissionComponent from './PermissionComponent';
 import translations from "../utils/translations";
 
-ActionsBar = ({textsArray, addressIndex, textsStyleArray, onPressArray, arrayPermissions, hasBorder, borderColor, containerStyle, containerTextStyle, isEditMode, translation}) => (
+ActionsBar = React.memo(({textsArray, addressIndex, textsStyleArray, onPressArray, arrayPermissions, hasBorder, borderColor, containerStyle, containerTextStyle, isEditMode, translation}) => (
     <View style={[style.containerStyle, containerStyle]}>
         <View style={[style.separatorStyle, {backgroundColor: borderColor, display: hasBorder ? 'flex' : 'none'}]}/>
         {
@@ -78,7 +78,7 @@ ActionsBar = ({textsArray, addressIndex, textsStyleArray, onPressArray, arrayPer
                 </View>) : null
         }
     </View>
-);
+));
 
 // Create style outside the class, or for components that will be used by other components (buttons),
 // make a global style in the config directory

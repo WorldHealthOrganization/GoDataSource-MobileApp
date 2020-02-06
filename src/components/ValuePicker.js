@@ -3,18 +3,44 @@
  */
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
-import React, {PureComponent, useState, useRef} from 'react';
+import React, {useRef} from 'react';
 import {StyleSheet} from 'react-native';
 import {calculateDimension, getTranslation} from './../utils/functions';
 import config from './../utils/config';
-import {connect} from "react-redux";
+import {useSelector} from "react-redux";
+import {createSelector} from 'reselect';
 import ElevatedView from 'react-native-elevated-view';
 import ButtonWithIcons from './ButtonWithIcons';
 import {Dropdown} from 'react-native-material-dropdown';
 import lodashGet from 'lodash/get';
 
-function ValuePicker({value, data, screenSize, translation, referenceData, onSelectValue, top}) {
+const selectValuePickerReduxData = createSelector(
+    state => lodashGet(state, 'referenceData', []),
+    state => lodashGet(state, 'app.screenSize', config.designScreenSize),
+    state => lodashGet(state, 'app.translation', []),
+    (referenceData, screenSize, translation) => {
+        return {
+            referenceData: referenceData ? referenceData.filter((e) => {
+                return e.active && !e.deleted && e.categoryId === 'LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE'
+            })
+                .sort((a, b) => {
+                    return a.order - b.order;
+                })
+                .map((e) => {
+                    return {value: e.value}
+                })
+                : [],
+            screenSize,
+            translation
+        }
+    }
+);
+
+export default ValuePicker = React.memo(({value, onSelectValue, top}) => {
     const dropdown = useRef(null);
+    const {referenceData, screenSize, translation} = useSelector(selectValuePickerReduxData);
+    let data = referenceData;
+    data.unshift(config.dropDownValues[0]);
 
     const handlePressDropdown = () => {
         dropdown.current.focus();
@@ -53,7 +79,7 @@ function ValuePicker({value, data, screenSize, translation, referenceData, onSel
             </ButtonWithIcons>
         </ElevatedView>
     );
-}
+})
 
 // class ValuePicker extends PureComponent {
 //
@@ -153,12 +179,12 @@ const style = StyleSheet.create({
     }
 });
 
-function mapStateToProps(state) {
-    return {
-        screenSize: lodashGet(state, 'app.screenSize', config.designScreenSize),
-        translation: lodashGet(state, 'app.translation', []),
-        referenceData: lodashGet(state, 'referenceData', [])
-    };
-}
+// function mapStateToProps(state) {
+//     return {
+//         screenSize: lodashGet(state, 'app.screenSize', config.designScreenSize),
+//         translation: lodashGet(state, 'app.translation', []),
+//         referenceData: lodashGet(state, 'referenceData', [])
+//     };
+// }
 
-export default connect(mapStateToProps)(ValuePicker);
+// export default ValuePicker;
