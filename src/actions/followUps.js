@@ -132,6 +132,46 @@ export function getFollowUpsForOutbreakId({outbreakId, followUpFilter, userTeams
         .catch((errorGetFollowUps) => Promise.reject(errorGetFollowUps))
 }
 
+function getContactsWithRelationships(outbreakId) {
+    return {
+        type: 'select',
+        table: 'person',
+        alias: 'Contact',
+        fields: [
+            {
+                table: 'Contact'
+            },
+            {
+                table: 'Relation',
+                name: 'sourceId',
+                alias: 'SourceId'
+            },
+            {
+                table: 'Relation',
+                name: 'targetId',
+                alias: 'TargetId'
+            },
+            {
+                table: 'Relation',
+                name: '_id',
+                alias: 'RelId'
+            }
+        ],
+        join: [
+            {
+                type: 'left',
+                table: 'relationship',
+                alias: 'Relation',
+                on: {['Contact._id']: 'Relation.targetId'}
+            }
+        ],
+        condition: {
+            'Contact.type': translations.personTypes.contacts,
+            'Contact.outbreakId': outbreakId
+        }
+    }
+}
+
 function createMainQuery (dataType, outbreakId, mainFilter, search, lastElement, offset, skipExposures) {
     let condition = {
         [`MainQuery.deleted`]: 0,
