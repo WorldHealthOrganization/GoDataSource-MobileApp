@@ -132,7 +132,42 @@ export function getFollowUpsForOutbreakId({outbreakId, followUpFilter, userTeams
         .catch((errorGetFollowUps) => Promise.reject(errorGetFollowUps))
 }
 
-function getContactsWithRelationships(outbreakId) {
+function getContactsWithRelationships(outbreakId, dataType, contactFilter) {
+
+    let condition = {
+        [`Contact.deleted`]: 0,
+        [`Contact.type`]: dataType,
+        [`MainQuery.outbreakId`]: outbreakId
+    };
+
+
+    if (checkArrayAndLength(get(mainFilter, 'age', null)) && mainFilter.age.length === 2) {
+        condition[`MainQuery.age`] = {
+            ['$gte']: get(mainFilter, 'age[0]', 0),
+            ['$lte']: get(mainFilter, 'age[1]', 150)
+        };
+    }
+    if (get(mainFilter, 'gender', null) !== null) {
+        condition[`MainQuery.gender`] = mainFilter.gender;
+    }
+    if (checkArrayAndLength(get(mainFilter, 'categories', null))) {
+        condition[`MainQuery.categoryId`] = {
+            ['$in']: mainFilter.categories
+        };
+    }
+    if (checkArrayAndLength(get(mainFilter, 'classification', null))) {
+        condition[`MainQuery.classification`] = {
+            ['$in']: mainFilter.classification
+        };
+    }
+    if (checkArrayAndLength(get(mainFilter, 'selectedLocations', null))) {
+        condition[`MainQuery.locationId`] = {
+            ['$in']: mainFilter.selectedLocations
+        };
+    }
+
+
+
     return {
         type: 'select',
         table: 'person',
