@@ -43,26 +43,26 @@ function createQueryContactsWithRelations(outbreakId, dataType, mainFilter) {
         type: 'select',
         table: 'person',
         alias: contactAlias,
-        fields: [
-            {
-                table: contactAlias
-            },
-            {
-                table: relationAlias,
-                name: 'sourceId',
-                alias: 'SourceId'
-            },
-            {
-                table: relationAlias,
-                name: 'targetId',
-                alias: 'TargetId'
-            },
-            {
-                table: relationAlias,
-                name: '_id',
-                alias: 'RelId'
-            }
-        ],
+        // fields: [
+        //     {
+        //         table: contactAlias
+        //     },
+        //     {
+        //         table: relationAlias,
+        //         name: 'sourceId',
+        //         alias: 'SourceId'
+        //     },
+        //     {
+        //         table: relationAlias,
+        //         name: 'targetId',
+        //         alias: 'TargetId'
+        //     },
+        //     {
+        //         table: relationAlias,
+        //         name: '_id',
+        //         alias: 'RelId'
+        //     }
+        // ],
         join: [
             {
                 type: 'left',
@@ -119,7 +119,7 @@ function createQueryFollowUps(outbreakId, followUpsFilter, userTeams, contactsFi
     let aliasForAllExposures = 'AllExposures';
 
     let innerQuery = createQueryContactsWithRelations(outbreakId, translations.personTypes.contacts, contactsFilter);
-    let {condition, sort} = createConditionFollowUps(outbreakId, followUpsFilter, userTeams, translations.personTypes.contacts, contactsFilter, searchText, lastElement, offset, skipExposure);
+    let {condition, sort} = createConditionFollowUps(outbreakId, followUpsFilter, userTeams, translations.personTypes.contacts, contactsFilter, searchText, lastElement, offset, isCount);
 
     let query = {
         type: 'select',
@@ -189,7 +189,7 @@ function createQueryFollowUps(outbreakId, followUpsFilter, userTeams, contactsFi
     return query;
 }
 
-function createConditionFollowUps (outbreakId, followUpFilter, userTeams, dataType, contactsFilter, searchText, lastElement, offset, skipExposure) {
+function createConditionFollowUps (outbreakId, followUpFilter, userTeams, dataType, contactsFilter, search, lastElement, offset, skipExposure) {
     let aliasFollowUps = 'FollowUps';
     let aliasForContacts = 'Contacts';
     let aliasForFilteredExposures = 'FilteredExposures';
@@ -204,7 +204,7 @@ function createConditionFollowUps (outbreakId, followUpFilter, userTeams, dataTy
     if (outbreakId) {
         condition[`${aliasFollowUps}.outbreakId`] = outbreakId;
     }
-    if (contactsFilter.date) {
+    if (followUpFilter.date) {
         condition[`${aliasFollowUps}.date`] = {
             '$gte': `${createDate(followUpFilter.date).toISOString()}`,
             '$lte': `${createDate(followUpFilter.date, true).toISOString()}`
