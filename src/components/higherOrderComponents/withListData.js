@@ -109,7 +109,7 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                             contactsFilter: get(this.state, 'mainFilter', null),
                             exposureFilter: get(this.state, 'searchText', null),
                             lastElement: get(this.state, 'lastElement', null),
-                            offset: get(this.state, 'data.length', 0)
+                            offset: get(this.state, 'offset', 0)
                         };
                         break;
                     case 'ContactsScreen':
@@ -177,7 +177,8 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                                         data: prevState.lastElement !== null ? prevState.data.concat(result.data) : result.data,
                                             lastElement: result.data.length === 10 ? screenType === 'FollowUpsScreen' ? Object.assign({}, get(result, 'data[9].mainData', null), {followUpId: get(result, 'data[9].followUpData._id', null)}) : get(result, 'data[9].mainData', null) : null,
                                         isAddFromNavigation: false,
-                                        dataCount: get(result, 'dataCount', prevState.dataCount)
+                                        dataCount: get(result, 'dataCount', prevState.dataCount),
+                                        offset: result.data.length
                                     }
                                 })
                             })
@@ -201,7 +202,8 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
 
             refresh = () => {
                 this.setState({
-                    lastElement: null
+                    lastElement: null,
+                    offset: 0
                 }, () => {
                     this.getData(true)
                 })
@@ -209,20 +211,23 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
 
             setSearchText = (text) => {
                 this.setState(prevState => ({
-                    searchText: text
+                    searchText: text,
+                    offset: 0
                 }), () => this.refresh())
             };
 
             // Here will be mostly status and date
             setFollowUpFilter = (key, value) => {
                 this.setState(prevState => ({
-                    followUpFilter: Object.assign({}, prevState.followUpFilter, {[key]: value})
+                    followUpFilter: Object.assign({}, prevState.followUpFilter, {[key]: value}),
+                    offset: 0
                 }), () => this.refresh())
             };
 
             setMainFilter = (filter) => {
                 this.setState(prevState => ({
-                    mainFilter: filter
+                    mainFilter: filter,
+                    offset: 0
                 }), () => this.refresh())
             };
 

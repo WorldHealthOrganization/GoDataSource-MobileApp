@@ -43,26 +43,6 @@ function createQueryContactsWithRelations(outbreakId, dataType, mainFilter) {
         type: 'select',
         table: 'person',
         alias: contactAlias,
-        // fields: [
-        //     {
-        //         table: contactAlias
-        //     },
-        //     {
-        //         table: relationAlias,
-        //         name: 'sourceId',
-        //         alias: 'SourceId'
-        //     },
-        //     {
-        //         table: relationAlias,
-        //         name: 'targetId',
-        //         alias: 'TargetId'
-        //     },
-        //     {
-        //         table: relationAlias,
-        //         name: '_id',
-        //         alias: 'RelId'
-        //     }
-        // ],
         join: [
             {
                 type: 'left',
@@ -146,12 +126,10 @@ function createQueryFollowUps(outbreakId, followUpsFilter, userTeams, contactsFi
             }
         ],
         condition: condition,
-        group: `${aliasForContacts}._id`,
         sort: sort
     };
 
     if (isCount) {
-        query.limit = 10;
         query.fields = [
             {
                 func: {
@@ -165,6 +143,7 @@ function createQueryFollowUps(outbreakId, followUpsFilter, userTeams, contactsFi
             }
         ];
     } else {
+        query.limit = 10;
         query.fields = [
             {
                 table: aliasForFollowUps,
@@ -183,7 +162,12 @@ function createQueryFollowUps(outbreakId, followUpsFilter, userTeams, contactsFi
                 },
                 alias: 'exposureData'
             }
-        ]
+        ];
+        query.group = `${aliasForFollowUps}._id`;
+    }
+
+    if (get(contactsFilter, 'sort', null) !== null && offset) {
+        query.offset = offset;
     }
 
     return query;
@@ -269,7 +253,6 @@ function createConditionFollowUps (outbreakId, followUpFilter, userTeams, dataTy
                 sort[`${aliasForContacts}.updatedAt`] = sortOrder;
             }
         }
-        // followUpCondition['$not'] = notQuery;
     } else {
         sort[`${aliasForContacts}.lastName`] = 1;
         sort[`${aliasForContacts}.firstName`] = 1;
@@ -291,7 +274,6 @@ function createConditionFollowUps (outbreakId, followUpFilter, userTeams, dataTy
     }
 
     return {condition, sort};
-
 }
 
 
