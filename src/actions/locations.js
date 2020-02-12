@@ -62,7 +62,6 @@ export function getUserLocations(locationIds){
                 reject(errorTypes.ERROR_LOCATIONS);
             }
             if (responseLocations) {
-                // console.log('*** getUserLocationsByOutbreakId response: ', responseLocations);
                 let treeLocationList = [];
                 if (responseLocations.length > 0) {
                     treeLocationList = mapLocations(responseLocations.filter((e) => {return e.active === true}));

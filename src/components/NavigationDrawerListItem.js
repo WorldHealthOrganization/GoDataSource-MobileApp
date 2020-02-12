@@ -53,7 +53,7 @@ class NavigationDrawerListItem extends PureComponent {
                 {
                     this.props && this.props.addButton ?
                         (<View style={{
-                                flex: 0.2,
+                                flex: 0.15,
                                 justifyContent: 'center',
                                 backgroundColor: this.props.isSelected ? styles.backgroundGreen : 'white',
                                 marginTop: this.props.isSelected ? 7.5 : 0,

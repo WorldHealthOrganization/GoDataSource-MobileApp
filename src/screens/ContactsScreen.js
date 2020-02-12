@@ -149,6 +149,7 @@ class ContactsScreen extends Component {
                         colors={this.state.riskColors}
                         dataType={'Contact'}
                         filterText={filterText}
+                        hasFilter={true}
                         style={[style.listViewStyle]}
                         componentContainerStyle={style.componentContainerStyle}
                         refreshing={this.state.refreshing}

@@ -7,8 +7,7 @@ import translations from "../utils/translations";
 import sqlConstants from "../queries/sqlTools/constants";
 import get from 'lodash/get';
 import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
-import {insertOrUpdateExposure} from "./exposure";
-var jsonSql = require('json-sql')();
+let jsonSql = require('json-sql')();
 jsonSql.setDialect('sqlite');
 
 // Add here only the actions, not also the requests that are executed. For that purpose is the requests directory
@@ -39,7 +38,6 @@ export function getCasesForOutbreakId({outbreakId, casesFilter, searchText, last
         ]
     };
 
-
     if (computeCount) {
         let casesQueryCount = {
             type: 'select',
@@ -65,15 +63,11 @@ export function getCasesForOutbreakId({outbreakId, casesFilter, searchText, last
             return Promise.resolve({data: cases, dataCount: checkArrayAndLength(casesCount) ? casesCount[0].countRecords : undefined});
         })
         .catch((errorGetCases) => Promise.reject(errorGetCases))
-    // return Promise.resolve()
-    //     .then(() => executeQuery(casesQuery))
-    //     .then((mappedData) => Promise.resolve(mappedData))
-    //     .catch((errorGetCases) => Promise.reject(errorGetCases));
-};
+}
 
 export function addCase(myCase) {
     return insertOrUpdate('common', 'person', [myCase], false);
-};
+}
 
 export function updateCase (myCase) {
     return  insertOrUpdate('common', 'person', [myCase], false)
