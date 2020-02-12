@@ -65,6 +65,7 @@
     "react-native-navigation": "1.1.480",
     "react-native-os": "^1.2.1",
     "react-native-permissions": "^1.1.1",
+    "react-native-phone-call": "^1.0.9",
     "react-native-qrcode-scanner": "^1.1.0",
     "react-native-randombytes": "^3.5.1",
     "react-native-reanimated": "^1.0.1",

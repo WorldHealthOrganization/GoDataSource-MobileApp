@@ -1,14 +1,11 @@
 /**
  * Created by florinpopa on 28/08/2018.
  */
-/**
- * Created by florinpopa on 14/06/2018.
- */
+// Since this app is based around the material ui is better to use the components from
+// the material ui library, since it provides design and animations out of the box
 import React, {PureComponent, Suspense, } from 'react';
 import {View, Text, StyleSheet, Platform, Image, Alert} from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
-// Since this app is based around the material ui is better to use the components from
-// the material ui library, since it provides design and animations out of the box
 import {Button, Icon} from 'react-native-material-ui';
 import { TextField } from 'react-native-material-textfield';
 import styles from './../styles';
@@ -29,7 +26,6 @@ import ModalSyncStatus from './../components/ModalSyncStatus';
 import VersionNumber from 'react-native-version-number';
 import IntervalPicker from './../components/IntervalPicker';
 import constants from './../utils/constants';
-// import get from "lodash/get";
 
 class ManualConfigScreen extends PureComponent {
 
@@ -70,102 +66,99 @@ class ManualConfigScreen extends PureComponent {
     componentDidMount = async () => {
         // Get all hubs urls for the check
         // To get them, first get all databases names and ids from AsyncStorage, then for each url, get its internet credentials and map them to an array of urls
-
-                try {
-                    let allDatabases = await AsyncStorage.getItem('databases');
-                    if (allDatabases) {
-                        allDatabases = JSON.parse(allDatabases);
-                        allDatabases = allDatabases.map((e) => {
-                            return e.id;
-                        });
-                        let allUrls = [];
-                        for (let i=0; i<allDatabases.length; i++) {
-                            try {
-                                let internetCredentials = await getInternetCredentials(allDatabases[i]);
-                                if (internetCredentials) {
-                                    internetCredentials = JSON.parse(internetCredentials.username);
-                                    allUrls.push(internetCredentials.url);
-                                } else {
-                                    console.log(`Internet credentials not found for ${allDatabases[i]}`);
-                                }
-                            } catch(errorGetInternetCredentials) {
-                                console.log('Error while getting internet credentials: ', errorGetInternetCredentials);
-                            }
-                        }
-
-                        // console.log('All URLs: ', this.props.QRCodeInfo);
-
-                        if (this.props && this.props.QRCodeInfo && this.props.QRCodeInfo.data) {
-                            //TO DO map this.props.QRCodeInfo info to props
-                            // console.log('Here have the QRCodeInfo: ', JSON.parse(this.props.QRCodeInfo.data));
-                            let QRCodeData = JSON.parse(this.props.QRCodeInfo.data);
-                            this.setState({
-                                url: QRCodeData.url || '',
-                                clientId: QRCodeData.clientId || '',
-                                clientSecret: QRCodeData.clientSecret || '',
-                                allUrls
-                            })
+        try {
+            let allDatabases = await AsyncStorage.getItem('databases');
+            if (allDatabases) {
+                allDatabases = JSON.parse(allDatabases);
+                allDatabases = allDatabases.map((e) => {
+                    return e.id;
+                });
+                let allUrls = [];
+                for (let i=0; i<allDatabases.length; i++) {
+                    try {
+                        let internetCredentials = await getInternetCredentials(allDatabases[i]);
+                        if (internetCredentials) {
+                            internetCredentials = JSON.parse(internetCredentials.username);
+                            allUrls.push(internetCredentials.url);
                         } else {
-                            if (this.props && this.props.activeDatabase && !this.props.isNewHub) {
-                                try{
-                                    let activeDatabaseCredentials = await getInternetCredentials(this.props.activeDatabase);
-                                    if (activeDatabaseCredentials) {
-                                        activeDatabaseCredentials = JSON.parse(activeDatabaseCredentials.username);
-                                        this.setState({
-                                            name: activeDatabaseCredentials.name,
-                                            url: activeDatabaseCredentials.url,
-                                            clientId: activeDatabaseCredentials.clientId,
-                                            clientSecret: activeDatabaseCredentials.clientSecret,
-                                            userEmail: activeDatabaseCredentials.userEmail,
-                                            encryptedData: activeDatabaseCredentials.encryptedData,
-                                            allUrls: allUrls
-                                        })
-                                    } else {
-                                        console.log("No active database found");
-                                        this.setState({
-                                            allUrls
-                                        })
-                                    }
-                                } catch (errorGetInternetCredentialsActiveDatabase) {
-                                    console.log("errorGetInternetCredentialsActiveDatabase: ", errorGetInternetCredentialsActiveDatabase);
-                                    this.setState({
-                                        allUrls
-                                    })
-                                }
+                            console.log(`Internet credentials not found for ${allDatabases[i]}`);
+                        }
+                    } catch(errorGetInternetCredentials) {
+                        console.log('Error while getting internet credentials: ', errorGetInternetCredentials);
+                    }
+                }
+
+                if (this.props && this.props.QRCodeInfo && this.props.QRCodeInfo.data) {
+                    //TODO map this.props.QRCodeInfo info to props
+                    // console.log('Here have the QRCodeInfo: ', JSON.parse(this.props.QRCodeInfo.data));
+                    let QRCodeData = JSON.parse(this.props.QRCodeInfo.data);
+                    this.setState({
+                        url: QRCodeData.url || '',
+                        clientId: QRCodeData.clientId || '',
+                        clientSecret: QRCodeData.clientSecret || '',
+                        allUrls
+                    })
+                } else {
+                    if (this.props && this.props.activeDatabase && !this.props.isNewHub) {
+                        try{
+                            let activeDatabaseCredentials = await getInternetCredentials(this.props.activeDatabase);
+                            if (activeDatabaseCredentials) {
+                                activeDatabaseCredentials = JSON.parse(activeDatabaseCredentials.username);
+                                this.setState({
+                                    name: activeDatabaseCredentials.name,
+                                    url: activeDatabaseCredentials.url,
+                                    clientId: activeDatabaseCredentials.clientId,
+                                    clientSecret: activeDatabaseCredentials.clientSecret,
+                                    userEmail: activeDatabaseCredentials.userEmail,
+                                    encryptedData: activeDatabaseCredentials.encryptedData,
+                                    allUrls: allUrls
+                                })
                             } else {
+                                console.log("No active database found");
                                 this.setState({
                                     allUrls
                                 })
                             }
-                        }
-                    } else {
-                        console.log('No database found');
-                        if (this.props && this.props.QRCodeInfo && this.props.QRCodeInfo.data) {
-                            //TO DO map this.props.QRCodeInfo info to props
-                            // console.log('Here have the QRCodeInfo: ', JSON.parse(this.props.QRCodeInfo.data));
-                            console.log('TestQRCode has qr code data');
-                            let QRCodeData = JSON.parse(this.props.QRCodeInfo.data);
+                        } catch (errorGetInternetCredentialsActiveDatabase) {
+                            console.log("errorGetInternetCredentialsActiveDatabase: ", errorGetInternetCredentialsActiveDatabase);
                             this.setState({
-                                url: QRCodeData.url || '',
-                                clientId: QRCodeData.clientId || '',
-                                clientSecret: QRCodeData.clientSecret || ''
+                                allUrls
                             })
                         }
-                    }
-                } catch (errorGetAllDatabases) {
-                    console.log('Error get all databases: ', errorGetAllDatabases);
-                    if (this.props && this.props.QRCodeInfo && this.props.QRCodeInfo.data) {
-                        //TO DO map this.props.QRCodeInfo info to props
-                        // console.log('Here have the QRCodeInfo: ', JSON.parse(this.props.QRCodeInfo.data));
-                        // console.log('TestQRCode has qr code data');
-                        let QRCodeData = JSON.parse(this.props.QRCodeInfo.data);
+                    } else {
                         this.setState({
-                            url: QRCodeData.url || '',
-                            clientId: QRCodeData.clientId || '',
-                            clientSecret: QRCodeData.clientSecret || ''
+                            allUrls
                         })
                     }
                 }
+            } else {
+                console.log('No database found');
+                if (this.props && this.props.QRCodeInfo && this.props.QRCodeInfo.data) {
+                    //TODO map this.props.QRCodeInfo info to props
+                    // console.log('Here have the QRCodeInfo: ', JSON.parse(this.props.QRCodeInfo.data));
+                    console.log('TestQRCode has qr code data');
+                    let QRCodeData = JSON.parse(this.props.QRCodeInfo.data);
+                    this.setState({
+                        url: QRCodeData.url || '',
+                        clientId: QRCodeData.clientId || '',
+                        clientSecret: QRCodeData.clientSecret || ''
+                    })
+                }
+            }
+        } catch (errorGetAllDatabases) {
+            console.log('Error get all databases: ', errorGetAllDatabases);
+            if (this.props && this.props.QRCodeInfo && this.props.QRCodeInfo.data) {
+                //TODO map this.props.QRCodeInfo info to props
+                // console.log('Here have the QRCodeInfo: ', JSON.parse(this.props.QRCodeInfo.data));
+                // console.log('TestQRCode has qr code data');
+                let QRCodeData = JSON.parse(this.props.QRCodeInfo.data);
+                this.setState({
+                    url: QRCodeData.url || '',
+                    clientId: QRCodeData.clientId || '',
+                    clientSecret: QRCodeData.clientSecret || ''
+                })
+            }
+        }
     };
 
     componentWillUnmount() {
@@ -203,14 +196,11 @@ class ManualConfigScreen extends PureComponent {
                         alignSelf: 'center',
                         justifyContent: 'space-between',
                         flexDirection: 'row',
-                        // flex: Platform.OS === 'ios' && this.props && this.props.screenSize.height < 600 ? 0.05 : 0.35
                     }}>
                         <Ripple
                             style={{
                                 flexDirection: 'row',
                                 alignItems: 'center',
-                                // position: "absolute",
-                                // top: 20,
                                 left: -20
                             }}
                             onPress={this.handleOnPressBack}>
@@ -223,8 +213,6 @@ class ManualConfigScreen extends PureComponent {
                                 <Ripple style={{
                                     flexDirection: 'row',
                                     alignItems: 'center',
-                                    // position: "absolute",
-                                    // top: 20,
                                     right: -20
                                 }} onPress={this.handleOnPressForward}>
                                     <Text
@@ -407,8 +395,6 @@ class ManualConfigScreen extends PureComponent {
                     skipEdit: this.props.skipEdit,
                     isMultipleHub: this.props.isMultipleHub
                 }
-                // animationType: 'fade',
-                // animated: true
             });
         }
     };
@@ -421,8 +407,6 @@ class ManualConfigScreen extends PureComponent {
                 skipEdit: this.props.skipEdit,
                 isMultipleHub: this.props.isMultipleHub
             }
-            // animationType: 'fade',
-            // animated: true
         })
     };
 
@@ -577,23 +561,6 @@ class ManualConfigScreen extends PureComponent {
             this.props.setSyncState('Reset');
         }
     };
-
-    // resetModalProps = (callback) => {
-    //     this.setState({
-    //         syncState: [
-    //             {id: 'testApi', name: 'Test API', status: '...'},
-    //             {id: 'downloadDatabase', name: 'Download database', status: '...'},
-    //             {id: 'unzipFile', name: 'Unzip', status: '...'},
-    //             {id: 'sync', name: 'Sync', status: '...'}
-    //         ],
-    //         showModal: false,
-    //         showCloseModalButton: false
-    //     }, () => {
-    //         console.log('New state: ', this.state.syncState);
-    //         this.props.setSyncState({id: 'sync', status: null});
-    //         callback();
-    //     })
-    // }
 }
 
 // Create style outside the class, or for components that will be used by other components (buttons),
