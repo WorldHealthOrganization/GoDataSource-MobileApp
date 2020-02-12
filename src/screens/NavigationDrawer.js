@@ -148,6 +148,7 @@ class NavigationDrawer extends Component {
                         onPress={() => this.handlePressOnListItem(3)}
                         isSelected={3 === this.state.selectedScreen}
                         addButton={false}
+                        itemKey={'users'}
                     />
 
                     <NavigationDrawerListItem

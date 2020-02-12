@@ -13,7 +13,7 @@ import ElevatedView from 'react-native-elevated-view';
 import Ripple from 'react-native-material-ripple';
 import {calculateDimension} from './../utils/functions';
 import PermissionComponent from './../components/PermissionComponent';
-import translations from "../utils/translations";
+import constants from './../utils/constants';
 
 class NavigationDrawerListItem extends PureComponent {
 
@@ -33,13 +33,28 @@ class NavigationDrawerListItem extends PureComponent {
 
         switch(this.props.itemKey) {
             case 'followups':
-                permissionElement = ['follow_up_all', 'follow_up_list'];
+                permissionElement = [
+                    constants.PERMISSIONS_FOLLOW_UP.followUpAll,
+                    constants.PERMISSIONS_FOLLOW_UP.followUpList
+                ];
                 break;
             case 'contacts':
-                permissionElement = ['contact_all', 'contact_list'];
+                permissionElement = [
+                    constants.PERMISSIONS_CONTACT.contactAll,
+                    constants.PERMISSIONS_CONTACT.contactList
+                ];
                 break;
             case 'cases':
-                permissionElement = ['case_all', 'case_list'];
+                permissionElement = [
+                    constants.PERMISSIONS_CASE.caseAll,
+                    constants.PERMISSIONS_CASE.caseList
+                ];
+                break;
+            case 'users':
+                permissionElement = [
+                    constants.PERMISSIONS_USER.userAll,
+                    constants.PERMISSIONS_USER.userList
+                ];
                 break;
             default:
                 permissionElement = ['follow_up_all', 'follow_up_list'];
