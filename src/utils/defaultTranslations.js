@@ -6,6 +6,7 @@ export default {
     'LNG_NAVIGATION_DRAWER_CASES': 'Cases',
     'LNG_NAVIGATION_DRAWER_SYNC_HUB_MANUAL': 'Sync HUB manually',
     'LNG_NAVIGATION_DRAWER_CHANGE_HUB_CONFIG': 'Change HUB configuration',
+    'LNG_NAVIGATION_DRAWER_USERS': 'Users',
     'LNG_NAVIGATION_DRAWER_LANGUAGES': 'Languages',
     'LNG_NAVIGATION_DRAWER_LOGOUT': 'Logout',
     'LNG_LAYOUT_MENU_ITEM_HELP_LABEL': 'Help & support',
@@ -200,6 +201,12 @@ export default {
     'LNG_CASE_LIST_SCREEN_NO_CASES': 'There are no cases to display',
     'LNG_CASE_LIST_SCREEN_SEE_CONTACTS': 'Contacts',
 
+    //usersScreen
+    'LNG_USER_LIST_SCREEN_TITLE': 'Users',
+    'LNG_USER_LIST_SCREEN_PHONE_BUTTON': 'Call',
+    'LNG_USER_LIST_SCREEN_NO_USERS': 'There are no users to display',
+    'LNG_USER_FIELD_LABEL_PRIMARY_TELEPHONE': 'Primary telephone',
+    'LNG_USER_FIELD_LABEL_INSTITUTION_NAME': 'Institution name',
 
     //contactsScreen
     'LNG_CONTACT_LIST_SCREEN_TITLE': 'Contacts',

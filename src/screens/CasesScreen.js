@@ -192,6 +192,7 @@ class CasesScreen extends Component {
                                 onPressExposure={this.props.onPressExposure}
                                 screen={translations.caseSingleScreen.title}
                                 onEndReached={this.props.onEndReached}
+                                hasFilter={true}
                             />
                         )}
                         permissionsList={['case_all', 'case_list']}

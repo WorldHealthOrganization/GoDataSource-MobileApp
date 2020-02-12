@@ -183,6 +183,7 @@ class FollowUpsScreen extends Component {
                                 onPressExposure={this.props.onPressExposure}
                                 screen={translations.followUpsScreen.followUpsTitle}
                                 onEndReached={this.props.onEndReached}
+                                hasFilter={true}
                             />
                         )}
                         permissionsList={['follow_up_all', 'follow_up_list']}

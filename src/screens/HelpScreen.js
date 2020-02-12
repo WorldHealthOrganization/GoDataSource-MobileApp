@@ -342,35 +342,47 @@ class HelpScreen extends Component {
 
         if (this.state.pageAskingHelpFrom === 'followUps') {
             pageAskingHelpFromNameToDisplay = getTranslation(translations.followUpsScreen.followUpsTitle, this.props.translation)
-        } else if (this.state.pageAskingHelpFrom === 'contacts') {
+        }
+        else if (this.state.pageAskingHelpFrom === 'contacts') {
             pageAskingHelpFromNameToDisplay = getTranslation(translations.contactsScreen.contactsTitle, this.props.translation)
-        } else if (this.state.pageAskingHelpFrom === 'cases') {
+        }
+        else if (this.state.pageAskingHelpFrom === 'cases') {
             pageAskingHelpFromNameToDisplay = getTranslation(translations.casesScreen.casesTitle, this.props.translation)
-        } 
+        }
+        else if (this.state.pageAskingHelpFrom === 'users') {
+            pageAskingHelpFromNameToDisplay = getTranslation(translations.usersScreen.usersTitle, this.props.translation)
+        }
         else if (this.state.pageAskingHelpFrom === 'followUpSingleScreenAdd') {
             pageAskingHelpFromNameToDisplay = `${getTranslation(translations.helpScreen.addMessage, this.props.translation)} ${getTranslation(translations.followUpsSingleScreen.title, this.props.translation)}`
-        } else if (this.state.pageAskingHelpFrom === 'contactsSingleScreenAdd') {
+        }
+        else if (this.state.pageAskingHelpFrom === 'contactsSingleScreenAdd') {
             pageAskingHelpFromNameToDisplay = `${getTranslation(translations.helpScreen.addMessage, this.props.translation)} ${getTranslation(translations.contactSingleScreen.title, this.props.translation)}`
-        } else if (this.state.pageAskingHelpFrom === 'casesSingleScreenAdd') {
+        }
+        else if (this.state.pageAskingHelpFrom === 'casesSingleScreenAdd') {
             pageAskingHelpFromNameToDisplay = `${getTranslation(translations.helpScreen.addMessage, this.props.translation)} ${getTranslation(translations.caseSingleScreen.title, this.props.translation)}`
         } 
         else if (this.state.pageAskingHelpFrom === 'followUpSingleScreenEdit') {
             pageAskingHelpFromNameToDisplay = `${getTranslation(translations.helpScreen.editMessage, this.props.translation)} ${getTranslation(translations.followUpsSingleScreen.title, this.props.translation)}`
-        } else if (this.state.pageAskingHelpFrom === 'contactsSingleScreenEdit') {
+        }
+        else if (this.state.pageAskingHelpFrom === 'contactsSingleScreenEdit') {
             pageAskingHelpFromNameToDisplay = `${getTranslation(translations.helpScreen.editMessage, this.props.translation)} ${getTranslation(translations.contactSingleScreen.title, this.props.translation)}`
-        } else if (this.state.pageAskingHelpFrom === 'casesSingleScreenEdit') {
+        }
+        else if (this.state.pageAskingHelpFrom === 'casesSingleScreenEdit') {
             pageAskingHelpFromNameToDisplay = `${getTranslation(translations.helpScreen.editMessage, this.props.translation)} ${getTranslation(translations.caseSingleScreen.title, this.props.translation)}`
         } 
         else if (this.state.pageAskingHelpFrom === 'followUpSingleScreenView') {
             pageAskingHelpFromNameToDisplay = `${getTranslation(translations.helpScreen.viewMessage, this.props.translation)} ${getTranslation(translations.followUpsSingleScreen.title, this.props.translation)}`
-        } else if (this.state.pageAskingHelpFrom === 'contactsSingleScreenView') {
+        }
+        else if (this.state.pageAskingHelpFrom === 'contactsSingleScreenView') {
             pageAskingHelpFromNameToDisplay = `${getTranslation(translations.helpScreen.viewMessage, this.props.translation)} ${getTranslation(translations.contactSingleScreen.title, this.props.translation)}`
-        } else if (this.state.pageAskingHelpFrom === 'casesSingleScreenView') {
+        }
+        else if (this.state.pageAskingHelpFrom === 'casesSingleScreenView') {
             pageAskingHelpFromNameToDisplay = `${getTranslation(translations.helpScreen.viewMessage, this.props.translation)} ${getTranslation(translations.caseSingleScreen.title, this.props.translation)}`
         }
         else if (this.state.pageAskingHelpFrom === 'exposureAdd') {
             pageAskingHelpFromNameToDisplay = `${getTranslation(translations.exposureScreen.editExposureLabel, this.props.translation)}`
-        } else if (this.state.pageAskingHelpFrom === 'exposureEdit') {
+        }
+        else if (this.state.pageAskingHelpFrom === 'exposureEdit') {
             pageAskingHelpFromNameToDisplay = `${getTranslation(translations.exposureScreen.editExposureLabel, this.props.translation)}`
         }
 
@@ -436,7 +448,6 @@ class HelpScreen extends Component {
             filter: Object.assign({}, prevState.filter, {searchText: text})
         }), console.log('### filter after changed text: ', this.state.filter))
     };
-
 
     //Other
     showMenu = () => {

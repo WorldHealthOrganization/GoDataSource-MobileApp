@@ -37,7 +37,6 @@ export function getCasesForOutbreakId({outbreakId, casesFilter, searchText, last
         ]
     };
 
-
     if (computeCount) {
         let casesQueryCount = {
             type: 'select',
@@ -63,15 +62,11 @@ export function getCasesForOutbreakId({outbreakId, casesFilter, searchText, last
             return Promise.resolve({data: cases, dataCount: checkArrayAndLength(casesCount) ? casesCount[0].countRecords : undefined});
         })
         .catch((errorGetCases) => Promise.reject(errorGetCases))
-    // return Promise.resolve()
-    //     .then(() => executeQuery(casesQuery))
-    //     .then((mappedData) => Promise.resolve(mappedData))
-    //     .catch((errorGetCases) => Promise.reject(errorGetCases));
-};
+}
 
 export function addCase(myCase) {
     return insertOrUpdate('common', 'person', [myCase], false);
-};
+}
 
 export function updateCase (myCase) {
     return  insertOrUpdate('common', 'person', [myCase], false)

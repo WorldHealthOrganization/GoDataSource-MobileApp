@@ -169,6 +169,7 @@ class ContactsScreen extends Component {
                                 onPressExposure={this.props.onPressExposure}
                                 screen={translations.contactSingleScreen.title}
                                 onEndReached={this.props.onEndReached}
+                                hasFilter={true}
                             />
                         )}
                         permissionsList={['contact_all', 'case_list']}

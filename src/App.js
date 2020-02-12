@@ -1,10 +1,9 @@
 import { Navigation, NativeEventsReceiver } from 'react-native-navigation';
-import {connect, Provider} from 'react-redux';
+import {Provider} from 'react-redux';
 import { createStore, applyMiddleware } from 'redux';
 import { enableBatching } from 'redux-batched-actions';
 import thunk from 'redux-thunk';
 import promise from 'redux-promise';
-import { createLogger } from 'redux-logger';
 import { Platform, DeviceEventEmitter, NativeEventEmitter, NativeModules } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 import RNFetchBlobFS from 'rn-fetch-blob/fs';
@@ -13,10 +12,8 @@ import {getInternetCredentials} from 'react-native-keychain';
 import {wipeCompleteRequest} from './requests/wipeData';
 import appReducers from './reducers';
 import appActions from './actions';
-import {appInitialized} from './actions/app';
 import { registerScreens } from './screens';
 import config from './utils/config';
-import Modal from 'react-native-root-modal';
 import {resetInternetCredentials} from 'react-native-keychain';
 import {checkDeviceStatus} from "./requests/deviceStatus";
 import isNumber from 'lodash/isNumber';
@@ -24,7 +21,6 @@ import constants from './utils/constants';
 
 console.disableYellowBox = true;
 
-// const logger = createLogger();
 export const store = createStore(enableBatching(appReducers), applyMiddleware(thunk, promise));
 
 registerScreens(store, Provider);
@@ -44,7 +40,7 @@ export default class App {
         });
 
         ParseNativeModule.addListener('onPushReceived', (item) => {
-            console.log('~~~ TODO WIPE onPushReceived ~~~', item)
+            console.log('~~~ TODO WIPE onPushReceived ~~~', item);
 
             //Request to server after finish wipe data
             AsyncStorage.getItem('installationId')
@@ -66,8 +62,6 @@ export default class App {
                                                             console.log('Response activeDatabaseCredentials ', activeDatabaseCredentials);
                                                             let currentHubConfig = JSON.parse(activeDatabaseCredentials.username);
                                                             if (currentHubConfig && currentHubConfig !== undefined && currentHubConfig.url && currentHubConfig.url !== undefined && currentHubConfig.url.trim().length > 0 && installationId && installationId !== undefined) {
-                                                                // console.log ('configHubInfo', currentHubConfig)
-                                                                // console.log ('installationId', installationId)
                                                                 this.removeAllDatabases((errorWipe, success) => {
                                                                     if (errorWipe) {
                                                                         console.log('error at wiping data: ', errorWipe)
@@ -81,10 +75,6 @@ export default class App {
                                                                                 store.dispatch(appActions.saveActiveDatabase(null));
                                                                                 store.dispatch(appActions.changeAppRoot('config'));
                                                                                 store.dispatch(appActions.storeUser(null));
-                                                                                // store.dispatch(appActions.storeContacts(null));
-                                                                                // store.dispatch(appActions.storeFollowUps(null));
-                                                                                // store.dispatch(appActions.storeCases(null));
-                                                                                // store.dispatch(appActions.storeEvents(null));
                                                                                 store.dispatch(appActions.storeOutbreak(null));
                                                                                 store.dispatch(appActions.storeHelpCategory(null));
                                                                                 store.dispatch(appActions.storeHelpItem(null));
@@ -122,9 +112,6 @@ export default class App {
         this.checkDevice(() => {
             store.dispatch(appActions.appInitialized(Platform.OS === 'ios' ? NativeModules.APNSEventEmitter : NativeModules.ParseReceiver));
         })
-
-        // console.log('App loaded');
-        // NativeModules.APNSEventEmitter.appLoaded();
     };
 
     onStoreUpdate = () => {
@@ -153,7 +140,7 @@ export default class App {
             } else {
                 ParseNativeModule = NativeModules.ParseReceiver
             }
-            console.log('~~~ Calling native module ready to start init parse ~~~')
+            console.log('~~~ Calling native module ready to start init parse ~~~');
             ParseNativeModule.initParse()
         }
 
@@ -225,7 +212,6 @@ export default class App {
         }
     };
 
-
     // Checks device status if exists, and if the status is pending wipe, removes everything
     checkDevice = async (callback) => {
         try {
@@ -280,10 +266,6 @@ export default class App {
     };
 
     removeAllDatabases = async (callback) => {
-        // Remove DocumentDirectory and LibraryDirectory
-        // console.log('Path for debug purposes: ', RNFetchBlobFS.dirs.DocumentDir);
-
-
         // First clear the internet credentials
         try {
             let allDatabases = await AsyncStorage.getItem('databases');

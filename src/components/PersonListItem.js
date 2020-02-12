@@ -13,7 +13,7 @@ import styles from './../styles';
 import {getTranslation, calculateDimension} from './../utils/functions';
 import {connect} from "react-redux";
 import GeneralListItem from './GeneralListItem';
-import {extractIdFromPouchId, getAddress, handleExposedTo} from "../utils/functions";
+import {getAddress, handleExposedTo} from "../utils/functions";
 import config from "../utils/config";
 import PersonListItemNameAndAddressComponent from './PersonListItemNameAndAddressComponent';
 import PersonListItemExposuresComponent from './PersonListItemExposuresComponent';
@@ -21,6 +21,7 @@ import PermissionComponent from './PermissionComponent';
 import isEqual from 'lodash/isEqual';
 import get from 'lodash/get';
 import constants from './../utils/constants';
+import translations from "../utils/translations";
 
 class PersonListItem extends Component {
     constructor(props) {
@@ -56,7 +57,7 @@ class PersonListItem extends Component {
                         onPressName={this.props.onPressNameProp}
                     />
                 }
-                secondComponent={this.props.type !== 'Case' ? (
+                secondComponent={this.props.type !== 'Case' && this.props.type !== 'User' ? (
                     <PermissionComponent
                         render={() => (
                             <PersonListItemExposuresComponent
@@ -90,12 +91,12 @@ class PersonListItem extends Component {
             visualId: '',
             addressString: '',
             primaryColor: 'black',
-            status: null
+            status: null,
+            institutionName: '',
+            telephoneNumbers: '',
         };
         // the new implementation
         let person = get(itemToRender, 'mainData', null);
-
-
 
         // Get followUp's contact
         // let person = type === 'Contact' || type === 'Case' ? itemToRender : this.props.contacts && Array.isArray(this.props.contacts) && this.props.contacts.length > 0 ?  this.props.contacts.find((e) => {return extractIdFromPouchId(e._id, 'person') === itemToRender.personId}) : null;
@@ -133,9 +134,15 @@ class PersonListItem extends Component {
         }
         // Followup final status
         if (type !== 'Case' && person && person.followUp){
-            returnValues.status = person.followUp.status ? getTranslation(person.followUp.status, this.props.translations) : null;
+            returnValues.status = person.followUp.status ? getTranslation(person.followUp.status, this.props.translation) : null;
         }
-
+        // User institution and phone number
+        if (person &&  person.hasOwnProperty('institutionName')){
+            returnValues.institutionName =  getTranslation(person.institutionName, this.props.translation);
+        }
+        if (person &&  person.hasOwnProperty('telephoneNumbers')){
+            returnValues.telephoneNumbers = person.telephoneNumbers[translations.usersScreen.primaryPhone];
+        }
         return returnValues;
     };
 
@@ -155,8 +162,6 @@ class PersonListItem extends Component {
 
     onPressMapIcon = () => {
         InteractionManager.runAfterInteractions(() => {
-            // let person = this.props.type === 'Contact' || this.props.type === 'Case' ? this.props.itemToRender : this.props.contacts && Array.isArray(this.props.contacts) && this.props.contacts.length > 0 ?  this.props.contacts.find((e) => {return extractIdFromPouchId(e._id, 'person') === this.props.itemToRender.personId}) : null;
-
             if (this.props.onPressMapIconProp !== undefined) {
                 this.props.onPressMapIconProp()
             }

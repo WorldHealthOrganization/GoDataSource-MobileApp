@@ -143,6 +143,9 @@ export function navigation(event, navigator) {
                     case 'help':
                         screenToSwitchTo = "HelpScreen";
                     break;
+                    case '3':
+                        screenToSwitchTo = "UsersScreen";
+                    break;
                     default:
                         screenToSwitchTo = "FollowUpsScreen";
                         break;
@@ -1068,6 +1071,10 @@ export function filterItemsForEachPage (helpItemsCopy, pageAskingHelpFrom) {
             } else if (pageAskingHelpFrom === 'exposureEdit') {
                 return e.page.toLowerCase().includes('relationships') && (e.page.toLowerCase().includes('modify') || e.page.toLowerCase().includes('edit') ||
                     e.page.toLowerCase().includes('view')) && !e.page.toLowerCase().includes('add') && !e.page.toLowerCase().includes('create')
+            }
+            else if ( pageAskingHelpFrom === 'users') {
+                return e.page.toLowerCase().includes('users') && !e.page.toLowerCase().includes('modify') && !e.page.toLowerCase().includes('edit') &&
+                    !e.page.toLowerCase().includes('view') && !e.page.toLowerCase().includes('add') && !e.page.toLowerCase().includes('create')
             }
         }
     });
