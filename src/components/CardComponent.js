@@ -154,6 +154,14 @@ class CardComponent extends PureComponent {
                         index={this.props.index}
                         value={this.props.value}
                         showValue={true}
+                        labelStyle={{
+                            fontFamily: 'Roboto-Regular',
+                            fontSize: 15,
+                            textAlign: 'left',
+                            color: 'rgb(0,0,0)',
+                            marginBottom: 2,
+                            marginTop: 7,
+                        }}
                         isEditMode={this.props.item.isEditMode}
                         isRequired={this.props.item.isRequired}
                         onChange={this.props.onChangeSwitch}
