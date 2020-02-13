@@ -49,7 +49,7 @@ class DatePicker extends PureComponent {
                             <View>
                                 <Text style={{
                                     fontFamily: 'Roboto',
-                                    fontSize: 12.5,
+                                    fontSize: 15,
                                     textAlign: 'left',
                                     color: 'rgba(0, 0, 0, .38)',
                                 }}>
@@ -75,12 +75,13 @@ class DatePicker extends PureComponent {
                                 <TextField
                                     label={this.props.isRequired ? getTranslation(this.props.label, this.props.translation) + ' * ' : getTranslation(this.props.label, this.props.translation)}
                                     textColor='rgb(0,0,0)'
-                                    labelFontSize={12.5}
-                                    labelHeight={30}
+                                    labelFontSize={15}
+                                    // labelHeight={30}
                                     labelTextStyle={{
                                         fontFamily: 'Roboto',
                                         textAlign: 'left',
-                                        marginBottom: 7.5
+                                        marginBottom: 2,
+                                        marginTop: 2,
                                     }}
                                     tintColor='rgb(77,176,160)'
                                 >
@@ -117,17 +118,17 @@ class DatePicker extends PureComponent {
                     <Text style={{
                         fontFamily: 'Roboto-Regular',
                         fontSize: 15,
-                        lineHeight: 30,
                         textAlign: 'left',
                         color: 'rgb(0,0,0)',
-                        marginBottom: 7.5
+                        marginBottom: 2,
+                        marginTop: 7,
                     }}>
                         {getTranslation(this.props.label, this.props.translation)}
                     </Text>
                     <Text
                 style={{
                     fontFamily: 'Roboto-Light',
-                    fontSize: 12.5,
+                    fontSize: 15,
                     textAlign: 'left',
                     color: 'rgb(60,60,60)',
                 }}>

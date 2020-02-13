@@ -46,7 +46,7 @@ class DropdownInput extends PureComponent {
                         data={this.props.data}
                         value={this.props.value || ''}
                         fontSize={15}
-                        labelFontSize={12.5}
+                        labelFontSize={15}
                         selectedItemColor={'rgb(255,60,56)'}
                         onChangeText={this.handleOnChangeText}
                         dropdownMargins={{min: 4, max: 8}}
@@ -73,16 +73,16 @@ class DropdownInput extends PureComponent {
                     <Text style={{
                         fontFamily: 'Roboto-Regular',
                         fontSize: 15,
-                        lineHeight: 30,
                         textAlign: 'left',
                         color: 'rgb(0,0,0)',
-                        marginBottom: 7.5
+                        marginBottom: 2,
+                        marginTop: 7,
                     }}>
                         {getTranslation(this.props.label, this.props.translation)}
                     </Text>
                     <Text style={{
                         fontFamily: 'Roboto-Light',
-                        fontSize: 12.5,
+                        fontSize: 15,
                         textAlign: 'left',
                         color: 'rgb(60,60,60)',
                     }}>
