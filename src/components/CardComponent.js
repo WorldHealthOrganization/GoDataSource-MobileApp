@@ -160,7 +160,7 @@ class CardComponent extends PureComponent {
                             textAlign: 'left',
                             color: 'rgb(0,0,0)',
                             marginBottom: 2,
-                            marginTop: 2,
+                            marginTop: 7,
                         }}
                         isEditMode={this.props.item.isEditMode}
                         isRequired={this.props.item.isRequired}

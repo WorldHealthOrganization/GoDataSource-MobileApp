@@ -121,7 +121,7 @@ class DatePicker extends PureComponent {
                         textAlign: 'left',
                         color: 'rgb(0,0,0)',
                         marginBottom: 2,
-                        marginTop: 2,
+                        marginTop: 7,
                     }}>
                         {getTranslation(this.props.label, this.props.translation)}
                     </Text>
