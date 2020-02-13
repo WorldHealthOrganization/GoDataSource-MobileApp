@@ -5,6 +5,7 @@ const navigationDrawer = {
     casesLabel: 'LNG_NAVIGATION_DRAWER_CASES',
     syncHubManually: 'LNG_NAVIGATION_DRAWER_SYNC_HUB_MANUAL',
     changeHubConfig: 'LNG_NAVIGATION_DRAWER_CHANGE_HUB_CONFIG',
+    usersLabel: 'LNG_NAVIGATION_DRAWER_USERS',
     languagesLabel: 'LNG_NAVIGATION_DRAWER_LANGUAGES',
     logoutLabel: 'LNG_NAVIGATION_DRAWER_LOGOUT',
     helpLabel: 'LNG_LAYOUT_MENU_ITEM_HELP_LABEL',
@@ -240,6 +241,14 @@ const casesScreen = {
     addContactButtonLabel: 'LNG_CASE_LIST_SCREEN_ADD_CONTACT_BUTTON',
     noCases: 'LNG_CASE_LIST_SCREEN_NO_CASES',
     contactExposures: 'LNG_CASE_LIST_SCREEN_SEE_CONTACTS'
+};
+
+const usersScreen = {
+    usersTitle: 'LNG_USER_LIST_SCREEN_TITLE',
+    phoneButtonLabel: 'LNG_USER_LIST_SCREEN_PHONE_BUTTON',
+    noUsers: 'LNG_USER_LIST_SCREEN_NO_USERS',
+    primaryPhone: 'LNG_USER_FIELD_LABEL_PRIMARY_TELEPHONE',
+    institutionName: 'LNG_USER_FIELD_LABEL_INSTITUTION_NAME'
 };
 
 const contactsScreen = {
@@ -543,6 +552,7 @@ export default {
     casesFilter,
     caseSingleScreen,
     casesScreen,
+    usersScreen,
     contactsScreen,
     generalLabels,
     alertMessages,

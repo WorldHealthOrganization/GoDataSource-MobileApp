@@ -163,6 +163,7 @@ class FollowUpsScreen extends Component {
                         dataType={'FollowUp'}
                         colors={this.state.followUpsColors}
                         filterText={filterText}
+                        hasFilter={true}
                         style={[style.listViewStyle]}
                         componentContainerStyle={style.componentContainerStyle}
                         refreshing={this.state.refreshing}

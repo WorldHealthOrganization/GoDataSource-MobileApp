@@ -1,13 +1,11 @@
 import React, {Component} from 'react'
 import {Alert, BackHandler} from 'react-native';
-import PropTypes from 'prop-types'
 import get from 'lodash/get';
 import {createDate} from './../../utils/functions';
 import {getTranslation, navigation, extractMainAddress} from "../../utils/functions";
 import RNExitApp from "react-native-exit-app";
 import translations from "../../utils/translations";
 import constants from './../../utils/constants';
-import {getCaseAndExposuresById} from './../../actions/cases';
 
 // Here have access to redux props
 export function enhanceListWithGetData(methodForGettingData, screenType) {
@@ -33,7 +31,6 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                     limit: 15,
                     isAddFromNavigation: false
                 };
-
                 this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this));
             }
 
@@ -109,7 +106,7 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                             contactsFilter: get(this.state, 'mainFilter', null),
                             exposureFilter: get(this.state, 'searchText', null),
                             lastElement: get(this.state, 'lastElement', null),
-                            offset: get(this.state, 'data.length', 0)
+                            offset: get(this.state, 'offset', 0)
                         };
                         break;
                     case 'ContactsScreen':
@@ -122,6 +119,15 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                         };
                         break;
                     case 'CasesScreen':
+                        filter = {
+                            outbreakId: get(this.props, 'user.activeOutbreakId', null),
+                            casesFilter: get(this.state, 'mainFilter', null),
+                            searchText: get(this.state, 'searchText', null),
+                            lastElement: get(this.state, 'lastElement', null),
+                            offset: get(this.state, 'data.length', 0)
+                        };
+                        break;
+                    case 'UsersScreen':
                         filter = {
                             outbreakId: get(this.props, 'user.activeOutbreakId', null),
                             casesFilter: get(this.state, 'mainFilter', null),
@@ -165,7 +171,7 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                     }
                     if (doAction === true) {
                         let filters = this.prepareFilters();
-                        methodForGettingData(filters, isRefresh === true ? isRefresh : false)
+                        methodForGettingData(filters, isRefresh === true ? isRefresh : false, this.props)
                             .then((result) => {
                                 if (isRefresh === true) {
                                     this.props.setLoaderState(false);
@@ -177,7 +183,8 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                                         data: prevState.lastElement !== null ? prevState.data.concat(result.data) : result.data,
                                             lastElement: result.data.length === 10 ? screenType === 'FollowUpsScreen' ? Object.assign({}, get(result, 'data[9].mainData', null), {followUpId: get(result, 'data[9].followUpData._id', null)}) : get(result, 'data[9].mainData', null) : null,
                                         isAddFromNavigation: false,
-                                        dataCount: get(result, 'dataCount', prevState.dataCount)
+                                        dataCount: get(result, 'dataCount', prevState.dataCount),
+                                        offset: result.data.length
                                     }
                                 })
                             })
@@ -201,7 +208,8 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
 
             refresh = () => {
                 this.setState({
-                    lastElement: null
+                    lastElement: null,
+                    offset: 0
                 }, () => {
                     this.getData(true)
                 })
@@ -209,20 +217,23 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
 
             setSearchText = (text) => {
                 this.setState(prevState => ({
-                    searchText: text
+                    searchText: text,
+                    offset: 0
                 }), () => this.refresh())
             };
 
             // Here will be mostly status and date
             setFollowUpFilter = (key, value) => {
                 this.setState(prevState => ({
-                    followUpFilter: Object.assign({}, prevState.followUpFilter, {[key]: value})
+                    followUpFilter: Object.assign({}, prevState.followUpFilter, {[key]: value}),
+                    offset: 0
                 }), () => this.refresh())
             };
 
             setMainFilter = (filter) => {
                 this.setState(prevState => ({
-                    mainFilter: filter
+                    mainFilter: filter,
+                    offset: 0
                 }), () => this.refresh())
             };
 
@@ -252,9 +263,6 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                         forwardProps.item = dataToForward;
                         forwardProps.contact = contactData;
                         forwardProps.isEditMode = false;
-                        // forwardProps.elementId = dataToForward._id;
-                        // forwardProps.additionalId = contactData._id;
-                        // forwardProps.elementType = 'followUp';
                         forwardProps.previousScreen = 'FollowUps';
                         break;
                     case 'ContactsScreen':
@@ -449,7 +457,6 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                 navigation(event, this.props.navigator);
             };
         }
-
 
         WithListData.propTypes = {};
 

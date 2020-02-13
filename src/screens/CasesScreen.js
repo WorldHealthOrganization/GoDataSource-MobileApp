@@ -171,6 +171,7 @@ class CasesScreen extends Component {
                         dataType={'Case'}
                         colors={this.state.riskColors}
                         filterText={filterText}
+                        hasFilter={true}
                         style={[style.listViewStyle]}
                         componentContainerStyle={style.componentContainerStyle}
                         refreshing={this.state.refreshing}

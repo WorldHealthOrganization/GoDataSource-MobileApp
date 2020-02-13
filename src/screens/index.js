@@ -3,14 +3,12 @@
  */
 import { Navigation } from 'react-native-navigation';
 import constants from './../utils/constants';
-
 import LoginScreen from './LoginScreen';
 import FirstConfigScreen from './FirstConfigScreen';
 import ManualConfigScreen from './ManualConfigScreen';
 import NavigationDrawer from './NavigationDrawer';
 import FollowUpsScreen from './FollowUpsScreen';
 import AddFollowUpScreen from './AddFollowUpScreen';
-// import GenerateFollowUpScreen from './GenerateFollowUpScreen';
 import FilterScreen from './FilterScreen';
 import FollowUpsSingleScreen from './FollowUpsSingleScreen';
 import CasesScreen from './CasesScreen';
@@ -23,7 +21,7 @@ import HelpScreen from './HelpScreen';
 import HelpSingleScreen from './HelpSingleScreen';
 import QRScanScreen from './QRScanScreen';
 import HubConfigScreen from './HubConfigScreen';
-// import ViewEditScreen from './viewEditScreen/ViewEditScreen';
+import UsersScreen from './UsersScreen';
 
 const screens = [
     {screen: constants.appScreens.loginScreen, component: LoginScreen},
@@ -32,7 +30,6 @@ const screens = [
     {screen: constants.appScreens.navigationDrawer, component: NavigationDrawer},
     {screen: constants.appScreens.followUpScreen, component: FollowUpsScreen},
     {screen: constants.appScreens.addFollowUpScreen, component: AddFollowUpScreen},
-    // {screen: constants.appScreens.generateFollowUpsScreen, component: GenerateFollowUpScreen},
     {screen: constants.appScreens.filterScreen, component: FilterScreen},
     {screen: constants.appScreens.followUpSingleScreen, component: FollowUpsSingleScreen},
     {screen: constants.appScreens.casesScreen, component: CasesScreen},
@@ -45,7 +42,7 @@ const screens = [
     {screen: constants.appScreens.helpSingleScreen, component: HelpSingleScreen},
     {screen: constants.appScreens.qrScanScreen, component: QRScanScreen},
     {screen: constants.appScreens.hubConfigScreen, component: HubConfigScreen},
-    // {screen: constants.appScreens.viewEditScreen, component: ViewEditScreen},
+    {screen: constants.appScreens.usersScreen, component: UsersScreen},
 ];
 
 export function registerScreens(store, Provider) {
