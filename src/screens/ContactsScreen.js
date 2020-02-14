@@ -51,7 +51,7 @@ class ContactsScreen extends Component {
     // Please add here the react lifecycle methods that you need
     componentDidMount() {
         let riskColors = {};
-        let refData = this.props.referenceData.filter((e) => {return e.categoryId.includes("RISK_LEVEL")});
+        let refData = checkArrayAndLength(get(this.props, 'referenceData', null)) !== null ? this.props.referenceData.filter((e) => {return e.categoryId.includes("RISK_LEVEL")}) : [];
         for (let i=0; i<refData.length; i++) {
             riskColors[refData[i].value] = refData[i].colorCode || 'black'
         }

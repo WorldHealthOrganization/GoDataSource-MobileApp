@@ -37,13 +37,21 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
 
             componentDidMount() {
                 BackHandler.addEventListener('hardwareBackPress', this.handleBackButtonClick);
-                if (this.props.isAddFromNavigation && this.props.addScreen) {
-                    this.setState({
-                        isAddFromNavigation: true
-                    }, () => {
+                if (get(this.props, 'user.activeOutbreakId', null) !== null) {
+                    if (this.props.isAddFromNavigation && this.props.addScreen) {
+                        this.setState({
+                            isAddFromNavigation: true
+                        }, () => {
+                            this.getData(true);
+                        })
+                    } else {
                         this.getData(true);
-                    })
-                } else {
+                    }
+                }
+            }
+
+            componentDidUpdate(prevProps) {
+                if (get(prevProps, 'user.activeOutbreakId', null) !== get(this.props, 'user.activeOutbreakId', null)) {
                     this.getData(true);
                 }
             }

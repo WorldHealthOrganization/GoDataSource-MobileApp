@@ -19,7 +19,7 @@ import {storeHelpItem} from './helpItem';
 import {storeOutbreak, storeLocationsList, storeLocations, storeUserLocationsList, storeUserLocations} from './outbreak';
 import {storeUserTeams} from './teams';
 import {storeClusters} from './clusters';
-import {setLoginState, storeData, getAvailableLanguages, setSyncState, saveSelectedScreen} from './app';
+import {setLoginState, storeData, getAvailableLanguages, setSyncState, saveSelectedScreen, setLoaderState} from './app';
 import {storePermissions} from './role';
 import {getLocations, getUserLocations} from './locations';
 import get from 'lodash/get';
@@ -115,7 +115,7 @@ export function computeCommonData(storeUserBool, user, refreshFollowUps, filters
                 let promises = [];
 
                 let userTeams = await getUserTeams(user._id);
-                promises.push(getUserRoles(user.roleIds));
+                let userRoles = await getUserRoles(user.roleIds);
                 promises.push(getClusters());
                 promises.push(getAvailableLanguages(dispatch));
                 promises.push(getReferenceData());
@@ -125,7 +125,32 @@ export function computeCommonData(storeUserBool, user, refreshFollowUps, filters
                 promises.push(getHelpCategory());
                 promises.push(getHelpItem());
 
-                dispatch(changeAppRoot('after-login'));
+                // Compute startup screen
+                let selectedScreen = 0;
+                if (!checkArrayAndLength(
+                    lodashIntersection(userRoles, [
+                        constants.PERMISSIONS_FOLLOW_UP.followUpAll,
+                        constants.PERMISSIONS_FOLLOW_UP.followUpList
+                    ])
+                )) {
+                    if (checkArrayAndLength(
+                        lodashIntersection(userRoles, [
+                            constants.PERMISSIONS_CONTACT.contactAll,
+                            constants.PERMISSIONS_CONTACT.contactList
+                        ])
+                    )) {
+                        selectedScreen = 1;
+                    } else {
+                        selectedScreen = 2;
+                    }
+                }
+
+                dispatch(batchActions([
+                    saveSelectedScreen(selectedScreen),
+                    changeAppRoot('after-login'),
+                    setLoaderState(true),
+                    setLoginState('Finished logging'),
+                ]));
 
                 Promise.all(promises)
                     .then((dataArray) => {
@@ -134,16 +159,8 @@ export function computeCommonData(storeUserBool, user, refreshFollowUps, filters
                             return Object.assign({}, obj, {[key]: item[key]});
                         }, {});
 
-                        // TODO remove after testing
-                        // actionsObject.userRoles.push(constants.PERMISSIONS_CONTACT.contactAll);
-                        // actionsObject.userRoles.push(constants.PERMISSIONS_CASE.caseAll);
-                        // actionsObject.userRoles.push(constants.PERMISSIONS_FOLLOW_UP.followUpDelete);
-                        // actionsObject.userRoles.push(constants.PERMISSIONS_FOLLOW_UP.followUpView);
-                        // actionsObject.userRoles.push(constants.PERMISSIONS_FOLLOW_UP.followUpCreate);
-                        // actionsObject.userRoles.push(constants.PERMISSIONS_USER.userModifyOwnAccount);
-
                         // First check if the user has at least one of the required permissions to see data
-                        if (checkArrayAndLength(lodashIntersection(get(actionsObject, 'userRoles', []), [
+                        if (checkArrayAndLength(lodashIntersection(userRoles, [
                             constants.PERMISSIONS_FOLLOW_UP.followUpAll,
                             constants.PERMISSIONS_FOLLOW_UP.followUpList,
                             constants.PERMISSIONS_CONTACT.contactAll,
@@ -151,25 +168,6 @@ export function computeCommonData(storeUserBool, user, refreshFollowUps, filters
                             constants.PERMISSIONS_CASE.caseAll,
                             constants.PERMISSIONS_CASE.caseList
                         ]))) {
-                            let selectedScreen = 0;
-
-                            if (!checkArrayAndLength(
-                                lodashIntersection(get(actionsObject, 'userRoles', []), [
-                                    constants.PERMISSIONS_FOLLOW_UP.followUpAll,
-                                    constants.PERMISSIONS_FOLLOW_UP.followUpList
-                                ])
-                            )) {
-                                    if (checkArrayAndLength(
-                                        lodashIntersection(get(actionsObject, 'userRoles', []), [
-                                            constants.PERMISSIONS_FOLLOW_UP.followUpAll,
-                                            constants.PERMISSIONS_FOLLOW_UP.followUpList
-                                        ])
-                                    )) {
-                                        selectedScreen = 1;
-                                    } else {
-                                        selectedScreen = 2;
-                                    }
-                            }
 
                             let arrayOfActions = [
                                 storeUser(user),
@@ -182,7 +180,7 @@ export function computeCommonData(storeUserBool, user, refreshFollowUps, filters
                                 storeReferenceData(get(actionsObject,  'referenceData', null)),
                                 saveTranslation(get(actionsObject,  'translations', null)),
                                 storeClusters(get(actionsObject,  'clusters', null)),
-                                storePermissions(get(actionsObject,  'userRoles', null)),
+                                storePermissions(userRoles),
                                 // storePermissions([
                                 //     // 'contact_modify',
                                 //     'outbreak_view',
@@ -196,8 +194,8 @@ export function computeCommonData(storeUserBool, user, refreshFollowUps, filters
                                 storeUserTeams(userTeams),
                                 storeHelpCategory(get(actionsObject,  'helpCategory', null)),
                                 storeHelpItem(get(actionsObject,  'helpItem', null)),
-                                setLoginState('Finished logging'),
-                                saveSelectedScreen(selectedScreen),
+                                // setLoginState('Finished logging'),
+                                // saveSelectedScreen(selectedScreen),
                                 // changeAppRoot('after-login')
                             ];
 
