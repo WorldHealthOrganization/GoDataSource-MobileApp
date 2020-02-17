@@ -2104,7 +2104,8 @@ function mapStateToProps(state) {
         selectedScreen: state.app.selectedScreen,
         errors: state.errors,
         caseInvestigationQuestions: state.outbreak.caseInvestigationTemplate,
-        translation: state.app.translation
+        translation: state.app.translation,
+        role: state.role
     };
 }
 function matchDispatchProps(dispatch) {

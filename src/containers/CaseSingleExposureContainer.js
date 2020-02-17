@@ -164,7 +164,7 @@ class ContactsSingleExposures extends Component {
                     () => {this.props.onPressEditExposure(relation.item, relation.index)}
                     // () => {this.props.onPressDeleteExposure(relation.item, relation.index)}
                 ]}
-                arrayPermisssions={[
+                arrayPermissions={[
                     [constants.PERMISSIONS_RELATIONSHIP.relationshipAll, constants.PERMISSIONS_RELATIONSHIP.relationshipModify]
                 ]}
                 containerStyle={{flex: 1, height: '100%', marginHorizontal: calculateDimension(16, false, this.props.screenSize)}}

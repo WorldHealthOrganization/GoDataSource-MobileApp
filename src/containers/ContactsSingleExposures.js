@@ -114,7 +114,13 @@ class ContactsSingleExposures extends Component {
                                     <View style={{height: 30}}/>
                                 </ScrollView>
                             )}
-                            permissionsList={[constants.PERMISSIONS_RELATIONSHIP.relationshipAll, constants.PERMISSIONS_RELATIONSHIP.relationshipView]}
+                            permissionsList={[
+                                constants.PERMISSIONS_RELATIONSHIP.relationshipAll,
+                                constants.PERMISSIONS_RELATIONSHIP.relationshipView,
+                                constants.PERMISSIONS_RELATIONSHIP.relationshipList,
+                                constants.PERMISSIONS_CONTACT.contactListRelationshipExposures,
+                                constants.PERMISSIONS_CONTACT.contactListRelationshipContacts
+                            ]}
                         />
                     ) : (
                         <ExposureContainer
@@ -181,8 +187,11 @@ class ContactsSingleExposures extends Component {
                     () => {this.props.onPressEditExposure(relation.item, relation.index)}
                     // () => {this.props.onPressDeleteExposure(relation.item, relation.index)}
                     ]}
-                arrayPermisssions={[
-                    [constants.PERMISSIONS_RELATIONSHIP.relationshipAll, constants.PERMISSIONS_RELATIONSHIP.relationshipModify]
+                arrayPermissions={[
+                    [
+                        constants.PERMISSIONS_RELATIONSHIP.relationshipAll,
+                        constants.PERMISSIONS_RELATIONSHIP.relationshipModify
+                    ]
                 ]}
                 containerStyle={{flex: 1, height: '100%', marginHorizontal: calculateDimension(16, false, this.props.screenSize)}}
                 translation={this.props.translation}
