@@ -19,6 +19,8 @@ import _ from 'lodash';
 import lodashGet from "lodash/get";
 import {checkArray, checkArrayAndLength} from "../utils/typeCheckingFunctions";
 import TopContainerButtons from "./../components/TopContainerButtons";
+import PermissionComponent from './../components/PermissionComponent';
+import constants from "./../utils/constants";
 
 class ContactsSinglePersonal extends PureComponent {
 
@@ -59,16 +61,26 @@ class ContactsSinglePersonal extends PureComponent {
         return (
             <View style={{ flex: 1 }}>
                 <View style={style.viewContainer}>
-                    <TopContainerButtons
-                        isNew={this.props.isNew}
-                        isEditMode={this.props.isEditMode}
-                        index={this.props.activeIndex}
-                        numberOfTabs={this.props.numberOfTabs}
-                        onPressEdit={this.props.onPressEdit}
-                        onPressSaveEdit={this.props.onPressSaveEdit}
-                        onPressCancelEdit={this.props.onPressCancelEdit}
-                        onPressNextButton={this.props.onPressNextButton}
+                    <PermissionComponent
+                        render={() => (
+                            <TopContainerButtons
+                                isNew={this.props.isNew}
+                                isEditMode={this.props.isEditMode}
+                                index={this.props.activeIndex}
+                                numberOfTabs={this.props.numberOfTabs}
+                                onPressEdit={this.props.onPressEdit}
+                                onPressSaveEdit={this.props.onPressSaveEdit}
+                                onPressCancelEdit={this.props.onPressCancelEdit}
+                                onPressNextButton={this.props.onPressNextButton}
+                            />
+                        )}
+                        permissionsList={[
+                            constants.PERMISSIONS_CONTACT.contactAll,
+                            constants.PERMISSIONS_CONTACT.contactCreate,
+                            constants.PERMISSIONS_CONTACT.contactModify
+                        ]}
                     />
+
                     <ScrollView
                         style={style.containerScrollView}
                         contentContainerStyle={[style.contentContainerStyle, { paddingBottom: this.props.screenSize.height < 600 ? 70 : 20 }]}

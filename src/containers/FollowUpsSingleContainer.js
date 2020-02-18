@@ -5,15 +5,14 @@
 // the material ui library, since it provides design and animations out of the box
 import React, { Component } from 'react';
 import { View, StyleSheet, ScrollView } from 'react-native';
-import { calculateDimension, getTranslation } from '../utils/functions';
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import styles from '../styles';
-import Button from '../components/Button';
-import translations from '../utils/translations'
+import constants from './../utils/constants';
 import FollowUpsSingleAddressContainer from './FollowUpsSingleAddressContainer'
 import FollowUpsSingleGetInfoContainer from './FollowUpsSingleGetInfoContainer'
 import TopContainerButtons from './../components/TopContainerButtons';
+import PermissionComponent from './../components/PermissionComponent';
 
 class FollowUpsSingleContainer extends Component {
 
@@ -40,28 +39,27 @@ class FollowUpsSingleContainer extends Component {
         // console.log('FollowUpsSingleContainer render Details');
         return (
             <View style={style.container}>
-                {/*<Button*/}
-                    {/*title={getTranslation(translations.generalButtons.nextButtonLabel, this.props.translation)}*/}
-                    {/*onPress={this.props.onNext}*/}
-                    {/*color={styles.buttonGreen}*/}
-                    {/*titleColor={'white'}*/}
-                    {/*height={calculateDimension(25, true, this.props.screenSize)}*/}
-                    {/*width={calculateDimension(166, false, this.props.screenSize)}*/}
-                    {/*style={{*/}
-                        {/*marginVertical: calculateDimension(12.5, true, this.props.screenSize)*/}
-                    {/*}}*/}
-                {/*/>*/}
-                <TopContainerButtons
-                    isNew={this.props.isNew}
-                    isEditMode={this.props.isEditMode}
-                    index={this.props.activeIndex}
-                    numberOfTabs={this.props.numberOfTabs}
-                    onPressEdit={this.props.onPressEdit}
-                    onPressSaveEdit={this.props.onPressSaveEdit}
-                    onPressCancelEdit={this.props.onPressCancelEdit}
-                    onPressNextButton={this.props.onPressNextButton}
-                    onPressPreviousButton={this.props.onPressPreviousButton}
+                <PermissionComponent
+                    render={() => (
+                        <TopContainerButtons
+                            isNew={this.props.isNew}
+                            isEditMode={this.props.isEditMode}
+                            index={this.props.activeIndex}
+                            numberOfTabs={this.props.numberOfTabs}
+                            onPressEdit={this.props.onPressEdit}
+                            onPressSaveEdit={this.props.onPressSaveEdit}
+                            onPressCancelEdit={this.props.onPressCancelEdit}
+                            onPressNextButton={this.props.onPressNextButton}
+                            onPressPreviousButton={this.props.onPressPreviousButton}
+                        />
+                    )}
+                    permissionsList={[
+                        constants.PERMISSIONS_FOLLOW_UP.followUpAll,
+                        constants.PERMISSIONS_FOLLOW_UP.followUpCreate,
+                        constants.PERMISSIONS_FOLLOW_UP.followUpsModify
+                    ]}
                 />
+
                 <ScrollView
                     style={style.containerScrollView}
                     contentContainerStyle={[style.contentContainerStyle, { paddingBottom: this.props.screenSize.height < 600 ? 70 : 20 }]}

@@ -11,20 +11,20 @@ import {
     Alert,
     ScrollView
 } from 'react-native';
-import { calculateDimension, extractAllQuestions, getTranslation, checkRequiredQuestions, createDate } from './../utils/functions';
-import config from './../utils/config';
+import { extractAllQuestions, getTranslation, checkRequiredQuestions, createDate } from './../utils/functions';
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import styles from './../styles';
 import QuestionCard from './../components/QuestionCard';
-import Button from './../components/Button';
 import { LoaderScreen } from 'react-native-ui-lib';
 import { sortBy } from 'lodash';
-import translations from './../utils/translations'
+import translations from './../utils/translations';
+import constants from './../utils/constants';
 import cloneDeep from "lodash/cloneDeep";
 import uniqueId from "lodash/uniqueId";
 import _ from "lodash";
 import TopContainerButtons from './../components/TopContainerButtons';
+import PermissionComponent from './../components/PermissionComponent';
 
 class FollowUpsSingleQuestionnaireContainer extends Component {
 
@@ -88,30 +88,26 @@ class FollowUpsSingleQuestionnaireContainer extends Component {
         return (
             <View style={{ flex: 1 }}>
                 <View style={style.mainContainer}>
-                    <TopContainerButtons
-                        isNew={this.props.isNew}
-                        isEditMode={this.props.isEditMode}
-                        index={this.props.activeIndex}
-                        numberOfTabs={this.props.numberOfTabs}
-                        onPressEdit={this.props.onPressEdit}
-                        onPressSaveEdit={this.props.onPressSaveEdit}
-                        onPressCancelEdit={this.props.onPressCancelEdit}
-                        onPressNextButton={this.props.handleNextButton}
-                        onPressPreviousButton={this.props.onPressPreviousButton}
+                    <PermissionComponent
+                        render={() => (
+                            <TopContainerButtons
+                                isNew={this.props.isNew}
+                                isEditMode={this.props.isEditMode}
+                                index={this.props.activeIndex}
+                                numberOfTabs={this.props.numberOfTabs}
+                                onPressEdit={this.props.onPressEdit}
+                                onPressSaveEdit={this.props.onPressSaveEdit}
+                                onPressCancelEdit={this.props.onPressCancelEdit}
+                                onPressNextButton={this.props.handleNextButton}
+                                onPressPreviousButton={this.props.onPressPreviousButton}
+                            />
+                        )}
+                        permissionsList={[
+                            constants.PERMISSIONS_FOLLOW_UP.followUpAll,
+                            constants.PERMISSIONS_FOLLOW_UP.followUpCreate,
+                            constants.PERMISSIONS_FOLLOW_UP.followUpsModify
+                        ]}
                     />
-                    {/*{*/}
-                        {/*this && this.props && this.props.isEditMode ? (*/}
-                            {/*<View style={[style.containerButtons, { marginVertical: marginVertical, width: viewWidth }]}>*/}
-                                {/*<Button*/}
-                                    {/*title={getTranslation(translations.generalButtons.saveButtonLabel, this.props.translation)}*/}
-                                    {/*onPress={() => {this.onPressSave(questions)}}*/}
-                                    {/*color={styles.buttonGreen}*/}
-                                    {/*titleColor={'white'}*/}
-                                    {/*height={buttonHeight}*/}
-                                    {/*width={buttonWidth}*/}
-                                {/*/>*/}
-                            {/*</View>) : (null)*/}
-                    {/*}*/}
                     <ScrollView
                         style={style.containerScrollView}
                         contentContainerStyle={[style.contentContainerStyle, { paddingBottom: this.props.screenSize.height < 600 ? 70 : 20 }]}

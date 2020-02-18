@@ -1,11 +1,14 @@
 /**
  * Created by florinpopa on 23/08/2018.
  */
-// Since this app is based around the material ui is better to use the components from
-// the material ui library, since it provides design and animations out of the box
+/**
+ * Created by florinpopa on 03/08/2018.
+ */
 import React, {Component} from 'react';
 import {StyleSheet, InteractionManager} from 'react-native';
 import PropTypes from 'prop-types';
+// Since this app is based around the material ui is better to use the components from
+// the material ui library, since it provides design and animations out of the box
 import styles from './../styles';
 import {getTranslation, calculateDimension} from './../utils/functions';
 import {connect} from "react-redux";
@@ -14,8 +17,10 @@ import {getAddress, handleExposedTo} from "../utils/functions";
 import config from "../utils/config";
 import PersonListItemNameAndAddressComponent from './PersonListItemNameAndAddressComponent';
 import PersonListItemExposuresComponent from './PersonListItemExposuresComponent';
+import PermissionComponent from './PermissionComponent';
 import isEqual from 'lodash/isEqual';
 import get from 'lodash/get';
+import constants from './../utils/constants';
 import translations from "../utils/translations";
 
 class PersonListItem extends Component {
@@ -53,15 +58,25 @@ class PersonListItem extends Component {
                     />
                 }
                 secondComponent={this.props.type !== 'Case' && this.props.type !== 'User' ? (
-                    <PersonListItemExposuresComponent
-                        data={secondComponentData}
-                        onPressExposureProp={this.props.onPressExposureProp}
+                    <PermissionComponent
+                        render={() => (
+                            <PersonListItemExposuresComponent
+                                data={secondComponentData}
+                                onPressExposureProp={this.props.onPressExposureProp}
+                            />
+                        )}
+                        permissionsList={[
+                            constants.PERMISSIONS_CONTACT.contactAll,
+                            constants.PERMISSIONS_CONTACT.contactListRelationshipContacts,
+                            constants.PERMISSIONS_CONTACT.contactListRelationshipExposures
+                        ]}
                     />) : (null)
                 }
                 hasActionsBar={true}
                 textsArray={this.props.textsArray}
                 textsStyleArray={this.props.textsStyleArray}
                 onPressArray={this.props.onPressTextsArray}
+                arrayPermissions={this.props.arrayPermissions}
             />
         )
     }

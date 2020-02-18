@@ -12,24 +12,22 @@ import {
     Alert,
     ScrollView,
     TouchableWithoutFeedback,
-    Keyboard,
-    findNodeHandle
+    Keyboard
 } from 'react-native';
 import { LoaderScreen } from 'react-native-ui-lib';
 import { calculateDimension, getTranslation, extractIdFromPouchId, createDate } from './../utils/functions';
 import config from './../utils/config';
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
-import Button from './../components/Button';
 import styles from './../styles';
+import constants from './../utils/constants';
 import Ripple from 'react-native-material-ripple';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import CardComponent from './../components/CardComponent';
 import translations from './../utils/translations'
 import ElevatedView from 'react-native-elevated-view';
 import _ from 'lodash';
-import moment from 'moment';
 import TopContainerButtons from "./../components/TopContainerButtons";
+import PermissionComponent from './../components/PermissionComponent';
 
 class ContactsSingleAddress extends PureComponent {
 
@@ -75,52 +73,26 @@ class ContactsSingleAddress extends PureComponent {
                 Keyboard.dismiss()
             }} accessible={false}>
                 <View style={style.viewContainer}>
-                    {/*<View style={{ flexDirection: 'row' }}>*/}
-                        {/*<Button*/}
-                            {/*title={getTranslation(translations.generalButtons.backButtonLabel, this.props.translation)}*/}
-                            {/*onPress={this.handleBackButton}*/}
-                            {/*color={styles.buttonGreen}*/}
-                            {/*titleColor={'white'}*/}
-                            {/*height={calculateDimension(25, true, this.props.screenSize)}*/}
-                            {/*width={calculateDimension(130, false, this.props.screenSize)}*/}
-                            {/*style={{*/}
-                                {/*marginVertical: calculateDimension(12.5, true, this.props.screenSize),*/}
-                                {/*marginHorizontal: calculateDimension(16, false, this.props.screenSize),*/}
-                            {/*}} />*/}
-                        {/*<Button*/}
-                            {/*title={getTranslation(translations.generalButtons.nextButtonLabel, this.props.translation)}*/}
-                            {/*onPress={this.handleNextButton}*/}
-                            {/*color={styles.buttonGreen}*/}
-                            {/*titleColor={'white'}*/}
-                            {/*height={calculateDimension(25, true, this.props.screenSize)}*/}
-                            {/*width={calculateDimension(130, false, this.props.screenSize)}*/}
-                            {/*style={{*/}
-                                {/*marginVertical: calculateDimension(12.5, true, this.props.screenSize),*/}
-                                {/*marginHorizontal: calculateDimension(16, false, this.props.screenSize),*/}
-                            {/*}} />*/}
-                    {/*</View>*/}
-
-                    <TopContainerButtons
-                        isNew={this.props.isNew}
-                        isEditMode={this.props.isEditMode}
-                        index={this.props.activeIndex}
-                        numberOfTabs={this.props.numberOfTabs}
-                        onPressEdit={this.props.onPressEdit}
-                        onPressSaveEdit={this.props.onPressSaveEdit}
-                        onPressCancelEdit={this.props.onPressCancelEdit}
-                        onPressNextButton={this.props.onPressNextButton}
-                        onPressPreviousButton={this.handleBackButton}
+                    <PermissionComponent
+                        render={() => (
+                            <TopContainerButtons
+                                isNew={this.props.isNew}
+                                isEditMode={this.props.isEditMode}
+                                index={this.props.activeIndex}
+                                numberOfTabs={this.props.numberOfTabs}
+                                onPressEdit={this.props.onPressEdit}
+                                onPressSaveEdit={this.props.onPressSaveEdit}
+                                onPressCancelEdit={this.props.onPressCancelEdit}
+                                onPressNextButton={this.props.onPressNextButton}
+                                onPressPreviousButton={this.handleBackButton}
+                            />
+                        )}
+                        permissionsList={[
+                            constants.PERMISSIONS_CONTACT.contactAll,
+                            constants.PERMISSIONS_CONTACT.contactCreate,
+                            constants.PERMISSIONS_CONTACT.contactModify
+                        ]}
                     />
-
-                    {/* <KeyboardAwareScrollView
-                        style={style.containerScrollView}
-                        contentContainerStyle={[style.contentContainerStyle, { paddingBottom: this.props.screenSize.height < 600 ? 70 : 20 }]}
-                        keyboardShouldPersistTaps={'always'}
-                        extraHeight={20 + 81 + 50 + 70}
-                        innerRef={ref => {
-                            this.scrollContactsSingleAddress = ref
-                        }}
-                    > */}
                     <ScrollView
                         style={style.containerScrollView}
                         contentContainerStyle={[style.contentContainerStyle, { paddingBottom: this.props.screenSize.height < 600 ? 70 : 20 }]}

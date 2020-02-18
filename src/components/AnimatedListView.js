@@ -15,6 +15,7 @@ import PersonListItem from "./PersonListItem";
 import PropTypes from 'prop-types';
 import SearchFilterView from "./SearchFilterView";
 import config from "../utils/config";
+import constants from "../utils/constants";
 import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
 
 const AnimatedFlatList = Animated.createAnimatedComponent(FlatList);
@@ -137,6 +138,7 @@ class AnimatedListView extends Component {
         let textsArray = [];
         let textsStyleArray = [];
         let onPressTextsArray = [];
+        let arrayPermissions = [];
         let id = null;
         let mainData = null;
         let exposureData = null;
@@ -162,6 +164,10 @@ class AnimatedListView extends Component {
                         this.props.onPressAddExposure(mainData);
                         // this.handleOnPressExposure(item, this.props.contacts.find((e) => {return extractIdFromPouchId(e._id, 'person') === item.personId}))
                     }];
+                arrayPermissions = [
+                    [constants.PERMISSIONS_FOLLOW_UP.followUpAll, constants.PERMISSIONS_FOLLOW_UP.followUpView],
+                    [constants.PERMISSIONS_RELATIONSHIP.relationshipAll, constants.PERMISSIONS_RELATIONSHIP.relationshipCreate],
+                ];
                 id = get(followUpData, 'id', null);
                 break;
             case 'Contact':
@@ -186,6 +192,11 @@ class AnimatedListView extends Component {
                     () => {
                         this.props.onPressAddExposure(mainData);
                     }];
+                arrayPermissions = [
+                    [constants.PERMISSIONS_CONTACT.contactAll, constants.PERMISSIONS_CONTACT.contactView],
+                    [constants.PERMISSIONS_CONTACT.contactAll, constants.PERMISSIONS_CONTACT.contactModify],
+                    [constants.PERMISSIONS_RELATIONSHIP.relationshipAll, constants.PERMISSIONS_RELATIONSHIP.relationshipCreate],
+                ];
                 titleColor = this.props.colors[mainData.riskLevel];
                 break;
             case 'Case':
@@ -210,6 +221,22 @@ class AnimatedListView extends Component {
                     () => {
                         this.props.onPressAddExposure(mainData);
                     }];
+                arrayPermissions = [
+                    [
+                        constants.PERMISSIONS_CASE.caseAll,
+                        constants.PERMISSIONS_CASE.caseView
+                    ],
+                    [
+                        constants.PERMISSIONS_RELATIONSHIP.relationshipAll,
+                        constants.PERMISSIONS_RELATIONSHIP.relationshipList,
+                        constants.PERMISSIONS_CASE.caseAll,
+                        constants.PERMISSIONS_CASE.caseListRelationshipContacts
+                    ],
+                    [
+                        constants.PERMISSIONS_CONTACT.contactAll,
+                        constants.PERMISSIONS_CONTACT.contactCreate
+                    ],
+                ];
                 titleColor = this.props.colors[mainData.classification];
                 break;
             case 'User':
@@ -252,6 +279,7 @@ class AnimatedListView extends Component {
                 textsArray={textsArray}
                 textsStyleArray={textsStyleArray}
                 onPressTextsArray={onPressTextsArray}
+                arrayPermissions={arrayPermissions}
                 titleColor={titleColor}
             />
         )

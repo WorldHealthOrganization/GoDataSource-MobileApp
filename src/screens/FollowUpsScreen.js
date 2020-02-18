@@ -31,6 +31,10 @@ import {enhanceListWithGetData} from './../components/higherOrderComponents/with
 import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
 import {bindActionCreators} from "redux";
 import { setLoaderState } from './../actions/app';
+import PermissionComponent from './../components/PermissionComponent';
+import constants from "../utils/constants";
+import {handleQRSearchTransition} from "../utils/screenTransitionFunctions";
+
 class FollowUpsScreen extends Component {
 
     constructor(props) {
@@ -61,7 +65,7 @@ class FollowUpsScreen extends Component {
 
     componentDidMount = () => {
         let followUpsColors = {};
-        let refData = this.props.referenceData.filter((e) => {return e.categoryId === "LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE"});
+        let refData = checkArrayAndLength(this.props.referenceData) ? this.props.referenceData.filter((e) => {return e.categoryId === "LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE"}) : {};
         for (let i=0; i<refData.length; i++) {
             followUpsColors[refData[i].value] = refData[i].colorCode || styles.buttonGreen
         }
@@ -117,7 +121,7 @@ class FollowUpsScreen extends Component {
                                 </Ripple>
                             </View>
 
-                            <View style={{ flex: 0.135 /*, marginRight: 10*/ }}>
+                            <View style={{flex: 0.135 /*, marginRight: 10*/}}>
                                 <ElevatedView
                                     elevation={3}
                                     style={{
@@ -132,7 +136,7 @@ class FollowUpsScreen extends Component {
                                         justifyContent: 'center',
                                         alignItems: 'center'
                                     }} onPress={this.goToHelpScreen}>
-                                        <Icon name="help" color={'white'} size={15} />
+                                        <Icon name="help" color={'white'} size={15}/>
                                     </Ripple>
                                 </ElevatedView>
                             </View>
@@ -157,27 +161,32 @@ class FollowUpsScreen extends Component {
                     />
                 </NavBarCustom>
                 <View style={style.containerContent}>
-                    <AnimatedListView
-                        data={this.props.data || []}
-                        dataCount={get(this.props, 'dataCount', 0)}
-                        dataType={'FollowUp'}
-                        colors={this.state.followUpsColors}
-                        filterText={filterText}
-                        hasFilter={true}
-                        style={[style.listViewStyle]}
-                        componentContainerStyle={style.componentContainerStyle}
-                        refreshing={this.state.refreshing}
-                        onRefresh={this.handleOnRefresh}
-                        onSearch={this.props.setSearchText}
-                        onPressFilter={this.props.onPressFilter}
-                        onPressView={this.props.onPressView}
-                        onPressCenterButton={this.props.onPressCenterButton}
-                        onPressAddExposure={this.props.onPressAddExposure}
-                        onPressMap={this.handleOnPressMap}
-                        onPressName={this.props.onPressFullName}
-                        onPressExposure={this.props.onPressExposure}
-                        screen={translations.followUpsScreen.followUpsTitle}
-                        onEndReached={this.props.onEndReached}
+                    <PermissionComponent
+                        render={() => (
+                            <AnimatedListView
+                                data={this.props.data || []}
+                                dataCount={get(this.props, 'dataCount', 0)}
+                                dataType={'FollowUp'}
+                                colors={this.state.followUpsColors}
+                                filterText={filterText}
+                                style={[style.listViewStyle]}
+                                componentContainerStyle={style.componentContainerStyle}
+                                refreshing={this.state.refreshing}
+                                onRefresh={this.handleOnRefresh}
+                                onSearch={this.props.setSearchText}
+                                onPressFilter={this.props.onPressFilter}
+                                onPressView={this.props.onPressView}
+                                onPressCenterButton={this.props.onPressCenterButton}
+                                onPressAddExposure={this.props.onPressAddExposure}
+                                onPressMap={this.handleOnPressMap}
+                                onPressName={this.props.onPressFullName}
+                                onPressExposure={this.props.onPressExposure}
+                                screen={translations.followUpsScreen.followUpsTitle}
+                                onEndReached={this.props.onEndReached}
+                                hasFilter={true}
+                            />
+                        )}
+                        permissionsList={['follow_up_all', 'follow_up_list']}
                     />
                 </View>
                 <View style={styles.mapContainer}>
@@ -288,66 +297,7 @@ class FollowUpsScreen extends Component {
                 this.setState({
                     loading: false
                 }, () => {
-                    if (error) {
-                        if (error === translations.alertMessages.noItemAlert && itemType === 'case' && record) {
-                            Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props && this.props.translation ? this.props.translation : null), `${getTranslation(error, this.props && this.props.translation ? this.props.translation : null)}.\n${getTranslation(translations.alertMessages.addMissingPerson, this.props && this.props.translation ? this.props.translation : null)}`, [
-                                {
-                                    text: getTranslation(translations.alertMessages.cancelButtonLabel, this.props && this.props.translation ? this.props.translation : null),
-                                    onPress: () => {
-                                        console.log('Cancel pressed');
-                                    }
-                                },
-                                {
-                                    text: getTranslation(translations.alertMessages.yesButtonLabel, this.props && this.props.translation ? this.props.translation : null),
-                                    onPress: () => {
-                                        console.log('Yes pressed');
-                                        this.props.navigator.push({
-                                            screen: 'CaseSingleScreen',
-                                            animated: true,
-                                            animationType: 'fade',
-                                            passProps: {
-                                                case: Object.assign({}, record, {
-                                                    outbreakId: this.props.user.activeOutbreakId,
-                                                }, config.caseBlueprint),
-                                                forceNew: true
-                                            }
-                                        })
-                                    }
-                                },
-                            ])
-                        } else {
-                            Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props && this.props.translation ? this.props.translation : null), getTranslation(error, this.props && this.props.translation ? this.props.translation : null), [
-                                {
-                                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props && this.props.translation ? this.props.translation : null),
-                                    onPress: () => {
-                                        console.log('Ok pressed');
-                                    }
-                                }
-                            ])
-                        }
-                    } else {
-                        if (itemType && record) {
-                            if (itemType === 'case') {
-                                this.props.navigator.push({
-                                    screen: 'CaseSingleScreen',
-                                    animated: true,
-                                    animationType: 'fade',
-                                    passProps: {
-                                        case: record
-                                    }
-                                })
-                            } else if (itemType === 'contact') {
-                                this.props.navigator.push({
-                                    screen: 'ContactsSingleScreen',
-                                    animated: true,
-                                    animationType: 'fade',
-                                    passProps: {
-                                        contact: record
-                                    }
-                                })
-                            }
-                        }
-                    }
+                    handleQRSearchTransition(this.props.navigator, error, itemType, record, get(this.props, 'user', null), get(this.props, 'translation', null));
                 });
             })
         });
@@ -407,7 +357,8 @@ mapStateToProps = (state) => {
         user: get(state, 'user', {}),
         screenSize: get(state, 'app.screenSize', config.designScreenSize),
         translation: get(state, 'app.translation', []),
-        referenceData: get(state, 'referenceData', [])
+        referenceData: get(state, 'referenceData', []),
+        role: get(state, 'role', [])
     };
 };
 

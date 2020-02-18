@@ -16,6 +16,8 @@ import { registerScreens } from './screens';
 import config from './utils/config';
 import {resetInternetCredentials} from 'react-native-keychain';
 import {checkDeviceStatus} from "./requests/deviceStatus";
+import isNumber from 'lodash/isNumber';
+import constants from './utils/constants';
 
 console.disableYellowBox = true;
 
@@ -113,25 +115,25 @@ export default class App {
     };
 
     onStoreUpdate = () => {
-        const { root } = store.getState().app;
+        const { root, selectedScreen } = store.getState().app;
         const oldRoot = this.currentRoot;
         if (this.currentRoot !== root) {
             this.currentRoot = root;
             if (Platform.OS === 'ios') {
-                this.startApp(root, oldRoot);
+                this.startApp(root, oldRoot, selectedScreen);
             } else {
                 Navigation.isAppLaunched()
                     .then((appLaunched) => {
                         if (appLaunched) {
-                            this.startApp(root, oldRoot);
+                            this.startApp(root, oldRoot, selectedScreen);
                         }
-                        new NativeEventsReceiver().appLaunched(this.startApp(root, oldRoot));
+                        new NativeEventsReceiver().appLaunched(this.startApp(root, oldRoot, selectedScreen));
                     })
             }
         }
     };
 
-    startApp = (root, oldRoot) => {
+    startApp = (root, oldRoot, selectedScreens) => {
         if (!oldRoot) {
             if (Platform.OS === 'ios') {
                 ParseNativeModule = NativeModules.APNSEventEmitter
@@ -141,9 +143,24 @@ export default class App {
             console.log('~~~ Calling native module ready to start init parse ~~~');
             ParseNativeModule.initParse()
         }
+
+        let screen = constants.appScreens.followUpScreen;
+        if (isNumber(selectedScreens) && selectedScreens <= 3) {
+            switch (selectedScreens) {
+                case 1:
+                    screen = constants.appScreens.contactsScreen;
+                    break;
+                case 2:
+                    screen = constants.appScreens.casesScreen;
+                    break;
+                default:
+                    screen = constants.appScreens.followUpScreen;
+                    break;
+            }
+        }
+
         switch (root) {
             case 'config':
-                console.log("### config startApp");
                 Navigation.startSingleScreenApp({
                     screen: {
                         screen: 'FirstConfigScreen'
@@ -154,7 +171,6 @@ export default class App {
                 });
                 break;
             case 'login':
-                console.log("### login startApp");
                 Navigation.startSingleScreenApp({
                     screen: {
                         screen: 'LoginScreen'
@@ -167,7 +183,7 @@ export default class App {
             case 'after-login':
                 Navigation.startSingleScreenApp({
                     screen: {
-                        screen: 'FollowUpsScreen'
+                        screen: screen
                     },
                     appStyle: {
                         orientation: 'portrait'

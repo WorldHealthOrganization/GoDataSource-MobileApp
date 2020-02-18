@@ -12,8 +12,6 @@ import {executeQuery, insertOrUpdate} from "../queries/sqlTools/helperMethods";
 import translations from "../utils/translations";
 import sqlConstants from "../queries/sqlTools/constants";
 import {insertOrUpdateExposure} from './exposure';
-var jsonSql = require('json-sql')();
-jsonSql.setDialect('sqlite');
 
 // Add here only the actions, not also the requests that are executed. For that purpose is the requests directory
 export function getContactsForOutbreakId({outbreakId, contactsFilter, exposureFilter, lastElement, offset}, computeCount) {
@@ -104,17 +102,34 @@ export function addContact(contact, periodOfFollowUp, userId) {
         // }
         set(exposure, `persons[${exposurePersons.findIndex((e) => e.type === translations.personTypes.contacts)}].id`, get(contact, '_id', null));
     }
-    delete contact.relationships;
+    if (contact.followUps) {
+        delete contact.followUps;
+    }
+    if (contact.relationships) {
+        delete contact.relationships;
+    }
     return Promise.resolve()
         .then(() => insertOrUpdate('common', 'person', [contact], false))
         .then(() => addExposureForContact(exposure, contact, periodOfFollowUp, userId))
 }
 
 export function updateContactRequest(contact) {
+    if (contact.followUps) {
+        delete contact.followUps;
+    }
+    if (contact.relationships) {
+        delete contact.relationships;
+    }
     return insertOrUpdate('common', 'person', [contact], true);
 }
 
 export function updateContact(contact) {
+    if (contact.followUps) {
+        delete contact.followUps;
+    }
+    if (contact.relationships) {
+        delete contact.relationships;
+    }
     return insertOrUpdate('common', 'person', [contact], true);
 }
 

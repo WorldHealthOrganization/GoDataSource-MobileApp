@@ -19,12 +19,13 @@ import {storeHelpItem} from './helpItem';
 import {storeOutbreak, storeLocationsList, storeLocations, storeUserLocationsList, storeUserLocations} from './outbreak';
 import {storeUserTeams} from './teams';
 import {storeClusters} from './clusters';
-import {setLoginState, storeData, getAvailableLanguages, setSyncState} from './app';
+import {setLoginState, storeData, getAvailableLanguages, setSyncState, saveSelectedScreen, setLoaderState} from './app';
 import {storePermissions} from './role';
 import {getLocations, getUserLocations} from './locations';
 import get from 'lodash/get';
-import {filterByUser} from './../utils/functions'
-import translations from "../utils/translations";
+import lodashIntersection from 'lodash/intersection';
+import {filterByUser} from './../utils/functions';
+import constants from './../utils/constants';
 import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
 
 // Add here only the actions, not also the requests that are executed.
@@ -114,7 +115,7 @@ export function computeCommonData(storeUserBool, user, refreshFollowUps, filters
                 let promises = [];
 
                 let userTeams = await getUserTeams(user._id);
-                promises.push(getUserRoles(user.roleIds));
+                let userRoles = await getUserRoles(user.roleIds);
                 promises.push(getClusters());
                 promises.push(getAvailableLanguages(dispatch));
                 promises.push(getReferenceData());
@@ -124,49 +125,107 @@ export function computeCommonData(storeUserBool, user, refreshFollowUps, filters
                 promises.push(getHelpCategory());
                 promises.push(getHelpItem());
 
+                // Compute startup screen
+                let selectedScreen = 0;
+                if (!checkArrayAndLength(
+                    lodashIntersection(userRoles, [
+                        constants.PERMISSIONS_FOLLOW_UP.followUpAll,
+                        constants.PERMISSIONS_FOLLOW_UP.followUpList
+                    ])
+                )) {
+                    if (checkArrayAndLength(
+                        lodashIntersection(userRoles, [
+                            constants.PERMISSIONS_CONTACT.contactAll,
+                            constants.PERMISSIONS_CONTACT.contactList
+                        ])
+                    )) {
+                        selectedScreen = 1;
+                    } else {
+                        selectedScreen = 2;
+                    }
+                }
+
+                dispatch(batchActions([
+                    saveSelectedScreen(selectedScreen),
+                    changeAppRoot('after-login'),
+                    setLoaderState(true),
+                    setLoginState('Finished logging'),
+                ]));
+
                 Promise.all(promises)
                     .then((dataArray) => {
                         let actionsObject = dataArray.reduce((obj, item) => {
                             let key = Object.keys(item)[0];
                             return Object.assign({}, obj, {[key]: item[key]});
                         }, {});
-                        let arrayOfActions = [
-                            storeUser(user),
-                            storeOutbreak(outbreakAndLocationInfo || null),
-                            storeLocationsList(get(actionsObject, 'locations.locationsList', null)),
-                            storeLocations(get(actionsObject, 'locations.treeLocationsList', null)),
-                            storeUserLocationsList(get(actionsObject, 'userLocations.userLocationsList', null)),
-                            storeUserLocations(filterByUser(get(actionsObject, 'userLocations.userTreeLocationsList', null), userTeams)),
-                            saveAvailableLanguages(get(actionsObject,  'availableLanguages', null)),
-                            storeReferenceData(get(actionsObject,  'referenceData', null)),
-                            saveTranslation(get(actionsObject,  'translations', null)),
-                            storeClusters(get(actionsObject,  'clusters', null)),
-                            storePermissions(get(actionsObject,  'userRoles', null)),
-                            storeUserTeams(userTeams),
-                            storeHelpCategory(get(actionsObject,  'helpCategory', null)),
-                            storeHelpItem(get(actionsObject,  'helpItem', null)),
-                            setLoginState('Finished logging'),
-                            changeAppRoot('after-login')
-                        ];
 
-                        if(refreshFollowUps) {
-                            arrayOfActions.push(setSyncState({id: 'tests', status:'Success'}));
-                        }
+                        // First check if the user has at least one of the required permissions to see data
+                        if (checkArrayAndLength(lodashIntersection(userRoles, [
+                            constants.PERMISSIONS_FOLLOW_UP.followUpAll,
+                            constants.PERMISSIONS_FOLLOW_UP.followUpList,
+                            constants.PERMISSIONS_CONTACT.contactAll,
+                            constants.PERMISSIONS_CONTACT.contactList,
+                            constants.PERMISSIONS_CASE.caseAll,
+                            constants.PERMISSIONS_CASE.caseList
+                        ]))) {
 
-                        if (storeUserBool) {
-                            storeData('loggedUser', user._id, (error, success) => {
-                                if (error) {
-                                    dispatch(batchActions([
-                                        setLoginState('Error'),
-                                        addError({type: 'Login error', message: "Error while saving logged user"})
-                                    ]))
-                                }
-                                if (success) {
-                                    dispatch(batchActions(arrayOfActions));
-                                }
-                            })
+                            let arrayOfActions = [
+                                storeUser(user),
+                                storeOutbreak(outbreakAndLocationInfo || null),
+                                storeLocationsList(get(actionsObject, 'locations.locationsList', null)),
+                                storeLocations(get(actionsObject, 'locations.treeLocationsList', null)),
+                                storeUserLocationsList(get(actionsObject, 'userLocations.userLocationsList', null)),
+                                storeUserLocations(filterByUser(get(actionsObject, 'userLocations.userTreeLocationsList', null), userTeams)),
+                                saveAvailableLanguages(get(actionsObject,  'availableLanguages', null)),
+                                storeReferenceData(get(actionsObject,  'referenceData', null)),
+                                saveTranslation(get(actionsObject,  'translations', null)),
+                                storeClusters(get(actionsObject,  'clusters', null)),
+                                storePermissions(userRoles),
+                                // storePermissions([
+                                //     // 'contact_modify',
+                                //     'outbreak_view',
+                                //     // 'follow_up_list',
+                                //     'contact_list',
+                                //     'contact_view',
+                                //     'case_list',
+                                //     'case_view',
+                                //     'help_list_category_item'
+                                // ]),
+                                storeUserTeams(userTeams),
+                                storeHelpCategory(get(actionsObject,  'helpCategory', null)),
+                                storeHelpItem(get(actionsObject,  'helpItem', null)),
+                                // setLoginState('Finished logging'),
+                                // saveSelectedScreen(selectedScreen),
+                                // changeAppRoot('after-login')
+                            ];
+
+                            if(refreshFollowUps) {
+                                arrayOfActions.push(setSyncState({id: 'tests', status:'Success'}));
+                            }
+
+                            if (storeUserBool) {
+                                storeData('loggedUser', user._id, (error, success) => {
+                                    if (error) {
+                                        dispatch(batchActions([
+                                            setLoginState('Error'),
+                                            addError({type: 'Login error', message: "Error while saving logged user"})
+                                        ]))
+                                    }
+                                    if (success) {
+                                        dispatch(batchActions(arrayOfActions));
+                                    }
+                                })
+                            } else {
+                                dispatch(batchActions(arrayOfActions));
+                            }
                         } else {
-                            dispatch(batchActions(arrayOfActions));
+                            // This means the user hasn't any of the permissions to view at least one type of data so
+                            // the login should not occur
+                            dispatch(batchActions([
+                                cleanDataAfterLogout(),
+                                setLoginState('Error'),
+                                addError({type: 'Permissions error', message: `You don't have permissions to see the any of the data types. Please speak to the system administrator to see if there is an issue to your permissions`})
+                            ]))
                         }
                     })
                     .catch((errorProcessInitialData) => {

@@ -25,7 +25,7 @@ export function getUserRoles(userRoleIds) {
                     })
                 });
                 permissions = _.uniq(permissions);
-                resolve({userRoles: permissions});
+                resolve(permissions);
             }
         })
     })

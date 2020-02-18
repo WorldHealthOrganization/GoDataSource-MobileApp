@@ -7,8 +7,7 @@ import translations from "../utils/translations";
 import sqlConstants from "../queries/sqlTools/constants";
 import get from 'lodash/get';
 import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
-let jsonSql = require('json-sql')();
-jsonSql.setDialect('sqlite');
+import {insertOrUpdateExposure} from "./exposure";
 
 // Add here only the actions, not also the requests that are executed. For that purpose is the requests directory
 export function getCasesForOutbreakId({outbreakId, casesFilter, searchText, lastElement, offset}, computeCount) {

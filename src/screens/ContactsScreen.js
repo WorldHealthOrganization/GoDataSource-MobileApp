@@ -24,8 +24,11 @@ import {pushNewEditScreen} from './../utils/screenTransitionFunctions';
 import {enhanceListWithGetData} from './../components/higherOrderComponents/withListData';
 import get from "lodash/get";
 import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
+import {handleQRSearchTransition} from "../utils/screenTransitionFunctions";
 import {bindActionCreators} from "redux";
 import {setLoaderState} from "../actions/app";
+import PermissionComponent from './../components/PermissionComponent';
+import constants from "../utils/constants";
 
 class ContactsScreen extends Component {
 
@@ -48,7 +51,7 @@ class ContactsScreen extends Component {
     // Please add here the react lifecycle methods that you need
     componentDidMount() {
         let riskColors = {};
-        let refData = this.props.referenceData.filter((e) => {return e.categoryId.includes("RISK_LEVEL")});
+        let refData = checkArrayAndLength(get(this.props, 'referenceData', null)) !== null ? this.props.referenceData.filter((e) => {return e.categoryId.includes("RISK_LEVEL")}) : [];
         for (let i=0; i<refData.length; i++) {
             riskColors[refData[i].value] = refData[i].colorCode || 'black'
         }
@@ -133,8 +136,9 @@ class ContactsScreen extends Component {
                                     }} onPress={this.goToHelpScreen}>
                                         <Icon name="help" color={'white'} size={15}/>
                                     </Ripple>
-                                </ElevatedView> 
+                                </ElevatedView>
                             </View>
+
                         </View>
                     }
                     navigator={this.props.navigator}
@@ -143,27 +147,32 @@ class ContactsScreen extends Component {
                 >
                 </NavBarCustom>
                 <View style={style.containerContent}>
-                    <AnimatedListView
-                        data={this.props.data || []}
-                        dataCount={this.props.dataCount || 0}
-                        colors={this.state.riskColors}
-                        dataType={'Contact'}
-                        filterText={filterText}
-                        hasFilter={true}
-                        style={[style.listViewStyle]}
-                        componentContainerStyle={style.componentContainerStyle}
-                        refreshing={this.state.refreshing}
-                        onRefresh={this.handleOnRefresh}
-                        onSearch={this.props.setSearchText}
-                        onPressFilter={this.props.onPressFilter}
-                        onPressView={this.props.onPressView}
-                        onPressCenterButton={this.props.onPressCenterButton}
-                        onPressAddExposure={this.props.onPressAddExposure}
-                        onPressMap={this.handleOnPressMap}
-                        onPressName={this.props.onPressFullName}
-                        onPressExposure={this.props.onPressExposure}
-                        screen={translations.contactSingleScreen.title}
-                        onEndReached={this.props.onEndReached}
+                    <PermissionComponent
+                        render={() => (
+                            <AnimatedListView
+                                data={this.props.data || []}
+                                dataCount={this.props.dataCount || 0}
+                                colors={this.state.riskColors}
+                                dataType={'Contact'}
+                                filterText={filterText}
+                                style={[style.listViewStyle]}
+                                componentContainerStyle={style.componentContainerStyle}
+                                refreshing={this.state.refreshing}
+                                onRefresh={this.handleOnRefresh}
+                                onSearch={this.props.setSearchText}
+                                onPressFilter={this.props.onPressFilter}
+                                onPressView={this.props.onPressView}
+                                onPressCenterButton={this.props.onPressCenterButton}
+                                onPressAddExposure={this.props.onPressAddExposure}
+                                onPressMap={this.handleOnPressMap}
+                                onPressName={this.props.onPressFullName}
+                                onPressExposure={this.props.onPressExposure}
+                                screen={translations.contactSingleScreen.title}
+                                onEndReached={this.props.onEndReached}
+                                hasFilter={true}
+                            />
+                        )}
+                        permissionsList={['contact_all', 'case_list']}
                     />
                 </View>
 
@@ -252,74 +261,17 @@ class ContactsScreen extends Component {
         this.setState({
             loading: true
         }, () => {
-            pushNewEditScreen(QRCodeInfo, this.props.navigator, this.props && this.props.user ? this.props.user : null, this.props && this.props.translation ? this.props.translation : null, (error, itemType, record) => {
+            pushNewEditScreen(QRCodeInfo, this.props.navigator, get(this.props, 'user', null), get(this.props, 'translation', null), (error, itemType, record) => {
                 this.setState({
                     loading: false
                 }, () => {
-                    if (error) {
-                        if (error === translations.alertMessages.noItemAlert && itemType === 'case' && record) {
-                            Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props && this.props.translation ? this.props.translation : null), `${getTranslation(error, this.props && this.props.translation ? this.props.translation : null)}.\n${getTranslation(translations.alertMessages.addMissingPerson, this.props && this.props.translation ? this.props.translation : null)}`, [
-                                {
-                                    text: getTranslation(translations.alertMessages.cancelButtonLabel, this.props && this.props.translation ? this.props.translation : null),
-                                    onPress: () => {
-                                        console.log('Cancel pressed');
-                                    }
-                                },
-                                {
-                                    text: getTranslation(translations.alertMessages.yesButtonLabel, this.props && this.props.translation ? this.props.translation : null),
-                                    onPress: () => {
-                                        console.log('Yes pressed');
-                                        this.props.navigator.push({
-                                            screen: 'CaseSingleScreen',
-                                            animated: true,
-                                            animationType: 'fade',
-                                            passProps: {
-                                                case: Object.assign({}, record, {
-                                                    outbreakId: this.props.user.activeOutbreakId,
-                                                }, config.caseBlueprint),
-                                                forceNew: true
-                                            }
-                                        })
-                                    }
-                                },
-                            ])
-                        } else {
-                            Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props && this.props.translation ? this.props.translation : null), getTranslation(error, this.props && this.props.translation ? this.props.translation : null), [
-                                {
-                                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props && this.props.translation ? this.props.translation : null),
-                                    onPress: () => {
-                                        console.log('Ok pressed');
-                                    }
-                                }
-                            ])
-                        }
-                    } else {
-                        if (itemType && record) {
-                            if (itemType === 'case') {
-                                this.props.navigator.push({
-                                    screen: 'CaseSingleScreen',
-                                    animated: true,
-                                    animationType: 'fade',
-                                    passProps: {
-                                        case: record
-                                    }
-                                })
-                            } else if (itemType === 'contact') {
-                                this.props.navigator.push({
-                                    screen: 'ContactsSingleScreen',
-                                    animated: true,
-                                    animationType: 'fade',
-                                    passProps: {
-                                        contact: record
-                                    }
-                                })
-                            }
-                        }
-                    }
+                    handleQRSearchTransition(this.props.navigator, error, itemType, record, get(this.props, 'user', null), get(this.props, 'translation', null));
                 });
             })
         });
     };
+
+
 }
 
 // Create style outside the class, or for components that will be used by other components (buttons),
@@ -361,7 +313,8 @@ function mapStateToProps(state) {
         syncState:      state.app.syncState,
         translation:    state.app.translation,
         loaderState:    state.app.loaderState,
-        referenceData:  state.referenceData
+        referenceData:  state.referenceData,
+        role:           get(state, 'role', [])
     };
 }
 

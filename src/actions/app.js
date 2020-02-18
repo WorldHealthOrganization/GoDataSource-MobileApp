@@ -4,6 +4,7 @@
 import {
     ACTION_TYPE_ROOT_CHANGE,
     ACTION_TYPE_SAVE_SCREEN_SIZE,
+    ACTION_TYPE_SAVE_SELECTED_SCREEN,
     ACTION_TYPE_ADD_FILTER_FOR_SCREEN,
     ACTION_TYPE_REMOVE_FILTER_FOR_SCREEN,
     ACTION_TYPE_SAVE_TRANSLATION,
@@ -50,6 +51,13 @@ export function saveScreenSize(screenSize) {
     return {
         type: ACTION_TYPE_SAVE_SCREEN_SIZE,
         screenSize: screenSize
+    };
+}
+
+export function saveSelectedScreen(selectedScreen) {
+    return {
+        type: ACTION_TYPE_SAVE_SELECTED_SCREEN,
+        selectedScreen: selectedScreen
     };
 }
 
@@ -563,6 +571,7 @@ export function appInitialized(nativeEventEmitter) {
         let screenSize = {width, height};
 
         dispatch(saveScreenSize(screenSize));
+        // dispatch(saveSelectedScreen(0));
 
         try {
             let loggedUser = await AsyncStorage.getItem('loggedUser');

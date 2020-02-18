@@ -18,6 +18,8 @@ import {calculateDimension, navigation, getTranslation, localSortHelpItem, filte
 import ViewHOC from './../components/ViewHOC';
 import translations from './../utils/translations'
 import RNExitApp from 'react-native-exit-app';
+import constants from "../utils/constants";
+import PermissionComponent from './../components/PermissionComponent';
 let AnimatedListView = Animated.createAnimatedComponent(FlatList);
 
 const scrollAnim = new Animated.Value(0);
@@ -204,33 +206,41 @@ class HelpScreen extends Component {
                     )
                 }
                 <View style={style.containerContent}>
-                    <AnimatedListView
-                        stickyHeaderIndices={[0]}
-                        data={helpItemClone || []}
-                        renderItem={this.renderHelp}
-                        keyExtractor={this.keyExtractor}
-                        ListHeaderComponent={
-                            <SearchFilterView
-                                style={{
-                                    transform: [{
-                                        translateY: navbarTranslate
-                                    }],
-                                    opacity: navbarOpacity
-                                }}
-                                value={this.state.filter.searchText}
-                                onPress={this.handlePressFilter}
-                                onChangeText={this.handleOnChangeText}
-                                onSubmitEditing={this.handleOnSubmitEditing}
-                                filterText={filterText}
-                            />}
-                        ItemSeparatorComponent={this.renderSeparatorComponent}
-                        ListEmptyComponent={this.listEmptyComponent}
-                        style={[style.listViewStyle]}
-                        componentContainerStyle={style.componentContainerStyle}
-                        onScroll={this.handleScroll}
-                        refreshing={this.state.refreshing}
-                        onRefresh={this.handleOnRefresh}
-                        getItemLayout={this.getItemLayout}
+                    <PermissionComponent
+                        render={() => (
+                            <AnimatedListView
+                                stickyHeaderIndices={[0]}
+                                data={helpItemClone || []}
+                                renderItem={this.renderHelp}
+                                keyExtractor={this.keyExtractor}
+                                ListHeaderComponent={
+                                    <SearchFilterView
+                                        style={{
+                                            transform: [{
+                                                translateY: navbarTranslate
+                                            }],
+                                            opacity: navbarOpacity
+                                        }}
+                                        value={this.state.filter.searchText}
+                                        onPress={this.handlePressFilter}
+                                        onChangeText={this.handleOnChangeText}
+                                        onSubmitEditing={this.handleOnSubmitEditing}
+                                        filterText={filterText}
+                                    />}
+                                ItemSeparatorComponent={this.renderSeparatorComponent}
+                                ListEmptyComponent={this.listEmptyComponent}
+                                style={[style.listViewStyle]}
+                                componentContainerStyle={style.componentContainerStyle}
+                                onScroll={this.handleScroll}
+                                refreshing={this.state.refreshing}
+                                onRefresh={this.handleOnRefresh}
+                                getItemLayout={this.getItemLayout}
+                            />
+                        )}
+                        permissionsList={[
+                            constants.PERMISSIONS_HELP.helpAll,
+                            constants.PERMISSIONS_HELP.helpListCategoryItem
+                        ]}
                     />
                 </View>
             </ViewHOC>

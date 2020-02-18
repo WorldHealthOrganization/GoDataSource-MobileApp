@@ -8,7 +8,7 @@ import config from './../utils/config';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import {logoutUser} from './../actions/user';
-import {sendDatabaseToServer, getTranslationsAsync, changeAppRoot} from './../actions/app';
+import {sendDatabaseToServer, getTranslationsAsync, changeAppRoot, saveSelectedScreen} from './../actions/app';
 import styles from './../styles';
 import {ListItem, Icon} from 'react-native-material-ui';
 import DropdownInput from './../components/DropdownInput';
@@ -16,6 +16,10 @@ import {updateUser} from './../actions/user';
 import {updateRequiredFields, getTranslation} from './../utils/functions';
 import translations from './../utils/translations';
 import VersionNumber from 'react-native-version-number';
+import PermissionComponent from './../components/PermissionComponent';
+import constants from "../utils/constants";
+import lodashGet from 'lodash/get';
+import isNumber from 'lodash/isNumber';
 
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
@@ -25,7 +29,7 @@ class NavigationDrawer extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            selectedScreen: 0
+            selectedScreen: this.props.selectedScreen
         };
         // Bind here methods, or at least don't declare methods in the render method
         this.handlePressOnListItem = this.handlePressOnListItem.bind(this);
@@ -33,7 +37,14 @@ class NavigationDrawer extends Component {
     }
 
     // Please add here the react lifecycle methods that you need
-
+    componentDidUpdate(prevProps) {
+        let thisPropsSelectedScreen = lodashGet(this.props, 'selectedScreen', 0);
+        if (isNumber(thisPropsSelectedScreen) && thisPropsSelectedScreen >= 0 && prevProps.selectedScreen !== this.props.selectedScreen) {
+            this.setState({
+                selectedScreen: this.props.selectedScreen
+            })
+        }
+    }
     // The render method should have at least business logic as possible,
     // because this will be called whenever there is a new setState call
     // and can slow down the app
@@ -74,26 +85,27 @@ class NavigationDrawer extends Component {
                     {
                         config.sideMenuItems.map((item, index) => {
                             let addButton = false;
-                            if (this.props && this.props.role) {
-                                if (item.addButton && item.addButton === true) {
-                                    let findPermission = undefined;
-                                    if (item.key === 'followups') {
-                                        findPermission = this.props.role.find((e) => e === config.userPermissions.writeFollowUp)
-                                    } else if (item.key === 'contacts') {
-                                        findPermission = this.props.role.find((e) => e === config.userPermissions.writeContact)
-                                    } else if (item.key === 'cases') {
-                                        findPermission = this.props.role.find((e) => e === config.userPermissions.writeCase)
-                                    }
-                                    if (findPermission !== undefined) {
-                                        addButton = true
-                                    }
-                                }
-                            }
+                            // let findPermission = undefined;
+                            // if (this.props && this.props.role) {
+                            //     if (item.addButton && item.addButton === true) {
+                            //         if (item.key === 'followups') {
+                            //             findPermission = ['follow_up_all', 'follow_up_list'];
+                            //         } else if (item.key === 'contacts') {
+                            //             findPermission = ['contact_all', 'contact_list'];
+                            //         } else if (item.key === 'cases') {
+                            //             findPermission = ['case_all', 'case_list'];
+                            //         }
+                            //         if (findPermission !== undefined) {
+                            //             addButton = true
+                            //         }
+                                // }
+                            // }
 
                             return (
                                 <NavigationDrawerListItem
                                     key={index}
-                                    label={getTranslation(item.label, this.props.translation)} 
+                                    itemKey={item.key}
+                                    label={getTranslation(item.label, this.props.translation)}
                                     name={item.name}
                                     onPress={() => this.handlePressOnListItem(index)}
                                     handleOnPressAdd={() => this.handleOnPressAdd(item.key, index)}
@@ -108,17 +120,25 @@ class NavigationDrawer extends Component {
                     <NavigationDrawerListItem label={getTranslation(translations.navigationDrawer.changeHubConfig, this.props.translation)} name={'settings'} onPress={this.handleOnPressChangeHubConfig} />
                     <View style={styles.lineStyle} />
                     <View style={{justifyContent: 'center', alignItems: 'center'}}>
-                        <DropdownInput
-                            id="test"
-                            label={getTranslation(translations.navigationDrawer.languagesLabel, this.props.translation)}
-                            value={this.props.availableLanguages && this.props.user && this.props.user.languageId && this.props.availableLanguages[this.props.availableLanguages.map((e) => {return e.value}).indexOf(this.props.user.languageId)] ? this.props.availableLanguages[this.props.availableLanguages.map((e) => {return e.value}).indexOf(this.props.user.languageId)].label : null}
-                            data={this.props.availableLanguages}
-                            isEditMode={true}
-                            isRequired={false}
-                            onChange={this.handleOnChangeLanguage}
-                            style={{width: '90%'}}
-                            translation={this.props.translation}
-                            screenSize={this.props.screenSize}
+                        <PermissionComponent
+                            render={() => (
+                                <DropdownInput
+                                    id="test"
+                                    label={getTranslation(translations.navigationDrawer.languagesLabel, this.props.translation)}
+                                    value={this.props.availableLanguages && this.props.user && this.props.user.languageId && this.props.availableLanguages[this.props.availableLanguages.map((e) => {return e.value}).indexOf(this.props.user.languageId)] ? this.props.availableLanguages[this.props.availableLanguages.map((e) => {return e.value}).indexOf(this.props.user.languageId)].label : null}
+                                    data={this.props.availableLanguages}
+                                    isEditMode={true}
+                                    isRequired={false}
+                                    onChange={this.handleOnChangeLanguage}
+                                    style={{width: '90%'}}
+                                    translation={this.props.translation}
+                                    screenSize={this.props.screenSize}
+                                />
+                            )}
+                            permissionsList={[
+                                constants.PERMISSIONS_USER.userAll,
+                                constants.PERMISSIONS_USER.userModifyOwnAccount
+                            ]}
                         />
                     </View>
                     <NavigationDrawerListItem
@@ -128,8 +148,16 @@ class NavigationDrawer extends Component {
                         onPress={() => this.handlePressOnListItem(3)}
                         isSelected={3 === this.state.selectedScreen}
                         addButton={false}
+                        itemKey={'users'}
                     />
-                    <NavigationDrawerListItem key={'help'} label={getTranslation(translations.navigationDrawer.helpLabel, this.props.translation)} name="help" onPress={() => this.handlePressOnListItem('help')} isSelected={'help' === this.state.selectedScreen}/>
+
+                    <NavigationDrawerListItem
+                        key={'help'}
+                        label={getTranslation(translations.navigationDrawer.helpLabel, this.props.translation)}
+                        name="help"
+                        onPress={() => this.handlePressOnListItem('help')}
+                        isSelected={'help' === this.state.selectedScreen}
+                    />
                     <NavigationDrawerListItem label={getTranslation(translations.navigationDrawer.logoutLabel, this.props.translation)} name="power-settings-new" onPress={this.handleLogout} />
                     <Text
                         style={{
@@ -149,6 +177,7 @@ class NavigationDrawer extends Component {
 
     // Please write here all the methods that are not react native lifecycle methods
     handlePressOnListItem = (index) => {
+        this.props.saveSelectedScreen(index);
         this.setState({
             selectedScreen: index
             }, () => {
@@ -166,6 +195,7 @@ class NavigationDrawer extends Component {
 
     handleOnPressAdd = (key, index) => {
         console.log('handleOnPressAdd', key, index);
+        this.props.saveSelectedScreen(index);
         this.setState({
             selectedScreen: index
         }, () => {
@@ -199,19 +229,6 @@ class NavigationDrawer extends Component {
             animated: true,
             to: 'missing'
         });
-
-        // let arrayOfTexts = [{text: 'Get Data', status: 'OK'}, {text: 'Be cool', status: 'Ceva'}];
-        //
-        // let text = '';
-        // for (let i=0; i<arrayOfTexts.length; i++) {
-        //     text += arrayOfTexts[i].text + '\n' + 'Status: ' + arrayOfTexts[i].status + '\n';
-        // }
-        // Alert.alert("Alert", text, [
-        //     {
-        //         text: 'Ok', onPress: () => {console.log('Ok pressed')}
-        //     }
-        // ])
-
         this.props.sendDatabaseToServer();
     };
 
@@ -226,7 +243,7 @@ class NavigationDrawer extends Component {
             animated: true
         })
     };
-    
+
     handleOnChangeLanguage = (value, label) => {
         let user = Object.assign({}, this.props.user);
         user.languageId = value;
@@ -263,6 +280,7 @@ function mapStateToProps(state) {
         user: state.user,
         role: state.role,
         screenSize: state.app.screenSize,
+        selectedScreen: state.app.selectedScreen,
         availableLanguages: state.app.availableLanguages,
         outbreak: state.outbreak,
         translation: state.app.translation
@@ -275,7 +293,8 @@ function matchDispatchProps(dispatch) {
         sendDatabaseToServer,
         updateUser,
         getTranslationsAsync,
-        changeAppRoot
+        changeAppRoot,
+        saveSelectedScreen
     }, dispatch);
 }
 

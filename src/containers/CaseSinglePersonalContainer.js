@@ -22,6 +22,8 @@ import ElevatedView from 'react-native-elevated-view';
 import translations from './../utils/translations'
 import _ from 'lodash';
 import TopContainerButtons from "../components/TopContainerButtons";
+import PermissionComponent from './../components/PermissionComponent';
+import constants from "./../utils/constants";
 
 class CaseSinglePersonalContainer extends Component {
 
@@ -47,17 +49,25 @@ class CaseSinglePersonalContainer extends Component {
         return (
             <View style={{ flex: 1 }}>
                 <View style={style.container}>
-                    <TopContainerButtons
-                        isNew={this.props.isNew}
-                        isEditMode={this.props.isEditMode}
-                        index={this.props.index}
-                        numberOfTabs={this.props.numberOfTabs}
-                        onPressEdit={this.props.onPressEdit}
-                        onPressSaveEdit={this.props.onPressSaveEdit}
-                        onPressCancelEdit={this.props.onPressCancelEdit}
-                        onPressNextButton={this.handleNextButton}
+                    <PermissionComponent
+                        render={() => (
+                            <TopContainerButtons
+                                isNew={this.props.isNew}
+                                isEditMode={this.props.isEditMode}
+                                index={this.props.index}
+                                numberOfTabs={this.props.numberOfTabs}
+                                onPressEdit={this.props.onPressEdit}
+                                onPressSaveEdit={this.props.onPressSaveEdit}
+                                onPressCancelEdit={this.props.onPressCancelEdit}
+                                onPressNextButton={this.handleNextButton}
+                            />
+                        )}
+                        permissionsList={[
+                            constants.PERMISSIONS_CASE.caseAll,
+                            constants.PERMISSIONS_CASE.caseCreate,
+                            constants.PERMISSIONS_CASE.caseModify
+                        ]}
                     />
-
                     <ScrollView
                         style={style.containerScrollView}
                         contentContainerStyle={[style.contentContainerStyle, { paddingBottom: this.props.screenSize.height < 600 ? 70 : 20 }]}

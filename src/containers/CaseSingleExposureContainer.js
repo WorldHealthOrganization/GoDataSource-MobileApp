@@ -10,8 +10,7 @@ import React, {Component} from 'react';
 import {Animated, StyleSheet, InteractionManager, ScrollView, View, Text, FlatList} from 'react-native';
 import {calculateDimension} from './../utils/functions';
 import {connect} from "react-redux";
-import Button from './../components/Button';
-import {extractIdFromPouchId, getTranslation, computeFullName} from './../utils/functions';
+import {getTranslation, computeFullName} from './../utils/functions';
 import {bindActionCreators} from "redux";
 import styles from './../styles';
 import ElevatedView from 'react-native-elevated-view';
@@ -21,8 +20,9 @@ import Ripple from 'react-native-material-ripple';
 import moment from 'moment';
 import translations from './../utils/translations';
 import get from 'lodash/get';
-import config from "../utils/config";
 import TopContainerButtons from "../components/TopContainerButtons";
+import PermissionComponent from './../components/PermissionComponent';
+import constants from "./../utils/constants";
 
 const AnimatedFlatList = Animated.createAnimatedComponent(FlatList);
 
@@ -65,85 +65,43 @@ class ContactsSingleExposures extends Component {
 
         return (
             <ElevatedView elevation={3} style={[style.container]}>
-                <TopContainerButtons
-                    isNew={this.props.isNew}
-                    isEditMode={this.props.isEditMode}
-                    index={this.props.index}
-                    numberOfTabs={this.props.numberOfTabs}
-                    onPressEdit={this.props.onPressEdit}
-                    onPressSaveEdit={this.props.onPressSaveEdit}
-                    onPressCancelEdit={this.props.onPressCancelEdit}
-                    onPressNextButton={this.handleNextButton}
-                    onPressPreviousButton={this.handleBackButton}
+                <PermissionComponent
+                    render={() => (
+                        <TopContainerButtons
+                            isNew={this.props.isNew}
+                            isEditMode={this.props.isEditMode}
+                            index={this.props.index}
+                            numberOfTabs={this.props.numberOfTabs}
+                            onPressEdit={this.props.onPressEdit}
+                            onPressSaveEdit={this.props.onPressSaveEdit}
+                            onPressCancelEdit={this.props.onPressCancelEdit}
+                            onPressNextButton={this.handleNextButton}
+                            onPressPreviousButton={this.handleBackButton}
+                        />
+                    )}
+                    permissionsList={[
+                        constants.PERMISSIONS_CASE.caseAll,
+                        constants.PERMISSIONS_CASE.caseCreate,
+                        constants.PERMISSIONS_CASE.caseModify
+                    ]}
                 />
-                {/*<View style={{ flexDirection: 'row', justifyContent: 'center' }}>*/}
-                    {/*{*/}
-                        {/*this.props.isNew ? (*/}
-                            {/*<View style={{ flexDirection: 'row' }}>*/}
-                                {/*<Button*/}
-                                    {/*title={getTranslation(translations.generalButtons.backButtonLabel, this.props.translation)}*/}
-                                    {/*onPress={this.handleBackButton}*/}
-                                    {/*color={styles.buttonGreen}*/}
-                                    {/*titleColor={'white'}*/}
-                                    {/*height={calculateDimension(25, true, this.props.screenSize)}*/}
-                                    {/*width={calculateDimension(130, false, this.props.screenSize)}*/}
-                                    {/*style={{*/}
-                                        {/*marginVertical: calculateDimension(12.5, true, this.props.screenSize),*/}
-                                        {/*marginHorizontal: calculateDimension(16, false, this.props.screenSize),*/}
-                                    {/*}} />*/}
-                                {/*<Button*/}
-                                    {/*title={getTranslation(translations.generalButtons.nextButtonLabel, this.props.translation)}*/}
-                                    {/*onPress={this.handleNextButton}*/}
-                                    {/*color={styles.buttonGreen}*/}
-                                    {/*titleColor={'white'}*/}
-                                    {/*height={calculateDimension(25, true, this.props.screenSize)}*/}
-                                    {/*width={calculateDimension(130, false, this.props.screenSize)}*/}
-                                    {/*style={{*/}
-                                        {/*marginVertical: calculateDimension(12.5, true, this.props.screenSize),*/}
-                                        {/*marginHorizontal: calculateDimension(16, false, this.props.screenSize),*/}
-                                    {/*}} />*/}
-                            {/*</View>) : (*/}
-                            {/*this.props.isEditMode ? (*/}
-                                {/*<View style={{ flexDirection: 'row' }}>*/}
-                                    {/*<Button*/}
-                                        {/*title={getTranslation(translations.generalButtons.saveButtonLabel, this.props.translation)}*/}
-                                        {/*onPress={this.props.onPressSaveEdit}*/}
-                                        {/*color={styles.buttonGreen}*/}
-                                        {/*titleColor={'white'}*/}
-                                        {/*height={calculateDimension(25, true, this.props.screenSize)}*/}
-                                        {/*width={calculateDimension(166, false, this.props.screenSize)}*/}
-                                        {/*style={{*/}
-                                            {/*marginVertical: calculateDimension(12.5, true, this.props.screenSize),*/}
-                                            {/*marginRight: 10,*/}
-                                        {/*}} />*/}
-                                    {/*<Button*/}
-                                        {/*title={getTranslation(translations.generalButtons.cancelButtonLabel, this.props.translation)}*/}
-                                        {/*onPress={this.props.onPressCancelEdit}*/}
-                                        {/*color={styles.buttonGreen}*/}
-                                        {/*titleColor={'white'}*/}
-                                        {/*height={calculateDimension(25, true, this.props.screenSize)}*/}
-                                        {/*width={calculateDimension(166, false, this.props.screenSize)}*/}
-                                        {/*style={{*/}
-                                            {/*marginVertical: calculateDimension(12.5, true, this.props.screenSize),*/}
-                                            {/*marginRight: 10,*/}
-                                        {/*}} />*/}
-                                {/*</View>) : (*/}
-                                {/*this.props.role.find((e) => e === config.userPermissions.writeCase) !== undefined ? (*/}
-                                    {/*<Button*/}
-                                        {/*title={getTranslation(translations.generalButtons.editButtonLabel, this.props.translation)}*/}
-                                        {/*onPress={this.props.onPressEdit}*/}
-                                        {/*color={styles.buttonGreen}*/}
-                                        {/*titleColor={'white'}*/}
-                                        {/*height={calculateDimension(25, true, this.props.screenSize)}*/}
-                                        {/*width={calculateDimension(166, false, this.props.screenSize)}*/}
-                                        {/*style={{*/}
-                                            {/*marginVertical: calculateDimension(12.5, true, this.props.screenSize),*/}
-                                            {/*marginRight: 10,*/}
-                                        {/*}} />*/}
-                                {/*) : null*/}
-                            {/*))*/}
-                    {/*}*/}
-                {/*</View>View*/}
+                <PermissionComponent
+                    render={() => (
+                        <ScrollView contentContainerStyle={{flexGrow: 1}}>
+                            <AnimatedFlatList
+                                data={get(this.props, 'relations', [])}
+                                renderItem={this.renderRelationship}
+                                keyExtractor={this.keyExtractor}
+                                ItemSeparatorComponent={this.renderSeparatorComponent}
+                                ListEmptyComponent={this.listEmptyComponent}
+                                style={[style.listViewStyle]}
+                                componentContainerStyle={style.componentContainerStyle}
+                            />
+                            <View style={{height: 30}}/>
+                        </ScrollView>
+                    )}
+                    permissionsList={[constants.PERMISSIONS_RELATIONSHIP.relationshipAll, constants.PERMISSIONS_RELATIONSHIP.relationshipView]}
+                />
                 <ScrollView contentContainerStyle={{flexGrow: 1}}>
                     <AnimatedFlatList
                         data={get(this.props, 'relations', [])}
@@ -205,6 +163,9 @@ class ContactsSingleExposures extends Component {
                 onPressArray={[
                     () => {this.props.onPressEditExposure(relation.item, relation.index)}
                     // () => {this.props.onPressDeleteExposure(relation.item, relation.index)}
+                ]}
+                arrayPermissions={[
+                    [constants.PERMISSIONS_RELATIONSHIP.relationshipAll, constants.PERMISSIONS_RELATIONSHIP.relationshipModify]
                 ]}
                 containerStyle={{flex: 1, height: '100%', marginHorizontal: calculateDimension(16, false, this.props.screenSize)}}
                 translation={this.props.translation}

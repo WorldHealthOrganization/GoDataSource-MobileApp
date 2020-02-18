@@ -310,6 +310,10 @@ export default {
 
     'LNG_DIALOG_ALERT_MESSAGE_ARE_YOU_SURE_YOU_WANT_TO_COPY_THE_ADDRESS_FROM_THE_PARENT_ENTITY': 'Are you sure you want to copy the address from the parent entity?',
 
+
+    // TODO add to backend permissions
+    'LNG_MOBILE_DIALOG_ALERT_MESSAGE_PERMISSION': `You don't have permissions for the following operation: `,
+
     //loadingScreenMessages
     'LNG_LOADING_SCREEN_MESSAGE': 'Loading...',
 

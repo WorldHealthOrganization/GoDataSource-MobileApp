@@ -1,10 +1,15 @@
 /**
  * Created by florinpopa on 25/02/2019.
  */
-import {Alert} from 'react-native';
-import {getTranslation} from './functions';
 import translations from './translations';
 import {getItemByIdRequest} from './../actions/cases';
+import lodashIntersection from 'lodash/intersection';
+import {checkArrayAndLength} from './typeCheckingFunctions';
+import {getTranslation, generatePermissionMessage} from "./functions";
+import {Alert} from "react-native";
+import get from "lodash/get";
+import config from "./config";
+import constants from './constants';
 
 export function pushNewEditScreen(QRCodeInfo, navigator, user, translation, callback) {
     console.log('pushNewEditScreen QRCodeInfo', QRCodeInfo);
@@ -70,20 +75,141 @@ export function pushNewEditScreen(QRCodeInfo, navigator, user, translation, call
     }
 }
 
-// export function pushToScreen(navigator, screen, passProps) {
-//     try {
-//         navigator.push({
-//             screen,
-//             passProps
-//         })
-//     } catch(screenPushError) {
-//         console.log('Screen push error: ', screenPushError);
-//         Alert.alert(getTranslation(translations.alertMessages.alertLabel, null), 'An unknown error occurred', [
-//             {
-//                 text: getTranslation(translations.alertMessages.okButtonLabel, null), onPress: () => {
-//                     console.log('Ok pressed')
-//                 }
-//             }
-//         ])
-//     }
-// }
+export function screenTransition(navigator, transition, nextScreen, passProps, userPermissions, requiredPermissions) {
+    if (checkArrayAndLength(lodashIntersection(userPermissions, requiredPermissions))) {
+        switch (transition) {
+            case 'push':
+                navigator.push({
+                    screen: nextScreen,
+                    animated: true,
+                    // animationType: 'fade',
+                    passProps: passProps
+                });
+                break;
+            case 'showModal':
+                navigator.showModal({
+                    screen: nextScreen,
+                    animated: true,
+                    // animationType: 'fade',
+                    passProps: passProps
+                });
+                break;
+            default:
+                break
+        }
+    }
+}
+
+export function handleQRSearchTransition (navigator, error, itemType, record, user, translation, userPermissions, ) {
+    if (error) {
+        if (error === translations.alertMessages.noItemAlert && itemType === 'case' && record) {
+            if (checkArrayAndLength(lodashIntersection([
+                constants.PERMISSIONS_CASE.caseAll,
+                constants.PERMISSIONS_CASE.caseCreate
+            ], userPermissions))) {
+                Alert.alert(getTranslation(translations.alertMessages.alertLabel, translation), `${getTranslation(error, translation)}.\n${getTranslation(translations.alertMessages.addMissingPerson, translation)}`, [
+                    {
+                        text: getTranslation(translations.alertMessages.cancelButtonLabel, translation),
+                        onPress: () => {
+                            console.log('Cancel pressed');
+                        }
+                    },
+                    {
+                        text: getTranslation(translations.alertMessages.yesButtonLabel, translation),
+                        onPress: () => {
+                            console.log('Yes pressed');
+                            navigator.push({
+                                screen: 'CaseSingleScreen',
+                                animated: true,
+                                animationType: 'fade',
+                                passProps: {
+                                    case: Object.assign({}, record, {
+                                        outbreakId: get(user, 'activeOutbreakId', null),
+                                    }, config.caseBlueprint),
+                                    forceNew: true
+                                }
+                            })
+                        }
+                    },
+                ])
+            } else {
+                // user doesn't have permission to create case
+                Alert.alert(
+                    getTranslation(translations.alertMessages.alertLabel, translation),
+                    generatePermissionMessage(translations.helpScreen.addMessage, translations.personTypes.cases, translation),
+                    [
+                        {
+                            text: getTranslation(translations.alertMessages.okButtonLabel),
+                            onPress: () => {console.log('Ok pressed')}
+                        }
+                    ]
+                )
+            }
+        } else {
+            Alert.alert(getTranslation(translations.alertMessages.alertLabel, translation), getTranslation(error, translation), [
+                {
+                    text: getTranslation(translations.alertMessages.okButtonLabel, translation),
+                    onPress: () => {
+                        console.log('Ok pressed');
+                    }
+                }
+            ])
+        }
+    } else {
+        if (itemType && record) {
+            if (itemType === 'case') {
+                if (checkArrayAndLength(lodashIntersection([
+                    constants.PERMISSIONS_CASE.caseAll,
+                    constants.PERMISSIONS_CASE.caseView
+                ], userPermissions))) {
+                        navigator.push({
+                            screen: 'CaseSingleScreen',
+                            animated: true,
+                            animationType: 'fade',
+                            passProps: {
+                                case: record
+                            }
+                        })
+                } else {
+                    // user doesn't have permission to view case
+                    Alert.alert(
+                        getTranslation(translations.alertMessages.alertLabel, translation),
+                        generatePermissionMessage(translations.helpScreen.viewMessage, translations.personTypes.cases, translation),
+                        [
+                            {
+                                text: getTranslation(translations.alertMessages.okButtonLabel),
+                                onPress: () => {console.log('Ok pressed')}
+                            }
+                        ]
+                    )
+                }
+            } else if (itemType === 'contact') {
+                if (checkArrayAndLength(lodashIntersection([
+                    constants.PERMISSIONS_CONTACT.contactAll,
+                    constants.PERMISSIONS_CONTACT.contactView
+                ], userPermissions))) {
+                        navigator.push({
+                            screen: 'ContactsSingleScreen',
+                            animated: true,
+                            animationType: 'fade',
+                            passProps: {
+                                contact: record
+                            }
+                        })
+                } else {
+                    // user doesn't have permission to view contact
+                    Alert.alert(
+                        getTranslation(translations.alertMessages.alertLabel, translation),
+                        generatePermissionMessage(translations.helpScreen.viewMessage, translations.personTypes.contacts, translation),
+                        [
+                            {
+                                text: getTranslation(translations.alertMessages.okButtonLabel),
+                                onPress: () => {console.log('Ok pressed')}
+                            }
+                        ]
+                    )
+                }
+            }
+        }
+    }
+}

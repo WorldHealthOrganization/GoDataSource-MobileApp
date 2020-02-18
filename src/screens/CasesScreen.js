@@ -26,6 +26,9 @@ import {enhanceListWithGetData} from './../components/higherOrderComponents/with
 import get from "lodash/get";
 import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
 import { Popup } from 'react-native-map-link';
+import PermissionComponent from './../components/PermissionComponent';
+import constants from "../utils/constants";
+import {handleQRSearchTransition} from "../utils/screenTransitionFunctions";
 
 class CasesScreen extends Component {
 
@@ -47,7 +50,7 @@ class CasesScreen extends Component {
     // Please add here the react lifecycle methods that you need
     componentDidMount() {
         let riskColors = {};
-        let refData = this.props.referenceData.filter((e) => {return e.categoryId.includes("RISK_LEVEL")});
+        let refData = checkArrayAndLength(get(this.props, 'referenceData', null)) !== null ? this.props.referenceData.filter((e) => {return e.categoryId.includes("RISK_LEVEL")}) : [];
         for (let i=0; i<refData.length; i++) {
             riskColors[refData[i].value] = refData[i].colorCode || 'black'
         }
@@ -131,10 +134,11 @@ class CasesScreen extends Component {
                                     }} onPress={this.goToHelpScreen}>
                                         <Icon name="help" color={'white'} size={15}/>
                                     </Ripple>
-                                </ElevatedView> 
+                                </ElevatedView>
                             </View>
-                            {
-                                this.props.role !== null && this.props.role.find((e) => e === config.userPermissions.writeCase) !== undefined ? (
+
+                            <PermissionComponent
+                                render={() => (
                                     <View style={{flex: 0.15}}>
                                         <ElevatedView
                                             elevation={3}
@@ -154,8 +158,9 @@ class CasesScreen extends Component {
                                             </Ripple>
                                         </ElevatedView>
                                     </View>
-                                ) : null
-                            }
+                                )}
+                                permissionsList={['case_all', 'case_create']}
+                            />
                         </View>
                     }
                     navigator={this.props.navigator}
@@ -165,27 +170,32 @@ class CasesScreen extends Component {
                 </NavBarCustom>
 
                 <View style={style.containerContent}>
-                    <AnimatedListView
-                        data={this.props.data || []}
-                        dataCount={this.props.dataCount || 0}
-                        dataType={'Case'}
-                        colors={this.state.riskColors}
-                        filterText={filterText}
-                        hasFilter={true}
-                        style={[style.listViewStyle]}
-                        componentContainerStyle={style.componentContainerStyle}
-                        refreshing={this.state.refreshing}
-                        onRefresh={this.handleOnRefresh}
-                        onSearch={this.props.setSearchText}
-                        onPressFilter={this.props.onPressFilter}
-                        onPressView={this.props.onPressView}
-                        onPressAddExposure={this.props.onPressAddExposure}
-                        onPressCenterButton={this.props.onPressCenterButton}
-                        onPressMap={this.handleOnPressMap}
-                        onPressName={this.props.onPressFullName}
-                        onPressExposure={this.props.onPressExposure}
-                        screen={translations.caseSingleScreen.title}
-                        onEndReached={this.props.onEndReached}
+                    <PermissionComponent
+                        render={() => (
+                            <AnimatedListView
+                                data={this.props.data || []}
+                                dataCount={this.props.dataCount || 0}
+                                dataType={'Case'}
+                                colors={this.state.riskColors}
+                                filterText={filterText}
+                                style={[style.listViewStyle]}
+                                componentContainerStyle={style.componentContainerStyle}
+                                refreshing={this.state.refreshing}
+                                onRefresh={this.handleOnRefresh}
+                                onSearch={this.props.setSearchText}
+                                onPressFilter={this.props.onPressFilter}
+                                onPressView={this.props.onPressView}
+                                onPressAddExposure={this.props.onPressAddExposure}
+                                onPressCenterButton={this.props.onPressCenterButton}
+                                onPressMap={this.handleOnPressMap}
+                                onPressName={this.props.onPressFullName}
+                                onPressExposure={this.props.onPressExposure}
+                                screen={translations.caseSingleScreen.title}
+                                onEndReached={this.props.onEndReached}
+                                hasFilter={true}
+                            />
+                        )}
+                        permissionsList={['case_all', 'case_list']}
                     />
                 </View>
 
@@ -290,69 +300,7 @@ class CasesScreen extends Component {
                 this.setState({
                     loading: false
                 }, () => {
-                    if (error) {
-                        if (error === translations.alertMessages.noItemAlert && itemType === 'case' && record) {
-                            Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props && this.props.translation ? this.props.translation : null), `${getTranslation(error, this.props && this.props.translation ? this.props.translation : null)}.\n${getTranslation(translations.alertMessages.addMissingPerson, this.props && this.props.translation ? this.props.translation : null)}`, [
-                                {
-                                    text: getTranslation(translations.alertMessages.cancelButtonLabel, this.props && this.props.translation ? this.props.translation : null),
-                                    onPress: () => {
-                                        console.log('Cancel pressed');
-                                    }
-                                },
-                                {
-                                    text: getTranslation(translations.alertMessages.yesButtonLabel, this.props && this.props.translation ? this.props.translation : null),
-                                    onPress: () => {
-                                        // console.log('Yes pressed');
-                                        this.props.navigator.push({
-                                            screen: 'CaseSingleScreen',
-                                            animated: true,
-                                            animationType: 'fade',
-                                            passProps: {
-                                                case: Object.assign({}, record, {
-                                                    outbreakId: this.props.user.activeOutbreakId,
-                                                }, config.caseBlueprint),
-                                                forceNew: true,
-                                                refresh: this.props.onRefresh
-                                            }
-                                        })
-                                    }
-                                },
-                            ])
-                        } else {
-                            Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props && this.props.translation ? this.props.translation : null), getTranslation(error, this.props && this.props.translation ? this.props.translation : null), [
-                                {
-                                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props && this.props.translation ? this.props.translation : null),
-                                    onPress: () => {
-                                        console.log('Ok pressed');
-                                    }
-                                }
-                            ])
-                        }
-                    } else {
-                        if (itemType && record) {
-                            if (itemType === 'case') {
-                                this.props.navigator.push({
-                                    screen: 'CaseSingleScreen',
-                                    animated: true,
-                                    animationType: 'fade',
-                                    passProps: {
-                                        case: record,
-                                        refresh: this.props.onRefresh
-                                    }
-                                })
-                            } else if (itemType === 'contact') {
-                                this.props.navigator.push({
-                                    screen: 'ContactsSingleScreen',
-                                    animated: true,
-                                    animationType: 'fade',
-                                    passProps: {
-                                        contact: record,
-                                        refresh: this.props.onRefresh
-                                    }
-                                })
-                            }
-                        }
-                    }
+                    handleQRSearchTransition(this.props.navigator, error, itemType, record, get(this.props, 'user', null), get(this.props, 'translation', null));
                 });
             })
         });

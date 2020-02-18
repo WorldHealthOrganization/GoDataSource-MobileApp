@@ -1,15 +1,10 @@
 /**
  * Created by florinpopa on 21/08/2018.
  */
-/**
- * Created by florinpopa on 25/07/2018.
- */
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
 import {View, StyleSheet, InteractionManager} from 'react-native';
-import {calculateDimension} from './../utils/functions';
-import config from './../utils/config';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import styles from './../styles';
@@ -17,10 +12,9 @@ import ElevatedView from 'react-native-elevated-view';
 import {LoaderScreen} from 'react-native-ui-lib';
 import FollowUpAgenda from './../components/FollowUpAgenda';
 import moment from 'moment';
-import {getTranslation} from "../utils/functions";
-import translations from "../utils/translations";
-import Button from './../components/Button';
 import TopContainerButtons from "./../components/TopContainerButtons";
+import PermissionComponent from './../components/PermissionComponent';
+import constants from "./../utils/constants";
 
 class ContactsSingleCalendar extends Component {
 
@@ -71,43 +65,26 @@ class ContactsSingleCalendar extends Component {
         return (
             <ElevatedView elevation={3} style={[style.container]}>
                 <View style = {{alignItems: 'center'}}>
-                    {/*<View style={{flexDirection: 'row'}}>*/}
-                        {/*<Button*/}
-                            {/*title={getTranslation(translations.generalButtons.backButtonLabel, this.props.translation)}*/}
-                            {/*onPress={this.props.handleMoveToPrevieousScreenButton}*/}
-                            {/*color={styles.buttonGreen}*/}
-                            {/*titleColor={'white'}*/}
-                            {/*height={calculateDimension(25, true, this.props.screenSize)}*/}
-                            {/*width={calculateDimension(130, false, this.props.screenSize)}*/}
-                            {/*style={{*/}
-                                {/*marginVertical: calculateDimension(12.5, true, this.props.screenSize),*/}
-                                {/*marginHorizontal: calculateDimension(16, false, this.props.screenSize),*/}
-                            {/*}}/>*/}
-                        {/*<Button*/}
-                            {/*title={getTranslation(translations.generalButtons.saveButtonLabel, this.props.translation)}*/}
-                            {/*onPress={this.props.handleOnPressSave}*/}
-                            {/*color={styles.buttonGreen}*/}
-                            {/*titleColor={'white'}*/}
-                            {/*height={calculateDimension(25, true, this.props.screenSize)}*/}
-                            {/*width={calculateDimension(130, false, this.props.screenSize)}*/}
-                            {/*style={{*/}
-                                {/*marginVertical: calculateDimension(12.5, true, this.props.screenSize),*/}
-                                {/*marginHorizontal: calculateDimension(16, false, this.props.screenSize),*/}
-                            {/*}}/>*/}
-                    {/*</View>*/}
-
-                    <TopContainerButtons
-                        isNew={this.props.isNew}
-                        isEditMode={this.props.isEditMode}
-                        index={this.props.activeIndex}
-                        numberOfTabs={this.props.numberOfTabs}
-                        onPressEdit={this.props.onPressEdit}
-                        onPressSaveEdit={this.props.onPressSaveEdit}
-                        onPressCancelEdit={this.props.onPressCancelEdit}
-                        onPressNextButton={this.props.onPressNextButton}
-                        onPressPreviousButton={this.props.onPressPreviousButton}
+                    <PermissionComponent
+                        render={() => (
+                            <TopContainerButtons
+                                isNew={this.props.isNew}
+                                isEditMode={this.props.isEditMode}
+                                index={this.props.activeIndex}
+                                numberOfTabs={this.props.numberOfTabs}
+                                onPressEdit={this.props.onPressEdit}
+                                onPressSaveEdit={this.props.onPressSaveEdit}
+                                onPressCancelEdit={this.props.onPressCancelEdit}
+                                onPressNextButton={this.props.onPressNextButton}
+                                onPressPreviousButton={this.props.onPressPreviousButton}
+                            />
+                        )}
+                        permissionsList={[
+                            constants.PERMISSIONS_CONTACT.contactAll,
+                            constants.PERMISSIONS_CONTACT.contactCreate,
+                            constants.PERMISSIONS_CONTACT.contactModify
+                        ]}
                     />
-
                 </View>
                 <FollowUpAgenda
                     contact={this.props.contact}

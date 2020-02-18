@@ -93,6 +93,11 @@ const tabsValuesRoutes = {
         {key: 'exposures', title: translations.contactSingleScreen.exposuresTitle},
         {key: 'calendar', title: translations.contactSingleScreen.calendarTitle}
     ],
+    contactsSingleWithoutExposures: [
+        {key: 'personal', title: translations.contactSingleScreen.personalTitle},
+        {key: 'address', title: translations.contactSingleScreen.addressTitle},
+        {key: 'calendar', title: translations.contactSingleScreen.calendarTitle}
+    ],
     contactsAdd: [
         {key: 'personal', title: translations.contactSingleScreen.personalTitle},
         {key: 'address', title: translations.contactSingleScreen.addressTitle},

@@ -6,7 +6,8 @@
 import React, { Component } from 'react';
 import { View, Alert, StyleSheet, Animated, Platform, Dimensions, BackHandler, Keyboard } from 'react-native';
 import { TabBar, TabView, PagerPan, PagerAndroid, PagerScroll } from 'react-native-tab-view';
-import { connect } from "react-redux";
+import {connect} from "react-redux";
+import {bindActionCreators} from "redux";
 import NavBarCustom from './../components/NavBarCustom';
 import Breadcrumb from './../components/Breadcrumb';
 import Ripple from 'react-native-material-ripple';
@@ -26,6 +27,7 @@ import {
     getCaseAndExposuresById,
     getRelationsForCase
 } from './../actions/cases';
+import { saveSelectedScreen } from "../actions/app";
 import {
     updateRequiredFields,
     extractIdFromPouchId,
@@ -44,6 +46,9 @@ import translations from './../utils/translations'
 import ElevatedView from 'react-native-elevated-view';
 import ViewHOC from './../components/ViewHOC';
 import cloneDeep from "lodash/cloneDeep";
+import lodashIntersect from "lodash/intersection";
+import constants from "../utils/constants";
+import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
 
 const initialLayout = {
     height: 0,
@@ -58,12 +63,27 @@ class CaseSingleScreen extends Component {
 
     constructor(props) {
         super(props);
+
+        // Process what the tab contents will be based on
+        let routes = this.props.isNew ?
+            config.tabsValuesRoutes.casesSingle :
+            checkArrayAndLength(lodashIntersect(
+                this.props.role,
+                [
+                    constants.PERMISSIONS_CASE.caseAll,
+                    constants.PERMISSIONS_CASE.caseListRelationshipContacts,
+                    constants.PERMISSIONS_CASE.caseListRelationshipExposures
+                ]
+            )) ?
+                config.tabsValuesRoutes.casesSingleViewEdit :
+                config.tabsValuesRoutes.casesSingle;
+
         this.state = {
             interactionComplete: false,
             deletePressed: false,
             savePressed: false,
             saveFromEditPressed: false,
-            routes: this.props.isNew ? config.tabsValuesRoutes.casesSingle : config.tabsValuesRoutes.casesSingleViewEdit,
+            routes: routes,
             index: _.get(this.props, 'index', 0),
             case: this.props.isNew ? {
                 outbreakId: this.props.user.activeOutbreakId,
@@ -787,18 +807,14 @@ class CaseSingleScreen extends Component {
             Alert.alert("", 'You have unsaved data. Are you sure you want to leave this page and lose all changes?', [
                 {
                     text: 'Yes', onPress: () => {
-                        if (this.props.isAddFromNavigation) {
-                            this.props.navigator.resetTo({
+                        if(this.props.selectedScreen !== 2) {
+                            this.props.saveSelectedScreen(2);
+                        }
+                        this.props.navigator.resetTo({
                                 screen: 'CasesScreen',
                                 animated: true,
                                 animationStyle: 'fade'
                             })
-                        } else {
-                            this.props.navigator.pop({
-                                animated: true,
-                                animationType: 'fade'
-                            })
-                        }
                     }
                 },
                 {
@@ -808,18 +824,14 @@ class CaseSingleScreen extends Component {
                 }
             ])
         } else {
-            if (this.props.isAddFromNavigation) {
-                this.props.navigator.resetTo({
+            if(this.props.selectedScreen !== 2) {
+                this.props.saveSelectedScreen(2);
+            }
+            this.props.navigator.resetTo({
                     screen: 'CasesScreen',
                     animated: true,
                     animationStyle: 'fade'
                 })
-            } else {
-                this.props.navigator.pop({
-                    animated: true,
-                    animationType: 'fade'
-                })
-            }
         }
     };
 
@@ -2089,10 +2101,17 @@ function mapStateToProps(state) {
     return {
         user: state.user,
         screenSize: state.app.screenSize,
+        selectedScreen: state.app.selectedScreen,
         errors: state.errors,
         caseInvestigationQuestions: state.outbreak.caseInvestigationTemplate,
-        translation: state.app.translation
+        translation: state.app.translation,
+        role: state.role
     };
 }
+function matchDispatchProps(dispatch) {
+    return bindActionCreators({
+        saveSelectedScreen
+    }, dispatch);
+}
 
-export default connect(mapStateToProps)(CaseSingleScreen);
+export default connect(mapStateToProps, matchDispatchProps)(CaseSingleScreen);
