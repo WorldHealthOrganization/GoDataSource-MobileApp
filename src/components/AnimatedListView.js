@@ -312,7 +312,20 @@ class AnimatedListView extends Component {
         )
     };
 
-    keyExtractor = (item, index) => item._id;
+    keyExtractor = (item, index) => {
+        switch(this.props.dataType) {
+            case 'FollowUp':
+                return get(item, 'followUpData._id', null);
+            case 'Contact':
+                return get(item, 'mainData._id', null);
+            case 'Case':
+                return get(item, 'mainData._id', null);
+            case 'User':
+                return get(item, 'mainData._id', null);
+            default:
+                return get(item, 'mainData._id', null);
+        }
+    };
 
     renderSeparatorComponent = () => {
         return (

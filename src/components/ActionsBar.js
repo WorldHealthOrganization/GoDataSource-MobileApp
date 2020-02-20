@@ -27,6 +27,7 @@ ActionsBar = React.memo(({textsArray, addressIndex, textsStyleArray, onPressArra
                         if (checkArrayAndLength(arrayPermissions) && arrayPermissions.length === textsArray.length) {
                             return (
                                 <PermissionComponent
+                                    key={index}
                                     render={() => (
                                         <Ripple
                                             key={index}

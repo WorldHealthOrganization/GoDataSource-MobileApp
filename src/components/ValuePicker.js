@@ -40,14 +40,24 @@ export default ValuePicker = React.memo(({value, onSelectValue, top}) => {
     const dropdown = useRef(null);
     const {referenceData, screenSize, translation} = useSelector(selectValuePickerReduxData);
     let data = referenceData;
-    data.unshift(config.dropDownValues[0]);
+    if (lodashGet(data, '[0].value', null) !== config.dropDownValues[0].value) {
+        data.unshift(config.dropDownValues[0]);
+    }
 
     const handlePressDropdown = () => {
         dropdown.current.focus();
     };
 
     const handleChangeText = (value, index, dataLocal) => {
-        onSelectValue({label: data[dataLocal.map((e) => {return e.value}).indexOf(value)].label, value: value});
+        if (value !== config.dropDownValues[0].value) {
+            onSelectValue({
+                label: data[dataLocal.map((e) => {
+                    return e.value
+                }).indexOf(value)].label, value: value
+            });
+        } else {
+            onSelectValue();
+        }
     };
 
     return (
