@@ -4,11 +4,11 @@
 /**
  * Created by florinpopa on 03/08/2018.
  */
+// Since this app is based around the material ui is better to use the components from
+// the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
 import {StyleSheet, InteractionManager} from 'react-native';
 import PropTypes from 'prop-types';
-// Since this app is based around the material ui is better to use the components from
-// the material ui library, since it provides design and animations out of the box
 import styles from './../styles';
 import {getTranslation, calculateDimension} from './../utils/functions';
 import {connect} from "react-redux";

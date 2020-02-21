@@ -186,11 +186,9 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                                     this.props.setLoaderState(false);
                                 }
                                 this.setState((prevState) => {
-                                    console.log(prevState.dataCount);
-                                    console.log('Stuff: ', get(result, 'dataCount', prevState.dataCount));
                                     return {
-                                        data: prevState.lastElement !== null ? prevState.data.concat(result.data) : result.data,
-                                            lastElement: result.data.length === 10 ? screenType === 'FollowUpsScreen' ? Object.assign({}, get(result, 'data[9].mainData', null), {followUpId: get(result, 'data[9].followUpData._id', null)}) : get(result, 'data[9].mainData', null) : null,
+                                        data: prevState.lastElement !== null || (prevState.data.length + result.data.length) === prevState.dataCount ? prevState.data.concat(result.data) : result.data,
+                                        lastElement: result.data.length === 10 ? screenType === 'FollowUpsScreen' ? Object.assign({}, get(result, 'data[9].mainData', null), {followUpId: get(result, 'data[9].followUpData._id', null)}) : get(result, 'data[9].mainData', null) : null,
                                         isAddFromNavigation: false,
                                         dataCount: get(result, 'dataCount', prevState.dataCount),
                                         offset: result.data.length

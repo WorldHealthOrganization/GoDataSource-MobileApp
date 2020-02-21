@@ -6,7 +6,7 @@ import set from 'lodash/set';
 import {checkArrayAndLength} from './../../utils/typeCheckingFunctions';
 import config from './../../utils/config';
 
-const databaseTables = ['person', 'followUp', 'relationship'];
+const databaseTables = ['person', 'followUp', 'relationship', 'languageToken'];
 const tableStructure = {
     person: [
         {
@@ -109,6 +109,16 @@ const tableStructure = {
         {
             fieldName: 'targetType',
             fieldType: 'TEXT NOT NULL'
+        },
+    ],
+    languageToken: [
+        {
+            fieldName: '_id',
+            fieldType: 'TEXT PRIMARY KEY'
+        },
+        {
+            fieldName: "languageId",
+            fieldType: "TEXT NOT NULL"
         },
     ],
     commonFields: [

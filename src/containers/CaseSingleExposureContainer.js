@@ -102,18 +102,6 @@ class ContactsSingleExposures extends Component {
                     )}
                     permissionsList={[constants.PERMISSIONS_RELATIONSHIP.relationshipAll, constants.PERMISSIONS_RELATIONSHIP.relationshipView]}
                 />
-                <ScrollView contentContainerStyle={{flexGrow: 1}}>
-                    <AnimatedFlatList
-                        data={get(this.props, 'relations', [])}
-                        renderItem={this.renderRelationship}
-                        keyExtractor={this.keyExtractor}
-                        ItemSeparatorComponent={this.renderSeparatorComponent}
-                        ListEmptyComponent={this.listEmptyComponent}
-                        style={[style.listViewStyle]}
-                        componentContainerStyle={style.componentContainerStyle}
-                    />
-                    <View style={{height: 30}}/>
-                </ScrollView>
             </ElevatedView>
 
         );

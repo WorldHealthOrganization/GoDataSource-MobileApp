@@ -4,6 +4,7 @@
 // import {getDatabase} from './database';
 import config from './../utils/config';
 import {rawSQLQuery} from './sqlHelper';
+import {executeQuery} from './sqlTools/helperMethods';
 
 export function getAvailableLanguagesRequest (callback) {
 
@@ -46,14 +47,37 @@ export function getAvailableLanguagesRequest (callback) {
 
 export function getTranslationRequest (languageId, callback) {
 
-    rawSQLQuery(config.mongoCollections.languageToken, `${config.rawSQLQueryString}${config.rawSQLQueryWhereString}`, [`${config.mongoCollections.languageToken}.json_${languageId}_%`])
-        .then((result) => {
-            callback(null, result);
+    let query = {
+        type: 'select',
+        table: 'languageToken',
+        fields: [
+            {
+                name: 'json',
+                alias: 'languageData',
+                table: 'languageToken'
+            }
+        ],
+        condition: {
+            languageId: languageId
+        }
+    };
+
+    executeQuery(query)
+        .then((languageData) => {
+            callback(null, languageData.map((e) => e.languageData));
         })
-        .catch((error) => {
-            console.log('Error get translations: ', error);
-            callback(error)
+        .catch((errorLanguageData) => {
+            callback(errorLanguageData);
         })
+
+    // rawSQLQuery(config.mongoCollections.languageToken, `${config.rawSQLQueryString}${config.rawSQLQueryWhereString}`, [`${config.mongoCollections.languageToken}.json_${languageId}_%`])
+    //     .then((result) => {
+    //         callback(null, result);
+    //     })
+    //     .catch((error) => {
+    //         console.log('Error get translations: ', error);
+    //         callback(error)
+    //     })
 
     // getDatabase(config.mongoCollections.languageToken)
     //     .then((database) => {

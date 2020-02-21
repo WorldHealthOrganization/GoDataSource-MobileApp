@@ -229,7 +229,7 @@ class SectionedMultiSelect extends PureComponent {
                 handleOnSelectItem={this.handleOnSelectItem}
                 handleOnPressExpand={this.handleOnPressExpand}
                 handleRenderList={this.handleRenderList}
-                iconWidth={calculateDimension(20, false, this.props.screenSize)}
+                iconWidth={calculateDimension(30, false, this.props.screenSize)}
                 selectedItems={this.state.reRenderProps.selectedItems}
                 selectToggleIconComponent={this.props.selectToggleIconComponent}
                 expandedItems={this.state.reRenderProps.expandedItems}

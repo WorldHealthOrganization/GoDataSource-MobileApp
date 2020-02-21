@@ -48,7 +48,7 @@ export function wrapReadTransactionInPromise (database) {
 }
 
 export function wrapExecuteSQLInPromise (transaction, sqlStatement, arrayOfFields, skipCallback) {
-    console.log('Execute query: ', sqlStatement, arrayOfFields);
+    // console.log('Execute query: ', sqlStatement, arrayOfFields);
     if (transaction && sqlStatement && checkArray(arrayOfFields)) {
         return new Promise((resolve, reject) => {
             if (skipCallback) {

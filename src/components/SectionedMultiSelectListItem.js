@@ -13,7 +13,7 @@ import Ripple from 'react-native-material-ripple';
 SectionedMultiSelectListItem = ({item, uniqueKey, subKey, handleOnSelectItem, handleOnPressExpand,
                handleRenderList, iconWidth, selectedItems, selectToggleIconComponent,
                expandedItems, dropDownToggleIconUpComponent, dropDownToggleIconDownComponent}) => (
-    <View style={{flex: 1, marginVertical: 5}}>
+    <View style={{flex: 1, marginVertical: 10}}>
         <View style={{flexDirection: 'row', flex: 1, alignItems: 'center', justifyContent: 'space-between'}}>
             <Ripple
                 onPress={() => {handleOnSelectItem(item)}}
@@ -31,7 +31,7 @@ SectionedMultiSelectListItem = ({item, uniqueKey, subKey, handleOnSelectItem, ha
                 {
                     selectedItems.findIndex((e) => {return e[uniqueKey] === item[uniqueKey]}) > -1 ? (
                         <Ripple
-                            style={{height: '100%', width: iconWidth}}
+                            style={{height: '100%', width: iconWidth, marginRight: 10}}
                         >
                             {
                                 selectToggleIconComponent
@@ -44,6 +44,12 @@ SectionedMultiSelectListItem = ({item, uniqueKey, subKey, handleOnSelectItem, ha
                         <Ripple
                             style={{height: '100%', width: iconWidth}}
                             onPress={() => {handleOnPressExpand(item[uniqueKey])}}
+                            hitSlop={{
+                                top: 20,
+                                left: 20,
+                                bottom: 20,
+                                right: 20
+                            }}
                         >
                             {
                                 expandedItems.findIndex((e) => {return e === item[uniqueKey]}) > -1 ?

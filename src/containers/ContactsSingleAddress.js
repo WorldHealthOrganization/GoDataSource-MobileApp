@@ -69,9 +69,6 @@ class ContactsSingleAddress extends PureComponent {
         // console.log('ContactsSingleContainer render Address');
 
         return (
-            <TouchableWithoutFeedback onPress={() => {
-                Keyboard.dismiss()
-            }} accessible={false}>
                 <View style={style.viewContainer}>
                     <PermissionComponent
                         render={() => (
@@ -124,7 +121,6 @@ class ContactsSingleAddress extends PureComponent {
                     </ScrollView>
                     {/* </KeyboardAwareScrollView> */}
                 </View>
-            </TouchableWithoutFeedback >
         );
     }
 
