@@ -121,7 +121,7 @@ export function computeCommonData(storeUserBool, user, refreshFollowUps, filters
                 promises.push(getReferenceData());
                 promises.push(getTranslations(user.languageId));
                 promises.push(getLocations(outbreakAndLocationInfo.locationIds || null));
-                promises.push(getUserLocations(outbreakAndLocationInfo.locationIds || null));
+                // promises.push(getUserLocations(outbreakAndLocationInfo.locationIds || null));
                 promises.push(getHelpCategory());
                 promises.push(getHelpItem());
 
@@ -174,8 +174,8 @@ export function computeCommonData(storeUserBool, user, refreshFollowUps, filters
                                 storeOutbreak(outbreakAndLocationInfo || null),
                                 storeLocationsList(get(actionsObject, 'locations.locationsList', null)),
                                 storeLocations(get(actionsObject, 'locations.treeLocationsList', null)),
-                                storeUserLocationsList(get(actionsObject, 'userLocations.userLocationsList', null)),
-                                storeUserLocations(filterByUser(get(actionsObject, 'userLocations.userTreeLocationsList', null), userTeams)),
+                                storeUserLocationsList(get(actionsObject, 'locations.locationsList', null)),
+                                storeUserLocations(filterByUser(get(actionsObject, 'locations.treeLocationsList', null), userTeams)),
                                 saveAvailableLanguages(get(actionsObject,  'availableLanguages', null)),
                                 storeReferenceData(get(actionsObject,  'referenceData', null)),
                                 saveTranslation(get(actionsObject,  'translations', null)),

@@ -11,6 +11,7 @@ import ElevatedView from 'react-native-elevated-view';
 import Button from './Button';
 import SectionedMultiSelectListItem from './SectionedMultiSelectListItem';
 import cloneDeep from 'lodash/cloneDeep';
+import debounce from 'lodash/debounce';
 
 class SectionedMultiSelect extends PureComponent {
 
@@ -28,6 +29,8 @@ class SectionedMultiSelect extends PureComponent {
             allItems: this.props.allItems,
             items: this.props.items,
         };
+
+        this.handleOnChangeTextSearch = debounce(this.handleOnChangeTextSearch, 2000);
     }
 
     // Since this.props.selectedItems is just an array of ids, we want to map them to the internal structure of the component
@@ -114,7 +117,7 @@ class SectionedMultiSelect extends PureComponent {
                                     }}
                                     value={this.state.searchText}
                                     onChangeText={this.handleOnChangeText}
-                                    onSubmitEditing={this.handleOnChangeTextSearch}
+                                    // onSubmitEditing={this.handleOnChangeTextSearch}
                                     placeholder={this.props.searchPlaceholderText}
                                 />
                             </View>
@@ -283,15 +286,16 @@ class SectionedMultiSelect extends PureComponent {
     handleOnChangeText = (text) => {
         this.setState({
             searchText: text
-        })
+        });
+        this.handleOnChangeTextSearch();
     };
 
     handleOnChangeTextSearch = () => {
         let text = this.state.searchText;
         if (text !== '' && text !== null && text !== undefined) {
-            this.setState({
-                searchText: text
-            }, () => {
+            // this.setState({
+            //     searchText: text
+            // }, () => {
                 let filteredData = this.filterData(cloneDeep(this.props.items), text);
                 let filteredAllData = this.filterData(cloneDeep(this.props.allItems), text);
                 this.setState(prevState => ({
@@ -299,7 +303,7 @@ class SectionedMultiSelect extends PureComponent {
                     items: filteredData.filteredData,
                     reRenderProps: Object.assign({}, prevState.reRenderProps, {expandedItems: this.state.showAll ? filteredAllData.expandedItems : filteredData.expandedItems})
                 }))
-            })
+            // })
         } else {
             this.setState(prevState => ({
                 allItems: cloneDeep(this.props.allItems),
@@ -310,7 +314,13 @@ class SectionedMultiSelect extends PureComponent {
     };
 
     handleOnPressShowAll = () => {
-        this.setState({showAll: !this.state.showAll});
+        this.setState(prevState => ({
+            showAll: !this.state.showAll,
+            allItems: cloneDeep(this.props.allItems),
+            items: cloneDeep(this.props.items),
+            reRenderProps: Object.assign({}, prevState.reRenderProps, {expandedItems: []}),
+            searchText: ''
+        }));
     };
 
     filterData = (items, text) => {

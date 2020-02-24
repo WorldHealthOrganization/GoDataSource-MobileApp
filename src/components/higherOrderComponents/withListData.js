@@ -2,7 +2,7 @@ import React, {Component} from 'react'
 import {Alert, BackHandler} from 'react-native';
 import get from 'lodash/get';
 import {createDate} from './../../utils/functions';
-import {getTranslation, navigation, extractMainAddress} from "../../utils/functions";
+import {getTranslation, navigation, extractMainAddress, extractIdFromPouchId} from "../../utils/functions";
 import RNExitApp from "react-native-exit-app";
 import translations from "../../utils/translations";
 import constants from './../../utils/constants';
@@ -225,6 +225,7 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
             setSearchText = (text) => {
                 this.setState(prevState => ({
                     searchText: text,
+                    mainFilter: this.computeLocationIdsFromName(text),
                     offset: 0
                 }), () => this.refresh())
             };
@@ -523,6 +524,10 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                         break;
                 }
                 return permissions;
+            };
+
+            computeLocationIdsFromName = (searchText) => {
+                return this.props.location.filter((e) => e.name.includes(searchText)).map((e) => extractIdFromPouchId(e._id, 'location'))
             };
 
             onNavigatorEvent = (event) => {

@@ -358,7 +358,8 @@ mapStateToProps = (state) => {
         screenSize: get(state, 'app.screenSize', config.designScreenSize),
         translation: get(state, 'app.translation', []),
         referenceData: get(state, 'referenceData', []),
-        role: get(state, 'role', [])
+        role: get(state, 'role', []),
+        location:       get(state, 'location.locationsList')
     };
 };
 

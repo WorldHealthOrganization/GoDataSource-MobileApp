@@ -343,7 +343,8 @@ function mapStateToProps(state) {
         translation:    state.app.translation,
         loaderState:    state.app.loaderState,
         role:           state.role,
-        referenceData:  state.referenceData
+        referenceData:  state.referenceData,
+        location:       get(state, 'location.locationsList')
     };
 }
 
