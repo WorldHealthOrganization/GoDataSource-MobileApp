@@ -210,18 +210,20 @@ function createConditionFollowUps (outbreakId, followUpFilter, userTeams, dataTy
     if (search) {
         if (dataType === translations.personTypes.cases) {
             condition['$or'] = [
-                {[`${aliasForContacts}.firstName`]: {'$like': `%${search}%`}},
-                {[`${aliasForContacts}.lastName`]: {'$like': `%${search}%`}},
-                {[`${aliasForContacts}.visualId`]: {'$like': `%${search}%`}}
+                {[`${aliasForContacts}.firstName`]: {'$like': `%${search.text}%`}},
+                {[`${aliasForContacts}.lastName`]: {'$like': `%${search.text}%`}},
+                {[`${aliasForContacts}.visualId`]: {'$like': `%${search.text}%`}},
+                {[`${aliasForContacts}.locationId`]: {'$in': search.locations}},
             ]
         } else {
             condition['$or'] = [
-                {[`${aliasForContacts}.firstName`]: {'$like': `%${search}%`}},
-                {[`${aliasForContacts}.lastName`]: {'$like': `%${search}%`}},
-                {[`${aliasForContacts}.visualId`]: {'$like': `%${search}%`}},
-                {[`${aliasForFilteredExposures}.firstName`]: {'$like': `%${search}%`}},
-                {[`${aliasForFilteredExposures}.lastName`]: {'$like': `%${search}%`}},
-                {[`${aliasForFilteredExposures}.visualId`]: {'$like': `%${search}%`}}
+                {[`${aliasForContacts}.firstName`]: {'$like': `%${search.text}%`}},
+                {[`${aliasForContacts}.lastName`]: {'$like': `%${search.text}%`}},
+                {[`${aliasForContacts}.visualId`]: {'$like': `%${search.text}%`}},
+                {[`${aliasForContacts}.locationId`]: {'$in': search.locations}},
+                {[`${aliasForFilteredExposures}.firstName`]: {'$like': `%${search.text}%`}},
+                {[`${aliasForFilteredExposures}.lastName`]: {'$like': `%${search.text}%`}},
+                {[`${aliasForFilteredExposures}.visualId`]: {'$like': `%${search.text}%`}}
             ]
         }
     }

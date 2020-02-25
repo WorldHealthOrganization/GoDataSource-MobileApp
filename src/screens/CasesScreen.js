@@ -344,7 +344,7 @@ function mapStateToProps(state) {
         loaderState:    state.app.loaderState,
         role:           state.role,
         referenceData:  state.referenceData,
-        location:       get(state, 'location.locationsList')
+        location:       get(state, 'locations.locationsList')
     };
 }
 

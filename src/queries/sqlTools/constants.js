@@ -283,20 +283,22 @@ function createMainQuery(dataType, outbreakId, filter, search, lastElement, offs
     if (search) {
         if (dataType === translations.personTypes.cases) {
             outerFilterCondition['$or'] = [
-                {[`${mainQueryStrings.outerFilter}.firstName`]: {'$like': `%${search}%`}},
-                {[`${mainQueryStrings.outerFilter}.lastName`]: {'$like': `%${search}%`}},
-                {[`${mainQueryStrings.outerFilter}.visualId`]: {'$like': `%${search}%`}},
+                {[`${mainQueryStrings.outerFilter}.firstName`]: {'$like': `%${search.text}%`}},
+                {[`${mainQueryStrings.outerFilter}.lastName`]: {'$like': `%${search.text}%`}},
+                {[`${mainQueryStrings.outerFilter}.visualId`]: {'$like': `%${search.text}%`}},
+                {[`${mainQueryStrings.outerFilter}.locationId`]: {'$in': search.locations}},
                 // {[`${innerQueriesStrings.filteredExposuresTable}.firstName`]: {'$like': `%${search}%`}},
                 // {[`${innerQueriesStrings.filteredExposuresTable}.lastName`]: {'$like': `%${search}%`}},
             ]
         } else {
             outerFilterCondition['$or'] = [
-                {[`${mainQueryStrings.outerFilter}.firstName`]: {'$like': `%${search}%`}},
-                {[`${mainQueryStrings.outerFilter}.lastName`]: {'$like': `%${search}%`}},
-                {[`${mainQueryStrings.outerFilter}.visualId`]: {'$like': `%${search}%`}},
-                {[`${innerQueriesStrings.filteredExposuresTable}.firstName`]: {'$like': `%${search}%`}},
-                {[`${innerQueriesStrings.filteredExposuresTable}.lastName`]: {'$like': `%${search}%`}},
-                {[`${innerQueriesStrings.filteredExposuresTable}.visualId`]: {'$like': `%${search}%`}}
+                {[`${mainQueryStrings.outerFilter}.firstName`]: {'$like': `%${search.text}%`}},
+                {[`${mainQueryStrings.outerFilter}.lastName`]: {'$like': `%${search.text}%`}},
+                {[`${mainQueryStrings.outerFilter}.visualId`]: {'$like': `%${search.text}%`}},
+                {[`${mainQueryStrings.outerFilter}.locationId`]: {'$in': search.locations}},
+                {[`${innerQueriesStrings.filteredExposuresTable}.firstName`]: {'$like': `%${search.text}%`}},
+                {[`${innerQueriesStrings.filteredExposuresTable}.lastName`]: {'$like': `%${search.text}%`}},
+                {[`${innerQueriesStrings.filteredExposuresTable}.visualId`]: {'$like': `%${search.text}%`}}
             ]
         }
     }

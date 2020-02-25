@@ -224,8 +224,10 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
 
             setSearchText = (text) => {
                 this.setState(prevState => ({
-                    searchText: text,
-                    mainFilter: this.computeLocationIdsFromName(text),
+                    searchText: {
+                        text,
+                        locations: this.computeLocationIdsFromName(text)
+                    },
                     offset: 0
                 }), () => this.refresh())
             };
@@ -527,7 +529,7 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
             };
 
             computeLocationIdsFromName = (searchText) => {
-                return this.props.location.filter((e) => e.name.includes(searchText)).map((e) => extractIdFromPouchId(e._id, 'location'))
+                return this.props.location.filter((e) => e.name.includes(searchText)).map((e) => extractIdFromPouchId(e._id, 'location'));
             };
 
             onNavigatorEvent = (event) => {

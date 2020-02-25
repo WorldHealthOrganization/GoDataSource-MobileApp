@@ -359,7 +359,7 @@ mapStateToProps = (state) => {
         translation: get(state, 'app.translation', []),
         referenceData: get(state, 'referenceData', []),
         role: get(state, 'role', []),
-        location:       get(state, 'location.locationsList')
+        location:       get(state, 'locations.locationsList')
     };
 };
 
