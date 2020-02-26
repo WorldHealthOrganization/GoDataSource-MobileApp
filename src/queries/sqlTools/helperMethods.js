@@ -2,6 +2,7 @@ import SQLite, {encodeName} from 'react-native-sqlcipher-2';
 import {database} from './../database';
 import constants from './constants';
 import get from 'lodash/get';
+import isObject from 'lodash/isObject';
 import {extractLocationId} from './../../utils/functions';
 import {checkArray, checkArrayAndLength} from './../../utils/typeCheckingFunctions';
 import translations from "../../utils/translations";
@@ -49,7 +50,7 @@ export function wrapReadTransactionInPromise (database) {
 
 export function wrapExecuteSQLInPromise (transaction, sqlStatement, arrayOfFields, skipCallback) {
     // console.log('Execute query: ', sqlStatement, arrayOfFields);
-    if (transaction && sqlStatement && checkArray(arrayOfFields)) {
+    if (transaction && sqlStatement && (checkArray(arrayOfFields) || isObject(arrayOfFields))) {
         return new Promise((resolve, reject) => {
             if (skipCallback) {
                 transaction.executeSql(sqlStatement, arrayOfFields, null, (txn, errorStatement) => {return reject(errorStatement)});
@@ -109,61 +110,79 @@ export function createTable(transaction, tableName) {
 
 // The following methods refer to the bulk insert or update of mapped data. Data mapping will not be done here
 function insertOrUpdateStringCreation (tableName) {
-    try {
-        let insertOrUpdateString = `INSERT INTO ${tableName} values (`;
-        let tableFields = constants.tableStructure[tableName].concat(constants.tableStructure.commonFields);
-        for (let i=0; i<tableFields.length; i++) {
-            insertOrUpdateString = insertOrUpdateString + `:${tableFields[i].fieldName}`;
-            if (i === tableFields.length - 1) {
-                insertOrUpdateString = insertOrUpdateString + `)`;
-            } else {
-                insertOrUpdateString = insertOrUpdateString + `, `;
-            }
-        }
-        insertOrUpdateString = insertOrUpdateString + ` ON CONFLICT (_id) DO UPDATE SET `;
-        // Skip the id field (first field in the declared structure)
-        for (let i=1; i<tableFields.length; i++) {
-            insertOrUpdateString = insertOrUpdateString + `${tableFields[i].fieldName}=excluded.${tableFields[i].fieldName}`;
-            if (i < tableFields.length - 1) {
-                insertOrUpdateString = insertOrUpdateString + `, `;
-            }
-        }
-        return insertOrUpdateString
-    } catch (errorAtCreatingString) {
-        console.log('SQLite console: error at creating insertOrUpdate string: ', errorAtCreatingString)
+    return {
+        type: 'insert',
+        table: tableName
     }
+
+    // try {
+    //     let insertOrUpdateString = `INSERT INTO ${tableName} values (`;
+    //     let tableFields = constants.tableStructure[tableName].concat(constants.tableStructure.commonFields);
+    //     for (let i=0; i<tableFields.length; i++) {
+    //         insertOrUpdateString = insertOrUpdateString + `:${tableFields[i].fieldName}`;
+    //         if (i === tableFields.length - 1) {
+    //             insertOrUpdateString = insertOrUpdateString + `)`;
+    //         } else {
+    //             insertOrUpdateString = insertOrUpdateString + `, `;
+    //         }
+    //     }
+    //     insertOrUpdateString = insertOrUpdateString + ` ON CONFLICT (_id) DO UPDATE SET `;
+    //     // Skip the id field (first field in the declared structure)
+    //     for (let i=1; i<tableFields.length; i++) {
+    //         insertOrUpdateString = insertOrUpdateString + `${tableFields[i].fieldName}=excluded.${tableFields[i].fieldName}`;
+    //         if (i < tableFields.length - 1) {
+    //             insertOrUpdateString = insertOrUpdateString + `, `;
+    //         }
+    //     }
+    //     return insertOrUpdateString
+    // } catch (errorAtCreatingString) {
+    //     console.log('SQLite console: error at creating insertOrUpdate string: ', errorAtCreatingString)
+    // }
 }
 // This method takes the databaseName, tableName and the mappedData and inserts it in bulk in the database
 // Use this even for a single value
 export function insertOrUpdate(databaseName, tableName, data, createTableBool) {
     // return new Promise((resolve, reject) => {
     //     try {
-            let insertOrUpdateString = insertOrUpdateStringCreation(tableName);
-            let mappedData = mapDataForInsert(tableName, data);
-            if (checkArrayAndLength(mappedData)) {
-                return Promise.resolve()
-                    .then(() => openDatabase(databaseName))
-                    .then(wrapTransationInPromise)
-                    .then((txn) => {
-                        if (createTableBool) {
-                            return createTable(txn, tableName);
-                        }
-                        return Promise.resolve(txn);
+
+    let mappedData = mapDataForInsert(tableName, data);
+    let insertOrUpdateString = {
+        type: 'insert',
+        table: tableName,
+        or: 'replace',
+        values: mappedData
+    };
+    if (checkArrayAndLength(mappedData)) {
+        return Promise.resolve()
+            .then(() => openDatabase(databaseName))
+            .then(wrapTransationInPromise)
+            .then((txn) => {
+                if (createTableBool) {
+                    return createTable(txn, tableName);
+                }
+                return Promise.resolve(txn);
+            })
+            .then((txn) => {
+                let query = jsonSql.build(insertOrUpdateString);
+
+                return wrapExecuteSQLInPromise(txn, query.query, query.values, false)
+                    .catch((errorInsert) => {
+                        console.log('Insert failed. Reason: ', JSON.stringify(errorInsert));
+                        return Promise.reject(errorInsert);
                     })
-                    .then((txn) => {
-                        let dataToBeInsertedPromise = [];
-                        for (let i = 0; i < mappedData.length; i++) {
-                            dataToBeInsertedPromise.push(wrapExecuteSQLInPromise(txn, insertOrUpdateString, mappedData[i], i < mappedData.length  - 1));
-                        }
-                        return Promise.all(dataToBeInsertedPromise)
-                            .then((results) => {
-                                return Promise.resolve(results)
-                            });
-                    })
-                    .catch((errorInsertOrUpdate) => Promise.reject(errorInsertOrUpdate))
-            } else {
-                return Promise.resolve('Success');
-            }
+                // let dataToBeInsertedPromise = [];
+                // for (let i = 0; i < mappedData.length; i++) {
+                //     dataToBeInsertedPromise.push(wrapExecuteSQLInPromise(txn, insertOrUpdateString, mappedData[i], i < mappedData.length - 1));
+                // }
+                // return Promise.all(dataToBeInsertedPromise)
+                //     .then((results) => {
+                //         return Promise.resolve(results)
+                //     });
+            })
+            .catch((errorInsertOrUpdate) => Promise.reject(errorInsertOrUpdate))
+    } else {
+        return Promise.resolve('Success');
+    }
         // } catch (openDatabaseError) {
         //     reject(new Error('Could not open database'));
         // }
@@ -177,32 +196,32 @@ export function mapDataForInsert(tableName, data) {
     }
     let tableFields = constants.tableStructure[tableName].concat(constants.tableStructure.commonFields);
     return data.map((e) => {
-        let innerArray = [];
+        let innerArray = {};
         for (let i=0; i<tableFields.length; i++) {
             if (i === tableFields.length - 1) {
-                innerArray.push(JSON.stringify(e));
+                innerArray.json = JSON.stringify(e);
             } else {
                 if (tableFields[i].fieldName === 'locationId') {
-                    innerArray.push(extractLocationId(e));
+                    innerArray[tableFields[i].fieldName] = extractLocationId(e);
                 } else {
                     if (tableFields[i].fieldName === 'age') {
                         let years = get(e, `[${tableFields[i].fieldName}].years`, 0);
                         let months = get(e, `[${tableFields[i].fieldName}].months`, 0);
-                        innerArray.push(Math.max(years, months));
+                        innerArray[tableFields[i].fieldName] = Math.max(years, months);
                     } else {
                         if (tableFields[i].fieldName === 'indexDay') {
-                            innerArray.push(get(e, `[index]`, null));
+                            innerArray[tableFields[i].fieldName] = get(e, `[index]`, null);
                         } else {
                             if (constants.relationshipsMappedFields.includes(tableFields[i].fieldName)) {
-                                innerArray.push(mapRelationshipFields(e, tableFields[i].fieldName));
+                                innerArray[tableFields[i].fieldName] = mapRelationshipFields(e, tableFields[i].fieldName);
                             } else {
                                 if (tableName === 'person' && e.type === translations.personTypes.events && tableFields[i].fieldName === 'firstName') {
-                                    innerArray.push(get(e, `name`, null));
+                                    innerArray[tableFields[i].fieldName] = get(e, `name`, null);
                                 } else {
                                     if (tableName === 'person' && (tableFields[i].fieldName === 'firstName' || tableFields[i].fieldName === 'lastName')) {
-                                        innerArray.push(get(e, `[${tableFields[i].fieldName}]`, ''));
+                                        innerArray[tableFields[i].fieldName] = get(e, `[${tableFields[i].fieldName}]`, '');
                                     } else {
-                                        innerArray.push(get(e, `[${tableFields[i].fieldName}]`, null));
+                                        innerArray[tableFields[i].fieldName] = get(e, `[${tableFields[i].fieldName}]`, null);
                                     }
                                 }
                             }

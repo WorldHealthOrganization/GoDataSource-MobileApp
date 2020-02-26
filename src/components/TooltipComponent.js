@@ -42,7 +42,7 @@ class TooltipComponent extends PureComponent {
             > 
                 <ElevatedView elevation={3} style={style.elevatedView}>
                     <Ripple style={style.ripple} onPress={this.handleOnPressTooltip}>
-                        <Icon name='question' color='white' size={15}/>
+                        <Icon name='help' color='black' size={25}/>
                     </Ripple>
                 </ElevatedView>
 
@@ -81,7 +81,7 @@ const style = StyleSheet.create({
     },
     elevatedView: {
         flex: 1,
-        backgroundColor: styles.buttonBlack,
+        // backgroundColor: 'white',
         borderRadius: 150,
     },
     ripple: {
