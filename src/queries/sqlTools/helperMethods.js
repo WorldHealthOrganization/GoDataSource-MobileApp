@@ -50,7 +50,7 @@ export function wrapReadTransactionInPromise (database) {
 
 export function wrapExecuteSQLInPromise (transaction, sqlStatement, arrayOfFields, skipCallback) {
     // console.log('Execute query: ', sqlStatement, arrayOfFields);
-    if (transaction && sqlStatement && (checkArray(arrayOfFields) || isObject(arrayOfFields))) {
+    if (transaction && sqlStatement && checkArray(arrayOfFields)) {
         return new Promise((resolve, reject) => {
             if (skipCallback) {
                 transaction.executeSql(sqlStatement, arrayOfFields, null, (txn, errorStatement) => {return reject(errorStatement)});
@@ -66,15 +66,6 @@ export function wrapExecuteSQLInPromise (transaction, sqlStatement, arrayOfField
                         return reject(errorStatement);
                     }
                     );
-                // transaction.executeSql('SELECT * FROM person', []
-                //     , (transaction, resultSet) => {
-                //         console.log('result set: ', resultSet)
-                //         return resolve(resultSet)
-                //     },
-                //     (transaction, errorStatement) => {
-                //         return reject(errorStatement)
-                //     }
-                // )
             }
         })
     } else {
@@ -110,79 +101,64 @@ export function createTable(transaction, tableName) {
 
 // The following methods refer to the bulk insert or update of mapped data. Data mapping will not be done here
 function insertOrUpdateStringCreation (tableName) {
-    return {
-        type: 'insert',
-        table: tableName
+    try {
+        let insertOrUpdateString = `INSERT INTO ${tableName} values (`;
+        let tableFields = constants.tableStructure[tableName].concat(constants.tableStructure.commonFields);
+        for (let i=0; i<tableFields.length; i++) {
+            insertOrUpdateString = insertOrUpdateString + `:${tableFields[i].fieldName}`;
+            if (i === tableFields.length - 1) {
+                insertOrUpdateString = insertOrUpdateString + `)`;
+            } else {
+                insertOrUpdateString = insertOrUpdateString + `, `;
+            }
+        }
+        insertOrUpdateString = insertOrUpdateString + ` ON CONFLICT (_id) DO UPDATE SET `;
+        // Skip the id field (first field in the declared structure)
+        for (let i=1; i<tableFields.length; i++) {
+            insertOrUpdateString = insertOrUpdateString + `${tableFields[i].fieldName}=excluded.${tableFields[i].fieldName}`;
+            if (i < tableFields.length - 1) {
+                insertOrUpdateString = insertOrUpdateString + `, `;
+            }
+        }
+        return insertOrUpdateString
+    } catch (errorAtCreatingString) {
+        console.log('SQLite console: error at creating insertOrUpdate string: ', errorAtCreatingString)
     }
-
-    // try {
-    //     let insertOrUpdateString = `INSERT INTO ${tableName} values (`;
-    //     let tableFields = constants.tableStructure[tableName].concat(constants.tableStructure.commonFields);
-    //     for (let i=0; i<tableFields.length; i++) {
-    //         insertOrUpdateString = insertOrUpdateString + `:${tableFields[i].fieldName}`;
-    //         if (i === tableFields.length - 1) {
-    //             insertOrUpdateString = insertOrUpdateString + `)`;
-    //         } else {
-    //             insertOrUpdateString = insertOrUpdateString + `, `;
-    //         }
-    //     }
-    //     insertOrUpdateString = insertOrUpdateString + ` ON CONFLICT (_id) DO UPDATE SET `;
-    //     // Skip the id field (first field in the declared structure)
-    //     for (let i=1; i<tableFields.length; i++) {
-    //         insertOrUpdateString = insertOrUpdateString + `${tableFields[i].fieldName}=excluded.${tableFields[i].fieldName}`;
-    //         if (i < tableFields.length - 1) {
-    //             insertOrUpdateString = insertOrUpdateString + `, `;
-    //         }
-    //     }
-    //     return insertOrUpdateString
-    // } catch (errorAtCreatingString) {
-    //     console.log('SQLite console: error at creating insertOrUpdate string: ', errorAtCreatingString)
-    // }
 }
 // This method takes the databaseName, tableName and the mappedData and inserts it in bulk in the database
 // Use this even for a single value
 export function insertOrUpdate(databaseName, tableName, data, createTableBool) {
     // return new Promise((resolve, reject) => {
     //     try {
-
-    let mappedData = mapDataForInsert(tableName, data);
-    let insertOrUpdateString = {
-        type: 'insert',
-        table: tableName,
-        or: 'replace',
-        values: mappedData
-    };
-    if (checkArrayAndLength(mappedData)) {
-        return Promise.resolve()
-            .then(() => openDatabase(databaseName))
-            .then(wrapTransationInPromise)
-            .then((txn) => {
-                if (createTableBool) {
-                    return createTable(txn, tableName);
-                }
-                return Promise.resolve(txn);
-            })
-            .then((txn) => {
-                let query = jsonSql.build(insertOrUpdateString);
-
-                return wrapExecuteSQLInPromise(txn, query.query, query.values, false)
-                    .catch((errorInsert) => {
-                        console.log('Insert failed. Reason: ', JSON.stringify(errorInsert));
-                        return Promise.reject(errorInsert);
+            let insertOrUpdateString = insertOrUpdateStringCreation(tableName);
+            let mappedData = mapDataForInsert(tableName, data);
+            if (checkArrayAndLength(mappedData)) {
+                return Promise.resolve()
+                    .then(() => openDatabase(databaseName))
+                    .then(wrapTransationInPromise)
+                    .then((txn) => {
+                        if (createTableBool) {
+                            return createTable(txn, tableName);
+                        }
+                        return Promise.resolve(txn);
                     })
-                // let dataToBeInsertedPromise = [];
-                // for (let i = 0; i < mappedData.length; i++) {
-                //     dataToBeInsertedPromise.push(wrapExecuteSQLInPromise(txn, insertOrUpdateString, mappedData[i], i < mappedData.length - 1));
-                // }
-                // return Promise.all(dataToBeInsertedPromise)
-                //     .then((results) => {
-                //         return Promise.resolve(results)
-                //     });
-            })
-            .catch((errorInsertOrUpdate) => Promise.reject(errorInsertOrUpdate))
-    } else {
-        return Promise.resolve('Success');
-    }
+                    .then((txn) => {
+                        let dataToBeInsertedPromise = [];
+                        let i = 0;
+                        while(i < mappedData.length) {
+                            dataToBeInsertedPromise.push(wrapExecuteSQLInPromise(txn, insertOrUpdateString, mappedData[i], i < mappedData.length  - 1).catch((error) => console.log('stuff')));
+                            i++;
+                        }
+                        return Promise.all(dataToBeInsertedPromise)
+                            .then((results) => {
+                                dataToBeInsertedPromise = null;
+                                return Promise.resolve(results)
+                            });
+                    })
+                    .catch((errorInsertOrUpdate) => Promise.reject(errorInsertOrUpdate))
+            } else {
+                return Promise.resolve('Success');
+            }
         // } catch (openDatabaseError) {
         //     reject(new Error('Could not open database'));
         // }
@@ -196,32 +172,32 @@ export function mapDataForInsert(tableName, data) {
     }
     let tableFields = constants.tableStructure[tableName].concat(constants.tableStructure.commonFields);
     return data.map((e) => {
-        let innerArray = {};
+        let innerArray = [];
         for (let i=0; i<tableFields.length; i++) {
             if (i === tableFields.length - 1) {
-                innerArray.json = JSON.stringify(e);
+                innerArray.push(JSON.stringify(e));
             } else {
                 if (tableFields[i].fieldName === 'locationId') {
-                    innerArray[tableFields[i].fieldName] = extractLocationId(e);
+                    innerArray.push(extractLocationId(e));
                 } else {
                     if (tableFields[i].fieldName === 'age') {
                         let years = get(e, `[${tableFields[i].fieldName}].years`, 0);
                         let months = get(e, `[${tableFields[i].fieldName}].months`, 0);
-                        innerArray[tableFields[i].fieldName] = Math.max(years, months);
+                        innerArray.push(Math.max(years, months));
                     } else {
                         if (tableFields[i].fieldName === 'indexDay') {
-                            innerArray[tableFields[i].fieldName] = get(e, `[index]`, null);
+                            innerArray.push(get(e, `[index]`, null));
                         } else {
                             if (constants.relationshipsMappedFields.includes(tableFields[i].fieldName)) {
-                                innerArray[tableFields[i].fieldName] = mapRelationshipFields(e, tableFields[i].fieldName);
+                                innerArray.push(mapRelationshipFields(e, tableFields[i].fieldName));
                             } else {
                                 if (tableName === 'person' && e.type === translations.personTypes.events && tableFields[i].fieldName === 'firstName') {
-                                    innerArray[tableFields[i].fieldName] = get(e, `name`, null);
+                                    innerArray.push(get(e, `name`, null));
                                 } else {
                                     if (tableName === 'person' && (tableFields[i].fieldName === 'firstName' || tableFields[i].fieldName === 'lastName')) {
-                                        innerArray[tableFields[i].fieldName] = get(e, `[${tableFields[i].fieldName}]`, '');
+                                        innerArray.push(get(e, `[${tableFields[i].fieldName}]`, ''));
                                     } else {
-                                        innerArray[tableFields[i].fieldName] = get(e, `[${tableFields[i].fieldName}]`, null);
+                                        innerArray.push(get(e, `[${tableFields[i].fieldName}]`, null));
                                     }
                                 }
                             }

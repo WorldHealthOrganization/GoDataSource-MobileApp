@@ -189,17 +189,17 @@ export function storeHubConfigurationNew(hubConfiguration) {
             .then(() => AsyncStorage.getItem(hubConfiguration.url))
             .then((lastSyncDate) => getDatabaseSnapshotRequestNew(hubConfiguration, lastSyncDate, dispatch))
             .then((databasePath) => {
-                dispatch(processFilesForSyncNew(null, databasePath, hubConfiguration, true, true, true));
+                dispatch(processFilesForSyncNew(null, databasePath, hubConfiguration, true, true, true, dispatch));
             })
             .catch((error) => {
                 console.log('Error while doing stuff: ', error);
-                dispatch(processFilesForSyncNew(error, null, hubConfiguration, true, true, true));
+                dispatch(processFilesForSyncNew(error, null, hubConfiguration, true, true, true, dispatch));
             })
     }
 }
 
-function processFilesForSyncNew(error, response, hubConfiguration, isFirstTime, syncSuccessful, forceBulk) {
-    return async function (dispatch) {
+async function processFilesForSyncNew(error, response, hubConfiguration, isFirstTime, syncSuccessful, forceBulk, dispatch) {
+    // return async function (dispatch) {
         let hubConfig = JSON.parse(hubConfiguration.clientId);
         if (error) {
             if (error === 'No data to export') {
@@ -325,7 +325,7 @@ function processFilesForSyncNew(error, response, hubConfiguration, isFirstTime, 
                     }
                 })
         }
-    }
+    // }
 }
 
 function sortFiles (files) {
@@ -504,7 +504,7 @@ export function sendDatabaseToServer () {
                                 url: Platform.OS === 'ios' ? internetCredentialsGlobal.server : internetCredentialsGlobal.service,
                                 clientId: internetCredentialsGlobal.username,
                                 clientSecret: internetCredentialsGlobal.password
-                            }, null, true, false));
+                            }, null, true, false, dispatch));
                         })
                         .catch((errorGetDatabase) => {
                             if (errorGetDatabase === 'No data to export') {

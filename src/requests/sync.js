@@ -62,36 +62,33 @@ export function getDatabaseSnapshotRequestNew(hubConfig, lastSyncDate, dispatch)
 
             return computeHelpItemsAndCategories(hubConfiguration, lastSyncDate)
         })
-        .then((helpTranslations) => {
-                console.log("All language tokens requested from mobile: ", JSON.stringify(arrayOfTokens.concat(helpTranslations)));
-                return retriablePromise(RNFetchBlob.config({
-                    timeout: (30 * 60 * 10 * 1000),
-                    followRedirect: false,
-                    fileCache: true,
-                    path: `${dirs}/database.zip`
-                })
-                    .fetch('POST', encodeURI(requestUrl), {
-                            'device-info': deviceInfo,
-                            'Content-Type': 'application/json',
-                            'Accept': 'application/json',
-                            'Authorization': 'Basic ' + base64.encode(`${hubConfiguration.clientId}:${hubConfiguration.clientSecret}`)
-                        },
-                        JSON.stringify({
-                            languageTokens: lastSyncDate ? helpTranslations : arrayOfTokens.concat(helpTranslations)
-                        })
-                    )
-                    .progress({count: 500}, (received, total) => {
-                        dispatch(setSyncState({
-                            id: 'downloadDatabase',
-                            name: `Downloading database\nReceived ${received} bytes`
-                        }));
-                        console.log(received, total)
+        .then((helpTranslations) => retriablePromise(RNFetchBlob.config({
+                timeout: (30 * 60 * 10 * 1000),
+                followRedirect: false,
+                fileCache: true,
+                path: `${dirs}/database.zip`
+            })
+                .fetch('POST', encodeURI(requestUrl), {
+                        'device-info': deviceInfo,
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'Authorization': 'Basic ' + base64.encode(`${hubConfiguration.clientId}:${hubConfiguration.clientSecret}`)
+                    },
+                    JSON.stringify({
+                        languageTokens: lastSyncDate ? helpTranslations : arrayOfTokens.concat(helpTranslations)
                     })
-                    .then((res) => {
-                        return handleResponseFromRNFetchBlob(res)
-                    }), 3)
-                    .then((response) => Promise.resolve(databaseLocation))
-            }
+                )
+                .progress({count: 500}, (received, total) => {
+                    dispatch(setSyncState({
+                        id: 'downloadDatabase',
+                        name: `Downloading database\nReceived ${received} bytes`
+                    }));
+                    console.log(received, total)
+                })
+                .then((res) => {
+                    return handleResponseFromRNFetchBlob(res)
+                }), 3)
+                .then((response) => Promise.resolve(databaseLocation))
         )
 }
 
