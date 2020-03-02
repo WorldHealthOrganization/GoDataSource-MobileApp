@@ -21,6 +21,7 @@ import ViewHOC from './../components/ViewHOC';
 import translations from './../utils/translations';
 import {enhanceListWithGetData} from './../components/higherOrderComponents/withListData';
 import call from 'react-native-phone-call';
+import get from 'lodash/get';
 
 class UsersScreen extends Component {
 
@@ -182,10 +183,13 @@ const style = StyleSheet.create({
 
 function mapStateToProps(state) {
     return {
+        user:           state.user,
+        teams:          state.teams,
         screenSize:     state.app.screenSize,
         syncState:      state.app.syncState,
         translation:    state.app.translation,
-        loaderState:    state.app.loaderState
+        loaderState:    state.app.loaderState,
+        location:       get(state, 'locations.locationsList')
     };
 }
 

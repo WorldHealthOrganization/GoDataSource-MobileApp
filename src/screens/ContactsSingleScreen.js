@@ -393,7 +393,7 @@ class ContactsSingleScreen extends Component {
         let followUp = {
             _id: generateId(),
             statusId: config.followUpStatuses.notPerformed,
-            targeted: false,
+            targeted: true,
             date: date,
             fileType: 'followUp.json',
             outbreakId: this.props.user.activeOutbreakId,

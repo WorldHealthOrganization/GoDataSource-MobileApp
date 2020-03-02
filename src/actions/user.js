@@ -272,7 +272,7 @@ export function getUsersForOutbreakId({outbreakId, usersFilter, searchText, last
         userList = userList.concat(get(teams, `[${i}].userIds`, []));
     }
 
-    return getUserTeamMembers(userList, {outbreakId, usersFilter, searchText})
+    return getUserTeamMembers(userList, {outbreakId, usersFilter, searchText: searchText.text})
         .then((response) => {
             return {
                 data: response.map((user) => {
