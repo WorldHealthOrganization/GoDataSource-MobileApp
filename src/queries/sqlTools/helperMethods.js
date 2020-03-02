@@ -130,31 +130,62 @@ function insertOrUpdateStringCreation (tableName) {
 export function insertOrUpdate(databaseName, tableName, data, createTableBool) {
     // return new Promise((resolve, reject) => {
     //     try {
+            let start = new Date().getTime();
             let insertOrUpdateString = insertOrUpdateStringCreation(tableName);
             let mappedData = mapDataForInsert(tableName, data);
             if (checkArrayAndLength(mappedData)) {
                 return Promise.resolve()
                     .then(() => openDatabase(databaseName))
-                    .then(wrapTransationInPromise)
-                    .then((txn) => {
-                        if (createTableBool) {
-                            return createTable(txn, tableName);
-                        }
-                        return Promise.resolve(txn);
+                    .then((database) => {
+                        database.transaction((txn) => {
+                            if (createTableBool) {
+                                let createTableString = createTableStringMethod(tableName);
+                                txn.executeSql(createTableString, []);
+                            }
+                            let i = 0;
+                            while (i < mappedData.length) {
+                                if (i < mappedData.length - 1) {
+                                    txn.executeSql(insertOrUpdateString, mappedData[i]);
+                                } else {
+                                    txn.executeSql(insertOrUpdateString, mappedData[mappedData.length - 1],
+                                        (success) => {
+                                            console.log('Transactional insert took: ', new Date().getTime() - start);
+                                            txn = null;
+                                            database = null;
+                                            return Promise.resolve(success);
+                                        },
+                                        (error) => {
+                                            return Promise.reject(error);
+                                        })
+                                }
+                                i++
+                            }
+                        })
                     })
-                    .then((txn) => {
-                        let dataToBeInsertedPromise = [];
-                        let i = 0;
-                        while(i < mappedData.length) {
-                            dataToBeInsertedPromise.push(wrapExecuteSQLInPromise(txn, insertOrUpdateString, mappedData[i], i < mappedData.length  - 1).catch((error) => console.log('stuff')));
-                            i++;
-                        }
-                        return Promise.all(dataToBeInsertedPromise)
-                            .then((results) => {
-                                dataToBeInsertedPromise = null;
-                                return Promise.resolve(results)
-                            });
-                    })
+
+                    // .then(wrapTransationInPromise)
+                    // .then((txn) => {
+                    //     if (createTableBool) {
+                    //         return createTable(txn, tableName);
+                    //     }
+                    //     return Promise.resolve(txn);
+                    // })
+                    // .then((txn) => {
+                    //     let start = new Date().getTime();
+                    //     // console.log('Transaction wrapped: ', JSON.stringify(txn));
+                    //     let dataToBeInsertedPromise = [];
+                    //     let i = 0;
+                    //     while(i < mappedData.length) {
+                    //         dataToBeInsertedPromise.push(wrapExecuteSQLInPromise(txn, insertOrUpdateString, mappedData[i], i < mappedData.length  - 1).catch((error) => console.log('stuff')));
+                    //         i++;
+                    //     }
+                    //     return Promise.all(dataToBeInsertedPromise)
+                    //         .then((results) => {
+                    //             dataToBeInsertedPromise = null;
+                    //             console.log('Transaction wrapped: time for processing file: ', new Date().getTime() - start, tableName);
+                    //             return Promise.resolve(results)
+                    //         });
+                    // })
                     .catch((errorInsertOrUpdate) => Promise.reject(errorInsertOrUpdate))
             } else {
                 return Promise.resolve('Success');
