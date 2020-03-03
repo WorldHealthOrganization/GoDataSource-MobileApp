@@ -2,33 +2,38 @@
  * Created by florinpopa on 14/06/2018.
  */
 import {
-    ACTION_TYPE_ROOT_CHANGE,
-    ACTION_TYPE_SAVE_SCREEN_SIZE,
-    ACTION_TYPE_SAVE_SELECTED_SCREEN,
     ACTION_TYPE_ADD_FILTER_FOR_SCREEN,
     ACTION_TYPE_REMOVE_FILTER_FOR_SCREEN,
-    ACTION_TYPE_SAVE_TRANSLATION,
-    ACTION_TYPE_SAVE_HELP_CATEGORY,
+    ACTION_TYPE_ROOT_CHANGE,
+    ACTION_TYPE_SAVE_ACTIVE_DATABASE,
     ACTION_TYPE_SAVE_AVAILABLE_LANGUAGES,
     ACTION_TYPE_SAVE_HUB_CONFIGURATION,
-    ACTION_TYPE_SET_SYNC_STATE,
-    ACTION_TYPE_SAVE_GENERATED_FOLLOWUPS,
-    ACTION_TYPE_SET_LOGIN_STATE,
-    ACTION_TYPE_SAVE_ACTIVE_DATABASE,
+    ACTION_TYPE_SAVE_SCREEN_SIZE,
+    ACTION_TYPE_SAVE_SELECTED_SCREEN,
+    ACTION_TYPE_SAVE_TRANSLATION,
     ACTION_TYPE_SET_LOADER_STATE,
-    ACTION_TYPE_SAVE_HELP_ITEM
+    ACTION_TYPE_SET_LOGIN_STATE,
+    ACTION_TYPE_SET_SYNC_STATE
 } from './../utils/enums';
 import config from './../utils/config';
-import {Dimensions} from 'react-native';
-import {Platform} from 'react-native';
+import {Dimensions, Platform} from 'react-native';
 import {getAvailableLanguagesRequest, getTranslationRequest} from './../queries/translation';
-import {postDatabaseSnapshotRequest, getDatabaseSnapshotRequestNew} from './../requests/sync';
-import {setInternetCredentials, getInternetCredentials} from 'react-native-keychain';
-import {unzipFile, readDir} from './../utils/functions';
+import {getDatabaseSnapshotRequestNew, postDatabaseSnapshotRequest} from './../requests/sync';
+import {getInternetCredentials, setInternetCredentials} from 'react-native-keychain';
+import {
+    createDate,
+    createZipFileAtPath,
+    deleteFile,
+    getDataFromDatabaseFromFile,
+    getDataFromDatabaseFromFileSql,
+    processFilePouch,
+    processFilesSql,
+    readDir,
+    setNumberOfFilesProcessed,
+    unzipFile
+} from './../utils/functions';
 import RNFetchBlobFs from 'rn-fetch-blob/fs';
-import {deleteFile, getDataFromDatabaseFromFile, processFilePouch, processFilesSql} from './../utils/functions';
 import {createDatabase, getDatabase} from './../queries/database';
-import {setNumberOfFilesProcessed, createZipFileAtPath, createDate, getDataFromDatabaseFromFileSql} from './../utils/functions';
 import AsyncStorage from '@react-native-community/async-storage';
 import {getUserById} from './user';
 import get from 'lodash/get';

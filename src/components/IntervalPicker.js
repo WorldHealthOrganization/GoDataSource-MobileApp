@@ -4,10 +4,9 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {PureComponent} from 'react';
-import {View, StyleSheet} from 'react-native';
+import {StyleSheet, View} from 'react-native';
 import styles from './../styles';
 import {connect} from "react-redux";
-import {bindActionCreators} from "redux";
 import MultiSlider from '@ptomasroos/react-native-multi-slider';
 import PropTypes from 'prop-types';
 import CustomMarker from './CustomMarker';
@@ -24,7 +23,6 @@ class IntervalPicker extends PureComponent {
             interval: [this.props.min, this.props.max]
         }
     }
-
     // Please add here the react lifecycle methods that you need
 
 
@@ -141,9 +139,4 @@ function mapStateToProps(state) {
     };
 }
 
-function matchDispatchProps(dispatch) {
-    return bindActionCreators({
-    }, dispatch);
-}
-
-export default connect(mapStateToProps, matchDispatchProps)(IntervalPicker);
+export default connect(mapStateToProps)(IntervalPicker);

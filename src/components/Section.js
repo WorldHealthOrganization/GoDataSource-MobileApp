@@ -1,11 +1,10 @@
 /**
  * Created by florinpopa on 03/08/2018.
  */
-import React, {PureComponent} from 'react';
-import {View, Text, StyleSheet, PixelRatio} from 'react-native';
+import React from 'react';
+import {StyleSheet, Text, View} from 'react-native';
 import PropTypes from 'prop-types';
 import styles from './../styles';
-import translations from './../utils/translations'
 import {getTranslation} from './../utils/functions';
 
 // Since this app is based around the material ui is better to use the components from

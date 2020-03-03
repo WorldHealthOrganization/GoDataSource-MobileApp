@@ -1,11 +1,10 @@
 import React, {PureComponent} from 'react';
-import {View, Text, Modal, StyleSheet, TextInput, FlatList} from 'react-native';
+import {FlatList, Modal, Text, TextInput, View} from 'react-native';
 import {Icon} from 'react-native-material-ui';
 import config from './../utils/config';
 import Ripple from 'react-native-material-ripple';
 import stylesGlobal from './../styles';
 import {connect} from "react-redux";
-import {bindActionCreators} from "redux";
 import {calculateDimension} from './../utils/functions';
 import ElevatedView from 'react-native-elevated-view';
 import Button from './Button';
@@ -388,11 +387,6 @@ class SectionedMultiSelect extends PureComponent {
     };
 }
 
-// Create style outside the class, or for components that will be used by other components (buttons),
-// make a global style in the config directory
-const style = StyleSheet.create({
-});
-
 function mapStateToProps(state) {
     return {
         screenSize: state.app.screenSize,
@@ -400,9 +394,4 @@ function mapStateToProps(state) {
     };
 }
 
-function matchDispatchProps(dispatch) {
-    return bindActionCreators({
-    }, dispatch);
-}
-
-export default connect(mapStateToProps, matchDispatchProps)(SectionedMultiSelect);
+export default connect(mapStateToProps)(SectionedMultiSelect);

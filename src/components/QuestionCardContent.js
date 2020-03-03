@@ -1,5 +1,5 @@
 import React, {PureComponent} from 'react';
-import {View, Text, StyleSheet, Platform, ScrollView, Alert} from 'react-native';
+import {Alert, ScrollView, StyleSheet, Text, View} from 'react-native';
 import styles from './../styles';
 import cloneDeep from "lodash/cloneDeep";
 import translations from "../utils/translations";
@@ -9,7 +9,6 @@ import TextInput from './TextInput';
 import DropdownInput from './DropdownInput';
 import DropDown from './DropDown';
 import Section from './Section';
-import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
 import get from 'lodash/get';
 import Ripple from 'react-native-material-ripple';
@@ -475,9 +474,4 @@ function mapStateToProps(state) {
     };
 }
 
-function matchDispatchProps(dispatch) {
-    return bindActionCreators({
-    }, dispatch);
-}
-
-export default connect(mapStateToProps, matchDispatchProps)(QuestionCardContent);
+export default connect(mapStateToProps)(QuestionCardContent);

@@ -1,10 +1,7 @@
 // Here will be stored different values in relation to the sql structure
-import moment from "moment/moment";
 import translations from './../../utils/translations';
 import get from 'lodash/get';
-import set from 'lodash/set';
 import {checkArrayAndLength} from './../../utils/typeCheckingFunctions';
-import config from './../../utils/config';
 
 const databaseTables = ['person', 'followUp', 'relationship', 'languageToken'];
 const tableStructure = {

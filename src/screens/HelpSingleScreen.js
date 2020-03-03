@@ -4,7 +4,7 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
-import {View, StyleSheet, Alert, BackHandler} from 'react-native';
+import {Alert, BackHandler, StyleSheet, View} from 'react-native';
 import NavBarCustom from './../components/NavBarCustom';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";

@@ -3,9 +3,9 @@
  */
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
-import React, { Component } from 'react';
-import { View, Alert, StyleSheet, Animated, Platform, Dimensions, BackHandler, Keyboard } from 'react-native';
-import { TabBar, TabView, PagerPan, PagerAndroid, PagerScroll } from 'react-native-tab-view';
+import React, {Component} from 'react';
+import {Alert, Animated, BackHandler, Dimensions, Keyboard, Platform, StyleSheet, View} from 'react-native';
+import {PagerAndroid, PagerPan, PagerScroll, TabBar, TabView} from 'react-native-tab-view';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import NavBarCustom from './../components/NavBarCustom';
@@ -13,35 +13,30 @@ import Breadcrumb from './../components/Breadcrumb';
 import Ripple from 'react-native-material-ripple';
 import styles from './../styles';
 import config from './../utils/config';
-import _, { sortBy } from 'lodash';
+import _, {sortBy} from 'lodash';
 import CaseSinglePersonalContainer from './../containers/CaseSinglePersonalContainer';
 import CaseSingleAddressContainer from './../containers/CaseSingleAddressContainer';
 import CaseSingleInfectionContainer from './../containers/CaseSingleInfectionContainer';
 import CaseSingleInvestigationContainer from '../containers/CaseSingleInvestigationContainer';
 import CaseSingleExposureContainer from '../containers/CaseSingleExposureContainer';
-import { Icon } from 'react-native-material-ui';
-import { checkForNameDuplicatesRequest } from './../queries/cases';
+import {Icon} from 'react-native-material-ui';
+import {checkForNameDuplicatesRequest} from './../queries/cases';
+import {addCase, getCaseAndExposuresById, getRelationsForCase, updateCase} from './../actions/cases';
+import {saveSelectedScreen} from "../actions/app";
 import {
-    addCase,
-    updateCase,
-    getCaseAndExposuresById,
-    getRelationsForCase
-} from './../actions/cases';
-import { saveSelectedScreen } from "../actions/app";
-import {
-    updateRequiredFields,
-    extractIdFromPouchId,
-    navigation,
-    getTranslation,
     calculateDimension,
-    mapAnswers,
-    reMapAnswers,
     checkRequiredQuestions,
-    extractAllQuestions,
+    computeFullName,
     createDate,
-    computeFullName
+    extractAllQuestions,
+    extractIdFromPouchId,
+    getTranslation,
+    mapAnswers,
+    navigation,
+    reMapAnswers,
+    updateRequiredFields
 } from './../utils/functions';
-import moment from 'moment';
+import moment from 'moment/src/moment';
 import translations from './../utils/translations'
 import ElevatedView from 'react-native-elevated-view';
 import ViewHOC from './../components/ViewHOC';

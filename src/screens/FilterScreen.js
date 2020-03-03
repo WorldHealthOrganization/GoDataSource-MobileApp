@@ -1,16 +1,16 @@
-import React, { Component } from 'react';
-import { View, Text, StyleSheet, Animated, Platform } from 'react-native';
-import { connect } from "react-redux";
-import { bindActionCreators } from "redux";
-import { TabBar, TabView, PagerScroll } from 'react-native-tab-view';
+import React, {Component} from 'react';
+import {Animated, Platform, StyleSheet, View} from 'react-native';
+import {connect} from "react-redux";
+import {bindActionCreators} from "redux";
+import {PagerScroll, TabBar, TabView} from 'react-native-tab-view';
 import cloneDeep from 'lodash/cloneDeep';
 import get from 'lodash/get';
 
 import styles from './../styles';
 import NavBarCustom from './../components/NavBarCustom';
-import { extractIdFromPouchId, getTranslation } from './../utils/functions';
+import {extractIdFromPouchId, getTranslation} from './../utils/functions';
 import config from './../utils/config';
-import { addFilterForScreen, removeFilterForScreen } from './../actions/app';
+import {addFilterForScreen, removeFilterForScreen} from './../actions/app';
 import FiltersContainer from './../containers/FiltersContainer';
 import SortContainer from './../containers/SortContainer';
 import translations from './../utils/translations';

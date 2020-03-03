@@ -2,11 +2,11 @@ import SQLite, {encodeName} from 'react-native-sqlcipher-2';
 import {database} from './../database';
 import constants from './constants';
 import get from 'lodash/get';
-import isObject from 'lodash/isObject';
 import {extractLocationId} from './../../utils/functions';
 import {checkArray, checkArrayAndLength} from './../../utils/typeCheckingFunctions';
 import translations from "../../utils/translations";
 import {generalMapping} from "../../actions/followUps";
+
 var jsonSql = require('json-sql')();
 jsonSql.setDialect('sqlite');
 

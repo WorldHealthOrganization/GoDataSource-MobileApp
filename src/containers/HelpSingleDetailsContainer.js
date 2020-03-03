@@ -4,11 +4,10 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {PureComponent} from 'react';
-import {View, StyleSheet, ScrollView} from 'react-native';
+import {ScrollView, StyleSheet, View} from 'react-native';
 import {calculateDimension, getTranslation} from './../utils/functions';
 import config from './../utils/config';
 import {connect} from "react-redux";
-import {bindActionCreators} from "redux";
 import styles from './../styles';
 import CardComponent from './../components/CardComponent';
 import ElevatedView from 'react-native-elevated-view';
@@ -148,9 +147,4 @@ function mapStateToProps(state) {
     };
 }
 
-function matchDispatchProps(dispatch) {
-    return bindActionCreators({
-    }, dispatch);
-}
-
-export default connect(mapStateToProps, matchDispatchProps)(HelpSingleDetailsContainer);
+export default connect(mapStateToProps)(HelpSingleDetailsContainer);

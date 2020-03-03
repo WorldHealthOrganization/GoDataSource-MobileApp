@@ -3,7 +3,6 @@
  */
 import {ACTION_TYPE_STORE_HELP_ITEM} from './../utils/enums';
 import {getHelpItemRequest} from '../queries/helpItem';
-import { addError } from './errors';
 import errorTypes from './../utils/errorTypes';
 
 

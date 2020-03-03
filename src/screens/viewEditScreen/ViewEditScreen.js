@@ -1,11 +1,10 @@
 // This will handle rendering
 import React, {Component} from 'react';
-import {View, StyleSheet, Platform, InteractionManager, Animated, Alert} from 'react-native';
-import {TabBar, TabView, PagerScroll} from 'react-native-tab-view';
+import {Alert, Animated, InteractionManager, Platform, StyleSheet, View} from 'react-native';
+import {PagerScroll, TabBar, TabView} from 'react-native-tab-view';
 import ElevatedView from 'react-native-elevated-view';
 import Ripple from 'react-native-material-ripple';
-// import Menu, { MenuItem } from 'react-native-material-menu';
-import { Icon } from 'react-native-material-ui';
+import {Icon} from 'react-native-material-ui';
 import {LoaderScreen} from 'react-native-ui-lib';
 import PropTypes from 'prop-types';
 import {bindActionCreators} from 'redux';
@@ -16,10 +15,14 @@ import Breadcrumb from './../../components/Breadcrumb';
 import {enhanceTabsWithDataHandling} from './withDataHandling';
 import {
     calculateDimension,
-    getTranslation,
     computeFullName,
     createDate,
-    extractIdFromPouchId, generateId, generateTeamId, updateRequiredFields, daysSince
+    daysSince,
+    extractIdFromPouchId,
+    generateId,
+    generateTeamId,
+    getTranslation,
+    updateRequiredFields
 } from "../../utils/functions";
 import styles from "../../styles";
 import translations from "../../utils/translations";

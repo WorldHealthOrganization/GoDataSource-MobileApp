@@ -2,9 +2,9 @@
  * Created by florinpopa on 14/06/2018.
  */
 import styles from './../styles';
-import { Platform } from 'react-native';
+import {Platform} from 'react-native';
 import translations from './translations';
-import { createDate } from './../utils/functions';
+import {createDate} from './../utils/functions';
 
 const baseUrls = [
     {value: 'gva11sucombee.who.int:3000'},

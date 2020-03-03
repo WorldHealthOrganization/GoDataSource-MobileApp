@@ -3,25 +3,24 @@
  */
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
-import React, {PureComponent, Suspense, } from 'react';
-import {View, Text, StyleSheet, Platform, Image, Alert} from 'react-native';
+import React, {PureComponent,} from 'react';
+import {Alert, Image, Platform, StyleSheet, Text, View} from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 import {Button, Icon} from 'react-native-material-ui';
-import { TextField } from 'react-native-material-textfield';
+import {TextField} from 'react-native-material-textfield';
 import styles from './../styles';
-import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
-import { loginUser } from './../actions/user';
-import { removeErrors } from './../actions/errors';
+import {connect} from 'react-redux';
+import {bindActionCreators} from 'redux';
+import {loginUser} from './../actions/user';
+import {removeErrors} from './../actions/errors';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import url from './../utils/url';
-import {storeHubConfigurationNew} from './../actions/app';
+import {changeAppRoot, setSyncState, storeHubConfigurationNew} from './../actions/app';
 import Ripple from 'react-native-material-ripple';
-import {getTranslation, generateId, calculateDimension} from './../utils/functions';
+import {calculateDimension, generateId, getTranslation} from './../utils/functions';
 import translations from './../utils/translations';
 import SwitchInput from './../components/SwitchInput';
 import {getInternetCredentials} from 'react-native-keychain';
-import {setSyncState, changeAppRoot} from './../actions/app';
 import ModalSyncStatus from './../components/ModalSyncStatus';
 import VersionNumber from 'react-native-version-number';
 import IntervalPicker from './../components/IntervalPicker';

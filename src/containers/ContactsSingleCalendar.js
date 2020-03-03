@@ -4,9 +4,8 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
-import {View, StyleSheet, InteractionManager} from 'react-native';
+import {InteractionManager, StyleSheet, View} from 'react-native';
 import {connect} from "react-redux";
-import {bindActionCreators} from "redux";
 import styles from './../styles';
 import ElevatedView from 'react-native-elevated-view';
 import {LoaderScreen} from 'react-native-ui-lib';
@@ -27,11 +26,6 @@ class ContactsSingleCalendar extends Component {
     }
 
     // Please add here the react lifecycle methods that you need
-    // shouldComponentUpdate(nextProps, nextState) {
-    //     // console.log("NextPropsIndex ContactsSingleCalendar: ", nextProps.activeIndex, this.props.activeIndex);
-    //     return nextProps.activeIndex === 3;
-    // }
-
     componentDidMount() {
         InteractionManager.runAfterInteractions(() => {
             this.setState({
@@ -133,9 +127,4 @@ function mapStateToProps(state) {
     };
 }
 
-function matchDispatchProps(dispatch) {
-    return bindActionCreators({
-    }, dispatch);
-}
-
-export default connect(mapStateToProps, matchDispatchProps)(ContactsSingleCalendar);
+export default connect(mapStateToProps)(ContactsSingleCalendar);

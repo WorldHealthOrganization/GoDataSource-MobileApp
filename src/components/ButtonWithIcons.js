@@ -11,7 +11,6 @@ import Ripple from 'react-native-material-ripple';
 import IconMaterial from 'react-native-vector-icons/MaterialCommunityIcons';
 import styles from './../styles';
 import {connect} from "react-redux";
-import {bindActionCreators} from "redux";
 
 class ButtonWithIcons extends PureComponent {
 
@@ -101,9 +100,4 @@ function mapStateToProps(state) {
     };
 }
 
-function matchDispatchProps(dispatch) {
-    return bindActionCreators({
-    }, dispatch);
-}
-
-export default connect(mapStateToProps, matchDispatchProps)(ButtonWithIcons);
+export default connect(mapStateToProps)(ButtonWithIcons);

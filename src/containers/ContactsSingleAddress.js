@@ -3,22 +3,12 @@
  */
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
-import React, { PureComponent } from 'react';
-import {
-    View,
-    Text,
-    StyleSheet,
-    InteractionManager,
-    Alert,
-    ScrollView,
-    TouchableWithoutFeedback,
-    Keyboard
-} from 'react-native';
-import { LoaderScreen } from 'react-native-ui-lib';
-import { calculateDimension, getTranslation, extractIdFromPouchId, createDate } from './../utils/functions';
+import React, {PureComponent} from 'react';
+import {Alert, InteractionManager, ScrollView, StyleSheet, Text, View} from 'react-native';
+import {LoaderScreen} from 'react-native-ui-lib';
+import {calculateDimension, createDate, extractIdFromPouchId, getTranslation} from './../utils/functions';
 import config from './../utils/config';
-import { connect } from "react-redux";
-import { bindActionCreators } from "redux";
+import {connect} from "react-redux";
 import styles from './../styles';
 import constants from './../utils/constants';
 import Ripple from 'react-native-material-ripple';
@@ -379,9 +369,4 @@ function mapStateToProps(state) {
     };
 }
 
-function matchDispatchProps(dispatch) {
-    return bindActionCreators({
-    }, dispatch);
-}
-
-export default connect(mapStateToProps, matchDispatchProps)(ContactsSingleAddress);
+export default connect(mapStateToProps)(ContactsSingleAddress);

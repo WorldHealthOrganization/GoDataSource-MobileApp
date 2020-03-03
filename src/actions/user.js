@@ -2,26 +2,39 @@
  * Created by florinpopa on 03/07/2018.
  */
 import {ACTION_TYPE_STORE_USER} from './../utils/enums';
-import { batchActions } from 'redux-batched-actions';
-import {changeAppRoot, getTranslations, saveTranslation, saveAvailableLanguages} from './app';
-import {loginUserRequest, getUserByIdRequest, updateUserRequest, getUserTeamMembers} from './../queries/user';
+import {batchActions} from 'redux-batched-actions';
+import {
+    changeAppRoot,
+    getAvailableLanguages,
+    getTranslations,
+    saveAvailableLanguages,
+    saveSelectedScreen,
+    saveTranslation,
+    setLoaderState,
+    setLoginState,
+    setSyncState,
+    storeData
+} from './app';
+import {getUserByIdRequest, getUserTeamMembers, loginUserRequest, updateUserRequest} from './../queries/user';
 import {getUserRoles} from './../actions/role';
 import {getUserTeams} from './../actions/teams';
-import { getClusters } from './clusters';
-import { getOutbreakById } from './outbreak';
-import { addError } from './errors';
+import {getClusters, storeClusters} from './clusters';
+import {
+    getOutbreakById,
+    storeLocations,
+    storeLocationsList,
+    storeOutbreak,
+    storeUserLocations,
+    storeUserLocationsList
+} from './outbreak';
+import {addError} from './errors';
 import {getReferenceData, storeReferenceData} from './referenceData';
-import {getHelpCategory} from './helpCategory';
-import {getHelpItem} from './helpItem';
+import {getHelpCategory, storeHelpCategory} from './helpCategory';
+import {getHelpItem, storeHelpItem} from './helpItem';
 import errorTypes from './../utils/errorTypes';
-import {storeHelpCategory} from './helpCategory';
-import {storeHelpItem} from './helpItem';
-import {storeOutbreak, storeLocationsList, storeLocations, storeUserLocationsList, storeUserLocations} from './outbreak';
 import {storeUserTeams} from './teams';
-import {storeClusters} from './clusters';
-import {setLoginState, storeData, getAvailableLanguages, setSyncState, saveSelectedScreen, setLoaderState} from './app';
 import {storePermissions} from './role';
-import {getLocations, getUserLocations} from './locations';
+import {getLocations} from './locations';
 import get from 'lodash/get';
 import lodashIntersection from 'lodash/intersection';
 import {filterByUser} from './../utils/functions';

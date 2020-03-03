@@ -1,4 +1,4 @@
-import { getRolesForUserRequest } from './../queries/user';
+import {getRolesForUserRequest} from './../queries/user';
 import {ACTION_TYPE_STORE_USER_PERMISSIONS} from './../utils/enums';
 import _ from 'lodash';
 import errorTypes from "../utils/errorTypes";

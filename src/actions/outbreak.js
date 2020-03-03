@@ -1,7 +1,13 @@
 /**
  * Created by florinpopa on 19/07/2018.
  */
-import {ACTION_TYPE_STORE_OUTBREAK, ACTION_TYPE_STORE_LOCATIONS, ACTION_TYPE_STORE_USER_LOCATIONS, ACTION_TYPE_STORE_LOCATIONS_LIST, ACTION_TYPE_STORE_USER_LOCATIONS_LIST} from './../utils/enums';
+import {
+    ACTION_TYPE_STORE_LOCATIONS,
+    ACTION_TYPE_STORE_LOCATIONS_LIST,
+    ACTION_TYPE_STORE_OUTBREAK,
+    ACTION_TYPE_STORE_USER_LOCATIONS,
+    ACTION_TYPE_STORE_USER_LOCATIONS_LIST
+} from './../utils/enums';
 import {getOutbreakByIdRequest} from './../queries/outbreak';
 import errorTypes from './../utils/errorTypes';
 

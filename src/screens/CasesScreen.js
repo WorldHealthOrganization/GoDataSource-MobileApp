@@ -4,12 +4,11 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
-import {View, Alert, StyleSheet} from 'react-native';
+import {StyleSheet, View} from 'react-native';
 import {Icon} from 'react-native-material-ui';
 import styles from './../styles';
 import NavBarCustom from './../components/NavBarCustom';
 import {calculateDimension, getTranslation} from './../utils/functions';
-import config from './../utils/config';
 import Ripple from 'react-native-material-ripple';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -25,9 +24,8 @@ import {pushNewEditScreen} from './../utils/screenTransitionFunctions';
 import {enhanceListWithGetData} from './../components/higherOrderComponents/withListData';
 import get from "lodash/get";
 import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
-import { Popup } from 'react-native-map-link';
+import {Popup} from 'react-native-map-link';
 import PermissionComponent from './../components/PermissionComponent';
-import constants from "../utils/constants";
 import {handleQRSearchTransition} from "../utils/screenTransitionFunctions";
 
 class CasesScreen extends Component {

@@ -7,13 +7,13 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
-import {View, Text, StyleSheet, Platform, Image, Alert} from 'react-native';
+import {Alert, Image, Platform, StyleSheet, Text, View} from 'react-native';
 import {Button, Icon} from 'react-native-material-ui';
 import styles from './../styles';
-import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
-import { loginUser } from './../actions/user';
-import { removeErrors } from './../actions/errors';
+import {connect} from 'react-redux';
+import {bindActionCreators} from 'redux';
+import {loginUser} from './../actions/user';
+import {removeErrors} from './../actions/errors';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import Ripple from 'react-native-material-ripple';
 import translations from './../utils/translations'

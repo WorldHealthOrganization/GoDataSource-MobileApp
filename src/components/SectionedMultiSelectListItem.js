@@ -1,10 +1,5 @@
 import React from 'react';
-import {View, Text, StyleSheet} from 'react-native';
-import PropTypes from 'prop-types';
-import styles from './../styles';
-import translations from './../utils/translations'
-import {getTranslation} from './../utils/functions';
-import {calculateDimension} from "../utils/functions";
+import {StyleSheet, Text, View} from 'react-native';
 import Ripple from 'react-native-material-ripple';
 
 // Since this app is based around the material ui is better to use the components from
@@ -97,17 +92,5 @@ const style = StyleSheet.create({
         height: 1
     }
 });
-
-// Section.propTypes = {
-//     label: PropTypes.string.isRequired,
-//     hasBorderBottom: PropTypes.boolean,
-//     borderBottomColor: PropTypes.string
-// };
-//
-// Section.defaultProps = {
-//     label: 'Test',
-//     hasBorderBottom: false,
-//     borderBottomColor: styles.navigationDrawerSeparatorGrey
-// };
 
 export default SectionedMultiSelectListItem;

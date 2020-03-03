@@ -4,7 +4,7 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
-import {View, StyleSheet, Alert} from 'react-native';
+import {StyleSheet, View} from 'react-native';
 import styles from './../styles';
 import NavBarCustom from './../components/NavBarCustom';
 import ElevatedView from 'react-native-elevated-view';
@@ -15,8 +15,7 @@ import {connect} from "react-redux";
 import AnimatedListView from './../components/AnimatedListView';
 import {getContactsForOutbreakId} from './../actions/contacts';
 import ViewHOC from './../components/ViewHOC';
-import config from './../utils/config';
-import { Popup } from 'react-native-map-link';
+import {Popup} from 'react-native-map-link';
 import translations from './../utils/translations'
 import Breadcrumb from './../components/Breadcrumb';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -28,7 +27,6 @@ import {handleQRSearchTransition} from "../utils/screenTransitionFunctions";
 import {bindActionCreators} from "redux";
 import {setLoaderState} from "../actions/app";
 import PermissionComponent from './../components/PermissionComponent';
-import constants from "../utils/constants";
 
 class ContactsScreen extends Component {
 

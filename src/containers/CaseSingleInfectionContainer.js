@@ -3,12 +3,11 @@
  */
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
-import React, { Component } from 'react';
-import { View, Text, StyleSheet, Alert, ScrollView } from 'react-native';
-import { calculateDimension, getTranslation, extractIdFromPouchId, createDate } from './../utils/functions';
+import React, {Component} from 'react';
+import {Alert, ScrollView, StyleSheet, Text, View} from 'react-native';
+import {calculateDimension, createDate, extractIdFromPouchId, getTranslation} from './../utils/functions';
 import config from './../utils/config';
-import { connect } from "react-redux";
-import { bindActionCreators } from "redux";
+import {connect} from "react-redux";
 import styles from './../styles';
 import Ripple from 'react-native-material-ripple';
 import CardComponent from './../components/CardComponent';
@@ -516,9 +515,4 @@ function mapStateToProps(state) {
     };
 }
 
-function matchDispatchProps(dispatch) {
-    return bindActionCreators({
-    }, dispatch);
-}
-
-export default connect(mapStateToProps, matchDispatchProps)(CaseSingleInfectionContainer);
+export default connect(mapStateToProps)(CaseSingleInfectionContainer);

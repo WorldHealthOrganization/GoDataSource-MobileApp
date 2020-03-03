@@ -5,7 +5,7 @@ import translations from './translations';
 import {getItemByIdRequest} from './../actions/cases';
 import lodashIntersection from 'lodash/intersection';
 import {checkArrayAndLength} from './typeCheckingFunctions';
-import {getTranslation, generatePermissionMessage} from "./functions";
+import {generatePermissionMessage, getTranslation} from "./functions";
 import {Alert} from "react-native";
 import get from "lodash/get";
 import config from "./config";

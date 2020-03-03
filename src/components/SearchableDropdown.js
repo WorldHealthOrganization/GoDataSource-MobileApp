@@ -1,8 +1,8 @@
 /**
  * Created by florinpopa on 22/10/2018.
  */
-import React, { Component } from 'react';
-import {Text, View, FlatList } from 'react-native';
+import React, {Component} from 'react';
+import {FlatList, Text, View} from 'react-native';
 import PropTypes from 'prop-types';
 import TextInput from './TextInput';
 import {connect} from "react-redux";

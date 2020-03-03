@@ -5,7 +5,6 @@ import RNFetchBlob from 'rn-fetch-blob';
 import base64 from 'base-64';
 import {Platform} from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
-import {getSyncEncryptPassword} from './../utils/encryption';
 import {setSyncState} from './../actions/app';
 import DeviceInfo from 'react-native-device-info';
 import translations from './../utils/translations';
@@ -13,10 +12,9 @@ import {testApi, testApiPromise} from './testApi';
 import uniq from 'lodash/uniq';
 import get from 'lodash/get';
 import {getHelpItemsRequest} from './helpItem';
-import {handleResponseFromRNFetchBlob, createDate} from './../utils/functions';
-import moment from 'moment';
+import {createDate, handleResponseFromRNFetchBlob} from './../utils/functions';
 import {retriablePromise} from "../utils/typeCheckingFunctions";
-import constants  from './constants';
+import constants from './constants';
 
 export function getDatabaseSnapshotRequestNew(hubConfig, lastSyncDate, dispatch) {
     // hubConfiguration = {url: databaseName, clientId: JSON.stringify({name, url, clientId, clientSecret, encryptedData}), clientSecret: databasePass}

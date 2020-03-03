@@ -4,8 +4,8 @@
 import errorTypes from './errorTypes';
 import config from './config';
 import RNFetchBlobFS from 'rn-fetch-blob/fs';
-import {zip, unzip} from 'react-native-zip-archive';
-import {updateFileInDatabase, processBulkDocs} from './../queries/database';
+import {unzip, zip} from 'react-native-zip-archive';
+import {processBulkDocs, updateFileInDatabase} from './../queries/database';
 import {setSyncState} from './../actions/app';
 import {NativeModules} from 'react-native';
 import uuid from 'react-native-uuid';
@@ -15,7 +15,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import groupBy from 'lodash/groupBy';
 import set from 'lodash/set';
 import defaultTranslations from './defaultTranslations'
-import {getSyncEncryptPassword, encrypt, decrypt} from './../utils/encryption';
+import {decrypt, encrypt, getSyncEncryptPassword} from './../utils/encryption';
 import {extractLocations} from './../actions/locations';
 import moment from 'moment';
 import {checkArrayAndLength} from './typeCheckingFunctions';

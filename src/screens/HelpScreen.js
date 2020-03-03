@@ -4,7 +4,7 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
-import {View, Text, StyleSheet, Alert, Animated, BackHandler, FlatList} from 'react-native';
+import {Alert, Animated, BackHandler, FlatList, StyleSheet, Text, View} from 'react-native';
 import styles from './../styles';
 import NavBarCustom from './../components/NavBarCustom';
 import {connect} from "react-redux";
@@ -14,12 +14,19 @@ import HelpListItem from './../components/HelpListItem';
 import {removeErrors} from './../actions/errors';
 import {addFilterForScreen, removeFilterForScreen} from './../actions/app';
 import _ from 'lodash';
-import {calculateDimension, navigation, getTranslation, localSortHelpItem, filterItemsForEachPage} from './../utils/functions';
+import {
+    calculateDimension,
+    filterItemsForEachPage,
+    getTranslation,
+    localSortHelpItem,
+    navigation
+} from './../utils/functions';
 import ViewHOC from './../components/ViewHOC';
 import translations from './../utils/translations'
 import RNExitApp from 'react-native-exit-app';
 import constants from "../utils/constants";
 import PermissionComponent from './../components/PermissionComponent';
+
 let AnimatedListView = Animated.createAnimatedComponent(FlatList);
 
 const scrollAnim = new Animated.Value(0);

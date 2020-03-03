@@ -1,13 +1,11 @@
-import React, { Component } from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
-import { connect } from "react-redux";
-import { bindActionCreators } from "redux";
+import React, {Component} from 'react';
+import {ScrollView, StyleSheet, Text, View} from 'react-native';
+import {connect} from "react-redux";
 import Ripple from 'react-native-material-ripple';
 import ElevatedView from 'react-native-elevated-view';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import _ from 'lodash';
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 
-import { calculateDimension, getTranslation } from '../utils/functions';
+import {calculateDimension, getTranslation} from '../utils/functions';
 import config from '../utils/config';
 import Button from '../components/Button';
 import styles from '../styles';
@@ -243,9 +241,4 @@ function mapStateToProps(state) {
     };
 };
 
-function matchDispatchProps(dispatch) {
-    return bindActionCreators({
-    }, dispatch);
-};
-
-export default connect(mapStateToProps, matchDispatchProps)(SortContainer);
+export default connect(mapStateToProps)(SortContainer);

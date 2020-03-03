@@ -8,7 +8,6 @@ import {View, Text, StyleSheet} from 'react-native';
 import {WebView} from 'react-native-webview';
 import {calculateDimension, getTranslation, createDate} from './../utils/functions';
 import {connect} from "react-redux";
-import {bindActionCreators} from "redux";
 import DropdownInput from './DropdownInput';
 import DropDown from './DropDown';
 import TextInputWithDropDown from './TextInputWithDropDown'
@@ -313,9 +312,4 @@ function mapStateToProps(state) {
     };
 }
 
-function matchDispatchProps(dispatch) {
-    return bindActionCreators({
-    }, dispatch);
-}
-
-export default connect(mapStateToProps, matchDispatchProps)(CardComponent);
+export default connect(mapStateToProps)(CardComponent);

@@ -3,11 +3,10 @@
  */
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
-import React, { Component } from 'react';
-import { View, StyleSheet, ScrollView } from 'react-native';
-import { extractAllQuestions, createDate } from '../utils/functions';
-import { connect } from "react-redux";
-import { bindActionCreators } from "redux";
+import React, {Component} from 'react';
+import {ScrollView, StyleSheet, View} from 'react-native';
+import {createDate, extractAllQuestions} from '../utils/functions';
+import {connect} from "react-redux";
 import styles from '../styles';
 import QuestionCard from '../components/QuestionCard';
 import sortBy from 'lodash/sortBy';
@@ -213,9 +212,4 @@ function mapStateToProps(state) {
     };
 }
 
-function matchDispatchProps(dispatch) {
-    return bindActionCreators({
-    }, dispatch);
-}
-
-export default connect(mapStateToProps, matchDispatchProps)(CaseSingleInvestigationContainer);
+export default connect(mapStateToProps)(CaseSingleInvestigationContainer);

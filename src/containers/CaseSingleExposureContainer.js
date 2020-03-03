@@ -1,17 +1,12 @@
 /**
  * Created by florinpopa on 21/08/2018.
  */
-/**
- * Created by florinpopa on 25/07/2018.
- */
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
-import {Animated, StyleSheet, InteractionManager, ScrollView, View, Text, FlatList} from 'react-native';
-import {calculateDimension} from './../utils/functions';
+import {Animated, FlatList, InteractionManager, ScrollView, StyleSheet, Text, View} from 'react-native';
+import {calculateDimension, computeFullName, getTranslation} from './../utils/functions';
 import {connect} from "react-redux";
-import {getTranslation, computeFullName} from './../utils/functions';
-import {bindActionCreators} from "redux";
 import styles from './../styles';
 import ElevatedView from 'react-native-elevated-view';
 import {LoaderScreen} from 'react-native-ui-lib';
@@ -56,7 +51,6 @@ class ContactsSingleExposures extends Component {
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
-        // console.log("### contact data: ", this.props.contact);
         if(!this.state.interactionComplete) {
             return (
                 <LoaderScreen overlay={true} backgroundColor={'white'}/>
@@ -141,12 +135,6 @@ class ContactsSingleExposures extends Component {
                         fontFamily: 'Roboto-Medium',
                         fontSize: 12
                     }
-                    // {
-                    //     marginRight: calculateDimension(14, false, this.props.screenSize),
-                    //     color: styles.missedRedColor,
-                    //     fontFamily: 'Roboto-Medium',
-                    //     fontSize: 12
-                    // }
                 ]}
                 onPressArray={[
                     () => {this.props.onPressEditExposure(relation.item, relation.index)}
@@ -245,9 +233,4 @@ function mapStateToProps(state) {
     };
 }
 
-function matchDispatchProps(dispatch) {
-    return bindActionCreators({
-    }, dispatch);
-}
-
-export default connect(mapStateToProps, matchDispatchProps)(ContactsSingleExposures);
+export default connect(mapStateToProps)(ContactsSingleExposures);

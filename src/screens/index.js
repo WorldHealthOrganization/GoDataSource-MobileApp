@@ -1,7 +1,7 @@
 /**
  * Created by florinpopa on 14/06/2018.
  */
-import { Navigation } from 'react-native-navigation';
+import {Navigation} from 'react-native-navigation';
 import constants from './../utils/constants';
 import LoginScreen from './LoginScreen';
 import FirstConfigScreen from './FirstConfigScreen';

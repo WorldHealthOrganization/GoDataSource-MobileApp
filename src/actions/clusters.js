@@ -4,7 +4,7 @@
 
 
 // Add here only the actions, not also the requests that are executed. For that purpose is the requests directory
-import { ACTION_TYPE_STORE_CLUSTERS } from './../utils/enums';
+import {ACTION_TYPE_STORE_CLUSTERS} from './../utils/enums';
 import {getClustersdRequest} from './../queries/clusters';
 import errorTypes from './../utils/errorTypes';
 

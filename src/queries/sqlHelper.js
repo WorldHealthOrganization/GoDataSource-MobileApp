@@ -1,9 +1,6 @@
 import SQLite, {encodeName} from 'react-native-sqlcipher-2';
 import {database} from './database';
 import get from 'lodash/get';
-import groupBy from 'lodash/groupBy';
-
-// import SQLiteQueryBuilder from 'simple-sql-query-builder';
 
 export function rawSQLQuery (collectionName, query, params) {
     return new Promise((resolve, reject) => {

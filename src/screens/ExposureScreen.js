@@ -1,10 +1,10 @@
 /**
  * Created by florinpopa on 05/07/2018.
  */
-import React, {Component} from 'react';
-import {View, Text, StyleSheet, Alert} from 'react-native';
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
+import React, {Component} from 'react';
+import {Alert, StyleSheet, Text, View} from 'react-native';
 import Button from './../components/Button';
 import {Icon} from 'react-native-material-ui';
 import styles from './../styles';
@@ -14,11 +14,9 @@ import {bindActionCreators} from "redux";
 import {addExposureForContact, updateExposureForContact} from './../actions/contacts';
 import NavBarCustom from './../components/NavBarCustom';
 import config from './../utils/config';
-// import CardComponent from './../components/CardComponent';
 import Ripple from 'react-native-material-ripple';
 import {removeErrors} from './../actions/errors';
-import {calculateDimension, extractIdFromPouchId, updateRequiredFields, getTranslation} from './../utils/functions';
-// import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import {calculateDimension, extractIdFromPouchId, getTranslation, updateRequiredFields} from './../utils/functions';
 import translations from './../utils/translations'
 import ElevatedView from 'react-native-elevated-view';
 import ExposureContainer from '../containers/ExposureContainer';

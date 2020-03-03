@@ -60,11 +60,4 @@ class ModalSyncStatus extends PureComponent {
         )
     }
 }
-
-// Create style outside the class, or for components that will be used by other components (buttons),
-// make a global style in the config directory
-// const style = StyleSheet.create({
-//
-// });
-
 export default ModalSyncStatus;

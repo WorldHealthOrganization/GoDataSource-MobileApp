@@ -1,18 +1,16 @@
 /**
  * Created by florinpopa on 16/07/2018.
  */
-import React, {PureComponent} from 'react';
-import {StyleSheet} from 'react-native';
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
+import React, {PureComponent} from 'react';
+import {StyleSheet} from 'react-native';
 import {createDate, checkIfSameDay, getTranslation} from './../utils/functions';
 import CalendarPickerView from './CalendarPickerView';
 import ButtonWithIcons from './ButtonWithIcons';
 import {connect} from "react-redux";
-import {bindActionCreators} from "redux";
 import ElevatedView from 'react-native-elevated-view';
 import translations from './../utils/translations';
-// import moment from 'moment';
 
 class CalendarPicker extends PureComponent {
 
@@ -101,9 +99,4 @@ function mapStateToProps(state) {
     };
 }
 
-function matchDispatchProps(dispatch) {
-    return bindActionCreators({
-    }, dispatch);
-}
-
-export default connect(mapStateToProps, matchDispatchProps)(CalendarPicker);
+export default connect(mapStateToProps)(CalendarPicker);

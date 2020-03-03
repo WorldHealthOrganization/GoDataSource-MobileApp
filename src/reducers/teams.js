@@ -10,8 +10,8 @@ export default function (state=null, action) {
             if (!action.payload) {
                 return null;
             }
-            let state = null;
-            return Object.assign([], state, action.payload);
+            // let state = null;
+            return Object.assign([], action.payload);
         default:
             break;
     }

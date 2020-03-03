@@ -120,10 +120,4 @@ function mapStateToProps(state) {
         translation: state.app.translation
     };
 }
-
-function matchDispatchProps(dispatch) {
-    return bindActionCreators({
-    }, dispatch);
-}
-
-export default connect(mapStateToProps, matchDispatchProps)(Breadcrumb);
+export default connect(mapStateToProps)(Breadcrumb);

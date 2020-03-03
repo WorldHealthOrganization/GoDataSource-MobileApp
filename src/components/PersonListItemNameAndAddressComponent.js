@@ -4,10 +4,10 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {PureComponent} from 'react';
-import {View, Text, StyleSheet, Image} from 'react-native';
+import {Image, StyleSheet, Text, View} from 'react-native';
 import styles from './../styles';
 import translations from './../utils/translations'
-import {getTranslation, calculateDimension} from './../utils/functions';
+import {calculateDimension, getTranslation} from './../utils/functions';
 import {connect} from "react-redux";
 import Ripple from 'react-native-material-ripple';
 

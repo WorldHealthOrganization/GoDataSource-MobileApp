@@ -1,4 +1,4 @@
-import { getTeamsForUserRequest } from './../queries/user';
+import {getTeamsForUserRequest} from './../queries/user';
 import {ACTION_TYPE_STORE_USER_TEAMS} from './../utils/enums';
 import errorTypes from './../utils/errorTypes';
 

@@ -1,13 +1,12 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import {Icon} from 'react-native-material-ui';
-import { View, Text, StyleSheet, Alert } from 'react-native';
+import {Alert, StyleSheet, Text, View} from 'react-native';
 import styles from './../styles';
-import { connect } from "react-redux";
-import { bindActionCreators } from "redux";
-import _, { sortBy } from 'lodash';
-import { calculateDimension, getTranslation } from './../utils/functions';
+import {connect} from "react-redux";
+import _, {sortBy} from 'lodash';
+import {calculateDimension, getTranslation} from './../utils/functions';
 import translations from './../utils/translations';
 import ElevatedView from 'react-native-elevated-view';
 import config from './../utils/config';
@@ -16,10 +15,9 @@ import cloneDeep from "lodash/cloneDeep";
 import get from 'lodash/get';
 import set from 'lodash/set';
 import ViewHOC from './../components/ViewHOC';
-import { extractAllQuestions } from "../utils/functions";
+import {extractAllQuestions} from "../utils/functions";
 import Ripple from 'react-native-material-ripple';
 import uniqueId from "lodash/uniqueId";
-import Button from '../components/Button';
 
 class PreviousAnswers extends Component {
 
@@ -418,9 +416,4 @@ function mapStateToProps(state) {
     };
 }
 
-function matchDispatchProps(dispatch) {
-    return bindActionCreators({
-    }, dispatch);
-}
-
-export default connect(mapStateToProps, matchDispatchProps)(PreviousAnswers);
+export default connect(mapStateToProps)(PreviousAnswers);

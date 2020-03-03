@@ -10,7 +10,6 @@ import PouchUpsert from 'pouchdb-upsert';
 import PouchFind from 'pouchdb-find';
 import RNFS from 'react-native-fs';
 import _ from 'lodash';
-import moment from 'moment';
 import config from './../utils/config';
 import Database from './databaseController';
 import {extractIdFromPouchId} from './../utils/functions';
@@ -24,40 +23,6 @@ PouchDB.plugin(SQLiteAdapter);
 PouchDB.plugin(PouchUpsert);
 PouchDB.plugin(PouchFind);
 
-let databaseIndexes = [
-    {
-        index: {fields: ['languageId', 'fileType', 'deleted']},
-        name: 'translationIndex',
-        ddoc: 'translationIndex',
-    },
-    // {
-    //     index: {fields: ['fileType', 'outbreakId', 'deleted']},
-    //     name: 'generalIndex',
-    //     ddoc: 'generalIndex',
-    // },
-    // {
-    //     index: {fields: [
-    //         {name: 'persons.[].id', type: 'string'}]},
-    //     name: 'arrayIndex',
-    //     ddoc: 'arrayIndex',
-    //     type: 'text'
-    // },
-    // {
-    //     index: {fields: ['date', 'fileType', 'outbreakId', 'deleted']},
-    //     name: 'followUpIndex',
-    //     ddoc: 'followUpIndex',
-    // },
-    // {
-    //     index: {fields: ['languageId', 'fileType', 'deleted']},
-    //     name: 'languageIndex',
-    //     ddoc: 'languageIndex',
-    // },
-    // {
-    //     index: {fields: ['email', 'fileType', 'deleted']},
-    //     name: 'userIndex',
-    //     ddoc: 'userIndex',
-    // }
-];
 
 // PouchDB wrapper over SQLite uses one database per user, so we will store all documents from all the mongo collection to a single database.
 // We will separate the records by adding a new property called type: <collection_name>
@@ -68,75 +33,6 @@ export function createDatabase(databaseName, databasePassword, forceNewDatabase)
         }
         database = new Database(databaseName, databasePassword);
         resolve(database);
-    })
-}
-
-function createIndexContact() {
-    return new Promise ((resolve, reject) => {
-        if (database) {
-            // Index for contacts based on fileType, type, outbreakId, firstName, lastName, age, gender
-            database.createIndex({
-                index: {fields: ['type', 'fileType', 'outbreakId', 'deleted']},
-                name: 'indexContact',
-                ddoc: 'indexContact',
-            })
-                .then((res) => {
-                    console.log('Creating index: ', res);
-                    resolve('Done creating Mango index');
-                })
-                .catch((errorMangoIndex) => {
-                    console.log('Error creating mango index: ', errorMangoIndex);
-                    reject(errorMangoIndex)
-                })
-        } else {
-            reject('No database');
-        }
-    })
-}
-
-function createIndex() {
-    return new Promise ((resolve, reject) => {
-        if (database) {
-            // Index for contacts based on fileType, type, outbreakId, firstName, lastName, age, gender
-            database.createIndex({
-                index: {fields: ['languageId', 'fileType', 'deleted']},
-                name: 'index1',
-                ddoc: 'index1',
-            })
-                .then((res) => {
-                    console.log('Creating index: ', res);
-                    resolve('Done creating Mango index');
-                })
-                .catch((errorMangoIndex) => {
-                    console.log('Error creating mango index: ', errorMangoIndex);
-                    reject(errorMangoIndex)
-                })
-        } else {
-            reject('No database');
-        }
-    })
-}
-
-function createIndexPerson() {
-    return new Promise ((resolve, reject) => {
-        if (database) {
-            // Index for contacts based on fileType, type, outbreakId, firstName, lastName, age, gender
-            database.createIndex({
-                index: {fields: ['updatedAt']},
-                name: 'indexPerson',
-                ddoc: 'indexPerson',
-            })
-                .then((res) => {
-                    console.log('Creating index: ', res);
-                    resolve('Done creating Mango index');
-                })
-                .catch((errorMangoIndex) => {
-                    console.log('Error creating mango index: ', errorMangoIndex);
-                    reject(errorMangoIndex)
-                })
-        } else {
-            reject('No database');
-        }
     })
 }
 
@@ -172,15 +68,12 @@ export function createDesignDoc(name, mapFunction) {
 export function getDatabase(collectionName) {
     return new Promise((resolve, reject) => {
         // Define the design documents that tells the database to build indexes in order to query
-        let promisesArray = [];
-        let start = new Date().getTime();
 
         // Check first if the database is cached
         if (databaseCache && databaseCache.name.includes(collectionName)) {
             return resolve(databaseCache);
         }
         // After that, check if there is already a database with the name and return that
-        // console.log("Database name: ", databaseName);
         let databaseName = `${collectionName}${database.databaseName}`;
         let pathToDatabase = `${RNFetchBlobFS.dirs.DocumentDir}/${databaseName}`;
 
@@ -192,62 +85,19 @@ export function getDatabase(collectionName) {
 
         RNFetchBlobFS.exists(pathToDatabase)
             .then((exists) => {
-                // console.log('Database exists? ', exists);
-                // PouchDB.debug.enable('pouchdb:find');
                 databaseCache = new PouchDB(encodeName(databaseName, database.databasePassword), {adapter: 'react-native-sqlite'});
-                // console.log('Result for find time for chech if database exists: ', collectionName, new Date().getTime() - start);
-
                 if (!exists) {
-                    // for (let i=0; i<databaseIndexes.length; i++) {
-                    //     console.log("Create index: ", i);
-                    //     promisesArray.push(database.createIndex(databaseIndexes[i]));
-                    // }
-                    // promisesArray.push(createIndexContact());
-                    // promisesArray.push(createIndex());
-                    // promisesArray.push(createIndexPerson());
-                    // Add all the design docs and then return the database
-                    // Promise.all(promisesArray)
-                    //     .then((results) => {
-                    //         console.log("Results from creating indexes: ", results);
-                            databaseCacheCollectionName = collectionName;
-                            resolve(databaseCache);
-                        // })
-                        // .catch((error) => {
-                        //     console.log("Error from creating indexes: ", error);
-                        //     databaseCacheCollectionName = collectionName;
-                        //     resolve(databaseCache);
-                        // })
+                    databaseCacheCollectionName = collectionName;
+                    resolve(databaseCache);
                 } else {
                     resolve(databaseCache);
                 }
             })
             .catch((errorExistsDatabase) => {
                 console.log("Database exists error: ", errorExistsDatabase);
-                // const SQLiteAdapter = SQLiteAdapterFactory(SQLite);
-                // PouchDB.plugin(SQLiteAdapter);
-                // PouchDB.plugin(PouchUpsert);
-                // PouchDB.plugin(PouchFind);
-                // PouchDB.debug.enable('pouchdb:find');
                 databaseCache = new PouchDB(encodeName(databaseName, database.databasePassword), {adapter: 'react-native-sqlite'});
-                // for (let i=0; i<databaseIndexes.length; i++) {
-                //     console.log("Create index: ", i);
-                //     promisesArray.push(database.createIndex(databaseIndexes[i]));
-                // }
-                // promisesArray.push(createIndexContact());
-                // promisesArray.push(createIndex());
-                // promisesArray.push(createIndexPerson());
-                // Add al the design docs and then return the database
-                // Promise.all(promisesArray)
-                //     .then((results) => {
-                //         console.log("Results from creating indexes: ", results);
-                        databaseCacheCollectionName = collectionName;
-                        resolve(databaseCache);
-                    // })
-                    // .catch((error) => {
-                    //     console.log("Error from creating indexes: ", error);
-                    //     databaseCacheCollectionName = collectionName;
-                    //     resolve(databaseCache);
-                    // })
+                databaseCacheCollectionName = collectionName;
+                resolve(databaseCache);
             });
     })
 }
@@ -347,12 +197,6 @@ export function processBulkDocs(data, type) {
                 if (database) {
                     // New types: fileType.number.json
                     let fileType = `${type.split('.')[0]}.${type.split('.')[2]}`;
-                    // if (type.includes('location')) {
-                    //     data = data.splice(0, 1000);
-                    // }
-                    // if (type.includes('languageToken')) {
-                    //     data = data.filter((e) => {return e.languageId === 'english_en'})
-                    // }
                     database.bulkDocs(data.map((e) => {
                         return Object.assign({}, e, {_id: createIdForType(e, type), fileType})
                     }))
@@ -420,16 +264,4 @@ function upsertDataWithChangingId(file, type, database) {
             // If the operation failed, proceed to upsert
             return upsertFile;
         });
-}
-
-export function generalUpsert(collectionName, record) {
-    return getDatabase(collectionName)
-        .then((database) => {
-            return database.upsert(record._id, (doc) => {
-                return upsertFunction(doc, record, null);
-            })
-                .then((resultUpsert) => {
-                    return database.get(resultUpsert.id)
-                })
-        })
 }

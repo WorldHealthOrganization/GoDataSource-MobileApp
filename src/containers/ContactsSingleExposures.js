@@ -7,11 +7,9 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
-import {Animated, StyleSheet, InteractionManager, ScrollView, View, Text, FlatList} from 'react-native';
-import {calculateDimension} from './../utils/functions';
+import {Animated, FlatList, InteractionManager, ScrollView, StyleSheet, Text, View} from 'react-native';
+import {calculateDimension, computeFullName, getTranslation} from './../utils/functions';
 import {connect} from "react-redux";
-import {getTranslation, computeFullName} from './../utils/functions';
-import {bindActionCreators} from "redux";
 import styles from './../styles';
 import ElevatedView from 'react-native-elevated-view';
 import {LoaderScreen} from 'react-native-ui-lib';
@@ -38,10 +36,6 @@ class ContactsSingleExposures extends Component {
     }
 
     // Please add here the react lifecycle methods that you need
-    // shouldComponentUpdate(nextProps, nextState) {
-    //     // console.log("NextPropsIndex ContactsSingleExposures: ", nextProps.activeIndex, this.props.activeIndex);
-    //     return nextProps.activeIndex === 2;
-    // }
 
     componentDidMount() {
         InteractionManager.runAfterInteractions(() => {
@@ -176,12 +170,6 @@ class ContactsSingleExposures extends Component {
                         fontFamily: 'Roboto-Medium',
                         fontSize: 12
                     }
-                    // {
-                    //     marginRight: calculateDimension(14, false, this.props.screenSize),
-                    //     color: styles.missedRedColor,
-                    //     fontFamily: 'Roboto-Medium',
-                    //     fontSize: 12
-                    // }
                 ]}
                 onPressArray={[
                     () => {this.props.onPressEditExposure(relation.item, relation.index)}
@@ -235,20 +223,6 @@ class ContactsSingleExposures extends Component {
         let relationshipData = get(relation, 'relationshipData');
         let caseData = get(relation, 'caseData');
 
-        // let person = relation && relation.persons && relation.persons.filter((e) => {return e.id !== extractIdFromPouchId(this.props.contact._id, 'person')})[0];
-
-        // let caseName = '';
-        //
-        // if (person.type === config.personTypes.cases ) {
-        //     if (this.props.cases) {
-        //         let aux = this.props.cases.filter((e) => {return extractIdFromPouchId(e._id, 'person')  === person.id})[0];
-        //         caseName = (aux && aux.firstName ? (aux.firstName + ' ') : '') + (aux && aux.lastName ? aux.lastName : '');
-        //     }
-        // } else {
-        //     let aux = this.props.events.filter((e) => {return extractIdFromPouchId(e._id, 'person') === person.id})[0];
-        //     caseName = aux && aux.name ? aux.name : '';
-        // }
-
         return {title: computeFullName(caseData), primaryText: moment.utc(relationshipData.contactDate).format("YYYY-MM-DD").toString(), secondaryText: getTranslation(relationshipData.certaintyLevelId, this.props.translation)};
     };
 
@@ -298,9 +272,4 @@ function mapStateToProps(state) {
     };
 }
 
-function matchDispatchProps(dispatch) {
-    return bindActionCreators({
-    }, dispatch);
-}
-
-export default connect(mapStateToProps, matchDispatchProps)(ContactsSingleExposures);
+export default connect(mapStateToProps)(ContactsSingleExposures);

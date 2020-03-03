@@ -3,24 +3,31 @@
  */
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
-import React, { Component } from 'react';
-import { View, StyleSheet, Animated, Alert, BackHandler, Platform } from 'react-native';
-import { Icon } from 'react-native-material-ui';
+import React, {Component} from 'react';
+import {Alert, Animated, BackHandler, Platform, StyleSheet, View} from 'react-native';
+import {Icon} from 'react-native-material-ui';
 import styles from './../styles';
 import NavBarCustom from './../components/NavBarCustom';
 import config from './../utils/config';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
-import {TabBar, TabView, PagerScroll} from 'react-native-tab-view';
+import {PagerScroll, TabBar, TabView} from 'react-native-tab-view';
 import FollowUpsSingleContainer from './../containers/FollowUpsSingleContainer';
 import FollowUpsSingleQuestionnaireContainer from './../containers/FollowUpsSingleQuestionnaireContainer';
 import Breadcrumb from './../components/Breadcrumb';
-import Menu, { MenuItem } from 'react-native-material-menu';
+import Menu, {MenuItem} from 'react-native-material-menu';
 import Ripple from 'react-native-material-ripple';
-import { createFollowUp, updateFollowUpAndContact } from './../actions/followUps';
-import { removeErrors } from './../actions/errors';
-import _, {sortBy, cloneDeep} from 'lodash';
-import { calculateDimension, extractIdFromPouchId, updateRequiredFields, getTranslation, mapAnswers, reMapAnswers, createDate } from './../utils/functions';
+import {createFollowUp, updateFollowUpAndContact} from './../actions/followUps';
+import {removeErrors} from './../actions/errors';
+import _, {cloneDeep, sortBy} from 'lodash';
+import {
+    calculateDimension,
+    createDate,
+    getTranslation,
+    mapAnswers,
+    reMapAnswers,
+    updateRequiredFields
+} from './../utils/functions';
 import translations from './../utils/translations'
 import ElevatedView from 'react-native-elevated-view';
 import ViewHOC from './../components/ViewHOC';

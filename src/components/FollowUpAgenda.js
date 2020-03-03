@@ -1,24 +1,14 @@
 /**
  * Created by florinpopa on 23/08/2018.
  */
-import React, { PureComponent } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
-import styles from './../styles';
-import { connect } from "react-redux";
-import { bindActionCreators } from "redux";
+import React, {PureComponent} from 'react';
+import {Text, View} from 'react-native';
+import {connect} from "react-redux";
 import cloneDeep from "lodash/cloneDeep";
-import Ripple from 'react-native-material-ripple';
-import { Icon } from 'react-native-material-ui';
-import { Agenda } from 'react-native-calendars';
-import FollowUpsSingleQuestionnarireContainer from './../containers/FollowUpsSingleQuestionnaireContainer';
-import FollowUpsSingleGetInfoContainer from './../containers/FollowUpsSingleGetInfoContainer'
-import FollowUpsSingleAddressContainer from './../containers/FollowUpsSingleAddressContainer'
-import Collapsible from 'react-native-collapsible';
-import { mapAnswers, calculateDimension, getTranslation } from "../utils/functions";
-import get from 'lodash/get';
-import ElevatedView from 'react-native-elevated-view';
+import {Agenda} from 'react-native-calendars';
+import {calculateDimension, getTranslation} from "../utils/functions";
 import translation from './../utils/translations';
 import FollowUpAgendaItem from './FollowUpAgendaItem';
 
@@ -97,11 +87,6 @@ class FollowUpAgenda extends PureComponent {
     }
 }
 
-// Create style outside the class, or for components that will be used by other components (buttons),
-// make a global style in the config directory
-const style = StyleSheet.create({
-});
-
 function mapStateToProps(state) {
     return {
         screenSize: state.app.screenSize,
@@ -110,9 +95,4 @@ function mapStateToProps(state) {
     };
 }
 
-function matchDispatchProps(dispatch) {
-    return bindActionCreators({
-    }, dispatch);
-}
-
-export default connect(mapStateToProps, matchDispatchProps)(FollowUpAgenda);
+export default connect(mapStateToProps)(FollowUpAgenda);

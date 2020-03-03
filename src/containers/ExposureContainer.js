@@ -3,12 +3,11 @@
  */
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
-import React, { PureComponent } from 'react';
-import { View, StyleSheet, InteractionManager, ScrollView } from 'react-native';
-import {calculateDimension, getTranslation, extractIdFromPouchId, computeFullName} from './../utils/functions';
+import React, {PureComponent} from 'react';
+import {InteractionManager, ScrollView, StyleSheet, View} from 'react-native';
+import {calculateDimension, computeFullName, extractIdFromPouchId, getTranslation} from './../utils/functions';
 import config from './../utils/config';
-import { connect } from "react-redux";
-import { bindActionCreators } from "redux";
+import {connect} from "react-redux";
 import styles from './../styles';
 import CardComponent from './../components/CardComponent';
 import ElevatedView from 'react-native-elevated-view';
@@ -189,39 +188,14 @@ class ExposureContainer extends PureComponent {
                 .sort((a, b) => { return a.order - b.order; })
                 .map((e) => { return { value: getTranslation(e.value, this.props.translation), id: extractIdFromPouchId(e._id, 'referenceData') } });
         } else {
-            // if (item.id === 'exposure') {
-            //     if (this.props.type !== 'Contact') {
-            //         data = this.props.contacts.map((e) => { return { value: ((e.firstName ? e.firstName + ' ' : '') + (e.lastName ? e.lastName : '')), id: extractIdFromPouchId(e._id, 'person'), type: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT' } });
-            //     }
-            //     if (this.props.cases && this.props.cases.length > 0) {
-            //         data = this.props.cases.map((e) => { return { value: ((e.firstName ? e.firstName + ' ' : '') + (e.lastName ? e.lastName : '')), id: extractIdFromPouchId(e._id, 'person'), type: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE' } });
-            //     }
-            //     data = data.concat(this.props.events.map((e) => { return { value: e.name, id: extractIdFromPouchId(e._id, 'person'), type: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_EVENT' } }));
-            // } else {
-                if (item.id === 'clusterId') {
-                    data = this.props.clusters.map((e) => {
-                        return { value: e.name, id: extractIdFromPouchId(e._id, 'cluster') }
-                    })
-                }
-            // }
+            if (item.id === 'clusterId') {
+                data = this.props.clusters.map((e) => {
+                    return {value: e.name, id: extractIdFromPouchId(e._id, 'cluster')}
+                })
+            }
         }
         return data;
     };
-
-    // extractNameForExposure = (person) => {
-    //     switch (person.type) {
-    //         case config.personTypes.cases:
-    //             return (this.props.cases && Array.isArray(this.props.cases) && this.props.cases.map((e) => { return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id) > -1 && this.props.cases[this.props.cases.map((e) => { return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id)].firstName ? (this.props.cases[this.props.cases.map((e) => { return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id)].firstName + ' ') : '') +
-    //                 (this.props.cases && Array.isArray(this.props.cases) && this.props.cases.map((e) => { return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id) > -1 && this.props.cases[this.props.cases.map((e) => { return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id)].lastName ? (this.props.cases[this.props.cases.map((e) => { return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id)].lastName) : '');
-    //         case config.personTypes.events:
-    //             return (this.props.events && Array.isArray(this.props.events) && this.props.events.map((e) => { return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id) > -1 && this.props.events[this.props.events.map((e) => { return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id)].name ? (this.props.events[this.props.events.map((e) => { return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id)].name) : '');
-    //         case config.personTypes.contacts:
-    //             return (this.props.contacts && Array.isArray(this.props.contacts) && this.props.contacts.map((e) => { return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id) > -1 && this.props.contacts[this.props.contacts.map((e) => { return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id)].firstName ? (this.props.contacts[this.props.contacts.map((e) => { return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id)].firstName + ' ') : '') +
-    //                 (this.props.contacts && Array.isArray(this.props.contacts) && this.props.contacts.map((e) => { return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id) > -1 && this.props.contacts[this.props.contacts.map((e) => { return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id)].lastName ? (this.props.contacts[this.props.contacts.map((e) => { return extractIdFromPouchId(e._id, 'person'); }).indexOf(person.id)].lastName) : '');
-    //         default:
-    //             return ''
-    //     }
-    // };
 }
 
 
@@ -265,15 +239,9 @@ function mapStateToProps(state) {
         cases: state.exposure,
         translation: state.app.translation,
         referenceData: state.referenceData,
-        // locations: state.locations.locations,
         events: state.events,
         clusters: state.clusters,
     };
 }
 
-function matchDispatchProps(dispatch) {
-    return bindActionCreators({
-    }, dispatch);
-}
-
-export default connect(mapStateToProps, matchDispatchProps)(ExposureContainer);
+export default connect(mapStateToProps)(ExposureContainer);

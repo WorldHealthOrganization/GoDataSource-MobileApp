@@ -1,12 +1,11 @@
-import React, { PureComponent } from 'react';
-import { View, StyleSheet, ScrollView } from 'react-native';
-import { connect } from "react-redux";
-import { bindActionCreators } from "redux";
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import React, {PureComponent} from 'react';
+import {ScrollView, StyleSheet, View} from 'react-native';
+import {connect} from "react-redux";
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import ElevatedView from 'react-native-elevated-view';
 import filter from 'lodash/filter';
 import get from 'lodash/get';
-import { calculateDimension, getTranslation, extractIdFromPouchId } from './../utils/functions';
+import {calculateDimension, extractIdFromPouchId, getTranslation} from './../utils/functions';
 import config from './../utils/config';
 import Button from './../components/Button';
 import styles from './../styles';
@@ -239,9 +238,4 @@ function mapStateToProps(state) {
     };
 }
 
-function matchDispatchProps(dispatch) {
-    return bindActionCreators({
-    }, dispatch);
-}
-
-export default connect(mapStateToProps, matchDispatchProps)(FiltersContainer);
+export default connect(mapStateToProps)(FiltersContainer);

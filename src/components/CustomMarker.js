@@ -1,13 +1,13 @@
 /**
  * Created by florinpopa on 06/08/2018.
  */
-import React, {PureComponent} from 'react';
+import React from 'react';
 import {View, Text, StyleSheet} from 'react-native';
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import styles from './../styles';
 
-CustomMarker = ({markerStyle, style, currentValue, markerColor}) => {
+CustomMarker = React.memo(({markerStyle, style, currentValue, markerColor}) => {
     let formMarkerStyle = {};
     if(Array.isArray(markerStyle)){
         formMarkerStyle = markerStyle[1];
@@ -38,7 +38,7 @@ CustomMarker = ({markerStyle, style, currentValue, markerColor}) => {
                 backgroundColor: styles.buttonGreen
             },markerStyle]}/>
         </View>
-)};
+)});
 
 // Create style outside the class, or for components that will be used by other components (buttons),
 // make a global style in the config directory

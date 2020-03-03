@@ -1,19 +1,17 @@
 /**
  * Created by florinpopa on 08/10/2018.
  */
-import React, { Component } from 'react';
-import { View, Text, ScrollView, Modal, Platform } from 'react-native';
-import { LoaderScreen } from 'react-native-ui-lib';
-import { Button } from 'react-native-material-ui';
-import styles from './../styles';
+import React, {Component} from 'react';
+import {Platform, View} from 'react-native';
+import {LoaderScreen} from 'react-native-ui-lib';
 import config from './../utils/config';
-import { connect } from "react-redux";
-import { bindActionCreators } from "redux";
-import { getUserById } from './../actions/user';
+import {connect} from "react-redux";
+import {bindActionCreators} from "redux";
+import {getUserById} from './../actions/user';
 import cloneDeep from 'lodash/cloneDeep';
-import KeyboardManager  from 'react-native-keyboard-manager';
+import KeyboardManager from 'react-native-keyboard-manager';
 import ModalSyncStatus from './ModalSyncStatus';
-import {setSyncState, setLoaderState} from "../actions/app";
+import {setLoaderState, setSyncState} from "../actions/app";
 import isFunction from 'lodash/isFunction';
 
 if (Platform.OS === 'ios') {
@@ -40,15 +38,11 @@ class ViewHOC extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            // syncState: cloneDeep(config.manualSyncStages),
-            // showLoader: false,
-            // showModal: false,
-            // showCloseModalButton: false
         };
     }
 
     render() {
-        // console.log('Selectors logic: ViewHOC: ', this.props.showLoader);
+
         return (
             <View style={[this.props.style]}>
                 {
@@ -71,51 +65,20 @@ class ViewHOC extends Component {
                     screenSize={this.props.screenSize}
                     closeModal={this.closeModal}
                 />
-                {/* {
-                    Platform.OS === 'ios' ? (
-                        <KeyboardAccessoryNavigation
-                            nextHidden={true}
-                            previousHidden={true}
-                        />
-                    ) : (null)
-                } */}
             </View>
         )
     }
 
     closeModal = () => {
         if (this.props.syncState[this.props.syncState.length - 1].status === 'Success') {
-            // this.resetModalProps(() => {
-            //     if (this.props.isMultipleHub) {
-            //         this.props.changeAppRoot('login');
-            //     } else {
-            //         this.props.navigator.push({
-            //             screen: 'LoginScreen',
-            //             animated: true,
-            //             animationType: 'fade'
-            //         })
-            //     }
-            // })
             this.props.setSyncState('Finished');
             if (this.props.refresh && isFunction(this.props.refresh)) {
                 this.props.refresh();
             }
         } else {
-            // this.resetModalProps(() => {
-            //     console.log('reset props')
-            // })
             this.props.setSyncState('Reset');
         }
     };
-
-    // resetModalProps = (callback) => {
-    //     this.setState({
-    //         syncState: cloneDeep(config.manualSyncStages)
-    //     }, () => {
-    //         console.log('sync state: ', this.state.syncState, config.manualSyncStages);
-    //         callback();
-    //     })
-    // }
 }
 
 function mapStateToProps(state) {

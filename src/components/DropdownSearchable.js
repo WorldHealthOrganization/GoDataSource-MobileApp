@@ -1,19 +1,10 @@
 /**
  * Created by florinpopa on 19/10/2018.
  */
-/**
- * Created by mobileclarisoft on 16/07/2018.
- */
-import React, {PureComponent} from 'react';
-import {View, Text, StyleSheet, Alert} from 'react-native';
-import PropTypes from 'prop-types';
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
+import React, {PureComponent} from 'react';
 import SearchableDropdown from './SearchableDropdown';
-import Ripple from 'react-native-material-ripple';
-import {extractIdFromPouchId, createName, getTranslation} from './../utils/functions';
-import translations from './../utils/translations';
-import cloneDeep from 'lodash/cloneDeep';
 
 class DropdownSearchable extends PureComponent {
 
@@ -60,54 +51,6 @@ class DropdownSearchable extends PureComponent {
             searchText: text
         })
     };
-
-    // handleOnSubmitEditing = () => {
-    //     // here should make a query on contact for getting searched results
-    //     // outbreakId should be passed by props
-    //     // console.log('handleOnSubmitEditing: ', this.state.searchText);
-    //     let searchText = cloneDeep(this.state.searchText);
-    //
-    //     if (searchText && searchText.trim().length > 0) {
-    //         let splitedFilter= searchText.split(" ");
-    //         splitedFilter = splitedFilter.filter((e) => {return e !== ""});
-    //         searchText = new RegExp(splitedFilter.join("|"), "ig");
-    //     } else {
-    //         searchText = null
-    //     }
-    //
-    //     getContactsForOutbreakIdRequest(this.props.outbreakId, {searchText: searchText}, null, (error, response) => {
-    //         if (error) {
-    //             Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.alertMessages.dropDownSearchableContactsError, this.props.translation), [
-    //                 {
-    //                     text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
-    //                     onPress: () => {console.log('Ok pressed')}
-    //                 }
-    //             ])
-    //         }
-    //         if (response) {
-    //             // console.log('Response: ', response);
-    //             this.setState({
-    //                 items: response.map((e) => {
-    //                     return {
-    //                         id: extractIdFromPouchId(e._id, 'person.json'),
-    //                         name: createName(e.type, e.firstName, e.lastName)
-    //                     }
-    //                 })
-    //             }, () => {
-    //                 console.log('Response mapped: ', this.state.items);
-    //             })
-    //         }
-    //     })
-    // }
 }
-
-// Create style outside the class, or for components that will be used by other components (buttons),
-// make a global style in the config directory
-const style = StyleSheet.create({
-
-});
-
-DropdownSearchable.propTypes = {
-};
 
 export default DropdownSearchable;
