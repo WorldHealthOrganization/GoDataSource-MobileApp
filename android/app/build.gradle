@@ -99,12 +99,12 @@ android {
     buildToolsVersion '28.0.3'
 
     defaultConfig {
-        applicationId "com.who_mobile"
+        applicationId "com.who_mobile2020"
         minSdkVersion 20
         targetSdkVersion 28
         multiDexEnabled true
-        versionCode 12
-        versionName "1.0.10"
+        versionCode 1
+        versionName "1.0.0"
         ndk {
             abiFilters "armeabi-v7a", "x86", 'arm64-v8a', 'x86_64'
         }

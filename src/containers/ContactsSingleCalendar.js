@@ -10,7 +10,7 @@ import styles from './../styles';
 import ElevatedView from 'react-native-elevated-view';
 import {LoaderScreen} from 'react-native-ui-lib';
 import FollowUpAgenda from './../components/FollowUpAgenda';
-import moment from 'moment';
+import moment from 'moment/min/moment.min';
 import TopContainerButtons from "./../components/TopContainerButtons";
 import PermissionComponent from './../components/PermissionComponent';
 import constants from "./../utils/constants";

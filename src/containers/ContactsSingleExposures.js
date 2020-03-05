@@ -15,7 +15,7 @@ import ElevatedView from 'react-native-elevated-view';
 import {LoaderScreen} from 'react-native-ui-lib';
 import GeneralListItem from '../components/GeneralListItem';
 import Ripple from 'react-native-material-ripple';
-import moment from 'moment';
+import moment from 'moment/min/moment.min';
 import translations from './../utils/translations';
 import ExposureContainer from '../containers/ExposureContainer';
 import get from 'lodash/get';

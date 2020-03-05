@@ -17,7 +17,7 @@ import set from 'lodash/set';
 import defaultTranslations from './defaultTranslations'
 import {decrypt, encrypt, getSyncEncryptPassword} from './../utils/encryption';
 import {extractLocations} from './../actions/locations';
-import moment from 'moment';
+import moment from 'moment/min/moment.min';
 import {checkArrayAndLength} from './typeCheckingFunctions';
 import {executeQuery, insertOrUpdate} from './../queries/sqlTools/helperMethods';
 import translations from "./translations";

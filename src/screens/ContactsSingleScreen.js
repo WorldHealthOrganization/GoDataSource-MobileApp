@@ -36,7 +36,7 @@ import {
     navigation,
     updateRequiredFields
 } from './../utils/functions';
-import moment from 'moment/src/moment';
+import moment from 'moment/min/moment.min';
 import translations from './../utils/translations';
 import ElevatedView from 'react-native-elevated-view';
 import AddFollowUpScreen from './AddFollowUpScreen';

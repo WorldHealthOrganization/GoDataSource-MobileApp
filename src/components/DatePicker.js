@@ -10,7 +10,7 @@ import { TextField } from 'react-native-material-textfield';
 import DateTimePicker from 'react-native-modal-datetime-picker';
 import Ripple from 'react-native-material-ripple';
 import style from './../styles';
-import moment from 'moment';
+import moment from 'moment/min/moment.min';
 import {getTranslation, getTooltip, createDate} from './../utils/functions';
 import TooltipComponent from './TooltipComponent'
 

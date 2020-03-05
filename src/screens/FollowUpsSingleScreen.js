@@ -32,7 +32,7 @@ import translations from './../utils/translations'
 import ElevatedView from 'react-native-elevated-view';
 import ViewHOC from './../components/ViewHOC';
 import PermissionComponent from './../components/PermissionComponent';
-import moment from 'moment';
+import moment from 'moment/min/moment.min';
 import {checkArrayAndLength} from './../utils/typeCheckingFunctions';
 import {checkRequiredQuestions, extractAllQuestions} from "../utils/functions";
 import constants from './../utils/constants';
