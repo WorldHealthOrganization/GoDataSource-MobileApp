@@ -596,7 +596,7 @@ export function appInitialized(nativeEventEmitter) {
                                 try {
                                     let database = await createDatabase(server.replace(/\/|\.|\:/g, ''), databaseCredentials.password, false);
                                     if (database) {
-                                        dispatch(getUserById(loggedUser, null, false, nativeEventEmitter));
+                                        dispatch(getUserById(loggedUser, false));
                                     } else {
                                         console.log('Database does not exist');
                                         dispatch(changeAppRoot('config'));

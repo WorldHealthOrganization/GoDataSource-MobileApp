@@ -15,22 +15,22 @@ export default function (state={locations: null, locationsList: []}, action) {
             if (!action.payload) {
                 return null;
             }
-            return Object.assign([], state, {locations: action.payload});
+            return Object.assign({}, state, {locations: action.payload});
         case ACTION_TYPE_STORE_USER_LOCATIONS:
             if (!action.payload) {
                 return null;
             }
-            return Object.assign([], state, {userLocations: action.payload});
+            return Object.assign({}, state, {userLocations: action.payload});
         case ACTION_TYPE_STORE_LOCATIONS_LIST:
             if (!action.locationsList) {
                 return null;
             }
-            return Object.assign([], state, {locationsList: action.locationsList});
+            return Object.assign({}, state, {locationsList: action.locationsList});
         case ACTION_TYPE_STORE_USER_LOCATIONS_LIST:
             if (!action.userLocationsList) {
                 return null;
             }
-            return Object.assign([], state, {userLocationsList: action.userLocationsList});
+            return Object.assign({}, state, {userLocationsList: action.userLocationsList});
         default:
             break;
     }

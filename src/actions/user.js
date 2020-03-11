@@ -98,29 +98,24 @@ export function cleanDataAfterLogout() {
     }
 }
 
-export function getUserById(userId, token, refreshFollowUps, nativeEventEmitter) {
-    return async function (dispatch, getState) {
+export function getUserById(userId, skipLoad) {
+    return async function (dispatch) {
         console.log("getUserById userId: ", userId);
-        getUserByIdRequest(userId, token, (error, response) => {
+        getUserByIdRequest(userId, (error, response) => {
             if (error) {
                 console.log("*** getUserById error: ", error);
                 dispatch(addError(errorTypes.ERROR_GET_USER));
                 // dispatch(changeAppRoot('login'));
             }
             if (response) {
-                // Here is the local storage handling
-                if (refreshFollowUps) {
-                    dispatch(setSyncState({ id: 'sync', status: 'test' }));
-                }
-
-                dispatch(computeCommonData(false, response, refreshFollowUps, getState().app.filters));
+                dispatch(computeCommonData(false, response, skipLoad));
             }
 
         })
     }
 }
 
-export function computeCommonData(storeUserBool, user, refreshFollowUps, filters) {
+export function computeCommonData(storeUserBool, user, skipLoad) {
     return async function (dispatch) {
         try {
             let outbreakAndLocationInfo = await getOutbreakById(user.activeOutbreakId);
@@ -161,7 +156,7 @@ export function computeCommonData(storeUserBool, user, refreshFollowUps, filters
                 dispatch(batchActions([
                     saveSelectedScreen(selectedScreen),
                     changeAppRoot('after-login'),
-                    setLoaderState(true),
+                    setLoaderState(!skipLoad),
                     setLoginState('Finished logging'),
                 ]));
 
@@ -212,9 +207,9 @@ export function computeCommonData(storeUserBool, user, refreshFollowUps, filters
                                 // changeAppRoot('after-login')
                             ];
 
-                            if(refreshFollowUps) {
-                                arrayOfActions.push(setSyncState({id: 'tests', status:'Success'}));
-                            }
+                            // if(refreshFollowUps) {
+                            //     arrayOfActions.push(setSyncState({id: 'tests', status:'Success'}));
+                            // }
 
                             if (storeUserBool) {
                                 storeData('loggedUser', user._id, (error, success) => {

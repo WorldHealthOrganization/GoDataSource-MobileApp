@@ -72,6 +72,7 @@ class ViewHOC extends Component {
     closeModal = () => {
         if (this.props.syncState[this.props.syncState.length - 1].status === 'Success') {
             this.props.setSyncState('Finished');
+            this.props.getUserById(this.props.user._id, true);
             if (this.props.refresh && isFunction(this.props.refresh)) {
                 this.props.refresh();
             }
