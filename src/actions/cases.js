@@ -159,6 +159,7 @@ export function getCaseAndExposuresById (caseId, outbreakId) {
         ],
         condition: {
             'relationship.sourceId': caseId,
+            'person.type': translations.personTypes.contacts
             // 'relationship.outbreakId': outbreakId,
         }
     };

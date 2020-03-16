@@ -353,7 +353,7 @@ class AnimatedListView extends Component {
                 return e.typeId === config.userResidenceAddress.userPlaceOfResidence
             });
             let placeOfResidenceLatitude = get(placeOfResidence, 'geoLocation.coordinates[1]', 0);
-            let placeOfResidenceLongitude = get(placeOfResidence, 'geoLocation.coordinates[1]', 0);
+            let placeOfResidenceLongitude = get(placeOfResidence, 'geoLocation.coordinates[0]', 0);
             navigator.geolocation.getCurrentPosition(
                 (position) => {
                     this.props.onPressMap({
