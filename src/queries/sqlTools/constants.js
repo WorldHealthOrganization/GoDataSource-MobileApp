@@ -3,7 +3,7 @@ import translations from './../../utils/translations';
 import get from 'lodash/get';
 import {checkArrayAndLength} from './../../utils/typeCheckingFunctions';
 
-const databaseTables = ['person', 'followUp', 'relationship', 'languageToken'];
+const databaseTables = ['person', 'followUp', 'relationship', 'languageToken', 'location'];
 const tableStructure = {
     person: [
         {
@@ -118,35 +118,41 @@ const tableStructure = {
             fieldType: "TEXT NOT NULL"
         },
     ],
+    location: [
+        {
+            fieldName: '_id',
+            fieldType: 'TEXT PRIMARY KEY'
+        }
+    ],
     commonFields: [
         {
             fieldName: 'createdAt',
             fieldType: 'DATE NOT NULL'
         },
-        {
-            fieldName: 'createdBy',
-            fieldType: 'TEXT NOT NULL'
-        },
+        // {
+        //     fieldName: 'createdBy',
+        //     fieldType: 'TEXT NOT NULL'
+        // },
         {
             fieldName: 'updatedAt',
             fieldType: 'DATE NOT NULL'
         },
-        {
-            fieldName: 'updatedBy',
-            fieldType: 'TEXT NOT NULL'
-        },
+        // {
+        //     fieldName: 'updatedBy',
+        //     fieldType: 'TEXT NOT NULL'
+        // },
         {
             fieldName: 'deleted',
             fieldType: 'BOOLEAN NOT NULL'
         },
-        {
-            fieldName: 'deletedAt',
-            fieldType: 'DATE'
-        },
-        {
-            fieldName: 'deletedBy',
-            fieldType: 'TEXT'
-        },
+        // {
+        //     fieldName: 'deletedAt',
+        //     fieldType: 'DATE'
+        // },
+        // {
+        //     fieldName: 'deletedBy',
+        //     fieldType: 'TEXT'
+        // },
         {
             fieldName: 'json',
             fieldType: 'TEXT NOT NULL'

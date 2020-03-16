@@ -529,7 +529,7 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
             };
 
             computeLocationIdsFromName = (searchText) => {
-                return this.props.location.filter((e) => e.name.includes(searchText)).map((e) => extractIdFromPouchId(e._id, 'location'));
+                return this.props.location.filter((e) => e.name.toLowerCase().includes(searchText.toLowerCase())).map((e) => extractIdFromPouchId(e._id, 'location'));
             };
 
             onNavigatorEvent = (event) => {

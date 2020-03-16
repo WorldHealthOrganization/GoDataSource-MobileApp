@@ -325,8 +325,9 @@ class CaseSingleInfectionContainer extends Component {
                 }
             } else if (item.objectType === 'DateRanges') {
                 if (this.props.case && this.props.case.dateRanges && Array.isArray(this.props.case.dateRanges) && this.props.case.dateRanges.length > 0 && this.props.case.dateRanges[cardIndex]) {
+                    maximumDate = new Date();
                     if (this.props.case.dateRanges[cardIndex].startDate !== null && item.id !== 'startDate') {
-                        minimumDate = this.props.case.dateRanges[cardIndex].startDate
+                        minimumDate = this.props.case.dateRanges[cardIndex].startDate;
                     }
                     if (this.props.case.dateRanges[cardIndex].endDate !== null && item.id !== 'endDate') {
                         maximumDate = this.props.case.dateRanges[cardIndex].endDate

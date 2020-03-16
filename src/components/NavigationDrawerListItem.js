@@ -52,7 +52,7 @@ class NavigationDrawerListItem extends PureComponent {
             case 'users':
                 permissionElement = [
                     constants.PERMISSIONS_USER.userAll,
-                    constants.PERMISSIONS_USER.userList
+                    constants.PERMISSIONS_USER.userListForFilters
                 ];
                 break;
             default:

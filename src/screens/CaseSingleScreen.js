@@ -42,6 +42,7 @@ import ElevatedView from 'react-native-elevated-view';
 import ViewHOC from './../components/ViewHOC';
 import cloneDeep from "lodash/cloneDeep";
 import lodashIntersect from "lodash/intersection";
+import lodashGet from 'lodash/get';
 import constants from "../utils/constants";
 import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
 
@@ -1332,11 +1333,12 @@ class CaseSingleScreen extends Component {
         return true
     };
     checkIsolationOnsetDates = () => {
-        if (this.state.case && this.state.case.dateOfOnset && this.state.case.isolationDates && Array.isArray(this.state.case.isolationDates) && this.state.case.isolationDates.length > 0) {
-            for (let i = 0; i < this.state.case.isolationDates.length; i++) {
+        if (lodashGet(this.state, 'case.dateOfOnset', null) !== null && checkArrayAndLength(lodashGet(this.state, 'case.dateRanges', null))) {
+            let isolationDates = this.state.case.dateRanges.filter((e) => {return e.typeId === '﻿LNG_REFERENCE_DATA_CATEGORY_PERSON_DATE_TYPE_ISOLATION'});
+            for (let i = 0; i < isolationDates.length; i++) {
                 for (let j = 0; j < config.caseSingleScreen.isolationDate.fields.length; j++) {
-                    if (this.state.case.isolationDates[i][config.caseSingleScreen.isolationDate.fields[j].id]) {
-                        if (moment(this.state.case.isolationDates[i][config.caseSingleScreen.isolationDate.fields[j].id]).format('YYYY-MM-DD') < moment(this.state.case.dateOfOnset).format('YYYY-MM-DD')) {
+                    if (isolationDates[i][config.caseSingleScreen.isolationDate.fields[j].id]) {
+                        if (moment(isolationDates[i][config.caseSingleScreen.isolationDate.fields[j].id]).format('YYYY-MM-DD') < moment(this.state.case.dateOfOnset).format('YYYY-MM-DD')) {
                             return false;
                         }
                     }

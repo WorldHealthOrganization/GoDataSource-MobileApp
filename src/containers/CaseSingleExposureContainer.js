@@ -94,7 +94,12 @@ class ContactsSingleExposures extends Component {
                             <View style={{height: 30}}/>
                         </ScrollView>
                     )}
-                    permissionsList={[constants.PERMISSIONS_RELATIONSHIP.relationshipAll, constants.PERMISSIONS_RELATIONSHIP.relationshipView]}
+                    permissionsList={[
+                        constants.PERMISSIONS_RELATIONSHIP.relationshipAll,
+                        constants.PERMISSIONS_RELATIONSHIP.relationshipView,
+                        constants.PERMISSIONS_CASE.caseListRelationshipExposures,
+                        constants.PERMISSIONS_CASE.caseListRelationshipContacts
+                    ]}
                 />
             </ElevatedView>
 

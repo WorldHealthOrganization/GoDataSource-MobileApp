@@ -83,7 +83,8 @@ const PERMISSIONS_USER = {
     userAll: 'user_all',
     userView: 'user_view',
     userList: 'user_list',
-    userModifyOwnAccount: 'user_modify_own_account'
+    userModifyOwnAccount: 'user_modify_own_account',
+    userListForFilters: 'user_list_for_filters'
 };
 
 const PERMISSIONS_RELATIONSHIP = {

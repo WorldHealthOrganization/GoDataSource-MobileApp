@@ -692,7 +692,7 @@ export function mapLocations(locationList) {
     // delete undefined geographicalLevelId
     delete sortedArrays['undefined'];
     // Get sorted keys
-    let allKeys = Object.keys(sortedArrays).map((e) => {return e.split('_')[e.split('_').length - 1]}).sort((a, b) => {return b-a});
+    let allKeys = Object.keys(sortedArrays).filter((e) => {return e.includes('LNG_REFERENCE_DATA_CATEGORY_LOCATION_GEOGRAPHICAL_LEVEL_ADMIN_LEVEL_')}).map((e) => {return e.split('_')[e.split('_').length - 1]}).sort((a, b) => {return b-a});
 
     let currentTree = sortedArrays[`LNG_REFERENCE_DATA_CATEGORY_LOCATION_GEOGRAPHICAL_LEVEL_ADMIN_LEVEL_${allKeys[0]}`];
     for (let levelIndex=1; levelIndex<allKeys.length; levelIndex++) {

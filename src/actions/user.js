@@ -12,7 +12,6 @@ import {
     saveTranslation,
     setLoaderState,
     setLoginState,
-    setSyncState,
     storeData
 } from './app';
 import {getUserByIdRequest, getUserTeamMembers, loginUserRequest, updateUserRequest} from './../queries/user';
@@ -129,7 +128,6 @@ export function computeCommonData(storeUserBool, user, skipLoad) {
                 promises.push(getReferenceData());
                 promises.push(getTranslations(user.languageId));
                 promises.push(getLocations(outbreakAndLocationInfo.locationIds || null));
-                // promises.push(getUserLocations(outbreakAndLocationInfo.locationIds || null));
                 promises.push(getHelpCategory());
                 promises.push(getHelpItem());
 
@@ -189,27 +187,14 @@ export function computeCommonData(storeUserBool, user, skipLoad) {
                                 saveTranslation(get(actionsObject,  'translations', null)),
                                 storeClusters(get(actionsObject,  'clusters', null)),
                                 storePermissions(userRoles),
-                                // storePermissions([
-                                //     // 'contact_modify',
-                                //     'outbreak_view',
-                                //     // 'follow_up_list',
-                                //     'contact_list',
-                                //     'contact_view',
-                                //     'case_list',
-                                //     'case_view',
-                                //     'help_list_category_item'
-                                // ]),
                                 storeUserTeams(userTeams),
                                 storeHelpCategory(get(actionsObject,  'helpCategory', null)),
-                                storeHelpItem(get(actionsObject,  'helpItem', null)),
-                                // setLoginState('Finished logging'),
-                                // saveSelectedScreen(selectedScreen),
-                                // changeAppRoot('after-login')
+                                storeHelpItem(get(actionsObject,  'helpItem', null))
                             ];
 
-                            // if(refreshFollowUps) {
-                            //     arrayOfActions.push(setSyncState({id: 'tests', status:'Success'}));
-                            // }
+                            if (!skipLoad) {
+                                setLoaderState(!skipLoad);
+                            }
 
                             if (storeUserBool) {
                                 storeData('loggedUser', user._id, (error, success) => {
