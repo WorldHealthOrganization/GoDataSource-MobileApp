@@ -63,7 +63,18 @@ class ContactsSingleExposures extends Component {
             )
         }
 
-        // console.log('ContactsSingleContainer render Exposures');
+        let permissionsList = [
+            constants.PERMISSIONS_CONTACT.contactAll
+        ];
+        if (this.props.isNew) {
+            permissionsList.push(
+                constants.PERMISSIONS_CONTACT.contactCreate
+            )
+        } else {
+            permissionsList.push(
+                constants.PERMISSIONS_CONTACT.contactModify
+            )
+        }
 
         return (
             <ElevatedView elevation={3} style={[style.container]}>
@@ -83,11 +94,7 @@ class ContactsSingleExposures extends Component {
                                 onPressPreviousButton={this.handleBackButton}
                             />
                         )}
-                        permissionsList={[
-                            constants.PERMISSIONS_CONTACT.contactAll,
-                            constants.PERMISSIONS_CONTACT.contactCreate,
-                            constants.PERMISSIONS_CONTACT.contactModify
-                        ]}
+                        permissionsList={permissionsList}
                     />
 
                 </View>

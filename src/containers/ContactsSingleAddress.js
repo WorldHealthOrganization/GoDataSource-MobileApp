@@ -56,7 +56,18 @@ class ContactsSingleAddress extends PureComponent {
             )
         }
 
-        // console.log('ContactsSingleContainer render Address');
+        let permissionsList = [
+            constants.PERMISSIONS_CONTACT.contactAll
+        ];
+        if (this.props.isNew) {
+            permissionsList.push(
+                constants.PERMISSIONS_CONTACT.contactCreate
+            )
+        } else {
+            permissionsList.push(
+                constants.PERMISSIONS_CONTACT.contactModify
+            )
+        }
 
         return (
                 <View style={style.viewContainer}>
@@ -74,11 +85,7 @@ class ContactsSingleAddress extends PureComponent {
                                 onPressPreviousButton={this.handleBackButton}
                             />
                         )}
-                        permissionsList={[
-                            constants.PERMISSIONS_CONTACT.contactAll,
-                            constants.PERMISSIONS_CONTACT.contactCreate,
-                            constants.PERMISSIONS_CONTACT.contactModify
-                        ]}
+                        permissionsList={permissionsList}
                     />
                     <ScrollView
                         style={style.containerScrollView}

@@ -57,6 +57,19 @@ class ContactsSinglePersonal extends PureComponent {
             )
         }
 
+        let permissionsList = [
+            constants.PERMISSIONS_CONTACT.contactAll
+        ];
+        if (this.props.isNew) {
+            permissionsList.push(
+                constants.PERMISSIONS_CONTACT.contactCreate
+            )
+        } else {
+            permissionsList.push(
+                constants.PERMISSIONS_CONTACT.contactModify
+            )
+        }
+
         return (
             <View style={{ flex: 1 }}>
                 <View style={style.viewContainer}>
@@ -73,11 +86,7 @@ class ContactsSinglePersonal extends PureComponent {
                                 onPressNextButton={this.props.onPressNextButton}
                             />
                         )}
-                        permissionsList={[
-                            constants.PERMISSIONS_CONTACT.contactAll,
-                            constants.PERMISSIONS_CONTACT.contactCreate,
-                            constants.PERMISSIONS_CONTACT.contactModify
-                        ]}
+                        permissionsList={permissionsList}
                     />
 
                     <ScrollView
