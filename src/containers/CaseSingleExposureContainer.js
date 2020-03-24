@@ -81,16 +81,19 @@ class ContactsSingleExposures extends Component {
                 />
                 <PermissionComponent
                     render={() => (
-                        <ScrollView contentContainerStyle={{flexGrow: 1}}>
+                        <ScrollView >
                             <AnimatedFlatList
                                 data={get(this.props, 'relations', [])}
                                 renderItem={this.renderRelationship}
                                 keyExtractor={this.keyExtractor}
                                 ItemSeparatorComponent={this.renderSeparatorComponent}
-                                ListEmptyComponent={this.listEmptyComponent}
+                                // ListEmptyComponent={this.listEmptyComponent}
                                 style={[style.listViewStyle]}
                                 componentContainerStyle={style.componentContainerStyle}
                             />
+                            {
+                                this.listEmptyComponent()
+                            }
                             <View style={{height: 30}}/>
                         </ScrollView>
                     )}
@@ -215,14 +218,14 @@ const style = StyleSheet.create({
         borderRadius: 2
     },
     containerContent: {
-        flex: 1,
+        // flex: 1,
         backgroundColor: 'rgba(217, 217, 217, 0.5)'
     },
     separatorComponentStyle: {
         height: 8
     },
     listViewStyle: {
-        flex: 1,
+        // flex: 1,
         paddingTop: 10
     }
 });

@@ -837,7 +837,7 @@ const caseSingleScreen = {
                 cardNumber: 2,
                 id: 'centerName',
                 label: translations.caseSingleScreen.dateRangeCenterName,
-                type: 'TextInput',
+                type: 'DropdownInput',
                 value: '',
                 isRequired: false,
                 isEditMode: false,

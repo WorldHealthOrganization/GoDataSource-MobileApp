@@ -151,12 +151,18 @@ export function computeCommonData(storeUserBool, user, skipLoad) {
                     }
                 }
 
-                dispatch(batchActions([
+                let batchedActionsArray = [
                     saveSelectedScreen(selectedScreen),
                     changeAppRoot('after-login'),
-                    setLoaderState(!skipLoad),
+                    // setLoaderState(!skipLoad),
                     setLoginState('Finished logging'),
-                ]));
+                ];
+
+                if (!skipLoad) {
+                    batchedActionsArray.push(setLoaderState(!skipLoad));
+                }
+
+                dispatch(batchActions(batchedActionsArray));
 
                 Promise.all(promises)
                     .then((dataArray) => {
@@ -193,7 +199,7 @@ export function computeCommonData(storeUserBool, user, skipLoad) {
                             ];
 
                             if (!skipLoad) {
-                                setLoaderState(!skipLoad);
+                                arrayOfActions.push(setLoaderState(skipLoad));
                             }
 
                             if (storeUserBool) {

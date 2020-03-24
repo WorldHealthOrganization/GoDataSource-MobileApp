@@ -32,4 +32,8 @@ export function testApiPromise(testUrl, deviceInfo) {
         }
     })
         .then(handleResponse)
+        .catch((errorTestAPI) => {
+            console.log('error test api', errorTestAPI);
+            return Promise.reject(errorTestAPI);
+        })
 }

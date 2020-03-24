@@ -12,7 +12,7 @@ import {testApi, testApiPromise} from './testApi';
 import uniq from 'lodash/uniq';
 import get from 'lodash/get';
 import {getHelpItemsRequest} from './helpItem';
-import {createDate, handleResponseFromRNFetchBlob} from './../utils/functions';
+import {createDate, handleResponseFromRNFetchBlob, handleResponse} from './../utils/functions';
 import {retriablePromise} from "../utils/typeCheckingFunctions";
 import constants from './constants';
 

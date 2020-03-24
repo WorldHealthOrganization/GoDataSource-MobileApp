@@ -228,7 +228,15 @@ export function mapDataForInsert(tableName, data) {
                                     if (tableName === 'person' && (tableFields[i].fieldName === 'firstName' || tableFields[i].fieldName === 'lastName')) {
                                         innerArray.push(get(e, `[${tableFields[i].fieldName}]`, ''));
                                     } else {
-                                        innerArray.push(get(e, `[${tableFields[i].fieldName}]`, null));
+                                        if (tableFields[i].fieldName === 'deleted') {
+                                            if (get(e, `[${tableFields[i].fieldName}]`, null) !== true) {
+                                                innerArray.push(false);
+                                            } else {
+                                                innerArray.push(get(e, `[${tableFields[i].fieldName}]`, false));
+                                            }
+                                        } else {
+                                            innerArray.push(get(e, `[${tableFields[i].fieldName}]`, null));
+                                        }
                                     }
                                 }
                             }

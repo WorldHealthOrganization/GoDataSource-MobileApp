@@ -303,6 +303,8 @@ class FollowUpsSingleScreen extends Component {
                         copyAnswerDate={this.handleCopyAnswerDate}
                         onPressPreviousButton={this.handlePreviousPress}
                         numberOfTabs={this.state.routes.length}
+                        onPressEdit={this.onPressEdit}
+                        onPressCancelEdit={this.onPressCancelEdit}
                     />
                 );
             default:
