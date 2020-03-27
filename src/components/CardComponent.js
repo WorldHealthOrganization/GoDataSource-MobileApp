@@ -263,6 +263,7 @@ class CardComponent extends PureComponent {
             case 'SearchableDropdown':
                 return (
                     <SearchableDropdown
+                        type={this.props.type}
                         onSelectExposure={this.props.onSelectExposure}
                         isEditMode={this.props.item.isEditMode}
                         value={this.props.value}
