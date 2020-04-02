@@ -12,9 +12,11 @@ import QuestionCard from '../components/QuestionCard';
 import sortBy from 'lodash/sortBy';
 import cloneDeep from 'lodash/cloneDeep';
 import uniqueId from 'lodash/uniqueId';
+import get from 'lodash/get';
 import TopContainerButtons from "../components/TopContainerButtons";
 import PermissionComponent from './../components/PermissionComponent';
 import constants from "./../utils/constants";
+import config from "./../utils/config";
 
 class CaseSingleInvestigationContainer extends Component {
 
@@ -205,10 +207,10 @@ const style = StyleSheet.create({
 
 function mapStateToProps(state) {
     return {
-        screenSize: state.app.screenSize,
-        questions: state.outbreak.caseInvestigationTemplate,
-        translation: state.app.translation,
-        role: state.role
+        screenSize: get(state, 'app.screenSize', config.designScreenSize),
+        questions: get(state, 'outbreak.caseInvestigationTemplate', null),
+        translation: get(state, 'app.translation', []),
+        role: get(state, 'role', [])
     };
 }
 

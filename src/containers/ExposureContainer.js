@@ -109,7 +109,7 @@ class ExposureContainer extends PureComponent {
 
         if (item.type === 'DropdownInput' && item.id === 'clusterId' && this.props.exposure.clusterId) {
             let myCluster = this.props.clusters.filter((e) => {
-                return extractIdFromPouchId(e._id, 'cluster') === this.props.exposure.clusterId
+                return extractIdFromPouchId(get(e, '_id', null), 'cluster') === get(this.props, 'exposure.clusterId', null)
             });
             value = myCluster[0].name
         } else {
@@ -234,13 +234,10 @@ const style = StyleSheet.create({
 
 function mapStateToProps(state) {
     return {
-        screenSize: state.app.screenSize,
-        contacts: state.contacts,
-        cases: state.exposure,
-        translation: state.app.translation,
-        referenceData: state.referenceData,
-        events: state.events,
-        clusters: state.clusters,
+        screenSize: get(state, 'app.screenSize', config.designScreenSize),
+        translation: get(state, 'app.translation', []),
+        referenceData: get(state, 'referenceData', []),
+        clusters: get(state, 'clusters', []),
     };
 }
 

@@ -505,10 +505,10 @@ const style = StyleSheet.create({
 
 function mapStateToProps(state) {
     return {
-        screenSize: state.app.screenSize,
-        role: state.role,
-        translation: state.app.translation,
-        referenceData: state.referenceData,
+        screenSize: _.get(state, 'app.screenSize', config.designScreenSize),
+        role: _.get(state, 'role', []),
+        translation: _.get(state, 'app.translation', []),
+        referenceData: _.get(state, 'referenceData', []),
         locations: _.get(state, `locations.locations`, []),
     };
 }

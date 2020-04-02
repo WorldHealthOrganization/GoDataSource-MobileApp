@@ -651,7 +651,7 @@ class ContactsSingleScreen extends Component {
                         activeIndex={this.state.index}
                         handleOnPressSave={this.handleOnPressSave}
                         onPressPreviousButton={this.handleMoveToPrevieousScreenButton}
-
+                        isEditMode={this.state.isEditMode}
                         numberOfTabs={this.state.routes.length}
                         // onPressPreviousButton={this.handlePreviousPress}
                         onPressNextButton={this.handleMoveToNextScreenButton}
@@ -1887,15 +1887,12 @@ const style = StyleSheet.create({
 
 function mapStateToProps(state) {
     return {
-        teams: state.teams,
-        user: state.user,
-        role: state.role,
-        screenSize: state.app.screenSize,
-        followUps: state.followUps,
-        errors: state.errors,
-        contacts: state.contacts,
-        filter: state.app.filters,
-        translation: state.app.translation,
+        teams: _.get(state, 'teams', []),
+        user: _.get(state, 'user', null),
+        role: _.get(state, 'role', []),
+        screenSize: _.get(state, 'app.screenSize', config.designScreenSize),
+        filter: _.get(state, 'app.filters', null),
+        translation: _.get(state, 'app.translation', []),
         locations: _.get(state, 'locations.locations', []),
         periodOfFollowUp: _.get(state, 'outbreak.periodOfFollowUp', 1)
     };

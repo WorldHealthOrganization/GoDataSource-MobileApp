@@ -10,10 +10,12 @@ import styles from './../styles';
 import ElevatedView from 'react-native-elevated-view';
 import {LoaderScreen} from 'react-native-ui-lib';
 import FollowUpAgenda from './../components/FollowUpAgenda';
+import get from 'lodash/get';
 import moment from 'moment/min/moment.min';
 import TopContainerButtons from "./../components/TopContainerButtons";
 import PermissionComponent from './../components/PermissionComponent';
 import constants from "./../utils/constants";
+import config from "./../utils/config";
 
 class ContactsSingleCalendar extends Component {
 
@@ -128,11 +130,8 @@ const style = StyleSheet.create({
 
 function mapStateToProps(state) {
     return {
-        screenSize: state.app.screenSize,
-        contacts: state.contacts,
-        cases: state.cases,
-        events: state.events,
-        translation: state.app.translation,
+        screenSize: get(state, 'app.screenSize', config.designScreenSize),
+        translation: get(state, 'app.translation', [])
     };
 }
 

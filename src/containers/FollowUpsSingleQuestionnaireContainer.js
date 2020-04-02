@@ -13,6 +13,7 @@ import {LoaderScreen} from 'react-native-ui-lib';
 import _, {sortBy} from 'lodash';
 import translations from './../utils/translations';
 import constants from './../utils/constants';
+import config from './../utils/config';
 import cloneDeep from "lodash/cloneDeep";
 import uniqueId from "lodash/uniqueId";
 import TopContainerButtons from './../components/TopContainerButtons';
@@ -266,11 +267,11 @@ const style = StyleSheet.create({
     }
 });
 
-function mapStateToProps(state) {
+function mapStateToProps(state){
     return {
-        screenSize: state.app.screenSize,
-        questions: state.outbreak.contactFollowUpTemplate,
-        translation: state.app.translation
+        screenSize: _.get(state, 'app.screenSize', config.designScreenSize),
+        questions: _.get(state, 'outbreak.contactFollowUpTemplate', null),
+        translation: _.get(state, 'app.translation', [])
     };
 }
 

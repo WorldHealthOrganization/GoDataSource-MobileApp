@@ -8,6 +8,7 @@ import {ScrollView, StyleSheet, View} from 'react-native';
 import {calculateDimension, getTranslation} from './../utils/functions';
 import config from './../utils/config';
 import {connect} from "react-redux";
+import get from "lodash/get";
 import styles from './../styles';
 import CardComponent from './../components/CardComponent';
 import ElevatedView from 'react-native-elevated-view';
@@ -141,9 +142,9 @@ const style = StyleSheet.create({
 
 function mapStateToProps(state) {
     return {
-        screenSize: state.app.screenSize,
-        role: state.role,
-        translation: state.app.translation,
+        screenSize: get(state, 'app.screenSize', config.designScreenSize),
+        role: get(state, 'role', []),
+        translation: get(state, 'app.translation', []),
     };
 }
 

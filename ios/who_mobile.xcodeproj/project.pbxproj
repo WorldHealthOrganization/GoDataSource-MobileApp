@@ -80,6 +80,8 @@
 		E9CB62B08ACF4C2E98651372 /* Roboto-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A028CDE013104AAA955FC253 /* Roboto-Regular.ttf */; };
 		ED66F31E746248B331274E90 /* libPods-who_mobile.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0ECADE128F14DBEA491FB6A9 /* libPods-who_mobile.a */; };
 		F208B62A22AFCFD300B84216 /* libRNSentry.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F208B62322AFCFBD00B84216 /* libRNSentry.a */; };
+		F21A3E362434885800621781 /* libRNDateTimePicker.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F21A3E352434884400621781 /* libRNDateTimePicker.a */; };
+		F21A3E3D24348E5F00621781 /* libRNDarkMode.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F21A3E3C24348E5700621781 /* libRNDarkMode.a */; };
 		F2315FB3219601360088153C /* libRNDocumentPicker.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F2315FAA219601240088153C /* libRNDocumentPicker.a */; };
 		F2316EAF229D328F002B7854 /* libRNReanimated.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F2316EAE229D3281002B7854 /* libRNReanimated.a */; };
 		F234FF5F22E896B10087A880 /* libRNCAsyncStorage.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F234FF3C22E896410087A880 /* libRNCAsyncStorage.a */; };
@@ -401,6 +403,20 @@
 			remoteGlobalIDString = 274692C321B4414400BF91A8;
 			remoteInfo = "RNSentry-tvOS";
 		};
+		F21A3E342434884400621781 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F21A3E302434884400621781 /* RNDateTimePicker.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 134814201AA4EA6300B7C361;
+			remoteInfo = RNDateTimePicker;
+		};
+		F21A3E3B24348E5700621781 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F21A3E3724348E5700621781 /* RNDarkMode.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 6E20834822AADA1000CC4732;
+			remoteInfo = RNDarkMode;
+		};
 		F2315FA9219601240088153C /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = F2315F7B219601240088153C /* RNDocumentPicker.xcodeproj */;
@@ -644,6 +660,8 @@
 		E9DC39632BDD44A9915133B7 /* RNKeychain.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNKeychain.xcodeproj; path = "../node_modules/react-native-keychain/RNKeychain.xcodeproj"; sourceTree = "<group>"; };
 		EC98F5D4250748DC812CB9B3 /* EvilIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = EvilIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/EvilIcons.ttf"; sourceTree = "<group>"; };
 		F208B5E622AFCFBD00B84216 /* RNSentry.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNSentry.xcodeproj; path = "../node_modules/react-native-sentry/ios/RNSentry.xcodeproj"; sourceTree = "<group>"; };
+		F21A3E302434884400621781 /* RNDateTimePicker.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNDateTimePicker.xcodeproj; path = "../node_modules/@react-native-community/datetimepicker/ios/RNDateTimePicker.xcodeproj"; sourceTree = "<group>"; };
+		F21A3E3724348E5700621781 /* RNDarkMode.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNDarkMode.xcodeproj; path = "../node_modules/react-native-dark-mode/ios/RNDarkMode.xcodeproj"; sourceTree = "<group>"; };
 		F2315F7B219601240088153C /* RNDocumentPicker.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNDocumentPicker.xcodeproj; path = "../node_modules/react-native-document-picker/ios/RNDocumentPicker.xcodeproj"; sourceTree = "<group>"; };
 		F2315FB4219601E20088153C /* who_mobile.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = who_mobile.entitlements; path = who_mobile/who_mobile.entitlements; sourceTree = "<group>"; };
 		F2316EA9229D3281002B7854 /* RNReanimated.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNReanimated.xcodeproj; path = "../node_modules/react-native-reanimated/ios/RNReanimated.xcodeproj"; sourceTree = "<group>"; };
@@ -673,6 +691,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F21A3E3D24348E5F00621781 /* libRNDarkMode.a in Frameworks */,
+				F21A3E362434885800621781 /* libRNDateTimePicker.a in Frameworks */,
 				F2417D0A23D72B9C00656961 /* libRNCWebView.a in Frameworks */,
 				F23BFFAC238974D6001FD8FE /* libRNVersionNumber.a in Frameworks */,
 				F234FF5F22E896B10087A880 /* libRNCAsyncStorage.a in Frameworks */,
@@ -965,6 +985,8 @@
 		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
+				F21A3E3724348E5700621781 /* RNDarkMode.xcodeproj */,
+				F21A3E302434884400621781 /* RNDateTimePicker.xcodeproj */,
 				F2417CC423D72B7D00656961 /* RNCWebView.xcodeproj */,
 				F23BFF65238974C0001FD8FE /* RNVersionNumber.xcodeproj */,
 				F234FF3522E896400087A880 /* RNCAsyncStorage.xcodeproj */,
@@ -1070,6 +1092,22 @@
 			children = (
 				F208B62322AFCFBD00B84216 /* libRNSentry.a */,
 				F208B62522AFCFBD00B84216 /* libRNSentry-tvOS.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		F21A3E312434884400621781 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				F21A3E352434884400621781 /* libRNDateTimePicker.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		F21A3E3824348E5700621781 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				F21A3E3C24348E5700621781 /* libRNDarkMode.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1411,6 +1449,14 @@
 				{
 					ProductGroup = F2417CC523D72B7D00656961 /* Products */;
 					ProjectRef = F2417CC423D72B7D00656961 /* RNCWebView.xcodeproj */;
+				},
+				{
+					ProductGroup = F21A3E3824348E5700621781 /* Products */;
+					ProjectRef = F21A3E3724348E5700621781 /* RNDarkMode.xcodeproj */;
+				},
+				{
+					ProductGroup = F21A3E312434884400621781 /* Products */;
+					ProjectRef = F21A3E302434884400621781 /* RNDateTimePicker.xcodeproj */;
 				},
 				{
 					ProductGroup = 2B7B458F21C8ECA90060111B /* Products */;
@@ -1768,6 +1814,20 @@
 			fileType = archive.ar;
 			path = "libRNSentry-tvOS.a";
 			remoteRef = F208B62422AFCFBD00B84216 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		F21A3E352434884400621781 /* libRNDateTimePicker.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libRNDateTimePicker.a;
+			remoteRef = F21A3E342434884400621781 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		F21A3E3C24348E5700621781 /* libRNDarkMode.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libRNDarkMode.a;
+			remoteRef = F21A3E3B24348E5700621781 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		F2315FAA219601240088153C /* libRNDocumentPicker.a */ = {
@@ -2248,6 +2308,7 @@
 				PRODUCT_NAME = who_mobile;
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Debug;
@@ -2287,6 +2348,7 @@
 				PRODUCT_NAME = who_mobile;
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Release;

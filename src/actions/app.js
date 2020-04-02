@@ -515,7 +515,7 @@ export function sendDatabaseToServer () {
                             if (errorGetDatabase === 'No data to export') {
                                 dispatch(setSyncState({id: 'getDataFromServer', status: 'No data to export'}));
                             } else {
-                                dispatch(setSyncState({id: 'getDataFromServer', status: 'Error', error: JSON.stringify(error)}));
+                                dispatch(setSyncState({id: 'getDataFromServer', status: 'Error', error: JSON.stringify(errorGetDatabase)}));
                             }
                         })
                 }

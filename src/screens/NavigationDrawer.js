@@ -261,13 +261,13 @@ const style = StyleSheet.create({
 
 function mapStateToProps(state) {
     return {
-        user: state.user,
-        role: state.role,
-        screenSize: state.app.screenSize,
-        selectedScreen: state.app.selectedScreen,
-        availableLanguages: state.app.availableLanguages,
-        outbreak: state.outbreak,
-        translation: state.app.translation
+        user: lodashGet(state, 'user', null),
+        role: lodashGet(state, 'role', []),
+        screenSize: lodashGet(state, 'app.screenSize', config.designScreenSize),
+        selectedScreen: lodashGet(state, 'app.selectedScreen', 0),
+        availableLanguages: lodashGet(state, 'app.availableLanguages', []),
+        outbreak: lodashGet(state, 'outbreak', {name: ''}),
+        translation: lodashGet(state, 'app.translation', [])
     };
 }
 

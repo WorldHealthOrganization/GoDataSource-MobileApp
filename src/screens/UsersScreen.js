@@ -19,6 +19,7 @@ import {setLoaderState} from './../actions/app';
 import AnimatedListView from './../components/AnimatedListView';
 import ViewHOC from './../components/ViewHOC';
 import translations from './../utils/translations';
+import config from './../utils/config';
 import {enhanceListWithGetData} from './../components/higherOrderComponents/withListData';
 import call from 'react-native-phone-call';
 import get from 'lodash/get';
@@ -183,13 +184,10 @@ const style = StyleSheet.create({
 
 function mapStateToProps(state) {
     return {
-        user:           state.user,
-        teams:          state.teams,
-        screenSize:     state.app.screenSize,
-        syncState:      state.app.syncState,
-        translation:    state.app.translation,
-        loaderState:    state.app.loaderState,
-        location:       get(state, 'locations.locationsList')
+        screenSize:     get(state, 'app.screenSize', config.designScreenSize),
+        syncState:      get(state, 'app.syncState', null),
+        translation:    get(state, 'app.translation', []),
+        loaderState:    get(state, 'app.loaderState', false),
     };
 }
 

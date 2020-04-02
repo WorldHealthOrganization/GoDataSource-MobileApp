@@ -16,7 +16,8 @@ import AnimatedListView from './../components/AnimatedListView';
 import {getContactsForOutbreakId} from './../actions/contacts';
 import ViewHOC from './../components/ViewHOC';
 import {Popup} from 'react-native-map-link';
-import translations from './../utils/translations'
+import translations from './../utils/translations';
+import config from './../utils/config';
 import Breadcrumb from './../components/Breadcrumb';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {pushNewEditScreen} from './../utils/screenTransitionFunctions';
@@ -306,12 +307,12 @@ const style = StyleSheet.create({
 
 function mapStateToProps(state) {
     return {
-        user:           state.user,
-        screenSize:     state.app.screenSize,
-        syncState:      state.app.syncState,
-        translation:    state.app.translation,
-        loaderState:    state.app.loaderState,
-        referenceData:  state.referenceData,
+        user:           get(state, 'user', null),
+        screenSize:     get(state, 'app.screenSize', config.designScreenSize),
+        syncState:      get(state, 'app.syncState', null),
+        translation:    get(state, 'app.translation', []),
+        loaderState:    get(state, 'app.loaderState', false),
+        referenceData:  get(state, 'referenceData', []),
         role:           get(state, 'role', []),
         location:       get(state, 'locations.locationsList')
     };

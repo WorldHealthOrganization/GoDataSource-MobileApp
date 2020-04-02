@@ -3,9 +3,9 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import NavBarCustom from './../components/NavBarCustom';
 import {getTranslation} from './../utils/functions';
-import translations from './../utils/translations'
-
+import translations from './../utils/translations';
 import {Dimensions, StyleSheet, Text, View} from 'react-native';
+import lodashGet from 'lodash/get';
 
 import QRCodeScanner from 'react-native-qrcode-scanner';
 
@@ -120,7 +120,7 @@ const style = StyleSheet.create({
 
 function mapStateToProps(state) {
     return {
-        translation: state.app.translation
+        translation: lodashGet(state, 'app.translation', [])
     };
 }
 

@@ -430,11 +430,9 @@ const style = StyleSheet.create({
 
 function mapStateToProps(state) {
     return {
-        screenSize: state.app.screenSize,
-        contacts: state.contacts,
-        cases: state.cases,
-        translation: state.app.translation,
-        referenceData: state.referenceData,
+        screenSize: _.get(state, 'app.screenSize', config.designScreenSize),
+        translation: _.get(state, 'app.translation', []),
+        referenceData: _.get(state, 'referenceData', [])
     };
 }
 

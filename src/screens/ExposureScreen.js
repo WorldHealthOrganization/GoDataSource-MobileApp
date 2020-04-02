@@ -64,23 +64,6 @@ class ExposureScreen extends Component {
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
-        // console.log('Render from ExposureScreen: ', this.state.exposure, this.props.exposure);
-
-        // if (this.props.errors && this.props.errors.type && this.props.errors.message) {
-        //     Alert.alert(this.props.errors.type, this.props.errors.message, [
-        //         {
-        //             text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
-        //             onPress: () => {
-        //                 this.setState({
-        //                     savePressed: false
-        //                 }, () => {
-        //                     this.props.removeErrors();
-        //                 });
-        //             }
-        //         }
-        //     ])
-        // }
-
         return (
             <ViewHOC style={style.viewHocContainer}
                 showLoader={this && this.state && this.state.loading}
@@ -457,16 +440,9 @@ const style = StyleSheet.create({
 
 function mapStateToProps(state) {
     return {
-        teams: state.teams,
-        user: state.user,
-        screenSize: state.app.screenSize,
-        errors: state.errors,
-        contacts: state.contacts,
-        translation: state.app.translation,
-        referenceData: state.referenceData,
-        cases: state.exposure,
-        events: state.events,
-        clusters: state.clusters,
+        user: get(state, 'user', null),
+        screenSize: get(state, 'app.screenSize', config.designScreenSize),
+        translation: get(state, 'app.translation', []),
         periodOfFollowUp: get(state, 'outbreak.periodOfFollowup', null),
         outbreakId: get(state, 'outbreak._id', null)
     };

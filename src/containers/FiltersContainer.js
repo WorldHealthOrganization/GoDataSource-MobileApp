@@ -230,11 +230,11 @@ const style = StyleSheet.create({
 
 function mapStateToProps(state) {
     return {
-        screenSize: state.app.screenSize,
-        translation: state.app.translation,
+        screenSize: get(state, 'app.screenSize', config.designScreenSize),
+        translation: get(state, 'app.translation', []),
         locations: get(state, `locations.locations`, []),
-        helpCategory: state.helpCategory,
-        referenceData: state.referenceData,
+        helpCategory: get(state, 'helpCategory', []),
+        referenceData: get(state, 'referenceData', [])
     };
 }
 

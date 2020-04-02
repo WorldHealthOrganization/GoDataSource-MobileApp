@@ -1,9 +1,8 @@
 /**
  * Created by florinpopa on 05/12/2018.
  */
-/**
- * Created by florinpopa on 14/06/2018.
- */
+// Since this app is based around the material ui is better to use the components from
+// the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
 import {Alert, Platform, StyleSheet, Text, View} from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
@@ -16,9 +15,8 @@ import TextInput from './../components/TextInput';
 import styles from './../styles';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
+import lodashGet from 'lodash/get';
 import {logoutUser} from './../actions/user';
-// Since this app is based around the material ui is better to use the components from
-// the material ui library, since it provides design and animations out of the box
 import {removeErrors} from './../actions/errors';
 import {saveActiveDatabase} from './../actions/app';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
@@ -684,9 +682,9 @@ const style = StyleSheet.create({
 
 function mapStateToProps(state) {
     return {
-        screenSize: state.app.screenSize,
-        errors: state.errors,
-        translation: state.app.translation
+        screenSize: lodashGet(state, 'app.screenSize', config.designScreenSize),
+        errors: lodashGet(state, 'errors', null),
+        translation: lodashGet(state, 'app.translation', [])
     };
 }
 
