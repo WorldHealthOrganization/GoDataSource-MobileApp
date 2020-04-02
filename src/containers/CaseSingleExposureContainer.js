@@ -200,9 +200,10 @@ class ContactsSingleExposures extends Component {
             screen: "ExposureScreen",
             animated: true,
             passProps: {
-                contact: null,
-                type: 'Contact',
+                case: this.props.case,
+                type: 'Case',
                 saveExposure: this.props.saveExposure,
+                refreshRelations: this.props.refreshRelations
             }
         })
     };

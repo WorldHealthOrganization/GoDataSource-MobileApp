@@ -534,6 +534,7 @@ class CaseSingleScreen extends Component {
                         handleOnPressSave={this.handleOnPressSave}
                         isEditMode={this.state.isEditMode}
                         selectedExposure={this.props.singleCase}
+                        refreshRelations={this.refreshRelations}
                     />
                 );
                 break;
@@ -971,6 +972,12 @@ class CaseSingleScreen extends Component {
     };
 
     // Exposures handlers
+    handleSaveExposure = (exposure, isUpdate = false) => {
+        this.setState({
+            loading: true,
+            updateExposure: true
+        })
+    };
     handleOnPressEditExposure = (relation, index) => {
         _.set(relation, 'contactData.fullName', computeFullName(_.get(relation, 'contactData', null)));
         this.props.navigator.showModal({

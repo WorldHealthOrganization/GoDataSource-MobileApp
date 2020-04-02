@@ -119,6 +119,61 @@ export function getCasesByName(outbreakId, search) {
         .catch((errorGetData) => Promise.reject(errorGetData))
 }
 
+export function getPersonsByName(outbreakId, search, type) {
+    let condition = {
+        'outbreakId': outbreakId,
+        '$or': [
+            {'firstName': {'$like': `%${search}%`}},
+            {'lastName': {'$like': `%${search}%`}},
+            {'visualId': {'$like': `%${search}%`}},
+        ]
+    };
+    // if type is contacts, search both cases and events
+    if (type === 'Contact') {
+        condition['type'] = {'$ne': translations.personTypes.contacts};
+    }
+    if (type === 'Case') {
+        condition['type'] = translations.personTypes.contacts;
+    }
+    let casesQuery = {
+        type: 'select',
+        table: 'person',
+        fields: [
+            {
+                table: 'person',
+                name: '_id',
+                alias: '_id',
+            },
+            {
+                table: 'person',
+                name: 'firstName',
+                alias: 'firstName',
+            },
+            {
+                table: 'person',
+                name: 'lastName',
+                alias: 'lastName',
+            },
+            {
+                table: 'person',
+                name: 'visualId',
+                alias: 'visualId',
+            },
+            {
+                table: 'person',
+                name: 'type',
+                alias: 'type',
+            }
+        ],
+        condition: condition
+    };
+
+    return Promise.resolve()
+        .then(() => executeQuery(casesQuery))
+        .then((mappedData) => Promise.resolve(mappedData))
+        .catch((errorGetData) => Promise.reject(errorGetData))
+}
+
 export function getCaseAndExposuresById (caseId, outbreakId) {
     let queryCase = {
         type: 'select',
@@ -201,6 +256,7 @@ export function getRelationsForCase (caseId) {
         ],
         condition: {
             'relationship.sourceId': caseId,
+            'person.type': translations.personTypes.contacts
             // 'relationship.outbreakId': outbreakId,
         }
     };

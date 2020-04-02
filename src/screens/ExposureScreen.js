@@ -64,31 +64,11 @@ class ExposureScreen extends Component {
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
-        // console.log('Render from ExposureScreen: ', this.state.exposure, this.props.exposure);
-
-        // if (this.props.errors && this.props.errors.type && this.props.errors.message) {
-        //     Alert.alert(this.props.errors.type, this.props.errors.message, [
-        //         {
-        //             text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
-        //             onPress: () => {
-        //                 this.setState({
-        //                     savePressed: false
-        //                 }, () => {
-        //                     this.props.removeErrors();
-        //                 });
-        //             }
-        //         }
-        //     ])
-        // }
 
         return (
             <ViewHOC style={style.viewHocContainer}
                 showLoader={this && this.state && this.state.loading}
                 loaderText={this.props && this.props.syncState ? 'Loading' : getTranslation(translations.loadingScreenMessages.loadingMsg, this.props.translation)}>
-            
-                {/*<TouchableWithoutFeedback onPress={() => {*/}
-                    {/*Keyboard.dismiss()*/}
-                {/*}} accessible={false}>*/}
                     <View style={style.container}>
                         <NavBarCustom style = {style.navbarContainer}
                             customTitle={
@@ -159,7 +139,6 @@ class ExposureScreen extends Component {
                             />
                         </View>
                     </View>
-                {/*</TouchableWithoutFeedback>*/}
             </ViewHOC>
         )
     }
@@ -272,18 +251,25 @@ class ExposureScreen extends Component {
                 target: true
             }];
         } else {
-            // Here add logic for cases/events
+            // Here add logic for cases. Events are not yet handled. This needs refactoring
             personsArray = [{
-                id: value.value,
-                type: type
-            }]
+                id: get(selectedExposure, '_id', null),
+                type: get(selectedExposure, 'type', null),
+                source: null,
+                target: true
+            },{
+                id: get(this.props, 'case._id', null),
+                type: get(this.props, 'case.type', null),
+                source: true,
+                target: null
+            }];
         }
 
         let source = personsArray && Array.isArray(personsArray) && personsArray.length === 2 ? personsArray[0].source ? personsArray[0].id : personsArray[1].id : null;
         let target = personsArray && Array.isArray(personsArray) && personsArray.length === 2 ? personsArray[0].target ? personsArray[0].id : personsArray[1].id : null;
 
         this.setState(prevState => ({
-            exposure: Object.assign({}, prevState.exposure, {persons: personsArray, source: source, target: target, active: true}),
+            exposure: Object.assign({}, prevState.exposure, {persons: personsArray, active: true}),
             isModified: true,
             selectedExposure: selectedExposure
         }), () => {
@@ -460,12 +446,8 @@ function mapStateToProps(state) {
         teams: state.teams,
         user: state.user,
         screenSize: state.app.screenSize,
-        errors: state.errors,
-        contacts: state.contacts,
         translation: state.app.translation,
         referenceData: state.referenceData,
-        cases: state.exposure,
-        events: state.events,
         clusters: state.clusters,
         periodOfFollowUp: get(state, 'outbreak.periodOfFollowup', null),
         outbreakId: get(state, 'outbreak._id', null)

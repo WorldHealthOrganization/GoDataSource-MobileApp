@@ -23,7 +23,7 @@ export function testApi(testUrl, deviceInfo, callback) {
 
 
 export function testApiPromise(testUrl, deviceInfo) {
-    fetch(testUrl, {
+    return fetch(testUrl, {
         method: 'GET',
         headers: {
             'device-info': deviceInfo,
