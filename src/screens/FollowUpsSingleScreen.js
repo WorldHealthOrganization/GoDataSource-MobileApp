@@ -36,6 +36,7 @@ import moment from 'moment/min/moment.min';
 import {checkArrayAndLength} from './../utils/typeCheckingFunctions';
 import {checkRequiredQuestions, extractAllQuestions} from "../utils/functions";
 import constants from './../utils/constants';
+import lodashGet from "lodash/get";
 
 class FollowUpsSingleScreen extends Component {
 
@@ -631,6 +632,10 @@ class FollowUpsSingleScreen extends Component {
                 if (!questionnaireAnswers[parentId][0].subAnswers[id]) {
                     questionnaireAnswers[parentId][0].subAnswers[id] = [];
                 }
+                if (_.get(value, 'subAnswers', null) !== null) {
+                    questionnaireAnswers[parentId][0].subAnswers = Object.assign({}, questionnaireAnswers[parentId][0].subAnswers, value.subAnswers);
+                    delete value.subAnswers;
+                }
                 questionnaireAnswers[parentId][0].subAnswers[id][0] = value;
             }
         } else {
@@ -658,6 +663,10 @@ class FollowUpsSingleScreen extends Component {
                 }
                 if (!questionnaireAnswers[parentId][0].subAnswers[id]) {
                     questionnaireAnswers[parentId][0].subAnswers[id] = [];
+                }
+                if (_.get(value, 'subAnswers', null) !== null) {
+                    questionnaireAnswers[parentId][0].subAnswers = Object.assign({}, questionnaireAnswers[parentId][0].subAnswers, value.subAnswers);
+                    delete value.subAnswers;
                 }
                 questionnaireAnswers[parentId][0].subAnswers[id][0] = value;
             }

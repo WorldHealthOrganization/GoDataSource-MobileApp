@@ -1819,12 +1819,15 @@ class CaseSingleScreen extends Component {
             if (!questionnaireAnswers[parentId]) {
                 questionnaireAnswers[parentId] = [];
             }
-            if (questionnaireAnswers[parentId] && Array.isArray(questionnaireAnswers[parentId]) && questionnaireAnswers[parentId].length > 0 && questionnaireAnswers[parentId][0]) {
+            if (lodashGet(questionnaireAnswers, `[${parentId}][0]`, null) !== null) {
                 if(!questionnaireAnswers[parentId][0].hasOwnProperty("subAnswers")){
                     questionnaireAnswers[parentId][0] = Object.assign({}, questionnaireAnswers[parentId][0],{ subAnswers: {}});
                 }
                 if (typeof questionnaireAnswers[parentId][0].subAnswers === "object" && Object.keys(questionnaireAnswers[parentId][0].subAnswers).length === 0) {
                     questionnaireAnswers[parentId][0].subAnswers = {};
+                }
+                if (!Array.isArray(questionnaireAnswers[parentId][0].subAnswers[id])) {
+                    questionnaireAnswers[parentId][0].subAnswers[id] = [];
                 }
                 questionnaireAnswers[parentId][0].subAnswers[id][0] = value;
             }
@@ -1859,6 +1862,10 @@ class CaseSingleScreen extends Component {
                 if (!questionnaireAnswers[parentId][0].subAnswers[id]) {
                     questionnaireAnswers[parentId][0].subAnswers[id] = [];
                 }
+                if (lodashGet(value, 'subAnswers', null) !== null) {
+                    questionnaireAnswers[parentId][0].subAnswers = Object.assign({}, questionnaireAnswers[parentId][0].subAnswers, value.subAnswers);
+                    delete value.subAnswers;
+                }
                 questionnaireAnswers[parentId][0].subAnswers[id][0] = value;
             }
         } else {
@@ -1889,6 +1896,10 @@ class CaseSingleScreen extends Component {
                 }
                 if (!questionnaireAnswers[parentId][0].subAnswers[id]) {
                     questionnaireAnswers[parentId][0].subAnswers[id] = [];
+                }
+                if (lodashGet(value, 'subAnswers', null) !== null) {
+                    questionnaireAnswers[parentId][0].subAnswers = Object.assign({}, questionnaireAnswers[parentId][0].subAnswers, value.subAnswers);
+                    delete value.subAnswers;
                 }
                 questionnaireAnswers[parentId][0].subAnswers[id][0] = value;
             }
