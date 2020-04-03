@@ -16,7 +16,9 @@ import {changeAppRoot, setSyncState} from './../actions/app';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import {LoaderScreen} from 'react-native-ui-lib';
 import Ripple from 'react-native-material-ripple';
-import translations from './../utils/translations'
+import lodashGet from 'lodash/get';
+import translations from './../utils/translations';
+import config from './../utils/config';
 import {getTranslation} from './../utils/functions';
 import VersionNumber from 'react-native-version-number';
 
@@ -234,10 +236,10 @@ const style = StyleSheet.create({
 
 function mapStateToProps(state) {
     return {
-        screenSize: state.app.screenSize,
-        errors: state.errors,
-        loginState: state.app.loginState,
-        activeDatabase: state.app.activeDatabase
+        screenSize: lodashGet(state, 'app.screenSize', config.designScreenSize),
+        errors: lodashGet(state, 'errors', null),
+        loginState: lodashGet(state, 'app.loginState', null),
+        activeDatabase: lodashGet(state, 'app.activeDatabase', null)
     };
 }
 

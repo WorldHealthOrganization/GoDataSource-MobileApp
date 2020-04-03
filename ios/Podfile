@@ -4,6 +4,10 @@ target 'who_mobile' do
   pod 'Parse'
 
   # Add new pods below this line
+  pod 'ReactNativeDarkMode', :path => '../node_modules/react-native-dark-mode'
+
+  pod 'RNDateTimePicker', :path => '../node_modules/@react-native-community/datetimepicker'
+
   pod 'react-native-webview', :path => '../node_modules/react-native-webview'
 
 

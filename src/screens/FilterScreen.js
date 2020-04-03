@@ -5,7 +5,6 @@ import {bindActionCreators} from "redux";
 import {PagerScroll, TabBar, TabView} from 'react-native-tab-view';
 import cloneDeep from 'lodash/cloneDeep';
 import get from 'lodash/get';
-
 import styles from './../styles';
 import NavBarCustom from './../components/NavBarCustom';
 import {extractIdFromPouchId, getTranslation} from './../utils/functions';
@@ -433,8 +432,8 @@ const style = StyleSheet.create({
 
 function mapStateToProps(state) {
     return {
-        screenSize: state.app.screenSize,
-        translation: state.app.translation
+        screenSize: get(state, 'app.screenSize', config.designScreenSize),
+        translation: get(state, 'app.translation', [])
     };
 }
 

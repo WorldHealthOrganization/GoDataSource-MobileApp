@@ -2103,13 +2103,12 @@ const style = StyleSheet.create({
 
 function mapStateToProps(state) {
     return {
-        user: state.user,
-        screenSize: state.app.screenSize,
-        selectedScreen: state.app.selectedScreen,
-        errors: state.errors,
-        caseInvestigationQuestions: state.outbreak.caseInvestigationTemplate,
-        translation: state.app.translation,
-        role: state.role
+        user: lodashGet(state, 'user', {}),
+        screenSize: lodashGet(state, 'app.screenSize', config.designScreenSize),
+        selectedScreen: lodashGet(state, 'app.selectedScreen', 0),
+        caseInvestigationQuestions: lodashGet(state, 'outbreak.caseInvestigationTemplate', null),
+        translation: lodashGet(state, 'app.translation', []),
+        role: lodashGet(state, 'role', [])
     };
 }
 function matchDispatchProps(dispatch) {

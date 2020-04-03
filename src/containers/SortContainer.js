@@ -4,7 +4,7 @@ import {connect} from "react-redux";
 import Ripple from 'react-native-material-ripple';
 import ElevatedView from 'react-native-elevated-view';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
-
+import get from 'lodash/get';
 import {calculateDimension, getTranslation} from '../utils/functions';
 import config from '../utils/config';
 import Button from '../components/Button';
@@ -236,8 +236,8 @@ const style = StyleSheet.create({
 
 function mapStateToProps(state) {
     return {
-        screenSize: state.app.screenSize,
-        translation: state.app.translation,
+        screenSize: get(state, 'app.screenSize', config.designScreenSize),
+        translation: get(state, 'app.translation', []),
     };
 };
 

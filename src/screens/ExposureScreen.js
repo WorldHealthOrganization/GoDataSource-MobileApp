@@ -64,7 +64,6 @@ class ExposureScreen extends Component {
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
-
         return (
             <ViewHOC style={style.viewHocContainer}
                 showLoader={this && this.state && this.state.loading}
@@ -443,12 +442,9 @@ const style = StyleSheet.create({
 
 function mapStateToProps(state) {
     return {
-        teams: state.teams,
-        user: state.user,
-        screenSize: state.app.screenSize,
-        translation: state.app.translation,
-        referenceData: state.referenceData,
-        clusters: state.clusters,
+        user: get(state, 'user', null),
+        screenSize: get(state, 'app.screenSize', config.designScreenSize),
+        translation: get(state, 'app.translation', []),
         periodOfFollowUp: get(state, 'outbreak.periodOfFollowup', null),
         outbreakId: get(state, 'outbreak._id', null)
     };

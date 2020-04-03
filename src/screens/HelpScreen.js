@@ -25,6 +25,7 @@ import ViewHOC from './../components/ViewHOC';
 import translations from './../utils/translations'
 import RNExitApp from 'react-native-exit-app';
 import constants from "../utils/constants";
+import config from "../utils/config";
 import PermissionComponent from './../components/PermissionComponent';
 
 let AnimatedListView = Animated.createAnimatedComponent(FlatList);
@@ -520,21 +521,17 @@ const style = StyleSheet.create({
 
 function mapStateToProps(state) {
     return {
-        user: state.user,
-        screenSize: state.app.screenSize,
-        filter: state.app.filters,
-        syncState: state.app.syncState,
-        errors: state.errors,
-        translation: state.app.translation,
-        helpCategory: state.helpCategory,
-        helpItem: state.helpItem,
-        role: state.role
+        screenSize: _.get(state, 'app.screenSize', config.designScreenSize),
+        filter: _.get(state, 'app.filters', []),
+        syncState: _.get(state, 'app.syncState', null),
+        errors: _.get(state, 'errors', null),
+        translation: _.get(state, 'app.translation', []),
+        helpItem: _.get(state, 'helpItem', [])
     };
 }
 
 function matchDispatchProps(dispatch) {
     return bindActionCreators({
-        removeErrors,
         addFilterForScreen,
         removeFilterForScreen,
     }, dispatch);

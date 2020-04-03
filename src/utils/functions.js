@@ -932,6 +932,9 @@ export function checkRequiredQuestions(questions, previousAnswers) {
 }
 
 export function getTranslation (value, allTransactions) {
+    if (!value) {
+        return '';
+    }
     if (!getTranslation.cache) {
         getTranslation.cache = {}
     }
@@ -957,7 +960,7 @@ export function getTranslation (value, allTransactions) {
         } else if (defaultTranslations[`${value}`] !== undefined && defaultTranslations[`${value}`] !== null){
             valueToBeReturned = defaultTranslations[`${value}`]
         } else {
-            valueToBeReturned = ''
+            valueToBeReturned = value;
         }
     }
     getTranslation.cache[key] = valueToBeReturned;

@@ -1,51 +1,45 @@
 /**
  * Created by florinpopa on 04/07/2018.
  */
-import React, {PureComponent} from 'react';
-import {View, Text, StyleSheet} from 'react-native';
-import PropTypes from 'prop-types';
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
+import React, {useState} from 'react';
+import {View, Text, StyleSheet} from 'react-native';
+import PropTypes from 'prop-types';
 import { TextField } from 'react-native-material-textfield';
 import DateTimePicker from 'react-native-modal-datetime-picker';
 import Ripple from 'react-native-material-ripple';
-import style from './../styles';
 import moment from 'moment/min/moment.min';
 import {getTranslation, getTooltip, createDate} from './../utils/functions';
-import TooltipComponent from './TooltipComponent'
+import TooltipComponent from './TooltipComponent';
+import {useDarkMode} from 'react-native-dark-mode';
 
-class DatePicker extends PureComponent {
+const DatePicker = React.memo(({
+            id,
+            isEditMode,
+            label,
+            value,
+            isRequired,
+            onChange,
+            style,
+            objectType,
+            translation,
+            minimumDate,
+            maximumDate,
+            date
+                               }) => {
+    const [isDateTimePickerVisible, setIsDateTimePickerVisible] = useState(false);
+    const isDarkMode = useDarkMode();
 
-    // This will be a dumb component, so it's best not to put any business logic in it
-    constructor(props) {
-        super(props);
-        this.state = {
-            isDateTimePickerVisible: false
-        };
-    }
-
-    // Please add here the react lifecycle methods that you need
-    // The render method should have at least business logic as possible,
-    // because this will be called whenever there is a new setState call
-    // and can slow down the app
-    render() {
-        if(this.props.isEditMode){
-            return this.editInput();
-        }else{
-            return this.viewInput();
-        }
-    }
-
-    // Please write here all the methods that are not react native lifecycle methods
-    editInput = () => {
+    const editInput = () => {
         // console.log('This.props.value: ', this.props.value);
-        let tooltip = getTooltip(this.props.label, this.props.translation);
-        let customStyle = this.props.value !== undefined && this.props.value !== null ? styles.hasDateTooltipStyle : style.emptyDateTooltipStyle;
+        let tooltip = getTooltip(label, translation);
+        let customStyle = value !== undefined && value !== null ? styles.hasDateTooltipStyle : style.emptyDateTooltipStyle;
         return (
-            <View style={[{marginVertical: 10, flexDirection: 'row'},this.props.style]}>
+            <View style={[{marginVertical: 10, flexDirection: 'row'}, style]}>
                 <View style = {{flex: 1}}>
                     {
-                        this.props.value !== null && this.props.value !== undefined && this.props.date !== '' ? (
+                        value !== null && value !== undefined && date !== '' ? (
                             <View>
                                 <Text style={{
                                     fontFamily: 'Roboto',
@@ -53,27 +47,27 @@ class DatePicker extends PureComponent {
                                     textAlign: 'left',
                                     color: 'rgba(0, 0, 0, .38)',
                                 }}>
-                                    {this.props.isRequired ? getTranslation(this.props.label, this.props.translation) + ' * ' : getTranslation(this.props.label, this.props.translation)}
+                                    {isRequired ? getTranslation(label, translation) + ' * ' : getTranslation(label, translation)}
                                 </Text>
 
-                                <Ripple onPress={this.handleShowDatePicker}>
-                                    <Text 
+                                <Ripple onPress={handleShowDatePicker}>
+                                    <Text
                                         style={{
-                                        fontFamily: 'Roboto-Regular',
-                                        fontSize: 15,
-                                        textAlign: 'left',
-                                        lineHeight: 30,
-                                        color: 'rgb(60,60,60)',
-                                        marginBottom: 7.5
-                                    }}>
-                                        {this.props.value !== null && this.props.value !== undefined && this.props.value !== '' ? moment.utc(this.props.value).format('MM/DD/YYYY') : ''}
+                                            fontFamily: 'Roboto-Regular',
+                                            fontSize: 15,
+                                            textAlign: 'left',
+                                            lineHeight: 30,
+                                            color: 'rgb(60,60,60)',
+                                            marginBottom: 7.5
+                                        }}>
+                                        {value !== null && value !== undefined && value !== '' ? moment.utc(value).format('MM/DD/YYYY') : ''}
                                     </Text>
                                 </Ripple>
                             </View>
-                        ) : ( 
-                            <Ripple onPress={this.handleShowDatePicker}>
+                        ) : (
+                            <Ripple onPress={handleShowDatePicker}>
                                 <TextField
-                                    label={this.props.isRequired ? getTranslation(this.props.label, this.props.translation) + ' * ' : getTranslation(this.props.label, this.props.translation)}
+                                    label={isRequired ? getTranslation(label, translation) + ' * ' : getTranslation(label, translation)}
                                     textColor='rgb(0,0,0)'
                                     labelFontSize={15}
                                     // labelHeight={30}
@@ -85,17 +79,18 @@ class DatePicker extends PureComponent {
                                     }}
                                     tintColor='rgb(77,176,160)'
                                 >
-                                </TextField> 
+                                </TextField>
                             </Ripple>
                         )
                     }
                     <DateTimePicker
-                        minimumDate={this.props.minimumDate}
-                        maximumDate={this.props.maximumDate}
+                        minimumDate={minimumDate || null}
+                        maximumDate={maximumDate || null}
                         timeZoneOffsetInMinutes={0}
-                        isVisible={this.state.isDateTimePickerVisible}
-                        onConfirm={this.handleDatePicked}
-                        onCancel={this.handleDateCancelled}
+                        isVisible={isDateTimePickerVisible}
+                        onConfirm={handleDatePicked}
+                        onCancel={handleDateCancelled}
+                        isDarkModeEnabled={isDarkMode}
                     />
                 </View>
                 {
@@ -110,11 +105,11 @@ class DatePicker extends PureComponent {
         );
     };
 
-    viewInput = () => {
-        let tooltip = getTooltip(this.props.label, this.props.translation);
+    const viewInput = () => {
+        let tooltip = getTooltip(label, translation);
         return (
-            <View style={[{flexDirection: 'row'}, this.props.style]}>
-                <View style={{flex: 1}}> 
+            <View style={[{flexDirection: 'row'}, style]}>
+                <View style={{flex: 1}}>
                     <Text style={{
                         fontFamily: 'Roboto-Regular',
                         fontSize: 15,
@@ -123,17 +118,17 @@ class DatePicker extends PureComponent {
                         marginBottom: 2,
                         marginTop: 7,
                     }}>
-                        {getTranslation(this.props.label, this.props.translation)}
+                        {getTranslation(label, translation)}
                     </Text>
                     <Text
-                style={{
-                    fontFamily: 'Roboto-Light',
-                    fontSize: 15,
-                    textAlign: 'left',
-                    color: 'rgb(60,60,60)',
-                }}>
-                    {this.props.value !== null && this.props.value !== undefined && this.props.value !== '' ? moment.utc(this.props.value).format('MM/DD/YYYY') : ''}
-                </Text>
+                        style={{
+                            fontFamily: 'Roboto-Light',
+                            fontSize: 15,
+                            textAlign: 'left',
+                            color: 'rgb(60,60,60)',
+                        }}>
+                        {value !== null && value !== undefined && value !== '' ? moment.utc(value).format('MM/DD/YYYY') : ''}
+                    </Text>
                 </View>
                 {
                     tooltip.hasTooltip === true ? (
@@ -146,38 +141,34 @@ class DatePicker extends PureComponent {
         );
     };
 
-    handleShowDatePicker = () => {
-        this.setState({isDateTimePickerVisible: true})
+    const handleShowDatePicker = () => {
+        setIsDateTimePickerVisible(true);
     };
 
-    handleDateCancelled = () => {
-        if (this.state.isDateTimePickerVisible) {
-            this.setState({isDateTimePickerVisible: false})
+    const handleDateCancelled = () => {
+        if (isDateTimePickerVisible) {
+            setIsDateTimePickerVisible(false);
         }
     };
 
-    handleDatePicked = (date) => {
+    const handleDatePicked = (date) => {
         console.log("### date picked: ", date, moment.utc(date).format());
-        this.props.onChange(
+        onChange(
             createDate(date),
-            this.props.id, 
-            this.props.objectType ? (this.props.objectType === 'Address' || this.props.objectType === 'LabResult' || this.props.objectType === 'DateRanges' || this.props.objectType === 'Vaccines' ? this.props.index : this.props.objectType) : null,
-            this.props.objectType
+            id,
+            objectType ? (objectType === 'Address' || objectType === 'LabResult' || objectType === 'DateRanges' || objectType === 'Vaccines' ? index : objectType) : null,
+            objectType
         );
-        this.handleDateCancelled();
+        handleDateCancelled();
     };
 
-}
+    return isEditMode ? editInput() : viewInput()
+});
+
 
 // Create style outside the class, or for components that will be used by other components (buttons),
 // make a global style in the config directory
 const styles = StyleSheet.create({
-    editLabel: {
-
-    },
-    viewLabel: {
-
-    },
     hasDateTooltipStyle: {
         flex: 0,
         marginTop: 15,

@@ -241,25 +241,16 @@ class ContactsSingleAddress extends PureComponent {
     computeValueForContactsSingleScreen = (item, index) => {
         if (index !== null || index >= 0) {
             if (item.id === 'lng') {
-                return this.props.contact && this.props.contact.addresses && Array.isArray(this.props.contact.addresses) &&
-                    this.props.contact.addresses[index] && this.props.contact.addresses[index].geoLocation &&
-                    this.props.contact.addresses[index].geoLocation.coordinates &&
-                    Array.isArray(this.props.contact.addresses[index].geoLocation.coordinates) ?
-                    getTranslation(this.props.contact.addresses[index].geoLocation.coordinates[0], this.props.translation) : '';
+                return getTranslation(_.get(this.props, `contact.addresses[${index}].geoLocation.coordinates[0]`, ''), this.props.translation);
             } else {
                 if (item.id === 'lat') {
-                    return this.props.contact && this.props.contact.addresses && Array.isArray(this.props.contact.addresses) &&
-                        this.props.contact.addresses[index] && this.props.contact.addresses[index].geoLocation &&
-                        this.props.contact.addresses[index].geoLocation.coordinates &&
-                        Array.isArray(this.props.contact.addresses[index].geoLocation.coordinates) ?
-                        getTranslation(this.props.contact.addresses[index].geoLocation.coordinates[1], this.props.translation) : '';
+                    return getTranslation(_.get(this.props , `contact.addresses[${index}].geoLocation.coordinates[1]`, ''), this.props.translation);
                 } else {
-                    return this.props.contact && this.props.contact.addresses && Array.isArray(this.props.contact.addresses) ?
-                        getTranslation(this.props.contact.addresses[index][item.id], this.props.translation) : '';
+                    return getTranslation(_.get(this.props, `contact.addresses[${index}][${item.id}]`, ''), this.props.translation);
                 }
             }
         }
-        return this.props.contact && this.props.contact[item.id] ? getTranslation(this.props.contact[item.id], this.props.translation) : '';
+        return getTranslation(_.get(this.props, `contact[${item.id}]`, ''), this.props.translation);
     };
 
     setDateValidations = (item) => {

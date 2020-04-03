@@ -144,6 +144,8 @@ android {
 }
 
 dependencies {
+    implementation project(':react-native-dark-mode')
+    implementation project(':@react-native-community_datetimepicker')
     implementation project(':react-native-webview')
     implementation project(':react-native-version-number')
     implementation project(':react-native-randombytes')

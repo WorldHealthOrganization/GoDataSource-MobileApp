@@ -11,12 +11,14 @@ import {StyleSheet, View} from 'react-native';
 import Button from './../components/Button';
 import styles from './../styles';
 import {connect} from "react-redux";
+import get from 'lodash/get';
 import ElevatedView from 'react-native-elevated-view';
 import {calculateDimension, createDate, getTranslation} from './../utils/functions';
 import Section from './../components/Section';
 import DatePicker from './../components/DatePicker';
 import {Dialog} from 'react-native-ui-lib';
 import translations from './../utils/translations';
+import config from './../utils/config';
 
 class AddFollowUpScreen extends PureComponent{
 
@@ -131,8 +133,8 @@ const style = StyleSheet.create({
 
 function mapStateToProps(state) {
     return {
-        screenSize: state.app.screenSize,
-        translation: state.app.translation
+        screenSize: get(state, 'app.screenSize', config.designScreenSize),
+        translation: get(state, 'app.translation', [])
     };
 }
 

@@ -25,6 +25,8 @@ import ModalSyncStatus from './../components/ModalSyncStatus';
 import VersionNumber from 'react-native-version-number';
 import IntervalPicker from './../components/IntervalPicker';
 import constants from './../utils/constants';
+import config from './../utils/config';
+import lodashGet from 'lodash/get';
 
 class ManualConfigScreen extends PureComponent {
 
@@ -619,12 +621,12 @@ function mapStateToProps(state) {
     }
 
     return {
-        screenSize: state.app.screenSize,
+        screenSize: lodashGet(state, 'app.screenSize', config.designScreenSize),
         // errors: state.errors,
         syncState: syncState,
         showModal: showModal,
         showCloseModalButton: showCloseModalButton,
-        activeDatabase: state.app.activeDatabase
+        activeDatabase: lodashGet(state, 'app.activeDatabase', null)
     };
 }
 

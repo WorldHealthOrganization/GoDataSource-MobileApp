@@ -22,6 +22,7 @@ import get from 'lodash/get';
 import TopContainerButtons from "./../components/TopContainerButtons";
 import PermissionComponent from './../components/PermissionComponent';
 import constants from './../utils/constants';
+import config from './../utils/config';
 
 const AnimatedFlatList = Animated.createAnimatedComponent(FlatList);
 
@@ -270,12 +271,9 @@ const style = StyleSheet.create({
 
 function mapStateToProps(state) {
     return {
-        screenSize: state.app.screenSize,
-        contacts: state.contacts,
-        cases: state.exposure,
-        events: state.events,
-        translation: state.app.translation,
-        role: state.role
+        screenSize: get(state, 'app.screenSize', config),
+        translation: get(state, 'app.translation', []),
+        role: get(state, 'role', [])
     };
 }
 

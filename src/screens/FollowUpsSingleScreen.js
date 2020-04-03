@@ -1068,24 +1068,12 @@ const style = StyleSheet.create({
 
 function mapStateToProps(state) {
     return {
-        teams: state.teams,
-        user: state.user,
-        screenSize: state.app.screenSize,
-        followUps: state.followUps,
+        user: _.get(state, 'user', {_id: null, activeOutbreakId: null}),
+        screenSize: _.get(state, 'app.screenSize', config.designScreenSize),
         questions: _.get(state, 'outbreak.contactFollowUpTemplate', null),
-        errors: state.errors,
-        contacts: state.contacts,
-        translation: state.app.translation,
-        role: state.role
+        translation: _.get(state, 'app.translation', []),
+        role: _.get(state, 'role', [])
     };
 }
 
-function matchDispatchProps(dispatch) {
-    return bindActionCreators({
-        createFollowUp,
-        updateFollowUpAndContact,
-        removeErrors
-    }, dispatch);
-}
-
-export default connect(mapStateToProps, matchDispatchProps)(FollowUpsSingleScreen);
+export default connect(mapStateToProps)(FollowUpsSingleScreen);

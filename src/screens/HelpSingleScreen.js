@@ -8,11 +8,13 @@ import {Alert, BackHandler, StyleSheet, View} from 'react-native';
 import NavBarCustom from './../components/NavBarCustom';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
+import lodashGet from 'lodash/get';
 import HelpSingleDetailsContainer from './../containers/HelpSingleDetailsContainer';
 import Breadcrumb from './../components/Breadcrumb';
 import {removeErrors} from './../actions/errors';
 import {getTranslation} from './../utils/functions';
-import translations from './../utils/translations'
+import translations from './../utils/translations';
+import config from './../utils/config';
 
 class HelpSingleScreen extends Component {
 
@@ -112,8 +114,8 @@ const style = StyleSheet.create({
 
 function mapStateToProps(state) {
     return {
-        errors: state.errors,
-        translation: state.app.translation,
+        errors: lodashGet(state, 'errors', null),
+        translation: lodashGet(state, 'app.translation', [])
     };
 }
 

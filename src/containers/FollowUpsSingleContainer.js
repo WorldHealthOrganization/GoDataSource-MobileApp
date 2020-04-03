@@ -6,8 +6,10 @@
 import React, {Component} from 'react';
 import {ScrollView, StyleSheet, View} from 'react-native';
 import {connect} from "react-redux";
+import get from 'lodash/get';
 import styles from '../styles';
 import constants from './../utils/constants';
+import config from './../utils/config';
 import FollowUpsSingleAddressContainer from './FollowUpsSingleAddressContainer'
 import FollowUpsSingleGetInfoContainer from './FollowUpsSingleGetInfoContainer'
 import TopContainerButtons from './../components/TopContainerButtons';
@@ -104,10 +106,9 @@ const style = StyleSheet.create({
 
 function mapStateToProps(state) {
     return {
-        screenSize: state.app.screenSize,
-        translation: state.app.translation,
-        referenceData: state.referenceData,
-        locations: state.locations,
+        screenSize: get(state, 'app.screenSize', config.designScreenSize),
+        translation: get(state, 'app.translation', []),
+        referenceData: get(state, 'referenceData', [])
     };
 }
 
