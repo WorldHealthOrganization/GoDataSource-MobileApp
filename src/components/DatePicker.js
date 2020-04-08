@@ -106,6 +106,7 @@ const DatePicker = React.memo(({
         );
     };
 
+
     const viewInput = () => {
         let tooltip = getTooltip(label, translation);
         return (
