@@ -51,6 +51,15 @@ export function getDatabaseSnapshotRequestNew(hubConfig, lastSyncDate, dispatch)
             // Before starting a download, first test if the API responds
             dispatch(setSyncState({id: 'testApi', status: 'In progress'}));
             return testApiPromise(`${hubConfiguration.url}${constants.testApi}`, deviceInfo)
+                .catch((errorTestAPI) => {
+                    dispatch(setSyncState({
+                        id: 'testApi',
+                        name: `Test API`,
+                        status: 'Error',
+                        error: JSON.stringify(get(errorTestAPI, 'message', errorTestAPI))
+                    }));
+                    return Promise.reject({errorTestAPI, isAPIError: true});
+                })
         })
         .then((responseTestApi) => {
             // console.log('Response TestApi: ', responseTestApi);

@@ -3,8 +3,8 @@
 // Don't forget to change back to production before a release
 
 // const env = 'development';
-// const env = 'staging';
 const env = 'production';
+// const env = 'staging';
 
 export default {
     env

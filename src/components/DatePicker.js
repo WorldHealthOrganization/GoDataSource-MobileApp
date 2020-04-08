@@ -91,6 +91,7 @@ const DatePicker = React.memo(({
                         onConfirm={handleDatePicked}
                         onCancel={handleDateCancelled}
                         isDarkModeEnabled={isDarkMode}
+                        date={value}
                     />
                 </View>
                 {
@@ -152,14 +153,14 @@ const DatePicker = React.memo(({
     };
 
     const handleDatePicked = (date) => {
-        console.log("### date picked: ", date, moment.utc(date).format());
+        // console.log("### date picked: ", date, moment.utc(date).format());
+        handleDateCancelled();
         onChange(
             createDate(date),
             id,
             objectType ? (objectType === 'Address' || objectType === 'LabResult' || objectType === 'DateRanges' || objectType === 'Vaccines' ? index : objectType) : null,
             objectType
         );
-        handleDateCancelled();
     };
 
     return isEditMode ? editInput() : viewInput()

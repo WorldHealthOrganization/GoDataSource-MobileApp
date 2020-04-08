@@ -188,6 +188,9 @@ function mapStateToProps(state) {
         syncState:      get(state, 'app.syncState', null),
         translation:    get(state, 'app.translation', []),
         loaderState:    get(state, 'app.loaderState', false),
+        location:       get(state, 'locations.locationsList'),
+        teams:          get(state, 'teams', []),
+        user:           get(state, 'user', {activeOutbreakId: null})
     };
 }
 

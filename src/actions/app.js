@@ -206,7 +206,7 @@ export function storeHubConfigurationNew(hubConfiguration) {
 async function processFilesForSyncNew(error, response, hubConfiguration, isFirstTime, syncSuccessful, forceBulk, dispatch) {
     // return async function (dispatch) {
         let hubConfig = JSON.parse(hubConfiguration.clientId);
-        if (error) {
+        if (error && !error.isAPIError) {
             if (error === 'No data to export') {
                 dispatch(setSyncState({id: 'downloadDatabase', name: 'Download Database', status: error}));
             } else {
