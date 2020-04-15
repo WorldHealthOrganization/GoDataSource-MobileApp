@@ -26,7 +26,8 @@ const DatePicker = React.memo(({
             translation,
             minimumDate,
             maximumDate,
-            date
+            date,
+            index
                                }) => {
     const [isDateTimePickerVisible, setIsDateTimePickerVisible] = useState(false);
     const isDarkMode = useDarkMode();
@@ -35,6 +36,9 @@ const DatePicker = React.memo(({
         // console.log('This.props.value: ', this.props.value);
         let tooltip = getTooltip(label, translation);
         let customStyle = value !== undefined && value !== null ? styles.hasDateTooltipStyle : style.emptyDateTooltipStyle;
+        if (value && typeof value === 'string' && value !== '') {
+            value = new Date(value);
+        }
         return (
             <View style={[{marginVertical: 10, flexDirection: 'row'}, style]}>
                 <View style = {{flex: 1}}>
@@ -67,8 +71,7 @@ const DatePicker = React.memo(({
                         ) : (
                             <Ripple onPress={handleShowDatePicker}>
                                 <TextField
-                                    label={isRequired ? getTranslation(label, translation) + ' * ' : getTranslation(label, translation)}
-                                    textColor='rgb(0,0,0)'
+                                    label={isRequired ? getTranslation(label, translation) + ' * ' : getTranslation(label, translation)} textColor='rgb(0,0,0)'
                                     labelFontSize={15}
                                     // labelHeight={30}
                                     labelTextStyle={{
@@ -91,7 +94,7 @@ const DatePicker = React.memo(({
                         onConfirm={handleDatePicked}
                         onCancel={handleDateCancelled}
                         isDarkModeEnabled={isDarkMode}
-                        date={value}
+                        date={value || new Date()}
                     />
                 </View>
                 {
@@ -192,6 +195,16 @@ DatePicker.propTypes = {
     isRequired: PropTypes.bool.isRequired,
     onChange: PropTypes.func.isRequired,
     style: PropTypes.object
+};
+
+DatePicker.defaultTypes = {
+    id: null,
+    label: 'Select date',
+    value: new Date(),
+    isEditMode: true,
+    isRequired: false,
+    onChange: () => {console.log('Default DatePicker onChange')},
+    style: {}
 };
 
 export default DatePicker;

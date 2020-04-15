@@ -60,7 +60,10 @@ class NavigationDrawerListItem extends PureComponent {
         }
 
        if (this.props.addButton && this.props.itemKey === 'cases') {
-            permissionAddButton = ['case_all', 'case_create']
+            permissionAddButton = [
+                constants.PERMISSIONS_CASE.caseAll,
+                constants.PERMISSIONS_CASE.caseCreate
+            ]
        }
 
         return (

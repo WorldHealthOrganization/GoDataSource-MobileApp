@@ -94,6 +94,21 @@ def enableSeparateBuildPerCPUArchitecture = false
  */
 def enableProguardInReleaseBuilds = true
 
+def getPassword(String currentUser, String keyChain) {
+    def stdout = new ByteArrayOutputStream()
+    def stderr = new ByteArrayOutputStream()
+    exec {
+        commandLine 'security', '-q', 'find-generic-password', '-a', currentUser, '-s', keyChain, '-w'
+        standardOutput = stdout
+        errorOutput = stderr
+        ignoreExitValue true
+    }
+    //noinspection GroovyAssignabilityCheck
+    stdout.toString().trim()
+}
+
+def pass = getPassword("florinpopa","go.data_keystore_password")
+
 android {
     compileSdkVersion 28
     buildToolsVersion '28.0.3'
@@ -103,8 +118,8 @@ android {
         minSdkVersion 20
         targetSdkVersion 28
         multiDexEnabled true
-        versionCode 3
-        versionName "1.0.2"
+        versionCode 5
+        versionName "1.0.4"
         ndk {
             abiFilters "armeabi-v7a", "x86", 'arm64-v8a', 'x86_64'
         }
@@ -117,12 +132,23 @@ android {
             include "armeabi-v7a", "x86"
         }
     }
+    signingConfigs {
+        release {
+            if (project.hasProperty('GODATA_UPLOAD_STORE_FILE')) {
+                storeFile file(GODATA_UPLOAD_STORE_FILE)
+                storePassword pass
+                keyAlias GODATA_UPLOAD_KEY_ALIAS
+                keyPassword pass
+            }
+        }
+    }
     buildTypes {
         release {
             debuggable false
             minifyEnabled false
             shrinkResources false
             proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
+            signingConfig signingConfigs.release
         }
         debug {
             debuggable true

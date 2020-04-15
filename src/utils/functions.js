@@ -34,12 +34,17 @@ export function handleResponse(response) {
     }
 
     return response.json().then(response => {
-        if (response.error && response.error.message && (typeof response.error.message === 'string')) {
+        if (response.error) {
 
             // TODO ERROR HANDLING
+            if (response.error.message && (typeof response.error.message === 'string')) {
+                throw new Error(response.error.message);
+            } else {
+                throw new Error(JSON.stringify(response.error));
+            }
 
         }
-        throw new Error(errorTypes.UNKNOWN_ERROR);
+        throw new Error(errorTypes.UNKNOWN_ERROR.message);
     });
 }
 

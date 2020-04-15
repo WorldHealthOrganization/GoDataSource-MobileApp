@@ -85,6 +85,10 @@ class NavigationDrawer extends Component {
                         config.sideMenuItems.map((item, index) => {
                             let addButton = false;
 
+                            if (item.key === 'cases') {
+                                addButton = true;
+                            }
+
                             return (
                                 <NavigationDrawerListItem
                                     key={index}

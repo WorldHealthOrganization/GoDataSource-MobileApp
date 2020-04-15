@@ -8,6 +8,7 @@ import {checkArrayAndLength} from './typeCheckingFunctions';
 import {generatePermissionMessage, getTranslation} from "./functions";
 import {Alert} from "react-native";
 import get from "lodash/get";
+import isFunction from "lodash/isFunction";
 import config from "./config";
 import constants from './constants';
 
@@ -52,22 +53,25 @@ export function pushNewEditScreen(QRCodeInfo, navigator, user, translation, call
 
     console.log('pushNewEditScreen', itemId, itemType, outbreakId);
     if (itemId && itemType && outbreakId && outbreakId === user.activeOutbreakId) {
-        let itemPouchId = null;
-        if (itemType === 'case') {
-            itemPouchId = `${itemId}`
-        } else if (itemType === 'contact') {
-            itemPouchId = `${itemId}`
-        }
+        // let itemPouchId = null;
+        // if (itemType === 'case') {
+        //     itemPouchId = `${itemId}`
+        // } else if (itemType === 'contact') {
+        //     itemPouchId = `${itemId}`
+        // }
 
-        if (itemPouchId) {
-            getItemByIdRequest(itemPouchId)
+        if (itemId) {
+            getItemByIdRequest(itemId)
                 .then((response) => {
                     console.log("*** getItemByIdRequest response: ", response);
+                    if (!response) {
+                        return callback(translations.alertMessages.noItemAlert, itemType, {_id: itemId});
+                    }
                     return callback(null, itemType, response);
                 })
                 .catch((error) => {
                     console.log("*** getItemByIdRequest error: ", error);
-                    return callback(translations.alertMessages.noItemAlert, itemType, {_id: itemPouchId});
+                    return callback(translations.alertMessages.noItemAlert, itemType, {_id: itemId});
                 });
         } else {
             return callback(translations.alertMessages.wrongQR);
@@ -100,7 +104,10 @@ export function screenTransition(navigator, transition, nextScreen, passProps, u
     }
 }
 
-export function handleQRSearchTransition (navigator, error, itemType, record, user, translation, userPermissions, ) {
+export function handleQRSearchTransition (navigator, error, itemType, record, user, translation, userPermissions, refresh) {
+    if (!refresh || !isFunction(refresh)) {
+        refresh = () => {console.log('Default refresh function for scan qrCode')}
+    }
     if (error) {
         if (error === translations.alertMessages.noItemAlert && itemType === 'case' && record) {
             if (checkArrayAndLength(lodashIntersection([
@@ -118,15 +125,19 @@ export function handleQRSearchTransition (navigator, error, itemType, record, us
                         text: getTranslation(translations.alertMessages.yesButtonLabel, translation),
                         onPress: () => {
                             console.log('Yes pressed');
+                            let caseToSave = Object.assign({}, record, {
+                                outbreakId: get(user, 'activeOutbreakId', null),
+                            }, config.caseBlueprint);
+
                             navigator.push({
                                 screen: 'CaseSingleScreen',
                                 animated: true,
                                 animationType: 'fade',
                                 passProps: {
-                                    case: Object.assign({}, record, {
-                                        outbreakId: get(user, 'activeOutbreakId', null),
-                                    }, config.caseBlueprint),
-                                    forceNew: true
+                                    case: caseToSave,
+                                    forceNew: true,
+                                    isNew: true,
+                                    refresh: refresh
                                 }
                             })
                         }
@@ -167,7 +178,8 @@ export function handleQRSearchTransition (navigator, error, itemType, record, us
                             animated: true,
                             animationType: 'fade',
                             passProps: {
-                                case: record
+                                case: record,
+                                refresh: refresh
                             }
                         })
                 } else {
@@ -193,7 +205,8 @@ export function handleQRSearchTransition (navigator, error, itemType, record, us
                             animated: true,
                             animationType: 'fade',
                             passProps: {
-                                contact: record
+                                contact: record,
+                                refresh: refresh
                             }
                         })
                 } else {

@@ -10,6 +10,7 @@ import Calendar from "react-native-calendars/src/calendar/index";
 import Modal from 'react-native-root-modal';
 import {connect} from "react-redux";
 import ElevatedView from 'react-native-elevated-view';
+import moment from 'moment/min/moment.min';
 
 class CalendarPickerView extends PureComponent {
 
@@ -59,9 +60,7 @@ class CalendarPickerView extends PureComponent {
     };
 
     parseDate = (date) => {
-        let month = (date.getMonth() + 1) < 9 ? ("0" + (date.getMonth() + 1)) : (date.getMonth() + 1);
-        let day = date.getDate() < 9 ? ("0" + date.getDate()) : date.getDate();
-        return date.getFullYear() + '-' + month + '-' + day;
+        return moment(date).format('YYYY-MM-DD');
     };
 
     handleDateChanged = (date) => {

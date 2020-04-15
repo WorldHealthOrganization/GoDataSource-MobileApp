@@ -299,7 +299,7 @@ class CasesScreen extends Component {
                 this.setState({
                     loading: false
                 }, () => {
-                    handleQRSearchTransition(this.props.navigator, error, itemType, record, get(this.props, 'user', null), get(this.props, 'translation', null));
+                    handleQRSearchTransition(this.props.navigator, error, itemType, record, get(this.props, 'user', null), get(this.props, 'translation', null), get(this.props, 'role', []), this.props.refresh);
                 });
             })
         });
