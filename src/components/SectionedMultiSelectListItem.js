@@ -1,6 +1,7 @@
 import React from 'react';
 import {StyleSheet, Text, View} from 'react-native';
 import Ripple from 'react-native-material-ripple';
+import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
 
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
@@ -35,7 +36,7 @@ SectionedMultiSelectListItem = ({item, uniqueKey, subKey, handleOnSelectItem, ha
                     ) : (null)
                 }
                 {
-                    item[subKey] ? (
+                    item[subKey] && checkArrayAndLength(item[subKey]) ? (
                         <Ripple
                             style={{height: '100%', width: iconWidth}}
                             onPress={() => {handleOnPressExpand(item[uniqueKey])}}

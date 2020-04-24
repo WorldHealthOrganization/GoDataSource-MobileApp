@@ -131,27 +131,42 @@ export function insertOrUpdate(databaseName, tableName, data, createTableBool) {
     // return new Promise((resolve, reject) => {
     //     try {
             let start = new Date().getTime();
+            let mapTime, mapEnd, openCreateTime, openCreateEnd, insertTime, insertEnd;
             let insertOrUpdateString = insertOrUpdateStringCreation(tableName);
             let mappedData = mapDataForInsert(tableName, data);
+            mapEnd = new Date().getTime();
+            mapTime = mapEnd - start;
+            console.log("time for mapping: ", tableName, mapTime);
             if (checkArrayAndLength(mappedData)) {
                 return Promise.resolve()
                     .then(() => openDatabase(databaseName))
                     .then((database) => {
                         database.transaction((txn) => {
+                            database = null;
                             if (createTableBool) {
                                 let createTableString = createTableStringMethod(tableName);
                                 txn.executeSql(createTableString, []);
                             }
+                            openCreateEnd = new Date().getTime();
+                            openCreateTime = openCreateEnd - mapEnd;
+                            console.log("time for open create database: ", tableName, openCreateTime);
                             let i = 0;
+
+                            // let insertObject =
+
+
                             while (i < mappedData.length) {
                                 if (i < mappedData.length - 1) {
                                     txn.executeSql(insertOrUpdateString, mappedData[i]);
                                 } else {
                                     txn.executeSql(insertOrUpdateString, mappedData[mappedData.length - 1],
                                         (success) => {
+                                            insertEnd = new Date().getTime();
+                                            insertTime = insertEnd - openCreateEnd;
+                                            console.log('time for insert: ', tableName, insertTime);
                                             console.log('Transactional insert took: ', new Date().getTime() - start);
                                             txn = null;
-                                            database = null;
+                                            // database = null;
                                             return Promise.resolve(success);
                                         },
                                         (error) => {
@@ -202,6 +217,66 @@ export function mapDataForInsert(tableName, data) {
         return [];
     }
     let tableFields = constants.tableStructure[tableName].concat(constants.tableStructure.commonFields);
+
+
+    // let returnArray = [];
+    // let maximumNumberOfDataInAnArray = Math.floor(900 / tableFields.length);
+    //
+    // let outerArray = [];
+    // data.forEach((e, index) => {
+    //     let innerArray = {};
+    //     for (let i=0; i<tableFields.length; i++) {
+    //         if (i === tableFields.length - 1) {
+    //             innerArray['json'] = JSON.stringify(e);
+    //         } else {
+    //             if (tableFields[i].fieldName === 'locationId') {
+    //                 innerArray[tableFields[i].fieldName] = extractLocationId(e);
+    //             } else {
+    //                 if (tableFields[i].fieldName === 'age') {
+    //                     let years = get(e, `[${tableFields[i].fieldName}].years`, 0);
+    //                     let months = get(e, `[${tableFields[i].fieldName}].months`, 0);
+    //                     innerArray[tableFields[i].fieldName] = Math.max(years, months);
+    //                 } else {
+    //                     if (tableFields[i].fieldName === 'indexDay') {
+    //                         innerArray[tableFields[i].fieldName] = get(e, `[index]`, null);
+    //                     } else {
+    //                         if (constants.relationshipsMappedFields.includes(tableFields[i].fieldName)) {
+    //                             innerArray[tableFields[i].fieldName] = mapRelationshipFields(e, tableFields[i].fieldName);
+    //                         } else {
+    //                             if (tableName === 'person' && e.type === translations.personTypes.events && tableFields[i].fieldName === 'firstName') {
+    //                                 innerArray[tableFields[i].fieldName] = get(e, `name`, null);
+    //                             } else {
+    //                                 if (tableName === 'person' && (tableFields[i].fieldName === 'firstName' || tableFields[i].fieldName === 'lastName')) {
+    //                                     innerArray[tableFields[i].fieldName] = get(e, `[${tableFields[i].fieldName}]`, '');
+    //                                 } else {
+    //                                     if (tableFields[i].fieldName === 'deleted') {
+    //                                         if (get(e, `[${tableFields[i].fieldName}]`, null) !== true) {
+    //                                             innerArray[tableFields[i].fieldName] = false;
+    //                                         } else {
+    //                                             innerArray[tableFields[i].fieldName] = get(e, `[${tableFields[i].fieldName}]`, false);
+    //                                         }
+    //                                     } else {
+    //                                         innerArray[tableFields[i].fieldName] = get(e, `[${tableFields[i].fieldName}]`, null);
+    //                                                                             }
+    //                                 }
+    //                             }
+    //                         }
+    //                     }
+    //                 }
+    //             }
+    //         }
+    //     }
+    //     if (index % maximumNumberOfDataInAnArray === 0) {
+    //         returnArray.push(outerArray);
+    //         outerArray = [];
+    //     } else {
+    //         outerArray.push(innerArray);
+    //     }
+    // });
+    //
+    // return returnArray;
+
+
     return data.map((e) => {
         let innerArray = [];
         for (let i=0; i<tableFields.length; i++) {

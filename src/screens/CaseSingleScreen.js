@@ -698,7 +698,7 @@ class CaseSingleScreen extends Component {
         caseClone.age = ageConfig.ageClone;
         caseClone.dob = ageConfig.dobClone;
         caseClone.questionnaireAnswers = reMapAnswers(_.cloneDeep(this.state.previousAnswers));
-        caseClone.questionnaireAnswers = this.filterUnasweredQuestions();
+        caseClone.questionnaireAnswers = this.filterUnasweredQuestions(caseClone.questionnaireAnswers);
         if (caseClone.outcomeId !== config.caseFieldsForHardCodeCheck.outcomeIdDeceasedValue) {
             caseClone.safeBurial = false;
             caseClone.dateOfBurial = null;
@@ -2060,8 +2060,8 @@ class CaseSingleScreen extends Component {
         }
         return canSave;
     };
-    filterUnasweredQuestions = () => {
-        let previousAnswersClone = _.cloneDeep(this.state.previousAnswers);
+    filterUnasweredQuestions = (previousAnswersClone) => {
+        // let previousAnswersClone = _.cloneDeep(this.state.previousAnswers);
         let sortedQuestions = sortBy(cloneDeep(this.props.caseInvestigationQuestions), ['order', 'variable']);
         sortedQuestions = extractAllQuestions(sortedQuestions, this.state.previousAnswers, 0);
         if( Array.isArray(sortedQuestions) && sortedQuestions.length > 0) {

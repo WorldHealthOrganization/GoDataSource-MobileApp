@@ -59,10 +59,13 @@ export function handleResponseFromRNFetchBlob(response) {
             // Manage errors
             response.json()
                 .then((parsedError) => {
-                    reject({message: get(parsedError, 'error.message', 'Unknown Error')});
+                    reject({message: get(parsedError, 'error.message', JSON.stringify(parsedError))});
                 })
                 .catch((errorParseError) => {
-                    reject({message: 'Unknown Error'});
+                    if (status) {
+                        reject ({message: `The mobile received the status ${status} from the API but the error could not be parsed`});
+                    }
+                    reject({message: typeof errorParseError === 'string' ? errorParseError : JSON.stringify(errorParseError)});
                 })
         }
     })
@@ -345,6 +348,7 @@ export function processFilesSql(path, table, totalNumberOfFiles, dispatch, encry
         .then((data) => insertOrUpdate('common', table, data, true))
         .then((results) => {
             // console.log('Finished syncing: ', results);
+            results = null;
             let numberOfFilesProcessedAux = getNumberOfFilesProcessed();
             numberOfFilesProcessedAux += 1;
             setNumberOfFilesProcessed(numberOfFilesProcessedAux);
@@ -686,12 +690,58 @@ export function createName(type, firstName, lastName) {
     }
 }
 
+export function mapLocations (locationList) {
+    // let startTime = new Date().getTime();
+
+    // locationList = locationList.map((e) => Object.assign({}, e, {_id: extractIdFromPouchId(e._id, 'location')}));
+    // the resulted tree
+    const rootItems = [];
+
+    // stores all already processed items with their ids as the keys so we can search quick
+    const lookup = {};
+
+    for (let i=0; i<locationList.length; i++) {
+        const locationId = extractIdFromPouchId(locationList[i]._id, 'location');
+        const locationParentId = locationList[i].parentLocationId;
+
+        // check if location already exists in the lookup table
+        if (!lookup.hasOwnProperty(locationId)) {
+            lookup[locationId] = {children: []};
+        }
+
+        // add current's item data to the lookup
+        lookup[locationId] = Object.assign({}, locationList[i], {children: lookup[locationId].children});
+
+        const TreeItem = lookup[locationId];
+
+        if (locationParentId === null || locationParentId === undefined || locationParentId === '') {
+            // is a root item
+            rootItems.push(TreeItem);
+        } else {
+            // has a parent
+
+            // look if the parent already exists in the lookup table
+            if (!lookup.hasOwnProperty(locationParentId)) {
+                // parent is not yet there so add preliminary data
+                lookup[locationParentId] = {children: []};
+            }
+
+            lookup[locationParentId].children.push(TreeItem);
+        }
+    }
+
+
+    // console.log('Time for processing locations new: ', new Date().getTime() - startTime);
+    return rootItems;
+}
+
 // Map locations algorithm
 // 1. sort locations by geographicalLevelId desc
 // 2. filter locations that don't have geographicalLevelId
 // 3. for each level starting from the second to last, add them to the children
 // the new array will be the array that will be searched next
-export function mapLocations(locationList) {
+export function mapLocationsOld (locationList) {
+    let startTime = new Date().getTime();
     // start with the roots
     let sortedArrays = groupBy(locationList, 'geographicalLevelId');
     // delete undefined geographicalLevelId
@@ -699,7 +749,7 @@ export function mapLocations(locationList) {
     // Get sorted keys
     let allKeys = Object.keys(sortedArrays).filter((e) => {return e.includes('LNG_REFERENCE_DATA_CATEGORY_LOCATION_GEOGRAPHICAL_LEVEL_ADMIN_LEVEL_')}).map((e) => {return e.split('_')[e.split('_').length - 1]}).sort((a, b) => {return b-a});
 
-    let currentTree = sortedArrays[`LNG_REFERENCE_DATA_CATEGORY_LOCATION_GEOGRAPHICAL_LEVEL_ADMIN_LEVEL_${allKeys[0]}`];
+    let currentTree = sortedArrays[`LNG_REFERENCE_DATA_CATEGORY_LOCATION_GEOGRAPHICAL_LEVEL_ADMIN_LEVEL_${allKeys[0]}`] || [];
     for (let levelIndex=1; levelIndex<allKeys.length; levelIndex++) {
         currentTree = groupBy(currentTree, 'parentLocationId');
         let currentLevelTree = [];
@@ -713,6 +763,8 @@ export function mapLocations(locationList) {
         }
         currentTree = currentLevelTree.slice();
     }
+
+    console.log('Time for processing locations old: ', new Date().getTime() - startTime);
     return currentTree;
 }
 
@@ -888,6 +940,21 @@ function extractQuestions(questions) {
 
 export function reMapAnswers(answers) {
     let returnedAnswers = answers;
+    // Map to flat structure
+    for (let questionId in returnedAnswers) {
+        for (let elem of returnedAnswers[questionId]) {
+            if (elem.subAnswers) {
+                for (let subAnswerKey in elem.subAnswers) {
+                    if (returnedAnswers[subAnswerKey]) {
+                        returnedAnswers[subAnswerKey] = returnedAnswers[subAnswerKey].concat(elem.subAnswers[subAnswerKey]);
+                    } else {
+                        returnedAnswers[subAnswerKey] = elem.subAnswers[subAnswerKey];
+                    }
+                }
+            }
+        }
+    }
+
     // Sort each returnedAnswer by date descending
     for(let questionId in returnedAnswers) {
         returnedAnswers[questionId].sort((a, b) => {
