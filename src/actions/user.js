@@ -115,7 +115,7 @@ export function getUserById(userId, skipLoad) {
 }
 
 export function computeCommonData(storeUserBool, user, skipLoad) {
-    return async function (dispatch) {
+    return async function (dispatch, getState) {
         try {
             let outbreakAndLocationInfo = await getOutbreakById(user.activeOutbreakId);
             if (outbreakAndLocationInfo) {
@@ -133,6 +133,14 @@ export function computeCommonData(storeUserBool, user, skipLoad) {
 
                 // Compute startup screen
                 let selectedScreen = 0;
+                try {
+                    selectedScreen = getState().app.selectedScreen;
+                } catch(errorAssign) {
+                    console.log('Error while assigning');
+                }
+                if (typeof selectedScreen !== 'number') {
+                    selectedScreen = 0;
+                }
                 if (!checkArrayAndLength(
                     lodashIntersection(userRoles, [
                         constants.PERMISSIONS_FOLLOW_UP.followUpAll,

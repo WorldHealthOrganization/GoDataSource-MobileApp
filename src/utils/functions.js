@@ -1322,7 +1322,7 @@ export function generateTeamId (contactAddress, teams, locationsTree) {
         currentAddress = extractMainAddress(contactAddress);
     }
 
-    let teamId = computeAllTeamsForLocations(teams, locationsTree, [], currentAddress.locationId);
+    let teamId = computeAllTeamsForLocations(teams, locationsTree, [], currentAddress.locationId, null);
 
     console.log('Computed teamId in: ', new Date().getTime() - start);
     return teamId;
@@ -1330,8 +1330,10 @@ export function generateTeamId (contactAddress, teams, locationsTree) {
 
 // Warning: this code makes an assumption that the user will be a member of a very few teams and that each team will have few locations assigned
 // This will have poor performance for large number of teams with large number of locations for each
-export function computeAllTeamsForLocations(teams, locationsTree, teamsToBeAttachedToAllLocations, followUpLocationId) {
-    let teamId = null;
+export function computeAllTeamsForLocations(teams, locationsTree, teamsToBeAttachedToAllLocations, followUpLocationId, teamId) {
+    if (teamId) {
+        return teamId
+    }
 
     if (!checkArrayAndLength(teams) || !checkArrayAndLength(locationsTree) || !followUpLocationId) {
         return teamId;
@@ -1346,6 +1348,7 @@ export function computeAllTeamsForLocations(teams, locationsTree, teamsToBeAttac
         }
         if (extractIdFromPouchId(locationsTree[i]._id, 'location') === followUpLocationId) {
             if (checkArrayAndLength(teamsToBeAttachedToAllLocations)) {
+                // Check first if one of the user's teams is here
                 teamId = get(teamsToBeAttachedToAllLocations, `[0]`, null);
             }
             return teamId;
@@ -1354,7 +1357,7 @@ export function computeAllTeamsForLocations(teams, locationsTree, teamsToBeAttac
             set(locationsTree, `[${i}].teamsResponsible`, teamsToBeAttachedToAllLocations);
         }
         if (checkArrayAndLength(get(locationsTree, `[${i}].children`, []))) {
-            teamId = computeAllTeamsForLocations(teams, get(locationsTree, `[${i}].children`, []), teamsToBeAttachedToAllLocations, followUpLocationId);
+            teamId = computeAllTeamsForLocations(teams, get(locationsTree, `[${i}].children`, []), teamsToBeAttachedToAllLocations, followUpLocationId, teamId);
         }
     }
 
