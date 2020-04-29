@@ -725,7 +725,7 @@ class FollowUpsSingleScreen extends Component {
             if (checkRequiredFields && Array.isArray(checkRequiredFields) && checkRequiredFields.length === 0) {
                 if( this.checkAnswerDatesQuestionnaire()){
                     let questionnaireAnswers = reMapAnswers(_.cloneDeep(this.state.previousAnswers));
-                    questionnaireAnswers = this.filterUnasweredQuestions();
+                    questionnaireAnswers = this.filterUnasweredQuestions(questionnaireAnswers);
                     this.setState(prevState => ({
                         item: Object.assign({}, prevState.item,
                             {
@@ -994,8 +994,8 @@ class FollowUpsSingleScreen extends Component {
             isModified: true
         });
     };
-    filterUnasweredQuestions = () => {
-        let previousAnswersClone = _.cloneDeep(this.state.previousAnswers);
+    filterUnasweredQuestions = (previousAnswers) => {
+        let previousAnswersClone = _.cloneDeep(previousAnswers);
         let sortedQuestions = sortBy(cloneDeep(this.props.questions), ['order', 'variable']);
         sortedQuestions = extractAllQuestions(sortedQuestions, this.state.previousAnswers, 0);
         if( Array.isArray(sortedQuestions) && sortedQuestions.length > 0) {
