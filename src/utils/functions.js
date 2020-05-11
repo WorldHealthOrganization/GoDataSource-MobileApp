@@ -1318,6 +1318,17 @@ export function calcDateDiff(startdate, enddate) {
 export function generateTeamId (contactAddress, teams, locationsTree) {
     let start = new Date().getTime();
     let currentAddress = contactAddress;
+    if (!checkArrayAndLength(teams)) {
+        return null;
+    }
+
+    // Contact doesn't have an address or there aren't any locations
+    // Pick a random team from the user's teams
+    if (!checkArrayAndLength(contactAddress) || !checkArrayAndLength(locationsTree)) {
+        let index = Math.floor(Math.random() * Math.floor(teams.length));
+        return get(teams, `[${index}].teamId`, null);
+    }
+
     if (checkArrayAndLength(contactAddress)) {
         currentAddress = extractMainAddress(contactAddress);
     }
@@ -1344,7 +1355,8 @@ export function computeAllTeamsForLocations(teams, locationsTree, teamsToBeAttac
             return e.locationIds.includes(extractIdFromPouchId(locationsTree[i]._id, 'location'));
         }).map((e) => {return extractIdFromPouchId(e._id, 'team')});
         if (checkArrayAndLength(teamsToBeAdded)) {
-            teamsToBeAttachedToAllLocations = teamsToBeAttachedToAllLocations.concat(teamsToBeAdded);
+            // Add the new teams at the beginning so that the first ones are the ones closer to the contact's address
+            teamsToBeAttachedToAllLocations = teamsToBeAdded.concat(teamsToBeAttachedToAllLocations);
         }
         if (extractIdFromPouchId(locationsTree[i]._id, 'location') === followUpLocationId) {
             if (checkArrayAndLength(teamsToBeAttachedToAllLocations)) {
