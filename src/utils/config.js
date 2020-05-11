@@ -1586,6 +1586,17 @@ const contactsSingleScreen = {
                     isEditMode: true,
                     objectType: 'Contact',
                     skipNone: true
+                },
+                {
+                    cardNumber: 1,
+                    id: 'followUpTeamId',
+                    label: translations.contactSingleScreen.followUpTeamId,
+                    // labelValue: 'test',
+                    type: 'DropdownInput',
+                    value: '',
+                    isRequired: false,
+                    isEditMode: true,
+                    objectType: 'Contact'
                 }
             ]
         },

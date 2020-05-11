@@ -159,6 +159,8 @@ export default {
     'LNG_CONTACT_FIELD_LABEL_RISK_REASON': 'Reason',
     'LNG_CONTACT_FIELD_LABEL_CONTACT_ID': 'Contact ID',
 
+    'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_TEAM_ID': 'Follow-up assigned team',
+
 
     //exposureScreen
     'LNG_RELATIONSHIP_SCREEN_EDIT_EXPOSURE_TITLE': 'Edit exposure',
