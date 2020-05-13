@@ -1277,7 +1277,9 @@ class CaseSingleScreen extends Component {
         for (let i = 0; i < config.caseSingleScreen.infection.length; i++) {
             for (let j = 0; j < config.caseSingleScreen.infection[i].fields.length; j++) {
                 if (config.caseSingleScreen.infection[i].fields[j].isRequired && !this.state.case[config.caseSingleScreen.infection[i].fields[j].id]) {
-                    requiredFields.push(getTranslation(config.caseSingleScreen.infection[i].fields[j].label, this.props.translation));
+                    if (!(config.caseSingleScreen.infection[i].fields[j].id === 'dateOfOnset' && _.get(this.props, 'isDateOfOnsetRequired', null) === false)) {
+                        requiredFields.push(getTranslation(config.caseSingleScreen.infection[i].fields[j].label, this.props.translation));
+                    }
                     // return false;
                 }
             }
@@ -2121,7 +2123,8 @@ function mapStateToProps(state) {
         selectedScreen: lodashGet(state, 'app.selectedScreen', 0),
         caseInvestigationQuestions: lodashGet(state, 'outbreak.caseInvestigationTemplate', null),
         translation: lodashGet(state, 'app.translation', []),
-        role: lodashGet(state, 'role', [])
+        role: lodashGet(state, 'role', []),
+        isDateOfOnsetRequired: _.get(state, 'outbreak.isDateOfOnsetRequired', null)
     };
 }
 function matchDispatchProps(dispatch) {

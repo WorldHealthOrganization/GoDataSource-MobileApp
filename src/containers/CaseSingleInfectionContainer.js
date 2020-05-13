@@ -242,6 +242,11 @@ class CaseSingleInfectionContainer extends Component {
         minimumDate = dateValidation.minimumDate;
         maximumDate = dateValidation.maximumDate;
 
+        // Check if date of onset is required
+        if (item.id === 'dateOfOnset' && _.get(this.props, 'isDateOfOnsetRequired', null) === false) {
+            item.isRequired = false;
+        }
+
         return (
             <CardComponent
                 item={item}
@@ -510,6 +515,7 @@ function mapStateToProps(state) {
         translation: _.get(state, 'app.translation', []),
         referenceData: _.get(state, 'referenceData', []),
         locations: _.get(state, `locations.locations`, []),
+        isDateOfOnsetRequired: _.get(state, 'outbreak.isDateOfOnsetRequired', null)
     };
 }
 
