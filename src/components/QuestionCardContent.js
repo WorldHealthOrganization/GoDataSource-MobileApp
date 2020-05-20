@@ -14,6 +14,7 @@ import get from 'lodash/get';
 import Ripple from 'react-native-material-ripple';
 import {Icon} from 'react-native-material-ui';
 import uniqueId from "lodash/uniqueId";
+import {checkArrayAndLength} from './../utils/typeCheckingFunctions';
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 class QuestionCardContent extends PureComponent {
@@ -88,7 +89,7 @@ class QuestionCardContent extends PureComponent {
                     ) : ( this.handleRenderItem(this.props.item) )
                 }
                 {
-                    this.props.item.additionalQuestions ? (
+                    checkArrayAndLength(this.props.item.additionalQuestions) ? (
                         <View>
                             <Section label={'Additional Questions'}/>
                             {
