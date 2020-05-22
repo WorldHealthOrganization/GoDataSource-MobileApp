@@ -164,6 +164,7 @@ class FiltersContainer extends PureComponent {
                 onChangeInterval={onChangeInterval}
                 onChangeMultipleSelection={onChangeMultipleSelection}
                 onSelectItem={onSelectItem}
+                permissionsList={item.permissionsList}
             />
         )
     };

@@ -109,6 +109,11 @@ const PERMISSIONS_COMMON = {
     locationList: 'location_list'
 };
 
+const PERMISSIONS_TEAMS = {
+    teamAll: 'team_all',
+    teamList: 'team_list'
+};
+
 export default {
     appScreens,
     NUMBER_OF_RETRIES,
@@ -122,5 +127,6 @@ export default {
     PERMISSIONS_RELATIONSHIP,
     PERMISSIONS_USER,
     PERMISSIONS_HELP,
-    PERMISSIONS_COMMON
+    PERMISSIONS_COMMON,
+    PERMISSIONS_TEAMS
 }

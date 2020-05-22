@@ -56,7 +56,7 @@ class NavigationDrawerListItem extends PureComponent {
                 ];
                 break;
             default:
-                permissionElement = ['follow_up_all', 'follow_up_list'];
+                permissionElement = [];
         }
 
        if (this.props.addButton && this.props.itemKey === 'cases') {

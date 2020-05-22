@@ -211,6 +211,7 @@ class CaseSingleAddressContainer extends React.Component {
                 onDeletePress={this.props.onDeletePress}
                 onFocus={this.handleOnFocus}
                 onBlur={this.handleOnBlur}
+                permissionsList={item.permissionsList}
             />
         )
     };

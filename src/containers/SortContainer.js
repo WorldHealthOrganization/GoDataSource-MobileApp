@@ -182,6 +182,7 @@ class SortContainer extends Component {
                 onChangeSectionedDropDown={onChangeSectionedDropDown}
                 onChangeDropDown={onChangeDropDown}
                 onDeletePress={onDeletePress}
+                permissionsList={item.permissionsList}
             />
         )
     };

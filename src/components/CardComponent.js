@@ -24,6 +24,7 @@ import IntervalPicker from './IntervalPicker';
 import ActionsBar from './ActionsBar';
 import translations from './../utils/translations';
 import SearchableDropdown from './SearchableDropdown';
+import PermissionComponent from './PermissionComponent';
 
 class CardComponent extends PureComponent {
 
@@ -41,6 +42,16 @@ class CardComponent extends PureComponent {
      * and can slow down the app
      */
     render() {
+        return (
+            <PermissionComponent
+                render={this.renderElements}
+                alternativeRender={this.props.alternativeRender}
+                permissionsList={this.props.permissionsList}
+            />
+        )
+    };
+
+    renderElements = () => {
         let width = calculateDimension(315, false, this.props.screenSize);
         let marginHorizontal = calculateDimension(14, false, this.props.screenSize);
 
@@ -228,7 +239,7 @@ class CardComponent extends PureComponent {
                 );
             case 'TextSwitchSelector':
                 return (
-                    <TextSwitchSelector 
+                    <TextSwitchSelector
                         selectedItem={this.props.selectedItemIndexForTextSwitchSelectorForAge}
                         selectedItemIndexForTextSwitchSelector={this.props.item.selectedItemIndexForTextSwitchSelector}
                         onChange={this.props.onChangeTextSwitchSelector}
@@ -240,7 +251,7 @@ class CardComponent extends PureComponent {
                 );
             case 'TextInputWithDropDown':
                 return (
-                    <TextInputWithDropDown 
+                    <TextInputWithDropDown
                         id={this.props.item.id}
                         label={get(this.props, 'item.label', null)}
                         index={this.props.index}
@@ -286,7 +297,7 @@ class CardComponent extends PureComponent {
                     </View>
                 )
         }
-    };
+    }
 }
 
 /**

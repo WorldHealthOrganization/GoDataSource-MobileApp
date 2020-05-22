@@ -34,7 +34,7 @@ class ContactsSinglePersonal extends PureComponent {
     }
 
     // Please add here the react lifecycle methods that you need
-    componentWillMount() {
+    componentDidMount() {
         InteractionManager.runAfterInteractions(() => {
             getTeamsForUserRequest((errorGetTeams, teams) => {
                 this.setState({
@@ -269,6 +269,7 @@ class ContactsSinglePersonal extends PureComponent {
                 onChangeTextSwitchSelector={this.props.onChangeTextSwitchSelector}
                 onFocus={this.handleOnFocus}
                 onBlur={this.handleOnBlur}
+                permissionsList={item.permissionsList}
             />
         )
     };
@@ -308,7 +309,7 @@ class ContactsSinglePersonal extends PureComponent {
         } else if (item.id === 'followUpTeamId') {
             if (checkArrayAndLength(this.state.teams) && this.props.contact.followUpTeamId) {
                 let teamName = this.state.teams.find((e) => e.teamId === _.get(this.props, 'contact.followUpTeamId', null));
-                return teamName.name || null;
+                return (teamName && teamName.name) || null;
             }
         } else {
             // console.log('Missing: ', item.id, this.props.contact[item.id]);

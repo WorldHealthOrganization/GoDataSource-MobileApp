@@ -5,6 +5,7 @@ import styles from './../styles';
 import {Platform} from 'react-native';
 import translations from './translations';
 import {createDate} from './../utils/functions';
+import constants from './../utils/constants';
 
 const baseUrls = [
     {value: 'gva11sucombee.who.int:3000'},
@@ -1596,7 +1597,8 @@ const contactsSingleScreen = {
                     value: '',
                     isRequired: false,
                     isEditMode: true,
-                    objectType: 'Contact'
+                    objectType: 'Contact',
+                    permissionsList: [constants.PERMISSIONS_TEAMS.teamAll, constants.PERMISSIONS_TEAMS.teamList]
                 }
             ]
         },
