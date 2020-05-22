@@ -245,10 +245,7 @@ class HelpScreen extends Component {
                                 getItemLayout={this.getItemLayout}
                             />
                         )}
-                        permissionsList={[
-                            constants.PERMISSIONS_HELP.helpAll,
-                            constants.PERMISSIONS_HELP.helpListCategoryItem
-                        ]}
+                        permissionsList={[]}
                     />
                 </View>
             </ViewHOC>

@@ -153,6 +153,7 @@ class ExposureContainer extends PureComponent {
                 onSelectExposure={this.props.onSelectExposure}
                 onFocus={this.handleOnFocus}
                 onBlur={this.handleOnBlur}
+                permissionsList={item.permissionsList}
             />
         )
     };

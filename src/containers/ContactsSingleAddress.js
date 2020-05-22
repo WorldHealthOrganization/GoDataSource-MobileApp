@@ -217,6 +217,7 @@ class ContactsSingleAddress extends PureComponent {
                 anotherPlaceOfResidenceWasChosen={this.props.anotherPlaceOfResidenceWasChosen}
                 onFocus={this.handleOnFocus}
                 onBlur={this.handleOnBlur}
+                permissionsList={item.permissionsList}
             />
         )
     };

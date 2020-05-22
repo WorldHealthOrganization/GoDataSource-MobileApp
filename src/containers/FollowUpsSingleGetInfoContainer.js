@@ -120,6 +120,7 @@ class FollowUpsSingleGetInfoContainer extends PureComponent {
                 onChangeSwitch={this.props.onChangeSwitch}
                 onChangeDropDown={this.props.onChangeDropDown}
                 onChangeTextSwitchSelector={this.props.onChangeTextSwitchSelector}
+                permissionsList={item.permissionsList}
             />
         )
     };

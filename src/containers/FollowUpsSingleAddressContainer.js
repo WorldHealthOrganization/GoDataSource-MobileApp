@@ -112,6 +112,7 @@ class FollowUpsSingleAddressContainer extends PureComponent {
                 onChangeDropDown={() => {}}
                 onChangeDate={() => {}}
                 onChangeText={() => {}}
+                permissionsList={item.permissionsList}
             />
         )
     };

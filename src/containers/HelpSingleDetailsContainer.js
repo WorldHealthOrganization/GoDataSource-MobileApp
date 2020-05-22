@@ -102,6 +102,7 @@ class HelpSingleDetailsContainer extends PureComponent {
                 helpItem={this.props.item}
                 value={value}
                 index={cardIndex}
+                permissionsList={item.permissionsList}
             />
         )
     };

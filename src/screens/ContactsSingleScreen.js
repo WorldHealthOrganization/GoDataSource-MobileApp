@@ -397,7 +397,7 @@ class ContactsSingleScreen extends Component {
             fileType: 'followUp.json',
             outbreakId: this.props.user.activeOutbreakId,
             index: daysSince(_.get(this.state, 'contact.followUp.startDate', null), now) + 1,
-            teamId: generateTeamId(_.get(this.state, 'contact.addresses', []).slice(), this.props.teams, this.props.locations.slice()),
+            teamId: _.get(this.state, 'contact.followUpTeamId', null) !== null ? this.state.contact.followUpTeamId : generateTeamId(_.get(this.state, 'contact.addresses', []).slice(), this.props.teams, this.props.locations.slice()),
             personId: extractIdFromPouchId(this.state.contact._id, 'person.json')
         };
 

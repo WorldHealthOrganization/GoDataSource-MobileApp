@@ -280,6 +280,7 @@ class CaseSingleInfectionContainer extends Component {
                 }
                 onFocus={this.handleOnFocus}
                 onBlur={this.handleOnBlur}
+                permissionsList={item.permissionsList}
             />
         )
     };
