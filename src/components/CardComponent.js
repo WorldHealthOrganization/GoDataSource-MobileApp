@@ -44,7 +44,7 @@ class CardComponent extends PureComponent {
     render() {
         return (
             <PermissionComponent
-                render={this.renderElements}
+                render={() => this.renderElements()}
                 alternativeRender={this.props.alternativeRender}
                 permissionsList={this.props.permissionsList}
             />
