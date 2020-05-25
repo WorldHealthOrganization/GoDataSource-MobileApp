@@ -129,13 +129,13 @@ class DropdownInput extends PureComponent {
             }
         } else {
             let returnedValue = state;
-            if (!state.includes("LNG_")) {
+            if (state && !state.includes("LNG_")) {
                 returnedValue = this.props.data.find((e) => e.value === state || e.id === state)
             }
-            if (returnedValue.id) {
+            if (returnedValue && returnedValue.id) {
                 returnedValue = returnedValue.id;
             }
-            if (returnedValue.value) {
+            if (returnedValue && returnedValue.value) {
                 returnedValue = returnedValue.value;
             }
             this.props.onChange(

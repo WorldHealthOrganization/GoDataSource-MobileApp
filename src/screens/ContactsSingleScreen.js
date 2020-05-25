@@ -398,7 +398,8 @@ class ContactsSingleScreen extends Component {
             outbreakId: this.props.user.activeOutbreakId,
             index: daysSince(_.get(this.state, 'contact.followUp.startDate', null), now) + 1,
             teamId: _.get(this.state, 'contact.followUpTeamId', null) !== null ? this.state.contact.followUpTeamId : generateTeamId(_.get(this.state, 'contact.addresses', []).slice(), this.props.teams, this.props.locations.slice()),
-            personId: extractIdFromPouchId(this.state.contact._id, 'person.json')
+            personId: extractIdFromPouchId(this.state.contact._id, 'person.json'),
+            address: _.get(this.state, 'contact.addresses', null) !== null ? this.state.contact.addresses.find((e) => e.typeId === translations.userResidenceAddress.userPlaceOfResidence) : null
         };
 
         followUp = updateRequiredFields(this.props.user.outbreakId, this.props.user._id, followUp, 'create', 'followUp.json');
