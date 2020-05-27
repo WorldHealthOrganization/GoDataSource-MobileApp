@@ -25,10 +25,10 @@ class ModalSyncStatus extends PureComponent {
             >
                 <View style={{flex: 1, backgroundColor: '#55b5a6', alignItems: 'center'}}>
                     <Text style={{marginTop: 60, fontFamily: 'Roboto-Bold', fontSize: 20, color: 'white'}}>Sync status</Text>
-                    <Text style={{marginTop: 30, marginHorizontal: 20, fontFamily: 'Roboto-Medium', fontSize: 18, color: 'white'}}>
-                        Please do not navigate to other applications or close your phone while downloading the database or you will need to restart the process!
-                    </Text>
                     <ScrollView style={{width: '100%'}} contentContainerStyle={{flexGrow: 1, justifyContent: 'center', alignItems: 'center'}}>
+                        <Text style={{marginTop: 30, marginHorizontal: 20, marginBottom: 20, fontFamily: 'Roboto-Bold', fontSize: 16, color: 'white'}}>
+                            Please do not navigate to other applications or close your phone while downloading the database or you will need to restart the process!
+                        </Text>
                         {
                             this.props && this.props.syncState && Array.isArray(this.props.syncState) && this.props.syncState.map((item, index) => {
                                 // console.log('syncState map: ', item);
@@ -36,7 +36,7 @@ class ModalSyncStatus extends PureComponent {
                                     <View style={{
                                         width: '85%',
                                         justifyContent: 'space-between',
-                                        marginVertical: 8
+                                        marginVertical: 5
                                     }} key={index}>
                                         <View style={{
                                             flexDirection: 'row',
