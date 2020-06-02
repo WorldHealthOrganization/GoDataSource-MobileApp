@@ -769,7 +769,7 @@ export function mapLocationsOld (locationList) {
 }
 
 
-//recursively functions for mapping questionCard questions (followUps and Cases)
+//recursively functions for mapping questionCard questions (followUps and Cases )
 // item = {questionId1: [{date1, value1, subAnswers1}, {date2, value2}], questionId2: [{date: null, value1}]}
 export function extractAllQuestions (questions, item, index) {
     if (questions && Array.isArray(questions) && questions.length > 0) {
