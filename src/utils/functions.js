@@ -773,6 +773,9 @@ export function mapLocationsOld (locationList) {
 // item = {questionId1: [{date1, value1, subAnswers1}, {date2, value2}], questionId2: [{date: null, value1}]}
 export function extractAllQuestions (questions, item, index) {
     if (questions && Array.isArray(questions) && questions.length > 0) {
+        // First filter for inactive questions
+        questions = questions.filter((e) => !e.inactive || e.inactive === null || e.inactive === false || e.inactive === undefined);
+
         for (let i=0; i<questions.length; i++) {
             if (questions[i].additionalQuestions) {
                 delete questions[i].additionalQuestions;
@@ -829,8 +832,11 @@ export function extractQuestionsRecursively (questions, item) {
     let returnedQuestions = [];
 
     if (questions && Array.isArray(questions) && questions.length > 0) {
+        // First filter for inactive questions
+        questions = questions.filter((e) => !e.inactive || e.inactive === null || e.inactive === false || e.inactive === undefined);
+
         for (let i = 0; i < questions.length; i++) {
-            // First add every question
+            // Add every question
             returnedQuestions.push(questions[i]);
             if (questions[i] && questions[i].answerType && (questions[i].answerType === "LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_SINGLE_ANSWER" || questions[i].answerType === "LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_MULTIPLE_ANSWERS") && questions[i].answers && Array.isArray(questions[i].answers) && questions[i].answers.length > 0) {
                 // For every answer check if the user answered that question and then proceed with the showing
