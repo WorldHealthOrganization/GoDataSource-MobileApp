@@ -195,7 +195,12 @@ class AnimatedListView extends Component {
                 arrayPermissions = [
                     [constants.PERMISSIONS_CONTACT.contactAll, constants.PERMISSIONS_CONTACT.contactView],
                     [constants.PERMISSIONS_CONTACT.contactAll, constants.PERMISSIONS_CONTACT.contactModify],
-                    [constants.PERMISSIONS_RELATIONSHIP.relationshipAll, constants.PERMISSIONS_RELATIONSHIP.relationshipCreate],
+                    [
+                        [constants.PERMISSIONS_RELATIONSHIP.relationshipAll, constants.PERMISSIONS_CONTACT.contactAll],
+                        [constants.PERMISSIONS_RELATIONSHIP.relationshipAll, constants.PERMISSIONS_CONTACT.contactCreateRelationshipExposures],
+                        [constants.PERMISSIONS_RELATIONSHIP.relationshipCreate, constants.PERMISSIONS_CONTACT.contactAll],
+                        [constants.PERMISSIONS_RELATIONSHIP.relationshipCreate, constants.PERMISSIONS_CONTACT.contactCreateRelationshipExposures]
+                    ],
                 ];
                 titleColor = this.props.colors[mainData.riskLevel];
                 break;
