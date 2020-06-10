@@ -1046,11 +1046,15 @@ export function getTranslation (value, allTransactions) {
 }
 
 export function localSortHelpItem (helpItemsCopy, propsFilter, stateFilter, filterFromFilterScreen, translations) {
+    // Map helpItemsCopy to use translated title
+    if (checkArrayAndLength(helpItemsCopy)) {
+        helpItemsCopy = helpItemsCopy.map((e) => Object.assign({}, e, {title: getTranslation(e && e.title, translations)}));
+    }
     // Take care of search filter
     if (stateFilter.searchText) {
         helpItemsCopy = helpItemsCopy.filter((e) => {
-            return  e && e.title && stateFilter.searchText.toLowerCase().includes(getTranslation(e.title, translations).toLowerCase()) ||
-                e && e.title && getTranslation(e.title, translations).toLowerCase().includes(stateFilter.searchText.toLowerCase()) 
+            return  (e && e.title && stateFilter.searchText.toLowerCase().includes(e.title.toLowerCase())) ||
+                e && e.title && e.title.toLowerCase().includes(stateFilter.searchText.toLowerCase())
         });
     }
     
