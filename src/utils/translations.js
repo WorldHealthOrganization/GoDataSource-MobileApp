@@ -198,7 +198,10 @@ const contactSingleScreen = {
     riskReason: 'LNG_CONTACT_FIELD_LABEL_RISK_REASON',
 
     contactId: 'LNG_CONTACT_FIELD_LABEL_CONTACT_ID',
-    followUpFinalStatus: 'LNG_MOBILE_CONTACT_FIELD_LABEL_FOLLOW_UP_STATUS_DESCRIPTION'
+    followUpFinalStatus: 'LNG_MOBILE_CONTACT_FIELD_LABEL_FOLLOW_UP_STATUS_DESCRIPTION',
+
+    // TODO check with backend for common translation label between web and mobile
+    followUpTeamId: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_TEAM_ID'
 };
 
 const exposureScreen = {

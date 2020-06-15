@@ -1,11 +1,10 @@
 /**
  * Created by florinpopa on 05/12/2018.
  */
-/**
- * Created by florinpopa on 14/06/2018.
- */
+// Since this app is based around the material ui is better to use the components from
+// the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
-import {View, Text, StyleSheet, Platform, Image, Alert} from 'react-native';
+import {Alert, Platform, StyleSheet, Text, View} from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 import ViewHOC from './../components/ViewHOC';
 import Section from './../components/Section';
@@ -14,19 +13,18 @@ import {calculateDimension, getTranslation} from './../utils/functions';
 import Button from './../components/Button';
 import TextInput from './../components/TextInput';
 import styles from './../styles';
-import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
-import { logoutUser } from './../actions/user';
-// Since this app is based around the material ui is better to use the components from
-// the material ui library, since it provides design and animations out of the box
-import { removeErrors } from './../actions/errors';
-import { saveActiveDatabase } from './../actions/app';
+import {connect} from 'react-redux';
+import {bindActionCreators} from 'redux';
+import lodashGet from 'lodash/get';
+import {logoutUser} from './../actions/user';
+import {removeErrors} from './../actions/errors';
+import {saveActiveDatabase} from './../actions/app';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import NavBarCustom from './../components/NavBarCustom';
 import config from './../utils/config';
 import IntervalPicker from './../components/IntervalPicker';
 import translations from './../utils/translations';
-import {setInternetCredentials, getInternetCredentials} from 'react-native-keychain';
+import {getInternetCredentials, setInternetCredentials} from 'react-native-keychain';
 import {createDatabase} from './../queries/database';
 import SwitchInput from "../components/SwitchInput";
 
@@ -684,9 +682,9 @@ const style = StyleSheet.create({
 
 function mapStateToProps(state) {
     return {
-        screenSize: state.app.screenSize,
-        errors: state.errors,
-        translation: state.app.translation
+        screenSize: lodashGet(state, 'app.screenSize', config.designScreenSize),
+        errors: lodashGet(state, 'errors', null),
+        translation: lodashGet(state, 'app.translation', [])
     };
 }
 

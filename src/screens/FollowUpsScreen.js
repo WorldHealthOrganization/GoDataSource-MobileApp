@@ -6,33 +6,32 @@
  */
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
-import React, { Component } from 'react';
-import { View, StyleSheet, Alert } from 'react-native';
-import { Icon } from 'react-native-material-ui';
+import React, {Component} from 'react';
+import {StyleSheet, View} from 'react-native';
+import {Icon} from 'react-native-material-ui';
 import styles from './../styles';
 import NavBarCustom from './../components/NavBarCustom';
 import CalendarPicker from './../components/CalendarPicker';
 import config from './../utils/config';
 import Ripple from 'react-native-material-ripple';
-import { connect } from "react-redux";
+import {connect} from "react-redux";
 import AnimatedListView from './../components/AnimatedListView';
 import Breadcrumb from './../components/Breadcrumb';
 import ValuePicker from './../components/ValuePicker';
-import { getFollowUpsForOutbreakId } from './../actions/followUps';
+import {getFollowUpsForOutbreakId} from './../actions/followUps';
 import ElevatedView from 'react-native-elevated-view';
 import get from 'lodash/get';
-import { calculateDimension, getTranslation, createDate } from './../utils/functions';
+import {calculateDimension, createDate, getTranslation} from './../utils/functions';
 import ViewHOC from './../components/ViewHOC';
-import { Popup } from 'react-native-map-link';
+import {Popup} from 'react-native-map-link';
 import translations from './../utils/translations'
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-import { pushNewEditScreen } from './../utils/screenTransitionFunctions';
+import {pushNewEditScreen} from './../utils/screenTransitionFunctions';
 import {enhanceListWithGetData} from './../components/higherOrderComponents/withListData';
 import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
 import {bindActionCreators} from "redux";
-import { setLoaderState } from './../actions/app';
+import {setLoaderState} from './../actions/app';
 import PermissionComponent from './../components/PermissionComponent';
-import constants from "../utils/constants";
 import {handleQRSearchTransition} from "../utils/screenTransitionFunctions";
 
 class FollowUpsScreen extends Component {
@@ -297,7 +296,7 @@ class FollowUpsScreen extends Component {
                 this.setState({
                     loading: false
                 }, () => {
-                    handleQRSearchTransition(this.props.navigator, error, itemType, record, get(this.props, 'user', null), get(this.props, 'translation', null));
+                    handleQRSearchTransition(this.props.navigator, error, itemType, record, get(this.props, 'user', null), get(this.props, 'translation', null), get(this.props, 'role', []), this.props.refresh);
                 });
             })
         });
@@ -358,7 +357,9 @@ mapStateToProps = (state) => {
         screenSize: get(state, 'app.screenSize', config.designScreenSize),
         translation: get(state, 'app.translation', []),
         referenceData: get(state, 'referenceData', []),
-        role: get(state, 'role', [])
+        role: get(state, 'role', []),
+        location:       get(state, 'locations.locationsList'),
+        teams: get(state, 'teams')
     };
 };
 

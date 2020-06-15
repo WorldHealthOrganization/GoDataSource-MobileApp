@@ -1,131 +1,123 @@
 /**
  * Created by florinpopa on 22/10/2018.
  */
-import React, { Component } from 'react';
-import {Text, View, FlatList } from 'react-native';
+import React, {useState, useRef} from 'react';
+import {FlatList, Text, View} from 'react-native';
 import PropTypes from 'prop-types';
 import TextInput from './TextInput';
-import {connect} from "react-redux";
+import {useSelector} from "react-redux";
 import Ripple from 'react-native-material-ripple';
 import debounce from 'lodash/debounce';
-import get from 'lodash/get';
-import {getCasesByName} from './../actions/cases';
+import {getPersonsByName} from './../actions/cases';
 import {computeFullName} from './../utils/functions';
+import translations from './../utils/translations';
+import lodashGet from "lodash/get";
+import {createSelector} from "reselect/lib/index";
 
-class SearchableDropDown extends Component{
-    constructor(props) {
-        super(props);
-        this.state = {
-            text: '',
-            searchText: '',
-            item: {},
-            listItems: []
-        };
-        this.searchedItems = debounce(this.searchedItems, 2000);
-    };
-
-    componentDidMount(){
-        this.setState({
-            text: get(this.props, 'value', '')
-        })
+const selectOutbreakId = createSelector(
+    state => lodashGet(state, 'user.activeOutbreakId', null),
+    (outbreakId) => {
+        return {outbreakId}
     }
+);
 
-    updateText = (text) => {
-        this.setState({
-            text: text
-        });
-        this.searchedItems();
+SearchableDropDown = React.memo(({
+                                     containerStyle,
+                                     isEditMode,
+                                     placeholder,
+                                     onSubmitEditing,
+                                     translation,
+                                     itemsContainerStyle,
+                                     itemStyle,
+                                     itemTextStyle,
+                                     onSelectExposure,
+                                     type,
+                                     value
+                                 }) => {
+    const {outbreakId} = useSelector(selectOutbreakId);
+    const delayedSearch = useRef(debounce((tex) => searchedItems(tex), 500)).current;
+
+    const [text, setText] = useState(value);
+    const [searchText, setSearchText] = useState('');
+    const [item, setItem] = useState({});
+    const [listItems, setListItems] = useState([]);
+
+    const updateText = (tex) => {
+        setText(tex);
+        delayedSearch(tex);
     };
 
-    searchedItems = () => {
-        this.setState({
-            searchText: this.state.text
-        }, () => {
-            if (this.state.searchText === '') {
-                this.setState({
-                    listItems: []
-                })
-            } else {
-                getCasesByName(this.props.outbreakId, this.state.searchText)
-                    .then((cases) => {
-                        // console.log('Cases: ', cases);
-                        this.setState({
-                            listItems: cases
-                        })
-                    })
-                    .catch((errorSearchCases) => {
-                        console.log('ErrorSearchCases: ', errorSearchCases);
-                    })
-            }
-        })
-    };
-
-    renderItems = (item) => {
+    let renderItems = (item) => {
         let caseItem = item.item;
         caseItem.fullName = computeFullName(caseItem);
 
         return (
-            <Ripple style={{ ...this.props.itemStyle }} onPress={() => {this.setSelectedItem(caseItem)}}>
-                <Text style={{ ...this.props.itemTextStyle }}>{caseItem.fullName}</Text>
+            <Ripple style={{ ...itemStyle }} onPress={() => {setSelectedItem(caseItem)}}>
+                <Text style={{ ...itemTextStyle }}>{caseItem.fullName}</Text>
             </Ripple>
         );
     };
 
-    setSelectedItem = (selectedItem) => {
+    let setSelectedItem = (selectedItem) => {
         // Keyboard.dismiss();
-        this.setState({
-            item: selectedItem,
-            text: selectedItem.fullName,
-            searchText: selectedItem.fullName,
-            listItems: []
-        }, () => {
+            setItem(selectedItem);
+            setText(selectedItem.fullName);
+            setSearchText(selectedItem.fullName);
+            setListItems([]);
             //Perform more actions
-            this.props.onSelectExposure(selectedItem);
-        })
+            onSelectExposure(selectedItem);
     };
 
-    render() {
-        return (
-            <View keyboardShouldpersist='always' style={{...this.props.containerStyle}}>
-                <TextInput
-                    id={'SearchableDropDownId'}
-                    ref={(e) => this.input = e}
-                    onChange={this.updateText}
-                    isEditMode={this.props.isEditMode}
-                    value={this.state.text}
-                    label={this.props.placeholder}
-                    onSubmitEditing={this.props.onSubmitEditing}
-                    style={{width: '90%'}}
-                    translation={this.props.translation}
-                    isRequired={false}
-                />
-                <FlatList
-                    style={{...this.props.itemsContainerStyle}}
-                    enableEmptySections={true}
-                    keyboardShouldPersistTaps="always"
-                    data={this.state.listItems || []}
-                    renderItem={this.renderItems}/>
-            </View>
-        );
+    let searchedItems = (tex) => {
+        // setSearchText(tex);
+        if (tex === '') {
+            setListItems([]);
+        } else {
+            getPersonsByName(outbreakId, tex, type)
+                .then((cases) => {
+                    // console.log('Cases: ', cases);
+                    setListItems(cases)
+                })
+                .catch((errorSearchCases) => {
+                    console.log('ErrorSearchCases: ', errorSearchCases);
+                })
+        }
     };
-}
+
+    return (
+        <View keyboardShouldpersist='always' style={{...containerStyle}}>
+            <TextInput
+                id={'SearchableDropDownId'}
+                onChange={updateText}
+                isEditMode={isEditMode}
+                value={text}
+                label={placeholder}
+                onSubmitEditing={onSubmitEditing}
+                style={{width: '90%'}}
+                translation={translation}
+                isRequired={false}
+            />
+            <FlatList
+                style={{...itemsContainerStyle}}
+                enableEmptySections={true}
+                keyboardShouldPersistTaps="always"
+                data={listItems || []}
+                renderItem={renderItems}/>
+        </View>
+    );
+});
 
 SearchableDropDown.propTypes = {
     isEditMode: PropTypes.bool,
     onSelectExposure: PropTypes.func,
-    value: PropTypes.string
+    value: PropTypes.string,
+    type: PropTypes.oneOf('Contact', 'Case').required
 };
 
 SearchableDropDown.defaultProps = {
     isEditMode: true,
     onSelectExposure: () => {console.log('Default onSelectExposure')},
-
+    type: translations.personTypes.contacts
 };
 
-function mapStateToProps(state) {
-    return {
-        outbreakId: get(state, 'user.activeOutbreakId', null)
-    }
-}
-
-export default connect(mapStateToProps)(SearchableDropDown)
+export default SearchableDropDown

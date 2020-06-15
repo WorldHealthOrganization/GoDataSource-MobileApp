@@ -3,12 +3,11 @@
  */
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
-import React, { PureComponent } from 'react';
-import { View, StyleSheet, ScrollView } from 'react-native';
-import { calculateDimension, getTranslation, extractIdFromPouchId } from '../utils/functions';
+import React, {PureComponent} from 'react';
+import {ScrollView, StyleSheet, View} from 'react-native';
+import {calculateDimension, extractIdFromPouchId, getTranslation} from '../utils/functions';
 import config from '../utils/config';
-import { connect } from "react-redux";
-import { bindActionCreators } from "redux";
+import {connect} from "react-redux";
 import styles from '../styles';
 import CardComponent from '../components/CardComponent';
 import ElevatedView from 'react-native-elevated-view';
@@ -113,6 +112,7 @@ class FollowUpsSingleAddressContainer extends PureComponent {
                 onChangeDropDown={() => {}}
                 onChangeDate={() => {}}
                 onChangeText={() => {}}
+                permissionsList={item.permissionsList}
             />
         )
     };
@@ -179,16 +179,11 @@ const style = StyleSheet.create({
 
 function mapStateToProps(state) {
     return {
-        screenSize: state.app.screenSize,
-        translation: state.app.translation,
-        referenceData: state.referenceData,
+        screenSize: _.get(state, 'app.screenSize', config.designScreenSize),
+        translation: _.get(state, 'app.translation', []),
+        referenceData: _.get(state, 'referenceData', []),
         locations: _.get(state, `locations.locationsList`, []),
     };
 }
 
-function matchDispatchProps(dispatch) {
-    return bindActionCreators({
-    }, dispatch);
-}
-
-export default connect(mapStateToProps, matchDispatchProps)(FollowUpsSingleAddressContainer);
+export default connect(mapStateToProps)(FollowUpsSingleAddressContainer);

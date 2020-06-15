@@ -210,18 +210,20 @@ function createConditionFollowUps (outbreakId, followUpFilter, userTeams, dataTy
     if (search) {
         if (dataType === translations.personTypes.cases) {
             condition['$or'] = [
-                {[`${aliasForContacts}.firstName`]: {'$like': `%${search}%`}},
-                {[`${aliasForContacts}.lastName`]: {'$like': `%${search}%`}},
-                {[`${aliasForContacts}.visualId`]: {'$like': `%${search}%`}}
+                {[`${aliasForContacts}.firstName`]: {'$like': `%${search.text}%`}},
+                {[`${aliasForContacts}.lastName`]: {'$like': `%${search.text}%`}},
+                {[`${aliasForContacts}.visualId`]: {'$like': `%${search.text}%`}},
+                {[`${aliasForContacts}.locationId`]: {'$in': search.locations}},
             ]
         } else {
             condition['$or'] = [
-                {[`${aliasForContacts}.firstName`]: {'$like': `%${search}%`}},
-                {[`${aliasForContacts}.lastName`]: {'$like': `%${search}%`}},
-                {[`${aliasForContacts}.visualId`]: {'$like': `%${search}%`}},
-                {[`${aliasForFilteredExposures}.firstName`]: {'$like': `%${search}%`}},
-                {[`${aliasForFilteredExposures}.lastName`]: {'$like': `%${search}%`}},
-                {[`${aliasForFilteredExposures}.visualId`]: {'$like': `%${search}%`}}
+                {[`${aliasForContacts}.firstName`]: {'$like': `%${search.text}%`}},
+                {[`${aliasForContacts}.lastName`]: {'$like': `%${search.text}%`}},
+                {[`${aliasForContacts}.visualId`]: {'$like': `%${search.text}%`}},
+                {[`${aliasForContacts}.locationId`]: {'$in': search.locations}},
+                {[`${aliasForFilteredExposures}.firstName`]: {'$like': `%${search.text}%`}},
+                {[`${aliasForFilteredExposures}.lastName`]: {'$like': `%${search.text}%`}},
+                {[`${aliasForFilteredExposures}.visualId`]: {'$like': `%${search.text}%`}}
             ]
         }
     }
@@ -272,150 +274,6 @@ function createConditionFollowUps (outbreakId, followUpFilter, userTeams, dataTy
     }
 
     return {condition, sort};
-}
-
-
-function createMainQuery (dataType, outbreakId, mainFilter, search, lastElement, offset, skipExposures) {
-    let condition = {
-        [`MainQuery.deleted`]: 0,
-        [`MainQuery.type`]: dataType,
-        [`MainQuery.outbreakId`]: outbreakId
-    };
-    let joinFieldMainQueryRelations = dataType !== translations.personTypes.cases ? 'targetId' : 'sourceId';
-    let joinFieldRelationsFilteredExposures = dataType !== translations.personTypes.cases ? 'sourceId' : 'targetId';
-
-    if (search) {
-        if (dataType === translations.personTypes.cases) {
-            condition['$or'] = [
-                {[`MainQuery.firstName`]: {'$like': `%${search}%`}},
-                {[`MainQuery.lastName`]: {'$like': `%${search}%`}},
-                {[`MainQuery.visualId`]: {'$like': `%${search}%`}}
-            ]
-        } else {
-            condition['$or'] = [
-                {[`MainQuery.firstName`]: {'$like': `%${search}%`}},
-                {[`MainQuery.lastName`]: {'$like': `%${search}%`}},
-                {[`MainQuery.visualId`]: {'$like': `%${search}%`}},
-                {[`FilteredExposures.firstName`]: {'$like': `%${search}%`}},
-                {[`FilteredExposures.lastName`]: {'$like': `%${search}%`}},
-                {[`FilteredExposures.visualId`]: {'$like': `%${search}%`}}
-            ]
-        }
-    }
-
-    if (checkArrayAndLength(get(mainFilter, 'age', null)) && mainFilter.age.length === 2) {
-        condition[`MainQuery.age`] = {
-            ['$gte']: get(mainFilter, 'age[0]', 0),
-            ['$lte']: get(mainFilter, 'age[1]', 150)
-        };
-    }
-    if (get(mainFilter, 'gender', null) !== null) {
-        condition[`MainQuery.gender`] = mainFilter.gender;
-    }
-    if (checkArrayAndLength(get(mainFilter, 'categories', null))) {
-        condition[`MainQuery.categoryId`] = {
-            ['$in']: mainFilter.categories
-        };
-    }
-    if (checkArrayAndLength(get(mainFilter, 'classification', null))) {
-        condition[`MainQuery.classification`] = {
-            ['$in']: mainFilter.classification
-        };
-    }
-    if (checkArrayAndLength(get(mainFilter, 'selectedLocations', null))) {
-        condition[`MainQuery.locationId`] = {
-            ['$in']: mainFilter.selectedLocations
-        };
-    }
-
-    let query = {
-        type: 'select',
-        table: 'person',
-        alias: 'MainQuery',
-        fields: [
-            {
-                table: 'MainQuery',
-                name: 'json',
-                alias: 'mainData',
-            }
-        ],
-        join: [
-            {
-                type: 'left',
-                table: 'relationship',
-                alias: 'Relations',
-                on: {[`MainQuery._id`]: `Relations.${joinFieldMainQueryRelations}`}
-            },
-            {
-                type: 'left',
-                table: 'person',
-                alias: 'FilteredExposures',
-                on: {[`Relations.${joinFieldRelationsFilteredExposures}`]: `FilteredExposures._id`}
-            }
-        ],
-        condition: condition,
-        group: 'FollowUps._id'
-    };
-
-    if (!skipExposures) {
-        query.join.push({
-            type: 'left',
-            query: {
-                type: 'select',
-                table: 'relationship',
-                alias: 'AllRelations',
-                fields: [
-                    {
-                        table: 'AllRelations',
-                        name: dataType !== translations.personTypes.cases ? 'targetId' : 'sourceId',
-                        alias: 'linkExposures'
-                    },
-                    {
-                        table: 'AllPersons',
-                        name: 'json',
-                        alias: 'AllExposuresString'
-                    }
-                ],
-                join: [
-                    {
-                        type: 'inner',
-                        table: 'person',
-                        alias: 'AllPersons',
-                        on: {[`AllRelations.${joinFieldRelationsFilteredExposures}`]: `AllPersons._id`}
-                    }
-                ]
-            },
-            alias: 'AllExposures',
-            on: {[`MainQuery._id`]: `AllExposures.linkExposures`}
-        });
-        query.fields.push({
-            func: {
-                name: 'group_concat',
-                args: [{field: `AllExposures.AllExposuresString`}, '***']
-            },
-            alias: 'exposureData'
-        });
-        query.limit = 10;
-    } else {
-        query.fields = [
-            {
-                func: {
-                    name: 'count',
-                    args: [{
-                        expression: {
-                            pattern: `distinct FollowUps._id`
-                        }}]
-                },
-                alias: 'countRecords'
-            }
-        ]
-    }
-
-    if (checkArrayAndLength(get(mainFilter, 'sort', null)) && lastElement) {
-        query['offset'] = offset;
-    }
-
-    return query;
 }
 
 export function getFollowUpById(followUpId, outbreakId) {

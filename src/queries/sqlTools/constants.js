@@ -1,12 +1,9 @@
 // Here will be stored different values in relation to the sql structure
-import moment from "moment/moment";
 import translations from './../../utils/translations';
 import get from 'lodash/get';
-import set from 'lodash/set';
 import {checkArrayAndLength} from './../../utils/typeCheckingFunctions';
-import config from './../../utils/config';
 
-const databaseTables = ['person', 'followUp', 'relationship'];
+const databaseTables = ['person', 'followUp', 'relationship', 'languageToken'];
 const tableStructure = {
     person: [
         {
@@ -111,35 +108,51 @@ const tableStructure = {
             fieldType: 'TEXT NOT NULL'
         },
     ],
+    languageToken: [
+        {
+            fieldName: '_id',
+            fieldType: 'TEXT PRIMARY KEY'
+        },
+        {
+            fieldName: "languageId",
+            fieldType: "TEXT NOT NULL"
+        },
+    ],
+    location: [
+        {
+            fieldName: '_id',
+            fieldType: 'TEXT PRIMARY KEY'
+        }
+    ],
     commonFields: [
         {
             fieldName: 'createdAt',
             fieldType: 'DATE NOT NULL'
         },
-        {
-            fieldName: 'createdBy',
-            fieldType: 'TEXT NOT NULL'
-        },
+        // {
+        //     fieldName: 'createdBy',
+        //     fieldType: 'TEXT NOT NULL'
+        // },
         {
             fieldName: 'updatedAt',
             fieldType: 'DATE NOT NULL'
         },
-        {
-            fieldName: 'updatedBy',
-            fieldType: 'TEXT NOT NULL'
-        },
+        // {
+        //     fieldName: 'updatedBy',
+        //     fieldType: 'TEXT NOT NULL'
+        // },
         {
             fieldName: 'deleted',
             fieldType: 'BOOLEAN NOT NULL'
         },
-        {
-            fieldName: 'deletedAt',
-            fieldType: 'DATE'
-        },
-        {
-            fieldName: 'deletedBy',
-            fieldType: 'TEXT'
-        },
+        // {
+        //     fieldName: 'deletedAt',
+        //     fieldType: 'DATE'
+        // },
+        // {
+        //     fieldName: 'deletedBy',
+        //     fieldType: 'TEXT'
+        // },
         {
             fieldName: 'json',
             fieldType: 'TEXT NOT NULL'
@@ -273,20 +286,22 @@ function createMainQuery(dataType, outbreakId, filter, search, lastElement, offs
     if (search) {
         if (dataType === translations.personTypes.cases) {
             outerFilterCondition['$or'] = [
-                {[`${mainQueryStrings.outerFilter}.firstName`]: {'$like': `%${search}%`}},
-                {[`${mainQueryStrings.outerFilter}.lastName`]: {'$like': `%${search}%`}},
-                {[`${mainQueryStrings.outerFilter}.visualId`]: {'$like': `%${search}%`}},
+                {[`${mainQueryStrings.outerFilter}.firstName`]: {'$like': `%${search.text}%`}},
+                {[`${mainQueryStrings.outerFilter}.lastName`]: {'$like': `%${search.text}%`}},
+                {[`${mainQueryStrings.outerFilter}.visualId`]: {'$like': `%${search.text}%`}},
+                {[`${mainQueryStrings.outerFilter}.locationId`]: {'$in': search.locations}},
                 // {[`${innerQueriesStrings.filteredExposuresTable}.firstName`]: {'$like': `%${search}%`}},
                 // {[`${innerQueriesStrings.filteredExposuresTable}.lastName`]: {'$like': `%${search}%`}},
             ]
         } else {
             outerFilterCondition['$or'] = [
-                {[`${mainQueryStrings.outerFilter}.firstName`]: {'$like': `%${search}%`}},
-                {[`${mainQueryStrings.outerFilter}.lastName`]: {'$like': `%${search}%`}},
-                {[`${mainQueryStrings.outerFilter}.visualId`]: {'$like': `%${search}%`}},
-                {[`${innerQueriesStrings.filteredExposuresTable}.firstName`]: {'$like': `%${search}%`}},
-                {[`${innerQueriesStrings.filteredExposuresTable}.lastName`]: {'$like': `%${search}%`}},
-                {[`${innerQueriesStrings.filteredExposuresTable}.visualId`]: {'$like': `%${search}%`}}
+                {[`${mainQueryStrings.outerFilter}.firstName`]: {'$like': `%${search.text}%`}},
+                {[`${mainQueryStrings.outerFilter}.lastName`]: {'$like': `%${search.text}%`}},
+                {[`${mainQueryStrings.outerFilter}.visualId`]: {'$like': `%${search.text}%`}},
+                {[`${mainQueryStrings.outerFilter}.locationId`]: {'$in': search.locations}},
+                {[`${innerQueriesStrings.filteredExposuresTable}.firstName`]: {'$like': `%${search.text}%`}},
+                {[`${innerQueriesStrings.filteredExposuresTable}.lastName`]: {'$like': `%${search.text}%`}},
+                {[`${innerQueriesStrings.filteredExposuresTable}.visualId`]: {'$like': `%${search.text}%`}}
             ]
         }
     }

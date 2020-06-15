@@ -1,7 +1,18 @@
+import appConfig from './../../app.config';
+
 class DatabaseController {
+
     constructor(databaseName, databasePassword) {
         this.databaseName = databaseName.replace(/\/|\.|\:/g, '');
-        this.databasePassword = databasePassword.replace(/\/|\.|\:/g, '');//'test';
+        switch (appConfig.env) {
+            case 'development':
+                this.databasePassword = 'test';
+                break;
+            default:
+                this.databasePassword = databasePassword.replace(/\/|\.|\:/g, '');
+                break;
+
+        }
     }
 
     getDatabaseName () {

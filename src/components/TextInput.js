@@ -4,10 +4,10 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
-import {View, Text, StyleSheet} from 'react-native';
+import {Text, View} from 'react-native';
 import PropTypes from 'prop-types';
-import {getTranslation, getTooltip} from './../utils/functions';
-import { TextField } from 'react-native-material-textfield';
+import {getTooltip, getTranslation} from './../utils/functions';
+import {TextField} from 'react-native-material-textfield';
 import TooltipComponent from './TooltipComponent';
 import lodashGet from 'lodash/get';
 import lodashDebounce from 'lodash/debounce';
@@ -170,17 +170,6 @@ class TextInput extends Component {
         }
     };
 }
-
-// Create style outside the class, or for components that will be used by other components (buttons),
-// make a global style in the config directory
-const style = StyleSheet.create({
-    editLabel: {
-
-    },
-    viewLabel: {
-
-    }
-});
 
 TextInput.propTypes = {
     id: PropTypes.string.isRequired,

@@ -4,11 +4,10 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
-import {TextInput, View, Text, StyleSheet} from 'react-native';
+import {StyleSheet, TextInput, View} from 'react-native';
 import {Icon} from 'react-native-material-ui';
 import {getTranslation} from './../utils/functions';
 import {connect} from "react-redux";
-import {bindActionCreators} from "redux";
 import translations from './../utils/translations';
 import get from 'lodash/get';
 
@@ -102,9 +101,4 @@ function mapStateToProps(state) {
     };
 }
 
-function matchDispatchProps(dispatch) {
-    return bindActionCreators({
-    }, dispatch);
-}
-
-export default connect(mapStateToProps, matchDispatchProps)(TextInputWithIcon);
+export default connect(mapStateToProps)(TextInputWithIcon);

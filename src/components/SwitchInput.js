@@ -2,10 +2,10 @@
  * Created by mobileclarisoft on 16/07/2018.
  */
 import React, {PureComponent} from 'react';
-import {View, Text, StyleSheet} from 'react-native';
+import {Text, View} from 'react-native';
 import PropTypes from 'prop-types';
 import translations from './../utils/translations'
-import {getTranslation, getTooltip} from './../utils/functions';
+import {getTooltip, getTranslation} from './../utils/functions';
 import TooltipComponent from './TooltipComponent';
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
@@ -121,12 +121,6 @@ class SwitchInput extends PureComponent {
 
     // Please write here all the methods that are not react native lifecycle methods
 }
-
-// Create style outside the class, or for components that will be used by other components (buttons),
-// make a global style in the config directory
-const style = StyleSheet.create({
-
-});
 
 SwitchInput.propTypes = {
     id: PropTypes.string.isRequired,

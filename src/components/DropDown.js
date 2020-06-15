@@ -9,7 +9,6 @@ import {Icon} from 'react-native-material-ui';
 import Ripple from 'react-native-material-ripple';
 import styles from './../styles';
 import {connect} from "react-redux";
-import {bindActionCreators} from "redux";
 import Modal from 'react-native-modal';
 import ElevatedView from "react-native-elevated-view";
 import SelectMultiple from 'react-native-select-multiple';
@@ -191,9 +190,4 @@ function mapStateToProps(state) {
     };
 }
 
-function matchDispatchProps(dispatch) {
-    return bindActionCreators({
-    }, dispatch);
-}
-
-export default connect(mapStateToProps, matchDispatchProps)(DropDown);
+export default connect(mapStateToProps)(DropDown);

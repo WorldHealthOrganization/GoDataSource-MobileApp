@@ -55,7 +55,7 @@ export function loginUserRequest (credentials, callback) {
         });
 }
 
-export function getUserByIdRequest (userId, token, callback) {
+export function getUserByIdRequest (userId, callback) {
     let start = new Date().getTime();
     getDatabase(config.mongoCollections.user)
         .then((database) => {

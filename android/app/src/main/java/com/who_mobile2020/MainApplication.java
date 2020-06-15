@@ -1,4 +1,4 @@
-package com.who_mobile;
+package com.who_mobile2020;
 
 import android.app.Activity;
 
@@ -18,6 +18,8 @@ import com.github.wumke.RNExitApp.RNExitAppPackage;
 import com.learnium.RNDeviceInfo.RNDeviceInfo;
 import com.reactnativecommunity.asyncstorage.AsyncStoragePackage;
 import com.reactnativecommunity.webview.RNCWebViewPackage;
+import com.reactcommunity.rndatetimepicker.RNDateTimePickerPackage;
+import com.codemotionapps.reactnativedarkmode.DarkModePackage;
 import com.facebook.react.shell.MainReactPackage;
 import com.facebook.soloader.SoLoader;
 import com.bitgo.randombytes.RandomBytesPackage;
@@ -67,7 +69,9 @@ public class MainApplication extends NavigationApplication {
                  new RandomBytesPackage(),
                  new RNSentryPackage(),
                  new RNBcryptPackage(),
-                 new RNVersionNumberPackage()
+                 new RNVersionNumberPackage(),
+                 new RNDateTimePickerPackage(),
+                 new DarkModePackage()
          );
      }
 

@@ -1,19 +1,16 @@
 /**
  * Created by florinpopa on 16/07/2018.
  */
-import React, {PureComponent} from 'react';
-import {TextInput, View, Text, StyleSheet, Platform, Dimensions} from 'react-native';
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
-import {ListItem, Icon, Button} from 'react-native-material-ui';
-import {calculateDimension, getTranslation} from './../utils/functions';
-import config from './../utils/config';
+import React, {PureComponent} from 'react';
+import {StyleSheet, Platform} from 'react-native';
+import {calculateDimension} from './../utils/functions';
 import Calendar from "react-native-calendars/src/calendar/index";
 import Modal from 'react-native-root-modal';
 import {connect} from "react-redux";
-import {bindActionCreators} from "redux";
 import ElevatedView from 'react-native-elevated-view';
-import translations from './../utils/translations'
+import moment from 'moment/min/moment.min';
 
 class CalendarPickerView extends PureComponent {
 
@@ -63,9 +60,7 @@ class CalendarPickerView extends PureComponent {
     };
 
     parseDate = (date) => {
-        let month = (date.getMonth() + 1) < 9 ? ("0" + (date.getMonth() + 1)) : (date.getMonth() + 1);
-        let day = date.getDate() < 9 ? ("0" + date.getDate()) : date.getDate();
-        return date.getFullYear() + '-' + month + '-' + day;
+        return moment(date).format('YYYY-MM-DD');
     };
 
     handleDateChanged = (date) => {
@@ -98,9 +93,4 @@ function mapStateToProps(state) {
     };
 }
 
-function matchDispatchProps(dispatch) {
-    return bindActionCreators({
-    }, dispatch);
-}
-
-export default connect(mapStateToProps, matchDispatchProps)(CalendarPickerView);
+export default connect(mapStateToProps)(CalendarPickerView);

@@ -3,22 +3,12 @@
  */
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
-import React, { PureComponent } from 'react';
-import {
-    View,
-    Text,
-    StyleSheet,
-    InteractionManager,
-    Alert,
-    ScrollView,
-    TouchableWithoutFeedback,
-    Keyboard
-} from 'react-native';
-import { LoaderScreen } from 'react-native-ui-lib';
-import { calculateDimension, getTranslation, extractIdFromPouchId, createDate } from './../utils/functions';
+import React, {PureComponent} from 'react';
+import {Alert, InteractionManager, ScrollView, StyleSheet, Text, View} from 'react-native';
+import {LoaderScreen} from 'react-native-ui-lib';
+import {calculateDimension, createDate, extractIdFromPouchId, getTranslation} from './../utils/functions';
 import config from './../utils/config';
-import { connect } from "react-redux";
-import { bindActionCreators } from "redux";
+import {connect} from "react-redux";
 import styles from './../styles';
 import constants from './../utils/constants';
 import Ripple from 'react-native-material-ripple';
@@ -66,12 +56,20 @@ class ContactsSingleAddress extends PureComponent {
             )
         }
 
-        // console.log('ContactsSingleContainer render Address');
+        let permissionsList = [
+            constants.PERMISSIONS_CONTACT.contactAll
+        ];
+        if (this.props.isNew) {
+            permissionsList.push(
+                constants.PERMISSIONS_CONTACT.contactCreate
+            )
+        } else {
+            permissionsList.push(
+                constants.PERMISSIONS_CONTACT.contactModify
+            )
+        }
 
         return (
-            <TouchableWithoutFeedback onPress={() => {
-                Keyboard.dismiss()
-            }} accessible={false}>
                 <View style={style.viewContainer}>
                     <PermissionComponent
                         render={() => (
@@ -87,11 +85,7 @@ class ContactsSingleAddress extends PureComponent {
                                 onPressPreviousButton={this.handleBackButton}
                             />
                         )}
-                        permissionsList={[
-                            constants.PERMISSIONS_CONTACT.contactAll,
-                            constants.PERMISSIONS_CONTACT.contactCreate,
-                            constants.PERMISSIONS_CONTACT.contactModify
-                        ]}
+                        permissionsList={permissionsList}
                     />
                     <ScrollView
                         style={style.containerScrollView}
@@ -124,7 +118,6 @@ class ContactsSingleAddress extends PureComponent {
                     </ScrollView>
                     {/* </KeyboardAwareScrollView> */}
                 </View>
-            </TouchableWithoutFeedback >
         );
     }
 
@@ -224,6 +217,7 @@ class ContactsSingleAddress extends PureComponent {
                 anotherPlaceOfResidenceWasChosen={this.props.anotherPlaceOfResidenceWasChosen}
                 onFocus={this.handleOnFocus}
                 onBlur={this.handleOnBlur}
+                permissionsList={item.permissionsList}
             />
         )
     };
@@ -248,25 +242,16 @@ class ContactsSingleAddress extends PureComponent {
     computeValueForContactsSingleScreen = (item, index) => {
         if (index !== null || index >= 0) {
             if (item.id === 'lng') {
-                return this.props.contact && this.props.contact.addresses && Array.isArray(this.props.contact.addresses) &&
-                    this.props.contact.addresses[index] && this.props.contact.addresses[index].geoLocation &&
-                    this.props.contact.addresses[index].geoLocation.coordinates &&
-                    Array.isArray(this.props.contact.addresses[index].geoLocation.coordinates) ?
-                    getTranslation(this.props.contact.addresses[index].geoLocation.coordinates[0], this.props.translation) : '';
+                return getTranslation(_.get(this.props, `contact.addresses[${index}].geoLocation.coordinates[0]`, ''), this.props.translation);
             } else {
                 if (item.id === 'lat') {
-                    return this.props.contact && this.props.contact.addresses && Array.isArray(this.props.contact.addresses) &&
-                        this.props.contact.addresses[index] && this.props.contact.addresses[index].geoLocation &&
-                        this.props.contact.addresses[index].geoLocation.coordinates &&
-                        Array.isArray(this.props.contact.addresses[index].geoLocation.coordinates) ?
-                        getTranslation(this.props.contact.addresses[index].geoLocation.coordinates[1], this.props.translation) : '';
+                    return getTranslation(_.get(this.props , `contact.addresses[${index}].geoLocation.coordinates[1]`, ''), this.props.translation);
                 } else {
-                    return this.props.contact && this.props.contact.addresses && Array.isArray(this.props.contact.addresses) ?
-                        getTranslation(this.props.contact.addresses[index][item.id], this.props.translation) : '';
+                    return getTranslation(_.get(this.props, `contact.addresses[${index}][${item.id}]`, ''), this.props.translation);
                 }
             }
         }
-        return this.props.contact && this.props.contact[item.id] ? getTranslation(this.props.contact[item.id], this.props.translation) : '';
+        return getTranslation(_.get(this.props, `contact[${item.id}]`, ''), this.props.translation);
     };
 
     setDateValidations = (item) => {
@@ -383,9 +368,4 @@ function mapStateToProps(state) {
     };
 }
 
-function matchDispatchProps(dispatch) {
-    return bindActionCreators({
-    }, dispatch);
-}
-
-export default connect(mapStateToProps, matchDispatchProps)(ContactsSingleAddress);
+export default connect(mapStateToProps)(ContactsSingleAddress);

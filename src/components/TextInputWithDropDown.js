@@ -2,13 +2,13 @@
  * Created by mobileclarisoft on 16/07/2018.
  */
 import React, {Component} from 'react';
-import {View, Text, StyleSheet, Platform} from 'react-native';
+import {Text, View} from 'react-native';
 import config from './../utils/config'
 import PropTypes from 'prop-types';
-import { TextField } from 'react-native-material-textfield';
-import { Dropdown } from 'react-native-material-dropdown';
+import {TextField} from 'react-native-material-textfield';
+import {Dropdown} from 'react-native-material-dropdown';
 import translations from './../utils/translations';
-import {getTranslation, getTooltip, getDropDownInputDisplayParameters} from './../utils/functions';
+import {getDropDownInputDisplayParameters, getTooltip, getTranslation} from './../utils/functions';
 import TooltipComponent from './TooltipComponent';
 import get from 'lodash/get';
 
@@ -202,11 +202,6 @@ class TextInputWithDropDown extends Component {
         )
     }
 }
-
-// Create style outside the class, or for components that will be used by other components (buttons),
-// make a global style in the config directory
-const style = StyleSheet.create({
-});
 
 TextInputWithDropDown.propTypes = {
     id: PropTypes.string.isRequired,

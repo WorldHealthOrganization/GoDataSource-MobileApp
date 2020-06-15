@@ -3,15 +3,14 @@
  */
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
-import React, { PureComponent } from 'react';
-import { View, Text, StyleSheet, InteractionManager, Alert, ScrollView } from 'react-native';
-import { calculateDimension, getTranslation, createDate } from './../utils/functions';
+import React, {PureComponent} from 'react';
+import {Alert, InteractionManager, ScrollView, StyleSheet, Text, View} from 'react-native';
+import {calculateDimension, createDate, extractIdFromPouchId, getTranslation} from './../utils/functions';
 import config from './../utils/config';
-import { connect } from "react-redux";
-import { bindActionCreators } from "redux";
+import {connect} from "react-redux";
 import styles from './../styles';
 import CardComponent from './../components/CardComponent';
-import { LoaderScreen } from 'react-native-ui-lib';
+import {LoaderScreen} from 'react-native-ui-lib';
 import translations from './../utils/translations'
 import ElevatedView from 'react-native-elevated-view';
 import Ripple from 'react-native-material-ripple';
@@ -21,6 +20,7 @@ import {checkArray, checkArrayAndLength} from "../utils/typeCheckingFunctions";
 import TopContainerButtons from "./../components/TopContainerButtons";
 import PermissionComponent from './../components/PermissionComponent';
 import constants from "./../utils/constants";
+import {getTeamsForUserRequest} from './../queries/user';
 
 class ContactsSinglePersonal extends PureComponent {
 
@@ -28,16 +28,20 @@ class ContactsSinglePersonal extends PureComponent {
     constructor(props) {
         super(props);
         this.state = {
-            interactionComplete: false
+            interactionComplete: false,
+            teams: []
         };
     }
 
     // Please add here the react lifecycle methods that you need
-    componentWillMount() {
+    componentDidMount() {
         InteractionManager.runAfterInteractions(() => {
-            this.setState({
-                interactionComplete: true
-            })
+            getTeamsForUserRequest((errorGetTeams, teams) => {
+                this.setState({
+                    interactionComplete: true,
+                    teams: checkArrayAndLength(teams) ? teams.map((e) => Object.assign({}, e, {teamId: extractIdFromPouchId(e._id, 'team')})) : []
+                })
+            });
         })
     }
 
@@ -58,6 +62,19 @@ class ContactsSinglePersonal extends PureComponent {
             )
         }
 
+        let permissionsList = [
+            constants.PERMISSIONS_CONTACT.contactAll
+        ];
+        if (this.props.isNew) {
+            permissionsList.push(
+                constants.PERMISSIONS_CONTACT.contactCreate
+            )
+        } else {
+            permissionsList.push(
+                constants.PERMISSIONS_CONTACT.contactModify
+            )
+        }
+
         return (
             <View style={{ flex: 1 }}>
                 <View style={style.viewContainer}>
@@ -74,11 +91,7 @@ class ContactsSinglePersonal extends PureComponent {
                                 onPressNextButton={this.props.onPressNextButton}
                             />
                         )}
-                        permissionsList={[
-                            constants.PERMISSIONS_CONTACT.contactAll,
-                            constants.PERMISSIONS_CONTACT.contactCreate,
-                            constants.PERMISSIONS_CONTACT.contactModify
-                        ]}
+                        permissionsList={permissionsList}
                     />
 
                     <ScrollView
@@ -256,6 +269,7 @@ class ContactsSinglePersonal extends PureComponent {
                 onChangeTextSwitchSelector={this.props.onChangeTextSwitchSelector}
                 onFocus={this.handleOnFocus}
                 onBlur={this.handleOnBlur}
+                permissionsList={item.permissionsList}
             />
         )
     };
@@ -291,6 +305,11 @@ class ContactsSinglePersonal extends PureComponent {
         } else if (item.id === 'followUp.status'){
             if (this.props.contact && this.props.contact.followUp && lodashGet(this.props.contact, item.id) !== undefined) {
                 return getTranslation(lodashGet(this.props.contact, item.id),this.props.translation);
+            }
+        } else if (item.id === 'followUpTeamId') {
+            if (checkArrayAndLength(this.state.teams) && this.props.contact.followUpTeamId) {
+                let teamName = this.state.teams.find((e) => e.teamId === _.get(this.props, 'contact.followUpTeamId', null));
+                return (teamName && teamName.name) || null;
             }
         } else {
             // console.log('Missing: ', item.id, this.props.contact[item.id]);
@@ -338,6 +357,10 @@ class ContactsSinglePersonal extends PureComponent {
             return _.filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_VACCINE_STATUS' })
                 .sort((a, b) => { return a.order - b.order; })
                 .map((o) => { return { label: getTranslation(o.value, this.props.translation), value: o.value } })
+        }
+
+        if (item.id === 'followUpTeamId') {
+            return checkArrayAndLength(_.get(this.state, 'teams', [])) ? this.state.teams.map((e) => {return {label: e.name, value: e.teamId}}) : []
         }
     };
 
@@ -422,17 +445,10 @@ const style = StyleSheet.create({
 
 function mapStateToProps(state) {
     return {
-        screenSize: state.app.screenSize,
-        contacts: state.contacts,
-        cases: state.cases,
-        translation: state.app.translation,
-        referenceData: state.referenceData,
+        screenSize: _.get(state, 'app.screenSize', config.designScreenSize),
+        translation: _.get(state, 'app.translation', []),
+        referenceData: _.get(state, 'referenceData', [])
     };
 }
 
-function matchDispatchProps(dispatch) {
-    return bindActionCreators({
-    }, dispatch);
-}
-
-export default connect(mapStateToProps, matchDispatchProps)(ContactsSinglePersonal);
+export default connect(mapStateToProps)(ContactsSinglePersonal);

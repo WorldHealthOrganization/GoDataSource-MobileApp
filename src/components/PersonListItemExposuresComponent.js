@@ -1,22 +1,17 @@
 /**
  * Created by florinpopa on 23/08/2018.
  */
-/**
- * Created by florinpopa on 03/08/2018.
- */
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {PureComponent} from 'react';
-import {View, Text, StyleSheet} from 'react-native';
+import {StyleSheet, Text, View} from 'react-native';
 import styles from './../styles';
 import translations from './../utils/translations'
-import {getTranslation, calculateDimension} from './../utils/functions';
+import {calculateDimension, getTranslation} from './../utils/functions';
 import {connect} from "react-redux";
 import Ripple from 'react-native-material-ripple';
 import {checkArrayAndLength} from './../utils/typeCheckingFunctions';
 import lodashGet from 'lodash/get';
-import lodashIntersection from 'lodash/intersection';
-import constants from './../utils/constants';
 
 
 class PersonListItemNameAndAddressComponent extends PureComponent {

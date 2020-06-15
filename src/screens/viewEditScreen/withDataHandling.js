@@ -1,19 +1,18 @@
 import React, {Component} from 'react';
-import {View, Text, Alert} from 'react-native';
+import {Alert} from 'react-native';
 import PropTypes from 'prop-types';
 import lodashGet from 'lodash/get';
 import lodashSet from 'lodash/set';
 import config from '../../utils/config';
 import {getContactById, getExposuresForContact} from '../../actions/contacts';
-import {getFollowUpsForContactId, getFollowUpById} from '../../actions/followUps';
-import {getRelationsForCase, getItemByIdRequest} from '../../actions/cases';
+import {getFollowUpById, getFollowUpsForContactId} from '../../actions/followUps';
+import {getItemByIdRequest, getRelationsForCase} from '../../actions/cases';
 import translations from "../../utils/translations";
-import {getTranslation, calcDateDiff, createDate, getLocationAccurate} from "./../../utils/functions";
+import {calcDateDiff, createDate, getLocationAccurate, getTranslation} from "./../../utils/functions";
 import lodashCloneDeep from "lodash/cloneDeep";
-import {checkArrayAndLength, checkInteger, checkArray, checkObject} from './../../utils/typeCheckingFunctions';
+import {checkArray, checkArrayAndLength, checkInteger, checkObject} from './../../utils/typeCheckingFunctions';
 import {extractAllQuestions, extractIdFromPouchId} from "../../utils/functions";
 import _, {sortBy} from "lodash";
-// import moment from "moment/moment";
 
 export function enhanceTabsWithDataHandling() {
     return function withEditHandling(WrappedComponent) {

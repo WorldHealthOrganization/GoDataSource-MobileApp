@@ -3,20 +3,12 @@
  */
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
-import React, { PureComponent } from 'react';
-import {
-    View,
-    Text,
-    StyleSheet,
-    InteractionManager,
-    ScrollView,
-    Alert,
-} from 'react-native';
-import { LoaderScreen } from 'react-native-ui-lib';
-import { calculateDimension, getTranslation, extractIdFromPouchId, createDate } from './../utils/functions';
+import React from 'react';
+import {Alert, InteractionManager, ScrollView, StyleSheet, Text, View,} from 'react-native';
+import {LoaderScreen} from 'react-native-ui-lib';
+import {calculateDimension, createDate, extractIdFromPouchId, getTranslation} from './../utils/functions';
 import config from './../utils/config';
-import { connect } from "react-redux";
-import { bindActionCreators } from "redux";
+import {connect} from "react-redux";
 import styles from './../styles';
 import constants from './../utils/constants';
 import CardComponent from './../components/CardComponent';
@@ -219,6 +211,7 @@ class CaseSingleAddressContainer extends React.Component {
                 onDeletePress={this.props.onDeletePress}
                 onFocus={this.handleOnFocus}
                 onBlur={this.handleOnBlur}
+                permissionsList={item.permissionsList}
             />
         )
     };
@@ -266,26 +259,17 @@ class CaseSingleAddressContainer extends React.Component {
         if (index !== null || index >= 0) {
             if (item.objectType === 'Address') {
                 if (item.id === 'lng') {
-                    return this.props.case && this.props.case.addresses && Array.isArray(this.props.case.addresses) &&
-                        this.props.case.addresses[index] && this.props.case.addresses[index].geoLocation &&
-                        this.props.case.addresses[index].geoLocation.coordinates &&
-                        Array.isArray(this.props.case.addresses[index].geoLocation.coordinates) ?
-                        getTranslation(this.props.case.addresses[index].geoLocation.coordinates[0], this.props.translation) : '';
+                    return getTranslation(_.get(this.props, `case.addresses[${index}].geoLocation.coordinates[0]`, ''), this.props.translation);
                 } else {
                     if (item.id === 'lat') {
-                        return this.props.case && this.props.case.addresses && Array.isArray(this.props.case.addresses) &&
-                            this.props.case.addresses[index] && this.props.case.addresses[index].geoLocation &&
-                            this.props.case.addresses[index].geoLocation.coordinates &&
-                            Array.isArray(this.props.case.addresses[index].geoLocation.coordinates) ?
-                            getTranslation(this.props.case.addresses[index].geoLocation.coordinates[1], this.props.translation) : '';
+                        return getTranslation(_.get(this.props, `case.addresses[${index}].geoLocation.coordinates[1]`, ''), this.props.translation);
                     } else {
-                        return this.props.case && this.props.case.addresses && Array.isArray(this.props.case.addresses) && this.props.case.addresses[index][item.id] ?
-                            getTranslation(this.props.case.addresses[index][item.id], this.props.translation) : '';
+                        return getTranslation(_.get(this.props, `case.addresses[${index}][${item.id}]`, ''), this.props.translation);
                     }
                 }
             }
         }
-        return this.props.case && this.props.case[item.id] ? getTranslation(this.props.case[item.id], this.props.translation) : '';
+        return getTranslation(_.get(this.props, `case[${item.id}]`), this.props.translation);
     };
 
     handleNextButton = () => {
@@ -370,9 +354,4 @@ function mapStateToProps(state) {
 
 }
 
-function matchDispatchProps(dispatch) {
-    return bindActionCreators({
-    }, dispatch);
-}
-
-export default connect(mapStateToProps, matchDispatchProps)(CaseSingleAddressContainer);
+export default connect(mapStateToProps)(CaseSingleAddressContainer);

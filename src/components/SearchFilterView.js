@@ -4,11 +4,10 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
-import {View, StyleSheet, Animated} from 'react-native';
+import {Animated, StyleSheet, View} from 'react-native';
 import ElevatedView from 'react-native-elevated-view';
 import {calculateDimension} from './../utils/functions';
 import {connect} from "react-redux";
-import {bindActionCreators} from "redux";
 import PropTypes from 'prop-types';
 import IconButton from './ButtonWithIcons';
 import TextInputWithIcon from './TextInputWithIcon';
@@ -126,9 +125,4 @@ function mapStateToProps(state) {
     };
 }
 
-function matchDispatchProps(dispatch) {
-    return bindActionCreators({
-    }, dispatch);
-}
-
-export default connect(mapStateToProps, matchDispatchProps)(SearchFilterView);
+export default connect(mapStateToProps)(SearchFilterView);

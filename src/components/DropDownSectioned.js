@@ -4,11 +4,10 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
-import {View, Text, StyleSheet} from 'react-native';
+import {View, Text} from 'react-native';
 import {Icon} from 'react-native-material-ui';
 import stylesGlobal from './../styles';
 import {connect} from "react-redux";
-import {bindActionCreators} from "redux";
 import SectionedMultiSelect from './SectionedMultiSelect';
 import translations from './../utils/translations'
 import {getTranslation, getTooltip} from './../utils/functions';
@@ -140,11 +139,6 @@ class DropDownSectioned extends Component {
     };
 }
 
-// Create style outside the class, or for components that will be used by other components (buttons),
-// make a global style in the config directory
-const style = StyleSheet.create({
-});
-
 function mapStateToProps(state) {
     return {
         screenSize: state.app.screenSize,
@@ -152,9 +146,4 @@ function mapStateToProps(state) {
     };
 }
 
-function matchDispatchProps(dispatch) {
-    return bindActionCreators({
-    }, dispatch);
-}
-
-export default connect(mapStateToProps, matchDispatchProps)(DropDownSectioned);
+export default connect(mapStateToProps)(DropDownSectioned);

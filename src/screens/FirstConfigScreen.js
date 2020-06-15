@@ -7,16 +7,17 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
-import {View, Text, StyleSheet, Platform, Image, Alert} from 'react-native';
+import {Alert, Image, Platform, StyleSheet, Text, View} from 'react-native';
 import {Button, Icon} from 'react-native-material-ui';
 import styles from './../styles';
-import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
-import { loginUser } from './../actions/user';
-import { removeErrors } from './../actions/errors';
+import {connect} from 'react-redux';
+import {bindActionCreators} from 'redux';
+import {loginUser} from './../actions/user';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import Ripple from 'react-native-material-ripple';
-import translations from './../utils/translations'
+import lodashGet from 'lodash/get';
+import translations from './../utils/translations';
+import config from './../utils/config';
 import {getTranslation} from './../utils/functions';
 import VersionNumber from 'react-native-version-number';
 
@@ -237,16 +238,14 @@ const style = StyleSheet.create({
 
 function mapStateToProps(state) {
     return {
-        screenSize: state.app.screenSize,
-        errors: state.errors,
-        activeDatabase: state.app.activeDatabase
+        screenSize: lodashGet(state, 'app.screenSize', config.designScreenSize),
+        activeDatabase: lodashGet(state, 'app.activeDatabase', null)
     };
 }
 
 function matchDispatchToProps(dispatch) {
     return bindActionCreators({
-        loginUser,
-        removeErrors
+        loginUser
     }, dispatch);
 }
 

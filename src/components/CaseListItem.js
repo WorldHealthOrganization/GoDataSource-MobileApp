@@ -7,12 +7,11 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
-import {TextInput, View, Text, StyleSheet,Image, Platform, Dimensions, InteractionManager} from 'react-native';
+import { View, Text, StyleSheet,Image, InteractionManager} from 'react-native';
 import {ListItem, Icon} from 'react-native-material-ui';
 import {calculateDimension, getTranslation} from './../utils/functions';
 import config from './../utils/config';
 import {connect} from 'react-redux';
-import {bindActionCreators} from 'redux';
 import styles from './../styles';
 import Ripple from 'react-native-material-ripple';
 import ElevatedView from 'react-native-elevated-view';
@@ -230,9 +229,4 @@ function mapStateToProps(state) {
     };
 }
 
-function matchDispatchProps(dispatch) {
-    return bindActionCreators({
-    }, dispatch);
-}
-
-export default connect(mapStateToProps, matchDispatchProps)(CaseListItem);
+export default connect(mapStateToProps)(CaseListItem);

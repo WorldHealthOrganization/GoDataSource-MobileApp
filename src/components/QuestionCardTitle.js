@@ -2,7 +2,7 @@
  * Created by florinpopa on 04/03/2019.
  */
 import React, {PureComponent} from 'react';
-import {View, Text, StyleSheet} from 'react-native';
+import {StyleSheet, Text, View} from 'react-native';
 import styles from './../styles';
 
 // Since this app is based around the material ui is better to use the components from

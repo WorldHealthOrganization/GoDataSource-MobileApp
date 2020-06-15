@@ -1,13 +1,9 @@
 import React, {PureComponent} from 'react';
-import {View, Text, Modal, StyleSheet, TextInput, FlatList} from 'react-native';
+import {Text, View} from 'react-native';
 import {Icon} from 'react-native-material-ui';
-import config from './../utils/config';
 import Ripple from 'react-native-material-ripple';
-import stylesGlobal from './../styles';
 import {connect} from "react-redux";
-import {bindActionCreators} from "redux";
-import translations from './../utils/translations'
-import {getTranslation, getTooltip, calculateDimension} from './../utils/functions';
+import {calculateDimension, getTranslation} from './../utils/functions';
 import FollowUpsSingleQuestionnarireContainer from './../containers/FollowUpsSingleQuestionnaireContainer';
 import FollowUpsSingleGetInfoContainer from './../containers/FollowUpsSingleGetInfoContainer'
 import FollowUpsSingleAddressContainer from './../containers/FollowUpsSingleAddressContainer'
@@ -15,7 +11,6 @@ import Collapsible from 'react-native-collapsible';
 import get from "lodash/get";
 import translation from "../utils/translations";
 import {mapAnswers} from "../utils/functions";
-import cloneDeep from "lodash/cloneDeep";
 
 class FollowUpAgendaItem extends PureComponent {
 
@@ -66,20 +61,12 @@ class FollowUpAgendaItem extends PureComponent {
                 {
                     this.props.collapsed[itemId] === false ? (
                             <Collapsible collapsed={this.props.collapsed[itemId]}>
-                                {/*{*/}
-                                    {/*ToggleFollowUpDetails(getTranslation(translation.followUpAgenda.followUpStatus, this.props.translation), this.props.screenSize, itemIdStatus, this.props.ChangeCollpased, this.props.collapsed, 30)*/}
-                                {/*}*/}
-                                {/*{*/}
-                                    {/*this.props.collapsed[itemIdStatus] === false ? (*/}
-                                        {/*<Collapsible collapsed={this.props.collapsed[itemIdStatus]}>*/}
-                                            <FollowUpsSingleGetInfoContainer
-                                                isNew={false}
-                                                isEditMode={false}
-                                                item={get(this.props, 'item.text', {})}
-                                                contact={this.props.contact}
+                                <FollowUpsSingleGetInfoContainer
+                                    isNew={false}
+                                    isEditMode={false}
+                                    item={get(this.props, 'item.text', {})}
+                                    contact={this.props.contact}
                                             />
-                                        {/*</Collapsible>) : null*/}
-                                {/*}*/}
                                 {
                                     ToggleFollowUpDetails(getTranslation(translation.followUpAgenda.followUpQuestionnaire, this.props.translation), this.props.screenSize, itemIdQuestionnaire, this.props.ChangeCollpased, this.props.collapsed, 30)
                                 }
@@ -145,11 +132,6 @@ const ToggleFollowUpDetails = (text, screenSize, itemId, ChangeCollpased, collap
     )
 }
 
-// Create style outside the class, or for components that will be used by other components (buttons),
-// make a global style in the config directory
-const style = StyleSheet.create({
-});
-
 function mapStateToProps(state) {
     return {
         screenSize: state.app.screenSize,
@@ -158,9 +140,4 @@ function mapStateToProps(state) {
     };
 }
 
-function matchDispatchProps(dispatch) {
-    return bindActionCreators({
-    }, dispatch);
-}
-
-export default connect(mapStateToProps, matchDispatchProps)(FollowUpAgendaItem);
+export default connect(mapStateToProps)(FollowUpAgendaItem);

@@ -94,17 +94,32 @@ def enableSeparateBuildPerCPUArchitecture = false
  */
 def enableProguardInReleaseBuilds = true
 
+def getPassword(String currentUser, String keyChain) {
+    def stdout = new ByteArrayOutputStream()
+    def stderr = new ByteArrayOutputStream()
+    exec {
+        commandLine 'security', '-q', 'find-generic-password', '-a', currentUser, '-s', keyChain, '-w'
+        standardOutput = stdout
+        errorOutput = stderr
+        ignoreExitValue true
+    }
+    //noinspection GroovyAssignabilityCheck
+    stdout.toString().trim()
+}
+
+def pass = getPassword("florinpopa","go.data_keystore_password")
+
 android {
     compileSdkVersion 28
     buildToolsVersion '28.0.3'
 
     defaultConfig {
-        applicationId "com.who_mobile"
+        applicationId "com.who_mobile2020"
         minSdkVersion 20
         targetSdkVersion 28
         multiDexEnabled true
-        versionCode 11
-        versionName "1.0.9"
+        versionCode 12
+        versionName "1.0.8"
         ndk {
             abiFilters "armeabi-v7a", "x86", 'arm64-v8a', 'x86_64'
         }
@@ -117,12 +132,23 @@ android {
             include "armeabi-v7a", "x86"
         }
     }
+    signingConfigs {
+        release {
+            if (project.hasProperty('GODATA_UPLOAD_STORE_FILE')) {
+                storeFile file(GODATA_UPLOAD_STORE_FILE)
+                storePassword pass
+                keyAlias GODATA_UPLOAD_KEY_ALIAS
+                keyPassword pass
+            }
+        }
+    }
     buildTypes {
         release {
             debuggable false
             minifyEnabled false
             shrinkResources false
             proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
+            signingConfig signingConfigs.release
         }
         debug {
             debuggable true
@@ -144,6 +170,8 @@ android {
 }
 
 dependencies {
+    implementation project(':react-native-dark-mode')
+    implementation project(':@react-native-community_datetimepicker')
     implementation project(':react-native-webview')
     implementation project(':react-native-version-number')
     implementation project(':react-native-randombytes')

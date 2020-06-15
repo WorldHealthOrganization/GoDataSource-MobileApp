@@ -14,7 +14,6 @@ import {getTranslation} from './../utils/functions';
 import styles from './../styles';
 import {checkArrayAndLength} from './../utils/typeCheckingFunctions';
 import PermissionComponent from './PermissionComponent';
-import translations from "../utils/translations";
 
 ActionsBar = React.memo(({textsArray, addressIndex, textsStyleArray, onPressArray, arrayPermissions, hasBorder, borderColor, containerStyle, containerTextStyle, isEditMode, translation}) => (
     <View style={[style.containerStyle, containerStyle]}>
@@ -27,6 +26,7 @@ ActionsBar = React.memo(({textsArray, addressIndex, textsStyleArray, onPressArra
                         if (checkArrayAndLength(arrayPermissions) && arrayPermissions.length === textsArray.length) {
                             return (
                                 <PermissionComponent
+                                    key={index}
                                     render={() => (
                                         <Ripple
                                             key={index}

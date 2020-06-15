@@ -83,7 +83,8 @@ const PERMISSIONS_USER = {
     userAll: 'user_all',
     userView: 'user_view',
     userList: 'user_list',
-    userModifyOwnAccount: 'user_modify_own_account'
+    userModifyOwnAccount: 'user_modify_own_account',
+    userListForFilters: 'user_list_for_filters'
 };
 
 const PERMISSIONS_RELATIONSHIP = {
@@ -108,6 +109,11 @@ const PERMISSIONS_COMMON = {
     locationList: 'location_list'
 };
 
+const PERMISSIONS_TEAMS = {
+    teamAll: 'team_all',
+    teamList: 'team_list'
+};
+
 export default {
     appScreens,
     NUMBER_OF_RETRIES,
@@ -121,5 +127,6 @@ export default {
     PERMISSIONS_RELATIONSHIP,
     PERMISSIONS_USER,
     PERMISSIONS_HELP,
-    PERMISSIONS_COMMON
+    PERMISSIONS_COMMON,
+    PERMISSIONS_TEAMS
 }

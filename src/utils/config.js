@@ -2,9 +2,10 @@
  * Created by florinpopa on 14/06/2018.
  */
 import styles from './../styles';
-import { Platform } from 'react-native';
+import {Platform} from 'react-native';
 import translations from './translations';
-import { createDate } from './../utils/functions';
+import {createDate} from './../utils/functions';
+import constants from './../utils/constants';
 
 const baseUrls = [
     {value: 'gva11sucombee.who.int:3000'},
@@ -837,7 +838,7 @@ const caseSingleScreen = {
                 cardNumber: 2,
                 id: 'centerName',
                 label: translations.caseSingleScreen.dateRangeCenterName,
-                type: 'TextInput',
+                type: 'DropdownInput',
                 value: '',
                 isRequired: false,
                 isEditMode: false,
@@ -1586,6 +1587,18 @@ const contactsSingleScreen = {
                     isEditMode: true,
                     objectType: 'Contact',
                     skipNone: true
+                },
+                {
+                    cardNumber: 1,
+                    id: 'followUpTeamId',
+                    label: translations.contactSingleScreen.followUpTeamId,
+                    // labelValue: 'test',
+                    type: 'DropdownInput',
+                    value: '',
+                    isRequired: false,
+                    isEditMode: true,
+                    objectType: 'Contact',
+                    permissionsList: [constants.PERMISSIONS_TEAMS.teamAll, constants.PERMISSIONS_TEAMS.teamList]
                 }
             ]
         },

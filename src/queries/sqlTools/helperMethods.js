@@ -6,6 +6,7 @@ import {extractLocationId} from './../../utils/functions';
 import {checkArray, checkArrayAndLength} from './../../utils/typeCheckingFunctions';
 import translations from "../../utils/translations";
 import {generalMapping} from "../../actions/followUps";
+
 var jsonSql = require('json-sql')();
 jsonSql.setDialect('sqlite');
 
@@ -48,7 +49,7 @@ export function wrapReadTransactionInPromise (database) {
 }
 
 export function wrapExecuteSQLInPromise (transaction, sqlStatement, arrayOfFields, skipCallback) {
-    console.log('Execute query: ', sqlStatement, arrayOfFields);
+    // console.log('Execute query: ', sqlStatement, arrayOfFields);
     if (transaction && sqlStatement && checkArray(arrayOfFields)) {
         return new Promise((resolve, reject) => {
             if (skipCallback) {
@@ -65,15 +66,6 @@ export function wrapExecuteSQLInPromise (transaction, sqlStatement, arrayOfField
                         return reject(errorStatement);
                     }
                     );
-                // transaction.executeSql('SELECT * FROM person', []
-                //     , (transaction, resultSet) => {
-                //         console.log('result set: ', resultSet)
-                //         return resolve(resultSet)
-                //     },
-                //     (transaction, errorStatement) => {
-                //         return reject(errorStatement)
-                //     }
-                // )
             }
         })
     } else {
@@ -138,28 +130,77 @@ function insertOrUpdateStringCreation (tableName) {
 export function insertOrUpdate(databaseName, tableName, data, createTableBool) {
     // return new Promise((resolve, reject) => {
     //     try {
+            let start = new Date().getTime();
+            let mapTime, mapEnd, openCreateTime, openCreateEnd, insertTime, insertEnd;
             let insertOrUpdateString = insertOrUpdateStringCreation(tableName);
             let mappedData = mapDataForInsert(tableName, data);
+            mapEnd = new Date().getTime();
+            mapTime = mapEnd - start;
+            console.log("time for mapping: ", tableName, mapTime);
             if (checkArrayAndLength(mappedData)) {
                 return Promise.resolve()
                     .then(() => openDatabase(databaseName))
-                    .then(wrapTransationInPromise)
-                    .then((txn) => {
-                        if (createTableBool) {
-                            return createTable(txn, tableName);
-                        }
-                        return Promise.resolve(txn);
+                    .then((database) => {
+                        database.transaction((txn) => {
+                            database = null;
+                            if (createTableBool) {
+                                let createTableString = createTableStringMethod(tableName);
+                                txn.executeSql(createTableString, []);
+                            }
+                            openCreateEnd = new Date().getTime();
+                            openCreateTime = openCreateEnd - mapEnd;
+                            console.log("time for open create database: ", tableName, openCreateTime);
+                            let i = 0;
+
+                            // let insertObject =
+
+
+                            while (i < mappedData.length) {
+                                if (i < mappedData.length - 1) {
+                                    txn.executeSql(insertOrUpdateString, mappedData[i]);
+                                } else {
+                                    txn.executeSql(insertOrUpdateString, mappedData[mappedData.length - 1],
+                                        (success) => {
+                                            insertEnd = new Date().getTime();
+                                            insertTime = insertEnd - openCreateEnd;
+                                            console.log('time for insert: ', tableName, insertTime);
+                                            console.log('Transactional insert took: ', new Date().getTime() - start);
+                                            txn = null;
+                                            // database = null;
+                                            return Promise.resolve(success);
+                                        },
+                                        (error) => {
+                                            return Promise.reject(error);
+                                        })
+                                }
+                                i++
+                            }
+                        })
                     })
-                    .then((txn) => {
-                        let dataToBeInsertedPromise = [];
-                        for (let i = 0; i < mappedData.length; i++) {
-                            dataToBeInsertedPromise.push(wrapExecuteSQLInPromise(txn, insertOrUpdateString, mappedData[i], i < mappedData.length  - 1));
-                        }
-                        return Promise.all(dataToBeInsertedPromise)
-                            .then((results) => {
-                                return Promise.resolve(results)
-                            });
-                    })
+
+                    // .then(wrapTransationInPromise)
+                    // .then((txn) => {
+                    //     if (createTableBool) {
+                    //         return createTable(txn, tableName);
+                    //     }
+                    //     return Promise.resolve(txn);
+                    // })
+                    // .then((txn) => {
+                    //     let start = new Date().getTime();
+                    //     // console.log('Transaction wrapped: ', JSON.stringify(txn));
+                    //     let dataToBeInsertedPromise = [];
+                    //     let i = 0;
+                    //     while(i < mappedData.length) {
+                    //         dataToBeInsertedPromise.push(wrapExecuteSQLInPromise(txn, insertOrUpdateString, mappedData[i], i < mappedData.length  - 1).catch((error) => console.log('stuff')));
+                    //         i++;
+                    //     }
+                    //     return Promise.all(dataToBeInsertedPromise)
+                    //         .then((results) => {
+                    //             dataToBeInsertedPromise = null;
+                    //             console.log('Transaction wrapped: time for processing file: ', new Date().getTime() - start, tableName);
+                    //             return Promise.resolve(results)
+                    //         });
+                    // })
                     .catch((errorInsertOrUpdate) => Promise.reject(errorInsertOrUpdate))
             } else {
                 return Promise.resolve('Success');
@@ -176,6 +217,66 @@ export function mapDataForInsert(tableName, data) {
         return [];
     }
     let tableFields = constants.tableStructure[tableName].concat(constants.tableStructure.commonFields);
+
+
+    // let returnArray = [];
+    // let maximumNumberOfDataInAnArray = Math.floor(900 / tableFields.length);
+    //
+    // let outerArray = [];
+    // data.forEach((e, index) => {
+    //     let innerArray = {};
+    //     for (let i=0; i<tableFields.length; i++) {
+    //         if (i === tableFields.length - 1) {
+    //             innerArray['json'] = JSON.stringify(e);
+    //         } else {
+    //             if (tableFields[i].fieldName === 'locationId') {
+    //                 innerArray[tableFields[i].fieldName] = extractLocationId(e);
+    //             } else {
+    //                 if (tableFields[i].fieldName === 'age') {
+    //                     let years = get(e, `[${tableFields[i].fieldName}].years`, 0);
+    //                     let months = get(e, `[${tableFields[i].fieldName}].months`, 0);
+    //                     innerArray[tableFields[i].fieldName] = Math.max(years, months);
+    //                 } else {
+    //                     if (tableFields[i].fieldName === 'indexDay') {
+    //                         innerArray[tableFields[i].fieldName] = get(e, `[index]`, null);
+    //                     } else {
+    //                         if (constants.relationshipsMappedFields.includes(tableFields[i].fieldName)) {
+    //                             innerArray[tableFields[i].fieldName] = mapRelationshipFields(e, tableFields[i].fieldName);
+    //                         } else {
+    //                             if (tableName === 'person' && e.type === translations.personTypes.events && tableFields[i].fieldName === 'firstName') {
+    //                                 innerArray[tableFields[i].fieldName] = get(e, `name`, null);
+    //                             } else {
+    //                                 if (tableName === 'person' && (tableFields[i].fieldName === 'firstName' || tableFields[i].fieldName === 'lastName')) {
+    //                                     innerArray[tableFields[i].fieldName] = get(e, `[${tableFields[i].fieldName}]`, '');
+    //                                 } else {
+    //                                     if (tableFields[i].fieldName === 'deleted') {
+    //                                         if (get(e, `[${tableFields[i].fieldName}]`, null) !== true) {
+    //                                             innerArray[tableFields[i].fieldName] = false;
+    //                                         } else {
+    //                                             innerArray[tableFields[i].fieldName] = get(e, `[${tableFields[i].fieldName}]`, false);
+    //                                         }
+    //                                     } else {
+    //                                         innerArray[tableFields[i].fieldName] = get(e, `[${tableFields[i].fieldName}]`, null);
+    //                                                                             }
+    //                                 }
+    //                             }
+    //                         }
+    //                     }
+    //                 }
+    //             }
+    //         }
+    //     }
+    //     if (index % maximumNumberOfDataInAnArray === 0) {
+    //         returnArray.push(outerArray);
+    //         outerArray = [];
+    //     } else {
+    //         outerArray.push(innerArray);
+    //     }
+    // });
+    //
+    // return returnArray;
+
+
     return data.map((e) => {
         let innerArray = [];
         for (let i=0; i<tableFields.length; i++) {
@@ -202,7 +303,15 @@ export function mapDataForInsert(tableName, data) {
                                     if (tableName === 'person' && (tableFields[i].fieldName === 'firstName' || tableFields[i].fieldName === 'lastName')) {
                                         innerArray.push(get(e, `[${tableFields[i].fieldName}]`, ''));
                                     } else {
-                                        innerArray.push(get(e, `[${tableFields[i].fieldName}]`, null));
+                                        if (tableFields[i].fieldName === 'deleted') {
+                                            if (get(e, `[${tableFields[i].fieldName}]`, null) !== true) {
+                                                innerArray.push(false);
+                                            } else {
+                                                innerArray.push(get(e, `[${tableFields[i].fieldName}]`, false));
+                                            }
+                                        } else {
+                                            innerArray.push(get(e, `[${tableFields[i].fieldName}]`, null));
+                                        }
                                     }
                                 }
                             }

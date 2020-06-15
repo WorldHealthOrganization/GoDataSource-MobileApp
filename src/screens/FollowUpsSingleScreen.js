@@ -3,32 +3,40 @@
  */
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
-import React, { Component } from 'react';
-import { View, StyleSheet, Animated, Alert, BackHandler, Platform } from 'react-native';
-import { Icon } from 'react-native-material-ui';
+import React, {Component} from 'react';
+import {Alert, Animated, BackHandler, Platform, StyleSheet, View} from 'react-native';
+import {Icon} from 'react-native-material-ui';
 import styles from './../styles';
 import NavBarCustom from './../components/NavBarCustom';
 import config from './../utils/config';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
-import {TabBar, TabView, PagerScroll} from 'react-native-tab-view';
+import {PagerScroll, TabBar, TabView} from 'react-native-tab-view';
 import FollowUpsSingleContainer from './../containers/FollowUpsSingleContainer';
 import FollowUpsSingleQuestionnaireContainer from './../containers/FollowUpsSingleQuestionnaireContainer';
 import Breadcrumb from './../components/Breadcrumb';
-import Menu, { MenuItem } from 'react-native-material-menu';
+import Menu, {MenuItem} from 'react-native-material-menu';
 import Ripple from 'react-native-material-ripple';
-import { createFollowUp, updateFollowUpAndContact } from './../actions/followUps';
-import { removeErrors } from './../actions/errors';
-import _, {sortBy, cloneDeep} from 'lodash';
-import { calculateDimension, extractIdFromPouchId, updateRequiredFields, getTranslation, mapAnswers, reMapAnswers, createDate } from './../utils/functions';
+import {createFollowUp, updateFollowUpAndContact} from './../actions/followUps';
+import {removeErrors} from './../actions/errors';
+import _, {cloneDeep, sortBy} from 'lodash';
+import {
+    calculateDimension,
+    createDate,
+    getTranslation,
+    mapAnswers,
+    reMapAnswers,
+    updateRequiredFields
+} from './../utils/functions';
 import translations from './../utils/translations'
 import ElevatedView from 'react-native-elevated-view';
 import ViewHOC from './../components/ViewHOC';
 import PermissionComponent from './../components/PermissionComponent';
-import moment from 'moment';
+import moment from 'moment/min/moment.min';
 import {checkArrayAndLength} from './../utils/typeCheckingFunctions';
 import {checkRequiredQuestions, extractAllQuestions} from "../utils/functions";
 import constants from './../utils/constants';
+import lodashGet from "lodash/get";
 
 class FollowUpsSingleScreen extends Component {
 
@@ -296,6 +304,8 @@ class FollowUpsSingleScreen extends Component {
                         copyAnswerDate={this.handleCopyAnswerDate}
                         onPressPreviousButton={this.handlePreviousPress}
                         numberOfTabs={this.state.routes.length}
+                        onPressEdit={this.onPressEdit}
+                        onPressCancelEdit={this.onPressCancelEdit}
                     />
                 );
             default:
@@ -622,6 +632,10 @@ class FollowUpsSingleScreen extends Component {
                 if (!questionnaireAnswers[parentId][0].subAnswers[id]) {
                     questionnaireAnswers[parentId][0].subAnswers[id] = [];
                 }
+                if (_.get(value, 'subAnswers', null) !== null) {
+                    questionnaireAnswers[parentId][0].subAnswers = Object.assign({}, questionnaireAnswers[parentId][0].subAnswers, value.subAnswers);
+                    delete value.subAnswers;
+                }
                 questionnaireAnswers[parentId][0].subAnswers[id][0] = value;
             }
         } else {
@@ -649,6 +663,10 @@ class FollowUpsSingleScreen extends Component {
                 }
                 if (!questionnaireAnswers[parentId][0].subAnswers[id]) {
                     questionnaireAnswers[parentId][0].subAnswers[id] = [];
+                }
+                if (_.get(value, 'subAnswers', null) !== null) {
+                    questionnaireAnswers[parentId][0].subAnswers = Object.assign({}, questionnaireAnswers[parentId][0].subAnswers, value.subAnswers);
+                    delete value.subAnswers;
                 }
                 questionnaireAnswers[parentId][0].subAnswers[id][0] = value;
             }
@@ -707,7 +725,7 @@ class FollowUpsSingleScreen extends Component {
             if (checkRequiredFields && Array.isArray(checkRequiredFields) && checkRequiredFields.length === 0) {
                 if( this.checkAnswerDatesQuestionnaire()){
                     let questionnaireAnswers = reMapAnswers(_.cloneDeep(this.state.previousAnswers));
-                    questionnaireAnswers = this.filterUnasweredQuestions();
+                    questionnaireAnswers = this.filterUnasweredQuestions(questionnaireAnswers);
                     this.setState(prevState => ({
                         item: Object.assign({}, prevState.item,
                             {
@@ -976,8 +994,8 @@ class FollowUpsSingleScreen extends Component {
             isModified: true
         });
     };
-    filterUnasweredQuestions = () => {
-        let previousAnswersClone = _.cloneDeep(this.state.previousAnswers);
+    filterUnasweredQuestions = (previousAnswers) => {
+        let previousAnswersClone = _.cloneDeep(previousAnswers);
         let sortedQuestions = sortBy(cloneDeep(this.props.questions), ['order', 'variable']);
         sortedQuestions = extractAllQuestions(sortedQuestions, this.state.previousAnswers, 0);
         if( Array.isArray(sortedQuestions) && sortedQuestions.length > 0) {
@@ -1059,24 +1077,12 @@ const style = StyleSheet.create({
 
 function mapStateToProps(state) {
     return {
-        teams: state.teams,
-        user: state.user,
-        screenSize: state.app.screenSize,
-        followUps: state.followUps,
+        user: _.get(state, 'user', {_id: null, activeOutbreakId: null}),
+        screenSize: _.get(state, 'app.screenSize', config.designScreenSize),
         questions: _.get(state, 'outbreak.contactFollowUpTemplate', null),
-        errors: state.errors,
-        contacts: state.contacts,
-        translation: state.app.translation,
-        role: state.role
+        translation: _.get(state, 'app.translation', []),
+        role: _.get(state, 'role', [])
     };
 }
 
-function matchDispatchProps(dispatch) {
-    return bindActionCreators({
-        createFollowUp,
-        updateFollowUpAndContact,
-        removeErrors
-    }, dispatch);
-}
-
-export default connect(mapStateToProps, matchDispatchProps)(FollowUpsSingleScreen);
+export default connect(mapStateToProps)(FollowUpsSingleScreen);

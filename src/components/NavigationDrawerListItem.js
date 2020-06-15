@@ -4,11 +4,10 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {PureComponent} from 'react';
-import {View, StyleSheet, InteractionManager} from 'react-native';
-import {ListItem, Icon} from 'react-native-material-ui';
+import {InteractionManager, StyleSheet, View} from 'react-native';
+import {Icon, ListItem} from 'react-native-material-ui';
 import styles from './../styles';
 import {connect} from "react-redux";
-import {bindActionCreators} from "redux";
 import ElevatedView from 'react-native-elevated-view';
 import Ripple from 'react-native-material-ripple';
 import {calculateDimension} from './../utils/functions';
@@ -53,15 +52,18 @@ class NavigationDrawerListItem extends PureComponent {
             case 'users':
                 permissionElement = [
                     constants.PERMISSIONS_USER.userAll,
-                    constants.PERMISSIONS_USER.userList
+                    constants.PERMISSIONS_USER.userListForFilters
                 ];
                 break;
             default:
-                permissionElement = ['follow_up_all', 'follow_up_list'];
+                permissionElement = [];
         }
 
        if (this.props.addButton && this.props.itemKey === 'cases') {
-            permissionAddButton = ['case_all', 'case_create']
+            permissionAddButton = [
+                constants.PERMISSIONS_CASE.caseAll,
+                constants.PERMISSIONS_CASE.caseCreate
+            ]
        }
 
         return (
@@ -162,10 +164,4 @@ function mapStateToProps(state) {
         screenSize: state.app.screenSize
     };
 }
-
-function matchDispatchProps(dispatch) {
-    return bindActionCreators({
-    }, dispatch);
-}
-
-export default connect(mapStateToProps, matchDispatchProps)(NavigationDrawerListItem);
+export default connect(mapStateToProps)(NavigationDrawerListItem);

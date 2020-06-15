@@ -7,16 +7,18 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {PureComponent} from 'react';
-import {View, StyleSheet} from 'react-native';
+import {StyleSheet, View} from 'react-native';
 import Button from './../components/Button';
 import styles from './../styles';
 import {connect} from "react-redux";
+import get from 'lodash/get';
 import ElevatedView from 'react-native-elevated-view';
-import {calculateDimension, getTranslation, createDate} from './../utils/functions';
+import {calculateDimension, createDate, getTranslation} from './../utils/functions';
 import Section from './../components/Section';
 import DatePicker from './../components/DatePicker';
 import {Dialog} from 'react-native-ui-lib';
 import translations from './../utils/translations';
+import config from './../utils/config';
 
 class AddFollowUpScreen extends PureComponent{
 
@@ -131,8 +133,8 @@ const style = StyleSheet.create({
 
 function mapStateToProps(state) {
     return {
-        screenSize: state.app.screenSize,
-        translation: state.app.translation
+        screenSize: get(state, 'app.screenSize', config.designScreenSize),
+        translation: get(state, 'app.translation', [])
     };
 }
 

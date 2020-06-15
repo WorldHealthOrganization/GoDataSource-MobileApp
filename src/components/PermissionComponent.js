@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import { View, Text } from 'react-native';
+import {Text} from 'react-native';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 import lodashGet from 'lodash/get';
@@ -9,7 +9,7 @@ import {checkArrayAndLength} from './../utils/typeCheckingFunctions';
 // This component renders another component if the user has the permissions described in the permissionsList prop
 class PermissionComponent extends Component {
     render() {
-        if (checkArrayAndLength(lodashIntersection(this.props.permissionsList, this.props.permissions))) {
+        if (!checkArrayAndLength(this.props.permissionsList) || checkArrayAndLength(lodashIntersection(this.props.permissionsList, this.props.permissions))) {
             return this.props.render();
         } else {
             if (this.props.alternativeRender) {

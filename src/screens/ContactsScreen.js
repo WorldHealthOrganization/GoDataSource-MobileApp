@@ -4,7 +4,7 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
-import {View, StyleSheet, Alert} from 'react-native';
+import {StyleSheet, View} from 'react-native';
 import styles from './../styles';
 import NavBarCustom from './../components/NavBarCustom';
 import ElevatedView from 'react-native-elevated-view';
@@ -15,9 +15,9 @@ import {connect} from "react-redux";
 import AnimatedListView from './../components/AnimatedListView';
 import {getContactsForOutbreakId} from './../actions/contacts';
 import ViewHOC from './../components/ViewHOC';
+import {Popup} from 'react-native-map-link';
+import translations from './../utils/translations';
 import config from './../utils/config';
-import { Popup } from 'react-native-map-link';
-import translations from './../utils/translations'
 import Breadcrumb from './../components/Breadcrumb';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {pushNewEditScreen} from './../utils/screenTransitionFunctions';
@@ -28,7 +28,6 @@ import {handleQRSearchTransition} from "../utils/screenTransitionFunctions";
 import {bindActionCreators} from "redux";
 import {setLoaderState} from "../actions/app";
 import PermissionComponent from './../components/PermissionComponent';
-import constants from "../utils/constants";
 
 class ContactsScreen extends Component {
 
@@ -265,7 +264,7 @@ class ContactsScreen extends Component {
                 this.setState({
                     loading: false
                 }, () => {
-                    handleQRSearchTransition(this.props.navigator, error, itemType, record, get(this.props, 'user', null), get(this.props, 'translation', null));
+                    handleQRSearchTransition(this.props.navigator, error, itemType, record, get(this.props, 'user', null), get(this.props, 'translation', null), get(this.props, 'role', []), this.props.refresh);
                 });
             })
         });
@@ -308,13 +307,14 @@ const style = StyleSheet.create({
 
 function mapStateToProps(state) {
     return {
-        user:           state.user,
-        screenSize:     state.app.screenSize,
-        syncState:      state.app.syncState,
-        translation:    state.app.translation,
-        loaderState:    state.app.loaderState,
-        referenceData:  state.referenceData,
-        role:           get(state, 'role', [])
+        user:           get(state, 'user', null),
+        screenSize:     get(state, 'app.screenSize', config.designScreenSize),
+        syncState:      get(state, 'app.syncState', null),
+        translation:    get(state, 'app.translation', []),
+        loaderState:    get(state, 'app.loaderState', false),
+        referenceData:  get(state, 'referenceData', []),
+        role:           get(state, 'role', []),
+        location:       get(state, 'locations.locationsList')
     };
 }
 

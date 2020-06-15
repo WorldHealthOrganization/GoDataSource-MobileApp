@@ -2,18 +2,17 @@
  * Created by florinpopa on 03/07/2018.
  */
 import React, {Component} from 'react';
-import {Text, View, Platform, StyleSheet, ScrollView} from 'react-native';
+import {Platform, ScrollView, StyleSheet, Text, View} from 'react-native';
 import NavigationDrawerListItem from './../components/NavigationDrawerListItem';
 import config from './../utils/config';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
-import {logoutUser} from './../actions/user';
-import {sendDatabaseToServer, getTranslationsAsync, changeAppRoot, saveSelectedScreen} from './../actions/app';
+import {logoutUser, updateUser} from './../actions/user';
+import {changeAppRoot, getTranslationsAsync, saveSelectedScreen, sendDatabaseToServer} from './../actions/app';
 import styles from './../styles';
-import {ListItem, Icon} from 'react-native-material-ui';
+import {Icon, ListItem} from 'react-native-material-ui';
 import DropdownInput from './../components/DropdownInput';
-import {updateUser} from './../actions/user';
-import {updateRequiredFields, getTranslation} from './../utils/functions';
+import {getTranslation, updateRequiredFields} from './../utils/functions';
 import translations from './../utils/translations';
 import VersionNumber from 'react-native-version-number';
 import PermissionComponent from './../components/PermissionComponent';
@@ -85,21 +84,10 @@ class NavigationDrawer extends Component {
                     {
                         config.sideMenuItems.map((item, index) => {
                             let addButton = false;
-                            // let findPermission = undefined;
-                            // if (this.props && this.props.role) {
-                            //     if (item.addButton && item.addButton === true) {
-                            //         if (item.key === 'followups') {
-                            //             findPermission = ['follow_up_all', 'follow_up_list'];
-                            //         } else if (item.key === 'contacts') {
-                            //             findPermission = ['contact_all', 'contact_list'];
-                            //         } else if (item.key === 'cases') {
-                            //             findPermission = ['case_all', 'case_list'];
-                            //         }
-                            //         if (findPermission !== undefined) {
-                            //             addButton = true
-                            //         }
-                                // }
-                            // }
+
+                            if (item.key === 'cases') {
+                                addButton = true;
+                            }
 
                             return (
                                 <NavigationDrawerListItem
@@ -277,13 +265,13 @@ const style = StyleSheet.create({
 
 function mapStateToProps(state) {
     return {
-        user: state.user,
-        role: state.role,
-        screenSize: state.app.screenSize,
-        selectedScreen: state.app.selectedScreen,
-        availableLanguages: state.app.availableLanguages,
-        outbreak: state.outbreak,
-        translation: state.app.translation
+        user: lodashGet(state, 'user', null),
+        role: lodashGet(state, 'role', []),
+        screenSize: lodashGet(state, 'app.screenSize', config.designScreenSize),
+        selectedScreen: lodashGet(state, 'app.selectedScreen', 0),
+        availableLanguages: lodashGet(state, 'app.availableLanguages', []),
+        outbreak: lodashGet(state, 'outbreak', {name: ''}),
+        translation: lodashGet(state, 'app.translation', [])
     };
 }
 

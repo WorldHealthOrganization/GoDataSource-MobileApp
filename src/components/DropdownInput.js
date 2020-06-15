@@ -1,13 +1,12 @@
 /**
  * Created by mobileclarisoft on 16/07/2018.
  */
-import React, {PureComponent} from 'react';
-import {View, Text, StyleSheet} from 'react-native';
-import PropTypes from 'prop-types';
-import translations from './../utils/translations'
-import {getTranslation, getTooltip, getDropDownInputDisplayParameters} from './../utils/functions';
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
+import React, {PureComponent} from 'react';
+import {View, Text} from 'react-native';
+import PropTypes from 'prop-types';
+import {getTranslation, getTooltip, getDropDownInputDisplayParameters} from './../utils/functions';
 import { Dropdown } from 'react-native-material-dropdown';
 import TooltipComponent from './TooltipComponent'
 import get from 'lodash/get';
@@ -129,8 +128,18 @@ class DropdownInput extends PureComponent {
                 )
             }
         } else {
+            let returnedValue = state;
+            if (state && !state.includes("LNG_")) {
+                returnedValue = this.props.data.find((e) => e.value === state || e.id === state)
+            }
+            if (returnedValue && returnedValue.id) {
+                returnedValue = returnedValue.id;
+            }
+            if (returnedValue && returnedValue.value) {
+                returnedValue = returnedValue.value;
+            }
             this.props.onChange(
-                state,
+                returnedValue,
                 this.props.id,
                 this.props.objectType 
                     ? (this.props.objectType === 'Address' || 
@@ -150,9 +159,6 @@ class DropdownInput extends PureComponent {
 
 // Create style outside the class, or for components that will be used by other components (buttons),
 // make a global style in the config directory
-const style = StyleSheet.create({
-
-});
 
 DropdownInput.propTypes = {
     id: PropTypes.string.isRequired,

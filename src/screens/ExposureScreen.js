@@ -1,10 +1,10 @@
 /**
  * Created by florinpopa on 05/07/2018.
  */
-import React, {Component} from 'react';
-import {View, Text, StyleSheet, Alert} from 'react-native';
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
+import React, {Component} from 'react';
+import {Alert, StyleSheet, Text, View} from 'react-native';
 import Button from './../components/Button';
 import {Icon} from 'react-native-material-ui';
 import styles from './../styles';
@@ -14,11 +14,9 @@ import {bindActionCreators} from "redux";
 import {addExposureForContact, updateExposureForContact} from './../actions/contacts';
 import NavBarCustom from './../components/NavBarCustom';
 import config from './../utils/config';
-// import CardComponent from './../components/CardComponent';
 import Ripple from 'react-native-material-ripple';
 import {removeErrors} from './../actions/errors';
-import {calculateDimension, extractIdFromPouchId, updateRequiredFields, getTranslation} from './../utils/functions';
-// import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import {calculateDimension, extractIdFromPouchId, getTranslation, updateRequiredFields} from './../utils/functions';
 import translations from './../utils/translations'
 import ElevatedView from 'react-native-elevated-view';
 import ExposureContainer from '../containers/ExposureContainer';
@@ -66,31 +64,10 @@ class ExposureScreen extends Component {
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
-        // console.log('Render from ExposureScreen: ', this.state.exposure, this.props.exposure);
-
-        // if (this.props.errors && this.props.errors.type && this.props.errors.message) {
-        //     Alert.alert(this.props.errors.type, this.props.errors.message, [
-        //         {
-        //             text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
-        //             onPress: () => {
-        //                 this.setState({
-        //                     savePressed: false
-        //                 }, () => {
-        //                     this.props.removeErrors();
-        //                 });
-        //             }
-        //         }
-        //     ])
-        // }
-
         return (
             <ViewHOC style={style.viewHocContainer}
                 showLoader={this && this.state && this.state.loading}
                 loaderText={this.props && this.props.syncState ? 'Loading' : getTranslation(translations.loadingScreenMessages.loadingMsg, this.props.translation)}>
-            
-                {/*<TouchableWithoutFeedback onPress={() => {*/}
-                    {/*Keyboard.dismiss()*/}
-                {/*}} accessible={false}>*/}
                     <View style={style.container}>
                         <NavBarCustom style = {style.navbarContainer}
                             customTitle={
@@ -161,7 +138,6 @@ class ExposureScreen extends Component {
                             />
                         </View>
                     </View>
-                {/*</TouchableWithoutFeedback>*/}
             </ViewHOC>
         )
     }
@@ -274,18 +250,25 @@ class ExposureScreen extends Component {
                 target: true
             }];
         } else {
-            // Here add logic for cases/events
+            // Here add logic for cases. Events are not yet handled. This needs refactoring
             personsArray = [{
-                id: value.value,
-                type: type
-            }]
+                id: get(selectedExposure, '_id', null),
+                type: get(selectedExposure, 'type', null),
+                source: null,
+                target: true
+            },{
+                id: get(this.props, 'case._id', null),
+                type: get(this.props, 'case.type', null),
+                source: true,
+                target: null
+            }];
         }
 
         let source = personsArray && Array.isArray(personsArray) && personsArray.length === 2 ? personsArray[0].source ? personsArray[0].id : personsArray[1].id : null;
         let target = personsArray && Array.isArray(personsArray) && personsArray.length === 2 ? personsArray[0].target ? personsArray[0].id : personsArray[1].id : null;
 
         this.setState(prevState => ({
-            exposure: Object.assign({}, prevState.exposure, {persons: personsArray, source: source, target: target, active: true}),
+            exposure: Object.assign({}, prevState.exposure, {persons: personsArray, active: true}),
             isModified: true,
             selectedExposure: selectedExposure
         }), () => {
@@ -459,16 +442,9 @@ const style = StyleSheet.create({
 
 function mapStateToProps(state) {
     return {
-        teams: state.teams,
-        user: state.user,
-        screenSize: state.app.screenSize,
-        errors: state.errors,
-        contacts: state.contacts,
-        translation: state.app.translation,
-        referenceData: state.referenceData,
-        cases: state.exposure,
-        events: state.events,
-        clusters: state.clusters,
+        user: get(state, 'user', null),
+        screenSize: get(state, 'app.screenSize', config.designScreenSize),
+        translation: get(state, 'app.translation', []),
         periodOfFollowUp: get(state, 'outbreak.periodOfFollowup', null),
         outbreakId: get(state, 'outbreak._id', null)
     };

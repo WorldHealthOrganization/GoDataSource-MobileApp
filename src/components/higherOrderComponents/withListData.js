@@ -2,7 +2,7 @@ import React, {Component} from 'react'
 import {Alert, BackHandler} from 'react-native';
 import get from 'lodash/get';
 import {createDate} from './../../utils/functions';
-import {getTranslation, navigation, extractMainAddress} from "../../utils/functions";
+import {extractIdFromPouchId, extractMainAddress, getTranslation, navigation} from "../../utils/functions";
 import RNExitApp from "react-native-exit-app";
 import translations from "../../utils/translations";
 import constants from './../../utils/constants';
@@ -61,15 +61,15 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
             };
 
             handleBackButtonClick() {
-                Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.alertMessages.androidBackButtonMsg, this.props.translation), [
+                Alert.alert(getTranslation(translations.alertMessages.alertLabel, get(this.props, 'translation', [])), getTranslation(translations.alertMessages.androidBackButtonMsg, get(this.props, 'translation', [])), [
                     {
-                        text: getTranslation(translations.alertMessages.yesButtonLabel, this.props.translation), onPress: () => {
+                        text: getTranslation(translations.alertMessages.yesButtonLabel, get(this.props, 'translation', [])), onPress: () => {
                             RNExitApp.exitApp();
                             return true;
                         }
                     },
                     {
-                        text: getTranslation(translations.alertMessages.cancelButtonLabel, this.props.translation), onPress: () => {
+                        text: getTranslation(translations.alertMessages.cancelButtonLabel, get(this.props, 'translation', [])), onPress: () => {
                             return true;
                         }
                     }
@@ -151,7 +151,7 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                 return filter;
             };
 
-            getData = (isRefresh) => {
+            getData = (isRefresh, isRefreshAfterSync) => {
                 if (this.state.isAddFromNavigation) {
                     this.setState({
                         isAddFromNavigation: false
@@ -173,7 +173,9 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                     // else it means that is onEndReached so check if data modulo 10 is zero and continue
                     let doAction = false;
                     if (isRefresh === true) {
-                        this.props.setLoaderState(true);
+                        if (!isRefreshAfterSync) {
+                            this.props.setLoaderState(true);
+                        }
                         doAction = true;
                     } else {
                         doAction = this.state.data.length % 10 === 0 && this.state.data.length !== this.state.dataCount;
@@ -182,15 +184,13 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                         let filters = this.prepareFilters();
                         methodForGettingData(filters, isRefresh === true ? isRefresh : false, this.props)
                             .then((result) => {
-                                if (isRefresh === true) {
+                                if (isRefresh === true && !isRefreshAfterSync) {
                                     this.props.setLoaderState(false);
                                 }
                                 this.setState((prevState) => {
-                                    console.log(prevState.dataCount);
-                                    console.log('Stuff: ', get(result, 'dataCount', prevState.dataCount));
                                     return {
-                                        data: prevState.lastElement !== null ? prevState.data.concat(result.data) : result.data,
-                                            lastElement: result.data.length === 10 ? screenType === 'FollowUpsScreen' ? Object.assign({}, get(result, 'data[9].mainData', null), {followUpId: get(result, 'data[9].followUpData._id', null)}) : get(result, 'data[9].mainData', null) : null,
+                                        data: prevState.lastElement !== null || (!isRefresh && (prevState.data.length + result.data.length) === prevState.dataCount) ? prevState.data.concat(result.data) : result.data,
+                                        lastElement: result.data.length === 10 ? screenType === 'FollowUpsScreen' ? Object.assign({}, get(result, 'data[9].mainData', null), {followUpId: get(result, 'data[9].followUpData._id', null)}) : get(result, 'data[9].mainData', null) : null,
                                         isAddFromNavigation: false,
                                         dataCount: get(result, 'dataCount', prevState.dataCount),
                                         offset: result.data.length
@@ -215,18 +215,21 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                 }
             };
 
-            refresh = () => {
+            refresh = (isRefreshAfterSync) => {
                 this.setState({
                     lastElement: null,
                     offset: 0
                 }, () => {
-                    this.getData(true)
+                    this.getData(true, isRefreshAfterSync)
                 })
             };
 
             setSearchText = (text) => {
                 this.setState(prevState => ({
-                    searchText: text,
+                    searchText: {
+                        text,
+                        locations: this.computeLocationIdsFromName(text)
+                    },
                     offset: 0
                 }), () => this.refresh())
             };
@@ -525,6 +528,10 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                         break;
                 }
                 return permissions;
+            };
+
+            computeLocationIdsFromName = (searchText) => {
+                return this.props.location.filter((e) => e.name.toLowerCase().includes(searchText.toLowerCase())).map((e) => extractIdFromPouchId(e._id, 'location'));
             };
 
             onNavigatorEvent = (event) => {

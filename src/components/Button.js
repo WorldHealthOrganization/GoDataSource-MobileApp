@@ -1,16 +1,13 @@
 /**
  * Created by mobileclarisoft on 12/07/2018.
  */
-import React, {PureComponent} from 'react';
-import {TextInput, View, Text, StyleSheet} from 'react-native';
-import PropTypes from 'prop-types';
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
+import React, {PureComponent} from 'react';
+import PropTypes from 'prop-types';
 import { RaisedTextButton } from 'react-native-material-buttons';
 import {connect} from "react-redux";
-import {bindActionCreators} from "redux";
 import {getTranslation} from './../utils/functions';
-import translations from './../utils/translations'
 
 class Button extends PureComponent {
 
@@ -50,12 +47,6 @@ class Button extends PureComponent {
     // Please write here all the methods that are not react native lifecycle methods
 }
 
-// Create style outside the class, or for components that will be used by other components (buttons),
-// make a global style in the config directory
-const style = StyleSheet.create({
-
-});
-
 Button.propTypes = {
     title: PropTypes.string.isRequired,
     color: PropTypes.string.isRequired,
@@ -73,9 +64,4 @@ function mapStateToProps(state) {
     };
 }
 
-function matchDispatchProps(dispatch) {
-    return bindActionCreators({
-    }, dispatch);
-}
-
-export default connect(mapStateToProps, matchDispatchProps)(Button);
+export default connect(mapStateToProps)(Button);

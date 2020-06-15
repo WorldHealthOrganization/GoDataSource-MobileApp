@@ -4,10 +4,14 @@ target 'who_mobile' do
   pod 'Parse'
 
   # Add new pods below this line
-  pod 'react-native-webview', :path => '../node_modules/react-native-webview'
+  #pod 'ReactNativeDarkMode', :path => '../node_modules/react-native-dark-mode'
+
+  #pod 'RNDateTimePicker', :path => '../node_modules/@react-native-community/datetimepicker'
+
+  #pod 'react-native-webview', :path => '../node_modules/react-native-webview'
 
 
-  pod 'react-native-version-number', :path => '../node_modules/react-native-version-number'
+  #pod 'react-native-version-number', :path => '../node_modules/react-native-version-number'
 
   #pod 'RNCAsyncStorage', :path => '../node_modules/@react-native-community/async-storage'
 

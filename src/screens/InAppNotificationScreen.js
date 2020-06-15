@@ -1,11 +1,9 @@
 /**
  * Created by mobileclarisoft on 15/11/2018.
  */
-import React, { Component } from 'react';
-import { View, ActivityIndicator, Text, Platform, Dimensions } from 'react-native';
+import React, {Component} from 'react';
+import {Dimensions, Platform, Text, View} from 'react-native';
 import styles from './../styles';
-import translations from './../utils/translations'
-import {getTranslation} from './../utils/functions';
 
 
 class InAppNotificationScreen extends Component {

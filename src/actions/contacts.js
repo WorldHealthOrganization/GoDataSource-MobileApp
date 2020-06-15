@@ -1,8 +1,8 @@
 /**
  * Created by florinpopa on 20/07/2018.
  */
-import {updateRequiredFields, createDate} from './../utils/functions';
-import moment from 'moment';
+import {createDate, updateRequiredFields} from './../utils/functions';
+import moment from 'moment/min/moment.min';
 import config from './../utils/config';
 import max from 'lodash/max';
 import get from 'lodash/get';

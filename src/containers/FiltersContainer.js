@@ -1,12 +1,11 @@
-import React, { PureComponent } from 'react';
-import { View, StyleSheet, ScrollView } from 'react-native';
-import { connect } from "react-redux";
-import { bindActionCreators } from "redux";
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import React, {PureComponent} from 'react';
+import {ScrollView, StyleSheet, View} from 'react-native';
+import {connect} from "react-redux";
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import ElevatedView from 'react-native-elevated-view';
 import filter from 'lodash/filter';
 import get from 'lodash/get';
-import { calculateDimension, getTranslation, extractIdFromPouchId } from './../utils/functions';
+import {calculateDimension, extractIdFromPouchId, getTranslation} from './../utils/functions';
 import config from './../utils/config';
 import Button from './../components/Button';
 import styles from './../styles';
@@ -165,6 +164,7 @@ class FiltersContainer extends PureComponent {
                 onChangeInterval={onChangeInterval}
                 onChangeMultipleSelection={onChangeMultipleSelection}
                 onSelectItem={onSelectItem}
+                permissionsList={item.permissionsList}
             />
         )
     };
@@ -231,17 +231,12 @@ const style = StyleSheet.create({
 
 function mapStateToProps(state) {
     return {
-        screenSize: state.app.screenSize,
-        translation: state.app.translation,
+        screenSize: get(state, 'app.screenSize', config.designScreenSize),
+        translation: get(state, 'app.translation', []),
         locations: get(state, `locations.locations`, []),
-        helpCategory: state.helpCategory,
-        referenceData: state.referenceData,
+        helpCategory: get(state, 'helpCategory', []),
+        referenceData: get(state, 'referenceData', [])
     };
 }
 
-function matchDispatchProps(dispatch) {
-    return bindActionCreators({
-    }, dispatch);
-}
-
-export default connect(mapStateToProps, matchDispatchProps)(FiltersContainer);
+export default connect(mapStateToProps)(FiltersContainer);

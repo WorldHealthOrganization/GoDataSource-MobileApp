@@ -2,26 +2,38 @@
  * Created by florinpopa on 03/07/2018.
  */
 import {ACTION_TYPE_STORE_USER} from './../utils/enums';
-import { batchActions } from 'redux-batched-actions';
-import {changeAppRoot, getTranslations, saveTranslation, saveAvailableLanguages} from './app';
-import {loginUserRequest, getUserByIdRequest, updateUserRequest, getUserTeamMembers} from './../queries/user';
+import {batchActions} from 'redux-batched-actions';
+import {
+    changeAppRoot,
+    getAvailableLanguages,
+    getTranslations,
+    saveAvailableLanguages,
+    saveSelectedScreen,
+    saveTranslation,
+    setLoaderState,
+    setLoginState,
+    storeData
+} from './app';
+import {getUserByIdRequest, getUserTeamMembers, loginUserRequest, updateUserRequest} from './../queries/user';
 import {getUserRoles} from './../actions/role';
 import {getUserTeams} from './../actions/teams';
-import { getClusters } from './clusters';
-import { getOutbreakById } from './outbreak';
-import { addError } from './errors';
+import {getClusters, storeClusters} from './clusters';
+import {
+    getOutbreakById,
+    storeLocations,
+    storeLocationsList,
+    storeOutbreak,
+    storeUserLocations,
+    storeUserLocationsList
+} from './outbreak';
+import {addError} from './errors';
 import {getReferenceData, storeReferenceData} from './referenceData';
-import {getHelpCategory} from './helpCategory';
-import {getHelpItem} from './helpItem';
+import {getHelpCategory, storeHelpCategory} from './helpCategory';
+import {getHelpItem, storeHelpItem} from './helpItem';
 import errorTypes from './../utils/errorTypes';
-import {storeHelpCategory} from './helpCategory';
-import {storeHelpItem} from './helpItem';
-import {storeOutbreak, storeLocationsList, storeLocations, storeUserLocationsList, storeUserLocations} from './outbreak';
 import {storeUserTeams} from './teams';
-import {storeClusters} from './clusters';
-import {setLoginState, storeData, getAvailableLanguages, setSyncState, saveSelectedScreen, setLoaderState} from './app';
 import {storePermissions} from './role';
-import {getLocations, getUserLocations} from './locations';
+import {getLocations} from './locations';
 import get from 'lodash/get';
 import lodashIntersection from 'lodash/intersection';
 import {filterByUser} from './../utils/functions';
@@ -85,30 +97,25 @@ export function cleanDataAfterLogout() {
     }
 }
 
-export function getUserById(userId, token, refreshFollowUps, nativeEventEmitter) {
-    return async function (dispatch, getState) {
+export function getUserById(userId, skipLoad) {
+    return async function (dispatch) {
         console.log("getUserById userId: ", userId);
-        getUserByIdRequest(userId, token, (error, response) => {
+        getUserByIdRequest(userId, (error, response) => {
             if (error) {
                 console.log("*** getUserById error: ", error);
                 dispatch(addError(errorTypes.ERROR_GET_USER));
                 // dispatch(changeAppRoot('login'));
             }
             if (response) {
-                // Here is the local storage handling
-                if (refreshFollowUps) {
-                    dispatch(setSyncState({ id: 'sync', status: 'test' }));
-                }
-
-                dispatch(computeCommonData(false, response, refreshFollowUps, getState().app.filters));
+                dispatch(computeCommonData(false, response, skipLoad));
             }
 
         })
     }
 }
 
-export function computeCommonData(storeUserBool, user, refreshFollowUps, filters) {
-    return async function (dispatch) {
+export function computeCommonData(storeUserBool, user, skipLoad) {
+    return async function (dispatch, getState) {
         try {
             let outbreakAndLocationInfo = await getOutbreakById(user.activeOutbreakId);
             if (outbreakAndLocationInfo) {
@@ -121,12 +128,19 @@ export function computeCommonData(storeUserBool, user, refreshFollowUps, filters
                 promises.push(getReferenceData());
                 promises.push(getTranslations(user.languageId));
                 promises.push(getLocations(outbreakAndLocationInfo.locationIds || null));
-                promises.push(getUserLocations(outbreakAndLocationInfo.locationIds || null));
                 promises.push(getHelpCategory());
                 promises.push(getHelpItem());
 
                 // Compute startup screen
                 let selectedScreen = 0;
+                try {
+                    selectedScreen = getState().app.selectedScreen;
+                } catch(errorAssign) {
+                    console.log('Error while assigning');
+                }
+                if (typeof selectedScreen !== 'number') {
+                    selectedScreen = 0;
+                }
                 if (!checkArrayAndLength(
                     lodashIntersection(userRoles, [
                         constants.PERMISSIONS_FOLLOW_UP.followUpAll,
@@ -145,12 +159,18 @@ export function computeCommonData(storeUserBool, user, refreshFollowUps, filters
                     }
                 }
 
-                dispatch(batchActions([
+                let batchedActionsArray = [
                     saveSelectedScreen(selectedScreen),
                     changeAppRoot('after-login'),
-                    setLoaderState(true),
+                    // setLoaderState(!skipLoad),
                     setLoginState('Finished logging'),
-                ]));
+                ];
+
+                if (!skipLoad) {
+                    batchedActionsArray.push(setLoaderState(!skipLoad));
+                }
+
+                dispatch(batchActions(batchedActionsArray));
 
                 Promise.all(promises)
                     .then((dataArray) => {
@@ -174,33 +194,20 @@ export function computeCommonData(storeUserBool, user, refreshFollowUps, filters
                                 storeOutbreak(outbreakAndLocationInfo || null),
                                 storeLocationsList(get(actionsObject, 'locations.locationsList', null)),
                                 storeLocations(get(actionsObject, 'locations.treeLocationsList', null)),
-                                storeUserLocationsList(get(actionsObject, 'userLocations.userLocationsList', null)),
-                                storeUserLocations(filterByUser(get(actionsObject, 'userLocations.userTreeLocationsList', null), userTeams)),
+                                storeUserLocationsList(get(actionsObject, 'locations.locationsList', null)),
+                                storeUserLocations(filterByUser(get(actionsObject, 'locations.treeLocationsList', null), userTeams)),
                                 saveAvailableLanguages(get(actionsObject,  'availableLanguages', null)),
                                 storeReferenceData(get(actionsObject,  'referenceData', null)),
                                 saveTranslation(get(actionsObject,  'translations', null)),
                                 storeClusters(get(actionsObject,  'clusters', null)),
                                 storePermissions(userRoles),
-                                // storePermissions([
-                                //     // 'contact_modify',
-                                //     'outbreak_view',
-                                //     // 'follow_up_list',
-                                //     'contact_list',
-                                //     'contact_view',
-                                //     'case_list',
-                                //     'case_view',
-                                //     'help_list_category_item'
-                                // ]),
                                 storeUserTeams(userTeams),
                                 storeHelpCategory(get(actionsObject,  'helpCategory', null)),
-                                storeHelpItem(get(actionsObject,  'helpItem', null)),
-                                // setLoginState('Finished logging'),
-                                // saveSelectedScreen(selectedScreen),
-                                // changeAppRoot('after-login')
+                                storeHelpItem(get(actionsObject,  'helpItem', null))
                             ];
 
-                            if(refreshFollowUps) {
-                                arrayOfActions.push(setSyncState({id: 'tests', status:'Success'}));
+                            if (!skipLoad) {
+                                arrayOfActions.push(setLoaderState(skipLoad));
                             }
 
                             if (storeUserBool) {
@@ -272,7 +279,7 @@ export function getUsersForOutbreakId({outbreakId, usersFilter, searchText, last
         userList = userList.concat(get(teams, `[${i}].userIds`, []));
     }
 
-    return getUserTeamMembers(userList, {outbreakId, usersFilter, searchText})
+    return getUserTeamMembers(userList, {outbreakId, usersFilter, searchText: searchText.text})
         .then((response) => {
             return {
                 data: response.map((user) => {

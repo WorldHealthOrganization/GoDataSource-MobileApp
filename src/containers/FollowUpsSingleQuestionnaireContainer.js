@@ -3,26 +3,19 @@
  */
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
-import React, { Component } from 'react';
-import {
-    View,
-    StyleSheet,
-    InteractionManager,
-    Alert,
-    ScrollView
-} from 'react-native';
-import { extractAllQuestions, getTranslation, checkRequiredQuestions, createDate } from './../utils/functions';
-import { connect } from "react-redux";
-import { bindActionCreators } from "redux";
+import React, {Component} from 'react';
+import {Alert, InteractionManager, ScrollView, StyleSheet, View} from 'react-native';
+import {checkRequiredQuestions, createDate, extractAllQuestions, getTranslation} from './../utils/functions';
+import {connect} from "react-redux";
 import styles from './../styles';
 import QuestionCard from './../components/QuestionCard';
-import { LoaderScreen } from 'react-native-ui-lib';
-import { sortBy } from 'lodash';
+import {LoaderScreen} from 'react-native-ui-lib';
+import _, {sortBy} from 'lodash';
 import translations from './../utils/translations';
 import constants from './../utils/constants';
+import config from './../utils/config';
 import cloneDeep from "lodash/cloneDeep";
 import uniqueId from "lodash/uniqueId";
-import _ from "lodash";
 import TopContainerButtons from './../components/TopContainerButtons';
 import PermissionComponent from './../components/PermissionComponent';
 
@@ -274,17 +267,12 @@ const style = StyleSheet.create({
     }
 });
 
-function mapStateToProps(state) {
+function mapStateToProps(state){
     return {
-        screenSize: state.app.screenSize,
-        questions: state.outbreak.contactFollowUpTemplate,
-        translation: state.app.translation
+        screenSize: _.get(state, 'app.screenSize', config.designScreenSize),
+        questions: _.get(state, 'outbreak.contactFollowUpTemplate', null),
+        translation: _.get(state, 'app.translation', [])
     };
 }
 
-function matchDispatchProps(dispatch) {
-    return bindActionCreators({
-    }, dispatch);
-}
-
-export default connect(mapStateToProps, matchDispatchProps)(FollowUpsSingleQuestionnaireContainer);
+export default connect(mapStateToProps)(FollowUpsSingleQuestionnaireContainer);

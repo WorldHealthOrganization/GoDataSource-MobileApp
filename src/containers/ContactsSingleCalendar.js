@@ -4,17 +4,18 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
-import {View, StyleSheet, InteractionManager} from 'react-native';
+import {InteractionManager, StyleSheet, View} from 'react-native';
 import {connect} from "react-redux";
-import {bindActionCreators} from "redux";
 import styles from './../styles';
 import ElevatedView from 'react-native-elevated-view';
 import {LoaderScreen} from 'react-native-ui-lib';
 import FollowUpAgenda from './../components/FollowUpAgenda';
-import moment from 'moment';
+import get from 'lodash/get';
+import moment from 'moment/min/moment.min';
 import TopContainerButtons from "./../components/TopContainerButtons";
 import PermissionComponent from './../components/PermissionComponent';
 import constants from "./../utils/constants";
+import config from "./../utils/config";
 
 class ContactsSingleCalendar extends Component {
 
@@ -27,11 +28,6 @@ class ContactsSingleCalendar extends Component {
     }
 
     // Please add here the react lifecycle methods that you need
-    // shouldComponentUpdate(nextProps, nextState) {
-    //     // console.log("NextPropsIndex ContactsSingleCalendar: ", nextProps.activeIndex, this.props.activeIndex);
-    //     return nextProps.activeIndex === 3;
-    // }
-
     componentDidMount() {
         InteractionManager.runAfterInteractions(() => {
             this.setState({
@@ -62,6 +58,19 @@ class ContactsSingleCalendar extends Component {
         let followUps = this.computeFollowUps();
         // console.log("### ContactsSingleCalendar: ", followUps);
 
+        let permissionsList = [
+            constants.PERMISSIONS_CONTACT.contactAll
+        ];
+        if (this.props.isNew) {
+            permissionsList.push(
+                constants.PERMISSIONS_CONTACT.contactCreate
+            )
+        } else {
+            permissionsList.push(
+                constants.PERMISSIONS_CONTACT.contactModify
+            )
+        }
+
         return (
             <ElevatedView elevation={3} style={[style.container]}>
                 <View style = {{alignItems: 'center'}}>
@@ -79,11 +88,7 @@ class ContactsSingleCalendar extends Component {
                                 onPressPreviousButton={this.props.onPressPreviousButton}
                             />
                         )}
-                        permissionsList={[
-                            constants.PERMISSIONS_CONTACT.contactAll,
-                            constants.PERMISSIONS_CONTACT.contactCreate,
-                            constants.PERMISSIONS_CONTACT.contactModify
-                        ]}
+                        permissionsList={permissionsList}
                     />
                 </View>
                 <FollowUpAgenda
@@ -125,17 +130,9 @@ const style = StyleSheet.create({
 
 function mapStateToProps(state) {
     return {
-        screenSize: state.app.screenSize,
-        contacts: state.contacts,
-        cases: state.cases,
-        events: state.events,
-        translation: state.app.translation,
+        screenSize: get(state, 'app.screenSize', config.designScreenSize),
+        translation: get(state, 'app.translation', [])
     };
 }
 
-function matchDispatchProps(dispatch) {
-    return bindActionCreators({
-    }, dispatch);
-}
-
-export default connect(mapStateToProps, matchDispatchProps)(ContactsSingleCalendar);
+export default connect(mapStateToProps)(ContactsSingleCalendar);

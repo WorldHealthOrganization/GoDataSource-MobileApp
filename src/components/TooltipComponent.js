@@ -2,19 +2,15 @@
  * Created by florinpopa on 25/07/2018.
  */
 import React, {PureComponent} from 'react';
-import {View, Text, StyleSheet} from 'react-native';
+import {StyleSheet, Text, View} from 'react-native';
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import {Icon} from 'react-native-material-ui';
-import {calculateDimension} from './../utils/functions';
+import {calculateDimension, getTranslation} from './../utils/functions';
 import Ripple from 'react-native-material-ripple';
-import styles from './../styles';
 import {connect} from "react-redux";
-import {bindActionCreators} from "redux";
 import Modal from 'react-native-modal';
 import ElevatedView from "react-native-elevated-view";
-import translations from './../utils/translations'
-import {getTranslation} from './../utils/functions';
 
 class TooltipComponent extends PureComponent {
 
@@ -42,7 +38,7 @@ class TooltipComponent extends PureComponent {
             > 
                 <ElevatedView elevation={3} style={style.elevatedView}>
                     <Ripple style={style.ripple} onPress={this.handleOnPressTooltip}>
-                        <Icon name='question' color='white' size={15}/>
+                        <Icon name='help' color='black' size={25}/>
                     </Ripple>
                 </ElevatedView>
 
@@ -81,7 +77,7 @@ const style = StyleSheet.create({
     },
     elevatedView: {
         flex: 1,
-        backgroundColor: styles.buttonBlack,
+        // backgroundColor: 'white',
         borderRadius: 150,
     },
     ripple: {
@@ -109,9 +105,4 @@ function mapStateToProps(state) {
     };
 }
 
-function matchDispatchProps(dispatch) {
-    return bindActionCreators({
-    }, dispatch);
-}
-
-export default connect(mapStateToProps, matchDispatchProps)(TooltipComponent);
+export default connect(mapStateToProps)(TooltipComponent);

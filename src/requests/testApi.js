@@ -23,7 +23,7 @@ export function testApi(testUrl, deviceInfo, callback) {
 
 
 export function testApiPromise(testUrl, deviceInfo) {
-    fetch(testUrl, {
+    return fetch(testUrl, {
         method: 'GET',
         headers: {
             'device-info': deviceInfo,
@@ -32,4 +32,8 @@ export function testApiPromise(testUrl, deviceInfo) {
         }
     })
         .then(handleResponse)
+        .catch((errorTestAPI) => {
+            console.log('error test api', errorTestAPI);
+            return Promise.reject(errorTestAPI);
+        })
 }

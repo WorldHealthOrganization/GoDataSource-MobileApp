@@ -1,20 +1,11 @@
 'use strict';
-import React, { Component } from 'react';
-import { connect } from 'react-redux';
-import {bindActionCreators} from "redux";
+import React, {Component} from 'react';
+import {connect} from 'react-redux';
 import NavBarCustom from './../components/NavBarCustom';
-import styles from './../styles';
 import {getTranslation} from './../utils/functions';
-import translations from './../utils/translations'
-
-import {
-    AppRegistry,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    Dimensions,
-    View
-} from 'react-native';
+import translations from './../utils/translations';
+import {Dimensions, StyleSheet, Text, View} from 'react-native';
+import lodashGet from 'lodash/get';
 
 import QRCodeScanner from 'react-native-qrcode-scanner';
 
@@ -129,13 +120,8 @@ const style = StyleSheet.create({
 
 function mapStateToProps(state) {
     return {
-        translation: state.app.translation
+        translation: lodashGet(state, 'app.translation', [])
     };
 }
 
-function matchDispatchToProps(dispatch) {
-    return bindActionCreators({
-    }, dispatch);
-}
-
-export default connect(mapStateToProps, matchDispatchToProps)(QRScanScreen);
+export default connect(mapStateToProps)(QRScanScreen);

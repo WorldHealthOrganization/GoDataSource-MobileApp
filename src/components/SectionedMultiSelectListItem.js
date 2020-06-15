@@ -1,11 +1,7 @@
 import React from 'react';
-import {View, Text, StyleSheet} from 'react-native';
-import PropTypes from 'prop-types';
-import styles from './../styles';
-import translations from './../utils/translations'
-import {getTranslation} from './../utils/functions';
-import {calculateDimension} from "../utils/functions";
+import {StyleSheet, Text, View} from 'react-native';
 import Ripple from 'react-native-material-ripple';
+import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
 
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
@@ -13,7 +9,7 @@ import Ripple from 'react-native-material-ripple';
 SectionedMultiSelectListItem = ({item, uniqueKey, subKey, handleOnSelectItem, handleOnPressExpand,
                handleRenderList, iconWidth, selectedItems, selectToggleIconComponent,
                expandedItems, dropDownToggleIconUpComponent, dropDownToggleIconDownComponent}) => (
-    <View style={{flex: 1, marginVertical: 5}}>
+    <View style={{flex: 1, marginVertical: 10}}>
         <View style={{flexDirection: 'row', flex: 1, alignItems: 'center', justifyContent: 'space-between'}}>
             <Ripple
                 onPress={() => {handleOnSelectItem(item)}}
@@ -31,7 +27,7 @@ SectionedMultiSelectListItem = ({item, uniqueKey, subKey, handleOnSelectItem, ha
                 {
                     selectedItems.findIndex((e) => {return e[uniqueKey] === item[uniqueKey]}) > -1 ? (
                         <Ripple
-                            style={{height: '100%', width: iconWidth}}
+                            style={{height: '100%', width: iconWidth, marginRight: 10}}
                         >
                             {
                                 selectToggleIconComponent
@@ -40,10 +36,16 @@ SectionedMultiSelectListItem = ({item, uniqueKey, subKey, handleOnSelectItem, ha
                     ) : (null)
                 }
                 {
-                    item[subKey] ? (
+                    item[subKey] && checkArrayAndLength(item[subKey]) ? (
                         <Ripple
                             style={{height: '100%', width: iconWidth}}
                             onPress={() => {handleOnPressExpand(item[uniqueKey])}}
+                            hitSlop={{
+                                top: 20,
+                                left: 20,
+                                bottom: 20,
+                                right: 20
+                            }}
                         >
                             {
                                 expandedItems.findIndex((e) => {return e === item[uniqueKey]}) > -1 ?
@@ -91,17 +93,5 @@ const style = StyleSheet.create({
         height: 1
     }
 });
-
-// Section.propTypes = {
-//     label: PropTypes.string.isRequired,
-//     hasBorderBottom: PropTypes.boolean,
-//     borderBottomColor: PropTypes.string
-// };
-//
-// Section.defaultProps = {
-//     label: 'Test',
-//     hasBorderBottom: false,
-//     borderBottomColor: styles.navigationDrawerSeparatorGrey
-// };
 
 export default SectionedMultiSelectListItem;

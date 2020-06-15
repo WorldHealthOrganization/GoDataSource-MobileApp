@@ -2,11 +2,10 @@
  * Created by mobileclarisoft on 16/07/2018.
  */
 import React, {PureComponent} from 'react';
-import {View, Text, StyleSheet} from 'react-native';
+import {View} from 'react-native';
 import PropTypes from 'prop-types';
 import SwitchSelector from 'react-native-switch-selector';
 import config from './../utils/config'
-import translations from './../utils/translations'
 import {getTranslation} from './../utils/functions';
 
 class TextSwitchSelector extends PureComponent {
@@ -69,12 +68,6 @@ class TextSwitchSelector extends PureComponent {
         this.props.onChange(selectedValueIndex, this.props.selectedItemIndexForTextSwitchSelector)
     }
 }
-
-// Create style outside the class, or for components that will be used by other components (buttons),
-// make a global style in the config directory
-const style = StyleSheet.create({
-
-});
 
 TextSwitchSelector.propTypes = {
     selectedItem: PropTypes.bool.isRequired,

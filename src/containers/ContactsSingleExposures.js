@@ -7,23 +7,22 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
-import {Animated, StyleSheet, InteractionManager, ScrollView, View, Text, FlatList} from 'react-native';
-import {calculateDimension} from './../utils/functions';
+import {Animated, FlatList, InteractionManager, ScrollView, StyleSheet, Text, View} from 'react-native';
+import {calculateDimension, computeFullName, getTranslation} from './../utils/functions';
 import {connect} from "react-redux";
-import {getTranslation, computeFullName} from './../utils/functions';
-import {bindActionCreators} from "redux";
 import styles from './../styles';
 import ElevatedView from 'react-native-elevated-view';
 import {LoaderScreen} from 'react-native-ui-lib';
 import GeneralListItem from '../components/GeneralListItem';
 import Ripple from 'react-native-material-ripple';
-import moment from 'moment';
+import moment from 'moment/min/moment.min';
 import translations from './../utils/translations';
 import ExposureContainer from '../containers/ExposureContainer';
 import get from 'lodash/get';
 import TopContainerButtons from "./../components/TopContainerButtons";
 import PermissionComponent from './../components/PermissionComponent';
 import constants from './../utils/constants';
+import config from './../utils/config';
 
 const AnimatedFlatList = Animated.createAnimatedComponent(FlatList);
 
@@ -38,10 +37,6 @@ class ContactsSingleExposures extends Component {
     }
 
     // Please add here the react lifecycle methods that you need
-    // shouldComponentUpdate(nextProps, nextState) {
-    //     // console.log("NextPropsIndex ContactsSingleExposures: ", nextProps.activeIndex, this.props.activeIndex);
-    //     return nextProps.activeIndex === 2;
-    // }
 
     componentDidMount() {
         InteractionManager.runAfterInteractions(() => {
@@ -69,7 +64,18 @@ class ContactsSingleExposures extends Component {
             )
         }
 
-        // console.log('ContactsSingleContainer render Exposures');
+        let permissionsList = [
+            constants.PERMISSIONS_CONTACT.contactAll
+        ];
+        if (this.props.isNew) {
+            permissionsList.push(
+                constants.PERMISSIONS_CONTACT.contactCreate
+            )
+        } else {
+            permissionsList.push(
+                constants.PERMISSIONS_CONTACT.contactModify
+            )
+        }
 
         return (
             <ElevatedView elevation={3} style={[style.container]}>
@@ -89,11 +95,7 @@ class ContactsSingleExposures extends Component {
                                 onPressPreviousButton={this.handleBackButton}
                             />
                         )}
-                        permissionsList={[
-                            constants.PERMISSIONS_CONTACT.contactAll,
-                            constants.PERMISSIONS_CONTACT.contactCreate,
-                            constants.PERMISSIONS_CONTACT.contactModify
-                        ]}
+                        permissionsList={permissionsList}
                     />
 
                 </View>
@@ -176,12 +178,6 @@ class ContactsSingleExposures extends Component {
                         fontFamily: 'Roboto-Medium',
                         fontSize: 12
                     }
-                    // {
-                    //     marginRight: calculateDimension(14, false, this.props.screenSize),
-                    //     color: styles.missedRedColor,
-                    //     fontFamily: 'Roboto-Medium',
-                    //     fontSize: 12
-                    // }
                 ]}
                 onPressArray={[
                     () => {this.props.onPressEditExposure(relation.item, relation.index)}
@@ -235,20 +231,6 @@ class ContactsSingleExposures extends Component {
         let relationshipData = get(relation, 'relationshipData');
         let caseData = get(relation, 'caseData');
 
-        // let person = relation && relation.persons && relation.persons.filter((e) => {return e.id !== extractIdFromPouchId(this.props.contact._id, 'person')})[0];
-
-        // let caseName = '';
-        //
-        // if (person.type === config.personTypes.cases ) {
-        //     if (this.props.cases) {
-        //         let aux = this.props.cases.filter((e) => {return extractIdFromPouchId(e._id, 'person')  === person.id})[0];
-        //         caseName = (aux && aux.firstName ? (aux.firstName + ' ') : '') + (aux && aux.lastName ? aux.lastName : '');
-        //     }
-        // } else {
-        //     let aux = this.props.events.filter((e) => {return extractIdFromPouchId(e._id, 'person') === person.id})[0];
-        //     caseName = aux && aux.name ? aux.name : '';
-        // }
-
         return {title: computeFullName(caseData), primaryText: moment.utc(relationshipData.contactDate).format("YYYY-MM-DD").toString(), secondaryText: getTranslation(relationshipData.certaintyLevelId, this.props.translation)};
     };
 
@@ -289,18 +271,10 @@ const style = StyleSheet.create({
 
 function mapStateToProps(state) {
     return {
-        screenSize: state.app.screenSize,
-        contacts: state.contacts,
-        cases: state.exposure,
-        events: state.events,
-        translation: state.app.translation,
-        role: state.role
+        screenSize: get(state, 'app.screenSize', config),
+        translation: get(state, 'app.translation', []),
+        role: get(state, 'role', [])
     };
 }
 
-function matchDispatchProps(dispatch) {
-    return bindActionCreators({
-    }, dispatch);
-}
-
-export default connect(mapStateToProps, matchDispatchProps)(ContactsSingleExposures);
+export default connect(mapStateToProps)(ContactsSingleExposures);

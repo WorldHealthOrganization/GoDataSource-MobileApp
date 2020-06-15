@@ -1,4 +1,3 @@
-import url from './../utils/url';
 import {handleResponse} from './../utils/functions';
 
 export function getHelpItemsRequest(requestUrl, authorization, filter, callback) {

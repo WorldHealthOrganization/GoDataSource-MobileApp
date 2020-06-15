@@ -1,24 +1,20 @@
 /**
  * Created by florinpopa on 21/08/2018.
  */
-/**
- * Created by florinpopa on 25/07/2018.
- */
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
-import {Animated, StyleSheet, InteractionManager, ScrollView, View, Text, FlatList} from 'react-native';
-import {calculateDimension} from './../utils/functions';
+import {Animated, FlatList, InteractionManager, ScrollView, StyleSheet, Text, View} from 'react-native';
+import {calculateDimension, computeFullName, getTranslation} from './../utils/functions';
 import {connect} from "react-redux";
-import {getTranslation, computeFullName} from './../utils/functions';
-import {bindActionCreators} from "redux";
 import styles from './../styles';
 import ElevatedView from 'react-native-elevated-view';
 import {LoaderScreen} from 'react-native-ui-lib';
 import GeneralListItem from '../components/GeneralListItem';
 import Ripple from 'react-native-material-ripple';
-import moment from 'moment';
+import moment from 'moment/min/moment.min';
 import translations from './../utils/translations';
+import config from './../utils/config';
 import get from 'lodash/get';
 import TopContainerButtons from "../components/TopContainerButtons";
 import PermissionComponent from './../components/PermissionComponent';
@@ -56,7 +52,6 @@ class ContactsSingleExposures extends Component {
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
-        // console.log("### contact data: ", this.props.contact);
         if(!this.state.interactionComplete) {
             return (
                 <LoaderScreen overlay={true} backgroundColor={'white'}/>
@@ -87,33 +82,29 @@ class ContactsSingleExposures extends Component {
                 />
                 <PermissionComponent
                     render={() => (
-                        <ScrollView contentContainerStyle={{flexGrow: 1}}>
+                        <ScrollView >
                             <AnimatedFlatList
                                 data={get(this.props, 'relations', [])}
                                 renderItem={this.renderRelationship}
                                 keyExtractor={this.keyExtractor}
                                 ItemSeparatorComponent={this.renderSeparatorComponent}
-                                ListEmptyComponent={this.listEmptyComponent}
+                                // ListEmptyComponent={this.listEmptyComponent}
                                 style={[style.listViewStyle]}
                                 componentContainerStyle={style.componentContainerStyle}
                             />
+                            {
+                                this.listEmptyComponent()
+                            }
                             <View style={{height: 30}}/>
                         </ScrollView>
                     )}
-                    permissionsList={[constants.PERMISSIONS_RELATIONSHIP.relationshipAll, constants.PERMISSIONS_RELATIONSHIP.relationshipView]}
+                    permissionsList={[
+                        constants.PERMISSIONS_RELATIONSHIP.relationshipAll,
+                        constants.PERMISSIONS_RELATIONSHIP.relationshipView,
+                        constants.PERMISSIONS_CASE.caseListRelationshipExposures,
+                        constants.PERMISSIONS_CASE.caseListRelationshipContacts
+                    ]}
                 />
-                <ScrollView contentContainerStyle={{flexGrow: 1}}>
-                    <AnimatedFlatList
-                        data={get(this.props, 'relations', [])}
-                        renderItem={this.renderRelationship}
-                        keyExtractor={this.keyExtractor}
-                        ItemSeparatorComponent={this.renderSeparatorComponent}
-                        ListEmptyComponent={this.listEmptyComponent}
-                        style={[style.listViewStyle]}
-                        componentContainerStyle={style.componentContainerStyle}
-                    />
-                    <View style={{height: 30}}/>
-                </ScrollView>
             </ElevatedView>
 
         );
@@ -153,12 +144,6 @@ class ContactsSingleExposures extends Component {
                         fontFamily: 'Roboto-Medium',
                         fontSize: 12
                     }
-                    // {
-                    //     marginRight: calculateDimension(14, false, this.props.screenSize),
-                    //     color: styles.missedRedColor,
-                    //     fontFamily: 'Roboto-Medium',
-                    //     fontSize: 12
-                    // }
                 ]}
                 onPressArray={[
                     () => {this.props.onPressEditExposure(relation.item, relation.index)}
@@ -216,9 +201,10 @@ class ContactsSingleExposures extends Component {
             screen: "ExposureScreen",
             animated: true,
             passProps: {
-                contact: null,
-                type: 'Contact',
+                case: this.props.case,
+                type: 'Case',
                 saveExposure: this.props.saveExposure,
+                refreshRelations: this.props.refreshRelations
             }
         })
     };
@@ -234,32 +220,24 @@ const style = StyleSheet.create({
         borderRadius: 2
     },
     containerContent: {
-        flex: 1,
+        // flex: 1,
         backgroundColor: 'rgba(217, 217, 217, 0.5)'
     },
     separatorComponentStyle: {
         height: 8
     },
     listViewStyle: {
-        flex: 1,
+        // flex: 1,
         paddingTop: 10
     }
 });
 
 function mapStateToProps(state) {
     return {
-        screenSize: state.app.screenSize,
-        contacts: state.contacts,
-        cases: state.exposure,
-        events: state.events,
-        translation: state.app.translation,
-        role: state.role
+        screenSize: get(state, 'app.screenSize', config.designScreenSize),
+        translation: get(state, 'app.translation', []),
+        role: get(state, 'role', [])
     };
 }
 
-function matchDispatchProps(dispatch) {
-    return bindActionCreators({
-    }, dispatch);
-}
-
-export default connect(mapStateToProps, matchDispatchProps)(ContactsSingleExposures);
+export default connect(mapStateToProps)(ContactsSingleExposures);

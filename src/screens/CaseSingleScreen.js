@@ -3,9 +3,9 @@
  */
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
-import React, { Component } from 'react';
-import { View, Alert, StyleSheet, Animated, Platform, Dimensions, BackHandler, Keyboard } from 'react-native';
-import { TabBar, TabView, PagerPan, PagerAndroid, PagerScroll } from 'react-native-tab-view';
+import React, {Component} from 'react';
+import {Alert, Animated, BackHandler, Dimensions, Keyboard, Platform, StyleSheet, View} from 'react-native';
+import {PagerAndroid, PagerPan, PagerScroll, TabBar, TabView} from 'react-native-tab-view';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import NavBarCustom from './../components/NavBarCustom';
@@ -13,40 +13,36 @@ import Breadcrumb from './../components/Breadcrumb';
 import Ripple from 'react-native-material-ripple';
 import styles from './../styles';
 import config from './../utils/config';
-import _, { sortBy } from 'lodash';
+import _, {sortBy} from 'lodash';
 import CaseSinglePersonalContainer from './../containers/CaseSinglePersonalContainer';
 import CaseSingleAddressContainer from './../containers/CaseSingleAddressContainer';
 import CaseSingleInfectionContainer from './../containers/CaseSingleInfectionContainer';
 import CaseSingleInvestigationContainer from '../containers/CaseSingleInvestigationContainer';
 import CaseSingleExposureContainer from '../containers/CaseSingleExposureContainer';
-import { Icon } from 'react-native-material-ui';
-import { checkForNameDuplicatesRequest } from './../queries/cases';
+import {Icon} from 'react-native-material-ui';
+import {checkForNameDuplicatesRequest} from './../queries/cases';
+import {addCase, getCaseAndExposuresById, getRelationsForCase, updateCase} from './../actions/cases';
+import {saveSelectedScreen} from "../actions/app";
 import {
-    addCase,
-    updateCase,
-    getCaseAndExposuresById,
-    getRelationsForCase
-} from './../actions/cases';
-import { saveSelectedScreen } from "../actions/app";
-import {
-    updateRequiredFields,
-    extractIdFromPouchId,
-    navigation,
-    getTranslation,
     calculateDimension,
-    mapAnswers,
-    reMapAnswers,
     checkRequiredQuestions,
-    extractAllQuestions,
+    computeFullName,
     createDate,
-    computeFullName
+    extractAllQuestions,
+    extractIdFromPouchId,
+    getTranslation,
+    mapAnswers,
+    navigation,
+    reMapAnswers,
+    updateRequiredFields
 } from './../utils/functions';
-import moment from 'moment';
+import moment from 'moment/min/moment.min';
 import translations from './../utils/translations'
 import ElevatedView from 'react-native-elevated-view';
 import ViewHOC from './../components/ViewHOC';
 import cloneDeep from "lodash/cloneDeep";
 import lodashIntersect from "lodash/intersection";
+import lodashGet from 'lodash/get';
 import constants from "../utils/constants";
 import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
 
@@ -85,7 +81,7 @@ class CaseSingleScreen extends Component {
             saveFromEditPressed: false,
             routes: routes,
             index: _.get(this.props, 'index', 0),
-            case: this.props.isNew ? {
+            case: this.props.isNew && !this.props.forceNew ? {
                 outbreakId: this.props.user.activeOutbreakId,
                 riskLevel: '',
                 pregnancyStatus: '',
@@ -538,6 +534,7 @@ class CaseSingleScreen extends Component {
                         handleOnPressSave={this.handleOnPressSave}
                         isEditMode={this.state.isEditMode}
                         selectedExposure={this.props.singleCase}
+                        refreshRelations={this.refreshRelations}
                     />
                 );
                 break;
@@ -580,7 +577,7 @@ class CaseSingleScreen extends Component {
                         if ( this.state.case.addresses === undefined || this.state.case.addresses === null || this.state.case.addresses.length === 0 ||
                             (this.state.case.addresses.length > 0 && this.state.hasPlaceOfResidence === true)) {
                             if (this.checkIsolationOnsetDates()) {
-                                checkForNameDuplicatesRequest(this.props.isNew ? null : this.state.case._id, this.state.case.firstName, this.state.case.lastName, this.props.user.activeOutbreakId, (error, response) => {
+                                checkForNameDuplicatesRequest(_.get(this.state, 'case._id', null), this.state.case.firstName, this.state.case.lastName, this.props.user.activeOutbreakId, (error, response) => {
                                     if (error) {
                                         this.setState({
                                             loading: false
@@ -701,7 +698,7 @@ class CaseSingleScreen extends Component {
         caseClone.age = ageConfig.ageClone;
         caseClone.dob = ageConfig.dobClone;
         caseClone.questionnaireAnswers = reMapAnswers(_.cloneDeep(this.state.previousAnswers));
-        caseClone.questionnaireAnswers = this.filterUnasweredQuestions();
+        caseClone.questionnaireAnswers = this.filterUnasweredQuestions(caseClone.questionnaireAnswers);
         if (caseClone.outcomeId !== config.caseFieldsForHardCodeCheck.outcomeIdDeceasedValue) {
             caseClone.safeBurial = false;
             caseClone.dateOfBurial = null;
@@ -975,6 +972,12 @@ class CaseSingleScreen extends Component {
     };
 
     // Exposures handlers
+    handleSaveExposure = (exposure, isUpdate = false) => {
+        this.setState({
+            loading: true,
+            updateExposure: true
+        })
+    };
     handleOnPressEditExposure = (relation, index) => {
         _.set(relation, 'contactData.fullName', computeFullName(_.get(relation, 'contactData', null)));
         this.props.navigator.showModal({
@@ -1149,12 +1152,14 @@ class CaseSingleScreen extends Component {
     };
     onChangeSectionedDropDownDateRange = (selectedItems, index) => {
         // Here selectedItems is always an array with just one value and should pe mapped to the locationId field from the address from index
-        let dateRanges = _.cloneDeep(this.state.case.dateRanges);
-        dateRanges[index].locationId = extractIdFromPouchId(selectedItems['0']._id, 'location');
-        this.setState(prevState => ({
-            case: Object.assign({}, prevState.case, { dateRanges }),
-            isModified: true
-        }))
+        if (checkArrayAndLength(selectedItems)) {
+            let dateRanges = _.cloneDeep(this.state.case.dateRanges);
+            dateRanges[index].locationId = extractIdFromPouchId(selectedItems['0']._id, 'location');
+            this.setState(prevState => ({
+                case: Object.assign({}, prevState.case, {dateRanges}),
+                isModified: true
+            }))
+        }
     };
 
 
@@ -1272,7 +1277,9 @@ class CaseSingleScreen extends Component {
         for (let i = 0; i < config.caseSingleScreen.infection.length; i++) {
             for (let j = 0; j < config.caseSingleScreen.infection[i].fields.length; j++) {
                 if (config.caseSingleScreen.infection[i].fields[j].isRequired && !this.state.case[config.caseSingleScreen.infection[i].fields[j].id]) {
-                    requiredFields.push(getTranslation(config.caseSingleScreen.infection[i].fields[j].label, this.props.translation));
+                    if (!(config.caseSingleScreen.infection[i].fields[j].id === 'dateOfOnset' && _.get(this.props, 'isDateOfOnsetRequired', null) === false)) {
+                        requiredFields.push(getTranslation(config.caseSingleScreen.infection[i].fields[j].label, this.props.translation));
+                    }
                     // return false;
                 }
             }
@@ -1337,11 +1344,12 @@ class CaseSingleScreen extends Component {
         return true
     };
     checkIsolationOnsetDates = () => {
-        if (this.state.case && this.state.case.dateOfOnset && this.state.case.isolationDates && Array.isArray(this.state.case.isolationDates) && this.state.case.isolationDates.length > 0) {
-            for (let i = 0; i < this.state.case.isolationDates.length; i++) {
+        if (lodashGet(this.state, 'case.dateOfOnset', null) !== null && checkArrayAndLength(lodashGet(this.state, 'case.dateRanges', null))) {
+            let isolationDates = this.state.case.dateRanges.filter((e) => {return e.typeId === '﻿LNG_REFERENCE_DATA_CATEGORY_PERSON_DATE_TYPE_ISOLATION'});
+            for (let i = 0; i < isolationDates.length; i++) {
                 for (let j = 0; j < config.caseSingleScreen.isolationDate.fields.length; j++) {
-                    if (this.state.case.isolationDates[i][config.caseSingleScreen.isolationDate.fields[j].id]) {
-                        if (moment(this.state.case.isolationDates[i][config.caseSingleScreen.isolationDate.fields[j].id]).format('YYYY-MM-DD') < moment(this.state.case.dateOfOnset).format('YYYY-MM-DD')) {
+                    if (isolationDates[i][config.caseSingleScreen.isolationDate.fields[j].id]) {
+                        if (moment(isolationDates[i][config.caseSingleScreen.isolationDate.fields[j].id]).format('YYYY-MM-DD') < moment(this.state.case.dateOfOnset).format('YYYY-MM-DD')) {
                             return false;
                         }
                     }
@@ -1815,12 +1823,15 @@ class CaseSingleScreen extends Component {
             if (!questionnaireAnswers[parentId]) {
                 questionnaireAnswers[parentId] = [];
             }
-            if (questionnaireAnswers[parentId] && Array.isArray(questionnaireAnswers[parentId]) && questionnaireAnswers[parentId].length > 0 && questionnaireAnswers[parentId][0]) {
+            if (lodashGet(questionnaireAnswers, `[${parentId}][0]`, null) !== null) {
                 if(!questionnaireAnswers[parentId][0].hasOwnProperty("subAnswers")){
                     questionnaireAnswers[parentId][0] = Object.assign({}, questionnaireAnswers[parentId][0],{ subAnswers: {}});
                 }
                 if (typeof questionnaireAnswers[parentId][0].subAnswers === "object" && Object.keys(questionnaireAnswers[parentId][0].subAnswers).length === 0) {
                     questionnaireAnswers[parentId][0].subAnswers = {};
+                }
+                if (!Array.isArray(questionnaireAnswers[parentId][0].subAnswers[id])) {
+                    questionnaireAnswers[parentId][0].subAnswers[id] = [];
                 }
                 questionnaireAnswers[parentId][0].subAnswers[id][0] = value;
             }
@@ -1855,6 +1866,10 @@ class CaseSingleScreen extends Component {
                 if (!questionnaireAnswers[parentId][0].subAnswers[id]) {
                     questionnaireAnswers[parentId][0].subAnswers[id] = [];
                 }
+                if (lodashGet(value, 'subAnswers', null) !== null) {
+                    questionnaireAnswers[parentId][0].subAnswers = Object.assign({}, questionnaireAnswers[parentId][0].subAnswers, value.subAnswers);
+                    delete value.subAnswers;
+                }
                 questionnaireAnswers[parentId][0].subAnswers[id][0] = value;
             }
         } else {
@@ -1885,6 +1900,10 @@ class CaseSingleScreen extends Component {
                 }
                 if (!questionnaireAnswers[parentId][0].subAnswers[id]) {
                     questionnaireAnswers[parentId][0].subAnswers[id] = [];
+                }
+                if (lodashGet(value, 'subAnswers', null) !== null) {
+                    questionnaireAnswers[parentId][0].subAnswers = Object.assign({}, questionnaireAnswers[parentId][0].subAnswers, value.subAnswers);
+                    delete value.subAnswers;
                 }
                 questionnaireAnswers[parentId][0].subAnswers[id][0] = value;
             }
@@ -2045,8 +2064,8 @@ class CaseSingleScreen extends Component {
         }
         return canSave;
     };
-    filterUnasweredQuestions = () => {
-        let previousAnswersClone = _.cloneDeep(this.state.previousAnswers);
+    filterUnasweredQuestions = (previousAnswersClone) => {
+        // let previousAnswersClone = _.cloneDeep(this.state.previousAnswers);
         let sortedQuestions = sortBy(cloneDeep(this.props.caseInvestigationQuestions), ['order', 'variable']);
         sortedQuestions = extractAllQuestions(sortedQuestions, this.state.previousAnswers, 0);
         if( Array.isArray(sortedQuestions) && sortedQuestions.length > 0) {
@@ -2099,13 +2118,13 @@ const style = StyleSheet.create({
 
 function mapStateToProps(state) {
     return {
-        user: state.user,
-        screenSize: state.app.screenSize,
-        selectedScreen: state.app.selectedScreen,
-        errors: state.errors,
-        caseInvestigationQuestions: state.outbreak.caseInvestigationTemplate,
-        translation: state.app.translation,
-        role: state.role
+        user: lodashGet(state, 'user', {activeOutbreakId: null}),
+        screenSize: lodashGet(state, 'app.screenSize', config.designScreenSize),
+        selectedScreen: lodashGet(state, 'app.selectedScreen', 0),
+        caseInvestigationQuestions: lodashGet(state, 'outbreak.caseInvestigationTemplate', null),
+        translation: lodashGet(state, 'app.translation', []),
+        role: lodashGet(state, 'role', []),
+        isDateOfOnsetRequired: _.get(state, 'outbreak.isDateOfOnsetRequired', null)
     };
 }
 function matchDispatchProps(dispatch) {

@@ -4,8 +4,8 @@
 import errorTypes from './errorTypes';
 import config from './config';
 import RNFetchBlobFS from 'rn-fetch-blob/fs';
-import {zip, unzip} from 'react-native-zip-archive';
-import {updateFileInDatabase, processBulkDocs} from './../queries/database';
+import {unzip, zip} from 'react-native-zip-archive';
+import {processBulkDocs, updateFileInDatabase} from './../queries/database';
 import {setSyncState} from './../actions/app';
 import {NativeModules} from 'react-native';
 import uuid from 'react-native-uuid';
@@ -15,9 +15,9 @@ import cloneDeep from 'lodash/cloneDeep';
 import groupBy from 'lodash/groupBy';
 import set from 'lodash/set';
 import defaultTranslations from './defaultTranslations'
-import {getSyncEncryptPassword, encrypt, decrypt} from './../utils/encryption';
+import {decrypt, encrypt, getSyncEncryptPassword} from './../utils/encryption';
 import {extractLocations} from './../actions/locations';
-import moment from 'moment';
+import moment from 'moment/min/moment.min';
 import {checkArrayAndLength} from './typeCheckingFunctions';
 import {executeQuery, insertOrUpdate} from './../queries/sqlTools/helperMethods';
 import translations from "./translations";
@@ -34,12 +34,17 @@ export function handleResponse(response) {
     }
 
     return response.json().then(response => {
-        if (response.error && response.error.message && (typeof response.error.message === 'string')) {
+        if (response.error) {
 
             // TODO ERROR HANDLING
+            if (response.error.message && (typeof response.error.message === 'string')) {
+                throw new Error(response.error.message);
+            } else {
+                throw new Error(JSON.stringify(response.error));
+            }
 
         }
-        throw new Error(errorTypes.UNKNOWN_ERROR);
+        throw new Error(errorTypes.UNKNOWN_ERROR.message);
     });
 }
 
@@ -54,10 +59,13 @@ export function handleResponseFromRNFetchBlob(response) {
             // Manage errors
             response.json()
                 .then((parsedError) => {
-                    reject({message: get(parsedError, 'error.message', 'Unknown Error')});
+                    reject({message: get(parsedError, 'error.message', JSON.stringify(parsedError))});
                 })
                 .catch((errorParseError) => {
-                    reject({message: 'Unknown Error'});
+                    if (status) {
+                        reject ({message: `The mobile received the status ${status} from the API but the error could not be parsed`});
+                    }
+                    reject({message: typeof errorParseError === 'string' ? errorParseError : JSON.stringify(errorParseError)});
                 })
         }
     })
@@ -340,6 +348,7 @@ export function processFilesSql(path, table, totalNumberOfFiles, dispatch, encry
         .then((data) => insertOrUpdate('common', table, data, true))
         .then((results) => {
             // console.log('Finished syncing: ', results);
+            results = null;
             let numberOfFilesProcessedAux = getNumberOfFilesProcessed();
             numberOfFilesProcessedAux += 1;
             setNumberOfFilesProcessed(numberOfFilesProcessedAux);
@@ -681,20 +690,66 @@ export function createName(type, firstName, lastName) {
     }
 }
 
+export function mapLocations (locationList) {
+    // let startTime = new Date().getTime();
+
+    // locationList = locationList.map((e) => Object.assign({}, e, {_id: extractIdFromPouchId(e._id, 'location')}));
+    // the resulted tree
+    const rootItems = [];
+
+    // stores all already processed items with their ids as the keys so we can search quick
+    const lookup = {};
+
+    for (let i=0; i<locationList.length; i++) {
+        const locationId = extractIdFromPouchId(locationList[i]._id, 'location');
+        const locationParentId = locationList[i].parentLocationId;
+
+        // check if location already exists in the lookup table
+        if (!lookup.hasOwnProperty(locationId)) {
+            lookup[locationId] = {children: []};
+        }
+
+        // add current's item data to the lookup
+        lookup[locationId] = Object.assign({}, locationList[i], {children: lookup[locationId].children});
+
+        const TreeItem = lookup[locationId];
+
+        if (locationParentId === null || locationParentId === undefined || locationParentId === '') {
+            // is a root item
+            rootItems.push(TreeItem);
+        } else {
+            // has a parent
+
+            // look if the parent already exists in the lookup table
+            if (!lookup.hasOwnProperty(locationParentId)) {
+                // parent is not yet there so add preliminary data
+                lookup[locationParentId] = {children: []};
+            }
+
+            lookup[locationParentId].children.push(TreeItem);
+        }
+    }
+
+
+    // console.log('Time for processing locations new: ', new Date().getTime() - startTime);
+    return rootItems;
+}
+
 // Map locations algorithm
 // 1. sort locations by geographicalLevelId desc
 // 2. filter locations that don't have geographicalLevelId
 // 3. for each level starting from the second to last, add them to the children
 // the new array will be the array that will be searched next
-export function mapLocations(locationList) {
+export function mapLocationsOld (locationList) {
+    let startTime = new Date().getTime();
     // start with the roots
     let sortedArrays = groupBy(locationList, 'geographicalLevelId');
     // delete undefined geographicalLevelId
     delete sortedArrays['undefined'];
     // Get sorted keys
-    let allKeys = Object.keys(sortedArrays).map((e) => {return e.split('_')[e.split('_').length - 1]}).sort((a, b) => {return b-a});
+    let allKeys = Object.keys(sortedArrays).filter((e) => {return e.includes('LNG_REFERENCE_DATA_CATEGORY_LOCATION_GEOGRAPHICAL_LEVEL_ADMIN_LEVEL_')}).map((e) => {return e.split('_')[e.split('_').length - 1]}).sort((a, b) => {return b-a});
 
-    let currentTree = sortedArrays[`LNG_REFERENCE_DATA_CATEGORY_LOCATION_GEOGRAPHICAL_LEVEL_ADMIN_LEVEL_${allKeys[0]}`];
+    let currentTree = sortedArrays[`LNG_REFERENCE_DATA_CATEGORY_LOCATION_GEOGRAPHICAL_LEVEL_ADMIN_LEVEL_${allKeys[0]}`] || [];
     for (let levelIndex=1; levelIndex<allKeys.length; levelIndex++) {
         currentTree = groupBy(currentTree, 'parentLocationId');
         let currentLevelTree = [];
@@ -708,14 +763,19 @@ export function mapLocations(locationList) {
         }
         currentTree = currentLevelTree.slice();
     }
+
+    console.log('Time for processing locations old: ', new Date().getTime() - startTime);
     return currentTree;
 }
 
 
-//recursively functions for mapping questionCard questions (followUps and Cases)
+//recursively functions for mapping questionCard questions (followUps and Cases )
 // item = {questionId1: [{date1, value1, subAnswers1}, {date2, value2}], questionId2: [{date: null, value1}]}
 export function extractAllQuestions (questions, item, index) {
     if (questions && Array.isArray(questions) && questions.length > 0) {
+        // First filter for inactive questions
+        questions = questions.filter((e) => !e.inactive || e.inactive === null || e.inactive === false || e.inactive === undefined);
+
         for (let i=0; i<questions.length; i++) {
             if (questions[i].additionalQuestions) {
                 delete questions[i].additionalQuestions;
@@ -772,8 +832,11 @@ export function extractQuestionsRecursively (questions, item) {
     let returnedQuestions = [];
 
     if (questions && Array.isArray(questions) && questions.length > 0) {
+        // First filter for inactive questions
+        questions = questions.filter((e) => !e.inactive || e.inactive === null || e.inactive === false || e.inactive === undefined);
+
         for (let i = 0; i < questions.length; i++) {
-            // First add every question
+            // Add every question
             returnedQuestions.push(questions[i]);
             if (questions[i] && questions[i].answerType && (questions[i].answerType === "LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_SINGLE_ANSWER" || questions[i].answerType === "LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_MULTIPLE_ANSWERS") && questions[i].answers && Array.isArray(questions[i].answers) && questions[i].answers.length > 0) {
                 // For every answer check if the user answered that question and then proceed with the showing
@@ -883,6 +946,21 @@ function extractQuestions(questions) {
 
 export function reMapAnswers(answers) {
     let returnedAnswers = answers;
+    // Map to flat structure
+    for (let questionId in returnedAnswers) {
+        for (let elem of returnedAnswers[questionId]) {
+            if (elem.subAnswers) {
+                for (let subAnswerKey in elem.subAnswers) {
+                    if (returnedAnswers[subAnswerKey]) {
+                        returnedAnswers[subAnswerKey] = returnedAnswers[subAnswerKey].concat(elem.subAnswers[subAnswerKey]);
+                    } else {
+                        returnedAnswers[subAnswerKey] = elem.subAnswers[subAnswerKey];
+                    }
+                }
+            }
+        }
+    }
+
     // Sort each returnedAnswer by date descending
     for(let questionId in returnedAnswers) {
         returnedAnswers[questionId].sort((a, b) => {
@@ -932,6 +1010,9 @@ export function checkRequiredQuestions(questions, previousAnswers) {
 }
 
 export function getTranslation (value, allTransactions) {
+    if (!value) {
+        return '';
+    }
     if (!getTranslation.cache) {
         getTranslation.cache = {}
     }
@@ -957,7 +1038,7 @@ export function getTranslation (value, allTransactions) {
         } else if (defaultTranslations[`${value}`] !== undefined && defaultTranslations[`${value}`] !== null){
             valueToBeReturned = defaultTranslations[`${value}`]
         } else {
-            valueToBeReturned = ''
+            valueToBeReturned = value;
         }
     }
     getTranslation.cache[key] = valueToBeReturned;
@@ -1243,11 +1324,22 @@ export function calcDateDiff(startdate, enddate) {
 export function generateTeamId (contactAddress, teams, locationsTree) {
     let start = new Date().getTime();
     let currentAddress = contactAddress;
+    if (!checkArrayAndLength(teams)) {
+        return null;
+    }
+
+    // Contact doesn't have an address or there aren't any locations
+    // Pick a random team from the user's teams
+    if (!checkArrayAndLength(contactAddress) || !checkArrayAndLength(locationsTree)) {
+        let index = Math.floor(Math.random() * Math.floor(teams.length));
+        return get(teams, `[${index}].teamId`, null);
+    }
+
     if (checkArrayAndLength(contactAddress)) {
         currentAddress = extractMainAddress(contactAddress);
     }
 
-    let teamId = computeAllTeamsForLocations(teams, locationsTree, [], currentAddress.locationId);
+    let teamId = computeAllTeamsForLocations(teams, locationsTree, [], currentAddress.locationId, null);
 
     console.log('Computed teamId in: ', new Date().getTime() - start);
     return teamId;
@@ -1255,8 +1347,10 @@ export function generateTeamId (contactAddress, teams, locationsTree) {
 
 // Warning: this code makes an assumption that the user will be a member of a very few teams and that each team will have few locations assigned
 // This will have poor performance for large number of teams with large number of locations for each
-export function computeAllTeamsForLocations(teams, locationsTree, teamsToBeAttachedToAllLocations, followUpLocationId) {
-    let teamId = null;
+export function computeAllTeamsForLocations(teams, locationsTree, teamsToBeAttachedToAllLocations, followUpLocationId, teamId) {
+    if (teamId) {
+        return teamId
+    }
 
     if (!checkArrayAndLength(teams) || !checkArrayAndLength(locationsTree) || !followUpLocationId) {
         return teamId;
@@ -1267,10 +1361,12 @@ export function computeAllTeamsForLocations(teams, locationsTree, teamsToBeAttac
             return e.locationIds.includes(extractIdFromPouchId(locationsTree[i]._id, 'location'));
         }).map((e) => {return extractIdFromPouchId(e._id, 'team')});
         if (checkArrayAndLength(teamsToBeAdded)) {
-            teamsToBeAttachedToAllLocations = teamsToBeAttachedToAllLocations.concat(teamsToBeAdded);
+            // Add the new teams at the beginning so that the first ones are the ones closer to the contact's address
+            teamsToBeAttachedToAllLocations = teamsToBeAdded.concat(teamsToBeAttachedToAllLocations);
         }
         if (extractIdFromPouchId(locationsTree[i]._id, 'location') === followUpLocationId) {
             if (checkArrayAndLength(teamsToBeAttachedToAllLocations)) {
+                // Check first if one of the user's teams is here
                 teamId = get(teamsToBeAttachedToAllLocations, `[0]`, null);
             }
             return teamId;
@@ -1279,7 +1375,7 @@ export function computeAllTeamsForLocations(teams, locationsTree, teamsToBeAttac
             set(locationsTree, `[${i}].teamsResponsible`, teamsToBeAttachedToAllLocations);
         }
         if (checkArrayAndLength(get(locationsTree, `[${i}].children`, []))) {
-            teamId = computeAllTeamsForLocations(teams, get(locationsTree, `[${i}].children`, []), teamsToBeAttachedToAllLocations, followUpLocationId);
+            teamId = computeAllTeamsForLocations(teams, get(locationsTree, `[${i}].children`, []), teamsToBeAttachedToAllLocations, followUpLocationId, teamId);
         }
     }
 

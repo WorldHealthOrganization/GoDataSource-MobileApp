@@ -1,19 +1,14 @@
 /**
  * Created by florinpopa on 16/07/2018.
  */
-import React, {PureComponent} from 'react';
-import {TextInput, View, Text, StyleSheet, Platform, InteractionManager} from 'react-native';
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
-import {ListItem, Icon} from 'react-native-material-ui';
+import React, {PureComponent} from 'react';
+import {InteractionManager, Platform, StyleSheet, Text, View} from 'react-native';
+import {Icon} from 'react-native-material-ui';
 import {calculateDimension, getTranslation} from './../utils/functions';
-import config from './../utils/config';
-import CalendarPicker from './CalendarPicker';
-import Calendar from "react-native-calendars/src/calendar/index";
 import {connect} from "react-redux";
-import {bindActionCreators} from "redux";
 import Ripple from 'react-native-material-ripple';
-import translations from './../utils/translations';
 import ElevatedView from 'react-native-elevated-view';
 import styles from './../styles';
 
@@ -143,9 +138,4 @@ function mapStateToProps(state) {
     };
 }
 
-function matchDispatchProps(dispatch) {
-    return bindActionCreators({
-    }, dispatch);
-}
-
-export default connect(mapStateToProps, matchDispatchProps)(NavBarCustom);
+export default connect(mapStateToProps)(NavBarCustom);

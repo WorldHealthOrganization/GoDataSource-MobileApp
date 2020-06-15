@@ -5,10 +5,10 @@ import { combineReducers } from 'redux';
 import app from './app';
 import user from './user';
 import outbreak from './outbreak';
-import cases from './cases';
+// import cases from './cases';
 import followUps from './followUps';
-import contacts from './contacts';
-import events from './events';
+// import contacts from './contacts';
+// import events from './events';
 import errors from './errors';
 import referenceData from './referenceData';
 import locations from './locations';
@@ -17,17 +17,17 @@ import helpCategory from './helpCategory';
 import helpItem from './helpItem';
 import clusters from './clusters';
 import teams from './teams';
-import exposure from './exposure';
+// import exposure from './exposure';
 
 const allReducers = combineReducers({
     app,
     user,
     outbreak,
-    cases,
+    // cases,
     followUps,
     teams,
-    contacts,
-    events,
+    // contacts,
+    // events,
     clusters,
     helpCategory,
     helpItem,
@@ -35,7 +35,7 @@ const allReducers = combineReducers({
     referenceData,
     locations,
     role,
-    exposure
+    // exposure
 });
 
 export default allReducers;

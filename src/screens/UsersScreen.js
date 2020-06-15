@@ -4,7 +4,7 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
-import {View, StyleSheet} from 'react-native';
+import {StyleSheet, View} from 'react-native';
 import {Icon} from 'react-native-material-ui';
 import styles from './../styles';
 import NavBarCustom from './../components/NavBarCustom';
@@ -19,8 +19,10 @@ import {setLoaderState} from './../actions/app';
 import AnimatedListView from './../components/AnimatedListView';
 import ViewHOC from './../components/ViewHOC';
 import translations from './../utils/translations';
+import config from './../utils/config';
 import {enhanceListWithGetData} from './../components/higherOrderComponents/withListData';
 import call from 'react-native-phone-call';
+import get from 'lodash/get';
 
 class UsersScreen extends Component {
 
@@ -182,10 +184,13 @@ const style = StyleSheet.create({
 
 function mapStateToProps(state) {
     return {
-        screenSize:     state.app.screenSize,
-        syncState:      state.app.syncState,
-        translation:    state.app.translation,
-        loaderState:    state.app.loaderState
+        screenSize:     get(state, 'app.screenSize', config.designScreenSize),
+        syncState:      get(state, 'app.syncState', null),
+        translation:    get(state, 'app.translation', []),
+        loaderState:    get(state, 'app.loaderState', false),
+        location:       get(state, 'locations.locationsList'),
+        teams:          get(state, 'teams', []),
+        user:           get(state, 'user', {activeOutbreakId: null})
     };
 }
 

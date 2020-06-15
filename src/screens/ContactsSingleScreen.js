@@ -3,42 +3,41 @@
  */
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
-import React, { Component } from 'react';
-import { View, StyleSheet, Dimensions, Animated, Alert, Platform, BackHandler, Keyboard } from 'react-native';
-import { Icon } from 'react-native-material-ui';
+import React, {Component} from 'react';
+import {Alert, Animated, BackHandler, Dimensions, Keyboard, Platform, StyleSheet, View} from 'react-native';
+import {Icon} from 'react-native-material-ui';
 import styles from './../styles';
 import NavBarCustom from './../components/NavBarCustom';
 import ViewHOC from './../components/ViewHOC';
 import config from './../utils/config';
-import { connect } from "react-redux";
-import { bindActionCreators } from "redux";
-import { TabBar, TabView, PagerScroll} from 'react-native-tab-view';
+import {connect} from "react-redux";
+import {bindActionCreators} from "redux";
+import {PagerScroll, TabBar, TabView} from 'react-native-tab-view';
 import ContactsSingleAddress from './../containers/ContactsSingleAddress';
 import ContactsSingleCalendar from './../containers/ContactsSingleCalendar';
 import ContactsSingleExposures from './../containers/ContactsSingleExposures';
 import ContactsSinglePersonal from './../containers/ContactsSinglePersonal';
 import ExposureScreen from './../screens/ExposureScreen';
 import Breadcrumb from './../components/Breadcrumb';
-import Menu, { MenuItem } from 'react-native-material-menu';
+import Menu, {MenuItem} from 'react-native-material-menu';
 import Ripple from 'react-native-material-ripple';
-import { updateFollowUpAndContact, addFollowUp } from './../actions/followUps';
-import {updateContact,  addContact, getExposuresForContact, checkForNameDuplicated} from './../actions/contacts';
-import { removeErrors } from './../actions/errors';
+import {addFollowUp, getFollowUpsForContactId, updateFollowUpAndContact} from './../actions/followUps';
+import {addContact, checkForNameDuplicated, getExposuresForContact, updateContact} from './../actions/contacts';
+import {removeErrors} from './../actions/errors';
 import DateTimePicker from 'react-native-modal-datetime-picker';
 import _ from 'lodash';
 import {
     calculateDimension,
-    extractIdFromPouchId,
-    updateRequiredFields,
-    navigation,
-    getTranslation,
+    computeFullName,
     createDate,
     daysSince,
-    computeFullName
+    extractIdFromPouchId,
+    getTranslation,
+    navigation,
+    updateRequiredFields
 } from './../utils/functions';
-import { getFollowUpsForContactId } from './../actions/followUps'
-import moment from 'moment'
-import translations from './../utils/translations'
+import moment from 'moment/min/moment.min';
+import translations from './../utils/translations';
 import ElevatedView from 'react-native-elevated-view';
 import AddFollowUpScreen from './AddFollowUpScreen';
 import {generateId, generateTeamId} from "../utils/functions";
@@ -393,13 +392,14 @@ class ContactsSingleScreen extends Component {
         let followUp = {
             _id: generateId(),
             statusId: config.followUpStatuses.notPerformed,
-            targeted: false,
+            targeted: true,
             date: date,
             fileType: 'followUp.json',
             outbreakId: this.props.user.activeOutbreakId,
             index: daysSince(_.get(this.state, 'contact.followUp.startDate', null), now) + 1,
-            teamId: generateTeamId(this.state.contact.addresses.slice(), this.props.teams, this.props.locations.slice()),
-            personId: extractIdFromPouchId(this.state.contact._id, 'person.json')
+            teamId: _.get(this.state, 'contact.followUpTeamId', null) !== null ? this.state.contact.followUpTeamId : generateTeamId(_.get(this.state, 'contact.addresses', []).slice(), this.props.teams, this.props.locations.slice()),
+            personId: extractIdFromPouchId(this.state.contact._id, 'person.json'),
+            address: _.get(this.state, 'contact.addresses', null) !== null ? this.state.contact.addresses.find((e) => e.typeId === translations.userResidenceAddress.userPlaceOfResidence) : null
         };
 
         followUp = updateRequiredFields(this.props.user.outbreakId, this.props.user._id, followUp, 'create', 'followUp.json');
@@ -652,7 +652,7 @@ class ContactsSingleScreen extends Component {
                         activeIndex={this.state.index}
                         handleOnPressSave={this.handleOnPressSave}
                         onPressPreviousButton={this.handleMoveToPrevieousScreenButton}
-
+                        isEditMode={this.state.isEditMode}
                         numberOfTabs={this.state.routes.length}
                         // onPressPreviousButton={this.handlePreviousPress}
                         onPressNextButton={this.handleMoveToNextScreenButton}
@@ -1888,15 +1888,12 @@ const style = StyleSheet.create({
 
 function mapStateToProps(state) {
     return {
-        teams: state.teams,
-        user: state.user,
-        role: state.role,
-        screenSize: state.app.screenSize,
-        followUps: state.followUps,
-        errors: state.errors,
-        contacts: state.contacts,
-        filter: state.app.filters,
-        translation: state.app.translation,
+        teams: _.get(state, 'teams', []),
+        user: _.get(state, 'user', null),
+        role: _.get(state, 'role', []),
+        screenSize: _.get(state, 'app.screenSize', config.designScreenSize),
+        filter: _.get(state, 'app.filters', null),
+        translation: _.get(state, 'app.translation', []),
         locations: _.get(state, 'locations.locations', []),
         periodOfFollowUp: _.get(state, 'outbreak.periodOfFollowUp', 1)
     };

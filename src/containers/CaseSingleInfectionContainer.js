@@ -3,12 +3,11 @@
  */
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
-import React, { Component } from 'react';
-import { View, Text, StyleSheet, Alert, ScrollView } from 'react-native';
-import { calculateDimension, getTranslation, extractIdFromPouchId, createDate } from './../utils/functions';
+import React, {Component} from 'react';
+import {Alert, ScrollView, StyleSheet, Text, View} from 'react-native';
+import {calculateDimension, createDate, extractIdFromPouchId, getTranslation} from './../utils/functions';
 import config from './../utils/config';
-import { connect } from "react-redux";
-import { bindActionCreators } from "redux";
+import {connect} from "react-redux";
 import styles from './../styles';
 import Ripple from 'react-native-material-ripple';
 import CardComponent from './../components/CardComponent';
@@ -243,6 +242,11 @@ class CaseSingleInfectionContainer extends Component {
         minimumDate = dateValidation.minimumDate;
         maximumDate = dateValidation.maximumDate;
 
+        // Check if date of onset is required
+        if (item.id === 'dateOfOnset' && _.get(this.props, 'isDateOfOnsetRequired', null) === false) {
+            item.isRequired = false;
+        }
+
         return (
             <CardComponent
                 item={item}
@@ -276,6 +280,7 @@ class CaseSingleInfectionContainer extends Component {
                 }
                 onFocus={this.handleOnFocus}
                 onBlur={this.handleOnBlur}
+                permissionsList={item.permissionsList}
             />
         )
     };
@@ -326,8 +331,9 @@ class CaseSingleInfectionContainer extends Component {
                 }
             } else if (item.objectType === 'DateRanges') {
                 if (this.props.case && this.props.case.dateRanges && Array.isArray(this.props.case.dateRanges) && this.props.case.dateRanges.length > 0 && this.props.case.dateRanges[cardIndex]) {
+                    maximumDate = new Date();
                     if (this.props.case.dateRanges[cardIndex].startDate !== null && item.id !== 'startDate') {
-                        minimumDate = this.props.case.dateRanges[cardIndex].startDate
+                        minimumDate = this.props.case.dateRanges[cardIndex].startDate;
                     }
                     if (this.props.case.dateRanges[cardIndex].endDate !== null && item.id !== 'endDate') {
                         maximumDate = this.props.case.dateRanges[cardIndex].endDate
@@ -358,57 +364,59 @@ class CaseSingleInfectionContainer extends Component {
     };
 
     computeDataForCasesSingleScreenDropdownInput = (item) => {
-        if (item.id === 'typeId' && item.objectType === 'DateRanges') {
-            return _.filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_PERSON_DATE_TYPE' })
-                .sort((a, b) => { return a.order - b.order; })
-                .map((o) => { return { value: getTranslation(o.value, this.props.translation), id: o.value } })
-        }
-        if (item.id === 'riskLevel') {
-            return _.filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId.includes("RISK_LEVEL") })
-                .sort((a, b) => { return a.order - b.order; })
-                .map((o) => { return { value: getTranslation(o.value, this.props.translation), id: o.value } })
-        }
-        if (item.id === 'gender') {
-            return _.filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_GENDER' })
-                .sort((a, b) => { return a.order - b.order; })
-                .map((o) => { return { label: getTranslation(o.value, this.props.translation), value: o.value } })
-        }
-        if (item.id === 'typeId') {
-            return _.filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_ADDRESS_TYPE' })
-                .sort((a, b) => { return a.order - b.order; })
-                .map((o) => { return { value: getTranslation(o.value, this.props.translation), id: o.value } })
-        }
-        if (item.id === 'classification') {
-            return _.filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_CASE_CLASSIFICATION' })
-                .sort((a, b) => { return a.order - b.order; })
-                .map((o) => { return { label: getTranslation(o.value, this.props.translation), value: o.value } })
-        }
-        if (item.id === 'outcomeId') {
-            return _.filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_OUTCOME' })
-                .sort((a, b) => { return a.order - b.order; })
-                .map((o) => { return { label: getTranslation(o.value, this.props.translation), value: o.value } })
-        }
-        if (item.id === 'type') {
-            return _.filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_DOCUMENT_TYPE' })
-                .sort((a, b) => { return a.order - b.order; })
-                .map((o) => { return { label: getTranslation(o.value, this.props.translation), value: o.value } })
-        }
-        if (item.id === 'occupation') {
-            return _.filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_OCCUPATION' })
-                .sort((a, b) => { return a.order - b.order; })
-                .map((o) => { return { value: getTranslation(o.value, this.props.translation), id: o.value } })
+        let categoryId = null;
+        switch(item.id) {
+            case 'typeId':
+                if (item.objectType === 'DateRanges') {
+                    categoryId = 'LNG_REFERENCE_DATA_CATEGORY_PERSON_DATE_TYPE';
+                } else {
+                    categoryId = 'LNG_REFERENCE_DATA_CATEGORY_ADDRESS_TYPE';
+                }
+                break;
+            case 'centerName':
+                if (item.objectType === 'DateRanges') {
+                    categoryId = 'LNG_REFERENCE_DATA_CATEGORY_CENTRE_NAME';
+                }
+                break;
+            case 'riskLevel':
+                categoryId = "LNG_REFERENCE_DATA_CATEGORY_RISK_LEVEL";
+                break;
+            case 'gender':
+                categoryId = 'LNG_REFERENCE_DATA_CATEGORY_GENDER';
+                break;
+            case 'classification':
+                categoryId = 'LNG_REFERENCE_DATA_CATEGORY_CASE_CLASSIFICATION';
+                break;
+            case 'outcomeId':
+                categoryId = 'LNG_REFERENCE_DATA_CATEGORY_OUTCOME';
+                break;
+            case 'type':
+                categoryId = 'LNG_REFERENCE_DATA_CATEGORY_DOCUMENT_TYPE';
+                break;
+            case 'occupation':
+                categoryId = 'LNG_REFERENCE_DATA_CATEGORY_OCCUPATION';
+                break;
+            case 'vaccine':
+                categoryId = 'LNG_REFERENCE_DATA_CATEGORY_VACCINE';
+                break;
+            case 'status':
+                categoryId = 'LNG_REFERENCE_DATA_CATEGORY_VACCINE_STATUS';
+                break;
+            default:
+                categoryId = null;
         }
 
-        // Vaccines data
-        if (item.id === 'vaccine') {
-            return _.filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_VACCINE' })
-                .sort((a, b) => { return a.order - b.order; })
-                .map((o) => { return { label: getTranslation(o.value, this.props.translation), value: o.value } })
-        }
-        if (item.id === 'status') {
-            return _.filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_VACCINE_STATUS' })
-                .sort((a, b) => { return a.order - b.order; })
-                .map((o) => { return { label: getTranslation(o.value, this.props.translation), value: o.value } })
+        if (categoryId) {
+            let returnedValue = _.filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId === categoryId })
+                .sort((a, b) => { return a.order - b.order; });
+            returnedValue = _.map(returnedValue, (o) => {
+                return { value: getTranslation(o.value, this.props.translation), id: o.value }
+            });
+                //.filter((o) => {return o.value !== ''});
+            return returnedValue;
+                // .map()
+        } else {
+            return [];
         }
     };
 
@@ -470,11 +478,6 @@ class CaseSingleInfectionContainer extends Component {
         // this.scrollCasesSingleInfection.props.scrollToPosition(0, 0, false)
         // this.scrollToInput(findNodeHandle(event.target))
     };
-
-    scrollToInput(reactNode) {
-        // Add a 'scroll' ref to your ScrollView
-        // this.scrollCasesSingleInfection.props.scrollToFocusedInput(reactNode)
-    };
 }
 
 // Create style outside the class, or for components that will be used by other components (buttons),
@@ -508,17 +511,13 @@ const style = StyleSheet.create({
 
 function mapStateToProps(state) {
     return {
-        screenSize: state.app.screenSize,
-        role: state.role,
-        translation: state.app.translation,
-        referenceData: state.referenceData,
+        screenSize: _.get(state, 'app.screenSize', config.designScreenSize),
+        role: _.get(state, 'role', []),
+        translation: _.get(state, 'app.translation', []),
+        referenceData: _.get(state, 'referenceData', []),
         locations: _.get(state, `locations.locations`, []),
+        isDateOfOnsetRequired: _.get(state, 'outbreak.isDateOfOnsetRequired', null)
     };
 }
 
-function matchDispatchProps(dispatch) {
-    return bindActionCreators({
-    }, dispatch);
-}
-
-export default connect(mapStateToProps, matchDispatchProps)(CaseSingleInfectionContainer);
+export default connect(mapStateToProps)(CaseSingleInfectionContainer);

@@ -5,7 +5,6 @@ import RNFetchBlob from 'rn-fetch-blob';
 import base64 from 'base-64';
 import {Platform} from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
-import {getSyncEncryptPassword} from './../utils/encryption';
 import {setSyncState} from './../actions/app';
 import DeviceInfo from 'react-native-device-info';
 import translations from './../utils/translations';
@@ -13,10 +12,9 @@ import {testApi, testApiPromise} from './testApi';
 import uniq from 'lodash/uniq';
 import get from 'lodash/get';
 import {getHelpItemsRequest} from './helpItem';
-import {handleResponseFromRNFetchBlob, createDate} from './../utils/functions';
-import moment from 'moment';
+import {createDate, handleResponseFromRNFetchBlob, handleResponse} from './../utils/functions';
 import {retriablePromise} from "../utils/typeCheckingFunctions";
-import constants  from './constants';
+import constants from './constants';
 
 export function getDatabaseSnapshotRequestNew(hubConfig, lastSyncDate, dispatch) {
     // hubConfiguration = {url: databaseName, clientId: JSON.stringify({name, url, clientId, clientSecret, encryptedData}), clientSecret: databasePass}
@@ -53,6 +51,15 @@ export function getDatabaseSnapshotRequestNew(hubConfig, lastSyncDate, dispatch)
             // Before starting a download, first test if the API responds
             dispatch(setSyncState({id: 'testApi', status: 'In progress'}));
             return testApiPromise(`${hubConfiguration.url}${constants.testApi}`, deviceInfo)
+                .catch((errorTestAPI) => {
+                    dispatch(setSyncState({
+                        id: 'testApi',
+                        name: `Test API`,
+                        status: 'Error',
+                        error: JSON.stringify(get(errorTestAPI, 'message', errorTestAPI))
+                    }));
+                    return Promise.reject({errorTestAPI, isAPIError: true});
+                })
         })
         .then((responseTestApi) => {
             // console.log('Response TestApi: ', responseTestApi);
@@ -63,32 +70,33 @@ export function getDatabaseSnapshotRequestNew(hubConfig, lastSyncDate, dispatch)
             return computeHelpItemsAndCategories(hubConfiguration, lastSyncDate)
         })
         .then((helpTranslations) => retriablePromise(RNFetchBlob.config({
-            timeout: (30 * 60 * 10 * 1000),
-            followRedirect: false,
-            fileCache: true,
-            path: `${dirs}/database.zip`
-        })
-            .fetch('POST', encodeURI(requestUrl), {
-                    'device-info': deviceInfo,
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                    'Authorization': 'Basic ' + base64.encode(`${hubConfiguration.clientId}:${hubConfiguration.clientSecret}`)
-                },
-                JSON.stringify({
-                    languageTokens: lastSyncDate ? helpTranslations : arrayOfTokens.concat(helpTranslations)
-                })
-            )
-            .progress({count: 500}, (received, total) => {
-                dispatch(setSyncState({
-                    id: 'downloadDatabase',
-                    name: `Downloading database\nReceived ${received} bytes`
-                }));
-                console.log(received, total)
+                timeout: (30 * 60 * 10 * 1000),
+                followRedirect: false,
+                fileCache: true,
+                path: `${dirs}/database.zip`
             })
-            .then((res) => {
-                return handleResponseFromRNFetchBlob(res)
-            }), 3)
-            .then((response) => Promise.resolve(databaseLocation)))
+                .fetch('POST', encodeURI(requestUrl), {
+                        'device-info': deviceInfo,
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'Authorization': 'Basic ' + base64.encode(`${hubConfiguration.clientId}:${hubConfiguration.clientSecret}`)
+                    },
+                    JSON.stringify({
+                        languageTokens: lastSyncDate ? helpTranslations : arrayOfTokens.concat(helpTranslations)
+                    })
+                )
+                .progress({count: 500}, (received, total) => {
+                    dispatch(setSyncState({
+                        id: 'downloadDatabase',
+                        name: `Downloading database\nReceived ${received} bytes`
+                    }));
+                    console.log(received, total)
+                })
+                .then((res) => {
+                    return handleResponseFromRNFetchBlob(res)
+                }), 3)
+                .then((response) => Promise.resolve(databaseLocation))
+        )
 }
 
 export function postDatabaseSnapshotRequest(internetCredentials, path) {

@@ -2,33 +2,38 @@
  * Created by florinpopa on 14/06/2018.
  */
 import {
-    ACTION_TYPE_ROOT_CHANGE,
-    ACTION_TYPE_SAVE_SCREEN_SIZE,
-    ACTION_TYPE_SAVE_SELECTED_SCREEN,
     ACTION_TYPE_ADD_FILTER_FOR_SCREEN,
     ACTION_TYPE_REMOVE_FILTER_FOR_SCREEN,
-    ACTION_TYPE_SAVE_TRANSLATION,
-    ACTION_TYPE_SAVE_HELP_CATEGORY,
+    ACTION_TYPE_ROOT_CHANGE,
+    ACTION_TYPE_SAVE_ACTIVE_DATABASE,
     ACTION_TYPE_SAVE_AVAILABLE_LANGUAGES,
     ACTION_TYPE_SAVE_HUB_CONFIGURATION,
-    ACTION_TYPE_SET_SYNC_STATE,
-    ACTION_TYPE_SAVE_GENERATED_FOLLOWUPS,
-    ACTION_TYPE_SET_LOGIN_STATE,
-    ACTION_TYPE_SAVE_ACTIVE_DATABASE,
+    ACTION_TYPE_SAVE_SCREEN_SIZE,
+    ACTION_TYPE_SAVE_SELECTED_SCREEN,
+    ACTION_TYPE_SAVE_TRANSLATION,
     ACTION_TYPE_SET_LOADER_STATE,
-    ACTION_TYPE_SAVE_HELP_ITEM
+    ACTION_TYPE_SET_LOGIN_STATE,
+    ACTION_TYPE_SET_SYNC_STATE
 } from './../utils/enums';
 import config from './../utils/config';
-import {Dimensions} from 'react-native';
-import {Platform} from 'react-native';
+import {Dimensions, Platform} from 'react-native';
 import {getAvailableLanguagesRequest, getTranslationRequest} from './../queries/translation';
-import {postDatabaseSnapshotRequest, getDatabaseSnapshotRequestNew} from './../requests/sync';
-import {setInternetCredentials, getInternetCredentials} from 'react-native-keychain';
-import {unzipFile, readDir} from './../utils/functions';
+import {getDatabaseSnapshotRequestNew, postDatabaseSnapshotRequest} from './../requests/sync';
+import {getInternetCredentials, setInternetCredentials} from 'react-native-keychain';
+import {
+    createDate,
+    createZipFileAtPath,
+    deleteFile,
+    getDataFromDatabaseFromFile,
+    getDataFromDatabaseFromFileSql,
+    processFilePouch,
+    processFilesSql,
+    readDir,
+    setNumberOfFilesProcessed,
+    unzipFile
+} from './../utils/functions';
 import RNFetchBlobFs from 'rn-fetch-blob/fs';
-import {deleteFile, getDataFromDatabaseFromFile, processFilePouch, processFilesSql} from './../utils/functions';
 import {createDatabase, getDatabase} from './../queries/database';
-import {setNumberOfFilesProcessed, createZipFileAtPath, createDate, getDataFromDatabaseFromFileSql} from './../utils/functions';
 import AsyncStorage from '@react-native-community/async-storage';
 import {getUserById} from './user';
 import get from 'lodash/get';
@@ -189,19 +194,19 @@ export function storeHubConfigurationNew(hubConfiguration) {
             .then(() => AsyncStorage.getItem(hubConfiguration.url))
             .then((lastSyncDate) => getDatabaseSnapshotRequestNew(hubConfiguration, lastSyncDate, dispatch))
             .then((databasePath) => {
-                dispatch(processFilesForSyncNew(null, databasePath, hubConfiguration, true, true, true));
+                dispatch(processFilesForSyncNew(null, databasePath, hubConfiguration, true, true, true, dispatch));
             })
             .catch((error) => {
                 console.log('Error while doing stuff: ', error);
-                dispatch(processFilesForSyncNew(error, null, hubConfiguration, true, true, true));
+                dispatch(processFilesForSyncNew(error, null, hubConfiguration, true, true, true, dispatch));
             })
     }
 }
 
-function processFilesForSyncNew(error, response, hubConfiguration, isFirstTime, syncSuccessful, forceBulk) {
-    return async function (dispatch) {
+async function processFilesForSyncNew(error, response, hubConfiguration, isFirstTime, syncSuccessful, forceBulk, dispatch) {
+    // return async function (dispatch) {
         let hubConfig = JSON.parse(hubConfiguration.clientId);
-        if (error) {
+        if (error && !error.isAPIError) {
             if (error === 'No data to export') {
                 dispatch(setSyncState({id: 'downloadDatabase', name: 'Download Database', status: error}));
             } else {
@@ -325,7 +330,7 @@ function processFilesForSyncNew(error, response, hubConfiguration, isFirstTime, 
                     }
                 })
         }
-    }
+    // }
 }
 
 function sortFiles (files) {
@@ -504,13 +509,13 @@ export function sendDatabaseToServer () {
                                 url: Platform.OS === 'ios' ? internetCredentialsGlobal.server : internetCredentialsGlobal.service,
                                 clientId: internetCredentialsGlobal.username,
                                 clientSecret: internetCredentialsGlobal.password
-                            }, null, true, false));
+                            }, null, true, false, dispatch));
                         })
                         .catch((errorGetDatabase) => {
                             if (errorGetDatabase === 'No data to export') {
                                 dispatch(setSyncState({id: 'getDataFromServer', status: 'No data to export'}));
                             } else {
-                                dispatch(setSyncState({id: 'getDataFromServer', status: 'Error', error: JSON.stringify(error)}));
+                                dispatch(setSyncState({id: 'getDataFromServer', status: 'Error', error: JSON.stringify(errorGetDatabase)}));
                             }
                         })
                 }
@@ -591,7 +596,7 @@ export function appInitialized(nativeEventEmitter) {
                                 try {
                                     let database = await createDatabase(server.replace(/\/|\.|\:/g, ''), databaseCredentials.password, false);
                                     if (database) {
-                                        dispatch(getUserById(loggedUser, null, false, nativeEventEmitter));
+                                        dispatch(getUserById(loggedUser, false));
                                     } else {
                                         console.log('Database does not exist');
                                         dispatch(changeAppRoot('config'));

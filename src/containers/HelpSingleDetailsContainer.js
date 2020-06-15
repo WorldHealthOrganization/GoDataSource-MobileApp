@@ -4,11 +4,11 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {PureComponent} from 'react';
-import {View, StyleSheet, ScrollView} from 'react-native';
+import {ScrollView, StyleSheet, View} from 'react-native';
 import {calculateDimension, getTranslation} from './../utils/functions';
 import config from './../utils/config';
 import {connect} from "react-redux";
-import {bindActionCreators} from "redux";
+import get from "lodash/get";
 import styles from './../styles';
 import CardComponent from './../components/CardComponent';
 import ElevatedView from 'react-native-elevated-view';
@@ -102,6 +102,7 @@ class HelpSingleDetailsContainer extends PureComponent {
                 helpItem={this.props.item}
                 value={value}
                 index={cardIndex}
+                permissionsList={item.permissionsList}
             />
         )
     };
@@ -142,15 +143,10 @@ const style = StyleSheet.create({
 
 function mapStateToProps(state) {
     return {
-        screenSize: state.app.screenSize,
-        role: state.role,
-        translation: state.app.translation,
+        screenSize: get(state, 'app.screenSize', config.designScreenSize),
+        role: get(state, 'role', []),
+        translation: get(state, 'app.translation', []),
     };
 }
 
-function matchDispatchProps(dispatch) {
-    return bindActionCreators({
-    }, dispatch);
-}
-
-export default connect(mapStateToProps, matchDispatchProps)(HelpSingleDetailsContainer);
+export default connect(mapStateToProps)(HelpSingleDetailsContainer);
