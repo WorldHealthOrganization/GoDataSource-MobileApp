@@ -25,6 +25,9 @@ import sqlConstants from './../queries/sqlTools/constants';
 
 // This method is used for handling server responses. Please add here any custom error handling
 export function handleResponse(response) {
+    if (!response || !response.status) {
+        throw new Error('No response');
+    }
     if (response.status === 200) {
         return response.json();
     }

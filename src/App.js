@@ -241,6 +241,8 @@ export default class App {
                                         } else {
                                             return callback();
                                         }
+                                    } else {
+                                        return callback();
                                     }
                                 })
                             } else {
