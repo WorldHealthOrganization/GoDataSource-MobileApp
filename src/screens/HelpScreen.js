@@ -156,18 +156,6 @@ class HelpScreen extends Component {
         }
         let filterText = filterNumbers === 0 ? `${getTranslation(translations.generalLabels.filterTitle, this.props.translation)}` : `${getTranslation(translations.generalLabels.filterTitle, this.props.translation)}(${filterNumbers})`;
 
-        if (this.props.errors && this.props.errors.type && this.props.errors.message) {
-            Alert.alert(this.props.errors.type, this.props.errors.message, [
-                {
-                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
-                    onPress: () => {
-                        props.removeErrors();
-                        state.loading = false;
-                    }
-                }
-            ])
-        }
-
         let helpItemClone = _.cloneDeep(this.props.helpItem);
         if (this.state.filter || this.state.filterFromFilterScreen) {
             helpItemClone = localSortHelpItem(helpItemClone, this.props.filter, this.state.filter, this.state.filterFromFilterScreen, this.props.translation)
