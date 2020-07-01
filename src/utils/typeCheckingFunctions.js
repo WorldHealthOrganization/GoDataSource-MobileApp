@@ -1,9 +1,13 @@
 import constants from './constants';
 import lodashIsObject from 'lodash/isObject';
-import lodashGet from 'lodash/get';
+import isFct from 'lodash/isFunction';
 
 export function isPromise(obj) {
     return !!obj && (typeof obj === 'object' || typeof obj === 'function') && typeof obj.then === 'function';
+}
+
+export function isFunction(fct) {
+    return fct && isFct(fct)
 }
 
 export function checkArrayAndLength(array) {
@@ -20,33 +24,34 @@ export function checkObject(object) {
 
 const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
 
+
 export async function retriablePromise (promise, numberOfRetries, timeout) {
+    // if (!isPromise(promise)) {
+    //     throw new Error('Wrong input function Promise');
+    // }
+    if (!checkInteger(numberOfRetries)) {
+        throw new Error('Wrong input function numberOfRetries');
+    }
+    if (numberOfRetries === 0) {
+        return Promise.reject('retries failed');
+    }
+    if (!checkInteger(timeout)) {
+        timeout = constants.TIMEOUT_FOR_FETCH_BLOB;
+    }
 
-        // if (!isPromise(promise)) {
-        //     throw new Error('Wrong input function Promise');
-        // }
-        if (!checkInteger(numberOfRetries)) {
-            throw new Error('Wrong input function numberOfRetries');
-        }
-        if (numberOfRetries === 0) {
-            return Promise.reject('retries failed');
-        }
-        if (!checkInteger(timeout)) {
-            timeout = constants.TIMEOUT_FOR_FETCH_BLOB;
-        }
+    try {
+        let response = isPromise(promise) ? await promise : await promise();
+        return Promise.resolve(response)
+    } catch (error) {
 
-        try {
-            let response = null;
-            if (isPromise(promise)) {
-                response = await promise;
-            } else {
-                response = await promise();
-            }
-            return Promise.resolve(response)
-        } catch(error) {
+        let {Platform} = require('react-native');
+
+        if (Platform.OS === 'ios') {
             await wait(timeout);
-            return retriablePromise(promise, numberOfRetries - 1, timeout);
         }
+
+        return retriablePromise(promise, numberOfRetries - 1, timeout);
+    }
 }
 
 export function fetchWitTimeout (url, config) {
