@@ -74,7 +74,7 @@ export function getDatabaseSnapshotRequestNew(hubConfig, lastSyncDate, dispatch)
                 followRedirect: false,
                 fileCache: true,
                 path: `${dirs}/database.zip`
-            }, 3, 500)
+            }, 3, 100)
                 .fetch('POST', encodeURI(requestUrl), {
                         'device-info': deviceInfo,
                         'Content-Type': 'application/json',

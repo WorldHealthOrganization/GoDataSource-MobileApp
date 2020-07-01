@@ -14,7 +14,7 @@ export function checkDeviceStatus(url, installationId, clientId, clientSecret, c
                 'Content-Type': 'application/json',
             },
             timeout: 2000
-        }),3, 500)
+        }),3, 100)
             .then((response) => {
                 return handleResponse(response);
             })
