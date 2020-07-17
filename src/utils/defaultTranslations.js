@@ -11,6 +11,9 @@ export default {
     'LNG_NAVIGATION_DRAWER_LOGOUT': 'Logout',
     'LNG_LAYOUT_MENU_ITEM_HELP_LABEL': 'Help & support',
 
+    // TODO add to backend
+    'LNG_NAVIGATION_DRAWER_ADD_LANGUAGE_PACKS': 'Add languagePacks',
+
 
     //addFollowUpScreen
     'LNG_ADD_FOLLOW_UP_MODAL_TITLE': 'Add follow-up',
@@ -493,5 +496,12 @@ export default {
 
     'LNG_FOLLOW_UP_AGENDA_NO_FOLLOW_UPS_FOR_DATE': 'No follow-ups to show for this day',
 
-    'LNG_PERSON_LIST_ITEM_DAY_OF_FOLLOW_UP': 'Day of follow-up: '
+    'LNG_PERSON_LIST_ITEM_DAY_OF_FOLLOW_UP': 'Day of follow-up: ',
+
+
+    // LanguageModalComponent
+    //TODO add all to backend
+    'LNG_MOBILE_LANGUAGE_MODAL_COMPONENT_INFO_MESSAGE': 'Please select the packs that you want to download. \nClicking download means that a new sync will start so please make sure that you are connected to the internet before proceeding.',
+    'LNG_MOBILE_LANGUAGE_MODAL_COMPONENT_DOWNLOAD_BUTTON': 'Download language packs',
+    'LNG_MOBILE_LANGUAGE_MODAL_COMPONENT_ALERT_NO_LANGUAGE': 'Please select at least one language before proceeding to download'
 };

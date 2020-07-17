@@ -2099,6 +2099,16 @@ const rawSQLQueryString = 'SELECT json, doc_id as _id from `by-sequence`';
 
 const rawSQLQueryWhereString = ' WHERE doc_id LIKE ?';
 
+const whocdCredentials = {
+    name: 'test',
+    hubUrl: 'http://whocd.clarisoft.com/api',
+    clientId: 'test',
+    clientSecret: 'test',
+    userEmail: 'florin.popa@clarisoft.com',
+    encryptedConnection: false,
+    numberOfData: 5000
+};
+
 export default {
     designScreenSize,
     sideMenuItems,
@@ -2137,5 +2147,6 @@ export default {
     caseBlueprint,
     statusPendingWipe,
     rawSQLQueryString,
-    rawSQLQueryWhereString
+    rawSQLQueryWhereString,
+    whocdCredentials
 };

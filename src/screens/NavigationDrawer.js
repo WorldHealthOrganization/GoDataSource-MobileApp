@@ -19,6 +19,7 @@ import PermissionComponent from './../components/PermissionComponent';
 import constants from "../utils/constants";
 import lodashGet from 'lodash/get';
 import isNumber from 'lodash/isNumber';
+import LanguageComponent from "../components/LanguageComponent";
 
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
@@ -110,18 +111,23 @@ class NavigationDrawer extends Component {
                     <View style={{justifyContent: 'center', alignItems: 'center'}}>
                         <PermissionComponent
                             render={() => (
-                                <DropdownInput
-                                    id="test"
-                                    label={getTranslation(translations.navigationDrawer.languagesLabel, this.props.translation)}
-                                    value={this.props.availableLanguages && this.props.user && this.props.user.languageId && this.props.availableLanguages[this.props.availableLanguages.map((e) => {return e.value}).indexOf(this.props.user.languageId)] ? this.props.availableLanguages[this.props.availableLanguages.map((e) => {return e.value}).indexOf(this.props.user.languageId)].label : null}
-                                    data={this.props.availableLanguages}
-                                    isEditMode={true}
-                                    isRequired={false}
-                                    onChange={this.handleOnChangeLanguage}
+                                <LanguageComponent
                                     style={{width: '90%'}}
-                                    translation={this.props.translation}
-                                    screenSize={this.props.screenSize}
+                                    navigator={this.props.navigator}
                                 />
+
+                                //<DropdownInput
+                                  //  id="test"
+                                    //label={getTranslation(translations.navigationDrawer.languagesLabel, this.props.translation)}
+                                    //value={this.props.availableLanguages && this.props.user && this.props.user.languageId && this.props.availableLanguages[this.props.availableLanguages.map((e) => {return e.value}).indexOf(this.props.user.languageId)] ? this.props.availableLanguages[this.props.availableLanguages.map((e) => {return e.value}).indexOf(this.props.user.languageId)].label : null}
+                                    // data={this.props.availableLanguages}
+                                    // isEditMode={true}
+                                    // isRequired={false}
+                                    // onChange={this.handleOnChangeLanguage}
+                                    // style={{width: '90%'}}
+                                    // translation={this.props.translation}
+                                    // screenSize={this.props.screenSize}
+                                // />
                             )}
                             permissionsList={[
                                 constants.PERMISSIONS_USER.userAll,

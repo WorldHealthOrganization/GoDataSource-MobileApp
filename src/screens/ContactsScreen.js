@@ -225,10 +225,10 @@ class ContactsScreen extends Component {
 
     handlePressNavbarButton = () => {
         this.props.navigator.toggleDrawer({
-            side: 'left',
-            animated: true,
-            to: 'open'
-        })
+                side: 'left',
+                animated: true,
+                to: 'open'
+            })
     };
 
     goToHelpScreen = () => {

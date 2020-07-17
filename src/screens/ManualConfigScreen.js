@@ -3,7 +3,7 @@
  */
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
-import React, {PureComponent,} from 'react';
+import React, {PureComponent} from 'react';
 import {Alert, Image, Platform, StyleSheet, Text, View} from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 import {Button, Icon} from 'react-native-material-ui';
@@ -17,6 +17,8 @@ import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import url from './../utils/url';
 import {changeAppRoot, setSyncState, storeHubConfigurationNew} from './../actions/app';
 import Ripple from 'react-native-material-ripple';
+import ElevatedView from 'react-native-elevated-view';
+import Modal from 'react-native-modal';
 import {calculateDimension, generateId, getTranslation} from './../utils/functions';
 import translations from './../utils/translations';
 import SwitchInput from './../components/SwitchInput';
@@ -27,6 +29,11 @@ import IntervalPicker from './../components/IntervalPicker';
 import constants from './../utils/constants';
 import config from './../utils/config';
 import lodashGet from 'lodash/get';
+import {getAvailableLanguages} from './../requests/languages';
+import base64 from 'base-64';
+import DropdownInput from './../components/DropdownInput';
+import appConfig from './../../app.config';
+import LocalButton from './../components/Button';
 
 class ManualConfigScreen extends PureComponent {
 
@@ -37,13 +44,13 @@ class ManualConfigScreen extends PureComponent {
     constructor(props) {
         super(props);
         this.state = {
-            name: '',
-            url: '',
-            clientId: '',
-            clientSecret: '',
-            userEmail: '',
-            encryptedData: true,
-            chunkSize: 2500,
+            name: appConfig.env === 'development' ? config.whocdCredentials.name : '',
+            url: appConfig.env === 'development' ? config.whocdCredentials.hubUrl : '',
+            clientId: appConfig.env === 'development' ? config.whocdCredentials.clientId : '',
+            clientSecret: appConfig.env === 'development' ? config.whocdCredentials.clientSecret : '',
+            userEmail: appConfig.env === 'development' ? config.whocdCredentials.userEmail : '',
+            encryptedData: appConfig.env === 'development' ? config.whocdCredentials.encryptedConnection : true,
+            chunkSize: appConfig.env === 'development' ? config.whocdCredentials.numberOfData : 2500,
             hasAlert: false,
             syncState: [
                 {id: 'testApi', name: 'Test API', status: '...'},
@@ -53,7 +60,10 @@ class ManualConfigScreen extends PureComponent {
             ],
             showModal: false,
             showCloseModalButton: false,
-            allUrls: []
+            allUrls: [],
+            showLanguagesModal: false,
+            selectedLanguage: 'None',
+            availableLanguages: []
         };
         // Bind here methods, or at least don't declare methods in the render method
         this.nameRef = this.updateRef.bind(this, 'name');
@@ -379,6 +389,52 @@ class ManualConfigScreen extends PureComponent {
                         closeModal={this.closeModal}
                     />
 
+                    <Modal
+                        isVisible={this.state.showLanguagesModal}
+                        onBackdropPress={this.hideModal}
+                        key={'languageSelect'}
+                    >
+                            <ElevatedView elevation={4} style={{
+                                backgroundColor: 'white',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                marginHorizontal: 16,
+                                borderRadius: 8
+                            }}>
+                                <Text
+                                    style={style.titleText}
+                                    key={'languageSelectTtitle'}
+                                >Available HUB language</Text>
+                                <Text
+                                    style={style.subText}
+                                    key={'languageSelectSubText'}
+                                >Please select the language that you want the use. If you click continue without selecting a language the app will download all languages, resulting in potential long sync time</Text>
+                                <DropdownInput
+                                    id={'languages'}
+                                    label={'Select language'}
+                                    value={this.state.selectedLanguage}
+                                    data={this.state.availableLanguages}
+                                    isEditMode={true}
+                                    isRequired={false}
+                                    onChange={this.selectLanguage}
+                                    screenSize={this.props.screenSize}
+                                    style={{marginHorizontal: 16}}
+                                />
+                                <LocalButton
+                                    id={'languageSelectContinueSync'}
+                                    title={'Continue sync'}
+                                    onPress={this.continueSync}
+                                    color={styles.buttonGreen}
+                                    titleColor={'white'}
+                                    height={calculateDimension(35, true, this.props.screenSize)}
+                                    width={calculateDimension(166, false, this.props.screenSize)}
+                                    style={{
+                                        marginVertical: calculateDimension(12.5, true, this.props.screenSize),
+                                        marginRight: 10
+                                    }} />
+                            </ElevatedView>
+                    </Modal>
+
                 </KeyboardAwareScrollView>
             </View>
         );
@@ -498,10 +554,55 @@ class ManualConfigScreen extends PureComponent {
 
     saveHubConfiguration = () => {
         // First generate an id and a password for the hub
-        let hubId = generateId();
-        hubId = hubId.replace(/\/|\.|\:|\-/g, '');
-        let hubPassword = generateId();
-        hubPassword = hubPassword.replace(/\/|\.|\:|\-/g, '');
+        // TODO Investigate if language request can be done here. If the request fails, continue with taking all the languages
+        getAvailableLanguages(`${this.state.url}/languages`, 'Basic ' + base64.encode(`${this.state.clientId}:${this.state.clientSecret}`))
+            .then((availableLanguages) => {
+                this.setState(prevState => ({
+                    availableLanguages: availableLanguages,
+                    showLanguagesModal: true
+                }));
+            })
+            .catch((errorAvailableLanguages) => {
+                console.log("Error while getting available languages: ", errorAvailableLanguages);
+
+                let hubId = generateId();
+                hubId = hubId.replace(/\/|\.|\:|\-/g, '');
+                let hubPassword = generateId();
+                hubPassword = hubPassword.replace(/\/|\.|\:|\-/g, '');
+                let clientIdObject = {
+                    name: this.state.name,
+                    url: this.state.url,
+                    clientId: this.state.clientId,
+                    clientSecret: this.state.clientSecret,
+                    userEmail: this.state.userEmail,
+                    encryptedData: this.state.encryptedData,
+                    chunkSize: this.state.chunkSize,
+                    language: []
+                };
+
+                this.props.storeHubConfigurationNew({
+                    url: hubId,
+                    clientId: JSON.stringify(clientIdObject),
+                    clientSecret: hubPassword
+                });
+            });
+    };
+
+    selectLanguage = (value) => {
+        this.setState({
+            selectedLanguage: value
+        })
+    };
+
+    hideModal = () => {
+        this.setState({
+            selectedLanguage: 'None',
+            showLanguagesModal: false,
+            availableLanguages: []
+        })
+    };
+
+    continueSync = () => {
         let clientIdObject = {
             name: this.state.name,
             url: this.state.url,
@@ -509,12 +610,26 @@ class ManualConfigScreen extends PureComponent {
             clientSecret: this.state.clientSecret,
             userEmail: this.state.userEmail,
             encryptedData: this.state.encryptedData,
-            chunkSize: this.state.chunkSize
+            chunkSize: this.state.chunkSize,
+            language: [this.state.selectedLanguage]
         };
-        this.props.storeHubConfigurationNew({
-            url: hubId,
-            clientId: JSON.stringify(clientIdObject),
-            clientSecret: hubPassword
+        this.setState({
+            showLanguagesModal: false,
+            selectedLanguage: 'None',
+            availableLanguages: []
+        }, () => {
+            let hubId = generateId();
+            hubId = hubId.replace(/\/|\.|\:|\-/g, '');
+            let hubPassword = generateId();
+            hubPassword = hubPassword.replace(/\/|\.|\:|\-/g, '');
+
+            setTimeout(() => {
+                this.props.storeHubConfigurationNew({
+                    url: hubId,
+                    clientId: JSON.stringify(clientIdObject),
+                    clientSecret: hubPassword
+                });
+            }, 300)
         });
     };
 
@@ -605,7 +720,17 @@ const style = StyleSheet.create({
     logoStyle: {
         width: 180,
         height: 34
-    }
+    },
+    titleText: {
+        fontFamily: 'Roboto-Medium',
+        fontSize: 18,
+        marginVertical: 10
+    },
+    subText: {
+        fontFamily: 'Roboto-Light',
+        fontSize: 16,
+        textAlign: 'center'
+    },
 });
 
 function mapStateToProps(state) {

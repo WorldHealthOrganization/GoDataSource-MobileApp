@@ -290,7 +290,7 @@ export function getNumberOfFilesProcessed() {
     return numberOfFilesProcessed;
 }
 
-export function processFilePouch(path, type, totalNumberOfFiles, dispatch, isFirstTime, forceBulk, encryptedData, hubConfig) {
+export function processFilePouch(path, type, totalNumberOfFiles, dispatch, isFirstTime, forceBulk, encryptedData, hubConfig, languagePacks) {
     let fileName = path.split('/')[path.split('/').length - 1];
     let unzipLocation = path.substr(0, (path.length - fileName.length));
     return Promise.resolve()
@@ -313,7 +313,7 @@ export function processFilePouch(path, type, totalNumberOfFiles, dispatch, isFir
             let numberOfFilesProcessedAux = getNumberOfFilesProcessed();
             numberOfFilesProcessedAux += 1;
             setNumberOfFilesProcessed(numberOfFilesProcessedAux);
-            dispatch(setSyncState(({id: 'sync', name: 'Syncing', status: numberOfFilesProcessedAux + "/" + totalNumberOfFiles})));
+            dispatch(setSyncState({id: 'sync', name: 'Syncing', status: numberOfFilesProcessedAux + "/" + totalNumberOfFiles, addLanguagePacks: checkArrayAndLength(languagePacks)}));
             return Promise.resolve('Finished syncing');
         })
         .catch((errorProccessingPouch) => Promise.reject(errorProccessingPouch));
@@ -343,7 +343,7 @@ function getFilePath (unzipPath, fileName) {
 }
 
 // The files are sorted
-export function processFilesSql(path, table, totalNumberOfFiles, dispatch, encryptedData, hubConfig) {
+export function processFilesSql(path, table, totalNumberOfFiles, dispatch, encryptedData, hubConfig, languagePacks) {
     let fileName = path.split('/')[path.split('/').length - 1];
     let unzipLocation = path.substr(0, (path.length - fileName.length));
     return Promise.resolve()
@@ -355,7 +355,7 @@ export function processFilesSql(path, table, totalNumberOfFiles, dispatch, encry
             let numberOfFilesProcessedAux = getNumberOfFilesProcessed();
             numberOfFilesProcessedAux += 1;
             setNumberOfFilesProcessed(numberOfFilesProcessedAux);
-            dispatch(setSyncState(({id: 'sync', name: 'Syncing', status: numberOfFilesProcessedAux + "/" + totalNumberOfFiles})));
+            dispatch(setSyncState({id: 'sync', name: 'Syncing', status: numberOfFilesProcessedAux + "/" + totalNumberOfFiles, addLanguagePacks: checkArrayAndLength(languagePacks)}));
             return Promise.resolve('Finished syncing');
         })
         .catch((errorProcessingSql) => Promise.reject(errorProcessingSql));
@@ -599,6 +599,10 @@ export function extractIdFromPouchId (pouchId, type) {
     }
     if (type.includes('referenceData')) {
         return pouchId.substr('referenceData.json_'.length)
+    }
+    if (type.includes('language.json')) {
+        // console.log('language substr', pouchId);
+        return pouchId.substr('language.json_'.length)
     }
     return pouchId.split('_')[pouchId.split('_').length - 1];
 }
