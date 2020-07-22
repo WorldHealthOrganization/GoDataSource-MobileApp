@@ -36,6 +36,21 @@ export function initTables () {
         })
 }
 
+export function initIndexes () {
+    let promiseArray = [];
+    return Promise.resolve()
+        .then(() => openDatabase('common'))
+        .then(wrapTransationInPromise)
+        .then((txn) => {
+            let indexes = [];
+            indexes.push(wrapExecuteSQLInPromise(txn, 'CREATE INDEX IF NOT EXISTS translationIndex ON languageToken (languageId ASC, deleted ASC)', [], true))
+            indexes.push(wrapExecuteSQLInPromise(txn, 'CREATE INDEX IF NOT EXISTS personIndex ON person (lastName ASC, firstName ASC, _id ASC)', [], true))
+            indexes.push(wrapExecuteSQLInPromise(txn, 'CREATE INDEX IF NOT EXISTS relationshipIndex ON relationship (sourceId ASC, targetId ASC)', [], true))
+
+            return Promise.all(indexes);
+        })
+}
+
 export function wrapTransationInPromise (database) {
     return new Promise((resolve, reject) => {
         database.transaction((transaction) => resolve(transaction), (errorTransaction) => reject(errorTransaction));
