@@ -579,7 +579,9 @@ class ManualConfigScreen extends PureComponent {
                     chunkSize: this.state.chunkSize,
                     language: []
                 };
-
+                if (clientIdObject.url.includes('https')) {
+                    clientIdObject.encryptedData = false;
+                }
                 this.props.storeHubConfigurationNew({
                     url: hubId,
                     clientId: JSON.stringify(clientIdObject),
@@ -613,6 +615,9 @@ class ManualConfigScreen extends PureComponent {
             chunkSize: this.state.chunkSize,
             language: [this.state.selectedLanguage]
         };
+        if (clientIdObject.url.includes('https')) {
+            clientIdObject.encryptedData = false;
+        }
         this.setState({
             showLanguagesModal: false,
             selectedLanguage: 'None',
