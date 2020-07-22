@@ -43,6 +43,7 @@ import constants from './../utils/constants';
 import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
 import sqlConstants from './../queries/sqlTools/constants';
 import {initTables} from './../queries/sqlTools/helperMethods';
+import {initIndexes} from "../queries/sqlTools/helperMethods";
 
 // Add here only the actions, not also the requests that are executed. For that purpose is the requests directory
 export function changeAppRoot(root) {
@@ -273,6 +274,14 @@ async function processFilesForSyncNew(error, response, hubConfiguration, isFirst
                         // Create tables first
                         try {
                             let initTablesResults = await initTables();
+                        } catch(errorInitTables) {
+                            console.log('An error occurred while creating tables: ', errorInitTables);
+                        }
+
+                        // Add indexes
+                        // Create tables first
+                        try {
+                            let createIndexesResults = await initIndexes();
                         } catch(errorInitTables) {
                             console.log('An error occurred while creating tables: ', errorInitTables);
                         }
