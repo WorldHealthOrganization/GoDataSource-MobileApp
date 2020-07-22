@@ -42,8 +42,12 @@ export function initIndexes () {
         .then(() => openDatabase('common'))
         .then(wrapTransationInPromise)
         .then((txn) => {
-            let indexCreationString = 'CREATE INDEX IF NOT EXISTS translationIndex ON languageToken (languageId ASC, deleted ASC)';
-            return wrapExecuteSQLInPromise(txn, indexCreationString, [], true);
+            let indexes = [];
+            indexes.push(wrapExecuteSQLInPromise(txn, 'CREATE INDEX IF NOT EXISTS translationIndex ON languageToken (languageId ASC, deleted ASC)', [], true))
+            indexes.push(wrapExecuteSQLInPromise(txn, 'CREATE INDEX IF NOT EXISTS personIndex ON person (lastName ASC, firstName ASC, _id ASC)', [], true))
+            indexes.push(wrapExecuteSQLInPromise(txn, 'CREATE INDEX IF NOT EXISTS relationshipIndex ON relationship (sourceId ASC, targetId ASC)', [], true))
+
+            return Promise.all(indexes);
         })
 }
 
