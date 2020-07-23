@@ -29,6 +29,7 @@ if (Platform.OS === 'ios') {
     KeyboardManager.setShouldResignOnTouchOutside(true);
 }
 
+
 class ViewHOC extends Component {
 
     static navigatorStyle = {
@@ -119,6 +120,13 @@ handleChangingSyncState = (syncState) => {
             syncState: syncState === 'Finished' ? syncState : cloneDeep(config.manualSyncStages),
             showCloseModalButton: false
         }
+    } else if(syncState === 'addLanguagePacks') {
+        syncStateGlobal = [
+            {id: 'testApi', name: 'Test API', status: '...'},
+            {id: 'downloadDatabase', name: 'Download database', status: '...'},
+            {id: 'unzipFile', name: 'Unzip', status: '...'},
+            {id: 'sync', name: 'Sync', status: '...'}
+        ];
     } else {
         let itemToBeChanged = returnedValue.syncState.find((e) => {return e.id === syncState.id});
         if (itemToBeChanged) {

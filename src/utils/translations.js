@@ -9,6 +9,8 @@ const navigationDrawer = {
     languagesLabel: 'LNG_NAVIGATION_DRAWER_LANGUAGES',
     logoutLabel: 'LNG_NAVIGATION_DRAWER_LOGOUT',
     helpLabel: 'LNG_LAYOUT_MENU_ITEM_HELP_LABEL',
+    //TODO add to backend translations
+    addLanguagePacks: 'LNG_NAVIGATION_DRAWER_ADD_LANGUAGE_PACKS',
 };
 
 const addFollowUpScreen = {
@@ -551,6 +553,13 @@ const followUpAgenda = {
 
 const personListItem = {
     dayOfFollowUp: 'LNG_PERSON_LIST_ITEM_DAY_OF_FOLLOW_UP'
+};
+
+//TODO add translation to backend
+export const languageModalComponentLabels = {
+    infoMessage: 'LNG_MOBILE_LANGUAGE_MODAL_COMPONENT_INFO_MESSAGE',
+    downloadButton: 'LNG_MOBILE_LANGUAGE_MODAL_COMPONENT_DOWNLOAD_BUTTON',
+    alertNoLanguage: 'LNG_MOBILE_LANGUAGE_MODAL_COMPONENT_ALERT_NO_LANGUAGE'
 };
 
 export default {

@@ -5,17 +5,32 @@ import config from './../utils/config';
 import {rawSQLQuery} from './sqlHelper';
 import {executeQuery} from './sqlTools/helperMethods';
 import {getDatabase} from "./database";
+import {extractIdFromPouchId} from "../utils/functions";
 
+
+// This method will extract both all the languages available on API and the ones on mobile and will do a diff
 export function getAvailableLanguagesRequest (callback) {
+    let allLangPromise = rawSQLQuery(config.mongoCollections.language, `${config.rawSQLQueryString}`, []);
+    let deviceLangPromise = getLocalTranslations();
 
-    rawSQLQuery(config.mongoCollections.language, `${config.rawSQLQueryString}`, [])
-        .then((result) => {
-            callback(null, result);
+    Promise.all([allLangPromise, deviceLangPromise])
+        .then(([allLang, deviceLang]) => {
+            let allLangFilter = allLang.filter((e) => deviceLang.includes(extractIdFromPouchId(e._id, 'language.json'))).map((e) => {return {value: e._id.substr('language.json_'.length), label: e.name}});
+            callback(null, {apiLanguages: allLang.map((e) => Object.assign({}, e, {_id: extractIdFromPouchId(e._id, 'language.json')})), deviceLanguages: allLangFilter})
         })
         .catch((error) => {
             console.log('Error get translations: ', error);
             callback(error)
-        })
+        });
+
+    // rawSQLQuery(config.mongoCollections.language, `${config.rawSQLQueryString}`, [])
+    //     .then((result) => {
+    //         callback(null, result);
+    //     })
+    //     .catch((error) => {
+    //         console.log('Error get translations: ', error);
+    //         callback(error)
+    //     })
 }
 
 export function getTranslationRequest (languageId, callback) {
@@ -68,4 +83,26 @@ export function getTranslationRequest (languageId, callback) {
         .catch((errorLanguageData) => {
             callback(errorLanguageData);
         })
+}
+
+export function getLocalTranslations () {
+    let query = {
+        type: 'select',
+        table: 'languageToken',
+        fields: [
+            {
+                expression: {
+                    pattern: `distinct languageToken.languageId`
+                },
+                alias: 'languageData'
+            }
+        ],
+        condition: {
+            deleted: 0
+        }
+    };
+
+    return executeQuery(query)
+        .then((languageData) => Promise.resolve(languageData.map((e) => e.languageData)))
+        .catch((errorLanguageData) => Promise.reject(errorLanguageData))
 }

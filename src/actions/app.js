@@ -37,6 +37,7 @@ import {createDatabase, getDatabase} from './../queries/database';
 import AsyncStorage from '@react-native-community/async-storage';
 import {getUserById} from './user';
 import get from 'lodash/get';
+import lodashIntersection from 'lodash/intersection';
 import {getSyncEncryptPassword} from './../utils/encryption';
 import errorTypes from "../utils/errorTypes";
 import constants from './../utils/constants';
@@ -173,7 +174,7 @@ export function getAvailableLanguages(dispatch) {
                 // console.log("### here should have available languages: ", response.map((e) => {return {id: extractIdFromPouchId(e._id, 'language'), name: e.name}}));
                 // dispatch(saveAvailableLanguages(response.map((e) => {return {value: e._id.substr('language.json_'.length), label: e.name}})));
                 // resolve('Done available languages');
-                resolve({availableLanguages: response.map((e) => {return {value: e._id.substr('language.json_'.length), label: e.name}})});
+                resolve(response);
             }
         })
     })
@@ -204,20 +205,20 @@ export function storeHubConfigurationNew(hubConfiguration) {
     }
 }
 
-async function processFilesForSyncNew(error, response, hubConfiguration, isFirstTime, syncSuccessful, forceBulk, dispatch) {
+async function processFilesForSyncNew(error, response, hubConfiguration, isFirstTime, syncSuccessful, forceBulk, dispatch, languagePacks) {
     // return async function (dispatch) {
         let hubConfig = JSON.parse(hubConfiguration.clientId);
         if (error && !error.isAPIError) {
             if (error === 'No data to export') {
-                dispatch(setSyncState({id: 'downloadDatabase', name: 'Download Database', status: error}));
+                dispatch(setSyncState({id: 'downloadDatabase', name: 'Download Database', status: error, addLanguagePacks: checkArrayAndLength(languagePacks)}));
             } else {
-                dispatch(setSyncState({id: 'downloadDatabase', name: 'Download Database', status: 'Error', error: JSON.stringify(get(error, 'message', error))}));
+                dispatch(setSyncState({id: 'downloadDatabase', name: 'Download Database', status: 'Error', error: JSON.stringify(get(error, 'message', error)), addLanguagePacks: checkArrayAndLength(languagePacks)}));
                 // dispatch(addError({type: 'Error downloading database', message: error}));
             }
         }
         if (response) {
-            dispatch(setSyncState({id: 'downloadDatabase', name: 'Download Database', status: 'Success'}));
-            dispatch(setSyncState({id: 'unzipFile', name: "Unzipping database", status: 'In progress'}));
+            dispatch(setSyncState({id: 'downloadDatabase', name: 'Download Database', status: 'Success', addLanguagePacks: checkArrayAndLength(languagePacks)}));
+            dispatch(setSyncState({id: 'unzipFile', name: "Unzipping database", status: 'In progress', addLanguagePacks: checkArrayAndLength(languagePacks)}));
 
             let responseUnzipPath = null;
 
@@ -225,8 +226,8 @@ async function processFilesForSyncNew(error, response, hubConfiguration, isFirst
                 .then(() => unzipFile(response, constants.DATABASE_LOCATIONS, null, hubConfiguration))
                 .then((unzipPath) => {
                     responseUnzipPath = unzipPath;
-                    dispatch(setSyncState({id: 'unzipFile', name: "Unzipping database", status: 'Success'}));
-                    dispatch(setSyncState({id: 'sync', name: 'Syncing', status: 'In progress'}));
+                    dispatch(setSyncState({id: 'unzipFile', name: "Unzipping database", status: 'Success', addLanguagePacks: checkArrayAndLength(languagePacks)}));
+                    dispatch(setSyncState({id: 'sync', name: 'Syncing', status: 'In progress', addLanguagePacks: checkArrayAndLength(languagePacks)}));
                     setNumberOfFilesProcessed(0);
 
                     let databaseCreatePromise = createDatabase(hubConfiguration.url, hubConfiguration.clientSecret, true);
@@ -239,6 +240,10 @@ async function processFilesForSyncNew(error, response, hubConfiguration, isFirst
                     let promiseResponses = [];
                     let database = resultDatabaseCreationAndReadDir[0];
                     let files = resultDatabaseCreationAndReadDir[1];
+
+                    if (languagePacks) {
+                        files = files.filter((e) => e.includes('languageToken'));
+                    }
 
                     if (database && checkArrayAndLength(files)) {
                         // files = sortFiles(files);
@@ -253,19 +258,19 @@ async function processFilesForSyncNew(error, response, hubConfiguration, isFirst
                                 try {
                                     // console.log('Memory size of database: ', memorySizeOf(database));
                                     let startTimeForProcessingOneFile = new Date().getTime();
-                                    let auxData = await processFilePouch(`${constants.DATABASE_LOCATIONS}/${pouchFiles[i]}`, pouchFiles[i], files.length, dispatch, isFirstTime, forceBulk, hubConfig.encryptedData, hubConfig);
+                                    let auxData = await processFilePouch(`${constants.DATABASE_LOCATIONS}/${pouchFiles[i]}`, pouchFiles[i], files.length, dispatch, isFirstTime, forceBulk, hubConfig.encryptedData, hubConfig, languagePacks);
                                     if (auxData) {
                                         // console.log('auxData: ', auxData);
                                         console.log(`Time for processing file: ${pouchFiles[i]}: ${new Date().getTime() - startTimeForProcessingOneFile}`);
                                         promiseResponses.push(auxData);
                                     } else {
                                         console.log('There was an error at processing file: ', pouchFiles[i]);
-                                        dispatch(setSyncState({id: 'sync', status: 'Error', error: `There was an error at processing file: ${pouchFiles[i]}`}));
+                                        dispatch(setSyncState({id: 'sync', status: 'Error', error: `There was an error at processing file: ${pouchFiles[i]}`, addLanguagePacks: checkArrayAndLength(languagePacks)}));
                                         break;
                                     }
                                 } catch (errorProcessFile) {
                                     console.log('There was an error at processing file: ', pouchFiles[i], errorProcessFile);
-                                    dispatch(setSyncState({id: 'sync', status: 'Error', error: `There was an error at processing file: ${pouchFiles[i]}: ${JSON.stringify(errorProcessFile)}`}));
+                                    dispatch(setSyncState({id: 'sync', status: 'Error', error: `There was an error at processing file: ${pouchFiles[i]}: ${JSON.stringify(errorProcessFile)}`, addLanguagePacks: checkArrayAndLength(languagePacks)}));
                                     break;
                                 }
                             }
@@ -291,33 +296,33 @@ async function processFilesForSyncNew(error, response, hubConfiguration, isFirst
                             for(let i=0; i<sqlFiles.length; i++) {
                                 try {
                                     let startTimeForProcessingOneFile = new Date().getTime();
-                                    let auxData = await processFilesSql(`${constants.DATABASE_LOCATIONS}/${sqlFiles[i]}`, sqlFiles[i].split('.')[0], files.length, dispatch, hubConfig.encryptedData, hubConfig);
+                                    let auxData = await processFilesSql(`${constants.DATABASE_LOCATIONS}/${sqlFiles[i]}`, sqlFiles[i].split('.')[0], files.length, dispatch, hubConfig.encryptedData, hubConfig, languagePacks);
                                     if (auxData) {
                                         console.log('auxData: ', auxData);
                                         console.log(`Time for processing file: ${sqlFiles[i]}: ${new Date().getTime() - startTimeForProcessingOneFile}`);
                                         promiseResponses.push(auxData);
                                     } else {
                                         console.log('There was an error at processing file: ', sqlFiles[i]);
-                                        dispatch(setSyncState({id: 'sync', status: 'Error', error: `There was an error at processing file: ${sqlFiles[i]}`}));
+                                        dispatch(setSyncState({id: 'sync', status: 'Error', error: `There was an error at processing file: ${sqlFiles[i]}`, addLanguagePacks: checkArrayAndLength(languagePacks)}));
                                         break;
                                     }
                                 } catch(errorProcessingFilesForSql) {
                                     console.log('There was an error at processing file: ', sqlFiles[i], errorProcessingFilesForSql);
-                                    dispatch(setSyncState({id: 'sync', status: 'Error', error: `There was an error at processing file: ${sqlFiles[i]}: ${JSON.stringify(errorProcessingFilesForSql)}`}));
+                                    dispatch(setSyncState({id: 'sync', status: 'Error', error: `There was an error at processing file: ${sqlFiles[i]}: ${JSON.stringify(errorProcessingFilesForSql)}`, addLanguagePacks: checkArrayAndLength(languagePacks)}));
                                     break;
                                 }
                             }
                         }
 
                         if (promiseResponses.length === files.length) {
-                            saveActiveDatabaseAndCleanup(syncSuccessful, hubConfiguration, hubConfig, files.length === promiseResponses.length)
+                            saveActiveDatabaseAndCleanup(syncSuccessful, hubConfiguration, hubConfig, files.length === promiseResponses.length, languagePacks)
                                 .then((success) => {
                                     console.log('Responses promises: ', promiseResponses);
                                     files = null;
                                     database = null;
-                                    dispatch(setSyncState({id: 'sync', status: 'Success'}));
+                                    dispatch(setSyncState({id: 'sync', status: 'Success', addLanguagePacks: checkArrayAndLength(languagePacks)}));
                                     if (!isFirstTime) {
-                                        dispatch(setSyncState({id: 'getDataFromServer', status: 'Success'}));
+                                        dispatch(setSyncState({id: 'getDataFromServer', status: 'Success', addLanguagePacks: checkArrayAndLength(languagePacks)}));
                                     }
                                 })
                                 .catch((errorSaveActiveDatabaseAndCleanup) => {
@@ -327,14 +332,15 @@ async function processFilesForSyncNew(error, response, hubConfiguration, isFirst
                                     dispatch(setSyncState({
                                         id: 'sync',
                                         status: 'Error',
-                                        error: `Error at storing database name: \n${JSON.stringify(errorSaveActiveDatabaseAndCleanup)}`
+                                        error: `Error at storing database name: \n${JSON.stringify(errorSaveActiveDatabaseAndCleanup)}`,
+                                        addLanguagePacks: checkArrayAndLength(languagePacks)
                                     }));
                                     if (!isFirstTime) {
-                                        dispatch(setSyncState({id: 'getDataFromServer', status: 'Error'}));
+                                        dispatch(setSyncState({id: 'getDataFromServer', status: 'Error', addLanguagePacks: checkArrayAndLength(languagePacks)}));
                                     }
                                 })
                         } else {
-                            dispatch(setSyncState({id: 'sync', status: 'Error', error: 'Error while processing files'}));
+                            dispatch(setSyncState({id: 'sync', status: 'Error', error: 'Error while processing files', addLanguagePacks: checkArrayAndLength(languagePacks)}));
                         }
                     }
                 })
@@ -376,16 +382,20 @@ function sortFilesForSql (files) {
     return sortedArrayOfFiles;
 }
 
-function saveActiveDatabaseAndCleanup(syncSuccessful, hubConfiguration, hubConfig, processedAllFiles) {
+function saveActiveDatabaseAndCleanup(syncSuccessful, hubConfiguration, hubConfig, processedAllFiles, languagePacks) {
     return Promise.resolve()
         .then(deleteFile(constants.DATABASE_LOCATIONS, true))
         .then(() => {
             if (!syncSuccessful && !processedAllFiles) {
                 return Promise.reject('Sync unsuccessful');
             } else {
-                let storeActiveDatabasePair = ['activeDatabase', hubConfiguration.url];
-                let storeLastScynDataForHub = [hubConfiguration.url, createDate(null, null, true).toISOString()];
-                let storeMultipleDataPromise = AsyncStorage.multiSet([storeActiveDatabasePair, storeLastScynDataForHub]);
+                let pairArray = [];
+                pairArray.push(['activeDatabase', hubConfiguration.url]);
+                if (!checkArrayAndLength(languagePacks)) {
+                    pairArray.push([hubConfiguration.url, createDate(null, null, true).toISOString()]);
+                }
+
+                let storeMultipleDataPromise = AsyncStorage.multiSet(pairArray);
                 // let storeActiveDatabasePromise = AsyncStorage.setItem('activeDatabase', hubConfiguration.url);
                 // let storeLastSyncDateForHubPromise = AsyncStorage.setItem(hubConfiguration.url, createDate(null, null, true));
                 let getAllOtherDatabases = AsyncStorage.getItem('databases');
@@ -535,6 +545,43 @@ export function sendDatabaseToServer () {
     }
 }
 
+export function addLanguagePacks(languagePacks) {
+    return async function(dispatch) {
+        if (checkArrayAndLength(languagePacks)) {
+            dispatch(setSyncState('addLanguagePacks'));
+
+            let internetCredentials = null;
+            Promise.resolve()
+                .then(() => AsyncStorage.getItem('activeDatabase'))
+                .then(getInternetCredentials)
+                .then((credentials) => {
+                    internetCredentials = {
+                        url: credentials.server ? credentials.server : credentials.service,
+                        clientId: credentials.username,
+                        clientSecret: credentials.password
+                    };
+                    return getDatabaseSnapshotRequestNew(internetCredentials, null, dispatch, languagePacks)
+                })
+                .then((databasePath) => {
+                    dispatch(processFilesForSyncNew(null, databasePath, internetCredentials, true, true, true, dispatch, languagePacks));
+
+                    let fullCredentials = JSON.parse(internetCredentials.clientId);
+                    if (!checkArrayAndLength(lodashIntersection(fullCredentials.language, languagePacks))) {
+                        fullCredentials.language = fullCredentials.language.concat(languagePacks);
+                        setInternetCredentials(
+                            internetCredentials.url,
+                            JSON.stringify(fullCredentials),
+                            internetCredentials.clientSecret
+                        )
+                    }
+                })
+                .catch((error) => {
+                    dispatch(processFilesForSyncNew(error, null, internetCredentials, true, true, true, dispatch, languagePacks));
+                })
+        }
+    }
+}
+
 // We will store the last sync date inside the key/value store of react native
 // This way, we will only get the data that was changed from the last sync
 // We will also use this method to store the logged user's id, in order to keep him logged in
@@ -549,32 +596,6 @@ export function storeData (key, value, callback) {
         }
     });
 }
-
-// export function appInitializedNew(nativeEventEmitter) {
-//     return async function (dispatch) {
-//         // Handle save screen size for measurements
-//         let width = Dimensions.get("window").width;
-//         let height = Dimensions.get('window').height;
-//         let screenSize = {width, height};
-//         dispatch(saveScreenSize(screenSize));
-//
-//         let loggedUserGlobal = null;
-//         let activeDatabaseGlobal = null;
-//
-//         AsyncStorage.getItem('loggedUser')
-//             .then((loggedUser) => {
-//                 loggedUserGlobal = loggedUser;
-//                 return Promise.resolve();
-//             })
-//             .catch((errorGetLoggedUser) => Promise.resolve())
-//             .then(() => AsyncStorage.getItem('activeDatabase'))
-//             .then((activeDatabase) => {
-//                 activeDatabaseGlobal = activeDatabase;
-//                 return Promise.resolve();
-//             })
-//             .catch((errorGetActiveDatabase) => Promise.resolve())
-//     }
-// }
 
 export function appInitialized(nativeEventEmitter) {
     return async function (dispatch, getState) {

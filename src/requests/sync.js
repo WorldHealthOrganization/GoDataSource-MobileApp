@@ -11,12 +11,13 @@ import translations from './../utils/translations';
 import {testApi, testApiPromise} from './testApi';
 import uniq from 'lodash/uniq';
 import get from 'lodash/get';
+import lodashIntersection from 'lodash/intersection';
 import {getHelpItemsRequest} from './helpItem';
-import {createDate, handleResponseFromRNFetchBlob, handleResponse} from './../utils/functions';
-import {retriablePromise} from "../utils/typeCheckingFunctions";
+import {createDate, handleResponseFromRNFetchBlob} from './../utils/functions';
+import {checkArrayAndLength, retriablePromise} from "../utils/typeCheckingFunctions";
 import constants from './constants';
 
-export function getDatabaseSnapshotRequestNew(hubConfig, lastSyncDate, dispatch) {
+export function getDatabaseSnapshotRequestNew(hubConfig, lastSyncDate, dispatch, languagePacks) {
     // hubConfiguration = {url: databaseName, clientId: JSON.stringify({name, url, clientId, clientSecret, encryptedData}), clientSecret: databasePass}
     let hubConfiguration = JSON.parse(hubConfig.clientId);
 
@@ -30,7 +31,13 @@ export function getDatabaseSnapshotRequestNew(hubConfig, lastSyncDate, dispatch)
             fromDate: createDate(lastSyncDate)
         }
     }
-    let requestUrl = `${hubConfiguration.url}${constants.getDatabase}?autoEncrypt=${hubConfiguration.encryptedData}${lastSyncDate ? `&filter=${JSON.stringify(filter)}` : ''}&chunkSize=${hubConfiguration.chunkSize || 5000}${hubConfiguration.userEmail ? `&userEmail=${hubConfiguration.userEmail}` : ''}`;
+    if (languagePacks) {
+        if (!filter.where) {
+            filter.where = {};
+        }
+        filter.where.collections = 'languageToken';
+    }
+    let requestUrl = `${hubConfiguration.url}${constants.getDatabase}?autoEncrypt=${hubConfiguration.encryptedData}${lastSyncDate || languagePacks ? `&filter=${JSON.stringify(filter)}` : ''}&chunkSize=${hubConfiguration.chunkSize || 5000}${hubConfiguration.userEmail ? `&userEmail=${hubConfiguration.userEmail}` : ''}`;
 
     let dirs = RNFetchBlob.fs.dirs.DocumentDir;
 
@@ -49,7 +56,7 @@ export function getDatabaseSnapshotRequestNew(hubConfig, lastSyncDate, dispatch)
             });
 
             // Before starting a download, first test if the API responds
-            dispatch(setSyncState({id: 'testApi', status: 'In progress'}));
+            dispatch(setSyncState({id: 'testApi', status: 'In progress', addLanguagePacks: checkArrayAndLength(languagePacks)}));
             return testApiPromise(`${hubConfiguration.url}${constants.testApi}`, deviceInfo)
                 .catch((errorTestAPI) => {
                     dispatch(setSyncState({
@@ -63,39 +70,53 @@ export function getDatabaseSnapshotRequestNew(hubConfig, lastSyncDate, dispatch)
         })
         .then((responseTestApi) => {
             // console.log('Response TestApi: ', responseTestApi);
-            dispatch(setSyncState({id: 'testApi', status: 'Success'}));
-            dispatch(setSyncState({id: 'downloadDatabase', status: 'In progress'}));
+            dispatch(setSyncState({id: 'testApi', status: 'Success', addLanguagePacks: checkArrayAndLength(languagePacks)}));
+            dispatch(setSyncState({id: 'downloadDatabase', status: 'In progress', addLanguagePacks: checkArrayAndLength(languagePacks)}));
             // Here call the method computeHelpItemsAndCategories
-
             return computeHelpItemsAndCategories(hubConfiguration, lastSyncDate)
         })
-        .then((helpTranslations) => retriablePromise(RNFetchBlob.config({
-                timeout: (30 * 60 * 10 * 1000),
-                followRedirect: false,
-                fileCache: true,
-                path: `${dirs}/database.zip`
-            }, 3, 100)
-                .fetch('POST', encodeURI(requestUrl), {
-                        'device-info': deviceInfo,
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json',
-                        'Authorization': 'Basic ' + base64.encode(`${hubConfiguration.clientId}:${hubConfiguration.clientSecret}`)
-                    },
-                    JSON.stringify({
-                        languageTokens: lastSyncDate ? helpTranslations : arrayOfTokens.concat(helpTranslations)
+        .then((helpTranslations) => {
+            let syncParams = {
+                languageTokens: lastSyncDate ? helpTranslations : arrayOfTokens.concat(helpTranslations),
+                //languages: []//hubConfiguration.language ? hubConfiguration.language : []
+            };
+
+            if (languagePacks) {
+                syncParams.languages = languagePacks;
+            } else if (checkArrayAndLength(hubConfiguration.language)) {
+                if (!checkArrayAndLength(lodashIntersection(hubConfiguration.language, ['None']))) {
+                    syncParams.languages = hubConfiguration.language;
+                }
+            }
+            syncParams = JSON.stringify(syncParams);
+
+            return retriablePromise(RNFetchBlob.config({
+                    timeout: (30 * 60 * 10 * 1000),
+                    followRedirect: false,
+                    fileCache: true,
+                    path: `${dirs}/database.zip`
+                }, 3, 100)
+                    .fetch('POST', encodeURI(requestUrl), {
+                            'device-info': deviceInfo,
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                            'Authorization': 'Basic ' + base64.encode(`${hubConfiguration.clientId}:${hubConfiguration.clientSecret}`)
+                        },
+                        syncParams
+                    )
+                    .progress({count: 500}, (received, total) => {
+                        dispatch(setSyncState({
+                            id: 'downloadDatabase',
+                            name: `Downloading database\nReceived ${received} bytes`,
+                            addLanguagePacks: checkArrayAndLength(languagePacks)
+                        }));
+                        console.log(received, total)
                     })
-                )
-                .progress({count: 500}, (received, total) => {
-                    dispatch(setSyncState({
-                        id: 'downloadDatabase',
-                        name: `Downloading database\nReceived ${received} bytes`
-                    }));
-                    console.log(received, total)
-                })
-                .then((res) => {
-                    return handleResponseFromRNFetchBlob(res)
-                }), 3)
-                .then((response) => Promise.resolve(databaseLocation))
+                    .then((res) => {
+                        return handleResponseFromRNFetchBlob(res)
+                    }), 3)
+                    .then((response) => Promise.resolve(databaseLocation))
+            }
         )
 }
 
