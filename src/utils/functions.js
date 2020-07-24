@@ -22,6 +22,7 @@ import {checkArrayAndLength} from './typeCheckingFunctions';
 import {executeQuery, insertOrUpdate} from './../queries/sqlTools/helperMethods';
 import translations from "./translations";
 import sqlConstants from './../queries/sqlTools/constants';
+import constants from "./constants";
 
 // This method is used for handling server responses. Please add here any custom error handling
 export function handleResponse(response) {
@@ -145,16 +146,23 @@ export function navigation(event, navigator) {
                         addScreen = "ContactsSingleScreen";
                         break;
                     case '2':
-                        screenToSwitchTo = "CasesScreen";
+                        screenToSwitchTo = constants.appScreens.contactsOfContactsScreen;
                         break;
                     case '2-add':
+                        screenToSwitchTo = constants.appScreens.contactsOfContactsSingleScreen;
+                        addScreen = constants.appScreens.contactsOfContactsSingleScreen;
+                        break;
+                    case '3':
+                        screenToSwitchTo = "CasesScreen";
+                        break;
+                    case '3-add':
                         screenToSwitchTo = "CaseSingleScreen";
                         addScreen = "CaseSingleScreen";
                         break;
                     case 'help':
                         screenToSwitchTo = "HelpScreen";
                     break;
-                    case '3':
+                    case '4':
                         screenToSwitchTo = "UsersScreen";
                     break;
                     default:

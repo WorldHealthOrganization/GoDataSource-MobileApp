@@ -3,7 +3,7 @@
  */
 import styles from './../styles';
 import {Platform} from 'react-native';
-import translations from './translations';
+import translations, {contactsOfContactsScreen} from './translations';
 import {createDate} from './../utils/functions';
 import constants from './../utils/constants';
 
@@ -27,6 +27,12 @@ const sideMenuItems = [
         key: 'contacts',
         name: 'people',
         label: translations.navigationDrawer.contactsLabel,
+        // addButton: true
+    },
+    {
+        key: 'contactsOfContacts',
+        name: 'people',
+        label: contactsOfContactsScreen.contactsTitle,
         // addButton: true
     },
     {

@@ -13,6 +13,8 @@ const appScreens = {
     caseSingleScreen: 'CaseSingleScreen',
     contactsScreen: 'ContactsScreen',
     contactSingleScreen: 'ContactsSingleScreen',
+    contactsOfContactsScreen: 'ContactsOfContactsScreen',
+    contactsOfContactsSingleScreen: 'ContactsOfContactsSingleScreen',
     exposureScreen: 'ExposureScreen',
     helpScreen: 'HelpScreen',
     helpSingleScreen: 'HelpSingleScreen',
@@ -48,6 +50,25 @@ const PERMISSIONS_CONTACT = {
     contactCreateRelationshipExposures: 'contact_create_relationship_exposures',
     contactModifyRelationshipExposures: 'contact_modify_relationship_exposures',
     contactDeleteRelationshipExposures: 'contact_delete_relationship_exposures',
+};
+
+export const PERMISSIONS_CONTACT_OF_CONTACT = {
+    contactAll: 'contact_of_contact_all',
+    contactView: 'contact_of_contact_view',
+    contactList: 'contact_of_contact_list',
+    contactCreate: 'contact_of_contact_create',
+    contactModify: 'contact_of_contact_modify',
+    contactDelete: 'contact_of_contact_delete',
+    contactListRelationshipContacts: 'contact_of_contact_list_relationship_contacts',
+    contactViewRelationshipContacts: 'contact_of_contact_view_relationship_contacts',
+    contactCreateRelationshipContacts: 'contact_of_contact_create_relationship_contacts',
+    contactModifyRelationshipContacts: 'contact_of_contact_modify_relationship_contacts',
+    contactDeleteRelationshipContact: 'contact_of_contact_delete_relationship_contacts',
+    contactListRelationshipExposures: 'contact_of_contact_list_relationship_exposures',
+    contactViewRelationshipExposures: 'contact_of_contact_view_relationship_exposures',
+    contactCreateRelationshipExposures: 'contact_of_contact_create_relationship_exposures',
+    contactModifyRelationshipExposures: 'contact_of_contact_modify_relationship_exposures',
+    contactDeleteRelationshipExposures: 'contact_of_contact_delete_relationship_exposures',
 };
 
 const PERMISSIONS_CASE = {

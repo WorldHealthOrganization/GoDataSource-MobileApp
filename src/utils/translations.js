@@ -2,6 +2,9 @@ const navigationDrawer = {
     activeOutbreak: 'LNG_NAVIGATION_DRAWER_ACTIVE_OUTBREAK',
     followUpsLabel: 'LNG_NAVIGATION_DRAWER_FOLLOW_UPS',
     contactsLabel: 'LNG_NAVIGATION_DRAWER_CONTACTS',
+    //TODO add to backend translations
+    contactsOfContactsLabel: 'LNG_NAVIGATION_DRAWER_CONTACTS_OF_CONTACTS',
+
     casesLabel: 'LNG_NAVIGATION_DRAWER_CASES',
     syncHubManually: 'LNG_NAVIGATION_DRAWER_SYNC_HUB_MANUAL',
     changeHubConfig: 'LNG_NAVIGATION_DRAWER_CHANGE_HUB_CONFIG',
@@ -261,6 +264,13 @@ const contactsScreen = {
     addFollowupsButton: 'LNG_CONTACT_LIST_SCREEN_ADD_FOLLOW_UP_BUTTON',
     editButton: 'LNG_CONTACT_LIST_SCREEN_EDIT_BUTTON',
     noContacts: 'LNG_CONTACT_LIST_SCREEN_NO_CONTACTS'
+};
+
+// TODO add to backend
+export const contactsOfContactsScreen = {
+    contactsTitle: 'LNG_CONTACT_OF_CONTACT_LIST_SCREEN_TITLE',
+    // editButton: 'LNG_CONTACT_LIST_SCREEN_EDIT_BUTTON',
+    noContacts: 'LNG_CONTACT_OF_CONTACT_LIST_SCREEN_NO_CONTACTS'
 };
 
 const followUpsScreen = {
