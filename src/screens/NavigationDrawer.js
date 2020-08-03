@@ -138,9 +138,9 @@ class NavigationDrawer extends Component {
                     <NavigationDrawerListItem
                         label={getTranslation(translations.navigationDrawer.usersLabel, this.props.translation)}
                         name={'contact-phone'}
-                        key={3}
-                        onPress={() => this.handlePressOnListItem(3)}
-                        isSelected={3 === this.state.selectedScreen}
+                        key={4}
+                        onPress={() => this.handlePressOnListItem(4)}
+                        isSelected={4 === this.state.selectedScreen}
                         addButton={false}
                         itemKey={'users'}
                     />

@@ -155,6 +155,9 @@ export function getPersonsByName(outbreakId, search, type) {
     if (type === 'Case') {
         condition['type'] = translations.personTypes.contacts;
     }
+    if (type === 'ContactOfContact') {
+        condition['type'] = translations.personTypes.contacts;
+    }
     let casesQuery = {
         type: 'select',
         table: 'person',

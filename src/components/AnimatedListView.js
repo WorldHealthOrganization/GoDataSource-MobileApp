@@ -15,7 +15,7 @@ import PersonListItem from "./PersonListItem";
 import PropTypes from 'prop-types';
 import SearchFilterView from "./SearchFilterView";
 import config from "../utils/config";
-import constants from "../utils/constants";
+import constants, {PERMISSIONS_CONTACT_OF_CONTACT} from "../utils/constants";
 import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
 
 const AnimatedFlatList = Animated.createAnimatedComponent(FlatList);
@@ -175,7 +175,7 @@ class AnimatedListView extends Component {
                 exposureData = get(item, 'exposureData', null);
                 textsArray = [
                     getTranslation(translations.casesScreen.viewButtonLabel, this.props.translation),
-                    getTranslation(translations.contactsScreen.editButton, this.props.translation),
+                    'Add Contact', // getTranslation(translations.contactsScreen.editButton, this.props.translation),
                     getTranslation(translations.followUpsScreen.addExposureFollowUpLabel, this.props.translation)
                 ];
                 textsStyleArray = [
@@ -200,6 +200,40 @@ class AnimatedListView extends Component {
                         [constants.PERMISSIONS_RELATIONSHIP.relationshipAll, constants.PERMISSIONS_CONTACT.contactCreateRelationshipExposures],
                         [constants.PERMISSIONS_RELATIONSHIP.relationshipCreate, constants.PERMISSIONS_CONTACT.contactAll],
                         [constants.PERMISSIONS_RELATIONSHIP.relationshipCreate, constants.PERMISSIONS_CONTACT.contactCreateRelationshipExposures]
+                    ],
+                ];
+                titleColor = this.props.colors[mainData.riskLevel];
+                break;
+            case 'ContactOfContact':
+                mainData = get(item, 'mainData', null);
+                exposureData = get(item, 'exposureData', null);
+                textsArray = [
+                    getTranslation(translations.casesScreen.viewButtonLabel, this.props.translation),
+                    getTranslation(translations.contactsScreen.editButton, this.props.translation),
+                    getTranslation(translations.followUpsScreen.addExposureFollowUpLabel, this.props.translation)
+                ];
+                textsStyleArray = [
+                    [styles.buttonTextActionsBar, {fontSize: 14, marginLeft: margins}],
+                    [styles.buttonTextActionsBar, {fontSize: 14}],
+                    [styles.buttonTextActionsBar, {fontSize: 14, marginRight: margins}]];
+                onPressTextsArray = [
+                    () => {
+                        this.props.onPressView(mainData)
+                    },
+                    () => {
+                        this.props.onPressCenterButton(mainData)
+                    },
+                    () => {
+                        this.props.onPressAddExposure(mainData);
+                    }];
+                arrayPermissions = [
+                    [PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsAll, PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsView],
+                    [PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsAll, PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsModify],
+                    [
+                        [constants.PERMISSIONS_RELATIONSHIP.relationshipAll, PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsAll],
+                        [constants.PERMISSIONS_RELATIONSHIP.relationshipAll, PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsCreateRelationshipContacts],
+                        [constants.PERMISSIONS_RELATIONSHIP.relationshipCreate, PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsAll],
+                        [constants.PERMISSIONS_RELATIONSHIP.relationshipCreate, PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsCreateRelationshipContacts]
                     ],
                 ];
                 titleColor = this.props.colors[mainData.riskLevel];
@@ -322,6 +356,8 @@ class AnimatedListView extends Component {
             case 'FollowUp':
                 return get(item, 'followUpData._id', null);
             case 'Contact':
+                return get(item, 'mainData._id', null);
+            case 'ContactOfContact':
                 return get(item, 'mainData._id', null);
             case 'Case':
                 return get(item, 'mainData._id', null);

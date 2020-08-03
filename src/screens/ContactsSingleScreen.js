@@ -45,6 +45,7 @@ import constants from "../utils/constants";
 import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
 import PermissionComponent from './../components/PermissionComponent';
 import lodashIntersect from 'lodash/intersection';
+import {getItemByIdRequest} from './../actions/cases';
 
 const initialLayout = {
     height: 0,
@@ -181,12 +182,16 @@ class ContactsSingleScreen extends Component {
                 let followUpPromise = getFollowUpsForContactId(this.state.contact._id, this.props.user.activeOutbreakId, this.props.teams)
                     .then((responseFollowUps) => responseFollowUps.map((e) => e.followUps));
                 let exposurePromise = getExposuresForContact(this.state.contact._id, this.props.user.activeOutbreakId);
+                let getContactPromise = null;
+                if (this.props.getContact) {
+                    getContactPromise = getItemByIdRequest(this.state.contact._id);
+                }
 
-                Promise.all([followUpPromise, exposurePromise])
-                    .then(([followUps, relationshipsAndExposures]) => {
+                Promise.all([followUpPromise, exposurePromise, getContactPromise])
+                    .then(([followUps, relationshipsAndExposures, contact]) => {
                         this.setState(prevState => ({
                             loading: !prevState.loading,
-                            contact: Object.assign({}, prevState.contact, {
+                            contact: Object.assign({}, this.props.getContact ? contact : prevState.contact, {
                                 followUps,
                                 relationships: relationshipsAndExposures
                             })
@@ -261,7 +266,7 @@ class ContactsSingleScreen extends Component {
                         <View
                             style={[style.breadcrumbContainer]}>
                             <Breadcrumb
-                                entities={[getTranslation(this.props && this.props.previousScreen ? this.props.previousScreen : translations.contactSingleScreen.title, this.props.translation), this.props.isNew ? getTranslation(translations.contactSingleScreen.addContactTitle, this.props.translation) : ((this.props.contact && this.props.contact.firstName ? (this.props.contact.firstName + " ") : '') + (this.props.contact && this.props.contact.lastName ? this.props.contact.lastName : ''))]}
+                                entities={[getTranslation(this.props && this.props.previousScreen ? this.props.previousScreen : translations.contactSingleScreen.title, this.props.translation), this.props.isNew ? getTranslation(translations.contactSingleScreen.addContactTitle, this.props.translation) : ((this.state.contact && this.state.contact.firstName ? (this.state.contact.firstName + " ") : '') + (this.state.contact && this.state.contact.lastName ? this.state.contact.lastName : ''))]}
                                 navigator={this.props.navigator}
                                 onPress={this.handlePressBreadcrumb}
                             />

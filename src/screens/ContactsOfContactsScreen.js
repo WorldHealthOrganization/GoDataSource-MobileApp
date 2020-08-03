@@ -153,7 +153,7 @@ class ContactsOfContactsScreen extends Component {
                                 data={this.props.data || []}
                                 dataCount={this.props.dataCount || 0}
                                 colors={this.state.riskColors}
-                                dataType={'Contact'}
+                                dataType={'ContactOfContact'}
                                 filterText={filterText}
                                 style={[style.listViewStyle]}
                                 componentContainerStyle={style.componentContainerStyle}
@@ -167,14 +167,14 @@ class ContactsOfContactsScreen extends Component {
                                 onPressMap={this.handleOnPressMap}
                                 onPressName={this.props.onPressFullName}
                                 onPressExposure={this.props.onPressExposure}
-                                screen={translations.contactSingleScreen.title}
+                                screen={contactsOfContactsScreen.contactsTitle}
                                 onEndReached={this.props.onEndReached}
                                 hasFilter={true}
                             />
                         )}
                         permissionsList={[
-                            PERMISSIONS_CONTACT_OF_CONTACT.contactAll,
-                            PERMISSIONS_CONTACT_OF_CONTACT.contactList
+                            PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsAll,
+                            PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsList
                         ]}
                     />
                 </View>

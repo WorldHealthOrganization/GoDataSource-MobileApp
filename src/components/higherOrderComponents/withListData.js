@@ -4,7 +4,7 @@ import get from 'lodash/get';
 import {createDate} from './../../utils/functions';
 import {extractIdFromPouchId, extractMainAddress, getTranslation, navigation} from "../../utils/functions";
 import RNExitApp from "react-native-exit-app";
-import translations from "../../utils/translations";
+import translations, {contactsOfContactsScreen} from "../../utils/translations";
 import constants, {PERMISSIONS_CONTACT_OF_CONTACT} from './../../utils/constants';
 import {screenTransition} from './../../utils/screenTransitionFunctions';
 
@@ -288,7 +288,7 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                     case 'ContactsScreen':
                         forwardProps.contact = dataToForward;
                         break;
-                    case 'ContactsOfContacts':
+                    case constants.appScreens.contactsOfContactsScreen:
                         forwardProps.contact = dataToForward;
                         break;
                     case 'CasesScreen':
@@ -325,12 +325,16 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                 } else {
                     let dataToForwardType = 'contact';
                     if (forwardScreen && dataToForwardType && dataToForward) {
+                        let type = 'Contact';
+                        if (screenType === constants.appScreens.contactsOfContactsScreen) {
+                            type = "ContactOfContact";
+                        }
                         this.props.navigator.showModal({
                             screen: forwardScreen,
                             animated: true,
                             passProps: {
                                 [dataToForwardType]: dataToForward,
-                                type: 'Contact',
+                                type: type,
                                 refresh: this.refresh
                             }
                         })
@@ -357,12 +361,25 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                         screen: forwardScreen,
                         animated: true,
                         passProps: {
-                            isNew: false,
-                            isEditMode: true,
-                            contact: caseData,
+                            isNew: true,
+                            type: 'ContactOfContact',
+                            addContactFromCasesScreen: true,
+                            caseIdFromCasesScreen: caseData._id,
+                            caseAddress: extractMainAddress(get(caseData, 'addresses', [])),
+                            singleCase: caseData,
                             refresh: this.refresh
                         }
                     })
+                    // this.props.navigator.push({
+                    //     screen: forwardScreen,
+                    //     animated: true,
+                    //     passProps: {
+                    //         isNew: false,
+                    //         isEditMode: true,
+                    //         contact: caseData,
+                    //         refresh: this.refresh
+                    //     }
+                    // })
                 }
                 if (screenType === constants.appScreens.contactsOfContactsScreen) {
                     this.props.navigator.push({
@@ -387,6 +404,9 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                 forwardedProps['previousScreen'] = prevScreen;
                 forwardedProps['refresh'] = this.refresh;
                 forwardedProps['isEditMode'] = false;
+                if (screenType === constants.appScreens.contactsOfContactsScreen) {
+                    forwardedProps['type'] = 'ContactsOfContacts'
+                }
 
                 if (forwardScreen) {
                     screenTransition(this.props.navigator, 'push', forwardScreen, forwardedProps, this.props.role, requiredPermissions);
@@ -404,23 +424,24 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                 let previousScreen = screenType === constants.appScreens.followUpScreen ? translations.followUpsScreen.followUpsTitle : translations.contactsScreen.contactsTitle;
 
                 if (forwardScreen) {
-                    let forwardProps = {
-                        case: {_id: get(exposure, 'id', null)},
-                        refresh: this.refresh,
-                        previousScreen: previousScreen
-                    };
+                    let forwardProps = null;
+                    if (screenType === constants.appScreens.contactsOfContactsScreen) {
+                        forwardProps = {
+                            contact: {_id: get(exposure, 'id', null)},
+                            refresh: this.refresh,
+                            previousScreen: contactsOfContactsScreen.contactsTitle,
+                            isEditMode: false,
+                            getContact: true
+                        };
+                    } else {
+                        forwardProps = {
+                            case: {_id: get(exposure, 'id', null)},
+                            refresh: this.refresh,
+                            previousScreen: previousScreen
+                        };
+                    }
 
                     screenTransition(this.props.navigator, 'push', forwardScreen, forwardProps, this.props.role, requiredPermissions);
-
-                    // this.props.navigator.push({
-                    //     screen: forwardScreen,
-                    //     animated: true,
-                    //     passProps: {
-                    //         case: {_id: get(exposure, 'id', null)},
-                    //         refresh: this.refresh,
-                    //         previousScreen: previousScreen
-                    //     }
-                    // })
                 }
             };
 
@@ -463,7 +484,7 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                                 forwardScreen = constants.appScreens.caseSingleScreen;
                                 break;
                             case 'onPressCenterButton':
-                                forwardScreen = constants.appScreens.contactSingleScreen;
+                                forwardScreen = constants.appScreens.contactsOfContactsSingleScreen;
                                 break;
                             default:
                                 forwardScreen = null;
@@ -561,14 +582,14 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                         switch (method) {
                             case 'onPressFullName':
                                 permissions = [
-                                    PERMISSIONS_CONTACT_OF_CONTACT.contactAll,
-                                    PERMISSIONS_CONTACT_OF_CONTACT.contactView,
+                                    PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsAll,
+                                    PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsView,
                                 ];
                                 break;
                             case 'onPressExposure':
                                 permissions = [
-                                    PERMISSIONS_CONTACT_OF_CONTACT.caseAll,
-                                    PERMISSIONS_CONTACT_OF_CONTACT.caseView,
+                                    constants.PERMISSIONS_CONTACT.contactAll,
+                                    constants.PERMISSIONS_CONTACT.contactView,
                                 ];
                                 break;
                             default:

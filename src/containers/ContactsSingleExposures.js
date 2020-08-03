@@ -21,7 +21,7 @@ import ExposureContainer from '../containers/ExposureContainer';
 import get from 'lodash/get';
 import TopContainerButtons from "./../components/TopContainerButtons";
 import PermissionComponent from './../components/PermissionComponent';
-import constants from './../utils/constants';
+import constants, {PERMISSIONS_CONTACT_OF_CONTACT} from './../utils/constants';
 import config from './../utils/config';
 
 const AnimatedFlatList = Animated.createAnimatedComponent(FlatList);
@@ -68,13 +68,25 @@ class ContactsSingleExposures extends Component {
             constants.PERMISSIONS_CONTACT.contactAll
         ];
         if (this.props.isNew) {
-            permissionsList.push(
-                constants.PERMISSIONS_CONTACT.contactCreate
-            )
+            if(this.props.type === translations.personTypes.contactsOfContacts) {
+                permissionsList.push(
+                    PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsCreate
+                )
+            } else {
+                permissionsList.push(
+                    constants.PERMISSIONS_CONTACT.contactCreate
+                )
+            }
         } else {
-            permissionsList.push(
-                constants.PERMISSIONS_CONTACT.contactModify
-            )
+            if(this.props.type === translations.personTypes.contactsOfContacts) {
+                permissionsList.push(
+                    PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsModify
+                )
+            } else {
+                permissionsList.push(
+                    constants.PERMISSIONS_CONTACT.contactModify
+                )
+            }
         }
 
         return (

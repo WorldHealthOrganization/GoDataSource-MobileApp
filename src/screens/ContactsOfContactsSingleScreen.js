@@ -41,10 +41,13 @@ import translations from './../utils/translations';
 import ElevatedView from 'react-native-elevated-view';
 import AddFollowUpScreen from './AddFollowUpScreen';
 import {generateId, generateTeamId} from "../utils/functions";
-import constants from "../utils/constants";
+import constants, {PERMISSIONS_CONTACT_OF_CONTACT} from "../utils/constants";
 import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
 import PermissionComponent from './../components/PermissionComponent';
 import lodashIntersect from 'lodash/intersection';
+import {addContactOfContact, updateContactOfContact} from './../actions/contactsOfContacts';
+import {getRelationsForCase} from "../actions/cases";
+import {contactsOfContactsScreen} from "../utils/translations";
 
 const initialLayout = {
     height: 0,
@@ -71,8 +74,8 @@ class ContactsOfContactsSingleScreen extends Component {
                     constants.PERMISSIONS_CONTACT.contactListRelationshipContacts
                 ]
             )) ?
-                config.tabsValuesRoutes.contactsSingle :
-                config.tabsValuesRoutes.contactsSingleWithoutExposures;
+                config.tabsValuesRoutes.contactsOfContactsSingle :
+                config.tabsValuesRoutes.contactsOfContactsSingleWithoutExposures;
 
         this.state = {
             interactionComplete: false,
@@ -174,16 +177,11 @@ class ContactsOfContactsSingleScreen extends Component {
 
             if (this.props.user !== null) {
 
-                let followUpPromise = getFollowUpsForContactId(this.state.contact._id, this.props.user.activeOutbreakId, this.props.teams)
-                    .then((responseFollowUps) => responseFollowUps.map((e) => e.followUps));
-                let exposurePromise = getExposuresForContact(this.state.contact._id, this.props.user.activeOutbreakId);
-
-                Promise.all([followUpPromise, exposurePromise])
-                    .then(([followUps, relationshipsAndExposures]) => {
+                getExposuresForContact(this.state.contact._id, this.props.user.activeOutbreakId)
+                    .then((relationshipsAndExposures) => {
                         this.setState(prevState => ({
                             loading: !prevState.loading,
                             contact: Object.assign({}, prevState.contact, {
-                                followUps,
                                 relationships: relationshipsAndExposures
                             })
                         }))
@@ -197,12 +195,12 @@ class ContactsOfContactsSingleScreen extends Component {
             if (this.props.addContactFromCasesScreen !== null && this.props.addContactFromCasesScreen !== undefined && this.props.caseIdFromCasesScreen !== null && this.props.caseIdFromCasesScreen !== undefined) {
                 personsArray = [{
                     id: extractIdFromPouchId(this.props.caseIdFromCasesScreen, 'person'),
-                    type: config.personTypes.cases,
+                    type: config.personTypes.contacts,
                     source: true,
                     target: null
                 }, {
                     id: null,
-                    type: config.personTypes.contacts,
+                    type: config.personTypes.contactsOfContacts,
                     source: null,
                     target: true
                 }];
@@ -257,7 +255,7 @@ class ContactsOfContactsSingleScreen extends Component {
                         <View
                             style={[style.breadcrumbContainer]}>
                             <Breadcrumb
-                                entities={[getTranslation(this.props && this.props.previousScreen ? this.props.previousScreen : translations.contactSingleScreen.title, this.props.translation), this.props.isNew ? getTranslation(translations.contactSingleScreen.addContactTitle, this.props.translation) : ((this.props.contact && this.props.contact.firstName ? (this.props.contact.firstName + " ") : '') + (this.props.contact && this.props.contact.lastName ? this.props.contact.lastName : ''))]}
+                                entities={[getTranslation(this.props && this.props.previousScreen ? this.props.previousScreen : contactsOfContactsScreen.contactsTitle, this.props.translation), this.props.isNew ? getTranslation(translations.contactSingleScreen.addContactTitle, this.props.translation) : ((this.props.contact && this.props.contact.firstName ? (this.props.contact.firstName + " ") : '') + (this.props.contact && this.props.contact.lastName ? this.props.contact.lastName : ''))]}
                                 navigator={this.props.navigator}
                                 onPress={this.handlePressBreadcrumb}
                             />
@@ -281,10 +279,8 @@ class ContactsOfContactsSingleScreen extends Component {
                                 </ElevatedView>
                                 {
                                     this.props.role && checkArrayAndLength(lodashIntersect(this.props.role, [
-                                        constants.PERMISSIONS_FOLLOW_UP.followUpAll,
-                                        constants.PERMISSIONS_FOLLOW_UP.followUpCreate,
-                                        constants.PERMISSIONS_CONTACT.contactAll,
-                                        constants.PERMISSIONS_CONTACT.contactModify
+                                        PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsAll,
+                                        PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsModify
                                     ])) ? (
                                         <View>
                                             <Menu
@@ -310,31 +306,11 @@ class ContactsOfContactsSingleScreen extends Component {
                                                         />
                                                     ) : null
                                                 }
-                                                {
-                                                    !this.props.isNew ? (
-                                                        <PermissionComponent
-                                                            render={() => (
-                                                                <MenuItem onPress={this.handleOnAddFollowUp}>
-                                                                    {getTranslation(translations.contactsScreen.addFollowupsButton, this.props.translation)}
-                                                                </MenuItem>
-                                                            )}
-                                                            permissionsList={[constants.PERMISSIONS_FOLLOW_UP.followUpAll, constants.PERMISSIONS_FOLLOW_UP.followUpCreate]}
-                                                            alternativeRender={() => (
-                                                                <View style={[style.rippleStyle, {width: 60}]}/>
-                                                            )}
-                                                        />
-                                                    ) : null
-                                                }
                                                 <DateTimePicker
                                                     isVisible={this.state.isDateTimePickerVisible}
                                                     timeZoneOffsetInMinutes={0}
                                                     onConfirm={this._handleDatePicked}
                                                     onCancel={this._hideDateTimePicker}
-                                                />
-                                                <AddFollowUpScreen
-                                                    showAddFollowUpScreen={this.state.showAddFollowUpScreen}
-                                                    onCancelPressed={this.handleOnCancelPressed}
-                                                    onSavePressed={this.handleOnSavePressed}
                                                 />
                                             </Menu>
                                         </View>
@@ -488,6 +464,7 @@ class ContactsOfContactsSingleScreen extends Component {
             case 'personal':
                 return (
                     <ContactsSinglePersonal
+                        type={translations.personTypes.contactsOfContacts}
                         contact={this.state.contact}
                         activeIndex={this.state.index}
                         onChangeText={this.handleOnChangeText}
@@ -520,6 +497,7 @@ class ContactsOfContactsSingleScreen extends Component {
             case 'address':
                 return (
                     <ContactsSingleAddress
+                        type={translations.personTypes.contactsOfContacts}
                         contact={this.state.contact}
                         activeIndex={this.state.index}
                         onChangeText={this.handleOnChangeText}
@@ -549,6 +527,7 @@ class ContactsOfContactsSingleScreen extends Component {
             case 'exposures':
                 return (
                     <ContactsSingleExposures
+                        type={translations.personTypes.contactsOfContacts}
                         contact={this.state.contact}
                         activeIndex={this.state.index}
                         onPressEditExposure={this.handleOnPressEditExposure}
@@ -567,22 +546,6 @@ class ContactsOfContactsSingleScreen extends Component {
                         handleMoveToNextScreenButton={this.handleMoveToNextScreenButton}
                         selectedExposure={this.props.singleCase}
 
-                        numberOfTabs={this.state.routes.length}
-                        // onPressPreviousButton={this.handlePreviousPress}
-                        onPressNextButton={this.handleMoveToNextScreenButton}
-                        onPressSaveEdit={this.handleOnPressSave}
-                        onPressEdit={this.onPressEdit}
-                        onPressCancelEdit={this.onPressCancelEdit}
-                    />
-                );
-            case 'calendar':
-                return (
-                    <ContactsSingleCalendar
-                        contact={this.state.contact}
-                        activeIndex={this.state.index}
-                        handleOnPressSave={this.handleOnPressSave}
-                        onPressPreviousButton={this.handleMoveToPrevieousScreenButton}
-                        isEditMode={this.state.isEditMode}
                         numberOfTabs={this.state.routes.length}
                         // onPressPreviousButton={this.handlePreviousPress}
                         onPressNextButton={this.handleMoveToNextScreenButton}
@@ -1214,47 +1177,6 @@ class ContactsOfContactsSingleScreen extends Component {
         }
     };
 
-    // Answers handlers
-    onChangeTextAnswer = (value, id) => {
-        let itemClone = _.cloneDeep(this.state.item);
-        let questionnaireAnswers = itemClone && itemClone.questionnaireAnswers ? itemClone.questionnaireAnswers : null;
-        if (!itemClone.questionnaireAnswers) {
-            itemClone.questionnaireAnswers = {};
-            questionnaireAnswers = itemClone.questionnaireAnswers;
-        }
-        questionnaireAnswers[id] = value;
-        this.setState(prevState => ({
-            item: Object.assign({}, prevState.item, { questionnaireAnswers: questionnaireAnswers }),
-            isModified: true
-        }))
-    };
-    onChangeSingleSelection = (value, id) => {
-        let itemClone = _.cloneDeep(this.state.item);
-        let questionnaireAnswers = itemClone && itemClone.questionnaireAnswers ? itemClone.questionnaireAnswers : null;
-        if (!itemClone.questionnaireAnswers) {
-            itemClone.questionnaireAnswers = {};
-            questionnaireAnswers = itemClone.questionnaireAnswers;
-        }
-        questionnaireAnswers[id] = value.value;
-        this.setState(prevState => ({
-            item: Object.assign({}, prevState.item, { questionnaireAnswers: questionnaireAnswers }),
-            isModified: true
-        }))
-    };
-    onChangeMultipleSelection = (selections, id) => {
-        let itemClone = Object.assign({}, this.state.item);
-        let questionnaireAnswers = itemClone && itemClone.questionnaireAnswers ? itemClone.questionnaireAnswers : null;
-        if (!itemClone.questionnaireAnswers) {
-            itemClone.questionnaireAnswers = {};
-            questionnaireAnswers = itemClone.questionnaireAnswers;
-        }
-        questionnaireAnswers[id] = selections.map((e) => {return e.value});
-        this.setState(prevState => ({
-            item: Object.assign({}, prevState.item, { questionnaireAnswers: questionnaireAnswers }),
-            isModified: true
-        }))
-    };
-
     // Exposures handlers
     handleOnPressEditExposure = (relation, index) => {
         // console.log('handleOnPressEditExposure: ', relation, index);
@@ -1266,47 +1188,33 @@ class ContactsOfContactsSingleScreen extends Component {
                 exposure: _.get(relation, 'relationshipData', null),
                 selectedExposure: _.get(relation, 'caseData', null),
                 contact: this.props.isNew ? null : this.props.contact,
-                type: 'Contact',
+                type: 'ContactOfContact',
                 saveExposure: this.handleSaveExposure,
                 caseIdFromCasesScreen: this.props.caseIdFromCasesScreen,
                 isEditMode: false,
-                addContactFromCasesScreen: false
+                addContactFromCasesScreen: false,
+                refreshRelations: this.refreshRelations
             }
         })
     };
-    handleOnPressDeleteExposure = (relation, index) => {
-        if (this.state.contact.relationships.length === 1) {
-            Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.alertMessages.contactDeleteLastExposureError, this.props.translation), [
-                {
-                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
-                    onPress: () => { console.log("Ok pressed") }
-                }
-            ])
-        } else {
-            Alert.alert(getTranslation(translations.alertMessages.warningLabel, this.props.translation), getTranslation(translations.alertMessages.contactDeleteExposureConfirmation, this.props.translation), [
-                {
-                    text: getTranslation(translations.alertMessages.cancelButtonLabel, this.props.translation),
-                    onPress: () => { console.log("Cancel delete") }
-                },
-                {
-                    text: getTranslation(translations.alertMessages.yesButtonLabel, this.props.translation),
-                    onPress: () => {
-                        let relations = _.cloneDeep(this.state.contact.relationships);
-                        console.log('Relations after cloneDeep: ', relations, relation);
-                        if (relations && Array.isArray(relations) && relations.map((e) => { return e._id }).indexOf(relation._id) > -1) {
-                            relations.splice(relations.map((e) => { return e._id }).indexOf(relation._id), 1);
-                            console.log('Relations after splice: ', relations);
-                            this.setState(prevState => ({
-                                contact: Object.assign({}, prevState.contact, { relationships: relations })
-                            }), () => {
-                                relation = updateRequiredFields(this.props.user.activeOutbreakId, this.props.user._id, Object.assign({}, relation), 'delete');
-                                this.props.deleteExposureForContact(this.props.user.activeOutbreakId, this.props.contact._id, relation, this.props.user.token, this.props.teams);
-                            })
-                        }
-                    }
-                }
-            ])
-        }
+    refreshRelations = (exposure) => {
+        this.setState({
+            loading: true
+        }, () => {
+            getExposuresForContact(this.state.contact._id, this.props.user.activeOutbreakId)
+                .then((updatedRelations) => {
+                    this.setState(prevState => ({
+                        loading: false,
+                        contact: Object.assign({}, prevState.contact, {relationships: updatedRelations})
+                    }))
+                })
+                .catch((errorUpdateExposure) => {
+                    console.log('ErrorUpdateExposure', errorUpdateExposure);
+                    this.setState({
+                        loading: false
+                    });
+                })
+        })
     };
 
     handleOnPressSave = () => {
@@ -1426,14 +1334,14 @@ class ContactsOfContactsSingleScreen extends Component {
             }), () => {
                 console.log("ageAndDobPrepareForSave done", this.state.contact);
                 if (this.props.isNew) {
-                    let contactWithRequiredFields = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, this.state.contact), action = 'create', fileType = 'person.json', type = 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT')
+                    let contactWithRequiredFields = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, this.state.contact), action = 'create', fileType = 'person.json', config.personTypes.contactsOfContacts);
                     this.setState(prevState => ({
                         contact: Object.assign({}, prevState.contact, contactWithRequiredFields),
                     }), () => {
                         let contactClone = _.cloneDeep(this.state.contact);
                         // let contactMatchFilter = this.checkIfContactMatchFilter();
                         // console.log('contactMatchFilter', contactMatchFilter)
-                        addContact(contactClone, _.get(this.props, 'periodOfFollowUp', 1), _.get(this.props, 'user._id'))
+                        addContactOfContact(contactClone, _.get(this.props, 'user._id'))
                             .then((result) => {
                                 if (_.isFunction(this.props.refresh)) {
                                     this.props.refresh();
@@ -1452,16 +1360,16 @@ class ContactsOfContactsSingleScreen extends Component {
                 } else {
                     let contactWithRequiredFields = null;
                     if (this.state.deletePressed === true) {
-                        contactWithRequiredFields = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, this.state.contact), action = 'delete', fileType = 'person.json', type = 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT')
+                        contactWithRequiredFields = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, this.state.contact), action = 'delete', fileType = 'person.json', config.personTypes.contactsOfContacts)
                     } else {
-                        contactWithRequiredFields = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, this.state.contact), action = 'update', fileType = 'person.json', type = 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT')
+                        contactWithRequiredFields = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, this.state.contact), action = 'update', fileType = 'person.json', config.personTypes.contactsOfContacts)
                     }
 
                     this.setState(prevState => ({
                         contact: Object.assign({}, prevState.contact, contactWithRequiredFields),
                     }), () => {
                         let contactClone = _.cloneDeep(this.state.contact);
-                        updateContact(contactClone)
+                        updateContactOfContact(contactClone)
                             .then((result) => {
                                 if (_.isFunction(this.props.refresh)) {
                                     this.props.refresh();

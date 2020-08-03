@@ -250,7 +250,7 @@ export function checkForNameDuplicated(id, firstName, lastName, outbreakId) {
     };
 
     return executeQuery(query)
-        .then((result) => checkArrayAndLength(result))
+        .then((result) => Promise.resolve(checkArrayAndLength(result)))
 }
 
 // Expects relationships to be an array of relationships

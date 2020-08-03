@@ -26,3 +26,16 @@ export const selectUserLanguage = createSelector(
     state => lodashGet(state, 'user', null),
     user => lodashGet(user, 'languageId', null)
 );
+
+export const selectRole = createSelector(
+    state => lodashGet(state, 'role', []),
+    role => role
+);
+
+export const selectLocations = createSelector(
+    state => lodashGet(state, 'locations.locations', [])
+);
+
+export const selectSyncState = createSelector(
+    state => lodashGet(state, 'app.syncState', null)
+)

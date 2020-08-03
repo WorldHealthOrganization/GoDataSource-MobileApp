@@ -19,7 +19,7 @@ import lodashGet from "lodash/get";
 import {checkArray, checkArrayAndLength} from "../utils/typeCheckingFunctions";
 import TopContainerButtons from "./../components/TopContainerButtons";
 import PermissionComponent from './../components/PermissionComponent';
-import constants from "./../utils/constants";
+import constants, {PERMISSIONS_CONTACT_OF_CONTACT} from "./../utils/constants";
 import {getTeamsForUserRequest} from './../queries/user';
 
 class ContactsSinglePersonal extends PureComponent {
@@ -66,13 +66,25 @@ class ContactsSinglePersonal extends PureComponent {
             constants.PERMISSIONS_CONTACT.contactAll
         ];
         if (this.props.isNew) {
-            permissionsList.push(
-                constants.PERMISSIONS_CONTACT.contactCreate
-            )
+            if(this.props.type === translations.personTypes.contactsOfContacts) {
+                permissionsList.push(
+                    PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsCreate
+                )
+            } else {
+                permissionsList.push(
+                    constants.PERMISSIONS_CONTACT.contactCreate
+                )
+            }
         } else {
-            permissionsList.push(
-                constants.PERMISSIONS_CONTACT.contactModify
-            )
+            if(this.props.type === translations.personTypes.contactsOfContacts) {
+                permissionsList.push(
+                    PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsModify
+                )
+            } else {
+                permissionsList.push(
+                    constants.PERMISSIONS_CONTACT.contactModify
+                )
+            }
         }
 
         return (

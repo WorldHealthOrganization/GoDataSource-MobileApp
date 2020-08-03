@@ -25,7 +25,7 @@ export function checkObject(object) {
 const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 
-export async function retriablePromise (promise, numberOfRetries, timeout) {
+export async function retriablePromise (promise, numberOfRetries, timeout, error) {
     // if (!isPromise(promise)) {
     //     throw new Error('Wrong input function Promise');
     // }
@@ -33,6 +33,9 @@ export async function retriablePromise (promise, numberOfRetries, timeout) {
         throw new Error('Wrong input function numberOfRetries');
     }
     if (numberOfRetries === 0) {
+        if (error) {
+            return Promise.reject(error);
+        }
         return Promise.reject('retries failed');
     }
     if (!checkInteger(timeout)) {
@@ -50,7 +53,7 @@ export async function retriablePromise (promise, numberOfRetries, timeout) {
             await wait(timeout);
         }
 
-        return retriablePromise(promise, numberOfRetries - 1, timeout);
+        return retriablePromise(promise, numberOfRetries - 1, timeout, error);
     }
 }
 
