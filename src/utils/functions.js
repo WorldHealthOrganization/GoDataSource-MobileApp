@@ -1025,7 +1025,7 @@ export function getTranslation (value, allTransactions) {
     }
     let key = `${value}`;
     if (allTransactions && Array.isArray(allTransactions) && allTransactions[0] && allTransactions[0].languageId) {
-        key = `${key}-${allTransactions[0].languageId}`
+        key = `${key}-${allTransactions[0].languageId}-${new Date(allTransactions[0].updatedAt).getTime()}`;
     }
     if (getTranslation.cache[key] !== undefined) {
         // console.log('~~~ return cache value ~~~', key)
@@ -1048,7 +1048,7 @@ export function getTranslation (value, allTransactions) {
             valueToBeReturned = value;
         }
     }
-    getTranslation.cache[key] = valueToBeReturned;
+    // getTranslation.cache[key] = valueToBeReturned;
     return valueToBeReturned;
 }
 

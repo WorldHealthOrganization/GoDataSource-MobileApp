@@ -11,6 +11,7 @@ const navigationDrawer = {
     helpLabel: 'LNG_LAYOUT_MENU_ITEM_HELP_LABEL',
     //TODO add to backend translations
     addLanguagePacks: 'LNG_NAVIGATION_DRAWER_ADD_LANGUAGE_PACKS',
+    community: 'LNG_MOBILE_NAVIGATION_DRAWER_COMMUNITY_LINK'
 };
 
 const addFollowUpScreen = {
