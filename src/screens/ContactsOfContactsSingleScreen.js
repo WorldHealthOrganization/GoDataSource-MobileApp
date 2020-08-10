@@ -23,7 +23,6 @@ import Ripple from 'react-native-material-ripple';
 import {addFollowUp, updateFollowUpAndContact} from './../actions/followUps';
 import {addContact, checkForNameDuplicated, getExposuresForContact, updateContact} from './../actions/contacts';
 import {removeErrors} from './../actions/errors';
-import DateTimePicker from 'react-native-modal-datetime-picker';
 import _ from 'lodash';
 import {
     calculateDimension,
@@ -39,7 +38,6 @@ import translations from './../utils/translations';
 import ElevatedView from 'react-native-elevated-view';
 import constants, {PERMISSIONS_CONTACT_OF_CONTACT} from "../utils/constants";
 import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
-import PermissionComponent from './../components/PermissionComponent';
 import lodashIntersect from 'lodash/intersection';
 import {addContactOfContact, updateContactOfContact} from './../actions/contactsOfContacts';
 import {contactsOfContactsScreen} from "../utils/translations";
