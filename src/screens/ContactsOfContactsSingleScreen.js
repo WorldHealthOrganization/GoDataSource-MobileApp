@@ -14,14 +14,13 @@ import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import {PagerScroll, TabBar, TabView} from 'react-native-tab-view';
 import ContactsSingleAddress from './../containers/ContactsSingleAddress';
-import ContactsSingleCalendar from './../containers/ContactsSingleCalendar';
 import ContactsSingleExposures from './../containers/ContactsSingleExposures';
 import ContactsSinglePersonal from './../containers/ContactsSinglePersonal';
 import ExposureScreen from './../screens/ExposureScreen';
 import Breadcrumb from './../components/Breadcrumb';
 import Menu, {MenuItem} from 'react-native-material-menu';
 import Ripple from 'react-native-material-ripple';
-import {addFollowUp, getFollowUpsForContactId, updateFollowUpAndContact} from './../actions/followUps';
+import {addFollowUp, updateFollowUpAndContact} from './../actions/followUps';
 import {addContact, checkForNameDuplicated, getExposuresForContact, updateContact} from './../actions/contacts';
 import {removeErrors} from './../actions/errors';
 import DateTimePicker from 'react-native-modal-datetime-picker';
@@ -30,7 +29,6 @@ import {
     calculateDimension,
     computeFullName,
     createDate,
-    daysSince,
     extractIdFromPouchId,
     getTranslation,
     navigation,
@@ -39,14 +37,11 @@ import {
 import moment from 'moment/min/moment.min';
 import translations from './../utils/translations';
 import ElevatedView from 'react-native-elevated-view';
-import AddFollowUpScreen from './AddFollowUpScreen';
-import {generateId, generateTeamId} from "../utils/functions";
 import constants, {PERMISSIONS_CONTACT_OF_CONTACT} from "../utils/constants";
 import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
 import PermissionComponent from './../components/PermissionComponent';
 import lodashIntersect from 'lodash/intersection';
 import {addContactOfContact, updateContactOfContact} from './../actions/contactsOfContacts';
-import {getRelationsForCase} from "../actions/cases";
 import {contactsOfContactsScreen} from "../utils/translations";
 
 const initialLayout = {
@@ -277,45 +272,6 @@ class ContactsOfContactsSingleScreen extends Component {
                                         <Icon name="help" color={'white'} size={15} />
                                     </Ripple>
                                 </ElevatedView>
-                                {
-                                    this.props.role && checkArrayAndLength(lodashIntersect(this.props.role, [
-                                        PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsAll,
-                                        PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsModify
-                                    ])) ? (
-                                        <View>
-                                            <Menu
-                                                ref="menuRef"
-                                                button={
-                                                    <Ripple onPress={this.showMenu} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
-                                                        <Icon name="more-vert" />
-                                                    </Ripple>
-                                                }
-                                            >
-                                                {
-                                                    !this.props.isNew ? (
-                                                        <PermissionComponent
-                                                            render={() => (
-                                                                <MenuItem onPress={this.handleOnPressDeceased}>
-                                                                    {getTranslation(translations.contactSingleScreen.deceasedContactLabel, this.props.translation)}
-                                                                </MenuItem>
-                                                            )}
-                                                            permissionsList={[constants.PERMISSIONS_CONTACT.contactAll, constants.PERMISSIONS_CONTACT.contactModify]}
-                                                            alternativeRender={() => (
-                                                                <View style={[style.rippleStyle, {width: 60}]}/>
-                                                            )}
-                                                        />
-                                                    ) : null
-                                                }
-                                                <DateTimePicker
-                                                    isVisible={this.state.isDateTimePickerVisible}
-                                                    timeZoneOffsetInMinutes={0}
-                                                    onConfirm={this._handleDatePicked}
-                                                    onCancel={this._hideDateTimePicker}
-                                                />
-                                            </Menu>
-                                        </View>
-                                    ) : null
-                                }
                             </View>
                         </View>
                     }
@@ -1419,11 +1375,6 @@ class ContactsOfContactsSingleScreen extends Component {
             dobClone: dobClone
         }
 
-    };
-
-    handleOnPressDeceased = () => {
-        console.log("### show date time picker: ");
-        this._showDateTimePicker();
     };
 
     checkRequiredFieldsPersonalInfo = () => {
