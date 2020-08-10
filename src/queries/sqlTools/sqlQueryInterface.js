@@ -1,6 +1,7 @@
 import translations from './../../utils/translations';
 import {executeQuery} from './helperMethods';
 import lodashGet from 'lodash/get';
+import lodashSet from 'lodash/set';
 import {checkArrayAndLength} from "../../utils/typeCheckingFunctions";
 
 export function getPersonWithRelationsForOutbreakId({outbreakId, filter, search, lastElement, offset, personType}, computeCount) {
@@ -107,6 +108,7 @@ function createGeneralQuery ({outbreakId, innerFilter, search, lastElement, offs
             }
         ]
     };
+
     if (search) {
         mainCondition['$or'] = [
             {[`${innerQueryAlias}.firstName`]: {'$like': `%${search.text}%`}},
@@ -179,7 +181,9 @@ function createGeneralQuery ({outbreakId, innerFilter, search, lastElement, offs
 
     // Main query
     let source = type === translations.personTypes.contacts || type === translations.personTypes.contactsOfContacts ? 'sourceId' : 'targetId';
+    let sourceType = type === translations.personTypes.contacts || type === translations.personTypes.contactsOfContacts ? 'sourceType' : 'targetType';
     let target = type === translations.personTypes.contacts || type === translations.personTypes.contactsOfContacts ? 'targetId' : 'sourceId';
+    let targetType = type === translations.personTypes.contacts || type === translations.personTypes.contactsOfContacts ? 'targetType' : 'sourceType';
     let mainQuery = {
         type: 'select',
         query: innerQuery,
@@ -201,11 +205,25 @@ function createGeneralQuery ({outbreakId, innerFilter, search, lastElement, offs
                 type: 'left',
                 table: 'person',
                 alias: unfilteredExposuresAlias,
-                on: {[`${relationshipAlias}.${source}`]: `${unfilteredExposuresAlias}._id`}
+                on: {
+                    [`${relationshipAlias}.${source}`]: `${unfilteredExposuresAlias}._id`
+                }
             },
         ],
         condition: mainCondition
     };
+
+    if (type === translations.personTypes.contactsOfContacts) {
+        lodashSet(mainQuery, `join[1].on['${relationshipAlias}.${sourceType}']`, translations.personTypes.contacts);
+        lodashSet(mainQuery, `join[2].on['${relationshipAlias}.${sourceType}']`, translations.personTypes.contacts);
+        // mainCondition[`${filteredExposuresAlias}.type`] = translations.personTypes.contacts;
+        // mainCondition[`${unfilteredExposuresAlias}.type`] = translations.personTypes.contacts;
+    }
+    if (type === translations.personTypes.cases) {
+        lodashSet(mainQuery, `join[1].on['${relationshipAlias}.${sourceType}']`, translations.personTypes.contacts);
+        lodashSet(mainQuery, `join[2].on['${relationshipAlias}.${sourceType}']`, translations.personTypes.contacts);
+        // mainCondition[`${unfilteredExposuresAlias}.type`] = translations.personTypes.contacts;
+    }
 
     if (computeCount) {
         mainQuery.fields = [

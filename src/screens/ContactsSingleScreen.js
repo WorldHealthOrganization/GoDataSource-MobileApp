@@ -291,9 +291,7 @@ class ContactsSingleScreen extends Component {
                                 {
                                     this.props.role && checkArrayAndLength(lodashIntersect(this.props.role, [
                                         constants.PERMISSIONS_FOLLOW_UP.followUpAll,
-                                        constants.PERMISSIONS_FOLLOW_UP.followUpCreate,
-                                        constants.PERMISSIONS_CONTACT.contactAll,
-                                        constants.PERMISSIONS_CONTACT.contactModify
+                                        constants.PERMISSIONS_FOLLOW_UP.followUpCreate
                                     ])) ? (
                                         <View>
                                             <Menu
@@ -304,21 +302,6 @@ class ContactsSingleScreen extends Component {
                                                     </Ripple>
                                                 }
                                             >
-                                                {
-                                                    !this.props.isNew ? (
-                                                        <PermissionComponent
-                                                            render={() => (
-                                                                <MenuItem onPress={this.handleOnPressDeceased}>
-                                                                    {getTranslation(translations.contactSingleScreen.deceasedContactLabel, this.props.translation)}
-                                                                </MenuItem>
-                                                            )}
-                                                            permissionsList={[constants.PERMISSIONS_CONTACT.contactAll, constants.PERMISSIONS_CONTACT.contactModify]}
-                                                            alternativeRender={() => (
-                                                                <View style={[style.rippleStyle, {width: 60}]}/>
-                                                            )}
-                                                        />
-                                                    ) : null
-                                                }
                                                 {
                                                     !this.props.isNew ? (
                                                         <PermissionComponent
@@ -1588,11 +1571,6 @@ class ContactsSingleScreen extends Component {
 
     };
 
-    handleOnPressDeceased = () => {
-        console.log("### show date time picker: ");
-        this._showDateTimePicker();
-    };
-
     checkRequiredFieldsPersonalInfo = () => {
         let personalInfo = [];
         for (let i = 0; i < config.contactsSingleScreen.personal.length; i++) {
@@ -1722,17 +1700,6 @@ class ContactsSingleScreen extends Component {
 
     _hideDateTimePicker = () => {
         this.setState({ isDateTimePickerVisible: false });
-    };
-
-    _handleDatePicked = (date) => {
-        console.log("Date selected: ", date);
-        this._hideDateTimePicker();
-
-        this.setState(prevState => ({
-            contact: Object.assign({}, prevState.contact, { deceased: true, dateDeceased: createDate(date) })
-        }), () => {
-            this.handleOnPressSave();
-        });
     };
 
     handleOnPressDeleteContact = () => {

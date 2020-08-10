@@ -15,6 +15,7 @@ import {removeErrors} from './../actions/errors';
 import {getTranslation} from './../utils/functions';
 import translations from './../utils/translations';
 import config from './../utils/config';
+import ViewHOC from "../components/ViewHOC";
 
 class HelpSingleScreen extends Component {
 
@@ -27,6 +28,7 @@ class HelpSingleScreen extends Component {
         this.state = {
             item: this.props.item,
             isEditMode: false,
+            loading: false
         };
         // Bind here methods, or at least don't declare methods in the render method
         this.handleBackButtonClick = this.handleBackButtonClick.bind(this);
@@ -60,7 +62,9 @@ class HelpSingleScreen extends Component {
             ])
         }
         return (
-            <View style={style.container}>
+            <ViewHOC style={style.container}
+                     showLoader={this && this.state && this.state.loading}
+                     loaderText={this.props && this.props.syncState ? 'Loading' : getTranslation(translations.loadingScreenMessages.loadingMsg, this.props.translation)}>
                 <NavBarCustom
                     title={null}
                     customTitle={
@@ -84,7 +88,7 @@ class HelpSingleScreen extends Component {
                     isEditMode={this.state.isEditMode}
                     item={this.state.item}
                 />
-            </View>
+            </ViewHOC>
         );
     }
 
@@ -115,7 +119,8 @@ const style = StyleSheet.create({
 function mapStateToProps(state) {
     return {
         errors: lodashGet(state, 'errors', null),
-        translation: lodashGet(state, 'app.translation', [])
+        translation: lodashGet(state, 'app.translation', []),
+        syncState: lodashGet(state, 'app.syncState', null)
     };
 }
 

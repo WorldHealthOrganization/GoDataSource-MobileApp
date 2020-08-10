@@ -166,7 +166,12 @@ class AnimatedListView extends Component {
                     }];
                 arrayPermissions = [
                     [constants.PERMISSIONS_FOLLOW_UP.followUpAll, constants.PERMISSIONS_FOLLOW_UP.followUpView],
-                    [constants.PERMISSIONS_RELATIONSHIP.relationshipAll, constants.PERMISSIONS_RELATIONSHIP.relationshipCreate],
+                    [
+                        [constants.PERMISSIONS_RELATIONSHIP.relationshipAll, constants.PERMISSIONS_CONTACT.contactAll],
+                        [constants.PERMISSIONS_RELATIONSHIP.relationshipAll, constants.PERMISSIONS_CONTACT.contactCreateRelationshipExposures],
+                        [constants.PERMISSIONS_RELATIONSHIP.relationshipCreate, constants.PERMISSIONS_CONTACT.contactAll],
+                        [constants.PERMISSIONS_RELATIONSHIP.relationshipCreate, constants.PERMISSIONS_CONTACT.contactCreateRelationshipExposures]
+                    ]
                 ];
                 id = get(followUpData, 'id', null);
                 break;

@@ -2,7 +2,7 @@
  * Created by florinpopa on 03/07/2018.
  */
 import React, {Component} from 'react';
-import {Platform, ScrollView, StyleSheet, Text, View} from 'react-native';
+import {Platform, ScrollView, StyleSheet, Text, View, Linking} from 'react-native';
 import NavigationDrawerListItem from './../components/NavigationDrawerListItem';
 import config from './../utils/config';
 import {connect} from "react-redux";
@@ -152,6 +152,12 @@ class NavigationDrawer extends Component {
                         onPress={() => this.handlePressOnListItem('help')}
                         isSelected={'help' === this.state.selectedScreen}
                     />
+                    <NavigationDrawerListItem
+                        key={'community'}
+                        label={getTranslation(translations.navigationDrawer.community, this.props.translation)}
+                        name="open-in-browser"
+                        onPress={this.handleCommunity}
+                    />
                     <NavigationDrawerListItem label={getTranslation(translations.navigationDrawer.logoutLabel, this.props.translation)} name="power-settings-new" onPress={this.handleLogout} />
                     <Text
                         style={{
@@ -185,6 +191,10 @@ class NavigationDrawer extends Component {
                 })
             });
        
+    };
+
+    handleCommunity = async () => {
+        await Linking.openURL('https://community-godata.who.int/');
     };
 
     handleOnPressAdd = (key, index) => {

@@ -16,9 +16,9 @@ export function storeClusters(clusters) {
     }
 };
 
-export function getClusters() {
+export function getClusters(outbreakId) {
     return new Promise((resolve, reject) => {
-        getClustersdRequest((error, response) => {
+        getClustersdRequest(outbreakId, (error, response) => {
             if (error) {
                 console.log("*** getClustersdRequest error: ", error);
                 // dispatch(addError(errorTypes.ERROR_CLUSTERS));

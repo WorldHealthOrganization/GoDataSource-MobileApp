@@ -13,6 +13,7 @@ export default {
 
     // TODO add to backend
     'LNG_NAVIGATION_DRAWER_ADD_LANGUAGE_PACKS': 'Add languagePacks',
+    'LNG_MOBILE_NAVIGATION_DRAWER_COMMUNITY_LINK': 'Community',
 
 
     //addFollowUpScreen
@@ -190,7 +191,9 @@ export default {
     'LNG_FOLLOW_UPS_SINGLE_SCREEN_ACTION_MISSING': 'Missing',
     'LNG_FOLLOW_UPS_SINGLE_SCREEN_ACTION_DELETE': 'Deleted',
     'LNG_FOLLOW_UPS_SINGLE_SCREEN_ACTION_DECEASE': 'Deceased',
-    'LNG_FOLLOW_UPS_SINGLE_SCREEN_ACTION_EDIT_CONTACT': 'Edit contact',
+
+    // TODO change backand translation
+    'LNG_FOLLOW_UPS_SINGLE_SCREEN_ACTION_EDIT_CONTACT': 'View contact',
 
     'LNG_DIALOG_ALERT_MESSAGE_ARE_YOU_SURE_YOU_WANT_TO_DELETE_THIS_FOLLOW_UP': 'Are you sure you want to delete this follow-up?',
 
