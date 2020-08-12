@@ -37,7 +37,7 @@ import {getLocations} from './locations';
 import get from 'lodash/get';
 import lodashIntersection from 'lodash/intersection';
 import {filterByUser} from './../utils/functions';
-import constants from './../utils/constants';
+import constants, {PERMISSIONS_CONTACT_OF_CONTACT} from './../utils/constants';
 import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
 import {updateRequiredFields} from "../utils/functions";
 
@@ -166,7 +166,16 @@ export function computeCommonData(storeUserBool, user, skipLoad) {
                     )) {
                         selectedScreen = 1;
                     } else {
-                        selectedScreen = 2;
+                        if (checkArrayAndLength(
+                            lodashIntersection(userRoles, [
+                                PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsAll,
+                                PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsList
+                            ])
+                        )) {
+                            selectedScreen = 2;
+                        } else {
+                            selectedScreen = 3;
+                        }
                     }
                 }
 
@@ -196,6 +205,8 @@ export function computeCommonData(storeUserBool, user, skipLoad) {
                             constants.PERMISSIONS_FOLLOW_UP.followUpList,
                             constants.PERMISSIONS_CONTACT.contactAll,
                             constants.PERMISSIONS_CONTACT.contactList,
+                            PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsAll,
+                            PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsList,
                             constants.PERMISSIONS_CASE.caseAll,
                             constants.PERMISSIONS_CASE.caseList
                         ]))) {

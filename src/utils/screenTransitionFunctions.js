@@ -10,7 +10,7 @@ import {Alert} from "react-native";
 import get from "lodash/get";
 import isFunction from "lodash/isFunction";
 import config from "./config";
-import constants from './constants';
+import constants, {PERMISSIONS_CONTACT_OF_CONTACT} from './constants';
 
 export function pushNewEditScreen(QRCodeInfo, navigator, user, translation, callback) {
     console.log('pushNewEditScreen QRCodeInfo', QRCodeInfo);
@@ -46,6 +46,10 @@ export function pushNewEditScreen(QRCodeInfo, navigator, user, translation, call
                         itemId = parsedData.resourceContext.contactId;
                         outbreakId = parsedData.resourceContext.outbreakId;
                     }
+                } else if (parsedData.targetResource === 'contactOfContact' || parsedData.targetResource === translations.personTypes.contactsOfContacts) {
+                    itemType = 'contactOfContact';
+                    itemId = get(parsedData, 'resourceContext.contactOfContactId', null);
+                    outbreakId = get(parsedData, 'resourceContext.outbreakId', null);
                 }
             }
         }
@@ -214,6 +218,33 @@ export function handleQRSearchTransition (navigator, error, itemType, record, us
                     Alert.alert(
                         getTranslation(translations.alertMessages.alertLabel, translation),
                         generatePermissionMessage(translations.helpScreen.viewMessage, translations.personTypes.contacts, translation),
+                        [
+                            {
+                                text: getTranslation(translations.alertMessages.okButtonLabel),
+                                onPress: () => {console.log('Ok pressed')}
+                            }
+                        ]
+                    )
+                }
+            } else if (itemType === 'contactOfContact') {
+                if (checkArrayAndLength(lodashIntersection([
+                    PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsAll,
+                    PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsView
+                ], userPermissions))) {
+                    navigator.push({
+                        screen: constants.appScreens.contactsOfContactsSingleScreen,
+                        animated: true,
+                        animationType: 'fade',
+                        passProps: {
+                            contact: record,
+                            refresh: refresh
+                        }
+                    })
+                } else {
+                    // user doesn't have permission to view contact
+                    Alert.alert(
+                        getTranslation(translations.alertMessages.alertLabel, translation),
+                        generatePermissionMessage(translations.helpScreen.viewMessage, translations.personTypes.contactsOfContacts, translation),
                         [
                             {
                                 text: getTranslation(translations.alertMessages.okButtonLabel),

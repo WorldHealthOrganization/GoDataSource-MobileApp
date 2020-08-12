@@ -110,15 +110,15 @@ def getPassword(String currentUser, String keyChain) {
 def pass = getPassword("florinpopa","go.data_keystore_password")
 
 android {
-    compileSdkVersion 28
-    buildToolsVersion '28.0.3'
+    compileSdkVersion 29
+    buildToolsVersion '29.0.3'
 
     defaultConfig {
         applicationId "com.who_mobile2020"
         minSdkVersion 20
-        targetSdkVersion 28
+        targetSdkVersion 29
         multiDexEnabled true
-        versionCode 17
+        versionCode 18
         versionName "1.0.10"
         ndk {
             abiFilters "armeabi-v7a", "x86", 'arm64-v8a', 'x86_64'

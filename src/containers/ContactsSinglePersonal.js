@@ -29,7 +29,8 @@ class ContactsSinglePersonal extends PureComponent {
         super(props);
         this.state = {
             interactionComplete: false,
-            teams: []
+            teams: [],
+            fields: config.contactsSingleScreen.personal
         };
     }
 
@@ -39,7 +40,8 @@ class ContactsSinglePersonal extends PureComponent {
             getTeamsForUserRequest((errorGetTeams, teams) => {
                 this.setState({
                     interactionComplete: true,
-                    teams: checkArrayAndLength(teams) ? teams.map((e) => Object.assign({}, e, {teamId: extractIdFromPouchId(e._id, 'team')})) : []
+                    teams: checkArrayAndLength(teams) ? teams.map((e) => Object.assign({}, e, {teamId: extractIdFromPouchId(e._id, 'team')})) : [],
+                    fields: this.props.type === translations.personTypes.contactsOfContacts ? config.contactsOfContactsPersonal : config.contactsSingleScreen.personal
                 })
             });
         })
@@ -112,7 +114,7 @@ class ContactsSinglePersonal extends PureComponent {
                     >
                     <View style={style.container}>
                         {
-                            config.contactsSingleScreen.personal.map((item) => {
+                            this.state.fields.map((item) => {
                                 return this.handleRenderItem(item)
                             })
                         }
