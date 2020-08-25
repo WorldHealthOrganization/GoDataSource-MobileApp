@@ -1,7 +1,7 @@
 import {getDatabase} from './database';
 import config from './../utils/config';
 
-export function getClustersdRequest (callback) {
+export function getClustersdRequest (outbreakId, callback) {
     let start = new Date().getTime();
     getDatabase(config.mongoCollections.cluster)
         .then((database) => {
@@ -12,6 +12,7 @@ export function getClustersdRequest (callback) {
                         $lte: `cluster.json_\uffff`,
                     },
                     deleted: false,
+                    outbreakId: outbreakId
                 }
             })
                 .then((resultFind) => {

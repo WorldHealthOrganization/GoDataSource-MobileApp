@@ -22,9 +22,13 @@ import {checkArrayAndLength} from './typeCheckingFunctions';
 import {executeQuery, insertOrUpdate} from './../queries/sqlTools/helperMethods';
 import translations from "./translations";
 import sqlConstants from './../queries/sqlTools/constants';
+import constants from "./constants";
 
 // This method is used for handling server responses. Please add here any custom error handling
 export function handleResponse(response) {
+    if (!response || !response.status) {
+        throw new Error('No response');
+    }
     if (response.status === 200) {
         return response.json();
     }
@@ -142,16 +146,23 @@ export function navigation(event, navigator) {
                         addScreen = "ContactsSingleScreen";
                         break;
                     case '2':
-                        screenToSwitchTo = "CasesScreen";
+                        screenToSwitchTo = constants.appScreens.contactsOfContactsScreen;
                         break;
                     case '2-add':
+                        screenToSwitchTo = constants.appScreens.contactsOfContactsSingleScreen;
+                        addScreen = constants.appScreens.contactsOfContactsSingleScreen;
+                        break;
+                    case '3':
+                        screenToSwitchTo = "CasesScreen";
+                        break;
+                    case '3-add':
                         screenToSwitchTo = "CaseSingleScreen";
                         addScreen = "CaseSingleScreen";
                         break;
                     case 'help':
                         screenToSwitchTo = "HelpScreen";
                     break;
-                    case '3':
+                    case '4':
                         screenToSwitchTo = "UsersScreen";
                     break;
                     default:
@@ -209,43 +220,45 @@ export function computeFullName(person) {
 
 export function unzipFile(source, dest, password, clientCredentials) {
     console.log('Stuff: ', source, dest, password, clientCredentials);
-    return new Promise((resolve, reject) => {
-        RNFetchBlobFS.exists(source)
-            .then((exists) => {
-                if (exists) {
-                    unzip(source, dest, 'UTF-8')
-                        .then((path) => {
-                            console.log(`unzip completed at ${path}`);
-                            // Delete the zip file after unzipping
-                            deleteFile(source, true)
-                                .then(() => {
-                                    resolve(path);
-                                })
-                                .catch((errorDelete) => {
-                                    console.log('Error delete: ', errorDelete);
-                                    resolve(path);
-                                })
-                        })
-                        .catch((error) => {
-                            console.log(error);
-                            // Delete the zip file after unzipping
-                            deleteFile(source, true)
-                                .then(() => {
-                                    reject(error);
-                                })
-                                .catch((errorDelete) => {
-                                    console.log('Error delete: ', errorDelete);
-                                    reject(error);
-                                });
-                        })
-                } else {
-                    reject('Zip file does not exist');
-                }
-            })
-            .catch((existsError) => {
-                reject(('There was an error with getting the zip file: ' + existsError));
-            });
-    })
+    return function(dispatch) {
+        return new Promise((resolve, reject) => {
+            RNFetchBlobFS.exists(source)
+                .then((exists) => {
+                    if (exists) {
+                        unzip(source, dest, 'UTF-8')
+                            .then((path) => {
+                                console.log(`unzip completed at ${path}`);
+                                // Delete the zip file after unzipping
+                                deleteFile(source, true)
+                                    .then(() => {
+                                        resolve(path);
+                                    })
+                                    .catch((errorDelete) => {
+                                        console.log('Error delete: ', errorDelete);
+                                        resolve(path);
+                                    })
+                            })
+                            .catch((error) => {
+                                console.log(error);
+                                // Delete the zip file after unzipping
+                                deleteFile(source, true)
+                                    .then(() => {
+                                        reject(error);
+                                    })
+                                    .catch((errorDelete) => {
+                                        console.log('Error delete: ', errorDelete);
+                                        reject(error);
+                                    });
+                            })
+                    } else {
+                        reject('Zip file does not exist');
+                    }
+                })
+                .catch((existsError) => {
+                    reject(('There was an error with getting the zip file: ' + existsError));
+                });
+        })
+    }
 }
 
 export function readDir (path) {
@@ -287,7 +300,7 @@ export function getNumberOfFilesProcessed() {
     return numberOfFilesProcessed;
 }
 
-export function processFilePouch(path, type, totalNumberOfFiles, dispatch, isFirstTime, forceBulk, encryptedData, hubConfig) {
+export function processFilePouch(path, type, totalNumberOfFiles, dispatch, isFirstTime, forceBulk, encryptedData, hubConfig, languagePacks) {
     let fileName = path.split('/')[path.split('/').length - 1];
     let unzipLocation = path.substr(0, (path.length - fileName.length));
     return Promise.resolve()
@@ -310,7 +323,7 @@ export function processFilePouch(path, type, totalNumberOfFiles, dispatch, isFir
             let numberOfFilesProcessedAux = getNumberOfFilesProcessed();
             numberOfFilesProcessedAux += 1;
             setNumberOfFilesProcessed(numberOfFilesProcessedAux);
-            dispatch(setSyncState(({id: 'sync', name: 'Syncing', status: numberOfFilesProcessedAux + "/" + totalNumberOfFiles})));
+            dispatch(setSyncState({id: 'sync', name: 'Syncing', status: numberOfFilesProcessedAux + "/" + totalNumberOfFiles, addLanguagePacks: checkArrayAndLength(languagePacks)}));
             return Promise.resolve('Finished syncing');
         })
         .catch((errorProccessingPouch) => Promise.reject(errorProccessingPouch));
@@ -340,7 +353,7 @@ function getFilePath (unzipPath, fileName) {
 }
 
 // The files are sorted
-export function processFilesSql(path, table, totalNumberOfFiles, dispatch, encryptedData, hubConfig) {
+export function processFilesSql(path, table, totalNumberOfFiles, dispatch, encryptedData, hubConfig, languagePacks) {
     let fileName = path.split('/')[path.split('/').length - 1];
     let unzipLocation = path.substr(0, (path.length - fileName.length));
     return Promise.resolve()
@@ -352,7 +365,7 @@ export function processFilesSql(path, table, totalNumberOfFiles, dispatch, encry
             let numberOfFilesProcessedAux = getNumberOfFilesProcessed();
             numberOfFilesProcessedAux += 1;
             setNumberOfFilesProcessed(numberOfFilesProcessedAux);
-            dispatch(setSyncState(({id: 'sync', name: 'Syncing', status: numberOfFilesProcessedAux + "/" + totalNumberOfFiles})));
+            dispatch(setSyncState({id: 'sync', name: 'Syncing', status: numberOfFilesProcessedAux + "/" + totalNumberOfFiles, addLanguagePacks: checkArrayAndLength(languagePacks)}));
             return Promise.resolve('Finished syncing');
         })
         .catch((errorProcessingSql) => Promise.reject(errorProcessingSql));
@@ -597,6 +610,10 @@ export function extractIdFromPouchId (pouchId, type) {
     if (type.includes('referenceData')) {
         return pouchId.substr('referenceData.json_'.length)
     }
+    if (type.includes('language.json')) {
+        // console.log('language substr', pouchId);
+        return pouchId.substr('language.json_'.length)
+    }
     return pouchId.split('_')[pouchId.split('_').length - 1];
 }
 
@@ -772,6 +789,7 @@ export function mapLocationsOld (locationList) {
 //recursively functions for mapping questionCard questions (followUps and Cases )
 // item = {questionId1: [{date1, value1, subAnswers1}, {date2, value2}], questionId2: [{date: null, value1}]}
 export function extractAllQuestions (questions, item, index) {
+    let start = new Date().getTime();
     if (questions && Array.isArray(questions) && questions.length > 0) {
         // First filter for inactive questions
         questions = questions.filter((e) => !e.inactive || e.inactive === null || e.inactive === false || e.inactive === undefined);
@@ -824,6 +842,7 @@ export function extractAllQuestions (questions, item, index) {
             }
         }
     }
+    // console.log('Processing questions took: ', new Date().getTime() - start);
     return questions;
 }
 
@@ -1018,7 +1037,7 @@ export function getTranslation (value, allTransactions) {
     }
     let key = `${value}`;
     if (allTransactions && Array.isArray(allTransactions) && allTransactions[0] && allTransactions[0].languageId) {
-        key = `${key}-${allTransactions[0].languageId}`
+        key = `${key}-${allTransactions[0].languageId}-${new Date(allTransactions[0].updatedAt).getTime()}`;
     }
     if (getTranslation.cache[key] !== undefined) {
         // console.log('~~~ return cache value ~~~', key)
@@ -1041,16 +1060,20 @@ export function getTranslation (value, allTransactions) {
             valueToBeReturned = value;
         }
     }
-    getTranslation.cache[key] = valueToBeReturned;
+    // getTranslation.cache[key] = valueToBeReturned;
     return valueToBeReturned;
 }
 
 export function localSortHelpItem (helpItemsCopy, propsFilter, stateFilter, filterFromFilterScreen, translations) {
+    // Map helpItemsCopy to use translated title
+    if (checkArrayAndLength(helpItemsCopy)) {
+        helpItemsCopy = helpItemsCopy.map((e) => Object.assign({}, e, {title: getTranslation(e && e.title, translations)}));
+    }
     // Take care of search filter
     if (stateFilter.searchText) {
         helpItemsCopy = helpItemsCopy.filter((e) => {
-            return  e && e.title && stateFilter.searchText.toLowerCase().includes(getTranslation(e.title, translations).toLowerCase()) ||
-                e && e.title && getTranslation(e.title, translations).toLowerCase().includes(stateFilter.searchText.toLowerCase()) 
+            return  (e && e.title && stateFilter.searchText.toLowerCase().includes(e.title.toLowerCase())) ||
+                e && e.title && e.title.toLowerCase().includes(stateFilter.searchText.toLowerCase())
         });
     }
     

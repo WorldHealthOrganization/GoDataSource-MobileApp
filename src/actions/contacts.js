@@ -12,9 +12,30 @@ import {executeQuery, insertOrUpdate} from "../queries/sqlTools/helperMethods";
 import translations from "../utils/translations";
 import sqlConstants from "../queries/sqlTools/constants";
 import {insertOrUpdateExposure} from './exposure';
+import {getPersonWithRelationsForOutbreakId} from "../queries/sqlTools/sqlQueryInterface";
 
 // Add here only the actions, not also the requests that are executed. For that purpose is the requests directory
 export function getContactsForOutbreakId({outbreakId, contactsFilter, exposureFilter, lastElement, offset}, computeCount) {
+    return getPersonWithRelationsForOutbreakId({
+        outbreakId,
+        filter: contactsFilter,
+        search: exposureFilter,
+        lastElement: lastElement,
+        offset,
+        personType: translations.personTypes.contacts
+    }, computeCount)
+        .then((results) => {
+            // console.log('results', results);
+            return Promise.resolve({data: results.data, dataCount: results.dataCount || undefined});
+        })
+        .catch((error) => {
+            console.log('error', error);
+            return Promise.reject(error);
+        })
+}
+
+
+export function getContactsForOutbreakIdOld({outbreakId, contactsFilter, exposureFilter, lastElement, offset}, computeCount) {
     let countPromise = null;
     let contactsPromise = null;
 
@@ -229,7 +250,7 @@ export function checkForNameDuplicated(id, firstName, lastName, outbreakId) {
     };
 
     return executeQuery(query)
-        .then((result) => checkArrayAndLength(result))
+        .then((result) => Promise.resolve(checkArrayAndLength(result)))
 }
 
 // Expects relationships to be an array of relationships

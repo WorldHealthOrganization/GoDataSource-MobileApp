@@ -7,9 +7,29 @@ import translations from "../utils/translations";
 import sqlConstants from "../queries/sqlTools/constants";
 import get from 'lodash/get';
 import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
+import {getPersonWithRelationsForOutbreakId} from './../queries/sqlTools/sqlQueryInterface';
 
 // Add here only the actions, not also the requests that are executed. For that purpose is the requests directory
 export function getCasesForOutbreakId({outbreakId, casesFilter, searchText, lastElement, offset}, computeCount) {
+    return getPersonWithRelationsForOutbreakId({
+        outbreakId,
+        filter: casesFilter,
+        search: searchText,
+        lastElement: lastElement,
+        offset,
+        personType: translations.personTypes.cases
+    }, computeCount)
+        .then((results) => {
+            // console.log('results', results);
+            return Promise.resolve({data: results.data, dataCount: results && results.dataCount});
+        })
+        .catch((error) => {
+            console.log('error', error);
+            return Promise.reject(error);
+        })
+}
+
+export function getCasesForOutbreakIdOld({outbreakId, casesFilter, searchText, lastElement, offset}, computeCount) {
     let countPromise = null;
     let casesPromise = null;
 
@@ -133,6 +153,9 @@ export function getPersonsByName(outbreakId, search, type) {
         condition['type'] = {'$ne': translations.personTypes.contacts};
     }
     if (type === 'Case') {
+        condition['type'] = translations.personTypes.contacts;
+    }
+    if (type === 'ContactOfContact') {
         condition['type'] = translations.personTypes.contacts;
     }
     let casesQuery = {

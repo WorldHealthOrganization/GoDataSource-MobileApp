@@ -2,6 +2,9 @@ const navigationDrawer = {
     activeOutbreak: 'LNG_NAVIGATION_DRAWER_ACTIVE_OUTBREAK',
     followUpsLabel: 'LNG_NAVIGATION_DRAWER_FOLLOW_UPS',
     contactsLabel: 'LNG_NAVIGATION_DRAWER_CONTACTS',
+    //TODO add to backend translations
+    contactsOfContactsLabel: 'LNG_NAVIGATION_DRAWER_CONTACTS_OF_CONTACTS',
+
     casesLabel: 'LNG_NAVIGATION_DRAWER_CASES',
     syncHubManually: 'LNG_NAVIGATION_DRAWER_SYNC_HUB_MANUAL',
     changeHubConfig: 'LNG_NAVIGATION_DRAWER_CHANGE_HUB_CONFIG',
@@ -9,6 +12,9 @@ const navigationDrawer = {
     languagesLabel: 'LNG_NAVIGATION_DRAWER_LANGUAGES',
     logoutLabel: 'LNG_NAVIGATION_DRAWER_LOGOUT',
     helpLabel: 'LNG_LAYOUT_MENU_ITEM_HELP_LABEL',
+    //TODO add to backend translations
+    addLanguagePacks: 'LNG_NAVIGATION_DRAWER_ADD_LANGUAGE_PACKS',
+    community: 'LNG_MOBILE_NAVIGATION_DRAWER_COMMUNITY_LINK'
 };
 
 const addFollowUpScreen = {
@@ -261,6 +267,13 @@ const contactsScreen = {
     noContacts: 'LNG_CONTACT_LIST_SCREEN_NO_CONTACTS'
 };
 
+// TODO add to backend
+export const contactsOfContactsScreen = {
+    contactsTitle: 'LNG_CONTACT_OF_CONTACT_LIST_SCREEN_TITLE',
+    // editButton: 'LNG_CONTACT_LIST_SCREEN_EDIT_BUTTON',
+    noContacts: 'LNG_CONTACT_OF_CONTACT_LIST_SCREEN_NO_CONTACTS'
+};
+
 const followUpsScreen = {
     followUpsTitle: 'LNG_FOLLOW_UPS_LIST_SCREEN_TITLE',
     noFollowupsMessage: 'LNG_FOLLOW_UPS_LIST_SCREEN_NO_FOLLOW_UPS_MESSAGE',
@@ -445,6 +458,7 @@ const addressFieldLabels = {
 const personTypes = {
     cases: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE',
     contacts: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT',
+    contactsOfContacts: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT_OF_CONTACT',
     events: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_EVENT'
 };
 
@@ -550,6 +564,13 @@ const followUpAgenda = {
 
 const personListItem = {
     dayOfFollowUp: 'LNG_PERSON_LIST_ITEM_DAY_OF_FOLLOW_UP'
+};
+
+//TODO add translation to backend
+export const languageModalComponentLabels = {
+    infoMessage: 'LNG_MOBILE_LANGUAGE_MODAL_COMPONENT_INFO_MESSAGE',
+    downloadButton: 'LNG_MOBILE_LANGUAGE_MODAL_COMPONENT_DOWNLOAD_BUTTON',
+    alertNoLanguage: 'LNG_MOBILE_LANGUAGE_MODAL_COMPONENT_ALERT_NO_LANGUAGE'
 };
 
 export default {

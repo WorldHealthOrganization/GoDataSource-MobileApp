@@ -2,7 +2,7 @@
  * Created by florinpopa on 03/07/2018.
  */
 import React, {Component} from 'react';
-import {Platform, ScrollView, StyleSheet, Text, View} from 'react-native';
+import {Platform, ScrollView, StyleSheet, Text, View, Linking} from 'react-native';
 import NavigationDrawerListItem from './../components/NavigationDrawerListItem';
 import config from './../utils/config';
 import {connect} from "react-redux";
@@ -19,6 +19,7 @@ import PermissionComponent from './../components/PermissionComponent';
 import constants from "../utils/constants";
 import lodashGet from 'lodash/get';
 import isNumber from 'lodash/isNumber';
+import LanguageComponent from "../components/LanguageComponent";
 
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
@@ -110,18 +111,23 @@ class NavigationDrawer extends Component {
                     <View style={{justifyContent: 'center', alignItems: 'center'}}>
                         <PermissionComponent
                             render={() => (
-                                <DropdownInput
-                                    id="test"
-                                    label={getTranslation(translations.navigationDrawer.languagesLabel, this.props.translation)}
-                                    value={this.props.availableLanguages && this.props.user && this.props.user.languageId && this.props.availableLanguages[this.props.availableLanguages.map((e) => {return e.value}).indexOf(this.props.user.languageId)] ? this.props.availableLanguages[this.props.availableLanguages.map((e) => {return e.value}).indexOf(this.props.user.languageId)].label : null}
-                                    data={this.props.availableLanguages}
-                                    isEditMode={true}
-                                    isRequired={false}
-                                    onChange={this.handleOnChangeLanguage}
+                                <LanguageComponent
                                     style={{width: '90%'}}
-                                    translation={this.props.translation}
-                                    screenSize={this.props.screenSize}
+                                    navigator={this.props.navigator}
                                 />
+
+                                //<DropdownInput
+                                  //  id="test"
+                                    //label={getTranslation(translations.navigationDrawer.languagesLabel, this.props.translation)}
+                                    //value={this.props.availableLanguages && this.props.user && this.props.user.languageId && this.props.availableLanguages[this.props.availableLanguages.map((e) => {return e.value}).indexOf(this.props.user.languageId)] ? this.props.availableLanguages[this.props.availableLanguages.map((e) => {return e.value}).indexOf(this.props.user.languageId)].label : null}
+                                    // data={this.props.availableLanguages}
+                                    // isEditMode={true}
+                                    // isRequired={false}
+                                    // onChange={this.handleOnChangeLanguage}
+                                    // style={{width: '90%'}}
+                                    // translation={this.props.translation}
+                                    // screenSize={this.props.screenSize}
+                                // />
                             )}
                             permissionsList={[
                                 constants.PERMISSIONS_USER.userAll,
@@ -132,9 +138,9 @@ class NavigationDrawer extends Component {
                     <NavigationDrawerListItem
                         label={getTranslation(translations.navigationDrawer.usersLabel, this.props.translation)}
                         name={'contact-phone'}
-                        key={3}
-                        onPress={() => this.handlePressOnListItem(3)}
-                        isSelected={3 === this.state.selectedScreen}
+                        key={4}
+                        onPress={() => this.handlePressOnListItem(4)}
+                        isSelected={4 === this.state.selectedScreen}
                         addButton={false}
                         itemKey={'users'}
                     />
@@ -145,6 +151,12 @@ class NavigationDrawer extends Component {
                         name="help"
                         onPress={() => this.handlePressOnListItem('help')}
                         isSelected={'help' === this.state.selectedScreen}
+                    />
+                    <NavigationDrawerListItem
+                        key={'community'}
+                        label={getTranslation(translations.navigationDrawer.community, this.props.translation)}
+                        name="open-in-browser"
+                        onPress={this.handleCommunity}
                     />
                     <NavigationDrawerListItem label={getTranslation(translations.navigationDrawer.logoutLabel, this.props.translation)} name="power-settings-new" onPress={this.handleLogout} />
                     <Text
@@ -179,6 +191,10 @@ class NavigationDrawer extends Component {
                 })
             });
        
+    };
+
+    handleCommunity = async () => {
+        await Linking.openURL('https://community-godata.who.int/');
     };
 
     handleOnPressAdd = (key, index) => {

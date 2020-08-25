@@ -11,6 +11,10 @@ export default {
     'LNG_NAVIGATION_DRAWER_LOGOUT': 'Logout',
     'LNG_LAYOUT_MENU_ITEM_HELP_LABEL': 'Help & support',
 
+    // TODO add to backend
+    'LNG_NAVIGATION_DRAWER_ADD_LANGUAGE_PACKS': 'Add languagePacks',
+    'LNG_MOBILE_NAVIGATION_DRAWER_COMMUNITY_LINK': 'Community',
+
 
     //addFollowUpScreen
     'LNG_ADD_FOLLOW_UP_MODAL_TITLE': 'Add follow-up',
@@ -187,7 +191,9 @@ export default {
     'LNG_FOLLOW_UPS_SINGLE_SCREEN_ACTION_MISSING': 'Missing',
     'LNG_FOLLOW_UPS_SINGLE_SCREEN_ACTION_DELETE': 'Deleted',
     'LNG_FOLLOW_UPS_SINGLE_SCREEN_ACTION_DECEASE': 'Deceased',
-    'LNG_FOLLOW_UPS_SINGLE_SCREEN_ACTION_EDIT_CONTACT': 'Edit contact',
+
+    // TODO change backand translation
+    'LNG_FOLLOW_UPS_SINGLE_SCREEN_ACTION_EDIT_CONTACT': 'View contact',
 
     'LNG_DIALOG_ALERT_MESSAGE_ARE_YOU_SURE_YOU_WANT_TO_DELETE_THIS_FOLLOW_UP': 'Are you sure you want to delete this follow-up?',
 
@@ -493,5 +499,15 @@ export default {
 
     'LNG_FOLLOW_UP_AGENDA_NO_FOLLOW_UPS_FOR_DATE': 'No follow-ups to show for this day',
 
-    'LNG_PERSON_LIST_ITEM_DAY_OF_FOLLOW_UP': 'Day of follow-up: '
+    'LNG_PERSON_LIST_ITEM_DAY_OF_FOLLOW_UP': 'Day of follow-up: ',
+
+
+    // LanguageModalComponent
+    //TODO add all to backend
+    'LNG_MOBILE_LANGUAGE_MODAL_COMPONENT_INFO_MESSAGE': 'Please select the packs that you want to download. \nClicking download means that a new sync will start so please make sure that you are connected to the internet before proceeding.',
+    'LNG_MOBILE_LANGUAGE_MODAL_COMPONENT_DOWNLOAD_BUTTON': 'Download language packs',
+    'LNG_MOBILE_LANGUAGE_MODAL_COMPONENT_ALERT_NO_LANGUAGE': 'Please select at least one language before proceeding to download',
+
+    'LNG_CONTACT_OF_CONTACT_LIST_SCREEN_TITLE': 'Contacts of contacts',
+    'LNG_CONTACT_OF_CONTACT_LIST_SCREEN_NO_CONTACTS': 'There are no contacts of contacts to display',
 };

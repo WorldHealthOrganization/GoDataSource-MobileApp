@@ -12,7 +12,7 @@ import ElevatedView from 'react-native-elevated-view';
 import Ripple from 'react-native-material-ripple';
 import {calculateDimension} from './../utils/functions';
 import PermissionComponent from './../components/PermissionComponent';
-import constants from './../utils/constants';
+import constants, {PERMISSIONS_CONTACT_OF_CONTACT} from './../utils/constants';
 
 class NavigationDrawerListItem extends PureComponent {
 
@@ -41,6 +41,12 @@ class NavigationDrawerListItem extends PureComponent {
                 permissionElement = [
                     constants.PERMISSIONS_CONTACT.contactAll,
                     constants.PERMISSIONS_CONTACT.contactList
+                ];
+                break;
+            case 'contactsOfContacts':
+                permissionElement = [
+                    PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsAll,
+                    PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsList
                 ];
                 break;
             case 'cases':

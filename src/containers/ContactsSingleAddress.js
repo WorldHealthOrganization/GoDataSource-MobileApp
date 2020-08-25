@@ -10,7 +10,7 @@ import {calculateDimension, createDate, extractIdFromPouchId, getTranslation} fr
 import config from './../utils/config';
 import {connect} from "react-redux";
 import styles from './../styles';
-import constants from './../utils/constants';
+import constants, {PERMISSIONS_CONTACT_OF_CONTACT} from './../utils/constants';
 import Ripple from 'react-native-material-ripple';
 import CardComponent from './../components/CardComponent';
 import translations from './../utils/translations'
@@ -60,13 +60,25 @@ class ContactsSingleAddress extends PureComponent {
             constants.PERMISSIONS_CONTACT.contactAll
         ];
         if (this.props.isNew) {
-            permissionsList.push(
-                constants.PERMISSIONS_CONTACT.contactCreate
-            )
+            if(this.props.type === translations.personTypes.contactsOfContacts) {
+                permissionsList.push(
+                    PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsCreate
+                )
+            } else {
+                permissionsList.push(
+                    constants.PERMISSIONS_CONTACT.contactCreate
+                )
+            }
         } else {
-            permissionsList.push(
-                constants.PERMISSIONS_CONTACT.contactModify
-            )
+            if(this.props.type === translations.personTypes.contactsOfContacts) {
+                permissionsList.push(
+                    PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsModify
+                )
+            } else {
+                permissionsList.push(
+                    constants.PERMISSIONS_CONTACT.contactModify
+                )
+            }
         }
 
         return (

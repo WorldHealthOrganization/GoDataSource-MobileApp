@@ -13,6 +13,8 @@ const appScreens = {
     caseSingleScreen: 'CaseSingleScreen',
     contactsScreen: 'ContactsScreen',
     contactSingleScreen: 'ContactsSingleScreen',
+    contactsOfContactsScreen: 'ContactsOfContactsScreen',
+    contactsOfContactsSingleScreen: 'ContactsOfContactsSingleScreen',
     exposureScreen: 'ExposureScreen',
     helpScreen: 'HelpScreen',
     helpSingleScreen: 'HelpSingleScreen',
@@ -48,6 +50,25 @@ const PERMISSIONS_CONTACT = {
     contactCreateRelationshipExposures: 'contact_create_relationship_exposures',
     contactModifyRelationshipExposures: 'contact_modify_relationship_exposures',
     contactDeleteRelationshipExposures: 'contact_delete_relationship_exposures',
+};
+
+export const PERMISSIONS_CONTACT_OF_CONTACT = {
+    contactsOfContactsAll: 'contact_of_contact_all',
+    contactsOfContactsView: 'contact_of_contact_view',
+    contactsOfContactsList: 'contact_of_contact_list',
+    contactsOfContactsCreate: 'contact_of_contact_create',
+    contactsOfContactsModify: 'contact_of_contact_modify',
+    contactsOfContactsDelete: 'contact_of_contact_delete',
+    contactsOfContactsListRelationshipContacts: 'contact_of_contact_list_relationship_contacts',
+    contactsOfContactsViewRelationshipContacts: 'contact_of_contact_view_relationship_contacts',
+    contactsOfContactsCreateRelationshipContacts: 'contact_of_contact_create_relationship_contacts',
+    contactsOfContactsModifyRelationshipContacts: 'contact_of_contact_modify_relationship_contacts',
+    contactsOfContactsDeleteRelationshipContact: 'contact_of_contact_delete_relationship_contacts',
+    contactsOfContactsListRelationshipExposures: 'contact_of_contact_list_relationship_exposures',
+    contactsOfContactsViewRelationshipExposures: 'contact_of_contact_view_relationship_exposures',
+    contactsOfContactsCreateRelationshipExposures: 'contact_of_contact_create_relationship_exposures',
+    contactsOfContactsModifyRelationshipExposures: 'contact_of_contact_modify_relationship_exposures',
+    contactsOfContactsDeleteRelationshipExposures: 'contact_of_contact_delete_relationship_exposures',
 };
 
 const PERMISSIONS_CASE = {

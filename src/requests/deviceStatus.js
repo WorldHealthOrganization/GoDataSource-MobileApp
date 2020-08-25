@@ -6,7 +6,7 @@ export function checkDeviceStatus(url, installationId, clientId, clientSecret, c
     if (url && installationId) {
         let requestUrl = `${url}/devices/find-by-physical-device-id/${installationId}`;
 
-        retriablePromise(fetchWitTimeout( encodeURI(requestUrl), {
+        retriablePromise(fetchWitTimeout.bind(null, encodeURI(requestUrl), {
             method: 'GET',
             headers: {
                 'Authorization': 'Basic ' + base64.encode(`${clientId}:${clientSecret}`),
@@ -20,7 +20,7 @@ export function checkDeviceStatus(url, installationId, clientId, clientSecret, c
             })
             .then((response) => {
                 // console.log("*** checkDeviceStatus response: ", response);
-                callback(null, response.status);
+                callback(null, response && response.status ? response.status : null);
             })
             .catch((error) => {
                 console.log("*** checkDeviceStatus error: ", error);

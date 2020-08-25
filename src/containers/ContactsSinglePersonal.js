@@ -19,7 +19,7 @@ import lodashGet from "lodash/get";
 import {checkArray, checkArrayAndLength} from "../utils/typeCheckingFunctions";
 import TopContainerButtons from "./../components/TopContainerButtons";
 import PermissionComponent from './../components/PermissionComponent';
-import constants from "./../utils/constants";
+import constants, {PERMISSIONS_CONTACT_OF_CONTACT} from "./../utils/constants";
 import {getTeamsForUserRequest} from './../queries/user';
 
 class ContactsSinglePersonal extends PureComponent {
@@ -29,7 +29,8 @@ class ContactsSinglePersonal extends PureComponent {
         super(props);
         this.state = {
             interactionComplete: false,
-            teams: []
+            teams: [],
+            fields: config.contactsSingleScreen.personal
         };
     }
 
@@ -39,7 +40,8 @@ class ContactsSinglePersonal extends PureComponent {
             getTeamsForUserRequest((errorGetTeams, teams) => {
                 this.setState({
                     interactionComplete: true,
-                    teams: checkArrayAndLength(teams) ? teams.map((e) => Object.assign({}, e, {teamId: extractIdFromPouchId(e._id, 'team')})) : []
+                    teams: checkArrayAndLength(teams) ? teams.map((e) => Object.assign({}, e, {teamId: extractIdFromPouchId(e._id, 'team')})) : [],
+                    fields: this.props.type === translations.personTypes.contactsOfContacts ? config.contactsOfContactsPersonal : config.contactsSingleScreen.personal
                 })
             });
         })
@@ -66,13 +68,25 @@ class ContactsSinglePersonal extends PureComponent {
             constants.PERMISSIONS_CONTACT.contactAll
         ];
         if (this.props.isNew) {
-            permissionsList.push(
-                constants.PERMISSIONS_CONTACT.contactCreate
-            )
+            if(this.props.type === translations.personTypes.contactsOfContacts) {
+                permissionsList.push(
+                    PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsCreate
+                )
+            } else {
+                permissionsList.push(
+                    constants.PERMISSIONS_CONTACT.contactCreate
+                )
+            }
         } else {
-            permissionsList.push(
-                constants.PERMISSIONS_CONTACT.contactModify
-            )
+            if(this.props.type === translations.personTypes.contactsOfContacts) {
+                permissionsList.push(
+                    PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsModify
+                )
+            } else {
+                permissionsList.push(
+                    constants.PERMISSIONS_CONTACT.contactModify
+                )
+            }
         }
 
         return (
@@ -100,7 +114,7 @@ class ContactsSinglePersonal extends PureComponent {
                     >
                     <View style={style.container}>
                         {
-                            config.contactsSingleScreen.personal.map((item) => {
+                            this.state.fields.map((item) => {
                                 return this.handleRenderItem(item)
                             })
                         }

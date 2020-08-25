@@ -37,8 +37,9 @@ import {getLocations} from './locations';
 import get from 'lodash/get';
 import lodashIntersection from 'lodash/intersection';
 import {filterByUser} from './../utils/functions';
-import constants from './../utils/constants';
+import constants, {PERMISSIONS_CONTACT_OF_CONTACT} from './../utils/constants';
 import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
+import {updateRequiredFields} from "../utils/functions";
 
 // Add here only the actions, not also the requests that are executed.
 // For that purpose is the requests directory
@@ -123,8 +124,18 @@ export function computeCommonData(storeUserBool, user, skipLoad) {
 
                 let userTeams = await getUserTeams(user._id);
                 let userRoles = await getUserRoles(user.roleIds);
-                promises.push(getClusters());
-                promises.push(getAvailableLanguages(dispatch));
+                let availableLanguages = await getAvailableLanguages(dispatch);
+
+                // If there is a difference between user language and the device available languages, update user
+                if (!availableLanguages.deviceLanguages.find((e) => e.value === user.languageId)) {
+                    user.languageId = get(availableLanguages, 'deviceLanguages[0].value', user.languageId);
+                    user = updateRequiredFields(user.activeOutbreakId, user._id, user, 'update');
+
+                    promises.push(updateUserRequest(user));
+                }
+
+                promises.push(getClusters(user.activeOutbreakId));
+                // promises.push(getAvailableLanguages(dispatch));
                 promises.push(getReferenceData());
                 promises.push(getTranslations(user.languageId));
                 promises.push(getLocations(outbreakAndLocationInfo.locationIds || null));
@@ -155,7 +166,16 @@ export function computeCommonData(storeUserBool, user, skipLoad) {
                     )) {
                         selectedScreen = 1;
                     } else {
-                        selectedScreen = 2;
+                        if (checkArrayAndLength(
+                            lodashIntersection(userRoles, [
+                                PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsAll,
+                                PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsList
+                            ])
+                        )) {
+                            selectedScreen = 2;
+                        } else {
+                            selectedScreen = 3;
+                        }
                     }
                 }
 
@@ -185,6 +205,8 @@ export function computeCommonData(storeUserBool, user, skipLoad) {
                             constants.PERMISSIONS_FOLLOW_UP.followUpList,
                             constants.PERMISSIONS_CONTACT.contactAll,
                             constants.PERMISSIONS_CONTACT.contactList,
+                            PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsAll,
+                            PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsList,
                             constants.PERMISSIONS_CASE.caseAll,
                             constants.PERMISSIONS_CASE.caseList
                         ]))) {
@@ -196,7 +218,7 @@ export function computeCommonData(storeUserBool, user, skipLoad) {
                                 storeLocations(get(actionsObject, 'locations.treeLocationsList', null)),
                                 storeUserLocationsList(get(actionsObject, 'locations.locationsList', null)),
                                 storeUserLocations(filterByUser(get(actionsObject, 'locations.treeLocationsList', null), userTeams)),
-                                saveAvailableLanguages(get(actionsObject,  'availableLanguages', null)),
+                                saveAvailableLanguages(availableLanguages),
                                 storeReferenceData(get(actionsObject,  'referenceData', null)),
                                 saveTranslation(get(actionsObject,  'translations', null)),
                                 storeClusters(get(actionsObject,  'clusters', null)),
@@ -260,15 +282,14 @@ export function computeCommonData(storeUserBool, user, skipLoad) {
 
 export function updateUser(user) {
     return async function (dispatch) {
-        updateUserRequest(user, (error, newUser) => {
-            if (error) {
+        updateUserRequest(user)
+            .then((newUser) => {
+                dispatch(storeUser(newUser.user));
+            })
+            .catch((error) => {
                 console.log('Error while updating user: ', error);
                 dispatch(addError(errorTypes.ERROR_UPDATE_USER));
-            }
-            if (newUser) {
-                dispatch(storeUser(newUser));
-            }
-        })
+            })
     }
 }
 

@@ -75,32 +75,34 @@ export function getUserByIdRequest (userId, callback) {
         });
 }
 
-export function updateUserRequest (user, callback) {
-    let start = new Date().getTime();
-    getDatabase(config.mongoCollections.user)
-        .then((database) => {
-            database.put(user)
-                .then((resultUpdateUser) => {
-                    console.log('ResultUpdateUser: ', resultUpdateUser);
-                    database.get(user._id)
-                        .then((updatedUser) => {
-                            console.log('Updated user: ', updatedUser);
-                            callback(null, updatedUser);
-                        })
-                        .catch((errorUpdatedUser) => {
-                            console.log('Error updated user: ');
-                            return callback(errorUpdatedUser);
-                        })
-                })
-                .catch((errorUpdateUser) => {
-                    console.log('ErrorUpdateUser: ', errorUpdateUser);
-                    return callback(errorUpdateUser);
-                })
-        })
-        .catch((errorGetDatabase) => {
-            console.log('Error while getting database: ', errorGetDatabase);
-            callback(errorGetDatabase);
-        });
+export function updateUserRequest (user) {
+    return new Promise((resolve,reject) => {
+        let start = new Date().getTime();
+        getDatabase(config.mongoCollections.user)
+            .then((database) => {
+                database.put(user)
+                    .then((resultUpdateUser) => {
+                        console.log('ResultUpdateUser: ', resultUpdateUser);
+                        database.get(user._id)
+                            .then((updatedUser) => {
+                                // console.log('Updated user: ', updatedUser);
+                                return resolve({user: updatedUser});
+                            })
+                            .catch((errorUpdatedUser) => {
+                                console.log('Error updated user: ');
+                                return reject(errorUpdatedUser);
+                            })
+                    })
+                    .catch((errorUpdateUser) => {
+                        console.log('ErrorUpdateUser: ', errorUpdateUser);
+                        return reject(errorUpdateUser);
+                    })
+            })
+            .catch((errorGetDatabase) => {
+                console.log('Error while getting database: ', errorGetDatabase);
+                return reject(errorGetDatabase);
+            });
+    })
 }
 
 export function getRolesForUserRequest (roleIds, callback) {
