@@ -528,7 +528,7 @@ export function sendDatabaseToServer () {
                                 url: Platform.OS === 'ios' ? internetCredentialsGlobal.server : internetCredentialsGlobal.service,
                                 clientId: internetCredentialsGlobal.username,
                                 clientSecret: internetCredentialsGlobal.password
-                            }, null, true, false, dispatch));
+                            }, null, true, false, null));
                         })
                         .catch((errorGetDatabase) => {
                             if (errorGetDatabase === 'No data to export') {
@@ -563,7 +563,7 @@ export function addLanguagePacks(languagePacks) {
                     return getDatabaseSnapshotRequestNew(internetCredentials, null, dispatch, languagePacks)
                 })
                 .then((databasePath) => {
-                    dispatch(processFilesForSyncNew(null, databasePath, internetCredentials, true, true, true, dispatch, languagePacks));
+                    dispatch(processFilesForSyncNew(null, databasePath, internetCredentials, true, true, true, null, languagePacks));
 
                     let fullCredentials = JSON.parse(internetCredentials.clientId);
                     if (!checkArrayAndLength(lodashIntersection(fullCredentials.language, languagePacks))) {
@@ -576,7 +576,7 @@ export function addLanguagePacks(languagePacks) {
                     }
                 })
                 .catch((error) => {
-                    dispatch(processFilesForSyncNew(error, null, internetCredentials, true, true, true, dispatch, languagePacks));
+                    dispatch(processFilesForSyncNew(error, null, internetCredentials, true, true, true, null, languagePacks));
                 })
         }
     }
