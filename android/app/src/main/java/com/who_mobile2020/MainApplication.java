@@ -37,6 +37,7 @@ public class MainApplication extends NavigationApplication {
 
          Parse.initialize(new Parse.Configuration.Builder(this)
                  .applicationId("b61f5946-1af3-4e07-9986-9ffd1e36ae93")
+                 .clientKey("KlYddh2OdVycHuVBhXv2")
                  .server("http://whoapicd.clarisoft.com:1337/api")
                  .build()
          );

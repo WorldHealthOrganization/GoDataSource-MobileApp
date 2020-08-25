@@ -4,7 +4,7 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
-import {StyleSheet, View} from 'react-native';
+import {ActivityIndicator, StyleSheet, View} from 'react-native';
 import {Icon} from 'react-native-material-ui';
 import styles from './../styles';
 import NavBarCustom from './../components/NavBarCustom';
@@ -176,6 +176,7 @@ class CasesScreen extends Component {
                                 dataCount={this.props.dataCount || 0}
                                 dataType={'Case'}
                                 colors={this.state.riskColors}
+                                loadMore={this.props.loadMore}
                                 filterText={filterText}
                                 style={[style.listViewStyle]}
                                 componentContainerStyle={style.componentContainerStyle}
@@ -197,6 +198,21 @@ class CasesScreen extends Component {
                         permissionsList={['case_all', 'case_list']}
                     />
                 </View>
+                {
+                    this.props.loadMore ? (
+                        <View style={
+                            {
+                                width: '100%',
+                                height: 60,
+                                backgroundColor: styles.appBackground,
+                                justifyContent: 'center',
+                                alignItems: 'center'
+                            }}
+                        >
+                            <ActivityIndicator animating size={'large'} />
+                        </View>
+                    ) : (null)
+                }
 
                 <View style={styles.mapContainer}>
                     {

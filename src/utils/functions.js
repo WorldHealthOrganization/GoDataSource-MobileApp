@@ -220,43 +220,45 @@ export function computeFullName(person) {
 
 export function unzipFile(source, dest, password, clientCredentials) {
     console.log('Stuff: ', source, dest, password, clientCredentials);
-    return new Promise((resolve, reject) => {
-        RNFetchBlobFS.exists(source)
-            .then((exists) => {
-                if (exists) {
-                    unzip(source, dest, 'UTF-8')
-                        .then((path) => {
-                            console.log(`unzip completed at ${path}`);
-                            // Delete the zip file after unzipping
-                            deleteFile(source, true)
-                                .then(() => {
-                                    resolve(path);
-                                })
-                                .catch((errorDelete) => {
-                                    console.log('Error delete: ', errorDelete);
-                                    resolve(path);
-                                })
-                        })
-                        .catch((error) => {
-                            console.log(error);
-                            // Delete the zip file after unzipping
-                            deleteFile(source, true)
-                                .then(() => {
-                                    reject(error);
-                                })
-                                .catch((errorDelete) => {
-                                    console.log('Error delete: ', errorDelete);
-                                    reject(error);
-                                });
-                        })
-                } else {
-                    reject('Zip file does not exist');
-                }
-            })
-            .catch((existsError) => {
-                reject(('There was an error with getting the zip file: ' + existsError));
-            });
-    })
+    return function(dispatch) {
+        return new Promise((resolve, reject) => {
+            RNFetchBlobFS.exists(source)
+                .then((exists) => {
+                    if (exists) {
+                        unzip(source, dest, 'UTF-8')
+                            .then((path) => {
+                                console.log(`unzip completed at ${path}`);
+                                // Delete the zip file after unzipping
+                                deleteFile(source, true)
+                                    .then(() => {
+                                        resolve(path);
+                                    })
+                                    .catch((errorDelete) => {
+                                        console.log('Error delete: ', errorDelete);
+                                        resolve(path);
+                                    })
+                            })
+                            .catch((error) => {
+                                console.log(error);
+                                // Delete the zip file after unzipping
+                                deleteFile(source, true)
+                                    .then(() => {
+                                        reject(error);
+                                    })
+                                    .catch((errorDelete) => {
+                                        console.log('Error delete: ', errorDelete);
+                                        reject(error);
+                                    });
+                            })
+                    } else {
+                        reject('Zip file does not exist');
+                    }
+                })
+                .catch((existsError) => {
+                    reject(('There was an error with getting the zip file: ' + existsError));
+                });
+        })
+    }
 }
 
 export function readDir (path) {
@@ -787,6 +789,7 @@ export function mapLocationsOld (locationList) {
 //recursively functions for mapping questionCard questions (followUps and Cases )
 // item = {questionId1: [{date1, value1, subAnswers1}, {date2, value2}], questionId2: [{date: null, value1}]}
 export function extractAllQuestions (questions, item, index) {
+    let start = new Date().getTime();
     if (questions && Array.isArray(questions) && questions.length > 0) {
         // First filter for inactive questions
         questions = questions.filter((e) => !e.inactive || e.inactive === null || e.inactive === false || e.inactive === undefined);
@@ -839,6 +842,7 @@ export function extractAllQuestions (questions, item, index) {
             }
         }
     }
+    // console.log('Processing questions took: ', new Date().getTime() - start);
     return questions;
 }
 

@@ -30,7 +30,8 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                     dataCount: 0,
                     lastElement: null,
                     limit: 15,
-                    isAddFromNavigation: false
+                    isAddFromNavigation: false,
+                    loadMore: false
                 };
                 this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this));
             }
@@ -99,6 +100,7 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                         onPressFullName={this.onPressFullName}
                         onPressExposure={this.onPressExposure}
                         onEndReached={this.getData}
+                        loadMore={this.state.loadMore}
                         {...props} />
                 );
             }
@@ -191,35 +193,41 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                     }
                     if (doAction === true) {
                         let filters = this.prepareFilters();
-                        methodForGettingData(filters, isRefresh === true ? isRefresh : false, this.props)
-                            .then((result) => {
-                                if (isRefresh === true && !isRefreshAfterSync) {
-                                    this.props.setLoaderState(false);
-                                }
-                                this.setState((prevState) => {
-                                    return {
-                                        data: prevState.lastElement !== null || (!isRefresh && (prevState.data.length + result.data.length) === prevState.dataCount) ? prevState.data.concat(result.data) : result.data,
-                                        lastElement: result.data.length === 10 ? screenType === 'FollowUpsScreen' ? Object.assign({}, get(result, 'data[9].mainData', null), {followUpId: get(result, 'data[9].followUpData._id', null)}) : get(result, 'data[9].mainData', null) : null,
-                                        isAddFromNavigation: false,
-                                        dataCount: typeof get(result, 'dataCount') === 'number' ? get(result, 'dataCount') : prevState.dataCount,
-                                        offset: result.data.length
+                        this.setState({
+                            loadMore: isRefresh === null
+                        }, () => {
+                            methodForGettingData(filters, isRefresh === true ? isRefresh : false, this.props)
+                                .then((result) => {
+                                    if (isRefresh === true && !isRefreshAfterSync) {
+                                        this.props.setLoaderState(false);
                                     }
-                                })
-                            })
-                            .catch((errorGetData) => {
-                                this.setState({
-                                    isAddFromNavigation: false
-                                }, () => {
-                                    this.props.setLoaderState(false);
-                                    Alert.alert('Error', 'An error occurred while getting data', [
-                                        {
-                                            text: 'Ok', onPress: () => {
-                                                console.log('Ok pressed')
-                                            }
+                                    this.setState((prevState) => {
+                                        return {
+                                            data: prevState.lastElement !== null || (!isRefresh && (prevState.data.length + result.data.length) === prevState.dataCount) ? prevState.data.concat(result.data) : result.data,
+                                            lastElement: result.data.length === 10 ? screenType === 'FollowUpsScreen' ? Object.assign({}, get(result, 'data[9].mainData', null), {followUpId: get(result, 'data[9].followUpData._id', null)}) : get(result, 'data[9].mainData', null) : null,
+                                            isAddFromNavigation: false,
+                                            dataCount: typeof get(result, 'dataCount') === 'number' ? get(result, 'dataCount') : prevState.dataCount,
+                                            offset: result.data.length,
+                                            loadMore: false
                                         }
-                                    ])
-                                });
-                            })
+                                    })
+                                })
+                                .catch((errorGetData) => {
+                                    this.setState({
+                                        isAddFromNavigation: false,
+                                        loadMore: false
+                                    }, () => {
+                                        this.props.setLoaderState(false);
+                                        Alert.alert('Error', 'An error occurred while getting data', [
+                                            {
+                                                text: 'Ok', onPress: () => {
+                                                    console.log('Ok pressed')
+                                                }
+                                            }
+                                        ])
+                                    });
+                                })
+                        });
                     }
                 }
             };

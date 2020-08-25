@@ -196,17 +196,17 @@ export function storeHubConfigurationNew(hubConfiguration) {
             .then(() => AsyncStorage.getItem(hubConfiguration.url))
             .then((lastSyncDate) => getDatabaseSnapshotRequestNew(hubConfiguration, lastSyncDate, dispatch))
             .then((databasePath) => {
-                dispatch(processFilesForSyncNew(null, databasePath, hubConfiguration, true, true, true, dispatch));
+                dispatch(processFilesForSyncNew(null, databasePath, hubConfiguration, true, true, true, null));
             })
             .catch((error) => {
                 console.log('Error while doing stuff: ', error);
-                dispatch(processFilesForSyncNew(error, null, hubConfiguration, true, true, true, dispatch));
+                dispatch(processFilesForSyncNew(error, null, hubConfiguration, true, true, true, null));
             })
     }
 }
 
 async function processFilesForSyncNew(error, response, hubConfiguration, isFirstTime, syncSuccessful, forceBulk, dispatch, languagePacks) {
-    // return async function (dispatch) {
+    return async function (dispatch) {
         let hubConfig = JSON.parse(hubConfiguration.clientId);
         if (error && !error.isAPIError) {
             if (error === 'No data to export') {
@@ -223,7 +223,7 @@ async function processFilesForSyncNew(error, response, hubConfiguration, isFirst
             let responseUnzipPath = null;
 
             Promise.resolve()
-                .then(() => unzipFile(response, constants.DATABASE_LOCATIONS, null, hubConfiguration))
+                .then(() => dispatch(unzipFile(response, constants.DATABASE_LOCATIONS, null, hubConfiguration)))
                 .then((unzipPath) => {
                     responseUnzipPath = unzipPath;
                     dispatch(setSyncState({id: 'unzipFile', name: "Unzipping database", status: 'Success', addLanguagePacks: checkArrayAndLength(languagePacks)}));
@@ -345,7 +345,7 @@ async function processFilesForSyncNew(error, response, hubConfiguration, isFirst
                     }
                 })
         }
-    // }
+    }
 }
 
 function sortFiles (files) {

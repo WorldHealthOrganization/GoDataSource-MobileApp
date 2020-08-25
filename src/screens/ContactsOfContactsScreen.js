@@ -4,7 +4,7 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
-import {StyleSheet, View} from 'react-native';
+import {ActivityIndicator, StyleSheet, View} from 'react-native';
 import styles from './../styles';
 import NavBarCustom from './../components/NavBarCustom';
 import ElevatedView from 'react-native-elevated-view';
@@ -153,6 +153,7 @@ class ContactsOfContactsScreen extends Component {
                                 data={this.props.data || []}
                                 dataCount={this.props.dataCount || 0}
                                 colors={this.state.riskColors}
+                                loadMore={this.props.loadMore}
                                 dataType={'ContactOfContact'}
                                 filterText={filterText}
                                 style={[style.listViewStyle]}
@@ -178,6 +179,21 @@ class ContactsOfContactsScreen extends Component {
                         ]}
                     />
                 </View>
+                {
+                    this.props.loadMore ? (
+                        <View style={
+                            {
+                                width: '100%',
+                                height: 60,
+                                backgroundColor: styles.appBackground,
+                                justifyContent: 'center',
+                                alignItems: 'center'
+                            }}
+                        >
+                            <ActivityIndicator animating size={'large'} />
+                        </View>
+                    ) : (null)
+                }
 
                 <View style={styles.mapContainer}>
                     {

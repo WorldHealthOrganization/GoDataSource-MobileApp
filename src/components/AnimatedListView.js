@@ -4,7 +4,7 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
-import {View, Text, StyleSheet, Animated, FlatList, Alert} from 'react-native';
+import {View, Text, ActivityIndicator, Animated, FlatList, Alert, StyleSheet} from 'react-native';
 import {calculateDimension, getTranslation} from './../utils/functions';
 import styles from './../styles';
 import {connect} from "react-redux";
@@ -126,7 +126,7 @@ class AnimatedListView extends Component {
                         </Animated.View>
                     </View>
                 }
-                onEndReached={this.props.data.length >= 10 ? this.props.onEndReached : null}
+                onEndReached={this.loadMore}
                 onEndReachedThreshold={0.01}
             />
         );
@@ -377,6 +377,12 @@ class AnimatedListView extends Component {
         return (
             <View style={style.separatorComponentStyle} />
         )
+    };
+
+    loadMore = () => {
+        if (this.props.data.length >= 10) {
+            this.props.onEndReached(null)
+        }
     };
 
     handleOnChangeText = (text) => {

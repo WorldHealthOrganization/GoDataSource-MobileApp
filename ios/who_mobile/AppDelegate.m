@@ -50,6 +50,7 @@
   [self registerForRemoteNotifications:[UIApplication sharedApplication]];
   
   ParseClientConfiguration *config = [ParseClientConfiguration configurationWithBlock:^(id<ParseMutableClientConfiguration>  _Nonnull configuration) {
+    configuration.clientKey = @"KlYddh2OdVycHuVBhXv2";
     configuration.applicationId = @"b61f5946-1af3-4e07-9986-9ffd1e36ae93";
     configuration.server = @"http://whoapicd.clarisoft.com:1337/api";
   }];
