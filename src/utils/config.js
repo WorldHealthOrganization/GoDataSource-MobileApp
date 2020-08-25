@@ -3,7 +3,7 @@
  */
 import styles from './../styles';
 import {Platform} from 'react-native';
-import translations from './translations';
+import translations, {contactsOfContactsScreen} from './translations';
 import {createDate} from './../utils/functions';
 import constants from './../utils/constants';
 
@@ -27,6 +27,12 @@ const sideMenuItems = [
         key: 'contacts',
         name: 'people',
         label: translations.navigationDrawer.contactsLabel,
+        // addButton: true
+    },
+    {
+        key: 'contactsOfContacts',
+        name: 'people',
+        label: contactsOfContactsScreen.contactsTitle,
         // addButton: true
     },
     {
@@ -98,6 +104,15 @@ const tabsValuesRoutes = {
         {key: 'personal', title: translations.contactSingleScreen.personalTitle},
         {key: 'address', title: translations.contactSingleScreen.addressTitle},
         {key: 'calendar', title: translations.contactSingleScreen.calendarTitle}
+    ],
+    contactsOfContactsSingle: [
+        {key: 'personal', title: translations.contactSingleScreen.personalTitle},
+        {key: 'address', title: translations.contactSingleScreen.addressTitle},
+        {key: 'exposures', title: translations.contactSingleScreen.exposuresTitle}
+    ],
+    contactsOfContactsSingleWithoutExposures: [
+        {key: 'personal', title: translations.contactSingleScreen.personalTitle},
+        {key: 'address', title: translations.contactSingleScreen.addressTitle}
     ],
     contactsAdd: [
         {key: 'personal', title: translations.contactSingleScreen.personalTitle},
@@ -1440,6 +1455,174 @@ const addExposureScreen = [
     }
 ];
 
+const contactsOfContactsPersonal = [
+    {
+        fields: [
+            {
+                cardNumber: 1,
+                id: 'firstName',
+                label: translations.contactSingleScreen.firstName,
+                labelValue: 'test',
+                type: 'TextInput',
+                value: '',
+                isRequired: true,
+                isEditMode: true,
+                multiline: false,
+                objectType: 'Contact'
+            },
+            {
+                cardNumber: 1,
+                id: 'middleName',
+                label: translations.contactSingleScreen.middleName,
+                labelValue: 'test',
+                type: 'TextInput',
+                value: '',
+                isRequired: false,
+                isEditMode: true,
+                multiline: false,
+                objectType: 'Contact'
+            },
+            {
+                cardNumber: 1,
+                id: 'lastName',
+                label: translations.contactSingleScreen.lastName,
+                labelValue: 'test',
+                type: 'TextInput',
+                value: '',
+                isRequired: false,
+                isEditMode: true,
+                multiline: false,
+                objectType: 'Contact'
+            },
+            {
+                cardNumber: 1,
+                id: 'gender',
+                label: translations.contactSingleScreen.gender,
+                labelValue: 'test',
+                type: 'DropdownInput',
+                value: '',
+                isRequired: false,
+                isEditMode: true,
+                objectType: 'Contact'
+            },
+            {
+                cardNumber: 1,
+                id: 'occupation',
+                label: translations.contactSingleScreen.occupation,
+                labelValue: 'test',
+                type: 'DropdownInput',
+                value: '',
+                isRequired: false,
+                isEditMode: true,
+                objectType: 'Contact'
+            },
+            {
+                cardNumber: 2,
+                id: 'ageOrDob',
+                type: 'TextSwitchSelector',
+                values: 'TextSwitchSelectorAgeOrDobValues', //switch possibilities from config file
+                selectedItemIndexForTextSwitchSelector: 'selectedItemIndexForTextSwitchSelectorForAge', //name of state parameter that will contain the selected index from values
+                isEditMode: true,
+                objectType: 'Contact'
+            },
+            {
+                cardNumber: 3,
+                id: 'dob',
+                label: translations.contactSingleScreen.dob,
+                labelValue: 'test',
+                value: '',
+                type: "DatePicker",
+                isRequired: false,
+                isEditMode: true,
+                dependsOn: 'TextSwitchSelectorAgeOrDobValues', //if depends on this switch item and it is not selected, don't display
+                format: 'MM/dd/YYYY',
+                objectType: 'Contact'
+            },
+            {
+                cardNumber: 2,
+                id: 'age',
+                label: translations.contactSingleScreen.age,
+                type: 'TextInputWithDropDown',
+                value: '',
+                isRequired: false,
+                isEditMode: true,
+                multiline: false,
+                dependsOn: 'TextSwitchSelectorAgeOrDobValues',
+                dropDownData: 'ageUnitOfMeasureDropDown', //drop down with values
+                selectedItemIndexForAgeUnitOfMeasureDropDown: 'selectedItemIndexForAgeUnitOfMeasureDropDown', //name of state parameter that will contain the selected index from values
+                objectType: 'Contact',
+                keyboardType: 'numeric'
+            },
+            {
+                cardNumber: 3,
+                id: 'dateOfReporting',
+                label: translations.contactSingleScreen.dateOfReporting,
+                labelValue: 'test',
+                value: '',
+                type: "DatePicker",
+                isRequired: true,
+                isEditMode: true,
+                format: 'MM/dd/YYYY',
+                objectType: 'Contact'
+            },
+            {
+                cardNumber: 3,
+                id: 'isDateOfReportingApproximate',
+                label: translations.contactSingleScreen.isDateOfReportingApproximate,
+                labelValue: 'test',
+                type: 'SwitchInput',
+                value: false,
+                isRequired: false,
+                isEditMode: true,
+                activeButtonColor: 'green',
+                activeBackgroundColor: 'green',
+                objectType: 'Contact'
+            },
+            {
+                cardNumber: 1,
+                id: 'visualId',
+                label: translations.contactSingleScreen.contactId,
+                labelValue: 'test',
+                type: 'TextInput',
+                value: '',
+                isRequired: false,
+                isEditMode: false,
+                multiline: false,
+                objectType: 'Contact'
+            }
+        ]
+    },
+    {
+        fields: [
+            {
+                cardNumber: 1,
+                id: 'riskLevel',
+                label: translations.contactSingleScreen.riskLevel,
+                labelValue: 'test',
+                type: 'DropdownInput',
+                value: '',
+                isRequired: false,
+                isEditMode: true,
+                activeButtonColor: 'red',
+                activeBackgroundColor: 'red',
+                objectType: 'Contact'
+            },
+            {
+                cardNumber: 1,
+                id: 'riskReason',
+                label: translations.contactSingleScreen.riskReason,
+                labelValue: 'test',
+                type: 'TextInput',
+                value: '',
+                isRequired: false,
+                isEditMode: true,
+                multiline: true,
+                objectType: 'Contact'
+            }
+        ]
+    }
+];
+
 const contactsSingleScreen = {
     personal: [
         {
@@ -1923,6 +2106,7 @@ const personTypes = {
     cases: translations.personTypes.cases,
     contacts: translations.personTypes.contacts,
     events: translations.personTypes.events,
+    contactsOfContacts: translations.personTypes.contactsOfContacts
 };
 
 const mongoCollections = {
@@ -2148,5 +2332,6 @@ export default {
     statusPendingWipe,
     rawSQLQueryString,
     rawSQLQueryWhereString,
-    whocdCredentials
+    whocdCredentials,
+    contactsOfContactsPersonal
 };

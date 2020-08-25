@@ -256,6 +256,7 @@ class QuestionCardContent extends PureComponent {
             case 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_NUMERIC':
                 return (
                     <TextInput
+                        key={item.variable}
                         id={item.variable}
                         label={translations.questionCardLabels.textInputLabel}
                         labelValue={item.text}
@@ -280,6 +281,7 @@ class QuestionCardContent extends PureComponent {
             case 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_DATE_TIME':
                 return (
                     <DatePicker
+                        key={item.variable}
                         id={item.variable}
                         label={translations.questionCardLabels.datePickerLabel}
                         value={questionAnswers}
@@ -314,6 +316,7 @@ class QuestionCardContent extends PureComponent {
 
                 return (
                     <DropdownInput
+                        key={item.variable}
                         id={item.variable}
                         label={translations.questionCardLabels.dropDownInputLabel}
                         labelValue={item.text}
@@ -375,7 +378,7 @@ class QuestionCardContent extends PureComponent {
                 );
             case 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_MARKUP':
                 return (
-                    <Section label={getTranslation(item.text, this.props.translation)}/>
+                    <Section key={item.variable} label={getTranslation(item.text, this.props.translation)}/>
                 );
             default:
                 return(

@@ -7,7 +7,7 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
-import {StyleSheet, View} from 'react-native';
+import {ActivityIndicator, StyleSheet, View} from 'react-native';
 import {Icon} from 'react-native-material-ui';
 import styles from './../styles';
 import NavBarCustom from './../components/NavBarCustom';
@@ -15,6 +15,7 @@ import CalendarPicker from './../components/CalendarPicker';
 import config from './../utils/config';
 import Ripple from 'react-native-material-ripple';
 import {connect} from "react-redux";
+import {compose} from 'redux';
 import AnimatedListView from './../components/AnimatedListView';
 import Breadcrumb from './../components/Breadcrumb';
 import ValuePicker from './../components/ValuePicker';
@@ -33,6 +34,7 @@ import {bindActionCreators} from "redux";
 import {setLoaderState} from './../actions/app';
 import PermissionComponent from './../components/PermissionComponent';
 import {handleQRSearchTransition} from "../utils/screenTransitionFunctions";
+// import compose from 'lodash/flowRight';
 
 class FollowUpsScreen extends Component {
 
@@ -167,6 +169,7 @@ class FollowUpsScreen extends Component {
                                 dataCount={get(this.props, 'dataCount', 0)}
                                 dataType={'FollowUp'}
                                 colors={this.state.followUpsColors}
+                                loadMore={this.props.loadMore}
                                 filterText={filterText}
                                 style={[style.listViewStyle]}
                                 componentContainerStyle={style.componentContainerStyle}
@@ -188,6 +191,22 @@ class FollowUpsScreen extends Component {
                         permissionsList={['follow_up_all', 'follow_up_list']}
                     />
                 </View>
+                {
+                    this.props.loadMore ? (
+                        <View style={
+                            {
+                                width: '100%',
+                                height: 60,
+                                backgroundColor: styles.appBackground,
+                                justifyContent: 'center',
+                                alignItems: 'center'
+                            }}
+                        >
+                            <ActivityIndicator animating size={'large'} />
+                        </View>
+                    ) : (null)
+                }
+
                 <View style={styles.mapContainer}>
                     {
                         this.state.error === null ? (
@@ -369,4 +388,9 @@ function matchDispatchProps(dispatch) {
     }, dispatch);
 }
 
-export default connect(mapStateToProps, matchDispatchProps)(enhanceListWithGetData(getFollowUpsForOutbreakId, 'FollowUpsScreen')(FollowUpsScreen));
+export default compose(
+    connect(mapStateToProps, matchDispatchProps),
+    enhanceListWithGetData(getFollowUpsForOutbreakId, 'FollowUpsScreen')
+)(FollowUpsScreen)
+
+// export default connect(mapStateToProps, matchDispatchProps)(enhanceListWithGetData(getFollowUpsForOutbreakId, 'FollowUpsScreen')(FollowUpsScreen));

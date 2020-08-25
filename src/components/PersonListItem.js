@@ -150,7 +150,7 @@ class PersonListItem extends Component {
         let returnedValues = {};
         let exposures = get(itemToRender, 'exposureData', null);
         // For follow-ups and contact we need to compute exposures
-        if (type === 'FollowUp' || type === 'Contact') {
+        if (type === 'FollowUp' || type === 'Contact' || type === 'ContactOfContact') {
             returnedValues.exposures = handleExposedTo(exposures, false);
             if (type === 'FollowUp') {
                 returnedValues.followUpDay = get(itemToRender, 'followUpData.index', null);

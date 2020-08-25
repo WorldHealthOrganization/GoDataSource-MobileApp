@@ -4,8 +4,8 @@ import get from 'lodash/get';
 import {createDate} from './../../utils/functions';
 import {extractIdFromPouchId, extractMainAddress, getTranslation, navigation} from "../../utils/functions";
 import RNExitApp from "react-native-exit-app";
-import translations from "../../utils/translations";
-import constants from './../../utils/constants';
+import translations, {contactsOfContactsScreen} from "../../utils/translations";
+import constants, {PERMISSIONS_CONTACT_OF_CONTACT} from './../../utils/constants';
 import {screenTransition} from './../../utils/screenTransitionFunctions';
 
 // Here have access to redux props
@@ -30,7 +30,8 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                     dataCount: 0,
                     lastElement: null,
                     limit: 15,
-                    isAddFromNavigation: false
+                    isAddFromNavigation: false,
+                    loadMore: false
                 };
                 this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this));
             }
@@ -99,6 +100,7 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                         onPressFullName={this.onPressFullName}
                         onPressExposure={this.onPressExposure}
                         onEndReached={this.getData}
+                        loadMore={this.state.loadMore}
                         {...props} />
                 );
             }
@@ -119,6 +121,15 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                         };
                         break;
                     case 'ContactsScreen':
+                        filter = {
+                            outbreakId: get(this.props, 'user.activeOutbreakId', null),
+                            contactsFilter: get(this.state, 'mainFilter', null),
+                            exposureFilter: get(this.state, 'searchText', null),
+                            lastElement: get(this.state, 'lastElement', null),
+                            offset: get(this.state, 'data.length', 0)
+                        };
+                        break;
+                    case 'ContactsOfContactsScreen':
                         filter = {
                             outbreakId: get(this.props, 'user.activeOutbreakId', null),
                             contactsFilter: get(this.state, 'mainFilter', null),
@@ -182,35 +193,41 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                     }
                     if (doAction === true) {
                         let filters = this.prepareFilters();
-                        methodForGettingData(filters, isRefresh === true ? isRefresh : false, this.props)
-                            .then((result) => {
-                                if (isRefresh === true && !isRefreshAfterSync) {
-                                    this.props.setLoaderState(false);
-                                }
-                                this.setState((prevState) => {
-                                    return {
-                                        data: prevState.lastElement !== null || (!isRefresh && (prevState.data.length + result.data.length) === prevState.dataCount) ? prevState.data.concat(result.data) : result.data,
-                                        lastElement: result.data.length === 10 ? screenType === 'FollowUpsScreen' ? Object.assign({}, get(result, 'data[9].mainData', null), {followUpId: get(result, 'data[9].followUpData._id', null)}) : get(result, 'data[9].mainData', null) : null,
-                                        isAddFromNavigation: false,
-                                        dataCount: typeof get(result, 'dataCount') === 'number' ? get(result, 'dataCount') : prevState.dataCount,
-                                        offset: result.data.length
+                        this.setState({
+                            loadMore: isRefresh === null
+                        }, () => {
+                            methodForGettingData(filters, isRefresh === true ? isRefresh : false, this.props)
+                                .then((result) => {
+                                    if (isRefresh === true && !isRefreshAfterSync) {
+                                        this.props.setLoaderState(false);
                                     }
-                                })
-                            })
-                            .catch((errorGetData) => {
-                                this.setState({
-                                    isAddFromNavigation: false
-                                }, () => {
-                                    this.props.setLoaderState(false);
-                                    Alert.alert('Error', 'An error occurred while getting data', [
-                                        {
-                                            text: 'Ok', onPress: () => {
-                                                console.log('Ok pressed')
-                                            }
+                                    this.setState((prevState) => {
+                                        return {
+                                            data: prevState.lastElement !== null || (!isRefresh && (prevState.data.length + result.data.length) === prevState.dataCount) ? prevState.data.concat(result.data) : result.data,
+                                            lastElement: result.data.length === 10 ? screenType === 'FollowUpsScreen' ? Object.assign({}, get(result, 'data[9].mainData', null), {followUpId: get(result, 'data[9].followUpData._id', null)}) : get(result, 'data[9].mainData', null) : null,
+                                            isAddFromNavigation: false,
+                                            dataCount: typeof get(result, 'dataCount') === 'number' ? get(result, 'dataCount') : prevState.dataCount,
+                                            offset: result.data.length,
+                                            loadMore: false
                                         }
-                                    ])
-                                });
-                            })
+                                    })
+                                })
+                                .catch((errorGetData) => {
+                                    this.setState({
+                                        isAddFromNavigation: false,
+                                        loadMore: false
+                                    }, () => {
+                                        this.props.setLoaderState(false);
+                                        Alert.alert('Error', 'An error occurred while getting data', [
+                                            {
+                                                text: 'Ok', onPress: () => {
+                                                    console.log('Ok pressed')
+                                                }
+                                            }
+                                        ])
+                                    });
+                                })
+                        });
                     }
                 }
             };
@@ -279,6 +296,9 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                     case 'ContactsScreen':
                         forwardProps.contact = dataToForward;
                         break;
+                    case constants.appScreens.contactsOfContactsScreen:
+                        forwardProps.contact = dataToForward;
+                        break;
                     case 'CasesScreen':
                         forwardProps.case = dataToForward;
                         break;
@@ -313,12 +333,16 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                 } else {
                     let dataToForwardType = 'contact';
                     if (forwardScreen && dataToForwardType && dataToForward) {
+                        let type = 'Contact';
+                        if (screenType === constants.appScreens.contactsOfContactsScreen) {
+                            type = "ContactOfContact";
+                        }
                         this.props.navigator.showModal({
                             screen: forwardScreen,
                             animated: true,
                             passProps: {
                                 [dataToForwardType]: dataToForward,
-                                type: 'Contact',
+                                type: type,
                                 refresh: this.refresh
                             }
                         })
@@ -345,6 +369,31 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                         screen: forwardScreen,
                         animated: true,
                         passProps: {
+                            isNew: true,
+                            type: 'ContactOfContact',
+                            addContactFromCasesScreen: true,
+                            caseIdFromCasesScreen: caseData._id,
+                            caseAddress: extractMainAddress(get(caseData, 'addresses', [])),
+                            singleCase: caseData,
+                            refresh: this.refresh
+                        }
+                    })
+                    // this.props.navigator.push({
+                    //     screen: forwardScreen,
+                    //     animated: true,
+                    //     passProps: {
+                    //         isNew: false,
+                    //         isEditMode: true,
+                    //         contact: caseData,
+                    //         refresh: this.refresh
+                    //     }
+                    // })
+                }
+                if (screenType === constants.appScreens.contactsOfContactsScreen) {
+                    this.props.navigator.push({
+                        screen: forwardScreen,
+                        animated: true,
+                        passProps: {
                             isNew: false,
                             isEditMode: true,
                             contact: caseData,
@@ -363,6 +412,9 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                 forwardedProps['previousScreen'] = prevScreen;
                 forwardedProps['refresh'] = this.refresh;
                 forwardedProps['isEditMode'] = false;
+                if (screenType === constants.appScreens.contactsOfContactsScreen) {
+                    forwardedProps['type'] = 'ContactsOfContacts'
+                }
 
                 if (forwardScreen) {
                     screenTransition(this.props.navigator, 'push', forwardScreen, forwardedProps, this.props.role, requiredPermissions);
@@ -380,23 +432,24 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                 let previousScreen = screenType === constants.appScreens.followUpScreen ? translations.followUpsScreen.followUpsTitle : translations.contactsScreen.contactsTitle;
 
                 if (forwardScreen) {
-                    let forwardProps = {
-                        case: {_id: get(exposure, 'id', null)},
-                        refresh: this.refresh,
-                        previousScreen: previousScreen
-                    };
+                    let forwardProps = null;
+                    if (screenType === constants.appScreens.contactsOfContactsScreen) {
+                        forwardProps = {
+                            contact: {_id: get(exposure, 'id', null)},
+                            refresh: this.refresh,
+                            previousScreen: contactsOfContactsScreen.contactsTitle,
+                            isEditMode: false,
+                            getContact: true
+                        };
+                    } else {
+                        forwardProps = {
+                            case: {_id: get(exposure, 'id', null)},
+                            refresh: this.refresh,
+                            previousScreen: previousScreen
+                        };
+                    }
 
                     screenTransition(this.props.navigator, 'push', forwardScreen, forwardProps, this.props.role, requiredPermissions);
-
-                    // this.props.navigator.push({
-                    //     screen: forwardScreen,
-                    //     animated: true,
-                    //     passProps: {
-                    //         case: {_id: get(exposure, 'id', null)},
-                    //         refresh: this.refresh,
-                    //         previousScreen: previousScreen
-                    //     }
-                    // })
                 }
             };
 
@@ -439,7 +492,28 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                                 forwardScreen = constants.appScreens.caseSingleScreen;
                                 break;
                             case 'onPressCenterButton':
+                                forwardScreen = constants.appScreens.contactsOfContactsSingleScreen;
+                                break;
+                            default:
+                                forwardScreen = null;
+                        }
+                        break;
+                    case constants.appScreens.contactsOfContactsScreen:
+                        switch (method) {
+                            case 'onPressView':
+                                forwardScreen = constants.appScreens.contactsOfContactsSingleScreen;
+                                break;
+                            case 'onPressAddExposure':
+                                forwardScreen = constants.appScreens.exposureScreen;
+                                break;
+                            case 'onPressFullName':
+                                forwardScreen = constants.appScreens.contactsOfContactsSingleScreen;
+                                break;
+                            case 'onPressExposure':
                                 forwardScreen = constants.appScreens.contactSingleScreen;
+                                break;
+                            case 'onPressCenterButton':
+                                forwardScreen = constants.appScreens.contactsOfContactsSingleScreen;
                                 break;
                             default:
                                 forwardScreen = null;
@@ -506,6 +580,24 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                                 permissions = [
                                     constants.PERMISSIONS_CASE.caseAll,
                                     constants.PERMISSIONS_CASE.caseView,
+                                ];
+                                break;
+                            default:
+                                permissions = [];
+                        }
+                        break;
+                    case constants.appScreens.contactsOfContactsScreen:
+                        switch (method) {
+                            case 'onPressFullName':
+                                permissions = [
+                                    PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsAll,
+                                    PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsView,
+                                ];
+                                break;
+                            case 'onPressExposure':
+                                permissions = [
+                                    constants.PERMISSIONS_CONTACT.contactAll,
+                                    constants.PERMISSIONS_CONTACT.contactView,
                                 ];
                                 break;
                             default:

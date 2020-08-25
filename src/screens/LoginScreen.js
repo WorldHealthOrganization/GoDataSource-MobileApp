@@ -21,6 +21,7 @@ import translations from './../utils/translations';
 import config from './../utils/config';
 import {getTranslation} from './../utils/functions';
 import VersionNumber from 'react-native-version-number';
+import appConfig from './../../app.config';
 
 class LoginScreen extends Component {
 
@@ -31,8 +32,8 @@ class LoginScreen extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            email: '',
-            password: '',
+            email: appConfig.env === 'development' ? 'florin.popa@clarisoft.com' : '',
+            password: appConfig.env === 'development' ? '112233445566' : '',
             hasAlert: false
         };
         // Bind here methods, or at least don't declare methods in the render method

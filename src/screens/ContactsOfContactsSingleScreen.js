@@ -14,23 +14,20 @@ import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import {PagerScroll, TabBar, TabView} from 'react-native-tab-view';
 import ContactsSingleAddress from './../containers/ContactsSingleAddress';
-import ContactsSingleCalendar from './../containers/ContactsSingleCalendar';
 import ContactsSingleExposures from './../containers/ContactsSingleExposures';
 import ContactsSinglePersonal from './../containers/ContactsSinglePersonal';
 import ExposureScreen from './../screens/ExposureScreen';
 import Breadcrumb from './../components/Breadcrumb';
 import Menu, {MenuItem} from 'react-native-material-menu';
 import Ripple from 'react-native-material-ripple';
-import {addFollowUp, getFollowUpsForContactId, updateFollowUpAndContact} from './../actions/followUps';
+import {addFollowUp, updateFollowUpAndContact} from './../actions/followUps';
 import {addContact, checkForNameDuplicated, getExposuresForContact, updateContact} from './../actions/contacts';
 import {removeErrors} from './../actions/errors';
-import DateTimePicker from 'react-native-modal-datetime-picker';
 import _ from 'lodash';
 import {
     calculateDimension,
     computeFullName,
     createDate,
-    daysSince,
     extractIdFromPouchId,
     getTranslation,
     navigation,
@@ -39,20 +36,18 @@ import {
 import moment from 'moment/min/moment.min';
 import translations from './../utils/translations';
 import ElevatedView from 'react-native-elevated-view';
-import AddFollowUpScreen from './AddFollowUpScreen';
-import {generateId, generateTeamId} from "../utils/functions";
-import constants from "../utils/constants";
+import constants, {PERMISSIONS_CONTACT_OF_CONTACT} from "../utils/constants";
 import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
-import PermissionComponent from './../components/PermissionComponent';
 import lodashIntersect from 'lodash/intersection';
-import {getItemByIdRequest} from './../actions/cases';
+import {addContactOfContact, updateContactOfContact} from './../actions/contactsOfContacts';
+import {contactsOfContactsScreen} from "../utils/translations";
 
 const initialLayout = {
     height: 0,
     width: Dimensions.get('window').width,
 };
 
-class ContactsSingleScreen extends Component {
+class ContactsOfContactsSingleScreen extends Component {
 
     static navigatorStyle = {
         navBarHidden: true
@@ -63,27 +58,23 @@ class ContactsSingleScreen extends Component {
 
         // Process what the tab contents will be based on
         let routes = this.props.isNew ?
-                            config.tabsValuesRoutes.contactsAdd :
-                            checkArrayAndLength(lodashIntersect(
-                                this.props.role,
-                                [
-                                    constants.PERMISSIONS_CONTACT.contactAll,
-                                    constants.PERMISSIONS_CONTACT.contactListRelationshipExposures,
-                                    constants.PERMISSIONS_CONTACT.contactListRelationshipContacts
-                                ]
-                            )) ?
-            config.tabsValuesRoutes.contactsSingle :
-            config.tabsValuesRoutes.contactsSingleWithoutExposures;
+            config.tabsValuesRoutes.contactsAdd :
+            checkArrayAndLength(lodashIntersect(
+                this.props.role,
+                [
+                    constants.PERMISSIONS_CONTACT.contactAll,
+                    constants.PERMISSIONS_CONTACT.contactListRelationshipExposures,
+                    constants.PERMISSIONS_CONTACT.contactListRelationshipContacts
+                ]
+            )) ?
+                config.tabsValuesRoutes.contactsOfContactsSingle :
+                config.tabsValuesRoutes.contactsOfContactsSingleWithoutExposures;
 
         this.state = {
             interactionComplete: false,
             routes: routes,
             index: 0,
             item: this.props.item,
-            filter: this.props.filter && this.props.filter['FollowUpsScreen'] ? this.props.filter['FollowUpsScreen'] : {
-                searchText: ''
-            },
-            filterFromFilterScreen: this.props.filter && this.props.filter['ContactsFilterScreen'] ? this.props.filter['ContactsFilterScreen'] : null,
             contact: this.props.isNew ? {
                 riskLevel: null,
                 riskReason: '',
@@ -179,20 +170,11 @@ class ContactsSingleScreen extends Component {
 
             if (this.props.user !== null) {
 
-                let followUpPromise = getFollowUpsForContactId(this.state.contact._id, this.props.user.activeOutbreakId, this.props.teams)
-                    .then((responseFollowUps) => responseFollowUps.map((e) => e.followUps));
-                let exposurePromise = getExposuresForContact(this.state.contact._id, this.props.user.activeOutbreakId);
-                let getContactPromise = null;
-                if (this.props.getContact) {
-                    getContactPromise = getItemByIdRequest(this.state.contact._id);
-                }
-
-                Promise.all([followUpPromise, exposurePromise, getContactPromise])
-                    .then(([followUps, relationshipsAndExposures, contact]) => {
+                getExposuresForContact(this.state.contact._id, this.props.user.activeOutbreakId)
+                    .then((relationshipsAndExposures) => {
                         this.setState(prevState => ({
                             loading: !prevState.loading,
-                            contact: Object.assign({}, this.props.getContact ? contact : prevState.contact, {
-                                followUps,
+                            contact: Object.assign({}, prevState.contact, {
                                 relationships: relationshipsAndExposures
                             })
                         }))
@@ -206,12 +188,12 @@ class ContactsSingleScreen extends Component {
             if (this.props.addContactFromCasesScreen !== null && this.props.addContactFromCasesScreen !== undefined && this.props.caseIdFromCasesScreen !== null && this.props.caseIdFromCasesScreen !== undefined) {
                 personsArray = [{
                     id: extractIdFromPouchId(this.props.caseIdFromCasesScreen, 'person'),
-                    type: config.personTypes.cases,
+                    type: config.personTypes.contacts,
                     source: true,
                     target: null
                 }, {
                     id: null,
-                    type: config.personTypes.contacts,
+                    type: config.personTypes.contactsOfContacts,
                     source: null,
                     target: true
                 }];
@@ -258,15 +240,15 @@ class ContactsSingleScreen extends Component {
     render() {
         return (
             <ViewHOC style={style.container}
-                showLoader={this.state.loading}
-                loaderText={this.props && this.props.syncState ? 'Loading' : getTranslation(translations.loadingScreenMessages.loadingMsg, this.props.translation)}>
+                     showLoader={this.state.loading}
+                     loaderText={this.props && this.props.syncState ? 'Loading' : getTranslation(translations.loadingScreenMessages.loadingMsg, this.props.translation)}>
                 <NavBarCustom
                     title={null}
                     customTitle={
                         <View
                             style={[style.breadcrumbContainer]}>
                             <Breadcrumb
-                                entities={[getTranslation(this.props && this.props.previousScreen ? this.props.previousScreen : translations.contactSingleScreen.title, this.props.translation), this.props.isNew ? getTranslation(translations.contactSingleScreen.addContactTitle, this.props.translation) : ((this.state.contact && this.state.contact.firstName ? (this.state.contact.firstName + " ") : '') + (this.state.contact && this.state.contact.lastName ? this.state.contact.lastName : ''))]}
+                                entities={[getTranslation(this.props && this.props.previousScreen ? this.props.previousScreen : contactsOfContactsScreen.contactsTitle, this.props.translation), this.props.isNew ? getTranslation(translations.contactSingleScreen.addContactTitle, this.props.translation) : ((this.props.contact && this.props.contact.firstName ? (this.props.contact.firstName + " ") : '') + (this.props.contact && this.props.contact.lastName ? this.props.contact.lastName : ''))]}
                                 navigator={this.props.navigator}
                                 onPress={this.handlePressBreadcrumb}
                             />
@@ -288,50 +270,6 @@ class ContactsSingleScreen extends Component {
                                         <Icon name="help" color={'white'} size={15} />
                                     </Ripple>
                                 </ElevatedView>
-                                {
-                                    this.props.role && checkArrayAndLength(lodashIntersect(this.props.role, [
-                                        constants.PERMISSIONS_FOLLOW_UP.followUpAll,
-                                        constants.PERMISSIONS_FOLLOW_UP.followUpCreate
-                                    ])) ? (
-                                        <View>
-                                            <Menu
-                                                ref="menuRef"
-                                                button={
-                                                    <Ripple onPress={this.showMenu} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
-                                                        <Icon name="more-vert" />
-                                                    </Ripple>
-                                                }
-                                            >
-                                                {
-                                                    !this.props.isNew ? (
-                                                        <PermissionComponent
-                                                            render={() => (
-                                                                <MenuItem onPress={this.handleOnAddFollowUp}>
-                                                                    {getTranslation(translations.contactsScreen.addFollowupsButton, this.props.translation)}
-                                                                </MenuItem>
-                                                            )}
-                                                            permissionsList={[constants.PERMISSIONS_FOLLOW_UP.followUpAll, constants.PERMISSIONS_FOLLOW_UP.followUpCreate]}
-                                                            alternativeRender={() => (
-                                                                <View style={[style.rippleStyle, {width: 60}]}/>
-                                                            )}
-                                                        />
-                                                    ) : null
-                                                }
-                                                <DateTimePicker
-                                                    isVisible={this.state.isDateTimePickerVisible}
-                                                    timeZoneOffsetInMinutes={0}
-                                                    onConfirm={this._handleDatePicked}
-                                                    onCancel={this._hideDateTimePicker}
-                                                />
-                                                <AddFollowUpScreen
-                                                    showAddFollowUpScreen={this.state.showAddFollowUpScreen}
-                                                    onCancelPressed={this.handleOnCancelPressed}
-                                                    onSavePressed={this.handleOnSavePressed}
-                                                />
-                                            </Menu>
-                                        </View>
-                                    ) : null
-                                }
                             </View>
                         </View>
                     }
@@ -359,72 +297,6 @@ class ContactsSingleScreen extends Component {
     };
 
     // Please write here all the methods that are not react native lifecycle methods
-    handleOnAddFollowUp = () => {
-        this.setState({
-            showAddFollowUpScreen: !this.state.showAddFollowUpScreen
-        })
-    };
-
-    handleOnCancelPressed = () => {
-        this.setState({
-            showAddFollowUpScreen: !this.state.showAddFollowUpScreen
-        }, () => this.hideMenu())
-    };
-
-    handleOnSavePressed = (date) => {
-        // Here contact={label: <name>, value: <contactId>} and date is a regular date
-        // extract contact's main address
-        // let address = this.state.contact.addresses.find((e) => {return e.type === config.})
-        let now = createDate(null);
-        date = createDate(date).toISOString();
-        let followUp = {
-            _id: generateId(),
-            statusId: config.followUpStatuses.notPerformed,
-            targeted: true,
-            date: date,
-            fileType: 'followUp.json',
-            outbreakId: this.props.user.activeOutbreakId,
-            index: daysSince(_.get(this.state, 'contact.followUp.startDate', null), now) + 1,
-            teamId: _.get(this.state, 'contact.followUpTeamId', null) !== null ? this.state.contact.followUpTeamId : generateTeamId(_.get(this.state, 'contact.addresses', []).slice(), this.props.teams, this.props.locations.slice()),
-            personId: extractIdFromPouchId(this.state.contact._id, 'person.json'),
-            address: _.get(this.state, 'contact.addresses', null) !== null ? this.state.contact.addresses.find((e) => e.typeId === translations.userResidenceAddress.userPlaceOfResidence) : null
-        };
-
-        followUp = updateRequiredFields(this.props.user.outbreakId, this.props.user._id, followUp, 'create', 'followUp.json');
-
-        this.setState({
-            showAddFollowUpScreen: !this.state.showAddFollowUpScreen
-        }, () => {
-            this.hideMenu();
-            // addFollowUp(followUp)
-            //     .then((resultAddFollowUp) => {
-                    // console.log('FollowUpAdded');
-                    // this.props.navigator.showInAppNotification({
-                    //     screen: 'InAppNotificationScreen',
-                    //     autoDismissTimerSec: 1,
-                    //     passProps: {
-                    //         text: 'Follow-up added'
-                    //     }
-                    // })
-                    this.props.navigator.push({
-                        screen: 'FollowUpsSingleScreen',
-                        animated: true,
-                        animationType: 'fade',
-                        passProps: {
-                            isNew: true,
-                            isEditMode: true,
-                            item: followUp,
-                            contact: this.state.contact,
-                            previousScreen: getTranslation(translations.contactSingleScreen.addContactTitle, this.props.translation),
-                        }
-                    })
-                // })
-                // .catch((errorAddFollowUp) => {
-                //     console.log('ErrorAddFollowUp: ', errorAddFollowUp);
-                // })
-        });
-    };
-
     handlePressNavbarButton = () => {
         this.props.navigator.toggleDrawer({
             side: 'left',
@@ -546,6 +418,7 @@ class ContactsSingleScreen extends Component {
             case 'personal':
                 return (
                     <ContactsSinglePersonal
+                        type={translations.personTypes.contactsOfContacts}
                         contact={this.state.contact}
                         activeIndex={this.state.index}
                         onChangeText={this.handleOnChangeText}
@@ -578,6 +451,7 @@ class ContactsSingleScreen extends Component {
             case 'address':
                 return (
                     <ContactsSingleAddress
+                        type={translations.personTypes.contactsOfContacts}
                         contact={this.state.contact}
                         activeIndex={this.state.index}
                         onChangeText={this.handleOnChangeText}
@@ -607,6 +481,7 @@ class ContactsSingleScreen extends Component {
             case 'exposures':
                 return (
                     <ContactsSingleExposures
+                        type={translations.personTypes.contactsOfContacts}
                         contact={this.state.contact}
                         activeIndex={this.state.index}
                         onPressEditExposure={this.handleOnPressEditExposure}
@@ -625,22 +500,6 @@ class ContactsSingleScreen extends Component {
                         handleMoveToNextScreenButton={this.handleMoveToNextScreenButton}
                         selectedExposure={this.props.singleCase}
 
-                        numberOfTabs={this.state.routes.length}
-                        // onPressPreviousButton={this.handlePreviousPress}
-                        onPressNextButton={this.handleMoveToNextScreenButton}
-                        onPressSaveEdit={this.handleOnPressSave}
-                        onPressEdit={this.onPressEdit}
-                        onPressCancelEdit={this.onPressCancelEdit}
-                    />
-                );
-            case 'calendar':
-                return (
-                    <ContactsSingleCalendar
-                        contact={this.state.contact}
-                        activeIndex={this.state.index}
-                        handleOnPressSave={this.handleOnPressSave}
-                        onPressPreviousButton={this.handleMoveToPrevieousScreenButton}
-                        isEditMode={this.state.isEditMode}
                         numberOfTabs={this.state.routes.length}
                         // onPressPreviousButton={this.handlePreviousPress}
                         onPressNextButton={this.handleMoveToNextScreenButton}
@@ -669,7 +528,7 @@ class ContactsSingleScreen extends Component {
                 {
                     text: 'Yes', onPress: () => {
                         this.props.navigator.pop(
-                                {
+                            {
                                 animated: true,
                                 animationType: 'fade'
                             }
@@ -684,7 +543,7 @@ class ContactsSingleScreen extends Component {
             ])
         } else {
             this.props.navigator.pop(
-                    {
+                {
                     animated: true,
                     animationType: 'fade'
                 }
@@ -794,9 +653,9 @@ class ContactsSingleScreen extends Component {
                     ageClone.months = Number(value);
                 }
                 this.setState(prevState => ({
-                    contact: Object.assign({}, prevState.contact, { age: ageClone ,  dob: null }),
-                    isModified: true
-                })
+                        contact: Object.assign({}, prevState.contact, { age: ageClone ,  dob: null }),
+                        isModified: true
+                    })
                     , () => {
                         console.log("handleOnChangeTextInputWithDropDown done", id, " ", value, " ", this.state.contact);
                     }
@@ -807,68 +666,68 @@ class ContactsSingleScreen extends Component {
     handleOnChangeText = (value, id, objectTypeOrIndex, objectType) => {
         console.log("onChangeText: ", value, id, objectTypeOrIndex);
         if (objectTypeOrIndex === 'Contact') {
-                this.setState(
-                    (prevState) => ({
-                        contact: Object.assign({}, prevState.contact, {[id]: value}),
-                        isModified: true
-                    }))
-            } else if (objectTypeOrIndex === 'Exposure' && this.props.isNew === true) {
-                let relationshipsClone = _.cloneDeep(this.state.contact.relationships);
-                relationshipsClone[0][id] = value && value.value ? value.value : value;
-                this.setState(prevState => ({
-                    contact: Object.assign({}, prevState.contact, {relationships: relationshipsClone}),
+            this.setState(
+                (prevState) => ({
+                    contact: Object.assign({}, prevState.contact, {[id]: value}),
                     isModified: true
                 }))
-            } else if (typeof objectTypeOrIndex === 'phoneNumber' && objectTypeOrIndex >= 0 || typeof objectTypeOrIndex === 'number' && objectTypeOrIndex >= 0) {
-                if (objectType && objectType === 'Address') {
-                    let addressesClone = _.cloneDeep(this.state.contact.addresses);
-                    if (id === 'lng') {
-                        if (!addressesClone[objectTypeOrIndex].geoLocation) {
-                            addressesClone[objectTypeOrIndex].geoLocation = {};
-                            addressesClone[objectTypeOrIndex].geoLocation.type = 'Point';
-                            if (!addressesClone[objectTypeOrIndex].geoLocation.coordinates) {
-                                addressesClone[objectTypeOrIndex].geoLocation.coordinates = [];
-                            }
-                        }
+        } else if (objectTypeOrIndex === 'Exposure' && this.props.isNew === true) {
+            let relationshipsClone = _.cloneDeep(this.state.contact.relationships);
+            relationshipsClone[0][id] = value && value.value ? value.value : value;
+            this.setState(prevState => ({
+                contact: Object.assign({}, prevState.contact, {relationships: relationshipsClone}),
+                isModified: true
+            }))
+        } else if (typeof objectTypeOrIndex === 'phoneNumber' && objectTypeOrIndex >= 0 || typeof objectTypeOrIndex === 'number' && objectTypeOrIndex >= 0) {
+            if (objectType && objectType === 'Address') {
+                let addressesClone = _.cloneDeep(this.state.contact.addresses);
+                if (id === 'lng') {
+                    if (!addressesClone[objectTypeOrIndex].geoLocation) {
+                        addressesClone[objectTypeOrIndex].geoLocation = {};
+                        addressesClone[objectTypeOrIndex].geoLocation.type = 'Point';
                         if (!addressesClone[objectTypeOrIndex].geoLocation.coordinates) {
                             addressesClone[objectTypeOrIndex].geoLocation.coordinates = [];
                         }
-                        if (!addressesClone[objectTypeOrIndex].geoLocation.type) {
-                            addressesClone[objectTypeOrIndex].geoLocation.type = 'Point';
-                        }
-                        addressesClone[objectTypeOrIndex].geoLocation.coordinates[0] = value && value.value ? value.value : parseFloat(value);
-                    } else if (id === 'lat') {
-                        if (!addressesClone[objectTypeOrIndex].geoLocation) {
-                            addressesClone[objectTypeOrIndex].geoLocation = {};
-                            addressesClone[objectTypeOrIndex].geoLocation.type = 'Point';
-                            if (!addressesClone[objectTypeOrIndex].geoLocation.coordinates) {
-                                addressesClone[objectTypeOrIndex].geoLocation.coordinates = [];
-                            }
-                        }
-                        if (!addressesClone[objectTypeOrIndex].geoLocation.coordinates) {
-                            addressesClone[objectTypeOrIndex].geoLocation.coordinates = [];
-                        }
-                        if (!addressesClone[objectTypeOrIndex].geoLocation.type) {
-                            addressesClone[objectTypeOrIndex].geoLocation.type = 'Point';
-                        }
-                        addressesClone[objectTypeOrIndex].geoLocation.coordinates[1] = value && value.value ? value.value : parseFloat(value);
-                    } else {
-                        addressesClone[objectTypeOrIndex][id] = value && value.value ? value.value : value;
                     }
-                    this.setState(prevState => ({
-                        contact: Object.assign({}, prevState.contact, {addresses: addressesClone}),
-                        isModified: true
-                    }))
-                } else if (objectType && objectType === 'Documents') {
-                    let documentsClone = _.cloneDeep(this.state.contact.documents);
-                    documentsClone[objectTypeOrIndex][id] = value && value.value ? value.value : value;
-                    console.log('documentsClone', documentsClone);
-                    this.setState(prevState => ({
-                        contact: Object.assign({}, prevState.contact, {documents: documentsClone}),
-                        isModified: true
-                    }))
+                    if (!addressesClone[objectTypeOrIndex].geoLocation.coordinates) {
+                        addressesClone[objectTypeOrIndex].geoLocation.coordinates = [];
+                    }
+                    if (!addressesClone[objectTypeOrIndex].geoLocation.type) {
+                        addressesClone[objectTypeOrIndex].geoLocation.type = 'Point';
+                    }
+                    addressesClone[objectTypeOrIndex].geoLocation.coordinates[0] = value && value.value ? value.value : parseFloat(value);
+                } else if (id === 'lat') {
+                    if (!addressesClone[objectTypeOrIndex].geoLocation) {
+                        addressesClone[objectTypeOrIndex].geoLocation = {};
+                        addressesClone[objectTypeOrIndex].geoLocation.type = 'Point';
+                        if (!addressesClone[objectTypeOrIndex].geoLocation.coordinates) {
+                            addressesClone[objectTypeOrIndex].geoLocation.coordinates = [];
+                        }
+                    }
+                    if (!addressesClone[objectTypeOrIndex].geoLocation.coordinates) {
+                        addressesClone[objectTypeOrIndex].geoLocation.coordinates = [];
+                    }
+                    if (!addressesClone[objectTypeOrIndex].geoLocation.type) {
+                        addressesClone[objectTypeOrIndex].geoLocation.type = 'Point';
+                    }
+                    addressesClone[objectTypeOrIndex].geoLocation.coordinates[1] = value && value.value ? value.value : parseFloat(value);
+                } else {
+                    addressesClone[objectTypeOrIndex][id] = value && value.value ? value.value : value;
                 }
+                this.setState(prevState => ({
+                    contact: Object.assign({}, prevState.contact, {addresses: addressesClone}),
+                    isModified: true
+                }))
+            } else if (objectType && objectType === 'Documents') {
+                let documentsClone = _.cloneDeep(this.state.contact.documents);
+                documentsClone[objectTypeOrIndex][id] = value && value.value ? value.value : value;
+                console.log('documentsClone', documentsClone);
+                this.setState(prevState => ({
+                    contact: Object.assign({}, prevState.contact, {documents: documentsClone}),
+                    isModified: true
+                }))
             }
+        }
     };
     handleOnChangeTextSwitchSelector = (index, stateValue) => {
         if (stateValue === 'selectedItemIndexForAgeUnitOfMeasureDropDown') {
@@ -1272,47 +1131,6 @@ class ContactsSingleScreen extends Component {
         }
     };
 
-    // Answers handlers
-    onChangeTextAnswer = (value, id) => {
-        let itemClone = _.cloneDeep(this.state.item);
-        let questionnaireAnswers = itemClone && itemClone.questionnaireAnswers ? itemClone.questionnaireAnswers : null;
-        if (!itemClone.questionnaireAnswers) {
-            itemClone.questionnaireAnswers = {};
-            questionnaireAnswers = itemClone.questionnaireAnswers;
-        }
-        questionnaireAnswers[id] = value;
-        this.setState(prevState => ({
-            item: Object.assign({}, prevState.item, { questionnaireAnswers: questionnaireAnswers }),
-            isModified: true
-        }))
-    };
-    onChangeSingleSelection = (value, id) => {
-        let itemClone = _.cloneDeep(this.state.item);
-        let questionnaireAnswers = itemClone && itemClone.questionnaireAnswers ? itemClone.questionnaireAnswers : null;
-        if (!itemClone.questionnaireAnswers) {
-            itemClone.questionnaireAnswers = {};
-            questionnaireAnswers = itemClone.questionnaireAnswers;
-        }
-        questionnaireAnswers[id] = value.value;
-        this.setState(prevState => ({
-            item: Object.assign({}, prevState.item, { questionnaireAnswers: questionnaireAnswers }),
-            isModified: true
-        }))
-    };
-    onChangeMultipleSelection = (selections, id) => {
-        let itemClone = Object.assign({}, this.state.item);
-        let questionnaireAnswers = itemClone && itemClone.questionnaireAnswers ? itemClone.questionnaireAnswers : null;
-        if (!itemClone.questionnaireAnswers) {
-            itemClone.questionnaireAnswers = {};
-            questionnaireAnswers = itemClone.questionnaireAnswers;
-        }
-        questionnaireAnswers[id] = selections.map((e) => {return e.value});
-        this.setState(prevState => ({
-            item: Object.assign({}, prevState.item, { questionnaireAnswers: questionnaireAnswers }),
-            isModified: true
-        }))
-    };
-
     // Exposures handlers
     handleOnPressEditExposure = (relation, index) => {
         // console.log('handleOnPressEditExposure: ', relation, index);
@@ -1324,47 +1142,33 @@ class ContactsSingleScreen extends Component {
                 exposure: _.get(relation, 'relationshipData', null),
                 selectedExposure: _.get(relation, 'caseData', null),
                 contact: this.props.isNew ? null : this.props.contact,
-                type: 'Contact',
+                type: 'ContactOfContact',
                 saveExposure: this.handleSaveExposure,
                 caseIdFromCasesScreen: this.props.caseIdFromCasesScreen,
                 isEditMode: false,
-                addContactFromCasesScreen: false
+                addContactFromCasesScreen: false,
+                refreshRelations: this.refreshRelations
             }
         })
     };
-    handleOnPressDeleteExposure = (relation, index) => {
-        if (this.state.contact.relationships.length === 1) {
-            Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.alertMessages.contactDeleteLastExposureError, this.props.translation), [
-                {
-                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
-                    onPress: () => { console.log("Ok pressed") }
-                }
-            ])
-        } else {
-            Alert.alert(getTranslation(translations.alertMessages.warningLabel, this.props.translation), getTranslation(translations.alertMessages.contactDeleteExposureConfirmation, this.props.translation), [
-                {
-                    text: getTranslation(translations.alertMessages.cancelButtonLabel, this.props.translation),
-                    onPress: () => { console.log("Cancel delete") }
-                },
-                {
-                    text: getTranslation(translations.alertMessages.yesButtonLabel, this.props.translation),
-                    onPress: () => {
-                        let relations = _.cloneDeep(this.state.contact.relationships);
-                        console.log('Relations after cloneDeep: ', relations, relation);
-                        if (relations && Array.isArray(relations) && relations.map((e) => { return e._id }).indexOf(relation._id) > -1) {
-                            relations.splice(relations.map((e) => { return e._id }).indexOf(relation._id), 1);
-                            console.log('Relations after splice: ', relations);
-                            this.setState(prevState => ({
-                                contact: Object.assign({}, prevState.contact, { relationships: relations })
-                            }), () => {
-                                relation = updateRequiredFields(this.props.user.activeOutbreakId, this.props.user._id, Object.assign({}, relation), 'delete');
-                                this.props.deleteExposureForContact(this.props.user.activeOutbreakId, this.props.contact._id, relation, this.props.user.token, this.props.teams);
-                            })
-                        }
-                    }
-                }
-            ])
-        }
+    refreshRelations = (exposure) => {
+        this.setState({
+            loading: true
+        }, () => {
+            getExposuresForContact(this.state.contact._id, this.props.user.activeOutbreakId)
+                .then((updatedRelations) => {
+                    this.setState(prevState => ({
+                        loading: false,
+                        contact: Object.assign({}, prevState.contact, {relationships: updatedRelations})
+                    }))
+                })
+                .catch((errorUpdateExposure) => {
+                    console.log('ErrorUpdateExposure', errorUpdateExposure);
+                    this.setState({
+                        loading: false
+                    });
+                })
+        })
     };
 
     handleOnPressSave = () => {
@@ -1484,14 +1288,14 @@ class ContactsSingleScreen extends Component {
             }), () => {
                 console.log("ageAndDobPrepareForSave done", this.state.contact);
                 if (this.props.isNew) {
-                    let contactWithRequiredFields = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, this.state.contact), action = 'create', fileType = 'person.json', type = 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT')
+                    let contactWithRequiredFields = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, this.state.contact), action = 'create', fileType = 'person.json', config.personTypes.contactsOfContacts);
                     this.setState(prevState => ({
                         contact: Object.assign({}, prevState.contact, contactWithRequiredFields),
                     }), () => {
                         let contactClone = _.cloneDeep(this.state.contact);
                         // let contactMatchFilter = this.checkIfContactMatchFilter();
                         // console.log('contactMatchFilter', contactMatchFilter)
-                        addContact(contactClone, _.get(this.props, 'periodOfFollowUp', 1), _.get(this.props, 'user._id'))
+                        addContactOfContact(contactClone, _.get(this.props, 'user._id'))
                             .then((result) => {
                                 if (_.isFunction(this.props.refresh)) {
                                     this.props.refresh();
@@ -1510,16 +1314,16 @@ class ContactsSingleScreen extends Component {
                 } else {
                     let contactWithRequiredFields = null;
                     if (this.state.deletePressed === true) {
-                        contactWithRequiredFields = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, this.state.contact), action = 'delete', fileType = 'person.json', type = 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT')
+                        contactWithRequiredFields = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, this.state.contact), action = 'delete', fileType = 'person.json', config.personTypes.contactsOfContacts)
                     } else {
-                        contactWithRequiredFields = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, this.state.contact), action = 'update', fileType = 'person.json', type = 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT')
+                        contactWithRequiredFields = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, this.state.contact), action = 'update', fileType = 'person.json', config.personTypes.contactsOfContacts)
                     }
 
                     this.setState(prevState => ({
                         contact: Object.assign({}, prevState.contact, contactWithRequiredFields),
                     }), () => {
                         let contactClone = _.cloneDeep(this.state.contact);
-                        updateContact(contactClone)
+                        updateContactOfContact(contactClone)
                             .then((result) => {
                                 if (_.isFunction(this.props.refresh)) {
                                     this.props.refresh();
@@ -1558,10 +1362,10 @@ class ContactsSingleScreen extends Component {
                 }
             }
         } else if (this.state.selectedItemIndexForAgeUnitOfMeasureDropDown === 0 && this.state.contact.dob === null) {
-            //years dropdown 
+            //years dropdown
             ageClone.years = (this.state.contact.age && this.state.contact.age.years !== undefined && this.state.contact.age.years !== null) ? this.state.contact.age.years : 0
         } else if (this.state.selectedItemIndexForAgeUnitOfMeasureDropDown === 1 && this.state.contact.dob === null) {
-            //months dropdown 
+            //months dropdown
             ageClone.months = (this.state.contact.age && this.state.contact.age.months !== undefined && this.state.contact.age.months !== null) ? this.state.contact.age.months : 0
         }
         return {
@@ -1700,6 +1504,17 @@ class ContactsSingleScreen extends Component {
 
     _hideDateTimePicker = () => {
         this.setState({ isDateTimePickerVisible: false });
+    };
+
+    _handleDatePicked = (date) => {
+        console.log("Date selected: ", date);
+        this._hideDateTimePicker();
+
+        this.setState(prevState => ({
+            contact: Object.assign({}, prevState.contact, { deceased: true, dateDeceased: createDate(date) })
+        }), () => {
+            this.handleOnPressSave();
+        });
     };
 
     handleOnPressDeleteContact = () => {
@@ -1881,4 +1696,4 @@ function matchDispatchProps(dispatch) {
     }, dispatch);
 };
 
-export default connect(mapStateToProps, matchDispatchProps)(ContactsSingleScreen);
+export default connect(mapStateToProps, matchDispatchProps)(ContactsOfContactsSingleScreen);

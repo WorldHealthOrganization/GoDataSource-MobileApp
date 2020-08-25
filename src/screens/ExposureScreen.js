@@ -12,6 +12,7 @@ import ViewHOC from './../components/ViewHOC';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import {addExposureForContact, updateExposureForContact} from './../actions/contacts';
+import {addExposureForContactOfContact, updateExposureForContactOfContact} from './../actions/contactsOfContacts';
 import NavBarCustom from './../components/NavBarCustom';
 import config from './../utils/config';
 import Ripple from 'react-native-material-ripple';
@@ -128,10 +129,10 @@ class ExposureScreen extends Component {
                                 fromExposureScreen={true}
                                 type={this.props.type}
                                 isEditMode={this.props.isEditMode}
-                                onChangeText={this.handleOnChangeText}
+                                onChangeText={this.handleOnChangeData}
                                 onChangeDropDown={this.handleOnChangeDropDown}
-                                onChangeDate={this.handleOnChangeDate}
-                                onChangeSwitch={this.handleOnChangeSwitch}
+                                onChangeDate={this.handleOnChangeData}
+                                onChangeSwitch={this.handleOnChangeData}
                                 onSelectExposure={this.handleOnSelectExposure}
                                 selectedExposure={this.state.selectedExposure}
                                 addContactFromCasesScreen={this.props.addContactFromCasesScreen}
@@ -182,7 +183,19 @@ class ExposureScreen extends Component {
                     source: null,
                     target: true
                 }];
-            } else {
+            } else if (this.props.type === 'ContactOfContact') {
+                personsArray = [{
+                    id: value.value,
+                    type: type,
+                    source: true,
+                    target: null
+                },{
+                    id: this.props.contact && this.props.contact._id ? extractIdFromPouchId(this.props.contact._id, 'person') : null,
+                    type: translations.personTypes.contactsOfContacts,
+                    source: null,
+                    target: true
+                }];
+            }else {
                 // Here add logic for cases/events
                 personsArray = [{
                     id: value.value,
@@ -190,11 +203,11 @@ class ExposureScreen extends Component {
                 }]
             }
 
-            let source = personsArray && Array.isArray(personsArray) && personsArray.length === 2 ? personsArray[0].source ? personsArray[0].id : personsArray[1].id : null;
-            let target = personsArray && Array.isArray(personsArray) && personsArray.length === 2 ? personsArray[0].target ? personsArray[0].id : personsArray[1].id : null;
+            // let source = personsArray && Array.isArray(personsArray) && personsArray.length === 2 ? personsArray[0].source ? personsArray[0].id : personsArray[1].id : null;
+            // let target = personsArray && Array.isArray(personsArray) && personsArray.length === 2 ? personsArray[0].target ? personsArray[0].id : personsArray[1].id : null;
 
             this.setState(prevState => ({
-                exposure: Object.assign({}, prevState.exposure, {persons: personsArray, source: source, target: target, active: true}),
+                exposure: Object.assign({}, prevState.exposure, {persons: personsArray}),
                 isModified: true
             }), () => {
                 console.log('After changing state if: ', this.state.exposure);
@@ -211,27 +224,13 @@ class ExposureScreen extends Component {
         }
     };
 
-    handleOnChangeDate = (value, id) => {
+    handleOnChangeData = (value, id) => {
         this.setState(prevState => ({
             exposure: Object.assign({}, prevState.exposure, {[id]: value}),
             isModified: true
         }), () => {
             console.log('Exposure after changing date: ', this.state.exposure);
         })
-    };
-
-    handleOnChangeText = (value, id) => {
-        this.setState(prevState => ({
-            exposure: Object.assign({}, prevState.exposure, {[id]: value}),
-            isModified: true
-        }))
-    };
-
-    handleOnChangeSwitch = (value, id) => {
-        this.setState(prevState => ({
-            exposure: Object.assign({}, prevState.exposure, {[id]: value}),
-            isModified: true
-        }))
     };
 
     handleOnSelectExposure = (selectedExposure) => {
@@ -249,7 +248,19 @@ class ExposureScreen extends Component {
                 source: null,
                 target: true
             }];
-        } else {
+        } else if (this.props.type === 'ContactOfContact') {
+            personsArray = [{
+                id: get(selectedExposure, '_id', null),
+                type: get(selectedExposure, 'type', null),
+                source: true,
+                target: null
+            },{
+                id: get(this.props, 'contact._id', null),
+                type: get(this.props, 'contact.type', null),
+                source: null,
+                target: true
+            }];
+        }else {
             // Here add logic for cases. Events are not yet handled. This needs refactoring
             personsArray = [{
                 id: get(selectedExposure, '_id', null),
@@ -263,9 +274,6 @@ class ExposureScreen extends Component {
                 target: null
             }];
         }
-
-        let source = personsArray && Array.isArray(personsArray) && personsArray.length === 2 ? personsArray[0].source ? personsArray[0].id : personsArray[1].id : null;
-        let target = personsArray && Array.isArray(personsArray) && personsArray.length === 2 ? personsArray[0].target ? personsArray[0].id : personsArray[1].id : null;
 
         this.setState(prevState => ({
             exposure: Object.assign({}, prevState.exposure, {persons: personsArray, active: true}),
@@ -284,7 +292,7 @@ class ExposureScreen extends Component {
                 // savePressed: true,
                 isModified: false,
             }, () => {
-                if (this.props.type === 'Contact') {
+                if (this.props.type === 'Contact' || this.props.type === 'ContactOfContact') {
                     let operation = this.props.exposure ? 'update' : 'create';
                     let exposure = updateRequiredFields(get(this.props, 'user.activeOutbreakId', null), get(this.props, 'user._id', null), Object.assign({}, this.state.exposure), operation, 'relationship');
 
@@ -298,9 +306,15 @@ class ExposureScreen extends Component {
                             })
                         } else {
                             let exposure = updateRequiredFields(get(this.props, 'outbreakId', null), get(this.props, 'user._id', null), this.state.exposure, 'update');
-                            updateExposureForContact(exposure, this.props.contact, get(this.props, 'periodOfFollowUp', null), get(this.props, 'user._id', null))
+                            let promise = null;
+                            if (this.props.type === 'Contact') {
+                                promise = updateExposureForContact(exposure, this.props.contact, get(this.props, 'periodOfFollowUp', null), get(this.props, 'user._id', null))
+                            } else {
+                                promise = updateExposureForContactOfContact(exposure, get(this.props, 'user._id', null))
+                            }
+                            Promise.all([promise])
                                 .then((result) => {
-                                    // this.props.refres
+                                    this.props.refreshRelations();
                                     this.props.navigator.dismissModal();
                                 })
                         }
@@ -313,7 +327,13 @@ class ExposureScreen extends Component {
                             })
                         } else {
                             let exposure = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id.split('_')[this.props.user._id.split('_').length - 1], record = Object.assign({}, this.state.exposure), action = 'create', fileType = 'relationship.json')
-                            addExposureForContact(exposure, this.props.contact, this.props.periodOfFollowUp, get(this.props, 'user._id', null))
+                            let promise = null;
+                            if (this.props.type === 'Contact') {
+                                promise = addExposureForContact(exposure, this.props.contact, this.props.periodOfFollowUp, get(this.props, 'user._id', null));
+                            } else {
+                                promise = addExposureForContactOfContact(exposure, get(this.props, 'user._id', null));
+                            }
+                            Promise.all([promise])
                                 .then((result) => {
                                     console.log('Successful at adding exposures');
                                     this.props.refresh();
@@ -367,10 +387,10 @@ class ExposureScreen extends Component {
         }
         return requiredFields;
         // return pass;
-    }
+    };
 
     goToHelpScreen = () => {
-        let pageAskingHelpFrom = null
+        let pageAskingHelpFrom = null;
 
         if (this.props.exposure) {
             pageAskingHelpFrom = 'exposureEdit'

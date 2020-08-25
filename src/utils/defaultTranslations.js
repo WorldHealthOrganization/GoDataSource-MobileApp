@@ -506,5 +506,8 @@ export default {
     //TODO add all to backend
     'LNG_MOBILE_LANGUAGE_MODAL_COMPONENT_INFO_MESSAGE': 'Please select the packs that you want to download. \nClicking download means that a new sync will start so please make sure that you are connected to the internet before proceeding.',
     'LNG_MOBILE_LANGUAGE_MODAL_COMPONENT_DOWNLOAD_BUTTON': 'Download language packs',
-    'LNG_MOBILE_LANGUAGE_MODAL_COMPONENT_ALERT_NO_LANGUAGE': 'Please select at least one language before proceeding to download'
+    'LNG_MOBILE_LANGUAGE_MODAL_COMPONENT_ALERT_NO_LANGUAGE': 'Please select at least one language before proceeding to download',
+
+    'LNG_CONTACT_OF_CONTACT_LIST_SCREEN_TITLE': 'Contacts of contacts',
+    'LNG_CONTACT_OF_CONTACT_LIST_SCREEN_NO_CONTACTS': 'There are no contacts of contacts to display',
 };

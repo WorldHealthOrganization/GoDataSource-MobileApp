@@ -15,6 +15,8 @@ import CasesScreen from './CasesScreen';
 import CaseSingleScreen from './CaseSingleScreen';
 import ContactsScreen from './ContactsScreen';
 import ContactsSingleScreen from './ContactsSingleScreen';
+import ContactsOfContactsScreen from './ContactsOfContactsScreen';
+import ContactsOfContactsSingleScreen from './ContactsOfContactsSingleScreen';
 import InAppNotificationScreen from './InAppNotificationScreen';
 import ExposureScreen from './ExposureScreen';
 import HelpScreen from './HelpScreen';
@@ -36,6 +38,8 @@ const screens = [
     {screen: constants.appScreens.caseSingleScreen, component: CaseSingleScreen},
     {screen: constants.appScreens.contactsScreen, component: ContactsScreen},
     {screen: constants.appScreens.contactSingleScreen, component: ContactsSingleScreen},
+    {screen: constants.appScreens.contactsOfContactsScreen, component: ContactsOfContactsScreen},
+    {screen: constants.appScreens.contactsOfContactsSingleScreen, component: ContactsOfContactsSingleScreen},
     {screen: constants.appScreens.inAppNotificationScreen, component: InAppNotificationScreen},
     {screen: constants.appScreens.exposureScreen, component: ExposureScreen},
     {screen: constants.appScreens.helpScreen, component: HelpScreen},
