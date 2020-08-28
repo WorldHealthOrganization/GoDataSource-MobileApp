@@ -70,6 +70,8 @@ class ContactsOfContactsSingleScreen extends Component {
                 config.tabsValuesRoutes.contactsOfContactsSingle :
                 config.tabsValuesRoutes.contactsOfContactsSingleWithoutExposures;
 
+        routes = routes.filter((e) => e.key !== 'investigation');
+
         this.state = {
             interactionComplete: false,
             routes: routes,

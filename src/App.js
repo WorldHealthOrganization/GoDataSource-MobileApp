@@ -150,6 +150,9 @@ export default class App {
                     screen = constants.appScreens.contactsScreen;
                     break;
                 case 2:
+                    screen = constants.appScreens.contactsOfContactsScreen;
+                    break;
+                case 3:
                     screen = constants.appScreens.casesScreen;
                     break;
                 default:

@@ -98,11 +98,13 @@ const tabsValuesRoutes = {
         {key: 'personal', title: translations.contactSingleScreen.personalTitle},
         {key: 'address', title: translations.contactSingleScreen.addressTitle},
         {key: 'exposures', title: translations.contactSingleScreen.exposuresTitle},
+        {key: 'investigation', title: translations.caseSingleScreen.investigationTitle},
         {key: 'calendar', title: translations.contactSingleScreen.calendarTitle}
     ],
     contactsSingleWithoutExposures: [
         {key: 'personal', title: translations.contactSingleScreen.personalTitle},
         {key: 'address', title: translations.contactSingleScreen.addressTitle},
+        {key: 'investigation', title: translations.caseSingleScreen.investigationTitle},
         {key: 'calendar', title: translations.contactSingleScreen.calendarTitle}
     ],
     contactsOfContactsSingle: [
@@ -118,6 +120,7 @@ const tabsValuesRoutes = {
         {key: 'personal', title: translations.contactSingleScreen.personalTitle},
         {key: 'address', title: translations.contactSingleScreen.addressTitle},
         {key: 'exposures', title: translations.contactSingleScreen.exposuresTitle},
+        {key: 'investigation', title: translations.caseSingleScreen.investigationTitle},
     ]
 };
 
