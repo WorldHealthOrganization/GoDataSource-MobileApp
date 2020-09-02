@@ -340,24 +340,37 @@ export function mapDataForInsert(tableName, data) {
 }
 // Method for mapping the relationship data as needed in the database structure
 function mapRelationshipFields(relationship, fieldName) {
-    if (!checkArray(get(relationship, 'persons', null)) || relationship.persons.length !== 2) {
-        return null;
-    }
-    switch(fieldName) {
-            // sourceId
-        case constants.relationshipsMappedFields[0]:
-            return relationship.persons.find((e) => {return e.source === true;}).id;
-            // sourceType
-        case constants.relationshipsMappedFields[1]:
-            return relationship.persons.find((e) => {return e.source === true;}).type;
-            // targetId
-        case constants.relationshipsMappedFields[2]:
-            return relationship.persons.find((e) => {return e.target === true;}).id;
-            // targetType
-        case constants.relationshipsMappedFields[3]:
-            return relationship.persons.find((e) => {return e.target === true;}).type;
-        default:
+    if (checkArray(get(relationship, 'persons', null)) && relationship.persons.length === 2) {
+        console.log('Relationship log: ', relationship.persons);
+        if ((!relationship.persons[0].source && !relationship.persons[0].target) || (!relationship.persons[1].source && !relationship.persons[1].target)) {
             return null;
+        }
+        switch (fieldName) {
+            // sourceId
+            case constants.relationshipsMappedFields[0]:
+                return relationship.persons.find((e) => {
+                    return e.source === true;
+                }).id;
+            // sourceType
+            case constants.relationshipsMappedFields[1]:
+                return relationship.persons.find((e) => {
+                    return e.source === true;
+                }).type;
+            // targetId
+            case constants.relationshipsMappedFields[2]:
+                return relationship.persons.find((e) => {
+                    return e.target === true;
+                }).id;
+            // targetType
+            case constants.relationshipsMappedFields[3]:
+                return relationship.persons.find((e) => {
+                    return e.target === true;
+                }).type;
+            default:
+                return null;
+        }
+    } else {
+        return null;
     }
 }
 

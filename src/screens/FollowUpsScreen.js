@@ -34,7 +34,7 @@ import {bindActionCreators} from "redux";
 import {setLoaderState} from './../actions/app';
 import PermissionComponent from './../components/PermissionComponent';
 import {handleQRSearchTransition} from "../utils/screenTransitionFunctions";
-// import compose from 'lodash/flowRight';
+import withPincode from './../components/higherOrderComponents/withPincode';
 
 class FollowUpsScreen extends Component {
 
@@ -389,6 +389,7 @@ function matchDispatchProps(dispatch) {
 }
 
 export default compose(
+    withPincode(),
     connect(mapStateToProps, matchDispatchProps),
     enhanceListWithGetData(getFollowUpsForOutbreakId, 'FollowUpsScreen')
 )(FollowUpsScreen)

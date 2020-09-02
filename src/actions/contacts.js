@@ -26,7 +26,7 @@ export function getContactsForOutbreakId({outbreakId, contactsFilter, exposureFi
     }, computeCount)
         .then((results) => {
             // console.log('results', results);
-            return Promise.resolve({data: results.data, dataCount: results.dataCount || undefined});
+            return Promise.resolve({data: results.data, dataCount: results && results.dataCount});
         })
         .catch((error) => {
             console.log('error', error);

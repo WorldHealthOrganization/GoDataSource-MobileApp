@@ -9,7 +9,6 @@ import com.parse.Parse;
 import com.reactnativedocumentpicker.ReactNativeDocumentPicker;
 import com.rnfs.RNFSPackage;
 import dog.craftz.sqlite_2.RNSqlite2Package;
-import com.oblador.keychain.KeychainPackage;
 import com.rnziparchive.RNZipArchivePackage;
 import com.RNFetchBlob.RNFetchBlobPackage;
 import com.reactnativenavigation.NavigationApplication;
@@ -20,6 +19,8 @@ import com.reactnativecommunity.asyncstorage.AsyncStoragePackage;
 import com.reactnativecommunity.webview.RNCWebViewPackage;
 import com.reactcommunity.rndatetimepicker.RNDateTimePickerPackage;
 import com.codemotionapps.reactnativedarkmode.DarkModePackage;
+import com.rnfingerprint.FingerprintAuthPackage;
+import com.oblador.keychain.KeychainPackage;
 import com.facebook.react.shell.MainReactPackage;
 import com.facebook.soloader.SoLoader;
 import com.bitgo.randombytes.RandomBytesPackage;
@@ -72,7 +73,8 @@ public class MainApplication extends NavigationApplication {
                  new RNBcryptPackage(),
                  new RNVersionNumberPackage(),
                  new RNDateTimePickerPackage(),
-                 new DarkModePackage()
+                 new DarkModePackage(),
+                 new FingerprintAuthPackage()
          );
      }
 

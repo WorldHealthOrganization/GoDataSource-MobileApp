@@ -154,6 +154,11 @@ android {
             debuggable true
         }
     }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
     // applicationVariants are e.g. debug, release
     applicationVariants.all { variant ->
         variant.outputs.each { output ->
@@ -170,6 +175,8 @@ android {
 }
 
 dependencies {
+    implementation project(':react-native-keychain')
+    implementation project(':react-native-touch-id')
     implementation project(':react-native-dark-mode')
     implementation project(':@react-native-community_datetimepicker')
     implementation project(':react-native-webview')
@@ -189,7 +196,6 @@ dependencies {
     implementation project(':react-native-document-picker')
     implementation project(':react-native-fs')
     implementation project(':react-native-sqlcipher-2')
-    implementation project(':react-native-keychain')
     implementation project(':react-native-zip-archive')
     implementation project(':rn-fetch-blob')
     implementation project(':react-native-vector-icons')

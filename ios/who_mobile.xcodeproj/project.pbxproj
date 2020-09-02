@@ -5,7 +5,6 @@
 	};
 	objectVersion = 46;
 	objects = {
-
 /* Begin PBXBuildFile section */
 		00C302E51ABCBA2D00DB3ED1 /* libRCTActionSheet.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302AC1ABCB8CE00DB3ED1 /* libRCTActionSheet.a */; };
 		00C302E71ABCBA2D00DB3ED1 /* libRCTGeolocation.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302BA1ABCB90400DB3ED1 /* libRCTGeolocation.a */; };
@@ -47,7 +46,6 @@
 		375529ADF1CB461D91661EF3 /* Octicons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = D76C7890181046A1AA3452BD /* Octicons.ttf */; };
 		3B06BE0721C3DBFA0012D9C0 /* APNSEventEmitter.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B06BE0621C3DBFA0012D9C0 /* APNSEventEmitter.m */; };
 		3B38880421C79AD300ADBE5C /* APNSEventManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B38880321C79AD300ADBE5C /* APNSEventManager.m */; };
-		40F9574B44134A71916EAD47 /* libRNKeychain.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4610B02DCF40411D92FB00ED /* libRNKeychain.a */; };
 		4AED598218A74F9CA423E6C6 /* SimpleLineIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 1167A5CFED3D417C93EF4604 /* SimpleLineIcons.ttf */; };
 		4FA28C1F731A478998412FD9 /* Roboto-Black.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 5A1454C683FF43BEA12EA238 /* Roboto-Black.ttf */; };
 		557BCF373766454C8BC6BEAB /* libreactnativeuilib.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 35B2425CB10C49F3AA11270F /* libreactnativeuilib.a */; };
@@ -536,20 +534,6 @@
 			remoteGlobalIDString = 6456441F1EB8DA9100672408;
 			remoteInfo = "RNFS-tvOS";
 		};
-		F25A37F221385BC3005F3496 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = E9DC39632BDD44A9915133B7 /* RNKeychain.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 5D82366F1B0CE05B005A9EF3;
-			remoteInfo = RNKeychain;
-		};
-		F25A37F421385BC3005F3496 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = E9DC39632BDD44A9915133B7 /* RNKeychain.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 6478985F1F38BF9100DA1C12;
-			remoteInfo = "RNKeychain-tvOS";
-		};
 		F265C95321AD720B0055A97C /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = F265C91E21AD720A0055A97C /* RNRandomBytes.xcodeproj */;
@@ -625,7 +609,6 @@
 		3B38880321C79AD300ADBE5C /* APNSEventManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = APNSEventManager.m; sourceTree = "<group>"; };
 		3F94250387284F21930E14C1 /* libRNFS.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRNFS.a; sourceTree = "<group>"; };
 		402AC17241C218224A7E12DA /* Pods-who_mobile.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-who_mobile.release.xcconfig"; path = "Pods/Target Support Files/Pods-who_mobile/Pods-who_mobile.release.xcconfig"; sourceTree = "<group>"; };
-		4610B02DCF40411D92FB00ED /* libRNKeychain.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRNKeychain.a; sourceTree = "<group>"; };
 		4DCF0BAD2E9B4474BE76F457 /* RNSqlite2.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNSqlite2.xcodeproj; path = "../node_modules/react-native-sqlcipher-2/ios/RNSqlite2.xcodeproj"; sourceTree = "<group>"; };
 		4EEF426F4A7B44068C424A73 /* Roboto-ThinItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Roboto-ThinItalic.ttf"; path = "../assets/fonts/Roboto/Roboto-ThinItalic.ttf"; sourceTree = "<group>"; };
 		59636DB7940042C1BDA5D253 /* FontAwesome5_Brands.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FontAwesome5_Brands.ttf; path = "../node_modules/react-native-vector-icons/Fonts/FontAwesome5_Brands.ttf"; sourceTree = "<group>"; };
@@ -657,7 +640,6 @@
 		D3504A69925041D384B2A509 /* Roboto-MediumItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Roboto-MediumItalic.ttf"; path = "../assets/fonts/Roboto/Roboto-MediumItalic.ttf"; sourceTree = "<group>"; };
 		D69C68F7D8BF4154964A347A /* libRNSqlite2.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRNSqlite2.a; sourceTree = "<group>"; };
 		D76C7890181046A1AA3452BD /* Octicons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Octicons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Octicons.ttf"; sourceTree = "<group>"; };
-		E9DC39632BDD44A9915133B7 /* RNKeychain.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNKeychain.xcodeproj; path = "../node_modules/react-native-keychain/RNKeychain.xcodeproj"; sourceTree = "<group>"; };
 		EC98F5D4250748DC812CB9B3 /* EvilIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = EvilIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/EvilIcons.ttf"; sourceTree = "<group>"; };
 		F208B5E622AFCFBD00B84216 /* RNSentry.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNSentry.xcodeproj; path = "../node_modules/react-native-sentry/ios/RNSentry.xcodeproj"; sourceTree = "<group>"; };
 		F211DA1C2445EC7800CB50B8 /* libPods-who_mobile.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = "libPods-who_mobile.a"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -727,7 +709,6 @@
 				557BCF373766454C8BC6BEAB /* libreactnativeuilib.a in Frameworks */,
 				0E15B5EBB1514ECFB9E29E06 /* libRNZipArchive.a in Frameworks */,
 				7753401C6AD3409DBC573BCD /* libz.tbd in Frameworks */,
-				40F9574B44134A71916EAD47 /* libRNKeychain.a in Frameworks */,
 				6CF45914636A42FB87CD719A /* libRNSqlite2.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1022,7 +1003,6 @@
 				139FDEE61B06529A00C62182 /* RCTWebSocket.xcodeproj */,
 				CA95281FD18B4EAFA8EE0DBC /* reactnativeuilib.xcodeproj */,
 				A063A32E3E1A477DA53EFE50 /* RNZipArchive.xcodeproj */,
-				E9DC39632BDD44A9915133B7 /* RNKeychain.xcodeproj */,
 				4DCF0BAD2E9B4474BE76F457 /* RNSqlite2.xcodeproj */,
 				F3327DD41E4648F7802A204E /* RNExitApp.xcodeproj */,
 			);
@@ -1190,15 +1170,6 @@
 			children = (
 				F255A1EC2170B48100D93AFE /* libRNFS.a */,
 				F255A1EE2170B48100D93AFE /* libRNFS.a */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
-		F25A37EE21385BC3005F3496 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				F25A37F321385BC3005F3496 /* libRNKeychain.a */,
-				F25A37F521385BC3005F3496 /* libRNKeychain.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1483,10 +1454,6 @@
 				{
 					ProductGroup = F255A1BF2170B48100D93AFE /* Products */;
 					ProjectRef = F255A1BE2170B48100D93AFE /* RNFS.xcodeproj */;
-				},
-				{
-					ProductGroup = F25A37EE21385BC3005F3496 /* Products */;
-					ProjectRef = E9DC39632BDD44A9915133B7 /* RNKeychain.xcodeproj */;
 				},
 				{
 					ProductGroup = F265C91F21AD720A0055A97C /* Products */;
@@ -1955,20 +1922,6 @@
 			remoteRef = F255A1ED2170B48100D93AFE /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		F25A37F321385BC3005F3496 /* libRNKeychain.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libRNKeychain.a;
-			remoteRef = F25A37F221385BC3005F3496 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		F25A37F521385BC3005F3496 /* libRNKeychain.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libRNKeychain.a;
-			remoteRef = F25A37F421385BC3005F3496 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
 		F265C95421AD720B0055A97C /* libRNRandomBytes.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
@@ -2226,7 +2179,6 @@
 					"$(SRCROOT)/../node_modules/react-native-ui-lib/lib/ios/reactnativeuilib/**",
 					"$(SRCROOT)/../node_modules/react-native-zip-archive/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-fs/**",
-					"$(SRCROOT)/../node_modules/react-native-keychain/RNKeychainManager",
 					"$(SRCROOT)/../node_modules/react-native-sqlcipher-2/ios",
 					"$(SRCROOT)/../node_modules/react-native-sqlcipher-2/ios",
 				);
@@ -2259,7 +2211,6 @@
 					"$(SRCROOT)/../node_modules/react-native-ui-lib/lib/ios/reactnativeuilib/**",
 					"$(SRCROOT)/../node_modules/react-native-zip-archive/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-fs/**",
-					"$(SRCROOT)/../node_modules/react-native-keychain/RNKeychainManager",
 					"$(SRCROOT)/../node_modules/react-native-sqlcipher-2/ios",
 					"$(SRCROOT)/../node_modules/react-native-sqlcipher-2/ios",
 				);
@@ -2297,7 +2248,6 @@
 					"$(SRCROOT)/../node_modules/react-native-ui-lib/lib/ios/reactnativeuilib/**",
 					"$(SRCROOT)/../node_modules/react-native-zip-archive/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-fs/**",
-					"$(SRCROOT)/../node_modules/react-native-keychain/RNKeychainManager",
 					"$(SRCROOT)/../node_modules/react-native-sqlcipher-2/ios",
 					"$(SRCROOT)/../node_modules/react-native-sqlcipher-2/ios",
 					"$(SRCROOT)/Pods/**",
@@ -2338,7 +2288,6 @@
 					"$(SRCROOT)/../node_modules/react-native-ui-lib/lib/ios/reactnativeuilib/**",
 					"$(SRCROOT)/../node_modules/react-native-zip-archive/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-fs/**",
-					"$(SRCROOT)/../node_modules/react-native-keychain/RNKeychainManager",
 					"$(SRCROOT)/../node_modules/react-native-sqlcipher-2/ios",
 					"$(SRCROOT)/../node_modules/react-native-sqlcipher-2/ios",
 					"$(SRCROOT)/Pods/**",
@@ -2379,7 +2328,6 @@
 					"$(SRCROOT)/../node_modules/react-native-ui-lib/lib/ios/reactnativeuilib/**",
 					"$(SRCROOT)/../node_modules/react-native-zip-archive/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-fs/**",
-					"$(SRCROOT)/../node_modules/react-native-keychain/RNKeychainManager",
 					"$(SRCROOT)/../node_modules/react-native-sqlcipher-2/ios",
 					"$(SRCROOT)/../node_modules/react-native-sqlcipher-2/ios",
 				);
@@ -2416,7 +2364,6 @@
 					"$(SRCROOT)/../node_modules/react-native-ui-lib/lib/ios/reactnativeuilib/**",
 					"$(SRCROOT)/../node_modules/react-native-zip-archive/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-fs/**",
-					"$(SRCROOT)/../node_modules/react-native-keychain/RNKeychainManager",
 					"$(SRCROOT)/../node_modules/react-native-sqlcipher-2/ios",
 					"$(SRCROOT)/../node_modules/react-native-sqlcipher-2/ios",
 				);
@@ -2452,7 +2399,6 @@
 					"$(SRCROOT)/../node_modules/react-native-ui-lib/lib/ios/reactnativeuilib/**",
 					"$(SRCROOT)/../node_modules/react-native-zip-archive/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-fs/**",
-					"$(SRCROOT)/../node_modules/react-native-keychain/RNKeychainManager",
 					"$(SRCROOT)/../node_modules/react-native-sqlcipher-2/ios",
 					"$(SRCROOT)/../node_modules/react-native-sqlcipher-2/ios",
 				);
@@ -2488,7 +2434,6 @@
 					"$(SRCROOT)/../node_modules/react-native-ui-lib/lib/ios/reactnativeuilib/**",
 					"$(SRCROOT)/../node_modules/react-native-zip-archive/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-fs/**",
-					"$(SRCROOT)/../node_modules/react-native-keychain/RNKeychainManager",
 					"$(SRCROOT)/../node_modules/react-native-sqlcipher-2/ios",
 					"$(SRCROOT)/../node_modules/react-native-sqlcipher-2/ios",
 				);
