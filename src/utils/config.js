@@ -17,31 +17,28 @@ const designScreenSize = {
     height: 667
 };
 
-const sideMenuItems = [
-    {
-        key: 'followups',
+export const sideMenuKeys = ["followups", 'contacts', 'contactsOfContacts', 'cases', 'users', 'help'];
+
+const sideMenuItems = {
+    [sideMenuKeys[0]]: {
         name: 'update',
         label: translations.navigationDrawer.followUpsLabel,
     },
-    {
-        key: 'contacts',
+    [sideMenuKeys[1]]: {
         name: 'people',
         label: translations.navigationDrawer.contactsLabel,
-        // addButton: true
     },
-    {
-        key: 'contactsOfContacts',
+    [sideMenuKeys[2]]: {
         name: 'people',
         label: contactsOfContactsScreen.contactsTitle,
         // addButton: true
     },
-    {
-        key: 'cases',
+    [sideMenuKeys[3]]: {
         name: 'create-new-folder',
         label: translations.navigationDrawer.casesLabel,
         addButton: true
     }
-];
+};
 
 const dropDownValues = [
     {

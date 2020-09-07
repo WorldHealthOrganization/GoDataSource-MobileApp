@@ -12,7 +12,7 @@ import NavBarCustom from './../components/NavBarCustom';
 import Breadcrumb from './../components/Breadcrumb';
 import Ripple from 'react-native-material-ripple';
 import styles from './../styles';
-import config from './../utils/config';
+import config, {sideMenuKeys} from './../utils/config';
 import _, {sortBy} from 'lodash';
 import CaseSinglePersonalContainer from './../containers/CaseSinglePersonalContainer';
 import CaseSingleAddressContainer from './../containers/CaseSingleAddressContainer';
@@ -809,8 +809,8 @@ class CaseSingleScreen extends Component {
             Alert.alert("", 'You have unsaved data. Are you sure you want to leave this page and lose all changes?', [
                 {
                     text: 'Yes', onPress: () => {
-                        if(this.props.selectedScreen !== 3) {
-                            this.props.saveSelectedScreen(3);
+                        if(this.props.selectedScreen !== sideMenuKeys[3]) {
+                            this.props.saveSelectedScreen(sideMenuKeys[3]);
                         }
                         this.props.navigator.resetTo({
                                 screen: 'CasesScreen',
@@ -826,8 +826,8 @@ class CaseSingleScreen extends Component {
                 }
             ])
         } else {
-            if(this.props.selectedScreen !== 3) {
-                this.props.saveSelectedScreen(3);
+            if(this.props.selectedScreen !== sideMenuKeys[3]) {
+                this.props.saveSelectedScreen(sideMenuKeys[3]);
             }
             this.props.navigator.resetTo({
                     screen: 'CasesScreen',

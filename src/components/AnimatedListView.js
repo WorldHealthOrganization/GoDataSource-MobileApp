@@ -443,7 +443,8 @@ Animated.propTypes = {
     onPressView: PropTypes.func,
     onPressMap: PropTypes.func,
     onPressName: PropTypes.func,
-    onPressCenterButton: PropTypes.func
+    onPressCenterButton: PropTypes.func,
+    onEndReached: PropTypes.func
 };
 
 AnimatedListView.defaultProps = {
@@ -456,7 +457,8 @@ AnimatedListView.defaultProps = {
     onPressView: () => {console.log('Default function onPressView')},
     onPressMap: () => {console.log('Default function onPressMap')},
     onPressName: () => {console.log('Default function onPressName')},
-    onPressCenterButton: () => {console.log('Default function onPressCenterButton')}
+    onPressCenterButton: () => {console.log('Default function onPressCenterButton')},
+    onEndReached: () => {console.log('Default function onEndReached')}
 };
 
 // Create style outside the class, or for components that will be used by other components (buttons),
