@@ -37,7 +37,7 @@ class ContactsSingleCalendar extends Component {
     }
 
     shouldComponentUpdate(nextProps, nextState) {
-        if (nextProps.activeIndex === 3) {
+        if (nextProps.routeKey === 'calendar') {
             return true;
         }
         return false;

@@ -48,7 +48,7 @@ class ContactsSinglePersonal extends PureComponent {
     }
 
     shouldComponentUpdate(nextProps, nextState) {
-        if (nextProps.activeIndex === 0) {
+        if (nextProps.routeKey === 'personal') {
             return true;
         }
         return false;

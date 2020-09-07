@@ -39,7 +39,7 @@ class CaseSingleAddressContainer extends React.Component {
     }
 
     shouldComponentUpdate(nextProps, nextState) {
-        if (nextProps.isEditMode !== this.props.isEditMode || nextProps.index === 1) {
+        if (nextProps.isEditMode !== this.props.isEditMode || nextProps.routeKey === 'address') {
             return true;
         }
         return false;

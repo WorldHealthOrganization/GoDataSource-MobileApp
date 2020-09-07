@@ -17,6 +17,7 @@ import ContactsSingleAddress from './../containers/ContactsSingleAddress';
 import ContactsSingleCalendar from './../containers/ContactsSingleCalendar';
 import ContactsSingleExposures from './../containers/ContactsSingleExposures';
 import ContactsSinglePersonal from './../containers/ContactsSinglePersonal';
+import ContactsSingleQuestionnaire from './../containers/ContactsSingleQuestionnaire';
 import ExposureScreen from './../screens/ExposureScreen';
 import Breadcrumb from './../components/Breadcrumb';
 import Menu, {MenuItem} from 'react-native-material-menu';
@@ -25,7 +26,7 @@ import {addFollowUp, getFollowUpsForContactId, updateFollowUpAndContact} from '.
 import {addContact, checkForNameDuplicated, getExposuresForContact, updateContact} from './../actions/contacts';
 import {removeErrors} from './../actions/errors';
 import DateTimePicker from 'react-native-modal-datetime-picker';
-import _ from 'lodash';
+import _, {sortBy} from 'lodash';
 import {
     calculateDimension,
     computeFullName,
@@ -40,12 +41,20 @@ import moment from 'moment/min/moment.min';
 import translations from './../utils/translations';
 import ElevatedView from 'react-native-elevated-view';
 import AddFollowUpScreen from './AddFollowUpScreen';
-import {generateId, generateTeamId} from "../utils/functions";
+import {
+    checkRequiredQuestions,
+    extractAllQuestions,
+    generateId,
+    generateTeamId, mapAnswers,
+    reMapAnswers
+} from "../utils/functions";
 import constants from "../utils/constants";
 import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
 import PermissionComponent from './../components/PermissionComponent';
 import lodashIntersect from 'lodash/intersection';
 import {getItemByIdRequest} from './../actions/cases';
+import lodashGet from "lodash/get";
+import cloneDeep from "lodash/cloneDeep";
 
 const initialLayout = {
     height: 0,
@@ -147,7 +156,12 @@ class ContactsSingleScreen extends Component {
             isEditMode: true,
             selectedItemIndexForTextSwitchSelectorForAge: 0, // age/dob - switch tab
             selectedItemIndexForAgeUnitOfMeasureDropDown: this.props.isNew ? 0 : (this.props.contact && this.props.contact.age && this.props.contact.age.years !== undefined && this.props.contact.age.years !== null && this.props.contact.age.years > 0) ? 0 : 1, //default age dropdown value
-            showAddFollowUpScreen: false
+            showAddFollowUpScreen: false,
+
+            //Questionnaire features
+            previousAnswers: {},
+            currentAnswers: {},
+            mappedQuestions: []
         };
         // Bind here methods, or at least don't declare methods in the render method
         this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this));
@@ -170,6 +184,7 @@ class ContactsSingleScreen extends Component {
                     console.log('old contact with age as string update')
                 })
             }
+            let mappedAnswers = mapAnswers(this.props.caseInvestigationQuestions, this.props.contact.questionnaireAnswers);
 
             //permissions check
             let isEditMode = _.get(this.props, 'isEditMode', false);
@@ -191,6 +206,8 @@ class ContactsSingleScreen extends Component {
                     .then(([followUps, relationshipsAndExposures, contact]) => {
                         this.setState(prevState => ({
                             loading: !prevState.loading,
+                            previousAnswers: mappedAnswers.mappedAnswers,
+                            mappedQuestions: mappedAnswers.mappedQuestions,
                             contact: Object.assign({}, this.props.getContact ? contact : prevState.contact, {
                                 followUps,
                                 relationships: relationshipsAndExposures
@@ -465,8 +482,10 @@ class ContactsSingleScreen extends Component {
                 missingFields = this.checkRequiredFieldsAddresses();
                 break;
             case 2:
-                missingFields = this.lds();
+                missingFields = this.checkFields();
                 break;
+            case 3:
+                missingFields = this.check
             default:
                 break;
         }
@@ -546,6 +565,7 @@ class ContactsSingleScreen extends Component {
             case 'personal':
                 return (
                     <ContactsSinglePersonal
+                        routeKey={route.key}
                         contact={this.state.contact}
                         activeIndex={this.state.index}
                         onChangeText={this.handleOnChangeText}
@@ -578,6 +598,7 @@ class ContactsSingleScreen extends Component {
             case 'address':
                 return (
                     <ContactsSingleAddress
+                        routeKey={route.key}
                         contact={this.state.contact}
                         activeIndex={this.state.index}
                         onChangeText={this.handleOnChangeText}
@@ -607,6 +628,7 @@ class ContactsSingleScreen extends Component {
             case 'exposures':
                 return (
                     <ContactsSingleExposures
+                        routeKey={route.key}
                         contact={this.state.contact}
                         activeIndex={this.state.index}
                         onPressEditExposure={this.handleOnPressEditExposure}
@@ -631,6 +653,34 @@ class ContactsSingleScreen extends Component {
                         onPressSaveEdit={this.handleOnPressSave}
                         onPressEdit={this.onPressEdit}
                         onPressCancelEdit={this.onPressCancelEdit}
+                    />
+                );
+            case 'investigation':
+                return (
+                    <ContactsSingleQuestionnaire
+                        routeKey={route.key}
+                        item={this.state.contact}
+                        currentAnswers={this.state.currentAnswers}
+                        previousAnswers={this.state.previousAnswers}
+                        isEditMode={this.state.isEditMode}
+                        index={this.state.index}
+
+                        numberOfTabs={this.state.routes.length}
+                        onPressEdit={this.onPressEdit}
+                        onPressSave={this.handleOnPressSave}
+                        onPressSaveEdit={this.handleOnPressSave}
+                        onPressCancelEdit={this.onPressCancelEdit}
+
+                        onChangeTextAnswer={this.onChangeAnswer}
+                        onChangeSingleSelection={this.onChangeAnswer}
+                        onChangeMultipleSelection={this.onChangeAnswer}
+                        onChangeDateAnswer={this.onChangeAnswer}
+                        handleMoveToPrevieousScreenButton={this.handleMoveToPrevieousScreenButton}
+                        isNew={this.props.isNew ? true : this.props.forceNew ? true : false}
+                        onClickAddNewMultiFrequencyAnswer={this.onClickAddNewMultiFrequencyAnswer}
+                        onChangeAnswerDate={this.onChangeAnswerDate}
+                        savePreviousAnswers={this.savePreviousAnswers}
+                        copyAnswerDate={this.handleCopyAnswerDate}
                     />
                 );
             case 'calendar':
@@ -1272,47 +1322,6 @@ class ContactsSingleScreen extends Component {
         }
     };
 
-    // Answers handlers
-    onChangeTextAnswer = (value, id) => {
-        let itemClone = _.cloneDeep(this.state.item);
-        let questionnaireAnswers = itemClone && itemClone.questionnaireAnswers ? itemClone.questionnaireAnswers : null;
-        if (!itemClone.questionnaireAnswers) {
-            itemClone.questionnaireAnswers = {};
-            questionnaireAnswers = itemClone.questionnaireAnswers;
-        }
-        questionnaireAnswers[id] = value;
-        this.setState(prevState => ({
-            item: Object.assign({}, prevState.item, { questionnaireAnswers: questionnaireAnswers }),
-            isModified: true
-        }))
-    };
-    onChangeSingleSelection = (value, id) => {
-        let itemClone = _.cloneDeep(this.state.item);
-        let questionnaireAnswers = itemClone && itemClone.questionnaireAnswers ? itemClone.questionnaireAnswers : null;
-        if (!itemClone.questionnaireAnswers) {
-            itemClone.questionnaireAnswers = {};
-            questionnaireAnswers = itemClone.questionnaireAnswers;
-        }
-        questionnaireAnswers[id] = value.value;
-        this.setState(prevState => ({
-            item: Object.assign({}, prevState.item, { questionnaireAnswers: questionnaireAnswers }),
-            isModified: true
-        }))
-    };
-    onChangeMultipleSelection = (selections, id) => {
-        let itemClone = Object.assign({}, this.state.item);
-        let questionnaireAnswers = itemClone && itemClone.questionnaireAnswers ? itemClone.questionnaireAnswers : null;
-        if (!itemClone.questionnaireAnswers) {
-            itemClone.questionnaireAnswers = {};
-            questionnaireAnswers = itemClone.questionnaireAnswers;
-        }
-        questionnaireAnswers[id] = selections.map((e) => {return e.value});
-        this.setState(prevState => ({
-            item: Object.assign({}, prevState.item, { questionnaireAnswers: questionnaireAnswers }),
-            isModified: true
-        }))
-    };
-
     // Exposures handlers
     handleOnPressEditExposure = (relation, index) => {
         // console.log('handleOnPressEditExposure: ', relation, index);
@@ -1371,174 +1380,136 @@ class ContactsSingleScreen extends Component {
         Keyboard.dismiss();
         this.setState({
             loading: true
-        }, () => {
-            let relationshipsMissingFields = this.checkFields();
-            if (relationshipsMissingFields && Array.isArray(relationshipsMissingFields) && relationshipsMissingFields.length === 0) {
-                let missingFields = this.checkRequiredFields();
-                if (missingFields && Array.isArray(missingFields) && missingFields.length === 0) {
-                    if (this.checkAgeYearsRequirements()) {
-                        if (this.checkAgeMonthsRequirements()) {
-                            if (this.state.contact.addresses === undefined || this.state.contact.addresses === null || this.state.contact.addresses.length === 0 ||
-                                (this.state.contact.addresses.length > 0 && this.state.hasPlaceOfResidence === true)) {
-                                const {contact} = this.state;
-
-                                checkForNameDuplicated(this.props.isNew ? null : contact._id, contact.firstName, contact.lastName, this.props.user.activeOutbreakId)
-                                    .then((isDuplicate) => {
-                                        if (isDuplicate) {
-                                            Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.contactDuplicateNameError, this.props.translation), [
-                                                {
-                                                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
-                                                    onPress: () => {
-                                                        this.setState({
-                                                            loading: false
-                                                        }, () => {
-                                                            this.hideMenu()
-                                                        })
-                                                    }
-                                                },
-                                                {
-                                                    text: getTranslation(translations.alertMessages.saveAnywayLabel, this.props.translation),
-                                                    onPress: () => {
-                                                        this.saveContactAction()
-                                                    }
-                                                }
-                                            ])
-                                        } else {
-                                            this.saveContactAction();
-                                        }
-                                    })
-                                    .catch((errorIsDuplicate) => {
-                                        this.saveContactAction();
-                                    });
-                            } else {
-                                this.setState({loading: false}, () => {
-                                    Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.placeOfResidenceError, this.props.translation), [
-                                        {
-                                            text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
-                                            onPress: () => {
-                                                this.hideMenu()
-                                            }
-                                        }
-                                    ])
-                                })
-                            }
-                        } else {
-                            this.setState({loading: false}, () => {
-                                Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.monthsValueError, this.props.translation), [
-                                    {
-                                        text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
-                                        onPress: () => {
-                                            console.log("OK pressed")
-                                        }
-                                    }
-                                ])
-                            })
+        }, async () => {
+            let functionsArray = [this.checkFields, this.checkRequiredFields, this.checkAgeYearsRequirements, this.checkAgeMonthsRequirements, this.checkPlaceOfResidence, this.checkRequiredFieldsQuestionnaire];
+            let message = null;
+            for (let i=0; i<functionsArray.length; i++) {
+                let response = await functionsArray[i]();
+                if (checkArrayAndLength(response)) {
+                    message = `${getTranslation(translations.alertMessages.requiredFieldsMissingError, this.props.translation)}.\n${getTranslation(translations.alertMessages.missingFields, this.props.translation)}: ${response}`;
+                    break;
+                } else {
+                    if (!response) {
+                        switch(i) {
+                            case 2:
+                                message = translations.alertMessages.yearsValueError;
+                                break;
+                            case 3:
+                                message = translations.alertMessages.monthsValueError;
+                                break;
+                            case 4:
+                                message = translations.alertMessages.placeOfResidenceError;
+                                break;
+                            default:
+                                message = null;
                         }
-                    } else {
-                        this.setState({loading: false}, () => {
-                            Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.yearsValueError, this.props.translation), [
+                        break;
+                    }
+                }
+            }
+
+            if (message) {
+                this.setState({
+                    loading: false
+                }, () => {
+                    this.showAlert(translations.alertMessages.validationErrorLabel, message);
+                })
+            } else {
+                const {contact} = this.state;
+                checkForNameDuplicated(this.props.isNew ? null : contact._id, contact.firstName, contact.lastName, this.props.user.activeOutbreakId)
+                    .then((isDuplicate) => {
+                        if (isDuplicate) {
+                            Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.contactDuplicateNameError, this.props.translation), [
                                 {
                                     text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
                                     onPress: () => {
-                                        console.log("OK pressed")
+                                        this.setState({
+                                            loading: false
+                                        }, () => {
+                                            this.hideMenu()
+                                        })
+                                    }
+                                },
+                                {
+                                    text: getTranslation(translations.alertMessages.saveAnywayLabel, this.props.translation),
+                                    onPress: () => {
+                                        this.saveContactAction()
                                     }
                                 }
                             ])
-                        })
-                    }
-                } else {
-                    this.setState({loading: false}, () => {
-                        Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), `${getTranslation(translations.alertMessages.requiredFieldsMissingError, this.props.translation)}.\n${getTranslation(translations.alertMessages.missingFields, this.props.translation)}: ${missingFields}`, [
-                            {
-                                text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
-                                onPress: () => {
-                                    this.hideMenu()
-                                }
-                            }
-                        ])
-                    })
-                }
-            } else {
-                this.setState({loading: false}, () => {
-                    Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), `${getTranslation(translations.alertMessages.requiredFieldsMissingError, this.props.translation)}.\n${getTranslation(translations.alertMessages.missingFields, this.props.translation)}: ${relationshipsMissingFields}`, [
-                        {
-                            text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
-                            onPress: () => {
-                                this.hideMenu()
-                            }
+                        } else {
+                            this.saveContactAction();
                         }
-                    ])
-                })
+                    })
+                    .catch((errorIsDuplicate) => {
+                        this.saveContactAction();
+                    });
             }
         })
     };
 
+    checkPlaceOfResidence = () => {
+        return this.state.contact.addresses === undefined || this.state.contact.addresses === null || this.state.contact.addresses.length === 0 ||
+            (this.state.contact.addresses.length > 0 && this.state.hasPlaceOfResidence === true);
+    };
+
+    showAlert = (title, message) => {
+        Alert.alert(getTranslation(title, this.props.translation), getTranslation(message, this.props.translation), [
+            {
+                text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+                onPress: () => {
+                    this.hideMenu()
+                }
+            }
+        ])
+    };
+
     saveContactAction = () => {
-        this.setState({
-            savePressed: true
-        }, () => {
+        // this.setState({
+        //     savePressed: true
+        // }, () => {
             this.hideMenu();
             let ageConfig = this.ageAndDobPrepareForSave();
-            this.setState(prevState => ({
-                contact: Object.assign({}, prevState.contact, { age: ageConfig.ageClone }, { dob: ageConfig.dobClone }),
-            }), () => {
-                console.log("ageAndDobPrepareForSave done", this.state.contact);
-                if (this.props.isNew) {
-                    let contactWithRequiredFields = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, this.state.contact), action = 'create', fileType = 'person.json', type = 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT')
-                    this.setState(prevState => ({
-                        contact: Object.assign({}, prevState.contact, contactWithRequiredFields),
-                    }), () => {
-                        let contactClone = _.cloneDeep(this.state.contact);
-                        // let contactMatchFilter = this.checkIfContactMatchFilter();
-                        // console.log('contactMatchFilter', contactMatchFilter)
-                        addContact(contactClone, _.get(this.props, 'periodOfFollowUp', 1), _.get(this.props, 'user._id'))
-                            .then((result) => {
-                                if (_.isFunction(this.props.refresh)) {
-                                    this.props.refresh();
-                                }
-                                this.props.navigator.pop(
-                                    {
-                                        animated: true,
-                                        animationType: 'fade',
-                                    }
-                                )
-                            })
-                            .catch((errorAddContact) => {
-                                console.log('errorUpdateCase', errorAddContact);
-                            })
-                    })
-                } else {
-                    let contactWithRequiredFields = null;
-                    if (this.state.deletePressed === true) {
-                        contactWithRequiredFields = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, this.state.contact), action = 'delete', fileType = 'person.json', type = 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT')
-                    } else {
-                        contactWithRequiredFields = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, this.state.contact), action = 'update', fileType = 'person.json', type = 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT')
-                    }
 
-                    this.setState(prevState => ({
-                        contact: Object.assign({}, prevState.contact, contactWithRequiredFields),
-                    }), () => {
-                        let contactClone = _.cloneDeep(this.state.contact);
-                        updateContact(contactClone)
-                            .then((result) => {
-                                if (_.isFunction(this.props.refresh)) {
-                                    this.props.refresh();
-                                }
-                                this.props.navigator.pop(
-                                    {
-                                        animated: true,
-                                        animationType: 'fade',
-                                    }
-                                )
-                            })
-                            .catch((errorUpdateContact) => {
-                                console.log('errorUpdateCase', errorUpdateContact);
-                            })
-                    })
+            let contactClone = _.cloneDeep(this.state.contact);
+            contactClone = Object.assign({}, contactClone, { age: ageConfig.ageClone }, { dob: ageConfig.dobClone });
+            let operation = 'create';
+            let promise = null;
+            if (!this.props.isNew) {
+                if (this.state.deletePressed) {
+                    operation = 'delete';
+                } else {
+                    operation = 'update';
                 }
-            })
-        });
-    }
+            }
+
+            contactClone.questionnaireAnswers = reMapAnswers(_.cloneDeep(this.state.previousAnswers));
+            contactClone.questionnaireAnswers = this.filterUnasweredQuestions(contactClone.questionnaireAnswers);
+            contactClone = updateRequiredFields(this.props.user.activeOutbreakId, this.props.user._id, contactClone, operation, 'person.json', 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT');
+
+            if (operation === 'create') {
+                promise = addContact(contactClone, _.get(this.props, 'periodOfFollowUp', 1), _.get(this.props, 'user._id'))
+            } else {
+                promise = updateContact(contactClone);
+            }
+
+            promise
+                .then((result) => {
+                    if (_.isFunction(this.props.refresh)) {
+                        this.props.refresh();
+                    }
+                    this.props.navigator.pop(
+                        {
+                            animated: true,
+                            animationType: 'fade',
+                        }
+                    )
+                })
+                .catch((errorAddContact) => {
+                    console.log(`Error ${operation} contact`, errorAddContact);
+                })
+        // });
+    };
 
     ageAndDobPrepareForSave = () => {
         let dobClone = null
@@ -1842,6 +1813,136 @@ class ContactsSingleScreen extends Component {
             })
         }
     };
+
+    // Questionnaire methods
+    onChangeAnswer = (value, id, parentId, index) => {
+        let questionnaireAnswers = _.cloneDeep(this.state.previousAnswers);
+
+        if (parentId) {
+            if (!questionnaireAnswers[parentId]) {
+                questionnaireAnswers[parentId] = [];
+            }
+            if (lodashGet(questionnaireAnswers, `[${parentId}][0]`, null) !== null) {
+                if(!questionnaireAnswers[parentId][0].hasOwnProperty("subAnswers")){
+                    questionnaireAnswers[parentId][0] = Object.assign({}, questionnaireAnswers[parentId][0],{ subAnswers: {}});
+                }
+                if (typeof questionnaireAnswers[parentId][0].subAnswers === "object" && Object.keys(questionnaireAnswers[parentId][0].subAnswers).length === 0) {
+                    questionnaireAnswers[parentId][0].subAnswers = {};
+                }
+                if (!Array.isArray(questionnaireAnswers[parentId][0].subAnswers[id])) {
+                    questionnaireAnswers[parentId][0].subAnswers[id] = [];
+                }
+                questionnaireAnswers[parentId][0].subAnswers[id][0] = value;
+            }
+        } else {
+            if (!questionnaireAnswers[id]) {
+                questionnaireAnswers[id] = [];
+            }
+            questionnaireAnswers[id][0] = value;
+        }
+
+        this.setState({
+            previousAnswers: questionnaireAnswers,
+            isModified: true
+        }, () => {
+            console.log ('onChangeMultipleSelection after setState', this.state.previousAnswers);
+        })
+    };
+
+    // used for adding multi-frequency answers
+    onClickAddNewMultiFrequencyAnswer = (item) => {
+        //add new empty item to question and update previousAnswers
+        let previousAnswersClone = _.cloneDeep(this.state.previousAnswers);
+        if(previousAnswersClone.hasOwnProperty(item.variable) && item.variable){
+            previousAnswersClone[item.variable].push({date: null, value: null});
+        } else {
+            previousAnswersClone = Object.assign({}, previousAnswersClone, { [item.variable]: [{date: null, value: null}] });
+        }
+        this.savePreviousAnswers(previousAnswersClone[item.variable], item.variable);
+    };
+    savePreviousAnswers = (previousAnswers, previousAnswersId) => {
+        this.setState(prevState => ({
+            previousAnswers: Object.assign({}, prevState.previousAnswers, { [previousAnswersId]: previousAnswers }),
+            isModified: true
+        }), () => {
+            this.props.navigator.dismissAllModals();
+        })
+    };
+    handleCopyAnswerDate = (value) => {
+        let previousAnswersClone = _.cloneDeep(this.state.previousAnswers);
+        for(let questionId in previousAnswersClone) {
+            if(previousAnswersClone.hasOwnProperty(questionId)) {
+                previousAnswersClone[questionId] = previousAnswersClone[questionId].map((e) => {
+                    return {date: e.date === null ? createDate(value).toISOString() : e.date, value: e.value};
+                });
+            }
+        }
+        this.setState({
+            previousAnswers: previousAnswersClone,
+            isModified: true
+        });
+    };
+    checkAnswerDatesQuestionnaire = () => {
+        let previousAnswersClone = _.cloneDeep(this.state.previousAnswers);
+        let sortedQuestions = sortBy(cloneDeep(this.props.caseInvestigationQuestions), ['order', 'variable']);
+        sortedQuestions = extractAllQuestions(sortedQuestions, this.state.previousAnswers, 0);
+        let canSave = true;
+        //questions exist
+        if( Array.isArray(sortedQuestions) && sortedQuestions.length > 0){
+            for(let i=0; i < sortedQuestions.length; i++){
+                //verify only multianswer questions and if they were answered
+                if(sortedQuestions[i].multiAnswer && previousAnswersClone.hasOwnProperty(sortedQuestions[i].variable)){
+                    //current answers
+                    let answerValues = previousAnswersClone[sortedQuestions[i].variable];
+                    //validate all the answers of the question
+                    if( Array.isArray(answerValues) && answerValues.length > 0){
+                        for( let q=0; q < answerValues.length; q++){
+                            // if it has value then it must have date
+                            if(answerValues[q].value !== null && answerValues[q].date === null){
+                                canSave = false;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return canSave;
+    };
+    filterUnasweredQuestions = (previousAnswersClone) => {
+        // let previousAnswersClone = _.cloneDeep(this.state.previousAnswers);
+        let sortedQuestions = sortBy(cloneDeep(this.props.caseInvestigationQuestions), ['order', 'variable']);
+        sortedQuestions = extractAllQuestions(sortedQuestions, this.state.previousAnswers, 0);
+        if( Array.isArray(sortedQuestions) && sortedQuestions.length > 0) {
+            for (let i = 0; i < sortedQuestions.length; i++) {
+                //verify only multianswer questions and if they were answered
+                if (sortedQuestions[i].multiAnswer && previousAnswersClone.hasOwnProperty(sortedQuestions[i].variable)) {
+                    //current answers
+                    let answerValues = previousAnswersClone[sortedQuestions[i].variable];
+                    let answerValuesClone = [];
+                    //validate all the answers of the question
+                    if( Array.isArray(answerValues) && answerValues.length > 0){
+                        answerValuesClone = answerValues.filter((answer)=>{
+                            return answer.value !== null;
+                        });
+                    }
+                    if(answerValuesClone.length > 0){
+                        //update answer list
+                        previousAnswersClone[sortedQuestions[i].variable] = answerValuesClone;
+                    }else{
+                        //remove key
+                        delete previousAnswersClone[sortedQuestions[i].variable];
+                    }
+                }
+            }
+        }
+        return previousAnswersClone;
+    };
+    checkRequiredFieldsQuestionnaire = () => {
+        let sortedQuestions = sortBy(cloneDeep(this.props.caseInvestigationQuestions), ['order', 'variable']);
+        sortedQuestions = extractAllQuestions(sortedQuestions, this.state.previousAnswers, 0);
+
+        return checkRequiredQuestions(sortedQuestions, this.state.previousAnswers).map(e => getTranslation(e, this.props.translation));
+    };
 }
 
 // Create style outside the class, or for components that will be used by other components (buttons),
@@ -1867,7 +1968,8 @@ function mapStateToProps(state) {
         filter: _.get(state, 'app.filters', null),
         translation: _.get(state, 'app.translation', []),
         locations: _.get(state, 'locations.locations', []),
-        periodOfFollowUp: _.get(state, 'outbreak.periodOfFollowUp', 1)
+        periodOfFollowUp: _.get(state, 'outbreak.periodOfFollowUp', 1),
+        caseInvestigationQuestions: _.get(state, 'outbreak.contactInvestigationTemplate', null),
     };
 };
 
