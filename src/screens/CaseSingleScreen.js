@@ -12,7 +12,7 @@ import NavBarCustom from './../components/NavBarCustom';
 import Breadcrumb from './../components/Breadcrumb';
 import Ripple from 'react-native-material-ripple';
 import styles from './../styles';
-import config from './../utils/config';
+import config, {sideMenuKeys} from './../utils/config';
 import _, {sortBy} from 'lodash';
 import CaseSinglePersonalContainer from './../containers/CaseSinglePersonalContainer';
 import CaseSingleAddressContainer from './../containers/CaseSingleAddressContainer';
@@ -431,6 +431,7 @@ class CaseSingleScreen extends Component {
             case 'personal':
                 return (
                     <CaseSinglePersonalContainer
+                        routeKey={route.key}
                         case={this.state.case}
                         isEditMode={this.state.isEditMode}
                         index={this.state.index}
@@ -459,6 +460,7 @@ class CaseSingleScreen extends Component {
             case 'address':
                 return (
                     <CaseSingleAddressContainer
+                        routeKey={route.key}
                         case={this.state.case}
                         isEditMode={this.state.isEditMode}
                         index={this.state.index}
@@ -487,6 +489,7 @@ class CaseSingleScreen extends Component {
             case 'infection':
                 return (
                     <CaseSingleInfectionContainer
+                        routeKey={route.key}
                         case={this.state.case}
                         isEditMode={this.state.isEditMode}
                         index={this.state.index}
@@ -519,6 +522,7 @@ class CaseSingleScreen extends Component {
             case 'exposures':
                 return (
                     <CaseSingleExposureContainer
+                        routeKey={route.key}
                         case={this.state.case}
                         relations={this.state.relations}
                         index={this.state.index}
@@ -541,26 +545,27 @@ class CaseSingleScreen extends Component {
             case 'caseInvestigation':
                 return (
                     <CaseSingleInvestigationContainer
-                    item={this.state.case}
-                    currentAnswers={this.state.currentAnswers}
-                    previousAnswers={this.state.previousAnswers}
-                    isEditMode={this.state.isEditMode}
-                    index={this.state.index}
-                    numberOfTabs={this.state.routes.length}
-                    onPressEdit={this.onPressEdit}
-                    onPressSave={this.handleOnPressSave}
-                    onPressSaveEdit={this.onPressSaveEdit}
-                    onPressCancelEdit={this.onPressCancelEdit}
-                    onChangeTextAnswer={this.onChangeTextAnswer}
-                    onChangeSingleSelection={this.onChangeSingleSelection}
-                    onChangeMultipleSelection={this.onChangeMultipleSelection}
-                    onChangeDateAnswer={this.onChangeDateAnswer}
-                    handleMoveToPrevieousScreenButton={this.handleMoveToPrevieousScreenButton}
-                    isNew={this.props.isNew ? true : this.props.forceNew ? true : false}
-                    onClickAddNewMultiFrequencyAnswer={this.onClickAddNewMultiFrequencyAnswer}
-                    onChangeAnswerDate={this.onChangeAnswerDate}
-                    savePreviousAnswers={this.savePreviousAnswers}
-                    copyAnswerDate={this.handleCopyAnswerDate}
+                        routeKey={route.key}
+                        item={this.state.case}
+                        currentAnswers={this.state.currentAnswers}
+                        previousAnswers={this.state.previousAnswers}
+                        isEditMode={this.state.isEditMode}
+                        index={this.state.index}
+                        numberOfTabs={this.state.routes.length}
+                        onPressEdit={this.onPressEdit}
+                        onPressSave={this.handleOnPressSave}
+                        onPressSaveEdit={this.onPressSaveEdit}
+                        onPressCancelEdit={this.onPressCancelEdit}
+                        onChangeTextAnswer={this.onChangeTextAnswer}
+                        onChangeSingleSelection={this.onChangeSingleSelection}
+                        onChangeMultipleSelection={this.onChangeMultipleSelection}
+                        onChangeDateAnswer={this.onChangeDateAnswer}
+                        handleMoveToPrevieousScreenButton={this.handleMoveToPrevieousScreenButton}
+                        isNew={this.props.isNew ? true : this.props.forceNew ? true : false}
+                        onClickAddNewMultiFrequencyAnswer={this.onClickAddNewMultiFrequencyAnswer}
+                        onChangeAnswerDate={this.onChangeAnswerDate}
+                        savePreviousAnswers={this.savePreviousAnswers}
+                        copyAnswerDate={this.handleCopyAnswerDate}
                 />
                 );
                 break;
@@ -804,8 +809,8 @@ class CaseSingleScreen extends Component {
             Alert.alert("", 'You have unsaved data. Are you sure you want to leave this page and lose all changes?', [
                 {
                     text: 'Yes', onPress: () => {
-                        if(this.props.selectedScreen !== 2) {
-                            this.props.saveSelectedScreen(2);
+                        if(this.props.selectedScreen !== sideMenuKeys[3]) {
+                            this.props.saveSelectedScreen(sideMenuKeys[3]);
                         }
                         this.props.navigator.resetTo({
                                 screen: 'CasesScreen',
@@ -821,8 +826,8 @@ class CaseSingleScreen extends Component {
                 }
             ])
         } else {
-            if(this.props.selectedScreen !== 2) {
-                this.props.saveSelectedScreen(2);
+            if(this.props.selectedScreen !== sideMenuKeys[3]) {
+                this.props.saveSelectedScreen(sideMenuKeys[3]);
             }
             this.props.navigator.resetTo({
                     screen: 'CasesScreen',

@@ -40,6 +40,7 @@ import {filterByUser} from './../utils/functions';
 import constants, {PERMISSIONS_CONTACT_OF_CONTACT} from './../utils/constants';
 import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
 import {updateRequiredFields} from "../utils/functions";
+import {sideMenuKeys} from './../utils/config';
 
 // Add here only the actions, not also the requests that are executed.
 // For that purpose is the requests directory
@@ -143,15 +144,16 @@ export function computeCommonData(storeUserBool, user, skipLoad) {
                 promises.push(getHelpItem());
 
                 // Compute startup screen
-                let selectedScreen = 0;
+                let selectedScreen = sideMenuKeys[0];
                 try {
                     selectedScreen = getState().app.selectedScreen;
                 } catch(errorAssign) {
                     console.log('Error while assigning');
                 }
-                if (typeof selectedScreen !== 'number') {
-                    selectedScreen = 0;
-                }
+                console.log('SelectedScreen: ', selectedScreen);
+                // if (typeof selectedScreen !== 'number') {
+                //     selectedScreen = 0;
+                // }
                 if (!checkArrayAndLength(
                     lodashIntersection(userRoles, [
                         constants.PERMISSIONS_FOLLOW_UP.followUpAll,
@@ -164,7 +166,7 @@ export function computeCommonData(storeUserBool, user, skipLoad) {
                             constants.PERMISSIONS_CONTACT.contactList
                         ])
                     )) {
-                        selectedScreen = 1;
+                        selectedScreen = sideMenuKeys[1];
                     } else {
                         if (checkArrayAndLength(
                             lodashIntersection(userRoles, [
@@ -172,9 +174,9 @@ export function computeCommonData(storeUserBool, user, skipLoad) {
                                 PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsList
                             ])
                         )) {
-                            selectedScreen = 2;
+                            selectedScreen = sideMenuKeys[2];
                         } else {
-                            selectedScreen = 3;
+                            selectedScreen = sideMenuKeys[3];
                         }
                     }
                 }

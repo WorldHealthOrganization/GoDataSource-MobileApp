@@ -40,7 +40,7 @@ class ContactsSingleAddress extends PureComponent {
     }
 
     shouldComponentUpdate(nextProps, nextState) {
-        if (nextProps.activeIndex === 1) {
+        if (nextProps.routeKey === 'address') {
             return true;
         }
         return false;

@@ -18,7 +18,7 @@ import PermissionComponent from './../components/PermissionComponent';
 import constants from "./../utils/constants";
 import config from "./../utils/config";
 
-class CaseSingleInvestigationContainer extends Component {
+class ContactsSingleQuestionnaire extends Component {
 
     // This will be a container, so put as less business logic here as possible
     constructor(props) {
@@ -30,7 +30,7 @@ class CaseSingleInvestigationContainer extends Component {
     }
 
     shouldComponentUpdate(nextProps, nextState) {
-        if (nextProps.isEditMode !== this.props.isEditMode || nextProps.routeKey === 'caseInvestigation') {
+        if (nextProps.isEditMode !== this.props.isEditMode || (nextProps.routeKey === 'investigation')) {
             return true;
         }
         return false;
@@ -84,9 +84,9 @@ class CaseSingleInvestigationContainer extends Component {
                             />
                         )}
                         permissionsList={[
-                            constants.PERMISSIONS_CASE.caseAll,
-                            constants.PERMISSIONS_CASE.caseCreate,
-                            constants.PERMISSIONS_CASE.caseModify
+                            constants.PERMISSIONS_CONTACT.contactAll,
+                            constants.PERMISSIONS_CONTACT.contactCreate,
+                            constants.PERMISSIONS_CONTACT.contactModify
                         ]}
                     />
                     <ScrollView
@@ -208,10 +208,10 @@ const style = StyleSheet.create({
 function mapStateToProps(state) {
     return {
         screenSize: get(state, 'app.screenSize', config.designScreenSize),
-        questions: get(state, 'outbreak.caseInvestigationTemplate', null),
+        questions: get(state, 'outbreak.contactInvestigationTemplate', null),
         translation: get(state, 'app.translation', []),
         role: get(state, 'role', [])
     };
 }
 
-export default connect(mapStateToProps)(CaseSingleInvestigationContainer);
+export default connect(mapStateToProps)(ContactsSingleQuestionnaire);

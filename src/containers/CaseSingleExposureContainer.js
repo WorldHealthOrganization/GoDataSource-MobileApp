@@ -42,7 +42,7 @@ class ContactsSingleExposures extends Component {
     }
 
     shouldComponentUpdate(nextProps, nextState) {
-        if (nextProps.index === 3) {
+        if (nextProps.routeKey === 'exposures') {
             return true;
         }
         return false;

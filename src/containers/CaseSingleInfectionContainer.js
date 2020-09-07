@@ -28,7 +28,7 @@ class CaseSingleInfectionContainer extends Component {
     }
     // Please add here the react lifecycle methods that you need
     shouldComponentUpdate(nextProps, nextState) {
-        if (nextProps.isEditMode !== this.props.isEditMode || nextProps.index === 2) {
+        if (nextProps.isEditMode !== this.props.isEditMode || nextProps.routeKey === 'infection') {
             return true;
         }
         return false;

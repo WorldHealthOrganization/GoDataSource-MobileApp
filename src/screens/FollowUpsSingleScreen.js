@@ -265,6 +265,7 @@ class FollowUpsSingleScreen extends Component {
             case 'genInfo':
                 return (
                     <FollowUpsSingleContainer
+                        routeKey={route.key}
                         isNew={this.props.isNew}
                         isEditMode={this.state.isEditMode}
                         item={this.state.item}
@@ -285,6 +286,7 @@ class FollowUpsSingleScreen extends Component {
             case 'quest':
                 return (
                     <FollowUpsSingleQuestionnaireContainer
+                        routeKey={route.key}
                         item={this.state.item}
                         currentAnswers={this.state.currentAnswers}
                         previousAnswers={this.state.previousAnswers}
