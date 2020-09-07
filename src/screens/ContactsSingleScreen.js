@@ -686,6 +686,7 @@ class ContactsSingleScreen extends Component {
             case 'calendar':
                 return (
                     <ContactsSingleCalendar
+                        routeKey={route.key}
                         contact={this.state.contact}
                         activeIndex={this.state.index}
                         handleOnPressSave={this.handleOnPressSave}
