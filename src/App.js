@@ -114,11 +114,9 @@ export default class App {
     };
 
     onStoreUpdate = () => {
-        console.log('OnStoreUpdate frenzy');
         const { root, selectedScreen } = store.getState().app;
         const oldRoot = this.currentRoot;
         if (this.currentRoot !== root) {
-            console.log('Update root to: ', root, oldRoot);
             this.currentRoot = root;
             if (Platform.OS === 'ios') {
                 this.startApp(root, oldRoot, selectedScreen);
