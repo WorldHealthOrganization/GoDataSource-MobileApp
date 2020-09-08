@@ -5,6 +5,7 @@
 	};
 	objectVersion = 46;
 	objects = {
+
 /* Begin PBXBuildFile section */
 		00C302E51ABCBA2D00DB3ED1 /* libRCTActionSheet.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302AC1ABCB8CE00DB3ED1 /* libRCTActionSheet.a */; };
 		00C302E71ABCBA2D00DB3ED1 /* libRCTGeolocation.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302BA1ABCB90400DB3ED1 /* libRCTGeolocation.a */; };
@@ -1198,7 +1199,6 @@
 				35B2425CB10C49F3AA11270F /* libreactnativeuilib.a */,
 				A497454867DF431F8822A06A /* libRNZipArchive.a */,
 				3F94250387284F21930E14C1 /* libRNFS.a */,
-				4610B02DCF40411D92FB00ED /* libRNKeychain.a */,
 				D69C68F7D8BF4154964A347A /* libRNSqlite2.a */,
 				1791BF0AC1D84011BC314DA2 /* libRNExitApp.a */,
 			);
@@ -2238,7 +2238,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 1.0.90;
+				CURRENT_PROJECT_VERSION = 1.0.91;
 				DEAD_CODE_STRIPPING = NO;
 				DEVELOPMENT_TEAM = YJDF2LWD3T;
 				HEADER_SEARCH_PATHS = (
@@ -2255,7 +2255,7 @@
 				INFOPLIST_FILE = who_mobile/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 1.0.17;
+				MARKETING_VERSION = 1.0.18;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -2279,7 +2279,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 1.0.90;
+				CURRENT_PROJECT_VERSION = 1.0.91;
 				DEVELOPMENT_TEAM = YJDF2LWD3T;
 				HEADER_SEARCH_PATHS = (
 					"$(SRCROOT)/../node_modules/react-native/React",
@@ -2295,7 +2295,7 @@
 				INFOPLIST_FILE = who_mobile/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 1.0.17;
+				MARKETING_VERSION = 1.0.18;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
