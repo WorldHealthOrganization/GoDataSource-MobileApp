@@ -20,6 +20,8 @@ import translations from './../utils/translations';
 import config from './../utils/config';
 import {getTranslation} from './../utils/functions';
 import VersionNumber from 'react-native-version-number';
+import withPincode from "../components/higherOrderComponents/withPincode";
+import {compose} from "redux";
 
 class FirstConfigScreen extends Component {
 
@@ -249,4 +251,8 @@ function matchDispatchToProps(dispatch) {
     }, dispatch);
 }
 
-export default connect(mapStateToProps, matchDispatchToProps)(FirstConfigScreen);
+// export default connect(mapStateToProps, matchDispatchToProps)(FirstConfigScreen);
+export default compose(
+    withPincode(),
+    connect(mapStateToProps, matchDispatchToProps),
+)(FirstConfigScreen)

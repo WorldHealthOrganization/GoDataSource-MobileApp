@@ -28,6 +28,9 @@ import {handleQRSearchTransition} from "../utils/screenTransitionFunctions";
 import {bindActionCreators} from "redux";
 import {setLoaderState} from "../actions/app";
 import PermissionComponent from './../components/PermissionComponent';
+import withPincode from "../components/higherOrderComponents/withPincode";
+import {getFollowUpsForOutbreakId} from "../actions/followUps";
+import {compose} from "redux";
 
 class ContactsScreen extends Component {
 
@@ -340,4 +343,9 @@ function matchDispatchProps(dispatch) {
     }, dispatch);
 }
 
-export default connect(mapStateToProps, matchDispatchProps)(enhanceListWithGetData(getContactsForOutbreakId, 'ContactsScreen')(ContactsScreen));
+// export default connect(mapStateToProps, matchDispatchProps)(enhanceListWithGetData(getContactsForOutbreakId, 'ContactsScreen')(ContactsScreen));
+export default compose(
+    withPincode(),
+    connect(mapStateToProps, matchDispatchProps),
+    enhanceListWithGetData(getContactsForOutbreakId, 'ContactsScreen')
+)(ContactsScreen)

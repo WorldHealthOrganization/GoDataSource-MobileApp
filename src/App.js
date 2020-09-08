@@ -133,6 +133,8 @@ export default class App {
     };
 
     startApp = (root, oldRoot, selectedScreens) => {
+        let isAppInitialize = false;
+        console.log('Update root start app: ', root, oldRoot);
         if (!oldRoot) {
             if (Platform.OS === 'ios') {
                 ParseNativeModule = NativeModules.APNSEventEmitter
@@ -140,6 +142,7 @@ export default class App {
                 ParseNativeModule = NativeModules.ParseReceiver
             }
             console.log('~~~ Calling native module ready to start init parse ~~~');
+            isAppInitialize = true;
             ParseNativeModule.initParse()
         }
 
@@ -161,29 +164,34 @@ export default class App {
             }
         }
 
+        let rootObject = {
+            appStyle: {
+                orientation: 'portrait'
+            },
+            passProps: {
+                isAppInitialize: isAppInitialize
+            },
+        };
+
         switch (root) {
             case 'config':
-                Navigation.startSingleScreenApp({
-                    screen: {
-                        screen: 'FirstConfigScreen'
-                    },
-                    appStyle: {
-                        orientation: 'portrait'
-                    }
-                });
+                rootObject = Object.assign({}, rootObject,
+                    {
+                        screen: {
+                            screen: 'FirstConfigScreen'
+                        }
+                    });
                 break;
             case 'login':
-                Navigation.startSingleScreenApp({
-                    screen: {
-                        screen: 'LoginScreen'
-                    },
-                    appStyle: {
-                        orientation: 'portrait'
-                    }
-                });
+                rootObject = Object.assign({}, rootObject,
+                    {
+                        screen: {
+                            screen: 'LoginScreen'
+                        }
+                    });
                 break;
             case 'after-login':
-                Navigation.startSingleScreenApp({
+                rootObject = {
                     screen: {
                         screen: screen
                     },
@@ -199,19 +207,22 @@ export default class App {
                             contentOverlayColor: 'rgba(0,0,0,0.25)',
                         }
                     },
+                    passProps: {
+                        isAppInitialize: isAppInitialize
+                    },
                     animationType: 'slide-down'
-                });
+                };
                 break;
             default:
-                Navigation.startSingleScreenApp({
-                    screen: {
-                        screen: 'FirstConfigScreen',
-                    },
-                    appStyle: {
-                        orientation: 'portrait'
-                    }
-                });
+                rootObject = Object.assign({}, rootObject,
+                    {
+                        screen: {
+                            screen: 'FirstConfigScreen'
+                        }
+                    });
         }
+
+        Navigation.startSingleScreenApp(rootObject)
     };
 
     // Checks device status if exists, and if the status is pending wipe, removes everything
