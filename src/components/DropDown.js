@@ -115,7 +115,7 @@ class DropDown extends PureComponent {
                         <Text style={style.labelStyle}>
                             {this.state.selectedItems.map((e, index) => {return getTranslation(e.label, this.props.translation) + (index === (this.state.selectedItems.length - 1) ? '' : ', ')})}
                         </Text>
-                    ) : (<Text style={style.labelStyle}></Text>)
+                    ) : (null)
                 }
                 {
                     tooltip.hasTooltip === true ? (

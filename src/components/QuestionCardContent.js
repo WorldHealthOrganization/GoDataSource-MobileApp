@@ -54,10 +54,11 @@ class QuestionCardContent extends PureComponent {
                                 />
                                 {   this.props.isEditMode &&
                                     <View style={{
-                                        minHeight: calculateDimension(72, true, this.props.screenSize),
+                                        minHeight: calculateDimension(60, true, this.props.screenSize),
                                         justifyContent: 'center',
                                         alignItems: 'center',
                                         width: 25,
+                                        backgroundColor: 'red'
                                     }}>
                                         {
                                             answerDate !== null && <Ripple onPress={() => this.handleCopyAnswerDate(answerDate)}><Icon name="content-copy"/></Ripple>
@@ -74,10 +75,11 @@ class QuestionCardContent extends PureComponent {
                                 </View>
                                 {   this.props.isEditMode && !this.props.isCollapsed && this.props.index === 0 &&  Array.isArray(this.props.source[this.props.item.variable]) && this.props.source[this.props.item.variable].length > 1 &&
                                     <View style={{
-                                        minHeight: calculateDimension(72, true, this.props.screenSize),
+                                        minHeight: calculateDimension(60, true, this.props.screenSize),
                                         justifyContent: 'center',
                                         alignItems: 'center',
                                         width: 25,
+                                        backgroundColor: 'red'
                                     }}>
                                         <Ripple onPress={() => { this.handleDeletePrevAnswer(0)}}>
                                             <Icon name="delete"/>
@@ -91,7 +93,7 @@ class QuestionCardContent extends PureComponent {
                 {
                     checkArrayAndLength(this.props.item.additionalQuestions) ? (
                         <View>
-                            <Section label={'Additional Questions'}/>
+                            <Section label={translations.questionCardLabels.additionalQuestions} containerStyle={{marginBottom: 8}}/>
                             {
                                 this.props.item.additionalQuestions.map((additionalQuestion) => {
                                     return this.handleRenderAdditionalQuestions(additionalQuestion, this.props.item.variable);
@@ -109,8 +111,9 @@ class QuestionCardContent extends PureComponent {
         // console.log('handleRenderItem: ', item);
         return (
             <View style={[style.containerCardComponent, {
-                minHeight: calculateDimension(72, true, this.props.screenSize),
-                maxWidth: this.props.viewWidth
+                minHeight: calculateDimension(60, true, this.props.screenSize),
+                maxWidth: this.props.viewWidth,
+                justifyContent: 'center'
             }]}>
                 {
                     this.handleRenderItemByType(item)
@@ -125,6 +128,13 @@ class QuestionCardContent extends PureComponent {
         let width = calculateDimension(300, false, this.props.screenSize);
         let alternateWidth = calculateDimension(calculateWidth, false, this.props.screenSize);
         let marginHorizontal = calculateDimension(14, false, this.props.screenSize);
+        let marginVertical = calculateDimension(8, true, this.props.screenSize);
+        let style = {
+            width: item.answerType === 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_DATE_TIME' ? width : alternateWidth,
+            marginHorizontal,
+            marginTop: parentId ? 2 : 4,
+            marginBottom: parentId ? 8 : 4
+        };
         let source = cloneDeep(this.props.source);
         if (!source) {
             source = {};
@@ -178,35 +188,9 @@ class QuestionCardContent extends PureComponent {
             }
         }
 
-        let questionAnswers = null;
 
-        questionAnswers = parentId ?
-            (source
-            && source[parentId]
-            && Array.isArray(source[parentId])
-            && source[parentId].length > 0
-            && source[parentId][this.props.index]
-            && typeof source[parentId][this.props.index] === 'object'
-            && Object.keys(source[parentId][this.props.index]).length > 0
-            && source[parentId][this.props.index].hasOwnProperty('subAnswers')
-            && typeof source[parentId][this.props.index].subAnswers === "object"
-            && Object.keys(source[parentId][this.props.index].subAnswers).length > 0
-            && source[parentId][this.props.index].subAnswers[item.variable]
-            && Array.isArray(source[parentId][this.props.index].subAnswers[item.variable])
-            && source[parentId][this.props.index].subAnswers[item.variable].length > 0
-            && source[parentId][this.props.index].subAnswers[item.variable][0]
-            && source[parentId][this.props.index].subAnswers[item.variable][0].value ?
-                source[parentId][this.props.index].subAnswers[item.variable][0].value
-                : ''
-            ) :
-            (
-                source[item.variable]
-                && Array.isArray(source[item.variable])
-                && source[item.variable].length > 0
-                && source[item.variable][this.props.index]
-                && source[item.variable][this.props.index].value ?
-                    source[item.variable][this.props.index].value : ''
-            );
+        let questionAnswers = parentId ? get(source, `[${parentId}][${this.props.index}].subAnswers[${item.variable}][0].value`, '') : get(source, `[${item.variable}][${this.props.index}].value`, '');
+
         if (item.answerType === 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_SINGLE_ANSWER') {
             // console.log('QuestionCard: ', item);
             questionAnswers = questionAnswers !== null &&
@@ -234,6 +218,7 @@ class QuestionCardContent extends PureComponent {
                     <TextInput
                         id={item.variable}
                         label={translations.questionCardLabels.textInputLabel}
+                        skipLabel={true}
                         labelValue={item.text}
                         value={questionAnswers}
                         isEditMode={this.props.isEditMode}
@@ -246,7 +231,7 @@ class QuestionCardContent extends PureComponent {
                         }}
 
                         multiline={true}
-                        style={{width: alternateWidth, marginHorizontal: marginHorizontal}}
+                        style={style}
                         translation={this.props.translation}
                         screenSize={this.props.screenSize}
                         onFocus={this.props.onFocus}
@@ -259,6 +244,7 @@ class QuestionCardContent extends PureComponent {
                         key={item.variable}
                         id={item.variable}
                         label={translations.questionCardLabels.textInputLabel}
+                        skipLabel={true}
                         labelValue={item.text}
                         value={questionAnswers}
                         isEditMode={this.props.isEditMode}
@@ -271,7 +257,7 @@ class QuestionCardContent extends PureComponent {
                         }}
                         multiline={true}
                         keyboardType={'numeric'}
-                        style={{width: alternateWidth, marginHorizontal: marginHorizontal}}
+                        style={style}
                         translation={this.props.translation}
                         screenSize={this.props.screenSize}
                         onFocus={this.props.onFocus}
@@ -284,6 +270,7 @@ class QuestionCardContent extends PureComponent {
                         key={item.variable}
                         id={item.variable}
                         label={translations.questionCardLabels.datePickerLabel}
+                        skipLabel={true}
                         value={questionAnswers}
                         isEditMode={get(this.props, 'isEditMode', true)}
                         isRequired={item.required}
@@ -293,7 +280,7 @@ class QuestionCardContent extends PureComponent {
                             };
                             this.props.onChangeDateAnswer(valueToSend, id, parentId, this.props.index);
                         }}
-                        style={{width: width, marginHorizontal: marginHorizontal}}
+                        style={style}
                         translation={this.props.translation}
                     />
                 );
@@ -319,6 +306,7 @@ class QuestionCardContent extends PureComponent {
                         key={item.variable}
                         id={item.variable}
                         label={translations.questionCardLabels.dropDownInputLabel}
+                        skipLabel={true}
                         labelValue={item.text}
                         value={questionAnswers}
                         data={dataWithNoneOption}
@@ -337,7 +325,7 @@ class QuestionCardContent extends PureComponent {
                             }
                             this.props.onChangeSingleSelection(valueToSend, id, parentId, this.props.index);
                         }}
-                        style={{width: alternateWidth, marginHorizontal: marginHorizontal}}
+                        style={style}
                         translation={this.props.translation}
                         screenSize={this.props.screenSize}
                     />
@@ -348,6 +336,7 @@ class QuestionCardContent extends PureComponent {
                         key={uniqueId('key_')}
                         id={item.variable}
                         label={translations.questionCardLabels.dropDownLabel}
+                        skipLabel={true}
                         labelValue={item.text}
                         value={questionAnswers}
                         data={item.answers.map((e) => {return {label: getTranslation(e.label, this.props.translation), value: e.value}})}
@@ -371,14 +360,14 @@ class QuestionCardContent extends PureComponent {
                             }
                             this.props.onChangeMultipleSelection(valueToSend, id, parentId, this.props.index);
                         }}
-                        style={{width: alternateWidth, marginHorizontal: marginHorizontal}}
+                        style={style}
                         dropDownStyle={{width: width, alignSelf: 'center'}}
                         showDropdown={this.state.showDropdown}
                     />
                 );
             case 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_MARKUP':
                 return (
-                    <Section key={item.variable} label={getTranslation(item.text, this.props.translation)}/>
+                    <Section key={item.variable} label={getTranslation(item.text, this.props.translation)} containerStyle={{marginBottom: 8}} />
                 );
             default:
                 return(
@@ -397,7 +386,7 @@ class QuestionCardContent extends PureComponent {
             <View key={uniqueId('key_')}>
                 {
                     additionalQuestion.answerType !== 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_MARKUP' ? (
-                        <Section key={uniqueId('key_')} label={getTranslation(additionalQuestion.text, this.props.translation)} />
+                        <Section key={uniqueId('key_')} label={getTranslation(additionalQuestion.text, this.props.translation)} mediumTextStyle style={{marginBottom: 3}} />
                     ) : (null)
                 }
                 {
