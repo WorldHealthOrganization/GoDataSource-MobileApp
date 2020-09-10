@@ -405,7 +405,10 @@ const questionCardLabels = {
     dropDownInputLabel: 'LNG_QUESTIONNAIRE_LABEL_SELECT_ANSWER',
     dropDownLabel: 'LNG_QUESTIONNAIRE_LABEL_SELECT_ANSWERS',
     addAnswer: 'LNG_QUESTIONNAIRE_LABEL_ADD_ANSWER',
-    previousAnswers: 'LNG_QUESTIONNAIRE_LABEL_PREVIOUS_ANSWERS'
+    previousAnswers: 'LNG_QUESTIONNAIRE_LABEL_PREVIOUS_ANSWERS',
+
+    // TODO add to backend
+    additionalQuestions: 'LNG_QUESTIONNAIRE_LABEL_ADDITIONAL_QUESTIONS'
 };
 
 const inAppNotificationScreen = {

@@ -352,6 +352,8 @@ export default {
     'LNG_QUESTIONNAIRE_LABEL_WRITE_ANSWER': 'Write answer',
     'LNG_QUESTIONNAIRE_LABEL_SELECT_DATE': 'Select date',
     'LNG_QUESTIONNAIRE_LABEL_SELECT_ANSWER': 'Select answer',
+    // TODO add to backend
+    'LNG_QUESTIONNAIRE_LABEL_ADDITIONAL_QUESTIONS': 'Additional Questions',
 
 
     //firstConfigScreen

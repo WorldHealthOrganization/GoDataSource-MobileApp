@@ -10,10 +10,10 @@ import {getTranslation} from './../utils/functions';
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 
-Section = React.memo(({label, hasBorderBottom, borderBottomColor, containerStyle, translation}) => (
+Section = React.memo(({label, hasBorderBottom, borderBottomColor, containerStyle, translation, mediumTextStyle}) => (
     <View style={[style.containerStyle, containerStyle]}>
         <View style={[style.containerText]}>
-            <Text style={style.textStyle}>
+            <Text style={mediumTextStyle ? style.mediumTextStyle : style.largeTextStyle}>
                 {getTranslation(label, translation)}
             </Text>
         </View>
@@ -31,10 +31,16 @@ const style = StyleSheet.create({
         justifyContent: 'center',
         flex: 1
     },
-    textStyle: {
+    largeTextStyle: {
         fontFamily: 'Roboto-Medium',
         fontSize: 18,
         color: 'black',
+        marginLeft: 15
+    },
+    mediumTextStyle: {
+        fontFamily: 'Roboto-Medium',
+        fontSize: 16,
+        color: styles.colorLabelActiveTab,
         marginLeft: 15
     },
     separatorStyle: {
@@ -46,13 +52,15 @@ const style = StyleSheet.create({
 Section.propTypes = {
     label: PropTypes.string.isRequired,
     hasBorderBottom: PropTypes.bool,
-    borderBottomColor: PropTypes.string
+    borderBottomColor: PropTypes.string,
+    mediumTextStyle: PropTypes.bool
 };
 
 Section.defaultProps = {
     label: 'Test',
     hasBorderBottom: false,
-    borderBottomColor: styles.navigationDrawerSeparatorGrey
+    borderBottomColor: styles.navigationDrawerSeparatorGrey,
+    mediumTextStyle: false
 };
 
 export default Section;

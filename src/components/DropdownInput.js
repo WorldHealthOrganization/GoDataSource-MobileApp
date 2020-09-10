@@ -65,20 +65,23 @@ class DropdownInput extends PureComponent {
     }
 
     viewInput = () => {
-        let tooltip = getTooltip(this.props.label, this.props.translation)
+        let tooltip = getTooltip(this.props.label, this.props.translation);
         return (
-            <View style={[{flexDirection: 'row'}, this.props.style]}>
-                <View style={{flex: 1}}> 
-                    <Text style={{
-                        fontFamily: 'Roboto-Regular',
-                        fontSize: 15,
-                        textAlign: 'left',
-                        color: 'rgb(0,0,0)',
-                        marginBottom: 2,
-                        marginTop: 7,
-                    }}>
-                        {getTranslation(this.props.label, this.props.translation)}
-                    </Text>
+            <View style={[{flexDirection: 'row', marginTop: 7}, this.props.style]}>
+                <View style={{flex: 1}}>
+                    {
+                        this.props.skipLabel ? (null) : (
+                            <Text style={{
+                                fontFamily: 'Roboto-Regular',
+                                fontSize: 15,
+                                textAlign: 'left',
+                                color: 'rgb(0,0,0)',
+                                marginBottom: 2,
+                            }}>
+                                {getTranslation(this.props.label, this.props.translation)}
+                            </Text>
+                        )
+                    }
                     <Text style={{
                         fontFamily: 'Roboto-Light',
                         fontSize: 15,
@@ -169,6 +172,7 @@ DropdownInput.propTypes = {
     isRequired: PropTypes.bool.isRequired,
     onChange: PropTypes.func.isRequired,
     style: PropTypes.object,
+    skipLabel: PropTypes.bool
 };
 
 export default DropdownInput;
