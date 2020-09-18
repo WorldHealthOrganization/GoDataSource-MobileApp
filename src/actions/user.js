@@ -138,7 +138,7 @@ export function computeCommonData(storeUserBool, user, skipLoad) {
                 promises.push(getClusters(user.activeOutbreakId));
                 // promises.push(getAvailableLanguages(dispatch));
                 promises.push(getReferenceData());
-                promises.push(getTranslations(user.languageId));
+                promises.push(getTranslations(user.languageId, user?.activeOutbreakId));
                 promises.push(getLocations(outbreakAndLocationInfo.locationIds || null));
                 promises.push(getHelpCategory());
                 promises.push(getHelpItem());

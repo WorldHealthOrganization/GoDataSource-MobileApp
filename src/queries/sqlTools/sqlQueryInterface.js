@@ -184,17 +184,57 @@ function createGeneralQuery ({outbreakId, innerFilter, search, lastElement, offs
     let sourceType = type === translations.personTypes.contacts || type === translations.personTypes.contactsOfContacts ? 'sourceType' : 'targetType';
     let target = type === translations.personTypes.contacts || type === translations.personTypes.contactsOfContacts ? 'targetId' : 'sourceId';
     let targetType = type === translations.personTypes.contacts || type === translations.personTypes.contactsOfContacts ? 'targetType' : 'sourceType';
+
+    let relationshipJoin = {
+        type: 'left',
+        alias: relationshipAlias,
+        on: {[`${innerQueryAlias}._id`]: `${relationshipAlias}.${target}`}
+    };
+    let relationshipJoinForCases = {
+        table: 'relationship'
+    };
+    let relationshipsJoinForContacts = {
+        query: {
+            type: 'select',
+            table: 'relationship',
+            alias: relationshipAlias,
+            fields: [
+                {
+                    table: relationshipAlias,
+                    name: 'sourceId',
+                    alias: 'sourceId'
+                },
+                {
+                    table: relationshipAlias,
+                    name: 'targetId',
+                    alias: 'targetId'
+                },
+                {
+                    table: relationshipAlias,
+                    name: 'sourceType',
+                    alias: 'sourceType'
+                },
+                {
+                    table: relationshipAlias,
+                    name: 'targetType',
+                    alias: 'targetType'
+                }
+            ],
+            group: `${relationshipAlias}.${target}`
+        }
+    };
+    if (type === translations.personTypes.contacts) {
+        relationshipJoin = Object.assign({}, relationshipJoin, relationshipsJoinForContacts);
+    } else {
+        relationshipJoin = Object.assign({}, relationshipJoin, relationshipJoinForCases);
+    }
+
     let mainQuery = {
         type: 'select',
         query: innerQuery,
         alias: innerQueryAlias,
         join: [
-            {
-                type: 'left',
-                table: 'relationship',
-                alias: relationshipAlias,
-                on: {[`${innerQueryAlias}._id`]: `${relationshipAlias}.${target}`}
-            },
+            relationshipJoin,
             {
                 type: 'left',
                 table: 'person',
@@ -263,7 +303,7 @@ function createGeneralQuery ({outbreakId, innerFilter, search, lastElement, offs
             }
         ];
         mainQuery.sort = sort;
-        mainQuery.group = `${innerQueryAlias}._id`
+        mainQuery.group = checkArrayAndLength(lodashGet(innerFilter, 'sort', null)) ? `${innerQueryAlias}._id` : [`${innerQueryAlias}.lastName`, `${innerQueryAlias}.firstName`, `${innerQueryAlias}._id`];
     }
 
     return mainQuery;

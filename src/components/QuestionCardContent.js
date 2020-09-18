@@ -386,7 +386,7 @@ class QuestionCardContent extends PureComponent {
             <View key={uniqueId('key_')}>
                 {
                     additionalQuestion.answerType !== 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_MARKUP' ? (
-                        <Section key={uniqueId('key_')} label={getTranslation(additionalQuestion.text, this.props.translation)} mediumTextStyle style={{marginBottom: 3}} />
+                        <Section key={uniqueId('key_')} label={getTranslation(additionalQuestion.text, this.props.translation)} labelSize={'medium'} style={{marginBottom: 3}} />
                     ) : (null)
                 }
                 {

@@ -461,6 +461,11 @@ export default {
     'LNG_HUB_CONFIGURATION_SCREEN_ADD_HUB_BUTTON': 'Add HUB',
     'LNG_HUB_CONFIGURATION_SCREEN_OTHER_HUB_CONFIGURATIONS_LABEL': 'Other hub configurations',
     'LNG_HUB_CONFIGURATION_SCREEN_MAKE_ACTIVE_ACTION': 'Make Active',
+    // TODO add to backend translation
+    'LNG_HUB_CONFIGURATION_SCREEN_DELETE_HUB': 'Delete Hub',
+    'LNG_HUB_CONFIGURATION_SCREEN_CONFIRM_DELETE_HUB': "Are you sure you want to delete the hub?",
+    "LNG_HUB_CONFIGURATION_SCREEN_REPLACEMENT_HUBS": "Replacement Hubs",
+    "LNG_HUB_CONFIGURATION_SCREEN_REPLACEMENT_HUBS_LABEL": "Please select the Hub that you would like to switch to",
 
     // Errors
     'LNG_HUB_CONFIGURATION_SCREEN_ERROR_SET_ACTIVE_HUB': 'Error set active HUB',

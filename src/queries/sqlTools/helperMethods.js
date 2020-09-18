@@ -6,6 +6,7 @@ import {extractLocationId} from './../../utils/functions';
 import {checkArray, checkArrayAndLength} from './../../utils/typeCheckingFunctions';
 import translations from "../../utils/translations";
 import {generalMapping} from "../../actions/followUps";
+import appConfig from './../../../app.config';
 
 var jsonSql = require('json-sql')();
 jsonSql.setDialect('sqlite');
@@ -64,7 +65,9 @@ export function wrapReadTransactionInPromise (database) {
 }
 
 export function wrapExecuteSQLInPromise (transaction, sqlStatement, arrayOfFields, skipCallback) {
-    // console.log('Execute query: ', sqlStatement, arrayOfFields);
+    if (appConfig.env === 'development') {
+        console.log('Execute query: ', sqlStatement, arrayOfFields);
+    }
     if (transaction && sqlStatement && checkArray(arrayOfFields)) {
         return new Promise((resolve, reject) => {
             if (skipCallback) {
@@ -341,8 +344,11 @@ export function mapDataForInsert(tableName, data) {
 // Method for mapping the relationship data as needed in the database structure
 function mapRelationshipFields(relationship, fieldName) {
     if (checkArray(get(relationship, 'persons', null)) && relationship.persons.length === 2) {
-        console.log('Relationship log: ', relationship.persons);
+        // console.log('Relationship log: ', relationship.persons);
         if ((!relationship.persons[0].source && !relationship.persons[0].target) || (!relationship.persons[1].source && !relationship.persons[1].target)) {
+            if (appConfig.env === 'development') {
+                console.log('mapRelationshipFields relationship without source/target: ', relationship._id);
+            }
             return null;
         }
         switch (fieldName) {
@@ -376,6 +382,7 @@ function mapRelationshipFields(relationship, fieldName) {
 
 // Execute a query based on a query object
 export function executeQuery(queryObject) {
+    let wasCount = false;
     // return async function (dispatch) {
     let start = new Date().getTime();
     return openDatabase('common')
@@ -383,6 +390,9 @@ export function executeQuery(queryObject) {
         .then((transaction) => {
 
             let sql = jsonSql.build(queryObject);
+            if (sql.query.includes('count')) {
+                wasCount = true;
+            }
 
             // console.log('Sql statement: ', sql);
             return wrapExecuteSQLInPromise(transaction, sql.query, Object.values(sql.values))

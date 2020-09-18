@@ -51,7 +51,7 @@ const LanguageComponent = React.memo(({style, navigator}) => {
             if (value !== selectedLanguage) {
                 let userClone = Object.assign({}, user);
                 userClone.languageId = value;
-                dispatch(getTranslationsAsync(value));
+                dispatch(getTranslationsAsync(value, userClone?.activeOutbreakId));
 
                 userClone = updateRequiredFields(userClone.activeOutbreakId, userClone._id, userClone, 'update');
                 setSelectedLanguage(value);

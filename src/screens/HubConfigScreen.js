@@ -4,8 +4,10 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
-import {Alert, Platform, StyleSheet, Text, View} from 'react-native';
+import {Alert, Platform, StyleSheet, Text, View, ScrollView} from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
+import Modal from 'react-native-modal';
+import {Icon, Button as MaterialButton } from 'react-native-material-ui';
 import ViewHOC from './../components/ViewHOC';
 import Section from './../components/Section';
 import ElevatedView from 'react-native-elevated-view';
@@ -16,17 +18,22 @@ import styles from './../styles';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import lodashGet from 'lodash/get';
-import {logoutUser} from './../actions/user';
+import {logoutUser, cleanDataAfterLogout} from './../actions/user';
 import {removeErrors} from './../actions/errors';
-import {saveActiveDatabase} from './../actions/app';
-import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import {saveActiveDatabase, changeAppRoot} from './../actions/app';
 import NavBarCustom from './../components/NavBarCustom';
 import config from './../utils/config';
 import IntervalPicker from './../components/IntervalPicker';
 import translations from './../utils/translations';
-import {getInternetCredentials, setInternetCredentials} from 'react-native-keychain';
+import {getInternetCredentials, setInternetCredentials, resetInternetCredentials} from 'react-native-keychain';
 import {createDatabase} from './../queries/database';
 import SwitchInput from "../components/SwitchInput";
+import {modalStyle} from './../styles/views';
+import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
+import DropdownInput from "../components/DropdownInput";
+import RNFS from 'react-native-fs';
+import RNFetchBlobFS from 'rn-fetch-blob/fs';
+import RippleFeedback from 'react-native-material-ripple';
 
 
 let textFieldsStructure = [
@@ -122,7 +129,10 @@ class FirstConfigScreen extends Component {
             chunkSize: 2500,
             allDatabases: [],
             lastSyncDate: null,
-            isModified: false
+            isModified: false,
+            isVisible: false,
+            hubReplacement: '',
+            databaseToBeDeleted: ''
         };
     }
 
@@ -150,7 +160,7 @@ class FirstConfigScreen extends Component {
                 // lastSyncDateGlobal = lastSyncDate;
                 // internetCredentialsGlobal = internetCredentials;
                 databasesGlobal = JSON.parse(databases);
-                databasesGlobal = databasesGlobal ? databasesGlobal.filter((e) => {return e.id !== databaseId}) : [];
+                // databasesGlobal = databasesGlobal ? databasesGlobal.filter((e) => {return e.id !== databaseId}) : [];
 
                 this.setState({
                     databaseId: databaseId,
@@ -175,71 +185,6 @@ class FirstConfigScreen extends Component {
             })
     }
 
-
-    // componentDidMount() {
-    //     // get active database's id
-    //     AsyncStorage.getItem('activeDatabase')
-    //         .then((activeDatabase) => {
-    //             // console.log('Active database: ', activeDatabase);
-    //             // Get last sync date
-    //             AsyncStorage.getItem(activeDatabase)
-    //                 .then((lastSyncDate) => {
-    //                     // For the active database get all credentials
-    //                     lastSyncDate = new Date(lastSyncDate).toUTCString();
-    //                     getInternetCredentials(activeDatabase)
-    //                         .then((activeDatabaseCredentials) => {
-    //                             let currentHubConfig = JSON.parse(activeDatabaseCredentials.username);
-    //                             // console.log('Active database credentials: ', JSON.parse(activeDatabaseCredentials.username));
-    //                             let databaseId = Platform.OS === 'ios' ? activeDatabaseCredentials.server : activeDatabaseCredentials.service;
-    //                             // console.log('State before: ', this.state);
-    //                             this.setState({
-    //                                 databaseId: databaseId,
-    //                                 name: currentHubConfig.name,
-    //                                 url: currentHubConfig.url,
-    //                                 clientId: currentHubConfig.clientId,
-    //                                 clientSecret: currentHubConfig.clientSecret,
-    //                                 userEmail: currentHubConfig.userEmail,
-    //                                 encryptedData: currentHubConfig.encryptedData,
-    //                                 lastSyncDate: lastSyncDate
-    //                             }, () => {
-    //                                 // console.log('State after: ', this.state);
-    //                                 AsyncStorage.getItem('databases')
-    //                                     .then((databases) => {
-    //                                         // console.log('All databases: ', databases);
-    //                                         let allDatabases = JSON.parse(databases);
-    //                                         allDatabases = allDatabases.filter((e) => {return e.id !== databaseId});
-    //                                         this.setState({
-    //                                             showLoading: false,
-    //                                             allDatabases: allDatabases
-    //                                         })
-    //                                     })
-    //                                     .catch((errorDatabases) => {
-    //                                         console.log("Error getting all databases: ", errorDatabases);
-    //                                         this.showAlert(getTranslation(translations.hubConfigScreen.getOtherHubsTitle, this.props.translation), getTranslation(translations.hubConfigScreen.getOtherHubsMessage, this.props.translation));
-    //                                     })
-    //                             });
-    //                         })
-    //                         .catch((errorActiveDatabaseCredentials) => {
-    //                             console.log('Error active database credentials: ', errorActiveDatabaseCredentials);
-    //                             this.showAlert(getTranslation(translations.hubConfigScreen.getCurrentHubTitle, this.props.translation), getTranslation(translations.hubConfigScreen.getCurrentHubMessage, this.props.translation));
-    //                         })
-    //                 })
-    //                 .catch((errorLastSyncDate) => {
-    //                     console.log('Error while getting last sync date: ', errorLastSyncDate);
-    //                     this.showAlert(getTranslation(translations.hubConfigScreen.getCurrentHubLastSyncDateTitle, this.props.translation), getTranslation(translations.hubConfigScreen.getCurrentHubLastSyncDateMessage, this.props.translation));
-    //
-    //                 })
-    //         })
-    //         .catch((errorActiveDatabase) => {
-    //             console.log("Error while getting active database: ", errorActiveDatabase);
-    //             this.showAlert(getTranslation(translations.hubConfigScreen.getCurrentHubTitle, this.props.translation), getTranslation(translations.hubConfigScreen.getCurrentHubMessage, this.props.translation));
-    //         });
-    // }
-
-    // static getDerivedStateFromProps(props, state) {
-    //    return null;
-    // }
-
     // The render method should have at least business logic as possible,
     // because this will be called whenever there is a new setState call
     // and can slow down the app
@@ -258,7 +203,7 @@ class FirstConfigScreen extends Component {
                                   handlePressNavbarButton={this.handlePressNavbarButton}
                     />
 
-                    <KeyboardAwareScrollView
+                    <ScrollView
                         style={[style.container, {marginVertical: 10}]}
                         contentContainerStyle={style.contentContainerStyle}
                         keyboardShouldPersistTaps={'always'}
@@ -283,29 +228,47 @@ class FirstConfigScreen extends Component {
                         <View style={{
                             width,
                             marginHorizontal,
-                            flexDirection: 'row',
-                            minHeight: calculateDimension(40, true, this.props.screenSize),
-                            justifyContent: 'space-around',
-                            alignItems: 'center',
-                            paddingVertical: 5
+                            paddingVertical: 5,
+                            alignItems: 'center'
                         }}>
-                            <Button
-                                title={getTranslation(translations.hubConfigScreen.scanQRButtonLabel, this.props.translation)}
-                                onPress={this.handleOnPressQr}
-                                color={styles.buttonGreen}
-                                titleColor={'white'}
-                                height={calculateDimension(25, true, this.props.screenSize)}
-                                width={calculateDimension(165, false, this.props.screenSize)}
+                            <View
                                 style={{
-                                    marginVertical: calculateDimension(12.5, true, this.props.screenSize),
+                                    flexDirection: 'row',
+                                    minHeight: calculateDimension(40, true, this.props.screenSize),
+                                    justifyContent: 'space-around',
+                                    alignItems: 'center',
+                                    width: '100%'
+                                }}>
+                                <Button
+                                    title={getTranslation(translations.hubConfigScreen.scanQRButtonLabel, this.props.translation)}
+                                    onPress={this.handleOnPressQr}
+                                    color={styles.buttonGreen}
+                                    titleColor={'white'}
+                                    height={calculateDimension(25, true, this.props.screenSize)}
+                                    width={calculateDimension(165, false, this.props.screenSize)}
+                                    style={{
+                                        marginVertical: calculateDimension(12.5, true, this.props.screenSize),
 
-                                }}
-                                upperCase={false}
-                            />
+                                    }}
+                                    upperCase={false}
+                                />
+                                <Button
+                                    title={getTranslation(translations.hubConfigScreen.saveCurrentHubButtonLabel, this.props.translation)}
+                                    onPress={this.handlePressSaveHub}
+                                    color={styles.buttonGreen}
+                                    titleColor={'white'}
+                                    height={calculateDimension(25, true, this.props.screenSize)}
+                                    width={calculateDimension(165, false, this.props.screenSize)}
+                                    style={{
+                                        marginVertical: calculateDimension(12.5, true, this.props.screenSize)
+                                    }}
+                                    upperCase={false}
+                                />
+                            </View>
                             <Button
-                                title={getTranslation(translations.hubConfigScreen.saveCurrentHubButtonLabel, this.props.translation)}
-                                onPress={this.handlePressSaveHub}
-                                color={styles.buttonGreen}
+                                title={getTranslation(translations.hubConfigScreen.deleteHubButton, this.props.translation)}
+                                onPress={() => {this.handlePressDeleteHub(this.state.databaseId)}}
+                                color={styles.colorButtonRed}
                                 titleColor={'white'}
                                 height={calculateDimension(25, true, this.props.screenSize)}
                                 width={calculateDimension(165, false, this.props.screenSize)}
@@ -360,13 +323,93 @@ class FirstConfigScreen extends Component {
                             <Section label={getTranslation(translations.hubConfigScreen.otherHubConfigurationsLabel, this.props.translation)}/>
                             <View style={{alignItems: 'center', marginVertical: 10}}>
                                 {
-                                    this.state && this.state.allDatabases && Array.isArray(this.state.allDatabases) && this.state.allDatabases.map((database) => {
+                                    this.state && this.state.allDatabases && Array.isArray(this.state.allDatabases) && this.state.allDatabases.filter((e) => {return e.id !== this.state.databaseId}).map((database) => {
                                         return this.renderDatabase(database, width);
                                     })
                                 }
                             </View>
                         </ElevatedView>
-                    </KeyboardAwareScrollView>
+                    </ScrollView>
+
+                    <Modal isVisible={this.state.isVisible} onBackdropPress={this.hideModal}>
+                        <ElevatedView
+                            elevation={4}
+                            style={
+                                [
+                                    modalStyle,
+                                    {
+                                        height: this.state.databaseId === this.state.databaseToBeDeleted && checkArrayAndLength(this.state.allDatabases.filter((e) => e.id !== this.state.databaseId)) ? '35%' :'20%',
+                                        justifyContent: 'space-between',
+                                        margin: 15
+                                    }
+                                    ]
+                            }>
+                            <View>
+                                <Section
+                                    label={getTranslation(translations.hubConfigScreen.deleteHubButton, this.props.translation)}
+                                    containerStyle={{height: 20}}
+                                />
+                                <Section label={getTranslation(translations.hubConfigScreen.confirmationDeleteHub, this.props.translation)} labelSize={'normal'}
+                                         containerStyle={{height: 15}}/>
+                            </View>
+
+                            {
+                                this.state.databaseId === this.state.databaseToBeDeleted && checkArrayAndLength(this.state.allDatabases.filter((e) => e.id !== this.state.databaseId)) ? (
+                                    <View style={{marginHorizontal}}>
+                                        <Section
+                                            label={getTranslation(translations.hubConfigScreen.replacementHubsLabel, this.props.translation)}
+                                            labelSize={'normal'}
+                                            textStyle={{marginLeft: 0}}
+                                        />
+                                        <DropdownInput
+                                            id={'hubReplacement'}
+                                            label={getTranslation(translations.hubConfigScreen.replacementHubs, this.props.translation)}
+                                            value={this.state.hubReplacement}
+                                            data={this.state.allDatabases.filter((e) => e.id !== this.state.databaseId).map((e) => ({label: e.name, value: e.id}))}
+                                            isEditMode={true}
+                                            isRequired={true}
+                                            onChange={this.onChangeDropDown}
+                                            style={{width: '100%'}}
+                                        />
+                                    </View>
+                                ) : (null)
+                            }
+
+                            <View
+                                style={{
+                                    flexDirection: 'row',
+                                    justifyContent: 'space-around',
+                                    alignItems: 'center'
+                                }}
+                            >
+                                <Button
+                                    title={"Cancel"}
+                                    onPress={this.hideModal}
+                                    color={styles.buttonGreen}
+                                    titleColor={'white'}
+                                    height={calculateDimension(25, true, this.props.screenSize)}
+                                    width={calculateDimension(125, false, this.props.screenSize)}
+                                    style={{
+                                        marginVertical: calculateDimension(12.5, true, this.props.screenSize)
+                                    }}
+                                    upperCase={false}
+                                />
+                                <Button
+                                    title={'Delete'}
+                                    disabled={this.state.databaseToBeDeleted === this.state.databaseId && checkArrayAndLength(this.state.allDatabases.filter((e) => e.id !== this.state.databaseId)) && !this.state.hubReplacement}
+                                    onPress={this.onConfirmDelete}
+                                    color={styles.colorButtonRed}
+                                    titleColor={'white'}
+                                    height={calculateDimension(25, true, this.props.screenSize)}
+                                    width={calculateDimension(125, false, this.props.screenSize)}
+                                    style={{
+                                        marginVertical: calculateDimension(12.5, true, this.props.screenSize)
+                                    }}
+                                    upperCase={false}
+                                />
+                            </View>
+                        </ElevatedView>
+                    </Modal>
                 </ViewHOC>
         );
     }
@@ -388,6 +431,7 @@ class FirstConfigScreen extends Component {
     };
 
     renderItem = (item, index) => {
+        let width = calculateDimension(315, false, this.props.screenSize);
         switch(item.type) {
             case 'TextInput':
                 return (
@@ -400,7 +444,7 @@ class FirstConfigScreen extends Component {
                         isRequired={item.isRequired}
                         onChange={this.onChangeText}
                         multiline={item.multiline}
-                        style={{width: 315, marginHorizontal: 15}}
+                        style={{width: width, marginHorizontal: 15}}
                         objectType={item.objectType}
                         keyboardType={item.keyboardType}
                         translation={this.props.translation}
@@ -422,7 +466,7 @@ class FirstConfigScreen extends Component {
                         onChange={this.onChangeSwitch}
                         activeButtonColor={item.activeButtonColor}
                         activeBackgroundColor={item.activeBackgroundColor}
-                        style={{justifyContent: 'space-between', width: 315, marginHorizontal: 15}}
+                        style={{justifyContent: 'space-between', width: width, marginHorizontal: 15}}
                         objectType={item.objectType}
                         translation={this.props.translation}
                     />
@@ -435,10 +479,12 @@ class FirstConfigScreen extends Component {
                         value={[this.state.chunkSize]}
                         min={item.min}
                         max={item.max}
+                        sliderLength={width - 5}
                         step={500}
-                        // style={{
-                        //     backgroundColor: styles.backgroundGreen
-                        // }}
+                        style={{
+                            width: width,
+                            marginHorizontal: 15
+                        }}
                         onChange={this.onChangeInterval}
                         markerColor={'black'}
                     />
@@ -474,19 +520,126 @@ class FirstConfigScreen extends Component {
         )
     };
 
+    onChangeDropDown = (value, id) => {
+        this.setState({
+            [id]: value
+        })
+    };
+
+    onConfirmDelete = () => {
+        // 1. Delete databaseToBeDeleted
+        // 2. Remove the deleted database from AsyncStorage
+        // 3. Remove from keychain
+        // 4.
+        //      a. If deleting only hub and not having hubReplacement, changeRoot to FirstConfigScreen
+        //      b. If deleting only hub and having hubReplacement, make hubReplacement active
+        //      c. If deleting inactive hub, refresh list of hubs
+
+        let newDatabases = [];
+        this.filesDelete(this.state.databaseToBeDeleted)
+            .then((resultsRemove) => {
+                newDatabases = this.state.allDatabases.filter((e) => e.id !== this.state.databaseToBeDeleted);
+                return AsyncStorage.setItem('databases', JSON.stringify(newDatabases));
+            })
+            .then(() => getInternetCredentials(this.state.databaseToBeDeleted))
+            .then((internetCredentials) => {
+                console.log('InternetCredentials for databaseToBeDeleted: ', internetCredentials);
+                return resetInternetCredentials(this.state.databaseToBeDeleted);
+            })
+            .catch((errorResetInternetCredentials) => {
+                console.log('errorResetInternetCredentials: ', errorResetInternetCredentials);
+                return Promise.reject(errorResetInternetCredentials);
+            })
+            .then(() => {
+                // Here check for cases a., b. and c. from main point 4.
+                if (checkArrayAndLength(this.state.allDatabases.filter((e) => e.id !== this.state.databaseToBeDeleted))) {
+                    if (this.state.hubReplacement) {
+                        this.setState({
+                            isVisible
+                        }, () => {
+                            this.activateHub({id: this.state.hubReplacement});
+                        });
+                    } else {
+                        this.setState({
+                            allDatabases: newDatabases,
+                            isVisible: false,
+                            hubReplacement: ''
+                        })
+                    }
+                } else {
+                    if (this.state.databaseToBeDeleted === this.state.databaseId) {
+                        AsyncStorage.removeItem('activeDatabase')
+                            .then(() => {
+                                this.props.cleanDataAfterLogout();
+                                this.props.saveActiveDatabase(null);
+                                this.props.changeAppRoot('config');
+                            })
+                            .catch((errorRemoveItem) => {
+                                console.log('errorRemoveActiveDatabase: ', errorRemoveItem);
+                                this.props.cleanDataAfterLogout();
+                                this.props.saveActiveDatabase(null);
+                                this.props.changeAppRoot('config');
+                            })
+                    }
+                }
+            })
+            .catch((errorRemove) => {
+                console.log('ErrorRemove', errorRemove);
+                this.showAlert("Alert", `Error while deleting hub: \n${JSON.stringify(errorRemove)}`);
+            })
+    };
+    filesDelete = (hubId) => {
+        // hubId is database ID
+        let pathToDatabase = `${RNFetchBlobFS.dirs.DocumentDir}/`;
+
+        if (Platform.OS === 'ios') {
+            pathToDatabase = `${RNFS?.LibraryDirectoryPath}/NoCloud/`;
+        }
+
+        // Read all files from the directory and then filter only the hub's ones
+        return RNFetchBlobFS.ls(pathToDatabase)
+            .then((allFiles) => allFiles.filter((e) => e.includes(hubId)))
+            .then((filteredFiles) => Promise.all(filteredFiles.map((e) => RNFetchBlobFS.unlink(`${pathToDatabase}/${e}`))))
+    };
+
     renderDatabase = (database, width) => {
         console.log('Database: ', database);
         return (
             <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', width: width - 30}}>
                 <Text>{database.name}</Text>
-                <Button
-                    color={styles.buttonGreen}
-                    height={calculateDimension(25, true, this.props.screenSize)}
-                    width={calculateDimension(110, false, this.props.screenSize)}
-                    title={'Make active'}
-                    titleColor={'white'}
-                    onPress={() => {this.onPressMakeHubActive(database)}}
-                />
+                <View
+                    style={{
+                        flexDirection: 'row',
+                        alignItems: 'center'
+                    }}
+                >
+                    <Button
+                        color={styles.buttonGreen}
+                        height={calculateDimension(25, true, this.props.screenSize)}
+                        width={calculateDimension(110, false, this.props.screenSize)}
+                        title={'Make active'}
+                        titleColor={'white'}
+                        onPress={() => {
+                            this.onPressMakeHubActive(database)
+                        }}
+                    />
+                    <RippleFeedback
+                        style={{
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            marginLeft: 15
+                        }}
+                        hitSlop={{
+                            left: 5,
+                            top: 10,
+                            bottom: 10,
+                            right: 10
+                        }}
+                        onPress={() => {this.handlePressDeleteHub(database.id)}}
+                    >
+                        <Icon name={'delete'}/>
+                    </RippleFeedback>
+                </View>
             </View>
         )
     };
@@ -586,39 +739,44 @@ class FirstConfigScreen extends Component {
                 text: 'No', onPress: () => {console.log('Cancel pressed')}
             },
             {
-                text: 'Yes', onPress: () => {
-                // change active database and logout user
-                getInternetCredentials(database.id)
-                    .then((internetCredentials) => {
-                        let server = Platform.OS === 'ios' ? internetCredentials.server : internetCredentials.service;
-                        createDatabase(server, internetCredentials.password, true)
-                            .then((newDatabase) => {
-                                AsyncStorage.setItem('activeDatabase', database.id)
-                                    .then(() => {
-                                        this.props.saveActiveDatabase(database.id);
-                                        Alert.alert("", getTranslation(translations.hubConfigScreen.successMakingHubActiveMessage, this.props.translation), [
-                                            {
-                                                text: 'Ok', onPress: () => {this.props.logoutUser();}
-                                            }
-                                        ]);
-                                    })
-                                    .catch((errorMakeActive) => {
-                                        console.log('Error make active database: ', errorMakeActive);
-                                        this.showAlert(getTranslation(translations.hubConfigScreen.setActiveDatabaseTitle, this.props.translation), getTranslation(translations.hubConfigScreen.setActiveDatabaseMessage, this.props.translation));
-                                    })
-                            })
-                            .catch((errorNewDatabase) => {
-                                console.log('Error creating new Database: ', errorNewDatabase);
-                                this.showAlert(getTranslation(translations.hubConfigScreen.setActiveDatabaseTitle, this.props.translation), getTranslation(translations.hubConfigScreen.setActiveDatabaseMessage, this.props.translation));
-                            })
-                    })
-                    .catch((errorGettingInternetCredentials) => {
-                        console.log('Error getting internet credentials: ', errorGettingInternetCredentials)
-                        this.showAlert(getTranslation(translations.hubConfigScreen.setActiveDatabaseTitle, this.props.translation), getTranslation(translations.hubConfigScreen.setActiveDatabaseMessage, this.props.translation));
-                    })
-            }
+                text: 'Yes', onPress: () => this.activateHub(database)
             }
         ])
+    };
+
+    activateHub = (database) => {
+        getInternetCredentials(database.id)
+            .then((internetCredentials) => {
+                let server = Platform.OS === 'ios' ? internetCredentials?.server : internetCredentials?.service;
+                return createDatabase(server, internetCredentials?.password, true);
+            })
+            .then((newDatabase) => AsyncStorage.setItem('activeDatabase', database.id))
+            .then(() => {
+                this.props.saveActiveDatabase(database.id);
+                Alert.alert("", getTranslation(translations.hubConfigScreen.successMakingHubActiveMessage, this.props.translation), [
+                    {
+                        text: 'Ok', onPress: () => {this.props.logoutUser();}
+                    }
+                ]);
+            })
+            .catch((errorChangeActiveDatabase) => {
+                console.log('Error getting internet credentials: ', errorChangeActiveDatabase);
+                this.showAlert(getTranslation(translations.hubConfigScreen.setActiveDatabaseTitle, this.props.translation), getTranslation(translations.hubConfigScreen.setActiveDatabaseMessage, this.props.translation));
+            });
+    }
+
+    // Hub deletion methods
+    handlePressDeleteHub = (hubId) => {
+        this.setState({
+            isVisible: true,
+            databaseToBeDeleted: hubId
+        })
+    };
+    hideModal = () => {
+        this.setState({
+            isVisible: false,
+            hubReplacement: ''
+        });
     };
 
     showAlert = (alertTitle, alertText) => {
@@ -692,7 +850,9 @@ function matchDispatchToProps(dispatch) {
     return bindActionCreators({
         logoutUser,
         removeErrors,
-        saveActiveDatabase
+        saveActiveDatabase,
+        changeAppRoot,
+        cleanDataAfterLogout
     }, dispatch);
 }
 

@@ -251,7 +251,7 @@ class NavigationDrawer extends Component {
     handleOnChangeLanguage = (value, label) => {
         let user = Object.assign({}, this.props.user);
         user.languageId = value;
-        this.props.getTranslationsAsync(value);
+        this.props.getTranslationsAsync(value, user?.activeOutbreakId);
 
         user = updateRequiredFields(user.activeOutbreakId, user._id, user, 'update');
 

@@ -6,6 +6,7 @@ import {rawSQLQuery} from './sqlHelper';
 import {executeQuery} from './sqlTools/helperMethods';
 import {getDatabase} from "./database";
 import {extractIdFromPouchId} from "../utils/functions";
+import appConfig from './../../app.config';
 
 
 // This method will extract both all the languages available on API and the ones on mobile and will do a diff
@@ -33,34 +34,7 @@ export function getAvailableLanguagesRequest (callback) {
     //     })
 }
 
-export function getTranslationRequest (languageId, callback) {
-
-    // let start = new Date().getTime();
-    // getDatabase(config.mongoCollections.languageToken)
-    //     .then((database) => {
-    //         database.find({
-    //             selector: {
-    //                 _id: {
-    //                     $gte: `languageToken.json_${languageId}`,
-    //                     $lte: `languageToken.json_${languageId}\uffff`,
-    //                 },
-    //                 deleted: false
-    //             }
-    //         })
-    //             .then((resultFind) => {
-    //                 console.log('Result for find time for translations: ', new Date().getTime() - start);
-    //                 callback(null, resultFind.docs)
-    //             })
-    //             .catch((errorFind) => {
-    //                 console.log('Error find for translations: ', errorFind);
-    //                 callback(errorFind);
-    //             })
-    //     })
-    //     .catch((errorGetDatabase) => {
-    //         console.log('Error while getting database: ', errorGetDatabase);
-    //         callback(errorGetDatabase);
-    //     });
-
+export function getTranslationRequest (languageId, outbreakId, callback) {
     let query = {
         type: 'select',
         table: 'languageToken',
@@ -75,6 +49,19 @@ export function getTranslationRequest (languageId, callback) {
             languageId: languageId
         }
     };
+
+    if (appConfig.env === 'development' && outbreakId) {
+        query.condition = Object.assign({}, query.condition, {
+            $or: [
+                {
+                    _id: {$nlike: `LNG_OUTBREAK_%`}
+                },
+                {
+                    _id: {$like: `LNG_OUTBREAK_${outbreakId}_%`}
+                },
+            ]
+        });
+    }
 
     executeQuery(query)
         .then((languageData) => {

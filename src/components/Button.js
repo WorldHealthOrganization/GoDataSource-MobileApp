@@ -40,6 +40,7 @@ class Button extends PureComponent {
                     height: this.props.height,
                     width: this.props.width
                 },this.props.style]}
+                {...this.props}
             />
         );
     }

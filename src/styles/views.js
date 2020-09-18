@@ -9,6 +9,14 @@ const lineStyle = {
     backgroundColor: colors.navigationDrawerSeparatorGrey
 };
 
+export const modalStyle = {
+    backgroundColor: 'white',
+    marginHorizontal: 16,
+    padding: 8,
+    borderRadius: 10,
+    height: '70%'
+};
+
 export default {
     lineStyle
 }
