@@ -11,7 +11,6 @@ export default {
     'LNG_NAVIGATION_DRAWER_LOGOUT': 'Logout',
     'LNG_LAYOUT_MENU_ITEM_HELP_LABEL': 'Help & support',
 
-    // TODO add to backend
     'LNG_NAVIGATION_DRAWER_ADD_LANGUAGE_PACKS': 'Add languagePacks',
     'LNG_MOBILE_NAVIGATION_DRAWER_COMMUNITY_LINK': 'Community',
 
@@ -170,7 +169,7 @@ export default {
     'LNG_RELATIONSHIP_SCREEN_EDIT_EXPOSURE_TITLE': 'Edit exposure',
     'LNG_RELATIONSHIP_SCREEN_ADD_EXPOSURE_TITLE': 'Add exposure',
 
-    'LNG_RELATIONSHIP_LABEL_CHOOSE_CASE_OR_EVENT': 'Choose a case/event',
+    'LNG_RELATIONSHIP_LABEL_CHOOSE_CASE_OR_EVENT': 'Person',
     'LNG_RELATIONSHIP_LABEL_DATE_OF_LAST_CONTACT': 'Date of last contact',
     'LNG_RELATIONSHIP_LABEL_IS_CONTACT_DATE_ESTIMATED': 'Is contact date estimated?',
     'LNG_RELATIONSHIP_LABEL_CERTAINTY_LEVEL': 'Certainty level',
@@ -192,7 +191,6 @@ export default {
     'LNG_FOLLOW_UPS_SINGLE_SCREEN_ACTION_DELETE': 'Deleted',
     'LNG_FOLLOW_UPS_SINGLE_SCREEN_ACTION_DECEASE': 'Deceased',
 
-    // TODO change backand translation
     'LNG_FOLLOW_UPS_SINGLE_SCREEN_ACTION_EDIT_CONTACT': 'View contact',
 
     'LNG_DIALOG_ALERT_MESSAGE_ARE_YOU_SURE_YOU_WANT_TO_DELETE_THIS_FOLLOW_UP': 'Are you sure you want to delete this follow-up?',
@@ -293,6 +291,9 @@ export default {
     'LNG_DIALOG_ALERT_MESSAGE_THERE_WAS_AN_ISSUE_GETTING_YOUR_LOCATION': 'There was an issue with getting your location',
     'LNG_DIALOG_ALERT_MESSAGE_MAKE_SURE_YOU_COMPLETE_ALL_FIELDS': 'Please make sure you have completed the fields',
     'LNG_DIALOG_ALERT_MESSAGE_ERROR_OCCURED_WHILE_GETTING_CONTACTS': 'An error occurred while getting contacts',
+
+    //TODO add to backend
+    "LNG_MOBILE_DIALOG_ALERT_MESSAGE_INVALID_EMAIL_ADDRESSES": "Invalid email addresses",
 
     // mapsPopup
     'LNG_DIALOG_ALERT_MESSAGE_SELECT_MAPS_APP_THAT_YOU_WOULD_LIKE_TO_USER': 'Select the maps application that you would like to use',
@@ -510,7 +511,6 @@ export default {
 
 
     // LanguageModalComponent
-    //TODO add all to backend
     'LNG_MOBILE_LANGUAGE_MODAL_COMPONENT_INFO_MESSAGE': 'Please select the packs that you want to download. \nClicking download means that a new sync will start so please make sure that you are connected to the internet before proceeding.',
     'LNG_MOBILE_LANGUAGE_MODAL_COMPONENT_DOWNLOAD_BUTTON': 'Download language packs',
     'LNG_MOBILE_LANGUAGE_MODAL_COMPONENT_ALERT_NO_LANGUAGE': 'Please select at least one language before proceeding to download',

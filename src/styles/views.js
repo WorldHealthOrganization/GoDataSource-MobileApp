@@ -14,7 +14,7 @@ export const modalStyle = {
     marginHorizontal: 16,
     padding: 8,
     borderRadius: 10,
-    height: '70%'
+    maxHeight: '70%'
 };
 
 export default {

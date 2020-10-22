@@ -2,7 +2,6 @@ const navigationDrawer = {
     activeOutbreak: 'LNG_NAVIGATION_DRAWER_ACTIVE_OUTBREAK',
     followUpsLabel: 'LNG_NAVIGATION_DRAWER_FOLLOW_UPS',
     contactsLabel: 'LNG_NAVIGATION_DRAWER_CONTACTS',
-    //TODO add to backend translations
     contactsOfContactsLabel: 'LNG_NAVIGATION_DRAWER_CONTACTS_OF_CONTACTS',
 
     casesLabel: 'LNG_NAVIGATION_DRAWER_CASES',
@@ -12,7 +11,6 @@ const navigationDrawer = {
     languagesLabel: 'LNG_NAVIGATION_DRAWER_LANGUAGES',
     logoutLabel: 'LNG_NAVIGATION_DRAWER_LOGOUT',
     helpLabel: 'LNG_LAYOUT_MENU_ITEM_HELP_LABEL',
-    //TODO add to backend translations
     addLanguagePacks: 'LNG_NAVIGATION_DRAWER_ADD_LANGUAGE_PACKS',
     community: 'LNG_MOBILE_NAVIGATION_DRAWER_COMMUNITY_LINK'
 };
@@ -205,8 +203,6 @@ const contactSingleScreen = {
 
     contactId: 'LNG_CONTACT_FIELD_LABEL_CONTACT_ID',
     followUpFinalStatus: 'LNG_MOBILE_CONTACT_FIELD_LABEL_FOLLOW_UP_STATUS_DESCRIPTION',
-
-    // TODO check with backend for common translation label between web and mobile
     followUpTeamId: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_TEAM_ID'
 };
 
@@ -267,7 +263,6 @@ const contactsScreen = {
     noContacts: 'LNG_CONTACT_LIST_SCREEN_NO_CONTACTS'
 };
 
-// TODO add to backend
 export const contactsOfContactsScreen = {
     contactsTitle: 'LNG_CONTACT_OF_CONTACT_LIST_SCREEN_TITLE',
     // editButton: 'LNG_CONTACT_LIST_SCREEN_EDIT_BUTTON',
@@ -346,6 +341,8 @@ const alertMessages = {
     getLocationError: 'LNG_DIALOG_ALERT_MESSAGE_THERE_WAS_AN_ISSUE_GETTING_YOUR_LOCATION',
     credentialsValidationError: 'LNG_DIALOG_ALERT_MESSAGE_MAKE_SURE_YOU_COMPLETE_ALL_FIELDS',
     dropDownSearchableContactsError: 'LNG_DIALOG_ALERT_MESSAGE_ERROR_OCCURED_WHILE_GETTING_CONTACTS',
+    // TODO add to backend
+    invalidEmails: 'LNG_MOBILE_DIALOG_ALERT_MESSAGE_INVALID_EMAIL_ADDRESSES',
 
     // mapsPopup
     mapsPopupMessage: 'LNG_DIALOG_ALERT_MESSAGE_SELECT_MAPS_APP_THAT_YOU_WOULD_LIKE_TO_USER',
@@ -406,8 +403,6 @@ const questionCardLabels = {
     dropDownLabel: 'LNG_QUESTIONNAIRE_LABEL_SELECT_ANSWERS',
     addAnswer: 'LNG_QUESTIONNAIRE_LABEL_ADD_ANSWER',
     previousAnswers: 'LNG_QUESTIONNAIRE_LABEL_PREVIOUS_ANSWERS',
-
-    // TODO add to backend
     additionalQuestions: 'LNG_QUESTIONNAIRE_LABEL_ADDITIONAL_QUESTIONS'
 };
 
@@ -532,7 +527,6 @@ const hubConfigScreen = {
     otherHubConfigurationsLabel: 'LNG_HUB_CONFIGURATION_SCREEN_OTHER_HUB_CONFIGURATIONS_LABEL',
     makeActiveLabel: 'LNG_HUB_CONFIGURATION_SCREEN_MAKE_ACTIVE_ACTION',
 
-    //TODO send to API
     deleteHubButton: 'LNG_HUB_CONFIGURATION_SCREEN_DELETE_HUB',
     confirmationDeleteHub: 'LNG_HUB_CONFIGURATION_SCREEN_CONFIRM_DELETE_HUB',
     replacementHubs: "LNG_HUB_CONFIGURATION_SCREEN_REPLACEMENT_HUBS",
@@ -575,7 +569,6 @@ const personListItem = {
     dayOfFollowUp: 'LNG_PERSON_LIST_ITEM_DAY_OF_FOLLOW_UP'
 };
 
-//TODO add translation to backend
 export const languageModalComponentLabels = {
     infoMessage: 'LNG_MOBILE_LANGUAGE_MODAL_COMPONENT_INFO_MESSAGE',
     downloadButton: 'LNG_MOBILE_LANGUAGE_MODAL_COMPONENT_DOWNLOAD_BUTTON',

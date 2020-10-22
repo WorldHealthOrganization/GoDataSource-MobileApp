@@ -57,8 +57,7 @@ class QuestionCardContent extends PureComponent {
                                         minHeight: calculateDimension(60, true, this.props.screenSize),
                                         justifyContent: 'center',
                                         alignItems: 'center',
-                                        width: 25,
-                                        backgroundColor: 'red'
+                                        width: 25
                                     }}>
                                         {
                                             answerDate !== null && <Ripple onPress={() => this.handleCopyAnswerDate(answerDate)}><Icon name="content-copy"/></Ripple>

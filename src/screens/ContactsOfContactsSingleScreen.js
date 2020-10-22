@@ -18,7 +18,6 @@ import ContactsSingleExposures from './../containers/ContactsSingleExposures';
 import ContactsSinglePersonal from './../containers/ContactsSinglePersonal';
 import ExposureScreen from './../screens/ExposureScreen';
 import Breadcrumb from './../components/Breadcrumb';
-import Menu, {MenuItem} from 'react-native-material-menu';
 import Ripple from 'react-native-material-ripple';
 import {addFollowUp, updateFollowUpAndContact} from './../actions/followUps';
 import {addContact, checkForNameDuplicated, getExposuresForContact, updateContact} from './../actions/contacts';
@@ -41,6 +40,8 @@ import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
 import lodashIntersect from 'lodash/intersection';
 import {addContactOfContact, updateContactOfContact} from './../actions/contactsOfContacts';
 import {contactsOfContactsScreen} from "../utils/translations";
+import {checkValidEmails} from './../utils/formValidators';
+import {validateRequiredFields} from "../utils/formValidators";
 
 const initialLayout = {
     height: 0,
@@ -325,6 +326,8 @@ class ContactsOfContactsSingleScreen extends Component {
     handleMoveToNextScreenButton = () => {
         // Before moving to the next screen do the checks for the current screen
         let missingFields = [];
+        let invalidEmails = [];
+        let placeOfResidenceError = null;
         switch(this.state.index) {
             case 0:
                 missingFields = this.checkRequiredFieldsPersonalInfo();
@@ -337,9 +340,17 @@ class ContactsOfContactsSingleScreen extends Component {
                 break;
             case 1:
                 missingFields = this.checkRequiredFieldsAddresses();
+                invalidEmails = validateRequiredFields(_.get(this.state, 'contact.addresses', []), config?.addressFields?.fields, (dataToBeValidated, fields, defaultFunction) => {
+                    if (fields.id === 'emailAddress') {
+                        return checkValidEmails(dataToBeValidated, fields?.id);
+                    }
+
+                    return null;
+                });
+                placeOfResidenceError = this.checkPlaceOfResidence();
                 break;
             case 2:
-                missingFields = this.lds();
+                missingFields = this.checkFields();
                 break;
             default:
                 break;
@@ -352,6 +363,30 @@ class ContactsOfContactsSingleScreen extends Component {
                     onPress: () => { this.hideMenu() }
                 }
             ])
+        } else if (checkArrayAndLength(invalidEmails)){
+            Alert.alert(
+                getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation),
+                `${getTranslation(translations.alertMessages.invalidEmails, this.props.translation)}: ${invalidEmails}`,
+                [
+                    {
+                        text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+                        onPress: () => { this.hideMenu() }
+                    }
+                ]
+            );
+        } else if (placeOfResidenceError) {
+            Alert.alert(
+                getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation),
+                getTranslation(translations.alertMessages.placeOfResidenceError, this.props.translation),
+                [
+                    {
+                        text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+                        onPress: () => {
+                            this.hideMenu()
+                        }
+                    }
+                ]
+            )
         } else {
             let nextIndex = this.state.index + 1;
 
@@ -422,6 +457,7 @@ class ContactsOfContactsSingleScreen extends Component {
                     <ContactsSinglePersonal
                         type={translations.personTypes.contactsOfContacts}
                         contact={this.state.contact}
+                        routeKey={route.key}
                         activeIndex={this.state.index}
                         onChangeText={this.handleOnChangeText}
                         onChangeDropDown={this.handleOnChangeDropDown}
@@ -455,6 +491,7 @@ class ContactsOfContactsSingleScreen extends Component {
                     <ContactsSingleAddress
                         type={translations.personTypes.contactsOfContacts}
                         contact={this.state.contact}
+                        routeKey={route.key}
                         activeIndex={this.state.index}
                         onChangeText={this.handleOnChangeText}
                         onChangeDropDown={this.handleOnChangeDropDown}
@@ -485,6 +522,7 @@ class ContactsOfContactsSingleScreen extends Component {
                     <ContactsSingleExposures
                         type={translations.personTypes.contactsOfContacts}
                         contact={this.state.contact}
+                        routeKey={route.key}
                         activeIndex={this.state.index}
                         onPressEditExposure={this.handleOnPressEditExposure}
                         onPressDeleteExposure={this.handleOnPressDeleteExposure}
@@ -515,6 +553,7 @@ class ContactsOfContactsSingleScreen extends Component {
                     <ContactsSinglePersonal
                         contact={this.state.contact}
                         activeIndex={this.state.index}
+                        routeKey={route.key}
                         onChangeText={this.handleOnChangeText}
                         onChangeDropDown={this.handleOnChangeDropDown}
                         onChangeDate={this.handleOnChangeDate}
@@ -1179,6 +1218,13 @@ class ContactsOfContactsSingleScreen extends Component {
             loading: true
         }, () => {
             let relationshipsMissingFields = this.checkFields();
+            let invalidEmails = validateRequiredFields(_.get(this.state, 'contact.addresses', []), config?.addressFields?.fields, (dataToBeValidated, fields, defaultFunction) => {
+                if (fields.id === 'emailAddress') {
+                    return checkValidEmails(dataToBeValidated, fields?.id);
+                }
+
+                return null;
+            });
             if (relationshipsMissingFields && Array.isArray(relationshipsMissingFields) && relationshipsMissingFields.length === 0) {
                 let missingFields = this.checkRequiredFields();
                 if (missingFields && Array.isArray(missingFields) && missingFields.length === 0) {
@@ -1187,35 +1233,48 @@ class ContactsOfContactsSingleScreen extends Component {
                             if (this.state.contact.addresses === undefined || this.state.contact.addresses === null || this.state.contact.addresses.length === 0 ||
                                 (this.state.contact.addresses.length > 0 && this.state.hasPlaceOfResidence === true)) {
                                 const {contact} = this.state;
-
-                                checkForNameDuplicated(this.props.isNew ? null : contact._id, contact.firstName, contact.lastName, this.props.user.activeOutbreakId)
-                                    .then((isDuplicate) => {
-                                        if (isDuplicate) {
-                                            Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.contactDuplicateNameError, this.props.translation), [
-                                                {
-                                                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
-                                                    onPress: () => {
-                                                        this.setState({
-                                                            loading: false
-                                                        }, () => {
-                                                            this.hideMenu()
-                                                        })
+                                if (checkArrayAndLength(invalidEmails)) {
+                                    Alert.alert(
+                                        getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation),
+                                        `${getTranslation(translations.alertMessages.invalidEmails, this.props.translation)}: ${invalidEmails}`,
+                                        [
+                                            {
+                                                text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+                                                onPress: () => { this.hideMenu() }
+                                            }
+                                        ]
+                                    );
+                                } else {
+                                    checkForNameDuplicated(this.props.isNew ? null : contact._id, contact.firstName, contact.lastName, this.props.user.activeOutbreakId)
+                                        .then((isDuplicate) => {
+                                            if (isDuplicate) {
+                                                Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.contactDuplicateNameError, this.props.translation), [
+                                                    {
+                                                        text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+                                                        onPress: () => {
+                                                            this.setState({
+                                                                loading: false
+                                                            }, () => {
+                                                                this.hideMenu()
+                                                            })
+                                                        }
+                                                    },
+                                                    {
+                                                        text: getTranslation(translations.alertMessages.saveAnywayLabel, this.props.translation),
+                                                        onPress: () => {
+                                                            this.saveContactAction()
+                                                        }
                                                     }
-                                                },
-                                                {
-                                                    text: getTranslation(translations.alertMessages.saveAnywayLabel, this.props.translation),
-                                                    onPress: () => {
-                                                        this.saveContactAction()
-                                                    }
-                                                }
-                                            ])
-                                        } else {
+                                                ])
+                                            } else {
+                                                this.saveContactAction();
+                                            }
+                                        })
+                                        .catch((errorIsDuplicate) => {
                                             this.saveContactAction();
-                                        }
-                                    })
-                                    .catch((errorIsDuplicate) => {
-                                        this.saveContactAction();
-                                    });
+                                        });
+                                }
+
                             } else {
                                 this.setState({loading: false}, () => {
                                     Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.placeOfResidenceError, this.props.translation), [
@@ -1413,7 +1472,6 @@ class ContactsOfContactsSingleScreen extends Component {
         return personalInfo;
         // return true;
     };
-
     checkRequiredFieldsAddresses = () => {
         let addresses = [];
         if (this.state.contact && this.state.contact.addresses && Array.isArray(this.state.contact.addresses) && this.state.contact.addresses.length > 0) {
@@ -1432,7 +1490,6 @@ class ContactsOfContactsSingleScreen extends Component {
         return addresses;
         // return true;
     };
-
     checkFields = () => {
         // let pass = true;
         let requiredFields = [];
@@ -1458,7 +1515,6 @@ class ContactsOfContactsSingleScreen extends Component {
         return requiredFields;
         // return pass;
     };
-
     checkAgeYearsRequirements = () => {
         if (this.state.selectedItemIndexForAgeUnitOfMeasureDropDown === 0) {
             if (this.state.contact.age && this.state.contact.age.years !== undefined && this.state.contact.age.years !== null) {
@@ -1469,7 +1525,6 @@ class ContactsOfContactsSingleScreen extends Component {
         }
         return true
     };
-
     checkAgeMonthsRequirements = () => {
         if (this.state.selectedItemIndexForAgeUnitOfMeasureDropDown === 1) {
             if (this.state.contact.age && this.state.contact.age.years !== undefined && this.state.contact.age.years !== null) {
@@ -1480,11 +1535,13 @@ class ContactsOfContactsSingleScreen extends Component {
         }
         return true
     };
-
     checkRequiredFields = () => {
         let requiredFields = [];
         return requiredFields.concat(this.checkRequiredFieldsPersonalInfo(), this.checkRequiredFieldsAddresses());
         // return this.checkRequiredFieldsPersonalInfo() && this.checkRequiredFieldsAddresses() && this.checkRequiredFieldsRelationships()
+    };
+    checkPlaceOfResidence = () => {
+        return checkArrayAndLength(this.state?.contact?.addresses) && !this.state?.contact?.addresses.find((e) => e.typeId === translations.userResidenceAddress.userPlaceOfResidence);
     };
 
     showMenu = () => {

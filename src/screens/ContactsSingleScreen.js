@@ -11,7 +11,7 @@ import NavBarCustom from './../components/NavBarCustom';
 import ViewHOC from './../components/ViewHOC';
 import config from './../utils/config';
 import {connect} from "react-redux";
-import {bindActionCreators} from "redux";
+import {bindActionCreators, compose} from "redux";
 import {PagerScroll, TabBar, TabView} from 'react-native-tab-view';
 import ContactsSingleAddress from './../containers/ContactsSingleAddress';
 import ContactsSingleCalendar from './../containers/ContactsSingleCalendar';
@@ -55,6 +55,8 @@ import lodashIntersect from 'lodash/intersection';
 import {getItemByIdRequest} from './../actions/cases';
 import lodashGet from "lodash/get";
 import cloneDeep from "lodash/cloneDeep";
+import withPinconde from './../components/higherOrderComponents/withPincode';
+import {validateRequiredFields, checkValidEmails, formValidator} from './../utils/formValidators';
 
 const initialLayout = {
     height: 0,
@@ -468,6 +470,7 @@ class ContactsSingleScreen extends Component {
     handleMoveToNextScreenButton = () => {
         // Before moving to the next screen do the checks for the current screen
         let missingFields = [];
+        let invalidEmails = [];
         switch(this.state.index) {
             case 0:
                 missingFields = this.checkRequiredFieldsPersonalInfo();
@@ -480,12 +483,13 @@ class ContactsSingleScreen extends Component {
                 break;
             case 1:
                 missingFields = this.checkRequiredFieldsAddresses();
+                invalidEmails = this.checkForInvalidEmails();
                 break;
             case 2:
                 missingFields = this.checkFields();
                 break;
             case 3:
-                missingFields = this.check
+                missingFields = this.check;
             default:
                 break;
         }
@@ -497,6 +501,17 @@ class ContactsSingleScreen extends Component {
                     onPress: () => { this.hideMenu() }
                 }
             ])
+        } else if (checkArrayAndLength(invalidEmails)){
+                Alert.alert(
+                    getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation),
+                    `${getTranslation(translations.alertMessages.invalidEmails, this.props.translation)}: ${invalidEmails}`,
+                    [
+                        {
+                            text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+                            onPress: () => { this.hideMenu() }
+                        }
+                    ]
+                );
         } else {
             let nextIndex = this.state.index + 1;
 
@@ -1382,12 +1397,16 @@ class ContactsSingleScreen extends Component {
         this.setState({
             loading: true
         }, async () => {
-            let functionsArray = [this.checkFields, this.checkRequiredFields, this.checkAgeYearsRequirements, this.checkAgeMonthsRequirements, this.checkPlaceOfResidence, this.checkRequiredFieldsQuestionnaire];
+            let functionsArray = [this.checkFields, this.checkRequiredFields, this.checkAgeYearsRequirements, this.checkAgeMonthsRequirements, this.checkPlaceOfResidence, this.checkRequiredFieldsQuestionnaire, this.checkForInvalidEmails];
             let message = null;
             for (let i=0; i<functionsArray.length; i++) {
                 let response = await functionsArray[i]();
                 if (checkArrayAndLength(response)) {
-                    message = `${getTranslation(translations.alertMessages.requiredFieldsMissingError, this.props.translation)}.\n${getTranslation(translations.alertMessages.missingFields, this.props.translation)}: ${response}`;
+                    if (i === functionsArray.length - 1) {
+                        message = `${getTranslation(translations.alertMessages.invalidEmails, this.props.translation)}: ${response}`;
+                    } else {
+                        message = `${getTranslation(translations.alertMessages.requiredFieldsMissingError, this.props.translation)}.\n${getTranslation(translations.alertMessages.missingFields, this.props.translation)}: ${response}`;
+                    }
                     break;
                 } else {
                     if (!response) {
@@ -1513,7 +1532,7 @@ class ContactsSingleScreen extends Component {
     };
 
     ageAndDobPrepareForSave = () => {
-        let dobClone = null
+        let dobClone = null;
         let ageClone = { years: 0, months: 0 }
 
         if (this.state.contact.dob !== null && this.state.contact.dob !== undefined) {
@@ -1597,6 +1616,16 @@ class ContactsSingleScreen extends Component {
         }
         return addresses;
         // return true;
+    };
+
+    checkForInvalidEmails = () => {
+        return validateRequiredFields(_.get(this.state, 'contact.addresses', []), config?.addressFields?.fields, (dataToBeValidated, fields, defaultFunction) => {
+            if (fields.id === 'emailAddress') {
+                return checkValidEmails(dataToBeValidated, fields?.id);
+            }
+
+            return null;
+        })
     };
 
     checkFields = () => {
@@ -1849,6 +1878,30 @@ class ContactsSingleScreen extends Component {
             console.log ('onChangeMultipleSelection after setState', this.state.previousAnswers);
         })
     };
+    onChangeAnswerDate = (value, questionId, index) => {
+        let questionnaireAnswers = _.cloneDeep(this.state.previousAnswers);
+        if (checkArrayAndLength(questionnaireAnswers?.[questionId])) {
+            if (questionnaireAnswers[questionId][0]) {
+                questionnaireAnswers[questionId][0].date = value;
+                if(!questionnaireAnswers[questionId][0].hasOwnProperty("subAnswers")){
+                    questionnaireAnswers[questionId][0] = Object.assign({}, questionnaireAnswers[questionId][0],{ subAnswers: {}});
+                }
+                if (checkArrayAndLength(questionnaireAnswers?.[questionId]?.[0]?.subAnswers)) {
+                    for (let subQuestionId in questionnaireAnswers[questionId][0].subAnswers) {
+                        questionnaireAnswers[questionId][0].subAnswers[subQuestionId].map((e) => {
+                            return { value: e.value, date: value };
+                        })
+                    }
+                }
+            }
+        } else {
+            questionnaireAnswers[questionId]= [{date: value, value: null}];
+        }
+        this.setState({
+            previousAnswers: questionnaireAnswers,
+            isModified: true
+        });
+    };
 
     // used for adding multi-frequency answers
     onClickAddNewMultiFrequencyAnswer = (item) => {
@@ -1984,4 +2037,8 @@ function matchDispatchProps(dispatch) {
     }, dispatch);
 };
 
-export default connect(mapStateToProps, matchDispatchProps)(ContactsSingleScreen);
+export default
+    compose(
+        withPinconde(),
+        connect(mapStateToProps, matchDispatchProps)
+    )(ContactsSingleScreen);

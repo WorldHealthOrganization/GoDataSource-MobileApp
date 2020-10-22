@@ -13,7 +13,7 @@ import {wipeCompleteRequest} from './requests/wipeData';
 import appReducers from './reducers';
 import appActions from './actions';
 import {registerScreens} from './screens';
-import config from './utils/config';
+import config, {sideMenuKeys} from './utils/config';
 import {checkDeviceStatus} from "./requests/deviceStatus";
 import isNumber from 'lodash/isNumber';
 import constants from './utils/constants';
@@ -147,21 +147,19 @@ export default class App {
         }
 
         let screen = constants.appScreens.followUpScreen;
-        if (isNumber(selectedScreens) && selectedScreens <= 3) {
-            switch (selectedScreens) {
-                case 1:
-                    screen = constants.appScreens.contactsScreen;
-                    break;
-                case 2:
-                    screen = constants.appScreens.contactsOfContactsScreen;
-                    break;
-                case 3:
-                    screen = constants.appScreens.casesScreen;
-                    break;
-                default:
-                    screen = constants.appScreens.followUpScreen;
-                    break;
-            }
+        switch (selectedScreens) {
+            case sideMenuKeys[1]:
+                screen = constants.appScreens.contactsScreen;
+                break;
+            case sideMenuKeys[2]:
+                screen = constants.appScreens.contactsOfContactsScreen;
+                break;
+            case sideMenuKeys[3]:
+                screen = constants.appScreens.casesScreen;
+                break;
+            default:
+                screen = constants.appScreens.followUpScreen;
+                break;
         }
 
         let rootObject = {

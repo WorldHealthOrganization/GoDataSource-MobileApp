@@ -1,5 +1,5 @@
-import React, {useState, useEffect} from 'react';
-import {View} from 'react-native';
+import React, {useState, useEffect, useRef} from 'react';
+import {View, AppState} from 'react-native';
 import PINCode, {deleteUserPinCode, resetPinCodeInternalStates} from '@haskkor/react-native-pincode';
 import AsyncStorage from '@react-native-community/async-storage';
 import {useDispatch} from 'react-redux';
@@ -14,11 +14,14 @@ export default function withPincode() {
 
             const NUMBER_OF_ATTEMPTS = 5;
             const DELAY_BETWEEN_ATTEMPTS = 500;
+            const INACTIVE_TIMEOUT = 1000 //* 20 * 60; // Wait for 20 mins of inactivity
 
             const [validPinCode, setValidPinCode] = useState(false);
             const [status, setStatus] = useState(null);
             const [retries, setRetries] = useState(NUMBER_OF_ATTEMPTS);
             const dispatch = useDispatch();
+            const appStateStatus = useRef(AppState.currentState);
+            const appStateStatusTimer = useRef(0);
 
             useEffect(() => {
                 if (appConfig.env === 'development'){
@@ -28,13 +31,51 @@ export default function withPincode() {
                         .then((resp) => AsyncStorage.getItem('wasPinSet'))
                         .then((hasPin) => {
                             if (props.isAppInitialize) {
+                                props.navigator.setDrawerEnabled({
+                                    side: 'left',
+                                    enabled: false
+                                });
                                 setStatus(hasPin ? 'enter' : 'choose');
                             } else {
                                 setValidPinCode(true);
                             }
+
+                            if (hasPin || props.isAppInitialize) {
+                                AppState.addEventListener('change', handleAppStateChange);
+                            }
                         });
                 }
-            });
+
+                return () => {
+                    AppState.removeEventListener('change', handleAppStateChange)
+                }
+            }, []);
+
+            const handleAppStateChange = (nextAppState) => {
+                if (props && props.navigator) {
+                    console.log('Navigator: ', props, props.navigator);
+                    props.navigator.toggleDrawer({
+                        side: 'left',
+                        animated: false,
+                        to: 'closed'
+                    })
+                }
+                if (appStateStatus.current ==='active' && nextAppState === 'inactive') {
+                    appStateStatusTimer.current = new Date().getTime();
+                }
+                if (appStateStatus.current.match(/inactive|background/) && nextAppState === 'active') {
+                    if (new Date().getTime() - appStateStatusTimer.current > INACTIVE_TIMEOUT) {
+                        props.navigator.setDrawerEnabled({
+                            side: 'left',
+                            enabled: false
+                        });
+                        setStatus('enter');
+                        setValidPinCode(false);
+                    }
+                }
+
+                appStateStatus.current = nextAppState;
+            };
 
             const checkFirstInstall = async() => {
                 try {
@@ -62,7 +103,10 @@ export default function withPincode() {
                 } catch(wasPinSetError) {
                     console.log('wasPinSetError: ', wasPinSetError);
                 }
-                console.log('test');
+                props.navigator.setDrawerEnabled({
+                    side: 'left',
+                    enabled: true
+                });
                 setValidPinCode(true);
             };
 

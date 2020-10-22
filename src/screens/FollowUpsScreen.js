@@ -389,8 +389,8 @@ function matchDispatchProps(dispatch) {
 }
 
 export default compose(
-    withPincode(),
     connect(mapStateToProps, matchDispatchProps),
+    withPincode(),
     enhanceListWithGetData(getFollowUpsForOutbreakId, 'FollowUpsScreen')
 )(FollowUpsScreen)
 

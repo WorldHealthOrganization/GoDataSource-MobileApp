@@ -3,7 +3,7 @@
  */
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
-import React, {PureComponent} from 'react';
+import React, {Component} from 'react';
 import {Alert, InteractionManager, ScrollView, StyleSheet, Text, View} from 'react-native';
 import {LoaderScreen} from 'react-native-ui-lib';
 import {calculateDimension, createDate, extractIdFromPouchId, getTranslation} from './../utils/functions';
@@ -19,7 +19,7 @@ import _ from 'lodash';
 import TopContainerButtons from "./../components/TopContainerButtons";
 import PermissionComponent from './../components/PermissionComponent';
 
-class ContactsSingleAddress extends PureComponent {
+class ContactsSingleAddress extends Component {
 
     // This will be a container, so put as less business logic here as possible
     constructor(props) {

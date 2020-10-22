@@ -121,6 +121,154 @@ const tabsValuesRoutes = {
     ]
 };
 
+const addressFields = {
+    fields: [
+        {
+            cardNumber: 1,
+            id: 'typeId',
+            label: translations.addressFieldLabels.name,
+            labelValue: 'test',
+            type: 'DropdownInput',
+            value: '',
+            isRequired: true,
+            isEditMode: true,
+            objectType: 'Address'
+        },
+        {
+            cardNumber: 1,
+            id: 'date',
+            label: translations.addressFieldLabels.date,
+            labelValue: 'test',
+            value: '',
+            type: "DatePicker",
+            isRequired: false,
+            isEditMode: true,
+            format: 'MM/dd/YYYY',
+            objectType: 'Address'
+        },
+        {
+            cardNumber: 1,
+            id: 'phoneNumber',
+            label: translations.caseSingleScreen.phoneNumber,
+            type: 'TextInput',
+            value: '',
+            isRequired: false,
+            isEditMode: true,
+            keyboardType: Platform.OS === 'ios' ? 'number-pad' : 'numeric',
+            objectType: 'Address'
+        },
+        {
+            cardNumber: 1,
+            id: 'emailAddress',
+            label: 'Email',
+            type: 'TextInput',
+            value: '',
+            isRequired: false,
+            isEditMode: true,
+            objectType: 'Address'
+        },
+        {
+            cardNumber: 1,
+            id: 'locationId',
+            label: translations.addressFieldLabels.area,
+            labelValue: 'test',
+            type: 'DropDownSectioned',
+            value: '',
+            isRequired: true,
+            isEditMode: true,
+            objectType: 'Address',
+            single: true
+        },
+        {
+            cardNumber: 1,
+            id: 'city',
+            label: translations.addressFieldLabels.city,
+            labelValue: 'test',
+            type: 'TextInput',
+            value: '',
+            isRequired: false,
+            isEditMode: true,
+            multiline: true,
+            objectType: 'Address'
+        },
+        {
+            cardNumber: 1,
+            id: 'postalCode',
+            label: translations.addressFieldLabels.zip,
+            labelValue: 'test',
+            type: 'TextInput',
+            value: '',
+            isRequired: false,
+            isEditMode: true,
+            multiline: true,
+            objectType: 'Address'
+        },
+        {
+            cardNumber: 1,
+            id: 'addressLine1',
+            label: translations.addressFieldLabels.address,
+            labelValue: 'test',
+            type: 'TextInput',
+            value: '',
+            isRequired: false,
+            isEditMode: true,
+            multiline: true,
+            objectType: 'Address'
+        },
+        // Is the person next to you support
+        {
+            cardNumber: 1,
+            id: 'geoLocationAccurate',
+            label: translations.addressFieldLabels.isThePersonNextToYou,
+            labelValue: 'test',
+            type: 'SwitchInput',
+            value: '',
+            isRequired: false,
+            isEditMode: true,
+            activeButtonColor: styles.missedRedColor,
+            activeBackgroundColor: styles.missedRedColorWithOpacity,
+            objectType: 'Address'
+        },
+        // Add coordinates support
+        {
+            cardNumber: 1,
+            id: 'lng',
+            label: translations.addressFieldLabels.longitude,
+            labelValue: 'test',
+            type: 'TextInput',
+            value: '',
+            isRequired: false,
+            isEditMode: true,
+            multiline: false,
+            objectType: 'Address',
+            keyboardType: 'numeric'
+        },
+        {
+            cardNumber: 1,
+            id: 'lat',
+            label: translations.addressFieldLabels.latitude,
+            labelValue: 'test',
+            type: 'TextInput',
+            value: '',
+            isRequired: false,
+            isEditMode: true,
+            multiline: false,
+            objectType: 'Address',
+            keyboardType: 'numeric'
+        },
+        {
+            cardNumber: 1,
+            id: 'deleteButton',
+            type: 'ActionsBar',
+            labelValue: 'test',
+            textsArray: [translations.addressFieldLabels.deleteButton],
+            textsStyleArray: [{color: styles.missedRedColor}],
+            onPressArray: [],
+            objectType: 'Address'
+        }
+    ]
+};
+
 const followUpsSingleScreen = {
     generalInfo: [
         {
@@ -175,94 +323,7 @@ const followUpsSingleScreen = {
             ]
         }
     ],
-    address: {
-        fields: [
-            {
-                cardNumber: 2,
-                id: 'typeId',
-                label: translations.addressFieldLabels.name,
-                labelValue: 'test',
-                type: 'DropdownInput',
-                value: '',
-                isRequired: false,
-                isEditMode: false,
-                objectType: 'Address'
-            },
-            {
-                cardNumber: 1,
-                id: 'date',
-                label: translations.addressFieldLabels.date,
-                labelValue: 'test',
-                value: '',
-                type: "DatePicker",
-                isRequired: false,
-                isEditMode: false,
-                format: 'MM/dd/YYYY',
-                objectType: 'Address'
-            },
-            {
-                cardNumber: 2,
-                id: 'locationId',
-                label: translations.addressFieldLabels.area,
-                labelValue: 'test',
-                type: 'DropDownSectioned',
-                value: '',
-                isRequired: false,
-                isEditMode: false,
-                objectType: 'Address',
-                single: true
-            },
-            {
-                cardNumber: 2,
-                id: 'city',
-                label: translations.addressFieldLabels.city,
-                labelValue: 'test',
-                type: 'TextInput',
-                value: '',
-                isRequired: false,
-                isEditMode: false,
-                multiline: true,
-                objectType: 'Address'
-            },
-            {
-                cardNumber: 2,
-                id: 'postalCode',
-                label: translations.addressFieldLabels.zip,
-                labelValue: 'test',
-                type: 'TextInput',
-                value: '',
-                isRequired: false,
-                isEditMode: false,
-                multiline: true,
-                objectType: 'Address'
-            },
-            {
-                cardNumber: 2,
-                id: 'addressLine1',
-                label: translations.addressFieldLabels.address,
-                labelValue: 'test',
-                type: 'TextInput',
-                value: '',
-                isRequired: false,
-                isEditMode: false,
-                multiline: true,
-                objectType: 'Address'
-            },
-            {
-                cardNumber: 2,
-                id: 'phoneNumber',
-                label: translations.contactSingleScreen.phoneNumber,
-                labelValue: 'test',
-                type: 'TextInput',
-                value: '',
-                isRequired: false,
-                isEditMode: false,
-                multiline: false,
-                keyboardType: Platform.OS === 'ios' ? 'number-pad' : 'numeric',
-                objectType: 'Address'
-            },
-        ]
-    },
+    address: addressFields
 };
 
 const caseSingleScreen = {
@@ -528,143 +589,7 @@ const caseSingleScreen = {
             }
         ]
     },
-    address: {
-        fields: [
-            {
-                cardNumber: 1,
-                id: 'typeId',
-                label: translations.addressFieldLabels.name,
-                labelValue: 'test',
-                type: 'DropdownInput',
-                value: '',
-                isRequired: true,
-                isEditMode: true,
-                objectType: 'Address'
-            },
-            {
-                cardNumber: 1,
-                id: 'date',
-                label: translations.addressFieldLabels.date,
-                labelValue: 'test',
-                value: '',
-                type: "DatePicker",
-                isRequired: false,
-                isEditMode: true,
-                format: 'MM/dd/YYYY',
-                objectType: 'Address'
-            },
-            {
-                cardNumber: 1,
-                id: 'locationId',
-                label: translations.addressFieldLabels.area,
-                labelValue: 'test',
-                type: 'DropDownSectioned',
-                value: '',
-                isRequired: true,
-                isEditMode: true,
-                objectType: 'Address',
-                single: true
-            },
-            {
-                cardNumber: 1,
-                id: 'city',
-                label: translations.addressFieldLabels.city,
-                labelValue: 'test',
-                type: 'TextInput',
-                value: '',
-                isRequired: false,
-                isEditMode: true,
-                multiline: true,
-                objectType: 'Address'
-            },
-            {
-                cardNumber: 1,
-                id: 'postalCode',
-                label: translations.addressFieldLabels.zip,
-                labelValue: 'test',
-                type: 'TextInput',
-                value: '',
-                isRequired: false,
-                isEditMode: true,
-                multiline: true,
-                objectType: 'Address'
-            },
-            {
-                cardNumber: 1,
-                id: 'addressLine1',
-                label: translations.addressFieldLabels.address,
-                labelValue: 'test',
-                type: 'TextInput',
-                value: '',
-                isRequired: false,
-                isEditMode: true,
-                multiline: true,
-                objectType: 'Address'
-            },
-            {
-                cardNumber: 1,
-                id: 'phoneNumber',
-                label: translations.caseSingleScreen.phoneNumber,
-                type: 'TextInput',
-                value: '',
-                isRequired: false,
-                isEditMode: true,
-                keyboardType: Platform.OS === 'ios' ? 'number-pad' : 'numeric',
-                objectType: 'Address'
-            },
-            // Is the person next to you support
-            {
-                cardNumber: 1,
-                id: 'geoLocationAccurate',
-                label: translations.addressFieldLabels.isThePersonNextToYou,
-                labelValue: 'test',
-                type: 'SwitchInput',
-                value: '',
-                isRequired: false,
-                isEditMode: true,
-                activeButtonColor: styles.missedRedColor,
-                activeBackgroundColor: styles.missedRedColorWithOpacity,
-                objectType: 'Address'
-            },
-            // Add coordinates support
-            {
-                cardNumber: 1,
-                id: 'lng',
-                label: translations.addressFieldLabels.longitude,
-                labelValue: 'test',
-                type: 'TextInput',
-                value: '',
-                isRequired: false,
-                isEditMode: true,
-                multiline: false,
-                objectType: 'Address',
-                keyboardType: 'numeric'
-            },
-            {
-                cardNumber: 1,
-                id: 'lat',
-                label: translations.addressFieldLabels.latitude,
-                labelValue: 'test',
-                type: 'TextInput',
-                value: '',
-                isRequired: false,
-                isEditMode: true,
-                multiline: false,
-                objectType: 'Address',
-                keyboardType: 'numeric'
-            },
-            {
-                cardNumber: 1,
-                id: 'deleteButton',
-                type: 'ActionsBar',
-                labelValue: 'test',
-                textsArray: [translations.addressFieldLabels.deleteButton],
-                textsStyleArray: [{color: styles.missedRedColor}],
-                onPressArray: [],
-                objectType: 'Address'
-            }
-        ]
-    },
+    address: addressFields,
     infection: [
         {
             fields: [
@@ -1815,146 +1740,7 @@ const contactsSingleScreen = {
             ]
         }
     ],
-    address: {
-        fields: [
-            {
-                cardNumber: 1,
-                id: 'typeId',
-                label: translations.addressFieldLabels.name,
-                labelValue: 'test',
-                type: 'DropdownInput',
-                value: '',
-                isRequired: true,
-                isEditMode: true,
-                objectType: 'Address'
-            },
-            {
-                cardNumber: 1,
-                id: 'date',
-                label: translations.addressFieldLabels.date,
-                labelValue: 'test',
-                value: '',
-                type: "DatePicker",
-                isRequired: false,
-                isEditMode: true,
-                format: 'MM/dd/YYYY',
-                objectType: 'Address'
-            },
-            {
-                cardNumber: 1,
-                id: 'locationId',
-                label: translations.addressFieldLabels.area,
-                labelValue: 'test',
-                type: 'DropDownSectioned',
-                value: '',
-                isRequired: true,
-                isEditMode: true,
-                objectType: 'Address',
-                single: true
-            },
-            {
-                cardNumber: 1,
-                id: 'city',
-                label: translations.addressFieldLabels.city,
-                labelValue: 'test',
-                type: 'TextInput',
-                value: '',
-                isRequired: false,
-                isEditMode: true,
-                multiline: true,
-                objectType: 'Address'
-            },
-            {
-                cardNumber: 1,
-                id: 'postalCode',
-                label: translations.addressFieldLabels.zip,
-                labelValue: 'test',
-                type: 'TextInput',
-                value: '',
-                isRequired: false,
-                isEditMode: true,
-                multiline: true,
-                objectType: 'Address'
-            },
-            {
-                cardNumber: 1,
-                id: 'addressLine1',
-                label: translations.addressFieldLabels.address,
-                labelValue: 'test',
-                type: 'TextInput',
-                value: '',
-                isRequired: false,
-                isEditMode: true,
-                multiline: true,
-                objectType: 'Address'
-            },
-            {
-                cardNumber: 1,
-                id: 'phoneNumber',
-                label: translations.contactSingleScreen.phoneNumber,
-                labelValue: 'test',
-                type: 'TextInput',
-                value: '',
-                isRequired: false,
-                isEditMode: true,
-                multiline: false,
-                keyboardType: Platform.OS === 'ios' ? 'number-pad' : 'numeric',
-                objectType: 'Address'
-            },
-            // Is the person next to you support
-            {
-                cardNumber: 1,
-                id: 'geoLocationAccurate',
-                label: translations.addressFieldLabels.isThePersonNextToYou,
-                labelValue: 'test',
-                type: 'SwitchInput',
-                value: '',
-                isRequired: false,
-                isEditMode: true,
-                activeButtonColor: styles.missedRedColor,
-                activeBackgroundColor: styles.missedRedColorWithOpacity,
-                objectType: 'Address'
-            },
-            // Add coordinates support
-            {
-                cardNumber: 1,
-                id: 'lng',
-                label: translations.addressFieldLabels.longitude,
-                labelValue: 'test',
-                type: 'TextInput',
-                value: '',
-                isRequired: false,
-                isEditMode: true,
-                multiline: false,
-                objectType: 'Address',
-                keyboardType: 'numeric'
-            },
-            {
-                cardNumber: 1,
-                id: 'lat',
-                label: translations.addressFieldLabels.latitude,
-                labelValue: 'test',
-                type: 'TextInput',
-                value: '',
-                isRequired: false,
-                isEditMode: true,
-                multiline: false,
-                objectType: 'Address',
-                keyboardType: 'numeric'
-            },
-
-            {
-                cardNumber: 1,
-                id: 'deleteButton',
-                type: 'ActionsBar',
-                labelValue: 'test',
-                textsArray: [translations.addressFieldLabels.deleteButton],
-                textsStyleArray: [{color: styles.missedRedColor}],
-                onPressArray: [],
-                objectType: 'Address'
-            }
-        ]
-    },
+    address: addressFields,
     relationship: {
         fields: [
             {
@@ -2333,5 +2119,6 @@ export default {
     rawSQLQueryString,
     rawSQLQueryWhereString,
     whocdCredentials,
-    contactsOfContactsPersonal
+    contactsOfContactsPersonal,
+    addressFields
 };

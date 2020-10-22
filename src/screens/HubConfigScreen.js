@@ -331,14 +331,14 @@ class FirstConfigScreen extends Component {
                         </ElevatedView>
                     </ScrollView>
 
-                    <Modal isVisible={this.state.isVisible} onBackdropPress={this.hideModal}>
+                    <Modal animationOutTiming={150} isVisible={this.state.isVisible} onBackdropPress={this.hideModal}>
                         <ElevatedView
                             elevation={4}
                             style={
                                 [
                                     modalStyle,
                                     {
-                                        height: this.state.databaseId === this.state.databaseToBeDeleted && checkArrayAndLength(this.state.allDatabases.filter((e) => e.id !== this.state.databaseId)) ? '35%' :'20%',
+                                        // height: this.state.databaseId === this.state.databaseToBeDeleted && checkArrayAndLength(this.state.allDatabases.filter((e) => e.id !== this.state.databaseId)) ? '45%' :'25%',
                                         justifyContent: 'space-between',
                                         margin: 15
                                     }
@@ -347,10 +347,10 @@ class FirstConfigScreen extends Component {
                             <View>
                                 <Section
                                     label={getTranslation(translations.hubConfigScreen.deleteHubButton, this.props.translation)}
-                                    containerStyle={{height: 20}}
+                                    // containerStyle={{height: 20}}
                                 />
                                 <Section label={getTranslation(translations.hubConfigScreen.confirmationDeleteHub, this.props.translation)} labelSize={'normal'}
-                                         containerStyle={{height: 15}}/>
+                                         />
                             </View>
 
                             {
@@ -555,9 +555,11 @@ class FirstConfigScreen extends Component {
                 if (checkArrayAndLength(this.state.allDatabases.filter((e) => e.id !== this.state.databaseToBeDeleted))) {
                     if (this.state.hubReplacement) {
                         this.setState({
-                            isVisible
+                            isVisible: false
                         }, () => {
-                            this.activateHub({id: this.state.hubReplacement});
+                            setTimeout(() => {
+                                this.activateHub({id: this.state.hubReplacement});
+                            }, 300);
                         });
                     } else {
                         this.setState({
