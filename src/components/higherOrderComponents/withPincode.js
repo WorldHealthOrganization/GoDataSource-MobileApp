@@ -14,7 +14,7 @@ export default function withPincode() {
 
             const NUMBER_OF_ATTEMPTS = 5;
             const DELAY_BETWEEN_ATTEMPTS = 500;
-            const INACTIVE_TIMEOUT = 1000 //* 20 * 60; // Wait for 20 mins of inactivity
+            const INACTIVE_TIMEOUT = 1000 * 20 * 60; // Wait for 20 mins of inactivity
 
             const [validPinCode, setValidPinCode] = useState(false);
             const [status, setStatus] = useState(null);
@@ -42,28 +42,36 @@ export default function withPincode() {
 
                             if (hasPin || props.isAppInitialize) {
                                 AppState.addEventListener('change', handleAppStateChange);
+
+                                // This is added because the event listener is added after the app changes state.
+                                // The initialization from the top makes it 'background', and it would remain to background unless updated manually here
+                                // Since this code is only ran at the first render, this should not cause any issues
+                                appStateStatus.current = AppState.currentState;
                             }
                         });
                 }
 
                 return () => {
-                    AppState.removeEventListener('change', handleAppStateChange)
+                    // console.log("withPincode component has unmounted somehow ", appStateStatus, appStateStatusTimer);
+                    AppState.removeEventListener('change', handleAppStateChange);
                 }
             }, []);
 
             const handleAppStateChange = (nextAppState) => {
+                // console.log(`withPincode handleAppStateChange appStateStatus: ${appStateStatus.current} --- nextAppState: ${nextAppState}`);
                 if (props && props.navigator) {
-                    console.log('Navigator: ', props, props.navigator);
                     props.navigator.toggleDrawer({
                         side: 'left',
                         animated: false,
                         to: 'closed'
                     })
                 }
-                if (appStateStatus.current ==='active' && nextAppState === 'inactive') {
+                if (appStateStatus.current ==='active' && nextAppState.match(/inactive|background/)) {
+                    // console.log("withPincode moving to background", appStateStatus, appStateStatusTimer);
                     appStateStatusTimer.current = new Date().getTime();
                 }
                 if (appStateStatus.current.match(/inactive|background/) && nextAppState === 'active') {
+                    // console.log("withPincode coming from background", appStateStatus, appStateStatusTimer);
                     if (new Date().getTime() - appStateStatusTimer.current > INACTIVE_TIMEOUT) {
                         props.navigator.setDrawerEnabled({
                             side: 'left',
@@ -89,7 +97,7 @@ export default function withPincode() {
                         return Promise.resolve('success');
                     }
                 } catch (errorGetWasPinSet) {
-                    console.log("stuff: ", errorGetWasPinSet);
+                    // console.log("stuff: ", errorGetWasPinSet);
                     return Promise.reject(errorGetWasPinSet)
                 }
             };
@@ -111,7 +119,6 @@ export default function withPincode() {
             };
 
             const onFail = async (failedAttempts) => {
-                console.log('FailedAttempts: ', failedAttempts);
                 if (failedAttempts === NUMBER_OF_ATTEMPTS) {
                     setValidPinCode(true);
                     setRetries(NUMBER_OF_ATTEMPTS);
@@ -124,7 +131,7 @@ export default function withPincode() {
                         }
                         await resetPinCodeInternalStates();
                     } catch(errorGetLoggedUser) {
-                        console.log('errorGetLoggedUser: ', errorGetLoggedUser);
+                        // console.log('errorGetLoggedUser: ', errorGetLoggedUser);
                         await resetPinCodeInternalStates();
                     }
                 } else {
@@ -136,15 +143,12 @@ export default function withPincode() {
                 setValidPinCode(true);
                 try {
                     let userLogged = await AsyncStorage.getItem('loggedUser');
-                    console.log('UserLogged');
                     if (userLogged) {
                         // Handle logout
                         dispatch(logoutUser());
                     }
-                    console.log('Time to reset shit');
                     await resetPinCodeInternalStates();
                 } catch(errorGetLoggedUser) {
-                    console.log('errorGetLoggedUser: ', errorGetLoggedUser);
                     await resetPinCodeInternalStates();
                     setValidPinCode(true);
                 }

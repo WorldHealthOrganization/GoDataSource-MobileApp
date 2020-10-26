@@ -471,6 +471,7 @@ class ContactsSingleScreen extends Component {
         // Before moving to the next screen do the checks for the current screen
         let missingFields = [];
         let invalidEmails = [];
+        let placeOfResidenceError = null;
         switch(this.state.index) {
             case 0:
                 missingFields = this.checkRequiredFieldsPersonalInfo();
@@ -484,6 +485,7 @@ class ContactsSingleScreen extends Component {
             case 1:
                 missingFields = this.checkRequiredFieldsAddresses();
                 invalidEmails = this.checkForInvalidEmails();
+                placeOfResidenceError = this.checkPlaceOfResidence();
                 break;
             case 2:
                 missingFields = this.checkFields();
@@ -512,6 +514,19 @@ class ContactsSingleScreen extends Component {
                         }
                     ]
                 );
+        } else if (placeOfResidenceError) {
+            Alert.alert(
+                getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation),
+                getTranslation(translations.alertMessages.placeOfResidenceError, this.props.translation),
+                [
+                    {
+                        text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+                        onPress: () => {
+                            this.hideMenu()
+                        }
+                    }
+                ]
+            )
         } else {
             let nextIndex = this.state.index + 1;
 
@@ -1469,8 +1484,10 @@ class ContactsSingleScreen extends Component {
     };
 
     checkPlaceOfResidence = () => {
-        return this.state.contact.addresses === undefined || this.state.contact.addresses === null || this.state.contact.addresses.length === 0 ||
-            (this.state.contact.addresses.length > 0 && this.state.hasPlaceOfResidence === true);
+        return checkArrayAndLength(this.state?.contact?.addresses) &&
+            !this.state?.contact?.addresses.find((e) =>
+                e.typeId === translations.userResidenceAddress.userPlaceOfResidence
+            );
     };
 
     showAlert = (title, message) => {

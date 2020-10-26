@@ -316,7 +316,7 @@ async function processFilesForSyncNew(error, response, hubConfiguration, isFirst
 
                         if (promiseResponses.length === files.length) {
                             saveActiveDatabaseAndCleanup(syncSuccessful, hubConfiguration, hubConfig, files.length === promiseResponses.length, languagePacks)
-                                .then((success) => {
+                                .then(() => {
                                     console.log('Responses promises: ', promiseResponses);
                                     files = null;
                                     database = null;

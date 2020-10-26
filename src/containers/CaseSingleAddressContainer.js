@@ -18,6 +18,8 @@ import ElevatedView from 'react-native-elevated-view';
 import _ from 'lodash';
 import TopContainerButtons from "../components/TopContainerButtons";
 import PermissionComponent from './../components/PermissionComponent';
+import {validateRequiredFields, checkValidEmails} from './../utils/formValidators';
+import {checkArray, checkArrayAndLength} from "../utils/typeCheckingFunctions";
 
 class CaseSingleAddressContainer extends React.Component {
 
@@ -273,25 +275,51 @@ class CaseSingleAddressContainer extends React.Component {
     };
 
     handleNextButton = () => {
+        let invalidEmails = validateRequiredFields(
+            _.get(this.props, 'case.addresses', []),
+            config?.addressFields?.fields,
+            (dataToBeValidated, fields, defaultFunction) => {
+                if (fields.id === 'emailAddress') {
+                    return checkValidEmails(dataToBeValidated, fields?.id);
+                }
+                return null;
+            }
+        );
         let missingFields = this.props.checkRequiredFieldsAddresses();
-        if (missingFields && Array.isArray(missingFields) && missingFields.length === 0) {
-            if (this.props.case.addresses.length === 0 || (this.props.case.addresses.length > 0 && this.props.hasPlaceOfResidence)) {
-                this.props.onPressNextButton(true)
-            } else {
-                Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.alertMessages.addressOfResidenceError, this.props.translation), [
+        let checkPlaceOfResidence = validateRequiredFields(
+            this.props?.case?.addresses,
+            config.addressFields?.fields,
+            (dataToBeValidated, fields, defaultFunction) => {
+                if (fields.id === 'typeId') {
+                    return (checkArray(dataToBeValidated) && dataToBeValidated.length === 0) ||
+                        (checkArrayAndLength(dataToBeValidated) && dataToBeValidated.find((e) => {
+                            return e.typeId === translations.userResidenceAddress.userPlaceOfResidence
+                        }));
+                }
+                return null;
+            },
+            true);
+        let message = null;
+        if (checkArrayAndLength(missingFields)) {
+            message = `${getTranslation(translations.alertMessages.addressRequiredFieldsMissing, this.props.translation)}.\n${getTranslation(translations.alertMessages.missingFields, this.props.translation)}: ${missingFields}`;
+        } else if (checkArrayAndLength(invalidEmails)) {
+            message = `${getTranslation(translations.alertMessages.invalidEmails, this.props.translation)}: ${invalidEmails}`;
+        } else if (!checkArrayAndLength(checkPlaceOfResidence)) {
+            message = getTranslation(translations.alertMessages.addressOfResidenceError, this.props.translation);
+        }
+
+        if (message) {
+            Alert.alert(
+                getTranslation(translations.alertMessages.alertLabel, this.props.translation),
+                message,
+                [
                     {
                         text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
                         onPress: () => { console.log("OK pressed") }
                     }
                 ])
-            }
         } else {
-            Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), `${getTranslation(translations.alertMessages.addressRequiredFieldsMissing, this.props.translation)}.\n${getTranslation(translations.alertMessages.missingFields, this.props.translation)}: ${missingFields}`, [
-                {
-                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
-                    onPress: () => { console.log("OK pressed") }
-                }
-            ])
+            this.props.onPressNextButton(true);
         }
     };
 

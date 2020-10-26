@@ -44,8 +44,9 @@ import cloneDeep from "lodash/cloneDeep";
 import lodashIntersect from "lodash/intersection";
 import lodashGet from 'lodash/get';
 import constants from "../utils/constants";
-import {checkArrayAndLength, checkValidEmails} from "../utils/typeCheckingFunctions";
+import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
 import withPincode from './../components/higherOrderComponents/withPincode';
+import {checkValidEmails, validateRequiredFields} from './../utils/formValidators';
 
 const initialLayout = {
     height: 0,
@@ -577,134 +578,161 @@ class CaseSingleScreen extends Component {
     //Save case
     handleOnPressSave = () => {
         let missingFields = this.checkRequiredFields().map((e) => getTranslation(e, this.props.translation));
-        let invalidEmails = checkValidEmails(this.state?.case?.addresses, config.addressFields.fields[3].id);
+        let invalidEmails = validateRequiredFields(_.get(this.state, 'case.addresses', []), config?.addressFields?.fields, (dataToBeValidated, fields, defaultFunction) => {
+            if (fields.id === 'emailAddress') {
+                return checkValidEmails(dataToBeValidated, fields?.id);
+            }
+
+            return null;
+        });
+        let placeOfResidenceError = checkArrayAndLength(this.state?.case?.addresses) &&
+            !this.state?.case?.addresses.find((e) =>
+                e.typeId === translations.userResidenceAddress.userPlaceOfResidence
+            );
         // console.log('InvalidEmails: ', invalidEmails);
         if (missingFields && Array.isArray(missingFields) && missingFields.length === 0) {
-                if (this.checkAgeYearsRequirements()) {
-                    if (this.checkAgeMonthsRequirements()) {
-                        if ( this.state.case.addresses === undefined || this.state.case.addresses === null || this.state.case.addresses.length === 0 ||
-                            (this.state.case.addresses.length > 0 && this.state.hasPlaceOfResidence === true)) {
-                            if (checkArrayAndLength(invalidEmails)) {
-                                Alert.alert(
-                                    getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation),
-                                    `${getTranslation(translations.alertMessages.invalidEmails, this.props.translation)}: ${invalidEmails.join(', ')}`, [
+            if (this.checkAgeYearsRequirements()) {
+                if (this.checkAgeMonthsRequirements()) {
+                    if (!placeOfResidenceError) {
+                        if (checkArrayAndLength(invalidEmails)) {
+                            Alert.alert(
+                                getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation),
+                                `${getTranslation(translations.alertMessages.invalidEmails, this.props.translation)}: ${invalidEmails.join(', ')}`, [
                                     {
-                                        text: 'Ok', onPress: () => {console.log('Invalid emails')}
+                                        text: 'Ok', onPress: () => {
+                                            console.log('Invalid emails')
+                                        }
                                     }
                                 ])
-                            } else {
-                                if (this.checkIsolationOnsetDates()) {
-                                    checkForNameDuplicatesRequest(_.get(this.state, 'case._id', null), this.state.case.firstName, this.state.case.lastName, this.props.user.activeOutbreakId, (error, response) => {
-                                        if (error) {
-                                            this.setState({
-                                                loading: false
-                                            }, () => {
-                                                Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.checkForDuplicatesRequestError, this.props.translation), [
-                                                    {
-                                                        text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
-                                                        onPress: () => { this.hideMenu() }
+                        } else {
+                            if (this.checkIsolationOnsetDates()) {
+                                checkForNameDuplicatesRequest(_.get(this.state, 'case._id', null), this.state.case.firstName, this.state.case.lastName, this.props.user.activeOutbreakId, (error, response) => {
+                                    if (error) {
+                                        this.setState({
+                                            loading: false
+                                        }, () => {
+                                            Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.checkForDuplicatesRequestError, this.props.translation), [
+                                                {
+                                                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+                                                    onPress: () => {
+                                                        this.hideMenu()
                                                     }
-                                                ])
-                                            })
-                                        }
-                                        if (response) {
-                                            if (response.length === 0) {
-                                                if( this.checkAnswerDatesQuestionnaire()){
-                                                    this.saveCaseAction()
-                                                }else{
-                                                    this.setState({ loading: false }, () => {
-                                                        Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.answerDateMissingError, this.props.translation), [
-                                                            {
-                                                                text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
-                                                                onPress: () => { this.hideMenu() }
-                                                            }
-                                                        ])
-                                                    })
                                                 }
+                                            ])
+                                        })
+                                    }
+                                    if (response) {
+                                        if (response.length === 0) {
+                                            if (this.checkAnswerDatesQuestionnaire()) {
+                                                this.saveCaseAction()
                                             } else {
-                                                Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.caseDuplicateNameError, this.props.translation), [
-                                                    {
-                                                        text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
-                                                        onPress: () => {
-                                                            this.setState({
-                                                                loading: false
-                                                            }, () => {
+                                                this.setState({loading: false}, () => {
+                                                    Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.answerDateMissingError, this.props.translation), [
+                                                        {
+                                                            text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+                                                            onPress: () => {
                                                                 this.hideMenu()
+                                                            }
+                                                        }
+                                                    ])
+                                                })
+                                            }
+                                        } else {
+                                            Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.caseDuplicateNameError, this.props.translation), [
+                                                {
+                                                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+                                                    onPress: () => {
+                                                        this.setState({
+                                                            loading: false
+                                                        }, () => {
+                                                            this.hideMenu()
+                                                        })
+                                                    }
+                                                },
+                                                {
+                                                    text: getTranslation(translations.alertMessages.saveAnywayLabel, this.props.translation),
+                                                    onPress: () => {
+                                                        if (this.checkAnswerDatesQuestionnaire()) {
+                                                            this.saveCaseAction()
+                                                        } else {
+                                                            this.setState({loading: false}, () => {
+                                                                Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.answerDateMissingError, this.props.translation), [
+                                                                    {
+                                                                        text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+                                                                        onPress: () => {
+                                                                            this.hideMenu()
+                                                                        }
+                                                                    }
+                                                                ])
                                                             })
                                                         }
-                                                    },
-                                                    {
-                                                        text: getTranslation(translations.alertMessages.saveAnywayLabel, this.props.translation),
-                                                        onPress: () => {
-                                                            if( this.checkAnswerDatesQuestionnaire()){
-                                                                this.saveCaseAction()
-                                                            }else{
-                                                                this.setState({ loading: false }, () => {
-                                                                    Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.answerDateMissingError, this.props.translation), [
-                                                                        {
-                                                                            text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
-                                                                            onPress: () => { this.hideMenu() }
-                                                                        }
-                                                                    ])
-                                                                })
-                                                            }
-                                                        }
                                                     }
-                                                ])
+                                                }
+                                            ])
+                                        }
+                                    }
+                                });
+                            } else {
+                                this.setState({loading: false}, () => {
+                                    Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.dateOfOnsetError, this.props.translation), [
+                                        {
+                                            text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+                                            onPress: () => {
+                                                this.hideMenu()
                                             }
                                         }
-                                    });
-                                } else {
-                                    this.setState({ loading: false }, () => {
-                                        Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.dateOfOnsetError, this.props.translation), [
-                                            {
-                                                text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
-                                                onPress: () => { this.hideMenu() }
-                                            }
-                                        ])
-                                    })
-                                }
+                                    ])
+                                })
                             }
-                        } else {
-                            this.setState({ loading: false }, () => {
-                                Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.placeOfResidenceError, this.props.translation), [
-                                    {
-                                        text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
-                                        onPress: () => { this.hideMenu() }
-                                    }
-                                ])
-                            })
                         }
                     } else {
-                        this.setState({ loading: false }, () => {
-                            Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.monthsValueError, this.props.translation), [
+                        this.setState({loading: false}, () => {
+                            Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.placeOfResidenceError, this.props.translation), [
                                 {
                                     text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
-                                    onPress: () => { this.hideMenu() }
+                                    onPress: () => {
+                                        this.hideMenu()
+                                    }
                                 }
                             ])
                         })
                     }
                 } else {
-                    this.setState({ loading: false }, () => {
-                        Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.yearsValueError, this.props.translation), [
+                    this.setState({loading: false}, () => {
+                        Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.monthsValueError, this.props.translation), [
                             {
                                 text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
-                                onPress: () => { this.hideMenu() }
+                                onPress: () => {
+                                    this.hideMenu()
+                                }
                             }
                         ])
                     })
                 }
             } else {
-                this.setState({ loading: false }, () => {
-                    Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), `${getTranslation(translations.alertMessages.requiredFieldsMissingError, this.props.translation)}.\n${getTranslation(translations.alertMessages.missingFields, this.props.translation)}: ${missingFields}`, [
+                this.setState({loading: false}, () => {
+                    Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.yearsValueError, this.props.translation), [
                         {
                             text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
-                            onPress: () => { this.hideMenu() }
+                            onPress: () => {
+                                this.hideMenu()
+                            }
                         }
                     ])
                 })
             }
+        } else {
+            this.setState({loading: false}, () => {
+                Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), `${getTranslation(translations.alertMessages.requiredFieldsMissingError, this.props.translation)}.\n${getTranslation(translations.alertMessages.missingFields, this.props.translation)}: ${missingFields}`, [
+                    {
+                        text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+                        onPress: () => {
+                            this.hideMenu()
+                        }
+                    }
+                ])
+            })
+        }
     };
     saveCaseAction = () => {
         this.hideMenu();

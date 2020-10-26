@@ -1541,7 +1541,10 @@ class ContactsOfContactsSingleScreen extends Component {
         // return this.checkRequiredFieldsPersonalInfo() && this.checkRequiredFieldsAddresses() && this.checkRequiredFieldsRelationships()
     };
     checkPlaceOfResidence = () => {
-        return checkArrayAndLength(this.state?.contact?.addresses) && !this.state?.contact?.addresses.find((e) => e.typeId === translations.userResidenceAddress.userPlaceOfResidence);
+        return checkArrayAndLength(this.state?.contact?.addresses) &&
+            !this.state?.contact?.addresses.find((e) =>
+                e.typeId === translations.userResidenceAddress.userPlaceOfResidence
+            );
     };
 
     showMenu = () => {

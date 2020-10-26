@@ -248,65 +248,6 @@ export function mapDataForInsert(tableName, data) {
     }
     let tableFields = constants.tableStructure[tableName].concat(constants.tableStructure.commonFields);
 
-
-    // let returnArray = [];
-    // let maximumNumberOfDataInAnArray = Math.floor(900 / tableFields.length);
-    //
-    // let outerArray = [];
-    // data.forEach((e, index) => {
-    //     let innerArray = {};
-    //     for (let i=0; i<tableFields.length; i++) {
-    //         if (i === tableFields.length - 1) {
-    //             innerArray['json'] = JSON.stringify(e);
-    //         } else {
-    //             if (tableFields[i].fieldName === 'locationId') {
-    //                 innerArray[tableFields[i].fieldName] = extractLocationId(e);
-    //             } else {
-    //                 if (tableFields[i].fieldName === 'age') {
-    //                     let years = get(e, `[${tableFields[i].fieldName}].years`, 0);
-    //                     let months = get(e, `[${tableFields[i].fieldName}].months`, 0);
-    //                     innerArray[tableFields[i].fieldName] = Math.max(years, months);
-    //                 } else {
-    //                     if (tableFields[i].fieldName === 'indexDay') {
-    //                         innerArray[tableFields[i].fieldName] = get(e, `[index]`, null);
-    //                     } else {
-    //                         if (constants.relationshipsMappedFields.includes(tableFields[i].fieldName)) {
-    //                             innerArray[tableFields[i].fieldName] = mapRelationshipFields(e, tableFields[i].fieldName);
-    //                         } else {
-    //                             if (tableName === 'person' && e.type === translations.personTypes.events && tableFields[i].fieldName === 'firstName') {
-    //                                 innerArray[tableFields[i].fieldName] = get(e, `name`, null);
-    //                             } else {
-    //                                 if (tableName === 'person' && (tableFields[i].fieldName === 'firstName' || tableFields[i].fieldName === 'lastName')) {
-    //                                     innerArray[tableFields[i].fieldName] = get(e, `[${tableFields[i].fieldName}]`, '');
-    //                                 } else {
-    //                                     if (tableFields[i].fieldName === 'deleted') {
-    //                                         if (get(e, `[${tableFields[i].fieldName}]`, null) !== true) {
-    //                                             innerArray[tableFields[i].fieldName] = false;
-    //                                         } else {
-    //                                             innerArray[tableFields[i].fieldName] = get(e, `[${tableFields[i].fieldName}]`, false);
-    //                                         }
-    //                                     } else {
-    //                                         innerArray[tableFields[i].fieldName] = get(e, `[${tableFields[i].fieldName}]`, null);
-    //                                                                             }
-    //                                 }
-    //                             }
-    //                         }
-    //                     }
-    //                 }
-    //             }
-    //         }
-    //     }
-    //     if (index % maximumNumberOfDataInAnArray === 0) {
-    //         returnArray.push(outerArray);
-    //         outerArray = [];
-    //     } else {
-    //         outerArray.push(innerArray);
-    //     }
-    // });
-    //
-    // return returnArray;
-
-
     return data.map((e) => {
         let innerArray = [];
         for (let i=0; i<tableFields.length; i++) {
@@ -336,6 +277,8 @@ export function mapDataForInsert(tableName, data) {
                 default:
                     if (i === tableFields.length - 1) {
                         innerArray.push(JSON.stringify(e));
+                    } else if (constants.relationshipsMappedFields.includes(tableFields[i].fieldName)) {
+                        innerArray.push(mapRelationshipFields(e, tableFields[i].fieldName));
                     } else if (tableName === 'person' && e.type === translations.personTypes.events && tableFields[i].fieldName === 'firstName') {
                         innerArray.push(get(e, `name`, null));
                     } else if (tableName === 'person' && (tableFields[i].fieldName === 'firstName' || tableFields[i].fieldName === 'lastName')) {
