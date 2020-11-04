@@ -128,7 +128,7 @@ class PersonListItem extends Component {
         }
         // Emails
         if (checkArrayAndLength(person?.addresses)) {
-            returnValues.emails = person?.addresses.map((e) => e?.emailAddress).join(', ')
+            returnValues.emails = person?.addresses.filter((e) => e.emailAddress).map((e) => e?.emailAddress).join(', ')
         }
         // Visual Id
         if (person && person.visualId) {

@@ -57,7 +57,7 @@ class ContactsSingleAddress extends Component {
         }
 
         let permissionsList = [
-            constants.PERMISSIONS_CONTACT.contactAll
+            this.props.type === translations.personTypes.contactsOfContacts ? PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsAll : constants.PERMISSIONS_CONTACT.contactAll
         ];
         if (this.props.isNew) {
             if(this.props.type === translations.personTypes.contactsOfContacts) {

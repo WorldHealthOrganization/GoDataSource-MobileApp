@@ -1240,7 +1240,13 @@ class ContactsOfContactsSingleScreen extends Component {
                                         [
                                             {
                                                 text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
-                                                onPress: () => { this.hideMenu() }
+                                                onPress: () => {
+                                                    this.setState({
+                                                        loading: false
+                                                    }, () => {
+                                                        this.hideMenu()
+                                                    })
+                                                }
                                             }
                                         ]
                                     );

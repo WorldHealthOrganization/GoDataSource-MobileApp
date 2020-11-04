@@ -49,7 +49,7 @@ import {
     reMapAnswers
 } from "../utils/functions";
 import constants from "../utils/constants";
-import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
+import {checkArray, checkArrayAndLength} from "../utils/typeCheckingFunctions";
 import PermissionComponent from './../components/PermissionComponent';
 import lodashIntersect from 'lodash/intersection';
 import {getItemByIdRequest} from './../actions/cases';
@@ -154,7 +154,7 @@ class ContactsSingleScreen extends Component {
             canChangeScreen: false,
             anotherPlaceOfResidenceWasChosen: false,
             hasPlaceOfResidence: true,
-            updateExposure: false,
+            // updateExposure: false,
             isEditMode: true,
             selectedItemIndexForTextSwitchSelectorForAge: 0, // age/dob - switch tab
             selectedItemIndexForAgeUnitOfMeasureDropDown: this.props.isNew ? 0 : (this.props.contact && this.props.contact.age && this.props.contact.age.years !== undefined && this.props.contact.age.years !== null && this.props.contact.age.years > 0) ? 0 : 1, //default age dropdown value
@@ -471,7 +471,7 @@ class ContactsSingleScreen extends Component {
         // Before moving to the next screen do the checks for the current screen
         let missingFields = [];
         let invalidEmails = [];
-        let placeOfResidenceError = null;
+        let placeOfResidenceError = true;
         switch(this.state.index) {
             case 0:
                 missingFields = this.checkRequiredFieldsPersonalInfo();
@@ -514,7 +514,7 @@ class ContactsSingleScreen extends Component {
                         }
                     ]
                 );
-        } else if (placeOfResidenceError) {
+        } else if (!placeOfResidenceError) {
             Alert.alert(
                 getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation),
                 getTranslation(translations.alertMessages.placeOfResidenceError, this.props.translation),
@@ -666,6 +666,7 @@ class ContactsSingleScreen extends Component {
                         addContactFromCasesScreen={this.props.addContactFromCasesScreen}
                         navigator={this.props.navigator}
                         saveExposure={this.handleSaveExposure}
+                        refreshRelations={this.refreshRelations}
                         onPressPreviousButton={this.handleMoveToPrevieousScreenButton}
                         isNew={this.props.isNew}
                         handleOnPressSave={this.handleOnPressSave}
@@ -676,7 +677,6 @@ class ContactsSingleScreen extends Component {
                         onChangeSwitch={this.handleOnChangeSwitch}
                         handleMoveToNextScreenButton={this.handleMoveToNextScreenButton}
                         selectedExposure={this.props.singleCase}
-
                         numberOfTabs={this.state.routes.length}
                         // onPressPreviousButton={this.handlePreviousPress}
                         onPressNextButton={this.handleMoveToNextScreenButton}
@@ -775,10 +775,28 @@ class ContactsSingleScreen extends Component {
 
     handleSaveExposure = (exposure, isUpdate = false) => {
         this.setState({
-            loading: true,
-            updateExposure: true
+            loading: true
         })
     };
+    refreshRelations = () => {
+        this.setState({
+            loading: true
+        }, () => {
+            getExposuresForContact(this.state?.contact?._id, this.props?.user?.activeOutbreakId)
+                .then((relations) => {
+                    this.setState(prevState => ({
+                        loading: false,
+                        contact: Object.assign({}, prevState.contact, {relationships: relations})
+                    }))
+                })
+                .catch((errorGetRelations) => {
+                    console.log('Error while getting relations: ', errorGetRelations);
+                    this.setState({
+                        loading: false
+                    })
+                })
+        })
+    }
 
     // documents functions
     onPressAddDocument = () => {
@@ -1368,7 +1386,8 @@ class ContactsSingleScreen extends Component {
                 saveExposure: this.handleSaveExposure,
                 caseIdFromCasesScreen: this.props.caseIdFromCasesScreen,
                 isEditMode: false,
-                addContactFromCasesScreen: false
+                addContactFromCasesScreen: false,
+                refreshRelations: this.refreshRelations
             }
         })
     };
@@ -1484,10 +1503,13 @@ class ContactsSingleScreen extends Component {
     };
 
     checkPlaceOfResidence = () => {
-        return checkArrayAndLength(this.state?.contact?.addresses) &&
-            !this.state?.contact?.addresses.find((e) =>
+        const checkNoAddress = !this.state.contact?.addresses || (checkArray(this.state?.contact?.addresses) && this.state?.contact?.addresses.length === 0);
+        const checkIfPlaceOfResidence = checkArrayAndLength(this.state?.contact?.addresses) &&
+            this.state?.contact?.addresses.find((e) =>
                 e.typeId === translations.userResidenceAddress.userPlaceOfResidence
             );
+
+        return checkNoAddress || checkIfPlaceOfResidence;
     };
 
     showAlert = (title, message) => {

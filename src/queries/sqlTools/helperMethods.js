@@ -204,7 +204,7 @@ export function insertOrUpdate(databaseName, tableName, data, createTableBool) {
                                 console.log('Transactional insert took: ', new Date().getTime() - start);
                                 // database = null;
                                 return openDatabase('test')
-                                    .then((db) => Promise.resolve(success))
+                                    .then((db) => Promise.resolve('Success'))
                             })
                     })
 
