@@ -50,6 +50,9 @@ const PERMISSIONS_CONTACT = {
     contactCreateRelationshipExposures: 'contact_create_relationship_exposures',
     contactModifyRelationshipExposures: 'contact_modify_relationship_exposures',
     contactDeleteRelationshipExposures: 'contact_delete_relationship_exposures',
+    contactCreateContactOfContact: 'contact_create_contact_of_contact',
+    contactModifyContactOfContact: 'contact_modify_contact_of_contact',
+    contactDeleteContactOfContact: 'contact_delete_contact_of_contact'
 };
 
 export const PERMISSIONS_CONTACT_OF_CONTACT = {

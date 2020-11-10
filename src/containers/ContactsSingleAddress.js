@@ -57,27 +57,33 @@ class ContactsSingleAddress extends Component {
         }
 
         let permissionsList = [
-            this.props.type === translations.personTypes.contactsOfContacts ? PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsAll : constants.PERMISSIONS_CONTACT.contactAll
+           // this.props.type === translations.personTypes.contactsOfContacts ? PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsAll : constants.PERMISSIONS_CONTACT.contactAll
         ];
         if (this.props.isNew) {
             if(this.props.type === translations.personTypes.contactsOfContacts) {
-                permissionsList.push(
-                    PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsCreate
-                )
+                permissionsList = permissionsList.concat([
+                    [constants.PERMISSIONS_CONTACT.contactAll, PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsCreate],
+                    [constants.PERMISSIONS_CONTACT.contactAll, PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsCreate],
+                    [constants.PERMISSIONS_CONTACT.contactAll, PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsCreate],
+                    [constants.PERMISSIONS_CONTACT.contactAll, PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsCreate]
+                ])
             } else {
-                permissionsList.push(
+                permissionsList = permissionsList.concat([
+                    constants.PERMISSIONS_CONTACT.contactAll,
                     constants.PERMISSIONS_CONTACT.contactCreate
-                )
+                ])
             }
         } else {
             if(this.props.type === translations.personTypes.contactsOfContacts) {
-                permissionsList.push(
+                permissionsList = permissionsList.concat([
+                    PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsAll,
                     PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsModify
-                )
+                ])
             } else {
-                permissionsList.push(
+                permissionsList = permissionsList.concat([
+                    constants.PERMISSIONS_CONTACT.contactAll,
                     constants.PERMISSIONS_CONTACT.contactModify
-                )
+                ])
             }
         }
 

@@ -199,7 +199,12 @@ class AnimatedListView extends Component {
                     }];
                 arrayPermissions = [
                     [constants.PERMISSIONS_CONTACT.contactAll, constants.PERMISSIONS_CONTACT.contactView],
-                    [PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsAll, PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsCreate],
+                    [
+                        [constants.PERMISSIONS_CONTACT.contactAll, PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsAll],
+                        [constants.PERMISSIONS_CONTACT.contactAll, PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsCreate],
+                        [constants.PERMISSIONS_CONTACT.contactCreateContactOfContact, PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsAll],
+                        [constants.PERMISSIONS_CONTACT.contactCreateContactOfContact, PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsCreate]
+                    ],
                     [
                         [constants.PERMISSIONS_RELATIONSHIP.relationshipAll, constants.PERMISSIONS_CONTACT.contactAll],
                         [constants.PERMISSIONS_RELATIONSHIP.relationshipAll, constants.PERMISSIONS_CONTACT.contactCreateRelationshipExposures],
