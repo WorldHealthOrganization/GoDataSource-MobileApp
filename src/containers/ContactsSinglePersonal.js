@@ -4,7 +4,7 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
-import {Alert, InteractionManager, ScrollView, StyleSheet, Text, View} from 'react-native';
+import {InteractionManager, ScrollView, StyleSheet, Text, View} from 'react-native';
 import {calculateDimension, createDate, extractIdFromPouchId, getTranslation} from './../utils/functions';
 import config from './../utils/config';
 import {connect} from "react-redux";
@@ -19,7 +19,7 @@ import lodashGet from "lodash/get";
 import {checkArray, checkArrayAndLength} from "../utils/typeCheckingFunctions";
 import TopContainerButtons from "./../components/TopContainerButtons";
 import PermissionComponent from './../components/PermissionComponent';
-import constants, {PERMISSIONS_CONTACT_OF_CONTACT} from "./../utils/constants";
+import constants, {PERMISSIONS_CONTACT_OF_CONTACT, PERMISSION_CREATE_CONTACT, PERMISSION_CREATE_CONTACT_OF_CONTACT, PERMISSION_EDIT_CONTACT, PERMISSION_EDIT_CONTACT_OF_CONTACT} from "./../utils/constants";
 import {getTeamsForUserRequest} from './../queries/user';
 
 class ContactsSinglePersonal extends Component {
@@ -64,29 +64,11 @@ class ContactsSinglePersonal extends Component {
             )
         }
 
-        let permissionsList = [
-            this.props.type === translations.personTypes.contactsOfContacts ? PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsAll : constants.PERMISSIONS_CONTACT.contactAll
-        ];
+        let permissionsList = [];
         if (this.props.isNew) {
-            if(this.props.type === translations.personTypes.contactsOfContacts) {
-                permissionsList.push(
-                    PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsCreate
-                )
-            } else {
-                permissionsList.push(
-                    constants.PERMISSIONS_CONTACT.contactCreate
-                )
-            }
+            permissionsList = this.props.type === translations.personTypes.contactsOfContacts ? PERMISSION_CREATE_CONTACT_OF_CONTACT : PERMISSION_CREATE_CONTACT;
         } else {
-            if(this.props.type === translations.personTypes.contactsOfContacts) {
-                permissionsList.push(
-                    PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsModify
-                )
-            } else {
-                permissionsList.push(
-                    constants.PERMISSIONS_CONTACT.contactModify
-                )
-            }
+            permissionsList = this.props.type === translations.personTypes.contactsOfContacts ? PERMISSION_EDIT_CONTACT_OF_CONTACT : PERMISSION_EDIT_CONTACT;
         }
 
         return (

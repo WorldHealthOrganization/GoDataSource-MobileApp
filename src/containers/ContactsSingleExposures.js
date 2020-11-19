@@ -23,6 +23,11 @@ import TopContainerButtons from "./../components/TopContainerButtons";
 import PermissionComponent from './../components/PermissionComponent';
 import constants, {PERMISSIONS_CONTACT_OF_CONTACT} from './../utils/constants';
 import config from './../utils/config';
+import {
+    PERMISSION_CREATE_CONTACT,
+    PERMISSION_CREATE_CONTACT_OF_CONTACT,
+    PERMISSION_EDIT_CONTACT, PERMISSION_EDIT_CONTACT_OF_CONTACT
+} from "../utils/constants";
 
 const AnimatedFlatList = Animated.createAnimatedComponent(FlatList);
 
@@ -64,29 +69,11 @@ class ContactsSingleExposures extends Component {
             )
         }
 
-        let permissionsList = [
-            this.props.type === translations.personTypes.contactsOfContacts ? PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsAll : constants.PERMISSIONS_CONTACT.contactAll
-        ];
+        let permissionsList = [];
         if (this.props.isNew) {
-            if(this.props.type === translations.personTypes.contactsOfContacts) {
-                permissionsList.push(
-                    PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsCreate
-                )
-            } else {
-                permissionsList.push(
-                    constants.PERMISSIONS_CONTACT.contactCreate
-                )
-            }
+            permissionsList = this.props.type === translations.personTypes.contactsOfContacts ? PERMISSION_CREATE_CONTACT_OF_CONTACT : PERMISSION_CREATE_CONTACT;
         } else {
-            if(this.props.type === translations.personTypes.contactsOfContacts) {
-                permissionsList.push(
-                    PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsModify
-                )
-            } else {
-                permissionsList.push(
-                    constants.PERMISSIONS_CONTACT.contactModify
-                )
-            }
+            permissionsList = this.props.type === translations.personTypes.contactsOfContacts ? PERMISSION_EDIT_CONTACT_OF_CONTACT : PERMISSION_EDIT_CONTACT;
         }
 
         return (

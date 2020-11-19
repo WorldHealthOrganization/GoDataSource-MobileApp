@@ -138,6 +138,30 @@ const PERMISSIONS_TEAMS = {
     teamList: 'team_list'
 };
 
+export const PERMISSION_CREATE_CONTACT = [
+    [PERMISSIONS_CONTACT.contactAll, PERMISSIONS_CASE.caseAll],
+    [PERMISSIONS_CONTACT.contactAll, PERMISSIONS_CASE.caseCreateContact],
+    [PERMISSIONS_CONTACT.contactCreate, PERMISSIONS_CASE.caseAll],
+    [PERMISSIONS_CONTACT.contactCreate, PERMISSIONS_CASE.caseCreateContact]
+];
+
+export const PERMISSION_EDIT_CONTACT = [
+    PERMISSIONS_CONTACT.contactAll,
+    PERMISSIONS_CONTACT.contactModify
+];
+
+export const PERMISSION_CREATE_CONTACT_OF_CONTACT = [
+    [PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsAll, PERMISSIONS_CONTACT.contactAll],
+    [PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsAll, PERMISSIONS_CONTACT.contactCreateContactOfContact],
+    [PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsCreate, PERMISSIONS_CONTACT.contactAll],
+    [PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsCreate, PERMISSIONS_CONTACT.contactCreateContactOfContact],
+];
+
+export const PERMISSION_EDIT_CONTACT_OF_CONTACT = [
+    PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsAll,
+    PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsModify
+];
+
 export default {
     appScreens,
     NUMBER_OF_RETRIES,

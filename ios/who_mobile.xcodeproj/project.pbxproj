@@ -2238,7 +2238,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 1.0.99;
+				CURRENT_PROJECT_VERSION = 1.0.100;
 				DEAD_CODE_STRIPPING = NO;
 				DEVELOPMENT_TEAM = YJDF2LWD3T;
 				HEADER_SEARCH_PATHS = (
@@ -2279,7 +2279,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 1.0.99;
+				CURRENT_PROJECT_VERSION = 1.0.100;
 				DEVELOPMENT_TEAM = YJDF2LWD3T;
 				HEADER_SEARCH_PATHS = (
 					"$(SRCROOT)/../node_modules/react-native/React",

@@ -16,6 +16,12 @@ import TopContainerButtons from "./../components/TopContainerButtons";
 import PermissionComponent from './../components/PermissionComponent';
 import constants from "./../utils/constants";
 import config from "./../utils/config";
+import {
+    PERMISSION_CREATE_CONTACT,
+    PERMISSION_CREATE_CONTACT_OF_CONTACT,
+    PERMISSION_EDIT_CONTACT, PERMISSION_EDIT_CONTACT_OF_CONTACT
+} from "../utils/constants";
+import translations from "../utils/translations";
 
 class ContactsSingleCalendar extends Component {
 
@@ -58,17 +64,11 @@ class ContactsSingleCalendar extends Component {
         let followUps = this.computeFollowUps();
         // console.log("### ContactsSingleCalendar: ", followUps);
 
-        let permissionsList = [
-            constants.PERMISSIONS_CONTACT.contactAll
-        ];
+        let permissionsList = [];
         if (this.props.isNew) {
-            permissionsList.push(
-                constants.PERMISSIONS_CONTACT.contactCreate
-            )
+            permissionsList = this.props.type === translations.personTypes.contactsOfContacts ? PERMISSION_CREATE_CONTACT_OF_CONTACT : PERMISSION_CREATE_CONTACT;
         } else {
-            permissionsList.push(
-                constants.PERMISSIONS_CONTACT.contactModify
-            )
+            permissionsList = this.props.type === translations.personTypes.contactsOfContacts ? PERMISSION_EDIT_CONTACT_OF_CONTACT : PERMISSION_EDIT_CONTACT;
         }
 
         return (

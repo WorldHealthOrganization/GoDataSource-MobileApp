@@ -18,6 +18,11 @@ import ElevatedView from 'react-native-elevated-view';
 import _ from 'lodash';
 import TopContainerButtons from "./../components/TopContainerButtons";
 import PermissionComponent from './../components/PermissionComponent';
+import {
+    PERMISSION_CREATE_CONTACT,
+    PERMISSION_CREATE_CONTACT_OF_CONTACT,
+    PERMISSION_EDIT_CONTACT, PERMISSION_EDIT_CONTACT_OF_CONTACT
+} from "../utils/constants";
 
 class ContactsSingleAddress extends Component {
 
@@ -56,35 +61,11 @@ class ContactsSingleAddress extends Component {
             )
         }
 
-        let permissionsList = [
-           // this.props.type === translations.personTypes.contactsOfContacts ? PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsAll : constants.PERMISSIONS_CONTACT.contactAll
-        ];
+        let permissionsList = [];
         if (this.props.isNew) {
-            if(this.props.type === translations.personTypes.contactsOfContacts) {
-                permissionsList = permissionsList.concat([
-                    [constants.PERMISSIONS_CONTACT.contactAll, PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsCreate],
-                    [constants.PERMISSIONS_CONTACT.contactAll, PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsCreate],
-                    [constants.PERMISSIONS_CONTACT.contactAll, PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsCreate],
-                    [constants.PERMISSIONS_CONTACT.contactAll, PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsCreate]
-                ])
-            } else {
-                permissionsList = permissionsList.concat([
-                    constants.PERMISSIONS_CONTACT.contactAll,
-                    constants.PERMISSIONS_CONTACT.contactCreate
-                ])
-            }
+            permissionsList = this.props.type === translations.personTypes.contactsOfContacts ? PERMISSION_CREATE_CONTACT_OF_CONTACT : PERMISSION_CREATE_CONTACT;
         } else {
-            if(this.props.type === translations.personTypes.contactsOfContacts) {
-                permissionsList = permissionsList.concat([
-                    PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsAll,
-                    PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsModify
-                ])
-            } else {
-                permissionsList = permissionsList.concat([
-                    constants.PERMISSIONS_CONTACT.contactAll,
-                    constants.PERMISSIONS_CONTACT.contactModify
-                ])
-            }
+            permissionsList = this.props.type === translations.personTypes.contactsOfContacts ? PERMISSION_EDIT_CONTACT_OF_CONTACT : PERMISSION_EDIT_CONTACT;
         }
 
         return (

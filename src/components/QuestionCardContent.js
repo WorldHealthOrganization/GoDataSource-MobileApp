@@ -77,8 +77,7 @@ class QuestionCardContent extends PureComponent {
                                         minHeight: calculateDimension(60, true, this.props.screenSize),
                                         justifyContent: 'center',
                                         alignItems: 'center',
-                                        width: 25,
-                                        backgroundColor: 'red'
+                                        width: 25
                                     }}>
                                         <Ripple onPress={() => { this.handleDeletePrevAnswer(0)}}>
                                             <Icon name="delete"/>
