@@ -1,0 +1,51 @@
+PODS:
+  - Bolts/Tasks (1.9.0)
+  - Parse (1.17.3):
+    - Parse/Core (= 1.17.3)
+  - Parse/Core (1.17.3):
+    - Bolts/Tasks (~> 1.9)
+  - React (0.59.10):
+    - React/Core (= 0.59.10)
+  - React/Core (0.59.10):
+    - yoga (= 0.59.10.React)
+  - RNBcrypt (1.0.0):
+    - React
+  - SQLCipher (4.3.0):
+    - SQLCipher/standard (= 4.3.0)
+  - SQLCipher/common (4.3.0)
+  - SQLCipher/standard (4.3.0):
+    - SQLCipher/common
+  - yoga (0.59.10.React)
+
+DEPENDENCIES:
+  - Parse
+  - React (from `../node_modules/react-native`)
+  - RNBcrypt (from `../node_modules/react-native-bcrypt`)
+  - SQLCipher
+  - yoga (from `../node_modules/react-native/ReactCommon/yoga`)
+
+SPEC REPOS:
+  https://github.com/CocoaPods/Specs.git:
+    - Bolts
+    - Parse
+    - SQLCipher
+
+EXTERNAL SOURCES:
+  React:
+    :path: "../node_modules/react-native"
+  RNBcrypt:
+    :path: "../node_modules/react-native-bcrypt"
+  yoga:
+    :path: "../node_modules/react-native/ReactCommon/yoga"
+
+SPEC CHECKSUMS:
+  Bolts: ac6567323eac61e203f6a9763667d0f711be34c8
+  Parse: c1ad2a04d2cab2b54b6fb7da05f741abf2cf57d1
+  React: 36d0768f9e93be2473b37e7fa64f92c1d5341eef
+  RNBcrypt: 21320bf1df4fe7321b02ceee6e651d89329d9778
+  SQLCipher: d305a7bd9af4b64f095c79bdc1a1fa50f2a15116
+  yoga: 684513b14b03201579ba3cee20218c9d1298b0cc
+
+PODFILE CHECKSUM: 4825e5045497e4f289998455f534e0c71a51a4b3
+
+COCOAPODS: 1.8.4
