@@ -22,6 +22,7 @@ import isEqual from 'lodash/isEqual';
 import get from 'lodash/get';
 import constants from './../utils/constants';
 import translations from "../utils/translations";
+import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
 
 class PersonListItem extends Component {
     constructor(props) {
@@ -94,6 +95,7 @@ class PersonListItem extends Component {
             status: null,
             institutionName: '',
             telephoneNumbers: '',
+            emails: ''
         };
         // the new implementation
         let person = get(itemToRender, 'mainData', null);
@@ -123,6 +125,10 @@ class PersonListItem extends Component {
             if (personPlaceOfResidence) {
                 returnValues.addressString = getAddress(personPlaceOfResidence, true, this.props.locations);
             }
+        }
+        // Emails
+        if (checkArrayAndLength(person?.addresses)) {
+            returnValues.emails = person?.addresses.filter((e) => e.emailAddress).map((e) => e?.emailAddress).join(', ')
         }
         // Visual Id
         if (person && person.visualId) {

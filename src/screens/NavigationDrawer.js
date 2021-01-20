@@ -4,7 +4,7 @@
 import React, {Component} from 'react';
 import {Platform, ScrollView, StyleSheet, Text, View, Linking} from 'react-native';
 import NavigationDrawerListItem from './../components/NavigationDrawerListItem';
-import config from './../utils/config';
+import config, {sideMenuKeys} from './../utils/config';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import {logoutUser, updateUser} from './../actions/user';
@@ -38,8 +38,8 @@ class NavigationDrawer extends Component {
 
     // Please add here the react lifecycle methods that you need
     componentDidUpdate(prevProps) {
-        let thisPropsSelectedScreen = lodashGet(this.props, 'selectedScreen', 0);
-        if (isNumber(thisPropsSelectedScreen) && thisPropsSelectedScreen >= 0 && prevProps.selectedScreen !== this.props.selectedScreen) {
+        let thisPropsSelectedScreen = lodashGet(this.props, 'selectedScreen', sideMenuKeys[0]);
+        if (prevProps.selectedScreen !== this.props.selectedScreen) {
             this.setState({
                 selectedScreen: this.props.selectedScreen
             })
@@ -83,22 +83,22 @@ class NavigationDrawer extends Component {
 
                 <ScrollView scrollEnabled={true} style={{flex: 0.9}} contentContainerStyle={{flexGrow: 1}}>
                     {
-                        config.sideMenuItems.map((item, index) => {
+                        Object.keys(config.sideMenuItems).map((item, index) => {
                             let addButton = false;
 
-                            if (item.key === 'cases') {
+                            if (item === sideMenuKeys[3]) {
                                 addButton = true;
                             }
 
                             return (
                                 <NavigationDrawerListItem
                                     key={index}
-                                    itemKey={item.key}
-                                    label={getTranslation(item.label, this.props.translation)}
-                                    name={item.name}
-                                    onPress={() => this.handlePressOnListItem(index)}
-                                    handleOnPressAdd={() => this.handleOnPressAdd(item.key, index)}
-                                    isSelected={index === this.state.selectedScreen}
+                                    itemKey={item}
+                                    label={getTranslation(config.sideMenuItems[item].label, this.props.translation)}
+                                    name={config.sideMenuItems[item].name}
+                                    onPress={() => this.handlePressOnListItem(item)}
+                                    handleOnPressAdd={() => this.handleOnPressAdd(item, index)}
+                                    isSelected={item === this.state.selectedScreen}
                                     addButton={addButton}
                                 />
                             )
@@ -138,19 +138,19 @@ class NavigationDrawer extends Component {
                     <NavigationDrawerListItem
                         label={getTranslation(translations.navigationDrawer.usersLabel, this.props.translation)}
                         name={'contact-phone'}
-                        key={4}
-                        onPress={() => this.handlePressOnListItem(4)}
-                        isSelected={4 === this.state.selectedScreen}
+                        key={sideMenuKeys[4]}
+                        onPress={() => this.handlePressOnListItem(sideMenuKeys[4])}
+                        isSelected={sideMenuKeys[4] === this.state.selectedScreen}
                         addButton={false}
-                        itemKey={'users'}
+                        itemKey={sideMenuKeys[4]}
                     />
 
                     <NavigationDrawerListItem
-                        key={'help'}
+                        key={sideMenuKeys[5]}
                         label={getTranslation(translations.navigationDrawer.helpLabel, this.props.translation)}
-                        name="help"
-                        onPress={() => this.handlePressOnListItem('help')}
-                        isSelected={'help' === this.state.selectedScreen}
+                        name={sideMenuKeys[5]}
+                        onPress={() => this.handlePressOnListItem(sideMenuKeys[5])}
+                        isSelected={sideMenuKeys[5] === this.state.selectedScreen}
                     />
                     <NavigationDrawerListItem
                         key={'community'}
@@ -199,9 +199,9 @@ class NavigationDrawer extends Component {
 
     handleOnPressAdd = (key, index) => {
         console.log('handleOnPressAdd', key, index);
-        this.props.saveSelectedScreen(index);
+        this.props.saveSelectedScreen(key);
         this.setState({
-            selectedScreen: index
+            selectedScreen: key
         }, () => {
             this.props.navigator.toggleDrawer({
                 side: 'left',
@@ -211,12 +211,12 @@ class NavigationDrawer extends Component {
             switch(key) {
                 case 'contacts':
                     this.props.navigator.handleDeepLink({
-                        link: 'Navigate/' + index + '-add'
+                        link: 'Navigate/' + key + '-add'
                     });
                     break;
                 case 'cases':
                     this.props.navigator.handleDeepLink({
-                        link: 'Navigate/' + index + '-add'
+                        link: 'Navigate/' + key + '-add'
                     });
                     break;
                 default:
@@ -251,7 +251,7 @@ class NavigationDrawer extends Component {
     handleOnChangeLanguage = (value, label) => {
         let user = Object.assign({}, this.props.user);
         user.languageId = value;
-        this.props.getTranslationsAsync(value);
+        this.props.getTranslationsAsync(value, user?.activeOutbreakId);
 
         user = updateRequiredFields(user.activeOutbreakId, user._id, user, 'update');
 

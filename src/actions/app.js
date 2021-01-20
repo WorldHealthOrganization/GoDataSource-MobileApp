@@ -131,9 +131,9 @@ export function removeFilterForScreen(screenName) {
     }
 }
 
-export function getTranslations(language) {
+export function getTranslations(language, outbreakId) {
     return new Promise((resolve, reject) => {
-        getTranslationRequest(language, (error, response) => {
+        getTranslationRequest(language, outbreakId, (error, response) => {
             if (error) {
                 console.log("*** getTranslations error: ", error);
                 reject(errorTypes.ERROR_OUTBREAK);
@@ -146,10 +146,10 @@ export function getTranslations(language) {
     })
 }
 
-export function getTranslationsAsync(language) {
+export function getTranslationsAsync(language, outbreakId) {
     return async function (dispatch) {
     // return new Promise((resolve, reject) => {
-        getTranslationRequest(language, (error, response) => {
+        getTranslationRequest(language, outbreakId, (error, response) => {
             if (error) {
                 console.log("*** getTranslations error: ", error);
             }
@@ -283,14 +283,6 @@ async function processFilesForSyncNew(error, response, hubConfiguration, isFirst
                             console.log('An error occurred while creating tables: ', errorInitTables);
                         }
 
-                        // Add indexes
-                        // Create tables first
-                        try {
-                            let createIndexesResults = await initIndexes();
-                        } catch(errorInitTables) {
-                            console.log('An error occurred while creating tables: ', errorInitTables);
-                        }
-
                         // Do the sql processing
                         if (checkArrayAndLength(sqlFiles)) {
                             for(let i=0; i<sqlFiles.length; i++) {
@@ -314,9 +306,17 @@ async function processFilesForSyncNew(error, response, hubConfiguration, isFirst
                             }
                         }
 
+                        // Add indexes
+                        // Create tables first
+                        try {
+                            let createIndexesResults = await initIndexes();
+                        } catch(errorInitTables) {
+                            console.log('An error occurred while creating tables: ', errorInitTables);
+                        }
+
                         if (promiseResponses.length === files.length) {
                             saveActiveDatabaseAndCleanup(syncSuccessful, hubConfiguration, hubConfig, files.length === promiseResponses.length, languagePacks)
-                                .then((success) => {
+                                .then(() => {
                                     console.log('Responses promises: ', promiseResponses);
                                     files = null;
                                     database = null;

@@ -3,6 +3,8 @@ import {executeQuery} from './helperMethods';
 import lodashGet from 'lodash/get';
 import lodashSet from 'lodash/set';
 import {checkArrayAndLength} from "../../utils/typeCheckingFunctions";
+var jsonSql = require('json-sql')();
+jsonSql.configure({separatedValues: false});
 
 export function getPersonWithRelationsForOutbreakId({outbreakId, filter, search, lastElement, offset, personType}, computeCount) {
 
@@ -109,19 +111,23 @@ function createGeneralQuery ({outbreakId, innerFilter, search, lastElement, offs
         ]
     };
 
-    if (search) {
+    // TODO handle email
+    let shouldSearchEmail = false;
+    if (search && search.text) {
+        shouldSearchEmail = true;
         mainCondition['$or'] = [
             {[`${innerQueryAlias}.firstName`]: {'$like': `%${search.text}%`}},
             {[`${innerQueryAlias}.lastName`]: {'$like': `%${search.text}%`}},
             {[`${innerQueryAlias}.visualId`]: {'$like': `%${search.text}%`}},
-            {[`${innerQueryAlias}.locationId`]: {'$in': search.locations}}
+            {[`${innerQueryAlias}.locationId`]: {'$in': search.locations}},
+            {$expression: `json_extract(json_each.value, '$.emailAddress') like '%${search.text}%'`}
         ];
 
         if (type !== translations.personTypes.cases) {
             mainCondition['$or'] = mainCondition['$or'].concat([
                 {[`${filteredExposuresAlias}.firstName`]: {'$like': `%${search.text}%`}},
                 {[`${filteredExposuresAlias}.lastName`]: {'$like': `%${search.text}%`}},
-                {[`${filteredExposuresAlias}.visualId`]: {'$like': `%${search.text}%`}}
+                {[`${filteredExposuresAlias}.visualId`]: {'$like': `%${search.text}%`}},
             ])
         }
     }
@@ -184,17 +190,57 @@ function createGeneralQuery ({outbreakId, innerFilter, search, lastElement, offs
     let sourceType = type === translations.personTypes.contacts || type === translations.personTypes.contactsOfContacts ? 'sourceType' : 'targetType';
     let target = type === translations.personTypes.contacts || type === translations.personTypes.contactsOfContacts ? 'targetId' : 'sourceId';
     let targetType = type === translations.personTypes.contacts || type === translations.personTypes.contactsOfContacts ? 'targetType' : 'sourceType';
+
+    let relationshipJoin = {
+        type: 'left',
+        alias: relationshipAlias,
+        on: {[`${innerQueryAlias}._id`]: `${relationshipAlias}.${target}`}
+    };
+    let relationshipJoinForCases = {
+        table: 'relationship'
+    };
+    let relationshipsJoinForContacts = {
+        query: {
+            type: 'select',
+            table: 'relationship',
+            alias: relationshipAlias,
+            fields: [
+                {
+                    table: relationshipAlias,
+                    name: 'sourceId',
+                    alias: 'sourceId'
+                },
+                {
+                    table: relationshipAlias,
+                    name: 'targetId',
+                    alias: 'targetId'
+                },
+                {
+                    table: relationshipAlias,
+                    name: 'sourceType',
+                    alias: 'sourceType'
+                },
+                {
+                    table: relationshipAlias,
+                    name: 'targetType',
+                    alias: 'targetType'
+                }
+            ],
+            // group: `${relationshipAlias}.${target}`
+        }
+    };
+    if (type === translations.personTypes.contacts) {
+        relationshipJoin = Object.assign({}, relationshipJoin, relationshipsJoinForContacts);
+    } else {
+        relationshipJoin = Object.assign({}, relationshipJoin, relationshipJoinForCases);
+    }
+
     let mainQuery = {
         type: 'select',
         query: innerQuery,
         alias: innerQueryAlias,
         join: [
-            {
-                type: 'left',
-                table: 'relationship',
-                alias: relationshipAlias,
-                on: {[`${innerQueryAlias}._id`]: `${relationshipAlias}.${target}`}
-            },
+            relationshipJoin,
             {
                 type: 'left',
                 table: 'person',
@@ -212,6 +258,15 @@ function createGeneralQuery ({outbreakId, innerFilter, search, lastElement, offs
         ],
         condition: mainCondition
     };
+
+    // TODO handle email
+    if (shouldSearchEmail) {
+        delete mainQuery.query;
+        delete mainQuery.alias;
+        mainQuery.expression = {
+            pattern: `(${jsonSql.build(innerQuery).query.slice(0, -1)}) as ${innerQueryAlias}, json_each(${innerQueryAlias}.json, '$.addresses')`
+        }
+    }
 
     if (type === translations.personTypes.contactsOfContacts) {
         lodashSet(mainQuery, `join[1].on['${relationshipAlias}.${sourceType}']`, translations.personTypes.contacts);
@@ -263,7 +318,7 @@ function createGeneralQuery ({outbreakId, innerFilter, search, lastElement, offs
             }
         ];
         mainQuery.sort = sort;
-        mainQuery.group = `${innerQueryAlias}._id`
+        mainQuery.group = checkArrayAndLength(lodashGet(innerFilter, 'sort', null)) ? `${innerQueryAlias}._id` : [`${innerQueryAlias}.lastName`, `${innerQueryAlias}.firstName`, `${innerQueryAlias}._id`];
     }
 
     return mainQuery;

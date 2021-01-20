@@ -28,6 +28,9 @@ import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
 import {Popup} from 'react-native-map-link';
 import PermissionComponent from './../components/PermissionComponent';
 import {handleQRSearchTransition} from "../utils/screenTransitionFunctions";
+import withPincode from "../components/higherOrderComponents/withPincode";
+import {getContactsForOutbreakId} from "../actions/contacts";
+import {compose} from "redux";
 
 class CasesScreen extends Component {
 
@@ -369,4 +372,9 @@ function matchDispatchProps(dispatch) {
     }, dispatch);
 }
 
-export default connect(mapStateToProps, matchDispatchProps)(enhanceListWithGetData(getCasesForOutbreakId, 'CasesScreen')(CasesScreen));
+// export default connect(mapStateToProps, matchDispatchProps)(enhanceListWithGetData(getCasesForOutbreakId, 'CasesScreen')(CasesScreen));
+export default compose(
+    withPincode(),
+    connect(mapStateToProps, matchDispatchProps),
+    enhanceListWithGetData(getCasesForOutbreakId, 'CasesScreen')
+)(CasesScreen)

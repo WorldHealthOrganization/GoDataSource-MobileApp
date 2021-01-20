@@ -26,7 +26,7 @@ class FollowUpsSingleContainer extends Component {
 
     // Please add here the react lifecycle methods that you need
     shouldComponentUpdate(nextProps, nextState) {
-        if (nextProps.activeIndex === 0) {
+        if (nextProps.routeKey === 'genInfo') {
             return true;
         }
         return false;

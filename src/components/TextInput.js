@@ -94,18 +94,21 @@ class TextInput extends Component {
         let localValue = this.extractAgeForViewInput();
         let tooltip = getTooltip(this.props.label, this.props.translation);
         return (
-            <View style={[{flexDirection: 'row'},this.props.style]}>
+            <View style={[{flexDirection: 'row', marginTop: 7},this.props.style]}>
                 <View style={{flex: 1}}>
-                    <Text style={{
-                        fontFamily: 'Roboto-Regular',
-                        fontSize: 15,
-                        textAlign: 'left',
-                        color: 'rgb(0,0,0)',
-                        marginBottom: 2,
-                        marginTop: 7,
-                    }}>
-                        {getTranslation(this.props.label, this.props.translation)}
-                    </Text>
+                    {
+                        this.props.skipLabel ? (null) : (
+                            <Text style={{
+                                fontFamily: 'Roboto-Regular',
+                                fontSize: 15,
+                                textAlign: 'left',
+                                color: 'rgb(0,0,0)',
+                                marginBottom: 2,
+                            }}>
+                                {getTranslation(this.props.label, this.props.translation)}
+                            </Text>
+                        )
+                    }
                     <Text style={{
                         fontFamily: 'Roboto-Light',
                         fontSize: 15,
@@ -179,7 +182,8 @@ TextInput.propTypes = {
     isRequired: PropTypes.bool.isRequired,
     onChange: PropTypes.func.isRequired,
     style: PropTypes.object,
-    multiline: PropTypes.bool
+    multiline: PropTypes.bool,
+    skipLabel: PropTypes.bool
 };
 
 export default TextInput;

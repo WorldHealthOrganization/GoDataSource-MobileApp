@@ -2,7 +2,7 @@
  * Created by florinpopa on 14/06/2018.
  */
 import errorTypes from './errorTypes';
-import config from './config';
+import config, {sideMenuKeys} from './config';
 import RNFetchBlobFS from 'rn-fetch-blob/fs';
 import {unzip, zip} from 'react-native-zip-archive';
 import {processBulkDocs, updateFileInDatabase} from './../queries/database';
@@ -135,38 +135,38 @@ export function navigation(event, navigator) {
                 let screenToSwitchTo = null;
                 let addScreen = null;
                 switch(linkComponents[1]) {
-                    case '0':
-                        screenToSwitchTo = 'FollowUpsScreen';
+                    case sideMenuKeys[0]:
+                        screenToSwitchTo = constants.appScreens.followUpScreen;
                         break;
-                    case '1':
-                        screenToSwitchTo = "ContactsScreen";
+                    case sideMenuKeys[1]:
+                        screenToSwitchTo = constants.appScreens.contactsScreen;
                         break;
-                    case '1-add':
-                        screenToSwitchTo = "ContactsScreen";
-                        addScreen = "ContactsSingleScreen";
+                    case `${sideMenuKeys[1]}-add`:
+                        screenToSwitchTo = constants.appScreens.contactsScreen;
+                        addScreen = constants.appScreens.contactSingleScreen;
                         break;
-                    case '2':
+                    case sideMenuKeys[2]:
                         screenToSwitchTo = constants.appScreens.contactsOfContactsScreen;
                         break;
-                    case '2-add':
+                    case `${sideMenuKeys[2]}-add`:
                         screenToSwitchTo = constants.appScreens.contactsOfContactsSingleScreen;
                         addScreen = constants.appScreens.contactsOfContactsSingleScreen;
                         break;
-                    case '3':
-                        screenToSwitchTo = "CasesScreen";
+                    case sideMenuKeys[3]:
+                        screenToSwitchTo = constants.appScreens.casesScreen;
                         break;
-                    case '3-add':
-                        screenToSwitchTo = "CaseSingleScreen";
-                        addScreen = "CaseSingleScreen";
+                    case `${sideMenuKeys[3]}-add`:
+                        screenToSwitchTo = constants.appScreens.caseSingleScreen;
+                        addScreen = constants.appScreens.caseSingleScreen;
                         break;
-                    case 'help':
-                        screenToSwitchTo = "HelpScreen";
-                    break;
-                    case '4':
-                        screenToSwitchTo = "UsersScreen";
+                    case sideMenuKeys[4]:
+                        screenToSwitchTo = constants.appScreens.usersScreen;
+                        break;
+                    case sideMenuKeys[5]:
+                        screenToSwitchTo = constants.appScreens.helpScreen;
                     break;
                     default:
-                        screenToSwitchTo = "FollowUpsScreen";
+                        screenToSwitchTo = constants.appScreens.followUpScreen;
                         break;
                 }
 

@@ -4,6 +4,11 @@ target 'who_mobile' do
   pod 'Parse'
 
   # Add new pods below this line
+
+  pod 'RNKeychain', :path => '../node_modules/react-native-keychain'
+
+  pod 'TouchID', :path => '../node_modules/react-native-touch-id'
+
   #pod 'ReactNativeDarkMode', :path => '../node_modules/react-native-dark-mode'
 
   #pod 'RNDateTimePicker', :path => '../node_modules/@react-native-community/datetimepicker'

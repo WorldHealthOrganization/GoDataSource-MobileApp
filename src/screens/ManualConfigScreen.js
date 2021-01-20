@@ -393,6 +393,7 @@ class ManualConfigScreen extends PureComponent {
                         isVisible={this.state.showLanguagesModal}
                         onBackdropPress={this.hideModal}
                         key={'languageSelect'}
+                        animationOutTiming={150}
                     >
                             <ElevatedView elevation={4} style={{
                                 backgroundColor: 'white',

@@ -38,13 +38,14 @@ class DropDownSectioned extends Component {
     editInput() {
         let tooltip = getTooltip(this.props.label, this.props.translation);
         return (
-            <View style={[this.props.style, {flexDirection: 'row'}]}>
+            <View style={[this.props.style, {flexDirection: 'row', height: 62, marginBottom: 4, alignItems: 'flex-end'}]}>
                 <View style = {{flex: 1}}>
                     <Text style={{
-                        fontFamily: 'Roboto',
-                        fontSize: 15,
+                        fontFamily: 'Roboto-Regular',
+                        fontSize: 16,
                         textAlign: 'left',
-                        color: 'rgba(0,0,0,0.38)'
+                        color: 'rgba(0,0,0,0.38)',
+                        paddingVertical: 5
                     }}>
                         {this.props.isRequired ? getTranslation(this.props.label, this.props.translation) + ' * ' : getTranslation(this.props.label, this.props.translation)}
                     </Text>

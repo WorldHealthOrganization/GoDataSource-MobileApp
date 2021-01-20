@@ -102,7 +102,7 @@ class FollowUpsSingleAddressContainer extends PureComponent {
         }
         return (
             <CardComponent
-                item={item}
+                item={Object.assign(item, {isEditMode: false})}
                 isEditMode={false}
                 isEditModeForDropDownInput={false}
                 value={value}

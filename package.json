@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "start": "node node_modules/react-native/local-cli/cli.js start",
-    "test": "jest"
+    "test": "jest",
+    "postinstall": "patch-package"
   },
   "rnpm": {
     "assets": [
@@ -12,6 +13,7 @@
     ]
   },
   "dependencies": {
+    "@haskkor/react-native-pincode": "^1.22.4",
     "@ptomasroos/react-native-multi-slider": "^1.0.0",
     "@react-native-community/async-storage": "^1.2.2",
     "@react-native-community/datetimepicker": "^2.3.1",
@@ -53,7 +55,7 @@
     "react-native-fs": "^2.11.18",
     "react-native-keyboard-aware-scroll-view": "^0.8.0",
     "react-native-keyboard-manager": "^4.0.13-12",
-    "react-native-keychain": "^3.0.0",
+    "react-native-keychain": "^6.1.1",
     "react-native-level-fs": "^3.0.1",
     "react-native-map-link": "^2.4.0",
     "react-native-material-buttons": "^0.5.0",
@@ -80,6 +82,7 @@
     "react-native-switch-selector": "^1.1.8",
     "react-native-tab-view": "1.3.4",
     "react-native-tcp": "^3.3.0",
+    "react-native-touch-id": "^4.4.1",
     "react-native-udp": "^2.3.1",
     "react-native-ui-lib": "3.3.263",
     "react-native-uuid": "^1.4.9",
@@ -119,7 +122,8 @@
     "eslint-plugin-react": "^7.7.0",
     "eslint-plugin-react-native": "^3.2.1",
     "jest": "23.1.0",
-    "metro-react-native-babel-preset": "^0.54.1",
+    "metro-react-native-babel-preset": "^0.59.0",
+    "patch-package": "^6.2.2",
     "react-test-renderer": "16.3.1",
     "redux-devtools-extension": "^2.13.2",
     "remote-redux-devtools": "^0.5.12",

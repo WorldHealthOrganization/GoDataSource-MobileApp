@@ -6,8 +6,11 @@ import {extractLocationId} from './../../utils/functions';
 import {checkArray, checkArrayAndLength} from './../../utils/typeCheckingFunctions';
 import translations from "../../utils/translations";
 import {generalMapping} from "../../actions/followUps";
+import appConfig from './../../../app.config';
 
 var jsonSql = require('json-sql')();
+var jsonSqlPrime = require('json-sql')();
+jsonSqlPrime.configure({separatedValues: false});
 jsonSql.setDialect('sqlite');
 
 export function openDatabase(databaseName) {
@@ -64,7 +67,9 @@ export function wrapReadTransactionInPromise (database) {
 }
 
 export function wrapExecuteSQLInPromise (transaction, sqlStatement, arrayOfFields, skipCallback) {
-    // console.log('Execute query: ', sqlStatement, arrayOfFields);
+    if (appConfig.env === 'development') {
+        console.log('Execute query: ', sqlStatement, arrayOfFields);
+    }
     if (transaction && sqlStatement && checkArray(arrayOfFields)) {
         return new Promise((resolve, reject) => {
             if (skipCallback) {
@@ -174,23 +179,33 @@ export function insertOrUpdate(databaseName, tableName, data, createTableBool) {
                                 if (i < mappedData.length - 1) {
                                     txn.executeSql(insertOrUpdateString, mappedData[i]);
                                 } else {
-                                    txn.executeSql(insertOrUpdateString, mappedData[mappedData.length - 1],
-                                        (success) => {
-                                            insertEnd = new Date().getTime();
-                                            insertTime = insertEnd - openCreateEnd;
-                                            console.log('time for insert: ', tableName, insertTime);
-                                            console.log('Transactional insert took: ', new Date().getTime() - start);
-                                            txn = null;
-                                            // database = null;
-                                            return Promise.resolve(success);
-                                        },
-                                        (error) => {
-                                            return Promise.reject(error);
-                                        })
+                                    txn.executeSql(insertOrUpdateString, mappedData[mappedData.length - 1])//,
+                                        // (success) => {
+                                        //     insertEnd = new Date().getTime();
+                                        //     insertTime = insertEnd - openCreateEnd;
+                                        //     console.log('time for insert: ', tableName, insertTime);
+                                        //     console.log('Transactional insert took: ', new Date().getTime() - start);
+                                        //     txn = null;
+                                        //     // database = null;
+                                        //     return Promise.resolve(success);
+                                        // },
+                                        // (error) => {
+                                        //     return Promise.reject(error);
+                                        // })
                                 }
                                 i++
                             }
-                        })
+                        },
+                            (errorTransaction) => Promise.reject(errorTransaction),
+                            () => {
+                                insertEnd = new Date().getTime();
+                                insertTime = insertEnd - openCreateEnd;
+                                console.log('time for insert: ', tableName, insertTime);
+                                console.log('Transactional insert took: ', new Date().getTime() - start);
+                                // database = null;
+                                return openDatabase('test')
+                                    .then((db) => Promise.resolve('Success'))
+                            })
                     })
 
                     // .then(wrapTransationInPromise)
@@ -233,136 +248,132 @@ export function mapDataForInsert(tableName, data) {
     }
     let tableFields = constants.tableStructure[tableName].concat(constants.tableStructure.commonFields);
 
-
-    // let returnArray = [];
-    // let maximumNumberOfDataInAnArray = Math.floor(900 / tableFields.length);
-    //
-    // let outerArray = [];
-    // data.forEach((e, index) => {
-    //     let innerArray = {};
-    //     for (let i=0; i<tableFields.length; i++) {
-    //         if (i === tableFields.length - 1) {
-    //             innerArray['json'] = JSON.stringify(e);
-    //         } else {
-    //             if (tableFields[i].fieldName === 'locationId') {
-    //                 innerArray[tableFields[i].fieldName] = extractLocationId(e);
-    //             } else {
-    //                 if (tableFields[i].fieldName === 'age') {
-    //                     let years = get(e, `[${tableFields[i].fieldName}].years`, 0);
-    //                     let months = get(e, `[${tableFields[i].fieldName}].months`, 0);
-    //                     innerArray[tableFields[i].fieldName] = Math.max(years, months);
-    //                 } else {
-    //                     if (tableFields[i].fieldName === 'indexDay') {
-    //                         innerArray[tableFields[i].fieldName] = get(e, `[index]`, null);
-    //                     } else {
-    //                         if (constants.relationshipsMappedFields.includes(tableFields[i].fieldName)) {
-    //                             innerArray[tableFields[i].fieldName] = mapRelationshipFields(e, tableFields[i].fieldName);
-    //                         } else {
-    //                             if (tableName === 'person' && e.type === translations.personTypes.events && tableFields[i].fieldName === 'firstName') {
-    //                                 innerArray[tableFields[i].fieldName] = get(e, `name`, null);
-    //                             } else {
-    //                                 if (tableName === 'person' && (tableFields[i].fieldName === 'firstName' || tableFields[i].fieldName === 'lastName')) {
-    //                                     innerArray[tableFields[i].fieldName] = get(e, `[${tableFields[i].fieldName}]`, '');
-    //                                 } else {
-    //                                     if (tableFields[i].fieldName === 'deleted') {
-    //                                         if (get(e, `[${tableFields[i].fieldName}]`, null) !== true) {
-    //                                             innerArray[tableFields[i].fieldName] = false;
-    //                                         } else {
-    //                                             innerArray[tableFields[i].fieldName] = get(e, `[${tableFields[i].fieldName}]`, false);
-    //                                         }
-    //                                     } else {
-    //                                         innerArray[tableFields[i].fieldName] = get(e, `[${tableFields[i].fieldName}]`, null);
-    //                                                                             }
-    //                                 }
-    //                             }
-    //                         }
-    //                     }
-    //                 }
-    //             }
-    //         }
-    //     }
-    //     if (index % maximumNumberOfDataInAnArray === 0) {
-    //         returnArray.push(outerArray);
-    //         outerArray = [];
-    //     } else {
-    //         outerArray.push(innerArray);
-    //     }
-    // });
-    //
-    // return returnArray;
-
-
     return data.map((e) => {
         let innerArray = [];
         for (let i=0; i<tableFields.length; i++) {
-            if (i === tableFields.length - 1) {
-                innerArray.push(JSON.stringify(e));
-            } else {
-                if (tableFields[i].fieldName === 'locationId') {
+
+            switch (tableFields[i].fieldName) {
+                case 'locationId':
                     innerArray.push(extractLocationId(e));
-                } else {
-                    if (tableFields[i].fieldName === 'age') {
-                        let years = get(e, `[${tableFields[i].fieldName}].years`, 0);
-                        let months = get(e, `[${tableFields[i].fieldName}].months`, 0);
-                        innerArray.push(Math.max(years, months));
+                    break;
+                case 'age':
+                    let years = get(e, `[${tableFields[i].fieldName}].years`, 0);
+                    let months = get(e, `[${tableFields[i].fieldName}].months`, 0);
+                    innerArray.push(Math.max(years, months));
+                    break;
+                case 'deleted':
+                    if (get(e, `[${tableFields[i].fieldName}]`, null) !== true) {
+                        innerArray.push(false);
                     } else {
-                        if (tableFields[i].fieldName === 'indexDay') {
-                            innerArray.push(get(e, `[index]`, null));
-                        } else {
-                            if (constants.relationshipsMappedFields.includes(tableFields[i].fieldName)) {
-                                innerArray.push(mapRelationshipFields(e, tableFields[i].fieldName));
-                            } else {
-                                if (tableName === 'person' && e.type === translations.personTypes.events && tableFields[i].fieldName === 'firstName') {
-                                    innerArray.push(get(e, `name`, null));
-                                } else {
-                                    if (tableName === 'person' && (tableFields[i].fieldName === 'firstName' || tableFields[i].fieldName === 'lastName')) {
-                                        innerArray.push(get(e, `[${tableFields[i].fieldName}]`, ''));
-                                    } else {
-                                        if (tableFields[i].fieldName === 'deleted') {
-                                            if (get(e, `[${tableFields[i].fieldName}]`, null) !== true) {
-                                                innerArray.push(false);
-                                            } else {
-                                                innerArray.push(get(e, `[${tableFields[i].fieldName}]`, false));
-                                            }
-                                        } else {
-                                            innerArray.push(get(e, `[${tableFields[i].fieldName}]`, null));
-                                        }
-                                    }
-                                }
-                            }
-                        }
+                        innerArray.push(get(e, `[${tableFields[i].fieldName}]`, false));
                     }
-                }
+                    break;
+                case 'indexDay':
+                    innerArray.push(get(e, `[index]`, null));
+                    break;
+                case 'address':
+                    innerArray.push(get(e, '[addresses]', null) ? JSON.stringify(get(e, '[addresses]', null)) : null);
+                    break;
+                default:
+                    if (i === tableFields.length - 1) {
+                        innerArray.push(JSON.stringify(e));
+                    } else if (constants.relationshipsMappedFields.includes(tableFields[i].fieldName)) {
+                        innerArray.push(mapRelationshipFields(e, tableFields[i].fieldName));
+                    } else if (tableName === 'person' && e.type === translations.personTypes.events && tableFields[i].fieldName === 'firstName') {
+                        innerArray.push(get(e, `name`, null));
+                    } else if (tableName === 'person' && (tableFields[i].fieldName === 'firstName' || tableFields[i].fieldName === 'lastName')) {
+                        innerArray.push(get(e, `[${tableFields[i].fieldName}]`, ''));
+                    } else {
+                        innerArray.push(get(e, `[${tableFields[i].fieldName}]`, null));
+                    }
             }
         }
+
+        //     if (i === tableFields.length - 1) {
+        //         innerArray.push(JSON.stringify(e));
+        //     } else {
+        //         if (tableFields[i].fieldName === 'locationId') {
+        //             innerArray.push(extractLocationId(e));
+        //         } else {
+        //             if (tableFields[i].fieldName === 'age') {
+        //                 let years = get(e, `[${tableFields[i].fieldName}].years`, 0);
+        //                 let months = get(e, `[${tableFields[i].fieldName}].months`, 0);
+        //                 innerArray.push(Math.max(years, months));
+        //             } else {
+        //                 if (tableFields[i].fieldName === 'indexDay') {
+        //                     innerArray.push(get(e, `[index]`, null));
+        //                 } else {
+        //                     if (constants.relationshipsMappedFields.includes(tableFields[i].fieldName)) {
+        //                         innerArray.push(mapRelationshipFields(e, tableFields[i].fieldName));
+        //                     } else {
+        //                         if (tableName === 'person' && e.type === translations.personTypes.events && tableFields[i].fieldName === 'firstName') {
+        //                             innerArray.push(get(e, `name`, null));
+        //                         } else {
+        //                             if (tableName === 'person' && (tableFields[i].fieldName === 'firstName' || tableFields[i].fieldName === 'lastName')) {
+        //                                 innerArray.push(get(e, `[${tableFields[i].fieldName}]`, ''));
+        //                             } else {
+        //                                 if (tableFields[i].fieldName === 'deleted') {
+        //                                     if (get(e, `[${tableFields[i].fieldName}]`, null) !== true) {
+        //                                         innerArray.push(false);
+        //                                     } else {
+        //                                         innerArray.push(get(e, `[${tableFields[i].fieldName}]`, false));
+        //                                     }
+        //                                 } else {
+        //                                     innerArray.push(get(e, `[${tableFields[i].fieldName}]`, null));
+        //                                 }
+        //                             }
+        //                         }
+        //                     }
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }
         return innerArray;
     })
 }
 // Method for mapping the relationship data as needed in the database structure
 function mapRelationshipFields(relationship, fieldName) {
-    if (!checkArray(get(relationship, 'persons', null)) || relationship.persons.length !== 2) {
-        return null;
-    }
-    switch(fieldName) {
-            // sourceId
-        case constants.relationshipsMappedFields[0]:
-            return relationship.persons.find((e) => {return e.source === true;}).id;
-            // sourceType
-        case constants.relationshipsMappedFields[1]:
-            return relationship.persons.find((e) => {return e.source === true;}).type;
-            // targetId
-        case constants.relationshipsMappedFields[2]:
-            return relationship.persons.find((e) => {return e.target === true;}).id;
-            // targetType
-        case constants.relationshipsMappedFields[3]:
-            return relationship.persons.find((e) => {return e.target === true;}).type;
-        default:
+    if (checkArray(get(relationship, 'persons', null)) && relationship.persons.length === 2) {
+        // console.log('Relationship log: ', relationship.persons);
+        if ((!relationship.persons[0].source && !relationship.persons[0].target) || (!relationship.persons[1].source && !relationship.persons[1].target)) {
+            if (appConfig.env === 'development') {
+                console.log('mapRelationshipFields relationship without source/target: ', relationship._id);
+            }
             return null;
+        }
+        switch (fieldName) {
+            // sourceId
+            case constants.relationshipsMappedFields[0]:
+                return relationship.persons.find((e) => {
+                    return e.source === true;
+                }).id;
+            // sourceType
+            case constants.relationshipsMappedFields[1]:
+                return relationship.persons.find((e) => {
+                    return e.source === true;
+                }).type;
+            // targetId
+            case constants.relationshipsMappedFields[2]:
+                return relationship.persons.find((e) => {
+                    return e.target === true;
+                }).id;
+            // targetType
+            case constants.relationshipsMappedFields[3]:
+                return relationship.persons.find((e) => {
+                    return e.target === true;
+                }).type;
+            default:
+                return null;
+        }
+    } else {
+        return null;
     }
 }
 
 // Execute a query based on a query object
 export function executeQuery(queryObject) {
+    let wasCount = false;
     // return async function (dispatch) {
     let start = new Date().getTime();
     return openDatabase('common')
@@ -370,6 +381,9 @@ export function executeQuery(queryObject) {
         .then((transaction) => {
 
             let sql = jsonSql.build(queryObject);
+            if (sql.query.includes('count')) {
+                wasCount = true;
+            }
 
             // console.log('Sql statement: ', sql);
             return wrapExecuteSQLInPromise(transaction, sql.query, Object.values(sql.values))

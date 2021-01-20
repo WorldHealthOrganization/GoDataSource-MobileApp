@@ -27,7 +27,8 @@ const DatePicker = React.memo(({
             minimumDate,
             maximumDate,
             date,
-            index
+            index,
+            skipLabel
                                }) => {
     const [isDateTimePickerVisible, setIsDateTimePickerVisible] = useState(false);
     const isDarkMode = useDarkMode();
@@ -40,7 +41,7 @@ const DatePicker = React.memo(({
             value = new Date(value);
         }
         return (
-            <View style={[{marginVertical: 10, flexDirection: 'row'}, style]}>
+            <View style={[{marginVertical: 10, flexDirection: 'row', marginBottom: 7.5}, style]}>
                 <View style = {{flex: 1}}>
                     {
                         value !== null && value !== undefined && date !== '' ? (
@@ -61,8 +62,7 @@ const DatePicker = React.memo(({
                                             fontSize: 15,
                                             textAlign: 'left',
                                             lineHeight: 30,
-                                            color: 'rgb(60,60,60)',
-                                            marginBottom: 7.5
+                                            color: 'rgb(60,60,60)'
                                         }}>
                                         {value !== null && value !== undefined && value !== '' ? moment.utc(value).format('MM/DD/YYYY') : ''}
                                     </Text>
@@ -113,18 +113,21 @@ const DatePicker = React.memo(({
     const viewInput = () => {
         let tooltip = getTooltip(label, translation);
         return (
-            <View style={[{flexDirection: 'row'}, style]}>
+            <View style={[{flexDirection: 'row', marginTop: 7}, style]}>
                 <View style={{flex: 1}}>
-                    <Text style={{
-                        fontFamily: 'Roboto-Regular',
-                        fontSize: 15,
-                        textAlign: 'left',
-                        color: 'rgb(0,0,0)',
-                        marginBottom: 2,
-                        marginTop: 7,
-                    }}>
-                        {getTranslation(label, translation)}
-                    </Text>
+                    {
+                        skipLabel ? (null) : (
+                            <Text style={{
+                                fontFamily: 'Roboto-Regular',
+                                fontSize: 15,
+                                textAlign: 'left',
+                                color: 'rgb(0,0,0)',
+                                marginBottom: 2
+                            }}>
+                                {getTranslation(label, translation)}
+                            </Text>
+                        )
+                    }
                     <Text
                         style={{
                             fontFamily: 'Roboto-Light',
@@ -194,7 +197,8 @@ DatePicker.propTypes = {
     isEditMode: PropTypes.bool.isRequired,
     isRequired: PropTypes.bool.isRequired,
     onChange: PropTypes.func.isRequired,
-    style: PropTypes.object
+    style: PropTypes.object,
+    skipLabel: PropTypes.bool
 };
 
 DatePicker.defaultTypes = {
@@ -204,7 +208,8 @@ DatePicker.defaultTypes = {
     isEditMode: true,
     isRequired: false,
     onChange: () => {console.log('Default DatePicker onChange')},
-    style: {}
+    style: {},
+    skipLabel: false
 };
 
 export default DatePicker;

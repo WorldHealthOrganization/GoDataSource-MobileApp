@@ -13,7 +13,7 @@ import {wipeCompleteRequest} from './requests/wipeData';
 import appReducers from './reducers';
 import appActions from './actions';
 import {registerScreens} from './screens';
-import config from './utils/config';
+import config, {sideMenuKeys} from './utils/config';
 import {checkDeviceStatus} from "./requests/deviceStatus";
 import isNumber from 'lodash/isNumber';
 import constants from './utils/constants';
@@ -133,6 +133,8 @@ export default class App {
     };
 
     startApp = (root, oldRoot, selectedScreens) => {
+        let isAppInitialize = false;
+        console.log('Update root start app: ', root, oldRoot);
         if (!oldRoot) {
             if (Platform.OS === 'ios') {
                 ParseNativeModule = NativeModules.APNSEventEmitter
@@ -140,47 +142,54 @@ export default class App {
                 ParseNativeModule = NativeModules.ParseReceiver
             }
             console.log('~~~ Calling native module ready to start init parse ~~~');
+            isAppInitialize = true;
             ParseNativeModule.initParse()
         }
 
         let screen = constants.appScreens.followUpScreen;
-        if (isNumber(selectedScreens) && selectedScreens <= 3) {
-            switch (selectedScreens) {
-                case 1:
-                    screen = constants.appScreens.contactsScreen;
-                    break;
-                case 2:
-                    screen = constants.appScreens.casesScreen;
-                    break;
-                default:
-                    screen = constants.appScreens.followUpScreen;
-                    break;
-            }
+        switch (selectedScreens) {
+            case sideMenuKeys[1]:
+                screen = constants.appScreens.contactsScreen;
+                break;
+            case sideMenuKeys[2]:
+                screen = constants.appScreens.contactsOfContactsScreen;
+                break;
+            case sideMenuKeys[3]:
+                screen = constants.appScreens.casesScreen;
+                break;
+            default:
+                screen = constants.appScreens.followUpScreen;
+                break;
         }
+
+        let rootObject = {
+            appStyle: {
+                orientation: 'portrait'
+            },
+            passProps: {
+                isAppInitialize: isAppInitialize
+            },
+        };
 
         switch (root) {
             case 'config':
-                Navigation.startSingleScreenApp({
-                    screen: {
-                        screen: 'FirstConfigScreen'
-                    },
-                    appStyle: {
-                        orientation: 'portrait'
-                    }
-                });
+                rootObject = Object.assign({}, rootObject,
+                    {
+                        screen: {
+                            screen: 'FirstConfigScreen'
+                        }
+                    });
                 break;
             case 'login':
-                Navigation.startSingleScreenApp({
-                    screen: {
-                        screen: 'LoginScreen'
-                    },
-                    appStyle: {
-                        orientation: 'portrait'
-                    }
-                });
+                rootObject = Object.assign({}, rootObject,
+                    {
+                        screen: {
+                            screen: 'LoginScreen'
+                        }
+                    });
                 break;
             case 'after-login':
-                Navigation.startSingleScreenApp({
+                rootObject = {
                     screen: {
                         screen: screen
                     },
@@ -196,19 +205,22 @@ export default class App {
                             contentOverlayColor: 'rgba(0,0,0,0.25)',
                         }
                     },
+                    passProps: {
+                        isAppInitialize: isAppInitialize
+                    },
                     animationType: 'slide-down'
-                });
+                };
                 break;
             default:
-                Navigation.startSingleScreenApp({
-                    screen: {
-                        screen: 'FirstConfigScreen',
-                    },
-                    appStyle: {
-                        orientation: 'portrait'
-                    }
-                });
+                rootObject = Object.assign({}, rootObject,
+                    {
+                        screen: {
+                            screen: 'FirstConfigScreen'
+                        }
+                    });
         }
+
+        Navigation.startSingleScreenApp(rootObject)
     };
 
     // Checks device status if exists, and if the status is pending wipe, removes everything

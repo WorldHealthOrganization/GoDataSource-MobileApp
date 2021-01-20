@@ -8,10 +8,9 @@ import {Alert, Animated, BackHandler, FlatList, StyleSheet, Text, View} from 're
 import styles from './../styles';
 import NavBarCustom from './../components/NavBarCustom';
 import {connect} from "react-redux";
-import {bindActionCreators} from "redux";
+import {bindActionCreators, compose} from "redux";
 import SearchFilterView from './../components/SearchFilterView';
 import HelpListItem from './../components/HelpListItem';
-import {removeErrors} from './../actions/errors';
 import {addFilterForScreen, removeFilterForScreen} from './../actions/app';
 import _ from 'lodash';
 import {
@@ -24,7 +23,7 @@ import {
 import ViewHOC from './../components/ViewHOC';
 import translations from './../utils/translations'
 import RNExitApp from 'react-native-exit-app';
-import constants from "../utils/constants";
+import withPincode from './../components/higherOrderComponents/withPincode';
 import config from "../utils/config";
 import PermissionComponent from './../components/PermissionComponent';
 
@@ -522,4 +521,7 @@ function matchDispatchProps(dispatch) {
     }, dispatch);
 }
 
-export default connect(mapStateToProps, matchDispatchProps)(HelpScreen);
+export default compose(
+    withPincode(),
+    connect(mapStateToProps, matchDispatchProps)
+)(HelpScreen);

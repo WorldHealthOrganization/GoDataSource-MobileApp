@@ -10,7 +10,7 @@ import styles from './../styles';
 import NavBarCustom from './../components/NavBarCustom';
 import config from './../utils/config';
 import {connect} from "react-redux";
-import {bindActionCreators} from "redux";
+import {compose} from "redux";
 import {PagerScroll, TabBar, TabView} from 'react-native-tab-view';
 import FollowUpsSingleContainer from './../containers/FollowUpsSingleContainer';
 import FollowUpsSingleQuestionnaireContainer from './../containers/FollowUpsSingleQuestionnaireContainer';
@@ -18,7 +18,6 @@ import Breadcrumb from './../components/Breadcrumb';
 import Menu, {MenuItem} from 'react-native-material-menu';
 import Ripple from 'react-native-material-ripple';
 import {createFollowUp, updateFollowUpAndContact} from './../actions/followUps';
-import {removeErrors} from './../actions/errors';
 import _, {cloneDeep, sortBy} from 'lodash';
 import {
     calculateDimension,
@@ -36,7 +35,7 @@ import moment from 'moment/min/moment.min';
 import {checkArrayAndLength} from './../utils/typeCheckingFunctions';
 import {checkRequiredQuestions, extractAllQuestions} from "../utils/functions";
 import constants from './../utils/constants';
-import lodashGet from "lodash/get";
+import withPincode from './../components/higherOrderComponents/withPincode';
 
 class FollowUpsSingleScreen extends Component {
 
@@ -265,6 +264,7 @@ class FollowUpsSingleScreen extends Component {
             case 'genInfo':
                 return (
                     <FollowUpsSingleContainer
+                        routeKey={route.key}
                         isNew={this.props.isNew}
                         isEditMode={this.state.isEditMode}
                         item={this.state.item}
@@ -285,6 +285,7 @@ class FollowUpsSingleScreen extends Component {
             case 'quest':
                 return (
                     <FollowUpsSingleQuestionnaireContainer
+                        routeKey={route.key}
                         item={this.state.item}
                         currentAnswers={this.state.currentAnswers}
                         previousAnswers={this.state.previousAnswers}
@@ -1085,4 +1086,7 @@ function mapStateToProps(state) {
     };
 }
 
-export default connect(mapStateToProps)(FollowUpsSingleScreen);
+export default compose(
+    withPincode(),
+    connect(mapStateToProps)
+)(FollowUpsSingleScreen);

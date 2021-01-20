@@ -13,6 +13,7 @@ import Ripple from 'react-native-material-ripple';
 import {calculateDimension} from './../utils/functions';
 import PermissionComponent from './../components/PermissionComponent';
 import constants, {PERMISSIONS_CONTACT_OF_CONTACT} from './../utils/constants';
+import {sideMenuKeys} from "../utils/config";
 
 class NavigationDrawerListItem extends PureComponent {
 
@@ -31,25 +32,25 @@ class NavigationDrawerListItem extends PureComponent {
         let permissionAddButton = [];
 
         switch(this.props.itemKey) {
-            case 'followups':
+            case sideMenuKeys[0]:
                 permissionElement = [
                     constants.PERMISSIONS_FOLLOW_UP.followUpAll,
                     constants.PERMISSIONS_FOLLOW_UP.followUpList
                 ];
                 break;
-            case 'contacts':
+            case sideMenuKeys[1]:
                 permissionElement = [
                     constants.PERMISSIONS_CONTACT.contactAll,
                     constants.PERMISSIONS_CONTACT.contactList
                 ];
                 break;
-            case 'contactsOfContacts':
+            case sideMenuKeys[2]:
                 permissionElement = [
                     PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsAll,
                     PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsList
                 ];
                 break;
-            case 'cases':
+            case sideMenuKeys[3]:
                 permissionElement = [
                     constants.PERMISSIONS_CASE.caseAll,
                     constants.PERMISSIONS_CASE.caseList
@@ -65,7 +66,7 @@ class NavigationDrawerListItem extends PureComponent {
                 permissionElement = [];
         }
 
-       if (this.props.addButton && this.props.itemKey === 'cases') {
+       if (this.props.addButton && this.props.itemKey === sideMenuKeys[3]) {
             permissionAddButton = [
                 constants.PERMISSIONS_CASE.caseAll,
                 constants.PERMISSIONS_CASE.caseCreate

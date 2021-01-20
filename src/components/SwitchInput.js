@@ -12,6 +12,7 @@ import TooltipComponent from './TooltipComponent';
 // var Switch = require('react-native-material-switch');
 // import Switch from 'react-native-material-switch';
 import {Switch} from 'react-native-ui-lib';
+import {isFunction} from './../utils/typeCheckingFunctions';
 
 class SwitchInput extends PureComponent {
 
@@ -50,13 +51,16 @@ class SwitchInput extends PureComponent {
                     onTintColor={'white'}
                     onValueChange={(state) => {
                         // console.log("Value of the SwitchInput changed to: ", state);
-                        this.props.onChange(
-                        state,
-                        this.props.id,
-                        this.props.objectType ? (this.props.objectType === 'Address' ? this.props.index : (
-                            this.props.objectType === 'LabResult' ? this.props.index : this.props.objectType
-                        )) : null,
-                        this.props.objectType)
+                        if (isFunction(this.props.onChange)) {
+                            this.props.onChange(
+                                state,
+                                this.props.id,
+                                this.props.objectType ? (this.props.objectType === 'Address' ? this.props.index : (
+                                    this.props.objectType === 'LabResult' ? this.props.index : this.props.objectType
+                                )) : null,
+                                this.props.objectType
+                            )
+                        }
                     }}
                     height={18}
                     width={40}
