@@ -170,6 +170,10 @@ android {
 }
 
 dependencies {
+    implementation project(':react-native-touch-id')
+    implementation project(':react-native-udp')
+    implementation project(':react-native-tcp')
+    implementation project(':react-native-os')
     implementation project(':react-native-dark-mode')
     implementation project(':@react-native-community_datetimepicker')
     implementation project(':react-native-webview')
