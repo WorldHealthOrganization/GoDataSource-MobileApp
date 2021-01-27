@@ -295,17 +295,13 @@ class SectionedMultiSelect extends PureComponent {
     handleOnChangeTextSearch = () => {
         let text = this.state.searchText;
         if (text !== '' && text !== null && text !== undefined) {
-            // this.setState({
-            //     searchText: text
-            // }, () => {
-                let filteredData = this.filterData(cloneDeep(this.props.items), text);
-                let filteredAllData = this.filterData(cloneDeep(this.props.allItems), text);
-                this.setState(prevState => ({
-                    allItems: filteredAllData.filteredData,
-                    items: filteredData.filteredData,
-                    reRenderProps: Object.assign({}, prevState.reRenderProps, {expandedItems: this.state.showAll ? filteredAllData.expandedItems : filteredData.expandedItems})
-                }))
-            // })
+            let filteredData = this.filterData(cloneDeep(this.props.items), text);
+            let filteredAllData = this.filterData(cloneDeep(this.props.allItems), text);
+            this.setState(prevState => ({
+                allItems: filteredAllData.filteredData,
+                items: filteredData.filteredData,
+                reRenderProps: Object.assign({}, prevState.reRenderProps, {expandedItems: this.state.showAll ? filteredAllData.expandedItems : filteredData.expandedItems})
+            }))
         } else {
             this.setState(prevState => ({
                 allItems: cloneDeep(this.props.allItems),
@@ -345,8 +341,8 @@ class SectionedMultiSelect extends PureComponent {
                         dataToReturn.expandedItems.push( items[i][this.props.uniqueKey]);
                     }
                 } else {
+                    dataToReturn.filteredData.push(Object.assign({}, items[i], {children: items[i][this.props.subKey]}));
                     delete items[i][this.props.subKey];
-                    dataToReturn.filteredData.push(items[i]);
                 }
             } else {
                 if (keepData && Array.isArray(keepData) && keepData.length > 0) {

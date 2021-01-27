@@ -64,11 +64,11 @@
 	<key>NSFaceIDUsageDescription</key>
 	<string>Enabling Face ID allows you quick and secure access to your account.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>Your location is needed to retrieve contact/cases&apos; coordinates</string>
+	<string>Your location is needed to retrieve contact/cases' coordinates</string>
 	<key>NSLocationAlwaysUsageDescription</key>
-	<string>Your location is needed to retrieve contact/cases&apos; coordinates</string>
+	<string>Your location is needed to retrieve contact/cases' coordinates</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Your location is needed to retrieve contacts/cases&apos; coordinates</string>
+	<string>Your location is needed to retrieve contacts/cases' coordinates</string>
 	<key>NSMotionUsageDescription</key>
 	<string>Some description</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
