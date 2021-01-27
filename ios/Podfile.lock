@@ -1,19 +1,19 @@
 PODS:
-  - Bolts/Tasks (1.9.0)
-  - Parse (1.17.3):
-    - Parse/Core (= 1.17.3)
-  - Parse/Core (1.17.3):
-    - Bolts/Tasks (~> 1.9)
+  - Bolts/Tasks (1.9.1)
+  - Parse (1.19.1):
+    - Parse/Core (= 1.19.1)
+  - Parse/Core (1.19.1):
+    - Bolts/Tasks (= 1.9.1)
   - React (0.59.10):
     - React/Core (= 0.59.10)
   - React/Core (0.59.10):
     - yoga (= 0.59.10.React)
   - RNBcrypt (1.0.0):
     - React
-  - SQLCipher (4.3.0):
-    - SQLCipher/standard (= 4.3.0)
-  - SQLCipher/common (4.3.0)
-  - SQLCipher/standard (4.3.0):
+  - SQLCipher (4.4.2):
+    - SQLCipher/standard (= 4.4.2)
+  - SQLCipher/common (4.4.2)
+  - SQLCipher/standard (4.4.2):
     - SQLCipher/common
   - TouchID (4.4.1):
     - React
@@ -44,11 +44,11 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/yoga"
 
 SPEC CHECKSUMS:
-  Bolts: ac6567323eac61e203f6a9763667d0f711be34c8
-  Parse: c1ad2a04d2cab2b54b6fb7da05f741abf2cf57d1
+  Bolts: 8c1e8aab2f603387b8b9924f57d1d64f43d3ffdc
+  Parse: e40fdb9c7d665823b7fe9865949cac9a53eb2ce7
   React: 36d0768f9e93be2473b37e7fa64f92c1d5341eef
   RNBcrypt: 21320bf1df4fe7321b02ceee6e651d89329d9778
-  SQLCipher: d305a7bd9af4b64f095c79bdc1a1fa50f2a15116
+  SQLCipher: 1ab0b9486a77d141e72e92ff30681926ed79c07a
   TouchID: ba4c656d849cceabc2e4eef722dea5e55959ecf4
   yoga: 684513b14b03201579ba3cee20218c9d1298b0cc
 
