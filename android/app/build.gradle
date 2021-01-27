@@ -118,8 +118,8 @@ android {
         minSdkVersion 20
         targetSdkVersion 29
         multiDexEnabled true
-        versionCode 20
-        versionName "1.0.10"
+        versionCode 32
+        versionName "1.0.12"
         ndk {
             abiFilters "armeabi-v7a", "x86", 'arm64-v8a', 'x86_64'
         }
@@ -154,6 +154,11 @@ android {
             debuggable true
         }
     }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
     // applicationVariants are e.g. debug, release
     applicationVariants.all { variant ->
         variant.outputs.each { output ->
@@ -170,6 +175,7 @@ android {
 }
 
 dependencies {
+    implementation project(':react-native-keychain')
     implementation project(':react-native-touch-id')
     implementation project(':react-native-udp')
     implementation project(':react-native-tcp')
@@ -189,11 +195,10 @@ dependencies {
         // exclude group: "com.google.android.gms"
         exclude group: "com.android.support"
     }
-    implementation 'com.android.support:multidex:1.0.3'
+    implementation 'androidx.multidex:multidex:2.0.0'
     implementation project(':react-native-document-picker')
     implementation project(':react-native-fs')
     implementation project(':react-native-sqlcipher-2')
-    implementation project(':react-native-keychain')
     implementation project(':react-native-zip-archive')
     implementation project(':rn-fetch-blob')
     implementation project(':react-native-vector-icons')
@@ -206,11 +211,11 @@ dependencies {
 
     implementation 'com.google.firebase:firebase-messaging:16.0.1'
 
-    implementation 'com.android.support:appcompat-v7:28.0.0'
-    implementation 'com.android.support:design:28.0.0'
-    implementation 'com.android.support:animated-vector-drawable:28.0.0'
-    implementation 'com.android.support:support-media-compat:28.0.0'
-    implementation 'com.android.support:support-v4:28.0.0'
+    implementation 'androidx.appcompat:appcompat:1.0.0'
+    implementation 'com.google.android.material:material:1.0.0'
+    implementation 'androidx.vectordrawable:vectordrawable-animated:1.0.0'
+    implementation 'androidx.media:media:1.0.0'
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'com.facebook.react:react-native:+'
 
     implementation "com.github.parse-community.Parse-SDK-Android:parse:1.18.5"
