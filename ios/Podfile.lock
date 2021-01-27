@@ -10,6 +10,8 @@ PODS:
     - yoga (= 0.59.10.React)
   - RNBcrypt (1.0.0):
     - React
+  - RNKeychain (6.1.1):
+    - React
   - SQLCipher (4.4.2):
     - SQLCipher/standard (= 4.4.2)
   - SQLCipher/common (4.4.2)
@@ -23,6 +25,7 @@ DEPENDENCIES:
   - Parse
   - React (from `../node_modules/react-native`)
   - RNBcrypt (from `../node_modules/react-native-bcrypt`)
+  - RNKeychain (from `../node_modules/react-native-keychain`)
   - SQLCipher
   - TouchID (from `../node_modules/react-native-touch-id`)
   - yoga (from `../node_modules/react-native/ReactCommon/yoga`)
@@ -38,6 +41,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native"
   RNBcrypt:
     :path: "../node_modules/react-native-bcrypt"
+  RNKeychain:
+    :path: "../node_modules/react-native-keychain"
   TouchID:
     :path: "../node_modules/react-native-touch-id"
   yoga:
@@ -48,10 +53,11 @@ SPEC CHECKSUMS:
   Parse: e40fdb9c7d665823b7fe9865949cac9a53eb2ce7
   React: 36d0768f9e93be2473b37e7fa64f92c1d5341eef
   RNBcrypt: 21320bf1df4fe7321b02ceee6e651d89329d9778
+  RNKeychain: db956c02a018f7dd3a0ea8a6cf3087bc1894bf2b
   SQLCipher: 1ab0b9486a77d141e72e92ff30681926ed79c07a
   TouchID: ba4c656d849cceabc2e4eef722dea5e55959ecf4
   yoga: 684513b14b03201579ba3cee20218c9d1298b0cc
 
-PODFILE CHECKSUM: 94322ceba134a3cd03314bac1f2ffc27a241be99
+PODFILE CHECKSUM: ef497d600c24c5e519dbbef1e32f8f596ea9fa13
 
 COCOAPODS: 1.9.1

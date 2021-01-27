@@ -24,6 +24,7 @@ const colorUnselectedItemText = 'rgb(49, 49, 49)';
 const colorTint = '#f5f5f5';
 const colorBase = '#dcdcdc';
 const colorWhite = 'white';
+const colorButtonRed = '#B04D5D';
 
 export default {
     screenBackgroundGrey,
@@ -48,5 +49,6 @@ export default {
     buttonBlack,
     colorTint,
     colorBase,
-    colorWhite
+    colorWhite,
+    colorButtonRed
 }

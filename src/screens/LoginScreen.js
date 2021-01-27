@@ -22,6 +22,10 @@ import config from './../utils/config';
 import {getTranslation} from './../utils/functions';
 import VersionNumber from 'react-native-version-number';
 import appConfig from './../../app.config';
+import withPincode from "../components/higherOrderComponents/withPincode";
+import {getContactsOfContactsForOutbreakId} from "../actions/contactsOfContacts";
+import {enhanceListWithGetData} from "../components/higherOrderComponents/withListData";
+import {compose} from "redux";
 
 class LoginScreen extends Component {
 
@@ -254,4 +258,8 @@ function matchDispatchToProps(dispatch) {
     }, dispatch);
 }
 
-export default connect(mapStateToProps, matchDispatchToProps)(LoginScreen);
+// export default connect(mapStateToProps, matchDispatchToProps)(LoginScreen);
+export default compose(
+    withPincode(),
+    connect(mapStateToProps, matchDispatchToProps),
+)(LoginScreen)

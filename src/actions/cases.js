@@ -21,7 +21,7 @@ export function getCasesForOutbreakId({outbreakId, casesFilter, searchText, last
     }, computeCount)
         .then((results) => {
             // console.log('results', results);
-            return Promise.resolve({data: results.data, dataCount: results && results.dataCount});
+            return Promise.resolve({data: results.data, dataCount: results?.dataCount});
         })
         .catch((error) => {
             console.log('error', error);

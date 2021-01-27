@@ -36,7 +36,7 @@ export async function retriablePromise (promise, numberOfRetries, timeout, error
         if (error) {
             return Promise.reject(error);
         }
-        return Promise.reject('retries failed');
+        return Promise.reject(`The request failed multiple times${error ? `.\n${JSON.stringify(error)}` : ` without error message`}`);
     }
     if (!checkInteger(timeout)) {
         timeout = constants.TIMEOUT_FOR_FETCH_BLOB;
@@ -88,4 +88,17 @@ export function fetchWitTimeout (url, config) {
 
 export function checkInteger(integer) {
     return Number.isInteger(integer);
+}
+
+export function checkValidEmails (arrayToCheck, pathToObject) {
+    let invalidEmails = [];
+    if (checkArrayAndLength(arrayToCheck)) {
+        for (let i = 0; i < arrayToCheck.length; i++) {
+            let re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+            if (!re.test(arrayToCheck?.[i]?.[pathToObject])) {
+                invalidEmails.push(arrayToCheck?.[i]?.[pathToObject]);
+            }
+        }
+    }
+    return invalidEmails;
 }

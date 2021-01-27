@@ -3,8 +3,8 @@
  */
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
-import React, {PureComponent} from 'react';
-import {Alert, InteractionManager, ScrollView, StyleSheet, Text, View} from 'react-native';
+import React, {Component} from 'react';
+import {InteractionManager, ScrollView, StyleSheet, Text, View} from 'react-native';
 import {calculateDimension, createDate, extractIdFromPouchId, getTranslation} from './../utils/functions';
 import config from './../utils/config';
 import {connect} from "react-redux";
@@ -19,10 +19,10 @@ import lodashGet from "lodash/get";
 import {checkArray, checkArrayAndLength} from "../utils/typeCheckingFunctions";
 import TopContainerButtons from "./../components/TopContainerButtons";
 import PermissionComponent from './../components/PermissionComponent';
-import constants, {PERMISSIONS_CONTACT_OF_CONTACT} from "./../utils/constants";
+import constants, {PERMISSIONS_CONTACT_OF_CONTACT, PERMISSION_CREATE_CONTACT, PERMISSION_CREATE_CONTACT_OF_CONTACT, PERMISSION_EDIT_CONTACT, PERMISSION_EDIT_CONTACT_OF_CONTACT} from "./../utils/constants";
 import {getTeamsForUserRequest} from './../queries/user';
 
-class ContactsSinglePersonal extends PureComponent {
+class ContactsSinglePersonal extends Component {
 
     // This will be a container, so put as less business logic here as possible
     constructor(props) {
@@ -48,7 +48,7 @@ class ContactsSinglePersonal extends PureComponent {
     }
 
     shouldComponentUpdate(nextProps, nextState) {
-        if (nextProps.activeIndex === 0) {
+        if (nextProps.routeKey === 'personal') {
             return true;
         }
         return false;
@@ -64,29 +64,11 @@ class ContactsSinglePersonal extends PureComponent {
             )
         }
 
-        let permissionsList = [
-            constants.PERMISSIONS_CONTACT.contactAll
-        ];
+        let permissionsList = [];
         if (this.props.isNew) {
-            if(this.props.type === translations.personTypes.contactsOfContacts) {
-                permissionsList.push(
-                    PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsCreate
-                )
-            } else {
-                permissionsList.push(
-                    constants.PERMISSIONS_CONTACT.contactCreate
-                )
-            }
+            permissionsList = this.props.type === translations.personTypes.contactsOfContacts ? PERMISSION_CREATE_CONTACT_OF_CONTACT : PERMISSION_CREATE_CONTACT;
         } else {
-            if(this.props.type === translations.personTypes.contactsOfContacts) {
-                permissionsList.push(
-                    PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsModify
-                )
-            } else {
-                permissionsList.push(
-                    constants.PERMISSIONS_CONTACT.contactModify
-                )
-            }
+            permissionsList = this.props.type === translations.personTypes.contactsOfContacts ? PERMISSION_EDIT_CONTACT_OF_CONTACT : PERMISSION_EDIT_CONTACT;
         }
 
         return (
@@ -375,42 +357,6 @@ class ContactsSinglePersonal extends PureComponent {
 
         if (item.id === 'followUpTeamId') {
             return checkArrayAndLength(_.get(this.state, 'teams', [])) ? this.state.teams.map((e) => {return {label: e.name, value: e.teamId}}) : []
-        }
-    };
-
-    handleNextButton = () => {
-        if (this.props.isNew) {
-            let missingFields = this.props.checkRequiredFieldsPersonalInfo();
-            if (missingFields && Array.isArray(missingFields) && missingFields.length === 0) {
-                if (this.props.checkAgeYearsRequirements()) {
-                    if (this.props.checkAgeMonthsRequirements()) {
-                        this.props.handleMoveToNextScreenButton()
-                    } else {
-                        Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.monthsValueError, this.props.translation), [
-                            {
-                                text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
-                                onPress: () => { console.log("OK pressed") }
-                            }
-                        ])
-                    }
-                } else {
-                    Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.yearsValueError, this.props.translation), [
-                        {
-                            text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
-                            onPress: () => { console.log("OK pressed") }
-                        }
-                    ])
-                }
-            } else {
-                Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), `${getTranslation(translations.alertMessages.requiredFieldsMissingError, this.props.translation)}.\n${getTranslation(translations.alertMessages.missingFields, this.props.translation)}: ${missingFields}`, [
-                    {
-                        text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
-                        onPress: () => { console.log("OK pressed") }
-                    }
-                ])
-            }
-        } else {
-            this.props.handleMoveToNextScreenButton()
         }
     };
 

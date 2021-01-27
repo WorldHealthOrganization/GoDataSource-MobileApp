@@ -180,7 +180,7 @@ class AnimatedListView extends Component {
                 exposureData = get(item, 'exposureData', null);
                 textsArray = [
                     getTranslation(translations.casesScreen.viewButtonLabel, this.props.translation),
-                    'Add Contact', // getTranslation(translations.contactsScreen.editButton, this.props.translation),
+                    getTranslation(translations.casesScreen.addContactButtonLabel, this.props.translation),
                     getTranslation(translations.followUpsScreen.addExposureFollowUpLabel, this.props.translation)
                 ];
                 textsStyleArray = [
@@ -199,7 +199,12 @@ class AnimatedListView extends Component {
                     }];
                 arrayPermissions = [
                     [constants.PERMISSIONS_CONTACT.contactAll, constants.PERMISSIONS_CONTACT.contactView],
-                    [constants.PERMISSIONS_CONTACT.contactAll, constants.PERMISSIONS_CONTACT.contactModify],
+                    [
+                        [constants.PERMISSIONS_CONTACT.contactAll, PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsAll],
+                        [constants.PERMISSIONS_CONTACT.contactAll, PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsCreate],
+                        [constants.PERMISSIONS_CONTACT.contactCreateContactOfContact, PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsAll],
+                        [constants.PERMISSIONS_CONTACT.contactCreateContactOfContact, PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsCreate]
+                    ],
                     [
                         [constants.PERMISSIONS_RELATIONSHIP.relationshipAll, constants.PERMISSIONS_CONTACT.contactAll],
                         [constants.PERMISSIONS_RELATIONSHIP.relationshipAll, constants.PERMISSIONS_CONTACT.contactCreateRelationshipExposures],
@@ -443,7 +448,8 @@ Animated.propTypes = {
     onPressView: PropTypes.func,
     onPressMap: PropTypes.func,
     onPressName: PropTypes.func,
-    onPressCenterButton: PropTypes.func
+    onPressCenterButton: PropTypes.func,
+    onEndReached: PropTypes.func
 };
 
 AnimatedListView.defaultProps = {
@@ -456,7 +462,8 @@ AnimatedListView.defaultProps = {
     onPressView: () => {console.log('Default function onPressView')},
     onPressMap: () => {console.log('Default function onPressMap')},
     onPressName: () => {console.log('Default function onPressName')},
-    onPressCenterButton: () => {console.log('Default function onPressCenterButton')}
+    onPressCenterButton: () => {console.log('Default function onPressCenterButton')},
+    onEndReached: () => {console.log('Default function onEndReached')}
 };
 
 // Create style outside the class, or for components that will be used by other components (buttons),

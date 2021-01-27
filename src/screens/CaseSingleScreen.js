@@ -7,12 +7,12 @@ import React, {Component} from 'react';
 import {Alert, Animated, BackHandler, Dimensions, Keyboard, Platform, StyleSheet, View} from 'react-native';
 import {PagerAndroid, PagerPan, PagerScroll, TabBar, TabView} from 'react-native-tab-view';
 import {connect} from "react-redux";
-import {bindActionCreators} from "redux";
+import {bindActionCreators, compose} from "redux";
 import NavBarCustom from './../components/NavBarCustom';
 import Breadcrumb from './../components/Breadcrumb';
 import Ripple from 'react-native-material-ripple';
 import styles from './../styles';
-import config from './../utils/config';
+import config, {sideMenuKeys} from './../utils/config';
 import _, {sortBy} from 'lodash';
 import CaseSinglePersonalContainer from './../containers/CaseSinglePersonalContainer';
 import CaseSingleAddressContainer from './../containers/CaseSingleAddressContainer';
@@ -45,6 +45,8 @@ import lodashIntersect from "lodash/intersection";
 import lodashGet from 'lodash/get';
 import constants from "../utils/constants";
 import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
+import withPincode from './../components/higherOrderComponents/withPincode';
+import {checkValidEmails, validateRequiredFields} from './../utils/formValidators';
 
 const initialLayout = {
     height: 0,
@@ -431,6 +433,7 @@ class CaseSingleScreen extends Component {
             case 'personal':
                 return (
                     <CaseSinglePersonalContainer
+                        routeKey={route.key}
                         case={this.state.case}
                         isEditMode={this.state.isEditMode}
                         index={this.state.index}
@@ -459,6 +462,7 @@ class CaseSingleScreen extends Component {
             case 'address':
                 return (
                     <CaseSingleAddressContainer
+                        routeKey={route.key}
                         case={this.state.case}
                         isEditMode={this.state.isEditMode}
                         index={this.state.index}
@@ -487,6 +491,7 @@ class CaseSingleScreen extends Component {
             case 'infection':
                 return (
                     <CaseSingleInfectionContainer
+                        routeKey={route.key}
                         case={this.state.case}
                         isEditMode={this.state.isEditMode}
                         index={this.state.index}
@@ -519,6 +524,7 @@ class CaseSingleScreen extends Component {
             case 'exposures':
                 return (
                     <CaseSingleExposureContainer
+                        routeKey={route.key}
                         case={this.state.case}
                         relations={this.state.relations}
                         index={this.state.index}
@@ -541,26 +547,27 @@ class CaseSingleScreen extends Component {
             case 'caseInvestigation':
                 return (
                     <CaseSingleInvestigationContainer
-                    item={this.state.case}
-                    currentAnswers={this.state.currentAnswers}
-                    previousAnswers={this.state.previousAnswers}
-                    isEditMode={this.state.isEditMode}
-                    index={this.state.index}
-                    numberOfTabs={this.state.routes.length}
-                    onPressEdit={this.onPressEdit}
-                    onPressSave={this.handleOnPressSave}
-                    onPressSaveEdit={this.onPressSaveEdit}
-                    onPressCancelEdit={this.onPressCancelEdit}
-                    onChangeTextAnswer={this.onChangeTextAnswer}
-                    onChangeSingleSelection={this.onChangeSingleSelection}
-                    onChangeMultipleSelection={this.onChangeMultipleSelection}
-                    onChangeDateAnswer={this.onChangeDateAnswer}
-                    handleMoveToPrevieousScreenButton={this.handleMoveToPrevieousScreenButton}
-                    isNew={this.props.isNew ? true : this.props.forceNew ? true : false}
-                    onClickAddNewMultiFrequencyAnswer={this.onClickAddNewMultiFrequencyAnswer}
-                    onChangeAnswerDate={this.onChangeAnswerDate}
-                    savePreviousAnswers={this.savePreviousAnswers}
-                    copyAnswerDate={this.handleCopyAnswerDate}
+                        routeKey={route.key}
+                        item={this.state.case}
+                        currentAnswers={this.state.currentAnswers}
+                        previousAnswers={this.state.previousAnswers}
+                        isEditMode={this.state.isEditMode}
+                        index={this.state.index}
+                        numberOfTabs={this.state.routes.length}
+                        onPressEdit={this.onPressEdit}
+                        onPressSave={this.handleOnPressSave}
+                        onPressSaveEdit={this.onPressSaveEdit}
+                        onPressCancelEdit={this.onPressCancelEdit}
+                        onChangeTextAnswer={this.onChangeTextAnswer}
+                        onChangeSingleSelection={this.onChangeSingleSelection}
+                        onChangeMultipleSelection={this.onChangeMultipleSelection}
+                        onChangeDateAnswer={this.onChangeDateAnswer}
+                        handleMoveToPrevieousScreenButton={this.handleMoveToPrevieousScreenButton}
+                        isNew={this.props.isNew ? true : this.props.forceNew ? true : false}
+                        onClickAddNewMultiFrequencyAnswer={this.onClickAddNewMultiFrequencyAnswer}
+                        onChangeAnswerDate={this.onChangeAnswerDate}
+                        savePreviousAnswers={this.savePreviousAnswers}
+                        copyAnswerDate={this.handleCopyAnswerDate}
                 />
                 );
                 break;
@@ -571,11 +578,33 @@ class CaseSingleScreen extends Component {
     //Save case
     handleOnPressSave = () => {
         let missingFields = this.checkRequiredFields().map((e) => getTranslation(e, this.props.translation));
+        let invalidEmails = validateRequiredFields(_.get(this.state, 'case.addresses', []), config?.addressFields?.fields, (dataToBeValidated, fields, defaultFunction) => {
+            if (fields.id === 'emailAddress') {
+                return checkValidEmails(dataToBeValidated, fields?.id);
+            }
+
+            return null;
+        });
+        let placeOfResidenceError = checkArrayAndLength(this.state?.case?.addresses) &&
+            !this.state?.case?.addresses.find((e) =>
+                e.typeId === translations.userResidenceAddress.userPlaceOfResidence
+            );
+        // console.log('InvalidEmails: ', invalidEmails);
         if (missingFields && Array.isArray(missingFields) && missingFields.length === 0) {
-                if (this.checkAgeYearsRequirements()) {
-                    if (this.checkAgeMonthsRequirements()) {
-                        if ( this.state.case.addresses === undefined || this.state.case.addresses === null || this.state.case.addresses.length === 0 ||
-                            (this.state.case.addresses.length > 0 && this.state.hasPlaceOfResidence === true)) {
+            if (this.checkAgeYearsRequirements()) {
+                if (this.checkAgeMonthsRequirements()) {
+                    if (!placeOfResidenceError) {
+                        if (checkArrayAndLength(invalidEmails)) {
+                            Alert.alert(
+                                getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation),
+                                `${getTranslation(translations.alertMessages.invalidEmails, this.props.translation)}: ${invalidEmails.join(', ')}`, [
+                                    {
+                                        text: 'Ok', onPress: () => {
+                                            console.log('Invalid emails')
+                                        }
+                                    }
+                                ])
+                        } else {
                             if (this.checkIsolationOnsetDates()) {
                                 checkForNameDuplicatesRequest(_.get(this.state, 'case._id', null), this.state.case.firstName, this.state.case.lastName, this.props.user.activeOutbreakId, (error, response) => {
                                     if (error) {
@@ -585,21 +614,25 @@ class CaseSingleScreen extends Component {
                                             Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.checkForDuplicatesRequestError, this.props.translation), [
                                                 {
                                                     text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
-                                                    onPress: () => { this.hideMenu() }
+                                                    onPress: () => {
+                                                        this.hideMenu()
+                                                    }
                                                 }
                                             ])
                                         })
                                     }
                                     if (response) {
                                         if (response.length === 0) {
-                                            if( this.checkAnswerDatesQuestionnaire()){
+                                            if (this.checkAnswerDatesQuestionnaire()) {
                                                 this.saveCaseAction()
-                                            }else{
-                                                this.setState({ loading: false }, () => {
+                                            } else {
+                                                this.setState({loading: false}, () => {
                                                     Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.answerDateMissingError, this.props.translation), [
                                                         {
                                                             text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
-                                                            onPress: () => { this.hideMenu() }
+                                                            onPress: () => {
+                                                                this.hideMenu()
+                                                            }
                                                         }
                                                     ])
                                                 })
@@ -619,14 +652,16 @@ class CaseSingleScreen extends Component {
                                                 {
                                                     text: getTranslation(translations.alertMessages.saveAnywayLabel, this.props.translation),
                                                     onPress: () => {
-                                                        if( this.checkAnswerDatesQuestionnaire()){
+                                                        if (this.checkAnswerDatesQuestionnaire()) {
                                                             this.saveCaseAction()
-                                                        }else{
-                                                            this.setState({ loading: false }, () => {
+                                                        } else {
+                                                            this.setState({loading: false}, () => {
                                                                 Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.answerDateMissingError, this.props.translation), [
                                                                     {
                                                                         text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
-                                                                        onPress: () => { this.hideMenu() }
+                                                                        onPress: () => {
+                                                                            this.hideMenu()
+                                                                        }
                                                                     }
                                                                 ])
                                                             })
@@ -638,55 +673,66 @@ class CaseSingleScreen extends Component {
                                     }
                                 });
                             } else {
-                                this.setState({ loading: false }, () => {
+                                this.setState({loading: false}, () => {
                                     Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.dateOfOnsetError, this.props.translation), [
                                         {
                                             text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
-                                            onPress: () => { this.hideMenu() }
+                                            onPress: () => {
+                                                this.hideMenu()
+                                            }
                                         }
                                     ])
                                 })
                             }
-                        } else {
-                            this.setState({ loading: false }, () => {
-                                Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.placeOfResidenceError, this.props.translation), [
-                                    {
-                                        text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
-                                        onPress: () => { this.hideMenu() }
-                                    }
-                                ])
-                            })
                         }
                     } else {
-                        this.setState({ loading: false }, () => {
-                            Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.monthsValueError, this.props.translation), [
+                        this.setState({loading: false}, () => {
+                            Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.placeOfResidenceError, this.props.translation), [
                                 {
                                     text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
-                                    onPress: () => { this.hideMenu() }
+                                    onPress: () => {
+                                        this.hideMenu()
+                                    }
                                 }
                             ])
                         })
                     }
                 } else {
-                    this.setState({ loading: false }, () => {
-                        Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.yearsValueError, this.props.translation), [
+                    this.setState({loading: false}, () => {
+                        Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.monthsValueError, this.props.translation), [
                             {
                                 text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
-                                onPress: () => { this.hideMenu() }
+                                onPress: () => {
+                                    this.hideMenu()
+                                }
                             }
                         ])
                     })
                 }
             } else {
-                this.setState({ loading: false }, () => {
-                    Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), `${getTranslation(translations.alertMessages.requiredFieldsMissingError, this.props.translation)}.\n${getTranslation(translations.alertMessages.missingFields, this.props.translation)}: ${missingFields}`, [
+                this.setState({loading: false}, () => {
+                    Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.yearsValueError, this.props.translation), [
                         {
                             text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
-                            onPress: () => { this.hideMenu() }
+                            onPress: () => {
+                                this.hideMenu()
+                            }
                         }
                     ])
                 })
             }
+        } else {
+            this.setState({loading: false}, () => {
+                Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), `${getTranslation(translations.alertMessages.requiredFieldsMissingError, this.props.translation)}.\n${getTranslation(translations.alertMessages.missingFields, this.props.translation)}: ${missingFields}`, [
+                    {
+                        text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+                        onPress: () => {
+                            this.hideMenu()
+                        }
+                    }
+                ])
+            })
+        }
     };
     saveCaseAction = () => {
         this.hideMenu();
@@ -804,8 +850,8 @@ class CaseSingleScreen extends Component {
             Alert.alert("", 'You have unsaved data. Are you sure you want to leave this page and lose all changes?', [
                 {
                     text: 'Yes', onPress: () => {
-                        if(this.props.selectedScreen !== 2) {
-                            this.props.saveSelectedScreen(2);
+                        if(this.props.selectedScreen !== sideMenuKeys[3]) {
+                            this.props.saveSelectedScreen(sideMenuKeys[3]);
                         }
                         this.props.navigator.resetTo({
                                 screen: 'CasesScreen',
@@ -821,8 +867,8 @@ class CaseSingleScreen extends Component {
                 }
             ])
         } else {
-            if(this.props.selectedScreen !== 2) {
-                this.props.saveSelectedScreen(2);
+            if(this.props.selectedScreen !== sideMenuKeys[3]) {
+                this.props.saveSelectedScreen(sideMenuKeys[3]);
             }
             this.props.navigator.resetTo({
                     screen: 'CasesScreen',
@@ -2133,4 +2179,7 @@ function matchDispatchProps(dispatch) {
     }, dispatch);
 }
 
-export default connect(mapStateToProps, matchDispatchProps)(CaseSingleScreen);
+export default compose(
+    withPincode(),
+    connect(mapStateToProps, matchDispatchProps)
+)(CaseSingleScreen);

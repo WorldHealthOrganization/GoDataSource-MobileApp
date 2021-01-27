@@ -7,14 +7,14 @@ import React, {Component} from 'react';
 import {Alert, BackHandler, StyleSheet, View} from 'react-native';
 import NavBarCustom from './../components/NavBarCustom';
 import {connect} from "react-redux";
-import {bindActionCreators} from "redux";
+import {bindActionCreators, compose} from "redux";
 import lodashGet from 'lodash/get';
 import HelpSingleDetailsContainer from './../containers/HelpSingleDetailsContainer';
 import Breadcrumb from './../components/Breadcrumb';
 import {removeErrors} from './../actions/errors';
 import {getTranslation} from './../utils/functions';
 import translations from './../utils/translations';
-import config from './../utils/config';
+import withPincode from './../components/higherOrderComponents/withPincode';
 import ViewHOC from "../components/ViewHOC";
 
 class HelpSingleScreen extends Component {
@@ -130,4 +130,7 @@ function matchDispatchProps(dispatch) {
     }, dispatch);
 }
 
-export default connect(mapStateToProps, matchDispatchProps)(HelpSingleScreen);
+export default compose(
+    withPincode(),
+    connect(mapStateToProps, matchDispatchProps)
+)(HelpSingleScreen);

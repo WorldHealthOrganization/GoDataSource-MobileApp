@@ -57,7 +57,10 @@ class SectionedMultiSelect extends PureComponent {
                 <Ripple onPress={this.handleOnPress}>
                     {/**Text and dropdown icon container*/}
                     <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
-                        <Text>{this.props.selectText}</Text>
+                        <Text style={{
+                            fontFamily: 'Roboto-Regular',
+                            fontSize: 16
+                        }}>{this.props.selectText}</Text>
                         <Icon name={'arrow-drop-down'} />
                     </View>
                     {

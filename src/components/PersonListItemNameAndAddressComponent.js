@@ -17,7 +17,7 @@ class PersonListItemNameAndAddressComponent extends PureComponent {
     }
 
     render() {
-        let {firstComponentRenderData, translation, titleColor} = this.props;
+        let {firstComponentRenderData, translation, titleColor, emails} = this.props;
         return (
             <View>
                 <View style={{
@@ -47,6 +47,13 @@ class PersonListItemNameAndAddressComponent extends PureComponent {
                             display: firstComponentRenderData.addressString ? 'flex' : 'none'
                         }]}>
                             {'\u2022 ' + getTranslation(translations.addressFieldLabels.address, translation) + ": " + firstComponentRenderData.addressString}
+                        </Text>
+                        <Text style={[style.secondaryText, {
+                            flex: 1,
+                            marginHorizontal: 7,
+                            display: firstComponentRenderData.emails ? 'flex' : 'none'
+                        }]}>
+                            {'\u2022 ' + "Emails" + ": " + firstComponentRenderData.emails}
                         </Text>
                         {
                             firstComponentRenderData.status ?

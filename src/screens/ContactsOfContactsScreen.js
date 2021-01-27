@@ -29,6 +29,9 @@ import {bindActionCreators} from "redux";
 import {setLoaderState} from "../actions/app";
 import PermissionComponent from './../components/PermissionComponent';
 import {PERMISSIONS_CONTACT_OF_CONTACT} from './../utils/constants';
+import withPincode from "../components/higherOrderComponents/withPincode";
+import {getContactsForOutbreakId} from "../actions/contacts";
+import {compose} from "redux";
 
 class ContactsOfContactsScreen extends Component {
 
@@ -344,4 +347,9 @@ function matchDispatchProps(dispatch) {
     }, dispatch);
 }
 
-export default connect(mapStateToProps, matchDispatchProps)(enhanceListWithGetData(getContactsOfContactsForOutbreakId       , 'ContactsOfContactsScreen')(ContactsOfContactsScreen));
+// export default connect(mapStateToProps, matchDispatchProps)(enhanceListWithGetData(getContactsOfContactsForOutbreakId       , 'ContactsOfContactsScreen')(ContactsOfContactsScreen));
+export default compose(
+    withPincode(),
+    connect(mapStateToProps, matchDispatchProps),
+    enhanceListWithGetData(getContactsOfContactsForOutbreakId, 'ContactsOfContactsScreen')
+)(ContactsOfContactsScreen)

@@ -11,7 +11,7 @@ import NavBarCustom from './../components/NavBarCustom';
 import {calculateDimension, getTranslation} from './../utils/functions';
 import Ripple from 'react-native-material-ripple';
 import {connect} from "react-redux";
-import {bindActionCreators} from "redux";
+import {bindActionCreators, compose} from "redux";
 import ElevatedView from 'react-native-elevated-view';
 import Breadcrumb from './../components/Breadcrumb';
 import {getUsersForOutbreakId} from './../actions/user';
@@ -23,6 +23,7 @@ import config from './../utils/config';
 import {enhanceListWithGetData} from './../components/higherOrderComponents/withListData';
 import call from 'react-native-phone-call';
 import get from 'lodash/get';
+import withPincode from './../components/higherOrderComponents/withPincode';
 
 class UsersScreen extends Component {
 
@@ -200,4 +201,8 @@ function matchDispatchProps(dispatch) {
     }, dispatch);
 }
 
-export default connect(mapStateToProps, matchDispatchProps)(enhanceListWithGetData(getUsersForOutbreakId, 'UsersScreen')(UsersScreen));
+export default compose(
+    connect(mapStateToProps, matchDispatchProps),
+    withPincode(),
+    enhanceListWithGetData(getUsersForOutbreakId, 'UsersScreen')
+)(UsersScreen);

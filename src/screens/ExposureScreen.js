@@ -10,7 +10,7 @@ import {Icon} from 'react-native-material-ui';
 import styles from './../styles';
 import ViewHOC from './../components/ViewHOC';
 import {connect} from "react-redux";
-import {bindActionCreators} from "redux";
+import {bindActionCreators, compose} from "redux";
 import {addExposureForContact, updateExposureForContact} from './../actions/contacts';
 import {addExposureForContactOfContact, updateExposureForContactOfContact} from './../actions/contactsOfContacts';
 import NavBarCustom from './../components/NavBarCustom';
@@ -23,6 +23,7 @@ import ElevatedView from 'react-native-elevated-view';
 import ExposureContainer from '../containers/ExposureContainer';
 import get from 'lodash/get';
 import {insertOrUpdateExposure} from "../actions/exposure";
+import withPincode from './../components/higherOrderComponents/withPincode';
 
 class ExposureScreen extends Component {
 
@@ -478,4 +479,7 @@ function matchDispatchProps(dispatch) {
     }, dispatch);
 }
 
-export default connect(mapStateToProps, matchDispatchProps)(ExposureScreen);
+export default compose(
+    withPincode(),
+    connect(mapStateToProps, matchDispatchProps)
+)(ExposureScreen);

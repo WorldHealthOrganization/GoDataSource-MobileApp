@@ -46,6 +46,10 @@ const tableStructure = {
             fieldName: 'visualId',
             fieldType: 'TEXT'
         },
+        // {
+        //     fieldName: 'address',
+        //     fieldType: 'JSON'
+        // }
     ],
     followUp: [
         {

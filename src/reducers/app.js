@@ -18,9 +18,10 @@ import {
     ACTION_TYPE_SET_LOGIN_STATE,
     ACTION_TYPE_SET_SYNC_STATE
 } from './../utils/enums';
+import {sideMenuKeys} from './../utils/config';
 
 // Do not add unnecessary business logic in the reducer. Here should only be updated the store
-export default function app(state = { root: undefined, screenSize: {width: 375, height: 667}, selectedScreen: '', filters: {}, translation: {}, helpCategory: {}, helpItem: {}, availableLanguages: [], hubConfiguration:{}, syncState: '', generatedFollowUps: '', loginState: '',  loaderState: false, activeDatabase: '' }, action = {}) {
+export default function app(state = { root: undefined, screenSize: {width: 375, height: 667}, selectedScreen: sideMenuKeys[0], filters: {}, translation: {}, helpCategory: {}, helpItem: {}, availableLanguages: [], hubConfiguration:{}, syncState: '', generatedFollowUps: '', loginState: '',  loaderState: false, activeDatabase: '' }, action = {}) {
     let stateClone = null;
     switch (action.type) {
         case ACTION_TYPE_ROOT_CHANGE:
