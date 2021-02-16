@@ -20,7 +20,7 @@ import {bindActionCreators} from 'redux';
 import lodashGet from 'lodash/get';
 import {logoutUser, cleanDataAfterLogout} from './../actions/user';
 import {removeErrors} from './../actions/errors';
-import {saveActiveDatabase, changeAppRoot} from './../actions/app';
+import {saveActiveDatabase, changeAppRoot, verifyChangesExist} from './../actions/app';
 import NavBarCustom from './../components/NavBarCustom';
 import config from './../utils/config';
 import IntervalPicker from './../components/IntervalPicker';
@@ -174,6 +174,8 @@ class FirstConfigScreen extends Component {
                     lastSyncDate: lastSyncDate,
                     showLoading: false,
                     allDatabases: databasesGlobal
+                }, () => {
+                    this.props.verifyChangesExist();
                 })
             })
             .catch((errorGetData) => {
@@ -436,6 +438,7 @@ class FirstConfigScreen extends Component {
             case 'TextInput':
                 return (
                     <TextInput
+                        key={item.id}
                         id={item.id}
                         label={getTranslation(item.label, this.props.translation)}
                         index={this.props.index}
@@ -456,6 +459,7 @@ class FirstConfigScreen extends Component {
             case 'SwitchInput' :
                 return (
                     <SwitchInput
+                        key={item.id}
                         id={item.id}
                         label={getTranslation(item.label, this.props.translation)}
                         index={this.props.index}
@@ -474,6 +478,7 @@ class FirstConfigScreen extends Component {
             case 'IntervalPicker':
                 return (
                     <IntervalPicker
+                        key={'chunkSize'}
                         id={'chunkSize'}
                         label={'Number of records per file'}
                         value={[this.state.chunkSize]}
@@ -590,6 +595,7 @@ class FirstConfigScreen extends Component {
                 this.showAlert("Alert", `Error while deleting hub: \n${JSON.stringify(errorRemove)}`);
             })
     };
+
     filesDelete = (hubId) => {
         // hubId is database ID
         let pathToDatabase = `${RNFetchBlobFS.dirs.DocumentDir}/`;
@@ -769,11 +775,18 @@ class FirstConfigScreen extends Component {
 
     // Hub deletion methods
     handlePressDeleteHub = (hubId) => {
-        this.setState({
-            isVisible: true,
-            databaseToBeDeleted: hubId
-        })
+
+        if( this.props.changesExist && this.props.changesExist["status"] === 'No data'){
+            this.setState({
+                isVisible: true,
+                databaseToBeDeleted: hubId
+            })
+        } else {
+            this.showAlert(getTranslation(translations.hubConfigScreen.deleteHubButton, this.props.translation), getTranslation(translations.hubConfigScreen.deleteHubSyncDataMessage, this.props.translation));
+        }
+
     };
+
     hideModal = () => {
         this.setState({
             isVisible: false,
@@ -843,6 +856,7 @@ const style = StyleSheet.create({
 function mapStateToProps(state) {
     return {
         screenSize: lodashGet(state, 'app.screenSize', config.designScreenSize),
+        changesExist: lodashGet(state, 'app.changesExist', null),
         errors: lodashGet(state, 'errors', null),
         translation: lodashGet(state, 'app.translation', [])
     };
@@ -853,6 +867,7 @@ function matchDispatchToProps(dispatch) {
         logoutUser,
         removeErrors,
         saveActiveDatabase,
+        verifyChangesExist,
         changeAppRoot,
         cleanDataAfterLogout
     }, dispatch);

@@ -9,6 +9,7 @@ import {
     ACTION_TYPE_SAVE_AVAILABLE_LANGUAGES,
     ACTION_TYPE_SAVE_HUB_CONFIGURATION,
     ACTION_TYPE_SAVE_SCREEN_SIZE,
+    ACTION_TYPE_CHANGES_EXIST,
     ACTION_TYPE_SAVE_SELECTED_SCREEN,
     ACTION_TYPE_SAVE_TRANSLATION,
     ACTION_TYPE_SET_LOADER_STATE,
@@ -59,6 +60,13 @@ export function saveScreenSize(screenSize) {
         type: ACTION_TYPE_SAVE_SCREEN_SIZE,
         screenSize: screenSize
     };
+}
+
+export function saveChangesExist(changesExist) {
+    return {
+        type: ACTION_TYPE_CHANGES_EXIST,
+        changesExist: changesExist
+    }
 }
 
 export function saveSelectedScreen(selectedScreen) {
@@ -419,6 +427,85 @@ function saveActiveDatabaseAndCleanup(syncSuccessful, hubConfiguration, hubConfi
             return AsyncStorage.setItem('databases', JSON.stringify(databases));
         })
         .catch((errorStoreData) => Promise.reject(errorStoreData));
+}
+
+export function verifyChangesExist() {
+   return async function (dispatch, getState) {
+       let internetCredentialsGlobal = null;
+       let lastSyncDateGlobal = null;
+       let skipZip = true;
+       // Get activeDatabase
+       Promise.resolve()
+           .then(() => AsyncStorage.getItem('activeDatabase'))
+           .then((activeDatabase) => {
+               let lastSyncDatePromise = AsyncStorage.getItem(activeDatabase);
+               let internetCredentialsPromise = getInternetCredentials(activeDatabase);
+               let cleanupPromise = Promise.resolve();
+
+               return Promise.all([lastSyncDatePromise, internetCredentialsPromise, Promise.resolve(activeDatabase), cleanupPromise])
+           })
+           .then(async ([lastSyncDate, internetCredentials, activeDatabase, cleanUpResult]) =>   {
+               internetCredentialsGlobal = internetCredentials;
+               lastSyncDateGlobal = lastSyncDate;
+               let statusArray = [];
+               let credentials = JSON.parse(internetCredentials.username);
+               let password = credentials.encryptedData ? getSyncEncryptPassword(null, credentials) : null;
+               for (let i=0; i<config.changingMongoCollections.length; i++) {
+                   try {
+                       let database = await getDatabase(config.changingMongoCollections[i]);
+                       let status = await getDataFromDatabaseFromFile(database, config.changingMongoCollections[i], lastSyncDate, password);
+
+                       statusArray.push(status);
+                   } catch (errorGetDatabaseFromFile) {
+                       console.log('ErrorGetDatabaseFromFile: ', errorGetDatabaseFromFile);
+                       dispatch(saveChangesExist({
+                           id: 'changesExist',
+                           status: 'Error',
+                           error: JSON.stringify(errorGetDatabaseFromFile)
+                       }));
+                       break;
+                   }
+               }
+               for (let i=0; i<config.changingSQLiteCollections.length; i++) {
+                   try {
+                       let status = await getDataFromDatabaseFromFileSql(config.changingSQLiteCollections[i], lastSyncDate, password);
+
+                       statusArray.push(status);
+                   } catch(errorGetSQLite) {
+                       console.log('ErrorGetDatabaseFromFile: ', errorGetSQLite);
+                       dispatch(saveChangesExist({
+                           id: 'changesExist',
+                           status: 'Error',
+                           error: JSON.stringify(errorGetSQLite)
+                       }));
+                       break;
+                   }
+               }
+
+               if (statusArray.length === (config.changingMongoCollections.length + config.changingSQLiteCollections.length)) {
+                   // Check if the status array is full of "No data to send" statuses
+                   // let skipZip = true;
+
+                   for (let i = 0; i < statusArray.length; i++) {
+                       if (statusArray[i] !== 'No data to send') {
+                           skipZip = false;
+                       }
+                   }
+
+
+                   if (skipZip) {
+                       dispatch(saveChangesExist({id: 'changesExist', status: 'No data'}));
+                   } else {
+                       dispatch(saveChangesExist({id: 'changesExist', status: 'Data'}));
+                   }
+
+                   return Promise.resolve();
+               }
+           })
+           .catch((errorSendDatabase) => {
+               dispatch(saveChangesExist({id: 'changesExist', status: 'Error', error: errorSendDatabase}));
+           })
+   }
 }
 
 export function sendDatabaseToServer () {
