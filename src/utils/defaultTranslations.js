@@ -467,7 +467,7 @@ export default {
     'LNG_HUB_CONFIGURATION_SCREEN_CONFIRM_DELETE_HUB': "Are you sure you want to delete the hub?",
     "LNG_HUB_CONFIGURATION_SCREEN_REPLACEMENT_HUBS": "Replacement Hubs",
     "LNG_HUB_CONFIGURATION_SCREEN_REPLACEMENT_HUBS_LABEL": "Please select the Hub that you would like to switch to",
-
+    'LNG_HUB_CONFIGURATION_SCREEN_DELETE_HUB_SYNC_DATA': "There is data that has not been sent to the server and will be lost. Please synchronize your data first, then try to delete the hub again.",
     // Errors
     'LNG_HUB_CONFIGURATION_SCREEN_ERROR_SET_ACTIVE_HUB': 'Error set active HUB',
     'LNG_HUB_CONFIGURATION_SCREEN_ERROR_OCCURED_WHILE_SETTING_ACTIVE_HUB': 'An error occurred while setting the new active HUB',
