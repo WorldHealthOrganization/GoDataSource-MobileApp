@@ -771,18 +771,18 @@ class FirstConfigScreen extends Component {
                 console.log('Error getting internet credentials: ', errorChangeActiveDatabase);
                 this.showAlert(getTranslation(translations.hubConfigScreen.setActiveDatabaseTitle, this.props.translation), getTranslation(translations.hubConfigScreen.setActiveDatabaseMessage, this.props.translation));
             });
-    }
+    };
 
     // Hub deletion methods
     handlePressDeleteHub = (hubId) => {
 
-        if( this.props.changesExist && this.props.changesExist["status"] === 'No data'){
+        if( this.props.changesExist && this.props.changesExist["status"] === 'Data'){
+            this.showAlert(getTranslation(translations.hubConfigScreen.deleteHubButton, this.props.translation), getTranslation(translations.hubConfigScreen.deleteHubSyncDataMessage, this.props.translation));
+        } else {
             this.setState({
                 isVisible: true,
                 databaseToBeDeleted: hubId
-            })
-        } else {
-            this.showAlert(getTranslation(translations.hubConfigScreen.deleteHubButton, this.props.translation), getTranslation(translations.hubConfigScreen.deleteHubSyncDataMessage, this.props.translation));
+            });
         }
 
     };
