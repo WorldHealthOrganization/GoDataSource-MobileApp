@@ -2,8 +2,6 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>NSContactsUsageDescription</key>
-	<string>Some description</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
@@ -61,6 +59,8 @@
 	<string>Some description</string>
 	<key>NSCameraUsageDescription</key>
 	<string>Camera is needed in order to scan QR code</string>
+	<key>NSContactsUsageDescription</key>
+	<string>Some description</string>
 	<key>NSFaceIDUsageDescription</key>
 	<string>Enabling Face ID allows you quick and secure access to your account.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>

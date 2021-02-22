@@ -5,6 +5,7 @@
 	};
 	objectVersion = 46;
 	objects = {
+
 /* Begin PBXBuildFile section */
 		00C302E51ABCBA2D00DB3ED1 /* libRCTActionSheet.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302AC1ABCB8CE00DB3ED1 /* libRCTActionSheet.a */; };
 		00C302E71ABCBA2D00DB3ED1 /* libRCTGeolocation.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302BA1ABCB90400DB3ED1 /* libRCTGeolocation.a */; };
@@ -45,7 +46,6 @@
 		3424E5E84C7944318A7900BD /* Roboto-ThinItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 4EEF426F4A7B44068C424A73 /* Roboto-ThinItalic.ttf */; };
 		375529ADF1CB461D91661EF3 /* Octicons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = D76C7890181046A1AA3452BD /* Octicons.ttf */; };
 		3B06BE0721C3DBFA0012D9C0 /* APNSEventEmitter.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B06BE0621C3DBFA0012D9C0 /* APNSEventEmitter.m */; };
-		3B1A858AB1744B04B1C4B651 /* libTcpSockets.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B3CF4F5C67E04490B6CFFA35 /* libTcpSockets.a */; };
 		3B38880421C79AD300ADBE5C /* APNSEventManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 3B38880321C79AD300ADBE5C /* APNSEventManager.m */; };
 		4AED598218A74F9CA423E6C6 /* SimpleLineIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 1167A5CFED3D417C93EF4604 /* SimpleLineIcons.ttf */; };
 		4FA28C1F731A478998412FD9 /* Roboto-Black.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 5A1454C683FF43BEA12EA238 /* Roboto-Black.ttf */; };
@@ -75,11 +75,9 @@
 		C2A7E866D20941CAB61359DF /* AntDesign.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8D4378C0849F40618679B554 /* AntDesign.ttf */; };
 		C330B627ADDF4DC29DE5E4C8 /* FontAwesome5_Brands.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 59636DB7940042C1BDA5D253 /* FontAwesome5_Brands.ttf */; };
 		D963938CD584422E932FE4E9 /* Roboto-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 3AE4AE468ABF483A96273BDA /* Roboto-Bold.ttf */; };
-		DEEB13ECEE344FCD829BFF24 /* libUdpSockets.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AC9539660413457FA8245AC5 /* libUdpSockets.a */; };
 		E28F666BABC24140A32FB0D2 /* Zocial.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8874A0A801A349E395ECA696 /* Zocial.ttf */; };
 		E567B4CD62EC4DE6B39954D5 /* Ionicons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A64F56DA9922496E8F14D97B /* Ionicons.ttf */; };
 		E9CB62B08ACF4C2E98651372 /* Roboto-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A028CDE013104AAA955FC253 /* Roboto-Regular.ttf */; };
-		ECDDEB1829A840EFBB17E0EF /* libRNOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EB0DBC52B3954A16AD221651 /* libRNOS.a */; };
 		F208B62A22AFCFD300B84216 /* libRNSentry.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F208B62322AFCFBD00B84216 /* libRNSentry.a */; };
 		F211DA1B2445EC6400CB50B8 /* libRNExitApp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2B255AEE22365942000F50DB /* libRNExitApp.a */; };
 		F211DA1D2445EC7800CB50B8 /* libPods-who_mobile.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F211DA1C2445EC7800CB50B8 /* libPods-who_mobile.a */; };
@@ -663,14 +661,12 @@
 		715FF1EF60124F6BB9874513 /* libUdpSockets.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libUdpSockets.a; sourceTree = "<group>"; };
 		7286DBFD802841D3BE167F11 /* Roboto-Thin.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Roboto-Thin.ttf"; path = "../assets/fonts/Roboto/Roboto-Thin.ttf"; sourceTree = "<group>"; };
 		73856D32D60C43B7B27E5098 /* Roboto-BoldItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Roboto-BoldItalic.ttf"; path = "../assets/fonts/Roboto/Roboto-BoldItalic.ttf"; sourceTree = "<group>"; };
-		76EF576524554401B56BEB9B /* UdpSockets.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = UdpSockets.xcodeproj; path = "../node_modules/react-native-udp/ios/UdpSockets.xcodeproj"; sourceTree = "<group>"; };
 		78C398B01ACF4ADC00677621 /* RCTLinking.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTLinking.xcodeproj; path = "../node_modules/react-native/Libraries/LinkingIOS/RCTLinking.xcodeproj"; sourceTree = "<group>"; };
 		7BBB6B0C964045429AA660DF /* Entypo.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Entypo.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Entypo.ttf"; sourceTree = "<group>"; };
 		832341B01AAA6A8300B99B32 /* RCTText.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTText.xcodeproj; path = "../node_modules/react-native/Libraries/Text/RCTText.xcodeproj"; sourceTree = "<group>"; };
 		8842D5AE20F89B970062B99B /* fonts */ = {isa = PBXFileReference; lastKnownFileType = folder; name = fonts; path = ../assets/fonts; sourceTree = "<group>"; };
 		8874A0A801A349E395ECA696 /* Zocial.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Zocial.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Zocial.ttf"; sourceTree = "<group>"; };
 		8D4378C0849F40618679B554 /* AntDesign.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = AntDesign.ttf; path = "../node_modules/react-native-vector-icons/Fonts/AntDesign.ttf"; sourceTree = "<group>"; };
-		8D813926319D4829A39CB49E /* TcpSockets.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = TcpSockets.xcodeproj; path = "../node_modules/react-native-tcp/ios/TcpSockets.xcodeproj"; sourceTree = "<group>"; };
 		96D95005C5764435B795195C /* Roboto-LightItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Roboto-LightItalic.ttf"; path = "../assets/fonts/Roboto/Roboto-LightItalic.ttf"; sourceTree = "<group>"; };
 		A028CDE013104AAA955FC253 /* Roboto-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Roboto-Regular.ttf"; path = "../assets/fonts/Roboto/Roboto-Regular.ttf"; sourceTree = "<group>"; };
 		A063A32E3E1A477DA53EFE50 /* RNZipArchive.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNZipArchive.xcodeproj; path = "../node_modules/react-native-zip-archive/ios/RNZipArchive.xcodeproj"; sourceTree = "<group>"; };
@@ -679,9 +675,7 @@
 		A497454867DF431F8822A06A /* libRNZipArchive.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRNZipArchive.a; sourceTree = "<group>"; };
 		A64F56DA9922496E8F14D97B /* Ionicons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Ionicons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Ionicons.ttf"; sourceTree = "<group>"; };
 		A820E020B2584485A8DEF6CD /* Roboto-Medium.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Roboto-Medium.ttf"; path = "../assets/fonts/Roboto/Roboto-Medium.ttf"; sourceTree = "<group>"; };
-		AC9539660413457FA8245AC5 /* libUdpSockets.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libUdpSockets.a; sourceTree = "<group>"; };
 		ADBDB91F1DFEBF0600ED6528 /* RCTBlob.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTBlob.xcodeproj; path = "../node_modules/react-native/Libraries/Blob/RCTBlob.xcodeproj"; sourceTree = "<group>"; };
-		B3CF4F5C67E04490B6CFFA35 /* libTcpSockets.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libTcpSockets.a; sourceTree = "<group>"; };
 		B5C077E73E1344FF8C57E0B2 /* Roboto-Light.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Roboto-Light.ttf"; path = "../assets/fonts/Roboto/Roboto-Light.ttf"; sourceTree = "<group>"; };
 		B9C28E08DB2E4DE6A0FC7697 /* Roboto-BlackItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Roboto-BlackItalic.ttf"; path = "../assets/fonts/Roboto/Roboto-BlackItalic.ttf"; sourceTree = "<group>"; };
 		BF5365B793F645DC982B16CB /* MaterialCommunityIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = MaterialCommunityIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/MaterialCommunityIcons.ttf"; sourceTree = "<group>"; };
@@ -691,7 +685,6 @@
 		D76C7890181046A1AA3452BD /* Octicons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Octicons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Octicons.ttf"; sourceTree = "<group>"; };
 		E54033C2BFF74BD69A695E2B /* UdpSockets.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = UdpSockets.xcodeproj; path = "../node_modules/react-native-udp/ios/UdpSockets.xcodeproj"; sourceTree = "<group>"; };
 		E9DC39632BDD44A9915133B7 /* RNKeychain.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNKeychain.xcodeproj; path = "../node_modules/react-native-keychain/RNKeychain.xcodeproj"; sourceTree = "<group>"; };
-		EB0DBC52B3954A16AD221651 /* libRNOS.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRNOS.a; sourceTree = "<group>"; };
 		EC98F5D4250748DC812CB9B3 /* EvilIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = EvilIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/EvilIcons.ttf"; sourceTree = "<group>"; };
 		F208B5E622AFCFBD00B84216 /* RNSentry.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNSentry.xcodeproj; path = "../node_modules/react-native-sentry/ios/RNSentry.xcodeproj"; sourceTree = "<group>"; };
 		F211DA1C2445EC7800CB50B8 /* libPods-who_mobile.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = "libPods-who_mobile.a"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -764,7 +757,6 @@
 				6CF45914636A42FB87CD719A /* libRNSqlite2.a in Frameworks */,
 				6096FC82DC9940B689657C3A /* libRNOS.a in Frameworks */,
 				63E5A2019A4A4AA2BAFA51CA /* libTcpSockets.a in Frameworks */,
-				E22C97661003476F8C787779 /* libUdpSockets.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2398,7 +2390,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 1.0.104;
+				CURRENT_PROJECT_VERSION = 1.0.106;
 				DEAD_CODE_STRIPPING = NO;
 				DEVELOPMENT_TEAM = YJDF2LWD3T;
 				HEADER_SEARCH_PATHS = (
@@ -2442,7 +2434,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 1.0.104;
+				CURRENT_PROJECT_VERSION = 1.0.106;
 				DEVELOPMENT_TEAM = YJDF2LWD3T;
 				HEADER_SEARCH_PATHS = (
 					"$(SRCROOT)/../node_modules/react-native/React",
