@@ -985,6 +985,10 @@ class CaseSingleScreen extends Component {
     onPressAddDocument = () => {
         let documents = _.cloneDeep(this.state.case.documents);
 
+        if (!checkArrayAndLength(documents)) {
+            documents = [];
+        }
+
         documents.push({
             type: '',
             number: ''

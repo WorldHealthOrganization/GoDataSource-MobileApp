@@ -17,6 +17,7 @@ import _ from 'lodash';
 import TopContainerButtons from "../components/TopContainerButtons";
 import PermissionComponent from './../components/PermissionComponent';
 import constants from "./../utils/constants";
+import {checkArray} from "../utils/typeCheckingFunctions";
 
 class CaseSinglePersonalContainer extends Component {
 
@@ -88,7 +89,7 @@ class CaseSinglePersonalContainer extends Component {
                                         onPress={this.props.onPressAddDocument}
                                     >
                                         <Text style={{ fontFamily: 'Roboto-Medium', fontSize: 12, color: styles.buttonGreen }}>
-                                            {this.props.case.documents && this.props.case.documents.length === 0 ? getTranslation(translations.caseSingleScreen.oneDocumentText, this.props.translation) : getTranslation(translations.caseSingleScreen.moreDocumentsText, this.props.translation)}
+                                            {!_.get(this.props, 'case.documents', null) || checkArray(this.props.case.documents) && this.props.case.documents.length === 0 ? getTranslation(translations.caseSingleScreen.oneDocumentText, this.props.translation) : getTranslation(translations.caseSingleScreen.moreDocumentsText, this.props.translation)}
                                         </Text>
                                     </Ripple>
                                 </View>) : null
