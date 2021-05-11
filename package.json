@@ -28,7 +28,7 @@
     "https-browserify": "0.0.1",
     "jetifier": "^1.6.5",
     "json-sql": "^0.4.11",
-    "lodash": "^4.17.10",
+    "lodash": "^4.17.21",
     "moment": "^2.22.2",
     "path-browserify": "0.0.0",
     "pouchdb-adapter-react-native-sqlite": "^1.0.3",
