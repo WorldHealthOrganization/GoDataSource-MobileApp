@@ -196,7 +196,10 @@ export function insertOrUpdate(databaseName, tableName, data, createTableBool) {
                                 i++
                             }
                         },
-                            (errorTransaction) => Promise.reject(errorTransaction),
+                            (errorTransaction) => {
+                            console.log("Transaction error", errorTransaction);
+                            return Promise.reject(errorTransaction);
+                            },
                             () => {
                                 insertEnd = new Date().getTime();
                                 insertTime = insertEnd - openCreateEnd;

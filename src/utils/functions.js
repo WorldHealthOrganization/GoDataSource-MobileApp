@@ -7,7 +7,7 @@ import RNFetchBlobFS from 'rn-fetch-blob/fs';
 import {unzip, zip} from 'react-native-zip-archive';
 import {processBulkDocs, updateFileInDatabase} from './../queries/database';
 import {setSyncState} from './../actions/app';
-import {NativeModules} from 'react-native';
+import {Alert, Linking, NativeModules} from 'react-native';
 import uuid from 'react-native-uuid';
 import get from 'lodash/get';
 import sortBy from 'lodash/sortBy';
@@ -1411,6 +1411,19 @@ export function extractMainAddress (addressesArray) {
     }
 
     return addressesArray.find((e) => {return e.typeId === config.userResidenceAddress.userPlaceOfResidence})
+}
+
+export function callPhone(number){
+    Alert.alert('Calling number', `Are you sure you want to call ${number}`, [
+        {
+            text: 'Yes',
+            onPress: ()=>{Linking.openURL(`tel:${number}`);}
+        },
+        {
+            text: 'No'
+        }
+    ],{cancelable: true});
+
 }
 
 export function extractLocationId (person) {

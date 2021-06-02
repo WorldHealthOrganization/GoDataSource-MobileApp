@@ -4,10 +4,10 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {PureComponent} from 'react';
-import {Image, StyleSheet, Text, View} from 'react-native';
+import {Image, StyleSheet, Text, View, Linking} from 'react-native';
 import styles from './../styles';
 import translations from './../utils/translations'
-import {calculateDimension, getTranslation} from './../utils/functions';
+import {calculateDimension, callPhone, getTranslation} from './../utils/functions';
 import {connect} from "react-redux";
 import Ripple from 'react-native-material-ripple';
 
@@ -82,13 +82,15 @@ class PersonListItemNameAndAddressComponent extends PureComponent {
                         {
                             firstComponentRenderData.telephoneNumbers ?
                                 (
-                                    <Text style={[style.secondaryText, {
-                                        flex: 1,
-                                        marginHorizontal: 7,
-                                        display: firstComponentRenderData.telephoneNumbers ? 'flex' : 'none'
-                                    }]}>
-                                        {'\u2022 ' + getTranslation(translations.usersScreen.primaryPhone, translation) + ": " + firstComponentRenderData.telephoneNumbers}
-                                    </Text>
+                                    <Ripple onPress={() => {callPhone(firstComponentRenderData.telephoneNumbers)}}>
+                                        <Text style={[style.secondaryText, {
+                                            flex: 1,
+                                            marginHorizontal: 7,
+                                            display: firstComponentRenderData.telephoneNumbers ? 'flex' : 'none'
+                                        }]}>
+                                            {'\u2022 ' + getTranslation(translations.usersScreen.primaryPhone, translation) + ": " + firstComponentRenderData.telephoneNumbers}
+                                        </Text>
+                                    </Ripple>
                                 ) : (null)
                         }
                     </View>

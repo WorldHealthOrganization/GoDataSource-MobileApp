@@ -1885,6 +1885,7 @@ class ContactsSingleScreen extends Component {
 
     // Questionnaire methods
     onChangeAnswer = (value, id, parentId, index) => {
+        console.log("Quest value", value);
         let questionnaireAnswers = _.cloneDeep(this.state.previousAnswers);
 
         if (parentId) {

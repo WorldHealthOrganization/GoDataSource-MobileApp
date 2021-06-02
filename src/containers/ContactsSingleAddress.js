@@ -162,6 +162,8 @@ class ContactsSingleAddress extends Component {
         let minimumDate = undefined;
         let maximumDate = undefined;
 
+        console.log("This is rendering the items in the view", item, cardIndex);
+
         if (item.type === 'DropdownInput') {
             item.data = this.computeDataForContactsSingleScreenDropdownInput(item, cardIndex);
         } else if (item.type === 'ActionsBar') {

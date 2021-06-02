@@ -4,9 +4,9 @@
 /** Since this app is based around the material ui is better to use the components from
  the material ui library, since it provides design and animations out of the box */
 import React, {PureComponent} from 'react';
-import {View, Text, StyleSheet} from 'react-native';
+import {View, Text, StyleSheet, Linking, Alert} from 'react-native';
 import {WebView} from 'react-native-webview';
-import {calculateDimension, getTranslation, createDate} from './../utils/functions';
+import {calculateDimension, getTranslation, createDate, callPhone} from './../utils/functions';
 import {connect} from "react-redux";
 import DropdownInput from './DropdownInput';
 import DropDown from './DropDown';
@@ -83,6 +83,7 @@ class CardComponent extends PureComponent {
                         onChange={this.props.onChangeText}
                         onFocus={this.props.onFocus}
                         onBlur={this.props.onBlur}
+                        onClickAction={this.props.item.id === 'phoneNumber' ? callPhone : null}
                     />
                 );
             case 'DropdownInput':
