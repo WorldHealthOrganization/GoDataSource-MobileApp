@@ -4,10 +4,17 @@ target 'who_mobile' do
   pod 'Parse'
 
   # Add new pods below this line
+
+   pod 'ReactNativePermissions', :path => '../node_modules/react-native-permissions'
+  #pod 'RNPermissions', :path => '../node_modules/react-native-permissions'
+
+  #permissions_path = '../node_modules/react-native-permissions/ios'
+  #pod 'Permission-Camera', :path => "#{permissions_path}/Camera"
+
   pod 'RNKeychain', :path => '../node_modules/react-native-keychain'
   pod 'TouchID', :path => '../node_modules/react-native-touch-id'
 
-  #pod 'ReactNativeDarkMode', :path => '../node_modules/react-native-dark-mode'
+  #pod 'ReactNativeDarkMode', :path => '../selfnode_modules/react-native-dark-mode'
 
   #pod 'RNDateTimePicker', :path => '../node_modules/@react-native-community/datetimepicker'
 
