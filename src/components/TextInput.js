@@ -4,7 +4,7 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
-import {Text, View} from 'react-native';
+import {Text, View, Alert} from 'react-native';
 import PropTypes from 'prop-types';
 import {getTooltip, getTranslation} from './../utils/functions';
 import {TextField} from 'react-native-material-textfield';
