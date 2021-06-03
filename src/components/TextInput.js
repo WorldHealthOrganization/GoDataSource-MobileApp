@@ -4,7 +4,7 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
-import {Text, View, Alert} from 'react-native';
+import {Text, View} from 'react-native';
 import PropTypes from 'prop-types';
 import {getTooltip, getTranslation} from './../utils/functions';
 import {TextField} from 'react-native-material-textfield';
@@ -54,6 +54,11 @@ class TextInput extends Component {
     editInput = () => {
         let tooltip = getTooltip(this.props.label, this.props.translation);
         let value = lodashGet(this.state, 'value', ' ');
+        if(value || value === 0){
+            value = value.toString()
+        } else {
+            value = '';
+        }
         return (
             <View style={[{flexDirection: 'row'},this.props.style]}>
                 <View style={{flex: 1}}> 
