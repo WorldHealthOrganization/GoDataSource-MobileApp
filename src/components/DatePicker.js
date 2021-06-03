@@ -46,16 +46,16 @@ const DatePicker = React.memo(({
                     {
                         value !== null && value !== undefined && date !== '' ? (
                             <View>
-                                <Text style={{
-                                    fontFamily: 'Roboto',
-                                    fontSize: 15,
-                                    textAlign: 'left',
-                                    color: 'rgba(0, 0, 0, .38)',
-                                }}>
-                                    {isRequired ? getTranslation(label, translation) + ' * ' : getTranslation(label, translation)}
-                                </Text>
-
                                 <Ripple onPress={handleShowDatePicker}>
+                                    <Text style={{
+                                        fontFamily: 'Roboto',
+                                        fontSize: 15,
+                                        textAlign: 'left',
+                                        color: 'rgba(0, 0, 0, .38)',
+                                    }}>
+                                        {isRequired ? getTranslation(label, translation) + ' * ' : getTranslation(label, translation)}
+                                    </Text>
+
                                     <Text
                                         style={{
                                             fontFamily: 'Roboto-Regular',

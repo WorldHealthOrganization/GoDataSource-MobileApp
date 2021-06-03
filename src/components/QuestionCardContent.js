@@ -248,9 +248,9 @@ class QuestionCardContent extends PureComponent {
                         isEditMode={this.props.isEditMode}
                         isRequired={item.required}
                         onChange={(text, id) => {
-                            let parsedText = text ? parseFloat(text) : undefined
+                            let parsedText = parseFloat(text);
                             let valueToSend = {
-                                date: answerDate, value: Number.isNaN(parsedText) ? undefined : parseFloat(text)
+                                date: answerDate, value: Number.isNaN(parsedText) ? undefined : parsedText
                             };
                             this.props.onChangeTextAnswer(valueToSend, id, parentId, this.props.index);
                         }}

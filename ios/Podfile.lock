@@ -8,9 +8,11 @@ PODS:
     - React/Core (= 0.59.10)
   - React/Core (0.59.10):
     - yoga (= 0.59.10.React)
+  - ReactNativePermissions (1.2.1):
+    - React
   - RNBcrypt (1.0.0):
     - React
-  - RNKeychain (6.1.1):
+  - RNKeychain (6.2.0):
     - React
   - SQLCipher (4.4.2):
     - SQLCipher/standard (= 4.4.2)
@@ -24,6 +26,7 @@ PODS:
 DEPENDENCIES:
   - Parse
   - React (from `../node_modules/react-native`)
+  - ReactNativePermissions (from `../node_modules/react-native-permissions`)
   - RNBcrypt (from `../node_modules/react-native-bcrypt`)
   - RNKeychain (from `../node_modules/react-native-keychain`)
   - SQLCipher
@@ -39,6 +42,8 @@ SPEC REPOS:
 EXTERNAL SOURCES:
   React:
     :path: "../node_modules/react-native"
+  ReactNativePermissions:
+    :path: "../node_modules/react-native-permissions"
   RNBcrypt:
     :path: "../node_modules/react-native-bcrypt"
   RNKeychain:
@@ -52,12 +57,13 @@ SPEC CHECKSUMS:
   Bolts: 8c1e8aab2f603387b8b9924f57d1d64f43d3ffdc
   Parse: e40fdb9c7d665823b7fe9865949cac9a53eb2ce7
   React: 36d0768f9e93be2473b37e7fa64f92c1d5341eef
+  ReactNativePermissions: e7db6c38a2f3fb8f26dbfdcaeb5c5e9364657a6d
   RNBcrypt: 21320bf1df4fe7321b02ceee6e651d89329d9778
-  RNKeychain: db956c02a018f7dd3a0ea8a6cf3087bc1894bf2b
+  RNKeychain: b8e0711b959a19c5b057d1e970d3c83d159b6da5
   SQLCipher: 1ab0b9486a77d141e72e92ff30681926ed79c07a
   TouchID: ba4c656d849cceabc2e4eef722dea5e55959ecf4
   yoga: 684513b14b03201579ba3cee20218c9d1298b0cc
 
-PODFILE CHECKSUM: ef497d600c24c5e519dbbef1e32f8f596ea9fa13
+PODFILE CHECKSUM: 57d6777391c3f6c47741d4ce1d2621ffa48a3f71
 
-COCOAPODS: 1.9.1
+COCOAPODS: 1.10.1
