@@ -107,7 +107,7 @@ def getPassword(String currentUser, String keyChain) {
     stdout.toString().trim()
 }
 
-def pass = getPassword("florinpopa","go.data_keystore_password")
+//def pass = getPassword("florinpopa","go.data_keystore_password")
 
 android {
     compileSdkVersion 28

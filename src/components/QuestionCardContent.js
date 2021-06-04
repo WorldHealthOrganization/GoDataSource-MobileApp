@@ -250,8 +250,8 @@ class QuestionCardContent extends PureComponent {
                         onChange={(text, id) => {
                             let parsedText = parseFloat(text);
                             let valueToSend = {
-                                date: answerDate, value: Number.isNaN(parsedText) ? undefined : parsedText;
-                            }
+                                date: answerDate, value: Number.isNaN(parsedText) ? undefined : parsedText
+                            };
                             this.props.onChangeTextAnswer(valueToSend, id, parentId, this.props.index);
                         }}
                         multiline={true}
