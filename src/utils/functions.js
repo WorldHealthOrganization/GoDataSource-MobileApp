@@ -1009,7 +1009,7 @@ export function checkRequiredQuestions(questions, previousAnswers) {
     for (let i = 0; i < questions.length; i++) {
         if (questions[i].required && questions[i].inactive === false) {
             if (!previousAnswers || !previousAnswers[questions[i].variable] || !Array.isArray(previousAnswers[questions[i].variable]) || previousAnswers[questions[i].variable].findIndex((e) => {
-                return !e.value || e.value === ''
+                return !e.value && e.value !== 0
             }) > -1) {
                 requiredQuestions.push(questions[i].text);
             }
