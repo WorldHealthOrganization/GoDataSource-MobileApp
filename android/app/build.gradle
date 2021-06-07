@@ -110,16 +110,16 @@ def getPassword(String currentUser, String keyChain) {
 //def pass = getPassword("florinpopa","go.data_keystore_password")
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 29
     buildToolsVersion '28.0.3'
 
     defaultConfig {
         applicationId "com.who_mobile2020"
         minSdkVersion 20
-        targetSdkVersion 28
+        targetSdkVersion 29
         multiDexEnabled true
-        versionCode 34
-        versionName "1.0.13"
+        versionCode 35
+        versionName "1.0.14"
         ndk {
             abiFilters "armeabi-v7a", "x86", 'arm64-v8a', 'x86_64'
         }
@@ -208,11 +208,19 @@ dependencies {
 
     implementation 'com.google.firebase:firebase-messaging:16.0.1'
 
-    implementation 'com.android.support:appcompat-v7:28.0.0'
-    implementation 'com.android.support:design:28.0.0'
-    implementation 'com.android.support:animated-vector-drawable:28.0.0'
-    implementation 'com.android.support:support-media-compat:28.0.0'
-    implementation 'com.android.support:support-v4:28.0.0'
+    implementation 'androidx.appcompat:appcompat:1.1.0'
+    implementation 'androidx.multidex:multidex:2.0.0'
+    implementation "androidx.vectordrawable:vectordrawable:1.1.0"
+    implementation "androidx.media:media:1.0.0"
+    implementation "androidx.legacy:legacy-support-v4"
+    implementation "androidx.vectordrawable:vectordrawable-animated:1.1.0"
+    implementation "com.google.android.material:material:1.0.0-rc01"
+
+//    implementation 'com.android.support:appcompat-v7:28.0.0'
+//    implementation 'com.android.support:design:28.0.0'
+//    implementation 'com.android.support:animated-vector-drawable:28.0.0'
+//    implementation 'com.android.support:support-media-compat:28.0.0'
+//    implementation 'com.android.support:support-v4:28.0.0'
     implementation 'com.facebook.react:react-native:+'
 
     implementation "com.github.parse-community.Parse-SDK-Android:parse:1.18.5"
