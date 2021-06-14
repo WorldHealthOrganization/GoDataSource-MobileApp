@@ -4,7 +4,7 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
-import {Text, View} from 'react-native';
+import {Text, View, Keyboard} from 'react-native';
 import PropTypes from 'prop-types';
 import {getTooltip, getTranslation} from './../utils/functions';
 import {TextField} from 'react-native-material-textfield';
@@ -24,11 +24,17 @@ class TextInput extends Component {
 
     // Please add here the react lifecycle methods that you need
     componentDidMount() {
+        Keyboard.addListener("keyboardDidHide", this._keyboardDidHide);
         // console.log('CDM TextInput: ', this.props.label, this.props.value);
         this.value = lodashGet(this.props, 'value', ' ');
         this.setState({
             value: lodashGet(this.props, 'value', ' ')
         })
+    }
+
+    componentWillUnmount() {
+        this.handleSubmitEditing();
+        Keyboard.removeListener("keyboardDidHide", this._keyboardDidHide);
     }
 
     componentDidUpdate(prevProps, prevState) {
@@ -134,6 +140,10 @@ class TextInput extends Component {
         );
     };
 
+    _keyboardDidHide = () => {
+        this.handleSubmitEditing();
+    }
+
     extractAgeForViewInput = () => {
         let localValue = typeof this.props.value === 'number' ? this.props.value : '';
         if (this.props.value && this.props.value != undefined) {
@@ -157,6 +167,9 @@ class TextInput extends Component {
 
     handleSubmitEditing = () => {
         console.log("Handle submit editing", this.value);
+        if(this.props.value === this.value){
+            return;
+        }
         if (this.props.labelValue) {
             //QuestionCard
             console.log("textInput has this.props.labelValue: ", this.props.data, this.value);
