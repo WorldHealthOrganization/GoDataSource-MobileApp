@@ -110,7 +110,7 @@ class ContactsSingleQuestionnaire extends Component {
         if (item.inactive === false) {
             return (
                 <QuestionCard
-                    key={uniqueId('key_')}
+                    key={index}
                     item={item}
                     isEditMode={this.props.isEditMode}
                     index={index + 1}

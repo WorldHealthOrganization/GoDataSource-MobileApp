@@ -58,7 +58,8 @@ class QuestionCard extends PureComponent {
         let buttonWidth = calculateDimension(165.5, false, this.props.screenSize);
         let index = this.calculateIndex(this.props.totalQuestions, this.props.index);
         return (
-            <ElevatedView elevation={3} key={uniqueId('key_')} style={[this.props.style, style.container, {
+            <ElevatedView elevation={3}
+                          style={[this.props.style, style.container, {
                 marginHorizontal: calculateDimension(16, false, this.props.screenSize),
                 width: calculateDimension(config.designScreenSize.width - 32, false, this.props.screenSize),
                 marginVertical: 4
@@ -80,7 +81,7 @@ class QuestionCard extends PureComponent {
                                 ' - ' + getTranslation(this.props.item.category, this.props.translation) : ''}
                         />
                 }
-                <View key={uniqueId('key_')}>
+                <View>
                     {
                         this.props.item.multiAnswer && this.props.isEditMode && !this.props.hideButtons ? (
                             <View
@@ -110,7 +111,6 @@ class QuestionCard extends PureComponent {
                     }
                     {this.props.item.multiAnswer && this.props.isEditMode && this.props.isCollapsed ? null :
                         <QuestionCardContent
-                            key={uniqueId('key_')}
                             index={0}
                             item={this.props.item}
                             isCollapsed={this.props.isCollapsed}
