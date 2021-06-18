@@ -651,7 +651,6 @@ class FollowUpsSingleScreen extends Component {
         }))
     };
     onChangeMultipleSelection = (value, id, parentId, index) => {
-        // console.log ('onChangeMultipleSelection', selections, id)
         let questionnaireAnswers = _.cloneDeep(this.state.previousAnswers);
 
         if (parentId) {
@@ -659,7 +658,7 @@ class FollowUpsSingleScreen extends Component {
                 questionnaireAnswers[parentId] = [];
             }
             if (questionnaireAnswers[parentId] && Array.isArray(questionnaireAnswers[parentId]) && questionnaireAnswers[parentId].length > 0 && questionnaireAnswers[parentId][0]) {
-                if (_.get(questionnaireAnswers, `[${parentId}][0].subAnswers`, null) || typeof questionnaireAnswers[parentId][0].subAnswers === "object" && Object.keys(questionnaireAnswers[parentId][0].subAnswers).length === 0) {
+                if (!_.get(questionnaireAnswers, `[${parentId}][0].subAnswers`, null) || (typeof questionnaireAnswers[parentId][0].subAnswers === "object" && Object.keys(questionnaireAnswers[parentId][0].subAnswers).length === 0)) {
                     questionnaireAnswers[parentId][0].subAnswers = {};
                 }
                 if (!questionnaireAnswers[parentId][0].subAnswers[id]) {
