@@ -28,7 +28,8 @@ class QuestionCardContent extends PureComponent {
     render() {
         let answerDate = get(this.props, `source[${get(this.props, 'item.variable', null)}][${this.props.index}].date`, null);
         return (
-            <ScrollView key={uniqueId('key_')} scrollEnabled={false} keyboardShouldPersistTaps={'always'}>
+            <ScrollView
+                        scrollEnabled={false} keyboardShouldPersistTaps={'always'}>
 
                 {
                     this.props.item.multiAnswer ? (
@@ -93,8 +94,8 @@ class QuestionCardContent extends PureComponent {
                         <View>
                             <Section label={translations.questionCardLabels.additionalQuestions} containerStyle={{marginBottom: 8}}/>
                             {
-                                this.props.item.additionalQuestions.map((additionalQuestion) => {
-                                    return this.handleRenderAdditionalQuestions(additionalQuestion, this.props.item.variable);
+                                this.props.item.additionalQuestions.map((additionalQuestion, i) => {
+                                    return this.handleRenderAdditionalQuestions(additionalQuestion, this.props.item.variable, i);
                                 })
                             }
                         </View>
@@ -239,7 +240,6 @@ class QuestionCardContent extends PureComponent {
             case 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_NUMERIC':
                 return (
                     <TextInput
-                        key={item.variable}
                         id={item.variable}
                         label={translations.questionCardLabels.textInputLabel}
                         skipLabel={true}
@@ -332,7 +332,7 @@ class QuestionCardContent extends PureComponent {
             case 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_MULTIPLE_ANSWERS':
                 return (
                     <DropDown
-                        key={uniqueId('key_')}
+                        // key={uniqueId('key_')}
                         id={item.variable}
                         label={translations.questionCardLabels.dropDownLabel}
                         skipLabel={true}
@@ -380,9 +380,11 @@ class QuestionCardContent extends PureComponent {
 
     };
 
-    handleRenderAdditionalQuestions = (additionalQuestion, parentId) => {
+    handleRenderAdditionalQuestions = (additionalQuestion, parentId, i) => {
         return (
-            <View key={uniqueId('key_')}>
+            <View
+                key={i}
+            >
                 {
                     additionalQuestion.answerType !== 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_MARKUP' ? (
                         <Section key={uniqueId('key_')} label={getTranslation(additionalQuestion.text, this.props.translation)} labelSize={'medium'} style={{marginBottom: 3}} />

@@ -10,6 +10,7 @@ import {getTooltip, getTranslation} from './../utils/functions';
 import {TextField} from 'react-native-material-textfield';
 import TooltipComponent from './TooltipComponent';
 import lodashGet from 'lodash/get';
+import lodashDebounce from 'lodash/debounce';
 
 class TextInput extends Component {
     constructor(props) {
@@ -19,13 +20,13 @@ class TextInput extends Component {
             value: lodashGet(this.props, 'value', ' ')
         };
 
+        this.handleSubmitEditingDB = lodashDebounce(this.handleSubmitEditing, 800);
+
         // If there are any bugs with saving data, please change the delay accordingly
     }
 
     // Please add here the react lifecycle methods that you need
     componentDidMount() {
-        Keyboard.addListener("keyboardDidHide", this._keyboardDidHide);
-        // console.log('CDM TextInput: ', this.props.label, this.props.value);
         this.value = lodashGet(this.props, 'value', ' ');
         this.setState({
             value: lodashGet(this.props, 'value', ' ')
@@ -39,6 +40,7 @@ class TextInput extends Component {
 
     componentDidUpdate(prevProps, prevState) {
         if (prevProps.isEditMode !== this.props.isEditMode || prevProps.value !== this.props.value) {
+            this.handleSubmitEditing();
             this.value = lodashGet(this.props, 'value', ' ');
             this.setState({
                 value: lodashGet(this.props, 'value', ' ')
@@ -73,7 +75,6 @@ class TextInput extends Component {
                         label={this.props.isRequired ? getTranslation(this.props.label, this.props.translation) + ' * ' : getTranslation(this.props.label, this.props.translation)}
                         value={value ? value.toString() : ''}
                         onChangeText={this.handleOnChangeText}
-                        onBlur={this.handleSubmitEditing}
                         textColor='rgb(0,0,0)'
                         fontSize={15}
                         labelFontSize={15}
@@ -140,10 +141,6 @@ class TextInput extends Component {
         );
     };
 
-    _keyboardDidHide = () => {
-        this.handleSubmitEditing();
-    }
-
     extractAgeForViewInput = () => {
         let localValue = typeof this.props.value === 'number' ? this.props.value : '';
         if (this.props.value && this.props.value != undefined) {
@@ -163,11 +160,11 @@ class TextInput extends Component {
 
     handleOnChangeText = (state) => {
         this.value = state;
+        this.handleSubmitEditingDB();
     };
 
     handleSubmitEditing = () => {
-        console.log("Handle submit editing", this.value);
-        if(this.props.value === this.value){
+        if(!this.props.isEditMode || this.props.value === this.value){
             return;
         }
         if (this.props.labelValue) {

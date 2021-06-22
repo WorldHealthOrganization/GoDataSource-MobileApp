@@ -122,7 +122,6 @@ class FollowUpsSingleQuestionnaireContainer extends Component {
         if (item.inactive === false) {
             return (
                 <QuestionCard
-                    key={uniqueId('key_')}
                     item={item}
                     index={index + 1}
                     isCollapsed={ this.isCollapsed(item)}

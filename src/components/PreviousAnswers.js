@@ -28,7 +28,7 @@ class PreviousAnswers extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            previousAnswers: this.props.previousAnswers,
+            previousAnswers: this.props.previousAnswers || [],
             isModified: false,
         };
     }
@@ -37,13 +37,13 @@ class PreviousAnswers extends Component {
         if (prevProps.previousAnswers !== undefined && this.props.previousAnswers !== undefined){
             if( this.props.previousAnswers.length !== prevProps.previousAnswers.length){
                 this.setState({
-                    previousAnswers: this.props.previousAnswers
+                    previousAnswers: this.props.previousAnswers || []
                 });
             }else{
                 if( (this.props.previousAnswers[0].date !== prevProps.previousAnswers[0].date)
                     || (this.props.previousAnswers[0].value !== prevProps.previousAnswers[0].value)){
                     this.setState({
-                        previousAnswers: this.props.previousAnswers
+                        previousAnswers: this.props.previousAnswers || []
                     });
                 }else {
                     let shouldUpdate = false;
@@ -69,7 +69,7 @@ class PreviousAnswers extends Component {
                     }
                     if(shouldUpdate){
                         this.setState({
-                            previousAnswers: this.props.previousAnswers
+                            previousAnswers: this.props.previousAnswers || []
                         });
                     }
                 }
@@ -77,7 +77,7 @@ class PreviousAnswers extends Component {
         } else {
             if (prevProps.previousAnswers === undefined && this.props.previousAnswers !== undefined){
                 this.setState({
-                    previousAnswers: this.props.previousAnswers
+                    previousAnswers: this.props.previousAnswers || []
                 });
             }
         }
@@ -115,7 +115,7 @@ class PreviousAnswers extends Component {
                 { this.props.isCollapsed &&
                     <View style={style.mapContainer} contentContainerStyle={style.containerContent}>
                         {
-                            this.state && this.state.previousAnswers && Array.isArray(this.state.previousAnswers) && this.state.previousAnswers.length > 0 && this.state.previousAnswers.map((previousAnswer, index) => {
+                            Array.isArray(this.state.previousAnswers) && this.state.previousAnswers.map((previousAnswer, index) => {
                                 return this.renderListOfPreviousAnswers(previousAnswer, index);
                             })
                         }
@@ -156,10 +156,9 @@ class PreviousAnswers extends Component {
                     flexDirection: 'row',
                 }}
                 elevation={5}
-                key={uniqueId('key_')}
+                key={index}
             >
                 <QuestionCardContent
-                    key={uniqueId('key_')}
                     index={index}
                     isCollapsed={true}
                     item={sortedQuestions[0]}
@@ -227,7 +226,7 @@ class PreviousAnswers extends Component {
 
         // console.log('~~~~~~~~~~ onChangeTextAnswer', questionnaireAnswers);
         this.setState({
-            previousAnswers: questionnaireAnswers,
+            previousAnswers: questionnaireAnswers || [],
             isModified: true
         }, () => {
             this.props.savePreviousAnswers(this.state.previousAnswers, this.props.previousAnswerVariable);
@@ -255,7 +254,7 @@ class PreviousAnswers extends Component {
 
         // console.log('~~~~~~~~~~ onChangeSingleSelection', questionnaireAnswers);
         this.setState({
-            previousAnswers: questionnaireAnswers,
+            previousAnswers: questionnaireAnswers || [],
             isModified: true
         }, () => {
             this.props.savePreviousAnswers(this.state.previousAnswers, this.props.previousAnswerVariable);
@@ -282,7 +281,7 @@ class PreviousAnswers extends Component {
 
         // console.log('~~~~~~~~~~ onChangeMultipleSelection', questionnaireAnswers);
         this.setState({
-            previousAnswers: questionnaireAnswers,
+            previousAnswers: questionnaireAnswers || [],
             isModified: true
         }, () => {
             console.log ('questionnaireAnswers', this.state.previousAnswers);
@@ -310,7 +309,7 @@ class PreviousAnswers extends Component {
 
         // console.log('~~~~~~~~~~ onChangeDateAnswer', questionnaireAnswers);
         this.setState({
-            previousAnswers: questionnaireAnswers,
+            previousAnswers: questionnaireAnswers || [],
             isModified: true
         }, () => {
             this.props.savePreviousAnswers(this.state.previousAnswers, this.props.previousAnswerVariable);
@@ -329,7 +328,7 @@ class PreviousAnswers extends Component {
 
         // console.log('~~~~~~~~~~ onChangeAnswerDate', questionnaireAnswers);
         this.setState({
-            previousAnswers: questionnaireAnswers,
+            previousAnswers: questionnaireAnswers || [],
             isModified: true
         }, () => {
             this.props.savePreviousAnswers(this.state.previousAnswers, this.props.previousAnswerVariable);
