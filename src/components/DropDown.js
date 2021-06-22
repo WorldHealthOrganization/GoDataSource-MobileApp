@@ -140,10 +140,6 @@ class DropDown extends PureComponent {
         })
     };
 
-    onSelectedItemsChange = (selectedItems) => {
-        console.log("Selected items SectionedMultiSelect: ", selectedItems);
-    };
-
     handleOnselectionChange = (selections, item) => {
         this.setState({
             selectedItems: selections
