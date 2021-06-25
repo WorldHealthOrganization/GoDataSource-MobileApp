@@ -40,7 +40,6 @@ class TextInput extends Component {
 
     componentDidUpdate(prevProps, prevState) {
         if (prevProps.isEditMode !== this.props.isEditMode || prevProps.value !== this.props.value) {
-            this.handleSubmitEditing();
             this.value = lodashGet(this.props, 'value', ' ');
             this.setState({
                 value: lodashGet(this.props, 'value', ' ')
