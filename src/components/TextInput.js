@@ -20,7 +20,7 @@ class TextInput extends Component {
             value: lodashGet(this.props, 'value', ' ')
         };
 
-        this.handleSubmitEditingDB = lodashDebounce(this.handleSubmitEditing, 800);
+        this.handleSubmitEditingDB = lodashDebounce(this.handleSubmitEditing, 300);
 
         // If there are any bugs with saving data, please change the delay accordingly
     }
