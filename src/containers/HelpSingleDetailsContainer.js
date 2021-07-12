@@ -99,7 +99,6 @@ class HelpSingleDetailsContainer extends PureComponent {
                 item={item}
                 isEditMode={this.props.isEditMode}
                 isEditModeForDropDownInput={this.props.isEditMode}
-                helpItem={this.props.item}
                 value={value}
                 index={cardIndex}
                 permissionsList={item.permissionsList}

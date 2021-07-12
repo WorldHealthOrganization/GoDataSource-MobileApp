@@ -107,8 +107,6 @@ class FollowUpsSingleAddressContainer extends PureComponent {
                 isEditModeForDropDownInput={false}
                 value={value}
                 index={cardIndex}
-                followUp={this.props.item}
-                contact={this.props.contact}
                 onChangeDropDown={() => {}}
                 onChangeDate={() => {}}
                 onChangeText={() => {}}

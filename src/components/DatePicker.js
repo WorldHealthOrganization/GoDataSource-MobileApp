@@ -26,25 +26,33 @@ const DatePicker = React.memo(({
             translation,
             minimumDate,
             maximumDate,
-            date,
             index,
             skipLabel
                                }) => {
     const [isDateTimePickerVisible, setIsDateTimePickerVisible] = useState(false);
+    const [date, setDate] = useState(value);
+
+    React.useEffect(() => {
+        if(date !== value){
+            setDate(value);
+        }
+    },[value])
+
+
     const isDarkMode = useDarkMode();
 
     const editInput = () => {
-        // console.log('This.props.value: ', this.props.value);
+        // console.log('Date This.props.value: ', date);
+        let newDate = date;
         let tooltip = getTooltip(label, translation);
-        let customStyle = value !== undefined && value !== null ? styles.hasDateTooltipStyle : style.emptyDateTooltipStyle;
-        if (value && typeof value === 'string' && value !== '') {
-            value = new Date(value);
+        let customStyle = newDate !== undefined && newDate !== null ? styles.hasDateTooltipStyle : style.emptyDateTooltipStyle;
+        if (newDate && typeof newDate === 'string' && newDate !== '') {
+            newDate = new Date(value);
         }
         return (
             <View style={[{marginVertical: 10, flexDirection: 'row', marginBottom: 7.5}, style]}>
                 <View style = {{flex: 1}}>
-                    {
-                        value !== null && value !== undefined && date !== '' ? (
+                    {newDate !== null && newDate !== undefined && newDate !== '' ? (
                             <View>
                                 <Ripple onPress={handleShowDatePicker}>
                                     <Text style={{
@@ -64,7 +72,7 @@ const DatePicker = React.memo(({
                                             lineHeight: 30,
                                             color: 'rgb(60,60,60)'
                                         }}>
-                                        {value !== null && value !== undefined && value !== '' ? moment.utc(value).format('MM/DD/YYYY') : ''}
+                                        {moment.utc(newDate).format('MM/DD/YYYY') || ''}
                                     </Text>
                                 </Ripple>
                             </View>
@@ -162,6 +170,7 @@ const DatePicker = React.memo(({
     const handleDatePicked = (date) => {
         // console.log("### date picked: ", date, moment.utc(date).format());
         handleDateCancelled();
+        setDate(createDate(date));
         onChange(
             createDate(date),
             id,

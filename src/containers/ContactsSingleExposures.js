@@ -146,7 +146,7 @@ class ContactsSingleExposures extends Component {
     // Please write here all the methods that are not react native lifecycle methods
 
     keyExtractor = (item, index) => {
-        return item.id;
+        return item.id || index;
     };
 
     handleBackButton = () => {

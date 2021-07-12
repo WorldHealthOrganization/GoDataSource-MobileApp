@@ -15,7 +15,6 @@ import lodashDebounce from 'lodash/debounce';
 class TextInput extends Component {
     constructor(props) {
         super(props);
-        this.value = lodashGet(this.props, 'value', ' ');
         this.state = {
             value: lodashGet(this.props, 'value', ' ')
         };
@@ -25,25 +24,31 @@ class TextInput extends Component {
         // If there are any bugs with saving data, please change the delay accordingly
     }
 
+    shouldComponentUpdate(nextProps, nextState, nextContext) {
+        let nextPropsValue = lodashGet(nextProps, 'value', ' ');
+        let answer = !(nextPropsValue !== this.props.value && this.state.value === nextPropsValue)
+        return answer;
+    }
+
     // Please add here the react lifecycle methods that you need
     componentDidMount() {
-        this.value = lodashGet(this.props, 'value', ' ');
         this.setState({
             value: lodashGet(this.props, 'value', ' ')
         })
     }
 
     componentWillUnmount() {
-        this.handleSubmitEditing();
         Keyboard.removeListener("keyboardDidHide", this._keyboardDidHide);
     }
 
     componentDidUpdate(prevProps, prevState) {
-        if (prevProps.isEditMode !== this.props.isEditMode || prevProps.value !== this.props.value) {
-            this.value = lodashGet(this.props, 'value', ' ');
-            this.setState({
-                value: lodashGet(this.props, 'value', ' ')
-            })
+        let propsValue = lodashGet(this.props, 'value', ' ');
+        if (prevProps.isEditMode !== this.props.isEditMode || prevProps.value !== propsValue) {
+            if(this.state.value !== propsValue){
+                this.setState({
+                    value: propsValue
+                })
+            }
         }
     }
 
@@ -157,26 +162,28 @@ class TextInput extends Component {
         return localValue
     };
 
-    handleOnChangeText = (state) => {
-        this.value = state;
-        this.handleSubmitEditingDB();
+    handleOnChangeText = (value) => {
+        this.setState({
+            value
+        }, ()=>{
+            this.handleSubmitEditingDB();
+        })
     };
 
     handleSubmitEditing = () => {
-        if(!this.props.isEditMode || this.props.value === this.value){
+        if(!this.props.isEditMode || this.props.value === this.state.value){
             return;
         }
         if (this.props.labelValue) {
             //QuestionCard
-            console.log("textInput has this.props.labelValue: ", this.props.data, this.value);
             this.props.onChange(
-                this.value,
+                this.state.value,
                 this.props.id
             )
         } else {
             //CardComponent
             this.props.onChange(
-                this.value,
+                this.state.value,
                 this.props.id,
                 this.props.objectType ? (this.props.objectType === 'Address' || this.props.objectType === 'LabResult' || this.props.objectType === 'Documents' || this.props.objectType === 'DateRanges' ? this.props.index : this.props.objectType) : null,
                 this.props.objectType

@@ -3,7 +3,7 @@
  */
 /** Since this app is based around the material ui is better to use the components from
  the material ui library, since it provides design and animations out of the box */
-import React, {PureComponent} from 'react';
+import React, { Component} from 'react';
 import {View, Text, StyleSheet} from 'react-native';
 import {WebView} from 'react-native-webview';
 import {calculateDimension, getTranslation, createDate} from './../utils/functions';
@@ -18,6 +18,7 @@ import SwitchInput from './SwitchInput';
 import DatePicker from './DatePicker';
 import cloneDeep from 'lodash/cloneDeep';
 import get from 'lodash/get';
+import isEqual from 'lodash/isEqual';
 import Section from './Section';
 import Selector from './Selector';
 import IntervalPicker from './IntervalPicker';
@@ -26,7 +27,7 @@ import translations from './../utils/translations';
 import SearchableDropdown from './SearchableDropdown';
 import PermissionComponent from './PermissionComponent';
 
-class CardComponent extends PureComponent {
+class CardComponent extends Component {
 
     /** This will be a dumb component, so it's best not to put any business logic in it */
     constructor(props) {
@@ -34,6 +35,20 @@ class CardComponent extends PureComponent {
         this.state = {
             showDropdown: false
         };
+    }
+
+    shouldComponentUpdate(nextProps, nextState, nextContext) {
+        let answer = false;
+        for (const [key, value] of Object.entries(nextProps)) {
+            if(!isEqual(this.props[key], value)){
+                if(!(key==='item' && this.props[key].id === value.id)) {
+                    answer = true;
+                    break;
+                }
+            }
+        }
+        return answer;
+        return true;
     }
 
     /** Please add here the react lifecycle methods that you need
