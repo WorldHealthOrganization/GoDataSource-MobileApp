@@ -157,7 +157,6 @@ class FiltersContainer extends PureComponent {
                 isEditMode={true}
                 isEditModeForDropDownInput={true}
                 value={value}
-                filter={filter}
                 data={data}
 
                 onChangeSectionedDropDown={onChangeSectionedDropDown}

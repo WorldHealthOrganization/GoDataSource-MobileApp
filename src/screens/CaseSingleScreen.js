@@ -1895,8 +1895,6 @@ class CaseSingleScreen extends Component {
         this.setState({
                 previousAnswers: questionnaireAnswers,
                 isModified: true
-            }, () => {
-                console.log ('onChangeMultipleSelection after setState', this.state.previousAnswers);
             })
     };
     onChangeSingleSelection = (value, id, parentId, index) => {

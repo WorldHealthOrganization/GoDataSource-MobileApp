@@ -18,6 +18,7 @@ import get from "lodash/get";
 import {sortBy} from "lodash";
 import PreviousAnswers from "./PreviousAnswers";
 import uniqueId from "lodash/uniqueId";
+import isEqual from "lodash/isEqual";
 
 class QuestionCard extends PureComponent {
 
@@ -27,6 +28,62 @@ class QuestionCard extends PureComponent {
         this.state = {
             previousAnswers: this.props.source
         };
+    }
+
+    shouldComponentUpdate(nextProps, nextState, nextContext) {
+        let answer = false;
+        for(const [key, value] of Object.entries(nextState)){
+            if (this.state[key] !== value) {
+                const newStateVariable = get(value, `${get(nextProps, 'item.variable', null)}`, null)
+                const oldStateVariable = get(this.state[key], `${get(nextProps, 'item.variable', null)}`, null)
+                if(newStateVariable?.length !== oldStateVariable?.length
+                    || get(newStateVariable, `[0].date`, null) !== get(oldStateVariable, `[0].date`, null)
+                ){
+                    return true;
+                }
+            }
+        }
+        for (const [key, value] of Object.entries(nextProps)) {
+            if (!isEqual(this.props[key], value)) {
+                switch (key) {
+                    case 'item':
+                        if (this.props[key].id !== value.id) {
+                            answer=true;
+                            break;
+                        }
+                        break;
+                    case 'source':
+                        const nextPropsVariable = get(nextProps, `source[${get(nextProps, 'item.variable', null)}]`, null);
+                        const propsVariable =  get(this.props, `source[${get(this.props, 'item.variable', null)}]`, null)
+                        if (nextPropsVariable?.length !== propsVariable?.length) {
+                            answer = true;
+                            break;
+                        } else if (
+                            (get(nextPropsVariable, `[0].date`, null) && get(nextPropsVariable, `[0].date`, null) !== get(propsVariable, `[0].date`, null))
+                            // || (get(nextPropsVariable, `[0].value`, null) && get(nextPropsVariable, `[0].value`, null) !== get(propsVariable, `[0].value`, null))
+                        ) {
+                            answer = true;
+                            break;
+                        }
+                        break;
+                    default:
+                        answer = true;
+                        break;
+                }
+                if(answer) break;
+            } else {
+                switch (key) {
+                    case 'item':
+                        if(this.props.item.variable !== nextProps.item.variable){
+                            answer = true;
+                            break;
+                        }
+                        break;
+                }
+                if(answer) break;
+            }
+        }
+        return answer;
     }
 
     componentDidUpdate(prevProps) {
@@ -95,6 +152,7 @@ class QuestionCard extends PureComponent {
                                     marginVertical: 5
                                 }}
                             >
+                                {/*Add answer button*/}
                                 <Button
                                     title={getTranslation(translations.questionCardLabels.addAnswer, this.props.translation)}
                                     width={buttonWidth}

@@ -177,8 +177,6 @@ class SortContainer extends Component {
                 isEditModeForDropDownInput={true}
                 value={value}
                 index={cardIndex}
-                filter={filter}
-
                 onChangeSectionedDropDown={onChangeSectionedDropDown}
                 onChangeDropDown={onChangeDropDown}
                 onDeletePress={onDeletePress}

@@ -192,16 +192,18 @@ class QuestionCardContent extends PureComponent {
 
         if (item.answerType === 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_SINGLE_ANSWER') {
             // console.log('QuestionCard: ', item);
-            questionAnswers = questionAnswers !== null &&
-            questionAnswers !== undefined &&
-            item.answers.map((e) => {return e && e.value ? e.value : null}).indexOf(questionAnswers) > -1 &&
-            item.answers[item.answers.map((e) => {return e.value ? e.value : null}).indexOf(questionAnswers)] ?
+            questionAnswers = (
+                questionAnswers !== null &&
+                questionAnswers !== undefined &&
+                item.answers.map((e) => {return e && e.value ? e.value : null}).indexOf(questionAnswers) > -1 &&
+                item.answers[item.answers.map((e) => {return e.value ? e.value : null}).indexOf(questionAnswers)]
+            ) ?
                 getTranslation(item.answers[item.answers.map((e) => {return e.value}).indexOf(questionAnswers)].label, this.props.translation) : ' ';
         }
         else {
             if (item.answerType === 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_MULTIPLE_ANSWERS') {
                 // console.log('QuestionCard: ', item);
-                questionAnswers = questionAnswers !== null && questionAnswers !== undefined && Array.isArray(questionAnswers) && questionAnswers.length > 0 ?
+                questionAnswers = (questionAnswers !== null && questionAnswers !== undefined && Array.isArray(questionAnswers) && questionAnswers.length > 0) ?
                     item.answers.filter((e) => {
                         // console.log('Inside filter: ', e);
                         return e && e.value && questionAnswers.indexOf(e.value) > -1;
@@ -387,7 +389,7 @@ class QuestionCardContent extends PureComponent {
             >
                 {
                     additionalQuestion.answerType !== 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_MARKUP' ? (
-                        <Section key={uniqueId('key_')} label={getTranslation(additionalQuestion.text, this.props.translation)} labelSize={'medium'} style={{marginBottom: 3}} />
+                        <Section label={getTranslation(additionalQuestion.text, this.props.translation)} labelSize={'medium'} style={{marginBottom: 3}} />
                     ) : (null)
                 }
                 {

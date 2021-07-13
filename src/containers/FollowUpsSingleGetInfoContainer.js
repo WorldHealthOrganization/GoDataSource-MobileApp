@@ -112,9 +112,6 @@ class FollowUpsSingleGetInfoContainer extends PureComponent {
                 isEditModeForDropDownInput={this.props.isEditMode}
                 value={value}
                 index={cardIndex}
-                followUp={this.props.item}
-                contact={this.props.contact}
-
                 onChangeText={this.props.onChangeText}
                 onChangeDate={this.props.onChangeDate}
                 onChangeSwitch={this.props.onChangeSwitch}
