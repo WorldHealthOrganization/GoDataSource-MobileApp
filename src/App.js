@@ -3,7 +3,7 @@ import {Provider} from 'react-redux';
 import {applyMiddleware, createStore} from 'redux';
 import {enableBatching} from 'redux-batched-actions';
 import thunk from 'redux-thunk';
-import promise from 'redux-promise';
+import promise from 'redux-prom`ise';
 import {DeviceEventEmitter, NativeEventEmitter, NativeModules, Platform} from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 import RNFetchBlobFS from 'rn-fetch-blob/fs';
@@ -220,7 +220,7 @@ export default class App {
                     });
         }
 
-        Navigation.startSingleScreenApp(rootObject)
+        Navigation.setRoot({root: rootObject})
     };
 
     // Checks device status if exists, and if the status is pending wipe, removes everything

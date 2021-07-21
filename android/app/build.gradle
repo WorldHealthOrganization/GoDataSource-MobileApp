@@ -116,6 +116,8 @@ def jscFlavor = 'org.webkit:android-jsc:+'
  */
 def enableHermes = project.ext.react.get("enableHermes", false);
 
+
+
 def getPassword(String currentUser, String keyChain) {
     def stdout = new ByteArrayOutputStream()
     def stderr = new ByteArrayOutputStream()
@@ -137,6 +139,7 @@ android {
     compileSdkVersion 29
     buildToolsVersion '28.0.3'
 
+
     defaultConfig {
         applicationId "com.who_mobile2020"
         minSdkVersion 20
@@ -153,7 +156,7 @@ android {
             reset()
             enable enableSeparateBuildPerCPUArchitecture
             universalApk false  // If true, also generate a universal APK
-            include "armeabi-v7a", "x86"
+            include "armeabi-v7a", "x86", "arm64-v8a", "x86_64"
         }
     }
     signingConfigs {
@@ -168,6 +171,7 @@ android {
     }
     buildTypes {
         release {
+            matchingFallbacks = ['release', 'debug']
             debuggable false
             minifyEnabled false
             shrinkResources false
@@ -175,6 +179,7 @@ android {
             signingConfig signingConfigs.release
         }
         debug {
+            matchingFallbacks = ['release', 'debug']
             debuggable true
         }
     }
@@ -199,14 +204,16 @@ android {
 }
 
 dependencies {
+    implementation fileTree(dir: "libs", include: ["*.jar"])
+    //noinspection GradleDynamicVersion
+    implementation "com.facebook.react:react-native:+"  // From node_modules
+
     implementation project(':react-native-keychain')
     implementation project(':react-native-touch-id')
     implementation project(':react-native-dark-mode')
-    implementation project(':@react-native-community_datetimepicker')
     implementation project(':react-native-webview')
     implementation project(':react-native-version-number')
     implementation project(':react-native-randombytes')
-    implementation project(':@react-native-community_async-storage')
     implementation project(':react-native-bcrypt')
     implementation project(':react-native-sentry')
     implementation project(':react-native-vector-icons')
@@ -239,13 +246,6 @@ dependencies {
     implementation "androidx.legacy:legacy-support-v4"
     implementation "androidx.vectordrawable:vectordrawable-animated:1.1.0"
     implementation "com.google.android.material:material:1.0.0-rc01"
-
-//    implementation 'com.android.support:appcompat-v7:28.0.0'
-//    implementation 'com.android.support:design:28.0.0'
-//    implementation 'com.android.support:animated-vector-drawable:28.0.0'
-//    implementation 'com.android.support:support-media-compat:28.0.0'
-//    implementation 'com.android.support:support-v4:28.0.0'
-    implementation 'com.facebook.react:react-native:+'
 
 
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.0.0"
@@ -281,3 +281,4 @@ task copyDownloadableDepsToLibs(type: Copy) {
 }
 
 apply plugin: 'com.google.gms.google-services'
+apply from: file("../../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesAppBuildGradle(project)

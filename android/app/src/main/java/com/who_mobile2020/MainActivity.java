@@ -3,9 +3,9 @@ package com.who_mobile2020;
 import android.view.LayoutInflater;
 import android.view.View;
 
-import com.reactnativenavigation.controllers.SplashActivity;
+import com.reactnativenavigation.controllers.NavigationActivity;
 
-public class MainActivity extends SplashActivity {
+public class MainActivity extends NavigationActivity {
     @Override
     public View createSplashLayout() {
         View v = LayoutInflater.from(this).inflate(R.layout.splash_layout,null);

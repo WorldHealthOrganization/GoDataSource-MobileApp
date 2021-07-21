@@ -6,6 +6,7 @@
  */
 
 #import "AppDelegate.h"
+#import <ReactNativeNavigation/ReactNativeNavigation.h>
 #import <React/RCTBundleURLProvider.h>
 
 #import "RCCManager.h"
@@ -13,7 +14,7 @@
 #import "APNSEventEmitter.h"
 #import "APNSEventManager.h"
 
-#import <React/RCTRootView.h>
+
 #if __has_include(<React/RNSentry.h>)
 #import <React/RNSentry.h> // This is used for versions of react >= 0.40
 #else
