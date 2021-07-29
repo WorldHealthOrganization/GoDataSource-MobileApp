@@ -23,15 +23,11 @@ import {getTranslation} from './../utils/functions';
 import VersionNumber from 'react-native-version-number';
 import appConfig from './../../app.config';
 import withPincode from "../components/higherOrderComponents/withPincode";
-import {getContactsOfContactsForOutbreakId} from "../actions/contactsOfContacts";
-import {enhanceListWithGetData} from "../components/higherOrderComponents/withListData";
 import {compose} from "redux";
+import {Navigation} from "react-native-navigation";
 
 class LoginScreen extends Component {
 
-    static navigatorStyle = {
-        navBarHidden: true
-    };
 
     constructor(props) {
         super(props);
@@ -185,11 +181,13 @@ class LoginScreen extends Component {
 
     handleOnPressBack = () => {
         this.props.setSyncState(null);
-        this.props.navigator.resetTo({
-            screen: this.props.activeDatabase ? 'ManualConfigScreen' : 'FirstConfigScreen',
-            passProps: {
-                allowBack: this.props.allowBack,
-                isMultipleHub: this.props.isMultipleHub
+        Navigation.setStackRoot(this.props.componentId,{
+            component:{
+                name: this.props.activeDatabase ? 'ManualConfigScreen' : 'FirstConfigScreen',
+                passProps: {
+                    allowBack: this.props.allowBack,
+                    isMultipleHub: this.props.isMultipleHub
+                }
             }
         })
     }

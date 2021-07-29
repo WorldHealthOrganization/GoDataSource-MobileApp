@@ -28,6 +28,7 @@ import {
     PERMISSION_CREATE_CONTACT_OF_CONTACT,
     PERMISSION_EDIT_CONTACT, PERMISSION_EDIT_CONTACT_OF_CONTACT
 } from "../utils/constants";
+import {Navigation} from "react-native-navigation";
 
 const AnimatedFlatList = Animated.createAnimatedComponent(FlatList);
 
@@ -234,13 +235,14 @@ class ContactsSingleExposures extends Component {
     };
 
     onPressAddExposure = () => {
-        this.props.navigator.showModal({
-            screen: "ExposureScreen",
-            animated: true,
-            passProps: {
-                contact: null,
-                type: 'Contact',
-                saveExposure: this.props.saveExposure,
+        Navigation.showModal({
+            component:{
+                name: "ExposureScreen",
+                passProps: {
+                    contact: null,
+                    type: 'Contact',
+                    saveExposure: this.props.saveExposure,
+                }
             }
         })
     };

@@ -8,10 +8,6 @@ import styles from './../styles';
 
 class InAppNotificationScreen extends Component {
 
-    static navigatorStyle = {
-        navBarHidden: true
-    };
-
     constructor(props) {
         super(props);
     }

@@ -36,12 +36,10 @@ import {checkArrayAndLength} from './../utils/typeCheckingFunctions';
 import {checkRequiredQuestions, extractAllQuestions} from "../utils/functions";
 import constants from './../utils/constants';
 import withPincode from './../components/higherOrderComponents/withPincode';
+import {Navigation} from "react-native-navigation";
+import {fadeInAnimation, fadeOutAnimation} from "../utils/animations";
 
 class FollowUpsSingleScreen extends Component {
-
-    static navigatorStyle = {
-        navBarHidden: true
-    };
 
     constructor(props) {
         super(props);
@@ -114,12 +112,7 @@ class FollowUpsSingleScreen extends Component {
             Alert.alert("", 'You have unsaved data. Are you sure you want to leave this page and lose all changes?', [
                 {
                     text: 'Yes', onPress: () => {
-                        this.props.navigator.pop(
-                            //     {
-                            //     animated: true,
-                            //     animationType: 'fade'
-                            // }
-                        )
+                        Navigation.pop(this.props.componentId)
                     }
                 },
                 {
@@ -129,12 +122,7 @@ class FollowUpsSingleScreen extends Component {
                 }
             ])
         } else {
-            this.props.navigator.pop(
-                //     {
-                //     animated: true,
-                //     animationType: 'fade'
-                // }
-            )
+            Navigation.pop(this.props.componentId)
         }
         return true;
     }
@@ -155,7 +143,7 @@ class FollowUpsSingleScreen extends Component {
                             style={[style.breadcrumbContainer]}>
                             <Breadcrumb
                                 entities={[getTranslation(this.props && this.props.previousScreen ? this.props.previousScreen : translations.followUpsSingleScreen.title, this.props.translation), ((this.state.contact && this.state.contact.firstName ? (this.state.contact.firstName + " ") : '') + (this.state.contact && this.state.contact.lastName ? this.state.contact.lastName : ''))]}
-                                navigator={this.props.navigator}
+                                componentId={this.props.componentId}
                                 onPress={this.handlePressBreadcrumb}
                             />
                             <View style={{ flexDirection: 'row', marginRight: calculateDimension(16, false, this.props.screenSize) }}>
@@ -224,7 +212,7 @@ class FollowUpsSingleScreen extends Component {
                             </View>
                         </View>
                     }
-                    navigator={this.props.navigator}
+                    componentId={this.props.componentId}
                     iconName="menu"
                     handlePressNavbarButton={this.handlePressNavbarButton}
                 />
@@ -247,11 +235,13 @@ class FollowUpsSingleScreen extends Component {
 
     // Please write here all the methods that are not react native lifecycle methods
     handlePressNavbarButton = () => {
-        this.props.navigator.toggleDrawer({
-            side: 'left',
-            animated: true,
-            to: 'open'
-        })
+        Navigation.mergeOptions(this.props.componentId, {
+            sideMenu: {
+                left: {
+                    visible: true,
+                },
+            },
+        });
     };
 
     handleOnIndexChange = (index) => {
@@ -400,7 +390,7 @@ class FollowUpsSingleScreen extends Component {
             Alert.alert("", 'You have unsaved data. Are you sure you want to leave this page and lose all changes?', [
                 {
                     text: 'Yes', onPress: () => {
-                        this.props.navigator.pop()
+                        Navigation.pop(this.props.componentId)
                     }
                 },
                 {
@@ -410,7 +400,7 @@ class FollowUpsSingleScreen extends Component {
                 }
             ])
         } else {
-            this.props.navigator.pop();
+            Navigation.pop(this.props.componentId);
         }
     };
 
@@ -750,11 +740,17 @@ class FollowUpsSingleScreen extends Component {
                             createFollowUp(followUpClone)
                                 .then((responseCreateFollowUp) => {
                                     // this.props.refresh();
-                                    this.props.navigator.resetTo(
+                                    Navigation.setStackRoot(this.props.componentId,
                                         {
-                                            screen: 'ContactsScreen',
-                                            animated: true,
-                                            animationType: 'fade',
+                                            component:{
+                                                name: 'ContactsScreen',
+                                                options:{
+                                                    animations:{
+                                                        pop: fadeOutAnimation,
+                                                        push: fadeInAnimation
+                                                    }
+                                                }
+                                            }
                                         }
                                     )
                                 })
@@ -772,12 +768,7 @@ class FollowUpsSingleScreen extends Component {
                             updateFollowUpAndContact(followUpClone)
                                 .then((responseUpdateFollowUp) => {
                                     this.props.refresh();
-                                    this.props.navigator.pop(
-                                        {
-                                            animated: true,
-                                            animationType: 'fade',
-                                        }
-                                    )
+                                    Navigation.pop(this.props.componentId)
                                 })
                                 .catch((errorUpdateFollowUp) => {
                                     console.log(errorUpdateFollowUp);
@@ -855,12 +846,14 @@ class FollowUpsSingleScreen extends Component {
     handleEditContact = () => {
         this.hideMenu();
 
-        this.props.navigator.push({
-            screen: 'ContactsSingleScreen',
-            passProps: {
-                contact: this.state.contact,
-                handleUpdateContactFromFollowUp: this.handleUpdateContactFromFollowUp,
-                refresh: this.props.refresh
+        Navigation.push(this.props.componentId,{
+            component:{
+                name: 'ContactsSingleScreen',
+                passProps: {
+                    contact: this.state.contact,
+                    handleUpdateContactFromFollowUp: this.handleUpdateContactFromFollowUp,
+                    refresh: this.props.refresh
+                }
             }
         })
     };
@@ -951,11 +944,12 @@ class FollowUpsSingleScreen extends Component {
                 pageAskingHelpFrom = 'followUpSingleScreenView'
             }
         }
-        this.props.navigator.showModal({
-            screen: 'HelpScreen',
-            animated: true,
-            passProps: {
-                pageAskingHelpFrom: pageAskingHelpFrom
+        Navigation.showModal({
+            component:{
+                name: 'HelpScreen',
+                passProps: {
+                    pageAskingHelpFrom: pageAskingHelpFrom
+                }
             }
         });
     };
@@ -977,7 +971,7 @@ class FollowUpsSingleScreen extends Component {
             isModified: true
         }), () => {
             // console.log('Updated previousAnswers: ', this.state.previousAnswers);
-            this.props.navigator.dismissAllModals();
+            Navigation.dismissAllModals();
         })
     };
     handleCopyAnswerDate = (value) => {

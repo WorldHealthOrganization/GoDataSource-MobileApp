@@ -31,6 +31,7 @@ import {handleQRSearchTransition} from "../utils/screenTransitionFunctions";
 import withPincode from "../components/higherOrderComponents/withPincode";
 import {getContactsForOutbreakId} from "../actions/contacts";
 import {compose} from "redux";
+import {Navigation} from "react-native-navigation";
 
 class CasesScreen extends Component {
 
@@ -106,7 +107,7 @@ class CasesScreen extends Component {
                                 <Breadcrumb
                                     key="caseKey"
                                     entities={caseTitle}
-                                    navigator={this.props.navigator}
+                                    componentId={this.props.componentId}
                                 />
                             </View>
                             <View style={{flex: 0.15, marginRight: 10}}>
@@ -165,7 +166,7 @@ class CasesScreen extends Component {
                             />
                         </View>
                     }
-                    navigator={this.props.navigator}
+                    componentId={this.props.componentId}
                     iconName="menu"
                     handlePressNavbarButton={this.handlePressNavbarButton}
                 >
@@ -245,11 +246,13 @@ class CasesScreen extends Component {
 
     // Please write here all the methods that are not react native lifecycle methods
     handlePressNavbarButton = () => {
-        this.props.navigator.toggleDrawer({
-            side: 'left',
-            animated: true,
-            to: 'open'
-        })
+        Navigation.mergeOptions(this.props.componentId, {
+            sideMenu: {
+                left: {
+                    visible: true,
+                },
+            },
+        });
     };
 
     handleOnPressMap = (dataFromMapHandler) => {
@@ -274,24 +277,25 @@ class CasesScreen extends Component {
 
     //Create new case in CaseSingleScreen
     handleOnPressAddCase = () => {
-        this.props.navigator.push({
-            screen: 'CaseSingleScreen',
-            animated: true,
-            // animationType: 'fade',
-            passProps: {
-                isNew: true,
-                refresh: this.props.onRefresh
+        Navigation.push(this.props.componentId,{
+            component:{
+                name: 'CaseSingleScreen',
+                passProps: {
+                    isNew: true,
+                    refresh: this.props.onRefresh
+                }
             }
         })
     };
 
     goToHelpScreen = () => {
         let pageAskingHelpFrom = 'cases';
-        this.props.navigator.showModal({
-            screen: 'HelpScreen',
-            animated: true,
-            passProps: {
-                pageAskingHelpFrom: pageAskingHelpFrom
+        Navigation.showModal({
+            component:{
+                name: 'HelpScreen',
+                passProps: {
+                    pageAskingHelpFrom: pageAskingHelpFrom
+                }
             }
         });
     };
@@ -299,11 +303,12 @@ class CasesScreen extends Component {
     handleOnPressQRCode = () => {
         // console.log('handleOnPressQRCode');
 
-        this.props.navigator.showModal({
-            screen: 'QRScanScreen',
-            animated: true,
-            passProps: {
-                pushNewScreen: this.pushNewEditScreenLocal
+        Navigation.showModal({
+            component:{
+                name: 'QRScanScreen',
+                passProps: {
+                    pushNewScreen: this.pushNewEditScreenLocal
+                }
             }
         })
     };
@@ -314,11 +319,11 @@ class CasesScreen extends Component {
         this.setState({
             loading: true
         }, () => {
-            pushNewEditScreen(QRCodeInfo, this.props.navigator, this.props && this.props.user ? this.props.user : null, this.props && this.props.translation ? this.props.translation : null, (error, itemType, record) => {
+            pushNewEditScreen(QRCodeInfo, this.props.componentId, this.props && this.props.user ? this.props.user : null, this.props && this.props.translation ? this.props.translation : null, (error, itemType, record) => {
                 this.setState({
                     loading: false
                 }, () => {
-                    handleQRSearchTransition(this.props.navigator, error, itemType, record, get(this.props, 'user', null), get(this.props, 'translation', null), get(this.props, 'role', []), this.props.refresh);
+                    handleQRSearchTransition(this.props.componentId, error, itemType, record, get(this.props, 'user', null), get(this.props, 'translation', null), get(this.props, 'role', []), this.props.refresh);
                 });
             })
         });

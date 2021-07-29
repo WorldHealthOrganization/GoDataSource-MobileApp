@@ -8,11 +8,9 @@ import {Dimensions, StyleSheet, Text, View} from 'react-native';
 import lodashGet from 'lodash/get';
 
 import QRCodeScanner from 'react-native-qrcode-scanner';
+import {Navigation} from "react-native-navigation";
 
 class QRScanScreen extends Component {
-    static navigatorStyle = {
-        navBarHidden: true
-    };
 
     constructor(props){
         super(props)
@@ -37,7 +35,7 @@ class QRScanScreen extends Component {
                     </View>
                 }
                               title={null}
-                              navigator={this.props.navigator}
+                              componentId={this.props.componentId}
                               iconName="close"
                               handlePressNavbarButton={this.handlePressNavbarButton}
                 />
@@ -52,14 +50,14 @@ class QRScanScreen extends Component {
     }
 
     handlePressNavbarButton = () => {
-        this.props.navigator.dismissModal()
+        Navigation.dismissModal(this.props.componentId)
     }
 
     onSuccess(e) {
         //  TO DO get data from e...
         console.log('Here we have some values for e: ', e);
         this.props.pushNewScreen(e, this.props.allowBack, this.props.skipEdit, this.props.isMultipleHub);
-        this.props.navigator.dismissModal();
+        Navigation.dismissModal(this.props.componentId);
     }
 }
 

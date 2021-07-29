@@ -35,6 +35,7 @@ import {setLoaderState} from './../actions/app';
 import PermissionComponent from './../components/PermissionComponent';
 import {handleQRSearchTransition} from "../utils/screenTransitionFunctions";
 import withPincode from './../components/higherOrderComponents/withPincode';
+import {Navigation} from "react-native-navigation";
 
 class FollowUpsScreen extends Component {
 
@@ -109,7 +110,7 @@ class FollowUpsScreen extends Component {
                                 <Breadcrumb
                                     key="followUpsKey"
                                     entities={followUpTitle}
-                                    navigator={this.props.navigator}
+                                    componentId={this.props.componentId}
                                 />
                             </View>
                             <View style={{ flex: 0.15, marginRight: 10 }}>
@@ -143,7 +144,7 @@ class FollowUpsScreen extends Component {
                             </View>
                         </View>
                     }
-                    navigator={this.props.navigator || null}
+                    componentId={this.props.componentId || null}
                     iconName="menu"
                     handlePressNavbarButton={this.handlePressNavbarButton}
                 >
@@ -243,11 +244,13 @@ class FollowUpsScreen extends Component {
         this.setState({
             calendarPickerOpen: false
         }, () => {
-            this.props.navigator.toggleDrawer({
-                side: 'left',
-                animated: true,
-                to: 'open'
-            })
+            Navigation.mergeOptions(this.props.componentId, {
+                sideMenu: {
+                    left: {
+                        visible: true,
+                    },
+                },
+            });
         })
     };
 
@@ -284,11 +287,12 @@ class FollowUpsScreen extends Component {
 
     goToHelpScreen = () => {
         let pageAskingHelpFrom = 'followUps';
-        this.props.navigator.showModal({
-            screen: 'HelpScreen',
-            animated: true,
-            passProps: {
-                pageAskingHelpFrom: pageAskingHelpFrom
+        Navigation.showModal({
+            component:{
+                name: 'HelpScreen',
+                passProps: {
+                    pageAskingHelpFrom: pageAskingHelpFrom
+                }
             }
         });
     };
@@ -296,11 +300,12 @@ class FollowUpsScreen extends Component {
     handleOnPressQRCode = () => {
         // console.log('handleOnPressQRCode');
 
-        this.props.navigator.showModal({
-            screen: 'QRScanScreen',
-            animated: true,
-            passProps: {
-                pushNewScreen: this.pushNewEditScreenLocal
+        Navigation.showModal({
+            component:{
+                name: 'QRScanScreen',
+                passProps: {
+                    pushNewScreen: this.pushNewEditScreenLocal
+                }
             }
         })
     };
@@ -311,11 +316,11 @@ class FollowUpsScreen extends Component {
         this.setState({
             loading: true
         }, () => {
-            pushNewEditScreen(QRCodeInfo, this.props.navigator, this.props && this.props.user ? this.props.user : null, this.props && this.props.translation ? this.props.translation : null, (error, itemType, record) => {
+            pushNewEditScreen(QRCodeInfo, this.props.componentId, this.props && this.props.user ? this.props.user : null, this.props && this.props.translation ? this.props.translation : null, (error, itemType, record) => {
                 this.setState({
                     loading: false
                 }, () => {
-                    handleQRSearchTransition(this.props.navigator, error, itemType, record, get(this.props, 'user', null), get(this.props, 'translation', null), get(this.props, 'role', []), this.props.refresh);
+                    handleQRSearchTransition(this.props.componentId, error, itemType, record, get(this.props, 'user', null), get(this.props, 'translation', null), get(this.props, 'role', []), this.props.refresh);
                 });
             })
         });

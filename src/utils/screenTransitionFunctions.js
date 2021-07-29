@@ -11,8 +11,10 @@ import get from "lodash/get";
 import isFunction from "lodash/isFunction";
 import config from "./config";
 import constants, {PERMISSIONS_CONTACT_OF_CONTACT} from './constants';
+import {Navigation} from "react-native-navigation";
+import {fadeInAnimation, fadeOutAnimation} from "./animations";
 
-export function pushNewEditScreen(QRCodeInfo, navigator, user, translation, callback) {
+export function pushNewEditScreen(QRCodeInfo, componentId, user, translation, callback) {
     console.log('pushNewEditScreen QRCodeInfo', QRCodeInfo);
 
     let itemId = null;
@@ -83,23 +85,23 @@ export function pushNewEditScreen(QRCodeInfo, navigator, user, translation, call
     }
 }
 
-export function screenTransition(navigator, transition, nextScreen, passProps, userPermissions, requiredPermissions) {
+export function screenTransition(componentId, transition, nextScreen, passProps, userPermissions, requiredPermissions) {
     if (checkArrayAndLength(lodashIntersection(userPermissions, requiredPermissions))) {
         switch (transition) {
             case 'push':
-                navigator.push({
-                    screen: nextScreen,
-                    animated: true,
-                    // animationType: 'fade',
-                    passProps: passProps
+                Navigation.push(componentId, {
+                    component:{
+                        name: nextScreen,
+                        passProps: passProps
+                    }
                 });
                 break;
             case 'showModal':
-                navigator.showModal({
-                    screen: nextScreen,
-                    animated: true,
-                    // animationType: 'fade',
-                    passProps: passProps
+                Navigation.showModal({
+                    component:{
+                        name: nextScreen,
+                        passProps: passProps
+                    }
                 });
                 break;
             default:
@@ -108,7 +110,7 @@ export function screenTransition(navigator, transition, nextScreen, passProps, u
     }
 }
 
-export function handleQRSearchTransition (navigator, error, itemType, record, user, translation, userPermissions, refresh) {
+export function handleQRSearchTransition (componentId, error, itemType, record, user, translation, userPermissions, refresh) {
     if (!refresh || !isFunction(refresh)) {
         refresh = () => {console.log('Default refresh function for scan qrCode')}
     }
@@ -133,16 +135,23 @@ export function handleQRSearchTransition (navigator, error, itemType, record, us
                                 outbreakId: get(user, 'activeOutbreakId', null),
                             }, config.caseBlueprint);
 
-                            navigator.push({
-                                screen: 'CaseSingleScreen',
-                                animated: true,
-                                animationType: 'fade',
-                                passProps: {
-                                    case: caseToSave,
-                                    forceNew: true,
-                                    isNew: true,
-                                    refresh: refresh
+                            Navigation.push(componentId,{
+                                component:{
+                                    name: 'CaseSingleScreen',
+                                    options:{
+                                        animations:{
+                                            push: fadeInAnimation,
+                                            pop: fadeOutAnimation
+                                        }
+                                    },
+                                    passProps: {
+                                        case: caseToSave,
+                                        forceNew: true,
+                                        isNew: true,
+                                        refresh: refresh
+                                    }
                                 }
+
                             })
                         }
                     },
@@ -177,13 +186,19 @@ export function handleQRSearchTransition (navigator, error, itemType, record, us
                     constants.PERMISSIONS_CASE.caseAll,
                     constants.PERMISSIONS_CASE.caseView
                 ], userPermissions))) {
-                        navigator.push({
-                            screen: 'CaseSingleScreen',
-                            animated: true,
-                            animationType: 'fade',
-                            passProps: {
-                                case: record,
-                                refresh: refresh
+                        Navigation.push(componentId,{
+                            component:{
+                                name: 'CaseSingleScreen',
+                                options:{
+                                    animations:{
+                                        push: fadeInAnimation,
+                                        pop: fadeOutAnimation
+                                    }
+                                },
+                                passProps: {
+                                    case: record,
+                                    refresh: refresh
+                                }
                             }
                         })
                 } else {
@@ -204,13 +219,19 @@ export function handleQRSearchTransition (navigator, error, itemType, record, us
                     constants.PERMISSIONS_CONTACT.contactAll,
                     constants.PERMISSIONS_CONTACT.contactView
                 ], userPermissions))) {
-                        navigator.push({
-                            screen: 'ContactsSingleScreen',
-                            animated: true,
-                            animationType: 'fade',
-                            passProps: {
-                                contact: record,
-                                refresh: refresh
+                        Navigation.push(componentId,{
+                            component:{
+                                name: 'ContactsSingleScreen',
+                                options:{
+                                    animations:{
+                                        push:fadeInAnimation,
+                                        pop: fadeOutAnimation
+                                    }
+                                },
+                                passProps: {
+                                    contact: record,
+                                    refresh: refresh
+                                }
                             }
                         })
                 } else {
@@ -231,13 +252,19 @@ export function handleQRSearchTransition (navigator, error, itemType, record, us
                     PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsAll,
                     PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsView
                 ], userPermissions))) {
-                    navigator.push({
-                        screen: constants.appScreens.contactsOfContactsSingleScreen,
-                        animated: true,
-                        animationType: 'fade',
-                        passProps: {
-                            contact: record,
-                            refresh: refresh
+                    Navigation.push(componentId,{
+                        component:{
+                            options:{
+                                animations:{
+                                    push: fadeInAnimation,
+                                    pop: fadeOutAnimation
+                                }
+                            },
+                            name: constants.appScreens.contactsOfContactsSingleScreen,
+                            passProps: {
+                                contact: record,
+                                refresh: refresh
+                            }
                         }
                     })
                 } else {

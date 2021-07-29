@@ -34,14 +34,14 @@ import base64 from 'base-64';
 import DropdownInput from './../components/DropdownInput';
 import appConfig from './../../app.config';
 import LocalButton from './../components/Button';
+import {Navigation} from "react-native-navigation";
+import {fadeInAnimation, fadeOutAnimation} from "../utils/animations";
 
 class ManualConfigScreen extends PureComponent {
 
-    static navigatorStyle = {
-        navBarHidden: true,
-    };
 
     constructor(props) {
+        console.log("Manual conf screen");
         super(props);
         this.state = {
             name: appConfig.env === 'development' ? config.whocdCredentials.name : '',
@@ -75,6 +75,7 @@ class ManualConfigScreen extends PureComponent {
 
     // Please add here the react lifecycle methods that you need
     componentDidMount = async () => {
+        console.log("Manual conf screen");
         // Get all hubs urls for the check
         // To get them, first get all databases names and ids from AsyncStorage, then for each url, get its internet credentials and map them to an array of urls
         try {
@@ -192,10 +193,16 @@ class ManualConfigScreen extends PureComponent {
                 this.props.changeAppRoot('login');
             } else {
                 // console.log('TestQRCode go to login without app root');
-                this.props.navigator.push({
-                    screen: 'LoginScreen',
-                    animated: true,
-                    animationType: 'fade'
+                Navigation.push(this.props.componentId,{
+                    component:{
+                        name: 'LoginScreen',
+                        options:{
+                            animations:{
+                                push: fadeInAnimation,
+                                pop: fadeOutAnimation
+                            }
+                        }
+                    }
                 })
             }
         }
@@ -444,26 +451,30 @@ class ManualConfigScreen extends PureComponent {
     // Please write here all the methods that are not react native lifecycle methods
     handleOnPressBack = () => {
         if (this.props && this.props.allowBack) {
-            this.props.navigator.pop();
+            Navigation.pop(this.props.componentId);
         } else {
-            this.props.navigator.resetTo({
-                screen: 'FirstConfigScreen',
-                passProps: {
-                    allowBack: this.props.allowBack,
-                    skipEdit: this.props.skipEdit,
-                    isMultipleHub: this.props.isMultipleHub
+            Navigation.setStackRoot(this.props.componentId,{
+                component:{
+                    name: 'FirstConfigScreen',
+                    passProps: {
+                        allowBack: this.props.allowBack,
+                        skipEdit: this.props.skipEdit,
+                        isMultipleHub: this.props.isMultipleHub
+                    }
                 }
             });
         }
     };
 
     handleOnPressForward = () => {
-        this.props.navigator.push({
-            screen: 'LoginScreen',
-            passProps: {
-                allowBack: this.props.allowBack,
-                skipEdit: this.props.skipEdit,
-                isMultipleHub: this.props.isMultipleHub
+        Navigation.push(this.props.componentId,{
+            component:{
+                name: 'LoginScreen',
+                passProps: {
+                    allowBack: this.props.allowBack,
+                    skipEdit: this.props.skipEdit,
+                    isMultipleHub: this.props.isMultipleHub
+                }
             }
         })
     };

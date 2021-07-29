@@ -125,6 +125,50 @@ export function getAddress(address, returnString, locationsList) {
     return returnString ? addressArray.join(', ') : addressArray;
 }
 
+export function mapSideMenuKeysToScreenName(sideMenuKey){
+    let screenToSwitchTo = null;
+    let addScreen = false;
+    switch(sideMenuKey) {
+        case sideMenuKeys[0]:
+            screenToSwitchTo = constants.appScreens.followUpScreen;
+            break;
+        case sideMenuKeys[1]:
+            screenToSwitchTo = constants.appScreens.contactsScreen;
+            break;
+        case `${sideMenuKeys[1]}-add`:
+            screenToSwitchTo = constants.appScreens.contactsScreen;
+            addScreen = true;
+            break;
+        case sideMenuKeys[2]:
+            screenToSwitchTo = constants.appScreens.contactsOfContactsScreen;
+            break;
+        case `${sideMenuKeys[2]}-add`:
+            screenToSwitchTo = constants.appScreens.contactsOfContactsSingleScreen;
+            addScreen = true;
+            break;
+        case sideMenuKeys[3]:
+            screenToSwitchTo = constants.appScreens.casesScreen;
+            break;
+        case `${sideMenuKeys[3]}-add`:
+            screenToSwitchTo = constants.appScreens.caseSingleScreen;
+            addScreen = true;
+            break;
+        case sideMenuKeys[4]:
+            screenToSwitchTo = constants.appScreens.usersScreen;
+            break;
+        case sideMenuKeys[5]:
+            screenToSwitchTo = constants.appScreens.helpScreen;
+            break;
+        default:
+            screenToSwitchTo = constants.appScreens.followUpScreen;
+            break;
+    }
+    return{
+        screenToSwitchTo,
+        addScreen
+    }
+}
+
 export function navigation(event, navigator) {
     // console.log('Event: ', event);
     if (event.type === 'DeepLink') {
@@ -180,7 +224,6 @@ export function navigation(event, navigator) {
                         }
                     });
                 } else {
-
                     navigator.resetTo({
                         screen: screenToSwitchTo,
                     });

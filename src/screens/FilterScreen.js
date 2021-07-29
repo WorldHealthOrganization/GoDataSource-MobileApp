@@ -13,11 +13,9 @@ import {addFilterForScreen, removeFilterForScreen} from './../actions/app';
 import FiltersContainer from './../containers/FiltersContainer';
 import SortContainer from './../containers/SortContainer';
 import translations from './../utils/translations';
+import {Navigation} from "react-native-navigation";
 
 class FilterScreen extends Component {
-    static navigatorStyle = {
-        navBarHidden: true
-    };
 
     constructor(props) {
         super(props);
@@ -145,13 +143,13 @@ class FilterScreen extends Component {
 
     render() {
         const { screenTitle } = this.state;
-        const { navigator } = this.props;
+        const { componentId } = this.props;
 
         return (
             <View style={style.container}>
                 <NavBarCustom
                     title={screenTitle}
-                    navigator={navigator}
+                    componentId={componentId}
                     iconName="close"
                     handlePressNavbarButton={this.handlePressNavbarButton}
                 />
@@ -273,15 +271,15 @@ class FilterScreen extends Component {
 
     // Buttons action
     handlePressNavbarButton = () => {
-        const { navigator } = this.props;
-        navigator.dismissModal();
+        Navigation.dismissModal(this.props.componentId);
     };
 
-    handleResetFilters = () => {
-        const { navigator, screen, onApplyFilters, removeFilterForScreen } = this.props;
+    handleResetFilters = async () => {
+        const { componentId, screen, onApplyFilters, removeFilterForScreen } = this.props;
 
         removeFilterForScreen(screen);
-        navigator.dismissModal(onApplyFilters(null));
+        await Navigation.dismissModal(componentId);
+        onApplyFilters(null);
     };
 
     handleOnIndexChange = (index) => {
@@ -300,10 +298,10 @@ class FilterScreen extends Component {
         this.handleOnIndexChange(nextIndex)
     };
 
-    handleOnPressApplyFilters = () => {
+    handleOnPressApplyFilters = async () => {
         const { filter } = this.state;
         const { localTranslationTokens } = config;
-        const { addFilterForScreen, screen, navigator, onApplyFilters } = this.props;
+        const { addFilterForScreen, screen, componentId, onApplyFilters } = this.props;
 
         let filterStateClone = Object.assign({}, filter.filter);
         let filterSortClone = filter.sort.slice()
@@ -334,7 +332,8 @@ class FilterScreen extends Component {
         }
 
         addFilterForScreen(screen, filterClone);
-        navigator.dismissModal(onApplyFilters(filterClone));
+        await Navigation.dismissModal(componentId);
+        onApplyFilters(filterClone)
     };
 
 

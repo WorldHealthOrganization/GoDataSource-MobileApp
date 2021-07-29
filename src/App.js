@@ -1,9 +1,9 @@
-import {NativeEventsReceiver, Navigation} from 'react-native-navigation';
+import { Navigation} from 'react-native-navigation';
 import {Provider} from 'react-redux';
 import {applyMiddleware, createStore} from 'redux';
 import {enableBatching} from 'redux-batched-actions';
 import thunk from 'redux-thunk';
-import promise from 'redux-prom`ise';
+import promise from 'redux-promise';
 import {DeviceEventEmitter, NativeEventEmitter, NativeModules, Platform} from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 import RNFetchBlobFS from 'rn-fetch-blob/fs';
@@ -12,22 +12,30 @@ import {getInternetCredentials, resetInternetCredentials} from 'react-native-key
 import {wipeCompleteRequest} from './requests/wipeData';
 import appReducers from './reducers';
 import appActions from './actions';
+//here
 import {registerScreens} from './screens';
 import config, {sideMenuKeys} from './utils/config';
 import {checkDeviceStatus} from "./requests/deviceStatus";
 import isNumber from 'lodash/isNumber';
 import constants from './utils/constants';
+import {slideInAnimation, slideOutAnimation} from "./utils/animations";
 
 console.disableYellowBox = true;
 
-export const store = createStore(enableBatching(appReducers), applyMiddleware(thunk, promise));
+export const store = createStore(
+  enableBatching(appReducers),
+  applyMiddleware(thunk, promise)
+);
 
 registerScreens(store, Provider);
+
+
+
 
 export default class App {
 
     constructor() {
-        let NativeModule = null;
+        let ParseNativeModule = null;
         if (Platform.OS === 'ios') {
             ParseNativeModule = new NativeEventEmitter(NativeModules.APNSEventEmitter)
         } else {
@@ -105,7 +113,6 @@ export default class App {
                     console.log('Error device id: ', errorInstallationId);
                 })
         });
-
         store.subscribe(this.onStoreUpdate);
         console.log('Proceed to initialize the app');
         this.checkDevice(() => {
@@ -116,19 +123,16 @@ export default class App {
     onStoreUpdate = () => {
         const { root, selectedScreen } = store.getState().app;
         const oldRoot = this.currentRoot;
+        console.log("Store has updated", this.currentRoot, root);
         if (this.currentRoot !== root) {
             this.currentRoot = root;
-            if (Platform.OS === 'ios') {
-                this.startApp(root, oldRoot, selectedScreen);
-            } else {
-                Navigation.isAppLaunched()
-                    .then((appLaunched) => {
-                        if (appLaunched) {
-                            this.startApp(root, oldRoot, selectedScreen);
-                        }
-                        new NativeEventsReceiver().appLaunched(this.startApp(root, oldRoot, selectedScreen));
-                    })
-            }
+            console.log("Register listener");
+            // this.appLaunchedListener = Navigation.events().registerAppLaunchedListener(() => {
+            //     console.log("app launched listener");
+            //     // Each time the event is received you should call Navigation.setRoot
+            //     this.startApp(root, oldRoot, selectedScreen);
+            // });
+            this.startApp(root, oldRoot, selectedScreen);
         }
     };
 
@@ -136,6 +140,7 @@ export default class App {
         let isAppInitialize = false;
         console.log('Update root start app: ', root, oldRoot);
         if (!oldRoot) {
+            let ParseNativeModule;
             if (Platform.OS === 'ios') {
                 ParseNativeModule = NativeModules.APNSEventEmitter
             } else {
@@ -162,47 +167,38 @@ export default class App {
                 break;
         }
 
-        let rootObject = {
-            appStyle: {
-                orientation: 'portrait'
-            },
+        let componentObject = {
             passProps: {
                 isAppInitialize: isAppInitialize
             },
         };
+        let rootObject = null;
 
         switch (root) {
             case 'config':
-                rootObject = Object.assign({}, rootObject,
+                componentObject = Object.assign({}, componentObject,
                     {
-                        screen: {
-                            screen: 'FirstConfigScreen'
-                        }
+                            name: 'FirstConfigScreen'
                     });
                 break;
             case 'login':
-                rootObject = Object.assign({}, rootObject,
+                componentObject = Object.assign({}, componentObject,
                     {
-                        screen: {
-                            screen: 'LoginScreen'
-                        }
+                            name: 'LoginScreen'
                     });
                 break;
             case 'after-login':
-                rootObject = {
-                    screen: {
-                        screen: screen
-                    },
-                    appStyle: {
-                        orientation: 'portrait'
-                    },
-                    drawer: {
-                        left: {
-                            screen: 'NavigationDrawer'
+                componentObject = {
+                    name: screen,
+                    options: {
+                        sideMenu:{
+                            left: {
+                                name: 'NavigationDrawer'
+                            },
                         },
-                        style: {
-                            drawerShadow: false,
-                            contentOverlayColor: 'rgba(0,0,0,0.25)',
+                        animations: {
+                            push: slideInAnimation,
+                            pop: slideOutAnimation
                         }
                     },
                     passProps: {
@@ -210,17 +206,117 @@ export default class App {
                     },
                     animationType: 'slide-down'
                 };
+                rootObject = {
+                    sideMenu:{
+                        center:{
+                            stack: {
+                                id: "CenterStack",
+                                children:[{
+                                    component:{
+                                        name: screen,
+                                        passProps: {
+                                            isAppInitialize: isAppInitialize
+                                        },
+                                    }
+                                }],
+                                options: {
+                                    layout: {
+                                        orientation: ['portrait']
+                                    },
+                                    topBar: {
+                                        visible: false,
+                                        drawBehind: true,
+                                        animate: false
+                                    }
+                                }
+                            }
+                        },
+                        left:{
+                            component:{
+                                name: 'NavigationDrawer',
+                                options:{
+                                    animations: {
+                                        push: slideInAnimation,
+                                        pop: slideOutAnimation
+                                    }
+                                }
+                            }
+                        }
+                    }
+                };
                 break;
             default:
-                rootObject = Object.assign({}, rootObject,
+                componentObject = Object.assign({}, componentObject,
                     {
-                        screen: {
-                            screen: 'FirstConfigScreen'
-                        }
+                            name: 'FirstConfigScreen'
                     });
         }
 
-        Navigation.setRoot({root: rootObject})
+        console.log("Nav set root", componentObject);
+            rootObject = {
+                stack: {
+                    id: "CenterStack",
+                    children: [{component: componentObject}],
+                    options: {
+                        layout: {
+                            orientation: ['portrait']
+                        },
+                        topBar: {
+                            visible: false,
+                            drawBehind: true,
+                            animate: false
+                        }
+                    }
+                }
+            }
+
+        console.log("Root object", rootObject);
+        Navigation.setRoot({
+            root: {
+            sideMenu:{
+                left:{
+                    component:{
+                        name: 'NavigationDrawer',
+                        options:{
+                            animations: {
+                                push: slideInAnimation,
+                                pop: slideOutAnimation
+                            }
+                        }
+                    }
+                },
+                center:{
+                    stack: {
+                        id: "CenterStack",
+                        children: [{component: componentObject}],
+                        options: {
+                            layout: {
+                                orientation: ['portrait']
+                            },
+                            topBar: {
+                                visible: false,
+                                drawBehind: true,
+                                animate: false
+                            },
+                            sideMenu: {
+                                left:{
+                                    //idk
+                                    visible: false
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            }})
+            .then((onfulfilled)=>{
+                console.log("On fulfilled", onfulfilled);
+            },(onrejected)=>{
+                console.log("On rejected", onrejected);
+            })
+            .catch((onreject2)=>{
+                console.log("Catch onreject", onreject2);
+            });
     };
 
     // Checks device status if exists, and if the status is pending wipe, removes everything

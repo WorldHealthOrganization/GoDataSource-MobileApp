@@ -19,6 +19,7 @@ import get from 'lodash/get';
 import TopContainerButtons from "../components/TopContainerButtons";
 import PermissionComponent from './../components/PermissionComponent';
 import constants from "./../utils/constants";
+import {Navigation} from "react-native-navigation";
 
 const AnimatedFlatList = Animated.createAnimatedComponent(FlatList);
 
@@ -197,14 +198,15 @@ class ContactsSingleExposures extends Component {
     };
 
     onPressAddExposure = () => {
-        this.props.navigator.showModal({
-            screen: "ExposureScreen",
-            animated: true,
-            passProps: {
-                case: this.props.case,
-                type: 'Case',
-                saveExposure: this.props.saveExposure,
-                refreshRelations: this.props.refreshRelations
+        Navigation.showModal({
+            component:{
+                name: "ExposureScreen",
+                passProps: {
+                    case: this.props.case,
+                    type: 'Case',
+                    saveExposure: this.props.saveExposure,
+                    refreshRelations: this.props.refreshRelations
+                }
             }
         })
     };

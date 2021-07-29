@@ -34,6 +34,7 @@ import DropdownInput from "../components/DropdownInput";
 import RNFS from 'react-native-fs';
 import RNFetchBlobFS from 'rn-fetch-blob/fs';
 import RippleFeedback from 'react-native-material-ripple';
+import {Navigation} from "react-native-navigation";
 
 
 let textFieldsStructure = [
@@ -111,9 +112,6 @@ let textFieldsStructure = [
 
 class FirstConfigScreen extends Component {
 
-    static navigatorStyle = {
-        navBarHidden: true
-    };
 
     constructor(props) {
         super(props);
@@ -200,7 +198,7 @@ class FirstConfigScreen extends Component {
                 <ViewHOC style={{flex: 1, backgroundColor: 'white'}} showLoader={this.state.showLoading} loaderText="Loading...">
                     <NavBarCustom style = {style.navbarContainer}
                                   title={getTranslation(translations.hubConfigScreen.label, this.props.translation)}
-                                  navigator={this.props.navigator}
+                                  componentId={this.props.componentId}
                                   iconName="close"
                                   handlePressNavbarButton={this.handlePressNavbarButton}
                     />
@@ -421,14 +419,14 @@ class FirstConfigScreen extends Component {
         if (this.state.isModified) {
             Alert.alert('', getTranslation(translations.hubConfigScreen.exitWithoutSavingMessage), [
                 {
-                    text: 'Yes', onPress: () => {this.props.navigator.dismissModal()}
+                    text: 'Yes', onPress: () => {Navigation.dismissModal(this.props.componentId)}
                 },
                 {
                     text: 'Cancel', onPress: () => {console.log('Cancel pressed')}
                 }
             ])
         } else {
-            this.props.navigator.dismissModal();
+            Navigation.dismissModal(this.props.componentId);
         }
     };
 
@@ -653,11 +651,12 @@ class FirstConfigScreen extends Component {
     };
 
     handleOnPressQr = () => {
-        this.props.navigator.showModal({
-            screen: 'QRScanScreen',
-            animated: true,
-            passProps: {
-                pushNewScreen: this.pushNewScreen
+        Navigation.showModal({
+            component:{
+                name: 'QRScanScreen',
+                passProps: {
+                    pushNewScreen: this.pushNewScreen
+                }
             }
         })
     };
@@ -730,12 +729,14 @@ class FirstConfigScreen extends Component {
     };
 
     handleOnPressAddHub = () => {
-        this.props.navigator.push({
-            screen: 'FirstConfigScreen',
-            passProps: {
-                allowBack: true,
-                skipEdit: true,
-                isMultipleHub: true
+        Navigation.push(this.props.componentId,{
+            component:{
+                name: 'FirstConfigScreen',
+                passProps: {
+                    allowBack: true,
+                    skipEdit: true,
+                    isMultipleHub: true
+                }
             }
         })
     };

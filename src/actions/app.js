@@ -785,6 +785,7 @@ export function appInitialized(nativeEventEmitter) {
                                 try {
                                     let database = await createDatabase(server.replace(/\/|\.|\:/g, ''), databaseCredentials.password, false);
                                     if (database) {
+                                        console.log("Login 2")
                                         dispatch(changeAppRoot('login'));
                                         console.log('NativeEventEmitter: ', typeof nativeEventEmitter, nativeEventEmitter);
                                         console.log("Typeof nativeEventEmitter: ", typeof nativeEventEmitter.appLoaded);
@@ -828,7 +829,7 @@ export function appInitialized(nativeEventEmitter) {
                             }
                         }
                     } else {
-                        console.log("We don't have an active database, and we don't have logged user. Proceed to config screen");
+                        console.log("We don't have an active database, and we don't have logged user. Proceed to config screen1");
                         dispatch(changeAppRoot('config'));
                         console.log('NativeEventEmitter: ', typeof nativeEventEmitter, nativeEventEmitter);
                         console.log("Typeof nativeEventEmitter: ", typeof nativeEventEmitter.appLoaded);
@@ -862,6 +863,7 @@ export function appInitialized(nativeEventEmitter) {
                             try {
                                 let database = await createDatabase(server.replace(/\/|\.|\:/g, ''), databaseCredentials.password, false);
                                 if (database) {
+                                    console.log("Login")
                                     dispatch(changeAppRoot('login'));
                                     console.log('NativeEventEmitter: ', typeof nativeEventEmitter, nativeEventEmitter);
                                     console.log("Typeof nativeEventEmitter: ", typeof nativeEventEmitter.appLoaded);
@@ -905,7 +907,7 @@ export function appInitialized(nativeEventEmitter) {
                         }
                     }
                 } else {
-                    console.log("We don't have an active database, and we don't have logged user. Proceed to config screen");
+                    console.log("We don't have an active database, and we don't have logged user. Proceed to config screen2");
                     dispatch(changeAppRoot('config'));
                     console.log('NativeEventEmitter: ', typeof nativeEventEmitter, nativeEventEmitter);
                     console.log("Typeof nativeEventEmitter: ", typeof nativeEventEmitter.appLoaded);

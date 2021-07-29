@@ -26,6 +26,7 @@ import RNExitApp from 'react-native-exit-app';
 import withPincode from './../components/higherOrderComponents/withPincode';
 import config from "../utils/config";
 import PermissionComponent from './../components/PermissionComponent';
+import {Navigation} from "react-native-navigation";
 
 let AnimatedListView = Animated.createAnimatedComponent(FlatList);
 
@@ -33,10 +34,6 @@ const scrollAnim = new Animated.Value(0);
 const offsetAnim = new Animated.Value(0);
 
 class HelpScreen extends Component {
-
-    static navigatorStyle = {
-        navBarHidden: true
-    };
 
     constructor(props) {
         super(props);
@@ -55,7 +52,7 @@ class HelpScreen extends Component {
         };
 
         // Bind here methods, or at least don't declare methods in the render method
-        this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this));
+        // this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this));
         this.renderHelp = this.renderHelp.bind(this);
         this.keyExtractor = this.keyExtractor.bind(this);
         this.renderSeparatorComponent = this.renderSeparatorComponent.bind(this);
@@ -186,14 +183,14 @@ class HelpScreen extends Component {
                             </View>
                         }
                             title={null}
-                            navigator={this.props.navigator}
+                            componentId={this.props.componentId}
                             iconName="close"
                             handlePressNavbarButton={this.handlePressNavbarButton}
                         />
                     ) : (
                     <NavBarCustom
                         title={helpTitle[1]}
-                        navigator={this.props.navigator || null}
+                        componentId={this.props.componentId || null}
                         iconName="menu"
                         handlePressNavbarButton={this.handlePressNavbarButton}
                     >
@@ -242,16 +239,18 @@ class HelpScreen extends Component {
     // Please write here all the methods that are not react native lifecycle methods
     handlePressNavbarButton = () => {
         this.state.displayModalFormat === true ? (
-            this.props.navigator.dismissModal()
+            Navigation.dismissModal(this.props.componentId)
         ) : (
             this.setState({
                 calendarPickerOpen: false
             }, () => {
-                this.props.navigator.toggleDrawer({
-                    side: 'left',
-                    animated: true,
-                    to: 'open'
-                })
+                Navigation.mergeOptions(this.props.componentId, {
+                    sideMenu: {
+                        left: {
+                            visible: true,
+                        },
+                    },
+                });
             })
         )
     };
@@ -316,13 +315,15 @@ class HelpScreen extends Component {
         console.log("### handlePressFollowUp: ", item);
 
         let itemClone = Object.assign({}, item);
-        this.props.navigator.push({
-            screen: 'HelpSingleScreen',
-            passProps: {
-                isNew: false,
-                item: itemClone,
-                filter: this.state.filter,
-                startLoadingScreen: this.startLoadingScreen
+        Navigation.push(this.props.componentId,{
+            component:{
+                name: 'HelpSingleScreen',
+                passProps: {
+                    isNew: false,
+                    item: itemClone,
+                    filter: this.state.filter,
+                    startLoadingScreen: this.startLoadingScreen
+                }
             }
         })
     };
@@ -423,13 +424,14 @@ class HelpScreen extends Component {
     };
 
     handlePressFilter = () => {
-        this.props.navigator.showModal({
-            screen: 'FilterScreen',
-            animated: true,
-            passProps: {
-                activeFilters: this.state.filterFromFilterScreen || null,
-                onApplyFilters: this.handleOnApplyFilters,
-                screen: 'HelpFilterScreen'
+        Navigation.showModal({
+            component:{
+                name: 'FilterScreen',
+                passProps: {
+                    activeFilters: this.state.filterFromFilterScreen || null,
+                    onApplyFilters: this.handleOnApplyFilters,
+                    screen: 'HelpFilterScreen'
+                }
             }
         })
     };

@@ -24,6 +24,7 @@ import {enhanceListWithGetData} from './../components/higherOrderComponents/with
 import call from 'react-native-phone-call';
 import get from 'lodash/get';
 import withPincode from './../components/higherOrderComponents/withPincode';
+import {Navigation} from "react-native-navigation";
 
 class UsersScreen extends Component {
 
@@ -64,7 +65,7 @@ class UsersScreen extends Component {
                                 <Breadcrumb
                                     key="userKey"
                                     entities={usersTitle}
-                                    navigator={this.props.navigator}
+                                    componentId={this.props.componentId}
                                 />
                             </View>
                             <View style={{ flex: 0.15 }}>
@@ -90,7 +91,7 @@ class UsersScreen extends Component {
                             </View>
                         </View>
                     }
-                    navigator={this.props.navigator}
+                    componentId={this.props.componentId}
                     iconName="menu"
                     handlePressNavbarButton={this.handlePressNavbarButton}
                 >
@@ -116,11 +117,13 @@ class UsersScreen extends Component {
 
     // Please write here all the methods that are not react native lifecycle methods
     handlePressNavbarButton = () => {
-        this.props.navigator.toggleDrawer({
-            side: 'left',
-            animated: true,
-            to: 'open'
-        })
+        Navigation.mergeOptions(this.props.componentId, {
+            sideMenu: {
+                left: {
+                    visible: true,
+                },
+            },
+        });
     };
 
     //Refresh list of users
@@ -134,11 +137,12 @@ class UsersScreen extends Component {
 
     goToHelpScreen = () => {
         let pageAskingHelpFrom = 'users';
-        this.props.navigator.showModal({
-            screen: 'HelpScreen',
-            animated: true,
-            passProps: {
-                pageAskingHelpFrom: pageAskingHelpFrom
+        Navigation.showModal({
+            component:{
+                name: 'HelpScreen',
+                passProps: {
+                    pageAskingHelpFrom: pageAskingHelpFrom
+                }
             }
         });
     };

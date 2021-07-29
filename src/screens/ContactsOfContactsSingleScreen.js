@@ -42,6 +42,7 @@ import {addContactOfContact, updateContactOfContact} from './../actions/contacts
 import {contactsOfContactsScreen} from "../utils/translations";
 import {checkValidEmails} from './../utils/formValidators';
 import {validateRequiredFields} from "../utils/formValidators";
+import {Navigation} from "react-native-navigation";
 
 const initialLayout = {
     height: 0,
@@ -49,10 +50,6 @@ const initialLayout = {
 };
 
 class ContactsOfContactsSingleScreen extends Component {
-
-    static navigatorStyle = {
-        navBarHidden: true
-    };
 
     constructor(props) {
         super(props);
@@ -144,7 +141,7 @@ class ContactsOfContactsSingleScreen extends Component {
             showAddFollowUpScreen: false
         };
         // Bind here methods, or at least don't declare methods in the render method
-        this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this));
+        // this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this));
         this.handleBackButtonClick = this.handleBackButtonClick.bind(this);
     };
 
@@ -222,7 +219,7 @@ class ContactsOfContactsSingleScreen extends Component {
             Alert.alert("", 'You have unsaved data. Are you sure you want to leave this page and lose all changes?', [
                 {
                     text: 'Yes', onPress: () => {
-                        this.props.navigator.pop()
+                        Navigation.pop(this.props.componentId)
                     }
                 },
                 {
@@ -232,7 +229,7 @@ class ContactsOfContactsSingleScreen extends Component {
                 }
             ])
         } else {
-            this.props.navigator.pop();
+            Navigation.pop(this.props.componentId);
         }
         return true;
     };
@@ -252,7 +249,7 @@ class ContactsOfContactsSingleScreen extends Component {
                             style={[style.breadcrumbContainer]}>
                             <Breadcrumb
                                 entities={[getTranslation(this.props && this.props.previousScreen ? this.props.previousScreen : contactsOfContactsScreen.contactsTitle, this.props.translation), this.props.isNew ? getTranslation(translations.contactSingleScreen.addContactTitle, this.props.translation) : ((this.props.contact && this.props.contact.firstName ? (this.props.contact.firstName + " ") : '') + (this.props.contact && this.props.contact.lastName ? this.props.contact.lastName : ''))]}
-                                navigator={this.props.navigator}
+                                componentId={this.props.componentId}
                                 onPress={this.handlePressBreadcrumb}
                             />
                             <View style={{ flexDirection: 'row', marginRight: calculateDimension(16, false, this.props.screenSize) }}>
@@ -276,7 +273,7 @@ class ContactsOfContactsSingleScreen extends Component {
                             </View>
                         </View>
                     }
-                    navigator={this.props.navigator}
+                    componentId={this.props.componentId}
                     iconName="menu"
                     handlePressNavbarButton={this.handlePressNavbarButton}
                 />
@@ -301,11 +298,13 @@ class ContactsOfContactsSingleScreen extends Component {
 
     // Please write here all the methods that are not react native lifecycle methods
     handlePressNavbarButton = () => {
-        this.props.navigator.toggleDrawer({
-            side: 'left',
-            animated: true,
-            to: 'open'
-        })
+        Navigation.mergeOptions(this.props.componentId, {
+            sideMenu: {
+                left: {
+                    visible: true,
+                },
+            },
+        });
     };
 
     handleOnIndexChange = (index) => {
@@ -527,7 +526,7 @@ class ContactsOfContactsSingleScreen extends Component {
                         onPressEditExposure={this.handleOnPressEditExposure}
                         onPressDeleteExposure={this.handleOnPressDeleteExposure}
                         addContactFromCasesScreen={this.props.addContactFromCasesScreen}
-                        navigator={this.props.navigator}
+                        componentId={this.props.componentId}
                         saveExposure={this.handleSaveExposure}
                         onPressPreviousButton={this.handleMoveToPrevieousScreenButton}
                         isNew={this.props.isNew}
@@ -568,12 +567,7 @@ class ContactsOfContactsSingleScreen extends Component {
             Alert.alert("", 'You have unsaved data. Are you sure you want to leave this page and lose all changes?', [
                 {
                     text: 'Yes', onPress: () => {
-                        this.props.navigator.pop(
-                            {
-                                animated: true,
-                                animationType: 'fade'
-                            }
-                        )
+                        Navigation.pop(this.props.componentId)
                     }
                 },
                 {
@@ -583,12 +577,7 @@ class ContactsOfContactsSingleScreen extends Component {
                 }
             ])
         } else {
-            this.props.navigator.pop(
-                {
-                    animated: true,
-                    animationType: 'fade'
-                }
-            );
+            Navigation.pop(this.props.componentId)
         }
     };
 
@@ -1176,19 +1165,20 @@ class ContactsOfContactsSingleScreen extends Component {
     handleOnPressEditExposure = (relation, index) => {
         // console.log('handleOnPressEditExposure: ', relation, index);
         _.set(relation, 'caseData.fullName', computeFullName(_.get(relation, 'caseData', null)));
-        this.props.navigator.showModal({
-            screen: 'ExposureScreen',
-            animated: true,
-            passProps: {
-                exposure: _.get(relation, 'relationshipData', null),
-                selectedExposure: _.get(relation, 'caseData', null),
-                contact: this.props.isNew ? null : this.props.contact,
-                type: 'ContactOfContact',
-                saveExposure: this.handleSaveExposure,
-                caseIdFromCasesScreen: this.props.caseIdFromCasesScreen,
-                isEditMode: false,
-                addContactFromCasesScreen: false,
-                refreshRelations: this.refreshRelations
+        Navigation.showModal({
+            component:{
+                name: 'ExposureScreen',
+                passProps: {
+                    exposure: _.get(relation, 'relationshipData', null),
+                    selectedExposure: _.get(relation, 'caseData', null),
+                    contact: this.props.isNew ? null : this.props.contact,
+                    type: 'ContactOfContact',
+                    saveExposure: this.handleSaveExposure,
+                    caseIdFromCasesScreen: this.props.caseIdFromCasesScreen,
+                    isEditMode: false,
+                    addContactFromCasesScreen: false,
+                    refreshRelations: this.refreshRelations
+                }
             }
         })
     };
@@ -1367,12 +1357,7 @@ class ContactsOfContactsSingleScreen extends Component {
                                 if (_.isFunction(this.props.refresh)) {
                                     this.props.refresh();
                                 }
-                                this.props.navigator.pop(
-                                    {
-                                        animated: true,
-                                        animationType: 'fade',
-                                    }
-                                )
+                                Navigation.pop(this.props.componentId)
                             })
                             .catch((errorAddContact) => {
                                 console.log('errorUpdateCase', errorAddContact);
@@ -1395,12 +1380,7 @@ class ContactsOfContactsSingleScreen extends Component {
                                 if (_.isFunction(this.props.refresh)) {
                                     this.props.refresh();
                                 }
-                                this.props.navigator.pop(
-                                    {
-                                        animated: true,
-                                        animationType: 'fade',
-                                    }
-                                )
+                                Navigation.pop(this.props.componentId)
                             })
                             .catch((errorUpdateContact) => {
                                 console.log('errorUpdateCase', errorUpdateContact);
@@ -1682,11 +1662,12 @@ class ContactsOfContactsSingleScreen extends Component {
             }
         }
 
-        this.props.navigator.showModal({
-            screen: 'HelpScreen',
-            animated: true,
-            passProps: {
-                pageAskingHelpFrom: pageAskingHelpFrom
+        Navigation.showModal({
+            component:{
+                name: 'HelpScreen',
+                passProps: {
+                    pageAskingHelpFrom: pageAskingHelpFrom
+                }
             }
         });
     };

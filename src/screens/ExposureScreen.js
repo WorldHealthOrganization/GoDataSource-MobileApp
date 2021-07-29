@@ -24,12 +24,9 @@ import ExposureContainer from '../containers/ExposureContainer';
 import get from 'lodash/get';
 import {insertOrUpdateExposure} from "../actions/exposure";
 import withPincode from './../components/higherOrderComponents/withPincode';
+import {Navigation} from "react-native-navigation";
 
 class ExposureScreen extends Component {
-
-    static navigatorStyle = {
-        navBarHidden: true
-    };
 
     constructor(props) {
         super(props);
@@ -58,7 +55,7 @@ class ExposureScreen extends Component {
     // Please add here the react lifecycle methods that you need
     componentDidUpdate(prevProps) {
         if (this.state.savePressed) {
-            this.props.navigator.dismissModal();
+            Navigation.dismissModal(this.props.componentId);
         }
     }
 
@@ -105,7 +102,7 @@ class ExposureScreen extends Component {
                                 </View>
                             }
                             title={null}
-                            navigator={this.props.navigator}
+                            componentId={this.props.componentId}
                             iconName="close"
                             handlePressNavbarButton={this.handlePressNavbarButton}
                         />
@@ -150,7 +147,7 @@ class ExposureScreen extends Component {
             Alert.alert("", 'You have unsaved data. Are you sure you want to leave this page and lose all changes?', [
                 {
                     text: 'Yes', onPress: () => {
-                        this.props.navigator.dismissModal();
+                        Navigation.dismissModal(this.props.componentId);
                     }
                 },
                 {
@@ -160,7 +157,7 @@ class ExposureScreen extends Component {
                 }
             ])
         } else {
-            this.props.navigator.dismissModal();
+            Navigation.dismissModal(this.props.componentId);
         }
     };
 
@@ -302,8 +299,9 @@ class ExposureScreen extends Component {
                         if (!this.props.contact) {
                             this.setState(prevState => ({
                                 exposure: Object.assign({}, prevState.exposure, {updatedAt: new Date().toISOString(), updatedBy: this.props.user._id.split('_')[this.props.user._id.split('_').length - 1]})
-                            }), () => {
-                                this.props.navigator.dismissModal(this.props.saveExposure(this.state.exposure, true));
+                            }), async () => {
+                                await Navigation.dismissModal(this.props.componentId);
+                                this.props.saveExposure(this.state.exposure, true);
                             })
                         } else {
                             let exposure = updateRequiredFields(get(this.props, 'outbreakId', null), get(this.props, 'user._id', null), this.state.exposure, 'update');
@@ -316,15 +314,16 @@ class ExposureScreen extends Component {
                             Promise.all([promise])
                                 .then((result) => {
                                     this.props.refreshRelations();
-                                    this.props.navigator.dismissModal();
+                                    Navigation.dismissModal(this.props.componentId);
                                 })
                         }
                     } else {
                         if (!this.props.contact) {
                             this.setState(prevState => ({
                                 exposure: Object.assign({}, prevState.exposure, {updatedAt: new Date().toISOString(), updatedBy: this.props.user._id.split('_')[this.props.user._id.split('_').length - 1]})
-                            }), () => {
-                              this.props.navigator.dismissModal(this.props.saveExposure(this.state.exposure));
+                            }), async () => {
+                              await Navigation.dismissModal(this.props.componentId);
+                                this.props.saveExposure(this.state.exposure);
                             })
                         } else {
                             let exposure = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id.split('_')[this.props.user._id.split('_').length - 1], record = Object.assign({}, this.state.exposure), action = 'create', fileType = 'relationship.json')
@@ -338,7 +337,7 @@ class ExposureScreen extends Component {
                                 .then((result) => {
                                     console.log('Successful at adding exposures');
                                     this.props.refresh();
-                                    this.props.navigator.dismissModal();
+                                    Navigation.dismissModal(this.props.componentId);
                                 })
                                 .catch((errorAddExposure) => {
                                     console.log(errorAddExposure)
@@ -351,7 +350,7 @@ class ExposureScreen extends Component {
                     insertOrUpdateExposure(exposure)
                         .then((resultInsertUpdateExposure) => {
                             this.props.refreshRelations();
-                            this.props.navigator.dismissModal();
+                            Navigation.dismissModal(this.props.componentId);
                         })
                         .catch((errorInsertUpdateExposure) => {
                             console.log('ErrorInsertUpdateExposure: ', errorInsertUpdateExposure);
@@ -399,11 +398,12 @@ class ExposureScreen extends Component {
             pageAskingHelpFrom = 'exposureAdd'
         }
 
-        this.props.navigator.showModal({
-            screen: 'HelpScreen',
-            animated: true,
-            passProps: {
-                pageAskingHelpFrom: pageAskingHelpFrom
+        Navigation.showModal({
+            component:{
+                name: 'HelpScreen',
+                passProps: {
+                    pageAskingHelpFrom: pageAskingHelpFrom
+                }
             }
         });
     };
