@@ -250,7 +250,6 @@ class ContactsSinglePersonal extends Component {
             <CardComponent
                 item={item}
                 isEditMode={this.props.isEditMode}
-                contact={this.props.contact}
                 isEditModeForDropDownInput={this.props.isEditMode}
                 selectedItemIndexForAgeUnitOfMeasureDropDown={this.props.selectedItemIndexForAgeUnitOfMeasureDropDown}
                 onChangeextInputWithDropDown={this.props.onChangeTextInputWithDropDown}

@@ -252,7 +252,6 @@ class CaseSingleInfectionContainer extends Component {
                 item={item}
                 isEditMode={this.props.isEditMode}
                 isEditModeForDropDownInput={this.props.isEditMode}
-                case={this.props.case}
                 value={value}
                 minimumDate={minimumDate}
                 maximumDate={maximumDate}

@@ -139,7 +139,6 @@ class ExposureContainer extends PureComponent {
             <CardComponent
                 item={item}
                 isEditMode={this.props.isEditMode !== undefined && this.props.isEditMode !== null ? this.props.isEditMode : true}
-                exposure={this.props.exposure}
                 isEditModeForDropDownInput={isEditModeForDropDownInput}
                 value={value}
                 minimumDate={minimumDate}

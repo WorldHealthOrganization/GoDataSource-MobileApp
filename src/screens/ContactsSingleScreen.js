@@ -276,7 +276,9 @@ class ContactsSingleScreen extends Component {
         return (
             <ViewHOC style={style.container}
                 showLoader={this.state.loading}
-                loaderText={this.props && this.props.syncState ? 'Loading' : getTranslation(translations.loadingScreenMessages.loadingMsg, this.props.translation)}>
+                loaderText={
+                    this.props && this.props.syncState ? 'Loading' : getTranslation(translations.loadingScreenMessages.loadingMsg, this.props.translation)
+                }>
                 <NavBarCustom
                     title={null}
                     customTitle={

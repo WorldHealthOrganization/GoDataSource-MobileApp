@@ -198,7 +198,6 @@ class CaseSingleAddressContainer extends React.Component {
                 item={item}
                 isEditMode={this.props.isEditMode}
                 isEditModeForDropDownInput={this.props.isEditMode}
-                case={this.props.case}
                 value={value}
                 minimumDate={minimumDate}
                 maximumDate={maximumDate}
