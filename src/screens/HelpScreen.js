@@ -14,7 +14,7 @@ import HelpListItem from './../components/HelpListItem';
 import {addFilterForScreen, removeFilterForScreen} from './../actions/app';
 import _ from 'lodash';
 import {
-    calculateDimension,
+    calculateDimension, createStackFromComponent,
     filterItemsForEachPage,
     getTranslation,
     localSortHelpItem,
@@ -424,16 +424,14 @@ class HelpScreen extends Component {
     };
 
     handlePressFilter = () => {
-        Navigation.showModal({
-            component:{
-                name: 'FilterScreen',
-                passProps: {
-                    activeFilters: this.state.filterFromFilterScreen || null,
-                    onApplyFilters: this.handleOnApplyFilters,
-                    screen: 'HelpFilterScreen'
-                }
+        Navigation.showModal(createStackFromComponent({
+            name: 'FilterScreen',
+            passProps: {
+                activeFilters: this.state.filterFromFilterScreen || null,
+                onApplyFilters: this.handleOnApplyFilters,
+                screen: 'HelpFilterScreen'
             }
-        })
+        }))
     };
 
     handleOnChangeText = (text) => {

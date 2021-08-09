@@ -5,7 +5,7 @@ import translations from './translations';
 import {getItemByIdRequest} from './../actions/cases';
 import lodashIntersection from 'lodash/intersection';
 import {checkArrayAndLength} from './typeCheckingFunctions';
-import {generatePermissionMessage, getTranslation} from "./functions";
+import {createStackFromComponent, generatePermissionMessage, getTranslation} from "./functions";
 import {Alert} from "react-native";
 import get from "lodash/get";
 import isFunction from "lodash/isFunction";
@@ -97,12 +97,10 @@ export function screenTransition(componentId, transition, nextScreen, passProps,
                 });
                 break;
             case 'showModal':
-                Navigation.showModal({
-                    component:{
-                        name: nextScreen,
-                        passProps: passProps
-                    }
-                });
+                Navigation.showModal(createStackFromComponent({
+                    name: nextScreen,
+                    passProps: passProps
+                }));
                 break;
             default:
                 break

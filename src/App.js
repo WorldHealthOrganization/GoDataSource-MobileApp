@@ -123,7 +123,7 @@ export default class App {
     onStoreUpdate = () => {
         const { root, selectedScreen } = store.getState().app;
         const oldRoot = this.currentRoot;
-        console.log("Store has updated", this.currentRoot, root);
+        console.log("Store has updated", root, oldRoot, selectedScreen);
         if (this.currentRoot !== root) {
             this.currentRoot = root;
             console.log("Register listener");
@@ -254,38 +254,7 @@ export default class App {
 
         console.log("Nav set root", componentObject);
             rootObject = {
-                stack: {
-                    id: "CenterStack",
-                    children: [{component: componentObject}],
-                    options: {
-                        layout: {
-                            orientation: ['portrait']
-                        },
-                        topBar: {
-                            visible: false,
-                            drawBehind: true,
-                            animate: false
-                        }
-                    }
-                }
-            }
-
-        console.log("Root object", rootObject);
-        Navigation.setRoot({
-            root: {
-            sideMenu:{
-                left:{
-                    component:{
-                        name: 'NavigationDrawer',
-                        options:{
-                            animations: {
-                                push: slideInAnimation,
-                                pop: slideOutAnimation
-                            }
-                        }
-                    }
-                },
-                center:{
+                root: {
                     stack: {
                         id: "CenterStack",
                         children: [{component: componentObject}],
@@ -297,18 +266,54 @@ export default class App {
                                 visible: false,
                                 drawBehind: true,
                                 animate: false
-                            },
-                            sideMenu: {
-                                left:{
-                                    //idk
-                                    visible: false
-                                }
                             }
                         }
                     }
                 }
             }
-            }})
+            if(root === 'after-login'){
+                rootObject = {
+                    root: {
+                        sideMenu:{
+                            left:{
+                                component:{
+                                    name: 'NavigationDrawer',
+                                    options:{
+                                        animations: {
+                                            push: slideInAnimation,
+                                            pop: slideOutAnimation
+                                        }
+                                    }
+                                }
+                            },
+                            center:{
+                                stack: {
+                                    id: "CenterStack",
+                                    children: [{component: componentObject}],
+                                    options: {
+                                        layout: {
+                                            orientation: ['portrait']
+                                        },
+                                        topBar: {
+                                            visible: false,
+                                            drawBehind: true,
+                                            animate: false
+                                        },
+                                        sideMenu: {
+                                            left:{
+                                                //idk
+                                                visible: false
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }}
+            }
+
+        console.log("Root object", rootObject);
+        Navigation.setRoot(rootObject)
             .then((onfulfilled)=>{
                 console.log("On fulfilled", onfulfilled);
             },(onrejected)=>{

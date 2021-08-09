@@ -96,7 +96,7 @@ class ContactsSinglePersonal extends Component {
                     >
                     <View style={style.container}>
                         {
-                            this.state.fields.map((item) => {
+                            this.state.fields.map((item, i) => {
                                 return this.handleRenderItem(item)
                             })
                         }
@@ -156,11 +156,11 @@ class ContactsSinglePersonal extends Component {
     };
 
     // Please write here all the methods that are not react native lifecycle methods
-    handleRenderItem = (item) => {
+    handleRenderItem = (item, i) => {
         let fields = item.fields.map((field) => {
-            return Object.assign({}, field, { isEditMode: field.id === 'visualId' ? false : this.props.isEditMode })
+            return Object.assign({}, field, { isEditMode: field.id === 'visualId' ? false : this.props.isEditMode }, {key: i})
         });
-        return this.renderItemCardComponent(fields);
+        return this.renderItemCardComponent(fields, i);
     };
 
     handleRenderItemForDocumentsList = (item, index) => {
@@ -179,7 +179,7 @@ class ContactsSinglePersonal extends Component {
 
     renderItemCardComponent = (fields, cardIndex = null) => {
         return (
-            <ElevatedView elevation={3} style={[style.containerCardComponent, {
+            <ElevatedView key={cardIndex} elevation={3} style={[style.containerCardComponent, {
                 marginHorizontal: calculateDimension(16, false, this.props.screenSize),
                 width: calculateDimension(config.designScreenSize.width - 32, false, this.props.screenSize),
                 marginVertical: 4,

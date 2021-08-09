@@ -1,7 +1,7 @@
 import React, {Component} from 'react'
 import {Alert, BackHandler} from 'react-native';
 import get from 'lodash/get';
-import {createDate} from './../../utils/functions';
+import {createDate, createStackFromComponent} from './../../utils/functions';
 import {extractIdFromPouchId, extractMainAddress, getTranslation, navigation} from "../../utils/functions";
 import RNExitApp from "react-native-exit-app";
 import translations, {contactsOfContactsScreen} from "../../utils/translations";
@@ -278,16 +278,14 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
 
             // Navigator methods
             onPressFilter = () => {
-                Navigation.showModal({
-                    component:{
-                        name: constants.appScreens.filterScreen,
-                        passProps: {
-                            activeFilters: this.state.mainFilter,
-                            onApplyFilters: this.setMainFilter,
-                            screen: screenType
-                        }
+                Navigation.showModal(createStackFromComponent({
+                    name: constants.appScreens.filterScreen,
+                    passProps: {
+                        activeFilters: this.state.mainFilter,
+                        onApplyFilters: this.setMainFilter,
+                        screen: screenType
                     }
-                })
+                }))
             };
 
             // onPressView handles what happens when the user clicks on the lower left button of the list
@@ -356,16 +354,14 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                         if (screenType === constants.appScreens.contactsOfContactsScreen) {
                             type = "ContactOfContact";
                         }
-                        Navigation.showModal({
-                            component:{
-                                name: forwardScreen,
-                                passProps: {
-                                    [dataToForwardType]: dataToForward,
-                                    type: type,
-                                    refresh: this.refresh
-                                }
+                        Navigation.showModal(createStackFromComponent({
+                            name: forwardScreen,
+                            passProps: {
+                                [dataToForwardType]: dataToForward,
+                                type: type,
+                                refresh: this.refresh
                             }
-                        })
+                        }))
                     }
                 }
             };

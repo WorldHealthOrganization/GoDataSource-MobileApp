@@ -12,7 +12,12 @@ import {changeAppRoot, getTranslationsAsync, saveSelectedScreen, sendDatabaseToS
 import styles from './../styles';
 import {Icon, ListItem} from 'react-native-material-ui';
 import DropdownInput from './../components/DropdownInput';
-import {getTranslation, mapSideMenuKeysToScreenName, updateRequiredFields} from './../utils/functions';
+import {
+    createStackFromComponent,
+    getTranslation,
+    mapSideMenuKeysToScreenName,
+    updateRequiredFields
+} from './../utils/functions';
 import translations from './../utils/translations';
 import VersionNumber from 'react-native-version-number';
 import PermissionComponent from './../components/PermissionComponent';
@@ -211,15 +216,21 @@ class NavigationDrawer extends Component {
             switch(key) {
                 case 'contacts':
                 case 'cases':
+                    console.log("Here");
                     Navigation.push('CenterStack', {
                         component: {
-                            name: mapSideMenuKeysToScreenName(key),
+                            name: mapSideMenuKeysToScreenName(`${key}-add`).screenToSwitchTo,
                             options: {
                                 sideMenu: {
                                     left: {
                                         visible: false
                                     }
                                 }
+                            },
+                            passProps: {
+                                isNew: true,
+                                isAddFromNavigation: true,
+                                refresh: () => {console.log('Default refresh')}
                             }
                         }
                     });
@@ -244,6 +255,7 @@ class NavigationDrawer extends Component {
     };
 
     handleOnPressChangeHubConfig = () => {
+        console.log("Pressed it");
         Navigation.mergeOptions(this.props.componentId, {
             sideMenu: {
                 left: {
@@ -251,11 +263,12 @@ class NavigationDrawer extends Component {
                 },
             },
         });
-        Navigation.showModal({
-            component:{
-                name: 'HubConfigScreen',
+        Navigation.showModal(createStackFromComponent({
+            name: 'HubConfigScreen',
+            passProps: {
+                stackComponentId: this.props.componentId
             }
-        })
+        }))
     };
 
     handleOnChangeLanguage = (value, label) => {

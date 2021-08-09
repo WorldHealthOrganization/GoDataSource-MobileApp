@@ -18,7 +18,7 @@ import Ripple from 'react-native-material-ripple';
 import lodashGet from 'lodash/get';
 import translations from './../utils/translations';
 import config from './../utils/config';
-import {getTranslation} from './../utils/functions';
+import {createStackFromComponent, getTranslation} from './../utils/functions';
 import VersionNumber from 'react-native-version-number';
 import withPincode from "../components/higherOrderComponents/withPincode";
 import {compose} from "redux";
@@ -28,10 +28,14 @@ import {fadeInAnimation, fadeOutAnimation} from "../utils/animations";
 class FirstConfigScreen extends Component {
 
     constructor(props) {
+        console.log("Constructor");
         super(props);
         this.state = {
         };
         // Bind here methods, or at least don't declare methods in the render method
+    }
+    componentDidMount() {
+        console.log("Comp did mount")
     }
 
     // Please add here the react lifecycle methods that you need
@@ -94,7 +98,10 @@ class FirstConfigScreen extends Component {
 
     // Please write here all the methods that are not react native lifecycle methods
     handleOnPressBack = () => {
-        Navigation.pop(this.props.componentId);
+        Navigation.pop(this.props.componentId)
+            .catch(reason => {
+
+            })
     };
 
     handleOnPressForward = () => {
@@ -110,16 +117,14 @@ class FirstConfigScreen extends Component {
     };
 
     handlePressScanQR = () => {
-        Navigation.showModal({
-            component:{
-                name: 'QRScanScreen',
-                passProps: {
-                    pushNewScreen: this.pushNewScreen,
-                    allowBack: this.props.allowBack,
-                    isMultipleHub: this.props.isMultipleHub
-                }
+        Navigation.showModal(createStackFromComponent({
+            name: 'QRScanScreen',
+            passProps: {
+                pushNewScreen: this.pushNewScreen,
+                allowBack: this.props.allowBack,
+                isMultipleHub: this.props.isMultipleHub
             }
-        })
+        }))
     };
 
     handlePressImport = () => {

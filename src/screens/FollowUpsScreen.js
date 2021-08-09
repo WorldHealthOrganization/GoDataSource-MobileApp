@@ -22,7 +22,7 @@ import ValuePicker from './../components/ValuePicker';
 import {getFollowUpsForOutbreakId} from './../actions/followUps';
 import ElevatedView from 'react-native-elevated-view';
 import get from 'lodash/get';
-import {calculateDimension, createDate, getTranslation} from './../utils/functions';
+import {calculateDimension, createDate, createStackFromComponent, getTranslation} from './../utils/functions';
 import ViewHOC from './../components/ViewHOC';
 import {Popup} from 'react-native-map-link';
 import translations from './../utils/translations'
@@ -287,27 +287,23 @@ class FollowUpsScreen extends Component {
 
     goToHelpScreen = () => {
         let pageAskingHelpFrom = 'followUps';
-        Navigation.showModal({
-            component:{
-                name: 'HelpScreen',
-                passProps: {
-                    pageAskingHelpFrom: pageAskingHelpFrom
-                }
+        Navigation.showModal(createStackFromComponent({
+            name: 'HelpScreen',
+            passProps: {
+                pageAskingHelpFrom: pageAskingHelpFrom
             }
-        });
+        }));
     };
 
     handleOnPressQRCode = () => {
         // console.log('handleOnPressQRCode');
 
-        Navigation.showModal({
-            component:{
-                name: 'QRScanScreen',
-                passProps: {
-                    pushNewScreen: this.pushNewEditScreenLocal
-                }
+        Navigation.showModal(createStackFromComponent({
+            name: 'QRScanScreen',
+            passProps: {
+                pushNewScreen: this.pushNewEditScreenLocal
             }
-        })
+        }))
     };
 
     pushNewEditScreenLocal = (QRCodeInfo) => {

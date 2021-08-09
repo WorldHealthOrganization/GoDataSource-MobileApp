@@ -4,6 +4,7 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
+import geolocation from '@react-native-community/geolocation';
 import {Alert, Animated, BackHandler, Dimensions, Keyboard, Platform, StyleSheet, View} from 'react-native';
 import {PagerAndroid, PagerPan, PagerScroll, TabBar, TabView} from 'react-native-tab-view';
 import {connect} from "react-redux";
@@ -27,7 +28,7 @@ import {
     calculateDimension,
     checkRequiredQuestions,
     computeFullName,
-    createDate,
+    createDate, createStackFromComponent,
     extractAllQuestions,
     extractIdFromPouchId,
     getTranslation,
@@ -161,6 +162,7 @@ class CaseSingleScreen extends Component {
     }
 
     componentDidMount() {
+        console.log("When this?",this.props.case, this.props.isNew);
         BackHandler.addEventListener('hardwareBackPress', this.handleBackButtonClick);
         if (!this.props.isNew) {
             getCaseAndExposuresById(this.props.case._id)
@@ -310,7 +312,6 @@ class CaseSingleScreen extends Component {
                     renderScene={this.handleRenderScene}
                     renderTabBar={this.handleRenderTabBar}
                     renderPager={this._renderPager}
-                    useNativeDriver={true}
                     initialLayout={initialLayout}
                     swipeEnabled={this.props.isNew ? false : true}
                 />
@@ -412,22 +413,23 @@ class CaseSingleScreen extends Component {
     };
 
     //Render label for TabBar
-    handleRenderLabel = (props) => ({ route }) => {
-        const inputRange = props.navigationState.routes.map((x, i) => i);
-        let index = props.navigationState.index;
-        const outputRange = inputRange.map(
-            inputIndex => (inputIndex === index ? styles.colorLabelActiveTab : styles.colorLabelInactiveTab)
-        );
-        const color = props.position.interpolate({
-            inputRange,
-            outputRange: outputRange,
-        });
+    handleRenderLabel = (props) => ({ route, focused, color }) => {
+
+        // const inputRange = props.navigationState.routes.map((x, i) => i);
+        // let index = props.navigationState.index;
+        // const outputRange = inputRange.map(
+        //     inputIndex => (inputIndex === index ? styles.colorLabelActiveTab : styles.colorLabelInactiveTab)
+        // );
+        // const color = props.position.interpolate({
+        //     inputRange,
+        //     outputRange: outputRange,
+        // });
 
         return (
             <Animated.Text style={{
                 fontFamily: 'Roboto-Medium',
                 fontSize: 12,
-                color: color,
+                color: styles.colorLabelActiveTab,
                 flex: 1,
                 alignSelf: 'center'
             }}>
@@ -1052,22 +1054,20 @@ class CaseSingleScreen extends Component {
     };
     handleOnPressEditExposure = (relation, index) => {
         _.set(relation, 'contactData.fullName', computeFullName(_.get(relation, 'contactData', null)));
-        Navigation.showModal({
-            component:{
-                name: 'ExposureScreen',
-                passProps: {
-                    exposure: _.get(relation, 'relationshipData', null),
-                    selectedExposure: _.get(relation, 'contactData', null),
-                    contact: this.props.isNew ? null : this.props.contact,
-                    type: 'Case',
-                    saveExposure: this.handleSaveExposure,
-                    caseIdFromCasesScreen: this.props.caseIdFromCasesScreen,
-                    isEditMode: false,
-                    addContactFromCasesScreen: false,
-                    refreshRelations: this.refreshRelations
-                }
+        Navigation.showModal(createStackFromComponent({
+            name: 'ExposureScreen',
+            passProps: {
+                exposure: _.get(relation, 'relationshipData', null),
+                selectedExposure: _.get(relation, 'contactData', null),
+                contact: this.props.isNew ? null : this.props.contact,
+                type: 'Case',
+                saveExposure: this.handleSaveExposure,
+                caseIdFromCasesScreen: this.props.caseIdFromCasesScreen,
+                isEditMode: false,
+                addContactFromCasesScreen: false,
+                refreshRelations: this.refreshRelations
             }
-        })
+        }))
     };
     refreshRelations = (exposure) => {
         this.setState({
@@ -1607,7 +1607,7 @@ class CaseSingleScreen extends Component {
                                     case: Object.assign({}, prevState.case, { addresses: addressesClone }),
                                     isModified: true
                                 }), () => {
-                                    navigator.geolocation.getCurrentPosition((position) => {
+                                    geolocation.getCurrentPosition((position) => {
                                             let addressesClone = _.cloneDeep(this.state.case.addresses);
                                             if (!addressesClone[objectTypeOrIndex].geoLocation) {
                                                 addressesClone[objectTypeOrIndex].geoLocation = {};
@@ -2065,14 +2065,12 @@ class CaseSingleScreen extends Component {
             }
         }
 
-        Navigation.showModal({
-            component:{
-                name: 'HelpScreen',
-                passProps: {
-                    pageAskingHelpFrom: pageAskingHelpFrom
-                }
+        Navigation.showModal(createStackFromComponent({
+            name: 'HelpScreen',
+            passProps: {
+                pageAskingHelpFrom: pageAskingHelpFrom
             }
-        });
+        }));
     };
 
     // used for adding multi-frequency answers

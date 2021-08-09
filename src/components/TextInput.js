@@ -13,6 +13,8 @@ import lodashGet from 'lodash/get';
 import lodashDebounce from 'lodash/debounce';
 
 class TextInput extends Component {
+    fieldRef = React.createRef();
+
     constructor(props) {
         super(props);
         this.state = {
@@ -44,7 +46,9 @@ class TextInput extends Component {
     componentDidUpdate(prevProps, prevState) {
         let propsValue = lodashGet(this.props, 'value', ' ');
         if (prevProps.isEditMode !== this.props.isEditMode || prevProps.value !== propsValue) {
-            if(this.state.value !== propsValue){
+            if(this.state.value !== propsValue && this.fieldRef.current){
+                console.log("What's the ref", this.fieldRef.current);
+                this.fieldRef.current.setValue(propsValue);
                 this.setState({
                     value: propsValue
                 })
@@ -72,6 +76,7 @@ class TextInput extends Component {
         } else {
             value = '';
         }
+        console.log("Render inside",this.props.id, value);
         return (
             <View style={[{flexDirection: 'row'},this.props.style]}>
                 <View style={{flex: 1}}> 
@@ -87,6 +92,7 @@ class TextInput extends Component {
                             fontFamily: 'Roboto',
                             textAlign: 'left'
                         }}
+                        ref={this.fieldRef}
                         tintColor='rgb(77,176,160)'
                         multiline={this.props.multiline !== undefined ? this.props.multiline : false}
                         onPress={() => {console.log("On press textInput")}}

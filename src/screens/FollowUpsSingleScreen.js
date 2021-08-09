@@ -4,6 +4,7 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
+import geolocation from '@react-native-community/geolocation';
 import {Alert, Animated, BackHandler, Platform, StyleSheet, View} from 'react-native';
 import {Icon} from 'react-native-material-ui';
 import styles from './../styles';
@@ -21,7 +22,7 @@ import {createFollowUp, updateFollowUpAndContact} from './../actions/followUps';
 import _, {cloneDeep, sortBy} from 'lodash';
 import {
     calculateDimension,
-    createDate,
+    createDate, createStackFromComponent,
     getTranslation,
     mapAnswers,
     reMapAnswers,
@@ -334,22 +335,22 @@ class FollowUpsSingleScreen extends Component {
     };
 
     handleRenderLabel = (props) => ({ route, index }) => {
-        const inputRange = props.navigationState.routes.map((x, i) => i);
-
-        const outputRange = inputRange.map(
-            inputIndex => (inputIndex === index ? styles.colorLabelActiveTab : styles.colorLabelInactiveTab)
-        );
-        const color = props.position.interpolate({
-            inputRange,
-            outputRange: outputRange,
-        });
+        // const inputRange = props.navigationState.routes.map((x, i) => i);
+        //
+        // const outputRange = inputRange.map(
+        //     inputIndex => (inputIndex === index ? styles.colorLabelActiveTab : styles.colorLabelInactiveTab)
+        // );
+        // const color = props.position.interpolate({
+        //     inputRange,
+        //     outputRange: outputRange,
+        // });
 
         return (
             <Animated.Text style={{
                 fontFamily: 'Roboto-Medium',
                 fontSize: 12,
                 flex: 1,
-                color: color,
+                color: styles.colorLabelActiveTab,
                 alignSelf: 'center'
             }}>
                 {getTranslation(route.title, this.props.translation).toUpperCase()}
@@ -459,7 +460,7 @@ class FollowUpsSingleScreen extends Component {
     onChangeSwitch = (value, id, objectType) => {
         // console.log("onChangeSwitch: ", value, id, this.state.item);
         if (id === 'fillLocation') {
-            navigator.geolocation.getCurrentPosition((position) => {
+            geolocation.getCurrentPosition((position) => {
                 this.setState(
                     (prevState) => ({
                         item: Object.assign({}, prevState.item, { [id]: value ? {geoLocation: { lat: position.coords.latitude, lng: position.coords.longitude }} : {geoLocation: { lat: null, lng: null }} }),
@@ -944,14 +945,12 @@ class FollowUpsSingleScreen extends Component {
                 pageAskingHelpFrom = 'followUpSingleScreenView'
             }
         }
-        Navigation.showModal({
-            component:{
-                name: 'HelpScreen',
-                passProps: {
-                    pageAskingHelpFrom: pageAskingHelpFrom
-                }
+        Navigation.showModal(createStackFromComponent({
+            name: 'HelpScreen',
+            passProps: {
+                pageAskingHelpFrom: pageAskingHelpFrom
             }
-        });
+        }));
     };
 
     // used for adding multi-frequency answers

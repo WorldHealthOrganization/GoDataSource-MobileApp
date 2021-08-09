@@ -42,7 +42,7 @@ const DatePicker = React.memo(({
     const isDarkMode = useDarkMode();
 
     const editInput = () => {
-        // console.log('Date This.props.value: ', date);
+        console.log('Date This.props.value: ', date, value, typeof date, typeof value, isDateTimePickerVisible);
         let newDate = date;
         let tooltip = getTooltip(label, translation);
         let customStyle = newDate !== undefined && newDate !== null ? styles.hasDateTooltipStyle : style.emptyDateTooltipStyle;
@@ -102,7 +102,13 @@ const DatePicker = React.memo(({
                         onConfirm={handleDatePicked}
                         onCancel={handleDateCancelled}
                         isDarkModeEnabled={isDarkMode}
-                        date={value || new Date()}
+                        date={value ? new Date(
+                            Date.parse(
+                                moment(value, 'DD/MM/YYYY').format(
+                                    'ddd MMM DD YYYY HH:mm:ss ZZ',
+                                ),
+                            ),
+                        ) : new Date()}
                     />
                 </View>
                 {
@@ -158,6 +164,7 @@ const DatePicker = React.memo(({
     };
 
     const handleShowDatePicker = () => {
+        console.log("Show date picker", isDateTimePickerVisible);
         setIsDateTimePickerVisible(true);
     };
 

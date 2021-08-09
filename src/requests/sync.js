@@ -110,7 +110,7 @@ export function getDatabaseSnapshotRequestNew(hubConfig, lastSyncDate, dispatch,
                             name: `Downloading database\nReceived ${received} bytes`,
                             addLanguagePacks: checkArrayAndLength(languagePacks)
                         }));
-                        console.log(received, total)
+                        console.log("Received", received, total)
                     })
                     .then((res) => {
                         return handleResponseFromRNFetchBlob(res)

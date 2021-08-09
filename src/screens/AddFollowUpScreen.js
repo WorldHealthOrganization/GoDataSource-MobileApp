@@ -64,11 +64,11 @@ class AddFollowUpScreen extends PureComponent{
                         <DatePicker
                             id='followUpDate'
                             label={getTranslation(translations.addFollowUpScreen.followUpDateLabel, this.props.translation)}
-                            value={this.state.date.toISOString()}
+                            value={this.state.date}
                             isEditMode={true}
                             isRequired={false}
                             onChange={this.onDateChanged}
-                            style={{width: contentWidth, marginHorizontal, flex: 0.33}}
+                            style={{width: contentWidth, flex: 0.33}}
                             translation={this.props.translation}
                         />
                     </View>

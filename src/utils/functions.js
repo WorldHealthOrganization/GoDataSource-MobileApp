@@ -3,6 +3,7 @@
  */
 import errorTypes from './errorTypes';
 import config, {sideMenuKeys} from './config';
+import geolocation from '@react-native-community/geolocation';
 import RNFetchBlobFS from 'rn-fetch-blob/fs';
 import {unzip, zip} from 'react-native-zip-archive';
 import {processBulkDocs, updateFileInDatabase} from './../queries/database';
@@ -167,6 +168,27 @@ export function mapSideMenuKeysToScreenName(sideMenuKey){
         screenToSwitchTo,
         addScreen
     }
+}
+
+export function createStackFromComponent(component) {
+    return({
+        stack:{
+            children:[
+                {
+                    component: component
+                }
+            ],
+            options: {
+                layout: {
+                    orientation: ['portrait']
+                },
+                topBar: {
+                    visible: false,
+                }
+            }
+        }
+
+    })
 }
 
 export function navigation(event, navigator) {
@@ -1469,7 +1491,7 @@ export function extractLocationId (person) {
 // Promise wrapper around getCurrentPosition from react-native
 export function getLocationAccurate () {
     return new Promise((resolve, reject) => {
-        navigator.geolocation.getCurrentPosition(
+        geolocation.getCurrentPosition(
             (position) => {
                 return resolve({
                     lat: get(position, 'coords.latitude', null),

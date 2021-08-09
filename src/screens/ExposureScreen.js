@@ -17,7 +17,13 @@ import NavBarCustom from './../components/NavBarCustom';
 import config from './../utils/config';
 import Ripple from 'react-native-material-ripple';
 import {removeErrors} from './../actions/errors';
-import {calculateDimension, extractIdFromPouchId, getTranslation, updateRequiredFields} from './../utils/functions';
+import {
+    calculateDimension,
+    createStackFromComponent,
+    extractIdFromPouchId,
+    getTranslation,
+    updateRequiredFields
+} from './../utils/functions';
 import translations from './../utils/translations'
 import ElevatedView from 'react-native-elevated-view';
 import ExposureContainer from '../containers/ExposureContainer';
@@ -398,14 +404,12 @@ class ExposureScreen extends Component {
             pageAskingHelpFrom = 'exposureAdd'
         }
 
-        Navigation.showModal({
-            component:{
-                name: 'HelpScreen',
-                passProps: {
-                    pageAskingHelpFrom: pageAskingHelpFrom
-                }
+        Navigation.showModal(createStackFromComponent({
+            name: 'HelpScreen',
+            passProps: {
+                pageAskingHelpFrom: pageAskingHelpFrom
             }
-        });
+        }));
     };
 }
 

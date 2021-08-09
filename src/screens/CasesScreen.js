@@ -8,7 +8,7 @@ import {ActivityIndicator, StyleSheet, View} from 'react-native';
 import {Icon} from 'react-native-material-ui';
 import styles from './../styles';
 import NavBarCustom from './../components/NavBarCustom';
-import {calculateDimension, getTranslation} from './../utils/functions';
+import {calculateDimension, createStackFromComponent, getTranslation} from './../utils/functions';
 import Ripple from 'react-native-material-ripple';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -290,27 +290,23 @@ class CasesScreen extends Component {
 
     goToHelpScreen = () => {
         let pageAskingHelpFrom = 'cases';
-        Navigation.showModal({
-            component:{
-                name: 'HelpScreen',
-                passProps: {
-                    pageAskingHelpFrom: pageAskingHelpFrom
-                }
+        Navigation.showModal(createStackFromComponent({
+            name: 'HelpScreen',
+            passProps: {
+                pageAskingHelpFrom: pageAskingHelpFrom
             }
-        });
+        }));
     };
 
     handleOnPressQRCode = () => {
         // console.log('handleOnPressQRCode');
 
-        Navigation.showModal({
-            component:{
-                name: 'QRScanScreen',
-                passProps: {
-                    pushNewScreen: this.pushNewEditScreenLocal
-                }
+        Navigation.showModal(createStackFromComponent({
+            name: 'QRScanScreen',
+            passProps: {
+                pushNewScreen: this.pushNewEditScreenLocal
             }
-        })
+        }))
     };
 
     pushNewEditScreenLocal = (QRCodeInfo) => {

@@ -10,7 +10,7 @@ import NavBarCustom from './../components/NavBarCustom';
 import ElevatedView from 'react-native-elevated-view';
 import Ripple from 'react-native-material-ripple';
 import {Icon} from 'react-native-material-ui';
-import {calculateDimension, getTranslation} from './../utils/functions';
+import {calculateDimension, createStackFromComponent, getTranslation} from './../utils/functions';
 import {connect} from "react-redux";
 import AnimatedListView from './../components/AnimatedListView';
 import {getContactsOfContactsForOutbreakId} from './../actions/contactsOfContacts';
@@ -259,27 +259,23 @@ class ContactsOfContactsScreen extends Component {
 
     goToHelpScreen = () => {
         let pageAskingHelpFrom = 'contacts';
-        Navigation.showModal({
-            component:{
-                name: 'HelpScreen',
-                passProps: {
-                    pageAskingHelpFrom: pageAskingHelpFrom
-                }
+        Navigation.showModal(createStackFromComponent({
+            name: 'HelpScreen',
+            passProps: {
+                pageAskingHelpFrom: pageAskingHelpFrom
             }
-        });
+        }));
     };
 
     handleOnPressQRCode = () => {
         console.log('handleOnPressQRCode');
 
-        Navigation.showModal({
-            component:{
-                name: 'QRScanScreen',
-                passProps: {
-                    pushNewScreen: this.pushNewEditScreenLocal
-                }
+        Navigation.showModal(createStackFromComponent({
+            name: 'QRScanScreen',
+            passProps: {
+                pushNewScreen: this.pushNewEditScreenLocal
             }
-        })
+        }))
     };
 
     pushNewEditScreenLocal = (QRCodeInfo) => {

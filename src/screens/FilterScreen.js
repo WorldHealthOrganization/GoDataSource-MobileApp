@@ -242,21 +242,21 @@ class FilterScreen extends Component {
         const { translation } = this.props;
 
         if (props.navigationState.routes !== null) {
-            const inputRange = props.navigationState.routes.map((x, i) => i);
-
-            const outputRange = inputRange.map(
-                inputIndex => (inputIndex === index ? styles.colorLabelActiveTab : styles.colorLabelInactiveTab)
-            );
-            const color = props.position.interpolate({
-                inputRange,
-                outputRange: outputRange,
-            });
+            // const inputRange = props.navigationState.routes.map((x, i) => i);
+            //
+            // const outputRange = inputRange.map(
+            //     inputIndex => (inputIndex === index ? styles.colorLabelActiveTab : styles.colorLabelInactiveTab)
+            // );
+            // const color = props.position.interpolate({
+            //     inputRange,
+            //     outputRange: outputRange,
+            // });
 
             return (
                 <Animated.Text style={{
                     fontFamily: 'Roboto-Medium',
                     fontSize: 12,
-                    color: color,
+                    color: styles.colorLabelActiveTab,
                     flex: 1,
                     alignSelf: 'center'
                 }}>

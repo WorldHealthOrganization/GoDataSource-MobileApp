@@ -4,6 +4,7 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
+import geolocation from '@react-native-community/geolocation';
 import {Alert, Animated, BackHandler, Dimensions, Keyboard, Platform, StyleSheet, View} from 'react-native';
 import {Icon} from 'react-native-material-ui';
 import styles from './../styles';
@@ -26,7 +27,7 @@ import _ from 'lodash';
 import {
     calculateDimension,
     computeFullName,
-    createDate,
+    createDate, createStackFromComponent,
     extractIdFromPouchId,
     getTranslation,
     navigation,
@@ -426,21 +427,21 @@ class ContactsOfContactsSingleScreen extends Component {
     };
 
     handleRenderLabel = (props) => ({ route, index }) => {
-        const inputRange = props.navigationState.routes.map((x, i) => i);
-
-        const outputRange = inputRange.map(
-            inputIndex => (inputIndex === index ? styles.colorLabelActiveTab : styles.colorLabelInactiveTab)
-        );
-        const color = props.position.interpolate({
-            inputRange,
-            outputRange: outputRange,
-        });
+        // const inputRange = props.navigationState.routes.map((x, i) => i);
+        //
+        // const outputRange = inputRange.map(
+        //     inputIndex => (inputIndex === index ? styles.colorLabelActiveTab : styles.colorLabelInactiveTab)
+        // );
+        // const color = props.position.interpolate({
+        //     inputRange,
+        //     outputRange: outputRange,
+        // });
 
         return (
             <Animated.Text style={{
                 fontFamily: 'Roboto-Medium',
                 fontSize: 12,
-                color: color,
+                color: styles.colorLabelActiveTab,
                 flex: 1,
                 alignSelf: 'center'
             }}>
@@ -912,7 +913,7 @@ class ContactsOfContactsSingleScreen extends Component {
                 {
                     text: getTranslation(translations.generalLabels.yesAnswer, this.props.translation), onPress: () => {
                         if (value) {
-                            navigator.geolocation.getCurrentPosition((position) => {
+                            geolocation.getCurrentPosition((position) => {
                                     let addressesClone = _.cloneDeep(this.state.contact.addresses);
                                     console.log('addressesClone: ', addressesClone);
                                     if (!addressesClone[objectTypeOrIndex].geoLocation) {
@@ -1165,22 +1166,20 @@ class ContactsOfContactsSingleScreen extends Component {
     handleOnPressEditExposure = (relation, index) => {
         // console.log('handleOnPressEditExposure: ', relation, index);
         _.set(relation, 'caseData.fullName', computeFullName(_.get(relation, 'caseData', null)));
-        Navigation.showModal({
-            component:{
-                name: 'ExposureScreen',
-                passProps: {
-                    exposure: _.get(relation, 'relationshipData', null),
-                    selectedExposure: _.get(relation, 'caseData', null),
-                    contact: this.props.isNew ? null : this.props.contact,
-                    type: 'ContactOfContact',
-                    saveExposure: this.handleSaveExposure,
-                    caseIdFromCasesScreen: this.props.caseIdFromCasesScreen,
-                    isEditMode: false,
-                    addContactFromCasesScreen: false,
-                    refreshRelations: this.refreshRelations
-                }
+        Navigation.showModal(createStackFromComponent({
+            name: 'ExposureScreen',
+            passProps: {
+                exposure: _.get(relation, 'relationshipData', null),
+                selectedExposure: _.get(relation, 'caseData', null),
+                contact: this.props.isNew ? null : this.props.contact,
+                type: 'ContactOfContact',
+                saveExposure: this.handleSaveExposure,
+                caseIdFromCasesScreen: this.props.caseIdFromCasesScreen,
+                isEditMode: false,
+                addContactFromCasesScreen: false,
+                refreshRelations: this.refreshRelations
             }
-        })
+        }))
     };
     refreshRelations = (exposure) => {
         this.setState({
@@ -1662,14 +1661,12 @@ class ContactsOfContactsSingleScreen extends Component {
             }
         }
 
-        Navigation.showModal({
-            component:{
-                name: 'HelpScreen',
-                passProps: {
-                    pageAskingHelpFrom: pageAskingHelpFrom
-                }
+        Navigation.showModal(createStackFromComponent({
+            name: 'HelpScreen',
+            passProps: {
+                pageAskingHelpFrom: pageAskingHelpFrom
             }
-        });
+        }));
     };
 
     onPressEdit = () => {
