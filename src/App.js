@@ -151,7 +151,7 @@ export default class App {
             ParseNativeModule.initParse()
         }
 
-        let screen = constants.appScreens.followUpScreen;
+        let screen;
         switch (selectedScreens) {
             case sideMenuKeys[1]:
                 screen = constants.appScreens.contactsScreen;
@@ -171,6 +171,13 @@ export default class App {
             passProps: {
                 isAppInitialize: isAppInitialize
             },
+            options:{
+                sideMenu:{
+                    left:{
+                        visible: false
+                    }
+                }
+            }
         };
         let rootObject = null;
 
@@ -193,7 +200,8 @@ export default class App {
                     options: {
                         sideMenu:{
                             left: {
-                                name: 'NavigationDrawer'
+                                name: 'NavigationDrawer',
+                                visible: false
                             },
                         },
                         animations: {
@@ -205,44 +213,6 @@ export default class App {
                         isAppInitialize: isAppInitialize
                     },
                     animationType: 'slide-down'
-                };
-                rootObject = {
-                    sideMenu:{
-                        center:{
-                            stack: {
-                                id: "CenterStack",
-                                children:[{
-                                    component:{
-                                        name: screen,
-                                        passProps: {
-                                            isAppInitialize: isAppInitialize
-                                        },
-                                    }
-                                }],
-                                options: {
-                                    layout: {
-                                        orientation: ['portrait']
-                                    },
-                                    topBar: {
-                                        visible: false,
-                                        drawBehind: true,
-                                        animate: false
-                                    }
-                                }
-                            }
-                        },
-                        left:{
-                            component:{
-                                name: 'NavigationDrawer',
-                                options:{
-                                    animations: {
-                                        push: slideInAnimation,
-                                        pop: slideOutAnimation
-                                    }
-                                }
-                            }
-                        }
-                    }
                 };
                 break;
             default:
@@ -282,6 +252,11 @@ export default class App {
                                         animations: {
                                             push: slideInAnimation,
                                             pop: slideOutAnimation
+                                        },
+                                        sideMenu:{
+                                            left:{
+                                                visible: false
+                                            }
                                         }
                                     }
                                 }
@@ -299,9 +274,8 @@ export default class App {
                                             drawBehind: true,
                                             animate: false
                                         },
-                                        sideMenu: {
+                                        sideMenu:{
                                             left:{
-                                                //idk
                                                 visible: false
                                             }
                                         }

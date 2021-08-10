@@ -63,18 +63,13 @@ class FollowUpsScreen extends Component {
                 refreshing: false
             })
         }
+        if(!prevProps.referenceData && Object.keys(this.state.followUpsColors).length === 0 && this.props.referenceData ){
+            this.setColors();
+        }
     }
 
     componentDidMount = () => {
-        let followUpsColors = {};
-        let refData = checkArrayAndLength(this.props.referenceData) ? this.props.referenceData.filter((e) => {return e.categoryId === "LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE"}) : {};
-        for (let i=0; i<refData.length; i++) {
-            followUpsColors[refData[i].value] = refData[i].colorCode || styles.buttonGreen
-        }
-        this.setState({
-            followUpsColors
-        }
-        )
+        this.setColors()
     };
 
     // The render method should have at least business logic as possible,
@@ -232,6 +227,19 @@ class FollowUpsScreen extends Component {
             </ViewHOC>
         );
     };
+
+    setColors = () =>{
+
+        let followUpsColors = {};
+        let refData = checkArrayAndLength(this.props.referenceData) ? this.props.referenceData.filter((e) => {return e.categoryId === "LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE"}) : {};
+        for (let i=0; i<refData.length; i++) {
+            followUpsColors[refData[i].value] = refData[i].colorCode || styles.buttonGreen
+        }
+        this.setState({
+                followUpsColors
+            }
+        )
+    }
 
     // Please write here all the methods that are not react native lifecycle methods
     openCalendarModal = () => {

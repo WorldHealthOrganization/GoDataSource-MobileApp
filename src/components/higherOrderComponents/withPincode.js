@@ -33,6 +33,7 @@ export default function withPincode() {
                         .then((hasPin) => {
                             if (props.isAppInitialize) {
                                 Navigation.mergeOptions(props.componentId, {
+
                                     sideMenu: {
                                         left: {
                                             visible: false,
@@ -128,10 +129,11 @@ export default function withPincode() {
                 } catch(wasPinSetError) {
                     console.log('wasPinSetError: ', wasPinSetError);
                 }
+                console.log("FINISH PROCESS?");
                 Navigation.mergeOptions(props.componentId, {
                     sideMenu: {
                         left: {
-                            visible: true,
+                            visible: false,
                         },
                     },
                 });
