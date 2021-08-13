@@ -97,7 +97,7 @@ class ContactsSinglePersonal extends Component {
                     <View style={style.container}>
                         {
                             this.state.fields.map((item, i) => {
-                                return this.handleRenderItem(item)
+                                return this.handleRenderItem(item, i)
                             })
                         }
 

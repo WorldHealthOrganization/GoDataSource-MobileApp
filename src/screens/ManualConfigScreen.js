@@ -38,7 +38,11 @@ import {Navigation} from "react-native-navigation";
 import {fadeInAnimation, fadeOutAnimation} from "../utils/animations";
 
 class ManualConfigScreen extends PureComponent {
-
+    nameRef = React.createRef();
+    urlRef = React.createRef();
+    clientIDRef = React.createRef();
+    clientSecretRef = React.createRef();
+    userEmailRef = React.createRef();
 
     constructor(props) {
         console.log("Manual conf screen");
@@ -65,13 +69,8 @@ class ManualConfigScreen extends PureComponent {
             selectedLanguage: 'None',
             availableLanguages: []
         };
-        // Bind here methods, or at least don't declare methods in the render method
-        this.nameRef = this.updateRef.bind(this, 'name');
-        this.urlRef = this.updateRef.bind(this, 'url');
-        this.clientIDRef = this.updateRef.bind(this, 'clientId');
-        this.clientSecretRef = this.updateRef.bind(this, 'clientSecret');
-        this.userEmailRef = this.updateRef.bind(this, 'userEmail');
     }
+
 
     // Please add here the react lifecycle methods that you need
     componentDidMount = async () => {
@@ -109,6 +108,10 @@ class ManualConfigScreen extends PureComponent {
                         clientId: QRCodeData.clientId || '',
                         clientSecret: QRCodeData.clientSecret || '',
                         allUrls
+                    },(state)=>{
+                        this.urlRef.current.setValue(this.state.url);
+                        this.clientIDRef.current.setValue(this.state.clientId);
+                        this.clientSecretRef.current.setValue(this.state.clientSecret);
                     })
                 } else {
                     if (this.props && this.props.activeDatabase && !this.props.isNewHub) {
@@ -124,6 +127,12 @@ class ManualConfigScreen extends PureComponent {
                                     userEmail: activeDatabaseCredentials.userEmail,
                                     encryptedData: activeDatabaseCredentials.encryptedData,
                                     allUrls: allUrls
+                                }, ()=>{
+                                    this.nameRef.current.setValue(this.state.name);
+                                    this.urlRef.current.setValue(this.state.url);
+                                    this.clientIDRef.current.setValue(this.state.clientId);
+                                    this.clientSecretRef.current.setValue(this.state.clientSecret);
+                                    this.userEmailRef.current.setValue(this.state.userEmail);
                                 })
                             } else {
                                 console.log("No active database found");
@@ -148,12 +157,16 @@ class ManualConfigScreen extends PureComponent {
                 if (this.props && this.props.QRCodeInfo && this.props.QRCodeInfo.data) {
                     //TODO map this.props.QRCodeInfo info to props
                     // console.log('Here have the QRCodeInfo: ', JSON.parse(this.props.QRCodeInfo.data));
-                    console.log('TestQRCode has qr code data');
+                    console.log('TestQRCode has qr code data', this.props.QRCodeInfo);
                     let QRCodeData = JSON.parse(this.props.QRCodeInfo.data);
                     this.setState({
                         url: QRCodeData.url || '',
                         clientId: QRCodeData.clientId || '',
                         clientSecret: QRCodeData.clientSecret || ''
+                    }, ()=>{
+                        this.urlRef.current.setValue(this.state.url);
+                        this.clientIDRef.current.setValue(this.state.clientId);
+                        this.clientSecretRef.current.setValue(this.state.clientSecret);
                     })
                 }
             }
@@ -168,6 +181,10 @@ class ManualConfigScreen extends PureComponent {
                     url: QRCodeData.url || '',
                     clientId: QRCodeData.clientId || '',
                     clientSecret: QRCodeData.clientSecret || ''
+                }, ()=>{
+                    this.urlRef.current.setValue(this.state.url);
+                    this.clientIDRef.current.setValue(this.state.clientId);
+                    this.clientSecretRef.current.setValue(this.state.clientSecret);
                 })
             }
         }
@@ -478,10 +495,6 @@ class ManualConfigScreen extends PureComponent {
             }
         })
     };
-
-    updateRef(name, ref) {
-        this[name] = ref;
-    }
 
     checkFields = (nextFunction, validateUrl) => {
         if (!this.state.name || !this.state.url || !this.state.clientId || !this.state.clientSecret || !this.state.userEmail) {

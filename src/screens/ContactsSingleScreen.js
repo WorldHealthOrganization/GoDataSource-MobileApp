@@ -13,7 +13,7 @@ import ViewHOC from './../components/ViewHOC';
 import config from './../utils/config';
 import {connect} from "react-redux";
 import {bindActionCreators, compose} from "redux";
-import {PagerScroll, TabBar, TabView} from 'react-native-tab-view';
+import {TabBar, TabView} from 'react-native-tab-view';
 import ContactsSingleAddress from './../containers/ContactsSingleAddress';
 import ContactsSingleCalendar from './../containers/ContactsSingleCalendar';
 import ContactsSingleExposures from './../containers/ContactsSingleExposures';
@@ -360,11 +360,10 @@ class ContactsSingleScreen extends Component {
                     handlePressNavbarButton={this.handlePressNavbarButton}
                 />
                 <TabView
-                    navigationState={this.state}
+                    navigationState={{index: this.state.index, routes:this.state.routes }}
                     onIndexChange={this.handleOnIndexChange}
                     renderScene={this.renderScene}
                     renderTabBar={this.handleRenderTabBar}
-                    renderPager={this.handleRenderPager}
                     useNativeDriver
                     initialLayout={initialLayout}
                     swipeEnabled={this.props.isNew ? false : true}
@@ -373,10 +372,6 @@ class ContactsSingleScreen extends Component {
         );
     };
 
-    handleRenderPager = (props) => {
-        return (Platform.OS === 'ios') ? <PagerScroll {...props} swipeEnabled={false} animationEnabled={false} /> :
-            <PagerScroll {...props} swipeEnabled={false} animationEnabled={false} />
-    };
 
     // Please write here all the methods that are not react native lifecycle methods
     handleOnAddFollowUp = () => {

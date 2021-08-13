@@ -104,10 +104,10 @@ export function getDatabaseSnapshotRequestNew(hubConfig, lastSyncDate, dispatch,
                         },
                         syncParams
                     )
-                    .progress({count: 500}, (received, total) => {
+                    .progress({count:500},(received, total) => {
                         dispatch(setSyncState({
                             id: 'downloadDatabase',
-                            name: `Downloading database\nReceived ${received} bytes`,
+                            name: `Downloading database`,
                             addLanguagePacks: checkArrayAndLength(languagePacks)
                         }));
                         console.log("Received", received, total)
