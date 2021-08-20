@@ -1111,6 +1111,10 @@ export function getTranslation (value, allTransactions) {
     let valueToBeReturned = value;
     if (value && typeof value === 'string' && value.includes('LNG')) {
         let item = null;
+
+        // if(value===translations.contactsOfContactsScreen.contactsTitle){
+        //     console.log("What's this?", allTransactions);
+        // }
         if (value && allTransactions && Array.isArray(allTransactions)) {
             item = allTransactions.find(e => {return e && e.token === value})
         }

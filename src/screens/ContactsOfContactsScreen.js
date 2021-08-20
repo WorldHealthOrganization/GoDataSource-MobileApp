@@ -16,7 +16,7 @@ import AnimatedListView from './../components/AnimatedListView';
 import {getContactsOfContactsForOutbreakId} from './../actions/contactsOfContacts';
 import ViewHOC from './../components/ViewHOC';
 import {Popup} from 'react-native-map-link';
-import translations, {contactsOfContactsScreen} from './../utils/translations';
+import translations from './../utils/translations';
 import config from './../utils/config';
 import Breadcrumb from './../components/Breadcrumb';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -93,7 +93,7 @@ class ContactsOfContactsScreen extends Component {
         let filterText = filterNumbers === 0 ? `${getTranslation(translations.generalLabels.filterTitle, this.props.translation)}` : `(${filterNumbers})`;
 
 
-        let contactTitle = []; contactTitle[0] = getTranslation(contactsOfContactsScreen.contactsTitle, this.props.translation);
+        let contactTitle = []; contactTitle[0] = getTranslation(translations.contactsOfContactsScreen.contactsTitle, this.props.translation);
 
         return (
             <ViewHOC style={style.container}
@@ -172,7 +172,7 @@ class ContactsOfContactsScreen extends Component {
                                 onPressMap={this.handleOnPressMap}
                                 onPressName={this.props.onPressFullName}
                                 onPressExposure={this.props.onPressExposure}
-                                screen={contactsOfContactsScreen.contactsTitle}
+                                screen={translations.contactsOfContactsScreen.contactsTitle}
                                 onEndReached={this.props.onEndReached}
                                 hasFilter={true}
                             />

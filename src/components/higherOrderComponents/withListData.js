@@ -4,7 +4,7 @@ import get from 'lodash/get';
 import {createDate, createStackFromComponent} from './../../utils/functions';
 import {extractIdFromPouchId, extractMainAddress, getTranslation, navigation} from "../../utils/functions";
 import RNExitApp from "react-native-exit-app";
-import translations, {contactsOfContactsScreen} from "../../utils/translations";
+import translations from "../../utils/translations";
 import constants, {PERMISSIONS_CONTACT_OF_CONTACT} from './../../utils/constants';
 import {screenTransition} from './../../utils/screenTransitionFunctions';
 import {Navigation} from "react-native-navigation";
@@ -441,7 +441,7 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                         forwardProps = {
                             contact: {_id: get(exposure, 'id', null)},
                             refresh: this.refresh,
-                            previousScreen: contactsOfContactsScreen.contactsTitle,
+                            previousScreen: translations.contactsOfContactsScreen.contactsTitle,
                             isEditMode: false,
                             getContact: true
                         };

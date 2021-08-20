@@ -40,7 +40,7 @@ import constants, {PERMISSIONS_CONTACT_OF_CONTACT} from "../utils/constants";
 import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
 import lodashIntersect from 'lodash/intersection';
 import {addContactOfContact, updateContactOfContact} from './../actions/contactsOfContacts';
-import {contactsOfContactsScreen} from "../utils/translations";
+import contactsOfContactsScreen from "../utils/translations";
 import {checkValidEmails} from './../utils/formValidators';
 import {validateRequiredFields} from "../utils/formValidators";
 import {Navigation} from "react-native-navigation";
