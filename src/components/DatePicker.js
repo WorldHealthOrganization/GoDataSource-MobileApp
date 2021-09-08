@@ -42,7 +42,6 @@ const DatePicker = React.memo(({
     const isDarkMode = useDarkMode();
 
     const editInput = () => {
-        console.log('Date This.props.value: ', date, value, typeof date, typeof value, isDateTimePickerVisible);
         let newDate = date;
         let tooltip = getTooltip(label, translation);
         let customStyle = newDate !== undefined && newDate !== null ? styles.hasDateTooltipStyle : style.emptyDateTooltipStyle;

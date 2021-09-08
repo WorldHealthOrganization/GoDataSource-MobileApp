@@ -14,6 +14,7 @@ import FiltersContainer from './../containers/FiltersContainer';
 import SortContainer from './../containers/SortContainer';
 import translations from './../utils/translations';
 import {Navigation} from "react-native-navigation";
+import throttle from 'lodash/throttle';
 
 class FilterScreen extends Component {
 
@@ -282,9 +283,9 @@ class FilterScreen extends Component {
         onApplyFilters(null);
     };
 
-    handleOnIndexChange = (index) => {
+    handleOnIndexChange = throttle((index) => {
         this.setState({ index });
-    };
+    }, 300);
 
     handleMoveToNextScreenButton = () => {
         const { index } = this.state;

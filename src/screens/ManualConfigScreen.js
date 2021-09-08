@@ -40,7 +40,7 @@ import {fadeInAnimation, fadeOutAnimation} from "../utils/animations";
 class ManualConfigScreen extends PureComponent {
     nameRef = React.createRef();
     urlRef = React.createRef();
-    clientIDRef = React.createRef();
+    clientIdRef = React.createRef();
     clientSecretRef = React.createRef();
     userEmailRef = React.createRef();
 
@@ -110,7 +110,7 @@ class ManualConfigScreen extends PureComponent {
                         allUrls
                     },(state)=>{
                         this.urlRef.current.setValue(this.state.url);
-                        this.clientIDRef.current.setValue(this.state.clientId);
+                        this.clientIdRef.current.setValue(this.state.clientId);
                         this.clientSecretRef.current.setValue(this.state.clientSecret);
                     })
                 } else {
@@ -130,7 +130,7 @@ class ManualConfigScreen extends PureComponent {
                                 }, ()=>{
                                     this.nameRef.current.setValue(this.state.name);
                                     this.urlRef.current.setValue(this.state.url);
-                                    this.clientIDRef.current.setValue(this.state.clientId);
+                                    this.clientIdRef.current.setValue(this.state.clientId);
                                     this.clientSecretRef.current.setValue(this.state.clientSecret);
                                     this.userEmailRef.current.setValue(this.state.userEmail);
                                 })
@@ -165,7 +165,7 @@ class ManualConfigScreen extends PureComponent {
                         clientSecret: QRCodeData.clientSecret || ''
                     }, ()=>{
                         this.urlRef.current.setValue(this.state.url);
-                        this.clientIDRef.current.setValue(this.state.clientId);
+                        this.clientIdRef.current.setValue(this.state.clientId);
                         this.clientSecretRef.current.setValue(this.state.clientSecret);
                     })
                 }
@@ -183,7 +183,7 @@ class ManualConfigScreen extends PureComponent {
                     clientSecret: QRCodeData.clientSecret || ''
                 }, ()=>{
                     this.urlRef.current.setValue(this.state.url);
-                    this.clientIDRef.current.setValue(this.state.clientId);
+                    this.clientIdRef.current.setValue(this.state.clientId);
                     this.clientSecretRef.current.setValue(this.state.clientSecret);
                 })
             }
@@ -299,7 +299,7 @@ class ManualConfigScreen extends PureComponent {
                             textColor={styles.colorWhite}
                         />
                         <TextField
-                            ref={this.clientIDRef}
+                            ref={this.clientIdRef}
                             value={this.state.clientId}
                             autoCorrect={false}
                             lineWidth={1}
@@ -664,9 +664,10 @@ class ManualConfigScreen extends PureComponent {
     };
 
     handleTextChange = (text) => {
-        ['name', 'url', 'clientId', 'clientSecret', 'userEmail'].map((name) => ({ name, ref: this[name] }))
+        ['name', 'url', 'clientId', 'clientSecret', 'userEmail']
+            .map((name) => ({ name, ref: this[`${name}Ref`] }))
             .forEach(({ name, ref }) => {
-                if (ref.isFocused()) {
+                if (ref.current && ref.current.isFocused()) {
                     this.setState({ [name]: text });
                 }
             });

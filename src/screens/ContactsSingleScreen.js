@@ -27,7 +27,7 @@ import {addFollowUp, getFollowUpsForContactId, updateFollowUpAndContact} from '.
 import {addContact, checkForNameDuplicated, getExposuresForContact, updateContact} from './../actions/contacts';
 import {removeErrors} from './../actions/errors';
 import DateTimePicker from 'react-native-modal-datetime-picker';
-import _, {sortBy} from 'lodash';
+import _, {findIndex, sortBy} from 'lodash';
 import {
     calculateDimension,
     computeFullName,
@@ -456,21 +456,22 @@ class ContactsSingleScreen extends Component {
         });
     };
 
-    handleOnIndexChange = (index) => {
-        if (this.props.isNew) {
-            if (this.state.canChangeScreen) {
-                this.setState({
-                    canChangeScreen: false,
-                    index
-                });
-            }
-        } else {
-            this.setState({
-                index
-            });
-        }
-    };
-
+    handleOnIndexChange = _.throttle( (index) => {
+        // if (this.state.canChangeScreen) {
+        this.setState({
+            canChangeScreen: false,
+            index
+        });
+        // }
+    },300);
+    handleMoveToScreen = (nextIndex) => {
+        this.setState({
+            canChangeScreen: true,
+        }, () => {
+            console.log("1");
+            this.handleOnIndexChange(nextIndex)
+        });
+    }
     handleMoveToNextScreenButton = () => {
         // Before moving to the next screen do the checks for the current screen
         let missingFields = [];
@@ -536,8 +537,9 @@ class ContactsSingleScreen extends Component {
 
             this.setState({
                 canChangeScreen: true,
+            }, ()=>{
+                this.handleOnIndexChange(nextIndex)
             });
-            this.handleOnIndexChange(nextIndex)
         }
     };
 
@@ -563,6 +565,18 @@ class ContactsSingleScreen extends Component {
                     height: 41,
                     backgroundColor: 'white'
                 }}
+                onTabPress={({ route, preventDefault })=>{
+                    preventDefault();
+                    if(this.props.isNew) {
+                        return;
+                    }
+                    const index = findIndex(this.state.routes, predicate => predicate.key === route.key);
+                    if(index !== -1){
+                        this.handleMoveToScreen(index);
+                    }
+                }}
+                pressOpacity={this.props.isNew ? 0 : undefined}
+                pressColor={this.props.isNew ? 'transparent' : undefined}
                 renderLabel={this.handleRenderLabel(props)}
                 scrollEnabled={true}
                 bounces={true}
@@ -599,7 +613,7 @@ class ContactsSingleScreen extends Component {
             case 'personal':
                 return (
                     <ContactsSinglePersonal
-                        routeKey={route.key}
+                        routeKey={this.state.routes[this.state.index].key}
                         contact={this.state.contact}
                         activeIndex={this.state.index}
                         onChangeText={this.handleOnChangeText}
@@ -632,7 +646,7 @@ class ContactsSingleScreen extends Component {
             case 'address':
                 return (
                     <ContactsSingleAddress
-                        routeKey={route.key}
+                        routeKey={this.state.routes[this.state.index].key}
                         contact={this.state.contact}
                         activeIndex={this.state.index}
                         onChangeText={this.handleOnChangeText}
@@ -662,7 +676,7 @@ class ContactsSingleScreen extends Component {
             case 'exposures':
                 return (
                     <ContactsSingleExposures
-                        routeKey={route.key}
+                        routeKey={this.state.routes[this.state.index].key}
                         contact={this.state.contact}
                         activeIndex={this.state.index}
                         onPressEditExposure={this.handleOnPressEditExposure}
@@ -692,7 +706,7 @@ class ContactsSingleScreen extends Component {
             case 'investigation':
                 return (
                     <ContactsSingleQuestionnaire
-                        routeKey={route.key}
+                        routeKey={this.state.routes[this.state.index].key}
                         item={this.state.contact}
                         currentAnswers={this.state.currentAnswers}
                         previousAnswers={this.state.previousAnswers}
@@ -720,7 +734,7 @@ class ContactsSingleScreen extends Component {
             case 'calendar':
                 return (
                     <ContactsSingleCalendar
-                        routeKey={route.key}
+                        routeKey={this.state.routes[this.state.index].key}
                         contact={this.state.contact}
                         activeIndex={this.state.index}
                         handleOnPressSave={this.handleOnPressSave}

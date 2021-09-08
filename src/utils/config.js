@@ -154,7 +154,7 @@ const addressFields = {
             value: '',
             isRequired: false,
             isEditMode: true,
-            keyboardType: Platform.OS === 'ios' ? 'number-pad' : 'numeric',
+            keyboardType: 'phone-pad',
             objectType: 'Address'
         },
         {

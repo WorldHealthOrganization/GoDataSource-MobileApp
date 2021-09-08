@@ -13,6 +13,7 @@ import IconButton from './ButtonWithIcons';
 import TextInputWithIcon from './TextInputWithIcon';
 
 class SearchFilterView extends Component {
+    searchRef = React.createRef();
 
     // This will be a dumb component, so it's best not to put any business logic in it
     constructor(props) {
@@ -23,7 +24,6 @@ class SearchFilterView extends Component {
 
         this.handleTextChange = this.handleTextChange.bind(this);
 
-        this.searchRef = this.updateRef.bind(this, 'search');
     }
 
     // Please add here the react lifecycle methods that you need
@@ -66,16 +66,12 @@ class SearchFilterView extends Component {
         );
     }
 
-    // Please write here all the methods that are not react native lifecycle methods
-    updateRef(name, ref) {
-        this[name] = ref;
-    }
 
     handleTextChange = (text) => {
         ['search']
-            .map((name) => ({ name, ref: this[name] }))
+            .map((name) => ({ name, ref: this[`${name}Ref`] }))
             .forEach(({ name, ref }) => {
-                if (ref.isFocused()) {
+                if (ref.current && ref.current.isFocused()) {
                     this.setState({ [name]: text });
                 }
             });

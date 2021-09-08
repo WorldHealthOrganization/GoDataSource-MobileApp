@@ -243,20 +243,14 @@ class ViewEditScreen extends Component {
     };
 
     //Index change for TabBar
-    handleOnIndexChange = (index) => {
-        if (this.props.isNew) {
-            if (this.state.canChangeScreen) {
-                this.setState({
-                    canChangeScreen: false,
-                    index
-                });
-            }
-        } else {
-            this.setState({
-                index
-            });
-        }
-    };
+    handleOnIndexChange = _.throttle( (index) => {
+        // if (this.state.canChangeScreen) {
+        this.setState({
+            canChangeScreen: false,
+            index
+        });
+        // }
+    },300);
     handleMoveToNextScreenButton = () => {
         let nextIndex = this.state.index + 1;
 

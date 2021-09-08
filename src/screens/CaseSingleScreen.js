@@ -14,7 +14,7 @@ import Breadcrumb from './../components/Breadcrumb';
 import Ripple from 'react-native-material-ripple';
 import styles from './../styles';
 import config, {sideMenuKeys} from './../utils/config';
-import _, {sortBy} from 'lodash';
+import _, {sortBy,findIndex} from 'lodash';
 import CaseSinglePersonalContainer from './../containers/CaseSinglePersonalContainer';
 import CaseSingleAddressContainer from './../containers/CaseSingleAddressContainer';
 import CaseSingleInfectionContainer from './../containers/CaseSingleInfectionContainer';
@@ -33,7 +33,6 @@ import {
     extractIdFromPouchId,
     getTranslation,
     mapAnswers,
-    navigation,
     reMapAnswers,
     updateRequiredFields
 } from './../utils/functions';
@@ -162,7 +161,6 @@ class CaseSingleScreen extends Component {
     }
 
     componentDidMount() {
-        console.log("When this?",this.props.case, this.props.isNew);
         BackHandler.addEventListener('hardwareBackPress', this.handleBackButtonClick);
         if (!this.props.isNew) {
             getCaseAndExposuresById(this.props.case._id)
@@ -260,11 +258,12 @@ class CaseSingleScreen extends Component {
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
+        console.log("render called");
         return (
-            <ViewHOC style={style.container}
-                     showLoader={this && this.state && this.state.loading}
-                     loaderText={this.props && this.props.syncState ? 'Loading' : getTranslation(translations.loadingScreenMessages.loadingMsg, this.props.translation)}
-            >
+             <ViewHOC style={style.container}
+                      showLoader={this && this.state && this.state.loading}
+                      loaderText={this.props && this.props.syncState ? 'Loading' : getTranslation(translations.loadingScreenMessages.loadingMsg, this.props.translation)}
+             >
                 <NavBarCustom
                     title={null}
                     customTitle={
@@ -307,7 +306,10 @@ class CaseSingleScreen extends Component {
                     handlePressNavbarButton={this.handlePressNavbarButton}
                 />
                 <TabView
-                    navigationState={this.state}
+                    navigationState={{
+                        index: this.state.index,
+                        routes: this.state.routes
+                    }}
                     onIndexChange={this.handleOnIndexChange}
                     renderScene={this.handleRenderScene}
                     renderTabBar={this.handleRenderTabBar}
@@ -331,26 +333,31 @@ class CaseSingleScreen extends Component {
     };
 
     //Index change for TabBar
-    handleOnIndexChange = (index) => {
-        if (this.props.isNew) {
-            if (this.state.canChangeScreen) {
-                this.setState({
-                    canChangeScreen: false,
-                    index
-                });
-            }
-        } else {
+    handleOnIndexChange = _.throttle( (index) => {
+        console.log("Can state change", index, this.state.canChangeScreen);
+        // if (this.state.canChangeScreen) {
             this.setState({
+                canChangeScreen: false,
                 index
             });
-        }
-    };
+        // }
+    },800);
+    handleMoveToScreen = (nextIndex) => {
+        this.setState({
+            canChangeScreen: true,
+        }, () => {
+            console.log("On index change 1");
+            this.handleOnIndexChange(nextIndex)
+        });
+    }
+
     handleMoveToNextScreenButton = () => {
         let nextIndex = this.state.index + 1;
 
         this.setState({
             canChangeScreen: true,
         }, () => {
+            console.log("On index change 2");
             this.handleOnIndexChange(nextIndex)
         });
     };
@@ -361,11 +368,13 @@ class CaseSingleScreen extends Component {
             canChangeScreen: true,
         });
 
+        console.log("On index change 3");
         this.handleOnIndexChange(nextIndex)
     };
 
     //Generate TabBar
     handleRenderTabBar = (props) => {
+        console.log("Render tab bar");
         return (
             <TabBar
                 {...props}
@@ -377,6 +386,18 @@ class CaseSingleScreen extends Component {
                     height: 41,
                     backgroundColor: 'white'
                 }}
+                onTabPress={({ route, preventDefault})=>{
+                    preventDefault();
+                    if(this.props.isNew) {
+                        return;
+                    }
+                    const index = findIndex(this.state.routes, predicate => predicate.key === route.key);
+                    if(index !== -1){
+                        this.handleMoveToScreen(index);
+                    }
+                }}
+                pressOpacity={this.props.isNew ? 0 : undefined}
+                pressColor={this.props.isNew ? 'transparent' : undefined}
                 renderLabel={this.handleRenderLabel(props)}
                 scrollEnabled={true}
                 bounces={true}
@@ -440,11 +461,12 @@ class CaseSingleScreen extends Component {
 
     //Render scene
     handleRenderScene = ({ route }) => {
+        console.log("Render scene", this.state.routes[this.state.index].key);
         switch (route.key) {
             case 'personal':
                 return (
                     <CaseSinglePersonalContainer
-                        routeKey={route.key}
+                        routeKey={this.state.routes[this.state.index].key}
                         case={this.state.case}
                         isEditMode={this.state.isEditMode}
                         index={this.state.index}
@@ -473,7 +495,7 @@ class CaseSingleScreen extends Component {
             case 'address':
                 return (
                     <CaseSingleAddressContainer
-                        routeKey={route.key}
+                        routeKey={this.state.routes[this.state.index].key}
                         case={this.state.case}
                         isEditMode={this.state.isEditMode}
                         index={this.state.index}
@@ -502,7 +524,7 @@ class CaseSingleScreen extends Component {
             case 'infection':
                 return (
                     <CaseSingleInfectionContainer
-                        routeKey={route.key}
+                        routeKey={this.state.routes[this.state.index].key}
                         case={this.state.case}
                         isEditMode={this.state.isEditMode}
                         index={this.state.index}
@@ -535,7 +557,7 @@ class CaseSingleScreen extends Component {
             case 'exposures':
                 return (
                     <CaseSingleExposureContainer
-                        routeKey={route.key}
+                        routeKey={this.state.routes[this.state.index].key}
                         case={this.state.case}
                         relations={this.state.relations}
                         index={this.state.index}
@@ -558,7 +580,7 @@ class CaseSingleScreen extends Component {
             case 'caseInvestigation':
                 return (
                     <CaseSingleInvestigationContainer
-                        routeKey={route.key}
+                        routeKey={this.state.routes[this.state.index].key}
                         item={this.state.case}
                         currentAnswers={this.state.currentAnswers}
                         previousAnswers={this.state.previousAnswers}

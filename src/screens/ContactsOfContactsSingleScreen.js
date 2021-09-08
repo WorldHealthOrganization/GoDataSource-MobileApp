@@ -23,7 +23,7 @@ import Ripple from 'react-native-material-ripple';
 import {addFollowUp, updateFollowUpAndContact} from './../actions/followUps';
 import {addContact, checkForNameDuplicated, getExposuresForContact, updateContact} from './../actions/contacts';
 import {removeErrors} from './../actions/errors';
-import _ from 'lodash';
+import _, {findIndex} from 'lodash';
 import {
     calculateDimension,
     computeFullName,
@@ -308,21 +308,21 @@ class ContactsOfContactsSingleScreen extends Component {
         });
     };
 
-    handleOnIndexChange = (index) => {
-        if (this.props.isNew) {
-            if (this.state.canChangeScreen) {
-                this.setState({
-                    canChangeScreen: false,
-                    index
-                });
-            }
-        } else {
-            this.setState({
-                index
-            });
-        }
-    };
-
+    handleOnIndexChange = _.throttle( (index) => {
+        // if (this.state.canChangeScreen) {
+        this.setState({
+            canChangeScreen: false,
+            index
+        });
+        // }
+    },300);
+    handleMoveToScreen = (nextIndex) => {
+        this.setState({
+            canChangeScreen: true,
+        }, () => {
+            this.handleOnIndexChange(nextIndex)
+        });
+    }
     handleMoveToNextScreenButton = () => {
         // Before moving to the next screen do the checks for the current screen
         let missingFields = [];
@@ -419,6 +419,18 @@ class ContactsOfContactsSingleScreen extends Component {
                     height: 41,
                     backgroundColor: 'white'
                 }}
+                onTabPress={({ route, preventDefault })=>{
+                    preventDefault();
+                    if(this.props.isNew) {
+                        return;
+                    }
+                    const index = findIndex(this.state.routes, predicate => predicate.key === route.key);
+                    if(index !== -1){
+                        this.handleMoveToScreen(index);
+                    }
+                }}
+                pressOpacity={this.props.isNew ? 0 : undefined}
+                pressColor={this.props.isNew ? 'transparent' : undefined}
                 renderLabel={this.handleRenderLabel(props)}
                 scrollEnabled={true}
                 bounces={true}
@@ -457,7 +469,7 @@ class ContactsOfContactsSingleScreen extends Component {
                     <ContactsSinglePersonal
                         type={translations.personTypes.contactsOfContacts}
                         contact={this.state.contact}
-                        routeKey={route.key}
+                        routeKey={this.state.routes[this.state.index].key}
                         activeIndex={this.state.index}
                         onChangeText={this.handleOnChangeText}
                         onChangeDropDown={this.handleOnChangeDropDown}
@@ -491,7 +503,7 @@ class ContactsOfContactsSingleScreen extends Component {
                     <ContactsSingleAddress
                         type={translations.personTypes.contactsOfContacts}
                         contact={this.state.contact}
-                        routeKey={route.key}
+                        routeKey={this.state.routes[this.state.index].key}
                         activeIndex={this.state.index}
                         onChangeText={this.handleOnChangeText}
                         onChangeDropDown={this.handleOnChangeDropDown}
@@ -522,7 +534,7 @@ class ContactsOfContactsSingleScreen extends Component {
                     <ContactsSingleExposures
                         type={translations.personTypes.contactsOfContacts}
                         contact={this.state.contact}
-                        routeKey={route.key}
+                        routeKey={this.state.routes[this.state.index].key}
                         activeIndex={this.state.index}
                         onPressEditExposure={this.handleOnPressEditExposure}
                         onPressDeleteExposure={this.handleOnPressDeleteExposure}
@@ -548,6 +560,7 @@ class ContactsOfContactsSingleScreen extends Component {
                         onPressCancelEdit={this.onPressCancelEdit}
                     />
                 );
+                //Default? Why not 'personal'????
             default:
                 return (
                     <ContactsSinglePersonal

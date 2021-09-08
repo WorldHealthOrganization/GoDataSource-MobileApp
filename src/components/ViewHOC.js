@@ -39,7 +39,6 @@ class ViewHOC extends Component {
     }
 
     render() {
-
         return (
             <View style={[this.props.style]}>
                 {

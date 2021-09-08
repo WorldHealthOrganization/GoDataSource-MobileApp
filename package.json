@@ -74,7 +74,7 @@
     "react-native-multiple-select": "^0.4.4",
     "react-native-navigation": "^7.18.1",
     "react-native-os": "^1.2.1",
-    "react-native-pager-view": "5.1.11",
+    "react-native-pager-view": "^5.4.1",
     "react-native-permissions": "^1.1.1",
     "react-native-phone-call": "^1.0.9",
     "react-native-qrcode-scanner": "1.1.0",

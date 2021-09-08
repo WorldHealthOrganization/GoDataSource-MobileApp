@@ -4,7 +4,7 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
-import {Text, View, Keyboard} from 'react-native';
+import {Text, View} from 'react-native';
 import PropTypes from 'prop-types';
 import {getTooltip, getTranslation} from './../utils/functions';
 import {TextField} from 'react-native-material-textfield';
@@ -37,10 +37,6 @@ class TextInput extends Component {
         this.setState({
             value: lodashGet(this.props, 'value', ' ')
         })
-    }
-
-    componentWillUnmount() {
-        Keyboard.removeListener("keyboardDidHide", this._keyboardDidHide);
     }
 
     componentDidUpdate(prevProps, prevState) {
@@ -76,7 +72,6 @@ class TextInput extends Component {
         } else {
             value = '';
         }
-        console.log("Render inside",this.props.id, value);
         return (
             <View style={[{flexDirection: 'row'},this.props.style]}>
                 <View style={{flex: 1}}> 
@@ -95,10 +90,9 @@ class TextInput extends Component {
                         ref={this.fieldRef}
                         tintColor='rgb(77,176,160)'
                         multiline={this.props.multiline !== undefined ? this.props.multiline : false}
-                        onPress={() => {console.log("On press textInput")}}
                         keyboardType={this.props.keyboardType ? this.props.keyboardType : 'default'}
+                        formatText={this.formatForNumeric}
                         secureTextEntry={this.props.secureTextEntry}
-                        onFocus={this.props.onFocus}
                     />
                 </View>
                 {
@@ -168,6 +162,12 @@ class TextInput extends Component {
         return localValue
     };
 
+    formatForNumeric = (text) => {
+        if(this.props.keyboardType === 'numeric'){
+            return Number.isNaN(parseFloat(text)) ? text : parseFloat(text).toString();
+        }
+        return text;
+    }
     handleOnChangeText = (value) => {
         this.setState({
             value
