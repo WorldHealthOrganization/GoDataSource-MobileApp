@@ -16,6 +16,20 @@ PODS:
     - Parse/Core (= 1.19.2)
   - Parse/Core (1.19.2):
     - Bolts/Tasks (= 1.9.1)
+  - Permission-Camera (3.0.5):
+    - RNPermissions
+  - Permission-FaceID (3.0.5):
+    - RNPermissions
+  - Permission-LocationAccuracy (3.0.5):
+    - RNPermissions
+  - Permission-LocationAlways (3.0.5):
+    - RNPermissions
+  - Permission-LocationWhenInUse (3.0.5):
+    - RNPermissions
+  - Permission-MediaLibrary (3.0.5):
+    - RNPermissions
+  - Permission-PhotoLibrary (3.0.5):
+    - RNPermissions
   - RCT-Folly (2020.01.13.00):
     - boost-for-react-native
     - DoubleConversion
@@ -209,19 +223,19 @@ PODS:
     - React-jsi (= 0.64.2)
     - React-perflogger (= 0.64.2)
   - React-jsinspector (0.64.2)
-  - react-native-camera (1.13.1):
-    - React
-    - react-native-camera/RCT (= 1.13.1)
-    - react-native-camera/RN (= 1.13.1)
-  - react-native-camera/RCT (1.13.1):
-    - React
-  - react-native-camera/RN (1.13.1):
-    - React
+  - react-native-camera (4.1.1):
+    - React-Core
+    - react-native-camera/RCT (= 4.1.1)
+    - react-native-camera/RN (= 4.1.1)
+  - react-native-camera/RCT (4.1.1):
+    - React-Core
+  - react-native-camera/RN (4.1.1):
+    - React-Core
   - react-native-document-picker (2.3.0):
     - React
   - react-native-geolocation (2.0.2):
     - React
-  - react-native-pager-view (5.1.11):
+  - react-native-pager-view (5.4.1):
     - React-Core
   - react-native-randombytes (3.6.0):
     - React-Core
@@ -301,17 +315,15 @@ PODS:
     - IQKeyboardManager (= 4.0.13)
     - React
     - React-RCTText
-  - ReactNativeNavigation (7.18.1):
+  - ReactNativeNavigation (7.20.0):
     - React-Core
     - React-RCTImage
     - React-RCTText
-    - ReactNativeNavigation/Core (= 7.18.1)
-  - ReactNativeNavigation/Core (7.18.1):
+    - ReactNativeNavigation/Core (= 7.20.0)
+  - ReactNativeNavigation/Core (7.20.0):
     - React-Core
     - React-RCTImage
     - React-RCTText
-  - ReactNativePermissions (1.2.1):
-    - React
   - ReactNativeUiLib (3.0.4):
     - React
   - rn-fetch-blob (0.12.0):
@@ -334,6 +346,8 @@ PODS:
     - React
   - RNOS (1.2.6):
     - React
+  - RNPermissions (3.0.5):
+    - React-Core
   - RNReanimated (1.13.3):
     - React-Core
   - RNSqlite2 (1.0.1):
@@ -372,6 +386,13 @@ DEPENDENCIES:
   - FBReactNativeSpec (from `../node_modules/react-native/React/FBReactNativeSpec`)
   - glog (from `../node_modules/react-native/third-party-podspecs/glog.podspec`)
   - Parse
+  - Permission-Camera (from `../node_modules/react-native-permissions/ios/Camera`)
+  - Permission-FaceID (from `../node_modules/react-native-permissions/ios/FaceID`)
+  - Permission-LocationAccuracy (from `../node_modules/react-native-permissions/ios/LocationAccuracy`)
+  - Permission-LocationAlways (from `../node_modules/react-native-permissions/ios/LocationAlways`)
+  - Permission-LocationWhenInUse (from `../node_modules/react-native-permissions/ios/LocationWhenInUse`)
+  - Permission-MediaLibrary (from `../node_modules/react-native-permissions/ios/MediaLibrary`)
+  - Permission-PhotoLibrary (from `../node_modules/react-native-permissions/ios/PhotoLibrary`)
   - RCT-Folly (from `../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec`)
   - RCTRequired (from `../node_modules/react-native/Libraries/RCTRequired`)
   - RCTTypeSafety (from `../node_modules/react-native/Libraries/TypeSafety`)
@@ -408,7 +429,6 @@ DEPENDENCIES:
   - ReactNativeDarkMode (from `../node_modules/react-native-dark-mode`)
   - ReactNativeKeyboardManager (from `../node_modules/react-native-keyboard-manager`)
   - ReactNativeNavigation (from `../node_modules/react-native-navigation`)
-  - ReactNativePermissions (from `../node_modules/react-native-permissions`)
   - ReactNativeUiLib (from `../node_modules/react-native-ui-lib/lib`)
   - rn-fetch-blob (from `../node_modules/rn-fetch-blob`)
   - RNBcrypt (from `../node_modules/react-native-bcrypt`)
@@ -420,6 +440,7 @@ DEPENDENCIES:
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
   - RNKeychain (from `../node_modules/react-native-keychain`)
   - RNOS (from `../node_modules/react-native-os`)
+  - RNPermissions (from `../node_modules/react-native-permissions`)
   - RNReanimated (from `../node_modules/react-native-reanimated`)
   - RNSqlite2 (from `../node_modules/react-native-sqlcipher-2`)
   - RNVectorIcons (from `../node_modules/react-native-vector-icons`)
@@ -448,6 +469,20 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/React/FBReactNativeSpec"
   glog:
     :podspec: "../node_modules/react-native/third-party-podspecs/glog.podspec"
+  Permission-Camera:
+    :path: "../node_modules/react-native-permissions/ios/Camera"
+  Permission-FaceID:
+    :path: "../node_modules/react-native-permissions/ios/FaceID"
+  Permission-LocationAccuracy:
+    :path: "../node_modules/react-native-permissions/ios/LocationAccuracy"
+  Permission-LocationAlways:
+    :path: "../node_modules/react-native-permissions/ios/LocationAlways"
+  Permission-LocationWhenInUse:
+    :path: "../node_modules/react-native-permissions/ios/LocationWhenInUse"
+  Permission-MediaLibrary:
+    :path: "../node_modules/react-native-permissions/ios/MediaLibrary"
+  Permission-PhotoLibrary:
+    :path: "../node_modules/react-native-permissions/ios/PhotoLibrary"
   RCT-Folly:
     :podspec: "../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec"
   RCTRequired:
@@ -516,8 +551,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-keyboard-manager"
   ReactNativeNavigation:
     :path: "../node_modules/react-native-navigation"
-  ReactNativePermissions:
-    :path: "../node_modules/react-native-permissions"
   ReactNativeUiLib:
     :path: "../node_modules/react-native-ui-lib/lib"
   rn-fetch-blob:
@@ -540,6 +573,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-keychain"
   RNOS:
     :path: "../node_modules/react-native-os"
+  RNPermissions:
+    :path: "../node_modules/react-native-permissions"
   RNReanimated:
     :path: "../node_modules/react-native-reanimated"
   RNSqlite2:
@@ -566,6 +601,13 @@ SPEC CHECKSUMS:
   glog: 73c2498ac6884b13ede40eda8228cb1eee9d9d62
   IQKeyboardManager: 8eab4d8111418414619d1df8e4779ce5d0f8d7e2
   Parse: 081fb8755c3000fd11df817eec235def233d0af3
+  Permission-Camera: 24c37a846ff69e0eb7fd4264346550850d5b707a
+  Permission-FaceID: 686384632cc38c62752acfec5a8f5aa958d53849
+  Permission-LocationAccuracy: bdcb49d8a0112f5e09cb9860a28f69cbfa65fbbe
+  Permission-LocationAlways: 92bf7638da5852ddba7c29fda18ecd0ac246c813
+  Permission-LocationWhenInUse: 1c1f3c5dc7e33029c0a4a0846b97b4bf89d3244b
+  Permission-MediaLibrary: 01085a7e58d0ffc5a6ecba2ba7874404e8ac10db
+  Permission-PhotoLibrary: 48e58291bd650b4f197cf542dad53f41dea4e84f
   RCT-Folly: ec7a233ccc97cc556cf7237f0db1ff65b986f27c
   RCTRequired: 6d3e854f0e7260a648badd0d44fc364bc9da9728
   RCTTypeSafety: c1f31d19349c6b53085766359caac425926fafaa
@@ -577,10 +619,10 @@ SPEC CHECKSUMS:
   React-jsi: 67747b9722f6dab2ffe15b011bcf6b3f2c3f1427
   React-jsiexecutor: 80c46bd381fd06e418e0d4f53672dc1d1945c4c3
   React-jsinspector: cc614ec18a9ca96fd275100c16d74d62ee11f0ae
-  react-native-camera: ea856bd8b9d21691ab78a9b763ffe2c929421d61
+  react-native-camera: 457a5279a12864bc241c28518fecd5db2838754c
   react-native-document-picker: 8508bfda34be6c24a2cbecbe515b15108658c183
   react-native-geolocation: cbd9d6bd06bac411eed2671810f454d4908484a8
-  react-native-pager-view: ff54ee114f3ed5d0d6484571ef77a7c4a38b7691
+  react-native-pager-view: 6de50b2df6d330a1116bde90519761912c060311
   react-native-randombytes: 45ae693012df24c9a07a5e578b3b567c01468581
   react-native-udp: ccbd878f0f3b968217fc7e3d5eb5839fcaab8b6c
   react-native-version-number: 15563dc4145a94aabfc1faab2a9af10174a4204e
@@ -599,8 +641,7 @@ SPEC CHECKSUMS:
   ReactCommon: 149906e01aa51142707a10665185db879898e966
   ReactNativeDarkMode: 0178ffca3b10f6a7c9f49d6f9810232b328fa949
   ReactNativeKeyboardManager: 34b4b857978fbe3fecd96850b9f3932c6130cabe
-  ReactNativeNavigation: 88128fa06b2c349b613e1e0fd3cdff2c58c01c55
-  ReactNativePermissions: e7db6c38a2f3fb8f26dbfdcaeb5c5e9364657a6d
+  ReactNativeNavigation: 87aa2e3a749a9b338057e8d53af54d865241b843
   ReactNativeUiLib: cde7263a7d308b60161cd286f95c9433e79f2f7d
   rn-fetch-blob: f065bb7ab7fb48dd002629f8bdcb0336602d3cba
   RNBcrypt: 21320bf1df4fe7321b02ceee6e651d89329d9778
@@ -612,6 +653,7 @@ SPEC CHECKSUMS:
   RNGestureHandler: a479ebd5ed4221a810967000735517df0d2db211
   RNKeychain: b8e0711b959a19c5b057d1e970d3c83d159b6da5
   RNOS: 6f2f9a70895bbbfbdad7196abd952e7b01d45027
+  RNPermissions: 3e5bb8afd93c787681bbacbf54d586a6272ecc92
   RNReanimated: 514a11da3a2bcc6c3dfd9de32b38e2b9bf101926
   RNSqlite2: ba2d1165f32df9a8651bbf36fd4e55c13ba022cc
   RNVectorIcons: 31cebfcf94e8cf8686eb5303ae0357da64d7a5a4
@@ -624,6 +666,6 @@ SPEC CHECKSUMS:
   TouchID: ba4c656d849cceabc2e4eef722dea5e55959ecf4
   Yoga: 575c581c63e0d35c9a83f4b46d01d63abc1100ac
 
-PODFILE CHECKSUM: 79580788704203884450c5ef78b4d8b8784c6ac8
+PODFILE CHECKSUM: 216af2bb29d1e797a3263e0f7eec1abc8ab36375
 
 COCOAPODS: 1.10.1

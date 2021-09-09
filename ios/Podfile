@@ -20,11 +20,17 @@ target 'who_mobile' do
   #pod 'RNSqlite2', :path => '../node_modules/react-native-sqlcipher-2'
 
 
-  pod 'ReactNativePermissions', :path => '../node_modules/react-native-permissions'
+  #pod 'ReactNativePermissions', :path => '../node_modules/react-native-permissions'
   #pod 'RNPermissions', :path => '../node_modules/react-native-permissions'
 
-  #permissions_path = '../node_modules/react-native-permissions/ios'
-  #pod 'Permission-Camera', :path => "#{permissions_path}/Camera"
+  permissions_path = '../node_modules/react-native-permissions/ios'
+  pod 'Permission-Camera', :path => "#{permissions_path}/Camera"
+  pod 'Permission-FaceID', :path => "#{permissions_path}/FaceID"
+  pod 'Permission-LocationAccuracy', :path => "#{permissions_path}/LocationAccuracy"
+  pod 'Permission-LocationAlways', :path => "#{permissions_path}/LocationAlways"
+  pod 'Permission-LocationWhenInUse', :path => "#{permissions_path}/LocationWhenInUse"
+  pod 'Permission-MediaLibrary', :path => "#{permissions_path}/MediaLibrary"
+  pod 'Permission-PhotoLibrary', :path => "#{permissions_path}/PhotoLibrary"
 
  pod 'RNKeychain', :path => '../node_modules/react-native-keychain'
  pod 'TouchID', :path => '../node_modules/react-native-touch-id'

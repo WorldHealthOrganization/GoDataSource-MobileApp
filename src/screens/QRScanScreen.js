@@ -17,6 +17,7 @@ class QRScanScreen extends Component {
     }
 
     render() {
+        console.log("Render inside qr scan", style.container);
         return (
             <View style = {style.container}>
                 <NavBarCustom customTitle={
@@ -64,7 +65,8 @@ class QRScanScreen extends Component {
 const style = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: 'white'
+        backgroundColor: 'white',
+        zIndex: 10000
     },
     cameraContainer: {
         height: Dimensions.get('window').height

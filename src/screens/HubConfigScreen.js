@@ -657,6 +657,7 @@ class FirstConfigScreen extends Component {
     };
 
     handleOnPressQr = () => {
+        console.log("QR code scan");
         Navigation.showModal(createStackFromComponent({
             name: 'QRScanScreen',
             passProps: {

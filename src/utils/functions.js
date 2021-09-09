@@ -184,7 +184,8 @@ export function createStackFromComponent(component) {
                 },
                 topBar: {
                     visible: false,
-                }
+                },
+                modalPresentationStyle: "fullScreen"
             }
         }
 
