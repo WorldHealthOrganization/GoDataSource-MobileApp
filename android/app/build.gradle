@@ -159,6 +159,7 @@ android {
         ndk {
             abiFilters "armeabi-v7a", "x86", 'arm64-v8a', 'x86_64'
         }
+        missingDimensionStrategy 'react-native-camera', 'general'
     }
     splits {
         abi {
@@ -226,10 +227,10 @@ dependencies {
     implementation project(':react-native-vector-icons')
     implementation project(':react-native-exit-app')
     implementation project(':react-native-reanimated')
-    implementation(project(':react-native-camera')) {
-        // exclude group: "com.google.android.gms"
-        exclude group: "com.android.support"
-    }
+//    implementation(project(':react-native-camera')) {
+//        // exclude group: "com.google.android.gms"
+//        exclude group: "com.android.support"
+//    }
     implementation 'com.android.support:multidex:1.0.3'
     implementation project(':react-native-document-picker')
     implementation project(':react-native-fs')
@@ -244,7 +245,7 @@ dependencies {
 
     implementation fileTree(include: ['*.jar'], dir: 'libs')
 
-    implementation 'com.google.firebase:firebase-messaging:16.0.1'
+    implementation 'com.google.firebase:firebase-messaging:22.0.0'
 
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'androidx.multidex:multidex:2.0.0'

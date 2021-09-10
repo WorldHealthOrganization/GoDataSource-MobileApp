@@ -2,7 +2,7 @@
  * Created by florinpopa on 22/10/2018.
  */
 import React, {useState, useRef} from 'react';
-import {FlatList, Text, View} from 'react-native';
+import {FlatList, Text, View, ScrollView} from 'react-native';
 import PropTypes from 'prop-types';
 import TextInput from './TextInput';
 import {useSelector} from "react-redux";
@@ -84,8 +84,13 @@ SearchableDropDown = React.memo(({
         }
     };
 
+    console.log("Searchable dropdown items", listItems?.length, itemsContainerStyle);
+
     return (
-        <View keyboardShouldpersist='always' style={{...containerStyle}}>
+        <View keyboardShouldpersist='always' style={{
+            flex:1,
+            ...containerStyle
+        }}>
             <TextInput
                 id={'SearchableDropDownId'}
                 onChange={updateText}
@@ -98,7 +103,12 @@ SearchableDropDown = React.memo(({
                 isRequired={false}
             />
             <FlatList
-                style={{...itemsContainerStyle}}
+                nestedScrollEnabled={true}
+                style={{
+                    flex: 1,
+                    maxHeight: 120,
+                    ...itemsContainerStyle,
+                }}
                 enableEmptySections={true}
                 keyboardShouldPersistTaps="always"
                 data={listItems || []}
