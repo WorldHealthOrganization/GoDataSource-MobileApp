@@ -106,7 +106,7 @@ class NavigationDrawer extends Component {
                                     data={this.state.outbreaks}
                                     onChangeText={(value,index,data)=>{
                                         console.log("What's the value now", value);
-                                        computeCommonData()
+                                        // computeCommonData()
                                         storeOutbreak(this.state.outbreaks[index]);
                                         AsyncStorage.setItem("outbreakId",value);
                                     }}
