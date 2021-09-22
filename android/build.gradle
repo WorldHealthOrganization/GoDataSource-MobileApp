@@ -44,7 +44,7 @@ allprojects {
             url("$rootDir/../node_modules/jsc-android/dist")
         }
         maven {
-            url("https://jitpack.io")
+            url("https://www.jitpack.io")
         }
 
     }

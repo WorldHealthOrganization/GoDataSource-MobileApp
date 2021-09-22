@@ -41,6 +41,7 @@ import constants, {PERMISSIONS_CONTACT_OF_CONTACT} from './../utils/constants';
 import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
 import {updateRequiredFields} from "../utils/functions";
 import {sideMenuKeys} from './../utils/config';
+import AsyncStorage from '@react-native-community/async-storage';
 
 // Add here only the actions, not also the requests that are executed.
 // For that purpose is the requests directory
@@ -116,10 +117,22 @@ export function getUserById(userId, skipLoad) {
     }
 }
 
-export function computeCommonData(storeUserBool, user, skipLoad) {
+// export async function computeOutbreakSwitch(outbreakId){
+//     let outbreakAndLocationInfo = await getOutbreakById(outbreakId);
+//     promises.push(getLocations(outbreakAndLocationInfo.locationIds || null));
+// }
+
+
+export function computeCommonData(storeUserBool, user, skipLoad, outbreakId) {
     return async function (dispatch, getState) {
         try {
-            let outbreakAndLocationInfo = await getOutbreakById(user.activeOutbreakId);
+            if(!outbreakId) {
+                outbreakId = user.activeOutbreakId;
+                const storageOutbreakId = await AsyncStorage.getItem("outbreakId");
+                if(storageOutbreakId) outbreakId = storageOutbreakId;
+            }
+            console.log("All user data", user);
+            let outbreakAndLocationInfo = await getOutbreakById(outbreakId);
             if (outbreakAndLocationInfo) {
                 let promises = [];
 
@@ -130,15 +143,15 @@ export function computeCommonData(storeUserBool, user, skipLoad) {
                 // If there is a difference between user language and the device available languages, update user
                 if (!availableLanguages.deviceLanguages.find((e) => e.value === user.languageId)) {
                     user.languageId = get(availableLanguages, 'deviceLanguages[0].value', user.languageId);
-                    user = updateRequiredFields(user.activeOutbreakId, user._id, user, 'update');
+                    user = updateRequiredFields(outbreakId, user._id, user, 'update');
 
                     promises.push(updateUserRequest(user));
                 }
 
-                promises.push(getClusters(user.activeOutbreakId));
+                promises.push(getClusters(outbreakId));
                 // promises.push(getAvailableLanguages(dispatch));
                 promises.push(getReferenceData());
-                promises.push(getTranslations(user.languageId, user?.activeOutbreakId));
+                promises.push(getTranslations(user.languageId, outbreakId));
                 promises.push(getLocations(outbreakAndLocationInfo.locationIds || null));
                 promises.push(getHelpCategory());
                 promises.push(getHelpItem());

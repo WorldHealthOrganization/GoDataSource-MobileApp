@@ -3,6 +3,7 @@
  */
 import React, {Component} from 'react';
 import {Platform, ScrollView, StyleSheet, Text, View, Linking} from 'react-native';
+import AsyncStorage from '@react-native-community/async-storage';
 import NavigationDrawerListItem from './../components/NavigationDrawerListItem';
 import config, {sideMenuKeys} from './../utils/config';
 import {connect} from "react-redux";
@@ -26,6 +27,9 @@ import lodashGet from 'lodash/get';
 import isNumber from 'lodash/isNumber';
 import LanguageComponent from "../components/LanguageComponent";
 import {Navigation} from "react-native-navigation";
+import {Dropdown} from "react-native-material-dropdown";
+import {getAllOutbreaks} from "../queries/outbreak";
+import {storeOutbreak} from "../actions/outbreak";
 
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
@@ -35,11 +39,23 @@ class NavigationDrawer extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            selectedScreen: this.props.selectedScreen
+            selectedScreen: this.props.selectedScreen,
+            outbreaks: []
         };
         // Bind here methods, or at least don't declare methods in the render method
         this.handlePressOnListItem = this.handlePressOnListItem.bind(this);
         this.handleLogout = this.handleLogout.bind(this);
+    }
+
+    componentWillMount() {
+        console.log("Get all outbreaks");
+        getAllOutbreaks((error, result)=>{
+            if(!error){
+                this.setState({
+                    outbreaks: result
+                })
+            }
+        });
     }
 
     // Please add here the react lifecycle methods that you need
@@ -55,6 +71,8 @@ class NavigationDrawer extends Component {
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
+        console.log("Number", this.state.outbreaks.length);
+        console.log("What's the item", this.props.outbreak);
         return (
             <View style={style.container}>
                 <View
@@ -80,7 +98,19 @@ class NavigationDrawer extends Component {
                         this.props && this.props.outbreak && this.props.outbreak.name ? (
                             <View style={{marginHorizontal: 16}}>
                                 <Text style={{fontFamily: 'Roboto-Medium', fontSize: 15, color: styles.navigationDrawerItemText}} numberOfLines={1}>{getTranslation(translations.navigationDrawer.activeOutbreak, this.props.translation)}</Text>
-                                <Text style={{fontFamily: 'Roboto-Medium', fontSize: 15, color: styles.navigationDrawerItemText}} numberOfLines={1}>{this.props.outbreak.name}</Text>
+                                <Dropdown
+                                    useNativeDriver={true}
+                                    value={this.props.outbreak?._id}
+                                    labelExtractor={element => element.name}
+                                    valueExtractor={element => element._id}
+                                    data={this.state.outbreaks}
+                                    onChangeText={(value,index,data)=>{
+                                        console.log("What's the value now", value);
+                                        computeCommonData()
+                                        storeOutbreak(this.state.outbreaks[index]);
+                                        AsyncStorage.setItem("outbreakId",value);
+                                    }}
+                                    />
                             </View>
                         ) : (null)
                     }
@@ -309,7 +339,7 @@ function mapStateToProps(state) {
         screenSize: lodashGet(state, 'app.screenSize', config.designScreenSize),
         selectedScreen: lodashGet(state, 'app.selectedScreen', 0),
         availableLanguages: lodashGet(state, 'app.availableLanguages', []),
-        outbreak: lodashGet(state, 'outbreak', {name: ''}),
+        outbreak: lodashGet(state, 'outbreak', {name: 'No outbreak'}),
         translation: lodashGet(state, 'app.translation', [])
     };
 }
