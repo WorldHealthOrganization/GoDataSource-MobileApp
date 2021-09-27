@@ -79,7 +79,7 @@ class ContactsOfContactsSingleScreen extends Component {
             contact: this.props.isNew ? {
                 riskLevel: null,
                 riskReason: '',
-                outbreakId: this.props.user && this.props.user.activeOutbreakId ? this.props.user.activeOutbreakId : '',
+                outbreakId: this.props.outbreak && this.props.outbreak._id ? this.props.outbreak._id : '',
                 firstName: '',
                 middleName: '',
                 lastName: '',
@@ -94,7 +94,7 @@ class ContactsOfContactsSingleScreen extends Component {
                 isDateOfReportingApproximate: false,
                 relationships: [
                     {
-                        outbreakId: this.props.user.activeOutbreakId ? this.props.user.activeOutbreakId : '',
+                        outbreakId: this.props.outbreak._id ? this.props.outbreak._id : '',
                         contactDate: createDate(null),
                         contactDateEstimated: false,
                         certaintyLevelId: '',
@@ -171,7 +171,7 @@ class ContactsOfContactsSingleScreen extends Component {
 
             if (this.props.user !== null) {
 
-                getExposuresForContact(this.state.contact._id, this.props.user.activeOutbreakId)
+                getExposuresForContact(this.state.contact._id, this.props.outbreak._id)
                     .then((relationshipsAndExposures) => {
                         this.setState(prevState => ({
                             loading: !prevState.loading,
@@ -1198,7 +1198,7 @@ class ContactsOfContactsSingleScreen extends Component {
         this.setState({
             loading: true
         }, () => {
-            getExposuresForContact(this.state.contact._id, this.props.user.activeOutbreakId)
+            getExposuresForContact(this.state.contact._id, this.props.outbreak._id)
                 .then((updatedRelations) => {
                     this.setState(prevState => ({
                         loading: false,
@@ -1253,7 +1253,7 @@ class ContactsOfContactsSingleScreen extends Component {
                                         ]
                                     );
                                 } else {
-                                    checkForNameDuplicated(this.props.isNew ? null : contact._id, contact.firstName, contact.lastName, this.props.user.activeOutbreakId)
+                                    checkForNameDuplicated(this.props.isNew ? null : contact._id, contact.firstName, contact.lastName, this.props.outbreak._id)
                                         .then((isDuplicate) => {
                                             if (isDuplicate) {
                                                 Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.contactDuplicateNameError, this.props.translation), [
@@ -1357,7 +1357,7 @@ class ContactsOfContactsSingleScreen extends Component {
             }), () => {
                 console.log("ageAndDobPrepareForSave done", this.state.contact);
                 if (this.props.isNew) {
-                    let contactWithRequiredFields = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, this.state.contact), action = 'create', fileType = 'person.json', config.personTypes.contactsOfContacts);
+                    let contactWithRequiredFields = updateRequiredFields(outbreakId = this.props.outbreak._id, userId = this.props.user._id, record = Object.assign({}, this.state.contact), action = 'create', fileType = 'person.json', config.personTypes.contactsOfContacts);
                     this.setState(prevState => ({
                         contact: Object.assign({}, prevState.contact, contactWithRequiredFields),
                     }), () => {
@@ -1378,9 +1378,9 @@ class ContactsOfContactsSingleScreen extends Component {
                 } else {
                     let contactWithRequiredFields = null;
                     if (this.state.deletePressed === true) {
-                        contactWithRequiredFields = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, this.state.contact), action = 'delete', fileType = 'person.json', config.personTypes.contactsOfContacts)
+                        contactWithRequiredFields = updateRequiredFields(outbreakId = this.props.outbreak._id, userId = this.props.user._id, record = Object.assign({}, this.state.contact), action = 'delete', fileType = 'person.json', config.personTypes.contactsOfContacts)
                     } else {
-                        contactWithRequiredFields = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, this.state.contact), action = 'update', fileType = 'person.json', config.personTypes.contactsOfContacts)
+                        contactWithRequiredFields = updateRequiredFields(outbreakId = this.props.outbreak._id, userId = this.props.user._id, record = Object.assign({}, this.state.contact), action = 'update', fileType = 'person.json', config.personTypes.contactsOfContacts)
                     }
 
                     this.setState(prevState => ({
@@ -1736,6 +1736,7 @@ function mapStateToProps(state) {
     return {
         teams: _.get(state, 'teams', []),
         user: _.get(state, 'user', null),
+        outbreak: _.get(state, 'outbreak', null),
         role: _.get(state, 'role', []),
         screenSize: _.get(state, 'app.screenSize', config.designScreenSize),
         filter: _.get(state, 'app.filters', null),

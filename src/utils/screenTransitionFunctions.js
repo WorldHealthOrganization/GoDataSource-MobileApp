@@ -14,7 +14,7 @@ import constants, {PERMISSIONS_CONTACT_OF_CONTACT} from './constants';
 import {Navigation} from "react-native-navigation";
 import {fadeInAnimation, fadeOutAnimation} from "./animations";
 
-export function pushNewEditScreen(QRCodeInfo, componentId, user, translation, callback) {
+export function pushNewEditScreen(QRCodeInfo, componentId, user, outbreak, translation, callback) {
     console.log('pushNewEditScreen QRCodeInfo', QRCodeInfo);
 
     let itemId = null;
@@ -58,7 +58,7 @@ export function pushNewEditScreen(QRCodeInfo, componentId, user, translation, ca
     }
 
     console.log('pushNewEditScreen', itemId, itemType, outbreakId);
-    if (itemId && itemType && outbreakId && outbreakId === user.activeOutbreakId) {
+    if (itemId && itemType && outbreakId && outbreakId === outbreak._id) {
         // let itemPouchId = null;
         // if (itemType === 'case') {
         //     itemPouchId = `${itemId}`
@@ -108,7 +108,7 @@ export function screenTransition(componentId, transition, nextScreen, passProps,
     }
 }
 
-export function handleQRSearchTransition (componentId, error, itemType, record, user, translation, userPermissions, refresh) {
+export function handleQRSearchTransition (componentId, error, itemType, record, user, outbreak, translation, userPermissions, refresh) {
     if (!refresh || !isFunction(refresh)) {
         refresh = () => {console.log('Default refresh function for scan qrCode')}
     }
@@ -130,7 +130,7 @@ export function handleQRSearchTransition (componentId, error, itemType, record, 
                         onPress: () => {
                             console.log('Yes pressed');
                             let caseToSave = Object.assign({}, record, {
-                                outbreakId: get(user, 'activeOutbreakId', null),
+                                outbreakId: get(outbreak, '_id', null),
                             }, config.caseBlueprint);
 
                             Navigation.push(componentId,{

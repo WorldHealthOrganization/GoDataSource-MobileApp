@@ -2,6 +2,11 @@ import {createSelector} from 'reselect';
 import lodashGet from "lodash/get";
 import config from "./config";
 
+export const selectOutbreak = createSelector(
+    state => lodashGet(state, 'outbreak', null),
+    outbreak => outbreak
+);
+
 export const selectUser = createSelector(
     state => lodashGet(state, 'user', null),
     user => user

@@ -15,7 +15,7 @@ import lodashGet from "lodash/get";
 import {createSelector} from "reselect/lib/index";
 
 const selectOutbreakId = createSelector(
-    state => lodashGet(state, 'user.activeOutbreakId', null),
+    state => lodashGet(state, 'outbreak._id', null),
     (outbreakId) => {
         return {outbreakId}
     }

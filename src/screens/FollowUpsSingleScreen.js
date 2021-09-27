@@ -735,7 +735,7 @@ class FollowUpsSingleScreen extends Component {
                         }
 
                         if (this.props.isNew) {
-                            followUpClone = updateRequiredFields(this.props.user.activeOutbreakId, this.props.user._id, Object.assign({}, followUpClone), action = 'create', 'followUp');
+                            followUpClone = updateRequiredFields(this.props.outbreak._id, this.props.user._id, Object.assign({}, followUpClone), action = 'create', 'followUp');
                             // console.log('followUpClone create', JSON.stringify(followUpClone))
                             createFollowUp(followUpClone)
                                 .then((responseCreateFollowUp) => {
@@ -759,10 +759,10 @@ class FollowUpsSingleScreen extends Component {
                                 })
                         } else {
                             if (this.state.deletePressed === false) {
-                                followUpClone = updateRequiredFields(this.props.user.activeOutbreakId, this.props.user._id, Object.assign({}, followUpClone), action = 'update');
+                                followUpClone = updateRequiredFields(this.props.outbreak._id, this.props.user._id, Object.assign({}, followUpClone), action = 'update');
                                 // console.log('followUpClone update', JSON.stringify(followUpClone))
                             } else {
-                                followUpClone = updateRequiredFields(this.props.user.activeOutbreakId, this.props.user._id, Object.assign({}, followUpClone), action = 'delete');
+                                followUpClone = updateRequiredFields(this.props.outbreak._id, this.props.user._id, Object.assign({}, followUpClone), action = 'delete');
                                 // console.log('followUpClone delete', JSON.stringify(followUpClone))
                             }
                             updateFollowUpAndContact(followUpClone)
@@ -1070,6 +1070,7 @@ const style = StyleSheet.create({
 function mapStateToProps(state) {
     return {
         user: _.get(state, 'user', {_id: null, activeOutbreakId: null}),
+        outbreak: _.get(state, 'outbreak', {_id: null}),
         screenSize: _.get(state, 'app.screenSize', config.designScreenSize),
         questions: _.get(state, 'outbreak.contactFollowUpTemplate', null),
         translation: _.get(state, 'app.translation', []),

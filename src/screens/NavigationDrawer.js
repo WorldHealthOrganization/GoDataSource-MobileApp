@@ -8,7 +8,7 @@ import NavigationDrawerListItem from './../components/NavigationDrawerListItem';
 import config, {sideMenuKeys} from './../utils/config';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
-import {logoutUser, updateUser} from './../actions/user';
+import {computeOutbreakSwitch, logoutUser, updateUser} from './../actions/user';
 import {changeAppRoot, getTranslationsAsync, saveSelectedScreen, sendDatabaseToServer} from './../actions/app';
 import styles from './../styles';
 import {Icon, ListItem} from 'react-native-material-ui';
@@ -51,6 +51,11 @@ class NavigationDrawer extends Component {
         console.log("Get all outbreaks");
         getAllOutbreaks((error, result)=>{
             if(!error){
+                result.map(outbreak => {
+                    if(outbreak._id.includes("outbreak.json_")){
+                    outbreak._id = outbreak._id.substring(14, outbreak._id.length);
+                    return outbreak;
+                }})
                 this.setState({
                     outbreaks: result
                 })
@@ -77,7 +82,7 @@ class NavigationDrawer extends Component {
             <View style={style.container}>
                 <View
                     style={{
-                        flex: 0.2,
+                        flex: 0.4,
                         marginTop: Platform.OS === 'ios' ? (this.props.screenSize.height === 812 ? 44 : 20) : 0,
                         justifyContent: 'space-around'
                     }}>
@@ -103,12 +108,16 @@ class NavigationDrawer extends Component {
                                     value={this.props.outbreak?._id}
                                     labelExtractor={element => element.name}
                                     valueExtractor={element => element._id}
+                                    containerStyle={{
+                                        margin:0, padding:0
+                                    }}
                                     data={this.state.outbreaks}
                                     onChangeText={(value,index,data)=>{
-                                        console.log("What's the value now", value);
+                                        console.log("What's the value now", data[index].name, value);
                                         // computeCommonData()
-                                        storeOutbreak(this.state.outbreaks[index]);
+                                        // this.props.storeOutbreak(data[index]);
                                         AsyncStorage.setItem("outbreakId",value);
+                                        this.props.computeOutbreakSwitch(this.props.user, value);
                                     }}
                                     />
                             </View>
@@ -306,7 +315,7 @@ class NavigationDrawer extends Component {
         user.languageId = value;
         this.props.getTranslationsAsync(value, user?.activeOutbreakId);
 
-        user = updateRequiredFields(user.activeOutbreakId, user._id, user, 'update');
+        user = updateRequiredFields(this.props.outbreak._id, user._id, user, 'update');
 
         this.props.updateUser(user);
     };
@@ -351,7 +360,9 @@ function matchDispatchProps(dispatch) {
         updateUser,
         getTranslationsAsync,
         changeAppRoot,
-        saveSelectedScreen
+        saveSelectedScreen,
+        storeOutbreak,
+        computeOutbreakSwitch
     }, dispatch);
 }
 
