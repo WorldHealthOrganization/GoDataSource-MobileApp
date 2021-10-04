@@ -88,7 +88,7 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                         mainFilter: this.state.mainFilter,
                         followUpFilter: this.state.followUpFilter
                     });
-                console.log("Important props", this.props.outbreak?.name);
+                console.log("Important props", props.outbreak?.name);
                 return (
                     <WrappedComponent
                         setSearchText={this.setSearchText}
@@ -103,7 +103,8 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                         onPressExposure={this.onPressExposure}
                         onEndReached={this.getData}
                         loadMore={this.state.loadMore}
-                        {...props} />
+                        {...props}
+                    />
                 );
             }
 
@@ -214,7 +215,7 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                                     }
                                     this.setState((prevState) => {
                                         return {
-                                            data: prevState.lastElement !== null || (!isRefresh && (prevState.data.length + result.data.length) === prevState.dataCount) ? prevState.data.concat(result.data) : result.data,
+                                            data: !isRefresh && (prevState.lastElement !== null ||  (prevState.data.length + result.data.length) === prevState.dataCount) ? prevState.data.concat(result.data) : result.data,
                                             lastElement: result.data.length === 10 ? screenType === 'FollowUpsScreen' ? Object.assign({}, get(result, 'data[9].mainData', null), {followUpId: get(result, 'data[9].followUpData._id', null)}) : get(result, 'data[9].mainData', null) : null,
                                             isAddFromNavigation: false,
                                             dataCount: typeof get(result, 'dataCount') === 'number' ? get(result, 'dataCount') : prevState.dataCount,

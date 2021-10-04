@@ -75,7 +75,7 @@ class CasesScreen extends Component {
     // and can slow down the app
     render() {
         let {mainFilter} = this.props;
-        console.log("Outbreak prop important", this.props.outbreak);
+        console.log("Outbreak prop important", this.props.outbreak?._id, this.props.data?.length, this.props.dataCount);
 
         let filterNumbers = 0;
         if (mainFilter) {
@@ -180,6 +180,7 @@ class CasesScreen extends Component {
                                 data={this.props.data || []}
                                 dataCount={this.props.dataCount || 0}
                                 dataType={'Case'}
+                                extraData={this.props.outbreak?._id}
                                 colors={this.state.riskColors}
                                 loadMore={this.props.loadMore}
                                 filterText={filterText}

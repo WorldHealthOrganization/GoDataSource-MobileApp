@@ -193,7 +193,8 @@ function mapStateToProps(state) {
         loaderState:    get(state, 'app.loaderState', false),
         location:       get(state, 'locations.locationsList'),
         teams:          get(state, 'teams', []),
-        user:           get(state, 'user', {activeOutbreakId: null})
+        user:           get(state, 'user', {activeOutbreakId: null}),
+        outbreak:       get(state, 'outbreak', {activeOutbreakId: null})
     };
 }
 
