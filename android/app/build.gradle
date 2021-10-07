@@ -142,7 +142,7 @@ android {
     ndkVersion rootProject.ext.ndkVersion
 
     compileSdkVersion 30
-    buildToolsVersion '28.0.3'
+    buildToolsVersion '29.0.3'
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -251,7 +251,7 @@ dependencies {
     implementation 'androidx.multidex:multidex:2.0.0'
     implementation "androidx.vectordrawable:vectordrawable:1.1.0"
     implementation "androidx.media:media:1.0.0"
-    implementation "androidx.legacy:legacy-support-v4"
+    implementation "androidx.legacy:legacy-support-v4:1.0.0"
     implementation "androidx.vectordrawable:vectordrawable-animated:1.1.0"
     implementation "com.google.android.material:material:1.0.0-rc01"
 

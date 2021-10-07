@@ -13,6 +13,10 @@ import errorTypes from './../utils/errorTypes';
 
 // Add here only the actions, not also the requests that are executed. For that purpose is the requests directory
 export function storeOutbreak(outbreak) {
+    if(outbreak?._id.includes("outbreak.json_")){
+        outbreak._id = outbreak._id.substring(14, outbreak._id.length);
+    }
+    console.log("Store the outbreak!", outbreak?.name);
     return {
         type: ACTION_TYPE_STORE_OUTBREAK,
         payload: outbreak

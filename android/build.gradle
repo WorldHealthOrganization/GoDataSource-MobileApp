@@ -4,8 +4,8 @@ buildscript {
     ext {
         buildToolsVersion = "29.0.3"
         minSdkVersion = 21
-        compileSdkVersion = 29
-        targetSdkVersion = 29
+        compileSdkVersion = 30
+        targetSdkVersion = 30
         ndkVersion = "20.1.5948944"
         //react-native-navigation
         kotlinVersion = "1.4.31"
@@ -44,7 +44,7 @@ allprojects {
             url("$rootDir/../node_modules/jsc-android/dist")
         }
         maven {
-            url("https://jitpack.io")
+            url("https://www.jitpack.io")
         }
 
     }
@@ -72,7 +72,7 @@ subprojects {
     afterEvaluate {project ->
         if (project.hasProperty("android")) {
             android {
-                compileSdkVersion 29
+                compileSdkVersion 30
                 buildToolsVersion "29.0.3"
             }
         }

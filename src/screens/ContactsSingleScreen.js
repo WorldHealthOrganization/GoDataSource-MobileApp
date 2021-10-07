@@ -97,7 +97,7 @@ class ContactsSingleScreen extends Component {
             contact: this.props.isNew ? {
                 riskLevel: null,
                 riskReason: '',
-                outbreakId: this.props.user && this.props.user.activeOutbreakId ? this.props.user.activeOutbreakId : '',
+                outbreakId: this.props.user && this.props.outbreak._id ? this.props.outbreak._id : '',
                 firstName: '',
                 middleName: '',
                 lastName: '',
@@ -112,7 +112,7 @@ class ContactsSingleScreen extends Component {
                 isDateOfReportingApproximate: false,
                 relationships: [
                     {
-                        outbreakId: this.props.user.activeOutbreakId ? this.props.user.activeOutbreakId : '',
+                        outbreakId: this.props.outbreak._id ? this.props.outbreak._id : '',
                         contactDate: createDate(null),
                         contactDateEstimated: false,
                         certaintyLevelId: '',
@@ -195,9 +195,9 @@ class ContactsSingleScreen extends Component {
 
             if (this.props.user !== null) {
 
-                let followUpPromise = getFollowUpsForContactId(this.state.contact._id, this.props.user.activeOutbreakId, this.props.teams)
+                let followUpPromise = getFollowUpsForContactId(this.state.contact._id, this.props.outbreak._id, this.props.teams)
                     .then((responseFollowUps) => responseFollowUps.map((e) => e.followUps));
-                let exposurePromise = getExposuresForContact(this.state.contact._id, this.props.user.activeOutbreakId);
+                let exposurePromise = getExposuresForContact(this.state.contact._id, this.props.outbreak._id);
                 let getContactPromise = null;
                 if (this.props.getContact) {
                     getContactPromise = getItemByIdRequest(this.state.contact._id);
@@ -398,7 +398,7 @@ class ContactsSingleScreen extends Component {
             targeted: true,
             date: date,
             fileType: 'followUp.json',
-            outbreakId: this.props.user.activeOutbreakId,
+            outbreakId: this.props.outbreak._id,
             index: daysSince(_.get(this.state, 'contact.followUp.startDate', null), now) + 1,
             teamId: _.get(this.state, 'contact.followUpTeamId', null) !== null ? this.state.contact.followUpTeamId : generateTeamId(_.get(this.state, 'contact.addresses', []).slice(), this.props.teams, this.props.locations.slice()),
             personId: extractIdFromPouchId(this.state.contact._id, 'person.json'),
@@ -790,7 +790,7 @@ class ContactsSingleScreen extends Component {
         this.setState({
             loading: true
         }, () => {
-            getExposuresForContact(this.state?.contact?._id, this.props?.user?.activeOutbreakId)
+            getExposuresForContact(this.state?.contact?._id, this.props?.outbreak?._id)
                 .then((relations) => {
                     this.setState(prevState => ({
                         loading: false,
@@ -1423,8 +1423,8 @@ class ContactsSingleScreen extends Component {
                             this.setState(prevState => ({
                                 contact: Object.assign({}, prevState.contact, { relationships: relations })
                             }), () => {
-                                relation = updateRequiredFields(this.props.user.activeOutbreakId, this.props.user._id, Object.assign({}, relation), 'delete');
-                                this.props.deleteExposureForContact(this.props.user.activeOutbreakId, this.props.contact._id, relation, this.props.user.token, this.props.teams);
+                                relation = updateRequiredFields(this.props.outbreak._id, this.props.user._id, Object.assign({}, relation), 'delete');
+                                this.props.deleteExposureForContact(this.props.outbreak._id, this.props.contact._id, relation, this.props.user.token, this.props.teams);
                             })
                         }
                     }
@@ -1477,7 +1477,7 @@ class ContactsSingleScreen extends Component {
                 })
             } else {
                 const {contact} = this.state;
-                checkForNameDuplicated(this.props.isNew ? null : contact._id, contact.firstName, contact.lastName, this.props.user.activeOutbreakId)
+                checkForNameDuplicated(this.props.isNew ? null : contact._id, contact.firstName, contact.lastName, this.props.outbreak._id)
                     .then((isDuplicate) => {
                         if (isDuplicate) {
                             Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.contactDuplicateNameError, this.props.translation), [
@@ -1551,7 +1551,7 @@ class ContactsSingleScreen extends Component {
 
             contactClone.questionnaireAnswers = reMapAnswers(_.cloneDeep(this.state.previousAnswers));
             contactClone.questionnaireAnswers = this.filterUnasweredQuestions(contactClone.questionnaireAnswers);
-            contactClone = updateRequiredFields(this.props.user.activeOutbreakId, this.props.user._id, contactClone, operation, 'person.json', 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT');
+            contactClone = updateRequiredFields(this.props.outbreak._id, this.props.user._id, contactClone, operation, 'person.json', 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT');
 
             if (operation === 'create') {
                 promise = addContact(contactClone, _.get(this.props, 'periodOfFollowUp', 1), _.get(this.props, 'user._id'))
@@ -2058,6 +2058,7 @@ function mapStateToProps(state) {
     return {
         teams: _.get(state, 'teams', []),
         user: _.get(state, 'user', null),
+        outbreak: _.get(state, 'outbreak', null),
         role: _.get(state, 'role', []),
         screenSize: _.get(state, 'app.screenSize', config.designScreenSize),
         filter: _.get(state, 'app.filters', null),

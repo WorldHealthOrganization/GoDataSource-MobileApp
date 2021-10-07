@@ -10,6 +10,7 @@ export default function (state=null, action) {
             if (!action.payload) {
                 return null;
             }
+            console.log("Stored outbreak", action.payload.name);
             return Object.assign([], action.payload);
         default:
             break;

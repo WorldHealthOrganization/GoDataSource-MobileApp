@@ -38,7 +38,7 @@ class ExposureScreen extends Component {
         super(props);
         this.state = {
             exposure: this.props.exposure || {
-                outbreakId: this.props.user.activeOutbreakId,
+                outbreakId: this.props.outbreak._id,
                 contactDate: new Date(),
                 contactDateEstimated: false,
                 certaintyLevelId: '',
@@ -298,7 +298,7 @@ class ExposureScreen extends Component {
             }, () => {
                 if (this.props.type === 'Contact' || this.props.type === 'ContactOfContact') {
                     let operation = this.props.exposure ? 'update' : 'create';
-                    let exposure = updateRequiredFields(get(this.props, 'user.activeOutbreakId', null), get(this.props, 'user._id', null), Object.assign({}, this.state.exposure), operation, 'relationship');
+                    let exposure = updateRequiredFields(get(this.props, 'outbreak._id', null), get(this.props, 'user._id', null), Object.assign({}, this.state.exposure), operation, 'relationship');
 
 
                     if (this.props.exposure) {
@@ -332,7 +332,7 @@ class ExposureScreen extends Component {
                                 this.props.saveExposure(this.state.exposure);
                             })
                         } else {
-                            let exposure = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id.split('_')[this.props.user._id.split('_').length - 1], record = Object.assign({}, this.state.exposure), action = 'create', fileType = 'relationship.json')
+                            let exposure = updateRequiredFields(outbreakId = this.props.outbreak._id, userId = this.props.user._id.split('_')[this.props.user._id.split('_').length - 1], record = Object.assign({}, this.state.exposure), action = 'create', fileType = 'relationship.json')
                             let promise = null;
                             if (this.props.type === 'Contact') {
                                 promise = addExposureForContact(exposure, this.props.contact, this.props.periodOfFollowUp, get(this.props, 'user._id', null));
@@ -352,7 +352,7 @@ class ExposureScreen extends Component {
                     }
                 } else {
                     let operation = this.props.exposure ? 'update' : 'create';
-                    let exposure = updateRequiredFields(get(this.props, 'user.activeOutbreakId', null), get(this.props, 'user._id', null), Object.assign({}, this.state.exposure), operation, 'relationship');
+                    let exposure = updateRequiredFields(get(this.props, 'outbreak._id', null), get(this.props, 'user._id', null), Object.assign({}, this.state.exposure), operation, 'relationship');
                     insertOrUpdateExposure(exposure)
                         .then((resultInsertUpdateExposure) => {
                             this.props.refreshRelations();
@@ -468,6 +468,7 @@ const style = StyleSheet.create({
 function mapStateToProps(state) {
     return {
         user: get(state, 'user', null),
+        outbreak: get(state, 'outbreak', null),
         screenSize: get(state, 'app.screenSize', config.designScreenSize),
         translation: get(state, 'app.translation', []),
         periodOfFollowUp: get(state, 'outbreak.periodOfFollowup', null),

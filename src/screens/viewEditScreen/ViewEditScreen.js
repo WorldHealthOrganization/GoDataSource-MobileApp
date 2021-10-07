@@ -863,7 +863,7 @@ const style = StyleSheet.create({
 function mapStateToProps(state) {
     return {
         user: lodashGet(state, 'user', {}),
-        outbreakId: lodashGet(state, 'user.activeOutbreakId', null),
+        outbreakId: lodashGet(state, 'outbreak._id', null),
         screenSize: lodashGet(state, 'app.screenSize', config.designScreenSize),
         caseInvestigationTemplate: lodashGet(state, 'outbreak.caseInvestigationTemplate', null),
         contactFollowUpTemplate: lodashGet(state, 'outbreak.contactFollowUpTemplate', null),

@@ -75,6 +75,7 @@ class CasesScreen extends Component {
     // and can slow down the app
     render() {
         let {mainFilter} = this.props;
+        console.log("Outbreak prop important", this.props.outbreak?._id, this.props.data?.length, this.props.dataCount);
 
         let filterNumbers = 0;
         if (mainFilter) {
@@ -179,6 +180,7 @@ class CasesScreen extends Component {
                                 data={this.props.data || []}
                                 dataCount={this.props.dataCount || 0}
                                 dataType={'Case'}
+                                extraData={this.props.outbreak?._id}
                                 colors={this.state.riskColors}
                                 loadMore={this.props.loadMore}
                                 filterText={filterText}
@@ -315,11 +317,11 @@ class CasesScreen extends Component {
         this.setState({
             loading: true
         }, () => {
-            pushNewEditScreen(QRCodeInfo, this.props.componentId, this.props && this.props.user ? this.props.user : null, this.props && this.props.translation ? this.props.translation : null, (error, itemType, record) => {
+            pushNewEditScreen(QRCodeInfo, this.props.componentId, this.props && this.props.user ? this.props.user : null, this.props.outbreak, this.props && this.props.translation ? this.props.translation : null, (error, itemType, record) => {
                 this.setState({
                     loading: false
                 }, () => {
-                    handleQRSearchTransition(this.props.componentId, error, itemType, record, get(this.props, 'user', null), get(this.props, 'translation', null), get(this.props, 'role', []), this.props.refresh);
+                    handleQRSearchTransition(this.props.componentId, error, itemType, record, get(this.props, 'user', null), get(this.props, 'outbreak', null), get(this.props, 'translation', null), get(this.props, 'role', []), this.props.refresh);
                 });
             })
         });
@@ -363,7 +365,8 @@ function mapStateToProps(state) {
         loaderState:    get(state, 'app.loaderState', null),
         role:           get(state, 'role', []),
         referenceData:  get(state, 'referenceData', []),
-        location:       get(state, 'locations.locationsList')
+        location:       get(state, 'locations.locationsList'),
+        outbreak:       get(state, 'outbreak', null)
     };
 }
 

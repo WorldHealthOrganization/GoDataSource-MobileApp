@@ -39,7 +39,7 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
 
             componentDidMount() {
                 BackHandler.addEventListener('hardwareBackPress', this.handleBackButtonClick);
-                if (get(this.props, 'user.activeOutbreakId', null) !== null) {
+                if (get(this.props, 'outbreak._id', null) !== null) {
                     if (this.props.isAddFromNavigation && this.props.addScreen) {
                         this.setState({
                             isAddFromNavigation: true
@@ -53,7 +53,7 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
             }
 
             componentDidUpdate(prevProps) {
-                if (get(prevProps, 'user.activeOutbreakId', null) !== get(this.props, 'user.activeOutbreakId', null)) {
+                if (get(prevProps, 'outbreak._id', null) !== get(this.props, 'outbreak._id', null)) {
                     this.getData(true);
                 }
             }
@@ -88,6 +88,7 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                         mainFilter: this.state.mainFilter,
                         followUpFilter: this.state.followUpFilter
                     });
+                console.log("Important props", props.outbreak?.name);
                 return (
                     <WrappedComponent
                         setSearchText={this.setSearchText}
@@ -102,7 +103,8 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                         onPressExposure={this.onPressExposure}
                         onEndReached={this.getData}
                         loadMore={this.state.loadMore}
-                        {...props} />
+                        {...props}
+                    />
                 );
             }
 
@@ -112,7 +114,7 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                     case 'FollowUpsScreen':
                         let statusId = get(this.state, 'followUpFilter.statusId.value');
                         filter = {
-                            outbreakId: get(this.props, 'user.activeOutbreakId', null),
+                            outbreakId: get(this.props, 'outbreak._id', null),
                             followUpFilter: Object.assign({}, get(this.state, 'followUpFilter', null), {statusId}),
                             userTeams: get(this.props, 'teams', null),
                             contactsFilter: get(this.state, 'mainFilter', null),
@@ -123,7 +125,7 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                         break;
                     case 'ContactsScreen':
                         filter = {
-                            outbreakId: get(this.props, 'user.activeOutbreakId', null),
+                            outbreakId: get(this.props, 'outbreak._id', null),
                             contactsFilter: get(this.state, 'mainFilter', null),
                             exposureFilter: get(this.state, 'searchText', null),
                             lastElement: get(this.state, 'lastElement', null),
@@ -132,7 +134,7 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                         break;
                     case 'ContactsOfContactsScreen':
                         filter = {
-                            outbreakId: get(this.props, 'user.activeOutbreakId', null),
+                            outbreakId: get(this.props, 'outbreak._id', null),
                             contactsFilter: get(this.state, 'mainFilter', null),
                             exposureFilter: get(this.state, 'searchText', null),
                             lastElement: get(this.state, 'lastElement', null),
@@ -141,7 +143,7 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                         break;
                     case 'CasesScreen':
                         filter = {
-                            outbreakId: get(this.props, 'user.activeOutbreakId', null),
+                            outbreakId: get(this.props, 'outbreak._id', null),
                             casesFilter: get(this.state, 'mainFilter', null),
                             searchText: get(this.state, 'searchText', null),
                             lastElement: get(this.state, 'lastElement', null),
@@ -150,7 +152,7 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                         break;
                     case 'UsersScreen':
                         filter = {
-                            outbreakId: get(this.props, 'user.activeOutbreakId', null),
+                            outbreakId: get(this.props, 'outbreak._id', null),
                             casesFilter: get(this.state, 'mainFilter', null),
                             searchText: get(this.state, 'searchText', null),
                             lastElement: get(this.state, 'lastElement', null),
@@ -213,7 +215,7 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                                     }
                                     this.setState((prevState) => {
                                         return {
-                                            data: prevState.lastElement !== null || (!isRefresh && (prevState.data.length + result.data.length) === prevState.dataCount) ? prevState.data.concat(result.data) : result.data,
+                                            data: !isRefresh && (prevState.lastElement !== null ||  (prevState.data.length + result.data.length) === prevState.dataCount) ? prevState.data.concat(result.data) : result.data,
                                             lastElement: result.data.length === 10 ? screenType === 'FollowUpsScreen' ? Object.assign({}, get(result, 'data[9].mainData', null), {followUpId: get(result, 'data[9].followUpData._id', null)}) : get(result, 'data[9].mainData', null) : null,
                                             isAddFromNavigation: false,
                                             dataCount: typeof get(result, 'dataCount') === 'number' ? get(result, 'dataCount') : prevState.dataCount,

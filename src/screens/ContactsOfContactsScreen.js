@@ -284,11 +284,11 @@ class ContactsOfContactsScreen extends Component {
         this.setState({
             loading: true
         }, () => {
-            pushNewEditScreen(QRCodeInfo, this.props.componentId, get(this.props, 'user', null), get(this.props, 'translation', null), (error, itemType, record) => {
+            pushNewEditScreen(QRCodeInfo, this.props.componentId, get(this.props, 'user', null), get(this.props, 'outbreak', null), get(this.props, 'translation', null), (error, itemType, record) => {
                 this.setState({
                     loading: false
                 }, () => {
-                    handleQRSearchTransition(this.props.componentId, error, itemType, record, get(this.props, 'user', null), get(this.props, 'translation', null), get(this.props, 'role', []), this.props.refresh);
+                    handleQRSearchTransition(this.props.componentId, error, itemType, record, get(this.props, 'user', null), get(this.props, 'outbreak', null), get(this.props, 'translation', null), get(this.props, 'role', []), this.props.refresh);
                 });
             })
         });
@@ -338,7 +338,8 @@ function mapStateToProps(state) {
         loaderState:    get(state, 'app.loaderState', false),
         referenceData:  get(state, 'referenceData', []),
         role:           get(state, 'role', []),
-        location:       get(state, 'locations.locationsList')
+        location:       get(state, 'locations.locationsList'),
+        outbreak:       get(state, 'outbreak', null)
     };
 }
 

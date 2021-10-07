@@ -3,11 +3,12 @@
  */
 import React, {Component} from 'react';
 import {Platform, ScrollView, StyleSheet, Text, View, Linking} from 'react-native';
+import AsyncStorage from '@react-native-community/async-storage';
 import NavigationDrawerListItem from './../components/NavigationDrawerListItem';
 import config, {sideMenuKeys} from './../utils/config';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
-import {logoutUser, updateUser} from './../actions/user';
+import {computeOutbreakSwitch, logoutUser, updateUser} from './../actions/user';
 import {changeAppRoot, getTranslationsAsync, saveSelectedScreen, sendDatabaseToServer} from './../actions/app';
 import styles from './../styles';
 import {Icon, ListItem} from 'react-native-material-ui';
@@ -26,6 +27,9 @@ import lodashGet from 'lodash/get';
 import isNumber from 'lodash/isNumber';
 import LanguageComponent from "../components/LanguageComponent";
 import {Navigation} from "react-native-navigation";
+import {Dropdown} from "react-native-material-dropdown";
+import {getAllOutbreaks} from "../queries/outbreak";
+import {storeOutbreak} from "../actions/outbreak";
 
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
@@ -35,11 +39,28 @@ class NavigationDrawer extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            selectedScreen: this.props.selectedScreen
+            selectedScreen: this.props.selectedScreen,
+            outbreaks: []
         };
         // Bind here methods, or at least don't declare methods in the render method
         this.handlePressOnListItem = this.handlePressOnListItem.bind(this);
         this.handleLogout = this.handleLogout.bind(this);
+    }
+
+    componentWillMount() {
+        console.log("Get all outbreaks");
+        getAllOutbreaks((error, result)=>{
+            if(!error){
+                result.map(outbreak => {
+                    if(outbreak._id.includes("outbreak.json_")){
+                    outbreak._id = outbreak._id.substring(14, outbreak._id.length);
+                    return outbreak;
+                }})
+                this.setState({
+                    outbreaks: result
+                })
+            }
+        });
     }
 
     // Please add here the react lifecycle methods that you need
@@ -55,11 +76,13 @@ class NavigationDrawer extends Component {
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
+        console.log("Number", this.state.outbreaks.length);
+        console.log("What's the item", this.props.outbreak);
         return (
             <View style={style.container}>
                 <View
                     style={{
-                        flex: 0.2,
+                        flex: 0.4,
                         marginTop: Platform.OS === 'ios' ? (this.props.screenSize.height === 812 ? 44 : 20) : 0,
                         justifyContent: 'space-around'
                     }}>
@@ -80,7 +103,23 @@ class NavigationDrawer extends Component {
                         this.props && this.props.outbreak && this.props.outbreak.name ? (
                             <View style={{marginHorizontal: 16}}>
                                 <Text style={{fontFamily: 'Roboto-Medium', fontSize: 15, color: styles.navigationDrawerItemText}} numberOfLines={1}>{getTranslation(translations.navigationDrawer.activeOutbreak, this.props.translation)}</Text>
-                                <Text style={{fontFamily: 'Roboto-Medium', fontSize: 15, color: styles.navigationDrawerItemText}} numberOfLines={1}>{this.props.outbreak.name}</Text>
+                                <Dropdown
+                                    useNativeDriver={true}
+                                    value={this.props.outbreak?._id}
+                                    labelExtractor={element => element.name}
+                                    valueExtractor={element => element._id}
+                                    containerStyle={{
+                                        margin:0, padding:0
+                                    }}
+                                    data={this.state.outbreaks}
+                                    onChangeText={(value,index,data)=>{
+                                        console.log("What's the value now", data[index].name, value);
+                                        // computeCommonData()
+                                        // this.props.storeOutbreak(data[index]);
+                                        AsyncStorage.setItem("outbreakId",value);
+                                        this.props.computeOutbreakSwitch(this.props.user, value);
+                                    }}
+                                    />
                             </View>
                         ) : (null)
                     }
@@ -276,7 +315,7 @@ class NavigationDrawer extends Component {
         user.languageId = value;
         this.props.getTranslationsAsync(value, user?.activeOutbreakId);
 
-        user = updateRequiredFields(user.activeOutbreakId, user._id, user, 'update');
+        user = updateRequiredFields(this.props.outbreak._id, user._id, user, 'update');
 
         this.props.updateUser(user);
     };
@@ -309,7 +348,7 @@ function mapStateToProps(state) {
         screenSize: lodashGet(state, 'app.screenSize', config.designScreenSize),
         selectedScreen: lodashGet(state, 'app.selectedScreen', 0),
         availableLanguages: lodashGet(state, 'app.availableLanguages', []),
-        outbreak: lodashGet(state, 'outbreak', {name: ''}),
+        outbreak: lodashGet(state, 'outbreak', {name: 'No outbreak'}),
         translation: lodashGet(state, 'app.translation', [])
     };
 }
@@ -321,7 +360,9 @@ function matchDispatchProps(dispatch) {
         updateUser,
         getTranslationsAsync,
         changeAppRoot,
-        saveSelectedScreen
+        saveSelectedScreen,
+        storeOutbreak,
+        computeOutbreakSwitch
     }, dispatch);
 }
 

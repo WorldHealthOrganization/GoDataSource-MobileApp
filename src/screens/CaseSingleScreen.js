@@ -82,7 +82,7 @@ class CaseSingleScreen extends Component {
             routes: routes,
             index: _.get(this.props, 'index', 0),
             case: this.props.isNew && !this.props.forceNew ? {
-                outbreakId: this.props.user.activeOutbreakId,
+                outbreakId: this.props.outbreak._id,
                 riskLevel: '',
                 pregnancyStatus: '',
                 dateOfReporting: null,
@@ -639,7 +639,7 @@ class CaseSingleScreen extends Component {
                                 ])
                         } else {
                             if (this.checkIsolationOnsetDates()) {
-                                checkForNameDuplicatesRequest(_.get(this.state, 'case._id', null), this.state.case.firstName, this.state.case.lastName, this.props.user.activeOutbreakId, (error, response) => {
+                                checkForNameDuplicatesRequest(_.get(this.state, 'case._id', null), this.state.case.firstName, this.state.case.lastName, this.props.outbreak._id, (error, response) => {
                                     if (error) {
                                         this.setState({
                                             loading: false
@@ -793,7 +793,7 @@ class CaseSingleScreen extends Component {
                     isModified: false,
                     caseBeforeEdit: {}
                 }, () => {
-                    let caseWithRequiredFields = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, this.state.case), action = 'update');
+                    let caseWithRequiredFields = updateRequiredFields(outbreakId = this.props.outbreak._id, userId = this.props.user._id, record = Object.assign({}, this.state.case), action = 'update');
                     this.setState(prevState => ({
                         case: Object.assign({}, prevState.case, caseWithRequiredFields)
                     }), () => {
@@ -813,7 +813,7 @@ class CaseSingleScreen extends Component {
                     savePressed: true
                 }, () => {
                     if (this.props.isNew || this.props.forceNew) {
-                        let caseWithRequiredFields = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, this.state.case), action = 'create', fileType = 'person.json', type = 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE');
+                        let caseWithRequiredFields = updateRequiredFields(outbreakId = this.props.outbreak._id, userId = this.props.user._id, record = Object.assign({}, this.state.case), action = 'create', fileType = 'person.json', type = 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE');
                         this.setState(prevState => ({
                             case: Object.assign({}, prevState.case, caseWithRequiredFields)
                         }), () => {
@@ -843,9 +843,9 @@ class CaseSingleScreen extends Component {
                     } else {
                         let caseWithRequiredFields = null;
                         if (this.state.deletePressed === true) {
-                            caseWithRequiredFields = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, this.state.case), action = 'delete', fileType = 'person.json', type = 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE')
+                            caseWithRequiredFields = updateRequiredFields(outbreakId = this.props.outbreak._id, userId = this.props.user._id, record = Object.assign({}, this.state.case), action = 'delete', fileType = 'person.json', type = 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE')
                         } else {
-                            caseWithRequiredFields = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id, record = Object.assign({}, this.state.case), action = 'update', fileType = 'person.json', type = 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE')
+                            caseWithRequiredFields = updateRequiredFields(outbreakId = this.props.outbreak._id, userId = this.props.user._id, record = Object.assign({}, this.state.case), action = 'update', fileType = 'person.json', type = 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE')
                         }
                         this.setState(prevState => ({
                             case: Object.assign({}, prevState.case, caseWithRequiredFields)
@@ -945,7 +945,7 @@ class CaseSingleScreen extends Component {
             this.setState({
                 loading: true
             }, () => {
-                checkForNameDuplicatesRequest(this.props.isNew ? null : this.state.case._id, this.state.case.firstName, this.state.case.lastName, this.props.user.activeOutbreakId, (error, response) => {
+                checkForNameDuplicatesRequest(this.props.isNew ? null : this.state.case._id, this.state.case.firstName, this.state.case.lastName, this.props.outbreak._id, (error, response) => {
                     if (error) {
                         this.setState({
                             loading: false
@@ -2209,6 +2209,7 @@ const style = StyleSheet.create({
 function mapStateToProps(state) {
     return {
         user: lodashGet(state, 'user', {activeOutbreakId: null}),
+        outbreak: lodashGet(state, 'outbreak', {_id: null}),
         screenSize: lodashGet(state, 'app.screenSize', config.designScreenSize),
         selectedScreen: lodashGet(state, 'app.selectedScreen', 0),
         caseInvestigationQuestions: lodashGet(state, 'outbreak.caseInvestigationTemplate', null),
