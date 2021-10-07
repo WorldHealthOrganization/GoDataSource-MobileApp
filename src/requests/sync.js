@@ -88,7 +88,12 @@ export function getDatabaseSnapshotRequestNew(hubConfig, lastSyncDate, dispatch,
                     syncParams.languages = hubConfiguration.language;
                 }
             }
+            //console.log("Just the sync params", syncParams);
             syncParams = JSON.stringify(syncParams);
+
+            //console.log(`####ZIP location ${dirs}/database.zip`);
+
+            //console.log("SYNC 1 request data",  encodeURI(requestUrl), deviceInfo, 'Basic ' + base64.encode(`${hubConfiguration.clientId}:${hubConfiguration.clientSecret}`), syncParams);
 
             return retriablePromise(RNFetchBlob.config({
                     timeout: (30 * 60 * 10 * 1000),
@@ -104,15 +109,16 @@ export function getDatabaseSnapshotRequestNew(hubConfig, lastSyncDate, dispatch,
                         },
                         syncParams
                     )
-                    .progress({count: 500}, (received, total) => {
+                    .progress({count:500},(received, total) => {
                         dispatch(setSyncState({
                             id: 'downloadDatabase',
-                            name: `Downloading database\nReceived ${received} bytes`,
+                            name: `Downloading database`,
                             addLanguagePacks: checkArrayAndLength(languagePacks)
                         }));
-                        console.log(received, total)
+                        console.log("Received", received, total)
                     })
                     .then((res) => {
+                        //console.log("RNFetchBlob response", res);
                         return handleResponseFromRNFetchBlob(res)
                     }), 3)
                     .then((response) => Promise.resolve(databaseLocation))

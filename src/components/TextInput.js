@@ -4,7 +4,7 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
-import {Text, View, Keyboard} from 'react-native';
+import {Text, View} from 'react-native';
 import PropTypes from 'prop-types';
 import {getTooltip, getTranslation} from './../utils/functions';
 import {TextField} from 'react-native-material-textfield';
@@ -13,6 +13,8 @@ import lodashGet from 'lodash/get';
 import lodashDebounce from 'lodash/debounce';
 
 class TextInput extends Component {
+    fieldRef = React.createRef();
+
     constructor(props) {
         super(props);
         this.state = {
@@ -37,14 +39,12 @@ class TextInput extends Component {
         })
     }
 
-    componentWillUnmount() {
-        Keyboard.removeListener("keyboardDidHide", this._keyboardDidHide);
-    }
-
     componentDidUpdate(prevProps, prevState) {
         let propsValue = lodashGet(this.props, 'value', ' ');
         if (prevProps.isEditMode !== this.props.isEditMode || prevProps.value !== propsValue) {
-            if(this.state.value !== propsValue){
+            if(this.state.value !== propsValue && this.fieldRef.current){
+                console.log("What's the ref", this.fieldRef.current);
+                this.fieldRef.current.setValue(propsValue);
                 this.setState({
                     value: propsValue
                 })
@@ -87,12 +87,12 @@ class TextInput extends Component {
                             fontFamily: 'Roboto',
                             textAlign: 'left'
                         }}
+                        ref={this.fieldRef}
                         tintColor='rgb(77,176,160)'
                         multiline={this.props.multiline !== undefined ? this.props.multiline : false}
-                        onPress={() => {console.log("On press textInput")}}
                         keyboardType={this.props.keyboardType ? this.props.keyboardType : 'default'}
+                        formatText={this.formatForNumeric}
                         secureTextEntry={this.props.secureTextEntry}
-                        onFocus={this.props.onFocus}
                     />
                 </View>
                 {
@@ -162,6 +162,12 @@ class TextInput extends Component {
         return localValue
     };
 
+    formatForNumeric = (text) => {
+        if(this.props.keyboardType === 'numeric'){
+            return Number.isNaN(parseFloat(text)) ? text : parseFloat(text).toString();
+        }
+        return text;
+    }
     handleOnChangeText = (value) => {
         this.setState({
             value

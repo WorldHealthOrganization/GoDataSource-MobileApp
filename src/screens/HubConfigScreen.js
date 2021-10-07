@@ -11,7 +11,7 @@ import {Icon, Button as MaterialButton } from 'react-native-material-ui';
 import ViewHOC from './../components/ViewHOC';
 import Section from './../components/Section';
 import ElevatedView from 'react-native-elevated-view';
-import {calculateDimension, getTranslation} from './../utils/functions';
+import {calculateDimension, createStackFromComponent, getTranslation} from './../utils/functions';
 import Button from './../components/Button';
 import TextInput from './../components/TextInput';
 import styles from './../styles';
@@ -34,6 +34,7 @@ import DropdownInput from "../components/DropdownInput";
 import RNFS from 'react-native-fs';
 import RNFetchBlobFS from 'rn-fetch-blob/fs';
 import RippleFeedback from 'react-native-material-ripple';
+import {Navigation} from "react-native-navigation";
 
 
 let textFieldsStructure = [
@@ -111,9 +112,6 @@ let textFieldsStructure = [
 
 class FirstConfigScreen extends Component {
 
-    static navigatorStyle = {
-        navBarHidden: true
-    };
 
     constructor(props) {
         super(props);
@@ -138,6 +136,7 @@ class FirstConfigScreen extends Component {
 
     // Please add here the react lifecycle methods that you need
     componentDidMount() {
+        console.log("Did mount comp")
         let activeDatabaseGlobal = null;
         let lastSyncDateGlobal = null;
         let internetCredentialsGlobal = null;
@@ -145,6 +144,7 @@ class FirstConfigScreen extends Component {
         Promise.resolve()
             .then(() => AsyncStorage.getItem('activeDatabase'))
             .then((activeDatabase) => {
+                console.log("active database")
                 activeDatabaseGlobal = activeDatabase;
                 let lastSyncDatePromise = AsyncStorage.getItem(activeDatabase);
                 let internetCredentialsPromise = getInternetCredentials(activeDatabase);
@@ -153,6 +153,7 @@ class FirstConfigScreen extends Component {
                 return Promise.all([lastSyncDatePromise, internetCredentialsPromise, databasesPromise])
             })
             .then(([lastSyncDate, internetCredentials, databases]) => {
+                console.log("What happened", internetCredentials);
                 let currentHubConfig = JSON.parse(internetCredentials.username);
                 // console.log('Active database credentials: ', JSON.parse(activeDatabaseCredentials.username));
                 let databaseId = Platform.OS === 'ios' ? internetCredentials.server : internetCredentials.service;
@@ -175,6 +176,7 @@ class FirstConfigScreen extends Component {
                     showLoading: false,
                     allDatabases: databasesGlobal
                 }, () => {
+                    console.log("It did change!", this.state, this.props.verifyChangesExist);
                     this.props.verifyChangesExist();
                 })
             })
@@ -191,6 +193,7 @@ class FirstConfigScreen extends Component {
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
+        console.log("Render", this.state);
         let marginHorizontal = calculateDimension(16, false, this.props.screenSize);
         let width = calculateDimension(config.designScreenSize.width - 32, false, this.props.screenSize);
         let marginVertical = 4;
@@ -200,7 +203,7 @@ class FirstConfigScreen extends Component {
                 <ViewHOC style={{flex: 1, backgroundColor: 'white'}} showLoader={this.state.showLoading} loaderText="Loading...">
                     <NavBarCustom style = {style.navbarContainer}
                                   title={getTranslation(translations.hubConfigScreen.label, this.props.translation)}
-                                  navigator={this.props.navigator}
+                                  componentId={this.props.componentId}
                                   iconName="close"
                                   handlePressNavbarButton={this.handlePressNavbarButton}
                     />
@@ -421,19 +424,20 @@ class FirstConfigScreen extends Component {
         if (this.state.isModified) {
             Alert.alert('', getTranslation(translations.hubConfigScreen.exitWithoutSavingMessage), [
                 {
-                    text: 'Yes', onPress: () => {this.props.navigator.dismissModal()}
+                    text: 'Yes', onPress: () => {Navigation.dismissModal(this.props.componentId)}
                 },
                 {
                     text: 'Cancel', onPress: () => {console.log('Cancel pressed')}
                 }
             ])
         } else {
-            this.props.navigator.dismissModal();
+            Navigation.dismissModal(this.props.componentId);
         }
     };
 
     renderItem = (item, index) => {
         let width = calculateDimension(315, false, this.props.screenSize);
+        console.log("Render item", this.state[item.id], item.id);
         switch(item.type) {
             case 'TextInput':
                 return (
@@ -441,7 +445,7 @@ class FirstConfigScreen extends Component {
                         key={item.id}
                         id={item.id}
                         label={getTranslation(item.label, this.props.translation)}
-                        index={this.props.index}
+                        index={index}
                         value={this.state[item.id]}
                         isEditMode={item.isEditMode}
                         isRequired={item.isRequired}
@@ -462,7 +466,7 @@ class FirstConfigScreen extends Component {
                         key={item.id}
                         id={item.id}
                         label={getTranslation(item.label, this.props.translation)}
-                        index={this.props.index}
+                        index={index}
                         value={this.state[item.id]}
                         showValue={true}
                         isEditMode={item.isEditMode}
@@ -653,13 +657,13 @@ class FirstConfigScreen extends Component {
     };
 
     handleOnPressQr = () => {
-        this.props.navigator.showModal({
-            screen: 'QRScanScreen',
-            animated: true,
+        console.log("QR code scan");
+        Navigation.showModal(createStackFromComponent({
+            name: 'QRScanScreen',
             passProps: {
                 pushNewScreen: this.pushNewScreen
             }
-        })
+        }))
     };
 
     pushNewScreen = (QRCodeInfo) => {
@@ -729,15 +733,22 @@ class FirstConfigScreen extends Component {
             })
     };
 
-    handleOnPressAddHub = () => {
-        this.props.navigator.push({
-            screen: 'FirstConfigScreen',
-            passProps: {
-                allowBack: true,
-                skipEdit: true,
-                isMultipleHub: true
-            }
-        })
+    handleOnPressAddHub = async () => {
+        console.log("Check", this.props.componentId, this.props.stackComponentId);
+        try {
+            await Navigation.push(this.props.componentId,{
+                component:{
+                    name: 'FirstConfigScreen',
+                    passProps: {
+                        allowBack: true,
+                        skipEdit: true,
+                        isMultipleHub: true
+                    }
+                }
+            })
+        } catch (e) {
+            console.log("Error seen here",e );
+        }
     };
 
     // database = {id, name}

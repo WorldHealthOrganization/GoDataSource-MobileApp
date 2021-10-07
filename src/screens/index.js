@@ -23,7 +23,8 @@ import HelpScreen from './HelpScreen';
 import HelpSingleScreen from './HelpSingleScreen';
 import QRScanScreen from './QRScanScreen';
 import HubConfigScreen from './HubConfigScreen';
-import UsersScreen from './UsersScreen';
+import UsersScreen  from "./UsersScreen";
+import React from "react";
 
 const screens = [
     {screen: constants.appScreens.loginScreen, component: LoginScreen},
@@ -51,6 +52,20 @@ const screens = [
 
 export function registerScreens(store, Provider) {
     screens.forEach((screen) => {
-        Navigation.registerComponent(screen.screen, () => screen.component, store, Provider);
-    })
+        Navigation.registerComponent(screen.screen,
+            () => {
+                console.log("This breaks", Provider, store);
+                if(store && Provider){
+                    const Screen = screen.component;
+                    console.log("Judge", screen.screen, Screen);
+                    return (props)=>
+                        <Provider store={store}>
+                            <Screen {...props}/>
+                        </Provider>
+                } else {
+                    return screen.component;
+                }
+            },
+            ()=>screen.component);
+    });
 }

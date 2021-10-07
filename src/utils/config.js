@@ -3,7 +3,7 @@
  */
 import styles from './../styles';
 import {Platform} from 'react-native';
-import translations, {contactsOfContactsScreen} from './translations';
+import translations from './translations';
 import {createDate} from './../utils/functions';
 import constants from './../utils/constants';
 
@@ -30,7 +30,7 @@ const sideMenuItems = {
     },
     [sideMenuKeys[2]]: {
         name: 'people',
-        label: contactsOfContactsScreen.contactsTitle,
+        label: translations.contactsOfContactsScreen.contactsTitle,
         // addButton: true
     },
     [sideMenuKeys[3]]: {
@@ -154,7 +154,7 @@ const addressFields = {
             value: '',
             isRequired: false,
             isEditMode: true,
-            keyboardType: Platform.OS === 'ios' ? 'number-pad' : 'numeric',
+            keyboardType: 'phone-pad',
             objectType: 'Address'
         },
         {

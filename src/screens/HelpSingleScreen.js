@@ -16,12 +16,10 @@ import {getTranslation} from './../utils/functions';
 import translations from './../utils/translations';
 import withPincode from './../components/higherOrderComponents/withPincode';
 import ViewHOC from "../components/ViewHOC";
+import {Navigation} from "react-native-navigation";
 
 class HelpSingleScreen extends Component {
 
-    static navigatorStyle = {
-        navBarHidden: true
-    };
 
     constructor(props) {
         super(props);
@@ -43,7 +41,7 @@ class HelpSingleScreen extends Component {
     }
     
     handleBackButtonClick() {
-        this.props.navigator.pop();
+        Navigation.pop(this.props.componentId);
         return true;
     };
 
@@ -75,12 +73,12 @@ class HelpSingleScreen extends Component {
                                     getTranslation(translations.helpScreen.helpTitle, this.props.translation),
                                     getTranslation(translations.helpScreen.helpViewItemTitle, this.props.translation)
                                 ]}
-                                navigator={this.props.navigator}
+                                componentId={this.props.componentId}
                                 onPress={this.handlePressBreadcrumb}
                             />
                         </View>
                     }
-                    navigator={this.props.navigator}
+                    componentId={this.props.componentId}
                     iconName="menu"
                     handlePressNavbarButton={this.handlePressNavbarButton}
                 />
@@ -94,11 +92,13 @@ class HelpSingleScreen extends Component {
 
     // Please write here all the methods that are not react native lifecycle methods
     handlePressNavbarButton = () => {
-        this.props.navigator.toggleDrawer({
-            side: 'left',
-            animated: true,
-            to: 'open'
-        })
+        Navigation.mergeOptions(this.props.componentId, {
+            sideMenu: {
+                left: {
+                    visible: true,
+                },
+            },
+        });
     };
 }
 

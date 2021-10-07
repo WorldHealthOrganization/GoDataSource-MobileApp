@@ -3,6 +3,7 @@
  */
 import errorTypes from './errorTypes';
 import config, {sideMenuKeys} from './config';
+import geolocation from '@react-native-community/geolocation';
 import RNFetchBlobFS from 'rn-fetch-blob/fs';
 import {unzip, zip} from 'react-native-zip-archive';
 import {processBulkDocs, updateFileInDatabase} from './../queries/database';
@@ -125,6 +126,72 @@ export function getAddress(address, returnString, locationsList) {
     return returnString ? addressArray.join(', ') : addressArray;
 }
 
+export function mapSideMenuKeysToScreenName(sideMenuKey){
+    let screenToSwitchTo = null;
+    let addScreen = false;
+    switch(sideMenuKey) {
+        case sideMenuKeys[0]:
+            screenToSwitchTo = constants.appScreens.followUpScreen;
+            break;
+        case sideMenuKeys[1]:
+            screenToSwitchTo = constants.appScreens.contactsScreen;
+            break;
+        case `${sideMenuKeys[1]}-add`:
+            screenToSwitchTo = constants.appScreens.contactsScreen;
+            addScreen = true;
+            break;
+        case sideMenuKeys[2]:
+            screenToSwitchTo = constants.appScreens.contactsOfContactsScreen;
+            break;
+        case `${sideMenuKeys[2]}-add`:
+            screenToSwitchTo = constants.appScreens.contactsOfContactsSingleScreen;
+            addScreen = true;
+            break;
+        case sideMenuKeys[3]:
+            screenToSwitchTo = constants.appScreens.casesScreen;
+            break;
+        case `${sideMenuKeys[3]}-add`:
+            screenToSwitchTo = constants.appScreens.caseSingleScreen;
+            addScreen = true;
+            break;
+        case sideMenuKeys[4]:
+            screenToSwitchTo = constants.appScreens.usersScreen;
+            break;
+        case sideMenuKeys[5]:
+            screenToSwitchTo = constants.appScreens.helpScreen;
+            break;
+        default:
+            screenToSwitchTo = constants.appScreens.followUpScreen;
+            break;
+    }
+    return{
+        screenToSwitchTo,
+        addScreen
+    }
+}
+
+export function createStackFromComponent(component) {
+    return({
+        stack:{
+            children:[
+                {
+                    component: component
+                }
+            ],
+            options: {
+                layout: {
+                    orientation: ['portrait']
+                },
+                topBar: {
+                    visible: false,
+                },
+                modalPresentationStyle: "fullScreen"
+            }
+        }
+
+    })
+}
+
 export function navigation(event, navigator) {
     // console.log('Event: ', event);
     if (event.type === 'DeepLink') {
@@ -180,7 +247,6 @@ export function navigation(event, navigator) {
                         }
                     });
                 } else {
-
                     navigator.resetTo({
                         screen: screenToSwitchTo,
                     });
@@ -1046,6 +1112,10 @@ export function getTranslation (value, allTransactions) {
     let valueToBeReturned = value;
     if (value && typeof value === 'string' && value.includes('LNG')) {
         let item = null;
+
+        // if(value===translations.contactsOfContactsScreen.contactsTitle){
+        //     console.log("What's this?", allTransactions);
+        // }
         if (value && allTransactions && Array.isArray(allTransactions)) {
             item = allTransactions.find(e => {return e && e.token === value})
         }
@@ -1426,7 +1496,7 @@ export function extractLocationId (person) {
 // Promise wrapper around getCurrentPosition from react-native
 export function getLocationAccurate () {
     return new Promise((resolve, reject) => {
-        navigator.geolocation.getCurrentPosition(
+        geolocation.getCurrentPosition(
             (position) => {
                 return resolve({
                     lat: get(position, 'coords.latitude', null),

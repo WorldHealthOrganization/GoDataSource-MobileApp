@@ -4,6 +4,7 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
+import geolocation from '@react-native-community/geolocation';
 import {Alert, Animated, BackHandler, Dimensions, Keyboard, Platform, StyleSheet, View} from 'react-native';
 import {Icon} from 'react-native-material-ui';
 import styles from './../styles';
@@ -22,11 +23,11 @@ import Ripple from 'react-native-material-ripple';
 import {addFollowUp, updateFollowUpAndContact} from './../actions/followUps';
 import {addContact, checkForNameDuplicated, getExposuresForContact, updateContact} from './../actions/contacts';
 import {removeErrors} from './../actions/errors';
-import _ from 'lodash';
+import _, {findIndex} from 'lodash';
 import {
     calculateDimension,
     computeFullName,
-    createDate,
+    createDate, createStackFromComponent,
     extractIdFromPouchId,
     getTranslation,
     navigation,
@@ -39,9 +40,10 @@ import constants, {PERMISSIONS_CONTACT_OF_CONTACT} from "../utils/constants";
 import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
 import lodashIntersect from 'lodash/intersection';
 import {addContactOfContact, updateContactOfContact} from './../actions/contactsOfContacts';
-import {contactsOfContactsScreen} from "../utils/translations";
+import contactsOfContactsScreen from "../utils/translations";
 import {checkValidEmails} from './../utils/formValidators';
 import {validateRequiredFields} from "../utils/formValidators";
+import {Navigation} from "react-native-navigation";
 
 const initialLayout = {
     height: 0,
@@ -49,10 +51,6 @@ const initialLayout = {
 };
 
 class ContactsOfContactsSingleScreen extends Component {
-
-    static navigatorStyle = {
-        navBarHidden: true
-    };
 
     constructor(props) {
         super(props);
@@ -144,7 +142,7 @@ class ContactsOfContactsSingleScreen extends Component {
             showAddFollowUpScreen: false
         };
         // Bind here methods, or at least don't declare methods in the render method
-        this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this));
+        // this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this));
         this.handleBackButtonClick = this.handleBackButtonClick.bind(this);
     };
 
@@ -222,7 +220,7 @@ class ContactsOfContactsSingleScreen extends Component {
             Alert.alert("", 'You have unsaved data. Are you sure you want to leave this page and lose all changes?', [
                 {
                     text: 'Yes', onPress: () => {
-                        this.props.navigator.pop()
+                        Navigation.pop(this.props.componentId)
                     }
                 },
                 {
@@ -232,7 +230,7 @@ class ContactsOfContactsSingleScreen extends Component {
                 }
             ])
         } else {
-            this.props.navigator.pop();
+            Navigation.pop(this.props.componentId);
         }
         return true;
     };
@@ -252,7 +250,7 @@ class ContactsOfContactsSingleScreen extends Component {
                             style={[style.breadcrumbContainer]}>
                             <Breadcrumb
                                 entities={[getTranslation(this.props && this.props.previousScreen ? this.props.previousScreen : contactsOfContactsScreen.contactsTitle, this.props.translation), this.props.isNew ? getTranslation(translations.contactSingleScreen.addContactTitle, this.props.translation) : ((this.props.contact && this.props.contact.firstName ? (this.props.contact.firstName + " ") : '') + (this.props.contact && this.props.contact.lastName ? this.props.contact.lastName : ''))]}
-                                navigator={this.props.navigator}
+                                componentId={this.props.componentId}
                                 onPress={this.handlePressBreadcrumb}
                             />
                             <View style={{ flexDirection: 'row', marginRight: calculateDimension(16, false, this.props.screenSize) }}>
@@ -276,7 +274,7 @@ class ContactsOfContactsSingleScreen extends Component {
                             </View>
                         </View>
                     }
-                    navigator={this.props.navigator}
+                    componentId={this.props.componentId}
                     iconName="menu"
                     handlePressNavbarButton={this.handlePressNavbarButton}
                 />
@@ -301,28 +299,30 @@ class ContactsOfContactsSingleScreen extends Component {
 
     // Please write here all the methods that are not react native lifecycle methods
     handlePressNavbarButton = () => {
-        this.props.navigator.toggleDrawer({
-            side: 'left',
-            animated: true,
-            to: 'open'
-        })
+        Navigation.mergeOptions(this.props.componentId, {
+            sideMenu: {
+                left: {
+                    visible: true,
+                },
+            },
+        });
     };
 
-    handleOnIndexChange = (index) => {
-        if (this.props.isNew) {
-            if (this.state.canChangeScreen) {
-                this.setState({
-                    canChangeScreen: false,
-                    index
-                });
-            }
-        } else {
-            this.setState({
-                index
-            });
-        }
-    };
-
+    handleOnIndexChange = _.throttle( (index) => {
+        // if (this.state.canChangeScreen) {
+        this.setState({
+            canChangeScreen: false,
+            index
+        });
+        // }
+    },300);
+    handleMoveToScreen = (nextIndex) => {
+        this.setState({
+            canChangeScreen: true,
+        }, () => {
+            this.handleOnIndexChange(nextIndex)
+        });
+    }
     handleMoveToNextScreenButton = () => {
         // Before moving to the next screen do the checks for the current screen
         let missingFields = [];
@@ -419,6 +419,18 @@ class ContactsOfContactsSingleScreen extends Component {
                     height: 41,
                     backgroundColor: 'white'
                 }}
+                onTabPress={({ route, preventDefault })=>{
+                    preventDefault();
+                    if(this.props.isNew) {
+                        return;
+                    }
+                    const index = findIndex(this.state.routes, predicate => predicate.key === route.key);
+                    if(index !== -1){
+                        this.handleMoveToScreen(index);
+                    }
+                }}
+                pressOpacity={this.props.isNew ? 0 : undefined}
+                pressColor={this.props.isNew ? 'transparent' : undefined}
                 renderLabel={this.handleRenderLabel(props)}
                 scrollEnabled={true}
                 bounces={true}
@@ -427,21 +439,21 @@ class ContactsOfContactsSingleScreen extends Component {
     };
 
     handleRenderLabel = (props) => ({ route, index }) => {
-        const inputRange = props.navigationState.routes.map((x, i) => i);
-
-        const outputRange = inputRange.map(
-            inputIndex => (inputIndex === index ? styles.colorLabelActiveTab : styles.colorLabelInactiveTab)
-        );
-        const color = props.position.interpolate({
-            inputRange,
-            outputRange: outputRange,
-        });
+        // const inputRange = props.navigationState.routes.map((x, i) => i);
+        //
+        // const outputRange = inputRange.map(
+        //     inputIndex => (inputIndex === index ? styles.colorLabelActiveTab : styles.colorLabelInactiveTab)
+        // );
+        // const color = props.position.interpolate({
+        //     inputRange,
+        //     outputRange: outputRange,
+        // });
 
         return (
             <Animated.Text style={{
                 fontFamily: 'Roboto-Medium',
                 fontSize: 12,
-                color: color,
+                color: styles.colorLabelActiveTab,
                 flex: 1,
                 alignSelf: 'center'
             }}>
@@ -457,7 +469,7 @@ class ContactsOfContactsSingleScreen extends Component {
                     <ContactsSinglePersonal
                         type={translations.personTypes.contactsOfContacts}
                         contact={this.state.contact}
-                        routeKey={route.key}
+                        routeKey={this.state.routes[this.state.index].key}
                         activeIndex={this.state.index}
                         onChangeText={this.handleOnChangeText}
                         onChangeDropDown={this.handleOnChangeDropDown}
@@ -491,7 +503,7 @@ class ContactsOfContactsSingleScreen extends Component {
                     <ContactsSingleAddress
                         type={translations.personTypes.contactsOfContacts}
                         contact={this.state.contact}
-                        routeKey={route.key}
+                        routeKey={this.state.routes[this.state.index].key}
                         activeIndex={this.state.index}
                         onChangeText={this.handleOnChangeText}
                         onChangeDropDown={this.handleOnChangeDropDown}
@@ -522,12 +534,12 @@ class ContactsOfContactsSingleScreen extends Component {
                     <ContactsSingleExposures
                         type={translations.personTypes.contactsOfContacts}
                         contact={this.state.contact}
-                        routeKey={route.key}
+                        routeKey={this.state.routes[this.state.index].key}
                         activeIndex={this.state.index}
                         onPressEditExposure={this.handleOnPressEditExposure}
                         onPressDeleteExposure={this.handleOnPressDeleteExposure}
                         addContactFromCasesScreen={this.props.addContactFromCasesScreen}
-                        navigator={this.props.navigator}
+                        componentId={this.props.componentId}
                         saveExposure={this.handleSaveExposure}
                         onPressPreviousButton={this.handleMoveToPrevieousScreenButton}
                         isNew={this.props.isNew}
@@ -548,6 +560,7 @@ class ContactsOfContactsSingleScreen extends Component {
                         onPressCancelEdit={this.onPressCancelEdit}
                     />
                 );
+                //Default? Why not 'personal'????
             default:
                 return (
                     <ContactsSinglePersonal
@@ -568,12 +581,7 @@ class ContactsOfContactsSingleScreen extends Component {
             Alert.alert("", 'You have unsaved data. Are you sure you want to leave this page and lose all changes?', [
                 {
                     text: 'Yes', onPress: () => {
-                        this.props.navigator.pop(
-                            {
-                                animated: true,
-                                animationType: 'fade'
-                            }
-                        )
+                        Navigation.pop(this.props.componentId)
                     }
                 },
                 {
@@ -583,12 +591,7 @@ class ContactsOfContactsSingleScreen extends Component {
                 }
             ])
         } else {
-            this.props.navigator.pop(
-                {
-                    animated: true,
-                    animationType: 'fade'
-                }
-            );
+            Navigation.pop(this.props.componentId)
         }
     };
 
@@ -923,7 +926,7 @@ class ContactsOfContactsSingleScreen extends Component {
                 {
                     text: getTranslation(translations.generalLabels.yesAnswer, this.props.translation), onPress: () => {
                         if (value) {
-                            navigator.geolocation.getCurrentPosition((position) => {
+                            geolocation.getCurrentPosition((position) => {
                                     let addressesClone = _.cloneDeep(this.state.contact.addresses);
                                     console.log('addressesClone: ', addressesClone);
                                     if (!addressesClone[objectTypeOrIndex].geoLocation) {
@@ -1176,9 +1179,8 @@ class ContactsOfContactsSingleScreen extends Component {
     handleOnPressEditExposure = (relation, index) => {
         // console.log('handleOnPressEditExposure: ', relation, index);
         _.set(relation, 'caseData.fullName', computeFullName(_.get(relation, 'caseData', null)));
-        this.props.navigator.showModal({
-            screen: 'ExposureScreen',
-            animated: true,
+        Navigation.showModal(createStackFromComponent({
+            name: 'ExposureScreen',
             passProps: {
                 exposure: _.get(relation, 'relationshipData', null),
                 selectedExposure: _.get(relation, 'caseData', null),
@@ -1190,7 +1192,7 @@ class ContactsOfContactsSingleScreen extends Component {
                 addContactFromCasesScreen: false,
                 refreshRelations: this.refreshRelations
             }
-        })
+        }))
     };
     refreshRelations = (exposure) => {
         this.setState({
@@ -1367,12 +1369,7 @@ class ContactsOfContactsSingleScreen extends Component {
                                 if (_.isFunction(this.props.refresh)) {
                                     this.props.refresh();
                                 }
-                                this.props.navigator.pop(
-                                    {
-                                        animated: true,
-                                        animationType: 'fade',
-                                    }
-                                )
+                                Navigation.pop(this.props.componentId)
                             })
                             .catch((errorAddContact) => {
                                 console.log('errorUpdateCase', errorAddContact);
@@ -1395,12 +1392,7 @@ class ContactsOfContactsSingleScreen extends Component {
                                 if (_.isFunction(this.props.refresh)) {
                                     this.props.refresh();
                                 }
-                                this.props.navigator.pop(
-                                    {
-                                        animated: true,
-                                        animationType: 'fade',
-                                    }
-                                )
+                                Navigation.pop(this.props.componentId)
                             })
                             .catch((errorUpdateContact) => {
                                 console.log('errorUpdateCase', errorUpdateContact);
@@ -1682,13 +1674,12 @@ class ContactsOfContactsSingleScreen extends Component {
             }
         }
 
-        this.props.navigator.showModal({
-            screen: 'HelpScreen',
-            animated: true,
+        Navigation.showModal(createStackFromComponent({
+            name: 'HelpScreen',
             passProps: {
                 pageAskingHelpFrom: pageAskingHelpFrom
             }
-        });
+        }));
     };
 
     onPressEdit = () => {

@@ -13,14 +13,11 @@ import lodashCloneDeep from "lodash/cloneDeep";
 import {checkArray, checkArrayAndLength, checkInteger, checkObject} from './../../utils/typeCheckingFunctions';
 import {extractAllQuestions, extractIdFromPouchId} from "../../utils/functions";
 import _, {sortBy} from "lodash";
+import {Navigation} from "react-native-navigation";
 
 export function enhanceTabsWithDataHandling() {
     return function withEditHandling(WrappedComponent) {
         class ViewEditScreenContainer extends Component {
-
-            static navigatorStyle = {
-                navBarHidden: true
-            };
 
             constructor(props) {
                 super(props);
@@ -801,7 +798,7 @@ export function enhanceTabsWithDataHandling() {
                     previousAnswers: Object.assign({}, prevState.previousAnswers, { [previousAnswersId]: previousAnswers }),
                     isModified: true
                 }), () => {
-                    this.props.navigator.dismissAllModals();
+                    Navigation.dismissAllModals();
                 })
             };
             copyAnswerDate = (value) => {

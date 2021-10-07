@@ -5,6 +5,7 @@
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
 import {View, Text, ActivityIndicator, Animated, FlatList, Alert, StyleSheet} from 'react-native';
+import geolocation from '@react-native-community/geolocation';
 import {calculateDimension, getTranslation} from './../utils/functions';
 import styles from './../styles';
 import {connect} from "react-redux";
@@ -411,7 +412,7 @@ class AnimatedListView extends Component {
             });
             let placeOfResidenceLatitude = get(placeOfResidence, 'geoLocation.coordinates[1]', 0);
             let placeOfResidenceLongitude = get(placeOfResidence, 'geoLocation.coordinates[0]', 0);
-            navigator.geolocation.getCurrentPosition(
+            geolocation.getCurrentPosition(
                 (position) => {
                     this.props.onPressMap({
                         latitude: placeOfResidenceLatitude,

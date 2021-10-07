@@ -12,7 +12,12 @@ import {changeAppRoot, getTranslationsAsync, saveSelectedScreen, sendDatabaseToS
 import styles from './../styles';
 import {Icon, ListItem} from 'react-native-material-ui';
 import DropdownInput from './../components/DropdownInput';
-import {getTranslation, updateRequiredFields} from './../utils/functions';
+import {
+    createStackFromComponent,
+    getTranslation,
+    mapSideMenuKeysToScreenName,
+    updateRequiredFields
+} from './../utils/functions';
 import translations from './../utils/translations';
 import VersionNumber from 'react-native-version-number';
 import PermissionComponent from './../components/PermissionComponent';
@@ -20,6 +25,7 @@ import constants from "../utils/constants";
 import lodashGet from 'lodash/get';
 import isNumber from 'lodash/isNumber';
 import LanguageComponent from "../components/LanguageComponent";
+import {Navigation} from "react-native-navigation";
 
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
@@ -113,7 +119,7 @@ class NavigationDrawer extends Component {
                             render={() => (
                                 <LanguageComponent
                                     style={{width: '90%'}}
-                                    navigator={this.props.navigator}
+                                    componentId={this.props.componentId}
                                 />
 
                                 //<DropdownInput
@@ -181,14 +187,18 @@ class NavigationDrawer extends Component {
         this.setState({
             selectedScreen: index
             }, () => {
-                this.props.navigator.toggleDrawer({
-                    side: 'left',
-                    animated: true,
-                    to: 'missing'
-                });
-                this.props.navigator.handleDeepLink({
-                    link: 'Navigate/' + index
-                })
+            Navigation.setStackRoot('CenterStack', {
+                component: {
+                    name: mapSideMenuKeysToScreenName(index).screenToSwitchTo,
+                    options: {
+                        sideMenu: {
+                            left: {
+                                visible: false
+                            }
+                        }
+                    }
+                }
+            });
             });
        
     };
@@ -203,20 +213,26 @@ class NavigationDrawer extends Component {
         this.setState({
             selectedScreen: key
         }, () => {
-            this.props.navigator.toggleDrawer({
-                side: 'left',
-                animated: true,
-                to: 'missing'
-            });
             switch(key) {
                 case 'contacts':
-                    this.props.navigator.handleDeepLink({
-                        link: 'Navigate/' + key + '-add'
-                    });
-                    break;
                 case 'cases':
-                    this.props.navigator.handleDeepLink({
-                        link: 'Navigate/' + key + '-add'
+                    console.log("Here");
+                    Navigation.push('CenterStack', {
+                        component: {
+                            name: mapSideMenuKeysToScreenName(`${key}-add`).screenToSwitchTo,
+                            options: {
+                                sideMenu: {
+                                    left: {
+                                        visible: false
+                                    }
+                                }
+                            },
+                            passProps: {
+                                isNew: true,
+                                isAddFromNavigation: true,
+                                refresh: () => {console.log('Default refresh')}
+                            }
+                        }
                     });
                     break;
                 default:
@@ -228,24 +244,31 @@ class NavigationDrawer extends Component {
     };
 
     handleOnPressSync = () => {
-        this.props.navigator.toggleDrawer({
-            side: 'left',
-            animated: true,
-            to: 'missing'
+        Navigation.mergeOptions(this.props.componentId, {
+            sideMenu: {
+                left: {
+                    visible: false,
+                },
+            },
         });
         this.props.sendDatabaseToServer();
     };
 
     handleOnPressChangeHubConfig = () => {
-        this.props.navigator.toggleDrawer({
-            side: 'left',
-            animated: true,
-            to: 'missing'
+        console.log("Pressed it");
+        Navigation.mergeOptions(this.props.componentId, {
+            sideMenu: {
+                left: {
+                    visible: false,
+                },
+            },
         });
-        this.props.navigator.showModal({
-            screen: 'HubConfigScreen',
-            animated: true
-        })
+        Navigation.showModal(createStackFromComponent({
+            name: 'HubConfigScreen',
+            passProps: {
+                stackComponentId: this.props.componentId
+            }
+        }))
     };
 
     handleOnChangeLanguage = (value, label) => {

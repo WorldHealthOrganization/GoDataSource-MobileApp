@@ -11,6 +11,7 @@ import {connect} from "react-redux";
 import Ripple from 'react-native-material-ripple';
 import ElevatedView from 'react-native-elevated-view';
 import styles from './../styles';
+import {Navigation} from "react-native-navigation";
 
 class NavBarCustom extends PureComponent {
 
@@ -89,7 +90,15 @@ class NavBarCustom extends PureComponent {
 
     // Please write here all the methods that are not react native lifecycle methods
     handlePressNavbarButton = () => {
+        console.log("Clicked the nav bar button");
         InteractionManager.runAfterInteractions(() => {
+            console.log("After interaction", this.props.componentId);
+            Navigation.mergeOptions(this.props.componentId,{
+                sideMenu: {
+                    left: {
+                        visible: true
+                    }
+                }});
             this.props.handlePressNavbarButton();
         })
     }

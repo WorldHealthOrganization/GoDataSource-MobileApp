@@ -6,6 +6,7 @@ import {useDispatch} from 'react-redux';
 import {logoutUser} from './../../actions/user';
 import appConfig from './../../../app.config';
 import {LoaderScreen} from 'react-native-ui-lib';
+import {Navigation} from "react-native-navigation";
 
 export default function withPincode() {
     return function withPincodeFunction (WrappedComponent) {
@@ -31,10 +32,18 @@ export default function withPincode() {
                         .then((resp) => AsyncStorage.getItem('wasPinSet'))
                         .then((hasPin) => {
                             if (props.isAppInitialize) {
-                                props.navigator.setDrawerEnabled({
-                                    side: 'left',
-                                    enabled: false
+                                Navigation.mergeOptions(props.componentId, {
+
+                                    sideMenu: {
+                                        left: {
+                                            visible: false,
+                                        },
+                                    },
                                 });
+                                // Navigation.setDrawerEnabled({
+                                //     side: 'left',
+                                //     enabled: false
+                                // });
                                 setStatus(hasPin ? 'enter' : 'choose');
                             } else {
                                 setValidPinCode(true);
@@ -59,12 +68,14 @@ export default function withPincode() {
 
             const handleAppStateChange = (nextAppState) => {
                 // console.log(`withPincode handleAppStateChange appStateStatus: ${appStateStatus.current} --- nextAppState: ${nextAppState}`);
-                if (props && props.navigator) {
-                    props.navigator.toggleDrawer({
-                        side: 'left',
-                        animated: false,
-                        to: 'closed'
-                    })
+                if (props && props.componentId) {
+                    Navigation.mergeOptions(props.componentId, {
+                        sideMenu: {
+                            left: {
+                                visible: false,
+                            },
+                        },
+                    });
                 }
                 if (appStateStatus.current ==='active' && nextAppState.match(/inactive|background/)) {
                     // console.log("withPincode moving to background", appStateStatus, appStateStatusTimer);
@@ -73,10 +84,17 @@ export default function withPincode() {
                 if (appStateStatus.current.match(/inactive|background/) && nextAppState === 'active') {
                     // console.log("withPincode coming from background", appStateStatus, appStateStatusTimer);
                     if (new Date().getTime() - appStateStatusTimer.current > INACTIVE_TIMEOUT) {
-                        props.navigator.setDrawerEnabled({
-                            side: 'left',
-                            enabled: false
+                        Navigation.mergeOptions(props.componentId, {
+                            sideMenu: {
+                                left: {
+                                    visible: false,
+                                },
+                            },
                         });
+                        // props.navigator.setDrawerEnabled({
+                        //     side: 'left',
+                        //     enabled: false
+                        // });
                         setStatus('enter');
                         setValidPinCode(false);
                     }
@@ -111,10 +129,18 @@ export default function withPincode() {
                 } catch(wasPinSetError) {
                     console.log('wasPinSetError: ', wasPinSetError);
                 }
-                props.navigator.setDrawerEnabled({
-                    side: 'left',
-                    enabled: true
+                console.log("FINISH PROCESS?");
+                Navigation.mergeOptions(props.componentId, {
+                    sideMenu: {
+                        left: {
+                            visible: false,
+                        },
+                    },
                 });
+                // props.navigator.setDrawerEnabled({
+                //     side: 'left',
+                //     enabled: true
+                // });
                 setValidPinCode(true);
             };
 
@@ -191,9 +217,6 @@ export default function withPincode() {
             )
         });
 
-        WithPincode.navigatorStyle = {
-            navBarHidden: true
-        };
 
         return WithPincode;
     }

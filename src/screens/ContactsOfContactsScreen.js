@@ -10,13 +10,13 @@ import NavBarCustom from './../components/NavBarCustom';
 import ElevatedView from 'react-native-elevated-view';
 import Ripple from 'react-native-material-ripple';
 import {Icon} from 'react-native-material-ui';
-import {calculateDimension, getTranslation} from './../utils/functions';
+import {calculateDimension, createStackFromComponent, getTranslation} from './../utils/functions';
 import {connect} from "react-redux";
 import AnimatedListView from './../components/AnimatedListView';
 import {getContactsOfContactsForOutbreakId} from './../actions/contactsOfContacts';
 import ViewHOC from './../components/ViewHOC';
 import {Popup} from 'react-native-map-link';
-import translations, {contactsOfContactsScreen} from './../utils/translations';
+import translations from './../utils/translations';
 import config from './../utils/config';
 import Breadcrumb from './../components/Breadcrumb';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -32,6 +32,7 @@ import {PERMISSIONS_CONTACT_OF_CONTACT} from './../utils/constants';
 import withPincode from "../components/higherOrderComponents/withPincode";
 import {getContactsForOutbreakId} from "../actions/contacts";
 import {compose} from "redux";
+import {Navigation} from "react-native-navigation";
 
 class ContactsOfContactsScreen extends Component {
 
@@ -92,7 +93,7 @@ class ContactsOfContactsScreen extends Component {
         let filterText = filterNumbers === 0 ? `${getTranslation(translations.generalLabels.filterTitle, this.props.translation)}` : `(${filterNumbers})`;
 
 
-        let contactTitle = []; contactTitle[0] = getTranslation(contactsOfContactsScreen.contactsTitle, this.props.translation);
+        let contactTitle = []; contactTitle[0] = getTranslation(translations.contactsOfContactsScreen.contactsTitle, this.props.translation);
 
         return (
             <ViewHOC style={style.container}
@@ -109,7 +110,7 @@ class ContactsOfContactsScreen extends Component {
                                 <Breadcrumb
                                     key="contactKey"
                                     entities={contactTitle}
-                                    navigator={this.props.navigator}
+                                    componentId={this.props.componentId}
                                 />
                             </View>
                             <View style={{flex: 0.15, marginRight: 10}}>
@@ -144,7 +145,7 @@ class ContactsOfContactsScreen extends Component {
 
                         </View>
                     }
-                    navigator={this.props.navigator}
+                    componentId={this.props.componentId}
                     iconName="menu"
                     handlePressNavbarButton={this.handlePressNavbarButton}
                 >
@@ -171,7 +172,7 @@ class ContactsOfContactsScreen extends Component {
                                 onPressMap={this.handleOnPressMap}
                                 onPressName={this.props.onPressFullName}
                                 onPressExposure={this.props.onPressExposure}
-                                screen={contactsOfContactsScreen.contactsTitle}
+                                screen={translations.contactsOfContactsScreen.contactsTitle}
                                 onEndReached={this.props.onEndReached}
                                 hasFilter={true}
                             />
@@ -247,34 +248,34 @@ class ContactsOfContactsScreen extends Component {
     };
 
     handlePressNavbarButton = () => {
-        this.props.navigator.toggleDrawer({
-            side: 'left',
-            animated: true,
-            to: 'open'
-        })
+        Navigation.mergeOptions(this.props.componentId, {
+            sideMenu: {
+                left: {
+                    visible: true,
+                },
+            },
+        });
     };
 
     goToHelpScreen = () => {
         let pageAskingHelpFrom = 'contacts';
-        this.props.navigator.showModal({
-            screen: 'HelpScreen',
-            animated: true,
+        Navigation.showModal(createStackFromComponent({
+            name: 'HelpScreen',
             passProps: {
                 pageAskingHelpFrom: pageAskingHelpFrom
             }
-        });
+        }));
     };
 
     handleOnPressQRCode = () => {
         console.log('handleOnPressQRCode');
 
-        this.props.navigator.showModal({
-            screen: 'QRScanScreen',
-            animated: true,
+        Navigation.showModal(createStackFromComponent({
+            name: 'QRScanScreen',
             passProps: {
                 pushNewScreen: this.pushNewEditScreenLocal
             }
-        })
+        }))
     };
 
     pushNewEditScreenLocal = (QRCodeInfo) => {
@@ -283,11 +284,11 @@ class ContactsOfContactsScreen extends Component {
         this.setState({
             loading: true
         }, () => {
-            pushNewEditScreen(QRCodeInfo, this.props.navigator, get(this.props, 'user', null), get(this.props, 'translation', null), (error, itemType, record) => {
+            pushNewEditScreen(QRCodeInfo, this.props.componentId, get(this.props, 'user', null), get(this.props, 'translation', null), (error, itemType, record) => {
                 this.setState({
                     loading: false
                 }, () => {
-                    handleQRSearchTransition(this.props.navigator, error, itemType, record, get(this.props, 'user', null), get(this.props, 'translation', null), get(this.props, 'role', []), this.props.refresh);
+                    handleQRSearchTransition(this.props.componentId, error, itemType, record, get(this.props, 'user', null), get(this.props, 'translation', null), get(this.props, 'role', []), this.props.refresh);
                 });
             })
         });

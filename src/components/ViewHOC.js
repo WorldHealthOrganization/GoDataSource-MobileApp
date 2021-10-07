@@ -32,10 +32,6 @@ if (Platform.OS === 'ios') {
 
 class ViewHOC extends Component {
 
-    static navigatorStyle = {
-        navBarHidden: true
-    };
-
     constructor(props) {
         super(props);
         this.state = {
@@ -43,7 +39,6 @@ class ViewHOC extends Component {
     }
 
     render() {
-
         return (
             <View style={[this.props.style]}>
                 {

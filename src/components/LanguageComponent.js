@@ -13,6 +13,7 @@ import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
 import {selectTranslations, selectUserLanguage, selectUser, selectAllLanguages} from './../utils/selectors';
 import {useSetStateWithCallback} from "../utils/hooks";
 import translations from './../utils/translations';
+import {Navigation} from "react-native-navigation";
 
 
 const selectReduxDataForLanguageComponent = createSelector(
@@ -20,7 +21,7 @@ const selectReduxDataForLanguageComponent = createSelector(
     (translation, userLanguage, allLanguages, user) => [translation, userLanguage, allLanguages, user]
 );
 
-const LanguageComponent = React.memo(({style, navigator}) => {
+const LanguageComponent = React.memo(({style, componentId}) => {
     const [translation, userLanguage, {apiLanguages, deviceLanguages}, user] = useSelector(selectReduxDataForLanguageComponent);
     const [showModal, setShowModal] = useSetStateWithCallback(false);
     const [selectedLanguage, setSelectedLanguage] = useState(userLanguage);
@@ -38,11 +39,14 @@ const LanguageComponent = React.memo(({style, navigator}) => {
     function setUserLanguage(value) {
         // console.log('value', value)
         if (value === 'addLanguagePack') {
-            navigator.toggleDrawer({
-                    side: 'left',
-                    animated: true,
-                    to: 'closed'
-                });
+            Navigation.mergeOptions(componentId, {
+                sideMenu: {
+                    left: {
+                        visible: false,
+                    },
+                },
+            });
+            //Timeout?
             setTimeout(() => {
                 setShowModal(true);
                 setSelectedLanguage(value);
@@ -97,12 +101,12 @@ const LanguageComponent = React.memo(({style, navigator}) => {
 });
 
 LanguageComponent.propTypes = {
-    navigator: PropTypes.object.isRequired,
+    componentId: PropTypes.string.isRequired,
     style: PropTypes.object.isRequired
 };
 
 LanguageComponent.defaultProps = {
-    navigator: {},
+    componentId: {},
     style: {}
 };
 

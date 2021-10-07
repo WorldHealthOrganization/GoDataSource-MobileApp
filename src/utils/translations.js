@@ -263,7 +263,7 @@ const contactsScreen = {
     noContacts: 'LNG_CONTACT_LIST_SCREEN_NO_CONTACTS'
 };
 
-export const contactsOfContactsScreen = {
+const contactsOfContactsScreen = {
     contactsTitle: 'LNG_CONTACT_OF_CONTACT_LIST_SCREEN_TITLE',
     // editButton: 'LNG_CONTACT_LIST_SCREEN_EDIT_BUTTON',
     noContacts: 'LNG_CONTACT_OF_CONTACT_LIST_SCREEN_NO_CONTACTS'
@@ -570,7 +570,7 @@ const personListItem = {
     dayOfFollowUp: 'LNG_PERSON_LIST_ITEM_DAY_OF_FOLLOW_UP'
 };
 
-export const languageModalComponentLabels = {
+const languageModalComponentLabels = {
     infoMessage: 'LNG_MOBILE_LANGUAGE_MODAL_COMPONENT_INFO_MESSAGE',
     downloadButton: 'LNG_MOBILE_LANGUAGE_MODAL_COMPONENT_DOWNLOAD_BUTTON',
     alertNoLanguage: 'LNG_MOBILE_LANGUAGE_MODAL_COMPONENT_ALERT_NO_LANGUAGE'
@@ -616,5 +616,7 @@ export default {
     hubConfigScreen,
     sortTab,
     followUpAgenda,
-    personListItem
+    personListItem,
+    contactsOfContactsScreen,
+    languageModalComponentLabels
 };

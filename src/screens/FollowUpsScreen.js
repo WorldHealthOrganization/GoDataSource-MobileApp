@@ -22,7 +22,7 @@ import ValuePicker from './../components/ValuePicker';
 import {getFollowUpsForOutbreakId} from './../actions/followUps';
 import ElevatedView from 'react-native-elevated-view';
 import get from 'lodash/get';
-import {calculateDimension, createDate, getTranslation} from './../utils/functions';
+import {calculateDimension, createDate, createStackFromComponent, getTranslation} from './../utils/functions';
 import ViewHOC from './../components/ViewHOC';
 import {Popup} from 'react-native-map-link';
 import translations from './../utils/translations'
@@ -35,6 +35,7 @@ import {setLoaderState} from './../actions/app';
 import PermissionComponent from './../components/PermissionComponent';
 import {handleQRSearchTransition} from "../utils/screenTransitionFunctions";
 import withPincode from './../components/higherOrderComponents/withPincode';
+import {Navigation} from "react-native-navigation";
 
 class FollowUpsScreen extends Component {
 
@@ -62,18 +63,13 @@ class FollowUpsScreen extends Component {
                 refreshing: false
             })
         }
+        if(!prevProps.referenceData && Object.keys(this.state.followUpsColors).length === 0 && this.props.referenceData ){
+            this.setColors();
+        }
     }
 
     componentDidMount = () => {
-        let followUpsColors = {};
-        let refData = checkArrayAndLength(this.props.referenceData) ? this.props.referenceData.filter((e) => {return e.categoryId === "LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE"}) : {};
-        for (let i=0; i<refData.length; i++) {
-            followUpsColors[refData[i].value] = refData[i].colorCode || styles.buttonGreen
-        }
-        this.setState({
-            followUpsColors
-        }
-        )
+        this.setColors()
     };
 
     // The render method should have at least business logic as possible,
@@ -109,7 +105,7 @@ class FollowUpsScreen extends Component {
                                 <Breadcrumb
                                     key="followUpsKey"
                                     entities={followUpTitle}
-                                    navigator={this.props.navigator}
+                                    componentId={this.props.componentId}
                                 />
                             </View>
                             <View style={{ flex: 0.15, marginRight: 10 }}>
@@ -143,7 +139,7 @@ class FollowUpsScreen extends Component {
                             </View>
                         </View>
                     }
-                    navigator={this.props.navigator || null}
+                    componentId={this.props.componentId || null}
                     iconName="menu"
                     handlePressNavbarButton={this.handlePressNavbarButton}
                 >
@@ -232,6 +228,19 @@ class FollowUpsScreen extends Component {
         );
     };
 
+    setColors = () =>{
+
+        let followUpsColors = {};
+        let refData = checkArrayAndLength(this.props.referenceData) ? this.props.referenceData.filter((e) => {return e.categoryId === "LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE"}) : {};
+        for (let i=0; i<refData.length; i++) {
+            followUpsColors[refData[i].value] = refData[i].colorCode || styles.buttonGreen
+        }
+        this.setState({
+                followUpsColors
+            }
+        )
+    }
+
     // Please write here all the methods that are not react native lifecycle methods
     openCalendarModal = () => {
         this.setState({
@@ -243,11 +252,13 @@ class FollowUpsScreen extends Component {
         this.setState({
             calendarPickerOpen: false
         }, () => {
-            this.props.navigator.toggleDrawer({
-                side: 'left',
-                animated: true,
-                to: 'open'
-            })
+            Navigation.mergeOptions(this.props.componentId, {
+                sideMenu: {
+                    left: {
+                        visible: true,
+                    },
+                },
+            });
         })
     };
 
@@ -284,25 +295,23 @@ class FollowUpsScreen extends Component {
 
     goToHelpScreen = () => {
         let pageAskingHelpFrom = 'followUps';
-        this.props.navigator.showModal({
-            screen: 'HelpScreen',
-            animated: true,
+        Navigation.showModal(createStackFromComponent({
+            name: 'HelpScreen',
             passProps: {
                 pageAskingHelpFrom: pageAskingHelpFrom
             }
-        });
+        }));
     };
 
     handleOnPressQRCode = () => {
         // console.log('handleOnPressQRCode');
 
-        this.props.navigator.showModal({
-            screen: 'QRScanScreen',
-            animated: true,
+        Navigation.showModal(createStackFromComponent({
+            name: 'QRScanScreen',
             passProps: {
                 pushNewScreen: this.pushNewEditScreenLocal
             }
-        })
+        }))
     };
 
     pushNewEditScreenLocal = (QRCodeInfo) => {
@@ -311,11 +320,11 @@ class FollowUpsScreen extends Component {
         this.setState({
             loading: true
         }, () => {
-            pushNewEditScreen(QRCodeInfo, this.props.navigator, this.props && this.props.user ? this.props.user : null, this.props && this.props.translation ? this.props.translation : null, (error, itemType, record) => {
+            pushNewEditScreen(QRCodeInfo, this.props.componentId, this.props && this.props.user ? this.props.user : null, this.props && this.props.translation ? this.props.translation : null, (error, itemType, record) => {
                 this.setState({
                     loading: false
                 }, () => {
-                    handleQRSearchTransition(this.props.navigator, error, itemType, record, get(this.props, 'user', null), get(this.props, 'translation', null), get(this.props, 'role', []), this.props.refresh);
+                    handleQRSearchTransition(this.props.componentId, error, itemType, record, get(this.props, 'user', null), get(this.props, 'translation', null), get(this.props, 'role', []), this.props.refresh);
                 });
             })
         });

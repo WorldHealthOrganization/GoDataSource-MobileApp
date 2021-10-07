@@ -34,14 +34,18 @@ import base64 from 'base-64';
 import DropdownInput from './../components/DropdownInput';
 import appConfig from './../../app.config';
 import LocalButton from './../components/Button';
+import {Navigation} from "react-native-navigation";
+import {fadeInAnimation, fadeOutAnimation} from "../utils/animations";
 
 class ManualConfigScreen extends PureComponent {
-
-    static navigatorStyle = {
-        navBarHidden: true,
-    };
+    nameRef = React.createRef();
+    urlRef = React.createRef();
+    clientIdRef = React.createRef();
+    clientSecretRef = React.createRef();
+    userEmailRef = React.createRef();
 
     constructor(props) {
+        console.log("Manual conf screen");
         super(props);
         this.state = {
             name: appConfig.env === 'development' ? config.whocdCredentials.name : '',
@@ -65,16 +69,12 @@ class ManualConfigScreen extends PureComponent {
             selectedLanguage: 'None',
             availableLanguages: []
         };
-        // Bind here methods, or at least don't declare methods in the render method
-        this.nameRef = this.updateRef.bind(this, 'name');
-        this.urlRef = this.updateRef.bind(this, 'url');
-        this.clientIDRef = this.updateRef.bind(this, 'clientId');
-        this.clientSecretRef = this.updateRef.bind(this, 'clientSecret');
-        this.userEmailRef = this.updateRef.bind(this, 'userEmail');
     }
+
 
     // Please add here the react lifecycle methods that you need
     componentDidMount = async () => {
+        console.log("Manual conf screen");
         // Get all hubs urls for the check
         // To get them, first get all databases names and ids from AsyncStorage, then for each url, get its internet credentials and map them to an array of urls
         try {
@@ -108,6 +108,10 @@ class ManualConfigScreen extends PureComponent {
                         clientId: QRCodeData.clientId || '',
                         clientSecret: QRCodeData.clientSecret || '',
                         allUrls
+                    },(state)=>{
+                        this.urlRef.current.setValue(this.state.url);
+                        this.clientIdRef.current.setValue(this.state.clientId);
+                        this.clientSecretRef.current.setValue(this.state.clientSecret);
                     })
                 } else {
                     if (this.props && this.props.activeDatabase && !this.props.isNewHub) {
@@ -123,6 +127,12 @@ class ManualConfigScreen extends PureComponent {
                                     userEmail: activeDatabaseCredentials.userEmail,
                                     encryptedData: activeDatabaseCredentials.encryptedData,
                                     allUrls: allUrls
+                                }, ()=>{
+                                    this.nameRef.current.setValue(this.state.name);
+                                    this.urlRef.current.setValue(this.state.url);
+                                    this.clientIdRef.current.setValue(this.state.clientId);
+                                    this.clientSecretRef.current.setValue(this.state.clientSecret);
+                                    this.userEmailRef.current.setValue(this.state.userEmail);
                                 })
                             } else {
                                 console.log("No active database found");
@@ -147,12 +157,16 @@ class ManualConfigScreen extends PureComponent {
                 if (this.props && this.props.QRCodeInfo && this.props.QRCodeInfo.data) {
                     //TODO map this.props.QRCodeInfo info to props
                     // console.log('Here have the QRCodeInfo: ', JSON.parse(this.props.QRCodeInfo.data));
-                    console.log('TestQRCode has qr code data');
+                    console.log('TestQRCode has qr code data', this.props.QRCodeInfo);
                     let QRCodeData = JSON.parse(this.props.QRCodeInfo.data);
                     this.setState({
                         url: QRCodeData.url || '',
                         clientId: QRCodeData.clientId || '',
                         clientSecret: QRCodeData.clientSecret || ''
+                    }, ()=>{
+                        this.urlRef.current.setValue(this.state.url);
+                        this.clientIdRef.current.setValue(this.state.clientId);
+                        this.clientSecretRef.current.setValue(this.state.clientSecret);
                     })
                 }
             }
@@ -167,6 +181,10 @@ class ManualConfigScreen extends PureComponent {
                     url: QRCodeData.url || '',
                     clientId: QRCodeData.clientId || '',
                     clientSecret: QRCodeData.clientSecret || ''
+                }, ()=>{
+                    this.urlRef.current.setValue(this.state.url);
+                    this.clientIdRef.current.setValue(this.state.clientId);
+                    this.clientSecretRef.current.setValue(this.state.clientSecret);
                 })
             }
         }
@@ -192,10 +210,16 @@ class ManualConfigScreen extends PureComponent {
                 this.props.changeAppRoot('login');
             } else {
                 // console.log('TestQRCode go to login without app root');
-                this.props.navigator.push({
-                    screen: 'LoginScreen',
-                    animated: true,
-                    animationType: 'fade'
+                Navigation.push(this.props.componentId,{
+                    component:{
+                        name: 'LoginScreen',
+                        options:{
+                            animations:{
+                                push: fadeInAnimation,
+                                pop: fadeOutAnimation
+                            }
+                        }
+                    }
                 })
             }
         }
@@ -275,7 +299,7 @@ class ManualConfigScreen extends PureComponent {
                             textColor={styles.colorWhite}
                         />
                         <TextField
-                            ref={this.clientIDRef}
+                            ref={this.clientIdRef}
                             value={this.state.clientId}
                             autoCorrect={false}
                             lineWidth={1}
@@ -444,33 +468,33 @@ class ManualConfigScreen extends PureComponent {
     // Please write here all the methods that are not react native lifecycle methods
     handleOnPressBack = () => {
         if (this.props && this.props.allowBack) {
-            this.props.navigator.pop();
+            Navigation.pop(this.props.componentId);
         } else {
-            this.props.navigator.resetTo({
-                screen: 'FirstConfigScreen',
-                passProps: {
-                    allowBack: this.props.allowBack,
-                    skipEdit: this.props.skipEdit,
-                    isMultipleHub: this.props.isMultipleHub
+            Navigation.setStackRoot(this.props.componentId,{
+                component:{
+                    name: 'FirstConfigScreen',
+                    passProps: {
+                        allowBack: this.props.allowBack,
+                        skipEdit: this.props.skipEdit,
+                        isMultipleHub: this.props.isMultipleHub
+                    }
                 }
             });
         }
     };
 
     handleOnPressForward = () => {
-        this.props.navigator.push({
-            screen: 'LoginScreen',
-            passProps: {
-                allowBack: this.props.allowBack,
-                skipEdit: this.props.skipEdit,
-                isMultipleHub: this.props.isMultipleHub
+        Navigation.push(this.props.componentId,{
+            component:{
+                name: 'LoginScreen',
+                passProps: {
+                    allowBack: this.props.allowBack,
+                    skipEdit: this.props.skipEdit,
+                    isMultipleHub: this.props.isMultipleHub
+                }
             }
         })
     };
-
-    updateRef(name, ref) {
-        this[name] = ref;
-    }
 
     checkFields = (nextFunction, validateUrl) => {
         if (!this.state.name || !this.state.url || !this.state.clientId || !this.state.clientSecret || !this.state.userEmail) {
@@ -640,9 +664,10 @@ class ManualConfigScreen extends PureComponent {
     };
 
     handleTextChange = (text) => {
-        ['name', 'url', 'clientId', 'clientSecret', 'userEmail'].map((name) => ({ name, ref: this[name] }))
+        ['name', 'url', 'clientId', 'clientSecret', 'userEmail']
+            .map((name) => ({ name, ref: this[`${name}Ref`] }))
             .forEach(({ name, ref }) => {
-                if (ref.isFocused()) {
+                if (ref.current && ref.current.isFocused()) {
                     this.setState({ [name]: text });
                 }
             });

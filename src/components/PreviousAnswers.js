@@ -18,12 +18,10 @@ import ViewHOC from './../components/ViewHOC';
 import {extractAllQuestions} from "../utils/functions";
 import Ripple from 'react-native-material-ripple';
 import uniqueId from "lodash/uniqueId";
+import {Navigation} from "react-native-navigation";
 
 class PreviousAnswers extends Component {
 
-    static navigatorStyle = {
-        navBarHidden: true
-    };
 
     constructor(props) {
         super(props);
@@ -133,7 +131,7 @@ class PreviousAnswers extends Component {
 
     // Please write here all the methods that are not react native lifecycle methods
     handlePressNavbarButton = () => {
-        this.props.navigator.dismissModal();
+        Navigation.dismissModal(this.props.componentId);
     };
 
     renderListOfPreviousAnswers = (previousAnswer, index) => {

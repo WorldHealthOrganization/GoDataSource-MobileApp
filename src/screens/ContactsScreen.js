@@ -10,7 +10,7 @@ import NavBarCustom from './../components/NavBarCustom';
 import ElevatedView from 'react-native-elevated-view';
 import Ripple from 'react-native-material-ripple';
 import {Icon} from 'react-native-material-ui';
-import {calculateDimension, getTranslation} from './../utils/functions';
+import {calculateDimension, createStackFromComponent, getTranslation} from './../utils/functions';
 import {connect} from "react-redux";
 import AnimatedListView from './../components/AnimatedListView';
 import {getContactsForOutbreakId} from './../actions/contacts';
@@ -31,6 +31,7 @@ import PermissionComponent from './../components/PermissionComponent';
 import withPincode from "../components/higherOrderComponents/withPincode";
 import {getFollowUpsForOutbreakId} from "../actions/followUps";
 import {compose} from "redux";
+import {Navigation} from "react-native-navigation";
 
 class ContactsScreen extends Component {
 
@@ -108,7 +109,7 @@ class ContactsScreen extends Component {
                                 <Breadcrumb
                                     key="contactKey"
                                     entities={contactTitle}
-                                    navigator={this.props.navigator}
+                                    componentId={this.props.componentId}
                                 />
                             </View>
                             <View style={{flex: 0.15, marginRight: 10}}>
@@ -143,7 +144,7 @@ class ContactsScreen extends Component {
 
                         </View>
                     }
-                    navigator={this.props.navigator}
+                    componentId={this.props.componentId}
                     iconName="menu"
                     handlePressNavbarButton={this.handlePressNavbarButton}
                 >
@@ -243,34 +244,34 @@ class ContactsScreen extends Component {
     };
 
     handlePressNavbarButton = () => {
-        this.props.navigator.toggleDrawer({
-                side: 'left',
-                animated: true,
-                to: 'open'
-            })
+        Navigation.mergeOptions(this.props.componentId, {
+            sideMenu: {
+                left: {
+                    visible: true,
+                },
+            },
+        });
     };
 
     goToHelpScreen = () => {
         let pageAskingHelpFrom = 'contacts';
-        this.props.navigator.showModal({
-            screen: 'HelpScreen',
-            animated: true,
+        Navigation.showModal(createStackFromComponent({
+            name: 'HelpScreen',
             passProps: {
                 pageAskingHelpFrom: pageAskingHelpFrom
             }
-        });
+        }));
     };
 
     handleOnPressQRCode = () => {
         console.log('handleOnPressQRCode');
 
-        this.props.navigator.showModal({
-            screen: 'QRScanScreen',
-            animated: true,
+        Navigation.showModal(createStackFromComponent({
+            name: 'QRScanScreen',
             passProps: {
                 pushNewScreen: this.pushNewEditScreenLocal
             }
-        })
+        }))
     };
 
     pushNewEditScreenLocal = (QRCodeInfo) => {
@@ -279,11 +280,11 @@ class ContactsScreen extends Component {
         this.setState({
             loading: true
         }, () => {
-            pushNewEditScreen(QRCodeInfo, this.props.navigator, get(this.props, 'user', null), get(this.props, 'translation', null), (error, itemType, record) => {
+            pushNewEditScreen(QRCodeInfo, this.props.componentId, get(this.props, 'user', null), get(this.props, 'translation', null), (error, itemType, record) => {
                 this.setState({
                     loading: false
                 }, () => {
-                    handleQRSearchTransition(this.props.navigator, error, itemType, record, get(this.props, 'user', null), get(this.props, 'translation', null), get(this.props, 'role', []), this.props.refresh);
+                    handleQRSearchTransition(this.props.componentId, error, itemType, record, get(this.props, 'user', null), get(this.props, 'translation', null), get(this.props, 'role', []), this.props.refresh);
                 });
             })
         });

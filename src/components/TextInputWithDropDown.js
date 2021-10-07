@@ -94,6 +94,7 @@ class TextInputWithDropDown extends Component {
                             multiline={this.props.multiline != undefined ? this.props.multiline : false}
                             onPress={() => {console.log("On press textInput")}}
                             keyboardType={this.props.keyboardType ? this.props.keyboardType : 'default'}
+                            formatText={this.formatForNumeric}
                             onSubmitEditing={this.props.onSubmitEditing}
                         />
                     </View>
@@ -127,6 +128,13 @@ class TextInputWithDropDown extends Component {
                 </View>
             </View>
         );
+    }
+
+    formatForNumeric = (text) => {
+        if(this.props.keyboardType === 'numeric'){
+            return Number.isNaN(parseFloat(text)) ? text : parseFloat(text).toString();
+        }
+        return text;
     }
 
     viewInput() {

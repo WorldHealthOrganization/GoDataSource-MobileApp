@@ -32,6 +32,8 @@ import lodashGet from "lodash/get";
 import _ from "lodash";
 import {checkArrayAndLength} from "../../utils/typeCheckingFunctions";
 import FollowUpsSingleContainer from './../../containers/FollowUpsSingleContainer';
+import {Navigation} from "react-native-navigation";
+import {fadeInAnimation, fadeOutAnimation} from "../../utils/animations";
 
 class ViewEditScreen extends Component {
     constructor(props) {
@@ -95,7 +97,7 @@ class ViewEditScreen extends Component {
                                         computeFullName(this.props.elementType === 'followUp' ? this.props.additionalData : this.props.element)
                                     ]
                                 }
-                                navigator={this.props.navigator}
+                                componentId={this.props.componentId}
                                 onPress={this.handlePressBreadcrumb}
                             />
                             <View style={{ flexDirection: 'row', marginRight: calculateDimension(16, false, this.props.screenSize) }}>
@@ -122,7 +124,7 @@ class ViewEditScreen extends Component {
                             </View>
                         </View>
                     }
-                    navigator={this.props.navigator}
+                    componentId={this.props.componentId}
                     iconName="menu"
                     handlePressNavbarButton={this.handlePressNavbarButton}
                 />
@@ -231,28 +233,24 @@ class ViewEditScreen extends Component {
 
     // Please write here all the methods that are not react native lifecycle methods
     handlePressNavbarButton = () => {
-        this.props.navigator.toggleDrawer({
-            side: 'left',
-            animated: true,
-            to: 'open'
-        })
+        Navigation.mergeOptions(this.props.componentId, {
+            sideMenu: {
+                left: {
+                    visible: true,
+                },
+            },
+        });
     };
 
     //Index change for TabBar
-    handleOnIndexChange = (index) => {
-        if (this.props.isNew) {
-            if (this.state.canChangeScreen) {
-                this.setState({
-                    canChangeScreen: false,
-                    index
-                });
-            }
-        } else {
-            this.setState({
-                index
-            });
-        }
-    };
+    handleOnIndexChange = _.throttle( (index) => {
+        // if (this.state.canChangeScreen) {
+        this.setState({
+            canChangeScreen: false,
+            index
+        });
+        // }
+    },300);
     handleMoveToNextScreenButton = () => {
         let nextIndex = this.state.index + 1;
 
@@ -293,21 +291,21 @@ class ViewEditScreen extends Component {
 
     //Render label for TabBar
     handleRenderLabel = (props) => ({ route, index }) => {
-        const inputRange = props.navigationState.routes.map((x, i) => i);
-
-        const outputRange = inputRange.map(
-            inputIndex => (inputIndex === index ? styles.colorLabelActiveTab : styles.colorLabelInactiveTab)
-        );
-        const color = props.position.interpolate({
-            inputRange,
-            outputRange: outputRange,
-        });
+        // const inputRange = props.navigationState.routes.map((x, i) => i);
+        //
+        // const outputRange = inputRange.map(
+        //     inputIndex => (inputIndex === index ? styles.colorLabelActiveTab : styles.colorLabelInactiveTab)
+        // );
+        // const color = props.position.interpolate({
+        //     inputRange,
+        //     outputRange: outputRange,
+        // });
 
         return (
             <Animated.Text style={{
                 fontFamily: 'Roboto-Medium',
                 fontSize: 12,
-                color: color,
+                color: styles.colorLabelActiveTab,
                 flex: 1,
                 alignSelf: 'center'
             }}>
@@ -460,7 +458,7 @@ class ViewEditScreen extends Component {
                                 onPressEditExposure={this.handleOnPressEditExposure}
                                 onPressDeleteExposure={this.handleOnPressDeleteExposure}
                                 addContactFromCasesScreen={this.props.addContactFromCasesScreen}
-                                navigator={this.props.navigator}
+                                componentId={this.props.componentId}
                                 saveExposure={this.handleSaveExposure}
                                 handleMoveToPrevieousScreenButton={this.handleMoveToPrevieousScreenButton}
                                 handleOnPressSave={this.handleOnPressSave}
@@ -636,7 +634,7 @@ class ViewEditScreen extends Component {
                                 onPressSaveEdit={this.onPressSaveEdit}
                                 onPressEditExposure={this.handleOnPressEditExposure}
                                 onPressDeleteExposure={this.handleOnPressDeleteExposure}
-                                navigator={this.props.navigator}
+                                componentId={this.props.componentId}
                                 saveExposure={this.handleSaveExposure}
                                 handleOnPressSave={this.handleOnPressSave}
                                 selectedExposure={this.props.singleCase}
@@ -754,20 +752,25 @@ class ViewEditScreen extends Component {
             showAddFollowUpScreen: !this.state.showAddFollowUpScreen
         }, () => {
             this.hideMenu();
-            this.props.navigator.push({
-                screen: constants.appScreens.viewEditScreen,
-                // screen: constants.appScreens.followUpSingleScreen,
-                animated: true,
-                animationType: 'fade',
-                passProps: {
-                    isNew: true,
-                    isEditMode: true,
-                    element: followUp,
-                    elementType: 'followUp',
-                    additionalId: this.props.element._id,
-                    previousScreen: getTranslation(translations.contactSingleScreen.addContactTitle, this.props.translation),
-                    // contact: this.props.element,
-                    // item: followUp
+            Navigation.push(this.props.componentId, {
+                component:{
+                    name: constants.appScreens.viewEditScreen,
+                    options:{
+                        animations: {
+                            push: fadeInAnimation,
+                            pop: fadeOutAnimation
+                        }
+                    },
+                    passProps: {
+                        isNew: true,
+                        isEditMode: true,
+                        element: followUp,
+                        elementType: 'followUp',
+                        additionalId: this.props.element._id,
+                        previousScreen: getTranslation(translations.contactSingleScreen.addContactTitle, this.props.translation),
+                        // contact: this.props.element,
+                        // item: followUp
+                    }
                 }
             });
         });
