@@ -153,7 +153,9 @@ export function insertOrUpdate(databaseName, tableName, data, createTableBool) {
             let start = new Date().getTime();
             let mapTime, mapEnd, openCreateTime, openCreateEnd, insertTime, insertEnd;
             let insertOrUpdateString = insertOrUpdateStringCreation(tableName);
+            console.log("Lab help", tableName, data?.length);
             let mappedData = mapDataForInsert(tableName, data);
+            console.log("Lab help mapped", tableName, mappedData?.length);
             mapEnd = new Date().getTime();
             mapTime = mapEnd - start;
             console.log("time for mapping: ", tableName, mapTime);
@@ -161,6 +163,7 @@ export function insertOrUpdate(databaseName, tableName, data, createTableBool) {
                 return Promise.resolve()
                     .then(() => openDatabase(databaseName))
                     .then((database) => {
+                        let i = 0;
                         database.transaction((txn) => {
                             database = null;
                             if (createTableBool) {
@@ -170,7 +173,6 @@ export function insertOrUpdate(databaseName, tableName, data, createTableBool) {
                             openCreateEnd = new Date().getTime();
                             openCreateTime = openCreateEnd - mapEnd;
                             console.log("time for open create database: ", tableName, openCreateTime);
-                            let i = 0;
 
                             // let insertObject =
 
@@ -193,10 +195,13 @@ export function insertOrUpdate(databaseName, tableName, data, createTableBool) {
                                         //     return Promise.reject(error);
                                         // })
                                 }
-                                i++
+                                i++;
                             }
                         },
-                            (errorTransaction) => Promise.reject(errorTransaction),
+                            (errorTransaction) => {
+                            console.log("Error transaction", errorTransaction, mappedData, i, mappedData.length);
+                            return Promise.reject(errorTransaction)
+                            },
                             () => {
                                 insertEnd = new Date().getTime();
                                 insertTime = insertEnd - openCreateEnd;
@@ -401,6 +406,7 @@ export function executeQuery(queryObject) {
     // }
 }
 function generalMapping1(unmappedData, queryFields) {
+    console.log("The unmapped data", unmappedData.length);
     if (checkArrayAndLength(queryFields)) {
         let fields = queryFields.map((e) => e.alias);
         return unmappedData.map((e) => {

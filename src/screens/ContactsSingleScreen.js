@@ -311,7 +311,9 @@ class ContactsSingleScreen extends Component {
                                 {
                                     this.props.role && checkArrayAndLength(lodashIntersect(this.props.role, [
                                         constants.PERMISSIONS_FOLLOW_UP.followUpAll,
-                                        constants.PERMISSIONS_FOLLOW_UP.followUpCreate
+                                        constants.PERMISSIONS_FOLLOW_UP.followUpCreate,
+                                        constants.PERMISSIONS_LAB_RESULT.labResultAll,
+                                        constants.PERMISSIONS_LAB_RESULT.labResultCreate
                                     ])) ? (
                                         <View>
                                             <Menu
@@ -337,6 +339,28 @@ class ContactsSingleScreen extends Component {
                                                         />
                                                     ) : null
                                                 }
+                                                <PermissionComponent
+                                                    render={() => (
+                                                        <MenuItem onPress={this.handleOnPressAddLabResult}>
+                                                            {getTranslation(translations.labResultsSingleScreen.createLabResult, this.props.translation)}
+                                                        </MenuItem>
+                                                    )}
+                                                    permissionsList={[
+                                                        constants.PERMISSIONS_LAB_RESULT.labResultAll,
+                                                        constants.PERMISSIONS_LAB_RESULT.labResultCreate
+                                                    ]}
+                                                />
+                                                <PermissionComponent
+                                                    render={() => (
+                                                        <MenuItem onPress={this.handleOnPressShowLabResults}>
+                                                            {getTranslation(translations.labResultsSingleScreen.viewLabResult, this.props.translation)}
+                                                        </MenuItem>
+                                                    )}
+                                                    permissionsList={[
+                                                        constants.PERMISSIONS_LAB_RESULT.labResultAll,
+                                                        constants.PERMISSIONS_LAB_RESULT.labResultList
+                                                    ]}
+                                                />
                                                 <DateTimePicker
                                                     isVisible={this.state.isDateTimePickerVisible}
                                                     timeZoneOffsetInMinutes={0}
@@ -348,6 +372,7 @@ class ContactsSingleScreen extends Component {
                                                     onCancelPressed={this.handleOnCancelPressed}
                                                     onSavePressed={this.handleOnSavePressed}
                                                 />
+
                                             </Menu>
                                         </View>
                                     ) : null
@@ -1668,7 +1693,34 @@ class ContactsSingleScreen extends Component {
             return null;
         })
     };
-
+    handleOnPressAddLabResult = () => {
+        console.log("Whats the id", this.props.contact._id);
+        Navigation.push(this.props.componentId,{
+            component:{
+                name: 'LabResultsSingleScreen',
+                passProps: {
+                    isNew: true,
+                    refresh: this.props.onRefresh,
+                    personId: this.props.contact._id,
+                    personType: translations.personTypes.contacts
+                }
+            }
+        })
+    };
+    handleOnPressShowLabResults = () =>{
+            Navigation.push(this.props.componentId,{
+                component:{
+                    name: constants.appScreens.labResultsScreen,
+                    passProps: {
+                        filtersToAdd: {
+                            personId: this.props.contact._id
+                        }
+                    },
+                    options: {
+                    }
+                }
+            });
+    }
     checkFields = () => {
         // let pass = true;
         let requiredFields = [];

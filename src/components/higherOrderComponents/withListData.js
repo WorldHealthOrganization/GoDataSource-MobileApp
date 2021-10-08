@@ -88,7 +88,7 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                         mainFilter: this.state.mainFilter,
                         followUpFilter: this.state.followUpFilter
                     });
-                console.log("Important props", props.outbreak?.name);
+                console.log("Important props", props.data?.length, props.dataCount );
                 return (
                     <WrappedComponent
                         setSearchText={this.setSearchText}
@@ -159,6 +159,16 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                             offset: get(this.state, 'data.length', 0)
                         };
                         break;
+                    case 'LabResultsScreen':
+                        filter = {
+                            outbreakId: get(this.props, 'outbreak._id', null),
+                            labResultsFilter: get(this.state, 'mainFilter', null),
+                            searchText: get(this.state, 'searchText', null),
+                            lastElement: get(this.state, 'lastElement', null),
+                            offset: get(this.state, 'offset', 0)
+                        };
+                        console.log("What's my filter?", filter);
+                        break;
                     default:
                         break;
                 }
@@ -213,10 +223,21 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                                     if (isRefresh === true && !isRefreshAfterSync) {
                                         this.props.setLoaderState(false);
                                     }
+                                    let lastElement = null;
+                                    if(result.data.length === 10){
+                                        if(screenType === 'FollowUpsScreen'){
+                                            lastElement =  Object.assign({}, get(result, 'data[9].mainData', null), {followUpId: get(result, 'data[9].followUpData._id', null)});
+                                        }
+                                        if(screenType === 'LabResultsScreen'){
+                                            lastElement =  Object.assign({}, get(result, 'data[9].mainData', null), {followUpId: get(result, 'data[9].labResultData._id', null)})
+                                        }
+                                        lastElement = get(result, 'data[9].mainData', null);
+                                    }
                                     this.setState((prevState) => {
+                                        console.log("Refresh state", isRefresh, !isRefresh && (prevState.lastElement !== null ||  (prevState.data.length + result.data.length) === prevState.dataCount) ? prevState.data.concat(result.data).length : result.data.length);
                                         return {
                                             data: !isRefresh && (prevState.lastElement !== null ||  (prevState.data.length + result.data.length) === prevState.dataCount) ? prevState.data.concat(result.data) : result.data,
-                                            lastElement: result.data.length === 10 ? screenType === 'FollowUpsScreen' ? Object.assign({}, get(result, 'data[9].mainData', null), {followUpId: get(result, 'data[9].followUpData._id', null)}) : get(result, 'data[9].mainData', null) : null,
+                                            lastElement: lastElement,
                                             isAddFromNavigation: false,
                                             dataCount: typeof get(result, 'dataCount') === 'number' ? get(result, 'dataCount') : prevState.dataCount,
                                             offset: result.data.length,
@@ -272,6 +293,7 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
             };
 
             setMainFilter = (filter) => {
+                console.log("Set main filter", filter);
                 this.setState(prevState => ({
                     mainFilter: filter,
                     offset: 0
@@ -280,6 +302,7 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
 
             // Navigator methods
             onPressFilter = () => {
+                // const activeFilters = (this.state.mainFilter && Object.keys(this.state.mainFilter).length !== 0) ? this.state.mainFilter :
                 Navigation.showModal(createStackFromComponent({
                     name: constants.appScreens.filterScreen,
                     passProps: {
@@ -297,6 +320,7 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                     isNew: false,
                     refresh: this.refresh
                 };
+                console.log("What's up?", screenType);
                 switch (screenType) {
                     case 'FollowUpsScreen':
                         forwardProps.item = dataToForward;
@@ -312,6 +336,12 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                         break;
                     case 'CasesScreen':
                         forwardProps.case = dataToForward;
+                        break;
+                    case 'LabResultsScreen':
+                        forwardProps.item = dataToForward;
+                        forwardProps.contact = contactData;
+                        forwardProps.isEditMode = false;
+                        forwardProps.previousScreen = 'LabResults'
                         break;
                     default:
                         break;
@@ -546,6 +576,27 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                                 forwardScreen = null;
                         }
                         break;
+                    case constants.appScreens.labResultsScreen:
+                        switch (method) {
+                            case 'onPressView':
+                                forwardScreen = constants.appScreens.labResultsSingleScreen;
+                                // forwardScreen = constants.appScreens.viewEditScreen;
+                                break;
+                            case 'onPressAddExposure':
+                                forwardScreen = constants.appScreens.exposureScreen;
+                                break;
+                            case 'onPressFullName':
+                                forwardScreen = constants.appScreens.contactSingleScreen;
+                                // forwardScreen = constants.appScreens.viewEditScreen;
+                                break;
+                            case 'onPressExposure':
+                                forwardScreen = constants.appScreens.caseSingleScreen;
+                                // forwardScreen = constants.appScreens.viewEditScreen;
+                                break;
+                            default:
+                                forwardScreen = null;
+                        }
+                        break;
                     default:
                         break;
                 }
@@ -622,6 +673,11 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                                 permissions = [];
                         }
                         break;
+                    case constants.appScreens.labResultsScreen:
+                        switch (method) {
+                            default:
+                                permissions = [];
+                        }
                     default:
                         break;
                 }

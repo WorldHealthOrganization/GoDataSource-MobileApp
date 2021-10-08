@@ -3,7 +3,9 @@ import translations from './../../utils/translations';
 import get from 'lodash/get';
 import {checkArrayAndLength} from './../../utils/typeCheckingFunctions';
 
-const databaseTables = ['person', 'followUp', 'relationship', 'languageToken'];
+const databaseTables = ['person', 'followUp', 'relationship', 'languageToken',
+    'labResult'
+];
 const tableStructure = {
     person: [
         {
@@ -161,6 +163,87 @@ const tableStructure = {
             fieldName: 'json',
             fieldType: 'TEXT NOT NULL'
         },
+    ],
+    labResult: [
+        {
+            fieldName: '_id',
+            fieldType: 'TEXT PRIMARY KEY'
+        },
+        {
+            fieldName: "createdOn",
+            fieldType: 'TEXT'
+        },
+        {
+            fieldName: "dateSampleTaken",
+            fieldType: 'TEXT'
+        },
+        {
+          fieldName: "dateSampleDelivered",
+          fieldType: 'TEXT'
+        },
+        {
+            fieldName: "labName",
+            fieldType: 'TEXT'
+        },
+        {
+            fieldName: "outbreakId",
+            fieldType: 'TEXT'
+        },
+        {
+            fieldName: "personType",
+            fieldType: 'TEXT'
+        },
+        {
+            fieldName: "result",
+            fieldType: 'TEXT'
+        },
+        {
+            fieldName: 'sampleIdentifier',
+            fieldType: 'TEXT'
+        },
+        {
+            fieldName: "sampleType",
+            fieldType: 'TEXT'
+        },
+        {
+            fieldName: "status",
+            fieldType: 'TEXT'
+        },
+        {
+            fieldName: "testType",
+            fieldType: 'TEXT'
+        },
+        // {
+        //     fieldName: "questionnaireAnswers",
+        //     fieldType: 'TEXT'
+        // },
+        // {
+        //     fieldName: 'sequence',
+        //     fieldType: 'TEXT'
+        // },
+        {
+            fieldName: 'quantitativeResult',
+            fieldType: 'TEXT'
+        },
+        {
+            fieldName: 'dateTesting',
+            fieldType: 'TEXT'
+        },
+        {
+            fieldName: 'dateOfResult',
+            fieldType: 'TEXT'
+        },
+        {
+          fieldName: 'notes',
+          fieldType: 'TEXT'
+        },
+        {
+            fieldName: 'personId',
+            fieldType: 'TEXT NOT NULL',
+            isForeignKey: true,
+            referencesTable: 'person',
+            referencesField: 'id'
+        },
     ]
 };
 const relationshipsMappedFields = ['sourceId', 'sourceType', 'targetId', 'targetType'];
@@ -173,13 +256,16 @@ const idFieldString = `id TEXT PRIMARY KEY`;
 const createQueries = {
     createTablePerson: `${createTableString} person (${idFieldString}, firstName TEXT NOT NULL, lastName TEXT, age INT, gender TEXT, type TEXT, ${essentialFields})`,
     createTableFollowUp: `${createTableString} followUp (${idFieldString}, date DATE NOT NULL, status TEXT NOT NULL, index INT NOT NULL, personId TEXT NOT NULL ${essentialFields}, FOREIGN KEY (personId) REFERENCES person(id))`,
-    createTableRelationship: `${createTableString} relationship (${idFieldString}, sourceId TEXT NOT NULL, sourceType TEXT NOT NULL, targetId TEXT NOT NULL, targetType TEXT NOT NULL ${essentialFields}, FOREIGN KEY (sourceId) REFERENCES person(id), FOREIGN KEY (targetId) REFERENCES person(id))`
+    createTableRelationship: `${createTableString} relationship (${idFieldString}, sourceId TEXT NOT NULL, sourceType TEXT NOT NULL, targetId TEXT NOT NULL, targetType TEXT NOT NULL ${essentialFields}, FOREIGN KEY (sourceId) REFERENCES person(id), FOREIGN KEY (targetId) REFERENCES person(id))`,
+    createTableLabResult: `${createTableString} labResult (${idFieldString}, dateSampleTaken DATE NOT NULL, status TEXT NOT NULL, personId TEXT NOT NULL ${essentialFields}, FOREIGN KEY (personId) REFERENCES person(id))`
 };
 
 const insertOrUpdateQueries = {
     insertTablePerson: `INSERT INTO person VALUES (:id, :firstName, :lastName, :age, :gender, :type, :createdAt, :createdBy, :updatedAt, :updatedBy, :deleted, :deletedAt, :deletedBy, :json) ON CONFLICT (id) DO UPDATE SET firstName=excluded.firstName, lastName=excluded.lastName, age=excluded.age, gender=excluded.gender, type=excluded.type, createdAt=excluded.createdAt, createdBy=excluded.createdBy, updatedAt=excluded.updatedAt, updatedBy=excluded.updatedBy, deleted=excluded.deleted, deletedAt=excluded.deletedAt, deletedBy=excluded.deletedBy, json=excluded.json`,
     insertTableFollowUp: `INSERT INTO followUp VALUES (:id, :status, :date, :personId, :index, :createdAt, :createdBy, :updatedAt, :updatedBy, :deleted, :deletedAt, :deletedBy, :json) ON CONFLICT (id) DO UPDATE SET status=excluded.status, date=excluded.date, personId=excluded.personId, index=excluded.index, createdAt=excluded.createdAt, createdBy=excluded.createdBy, updatedAt=excluded.updatedAt, updatedBy=excluded.updatedAt, deleted=excluded.deleted, deletedAt=excluded.deletedAt, deletedBy=excluded.deletedBy, json=excluded.json`,
-    insertTableRelationship: `INSERT INTO relationship values (:id, :sourceId, :sourceType, :targetId, :targetType, :createdAt, :createdBy, :updatedAt, :updatedBy, :deleted, :deletedAt, :deletedBy, :json) ON CONFLICT (id) DO UPDATE SET sourceId=excluded.sourceId, sourceType=excluded.sourceType, targetId=excluded.targetId, targetTyp=excluded.targetType, createdAt=excluded.createdAt, createdBy=excluded.createdBy, updatedAt=excluded.updatedAt, updatedBy=excluded.updatedBy, deleted=excluded.deleted, deletedAt=excluded.deletedAt, deletedBy=excluded.deletedBy, json=excluded.json`
+    insertTableRelationship: `INSERT INTO relationship values (:id, :sourceId, :sourceType, :targetId, :targetType, :createdAt, :createdBy, :updatedAt, :updatedBy, :deleted, :deletedAt, :deletedBy, :json) ON CONFLICT (id) DO UPDATE SET sourceId=excluded.sourceId, sourceType=excluded.sourceType, targetId=excluded.targetId, targetTyp=excluded.targetType, createdAt=excluded.createdAt, createdBy=excluded.createdBy, updatedAt=excluded.updatedAt, updatedBy=excluded.updatedBy, deleted=excluded.deleted, deletedAt=excluded.deletedAt, deletedBy=excluded.deletedBy, json=excluded.json`,
+    insertTableLabResult: `INSERT INTO labResult VALUES (:id, :status, :dateSampleTaken, :personId, :createdAt, :createdBy, :updatedAt, :updatedBy, :deleted, :deletedAt, :deletedBy, :json) ON CONFLICT (id) DO UPDATE SET status=excluded.status, dateSampleTaken=excluded.dateSampleTaken, personId=excluded.personId, createdAt=excluded.createdAt, createdBy=excluded.createdBy, updatedAt=excluded.updatedAt, updatedBy=excluded.updatedAt, deleted=excluded.deleted, deletedAt=excluded.deletedAt, deletedBy=excluded.deletedBy, json=excluded.json`,
+
 };
 
 const tableNamesAndAliases = {
@@ -187,8 +273,11 @@ const tableNamesAndAliases = {
     followUpTable: databaseTables[1],
     personTable: databaseTables[0],
     relationshipTable: databaseTables[2],
+    labResultTable: databaseTables[4],
     followUpAlias: 'FollowUps',
     followUpJsonAlias: 'followUpsJson',
+    labResultAlias: 'LabResults',
+    labResultJsonAlias: 'labResultsJson',
     contactsAlias: 'Contacts',
     contactsJsonAlias: 'contactsJson',
     relationshipsAlias: 'Relations',

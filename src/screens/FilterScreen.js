@@ -30,7 +30,11 @@ class FilterScreen extends Component {
                     age: [0, 150],
                     selectedLocations: [],
                     classification: [],
-                    categories: []
+                    categories: [],
+                    type: {
+                        [translations.personTypes.cases]: true,
+                        [translations.personTypes.contacts]: true
+                    }
                 },
                 sort: []
             },
@@ -51,7 +55,7 @@ class FilterScreen extends Component {
 
         const { tabsValuesRoutes, localTranslationTokens } = config;
         const { sortOrderDropDownItems, sortCriteriaDropDownItems, helpItemsSortCriteriaDropDownItems } = config;
-        const { followUpsFilterScreen, casesFilterScreen, helpFilterScreen } = config;
+        const { followUpsFilterScreen, casesFilterScreen, helpFilterScreen, labResultsFilterScreen } = config;
 
         let filterClone = cloneDeep(filter.filter);
         let sortClone = cloneDeep(filter.sort);
@@ -70,6 +74,15 @@ class FilterScreen extends Component {
                     filterClone.gender.Female = true
                     filterClone.gender.Male = false
                 }
+            }
+
+            console.log("Any active filters?", activeFilters);
+            if (activeFilters.type){
+                Object.keys(filterClone.type).forEach(key=>{
+                    if(!activeFilters.type.includes(key)){
+                        filterClone.type[key] = false;
+                    }
+                })
             }
 
             if (activeFilters.age && Array.isArray(activeFilters.age) && activeFilters.age.length === 2) {
@@ -118,6 +131,12 @@ class FilterScreen extends Component {
                 routes = tabsValuesRoutes.helpFilter;
                 configFilterScreen = helpFilterScreen;
                 mySortCriteriaDropDownItems = helpItemsSortCriteriaDropDownItems;
+                break;
+            case 'LabResultsScreen':
+                screenTitle = getTranslation(translations.labResultsFilter.filterTitle, translation);
+                routes = tabsValuesRoutes.labResultsFilter;
+                configFilterScreen = labResultsFilterScreen;
+                mySortCriteriaDropDownItems = sortCriteriaDropDownItems;
                 break;
             default:
                 screenTitle = getTranslation(translations.followUpFilter.contactFilterTitle, translation);
@@ -177,6 +196,7 @@ class FilterScreen extends Component {
         const { configFilterScreen, filter, index, sortCriteriaDropDownItems, sortOrderDropDownItems } = this.state;
 
         if (configFilterScreen !== null) {
+            console.log("Filters wacky stuff", route.key);
             switch (route.key) {
                 case 'filters':
                     return (
@@ -314,6 +334,12 @@ class FilterScreen extends Component {
         if (filterStateClone.gender.Female && !filterStateClone.gender.Male) {
             filterClone.gender = localTranslationTokens.female
         }
+        filterClone.type = []
+        Object.keys(filterStateClone.type).forEach(k=>{
+            if(filterStateClone.type[k]){
+                filterClone.type.push(k);
+            }
+        });
         if (filterStateClone.age) {
             filterClone.age = filterStateClone.age;
         }
@@ -390,7 +416,9 @@ class FilterScreen extends Component {
     handleOnSelectItem = (item, index, id) => {
         console.log("### handleOnSelectItem: ", item, index, id);
         let filter = Object.assign({}, this.state.filter.filter);
-        filter[id][item.value] = !filter[id][item.value];
+        console.log("HUUUH?", filter);
+        filter[id][item.value] = !item.selected;
+        console.log("Filter?", filter);
         this.setState(prevState => ({
             filter: Object.assign({}, prevState.filter, Object.assign({}, prevState.filter.filter, { [id]: filter[id] }))
         }))

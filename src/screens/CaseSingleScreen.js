@@ -49,6 +49,8 @@ import withPincode from './../components/higherOrderComponents/withPincode';
 import {checkValidEmails, validateRequiredFields} from './../utils/formValidators';
 import {Navigation} from "react-native-navigation";
 import {fadeInAnimation, fadeOutAnimation} from "../utils/animations";
+import Menu, {MenuItem} from "react-native-material-menu";
+import PermissionComponent from "../components/PermissionComponent";
 
 const initialLayout = {
     height: 0,
@@ -298,6 +300,50 @@ class CaseSingleScreen extends Component {
                                         <Icon name="help" color={'white'} size={15} />
                                     </Ripple>
                                 </ElevatedView>
+                                {
+                                    checkArrayAndLength(_.intersection(
+                                        _.get(this.props, 'role', []),
+                                        [
+                                            constants.PERMISSIONS_LAB_RESULT.labResultAll,
+                                            constants.PERMISSIONS_LAB_RESULT.labResultCreate,
+                                            constants.PERMISSIONS_LAB_RESULT.labResultList
+                                        ]
+                                    )) ? (
+                                        <View style={{backgroundColor: 'black', zIndex: 999}}>
+                                            <Menu
+                                                ref="menuRef"
+                                                button={
+                                                    <Ripple onPress={this.showMenu} hitSlop={{left: 10, right: 10, top: 10, bottom: 10}} >
+                                                        <Icon name="more-vert" />
+                                                    </Ripple>
+                                                }
+                                            >
+                                                <PermissionComponent
+                                                    render={() => (
+                                                        <MenuItem onPress={this.handleOnPressAddLabResult}>
+                                                            {getTranslation(translations.labResultsSingleScreen.createLabResult, this.props.translation)}
+                                                        </MenuItem>
+                                                    )}
+                                                    permissionsList={[
+                                                        constants.PERMISSIONS_LAB_RESULT.labResultAll,
+                                                        constants.PERMISSIONS_LAB_RESULT.labResultCreate
+                                                    ]}
+                                                />
+                                                <PermissionComponent
+                                                    render={() => (
+                                                        <MenuItem onPress={this.handleOnPressShowLabResults}>
+                                                            {getTranslation(translations.labResultsSingleScreen.viewLabResult, this.props.translation)}
+                                                        </MenuItem>
+                                                    )}
+                                                    permissionsList={[
+                                                        constants.PERMISSIONS_LAB_RESULT.labResultAll,
+                                                        constants.PERMISSIONS_LAB_RESULT.labResultList
+                                                    ]}
+                                                />
+                                            </Menu>
+                                        </View>
+                                    ) : null
+                                }
                             </View>
                         </View>
                     }
@@ -1312,12 +1358,15 @@ class CaseSingleScreen extends Component {
 
     // show/hide Menu
     showMenu = () => {
-        // console.log('Show menu is not necessary');
-        // this.refs.menuRef.show();
+        if( this.refs.menuRef) {
+            this.refs.menuRef.show();
+        }
     };
     hideMenu = () => {
-        // console.log('Hide menu is not necessary');
-        // this.refs.menuRef.hide();
+        // this.refs['menuRef'].hide();
+        if( this.refs.menuRef) {
+            this.refs.menuRef.hide();
+        }
     };
 
 
@@ -2183,6 +2232,36 @@ class CaseSingleScreen extends Component {
         }
         return previousAnswersClone;
     };
+
+    handleOnPressAddLabResult = () => {
+        console.log("Whats the person id", this.props.case._id);
+        Navigation.push(this.props.componentId,{
+            component:{
+                name: 'LabResultsSingleScreen',
+                passProps: {
+                    isNew: true,
+                    refresh: this.props.onRefresh,
+                    personId: this.props.case._id,
+                    personType: translations.personTypes.cases
+                }
+            }
+        })
+    };
+
+    handleOnPressShowLabResults = () =>{
+            Navigation.push(this.props.componentId,{
+                component:{
+                    name: constants.appScreens.labResultsScreen,
+                    passProps: {
+                        filtersToAdd: {
+                            personId: this.props.case._id
+                        }
+                    },
+                    options: {
+                    }
+                }
+            });
+    }
 }
 
 // Create style outside the class, or for components that will be used by other components (buttons),
@@ -2195,7 +2274,7 @@ const style = StyleSheet.create({
     breadcrumbContainer: {
         flex: 1,
         flexDirection: 'row',
-        justifyContent: 'flex-start'
+        justifyContent: 'space-between'
     },
     containerContent: {
         flex: 1,

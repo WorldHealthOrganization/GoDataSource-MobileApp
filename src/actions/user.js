@@ -227,8 +227,15 @@ export function computeCommonData(storeUserBool, user, skipLoad, outbreakId) {
                             ])
                         )) {
                             selectedScreen = sideMenuKeys[2];
-                        } else {
+                        } else if (checkArrayAndLength(
+                            lodashIntersection(userRoles, [
+                                constants.PERMISSIONS_CASE.caseAll,
+                                constants.PERMISSIONS_CASE.caseList
+                            ])
+                        )) {
                             selectedScreen = sideMenuKeys[3];
+                        } else {
+                            selectedScreen = sideMenuKeys[4]
                         }
                     }
                 }
@@ -262,7 +269,9 @@ export function computeCommonData(storeUserBool, user, skipLoad, outbreakId) {
                             PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsAll,
                             PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsList,
                             constants.PERMISSIONS_CASE.caseAll,
-                            constants.PERMISSIONS_CASE.caseList
+                            constants.PERMISSIONS_CASE.caseList,
+                            constants.PERMISSIONS_LAB_RESULT.labResultAll,
+                            constants.PERMISSIONS_LAB_RESULT.labResultList
                         ]))) {
 
                             let arrayOfActions = [

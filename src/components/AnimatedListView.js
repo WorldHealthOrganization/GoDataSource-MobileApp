@@ -34,6 +34,7 @@ class AnimatedListView extends Component {
 
     // This will be a dumb component, so it's best not to put any business logic in it
     constructor(props) {
+        console.log("Animated  list view constructor call", props.dataType);
         super(props);
         this.state = {
             searchText: ''
@@ -64,6 +65,7 @@ class AnimatedListView extends Component {
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
+        console.log("Lab data number", this.props.data?.length );
         const navbarTranslate = this.clampedScroll.interpolate({
             inputRange: [0, 30],
             outputRange: [0, -30],
@@ -135,6 +137,7 @@ class AnimatedListView extends Component {
 
     // Please write here all the methods that are not react native lifecycle methods
     renderItem = ({ item }) => {
+        console.log("Lab data type", this.props.dataType );
         let margins = calculateDimension(16, false, this.props.screenSize);
         let textsArray = [];
         let textsStyleArray = [];
@@ -311,6 +314,25 @@ class AnimatedListView extends Component {
                     }];
                 titleColor = 'black';
                 break;
+            case 'LabResult':
+                const labResultData = get(item, 'labResultData', null);
+                textsArray = [
+                    getTranslation(translations.casesScreen.viewButtonLabel, this.props.translation)
+                ];
+                textsStyleArray = [
+                    [styles.buttonTextActionsBar, {fontSize: 14, marginLeft: margins}]
+                ];
+                onPressTextsArray = [
+                    () => {
+                        this.props.onPressView(labResultData,mainData);
+                    }];
+                arrayPermissions = [
+                    [
+                        constants.PERMISSIONS_LAB_RESULT.labResultAll,
+                        constants.PERMISSIONS_LAB_RESULT.labResultView
+                    ]
+                ];
+                break;
             default:
                 textsArray = [];
                 textsStyleArray = [];
@@ -336,6 +358,7 @@ class AnimatedListView extends Component {
     };
 
     listEmptyComponent = () => {
+        console.log("What's the prop", this.props.dataType);
         let message = null;
         switch(this.props.dataType) {
             case 'FollowUp':
@@ -350,8 +373,11 @@ class AnimatedListView extends Component {
             case 'User':
                 message = translations.usersScreen.noUsers;
                 break;
+            case 'LabResult':
+                message = translations.labResultsScreen.noLabResults;
+                break;
             default:
-                message = translations.followUpsScreen.noFollowupsMessage;
+                message = translations.labResultsScreen.noLabResults;
         }
         return (
             <View style={[style.emptyComponent, { height: calculateDimension((667 - 152), true, this.props.screenSize) }]}>
@@ -374,6 +400,9 @@ class AnimatedListView extends Component {
                 return get(item, 'mainData._id', null);
             case 'User':
                 return get(item, 'mainData._id', null);
+            case 'LabResult':
+                console.log("Help lab result id",get(item, 'labResultData._id', null) );
+                return get(item, 'labResultData._id', null);
             default:
                 return get(item, 'mainData._id', null);
         }

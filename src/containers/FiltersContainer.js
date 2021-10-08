@@ -20,6 +20,7 @@ class FiltersContainer extends PureComponent {
     };
 
     render() {
+        console.log("Excuse me?", this.props.filter?.filter);
         const { configFilterScreen } = this.props
         const { handleMoveToNextScreenButton, onPressResetFilters, onPressApplyFilters } = this.props
         const { screenSize, translation } = this.props
@@ -120,11 +121,13 @@ class FiltersContainer extends PureComponent {
         let value = '';
         let data = [];
 
-        if (item.type === 'Selector' && item.id === 'gender') {
+        if (item.type === 'Selector') {
+            item = Object.assign({}, item);
             item.data = item.data.map((e) => {
+                console.log("Help", item.id, filter.filter);
                 return {
-                    value: getTranslation(e.value, translation),
-                    selected: filter && filter.filter && filter.filter.gender && filter.filter.gender[e.value] ? true : false
+                    value: e.value,
+                    selected: !!(filter && filter.filter && filter.filter[item.id] && filter.filter[item.id][e.value])
                 }
             })
         }
@@ -153,6 +156,7 @@ class FiltersContainer extends PureComponent {
 
         return (
             <CardComponent
+                key={item}
                 item={item}
                 isEditMode={true}
                 isEditModeForDropDownInput={true}

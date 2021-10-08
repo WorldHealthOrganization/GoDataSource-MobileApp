@@ -25,6 +25,8 @@ import QRScanScreen from './QRScanScreen';
 import HubConfigScreen from './HubConfigScreen';
 import UsersScreen  from "./UsersScreen";
 import React from "react";
+import LabResultsScreen from "./LabResultsScreen";
+import LabResultsSingleScreen from "./LabResultsSingleScreen";
 
 const screens = [
     {screen: constants.appScreens.loginScreen, component: LoginScreen},
@@ -41,6 +43,8 @@ const screens = [
     {screen: constants.appScreens.contactSingleScreen, component: ContactsSingleScreen},
     {screen: constants.appScreens.contactsOfContactsScreen, component: ContactsOfContactsScreen},
     {screen: constants.appScreens.contactsOfContactsSingleScreen, component: ContactsOfContactsSingleScreen},
+    {screen: constants.appScreens.labResultsScreen, component: LabResultsScreen},
+    {screen: constants.appScreens.labResultsSingleScreen, component: LabResultsSingleScreen},
     {screen: constants.appScreens.inAppNotificationScreen, component: InAppNotificationScreen},
     {screen: constants.appScreens.exposureScreen, component: ExposureScreen},
     {screen: constants.appScreens.helpScreen, component: HelpScreen},

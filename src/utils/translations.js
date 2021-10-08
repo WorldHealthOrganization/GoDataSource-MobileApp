@@ -5,6 +5,7 @@ const navigationDrawer = {
     contactsOfContactsLabel: 'LNG_NAVIGATION_DRAWER_CONTACTS_OF_CONTACTS',
 
     casesLabel: 'LNG_NAVIGATION_DRAWER_CASES',
+    labResultsLabel: 'LNG_LAYOUT_MENU_ITEM_LAB_RESULTS_LABEL',
     syncHubManually: 'LNG_NAVIGATION_DRAWER_SYNC_HUB_MANUAL',
     changeHubConfig: 'LNG_NAVIGATION_DRAWER_CHANGE_HUB_CONFIG',
     usersLabel: 'LNG_NAVIGATION_DRAWER_USERS',
@@ -247,6 +248,45 @@ const casesScreen = {
     noCases: 'LNG_CASE_LIST_SCREEN_NO_CASES',
     contactExposures: 'LNG_CASE_LIST_SCREEN_SEE_CONTACTS'
 };
+
+const labResultsScreen = {
+    labResultsTitle: 'LNG_PAGE_LIST_LAB_RESULTS_TITLE',
+    noLabResults: 'LNG_COMMON_LABEL_EMPTY_TABLE',
+    labName: 'LNG_LAB_RESULT_FIELD_LABEL_LAB_NAME',
+    dateOfResult: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_OF_RESULT',
+    status: 'LNG_LAB_RESULT_FIELD_LABEL_STATUS',
+    sampleTaken: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_TAKEN'
+}
+
+const labResultsSingleScreen = {
+    title: 'LNG_PAGE_LIST_LAB_RESULTS_TITLE',
+    sampleLabId: 'LNG_LAB_RESULT_FIELD_LABEL_SAMPLE_LAB_ID',
+    sampleTaken: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_TAKEN',
+    sampleDelivered: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_DELIVERED',
+    dateOfResult: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_OF_RESULT',
+    labName: 'LNG_LAB_RESULT_FIELD_LABEL_LAB_NAME',
+    result: 'LNG_LAB_RESULT_FIELD_LABEL_RESULT',
+    status: 'LNG_LAB_RESULT_FIELD_LABEL_STATUS',
+    notes: 'LNG_LAB_RESULT_FIELD_LABEL_NOTES',
+    variantStrain: 'Variant / Strain',
+    hasVariantStrain: 'Has variant / strain?',
+    dateSampleSent: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_DATE_SAMPLE_SENT',
+    dateSampleTested: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_TESTING',
+    sampleType: 'LNG_LAB_RESULT_FIELD_LABEL_SAMPLE_TYPE',
+    testType: 'LNG_LAB_RESULT_FIELD_LABEL_TEST_TYPE',
+    testedFor: 'LNG_LAB_RESULT_FIELD_LABEL_TESTED_FOR',
+    quantResult: 'LNG_LAB_RESULT_FIELD_LABEL_QUANTITATIVE_RESULT',
+    modifyLabResult: 'LNG_PAGE_LIST_ENTITY_LAB_RESULTS_ACTION_MODIFY_LAB_RESULT',
+    viewLabResult: 'LNG_PAGE_LIST_ENTITY_LAB_RESULTS_ACTION_VIEW_LAB_RESULT',
+    deleteAlertMessage: 'LNG_DIALOG_CONFIRM_DELETE_LAB_RESULT',
+    deleteLabResult: 'LNG_PAGE_LIST_ENTITY_LAB_RESULTS_ACTION_DELETE_LAB_RESULT',
+    createLabResult: 'LNG_PAGE_CREATE_LAB_RESULT_ACTION_CREATE_LAB_RESULT_BUTTON'
+}
+
+const labResultsFilter = {
+    filterTitle: 'LNG_FILTER_SCREEN_FILTER_TAB',
+    personType: 'LNG_LAB_RESULT_FIELD_LABEL_ENTITY_TYPE'
+}
 
 const usersScreen = {
     usersTitle: 'LNG_USER_LIST_SCREEN_TITLE',
@@ -618,5 +658,8 @@ export default {
     followUpAgenda,
     personListItem,
     contactsOfContactsScreen,
-    languageModalComponentLabels
+    languageModalComponentLabels,
+    labResultsScreen,
+    labResultsSingleScreen,
+    labResultsFilter
 };

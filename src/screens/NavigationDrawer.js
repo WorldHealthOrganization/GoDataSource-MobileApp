@@ -183,19 +183,19 @@ class NavigationDrawer extends Component {
                     <NavigationDrawerListItem
                         label={getTranslation(translations.navigationDrawer.usersLabel, this.props.translation)}
                         name={'contact-phone'}
-                        key={sideMenuKeys[4]}
-                        onPress={() => this.handlePressOnListItem(sideMenuKeys[4])}
-                        isSelected={sideMenuKeys[4] === this.state.selectedScreen}
+                        key={sideMenuKeys[5]}
+                        onPress={() => this.handlePressOnListItem(sideMenuKeys[5])}
+                        isSelected={sideMenuKeys[5] === this.state.selectedScreen}
                         addButton={false}
-                        itemKey={sideMenuKeys[4]}
+                        itemKey={sideMenuKeys[5]}
                     />
 
                     <NavigationDrawerListItem
-                        key={sideMenuKeys[5]}
+                        key={sideMenuKeys[6]}
                         label={getTranslation(translations.navigationDrawer.helpLabel, this.props.translation)}
-                        name={sideMenuKeys[5]}
+                        name={sideMenuKeys[6]}
                         onPress={() => this.handlePressOnListItem(sideMenuKeys[5])}
-                        isSelected={sideMenuKeys[5] === this.state.selectedScreen}
+                        isSelected={sideMenuKeys[6] === this.state.selectedScreen}
                     />
                     <NavigationDrawerListItem
                         key={'community'}

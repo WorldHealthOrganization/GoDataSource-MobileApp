@@ -162,6 +162,8 @@ export default class App {
             case sideMenuKeys[3]:
                 screen = constants.appScreens.casesScreen;
                 break;
+            case sideMenuKeys[4]:
+                screen = constants.appScreens.labResultsScreen;
             default:
                 screen = constants.appScreens.followUpScreen;
                 break;
