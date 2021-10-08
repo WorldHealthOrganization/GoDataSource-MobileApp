@@ -12,9 +12,11 @@ const appScreens = {
     casesScreen: 'CasesScreen',
     caseSingleScreen: 'CaseSingleScreen',
     contactsScreen: 'ContactsScreen',
+    labResultsScreen: 'LabResultsScreen',
     contactSingleScreen: 'ContactsSingleScreen',
     contactsOfContactsScreen: 'ContactsOfContactsScreen',
     contactsOfContactsSingleScreen: 'ContactsOfContactsSingleScreen',
+    labResultsSingleScreen: 'LabResultsSingleScreen',
     exposureScreen: 'ExposureScreen',
     helpScreen: 'HelpScreen',
     helpSingleScreen: 'HelpSingleScreen',
@@ -92,6 +94,26 @@ const PERMISSIONS_CASE = {
     caseCreateRelationshipExposures: 'case_create_relationship_exposures',
     caseModifyRelationshipExposures: 'case_modify_relationship_exposures',
     caseDeleteRelationshipExposures: 'case_delete_relationship_exposures',
+};
+
+const PERMISSIONS_LAB_RESULT = {
+    labResultAll: 'lab_result_all',
+    labResultView: 'lab_result_view',
+    labResultList: 'lab_result_list',
+    labResultCreate: 'lab_result_create',
+    labResultModify: 'lab_result_modify',
+    labResultDelete: 'lab_result_delete',
+    labResultCreateContact: 'lab_result_create_contact',
+    labResultListRelationshipContacts: 'lab_result_list_relationship_contacts',
+    labResultViewRelationshipContacts: 'lab_result_view_relationship_contacts',
+    labResultCreateRelationshipContacts: 'lab_result_create_relationship_contacts',
+    labResultModifyRelationshipContacts: 'lab_result_modify_relationship_contacts',
+    labResultDeleteRelationshipContacts: 'lab_result_delete_relationship_contacts',
+    labResultListRelationshipExposures: 'lab_result_list_relationship_exposures',
+    labResultViewRelationshipExposures: 'lab_result_view_relationship_exposures',
+    labResultCreateRelationshipExposures: 'lab_result_create_relationship_exposures',
+    labResultModifyRelationshipExposures: 'lab_result_modify_relationship_exposures',
+    labResultDeleteRelationshipExposures: 'lab_result_delete_relationship_exposures',
 };
 
 const PERMISSIONS_FOLLOW_UP = {
@@ -176,5 +198,6 @@ export default {
     PERMISSIONS_USER,
     PERMISSIONS_HELP,
     PERMISSIONS_COMMON,
-    PERMISSIONS_TEAMS
+    PERMISSIONS_TEAMS,
+    PERMISSIONS_LAB_RESULT
 }

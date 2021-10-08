@@ -117,8 +117,7 @@ class DropdownInput extends PureComponent {
                         ? this.props.data[this.props.data.map((e) => {return e.value}).indexOf(state)].type 
                         : this.props.objectType 
                             ?   (
-                                    this.props.objectType === 'Address' || 
-                                    this.props.objectType === 'LabResult' || 
+                                    this.props.objectType === 'Address' ||
                                     this.props.objectType === 'Documents' || 
                                     this.props.objectType === 'Sort' || 
                                     this.props.objectType === 'DateRanges' ||
@@ -145,8 +144,7 @@ class DropdownInput extends PureComponent {
                 returnedValue,
                 this.props.id,
                 this.props.objectType 
-                    ? (this.props.objectType === 'Address' || 
-                        this.props.objectType === 'LabResult' || 
+                    ? (this.props.objectType === 'Address' ||
                         this.props.objectType === 'Documents' || 
                         this.props.objectType === 'Sort' || 
                         this.props.objectType === 'DateRanges' ||

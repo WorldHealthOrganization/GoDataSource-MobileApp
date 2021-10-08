@@ -17,7 +17,7 @@ const designScreenSize = {
     height: 667
 };
 
-export const sideMenuKeys = ["followups", 'contacts', 'contactsOfContacts', 'cases', 'users', 'help'];
+export const sideMenuKeys = ["followups", 'contacts', 'contactsOfContacts', 'cases', 'labResults', 'users', 'help'];
 
 const sideMenuItems = {
     [sideMenuKeys[0]]: {
@@ -37,6 +37,10 @@ const sideMenuItems = {
         name: 'create-new-folder',
         label: translations.navigationDrawer.casesLabel,
         addButton: true
+    },
+    [sideMenuKeys[4]]: {
+        name: 'science',
+        label: translations.navigationDrawer.labResultsLabel
     }
 };
 
@@ -74,6 +78,14 @@ const tabsValuesRoutes = {
     followUpsSingle: [
         {key: 'genInfo', title: translations.followUpsSingleScreen.detailsiTitle},
         {key: 'quest', title: translations.followUpsSingleScreen.questionnaireTitle}
+    ],
+    labResultsSingle: [
+        {key: 'genInfo', title: translations.followUpsSingleScreen.detailsiTitle},
+        {key: 'quest', title: translations.followUpsSingleScreen.questionnaireTitle}
+    ],
+    labResultsFilter: [
+        {key: 'filters', title: translations.casesFilter.filterTitle},
+        {key: 'sort', title: translations.casesFilter.sortTitle}
     ],
     helpSingle: [
         {key: 'details', title: translations.helpScreen.helpSingleScreenTab},
@@ -325,7 +337,209 @@ const followUpsSingleScreen = {
     ],
     address: addressFields
 };
-
+const labResultsSingleScreen = {
+    generalInfo: [
+        {
+            fields: [
+                {
+                    cardNumber: 1,
+                    id: 'sampleLabId',
+                    label: translations.labResultsSingleScreen.sampleLabId,
+                    value: '',
+                    type: "TextInput",
+                    isRequired: false,
+                    isEditMode: true,
+                    objectType: 'LabResult'
+                },
+                {
+                    cardNumber: 1,
+                    id: 'dateSampleTaken',
+                    label: translations.labResultsSingleScreen.sampleTaken,
+                    type: 'DatePicker',
+                    value: '',
+                    isRequired: true,
+                    isEditMode: true,
+                    format: 'MM/dd/YYYY',
+                    objectType: 'LabResult',
+                    skipNone: true
+                },
+                {
+                    cardNumber: 1,
+                    id: 'dateSampleDelivered',
+                    label: translations.labResultsSingleScreen.sampleDelivered,
+                    type: 'DatePicker',
+                    value: false,
+                    isRequired: false,
+                    isEditMode: true,
+                    format: 'MM/dd/YYYY',
+                    objectType: 'LabResult'
+                },
+                {
+                    cardNumber: 1,
+                    id: 'dateTesting',
+                    label: translations.labResultsSingleScreen.dateSampleTested,
+                    value: '',
+                    type: "DatePicker",
+                    isRequired: false,
+                    isEditMode: true,
+                    format: 'MM/dd/YYYY',
+                    objectType: 'LabResult'
+                },
+                {
+                    cardNumber: 1,
+                    id: 'dateOfResult',
+                    label: translations.labResultsSingleScreen.dateOfResult,
+                    value: '',
+                    type: "DatePicker",
+                    isRequired: false,
+                    isEditMode: true,
+                    format: 'MM/dd/YYYY',
+                    objectType: 'LabResult'
+                },
+                {
+                    cardNumber: 1,
+                    id: 'labName',
+                    label: translations.labResultsSingleScreen.labName,
+                    value: '',
+                    type: "DropdownInput",
+                    isRequired: false,
+                    isEditMode: true,
+                    objectType: 'LabResult'
+                },{
+                    cardNumber: 1,
+                    id: 'sampleType',
+                    label: translations.labResultsSingleScreen.sampleType,
+                    value: '',
+                    type: "DropdownInput",
+                    isRequired: false,
+                    isEditMode: true,
+                    objectType: 'LabResult'
+                },{
+                    cardNumber: 1,
+                    id: 'testType',
+                    label: translations.labResultsSingleScreen.testType,
+                    value: '',
+                    type: "DropdownInput",
+                    isRequired: false,
+                    isEditMode: true,
+                    objectType: 'LabResult'
+                },{
+                    cardNumber: 1,
+                    id: 'result',
+                    label: translations.labResultsSingleScreen.result,
+                    value: '',
+                    type: "DropdownInput",
+                    isRequired: false,
+                    isEditMode: true,
+                    objectType: 'LabResult'
+                },{
+                    cardNumber: 1,
+                    id: 'testedFor',
+                    label: translations.labResultsSingleScreen.testedFor,
+                    value: '',
+                    type: "TextInput",
+                    isRequired: false,
+                    isEditMode: true,
+                    objectType: 'LabResult'
+                },{
+                    cardNumber: 1,
+                    id: 'status',
+                    label: translations.labResultsSingleScreen.status,
+                    labelValue: '',
+                    value: '',
+                    type: "DropdownInput",
+                    isRequired: false,
+                    isEditMode: true,
+                    objectType: 'LabResult'
+                },{
+                    cardNumber: 1,
+                    id: 'quantitativeResult',
+                    label: translations.labResultsSingleScreen.quantResult,
+                    labelValue: '',
+                    value: '',
+                    type: "TextInput",
+                    isRequired: false,
+                    isEditMode: true,
+                    objectType: 'LabResult'
+                },{
+                    cardNumber: 1,
+                    id: 'notes',
+                    label: translations.labResultsSingleScreen.notes,
+                    labelValue: '',
+                    value: '',
+                    type: "TextInput",
+                    isRequired: false,
+                    isEditMode: true,
+                    objectType: 'LabResult'
+                },
+            ]
+        }
+    ]
+};
+const labResultsFilterScreen = {
+    filter: [
+        {
+            fields: [
+                {
+                    cardNumber: 1,
+                    label: translations.labResultsFilter.personType,
+                    type: 'Section',
+                    hasBorderBottom: true,
+                    borderBottomColor: styles.navigationDrawerSeparatorGrey
+                },
+                {
+                    cardNumber: 1,
+                    id: 'type',
+                    type: 'Selector',
+                    value: '',
+                    shouldTranslate: true,
+                    data: [{value: translations.personTypes.cases, selected: true}, {value: translations.personTypes.contacts, selected: true}]
+                }
+            ]
+        }
+    ],
+    sort: {
+        fields: [
+            {
+                cardNumber: 1,
+                label: translations.sortTab.SortBy,
+                type: 'Section',
+                hasBorderBottom: true,
+                borderBottomColor: styles.navigationDrawerSeparatorGrey
+            },
+            {
+                cardNumber: 1,
+                id: 'sortCriteria',
+                type: 'DropdownInput',
+                label: translations.sortTab.sortCriteria,
+                isRequired: false,
+                isEditMode: true,
+                value: '',
+                objectType: 'Sort'
+            },
+            {
+                cardNumber: 1,
+                id: 'sortOrder',
+                type: 'DropdownInput',
+                label: translations.sortTab.sortOrder,
+                isRequired: false,
+                isEditMode: true,
+                value: '',
+                objectType: 'Sort'
+            },
+            {
+                cardNumber: 1,
+                id: 'deleteButton',
+                type: 'ActionsBar',
+                labelValue: 'test',
+                textsArray: ['Delete'],
+                textsStyleArray: [{color: styles.missedRedColor}],
+                onPressArray: [],
+                objectType: 'Sort'
+            }
+        ]
+    }
+};
 const caseSingleScreen = {
     personal: [
         {
@@ -1910,7 +2124,8 @@ const mongoCollections = {
     team: 'team',
     helpCategory: 'helpCategory',
     helpItem: 'helpItem',
-    user: 'user'
+    user: 'user',
+    common: 'common'
 };
 
 const changingMongoCollections = [
@@ -2086,6 +2301,8 @@ export default {
     tabsValuesRoutes,
     followUpsSingleScreen,
     followUpsFilterScreen,
+    labResultsSingleScreen,
+    labResultsFilterScreen,
     helpFilterScreen,
     casesFilterScreen,
     caseSingleScreen,

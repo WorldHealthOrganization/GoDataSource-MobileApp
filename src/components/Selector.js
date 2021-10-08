@@ -8,6 +8,7 @@ import {FlatList, StyleSheet, Text, View} from 'react-native';
 import Ripple from 'react-native-material-ripple';
 import styles from './../styles';
 import {connect} from "react-redux";
+import {getTranslation} from "../utils/functions";
 
 class Selector extends PureComponent {
 
@@ -51,13 +52,14 @@ class Selector extends PureComponent {
                 onPress={() => {this.handleSelectItem(item, index)}}
             >
                 <Text style={[style.itemTextStyle, {color: item.selected ? 'white' : styles.colorUnselectedItemText}]}>
-                    {item.value}
+                    {this.props.shouldTranslate ? getTranslation(item.value, this.props.translation) : item.value}
                 </Text>
             </Ripple>
         )
     };
 
     handleSelectItem = (item, index) => {
+        console.log("What item", item);
         this.props.selectItem(item, index, this.props.id);
     }
 }

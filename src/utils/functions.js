@@ -155,9 +155,16 @@ export function mapSideMenuKeysToScreenName(sideMenuKey){
             addScreen = true;
             break;
         case sideMenuKeys[4]:
-            screenToSwitchTo = constants.appScreens.usersScreen;
+            screenToSwitchTo = constants.appScreens.labResultsScreen;
+            break;
+        case `${sideMenuKeys[4]}-add`:
+            screenToSwitchTo = constants.appScreens.labResultsSingleScreen;
+            addScreen = true;
             break;
         case sideMenuKeys[5]:
+            screenToSwitchTo = constants.appScreens.usersScreen;
+            break;
+        case sideMenuKeys[6]:
             screenToSwitchTo = constants.appScreens.helpScreen;
             break;
         default:
@@ -227,9 +234,16 @@ export function navigation(event, navigator) {
                         addScreen = constants.appScreens.caseSingleScreen;
                         break;
                     case sideMenuKeys[4]:
-                        screenToSwitchTo = constants.appScreens.usersScreen;
+                        screenToSwitchTo = constants.appScreens.labResultsScreen;
+                        break;
+                    case `${sideMenuKeys[4]}-add`:
+                        screenToSwitchTo = constants.appScreens.labResultsSingleScreen;
+                        addScreen = constants.appScreens.labResultsSingleScreen;
                         break;
                     case sideMenuKeys[5]:
+                        screenToSwitchTo = constants.appScreens.usersScreen;
+                        break;
+                    case sideMenuKeys[6]:
                         screenToSwitchTo = constants.appScreens.helpScreen;
                     break;
                     default:
@@ -373,6 +387,7 @@ export function processFilePouch(path, type, totalNumberOfFiles, dispatch, isFir
         .then(() => processFileGeneral(path, fileName, unzipLocation, hubConfig, encryptedData))
         .then((data) => {
             if (data) {
+                console.log("Lab Pouch data",fileName, data?.length);
                 let promiseArray = [];
                 if (isFirstTime && forceBulk) {
                     promiseArray.push(processBulkDocs(data, type));
@@ -691,6 +706,8 @@ export function computeIdForFileType (fileType, outbreakId, file, type) {
             return generateId();
         // return (type + '_' + file.outbreakId + '_' + file._id);
         case 'relationship.json':
+            return generateId();
+        case 'labResult':
             return generateId();
         default:
             return (fileType + '_' + generateId());

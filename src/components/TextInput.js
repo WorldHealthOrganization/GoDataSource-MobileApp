@@ -191,7 +191,7 @@ class TextInput extends Component {
             this.props.onChange(
                 this.state.value,
                 this.props.id,
-                this.props.objectType ? (this.props.objectType === 'Address' || this.props.objectType === 'LabResult' || this.props.objectType === 'Documents' || this.props.objectType === 'DateRanges' ? this.props.index : this.props.objectType) : null,
+                this.props.objectType ? (this.props.objectType === 'Address' || this.props.objectType === 'Documents' || this.props.objectType === 'DateRanges' ? this.props.index : this.props.objectType) : null,
                 this.props.objectType
             )
         }

@@ -180,7 +180,7 @@ const DatePicker = React.memo(({
         onChange(
             createDate(date),
             id,
-            objectType ? (objectType === 'Address' || objectType === 'LabResult' || objectType === 'DateRanges' || objectType === 'Vaccines' ? index : objectType) : null,
+            objectType ? (objectType === 'Address' || objectType === 'DateRanges' || objectType === 'Vaccines' ? index : objectType) : null,
             objectType
         );
     };

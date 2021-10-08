@@ -45,10 +45,12 @@ class CardComponent extends Component {
                     answer = true;
                     break;
                 }
+                if(nextProps.item.type === 'Selector' && this.props.item !== nextProps.item){
+                    return true;
+                }
             }
         }
         return answer;
-        return true;
     }
 
     /** Please add here the react lifecycle methods that you need
@@ -215,11 +217,13 @@ class CardComponent extends Component {
                     />
                 );
             case 'Selector':
+                console.log("What data", this.props.item.data);
                 return (
                     <Selector
                         id={this.props.item.id}
                         key={this.props.item.id}
                         data={this.props.item.data}
+                        shouldTranslate={this.props.item.shouldTranslate}
                         selectItem={this.props.onSelectItem}
                         style={{width: width, height: '100%', marginHorizontal: marginHorizontal}}
                         objectType={this.props.item.objectType}
