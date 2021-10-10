@@ -17,11 +17,10 @@ export function storeOutbreak(outbreak) {
     if(outbreak?._id.includes("outbreak.json_")){
         outbreak._id = outbreak._id.substring(14, outbreak._id.length);
     }
-    console.log("Store the outbreak!", outbreak?.isContactLabResultsActive);
     if(!outbreak?.isContactLabResultsActive){
-        Object.keys(constants.PERMISSIONS_LAB_RESULT).forEach(permission=>{
-            constants.PERMISSIONS_LAB_RESULT[permission] = `${constants.PERMISSIONS_LAB_RESULT[permission]}_outbreak_inactive`;
-        });
+        constants.PERMISSIONS_LAB_RESULT = constants.PERMISSIONS_LAB_RESULT_OUTBREAK_INACTIVE;
+    } else {
+        constants.PERMISSIONS_LAB_RESULT = constants.PERMISSIONS_LAB_RESULT_CONSTANT;
     }
     return {
         type: ACTION_TYPE_STORE_OUTBREAK,
