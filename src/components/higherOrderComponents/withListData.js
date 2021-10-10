@@ -1,6 +1,7 @@
 import React, {Component} from 'react'
 import {Alert, BackHandler} from 'react-native';
 import get from 'lodash/get';
+import union from 'lodash/union';
 import {createDate, createStackFromComponent} from './../../utils/functions';
 import {extractIdFromPouchId, extractMainAddress, getTranslation, navigation} from "../../utils/functions";
 import RNExitApp from "react-native-exit-app";
@@ -167,11 +168,11 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                             lastElement: get(this.state, 'lastElement', null),
                             offset: get(this.state, 'offset', 0)
                         };
-                        console.log("What's my filter?", filter);
                         break;
                     default:
                         break;
                 }
+                console.log("Important cases filter", filter);
                 return filter;
             };
 
@@ -228,15 +229,15 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                                         if(screenType === 'FollowUpsScreen'){
                                             lastElement =  Object.assign({}, get(result, 'data[9].mainData', null), {followUpId: get(result, 'data[9].followUpData._id', null)});
                                         }
-                                        if(screenType === 'LabResultsScreen'){
-                                            lastElement =  Object.assign({}, get(result, 'data[9].mainData', null), {followUpId: get(result, 'data[9].labResultData._id', null)})
+                                        else if(screenType === 'LabResultsScreen'){
+                                            lastElement =  Object.assign({}, get(result, 'data[9].mainData', null), {labResultId: get(result, 'data[9].labResultData._id', null)});
+                                        } else {
+                                            lastElement = get(result, 'data[9].mainData', null);
                                         }
-                                        lastElement = get(result, 'data[9].mainData', null);
                                     }
                                     this.setState((prevState) => {
-                                        console.log("Refresh state", isRefresh, !isRefresh && (prevState.lastElement !== null ||  (prevState.data.length + result.data.length) === prevState.dataCount) ? prevState.data.concat(result.data).length : result.data.length);
                                         return {
-                                            data: !isRefresh && (prevState.lastElement !== null ||  (prevState.data.length + result.data.length) === prevState.dataCount) ? prevState.data.concat(result.data) : result.data,
+                                            data: !isRefresh && (prevState.lastElement !== null ||  (prevState.data.length + result.data.length) === prevState.dataCount) ? union(prevState.data,result.data) : result.data,
                                             lastElement: lastElement,
                                             isAddFromNavigation: false,
                                             dataCount: typeof get(result, 'dataCount') === 'number' ? get(result, 'dataCount') : prevState.dataCount,
@@ -293,7 +294,7 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
             };
 
             setMainFilter = (filter) => {
-                console.log("Set main filter", filter);
+                console.log("Important cases Set main filter", filter);
                 this.setState(prevState => ({
                     mainFilter: filter,
                     offset: 0

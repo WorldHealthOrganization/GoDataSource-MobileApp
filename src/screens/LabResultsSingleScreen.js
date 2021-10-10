@@ -87,6 +87,7 @@ class LabResultsSingleScreen extends Component {
         //     }
         // }
 
+        console.log("Sequence?", this.state?.item?.sequence);
         if (this.props.questions) {
             let mappedAnswers = mapAnswers(this.props.questions, this.state?.item?.questionnaireAnswers);
             this.setState({
@@ -408,129 +409,48 @@ class LabResultsSingleScreen extends Component {
 
     // Handle changes to the regular fields
     onChangeText = (value, id, objectType) => {
-        console.log("onChangeText: ", objectType);
-        if (objectType === 'LabResult') {
             this.setState(
                 (prevState) => ({
-                    item: Object.assign({}, prevState.item, { [id]: value }),
+                    item: Object.assign({}, _.set(prevState.item, id, value)),
                     isModified: true
                 }), () => {
                     console.log("onChangeText", id, " ", value, " ", this.state.item);
                 }
             )
-        } else {
-            if (objectType === 'Contact') {
-                this.setState(
-                    (prevState) => ({
-                        contact: Object.assign({}, prevState.contact, { [id]: value }),
-                        isModified: true
-                    }), () => {
-                        console.log("onChangeText", id, " ", value, " ", this.state.contact);
-                    }
-                )
-            }
-        }
     };
     onChangeDate = (value, id, objectType) => {
-        console.log("onChangeDate: ", value, id);
-
-        if (objectType === 'LabResult') {
             this.setState(
                 (prevState) => ({
-                    item: Object.assign({}, prevState.item, { [id]: new Date(value).toISOString() }),
+                    item: Object.assign({},_.set(prevState.item,id,new Date(value).toISOString())),
                     isModified: true
                 })
                 , () => {
                     console.log("onChangeDate", id, " ", value, " ", this.state.item);
                 }
             )
-        } else {
-            if (objectType === 'Contact') {
-                this.setState(
-                    (prevState) => ({
-                        contact: Object.assign({}, prevState.contact, { [id]: new Date(value).toISOString() }),
-                        isModified: true
-                    })
-                    , () => {
-                        console.log("onChangeDate", id, " ", value, " ", this.state.contact);
-                    }
-                )
-            }
-        }
     };
     onChangeSwitch = (value, id, objectType) => {
         // console.log("onChangeSwitch: ", value, id, this.state.item);
-        if (id === 'fillLocation') {
-            geolocation.getCurrentPosition((position) => {
-                    this.setState(
-                        (prevState) => ({
-                            item: Object.assign({}, prevState.item, { [id]: value ? {geoLocation: { lat: position.coords.latitude, lng: position.coords.longitude }} : {geoLocation: { lat: null, lng: null }} }),
-                            isModified: true
-                        }), () => {
-                            console.log("onChangeSwitch", id, " ", value, " ", this.state.item);
-                        }
-                    )
-                },
-                (error) => {
-                    Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(error.message, this.props.translation), [
-                        {
-                            text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
-                            onPress: () => { console.log("OK pressed") }
-                        }
-                    ])
-                },
-                {
-                    timeout: 5000
-                }
-            )
-        } else {
-            if (objectType === 'LabResult') {
                 this.setState(
                     (prevState) => ({
-                        item: Object.assign({}, prevState.item, { [id]: value }),
+                        item: Object.assign({}, _.set(prevState.item,id,value)),
                         isModified: true
                     }), () => {
                         console.log("onChangeSwitch", id, " ", value, " ", this.state.item);
                     }
                 )
-            } else {
-                if (objectType === 'Contact') {
-                    this.setState(
-                        (prevState) => ({
-                            contact: Object.assign({}, prevState.contact, { [id]: value }),
-                            isModified: true
-                        }), () => {
-                            console.log("onChangeSwitch", id, " ", value, " ", this.state.contact);
-                        }
-                    )
-                }
-            }
-        }
 
     };
     onChangeDropDown = (value, id, objectType) => {
         console.log("onChangeDropDown: ", value, id, objectType);
-        if (objectType === 'LabResult') {
                 this.setState(
                     (prevState) => ({
-                        item: Object.assign({}, prevState.item, { [id]: value && value.value !== undefined ? value.value : value }),
+                        item: Object.assign({}, _.set(prevState.item,id,value && value.value !== undefined ? value.value : value)),
                         isModified: true
                     }), () => {
                         console.log("onChangeDropDown", id, " ", value, " ", this.state.item);
                     }
                 )
-        } else {
-            if (objectType === 'Contact') {
-                this.setState(
-                    (prevState) => ({
-                        contact: Object.assign({}, prevState.contact, { [id]: value && value.value !== undefined ? value.value : value }),
-                        isModified: true
-                    }), () => {
-                        console.log("onChangeDropDown", id, " ", value, " ", this.state.contact);
-                    }
-                )
-            }
-        }
     };
 
     // Handle changes to the questionnaire fields
@@ -710,6 +630,17 @@ class LabResultsSingleScreen extends Component {
                         if (labResultClone.targeted !== false && labResultClone.targeted !== true) {
                             labResultClone.targeted = false;
                         }
+                        if(labResultClone.sequence){
+                            if(labResultClone.sequence.hasSequence){
+                                delete labResultClone.sequence.noSequenceReason;
+                            } else {
+                                delete labResultClone.sequence.dateSampleSent;
+                                delete labResultClone.sequence.labId;
+                                delete labResultClone.sequence.dateResult;
+                                delete labResultClone.sequence.resultId;
+                            }
+                        }
+                        console.log("Before save delete sequence", labResultClone);
 
                         if (this.props.isNew) {
                             labResultClone.personType = this.props.personType;

@@ -502,9 +502,11 @@ export function getDataFromDatabaseFromFileSql (table, lastSyncDate, password) {
         }
     };
 
+    console.log("SYNCLAB query", query);
     return executeQuery(query)
         .then((resultQuery) => resultQuery.map((e) => e.data))
         .then((response) => {
+            console.log("SYNCLAB get data from file SQL", response);
             return handleDataForZip(response, table, password, true);
         })
         .catch((errorGetDataFromDatabaseFromFileSql) => {

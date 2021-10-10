@@ -2,7 +2,6 @@ import { getAllLabResultsForOutbreakQuery } from "../queries/labResults";
 import {insertOrUpdate} from "../queries/sqlTools/helperMethods";
 
 export function getAllLabResultsForOutbreak({outbreakId, labResultsFilter, searchText, lastElement, offset}, computeCount) {
-    console.log("Condition filter what", outbreakId, labResultsFilter)
     return getAllLabResultsForOutbreakQuery(
         outbreakId,
         labResultsFilter,

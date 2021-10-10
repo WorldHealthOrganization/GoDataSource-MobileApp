@@ -8,6 +8,7 @@ jsonSql.configure({separatedValues: false});
 
 export function getPersonWithRelationsForOutbreakId({outbreakId, filter, search, lastElement, offset, personType}, computeCount) {
 
+    console.log("Important cases inside", filter);
     let countPromise = null;
     let mainPromise = executeQuery(createGeneralQuery({
         outbreakId: outbreakId,

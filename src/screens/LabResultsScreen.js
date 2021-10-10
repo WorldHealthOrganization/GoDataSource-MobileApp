@@ -81,7 +81,7 @@ class LabResultsScreen extends Component {
     // and can slow down the app
     render() {
         let {mainFilter} = this.props;
-        console.log("Lab results prop important", mainFilter);
+        console.log("Lab results prop important", this.props.data?.length);
 
         let filterNumbers = 0;
         if (mainFilter) {

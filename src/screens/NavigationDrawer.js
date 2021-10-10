@@ -76,8 +76,6 @@ class NavigationDrawer extends Component {
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
-        console.log("Number", this.state.outbreaks.length);
-        console.log("What's the item", this.props.outbreak);
         return (
             <View style={style.container}>
                 <View

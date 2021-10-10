@@ -309,7 +309,7 @@ class CaseSingleScreen extends Component {
                                             constants.PERMISSIONS_LAB_RESULT.labResultList
                                         ]
                                     )) ? (
-                                        <View style={{backgroundColor: 'black', zIndex: 999}}>
+                                        <View style={{zIndex: 999}}>
                                             <Menu
                                                 ref="menuRef"
                                                 button={

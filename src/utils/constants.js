@@ -96,7 +96,7 @@ const PERMISSIONS_CASE = {
     caseDeleteRelationshipExposures: 'case_delete_relationship_exposures',
 };
 
-const PERMISSIONS_LAB_RESULT = {
+let PERMISSIONS_LAB_RESULT = {
     labResultAll: 'lab_result_all',
     labResultView: 'lab_result_view',
     labResultList: 'lab_result_list',

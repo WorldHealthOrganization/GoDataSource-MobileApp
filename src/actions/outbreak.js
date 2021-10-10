@@ -8,6 +8,7 @@ import {
     ACTION_TYPE_STORE_USER_LOCATIONS,
     ACTION_TYPE_STORE_USER_LOCATIONS_LIST
 } from './../utils/enums';
+import constants from './../utils/constants';
 import {getOutbreakByIdRequest} from './../queries/outbreak';
 import errorTypes from './../utils/errorTypes';
 
@@ -16,7 +17,12 @@ export function storeOutbreak(outbreak) {
     if(outbreak?._id.includes("outbreak.json_")){
         outbreak._id = outbreak._id.substring(14, outbreak._id.length);
     }
-    console.log("Store the outbreak!", outbreak?.name);
+    console.log("Store the outbreak!", outbreak?.isContactLabResultsActive);
+    if(!outbreak?.isContactLabResultsActive){
+        Object.keys(constants.PERMISSIONS_LAB_RESULT).forEach(permission=>{
+            constants.PERMISSIONS_LAB_RESULT[permission] = `${constants.PERMISSIONS_LAB_RESULT[permission]}_outbreak_inactive`;
+        });
+    }
     return {
         type: ACTION_TYPE_STORE_OUTBREAK,
         payload: outbreak

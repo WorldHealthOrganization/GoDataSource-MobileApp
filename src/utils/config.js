@@ -471,6 +471,85 @@ const labResultsSingleScreen = {
                     isRequired: false,
                     isEditMode: true,
                     objectType: 'LabResult'
+                },{
+                    cardNumber: 2,
+                    id: 'sequence.hasSequence',
+                    label: translations.labResultsSingleScreen.hasVariantStrain,
+                    labelValue: '',
+                    value: false,
+                    type: "SwitchInput",
+                    isRequired: false,
+                    isEditMode: true,
+                    objectType: 'LabResult',
+                    activeButtonColor: styles.missedRedColor,
+                    activeBackgroundColor: styles.missedRedColorWithOpacity,
+                },
+                {
+                    cardNumber: 2,
+                    id: 'sequence.noSequenceReason',
+                    label: translations.labResultsSingleScreen.sequenceReason,
+                    labelValue: '',
+                    value: '',
+                    type: "TextInput",
+                    isRequired: false,
+                    isEditMode: true,
+                    objectType: 'LabResult',
+                    dependsOn: 'sequence.hasSequence',
+                    showWhenDependence: false
+                },
+                {
+                    cardNumber: 2,
+                    id: 'sequence.dateSampleSent',
+                    label: translations.labResultsSingleScreen.dateSampleSentSeq,
+                    labelValue: '',
+                    value: '',
+                    type: "DatePicker",
+                    isRequired: false,
+                    isEditMode: true,
+                    objectType: 'LabResult',
+                    dependsOn: 'sequence.hasSequence',
+                    showWhenDependence: true,
+                    format: 'MM/dd/YYYY'
+                },
+                {
+                    cardNumber: 2,
+                    id: 'sequence.labId',
+                    label: translations.labResultsSingleScreen.labNameSeq,
+                    labelValue: '',
+                    value: '',
+                    type: "DropdownInput",
+                    isRequired: false,
+                    isEditMode: true,
+                    objectType: 'LabResult',
+                    dependsOn: 'sequence.hasSequence',
+                    showWhenDependence: true,
+                },
+                {
+                    cardNumber: 2,
+                    id: 'sequence.dateResult',
+                    label: translations.labResultsSingleScreen.dateResultSeq,
+                    labelValue: '',
+                    value: '',
+                    type: "DatePicker",
+                    isRequired: false,
+                    isEditMode: true,
+                    objectType: 'LabResult',
+                    dependsOn: 'sequence.hasSequence',
+                    showWhenDependence: true,
+                    format: 'MM/dd/YYYY'
+                },
+                {
+                    cardNumber: 2,
+                    id: 'sequence.resultId',
+                    label: translations.labResultsSingleScreen.resultSeq,
+                    labelValue: '',
+                    value: '',
+                    type: "DropdownInput",
+                    isRequired: false,
+                    isEditMode: true,
+                    objectType: 'LabResult',
+                    dependsOn: 'sequence.hasSequence',
+                    showWhenDependence: true,
                 },
             ]
         }
@@ -1050,6 +1129,7 @@ const followUpsFilterScreen = {
                     cardNumber: 1,
                     id: 'gender',
                     type: 'Selector',
+                    shouldTranslate: true,
                     value: '',
                     data: [{value: 'LNG_REFERENCE_DATA_CATEGORY_GENDER_MALE'}, {value: 'LNG_REFERENCE_DATA_CATEGORY_GENDER_FEMALE'}]
                 }
@@ -1221,6 +1301,7 @@ const casesFilterScreen = {
                     cardNumber: 1,
                     id: 'gender',
                     type: 'Selector',
+                    shouldTranslate: true,
                     value: '',
                     data: [{value: 'LNG_REFERENCE_DATA_CATEGORY_GENDER_MALE'}, {value: 'LNG_REFERENCE_DATA_CATEGORY_GENDER_FEMALE'}]
                 }
@@ -2129,12 +2210,13 @@ const mongoCollections = {
 };
 
 const changingMongoCollections = [
-    'labResult',
+    // 'labResult',
     'user'
 ];
 
 const changingSQLiteCollections = [
     'followUp',
+    'labResult',
     'person',
     'relationship'
 ];

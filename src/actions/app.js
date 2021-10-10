@@ -587,6 +587,7 @@ export function sendDatabaseToServer () {
                 }
             })
             .then((zipPath) => {
+                console.log("SYNCLAB zipPath", zipPath);
                 let promise = zipPath ? postDatabaseSnapshotRequest(internetCredentialsGlobal, zipPath) : Promise.resolve();
                 if(zipPath) {
                     dispatch(setSyncState({id: 'createFile', status: 'Success'}));
@@ -611,6 +612,7 @@ export function sendDatabaseToServer () {
                         lastSyncDateGlobal,
                         dispatch)
                         .then((databasePath) => {
+                            console.log("")
                             dispatch(processFilesForSyncNew(null, databasePath, {
                                 url: Platform.OS === 'ios' ? internetCredentialsGlobal.server : internetCredentialsGlobal.service,
                                 clientId: internetCredentialsGlobal.username,
