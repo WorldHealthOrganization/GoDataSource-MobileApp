@@ -155,7 +155,8 @@ export function postDatabaseSnapshotRequest(internetCredentials, path) {
                 {name: 'generatePersonVisualId', data: `${true}`}
             ], '0', '6000000')
             .then((res) => {
-                // console.log('Finished sending the data to the server: ', res);
+                console.log('SYNCLAB Finished sending the data to the server: ', res, res.info());
+                console.log("SYNCLAB json server response", res.json());
                 let status = res.info().status;
                 if(status === 200) {
                     //     console.log("Got database");

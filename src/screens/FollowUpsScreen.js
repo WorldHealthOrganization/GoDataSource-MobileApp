@@ -32,6 +32,7 @@ import {enhanceListWithGetData} from './../components/higherOrderComponents/with
 import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
 import {bindActionCreators} from "redux";
 import {setLoaderState} from './../actions/app';
+import {setOutbreakCanBeChanged} from './../actions/outbreak'
 import PermissionComponent from './../components/PermissionComponent';
 import {handleQRSearchTransition} from "../utils/screenTransitionFunctions";
 import withPincode from './../components/higherOrderComponents/withPincode';
@@ -69,8 +70,23 @@ class FollowUpsScreen extends Component {
     }
 
     componentDidMount = () => {
-        this.setColors()
+        this.setColors();
+
+        const listener = {
+            componentDidAppear: () => {
+                this.props.setOutbreakCanBeChanged(true);
+            },
+            componentDidDisappear: () => {
+                this.props.setOutbreakCanBeChanged(false);
+            }
+        };
+        // Register the listener to all events related to our component
+        this.navigationListener = Navigation.events().registerComponentListener(listener, this.props.componentId);
     };
+
+    componentWillUnmount() {
+        this.navigationListener.remove();
+    }
 
     // The render method should have at least business logic as possible,
     // because this will be called whenever there is a new setState call
@@ -394,7 +410,8 @@ mapStateToProps = (state) => {
 
 function matchDispatchProps(dispatch) {
     return bindActionCreators({
-        setLoaderState
+        setLoaderState,
+        setOutbreakCanBeChanged
     }, dispatch);
 }
 

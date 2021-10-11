@@ -11,7 +11,8 @@ import {connect} from "react-redux";
 import {bindActionCreators, compose} from "redux";
 import SearchFilterView from './../components/SearchFilterView';
 import HelpListItem from './../components/HelpListItem';
-import {addFilterForScreen, removeFilterForScreen} from './../actions/app';
+import {addFilterForScreen, removeFilterForScreen} from './../actions/app'
+import {setOutbreakCanBeChanged} from './../actions/outbreak'
 import _ from 'lodash';
 import {
     calculateDimension, createStackFromComponent,
@@ -79,6 +80,17 @@ class HelpScreen extends Component {
                 console.log ('filter removed')
             })
         }
+
+        const listener = {
+            componentDidAppear: () => {
+                this.props.setOutbreakCanBeChanged(true);
+            },
+            componentDidDisappear: () => {
+                this.props.setOutbreakCanBeChanged(false);
+            }
+        };
+        // Register the listener to all events related to our component
+        this.navigationListener = Navigation.events().registerComponentListener(listener, this.props.componentId);
     };
 
     shouldComponentUpdate(nextProps, nextState) {
@@ -91,6 +103,7 @@ class HelpScreen extends Component {
 
     componentWillUnmount() {
         BackHandler.removeEventListener('hardwareBackPress', this.handleBackButtonClick);
+        this.navigationListener.remove();
     }
 
     handleBackButtonClick() {
@@ -518,6 +531,7 @@ function matchDispatchProps(dispatch) {
     return bindActionCreators({
         addFilterForScreen,
         removeFilterForScreen,
+        setOutbreakCanBeChanged
     }, dispatch);
 }
 

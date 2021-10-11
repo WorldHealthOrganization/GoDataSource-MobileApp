@@ -15,6 +15,7 @@ import {bindActionCreators} from "redux";
 import ElevatedView from 'react-native-elevated-view';
 import Breadcrumb from './../components/Breadcrumb';
 import {setLoaderState} from './../actions/app';
+import {setOutbreakCanBeChanged} from './../actions/outbreak';
 import AnimatedListView from './../components/AnimatedListView';
 import ViewHOC from './../components/ViewHOC';
 import translations from './../utils/translations';
@@ -65,6 +66,22 @@ class LabResultsScreen extends Component {
             riskColors: riskColors
         });
         // this.props.setMainFilter()
+
+
+        const listener = {
+            componentDidAppear: () => {
+                this.props.setOutbreakCanBeChanged(true);
+            },
+            componentDidDisappear: () => {
+                this.props.setOutbreakCanBeChanged(false);
+            }
+        };
+        // Register the listener to all events related to our component
+        this.navigationListener = Navigation.events().registerComponentListener(listener, this.props.componentId);
+    }
+
+    componentWillUnmount() {
+        this.navigationListener.remove();
     }
 
     componentDidUpdate(prevProps) {
@@ -81,7 +98,7 @@ class LabResultsScreen extends Component {
     // and can slow down the app
     render() {
         let {mainFilter} = this.props;
-        console.log("Lab results prop important", mainFilter);
+        console.log("Lab results prop important", this.props.data?.length);
 
         let filterNumbers = 0;
         if (mainFilter) {
@@ -362,7 +379,8 @@ function mapStateToProps(state) {
 
 function matchDispatchProps(dispatch) {
     return bindActionCreators({
-        setLoaderState
+        setLoaderState,
+        setOutbreakCanBeChanged
     }, dispatch);
 }
 

@@ -86,7 +86,7 @@ class LabResultsSingleGetInfoContainer extends PureComponent {
         }
 
         if (item.type === 'DatePicker' && this.props.item && this.props.item !== undefined && this.props.item[item.id] !== undefined) {
-            value = this.props.item[item.id]
+            value = _.get(this.props.item, item.id, null)
         } else if (item.type === 'SwitchInput' && this.props.item && this.props.item !== undefined && this.props.item[item.id] !== undefined) {
             if (item.id === 'fillLocation') {
                 value = false;
@@ -94,7 +94,7 @@ class LabResultsSingleGetInfoContainer extends PureComponent {
                     value = true;
                 }
             } else {
-                value = this.props.item[item.id]
+                value = _.get(this.props.item, item.id, null)
             }
         } else {
             value = this.computeValueForLabResultSingleScreen(item);
@@ -102,6 +102,23 @@ class LabResultsSingleGetInfoContainer extends PureComponent {
 
         if (item.type === 'DatePicker' && value === '') {
             value = null
+        }
+
+        if(item.dependsOn){
+            // const dependItem = config.labResultsSingleScreen.generalInfo[0].fields.find(e=> e.id === item.dependsOn);
+            const dependValue = _.get(this.props.item, item.dependsOn, null);
+            if(dependValue !== item.showWhenDependence){
+                return;
+            }
+        }
+
+        if (this.props.selectedItemIndexForTextSwitchSelectorForAge !== null && this.props.selectedItemIndexForTextSwitchSelectorForAge !== undefined && item.objectType === 'Case' && item.dependsOn !== undefined && item.dependsOn !== null) {
+            let itemIndexInConfigTextSwitchSelectorValues = config[item.dependsOn].map((e) => { return e.value }).indexOf(item.id);
+            if (itemIndexInConfigTextSwitchSelectorValues > -1) {
+                if (itemIndexInConfigTextSwitchSelectorValues !== this.props.selectedItemIndexForTextSwitchSelectorForAge) {
+                    return
+                }
+            }
         }
 
         return (
@@ -127,7 +144,7 @@ class LabResultsSingleGetInfoContainer extends PureComponent {
             return this.props.item && this.props.item.address && this.props.item.address[item.id] !== undefined ?
                 getTranslation(this.props.item.address[item.id], this.props.translation) : '';
         }
-        return this.props.item && this.props.item[item.id] ? getTranslation(this.props.item[item.id], this.props.translation) : '';
+        return this.props.item && _.get(this.props.item, item.id, null) ? getTranslation(_.get(this.props.item, item.id, null), this.props.translation) : '';
     };
 
     computeDataForLabResultSingleScreenDropdownInput = (item) => {
@@ -153,6 +170,16 @@ class LabResultsSingleGetInfoContainer extends PureComponent {
         }
         if (item.id === 'result') {
             return  _.filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId.includes("LNG_REFERENCE_DATA_CATEGORY_LAB_TEST_RESULT")})
+                .sort((a, b) => { return a.order - b.order; })
+                .map((o) => { return { label: getTranslation(o.value, this.props.translation), value: o.value } })
+        }
+        if(item.id === 'sequence.labId') {
+            return  _.filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId.includes("LNG_REFERENCE_DATA_CATEGORY_LAB_SEQUENCE_LABORATORY")})
+                .sort((a, b) => { return a.order - b.order; })
+                .map((o) => { return { label: getTranslation(o.value, this.props.translation), value: o.value } })
+        }
+        if(item.id === 'sequence.resultId') {
+            return  _.filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId.includes("LNG_REFERENCE_DATA_CATEGORY_LAB_SEQUENCE_RESULT")})
                 .sort((a, b) => { return a.order - b.order; })
                 .map((o) => { return { label: getTranslation(o.value, this.props.translation), value: o.value } })
         }

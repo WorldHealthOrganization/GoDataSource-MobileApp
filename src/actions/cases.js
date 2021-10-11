@@ -11,7 +11,7 @@ import {getPersonWithRelationsForOutbreakId} from './../queries/sqlTools/sqlQuer
 
 // Add here only the actions, not also the requests that are executed. For that purpose is the requests directory
 export function getCasesForOutbreakId({outbreakId, casesFilter, searchText, lastElement, offset}, computeCount) {
-    console.log("Important things", outbreakId);
+    console.log("Important cases things", casesFilter);
     return getPersonWithRelationsForOutbreakId({
         outbreakId,
         filter: casesFilter,

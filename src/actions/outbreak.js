@@ -5,9 +5,11 @@ import {
     ACTION_TYPE_STORE_LOCATIONS,
     ACTION_TYPE_STORE_LOCATIONS_LIST,
     ACTION_TYPE_STORE_OUTBREAK,
+    ACTION_TYPE_OUTBREAK_CHANGE,
     ACTION_TYPE_STORE_USER_LOCATIONS,
     ACTION_TYPE_STORE_USER_LOCATIONS_LIST
 } from './../utils/enums';
+import constants from './../utils/constants';
 import {getOutbreakByIdRequest} from './../queries/outbreak';
 import errorTypes from './../utils/errorTypes';
 
@@ -16,10 +18,21 @@ export function storeOutbreak(outbreak) {
     if(outbreak?._id.includes("outbreak.json_")){
         outbreak._id = outbreak._id.substring(14, outbreak._id.length);
     }
-    console.log("Store the outbreak!", outbreak?.name);
+    if(!outbreak?.isContactLabResultsActive){
+        constants.PERMISSIONS_LAB_RESULT = constants.PERMISSIONS_LAB_RESULT_OUTBREAK_INACTIVE;
+    } else {
+        constants.PERMISSIONS_LAB_RESULT = constants.PERMISSIONS_LAB_RESULT_CONSTANT;
+    }
     return {
         type: ACTION_TYPE_STORE_OUTBREAK,
         payload: outbreak
+    }
+}
+
+export function setOutbreakCanBeChanged(canOutbreakChange) {
+    return {
+        type: ACTION_TYPE_OUTBREAK_CHANGE,
+        payload: canOutbreakChange
     }
 }
 

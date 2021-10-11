@@ -133,10 +133,6 @@ export function computeOutbreakSwitch(user, outbreakId){
             const clusters = await getClusters(outbreakId);
             await getTranslations(user.languageId, outbreakId);
 
-            console.log("Maybe locations", locations);
-            console.log("Maybe clusters", clusters);
-
-            console.log()
             let arrayOfActions = [
                 storeUser(user),
                 storeOutbreak(outbreakAndLocationInfo || null),

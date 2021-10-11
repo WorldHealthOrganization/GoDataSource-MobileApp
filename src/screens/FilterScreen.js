@@ -24,8 +24,8 @@ class FilterScreen extends Component {
             filter: {
                 filter: {
                     gender: {
-                        Male: false,
-                        Female: false
+                        [translations.localTranslationTokens.male]: false,
+                        [translations.localTranslationTokens.female]: false
                     },
                     age: [0, 150],
                     selectedLocations: [],
@@ -67,12 +67,12 @@ class FilterScreen extends Component {
 
         if (activeFilters !== undefined && activeFilters !== null) {
             if (activeFilters.gender) {
-                if (activeFilters.gender === localTranslationTokens.male && filterClone.gender.Male === false) {
-                    filterClone.gender.Male = true
-                    filterClone.gender.Female = false
-                } else if (activeFilters.gender === localTranslationTokens.female && filterClone.gender.Female === false) {
-                    filterClone.gender.Female = true
-                    filterClone.gender.Male = false
+                if (activeFilters.gender === localTranslationTokens.male && filterClone.gender[localTranslationTokens.male] === false) {
+                    filterClone.gender[localTranslationTokens.male] = true
+                    filterClone.gender[localTranslationTokens.female] = false
+                } else if (activeFilters.gender === localTranslationTokens.female && filterClone.gender[localTranslationTokens.female] === false) {
+                    filterClone.gender[localTranslationTokens.female] = true
+                    filterClone.gender[localTranslationTokens.male] = false
                 }
             }
 
@@ -328,10 +328,11 @@ class FilterScreen extends Component {
         let filterSortClone = filter.sort.slice()
         let filterClone = {};
 
-        if (filterStateClone.gender.Male && !filterStateClone.gender.Female) {
+        console.log("Important cases filter state clone", filterStateClone);
+        if (filterStateClone.gender[localTranslationTokens.male] && !filterStateClone.gender[localTranslationTokens.female]) {
             filterClone.gender = localTranslationTokens.male
         }
-        if (filterStateClone.gender.Female && !filterStateClone.gender.Male) {
+        if (filterStateClone.gender[localTranslationTokens.female] && !filterStateClone.gender[localTranslationTokens.male]) {
             filterClone.gender = localTranslationTokens.female
         }
         filterClone.type = []

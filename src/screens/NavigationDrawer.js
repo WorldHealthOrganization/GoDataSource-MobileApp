@@ -76,8 +76,6 @@ class NavigationDrawer extends Component {
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
-        console.log("Number", this.state.outbreaks.length);
-        console.log("What's the item", this.props.outbreak);
         return (
             <View style={style.container}>
                 <View
@@ -111,6 +109,7 @@ class NavigationDrawer extends Component {
                                     containerStyle={{
                                         margin:0, padding:0
                                     }}
+                                    disabled={!this.props.outbreak?.canOutbreakChange}
                                     data={this.state.outbreaks}
                                     onChangeText={(value,index,data)=>{
                                         console.log("What's the value now", data[index].name, value);
@@ -194,7 +193,7 @@ class NavigationDrawer extends Component {
                         key={sideMenuKeys[6]}
                         label={getTranslation(translations.navigationDrawer.helpLabel, this.props.translation)}
                         name={sideMenuKeys[6]}
-                        onPress={() => this.handlePressOnListItem(sideMenuKeys[5])}
+                        onPress={() => this.handlePressOnListItem(sideMenuKeys[6])}
                         isSelected={sideMenuKeys[6] === this.state.selectedScreen}
                     />
                     <NavigationDrawerListItem
@@ -348,7 +347,7 @@ function mapStateToProps(state) {
         screenSize: lodashGet(state, 'app.screenSize', config.designScreenSize),
         selectedScreen: lodashGet(state, 'app.selectedScreen', 0),
         availableLanguages: lodashGet(state, 'app.availableLanguages', []),
-        outbreak: lodashGet(state, 'outbreak', {name: 'No outbreak'}),
+        outbreak: lodashGet(state, 'outbreak', {name: 'No outbreak', canOutbreakChange: false}),
         translation: lodashGet(state, 'app.translation', [])
     };
 }
@@ -362,7 +361,7 @@ function matchDispatchProps(dispatch) {
         changeAppRoot,
         saveSelectedScreen,
         storeOutbreak,
-        computeOutbreakSwitch
+        computeOutbreakSwitch,
     }, dispatch);
 }
 

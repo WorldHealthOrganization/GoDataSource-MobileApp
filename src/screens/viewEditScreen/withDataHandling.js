@@ -625,102 +625,14 @@ export function enhanceTabsWithDataHandling() {
             onChangeSingleSelection = (value, id, parentId, index) => {
 
                 this.onChangeAnswerGeneral(value, id, parentId, index);
-                // let questionnaireAnswers = _.cloneDeep(this.state.previousAnswers);
-                //
-                // if (parentId) {
-                //     if (!questionnaireAnswers[parentId]) {
-                //         questionnaireAnswers[parentId] = [];
-                //     }
-                //     if (questionnaireAnswers[parentId] && Array.isArray(questionnaireAnswers[parentId]) && questionnaireAnswers[parentId].length > 0 && questionnaireAnswers[parentId][0]) {
-                //         if(!questionnaireAnswers[parentId][0].hasOwnProperty("subAnswers")){
-                //             questionnaireAnswers[parentId][0] = Object.assign({}, questionnaireAnswers[parentId][0],{ subAnswers: {}});
-                //         }
-                //         if (typeof questionnaireAnswers[parentId][0].subAnswers === "object" && Object.keys(questionnaireAnswers[parentId][0].subAnswers).length === 0) {
-                //             questionnaireAnswers[parentId][0].subAnswers = {};
-                //         }
-                //         if (!questionnaireAnswers[parentId][0].subAnswers[id]) {
-                //             questionnaireAnswers[parentId][0].subAnswers[id] = [];
-                //         }
-                //         questionnaireAnswers[parentId][0].subAnswers[id][0] = value;
-                //     }
-                // } else {
-                //     if (!questionnaireAnswers[id]) {
-                //         questionnaireAnswers[id] = [];
-                //     }
-                //     questionnaireAnswers[id][0] = value;
-                // }
-                // this.setState(prevState => ({
-                //         previousAnswers: questionnaireAnswers,
-                //         isModified: true
-                //     })
-                // )
             };
             onChangeMultipleSelection = (value, id, parentId, index) => {
                 this.onChangeAnswerGeneral(value, id, parentId, index);
 
-                // let questionnaireAnswers = _.cloneDeep(this.state.previousAnswers);
-                //
-                // if (parentId) {
-                //     if (!questionnaireAnswers[parentId]) {
-                //         questionnaireAnswers[parentId] = [];
-                //     }
-                //     if (questionnaireAnswers[parentId] && Array.isArray(questionnaireAnswers[parentId]) && questionnaireAnswers[parentId].length > 0 && questionnaireAnswers[parentId][0]) {
-                //         if(!questionnaireAnswers[parentId][0].hasOwnProperty("subAnswers")){
-                //             questionnaireAnswers[parentId][0] = Object.assign({}, questionnaireAnswers[parentId][0],{ subAnswers: {}});
-                //         }
-                //         if (typeof questionnaireAnswers[parentId][0].subAnswers === "object" && Object.keys(questionnaireAnswers[parentId][0].subAnswers).length === 0) {
-                //             questionnaireAnswers[parentId][0].subAnswers = {};
-                //         }
-                //         if (!questionnaireAnswers[parentId][0].subAnswers[id]) {
-                //             questionnaireAnswers[parentId][0].subAnswers[id] = [];
-                //         }
-                //         questionnaireAnswers[parentId][0].subAnswers[id][0] = value;
-                //     }
-                // } else {
-                //     if (!questionnaireAnswers[id]) {
-                //         questionnaireAnswers[id] = [];
-                //     }
-                //     questionnaireAnswers[id][0] = value;
-                // }
-                // this.setState(prevState => ({
-                //         previousAnswers: questionnaireAnswers,
-                //         isModified: true
-                //     })
-                // )
             };
             onChangeDateAnswer = (value, id, parentId, index) => {
                 this.onChangeAnswerGeneral(value, id, parentId, index);
 
-                // let questionnaireAnswers = _.cloneDeep(this.state.previousAnswers);
-                //
-                // if (parentId) {
-                //     if (!questionnaireAnswers[parentId]) {
-                //         questionnaireAnswers[parentId] = [];
-                //     }
-                //     if (questionnaireAnswers[parentId] && Array.isArray(questionnaireAnswers[parentId]) && questionnaireAnswers[parentId].length > 0 && questionnaireAnswers[parentId][0]) {
-                //         if(!questionnaireAnswers[parentId][0].hasOwnProperty("subAnswers")){
-                //             questionnaireAnswers[parentId][0] = Object.assign({}, questionnaireAnswers[parentId][0],{ subAnswers: {}});
-                //         }
-                //         if (typeof questionnaireAnswers[parentId][0].subAnswers === "object" && Object.keys(questionnaireAnswers[parentId][0].subAnswers).length === 0) {
-                //             questionnaireAnswers[parentId][0].subAnswers = {};
-                //         }
-                //         if (!questionnaireAnswers[parentId][0].subAnswers[id]) {
-                //             questionnaireAnswers[parentId][0].subAnswers[id] = [];
-                //         }
-                //         questionnaireAnswers[parentId][0].subAnswers[id][0] = value;
-                //     }
-                // } else {
-                //     if (!questionnaireAnswers[id]) {
-                //         questionnaireAnswers[id] = [];
-                //     }
-                //     questionnaireAnswers[id][index] = value;
-                // }
-                // this.setState({
-                //     previousAnswers: questionnaireAnswers,
-                //     isModified: true
-                // }, () => {
-                //     // console.log ('onChangeDateAnswer after setState', this.state.previousAnswers);
-                // })
             };
             onChangeAnswerDate = (value, questionId, index) => {
                 let questionnaireAnswers = _.cloneDeep(this.state.previousAnswers);

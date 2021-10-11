@@ -137,7 +137,6 @@ class AnimatedListView extends Component {
 
     // Please write here all the methods that are not react native lifecycle methods
     renderItem = ({ item }) => {
-        console.log("Lab data type", this.props.dataType );
         let margins = calculateDimension(16, false, this.props.screenSize);
         let textsArray = [];
         let textsStyleArray = [];
@@ -401,7 +400,6 @@ class AnimatedListView extends Component {
             case 'User':
                 return get(item, 'mainData._id', null);
             case 'LabResult':
-                console.log("Help lab result id",get(item, 'labResultData._id', null) );
                 return get(item, 'labResultData._id', null);
             default:
                 return get(item, 'mainData._id', null);
