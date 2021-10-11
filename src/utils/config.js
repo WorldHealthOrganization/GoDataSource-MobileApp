@@ -343,7 +343,7 @@ const labResultsSingleScreen = {
             fields: [
                 {
                     cardNumber: 1,
-                    id: 'sampleLabId',
+                    id: 'sampleIdentifier',
                     label: translations.labResultsSingleScreen.sampleLabId,
                     value: '',
                     type: "TextInput",

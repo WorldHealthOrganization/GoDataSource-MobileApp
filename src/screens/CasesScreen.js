@@ -16,6 +16,7 @@ import ElevatedView from 'react-native-elevated-view';
 import Breadcrumb from './../components/Breadcrumb';
 import {getCasesForOutbreakId} from './../actions/cases';
 import {setLoaderState} from './../actions/app';
+import {setOutbreakCanBeChanged} from "../actions/outbreak";
 import AnimatedListView from './../components/AnimatedListView';
 import ViewHOC from './../components/ViewHOC';
 import translations from './../utils/translations';
@@ -60,6 +61,21 @@ class CasesScreen extends Component {
         this.setState({
             riskColors: riskColors
         });
+
+        const listener = {
+            componentDidAppear: () => {
+                this.props.setOutbreakCanBeChanged(true);
+            },
+            componentDidDisappear: () => {
+                this.props.setOutbreakCanBeChanged(false);
+            }
+        };
+        // Register the listener to all events related to our component
+        this.navigationListener = Navigation.events().registerComponentListener(listener, this.props.componentId);
+    }
+
+    componentWillUnmount() {
+        this.navigationListener.remove();
     }
 
     componentDidUpdate(prevProps) {
@@ -372,7 +388,8 @@ function mapStateToProps(state) {
 
 function matchDispatchProps(dispatch) {
     return bindActionCreators({
-        setLoaderState
+        setLoaderState,
+        setOutbreakCanBeChanged
     }, dispatch);
 }
 

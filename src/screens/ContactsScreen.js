@@ -19,6 +19,7 @@ import {Popup} from 'react-native-map-link';
 import translations from './../utils/translations';
 import config from './../utils/config';
 import Breadcrumb from './../components/Breadcrumb';
+import {setOutbreakCanBeChanged} from "../actions/outbreak";
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {pushNewEditScreen} from './../utils/screenTransitionFunctions';
 import {enhanceListWithGetData} from './../components/higherOrderComponents/withListData';
@@ -61,6 +62,22 @@ class ContactsScreen extends Component {
         this.setState({
             riskColors: riskColors
         })
+
+
+        const listener = {
+            componentDidAppear: () => {
+                this.props.setOutbreakCanBeChanged(true);
+            },
+            componentDidDisappear: () => {
+                this.props.setOutbreakCanBeChanged(false);
+            }
+        };
+        // Register the listener to all events related to our component
+        this.navigationListener = Navigation.events().registerComponentListener(listener, this.props.componentId);
+    }
+
+    componentWillUnmount() {
+        this.navigationListener.remove();
     }
 
     componentDidUpdate(prevProps) {
@@ -341,7 +358,8 @@ function mapStateToProps(state) {
 
 function matchDispatchProps(dispatch) {
     return bindActionCreators({
-        setLoaderState
+        setLoaderState,
+        setOutbreakCanBeChanged
     }, dispatch);
 }
 

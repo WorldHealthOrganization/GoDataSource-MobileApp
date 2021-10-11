@@ -58,7 +58,6 @@ export function registerScreens(store, Provider) {
     screens.forEach((screen) => {
         Navigation.registerComponent(screen.screen,
             () => {
-                console.log("This breaks", Provider, store);
                 if(store && Provider){
                     const Screen = screen.component;
                     console.log("Judge", screen.screen, Screen);

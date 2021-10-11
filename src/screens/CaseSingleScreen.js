@@ -301,14 +301,14 @@ class CaseSingleScreen extends Component {
                                     </Ripple>
                                 </ElevatedView>
                                 {
-                                    checkArrayAndLength(_.intersection(
+                                    (checkArrayAndLength(_.intersection(
                                         _.get(this.props, 'role', []),
                                         [
                                             constants.PERMISSIONS_LAB_RESULT.labResultAll,
                                             constants.PERMISSIONS_LAB_RESULT.labResultCreate,
                                             constants.PERMISSIONS_LAB_RESULT.labResultList
                                         ]
-                                    )) ? (
+                                    )) && this.props.case && !this.props.isNew) ? (
                                         <View style={{zIndex: 999}}>
                                             <Menu
                                                 ref="menuRef"
@@ -2234,7 +2234,6 @@ class CaseSingleScreen extends Component {
     };
 
     handleOnPressAddLabResult = () => {
-        console.log("Whats the person id", this.props.case._id);
         Navigation.push(this.props.componentId,{
             component:{
                 name: 'LabResultsSingleScreen',

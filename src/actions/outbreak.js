@@ -5,6 +5,7 @@ import {
     ACTION_TYPE_STORE_LOCATIONS,
     ACTION_TYPE_STORE_LOCATIONS_LIST,
     ACTION_TYPE_STORE_OUTBREAK,
+    ACTION_TYPE_OUTBREAK_CHANGE,
     ACTION_TYPE_STORE_USER_LOCATIONS,
     ACTION_TYPE_STORE_USER_LOCATIONS_LIST
 } from './../utils/enums';
@@ -25,6 +26,13 @@ export function storeOutbreak(outbreak) {
     return {
         type: ACTION_TYPE_STORE_OUTBREAK,
         payload: outbreak
+    }
+}
+
+export function setOutbreakCanBeChanged(canOutbreakChange) {
+    return {
+        type: ACTION_TYPE_OUTBREAK_CHANGE,
+        payload: canOutbreakChange
     }
 }
 

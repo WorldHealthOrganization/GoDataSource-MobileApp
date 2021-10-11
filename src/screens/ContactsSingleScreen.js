@@ -149,7 +149,6 @@ class ContactsSingleScreen extends Component {
             deletePressed: false,
             loading: !this.props.isNew,
             isModified: false,
-            isDateTimePickerVisible: false,
             canChangeScreen: false,
             anotherPlaceOfResidenceWasChosen: false,
             hasPlaceOfResidence: true,
@@ -309,7 +308,7 @@ class ContactsSingleScreen extends Component {
                                     </Ripple>
                                 </ElevatedView>
                                 {
-                                    this.props.role && checkArrayAndLength(lodashIntersect(this.props.role, [
+                                    !this.props.isNew && this.props.role && checkArrayAndLength(lodashIntersect(this.props.role, [
                                         constants.PERMISSIONS_FOLLOW_UP.followUpAll,
                                         constants.PERMISSIONS_FOLLOW_UP.followUpCreate,
                                         constants.PERMISSIONS_LAB_RESULT.labResultAll,
@@ -325,7 +324,6 @@ class ContactsSingleScreen extends Component {
                                                 }
                                             >
                                                 {
-                                                    !this.props.isNew ? (
                                                         <PermissionComponent
                                                             render={() => (
                                                                 <MenuItem onPress={this.handleOnAddFollowUp}>
@@ -337,36 +335,36 @@ class ContactsSingleScreen extends Component {
                                                                 <View style={[style.rippleStyle, {width: 60}]}/>
                                                             )}
                                                         />
-                                                    ) : null
                                                 }
-                                                <PermissionComponent
-                                                    render={() => (
-                                                        <MenuItem onPress={this.handleOnPressAddLabResult}>
-                                                            {getTranslation(translations.labResultsSingleScreen.createLabResult, this.props.translation)}
-                                                        </MenuItem>
-                                                    )}
-                                                    permissionsList={[
-                                                        constants.PERMISSIONS_LAB_RESULT.labResultAll,
-                                                        constants.PERMISSIONS_LAB_RESULT.labResultCreate
-                                                    ]}
-                                                />
-                                                <PermissionComponent
-                                                    render={() => (
-                                                        <MenuItem onPress={this.handleOnPressShowLabResults}>
-                                                            {getTranslation(translations.labResultsSingleScreen.viewLabResult, this.props.translation)}
-                                                        </MenuItem>
-                                                    )}
-                                                    permissionsList={[
-                                                        constants.PERMISSIONS_LAB_RESULT.labResultAll,
-                                                        constants.PERMISSIONS_LAB_RESULT.labResultList
-                                                    ]}
-                                                />
-                                                <DateTimePicker
-                                                    isVisible={this.state.isDateTimePickerVisible}
-                                                    timeZoneOffsetInMinutes={0}
-                                                    onConfirm={this._handleDatePicked}
-                                                    onCancel={this._hideDateTimePicker}
-                                                />
+                                                {
+                                                    this.props.contact ?
+                                                        <>
+                                                            <PermissionComponent
+                                                                render={() => (
+                                                                    <MenuItem onPress={this.handleOnPressAddLabResult}>
+                                                                        {getTranslation(translations.labResultsSingleScreen.createLabResult, this.props.translation)}
+                                                                    </MenuItem>
+                                                                )}
+                                                                permissionsList={[
+                                                                    constants.PERMISSIONS_LAB_RESULT.labResultAll,
+                                                                    constants.PERMISSIONS_LAB_RESULT.labResultCreate
+                                                                ]}
+                                                            />
+                                                            <PermissionComponent
+                                                                render={() => (
+                                                                    <MenuItem onPress={this.handleOnPressShowLabResults}>
+                                                                        {getTranslation(translations.labResultsSingleScreen.viewLabResult, this.props.translation)}
+                                                                    </MenuItem>
+                                                                )}
+                                                                permissionsList={[
+                                                                    constants.PERMISSIONS_LAB_RESULT.labResultAll,
+                                                                    constants.PERMISSIONS_LAB_RESULT.labResultList
+                                                                ]}
+                                                            />
+                                                        </>
+                                                        :
+                                                        null
+                                                }
                                                 <AddFollowUpScreen
                                                     showAddFollowUpScreen={this.state.showAddFollowUpScreen}
                                                     onCancelPressed={this.handleOnCancelPressed}
@@ -1694,7 +1692,6 @@ class ContactsSingleScreen extends Component {
         })
     };
     handleOnPressAddLabResult = () => {
-        console.log("Whats the id", this.props.contact._id);
         Navigation.push(this.props.componentId,{
             component:{
                 name: 'LabResultsSingleScreen',
@@ -1786,14 +1783,6 @@ class ContactsSingleScreen extends Component {
         if( this.refs.menuRef) {
             this.refs.menuRef.hide();
         }
-    };
-
-    _showDateTimePicker = () => {
-        this.setState({ isDateTimePickerVisible: true });
-    };
-
-    _hideDateTimePicker = () => {
-        this.setState({ isDateTimePickerVisible: false });
     };
 
     handleOnPressDeleteContact = () => {
