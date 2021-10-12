@@ -32,8 +32,8 @@ class FilterScreen extends Component {
                     classification: [],
                     categories: [],
                     type: {
-                        [translations.personTypes.cases]: true,
-                        [translations.personTypes.contacts]: true
+                        [translations.personTypes.cases]: false,
+                        [translations.personTypes.contacts]: false
                     }
                 },
                 sort: []
@@ -76,11 +76,12 @@ class FilterScreen extends Component {
                 }
             }
 
-            console.log("Any active filters?", activeFilters);
             if (activeFilters.type){
                 Object.keys(filterClone.type).forEach(key=>{
                     if(!activeFilters.type.includes(key)){
                         filterClone.type[key] = false;
+                    } else {
+                        filterClone.type[key] = true;
                     }
                 })
             }
@@ -196,7 +197,6 @@ class FilterScreen extends Component {
         const { configFilterScreen, filter, index, sortCriteriaDropDownItems, sortOrderDropDownItems } = this.state;
 
         if (configFilterScreen !== null) {
-            console.log("Filters wacky stuff", route.key);
             switch (route.key) {
                 case 'filters':
                     return (

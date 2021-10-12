@@ -133,7 +133,6 @@ class LabResultsSingleScreen extends Component {
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
-        console.log("Wha with nav state", this.state);
         return (
             <ViewHOC style={style.container}
                      showLoader={this && this.state && this.state.loading}
@@ -145,7 +144,7 @@ class LabResultsSingleScreen extends Component {
                         <View
                             style={[style.breadcrumbContainer]}>
                             <Breadcrumb
-                                entities={[getTranslation(this.props && this.props.previousScreen ? this.props.previousScreen : translations.labResultsSingleScreen.title, this.props.translation), getTranslation(this.state.isEditMode ? (this.props.isNew ? translations.labResultsSingleScreen.createLabResult : translations.labResultsSingleScreen.modifyLabResult) : translations.labResultsSingleScreen.viewLabResult, this.props.translation)]}
+                                entities={[getTranslation(this.props && this.props.previousScreen ? this.props.previousScreen : translations.labResultsSingleScreen.title, this.props.translation), getTranslation(this.props.isNew ? translations.labResultsSingleScreen.createLabResult : `${this.props.contact.firstName || ''} ${this.props.contact.lastName || ''}`, this.props.translation)]}
                                 componentId={this.props.componentId}
                                 onPress={this.handlePressBreadcrumb}
                             />
@@ -168,13 +167,11 @@ class LabResultsSingleScreen extends Component {
                                     </Ripple>
                                 </ElevatedView>
                                 {
-                                    checkArrayAndLength(_.intersection(
+                                    !this.props.isNew && checkArrayAndLength(_.intersection(
                                         _.get(this.props, 'role', []),
                                         [
                                             constants.PERMISSIONS_LAB_RESULT.labResultAll,
-                                            constants.PERMISSIONS_LAB_RESULT.labResultDelete,
-                                            constants.PERMISSIONS_CONTACT.contactAll,
-                                            constants.PERMISSIONS_CONTACT.contactView,
+                                            constants.PERMISSIONS_LAB_RESULT.labResultDelete
                                         ]
                                     )) ? (
                                         <View>
@@ -186,17 +183,6 @@ class LabResultsSingleScreen extends Component {
                                                     </Ripple>
                                                 }
                                             >
-                                                {/*<PermissionComponent*/}
-                                                {/*    render={() => (*/}
-                                                {/*        <MenuItem onPress={this.handleEditContact}>*/}
-                                                {/*            {getTranslation(translations.followUpsSingleScreen.editContactButton, this.props.translation)}*/}
-                                                {/*        </MenuItem>*/}
-                                                {/*    )}*/}
-                                                {/*    permissionsList={[*/}
-                                                {/*        constants.PERMISSIONS_CONTACT.contactAll,*/}
-                                                {/*        constants.PERMISSIONS_CONTACT.contactView*/}
-                                                {/*    ]}*/}
-                                                {/*/>*/}
                                                 <PermissionComponent
                                                     render={() => (
                                                         <MenuItem onPress={this.handleOnPressDelete}>

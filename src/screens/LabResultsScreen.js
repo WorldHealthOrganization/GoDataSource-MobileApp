@@ -85,7 +85,6 @@ class LabResultsScreen extends Component {
     }
 
     componentDidUpdate(prevProps) {
-        console.log("Lab results update", prevProps?.data.length, this.props.data?.length)
         if (this.props.data && prevProps.data !== this.props.data) {
             this.setState({
                 refreshing: false
@@ -98,16 +97,15 @@ class LabResultsScreen extends Component {
     // and can slow down the app
     render() {
         let {mainFilter} = this.props;
-        console.log("Lab results prop important", this.props.data?.length);
 
         let filterNumbers = 0;
         if (mainFilter) {
             if (get(mainFilter, 'type', null) !== null) {
                 ++filterNumbers
             }
-            if(get(mainFilter, 'personId', null) !== null){
-                ++filterNumbers
-            }
+            // if(get(mainFilter, 'personId', null) !== null){
+            //     ++filterNumbers
+            // }
         }
         let filterText = filterNumbers === 0 ? `${getTranslation(translations.generalLabels.filterTitle, this.props.translation)}` : `(${filterNumbers})`;
 
