@@ -315,6 +315,7 @@ class AnimatedListView extends Component {
                 break;
             case 'LabResult':
                 const labResultData = get(item, 'labResultData', null);
+                mainData = get(item, 'mainData', null);
                 textsArray = [
                     getTranslation(translations.casesScreen.viewButtonLabel, this.props.translation)
                 ];

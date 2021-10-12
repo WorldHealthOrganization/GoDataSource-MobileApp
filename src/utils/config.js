@@ -471,7 +471,12 @@ const labResultsSingleScreen = {
                     isRequired: false,
                     isEditMode: true,
                     objectType: 'LabResult'
-                },{
+                }
+            ],
+        },
+        {
+            fields:[
+                {
                     cardNumber: 2,
                     id: 'sequence.hasSequence',
                     label: translations.labResultsSingleScreen.hasVariantStrain,
@@ -550,7 +555,7 @@ const labResultsSingleScreen = {
                     objectType: 'LabResult',
                     dependsOn: 'sequence.hasSequence',
                     showWhenDependence: true,
-                },
+                }
             ]
         }
     ]

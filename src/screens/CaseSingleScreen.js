@@ -281,8 +281,7 @@ class CaseSingleScreen extends Component {
                                 componentId={this.props.componentId}
                                 onPress={this.handlePressBreadcrumb}
                             />
-
-                            <View style={{ flexDirection: 'row', marginLeft: calculateDimension(16, false, this.props.screenSize) }}>
+                            <View style={{ flexDirection: 'row', marginRight: calculateDimension(16, false, this.props.screenSize) }}>
                                 <ElevatedView
                                     elevation={3}
                                     style={{
@@ -309,7 +308,7 @@ class CaseSingleScreen extends Component {
                                             constants.PERMISSIONS_LAB_RESULT.labResultList
                                         ]
                                     )) && this.props.case && !this.props.isNew) ? (
-                                        <View style={{zIndex: 999}}>
+                                        <View style={{marginRight: calculateDimension(16, false, this.props.screenSize)}}>
                                             <Menu
                                                 ref="menuRef"
                                                 button={
@@ -2274,13 +2273,6 @@ const style = StyleSheet.create({
         flex: 1,
         flexDirection: 'row',
         justifyContent: 'space-between'
-    },
-    containerContent: {
-        flex: 1,
-        backgroundColor: 'rgba(217, 217, 217, 0.5)'
-    },
-    separatorComponentStyle: {
-        height: 8
     }
 });
 

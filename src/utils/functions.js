@@ -1221,6 +1221,9 @@ export function filterItemsForEachPage (helpItemsCopy, pageAskingHelpFrom) {
             if (pageAskingHelpFrom === 'followUps') {
                 return e.page.toLowerCase().includes('followups') && !e.page.toLowerCase().includes('modify') && !e.page.toLowerCase().includes('edit') &&
                     !e.page.toLowerCase().includes('view') && !e.page.toLowerCase().includes('add') && !e.page.toLowerCase().includes('create')
+            } else if (pageAskingHelpFrom === 'labResults') {
+                return e.page.toLowerCase().includes('lab-results') && !e.page.toLowerCase().includes('modify') && !e.page.toLowerCase().includes('edit') &&
+                    !e.page.toLowerCase().includes('view') && !e.page.toLowerCase().includes('add') && !e.page.toLowerCase().includes('create')
             } else if (pageAskingHelpFrom === 'contacts') {
                 return e.page.toLowerCase().includes('contacts') && !e.page.toLowerCase().includes('modify') && !e.page.toLowerCase().includes('edit') &&
                     !e.page.toLowerCase().includes('view') && !e.page.toLowerCase().includes('add') && !e.page.toLowerCase().includes('create')
@@ -1230,6 +1233,9 @@ export function filterItemsForEachPage (helpItemsCopy, pageAskingHelpFrom) {
             }
             else if (pageAskingHelpFrom === 'followUpSingleScreenAdd') {
                 return e.page.toLowerCase().includes('followups') && !e.page.toLowerCase().includes('modify') && !e.page.toLowerCase().includes('edit') &&
+                    !e.page.toLowerCase().includes('view') && (e.page.toLowerCase().includes('add') || e.page.toLowerCase().includes('create'))
+            } else if (pageAskingHelpFrom === 'labResultSingleScreenAdd') {
+                return e.page.toLowerCase().includes('lab-results') && !e.page.toLowerCase().includes('modify') && !e.page.toLowerCase().includes('edit') &&
                     !e.page.toLowerCase().includes('view') && (e.page.toLowerCase().includes('add') || e.page.toLowerCase().includes('create'))
             } else if (pageAskingHelpFrom === 'contactsSingleScreenAdd') {
                 return e.page.toLowerCase().includes('contacts') && !e.page.toLowerCase().includes('modify') && !e.page.toLowerCase().includes('edit') &&
@@ -1241,6 +1247,9 @@ export function filterItemsForEachPage (helpItemsCopy, pageAskingHelpFrom) {
             else if (pageAskingHelpFrom === 'followUpSingleScreenEdit') {
                 return e.page.toLowerCase().includes('followups') && (e.page.toLowerCase().includes('modify') || e.page.toLowerCase().includes('edit')) &&
                     !e.page.toLowerCase().includes('view') && !e.page.toLowerCase().includes('add') && !e.page.toLowerCase().includes('create')
+            } else if (pageAskingHelpFrom === 'labResultSingleScreenEdit') {
+                return e.page.toLowerCase().includes('lab-results') && (e.page.toLowerCase().includes('modify') || e.page.toLowerCase().includes('edit')) &&
+                    !e.page.toLowerCase().includes('view') && !e.page.toLowerCase().includes('add') && !e.page.toLowerCase().includes('create')
             } else if (pageAskingHelpFrom === 'contactsSingleScreenEdit') {
                 return e.page.toLowerCase().includes('contacts') && (e.page.toLowerCase().includes('modify') || e.page.toLowerCase().includes('edit')) &&
                     !e.page.toLowerCase().includes('view') && !e.page.toLowerCase().includes('add') && !e.page.toLowerCase().includes('create')
@@ -1250,6 +1259,9 @@ export function filterItemsForEachPage (helpItemsCopy, pageAskingHelpFrom) {
             }
             else if (pageAskingHelpFrom === 'followUpSingleScreenView') {
                 return e.page.toLowerCase().includes('followups') && !e.page.toLowerCase().includes('modify') && !e.page.toLowerCase().includes('edit') &&
+                    e.page.toLowerCase().includes('view') && !e.page.toLowerCase().includes('add') && !e.page.toLowerCase().includes('create')
+            } else if (pageAskingHelpFrom === 'labResultSingleScreenView') {
+                return e.page.toLowerCase().includes('lab-results') && !e.page.toLowerCase().includes('modify') && !e.page.toLowerCase().includes('edit') &&
                     e.page.toLowerCase().includes('view') && !e.page.toLowerCase().includes('add') && !e.page.toLowerCase().includes('create')
             } else if (pageAskingHelpFrom === 'contactsSingleScreenView') {
                 return e.page.toLowerCase().includes('contacts') && !e.page.toLowerCase().includes('modify') && !e.page.toLowerCase().includes('edit') &&
