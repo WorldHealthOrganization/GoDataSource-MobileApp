@@ -11,14 +11,14 @@ import styles from './../styles';
 import NavBarCustom from './../components/NavBarCustom';
 import config from './../utils/config';
 import {connect} from "react-redux";
-import {compose} from "redux";
+import {bindActionCreators, compose} from "redux";
 import {PagerScroll, TabBar, TabView} from 'react-native-tab-view';
 import FollowUpsSingleContainer from './../containers/FollowUpsSingleContainer';
 import FollowUpsSingleQuestionnaireContainer from './../containers/FollowUpsSingleQuestionnaireContainer';
 import Breadcrumb from './../components/Breadcrumb';
 import Menu, {MenuItem} from 'react-native-material-menu';
 import Ripple from 'react-native-material-ripple';
-import {createFollowUp, updateFollowUpAndContact} from './../actions/followUps';
+import {addFollowUp, createFollowUp, updateFollowUpAndContact} from './../actions/followUps';
 import _, {cloneDeep, sortBy} from 'lodash';
 import {
     calculateDimension,
@@ -39,6 +39,7 @@ import constants from './../utils/constants';
 import withPincode from './../components/higherOrderComponents/withPincode';
 import {Navigation} from "react-native-navigation";
 import {fadeInAnimation, fadeOutAnimation} from "../utils/animations";
+import {setDisableOutbreakChange} from "../actions/outbreak";
 
 class FollowUpsSingleScreen extends Component {
 
@@ -65,6 +66,13 @@ class FollowUpsSingleScreen extends Component {
     }
 
     componentDidMount() {
+        const listener = {
+            componentDidAppear: () => {
+                this.props.setDisableOutbreakChange(true);
+            }
+        };
+        // Register the listener to all events related to our component
+        this.navigationListener = Navigation.events().registerComponentListener(listener, this.props.componentId);
         BackHandler.addEventListener('hardwareBackPress', this.handleBackButtonClick);
 
         let isEditMode = _.get(this.props, 'isEditMode', true);
@@ -105,6 +113,8 @@ class FollowUpsSingleScreen extends Component {
 
     componentWillUnmount() {
         BackHandler.removeEventListener('hardwareBackPress', this.handleBackButtonClick);
+
+        this.navigationListener.remove();
     }
 
     handleBackButtonClick() {
@@ -1078,7 +1088,13 @@ function mapStateToProps(state) {
     };
 }
 
+function matchDispatchProps(dispatch) {
+    return bindActionCreators({
+        setDisableOutbreakChange
+    }, dispatch);
+};
+
 export default compose(
     withPincode(),
-    connect(mapStateToProps)
+    connect(mapStateToProps, matchDispatchProps)
 )(FollowUpsSingleScreen);

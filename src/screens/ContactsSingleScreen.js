@@ -60,6 +60,7 @@ import withPinconde from './../components/higherOrderComponents/withPincode';
 import {validateRequiredFields, checkValidEmails, formValidator} from './../utils/formValidators';
 import {Navigation} from "react-native-navigation";
 import {fadeInAnimation, fadeOutAnimation} from "../utils/animations";
+import {setDisableOutbreakChange} from "../actions/outbreak";
 
 const initialLayout = {
     height: 0,
@@ -170,6 +171,14 @@ class ContactsSingleScreen extends Component {
 
     // Please add here the react lifecycle methods that you need
     componentDidMount() {
+        const listener = {
+            componentDidAppear: () => {
+                this.props.setDisableOutbreakChange(true);
+            }
+        };
+        // Register the listener to all events related to our component
+        this.navigationListener = Navigation.events().registerComponentListener(listener, this.props.componentId);
+
         BackHandler.addEventListener('hardwareBackPress', this.handleBackButtonClick);
         if (!this.props.isNew) {
             let ageClone = { years: 0, months: 0 };
@@ -245,6 +254,7 @@ class ContactsSingleScreen extends Component {
     };
 
     componentWillUnmount() {
+        this.navigationListener.remove();
         BackHandler.removeEventListener('hardwareBackPress', this.handleBackButtonClick);
     };
 
@@ -337,7 +347,7 @@ class ContactsSingleScreen extends Component {
                                                         />
                                                 }
                                                 {
-                                                    this.props.contact ?
+                                                    this.props.outbreak?.isContactLabResultsActive && this.props.contact ?
                                                         <>
                                                             <PermissionComponent
                                                                 render={() => (
@@ -2116,7 +2126,8 @@ function matchDispatchProps(dispatch) {
         updateContact,
         addContact,
         removeErrors,
-        addFollowUp
+        addFollowUp,
+        setDisableOutbreakChange
     }, dispatch);
 };
 

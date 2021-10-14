@@ -75,11 +75,6 @@ class LabResultsSingleContainer extends Component {
                         onChangeSwitch={this.props.onChangeSwitch}
                         onChangeDropDown={this.props.onChangeDropDown}
                     />
-
-                    {/*<LabResultsSingleAddressContainer*/}
-                    {/*    item={this.props.item}*/}
-                    {/*    contact={this.props.contact}*/}
-                    {/*/>*/}
                 </ScrollView>
             </View>
         );

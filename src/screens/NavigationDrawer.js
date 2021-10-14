@@ -65,7 +65,6 @@ class NavigationDrawer extends Component {
 
     // Please add here the react lifecycle methods that you need
     componentDidUpdate(prevProps) {
-        let thisPropsSelectedScreen = lodashGet(this.props, 'selectedScreen', sideMenuKeys[0]);
         if (prevProps.selectedScreen !== this.props.selectedScreen) {
             this.setState({
                 selectedScreen: this.props.selectedScreen
@@ -109,7 +108,7 @@ class NavigationDrawer extends Component {
                                     containerStyle={{
                                         margin:0, padding:0
                                     }}
-                                    disabled={!this.props.outbreak?.canOutbreakChange}
+                                    disabled={!!this.props.outbreak?.disableOutbreakChange}
                                     data={this.state.outbreaks}
                                     onChangeText={(value,index,data)=>{
                                         console.log("What's the value now", data[index].name, value);
@@ -347,7 +346,7 @@ function mapStateToProps(state) {
         screenSize: lodashGet(state, 'app.screenSize', config.designScreenSize),
         selectedScreen: lodashGet(state, 'app.selectedScreen', 0),
         availableLanguages: lodashGet(state, 'app.availableLanguages', []),
-        outbreak: lodashGet(state, 'outbreak', {name: 'No outbreak', canOutbreakChange: false}),
+        outbreak: lodashGet(state, 'outbreak', {name: 'No outbreak', disableOutbreakChange: false}),
         translation: lodashGet(state, 'app.translation', [])
     };
 }

@@ -18,21 +18,18 @@ export function storeOutbreak(outbreak) {
     if(outbreak?._id.includes("outbreak.json_")){
         outbreak._id = outbreak._id.substring(14, outbreak._id.length);
     }
-    if(!outbreak?.isContactLabResultsActive){
-        constants.PERMISSIONS_LAB_RESULT = constants.PERMISSIONS_LAB_RESULT_OUTBREAK_INACTIVE;
-    } else {
-        constants.PERMISSIONS_LAB_RESULT = constants.PERMISSIONS_LAB_RESULT_CONSTANT;
-    }
+    constants.PERMISSIONS_LAB_RESULT = constants.PERMISSIONS_LAB_RESULT_CONSTANT;
+
     return {
         type: ACTION_TYPE_STORE_OUTBREAK,
         payload: outbreak
     }
 }
 
-export function setOutbreakCanBeChanged(canOutbreakChange) {
+export function setDisableOutbreakChange(disableOutbreakChange) {
     return {
         type: ACTION_TYPE_OUTBREAK_CHANGE,
-        payload: canOutbreakChange
+        payload: disableOutbreakChange
     }
 }
 

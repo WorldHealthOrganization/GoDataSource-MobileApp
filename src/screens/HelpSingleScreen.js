@@ -17,6 +17,7 @@ import translations from './../utils/translations';
 import withPincode from './../components/higherOrderComponents/withPincode';
 import ViewHOC from "../components/ViewHOC";
 import {Navigation} from "react-native-navigation";
+import {setDisableOutbreakChange} from "../actions/outbreak";
 
 class HelpSingleScreen extends Component {
 
@@ -33,10 +34,18 @@ class HelpSingleScreen extends Component {
     }
 
     componentDidMount() {
+        const listener = {
+            componentDidAppear: () => {
+                this.props.setDisableOutbreakChange(true);
+            }
+        };
+        // Register the listener to all events related to our component
+        this.navigationListener = Navigation.events().registerComponentListener(listener, this.props.componentId);
         BackHandler.addEventListener('hardwareBackPress', this.handleBackButtonClick);
     }
 
     componentWillUnmount() {
+        this.navigationListener.remove();
         BackHandler.removeEventListener('hardwareBackPress', this.handleBackButtonClick);
     }
     
@@ -126,7 +135,8 @@ function mapStateToProps(state) {
 
 function matchDispatchProps(dispatch) {
     return bindActionCreators({
-        removeErrors
+        removeErrors,
+        setDisableOutbreakChange
     }, dispatch);
 }
 

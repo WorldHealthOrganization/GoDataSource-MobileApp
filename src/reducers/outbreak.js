@@ -16,7 +16,7 @@ export default function (state=null, action) {
             console.log("Stored outbreak", action.payload.name);
             return Object.assign([], action.payload);
         case ACTION_TYPE_OUTBREAK_CHANGE:
-            return Object.assign([], state, {canOutbreakChange: !!action.payload});
+            return Object.assign([], state, {disableOutbreakChange: !!action.payload});
         default:
             break;
     }

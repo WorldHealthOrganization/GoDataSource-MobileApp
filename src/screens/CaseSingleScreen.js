@@ -51,6 +51,7 @@ import {Navigation} from "react-native-navigation";
 import {fadeInAnimation, fadeOutAnimation} from "../utils/animations";
 import Menu, {MenuItem} from "react-native-material-menu";
 import PermissionComponent from "../components/PermissionComponent";
+import {setDisableOutbreakChange} from "../actions/outbreak";
 
 const initialLayout = {
     height: 0,
@@ -163,6 +164,13 @@ class CaseSingleScreen extends Component {
     }
 
     componentDidMount() {
+        const listener = {
+            componentDidAppear: () => {
+                this.props.setDisableOutbreakChange(true);
+            }
+        };
+        // Register the listener to all events related to our component
+        this.navigationListener = Navigation.events().registerComponentListener(listener, this.props.componentId);
         BackHandler.addEventListener('hardwareBackPress', this.handleBackButtonClick);
         if (!this.props.isNew) {
             getCaseAndExposuresById(this.props.case._id)
@@ -204,6 +212,7 @@ class CaseSingleScreen extends Component {
     }
 
     componentWillUnmount() {
+        this.navigationListener.remove();
         BackHandler.removeEventListener('hardwareBackPress', this.handleBackButtonClick);
         this.screenEventListener.remove();
     }
@@ -2290,7 +2299,8 @@ function mapStateToProps(state) {
 }
 function matchDispatchProps(dispatch) {
     return bindActionCreators({
-        saveSelectedScreen
+        saveSelectedScreen,
+        setDisableOutbreakChange
     }, dispatch);
 }
 

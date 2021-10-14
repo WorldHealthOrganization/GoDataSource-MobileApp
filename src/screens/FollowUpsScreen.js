@@ -32,7 +32,7 @@ import {enhanceListWithGetData} from './../components/higherOrderComponents/with
 import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
 import {bindActionCreators} from "redux";
 import {setLoaderState} from './../actions/app';
-import {setOutbreakCanBeChanged} from './../actions/outbreak'
+import {setDisableOutbreakChange} from './../actions/outbreak'
 import PermissionComponent from './../components/PermissionComponent';
 import {handleQRSearchTransition} from "../utils/screenTransitionFunctions";
 import withPincode from './../components/higherOrderComponents/withPincode';
@@ -74,10 +74,7 @@ class FollowUpsScreen extends Component {
 
         const listener = {
             componentDidAppear: () => {
-                this.props.setOutbreakCanBeChanged(true);
-            },
-            componentDidDisappear: () => {
-                this.props.setOutbreakCanBeChanged(false);
+                this.props.setDisableOutbreakChange(false);
             }
         };
         // Register the listener to all events related to our component
@@ -411,7 +408,7 @@ mapStateToProps = (state) => {
 function matchDispatchProps(dispatch) {
     return bindActionCreators({
         setLoaderState,
-        setOutbreakCanBeChanged
+        setDisableOutbreakChange
     }, dispatch);
 }
 

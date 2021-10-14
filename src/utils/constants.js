@@ -96,26 +96,6 @@ const PERMISSIONS_CASE = {
     caseDeleteRelationshipExposures: 'case_delete_relationship_exposures',
 };
 
-const PERMISSIONS_LAB_RESULT_OUTBREAK_INACTIVE = {
-    labResultAll: 'lab_result_alli_outbreak_inactive',
-    labResultView: 'lab_result_view_outbreak_inactive',
-    labResultList: 'lab_result_list_outbreak_inactive',
-    labResultCreate: 'lab_result_create_outbreak_inactive',
-    labResultModify: 'lab_result_modify_outbreak_inactive',
-    labResultDelete: 'lab_result_delete_outbreak_inactive',
-    labResultCreateContact: 'lab_result_create_contact_outbreak_inactive',
-    labResultListRelationshipContacts: 'lab_result_list_relationship_contacts_outbreak_inactive',
-    labResultViewRelationshipContacts: 'lab_result_view_relationship_contacts_outbreak_inactive',
-    labResultCreateRelationshipContacts: 'lab_result_create_relationship_contacts_outbreak_inactive',
-    labResultModifyRelationshipContacts: 'lab_result_modify_relationship_contacts_outbreak_inactive',
-    labResultDeleteRelationshipContacts: 'lab_result_delete_relationship_contacts_outbreak_inactive',
-    labResultListRelationshipExposures: 'lab_result_list_relationship_exposures_outbreak_inactive',
-    labResultViewRelationshipExposures: 'lab_result_view_relationship_exposures_outbreak_inactive',
-    labResultCreateRelationshipExposures: 'lab_result_create_relationship_exposures_outbreak_inactive',
-    labResultModifyRelationshipExposures: 'lab_result_modify_relationship_exposures_outbreak_inactive',
-    labResultDeleteRelationshipExposures: 'lab_result_delete_relationship_exposures_outbreak_inactive',
-};
-
 const PERMISSIONS_LAB_RESULT_CONSTANT = {
     labResultAll: 'lab_result_all',
     labResultView: 'lab_result_view',
@@ -129,11 +109,6 @@ const PERMISSIONS_LAB_RESULT_CONSTANT = {
     labResultCreateRelationshipContacts: 'lab_result_create_relationship_contacts',
     labResultModifyRelationshipContacts: 'lab_result_modify_relationship_contacts',
     labResultDeleteRelationshipContacts: 'lab_result_delete_relationship_contacts',
-    labResultListRelationshipExposures: 'lab_result_list_relationship_exposures',
-    labResultViewRelationshipExposures: 'lab_result_view_relationship_exposures',
-    labResultCreateRelationshipExposures: 'lab_result_create_relationship_exposures',
-    labResultModifyRelationshipExposures: 'lab_result_modify_relationship_exposures',
-    labResultDeleteRelationshipExposures: 'lab_result_delete_relationship_exposures',
 };
 
 let PERMISSIONS_LAB_RESULT = PERMISSIONS_LAB_RESULT_CONSTANT;
@@ -222,6 +197,5 @@ export default {
     PERMISSIONS_COMMON,
     PERMISSIONS_TEAMS,
     PERMISSIONS_LAB_RESULT,
-    PERMISSIONS_LAB_RESULT_CONSTANT,
-    PERMISSIONS_LAB_RESULT_OUTBREAK_INACTIVE
+    PERMISSIONS_LAB_RESULT_CONSTANT
 }

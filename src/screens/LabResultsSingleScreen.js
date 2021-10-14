@@ -11,7 +11,7 @@ import styles from './../styles';
 import NavBarCustom from './../components/NavBarCustom';
 import config from './../utils/config';
 import {connect} from "react-redux";
-import {compose} from "redux";
+import {bindActionCreators, compose} from "redux";
 import {PagerScroll, TabBar, TabView} from 'react-native-tab-view';
 import LabResultsSingleContainer from './../containers/LabResultsSingleContainer';
 import LabResultsSingleQuestionnaireContainer from './../containers/LabResultsSingleQuestionnaireContainer';
@@ -39,6 +39,7 @@ import constants from './../utils/constants';
 import withPincode from './../components/higherOrderComponents/withPincode';
 import {Navigation} from "react-native-navigation";
 import {fadeInAnimation, fadeOutAnimation} from "../utils/animations";
+import {setDisableOutbreakChange} from "../actions/outbreak";
 
 class LabResultsSingleScreen extends Component {
 
@@ -65,6 +66,13 @@ class LabResultsSingleScreen extends Component {
     }
 
     componentDidMount() {
+        const listener = {
+            componentDidAppear: () => {
+                this.props.setDisableOutbreakChange(true);
+            }
+        };
+        // Register the listener to all events related to our component
+        this.navigationListener = Navigation.events().registerComponentListener(listener, this.props.componentId);
         BackHandler.addEventListener('hardwareBackPress', this.handleBackButtonClick);
 
         let isEditMode = _.get(this.props, 'isEditMode', true);
@@ -105,6 +113,7 @@ class LabResultsSingleScreen extends Component {
     }
 
     componentWillUnmount() {
+        this.navigationListener.remove();
         BackHandler.removeEventListener('hardwareBackPress', this.handleBackButtonClick);
     }
 
@@ -419,7 +428,7 @@ class LabResultsSingleScreen extends Component {
         // console.log("onChangeSwitch: ", value, id, this.state.item);
                 this.setState(
                     (prevState) => ({
-                        item: Object.assign({}, _.set(prevState.item,id,value)),
+                        item: Object.assign({}, _.set(prevState.item || {},id,value)),
                         isModified: true
                     }), () => {
                         console.log("onChangeSwitch", id, " ", value, " ", this.state.item);
@@ -976,8 +985,13 @@ function mapStateToProps(state) {
         role: _.get(state, 'role', [])
     };
 }
+function matchDispatchProps(dispatch) {
+    return bindActionCreators({
+        setDisableOutbreakChange
+    }, dispatch);
+};
 
 export default compose(
     withPincode(),
-    connect(mapStateToProps)
+    connect(mapStateToProps, matchDispatchProps)
 )(LabResultsSingleScreen);
