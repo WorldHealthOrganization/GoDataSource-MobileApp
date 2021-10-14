@@ -107,7 +107,7 @@ class LabResultsSingleGetInfoContainer extends PureComponent {
         if(item.dependsOn){
             // const dependItem = config.labResultsSingleScreen.generalInfo[0].fields.find(e=> e.id === item.dependsOn);
             const dependValue = _.get(this.props.item, item.dependsOn, null);
-            if(dependValue !== item.showWhenDependence){
+            if(!!dependValue !== item.showWhenDependence){
                 return;
             }
         }

@@ -55,7 +55,7 @@ class FilterScreen extends Component {
 
         const { tabsValuesRoutes, localTranslationTokens } = config;
         const { sortOrderDropDownItems, sortCriteriaDropDownItems, helpItemsSortCriteriaDropDownItems } = config;
-        const { followUpsFilterScreen, casesFilterScreen, helpFilterScreen, labResultsFilterScreen } = config;
+        const { followUpsFilterScreen, casesFilterScreen, helpFilterScreen, labResultsFilterScreen, labResultsFilterScreenNoContactPermission } = config;
 
         let filterClone = cloneDeep(filter.filter);
         let sortClone = cloneDeep(filter.sort);
@@ -135,8 +135,8 @@ class FilterScreen extends Component {
                 break;
             case 'LabResultsScreen':
                 screenTitle = getTranslation(translations.labResultsFilter.filterTitle, translation);
-                routes = tabsValuesRoutes.labResultsFilter;
-                configFilterScreen = labResultsFilterScreen;
+                routes = this.props.outbreak?.isContactLabResultsActive ? tabsValuesRoutes.labResultsFilter : tabsValuesRoutes.labResultsFilterNoFilter;
+                configFilterScreen = this.props.outbreak?.isContactLabResultsActive ? labResultsFilterScreen : labResultsFilterScreenNoContactPermission;
                 mySortCriteriaDropDownItems = sortCriteriaDropDownItems;
                 break;
             default:
@@ -462,7 +462,8 @@ const style = StyleSheet.create({
 function mapStateToProps(state) {
     return {
         screenSize: get(state, 'app.screenSize', config.designScreenSize),
-        translation: get(state, 'app.translation', [])
+        translation: get(state, 'app.translation', []),
+        outbreak: get(state, 'outbreak', null)
     };
 }
 

@@ -87,6 +87,9 @@ const tabsValuesRoutes = {
         {key: 'filters', title: translations.casesFilter.filterTitle},
         {key: 'sort', title: translations.casesFilter.sortTitle}
     ],
+    labResultsFilterNoFilter: [
+        {key: 'sort', title: translations.casesFilter.sortTitle}
+    ],
     helpSingle: [
         {key: 'details', title: translations.helpScreen.helpSingleScreenTab},
     ],
@@ -559,6 +562,49 @@ const labResultsSingleScreen = {
             ]
         }
     ]
+};
+const labResultsFilterScreenNoContactPermission = {
+    sort: {
+        fields: [
+            {
+                cardNumber: 1,
+                label: translations.sortTab.SortBy,
+                type: 'Section',
+                hasBorderBottom: true,
+                borderBottomColor: styles.navigationDrawerSeparatorGrey
+            },
+            {
+                cardNumber: 1,
+                id: 'sortCriteria',
+                type: 'DropdownInput',
+                label: translations.sortTab.sortCriteria,
+                isRequired: false,
+                isEditMode: true,
+                value: '',
+                objectType: 'Sort'
+            },
+            {
+                cardNumber: 1,
+                id: 'sortOrder',
+                type: 'DropdownInput',
+                label: translations.sortTab.sortOrder,
+                isRequired: false,
+                isEditMode: true,
+                value: '',
+                objectType: 'Sort'
+            },
+            {
+                cardNumber: 1,
+                id: 'deleteButton',
+                type: 'ActionsBar',
+                labelValue: 'test',
+                textsArray: ['Delete'],
+                textsStyleArray: [{color: styles.missedRedColor}],
+                onPressArray: [],
+                objectType: 'Sort'
+            }
+        ]
+    }
 };
 const labResultsFilterScreen = {
     filter: [
@@ -2424,5 +2470,6 @@ export default {
     rawSQLQueryWhereString,
     whocdCredentials,
     contactsOfContactsPersonal,
-    addressFields
+    addressFields,
+    labResultsFilterScreenNoContactPermission
 };

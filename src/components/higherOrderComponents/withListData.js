@@ -1,6 +1,7 @@
 import React, {Component} from 'react'
 import {Alert, BackHandler} from 'react-native';
 import get from 'lodash/get';
+import debounce from 'lodash/debounce';
 import union from 'lodash/union';
 import {createDate, createStackFromComponent} from './../../utils/functions';
 import {extractIdFromPouchId, extractMainAddress, getTranslation, navigation} from "../../utils/functions";
@@ -21,9 +22,9 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
             constructor(props) {
                 super(props);
                 let now = createDate();
-                this.state={
+                this.state = {
                     searchText: '',
-                    mainFilter: {},
+                    mainFilter: props.outbreak?.isContactLabResultsActive ? {} : {type:[translations.personTypes.cases]},
                     followUpFilter: {
                         date: now,
                         statusId: null
@@ -102,7 +103,7 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                         onPressCenterButton={this.onPressCenterButton}
                         onPressFullName={this.onPressFullName}
                         onPressExposure={this.onPressExposure}
-                        onEndReached={this.getData}
+                        onEndReached={this.getDataDebounce}
                         loadMore={this.state.loadMore}
                         {...props}
                     />
@@ -214,7 +215,10 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                     } else {
                         doAction = this.state.data.length % 10 === 0 && this.state.data.length !== this.state.dataCount;
                     }
-                    if (doAction === true) {
+                    if (doAction === true
+                        && !this.getDataInprogress
+                    ) {
+                        this.getDataInprogress = true;
                         let filters = this.prepareFilters();
                         this.setState({
                             loadMore: isRefresh === null
@@ -244,6 +248,8 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                                             offset: result.data.length,
                                             loadMore: false
                                         }
+                                    }, ()=>{
+                                        this.getDataInprogress = false;
                                     })
                                 })
                                 .catch((errorGetData) => {
@@ -251,6 +257,7 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                                         isAddFromNavigation: false,
                                         loadMore: false
                                     }, () => {
+                                        this.getDataInprogress = false;
                                         this.props.setLoaderState(false);
                                         Alert.alert('Error', 'An error occurred while getting data', [
                                             {
@@ -266,7 +273,10 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                 }
             };
 
-            refresh = (isRefreshAfterSync) => {
+
+            getDataDebounce = debounce(this.getData, 120);
+
+                refresh = (isRefreshAfterSync) => {
                 this.setState({
                     lastElement: null,
                     offset: 0
@@ -294,7 +304,12 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
             };
 
             setMainFilter = (filter) => {
-                console.log("Important cases Set main filter", filter);
+                switch (screenType) {
+                    case 'LabResultsScreen':
+                        if(!this.props.outbreak?.isContactLabResultsActive){
+                            filter.type = [translations.personTypes.cases];
+                        }
+                }
                 this.setState(prevState => ({
                     mainFilter: filter,
                     offset: 0

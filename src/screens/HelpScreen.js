@@ -12,7 +12,7 @@ import {bindActionCreators, compose} from "redux";
 import SearchFilterView from './../components/SearchFilterView';
 import HelpListItem from './../components/HelpListItem';
 import {addFilterForScreen, removeFilterForScreen} from './../actions/app'
-import {setOutbreakCanBeChanged} from './../actions/outbreak'
+import {setDisableOutbreakChange} from './../actions/outbreak'
 import _ from 'lodash';
 import {
     calculateDimension, createStackFromComponent,
@@ -83,10 +83,7 @@ class HelpScreen extends Component {
 
         const listener = {
             componentDidAppear: () => {
-                this.props.setOutbreakCanBeChanged(true);
-            },
-            componentDidDisappear: () => {
-                this.props.setOutbreakCanBeChanged(false);
+                this.props.setDisableOutbreakChange(false);
             }
         };
         // Register the listener to all events related to our component
@@ -543,7 +540,7 @@ function matchDispatchProps(dispatch) {
     return bindActionCreators({
         addFilterForScreen,
         removeFilterForScreen,
-        setOutbreakCanBeChanged
+        setDisableOutbreakChange
     }, dispatch);
 }
 

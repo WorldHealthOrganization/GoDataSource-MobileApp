@@ -15,7 +15,7 @@ import {bindActionCreators} from "redux";
 import ElevatedView from 'react-native-elevated-view';
 import Breadcrumb from './../components/Breadcrumb';
 import {setLoaderState} from './../actions/app';
-import {setOutbreakCanBeChanged} from './../actions/outbreak';
+import {setDisableOutbreakChange} from './../actions/outbreak';
 import AnimatedListView from './../components/AnimatedListView';
 import ViewHOC from './../components/ViewHOC';
 import translations from './../utils/translations';
@@ -70,10 +70,7 @@ class LabResultsScreen extends Component {
 
         const listener = {
             componentDidAppear: () => {
-                this.props.setOutbreakCanBeChanged(true);
-            },
-            componentDidDisappear: () => {
-                this.props.setOutbreakCanBeChanged(false);
+                this.props.setDisableOutbreakChange(false);
             }
         };
         // Register the listener to all events related to our component
@@ -100,7 +97,7 @@ class LabResultsScreen extends Component {
 
         let filterNumbers = 0;
         if (mainFilter) {
-            if (get(mainFilter, 'type', null) !== null) {
+            if (get(mainFilter, 'type', null) !== null && this.props.outbreak?.isContactLabResultsActive) {
                 ++filterNumbers
             }
             // if(get(mainFilter, 'personId', null) !== null){
@@ -378,7 +375,7 @@ function mapStateToProps(state) {
 function matchDispatchProps(dispatch) {
     return bindActionCreators({
         setLoaderState,
-        setOutbreakCanBeChanged
+        setDisableOutbreakChange
     }, dispatch);
 }
 
