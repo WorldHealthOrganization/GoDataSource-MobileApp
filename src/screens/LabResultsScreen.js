@@ -155,31 +155,6 @@ class LabResultsScreen extends Component {
                                     </Ripple>
                                 </ElevatedView>
                             </View>
-
-                            {/*<PermissionComponent*/}
-                            {/*    render={() => (*/}
-                            {/*        <View style={{flex: 0.15}}>*/}
-                            {/*            <ElevatedView*/}
-                            {/*                elevation={3}*/}
-                            {/*                style={{*/}
-                            {/*                    backgroundColor: styles.buttonGreen,*/}
-                            {/*                    width: calculateDimension(33, false, this.props.screenSize),*/}
-                            {/*                    height: calculateDimension(25, true, this.props.screenSize),*/}
-                            {/*                    borderRadius: 4*/}
-                            {/*                }}*/}
-                            {/*            >*/}
-                            {/*                <Ripple style={{*/}
-                            {/*                    flex: 1,*/}
-                            {/*                    justifyContent: 'center',*/}
-                            {/*                    alignItems: 'center'*/}
-                            {/*                }} onPress={this.handleOnPressAddLabResult}>*/}
-                            {/*                    <Icon name="add" color={'white'} size={15}/>*/}
-                            {/*                </Ripple>*/}
-                            {/*            </ElevatedView>*/}
-                            {/*        </View>*/}
-                            {/*    )}*/}
-                            {/*    permissionsList={['labResult_all', 'labResult_create']}*/}
-                            {/*/>*/}
                         </View>
                     }
                     componentId={this.props.componentId}

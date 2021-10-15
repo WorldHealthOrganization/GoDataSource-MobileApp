@@ -99,7 +99,7 @@ class NavigationDrawer extends Component {
                     {
                         this.props && this.props.outbreak && this.props.outbreak.name ? (
                             <View style={{marginHorizontal: 16}}>
-                                <Text style={{fontFamily: 'Roboto-Medium', fontSize: 15, color: styles.navigationDrawerItemText}} numberOfLines={1}>{getTranslation(translations.navigationDrawer.activeOutbreak, this.props.translation)}</Text>
+                                <Text style={{fontFamily: 'Roboto-Medium', fontSize: 15, color: styles.navigationDrawerItemText, marginBottom: -15}} numberOfLines={1}>{getTranslation(translations.navigationDrawer.activeOutbreak, this.props.translation)}</Text>
                                 <Dropdown
                                     useNativeDriver={true}
                                     value={this.props.outbreak?._id}
@@ -111,7 +111,6 @@ class NavigationDrawer extends Component {
                                     disabled={!!this.props.outbreak?.disableOutbreakChange}
                                     data={this.state.outbreaks}
                                     onChangeText={(value,index,data)=>{
-                                        console.log("What's the value now", data[index].name, value);
                                         // computeCommonData()
                                         // this.props.storeOutbreak(data[index]);
                                         AsyncStorage.setItem("outbreakId",value);

@@ -105,7 +105,7 @@ function createQueryLabResults(outbreakId, labResultsFilter, searchText, lastEle
         query.group = `${aliasForLabResults}._id`;
     }
 
-    if (get(labResultsFilter, 'sort', null) !== null && offset) {
+    if (get(labResultsFilter, 'sort', null) !== null && lastElement && offset) {
         query.offset = offset;
     }
 
@@ -200,7 +200,6 @@ function createConditionLabResults (outbreakId, labResultFilter, dataType, searc
     let sort = {};
 
     // Here take care of follow-ups conditions
-    console.log("Outbreak id", outbreakId);
     if (outbreakId) {
         condition[`${aliasLabResults}.outbreakId`] = outbreakId;
     }
@@ -225,7 +224,6 @@ function createConditionLabResults (outbreakId, labResultFilter, dataType, searc
     }
 
     // Here take care of searches
-    console.log("Is there a search", search)
     if (search) {
             condition['$or'] = [
                 {[`${aliasForContacts}.firstName`]: {'$like': `%${search.text}%`}},
