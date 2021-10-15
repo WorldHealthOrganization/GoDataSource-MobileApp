@@ -135,7 +135,7 @@ class PersonListItem extends Component {
             }
         }
         // Emails
-        if (checkArrayAndLength(person?.addresses)) {
+        if (checkArrayAndLength(person?.addresses) && type !== 'LabResult') {
             returnValues.emails = person?.addresses.filter((e) => e.emailAddress).map((e) => e?.emailAddress).join(', ')
         }
         // Visual Id
@@ -147,7 +147,7 @@ class PersonListItem extends Component {
             returnValues.id = person._id;
         }
         // Followup final status
-        if (type !== 'Case' && person && person.followUp){
+        if (type !== 'Case' && type !== 'LabResult'&& person && person.followUp type !== 'LabResult'){
             returnValues.status = person.followUp.status ? getTranslation(person.followUp.status, this.props.translation) : null;
         }
         // User institution and phone number

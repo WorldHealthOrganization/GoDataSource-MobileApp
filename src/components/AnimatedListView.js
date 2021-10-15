@@ -65,7 +65,6 @@ class AnimatedListView extends Component {
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
-        console.log("Lab data number", this.props.data?.length );
         const navbarTranslate = this.clampedScroll.interpolate({
             inputRange: [0, 30],
             outputRange: [0, -30],
