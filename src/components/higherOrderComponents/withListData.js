@@ -122,7 +122,7 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                             contactsFilter: get(this.state, 'mainFilter', null),
                             exposureFilter: get(this.state, 'searchText', null),
                             lastElement: get(this.state, 'lastElement', null),
-                            offset: get(this.state, 'offset', 0)
+                            offset: get(this.state, 'data.length', 0)
                         };
                         break;
                     case 'ContactsScreen':
@@ -167,7 +167,7 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                             labResultsFilter: get(this.state, 'mainFilter', null),
                             searchText: get(this.state, 'searchText', null),
                             lastElement: get(this.state, 'lastElement', null),
-                            offset: get(this.state, 'offset', 0)
+                            offset: get(this.state, 'data.length', 0)
                         };
                         break;
                     default:
