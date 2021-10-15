@@ -33,6 +33,7 @@ import withPincode from "../components/higherOrderComponents/withPincode";
 import {getContactsForOutbreakId} from "../actions/contacts";
 import {compose} from "redux";
 import {Navigation} from "react-native-navigation";
+import {setDisableOutbreakChange} from "../actions/outbreak";
 
 class ContactsOfContactsScreen extends Component {
 
@@ -62,7 +63,22 @@ class ContactsOfContactsScreen extends Component {
         this.setState({
             riskColors: riskColors
         })
+
+
+        const listener = {
+            componentDidAppear: () => {
+                this.props.setDisableOutbreakChange(false);
+            }
+        };
+        // Register the listener to all events related to our component
+        this.navigationListener = Navigation.events().registerComponentListener(listener, this.props.componentId);
     }
+
+
+    componentWillUnmount() {
+        this.navigationListener.remove();
+    }
+
 
     componentDidUpdate(prevProps) {
         if (this.props.data && prevProps.data !== this.props.data) {
@@ -345,7 +361,8 @@ function mapStateToProps(state) {
 
 function matchDispatchProps(dispatch) {
     return bindActionCreators({
-        setLoaderState
+        setLoaderState,
+        setDisableOutbreakChange
     }, dispatch);
 }
 
