@@ -147,7 +147,7 @@ class PersonListItem extends Component {
             returnValues.id = person._id;
         }
         // Followup final status
-        if (type !== 'Case' && type !== 'LabResult'&& person && person.followUp type !== 'LabResult'){
+        if (type !== 'Case' && type !== 'LabResult' && person && person.followUp){
             returnValues.status = person.followUp.status ? getTranslation(person.followUp.status, this.props.translation) : null;
         }
         // User institution and phone number
