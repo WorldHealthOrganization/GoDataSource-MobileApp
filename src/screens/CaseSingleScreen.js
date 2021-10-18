@@ -1129,7 +1129,7 @@ class CaseSingleScreen extends Component {
         })
     };
     handleOnPressEditExposure = (relation, index) => {
-        _.set(relation, 'contactData.fullName', computeFullName(_.get(relation, 'contactData', null)));
+        _.set(relation || {}, 'contactData.fullName', computeFullName(_.get(relation, 'contactData', null)));
         Navigation.showModal(createStackFromComponent({
             name: 'ExposureScreen',
             passProps: {
