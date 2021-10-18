@@ -140,6 +140,18 @@ class PersonListItemNameAndAddressComponent extends PureComponent {
                                 ) : (null)
                         }
                         {
+                            firstComponentRenderData.result ?
+                                (
+                                    <Text style={[style.secondaryText, {
+                                        flex: 1,
+                                        marginHorizontal: 7,
+                                        display: firstComponentRenderData.result ? 'flex' : 'none'
+                                    }]}>
+                                        {'\u2022 ' + getTranslation(translations.labResultsScreen.result, translation) + ": " + firstComponentRenderData.result}
+                                    </Text>
+                                ) : (null)
+                        }
+                        {
                             firstComponentRenderData.labResultStatus ?
                                 (
                                     <Text style={[style.secondaryText, {

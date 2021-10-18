@@ -164,7 +164,7 @@ function createQueryFollowUps(outbreakId, followUpsFilter, userTeams, contactsFi
         query.group = `${aliasForFollowUps}._id`;
     }
 
-    if (get(contactsFilter, 'sort', null) !== null && offset) {
+    if (get(contactsFilter, 'sort', null) !== null && offset && lastElement) {
         query.offset = offset;
     }
 
