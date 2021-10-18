@@ -155,7 +155,7 @@ android {
         targetSdkVersion 30
         multiDexEnabled true
         versionCode 37
-        versionName "1.0.16"
+        versionName "2.39.1"
         ndk {
             abiFilters "armeabi-v7a", "x86", 'arm64-v8a', 'x86_64'
         }
