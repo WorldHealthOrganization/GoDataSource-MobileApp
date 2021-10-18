@@ -56,7 +56,7 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
 
             componentDidUpdate(prevProps) {
                 if (get(prevProps, 'outbreak._id', null) !== get(this.props, 'outbreak._id', null)) {
-                    this.getData(true);
+                    this.setMainFilter(null);
                 }
             }
 
@@ -307,12 +307,17 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                 switch (screenType) {
                     case 'LabResultsScreen':
                         if(!this.props.outbreak?.isContactLabResultsActive){
+                            if (!filter){
+                                filter = {};
+                            }
                             filter.type = [translations.personTypes.cases];
                         }
                 }
                 this.setState(prevState => ({
                     mainFilter: filter,
-                    offset: 0
+                    //This happens in refresh as well
+                    offset: 0,
+                    lastElement: null
                 }), () => this.refresh())
             };
 
