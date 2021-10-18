@@ -406,7 +406,7 @@ class LabResultsSingleScreen extends Component {
     onChangeText = (value, id, objectType) => {
             this.setState(
                 (prevState) => ({
-                    item: Object.assign({}, _.set(prevState.item, id, value)),
+                    item: Object.assign({}, _.set(prevState.item || {}, id, value)),
                     isModified: true
                 }), () => {
                     console.log("onChangeText", id, " ", value, " ", this.state.item);
@@ -416,11 +416,11 @@ class LabResultsSingleScreen extends Component {
     onChangeDate = (value, id, objectType) => {
             this.setState(
                 (prevState) => ({
-                    item: Object.assign({},_.set(prevState.item,id,new Date(value).toISOString())),
+                    item: Object.assign({},_.set(prevState.item || {},id,new Date(value).toISOString())),
                     isModified: true
                 })
                 , () => {
-                    console.log("onChangeDate", id, " ", value, " ", this.state.item);
+                    console.log("onChangeDate", id, value, this.state.item);
                 }
             )
     };
@@ -440,7 +440,7 @@ class LabResultsSingleScreen extends Component {
         console.log("onChangeDropDown: ", value, id, objectType);
                 this.setState(
                     (prevState) => ({
-                        item: Object.assign({}, _.set(prevState.item,id,value && value.value !== undefined ? value.value : value)),
+                        item: Object.assign({}, _.set(prevState.item || {},id,value && value.value !== undefined ? value.value : value)),
                         isModified: true
                     }), () => {
                         console.log("onChangeDropDown", id, " ", value, " ", this.state.item);
