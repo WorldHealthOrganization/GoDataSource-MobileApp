@@ -164,7 +164,7 @@ class PersonListItem extends Component {
         }
         if(type === 'LabResult'){
             const labResultData =  get(itemToRender, 'labResultData', null);
-            console.log("Whats the lab result data", labResultData);
+            returnValues.result = labResultData.result ? getTranslation(labResultData.result, this.props.translation) : null;
             returnValues.dateSampleTaken = labResultData.dateSampleTaken ? moment(labResultData.dateSampleTaken).format('YYYY-MM-DD') : undefined;
             returnValues.dateOfResult = labResultData.dateOfResult ? moment(labResultData.dateOfResult).format('YYYY-MM-DD') : undefined;
             returnValues.labName = labResultData.labName;
