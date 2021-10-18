@@ -90,7 +90,6 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                         mainFilter: this.state.mainFilter,
                         followUpFilter: this.state.followUpFilter
                     });
-                console.log("Important props", props.data?.length, props.dataCount );
                 return (
                     <WrappedComponent
                         setSearchText={this.setSearchText}

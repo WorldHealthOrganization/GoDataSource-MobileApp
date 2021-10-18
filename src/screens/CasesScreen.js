@@ -88,7 +88,6 @@ class CasesScreen extends Component {
     // and can slow down the app
     render() {
         let {mainFilter} = this.props;
-        console.log("Outbreak prop important", this.props.outbreak?._id, this.props.data?.length, this.props.dataCount);
 
         let filterNumbers = 0;
         if (mainFilter) {
