@@ -17,7 +17,7 @@ import {createDate, handleResponseFromRNFetchBlob} from './../utils/functions';
 import {checkArrayAndLength, retriablePromise} from "../utils/typeCheckingFunctions";
 import constants from './constants';
 
-export function getDatabaseSnapshotRequestNew(hubConfig, lastSyncDate, dispatch, languagePacks) {
+export function getDatabaseSnapshotRequestNew(hubConfig, lastSyncDate, dispatch, languagePacks, noDateFilter) {
     // hubConfiguration = {url: databaseName, clientId: JSON.stringify({name, url, clientId, clientSecret, encryptedData}), clientSecret: databasePass}
     let hubConfiguration = JSON.parse(hubConfig.clientId);
 
@@ -26,7 +26,7 @@ export function getDatabaseSnapshotRequestNew(hubConfig, lastSyncDate, dispatch,
 
     let filter = {};
 
-    if (lastSyncDate) {
+    if (lastSyncDate && !noDateFilter) {
         filter.where = {
             fromDate: createDate(lastSyncDate)
         }
@@ -155,8 +155,6 @@ export function postDatabaseSnapshotRequest(internetCredentials, path) {
                 {name: 'generatePersonVisualId', data: `${true}`}
             ], '0', '6000000')
             .then((res) => {
-                console.log('SYNCLAB Finished sending the data to the server: ', res, res.info());
-                console.log("SYNCLAB json server response", res.json());
                 let status = res.info().status;
                 if(status === 200) {
                     //     console.log("Got database");

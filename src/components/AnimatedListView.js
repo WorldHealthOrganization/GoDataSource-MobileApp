@@ -357,7 +357,6 @@ class AnimatedListView extends Component {
     };
 
     listEmptyComponent = () => {
-        console.log("What's the prop", this.props.dataType);
         let message = null;
         switch(this.props.dataType) {
             case 'FollowUp':

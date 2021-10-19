@@ -3,9 +3,7 @@ import translations from './../../utils/translations';
 import get from 'lodash/get';
 import {checkArrayAndLength} from './../../utils/typeCheckingFunctions';
 
-const databaseTables = ['person', 'followUp', 'relationship', 'languageToken',
-    'labResult'
-];
+const databaseTables = ['person', 'followUp', 'relationship', 'languageToken', 'labResult'];
 const tableStructure = {
     person: [
         {
