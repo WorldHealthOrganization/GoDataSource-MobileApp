@@ -514,6 +514,7 @@ export function sendDatabaseToServer () {
         let internetCredentialsGlobal = null;
         let lastSyncDateGlobal = null;
         let skipZip = true;
+        let noDateFilter = false;
         // Get activeDatabase
         Promise.resolve()
             .then(() => AsyncStorage.getItem('activeDatabase'))
@@ -538,6 +539,7 @@ export function sendDatabaseToServer () {
                         statusArray.push(status);
                     } catch (errorGetDatabaseFromFile) {
                         console.log('ErrorGetDatabaseFromFile: ', errorGetDatabaseFromFile);
+                        noDateFilter = true;
                         dispatch(setSyncState({
                             id: 'createFile',
                             status: 'Error',
@@ -553,6 +555,7 @@ export function sendDatabaseToServer () {
                         statusArray.push(status);
                     } catch(errorGetSQLite) {
                         console.log('ErrorGetDatabaseFromFile: ', errorGetSQLite);
+                        noDateFilter = true;
                         dispatch(setSyncState({
                             id: 'createFile',
                             status: 'Error',
@@ -587,7 +590,6 @@ export function sendDatabaseToServer () {
                 }
             })
             .then((zipPath) => {
-                console.log("SYNCLAB zipPath", zipPath);
                 let promise = zipPath ? postDatabaseSnapshotRequest(internetCredentialsGlobal, zipPath) : Promise.resolve();
                 if(zipPath) {
                     dispatch(setSyncState({id: 'createFile', status: 'Success'}));
@@ -599,34 +601,32 @@ export function sendDatabaseToServer () {
             .then((resultPostDatabase) => {
                 if (resultPostDatabase && !resultPostDatabase.includes('Finished')) {
                     dispatch(setSyncState({id: 'sendData', status: 'Error', error: JSON.stringify(resultPostDatabase)}));
-                } else {
-                    if (!skipZip) {
-                        dispatch(setSyncState({id: 'sendData', status: 'Success'}));
-                    }
-                    getDatabaseSnapshotRequestNew(
-                        {
-                            url: internetCredentialsGlobal.server ? internetCredentialsGlobal.server : internetCredentialsGlobal.service,
+                    noDateFilter = true;
+                } else if (!skipZip) {
+                    dispatch(setSyncState({id: 'sendData', status: 'Success'}));
+                }
+                getDatabaseSnapshotRequestNew(
+                    {
+                        url: internetCredentialsGlobal.server ? internetCredentialsGlobal.server : internetCredentialsGlobal.service,
+                        clientId: internetCredentialsGlobal.username,
+                        clientSecret: internetCredentialsGlobal.password
+                    },
+                    lastSyncDateGlobal,
+                    dispatch,null, noDateFilter)
+                    .then((databasePath) => {
+                        dispatch(processFilesForSyncNew(null, databasePath, {
+                            url: Platform.OS === 'ios' ? internetCredentialsGlobal.server : internetCredentialsGlobal.service,
                             clientId: internetCredentialsGlobal.username,
                             clientSecret: internetCredentialsGlobal.password
-                        },
-                        lastSyncDateGlobal,
-                        dispatch)
-                        .then((databasePath) => {
-                            console.log("")
-                            dispatch(processFilesForSyncNew(null, databasePath, {
-                                url: Platform.OS === 'ios' ? internetCredentialsGlobal.server : internetCredentialsGlobal.service,
-                                clientId: internetCredentialsGlobal.username,
-                                clientSecret: internetCredentialsGlobal.password
-                            }, null, true, false, null));
-                        })
-                        .catch((errorGetDatabase) => {
-                            if (errorGetDatabase === 'No data to export') {
-                                dispatch(setSyncState({id: 'getDataFromServer', status: 'No data to export'}));
-                            } else {
-                                dispatch(setSyncState({id: 'getDataFromServer', status: 'Error', error: JSON.stringify(errorGetDatabase)}));
-                            }
-                        })
-                }
+                        }, null, true, false, null));
+                    })
+                    .catch((errorGetDatabase) => {
+                        if (errorGetDatabase === 'No data to export') {
+                            dispatch(setSyncState({id: 'getDataFromServer', status: 'No data to export'}));
+                        } else {
+                            dispatch(setSyncState({id: 'getDataFromServer', status: 'Error', error: JSON.stringify(errorGetDatabase)}));
+                        }
+                    })
             })
             .catch((errorSendDatabase) => {
                 dispatch(setSyncState({id: 'sendData', status: 'Error', error: JSON.stringify(errorSendDatabase)}));
