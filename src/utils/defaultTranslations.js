@@ -15,23 +15,20 @@ export default {
     'LNG_LAB_RESULT_FIELD_LABEL_SAMPLE_LAB_ID': "Sample lab ID",
     'LNG_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_DELIVERED': "Sample delivered to lab",
     'LNG_LAB_RESULT_FIELD_LABEL_NOTES': "Notes",
-    //TODO: Needs new translation
-    'Variant / Strain': 'Variant / Strain',
-    'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_HAS_SEQUENCE': "Has sequence?",
+    'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE': 'Variant / Strain',
+    'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_HAS_SEQUENCE': "Has variant / strain?",
     'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_NO_SEQUENCE_REASON': "Reason",
-    //TODO: Different translation than from web
-    'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_DATE_SAMPLE_SENT': "Date sample sent for sequencing",
+    'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_DATE_SAMPLE_SENT': "Date sample sent for determining variant / strain",
     'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_LAB': "Laboratory",
-    //TODO: Different translation than from web
-    'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_DATE_RESULT': "Sequencing result date",
-    //TODO: Different translation than from web
-    'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_RESULT': "Sequencing result",
+    'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_DATE_RESULT': "Variant / Strain result date",
+    'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_RESULT': "Variant / Strain result",
     'LNG_LAB_RESULT_FIELD_LABEL_DATE_TESTING': "Sample tested",
     'LNG_LAB_RESULT_FIELD_LABEL_SAMPLE_TYPE': "Sample type",
     'LNG_LAB_RESULT_FIELD_LABEL_TEST_TYPE': "Test type",
     'LNG_LAB_RESULT_FIELD_LABEL_TESTED_FOR': "Tested for",
     'LNG_LAB_RESULT_FIELD_LABEL_QUANTITATIVE_RESULT': "Quantitative result",
     'LNG_PAGE_LIST_ENTITY_LAB_RESULTS_ACTION_MODIFY_LAB_RESULT': "Modify lab result",
+    //TODO: needs change - to lab resultS
     'LNG_PAGE_LIST_ENTITY_LAB_RESULTS_ACTION_VIEW_LAB_RESULT': "View lab result",
     'LNG_DIALOG_CONFIRM_DELETE_LAB_RESULT': "Are you sure you want to delete this lab result?",
     'LNG_PAGE_LIST_ENTITY_LAB_RESULTS_ACTION_DELETE_LAB_RESULT': "Delete lab result",

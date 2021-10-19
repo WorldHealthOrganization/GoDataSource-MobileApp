@@ -269,7 +269,7 @@ const labResultsSingleScreen = {
     result: 'LNG_LAB_RESULT_FIELD_LABEL_RESULT',
     status: 'LNG_LAB_RESULT_FIELD_LABEL_STATUS',
     notes: 'LNG_LAB_RESULT_FIELD_LABEL_NOTES',
-    variantStrain: 'Variant / Strain',
+    variantStrain: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE',
     hasVariantStrain: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_HAS_SEQUENCE',
     sequenceReason: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_NO_SEQUENCE_REASON',
     dateSampleSentSeq: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_DATE_SAMPLE_SENT',
