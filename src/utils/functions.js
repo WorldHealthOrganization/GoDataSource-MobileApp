@@ -68,7 +68,7 @@ export function handleResponseFromRNFetchBlob(response) {
                 })
                 .catch((errorParseError) => {
                     if (status) {
-                        reject ({message: `The mobile received the status ${status} from the API but the error could not be parsed`});
+                        reject({message: `The mobile received the status ${status} from the API but the error could not be parsed`});
                     }
                     reject({message: typeof errorParseError === 'string' ? errorParseError : JSON.stringify(errorParseError)});
                 })
@@ -299,7 +299,6 @@ export function computeFullName(person) {
 }
 
 export function unzipFile(source, dest, password, clientCredentials) {
-    console.log('Stuff: ', source, dest, password, clientCredentials);
     return function(dispatch) {
         return new Promise((resolve, reject) => {
             RNFetchBlobFS.exists(source)
@@ -307,7 +306,6 @@ export function unzipFile(source, dest, password, clientCredentials) {
                     if (exists) {
                         unzip(source, dest, 'UTF-8')
                             .then((path) => {
-                                console.log(`unzip completed at ${path}`);
                                 // Delete the zip file after unzipping
                                 deleteFile(source, true)
                                     .then(() => {
@@ -387,7 +385,6 @@ export function processFilePouch(path, type, totalNumberOfFiles, dispatch, isFir
         .then(() => processFileGeneral(path, fileName, unzipLocation, hubConfig, encryptedData))
         .then((data) => {
             if (data) {
-                console.log("Lab Pouch data",fileName, data?.length);
                 let promiseArray = [];
                 if (isFirstTime && forceBulk) {
                     promiseArray.push(processBulkDocs(data, type));
@@ -502,15 +499,12 @@ export function getDataFromDatabaseFromFileSql (table, lastSyncDate, password) {
         }
     };
 
-    console.log("SYNCLAB query", query);
     return executeQuery(query)
         .then((resultQuery) => resultQuery.map((e) => e.data))
         .then((response) => {
-            console.log("SYNCLAB get data from file SQL", response);
             return handleDataForZip(response, table, password, true);
         })
         .catch((errorGetDataFromDatabaseFromFileSql) => {
-            console.log('getDataFromDatabaseFromFileSql: ', errorGetDataFromDatabaseFromFileSql);
             return Promise.reject(errorGetDataFromDatabaseFromFileSql)
         })
 }
