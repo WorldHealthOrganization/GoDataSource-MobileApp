@@ -49,6 +49,8 @@
 			</dict>
 		</dict>
 	</dict>
+	<key>NSAppleMusicUsageDescription</key>
+	<string>Some description</string>
 	<key>NSCameraUsageDescription</key>
 	<string>Camera is needed in order to scan QR code</string>
 	<key>NSFaceIDUsageDescription</key>

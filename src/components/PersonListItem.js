@@ -158,7 +158,6 @@ class PersonListItem extends Component {
             returnValues.telephoneNumbers = person.telephoneNumbers[translations.usersScreen.primaryPhone];
         }
         //Classification
-        console.log("What's a person", person, person?.classification);
         if (type === 'LabResult' && person && person.classification){
             returnValues.classification = person.classification ? getTranslation(person.classification, this.props.translation) : null;
         }
