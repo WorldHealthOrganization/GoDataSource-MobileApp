@@ -159,7 +159,9 @@ export function computeCommonData(storeUserBool, user, skipLoad, outbreakId) {
         try {
             if(!outbreakId) {
                 const storageOutbreakId = await AsyncStorage.getItem("outbreakId");
-                if(storageOutbreakId) {outbreakId = storageOutbreakId}
+                console.log("Storage outbreak Id", storageOutbreakId);
+                console.log("User outbreak Id", user.activeOutbreakId);
+                if(storageOutbreakId  && !storeUserBool) {outbreakId = storageOutbreakId}
                 else if(user.activeOutbreakId){outbreakId = user.activeOutbreakId}
                 else {
                     //TODO: in case there is no outbreak, select first from list

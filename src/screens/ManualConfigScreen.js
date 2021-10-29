@@ -45,7 +45,6 @@ class ManualConfigScreen extends PureComponent {
     userEmailRef = React.createRef();
 
     constructor(props) {
-        console.log("Manual conf screen");
         super(props);
         this.state = {
             name: appConfig.env === 'development' ? config.whocdCredentials.name : '',
@@ -74,7 +73,6 @@ class ManualConfigScreen extends PureComponent {
 
     // Please add here the react lifecycle methods that you need
     componentDidMount = async () => {
-        console.log("Manual conf screen");
         // Get all hubs urls for the check
         // To get them, first get all databases names and ids from AsyncStorage, then for each url, get its internet credentials and map them to an array of urls
         try {
@@ -100,19 +98,7 @@ class ManualConfigScreen extends PureComponent {
                 }
 
                 if (this.props && this.props.QRCodeInfo && this.props.QRCodeInfo.data) {
-                    //TODO map this.props.QRCodeInfo info to props
-                    // console.log('Here have the QRCodeInfo: ', JSON.parse(this.props.QRCodeInfo.data));
-                    let QRCodeData = JSON.parse(this.props.QRCodeInfo.data);
-                    this.setState({
-                        url: QRCodeData.url || '',
-                        clientId: QRCodeData.clientId || '',
-                        clientSecret: QRCodeData.clientSecret || '',
-                        allUrls
-                    },(state)=>{
-                        this.urlRef.current.setValue(this.state.url);
-                        this.clientIdRef.current.setValue(this.state.clientId);
-                        this.clientSecretRef.current.setValue(this.state.clientSecret);
-                    })
+                    this.parseQRCodeProp();
                 } else {
                     if (this.props && this.props.activeDatabase && !this.props.isNewHub) {
                         try{
@@ -154,41 +140,19 @@ class ManualConfigScreen extends PureComponent {
                 }
             } else {
                 console.log('No database found');
-                if (this.props && this.props.QRCodeInfo && this.props.QRCodeInfo.data) {
-                    //TODO map this.props.QRCodeInfo info to props
-                    // console.log('Here have the QRCodeInfo: ', JSON.parse(this.props.QRCodeInfo.data));
-                    console.log('TestQRCode has qr code data', this.props.QRCodeInfo);
-                    let QRCodeData = JSON.parse(this.props.QRCodeInfo.data);
-                    this.setState({
-                        url: QRCodeData.url || '',
-                        clientId: QRCodeData.clientId || '',
-                        clientSecret: QRCodeData.clientSecret || ''
-                    }, ()=>{
-                        this.urlRef.current.setValue(this.state.url);
-                        this.clientIdRef.current.setValue(this.state.clientId);
-                        this.clientSecretRef.current.setValue(this.state.clientSecret);
-                    })
-                }
+                this.parseQRCodeProp();
             }
         } catch (errorGetAllDatabases) {
             console.log('Error get all databases: ', errorGetAllDatabases);
-            if (this.props && this.props.QRCodeInfo && this.props.QRCodeInfo.data) {
-                //TODO map this.props.QRCodeInfo info to props
-                // console.log('Here have the QRCodeInfo: ', JSON.parse(this.props.QRCodeInfo.data));
-                // console.log('TestQRCode has qr code data');
-                let QRCodeData = JSON.parse(this.props.QRCodeInfo.data);
-                this.setState({
-                    url: QRCodeData.url || '',
-                    clientId: QRCodeData.clientId || '',
-                    clientSecret: QRCodeData.clientSecret || ''
-                }, ()=>{
-                    this.urlRef.current.setValue(this.state.url);
-                    this.clientIdRef.current.setValue(this.state.clientId);
-                    this.clientSecretRef.current.setValue(this.state.clientSecret);
-                })
-            }
+            this.parseQRCodeProp();
         }
     };
+    
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        if (this.props.QRCodeInfo?.data !== prevProps.QRCodeInfo?.data){
+            this.parseQRCodeProp();
+        }
+    }
 
     componentWillUnmount() {
         this.props.setSyncState(null);
@@ -463,6 +427,25 @@ class ManualConfigScreen extends PureComponent {
                 </KeyboardAwareScrollView>
             </View>
         );
+    }
+    
+    parseQRCodeProp = () =>{
+        if (this.props && this.props.QRCodeInfo && this.props.QRCodeInfo.data) {
+            console.log("Parse QR code data", this.props.QRCodeInfo.data);
+            //TODO map this.props.QRCodeInfo info to props
+            // console.log('Here have the QRCodeInfo: ', JSON.parse(this.props.QRCodeInfo.data));
+            // console.log('TestQRCode has qr code data');
+            let QRCodeData = JSON.parse(this.props.QRCodeInfo.data);
+            this.setState({
+                url: QRCodeData.url || '',
+                clientId: QRCodeData.clientId || '',
+                clientSecret: QRCodeData.clientSecret || ''
+            }, ()=>{
+                this.urlRef.current.setValue(this.state.url);
+                this.clientIdRef.current.setValue(this.state.clientId);
+                this.clientSecretRef.current.setValue(this.state.clientSecret);
+            })
+        }
     }
 
     // Please write here all the methods that are not react native lifecycle methods

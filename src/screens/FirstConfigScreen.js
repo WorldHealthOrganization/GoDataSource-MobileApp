@@ -13,6 +13,7 @@ import styles from './../styles';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {loginUser} from './../actions/user';
+import { setSyncState } from './../actions/app';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import Ripple from 'react-native-material-ripple';
 import lodashGet from 'lodash/get';
@@ -117,6 +118,7 @@ class FirstConfigScreen extends Component {
     };
 
     handlePressScanQR = () => {
+        console.log("Press scan QR", this.props.allowBack, this.props.isMultipleHub);
         Navigation.showModal(createStackFromComponent({
             name: 'QRScanScreen',
             passProps: {
@@ -159,6 +161,7 @@ class FirstConfigScreen extends Component {
                 let QRCodeInfoData = JSON.parse(QRCodeInfo.data);
                 if (QRCodeInfoData && QRCodeInfoData.url && QRCodeInfoData.clientId && QRCodeInfoData.clientSecret) {
                     // this.props.navigator.dismissAllModals();
+                    this.props.setSyncState(null);
                     setTimeout(() => {
                         Navigation.push(this.props.componentId,{
                             component:{
@@ -262,7 +265,8 @@ function mapStateToProps(state) {
 
 function matchDispatchToProps(dispatch) {
     return bindActionCreators({
-        loginUser
+        loginUser,
+        setSyncState
     }, dispatch);
 }
 
