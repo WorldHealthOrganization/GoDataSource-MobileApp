@@ -150,11 +150,8 @@ export function getPersonsByName(outbreakId, search, type) {
         ]
     };
     // if type is contacts, search both cases and events
-    if (type === 'Contact') {
-        condition['type'] = {'$ne': translations.personTypes.contacts};
-    }
-    if (type === 'Case') {
-        condition['type'] = translations.personTypes.contacts;
+    if (type === 'Contact' || type === 'Case' || type === 'Event') {
+        condition['type'] = {'$in': [translations.personTypes.events,translations.personTypes.cases ]};
     }
     if (type === 'ContactOfContact') {
         condition['type'] = translations.personTypes.contacts;

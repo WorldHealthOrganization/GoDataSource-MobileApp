@@ -65,12 +65,12 @@ export function createDesignDoc(name, mapFunction) {
     return ddoc;
 }
 
-export function getDatabase(collectionName) {
+export function getDatabase(collectionName, noCache) {
     return new Promise((resolve, reject) => {
         // Define the design documents that tells the database to build indexes in order to query
 
         // Check first if the database is cached
-        if (databaseCache && databaseCache.name.includes(collectionName)) {
+        if (!noCache && databaseCache && databaseCache.name.includes(collectionName)) {
             return resolve(databaseCache);
         }
         // After that, check if there is already a database with the name and return that
