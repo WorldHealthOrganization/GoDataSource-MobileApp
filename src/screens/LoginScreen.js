@@ -34,8 +34,8 @@ class LoginScreen extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            email: appConfig.env === 'development' ? 'florin.popa@clarisoft.com' : '',
-            password: appConfig.env === 'development' ? '112233445566' : '',
+            email: appConfig.env === 'development' ? 'andrei.postelnicu@clarisoft.com' : '',
+            password: appConfig.env === 'development' ? '123123123123' : '',
             hasAlert: false
         };
         // Bind here methods, or at least don't declare methods in the render method

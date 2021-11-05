@@ -135,6 +135,9 @@ export default {
     'LNG_ISOLATION_ADD_ANOTHER_ISOLATION_MESSAGE': 'Add another isolation date range',
     'LNG_DOCUMENT_ADD_NEW_DOCUMENT_MESSAGE': 'Add document',
     'LNG_DOCUMENT_ADD_ANOTHER_DOCUMENT_MESSAGE': 'Add another document',
+    'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_DELETE_CONTACT_OF_CONTACT': 'Delete contact of contact',
+
+    'LNG_PAGE_LIST_CASES_ACTION_DELETE_CASE': 'Delete case',
 
     'LNG_CASE_FIELD_LABEL_FIRST_NAME': 'First name',
     'LNG_CASE_FIELD_LABEL_MIDDLE_NAME': 'Middle name',
