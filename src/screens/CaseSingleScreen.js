@@ -314,7 +314,9 @@ class CaseSingleScreen extends Component {
                                         [
                                             constants.PERMISSIONS_LAB_RESULT.labResultAll,
                                             constants.PERMISSIONS_LAB_RESULT.labResultCreate,
-                                            constants.PERMISSIONS_LAB_RESULT.labResultList
+                                            constants.PERMISSIONS_LAB_RESULT.labResultList,
+                                            constants.PERMISSIONS_CASE.caseDelete,
+                                            constants.PERMISSIONS_CASE.caseAll
                                         ]
                                     )) && this.props.case && !this.props.isNew) ? (
                                         <View style={{marginRight: calculateDimension(16, false, this.props.screenSize)}}>
@@ -335,6 +337,17 @@ class CaseSingleScreen extends Component {
                                                     permissionsList={[
                                                         constants.PERMISSIONS_LAB_RESULT.labResultAll,
                                                         constants.PERMISSIONS_LAB_RESULT.labResultCreate
+                                                    ]}
+                                                />
+                                                <PermissionComponent
+                                                    render={() => (
+                                                        <MenuItem onPress={this.handleOnPressDelete}>
+                                                            {getTranslation(translations.caseSingleScreen.deleteCase, this.props.translation)}
+                                                        </MenuItem>
+                                                    )}
+                                                    permissionsList={[
+                                                        constants.PERMISSIONS_CASE.caseDelete,
+                                                        constants.PERMISSIONS_CASE.caseAll
                                                     ]}
                                                 />
                                                 <PermissionComponent
@@ -384,6 +397,38 @@ class CaseSingleScreen extends Component {
                 },
             },
         });
+    };
+
+    handleOnPressDelete = () => {
+        // console.log("### handleOnPressDelete");
+        Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.labResultsSingleScreen.deleteAlertMessage, this.props.translation), [
+            {
+                text: getTranslation(translations.alertMessages.yesButtonLabel, this.props.translation),
+                onPress: () => {
+                    this.hideMenu();
+                    this.setState({
+                        deletePressed: true
+                    }, () => {
+                        // console.log("### existing filters: ", this.props.filter);
+                        // this.props.deleteLabResult(this.props.outbreak.id, this.state.contact.id, this.state.item.id, this.props.filter, this.props.user.token);
+                        this.setState(prevState => ({
+                            case: Object.assign({}, prevState.case, {
+                                deleted: true,
+                                deletedAt: createDate().toISOString()
+                            })
+                        }), () => {
+                            this.handleOnPressSave();
+                        })
+                    })
+                }
+            },
+            {
+                text: getTranslation(translations.alertMessages.cancelButtonLabel, this.props.translation),
+                onPress: () => {
+                    this.hideMenu();
+                }
+            }
+        ])
     };
 
     //Index change for TabBar
@@ -1472,6 +1517,9 @@ class CaseSingleScreen extends Component {
     };
     checkRequiredFields = () => {
         let requiredFields = [];
+        if(this.state.case?.deleted){
+            return [];
+        }
         return requiredFields.concat(this.checkRequiredFieldsPersonalInfo(), this.checkRequiredFieldsAddresses(), this.checkRequiredFieldsInfection(), this.checkRequiredFieldsCaseInvestigationQuestionnaire());
         // return this.checkRequiredFieldsPersonalInfo() && this.checkRequiredFieldsAddresses() && this.checkRequiredFieldsInfection() && this.checkRequiredFieldsCaseInvestigationQuestionnaire()
     };

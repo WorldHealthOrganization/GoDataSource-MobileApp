@@ -2422,7 +2422,7 @@ const whocdCredentials = {
     hubUrl: 'http://whocd.clarisoft.com/api',
     clientId: 'test',
     clientSecret: 'test',
-    userEmail: 'florin.popa@clarisoft.com',
+    userEmail: 'andrei.postelnicu@clarisoft.com',
     encryptedConnection: false,
     numberOfData: 5000
 };

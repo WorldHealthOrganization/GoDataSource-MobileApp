@@ -45,6 +45,8 @@ import {checkValidEmails} from './../utils/formValidators';
 import {validateRequiredFields} from "../utils/formValidators";
 import {Navigation} from "react-native-navigation";
 import {setDisableOutbreakChange} from "../actions/outbreak";
+import Menu, {MenuItem} from "react-native-material-menu";
+import PermissionComponent from "../components/PermissionComponent";
 
 const initialLayout = {
     height: 0,
@@ -280,6 +282,38 @@ class ContactsOfContactsSingleScreen extends Component {
                                         <Icon name="help" color={'white'} size={15} />
                                     </Ripple>
                                 </ElevatedView>
+                                {
+                                    (checkArrayAndLength(_.intersection(
+                                        _.get(this.props, 'role', []),
+                                        [
+                                            constants.PERMISSIONS_CONTACT.contactDeleteContactOfContact,
+                                            constants.PERMISSIONS_CONTACT.contactAll
+                                        ]
+                                    )) && this.props.contact && !this.props.isNew) ? (
+                                        <View style={{marginRight: calculateDimension(16, false, this.props.screenSize)}}>
+                                            <Menu
+                                                ref="menuRef"
+                                                button={
+                                                    <Ripple onPress={this.showMenu} hitSlop={{left: 10, right: 10, top: 10, bottom: 10}} >
+                                                        <Icon name="more-vert" />
+                                                    </Ripple>
+                                                }
+                                            >
+                                                <PermissionComponent
+                                                    render={() => (
+                                                        <MenuItem onPress={this.handleOnPressDelete}>
+                                                            {getTranslation(translations.contactsOfContactsScreen.deleteCoC, this.props.translation)}
+                                                        </MenuItem>
+                                                    )}
+                                                    permissionsList={[
+                                                        constants.PERMISSIONS_CONTACT.contactDeleteContactOfContact,
+                                                        constants.PERMISSIONS_CONTACT.contactAll
+                                                    ]}
+                                                />
+                                            </Menu>
+                                        </View>
+                                    ) : null
+                                }
                             </View>
                         </View>
                     }
@@ -315,6 +349,38 @@ class ContactsOfContactsSingleScreen extends Component {
                 },
             },
         });
+    };
+
+    handleOnPressDelete = () => {
+        // console.log("### handleOnPressDelete");
+        Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.labResultsSingleScreen.deleteAlertMessage, this.props.translation), [
+            {
+                text: getTranslation(translations.alertMessages.yesButtonLabel, this.props.translation),
+                onPress: () => {
+                    this.hideMenu();
+                    this.setState({
+                        deletePressed: true
+                    }, () => {
+                        // console.log("### existing filters: ", this.props.filter);
+                        // this.props.deleteLabResult(this.props.outbreak.id, this.state.contact.id, this.state.item.id, this.props.filter, this.props.user.token);
+                        this.setState(prevState => ({
+                            contact: Object.assign({}, prevState.contact, {
+                                deleted: true,
+                                deletedAt: createDate().toISOString()
+                            })
+                        }), () => {
+                            this.handleOnPressSave();
+                        })
+                    })
+                }
+            },
+            {
+                text: getTranslation(translations.alertMessages.cancelButtonLabel, this.props.translation),
+                onPress: () => {
+                    this.hideMenu();
+                }
+            }
+        ])
     };
 
     handleOnIndexChange = _.throttle( (index) => {

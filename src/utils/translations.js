@@ -172,6 +172,8 @@ const caseSingleScreen = {
     isolationLocation: 'LNG_DATE_FIELD_LABEL_LOCATION',
     isolationComments: 'LNG_DATE_FIELD_LABEL_COMMENTS',
 
+    deleteCase: 'LNG_PAGE_LIST_CASES_ACTION_DELETE_CASE'
+
 };
 
 const contactSingleScreen = {
@@ -312,7 +314,8 @@ const contactsScreen = {
 const contactsOfContactsScreen = {
     contactsTitle: 'LNG_CONTACT_OF_CONTACT_LIST_SCREEN_TITLE',
     // editButton: 'LNG_CONTACT_LIST_SCREEN_EDIT_BUTTON',
-    noContacts: 'LNG_CONTACT_OF_CONTACT_LIST_SCREEN_NO_CONTACTS'
+    noContacts: 'LNG_CONTACT_OF_CONTACT_LIST_SCREEN_NO_CONTACTS',
+    deleteCoC: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_DELETE_CONTACT_OF_CONTACT'
 };
 
 const followUpsScreen = {
