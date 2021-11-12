@@ -4,6 +4,7 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
+import DeviceInfo from 'react-native-device-info';
 import {Alert, Platform, StyleSheet, Text, View, ScrollView} from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 import Modal from 'react-native-modal';
@@ -26,7 +27,7 @@ import config from './../utils/config';
 import IntervalPicker from './../components/IntervalPicker';
 import translations from './../utils/translations';
 import {getInternetCredentials, setInternetCredentials, resetInternetCredentials} from 'react-native-keychain';
-import {createDatabase} from './../queries/database';
+import {createDatabase, DATABASE_VERSION} from './../queries/database';
 import SwitchInput from "../components/SwitchInput";
 import {modalStyle} from './../styles/views';
 import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
@@ -769,6 +770,7 @@ class FirstConfigScreen extends Component {
                 let server = Platform.OS === 'ios' ? internetCredentials?.server : internetCredentials?.service;
                 return createDatabase(server, internetCredentials?.password, true);
             })
+            .then(()=> AsyncStorage.setItem('databaseVersioningToken', `${database.id}${DeviceInfo.getVersion()}${DATABASE_VERSION}`))
             .then((newDatabase) => AsyncStorage.setItem('activeDatabase', database.id))
             .then(() => {
                 this.props.saveActiveDatabase(database.id);

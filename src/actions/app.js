@@ -34,7 +34,7 @@ import {
     unzipFile
 } from './../utils/functions';
 import RNFetchBlobFs from 'rn-fetch-blob/fs';
-import {createDatabase, getDatabase} from './../queries/database';
+import {createDatabase, DATABASE_VERSION, getDatabase} from './../queries/database';
 import AsyncStorage from '@react-native-community/async-storage';
 import {getUserById} from './user';
 import get from 'lodash/get';
@@ -46,6 +46,7 @@ import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
 import sqlConstants from './../queries/sqlTools/constants';
 import {initTables} from './../queries/sqlTools/helperMethods';
 import {initIndexes} from "../queries/sqlTools/helperMethods";
+import DeviceInfo from "react-native-device-info";
 
 // Add here only the actions, not also the requests that are executed. For that purpose is the requests directory
 export function changeAppRoot(root) {
@@ -399,6 +400,7 @@ function saveActiveDatabaseAndCleanup(syncSuccessful, hubConfiguration, hubConfi
             } else {
                 let pairArray = [];
                 pairArray.push(['activeDatabase', hubConfiguration.url]);
+                pairArray.push(['databaseVersioningToken', `${hubConfiguration.url}${DeviceInfo.getVersion()}${DATABASE_VERSION}`]);
                 if (!checkArrayAndLength(languagePacks)) {
                     pairArray.push([hubConfiguration.url, createDate(null, null, true).toISOString()]);
                 }
@@ -519,13 +521,19 @@ export function sendDatabaseToServer () {
         Promise.resolve()
             .then(() => AsyncStorage.getItem('activeDatabase'))
             .then((activeDatabase) => {
+                let dbVersionTokenPromise =  AsyncStorage.getItem('databaseVersioningToken');
                 let lastSyncDatePromise = AsyncStorage.getItem(activeDatabase);
                 let internetCredentialsPromise = getInternetCredentials(activeDatabase);
                 let cleanupPromise = deleteFile(constants.FILES_LOCATIONS, true);
 
-                return Promise.all([lastSyncDatePromise, internetCredentialsPromise, Promise.resolve(activeDatabase), cleanupPromise])
+                return Promise.all([dbVersionTokenPromise, lastSyncDatePromise, internetCredentialsPromise, Promise.resolve(activeDatabase), cleanupPromise])
             })
-            .then(async ([lastSyncDate, internetCredentials, activeDatabase, cleanUpResult]) => {
+            .then(async ([dbVersionToken, lastSyncDate, internetCredentials, activeDatabase, cleanUpResult]) => {
+                if(dbVersionToken !== `${activeDatabase}${DeviceInfo.getVersion()}${DATABASE_VERSION}`){
+                    noDateFilter = true;
+                    AsyncStorage.setItem('databaseVersioningToken', `${activeDatabase}${DeviceInfo.getVersion()}${DATABASE_VERSION}`)
+                }
+
                 internetCredentialsGlobal = internetCredentials;
                 lastSyncDateGlobal = lastSyncDate;
                 let statusArray = [];
@@ -611,7 +619,7 @@ export function sendDatabaseToServer () {
                         clientId: internetCredentialsGlobal.username,
                         clientSecret: internetCredentialsGlobal.password
                     },
-                    lastSyncDateGlobal,
+                    noDateFilter ? null : lastSyncDateGlobal,
                     dispatch,null, noDateFilter)
                     .then((databasePath) => {
                         dispatch(processFilesForSyncNew(null, databasePath, {
