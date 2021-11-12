@@ -186,7 +186,8 @@ export function getPersonsByName(outbreakId, search, type) {
                 alias: 'type',
             }
         ],
-        condition: condition
+        condition: condition,
+        sort: {'firstName': 1, 'lastName': 2}
     };
 
     return Promise.resolve()

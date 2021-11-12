@@ -651,7 +651,7 @@ class LabResultsSingleScreen extends Component {
                                     Navigation.setStackRoot(this.props.componentId,
                                         {
                                             component:{
-                                                name: 'ContactsScreen',
+                                                name: this.props.personType === translations.personTypes.cases ? 'CasesScreen' : 'ContactsScreen',
                                                 options:{
                                                     animations:{
                                                         pop: fadeOutAnimation,
