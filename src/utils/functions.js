@@ -293,7 +293,7 @@ export function computeFullName(person) {
         return '';
     }
     if (person.type === translations.personTypes.events) {
-        return person.name;
+        return person.name || person.firstName;
     }
     return (person.firstName || '') + ' ' + (person.lastName || '');
 }
