@@ -374,7 +374,7 @@ export default class App {
                     }
                     // After removing the internet credentials delete everything from AsyncStorage
                     try {
-                        let clearAsyncStorage = await AsyncStorage.multiRemove(['loggedUser', 'databases', 'activeDatabase']);
+                        let clearAsyncStorage = await AsyncStorage.multiRemove(['loggedUser', 'databases', 'activeDatabase', 'databaseVersioningToken']);
                         // Proceed to removing the databases. For this take into consideration the differences between the two platforms
 
                         try {

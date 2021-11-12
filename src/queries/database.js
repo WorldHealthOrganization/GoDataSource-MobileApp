@@ -23,6 +23,8 @@ PouchDB.plugin(SQLiteAdapter);
 PouchDB.plugin(PouchUpsert);
 PouchDB.plugin(PouchFind);
 
+// Change version for manual sync
+export const DATABASE_VERSION = 1;
 
 // PouchDB wrapper over SQLite uses one database per user, so we will store all documents from all the mongo collection to a single database.
 // We will separate the records by adding a new property called type: <collection_name>

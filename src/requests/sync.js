@@ -188,11 +188,14 @@ async function computeHelpItemsAndCategories(hubConfiguration, lastSyncDate) {
         let translations = [];
         let generalRequestUrl = hubConfiguration.url;
         let authorization = `Basic ${base64.encode(`${hubConfiguration.clientId}:${hubConfiguration.clientSecret}`)}`;
-        let filterItems = {
-            updatedAt: {
-                gt: lastSyncDate
-            }
-        };
+        let filterItems;
+        if (lastSyncDate){
+            filterItems = {
+                updatedAt: {
+                    gt: lastSyncDate
+                }
+            };
+        }
         getHelpItemsRequest(`${generalRequestUrl}${constants.helpItems}`, authorization, filterItems, (errorGetItems, resultItems) => {
             if (errorGetItems) {
                 console.log('Error while getting items: ', errorGetItems);
