@@ -233,7 +233,7 @@ const followUpsSingleScreen = {
 
     missingButton: 'LNG_FOLLOW_UPS_SINGLE_SCREEN_ACTION_MISSING',
     deceasedButton: 'LNG_FOLLOW_UPS_SINGLE_SCREEN_ACTION_DECEASE',
-    deleteButton: 'LNG_FOLLOW_UPS_SINGLE_SCREEN_ACTION_DELETE',
+    deleteButton: 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_DELETE_FOLLOW_UP',
     editContactButton: 'LNG_FOLLOW_UPS_SINGLE_SCREEN_ACTION_EDIT_CONTACT',
 
     deleteFollowUpAlertError: 'LNG_DIALOG_ALERT_MESSAGE_ARE_YOU_SURE_YOU_WANT_TO_DELETE_THIS_FOLLOW_UP',
@@ -308,7 +308,8 @@ const contactsScreen = {
     contactsTitle: 'LNG_CONTACT_LIST_SCREEN_TITLE',
     addFollowupsButton: 'LNG_CONTACT_LIST_SCREEN_ADD_FOLLOW_UP_BUTTON',
     editButton: 'LNG_CONTACT_LIST_SCREEN_EDIT_BUTTON',
-    noContacts: 'LNG_CONTACT_LIST_SCREEN_NO_CONTACTS'
+    noContacts: 'LNG_CONTACT_LIST_SCREEN_NO_CONTACTS',
+    delete: 'LNG_CONTACT_SINGLE_SCREEN_DELETE_CONTACT_ACTION'
 };
 
 const contactsOfContactsScreen = {
@@ -355,6 +356,7 @@ const alertMessages = {
     validationErrorLabel: 'LNG_DIALOG_VALIDATION_ERROR_TITLE_LABEL',
     warningLabel: 'LNG_DIALOG_WARNING_TITLE_LABEL',
     saveAnywayLabel: 'LNG_DIALOG_SAVE_ANYWAY_LABEL',
+    areYouSureDelete: 'LNG_DIALOG_CONFIRM_DELETE_ITEM',
 
     //not used with translation
     invalidCredentials: 'Invalid credentials',

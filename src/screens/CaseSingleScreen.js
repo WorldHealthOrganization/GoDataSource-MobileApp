@@ -330,17 +330,6 @@ class CaseSingleScreen extends Component {
                                             >
                                                 <PermissionComponent
                                                     render={() => (
-                                                        <MenuItem onPress={this.handleOnPressAddLabResult}>
-                                                            {getTranslation(translations.labResultsSingleScreen.createLabResult, this.props.translation)}
-                                                        </MenuItem>
-                                                    )}
-                                                    permissionsList={[
-                                                        constants.PERMISSIONS_LAB_RESULT.labResultAll,
-                                                        constants.PERMISSIONS_LAB_RESULT.labResultCreate
-                                                    ]}
-                                                />
-                                                <PermissionComponent
-                                                    render={() => (
                                                         <MenuItem onPress={this.handleOnPressDelete}>
                                                             {getTranslation(translations.caseSingleScreen.deleteCase, this.props.translation)}
                                                         </MenuItem>
@@ -348,6 +337,17 @@ class CaseSingleScreen extends Component {
                                                     permissionsList={[
                                                         constants.PERMISSIONS_CASE.caseDelete,
                                                         constants.PERMISSIONS_CASE.caseAll
+                                                    ]}
+                                                />
+                                                <PermissionComponent
+                                                    render={() => (
+                                                        <MenuItem onPress={this.handleOnPressAddLabResult}>
+                                                            {getTranslation(translations.labResultsSingleScreen.createLabResult, this.props.translation)}
+                                                        </MenuItem>
+                                                    )}
+                                                    permissionsList={[
+                                                        constants.PERMISSIONS_LAB_RESULT.labResultAll,
+                                                        constants.PERMISSIONS_LAB_RESULT.labResultCreate
                                                     ]}
                                                 />
                                                 <PermissionComponent
@@ -401,7 +401,7 @@ class CaseSingleScreen extends Component {
 
     handleOnPressDelete = () => {
         // console.log("### handleOnPressDelete");
-        Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.labResultsSingleScreen.deleteAlertMessage, this.props.translation), [
+        Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.alertMessages.areYouSureDelete, this.props.translation), [
             {
                 text: getTranslation(translations.alertMessages.yesButtonLabel, this.props.translation),
                 onPress: () => {
