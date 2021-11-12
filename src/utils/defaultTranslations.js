@@ -33,6 +33,7 @@ export default {
     'LNG_DIALOG_CONFIRM_DELETE_LAB_RESULT': "Are you sure you want to delete this lab result?",
     'LNG_PAGE_LIST_ENTITY_LAB_RESULTS_ACTION_DELETE_LAB_RESULT': "Delete lab result",
     'LNG_PAGE_CREATE_LAB_RESULT_ACTION_CREATE_LAB_RESULT_BUTTON': "Create lab result",
+    'LNG_DIALOG_CONFIRM_DELETE_ITEM': 'Are you sure you want to delete this item?',
 
     //labResultsFilter
     'LNG_LAB_RESULT_FIELD_LABEL_ENTITY_TYPE': "Person type",
@@ -230,7 +231,7 @@ export default {
     'LNG_FOLLOW_UPS_SINGLE_SCREEN_QUESTIONNAIRE_TAB': 'Questionnaire',
 
     'LNG_FOLLOW_UPS_SINGLE_SCREEN_ACTION_MISSING': 'Missing',
-    'LNG_FOLLOW_UPS_SINGLE_SCREEN_ACTION_DELETE': 'Deleted',
+    'LNG_FOLLOW_UPS_SINGLE_SCREEN_ACTION_DELETE': 'Delete follow-up',
     'LNG_FOLLOW_UPS_SINGLE_SCREEN_ACTION_DECEASE': 'Deceased',
 
     'LNG_FOLLOW_UPS_SINGLE_SCREEN_ACTION_EDIT_CONTACT': 'View contact',

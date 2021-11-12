@@ -333,7 +333,17 @@ class ContactsSingleScreen extends Component {
                                                     </Ripple>
                                                 }
                                             >
-                                                {
+                                                <PermissionComponent
+                                                    render={() => (
+                                                        <MenuItem onPress={this.handleOnPressDelete}>
+                                                            {getTranslation(translations.contactsScreen.delete, this.props.translation)}
+                                                        </MenuItem>
+                                                    )}
+                                                    permissionsList={[
+                                                        constants.PERMISSIONS_CONTACT.contactDelete,
+                                                        constants.PERMISSIONS_CONTACT.contactAll
+                                                    ]}
+                                                />
                                                         <PermissionComponent
                                                             render={() => (
                                                                 <MenuItem onPress={this.handleOnAddFollowUp}>
@@ -345,7 +355,6 @@ class ContactsSingleScreen extends Component {
                                                                 <View style={[style.rippleStyle, {width: 60}]}/>
                                                             )}
                                                         />
-                                                }
                                                 {
                                                     this.props.outbreak?.isContactLabResultsActive && this.props.contact ?
                                                         <>
@@ -478,7 +487,36 @@ class ContactsSingleScreen extends Component {
                 // })
         });
     };
-
+    handleOnPressDelete = () => {
+        Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.alertMessages.areYouSureDelete, this.props.translation), [
+            {
+                text: getTranslation(translations.alertMessages.yesButtonLabel, this.props.translation),
+                onPress: () => {
+                    this.hideMenu();
+                    this.setState({
+                        deletePressed: true
+                    }, () => {
+                        // console.log("### existing filters: ", this.props.filter);
+                        // this.props.deleteLabResult(this.props.outbreak.id, this.state.contact.id, this.state.item.id, this.props.filter, this.props.user.token);
+                        this.setState(prevState => ({
+                            contact: Object.assign({}, prevState.contact, {
+                                deleted: true,
+                                deletedAt: createDate().toISOString()
+                            })
+                        }), () => {
+                            this.handleOnPressSave();
+                        })
+                    })
+                }
+            },
+            {
+                text: getTranslation(translations.alertMessages.cancelButtonLabel, this.props.translation),
+                onPress: () => {
+                    this.hideMenu();
+                }
+            }
+        ])
+    };
     handlePressNavbarButton = () => {
         Navigation.mergeOptions(this.props.componentId, {
             sideMenu: {

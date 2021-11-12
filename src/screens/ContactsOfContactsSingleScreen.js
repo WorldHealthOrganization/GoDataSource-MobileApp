@@ -353,7 +353,7 @@ class ContactsOfContactsSingleScreen extends Component {
 
     handleOnPressDelete = () => {
         // console.log("### handleOnPressDelete");
-        Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.labResultsSingleScreen.deleteAlertMessage, this.props.translation), [
+        Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.alertMessages.areYouSureDelete, this.props.translation), [
             {
                 text: getTranslation(translations.alertMessages.yesButtonLabel, this.props.translation),
                 onPress: () => {
